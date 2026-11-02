@@ -2,7 +2,7 @@
 
 ```toml
 feature = "spec-tokens"
-title = "Seven joins that resolve a live spec's leg names, witness paths and line citations, refuse a bar invocation as an observation, owe a guarded leg its name, refuse a dossier claim the map cannot hold, and hold a hands-off edge to the sibling it names"
+title = "The joins that resolve a live spec's leg names, witness paths and line citations, refuse a bar invocation as an observation, owe a guarded leg its name, refuse a dossier claim the map cannot hold, and hold a hands-off edge to the sibling it names"
 status = "shipped"
 streams = ["tooling"]
 decisions = []

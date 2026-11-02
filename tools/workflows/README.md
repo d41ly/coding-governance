@@ -292,8 +292,9 @@ trust boundary is not one to review light: the `security` lens is one of the two
 
 Every finding carries `lens`, the key of the lens the harness dispatched, never the label the agent
 echoed back, and every finding line in a skeptic prompt, the synthesis prompt and the run log names
-it as `lens=<key>`. On a spec subject a complete return also carries `addresses`, one
-`{ids, severity, specs}` per BLOCKER or HIGH item. Every return carries five fields beside the counts:
+it as `lens=<key>`. On a spec subject under a declared `disposal` a complete return also carries
+`addresses`, one `{ids, severity, specs}` per BLOCKER or HIGH item; with no `disposal` that list is
+empty and an item owes no `specs`. Every return carries five fields beside the counts:
 
 - `shape` — one record line, also logged, in this fixed grammar:
   `review-shape kind=<diff-review|spec-audit> round=<n> intensity=<full|light> at=<find|verify|synth> raw=<n|-> confirmed=<n|-> refuted=<n|-> unverified=<n|-> blocker=<n|-> high=<n|-> medium=<n|-> low=<n|-> agents=<n> out-tokens=<n|unknown>`.

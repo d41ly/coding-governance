@@ -1628,15 +1628,17 @@ def derive_past_pin_ids(units: list, records: list, root: str) -> list:
     A unit every one of whose revisions past the pin is an audit's own fold is left out, by the
     predicate the deviation join asks, `design_lib.check_audit_fold` (TOOL-dFoldedAudit-6 S3): each
     such revision holds a §9 entry citing, by file stem, a `spec-audit` record of this build that names
-    the unit. `root` is what a record's path joins to, because it is repo-relative and a unit's is
-    absolute.
+    the unit. It cites only from `reviews/`, the population the join cites from (TOOL-dFoldedAudit-15
+    S26), and every record's pins still count. `root` is what a record's path joins to, because it is
+    repo-relative and a unit's is absolute.
     """
     top: dict = {}
     audits = []
     for r in records:
         if r.get("kind") != "spec-audit":
             continue
-        audits.append(r["path"])
+        if "/reviews/" in r["path"]:
+            audits.append(r["path"])
         for i, n in (r.get("pins") or {}).items():
             top[i] = max(top.get(i, 0), n)
     return [f"{u['id']}@rev-{top[u['id']]}" for u in units
@@ -6110,6 +6112,22 @@ def cmd_selftest() -> int:
         arm("TOOL-dFoldedAudit-6 AC7 — one revision past the pin citing nothing keeps the unit, named at the pin",
             "Ids whose spec moved past its audited revision: ARCH-tOne-1@rev-1.",
             lambda: _set_fold_log("an edit no audit asked for"))
+
+        # TOOL-dFoldedAudit-15 AC28 — THE GENERATOR CITES FROM THE JOIN'S POPULATION. One cited record clears
+        # the unit under `reviews/` and clears nothing outside it, where its pin still counts. Against a
+        # generator citing every `spec-audit` record the first arm reds.
+        def _read_cited_past_pin(folder):
+            _set_fold_log(f"folded from {stem6f}")
+            rel = f"memory/builds/tOne/{folder}/{stem6f}.md"
+            os.makedirs(os.path.join(t6f, os.path.dirname(rel)), exist_ok=True)
+            write_text(os.path.join(t6f, rel), "**Serves:** spec-audit ARCH-tOne-1@rev-1\n\n# r\n")
+            return str(derive_past_pin_ids([{"id": "ARCH-tOne-1", "rev": "3", "path": spec6f}],
+                                           [{"kind": "spec-audit", "path": rel, "pins": {"ARCH-tOne-1": 1}}], t6f))
+
+        arm("TOOL-dFoldedAudit-15 AC28 — a cited record outside reviews/ clears nothing, and its pin still counts",
+            "['ARCH-tOne-1@rev-1']", lambda: _read_cited_past_pin("build"))
+        arm("TOOL-dFoldedAudit-15 AC28 — the same record under reviews/ clears the unit", "[]",
+            lambda: _read_cited_past_pin("reviews"))
         # TOOL-dFoldedAudit-6 AC5 — THE PREDICATE'S CASES, each over one record, its text naming FIX-x-1. The
         # two prefix arms red against either match dropping its boundary, the heading arm against a reader
         # finding the section by ordinal, and the continuation arm against a line-oriented entry.

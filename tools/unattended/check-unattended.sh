@@ -636,7 +636,7 @@ core_of REVIEW_DISPOSITIONS >/dev/null; REVIEW_DISPOSITIONS=$_core_of
 # that grades history needs one per rule it grades — the fold-beside-blockers clause under the
 # field's cutoff alone redded sixteen tracked records the driver itself wrote under the contract that
 # accepted them. Unreadable is named inside check 2 rather than at a `fail` site of its own, because
-# the three pinned check-2 ordinals in memory/project/unarmed-branches.txt sit below this line.
+# three pinned check-2 ordinals sat below this line until TOOL-dFoldedAudit-15 armed them.
 core_of FOLD_CUTOFF >/dev/null; FOLD_CUTOFF=$_core_of
 # TOOL-aEvidencedLens-9 S7 - the day a spec subject's terminal row began to carry `highs` and
 # `minors` and stopped folding (TOOL-aEvidencedLens-7 declares it). Read and named exactly as
@@ -908,7 +908,7 @@ else
           if (fo < 0 || pr < 0 || fo + pr < b + hi + mi || want != got) rowbad[it] = 1
         }
         if (rs ~ /NON-CONVERGENT|CEILING|BOUNDED/) {
-          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; pp[it] = pr; nw[it] = nr
+          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; fg[it] = fo; nw[it] = nr
           disp[it] = (nf > 0 && fld[nf] ~ /^disposition /) ? substr(fld[nf], length("disposition ") + 1) : ""
         }
         # A CONVERGED ROW CARRYING A DISPOSITION IS READ TOO (closing review of aProbedUnit, cluster
@@ -918,7 +918,7 @@ else
         # proxy predates the field and never read a converged row, and a converged subject is not
         # one that "EXITED without converging".
         else if (rs ~ /CONVERGED/ && graded == 1 && nf > 0 && fld[nf] ~ /^disposition /) {
-          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; pp[it] = pr; nw[it] = nr
+          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; fg[it] = fo; nw[it] = nr
           disp[it] = substr(fld[nf], length("disposition ") + 1)
         }
         # ...and a converged CLOSING row standing on a high or a minor with NO disposition owes one:
@@ -926,7 +926,7 @@ else
         # rather than reading as the ordinary converged round that demands nothing. The exit-row
         # clause above grades a row past SPEC_FOLD_CUTOFF instead, so this one leaves it alone.
         else if (rs ~ /CONVERGED/ && graded == 1 && cnt && hi + mi > 0 && !nr) {
-          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; pp[it] = pr; nw[it] = nr; disp[it] = ""
+          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; fg[it] = fo; nw[it] = nr; disp[it] = ""
         }
       }
       END {
@@ -938,14 +938,16 @@ else
             printf "\n  %s (subject %s: blocker counts did not shrink across consecutive rounds and no round carries an exit token, so the loop is non-convergent and nothing recorded that it stopped)", f, it
           if (it in needs) {
             # A ROW PAST SPEC_FOLD_CUTOFF OWES BY ITS OWN COUNTS, ahead of `graded`, so a fold owes
-            # nothing with DISPOSITION_CUTOFF blank too and never reaches `closefold`. `mm` counts
-            # every MEDIUM, LOW and adjudicated UNVERIFIED finding, so `pp - mm` is a lower bound on
-            # the promoted BLOCKERs and HIGHs, each its own unit, and a positive `pp` takes at least one.
-            # The row names no severity per promotion, so this is a floor and it stops there.
+            # nothing with DISPOSITION_CUTOFF blank too and never reaches `closefold`. The row names no
+            # severity per fold, so the floor is the least any honest split of `fg` can build: each
+            # promoted BLOCKER and HIGH its own unit, the promoted minors one. A fold spent on a major
+            # lowers the first term and cannot also leave no minor, so past what the folds reach the
+            # minors still owe their one, and inside it one unit stands for all (TOOL-dFoldedAudit-15 S2,
+            # as `owe` in the driver). A row short of its counts takes one, and specbad or rowbad reds it.
             if (nw[it]) {
               if (disp[it] == "promote") {
-                nsubj++
-                owe = pp[it] - mm[it]
+                nsubj++; nwfloor = 1
+                owe = (hc[it] && fg[it] >= 0 && bl[it] + hh[it] > fg[it]) ? bl[it] + hh[it] - fg[it] + (mm[it] > 0 ? 1 : 0) : 1
                 nneed += (owe > 0 ? owe : 1)
               }
             }
@@ -968,7 +970,7 @@ else
         }
         specs = ""; for (it in specbad) specs = specs " " it
         if (specs != "")
-          printf "\n  %s (spec subject(s)%s record a terminal row with no highs and minors counts or with disposition fold in a record first-committed on or after SPEC_COUNTS_CUTOFF, after which the driver requires both counts at every terminal exit of every subject and refuses fold at all of them, so every confirmed finding is promoted)", f, specs
+          printf "\n  %s (spec subject(s)%s record a terminal row with no highs and minors counts or with disposition fold in a record first-committed on or after SPEC_COUNTS_CUTOFF, after which the driver requires both counts at every terminal exit of every subject and, in a record begun before SPEC_FOLD_CUTOFF, refuses fold at all of them)", f, specs
         rows = ""; for (it in rowbad) rows = rows " " it
         if (rows != "")
           printf "\n  %s (spec subject(s)%s record an exit row past SPEC_FOLD_CUTOFF whose folded and promoted counts are absent, fall short of the findings it counted, or disagree with its disposition, so a confirmed finding cannot be traced to a fold or a unit)", f, rows
@@ -985,7 +987,7 @@ else
             if (readable != 1)
               printf "\n  %s (%d subject(s) EXITED recording disposition promote and the roster at this run BASE cannot be read, so whether a blocker was promoted CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, nsubj
             else if (newids + 0 < nneed)
-              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, against a floor of %d - one per subject, or on a row carrying highs and minors counts, on any subject, one per blocker and high plus one for its minors - so at least one promoted finding has no unit. A subject recording disposition fold beside zero blockers demands nothing here)", f, nsubj, newids + 0, nneed
+              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, against a floor of %d - %s - so at least one promoted finding has no unit. A subject recording disposition fold beside zero blockers demands nothing here)", f, nsubj, newids + 0, nneed, (nwfloor ? "on a row past SPEC_FOLD_CUTOFF, one per blocker and high its folds cannot account for, plus one for its minors" : "one per subject, or on a row carrying highs and minors counts, on any subject, one per blocker and high plus one for its minors")
           }
         }
         else {
@@ -1013,6 +1015,9 @@ else
   # two tracked archives were edited after they rotated, and a current-bytes test would red an archive
   # for good on a record no verb repairs. That predicate does not ask whether the commit rewrote
   # `RUN.md`, and a stub beside a HELD record passes it, so that test sits here.
+  # THE ADDING COMMIT IS READ FIRST AND DATED SECOND, with no `--follow`, because the commit this asks
+  # about is the one that added the archive's NAME, and following the rename would answer the record's
+  # own first commit. It is the SHA read check 15's scan passes, and it dates no record.
   # WHAT THIS DOES NOT CHECK: an archive with no add commit, one still staged or a rotation landing
   # inside a merge, and a complete hand rotation of a finished record with the true blob name and
   # `RUN.md` rewritten, which the closing review reads in the diff. The key is the working copy's, so a
@@ -1020,12 +1025,12 @@ else
   case "$SPEC_FOLD_CUTOFF" in
     [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9])
       for rvf in $(GIT ls-files ":(glob)$M/builds/*/RUN.*.md" 2>/dev/null); do
-        rv_add=$(GIT log -1 --diff-filter=A --format='%H %cs' -- "$rvf" 2>/dev/null)
+        rv_add=$(GIT log -1 --diff-filter=A --format=%H -- "$rvf" 2>/dev/null)
         [ -n "$rv_add" ] || continue
-        [[ "${rv_add#* }" < "$SPEC_FOLD_CUTOFF" ]] && continue
+        [[ "$(GIT log -1 --format=%cs "$rv_add" 2>/dev/null)" < "$SPEC_FOLD_CUTOFF" ]] && continue
         rv_rel=${rvf%/*}/RUN.md
-        if ! check_honest_rotation "${rv_add%% *}" "$rv_rel" \
-           || [ -z "$(GIT diff-tree --root --no-commit-id --no-renames -r --name-only "${rv_add%% *}" -- "$rv_rel" 2>/dev/null)" ]; then
+        if ! check_honest_rotation "$rv_add" "$rv_rel" \
+           || [ -z "$(GIT diff-tree --root --no-commit-id --no-renames -r --name-only "$rv_add" -- "$rv_rel" 2>/dev/null)" ]; then
           rv_bad="$rv_bad
   $rvf (an archive added on or after SPEC_FOLD_CUTOFF that no rotation wrote: its name is not the blob it added, the record it retired was not finished, or its commit left the run-state file alone, and the date floor reads an archive's first touch, so it would move the record beside it across the cutoff)"
         fi
@@ -1054,8 +1059,23 @@ else
   # two acts of one run, so a run forging both passes, and the closing review reads that diff. That the
   # audit read the spec at its current rev: like `specs-audited`, the join is a `has ever named` lower
   # bound, so a re-audit round's ids pass on round 1's record. MEDIUM and LOW counts.
+  # THE RECORD IS APPEND-ONLY, AND THIS IS WHAT HOLDS IT (TOOL-dFoldedAudit-15 S5): the verdict's skip list
+  # cannot see a row that is gone. The worktree bytes must extend every first-parent committed revision, so
+  # a deleted row reds through the older revision that held it, a commit deleting the whole file answers
+  # empty, which every string extends, and it feeds `rv_bad` for the ceiling's reason above. A tracked path
+  # gone from the worktree is the verb's own refusal, so it is skipped here.
+  # WHAT THIS DOES NOT CHECK: a rewritten history, whose earlier revisions are gone, and a shallow clone
+  # reads what it holds. A red clears when the bytes are restored if the commit that cut them left a
+  # prefix, so a cut from the tail clears. A commit cutting a row from the MIDDLE leaves a revision no
+  # restored record extends, and only dropping that commit from the branch clears it.
   for rv_cr in $(GIT ls-files ":(glob)$M/builds/*/build/*-chain-rounds.md" 2>/dev/null); do
     [ -f "$rv_cr" ] || continue
+    _rv_now=$(tr -d '\r' < "$rv_cr")
+    for _rv_sha in $(GIT log --first-parent --format=%H -- "$rv_cr" 2>/dev/null); do
+      _rv_was=$(GIT show "$_rv_sha:$rv_cr" 2>/dev/null | tr -d '\r')
+      [[ $_rv_now == "$_rv_was"* ]] || { rv_bad="$rv_bad
+  $rv_cr (a chain record no longer extends what commit ${_rv_sha:0:8} held, and it is append-only, so a round was edited or deleted by hand)"; break; }
+    done
     rv_dir=${rv_cr%/build/*}
     rv_runs=()
     for rvf in $(GIT ls-files ":(glob)$rv_dir/RUN*.md" 2>/dev/null); do
@@ -1106,7 +1126,7 @@ else
     rv_bad="$rv_bad${rv_out#"$rv_att"}"
     # ANNOUNCED, outside report() as the blank-cutoff lines are: a round left alone reads exactly like one
     # that passed.
-    [ "${rv_att:-0}" = 0 ] || echo "unattended: check 2 read $rv_att chain round(s) in $rv_cr with no terminal review row and took each as attended, so nothing grades their counts or their audited ids"
+    [ "$rv_att" = 0 ] || echo "unattended: check 2 read $rv_att chain round(s) in $rv_cr with no terminal review row and took each as attended, so nothing grades their counts or their audited ids"
   done
   [ -z "${rv_bad//[[:space:]]/}" ] || fail 2 "review loops that ran past the ceiling, stalled without recording it, or exited without accounting for their blockers:$rv_bad"
 fi
@@ -1250,8 +1270,8 @@ fi
 # ---- round 1, L5). `core_of` reads a renamed or missing constant as empty, and an empty set made
 # ---- check_derived_landed refuse every HELD record while the driver, reading its own constant, still
 # ---- derived LANDED for each: two readers of one phase disagreeing with nothing red. A member outside
-# ---- HOLD_CODES_CORE is a hand-off the hold vocabulary itself would refuse. Placed BELOW the pinned
-# ---- check-2 ordinals in the central unarmed-branches file, so none of them moves.
+# ---- HOLD_CODES_CORE is a hand-off the hold vocabulary itself would refuse. Placed BELOW the check-2
+# ---- ordinals that were pinned then, so none of them moved.
 if [ -z "$HOLD_CODES_HANDOFF" ]; then
   fail 2 "the driver declares no readable HOLD_CODES_HANDOFF, so this leg would derive LANDED for no handed record while the driver derives it for each: $DRIVER"
 else

@@ -3376,6 +3376,108 @@ check_order_fa12 "FA12 AC7 the clean round orders" "$r" 'Commit the record, then
 same   "FA12 AC8 the render spells the sentence once" "$(grep -c 'commit the chain record it staged' "$F")" "1"
 same   "FA12 AC8 ...and every site reaches it" "$([ "$(grep -c 'renderChainStep(' "$F")" -ge 4 ] && echo floor)" "floor"
 
+# ---- TOOL-dFoldedAudit-15: THE BATCH'S HARNESS ARMS. The failing cases, observed at the close and not by the
+# ---- pass that wrote this: the attended return dropping `nextAction` reds AC9; deleting each row of the
+# ---- reconciliation in turn reds its own `check_refused_fa3`; and `deriveReadRev` ignoring `rev` reds AC17.
+FA15_T="$HERE/unattended-build.template.js"
+FA15_A=${A_UNITS/'"slug":"tB",'/'"slug":"tB","disposal":"by-nature",'}
+FA15_SPEC='{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"}'
+run_attended_fa15() { local _r; printf -v _r '{"spec-write":%s,"workflow":%s,"dispose":%s}' "$FA15_SPEC" "$_fa3_review" "$_fa3_d"
+  RUN_WF_SCHEMA=strict run_wf "$1" "$_r"; }
+# AC9: the attended return holds a route beside its command, wherever it carries one.
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7"; build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]"
+o=$(run_attended_fa15 "$FA15_A"); r=$(read_result_fa5)
+has    "FA15 AC9 a local fold returns its chainRecord" "$r" '"chainRecord":"'
+has    "FA15 AC9 ...its dispositions" "$r" "\"dispositions\":[$FA3_L7]"
+has    "FA15 AC9 ...and the route" "$(read_field_fa12 nextAction)" '--chain-verdict tB'
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7N"; build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]"
+o=$(run_attended_fa15 "$FA15_A"); r=$(read_result_fa5)
+has    "FA15 AC9 a promotion returns its chainRecord" "$r" '"chainRecord":"'
+has    "FA15 AC9 ...its dispositions" "$r" "\"dispositions\":[$FA3_N7]"
+has    "FA15 AC9 ...and the route" "$(read_field_fa12 nextAction)" '--chain-verdict tB'
+o=$(run_attended_fa15 "${FA15_A/'"planState":"READY"'/'"planState":"DONE"'}"); r=$(read_result_fa5)
+has    "FA15 AC9 an all-terminal roster is empty" "$r" '"roster":[]'
+has    "FA15 AC9 ...and still returns its chainRecord" "$r" '"chainRecord":"'
+has    "FA15 AC9 ...saying nothing awaits dispatch" "$(read_field_fa12 nextAction)" 'no unit awaits dispatch'
+has    "FA15 AC9 ...on the same route" "$(read_field_fa12 nextAction)" '--chain-verdict tB'
+build_review_fa3 0 1 1 '[{"id":7}]'; build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]"
+o=$(run_attended_fa15 "${A_UNITS/'"planState":"READY"'/'"planState":"DONE"'}"); r=$(read_result_fa5)
+has    "FA15 AC9 the undeclared return is that return" "$r" '"roster":[]'
+hasnt_ "FA15 AC9 ...and keeps its keys" "$r" '"nextAction"'
+hasnt_ "FA15 AC9 ...with no command" "$r" '"chainRecord"'
+# AC10's half here: the callee learns the declaration, and an undeclared call holds no key.
+rec CONVERGED >/dev/null
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7"; build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]"
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec")
+has    "FA15 AC10 a declared call forwards disposal" "$(grep '^wargs:' <<<"$o")" '"disposal":"by-nature"'
+o=$(run_strict_fa3 "$UNITS" "$_rec")
+hasnt_ "FA15 AC10 an undeclared call holds no such key" "$(grep '^wargs:' <<<"$o")" '"disposal"'
+# AC13: each row of the reconciliation no arm read, by its own reason.
+build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7,"'{"id":7,"severity":"HIGH","nature":"new-mechanism","specs":["A-tB-1"],"unit":"A-tB-4","rev":1}]'
+check_refused_fa3 "$FA3_NAT" 'FA15 AC13 rule 3 two natures for one id' 'carries two severities'
+build_dispose_fa3 1 0 '[]' '[]' '[{"id":7,"severity":"HIGH","nature":"local","specs":["A-tB-1"],"unit":"A-tB-2","rev":2}]'
+check_refused_fa3 "$FA3_NAT" 'FA15 AC13 rule 7 a unit outside its specs' 'which is outside its address or this roster'
+build_dispose_fa3 1 0 '[]' '[]' '[{"id":7,"severity":"HIGH","nature":"local","specs":["A-tB-1","A-tB-2"],"unit":"A-tB-1","rev":2}]'
+check_refused_fa3 "$FA3_NAT" 'FA15 AC13 rule 7 two specs folded into one' 'stopped short of its address'
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7N"
+build_dispose_fa3 0 1 '[]' '[]' "[$FA3_N7]"
+check_refused_fa3 "$FA3_NAT" 'FA15 AC13 rule 9 a unit promotedIds lacks' 'which `promotedIds` does not name'
+build_dispose_fa3 0 1 '["A-tB-4","A-tB-5"]' "[$FA3_P4,$FA3_P5]" "[$FA3_N7]"
+check_refused_fa3 "$FA3_NAT" 'FA15 AC13 rule 9 a promotedIds entry no finding names' 'name no finding'
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" '[{"id":7,"severity":"HIGH","nature":"new-mechanism","specs":["A-tB-4","A-tB-9"],"unit":"A-tB-4","rev":1}]'
+check_refused_fa3 "$FA3_NAT" 'FA15 AC13 rule 10 a stray member of specs' 'neither this roster nor'
+# AC20: one spelling each, and the shared constant is still what reads the row.
+same   "FA15 AC20 the severities are spelled once" "$(grep -c "'BLOCKER', 'HIGH', 'MEDIUM', 'LOW'" "$FA15_T")" "1"
+same   "FA15 AC20 the natures are spelled once" "$(grep -c "'local', 'new-mechanism'" "$FA15_T")" "1"
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7"
+build_dispose_fa3 1 0 '[]' '[]' '[{"id":7,"severity":"CRITICAL","nature":"local","specs":["A-tB-1"],"unit":"A-tB-1","rev":2}]'
+check_refused_fa3 "$FA3_NAT" 'FA15 AC20 an off-list severity' 'outside the {id, severity, nature, specs, unit, rev} shape'
+# AC22: one prefix test, and both its callers keep it.
+same   "FA15 AC22 the prefix test is spelled once" "$(grep -c "indexOf('DONE')" "$FA15_T")" "1"
+build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]"
+check_refused_fa3 "${FA3_NAT/'"planState":"READY"'/'"planState":"DONE (THIN)"'}" 'FA15 AC22 a fold into DONE (THIN)' 'is frozen at'
+FA15_THIN='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","base":"5eed5eed5eed5eed5eed5eed5eed5eed5eed5eed","mode":"attended","subjects":[{"path":"s1","blob":"abc1234","id":"A-tB-1","rev":1},{"path":"s2","blob":"def5678","id":"A-tB-2","rev":1}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1","planState":"DONE (THIN)"},{"id":"A-tB-2","order":1,"specPath":"s2","briefPath":"b2","planState":"READY"}]}'
+o=$(RUN_WF_SCHEMA=strict run_wf "$FA15_THIN" '{"spec-write":{"authored":[],"alreadyPresent":["A-tB-1","A-tB-2"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md","precision":1,"note":"n","confirmedFindings":[],"addresses":[]}}')
+r=$(read_result_fa5)
+has    "FA15 AC22 an attended roster skips DONE (THIN)" "$r" '"skippedTerminal":["A-tB-1"]'
+has    "FA15 AC22 ...and hands out the live unit" "$r" '"roster":[{"id":"A-tB-2"'
+# AC17: a fold into a unit no audit read compares against the best fact held, and its sentence claims no
+# read that did not happen.
+FA15_F3='{"id":7,"severity":"HIGH","nature":"local","specs":["A-tB-3"],"unit":"A-tB-3","rev":REV}'
+FA15_R5=${FA3_NAT/'"id":"A-tB-3",'/'"id":"A-tB-3","rev":5,'}
+build_review_fa3 0 1 1 '[{"id":7}]' '[{"ids":[7],"severity":"HIGH","specs":["A-tB-3"]}]'
+build_dispose_fa3 1 0 '[]' '[]' "[${FA15_F3/REV/5}]"
+check_refused_fa3 "$FA15_R5" 'FA15 AC17 a claim at the rev --plan reads' 'not above the rev 5 `--plan` reads'
+build_dispose_fa3 1 0 '[]' '[]' "[${FA15_F3/REV/6}]"
+o=$(run_strict_fa3 "$FA15_R5" "$_rec")
+has    "FA15 AC17 a claim above it passes" "$o" "disposal: done"
+build_dispose_fa3 1 0 '[]' '[]' "[${FA15_F3/REV/1}]"
+check_refused_fa3 "$FA3_NAT" 'FA15 AC17 no rev and a claim of 1' 'rev 1, the lowest a spec carries'
+build_dispose_fa3 1 0 '[]' '[]' "[${FA15_F3/REV/2}]"
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec")
+has    "FA15 AC17 no rev and a claim of 2 passes" "$o" "disposal: done"
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7"
+build_dispose_fa3 1 0 '[]' '[]' '[{"id":7,"severity":"HIGH","nature":"local","specs":["A-tB-1"],"unit":"A-tB-1","rev":1}]'
+check_refused_fa3 "$FA3_NAT" 'FA15 AC17 a unit with a subject' 'not above the rev 1 the audit read'
+# AC21: the sentence reaches the `promote-all` prompt alone, and each absence reads a prompt that was there.
+FA15_ALL_SAYS='`new-mechanism`, because nothing folds'
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7N"; build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]"
+o=$(run_strict_fa3 "$FA3_ALL" "$_rec")
+has    "FA15 AC21 the promote-all prompt says it" "$(grep '^prompt:dispose:' <<<"$o")" "$FA15_ALL_SAYS"
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec"); r=$(grep '^prompt:dispose:' <<<"$o")
+has    "FA15 AC21 a by-nature prompt was read" "$r" 'Return in `edges`'
+hasnt_ "FA15 AC21 ...and does not say it" "$r" "$FA15_ALL_SAYS"
+o=$(run_strict_fa3 "$UNITS" "$_rec"); r=$(grep '^prompt:dispose:' <<<"$o")
+has    "FA15 AC21 an undeclared prompt was read" "$r" 'Return in `edges`'
+hasnt_ "FA15 AC21 ...and does not say it" "$r" "$FA15_ALL_SAYS"
+# AC25: a declared run's terminal-subject throw names the ids the chain named, and an undeclared one keeps
+# its bytes.
+build_review_fa3 0 0 0 '[]'
+o=$(run_strict_fa3 "$FA3_NAT" '{"terminalSubject":true,"stderr":"x"}')
+has    "FA15 AC25 the declared throw" "$o" 'a disposal passes the ids `--chain-verdict` names as `auditIds`'
+o=$(run_strict_fa3 "$UNITS" '{"terminalSubject":true,"stderr":"x"}')
+has    "FA15 AC25 the undeclared throw" "$o" "a disposal passes the hand-out's \`promotedIds\` as \`auditIds\`"
+
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
 # static count of the `same`/`has`/`hasnt_` sites in this file — `grep -cE '^\s*(same|has|hasnt_) '`
 # over it, 326 at 1d8530e7 (TOOL-aWokenSentinel-21) — at ~10 % headroom, rounded down, because the
@@ -3491,7 +3593,11 @@ same   "FA12 AC8 ...and every site reaches it" "$([ "$(grep -c 'renderChainStep(
 # 21 static sites counted with the grep above — AC1 (9, a loop run seven times), AC3 (4, the order helper's
 # one site), AC2 (5), AC4 (5), AC5 (5), AC6 (4), AC7 (3) and AC8 (2). Not measured by a run: the pass that
 # wrote it runs no suite.
-FLOOR_ASSERTIONS=815
+# RAISED 815 -> 899 by TOOL-dFoldedAudit-15: the 84 its block executes, as its New arm lines state — AC9 (13),
+# AC10 (2), AC13's six calls of the FA3 refusal helper (30), AC20 (2 and one call, 7), AC22 (1, one call and
+# 2, 8), AC17 (2 and three calls, 17), AC21 (5) and AC25 (2). Not measured by a run: the pass that wrote it
+# runs no suite.
+FLOOR_ASSERTIONS=899
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

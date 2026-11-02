@@ -1046,6 +1046,12 @@ SPEC_COUNTS_CUTOFF="2026-10-06"
 SPEC_AUDIT_DISPOSAL_DEFAULT="by-nature"
 SPEC_AUDIT_CHAIN_STOP_DEFAULT="own-work"
 SPEC_AUDIT_CHAIN_CEILING_DEFAULT="4"
+# THE CHAIN RECORD'S GRAMMAR, ONE SPELLING EACH (TOOL-dFoldedAudit-15 S22): `_ids_of`, `write_chain_round`
+# and `derive_chain_verdict` read these, the awk through `-v` and dynamic regexes. Which two severities
+# are major stays in that awk, because it asks a different question from which four exist.
+UNIT_ID_ERE='[A-Z]+-[A-Za-z0-9]+-[0-9]+'
+CHAIN_SEVERITIES='BLOCKER|HIGH|MEDIUM|LOW'
+CHAIN_NATURES='local|new-mechanism'
 HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed external-prerequisite acceptance-underivable repo-state-out-of-mandate gate-red-out-of-scope claim-lost"
 # THE HOLD VOCABULARY, a SECOND closed set beside the halt one and never an extension of it. Each
 # names a stop the run cannot fix and did not cause; none of them ends the run. A project extends
@@ -1297,8 +1303,9 @@ print_drift_delta() { # run-state file
   return 0
 }
 # TOOL-dFoldedAudit-7 S2 - THE SPEC-AUDIT SWITCHES, the driver's ONE reader of the three policy keys.
-# CALLED ON DEMAND and never by `load_driver_conf`, which runs on every verb: a spec exit and the chain
-# verdict are the only readers, so no other verb pays a Python start.
+# CALLED ON DEMAND and never by `load_driver_conf`, which runs on every verb: a spec exit, the chain
+# verdict, `--plan --paths` and a folding `--record-round` are the only readers, so no other verb pays a
+# Python start.
 #
 # IT CARRIES NO `fail`: each caller turns status 1 into its own refusal under its own check number,
 # because `check-arms` finds a branch by its literal number. Only an absent kit reads a default. A
@@ -3292,7 +3299,7 @@ check_waivers() { # run-state file
     # reached only after --preflight has written its facts, so the refusal belongs here, before them.
     # ONE `if` OVER THE THREE (TOOL-dFoldedAudit-5 S11): the two branches printed the same line, so the
     # merge retires no refusal, and the conditions keep their order.
-    if case "${BYPASS_BAN:+x}$r" in "") false ;; *"$BYPASS_BAN"*) true ;; *) false ;; esac \
+    if { [ -n "$BYPASS_BAN" ] && case "$r" in *"$BYPASS_BAN"*) true ;; *) false ;; esac; } \
        || [ "$(printf '%s' "$r" | wc -l | tr -d ' ')" != "0" ] \
        || case "$r" in *$'\r'*) true ;; *) false ;; esac; then
       fail 41 "a waiver reason may not spell the declared bypass flag or contain a newline; park writes it verbatim into a line-oriented region that the leg greps whole, so either one corrupts a record no verb rewrites"
@@ -4859,7 +4866,7 @@ unit_rows() { # build README -> unit rows; rc 3 = no single well-formed pair
 nonterminal_units() { unit_rows "$1" | grep -vE '\| (CLOSED|WONTDO) \|'; }
 # TOOL-aBoundedVerdict-11 S6 - ids out of whatever row text it is handed, sorted and deduplicated so
 # two callers cannot disagree about order. Reads stdin, so it composes with either side of the compare.
-_ids_of() { grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u; }
+_ids_of() { grep -oE "$UNIT_ID_ERE" | sort -u; }
 # The FIRST id on each row, which is the row's OWN id: a generated unit row leads with its link label
 # and may mention another id in the title text. `_ids_of` over a row SET cannot tell the two apart,
 # and a foreign id there would put a unit into a population it is not in. Measured over this corpus:
@@ -5871,14 +5878,21 @@ build_ask_plan() { # slug · spec paths… -> sets ASK_PLAN_ROWS, ASK_PLAN_NEXT,
 }
 
 # ONE EMITTER FOR EVERY ROW THAT NAMES A UNIT ID, so the two modes cannot disagree about which rows
-# are units. PATHS mode swaps the shape and nothing else: four TAB-separated fields, id, status,
-# state and the spec's repo-relative path, the fourth EMPTY for a unit no tracked spec defines. A
-# caller splits on TAB and skips any line with fewer than four fields - which is how the two
-# `NOT A UNIT` diagnostics, keyed on a FILENAME rather than an id, stay skippable: they keep their
-# padded shape in both modes and carry no TAB at all.
-plan_row() { # id · status · state · specPath
-  if [ -n "$PLAN_PATHS" ]; then printf '%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4"
+# are units. PATHS mode swaps the shape and nothing else: five TAB-separated fields, id, status,
+# state, the spec's repo-relative path and that spec's header rev, the last two EMPTY for a unit no
+# tracked spec defines. A caller splits on TAB and skips any line with fewer than four fields - which
+# is how the two `NOT A UNIT` diagnostics, keyed on a FILENAME rather than an id, stay skippable: they
+# keep their padded shape in both modes and carry no TAB at all.
+plan_row() { # id · status · state · specPath · specRev
+  if [ -n "$PLAN_PATHS" ]; then printf '%s\t%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4" "${5:-}"
   else printf '%-34s %-11s %s\n' "$1" "$2" "$3"; fi
+}
+
+# THE REV `--plan --paths` PRINTS (TOOL-dFoldedAudit-15 S14). Asked under PATHS mode alone, so the human
+# table and check 30's many-build read spawn nothing new, and apart from `spec_facts`, whose status action
+# is what that check selects by. The harness compares a fold into a unit no audit read against this.
+read_spec_rev() { # spec path -> the N of its header's rev-N, empty when it has none
+  awk '/^\*\*Status:\*\* [A-Z]+ / { if (match($0, / rev-[0-9]+/)) print substr($0, RSTART + 5, RLENGTH - 5); exit }' "$1"
 }
 
 # ------------------------------------------------------------------- THE `next:` LADDER, DECLARED
@@ -5964,7 +5978,7 @@ derive_next_shape() { # live-unit shape . first MISSING id . undecided-ask shape
 }
 
 verb_plan() { # slug
-  local slug="$1" dir specs spec id st state miss nmiss=0 _ar_id _ar_sum
+  local slug="$1" dir specs spec id st state miss nmiss=0 _ar_id _ar_sum _rev
   # THE LADDER'S INPUTS, collected by the two loops below and read ONCE at the bottom. They
   # are not the line: `_live` and `_miss1` are first-wins captures of data each loop already
   # has, `_ask1` is the undecided-ask rung's input and stays EMPTY here until
@@ -6113,7 +6127,8 @@ verb_plan() { # slug
     # a complete spec, and the one predicate that knew otherwise was discarded at the moment the
     # answer mattered. `build-complete`'s sixth term is the refusal; this is the human half.
     case "$st" in CLOSED|WONTDO) [ "$state" = "READY" ] && state="DONE" || state="DONE ($state)" ;; esac
-    plan_row "$id" "${st:-?}" "$state" "$spec"
+    _rev=""; [ -z "$PLAN_PATHS" ] || _rev=$(read_spec_rev "$spec")
+    plan_row "$id" "${st:-?}" "$state" "$spec" "$_rev"
     _graded=1
     # FIRST WINS, and what wins is an INPUT rather than the line. The guarded assignments to
     # `next` that stood here and in the loop below settled the precedence between the shapes
@@ -12802,7 +12817,7 @@ check_exit_fold() { # state · review kind · disposition -> 1 on a fold the exi
 }
 
 verb_review() { # slug · subject · verdict · blockers · disposition · highs · minors · folded · promoted
-  local slug="$1" subj="$2" verdict="$3" blockers="$4" disposition="${5:-}" highs="${6:-}" minors="${7:-}" folded="${8:-}" promoted="${9:-}" rel prior state note disp bound counts owe exitnote rkind rround rexit route dby
+  local slug="$1" subj="$2" verdict="$3" blockers="$4" disposition="${5:-}" highs="${6:-}" minors="${7:-}" folded="${8:-}" promoted="${9:-}" rel prior state note disp bound counts owe exitnote rkind rround rexit route dby dword
   check_slug "$slug" || return 1
   runmd_of "$slug" >/dev/null; rel=$_runmd
   check_run_state "$rel" "run to record a review round against" || return 1
@@ -12949,14 +12964,22 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   # the refusals below are the ones only the counts can decide: a converged round standing on a high or
   # a minor, and a promotion of nothing. Past `old`, `check_spec_exit` has derived the disposition from
   # `folded` and `promoted`, so those two refusals are skipped, and `owe` is the note's floor, the one
-  # check 2 grades: `promoted - minors` is a lower bound on the promoted BLOCKERs and HIGHs, each its own
-  # unit, and a positive `promoted` takes at least one. BOUNDED is reachable on a spec subject only: the
-  # slug's bound is the ceiling, which `review_state` tests first.
+  # check 2 grades, on a row with a positive `promoted`. A row names no severity per fold, so the floor is
+  # the least any honest split of `folded` can build: each promoted BLOCKER and HIGH its own unit, the
+  # promoted minors one. A fold spent on a major lowers the first term and cannot also leave no minor, so
+  # past the folds' reach the minors still owe their one, and inside it one unit stands for all
+  # (TOOL-dFoldedAudit-15 S2). Under `counted` `folded` is 0, so this is the severity rule's own count.
+  # BOUNDED is reachable on a spec subject only: the slug's bound is the ceiling, which `review_state`
+  # tests first.
   counts=""; owe=0
+  # THE WORD NAMES THE RULE THAT APPLIED (TOOL-dFoldedAudit-15 S3): under `folds` a finding may fold, so
+  # `promoted` would be false. The `exits <state>` clause never moves, because a harness's bare first
+  # call reads it.
+  dword=promoted; [ "$_se_rule" != folds ] || dword=disposed
   case "$state" in
     CONVERGED|NON-CONVERGENT|CEILING|BOUNDED)
       if [ -z "$highs" ] || [ -z "$minors" ]; then
-        fail 37 "--review exits $state on $rkind and requires --highs and --minors, the CONFIRMED HIGH and MEDIUM-plus-LOW findings standing at the exit, because every one of them is promoted and a row that does not count them cannot be graded"
+        fail 37 "--review exits $state on $rkind and requires --highs and --minors, the CONFIRMED HIGH and MEDIUM-plus-LOW findings standing at the exit, because every one of them is $dword and a row that does not count them cannot be graded"
         return 1
       fi
       check_exit_fold "$state" "$rkind" "$disposition" || return 1
@@ -12973,10 +12996,7 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
         fi
       else
         counts="$counts · folded $folded · promoted $promoted"
-        if [ "$promoted" -gt 0 ]; then
-          owe=$(( promoted - minors ))
-          [ "$owe" -ge 1 ] || owe=1
-        fi
+        [ "$promoted" -le 0 ] || owe=$(( blockers + highs > folded ? blockers + highs - folded + (minors > 0 ? 1 : 0) : 1 ))
       fi ;;
     *)
       if [ -n "$highs$minors" ]; then
@@ -13518,22 +13538,21 @@ check_chain_fold() { # unit · the row's rev, with `load_spec_facts` already rea
 # separator or a newline would forge a row. The counts are the review's: read from rows alone "every
 # confirmed BLOCKER and HIGH was disposed somewhere" could not fail, because a row at HIGH always names
 # a nature and a unit. A finding the disposal adjudicated from UNVERIFIED may add a row above the count,
-# so the test is "fewer", never "differs". It names no run-state file: `refuse_if_terminal` passes where
-# none exists, and the caller commits the record beside the disposal's folds.
+# so the test is "fewer", never "differs". THE VERB MOVES NO RUN STATE, so a terminal record does not
+# refuse it (TOOL-dFoldedAudit-15 S9): it writes a separate record, the caller commits that beside the
+# disposal's folds, and an attended chain on a finished build still records its round.
 write_chain_round() { # slug · subject · audited ids · blockers · highs, rows in RR_FINDINGS and RR_SIBLINGS
   local slug="$1" subj="$2" audited="$3" blockers="$4" highs="$5"
-  local id='[A-Z]+-[A-Za-z0-9]+-[0-9]+' rel rec now tok rows="" last=0 seen=0 round folds=()
+  local id="$UNIT_ID_ERE" rec now tok rows="" last=0 seen=0 round folds=()
   local f_id f_sev f_nat f_specs f_unit f_rev
   local re_ids="^$id( $id)*\$" re_sibling="^$id@rev-[0-9]+\$"
-  local re_finding="^[0-9]+/(BLOCKER|HIGH|MEDIUM|LOW)/(local|new-mechanism)/$id(,$id)*/$id/[0-9]+\$"
+  local re_finding="^[0-9]+/($CHAIN_SEVERITIES)/($CHAIN_NATURES)/$id(,$id)*/$id/[0-9]+\$"
   local -A b_ids=() h_ids=()
   check_slug "$slug" || return 1
   check_verb_flag --record-round --subject "$subj" || return 1
   check_verb_flag --record-round --audited "$audited" || return 1
   check_verb_flag --record-round --blockers "$blockers" || return 1
   check_verb_flag --record-round --highs "$highs" || return 1
-  runmd_of "$slug" >/dev/null; rel=$_runmd
-  refuse_if_terminal "$rel" --record-round || return 1
   [ -d "$M/builds/$slug" ] || { check_chain_fault "no build folder holds this slug, so a round has nothing to bind to: $slug"; return 1; }
   [[ $subj =~ ^[A-Za-z0-9-]+$ ]] || { check_chain_fault "--subject is outside [A-Za-z0-9-]+, and a row nothing can parse is prose in a record the verdict reads: $subj"; return 1; }
   [[ $audited =~ $re_ids ]] || { check_chain_fault "--audited holds a token that is no unit id, or two spaces, and a row nothing can parse is prose in a record the verdict reads: $audited"; return 1; }
@@ -13612,11 +13631,13 @@ write_chain_round() { # slug · subject · audited ids · blockers · highs, row
 # THE POPULATION IN STEP 3 IS THE POINT: an empty H is a subset of anything, so without it a clean round
 # would read as R5, and step 2 answers a clean round first anyway. POSIX awk, for the reason `spec_facts`
 # gives, so the lists sort by hand, as strings. A row outside the grammar was hand-edited: the file is
-# append-only, so one no reader can parse is a fault to name, never a question for the owner.
+# append-only, so one no reader can parse is a fault to name, never a question for the owner. A blank
+# line is skipped anywhere and the three header lines only before the first row, so a body row wearing a
+# header's prefix reaches that fault instead of leaving the sets (TOOL-dFoldedAudit-15 S4).
 derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -> 0 with _cv_* set, else check 118 and 1
   local out
-  out=$(awk -v live="$2" -v stop="$3" -v ceiling="$4" '
-    function isid(s) { return s ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/ }
+  out=$(awk -v live="$2" -v stop="$3" -v ceiling="$4" -v idre="^$UNIT_ID_ERE\$" -v sevre="^($CHAIN_SEVERITIES)\$" -v natre="^($CHAIN_NATURES)\$" '
+    function isid(s) { return s ~ idre }
     function isids(s,   a, k, i) {
       k = split(s, a, " ")
       for (i = 1; i <= k; i++) if (!isid(a[i])) return 0
@@ -13641,8 +13662,10 @@ derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -
       return 1
     }
     { sub(/\r$/, "") }
-    /^$/ || /^# / || /^\*\*Serves:\*\* journal / || /^Appended by / { next }
+    /^$/ { next }
+    !body && (/^# / || /^\*\*Serves:\*\* journal / || /^Appended by /) { next }
     {
+      body = 1
       k = split($0, f, " · "); c = split(f[1], w, " ")
       if (c != 2 || w[1] != "round" || w[2] !~ /^[1-9][0-9]*$/) { bad = $0; exit }
       r = w[2] + 0
@@ -13651,8 +13674,8 @@ derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -
         audn[r] = substr(f[3], 9)
       } else if (k == 4 && f[2] == "sibling" && f[3] ~ /^unit / && isid(substr(f[3], 6)) && f[4] ~ /^rev [0-9]+$/) {
         fold[r] = fold[r] " " substr(f[3], 6)
-      } else if (k == 7 && f[2] ~ /^finding [0-9]+$/ && f[3] ~ /^(BLOCKER|HIGH|MEDIUM|LOW)$/ &&
-                 f[4] ~ /^(local|new-mechanism)$/ && f[5] ~ /^specs / && isids(substr(f[5], 7)) &&
+      } else if (k == 7 && f[2] ~ /^finding [0-9]+$/ && f[3] ~ sevre &&
+                 f[4] ~ natre && f[5] ~ /^specs / && isids(substr(f[5], 7)) &&
                  f[6] ~ /^unit / && isid(substr(f[6], 6)) && f[7] ~ /^rev [0-9]+$/) {
         major = (f[3] == "BLOCKER" || f[3] == "HIGH")
         if (major) high[r] = high[r] " " substr(f[5], 7)
@@ -13695,6 +13718,8 @@ derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -
 # loop owns the keepalive: `--hold` refuses `owner-decision`, `--handoff` being that code's only producer.
 # ONE DERIVATION, TWO READERS (TOOL-dFoldedAudit-9): `--chain-verdict` prints what this leaves in `_cv_*`,
 # and `--dispatch` acts on it. Called in the caller's shell: a refusal in `$( )` loses its status.
+# AN EMPTY LIVE SET WITH NO ROUND REFUSES (TOOL-dFoldedAudit-15 S15), because a verdict over it is `N=0 STOP
+# clean` over nothing, the vacuous selector M4's rule names. A record beside that roster still answers.
 read_chain_verdict() { # slug -> 0 with _cv_* set, _cv_ceiling among them, else check 118 and 1
   local slug="$1" dir ids planned stop specs id st live=""
   dir="$M/builds/$slug"
@@ -13710,6 +13735,7 @@ read_chain_verdict() { # slug -> 0 with _cv_* set, _cv_ceiling among them, else 
     st=""; [ -z "${SPEC_PATH[$id]:-}" ] || st=${SPEC_ST[${SPEC_PATH[$id]}]:-}
     case "$st" in CLOSED|WONTDO) ;; *) live="$live${live:+ }$id" ;; esac
   done
+  [ -n "$live$_chain_rec" ] || { check_chain_fault "every unit of the roster is CLOSED or WONTDO and no round is recorded, so a verdict would stop a chain nothing audited: $slug"; return 1; }
   derive_chain_verdict "$_chain_rec" "$live" "$stop" "$_cv_ceiling" || return 1
 }
 print_chain_verdict() { # slug -> the verdict line, then the recipe line on a HOLD

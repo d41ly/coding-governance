@@ -171,10 +171,13 @@ function chunk(a, n) {
 //   units: [{ id, order, specPath, briefPath,      // ORDERED by the caller, from --plan
 //            specBriefPath,                        //   optional: the per-unit SPEC brief
 //            closes,                               //   optional: [<ask id>], the asks this unit answers
-//            planState }],                         //   REQUIRED in attended mode, from --plan, and under
+//            planState,                            //   REQUIRED in attended mode, from --plan, and under
 //                                                  //   `disposal: by-nature` on every unit a disposal return
 //                                                  //   names: an absent state would read as unbuilt, so the
 //                                                  //   frozen join refuses it rather than defaulting
+//            rev }],                               //   optional: the header rev `--plan --paths` prints in
+//                                                  //   its fifth field, which a fold into a unit no audit
+//                                                  //   read compares against. Absent reads as 1
 //   mode: "unattended" | "attended",              // DEFAULTS to "unattended"
 //   runStateExists: <bool>,                         // caller-supplied; this script cannot detect it
 //   specAudit: "<YYYY-MM-DD>",                      // the README front-matter `spec-audit:` override the
@@ -877,6 +880,10 @@ const SPEC_COMMIT_SCHEMA = {
 // more, which is why it stays out of `dispositions`: an entry there needs a finding id and a severity
 // this list does not hold. It sits out of `required` for `dispositions`' reason, and only `by-nature`
 // asks for it. It binds what the stage SAYS as well: whether a sibling was edited is read from the tree.
+//
+// TOOL-dFoldedAudit-15 S17 - ONE SPELLING EACH, read by this schema and by `deriveDispositionFault`.
+const SEVERITIES = ['BLOCKER', 'HIGH', 'MEDIUM', 'LOW']
+const NATURES = ['local', 'new-mechanism']
 const DISPOSAL_SCHEMA = {
   type: 'object',
   required: ['disposed', 'standing', 'promoted', 'folded', 'promotedIds', 'edges', 'placements', 'summary'],
@@ -919,8 +926,8 @@ const DISPOSAL_SCHEMA = {
         required: ['id', 'severity', 'nature', 'specs', 'unit', 'rev'],
         properties: {
           id: { type: 'integer' },
-          severity: { type: 'string', enum: ['BLOCKER', 'HIGH', 'MEDIUM', 'LOW'] },
-          nature: { type: 'string', enum: ['local', 'new-mechanism'] },
+          severity: { type: 'string', enum: SEVERITIES },
+          nature: { type: 'string', enum: NATURES },
           specs: { type: 'array', items: { type: 'string' } },
           unit: { type: 'string' },
           rev: { type: 'integer', minimum: 1 },
@@ -1715,6 +1722,9 @@ const auRaw = !specAudit ? null : await workflow(
     reviewDir: reviewDir,
     scratch: scratch,
     subjects: subjects,
+    // TOOL-dFoldedAudit-15 S8 - the callee asks for an address only under this, so an undeclared audit
+    // keeps today's synthesis. No key when none.
+    ...(disposalDeclared ? { disposal: a.disposal } : {}),
     // TOOL-aMendedFleet-111 S7 - `none`, so every judge writes its lens or verify file and the
     // deferred `next` below, which promises the re-run reuses them, is true. The callee's absent
     // default is Plan, under which no judge writes one and a re-run dispatches every judge again.
@@ -1964,7 +1974,8 @@ async function writeRound(disposition, adjudicated, tally) {
     throw new Error(
       'unattended-build: the driver refused round ' + roundNo + ' because the subject is terminal, ' +
         're-key it: `' + subject + '` already carries a terminal review round. A re-invocation after ' +
-        'a disposal passes the hand-out\'s `promotedIds` as `auditIds`, no `subjectRound` and no ' +
+        'a disposal passes ' + (disposalDeclared ? 'the ids `--chain-verdict` names' : 'the hand-out\'s `promotedIds`') +
+        ' as `auditIds`, no `subjectRound` and no ' +
         '`subjects`, so the promoted specs are audited under a fresh subject; a fold re-invoke passes ' +
         'the `subjectRound` the CONVERGING return handed back (driver said: ' + JSON.stringify(rv.stderr) + ').',
     )
@@ -2106,12 +2117,28 @@ if (verdict === 'CONVERGING') {
 }
 
 // TOOL-dFoldedAudit-3 S4 - THE REV THE AUDIT READ, joined by `specPath` as the clean round's binding line
-// joins it. A scoped round holds no subject for a sibling, so that unit answers 1, and a fold into it
-// still has to name a rev above 1.
+// joins it. A scoped round holds no subject for a sibling, so that unit answers its `units[]` `rev` where
+// the caller copied one from `--plan --paths` (TOOL-dFoldedAudit-15 S14), and 1 where it did not, so a fold
+// into it still has to name a rev above 1. A `rev` that is no integer of at least 1 reads as absent.
 function deriveReadRev(unit) {
   const u = ordered.find(function (x) { return x.id === unit })
   const s = u ? subjects.find(function (x) { return x.path === u.specPath }) : null
-  return s ? s.rev : 1
+  if (s) return s.rev
+  return u && Number.isInteger(u.rev) && u.rev >= 1 ? u.rev : 1
+}
+// WHAT `deriveReadRev` COMPARED, IN WORDS, so a refusal claims no read that did not happen. With no subject
+// the `rev` it answered equals the entry's only where the entry held a usable one: an absent or malformed
+// `rev` reads 1, which no such entry can equal.
+function renderReadRev(unit) {
+  const u = ordered.find(function (x) { return x.id === unit })
+  const n = deriveReadRev(unit)
+  if (u && subjects.some(function (x) { return x.path === u.specPath })) return 'the rev ' + n + ' the audit read'
+  return u && u.rev === n ? 'the rev ' + n + ' `--plan` reads' : 'rev 1, the lowest a spec carries'
+}
+// TOOL-dFoldedAudit-15 S19 - THE ONE TEST OF A `planState`. `--plan` prints `DONE (<grade>)` for a terminal
+// unit whose grade is not READY, so this is a prefix and never a closed set.
+function checkPlanDone(state) {
+  return state.indexOf('DONE') === 0
 }
 // TOOL-dFoldedAudit-3 S4 - THE RECONCILIATION, `''` or the reason a declared return does not join, its
 // tests in the spec's ten rules' order. The integers and the list must be one fact, and each finding
@@ -2153,8 +2180,8 @@ function deriveDispositionFault(d, promotedIds) {
     if (!Array.isArray(e.specs) || !e.specs.length) {
       return 'finding ' + e.id + ' names no spec — a disposition\'s address is the non-empty set of units its fix changes'
     }
-    if (['BLOCKER', 'HIGH', 'MEDIUM', 'LOW'].indexOf(e.severity) === -1 ||
-        ['local', 'new-mechanism'].indexOf(e.nature) === -1 ||
+    if (SEVERITIES.indexOf(e.severity) === -1 ||
+        NATURES.indexOf(e.nature) === -1 ||
         !e.specs.every(function (s) { return typeof s === 'string' && !!s }) ||
         typeof e.unit !== 'string' || !e.unit || !Number.isInteger(e.rev) || e.rev < 1) {
       return 'finding ' + e.id + ' is outside the {id, severity, nature, specs, unit, rev} shape, so it names ' +
@@ -2207,8 +2234,8 @@ function deriveDispositionFault(d, promotedIds) {
   }
   for (const e of list) {
     if (e.nature === 'local' && e.rev <= deriveReadRev(e.unit)) {
-      return 'finding ' + e.id + ' folded into ' + e.unit + ' at rev ' + e.rev + ', not above the rev ' +
-        deriveReadRev(e.unit) + ' the audit read — a fold is a rev bump'
+      return 'finding ' + e.id + ' folded into ' + e.unit + ' at rev ' + e.rev + ', not above ' +
+        renderReadRev(e.unit) + ' — a fold is a rev bump'
     }
   }
   for (const e of list) {
@@ -2238,8 +2265,8 @@ function deriveDispositionFault(d, promotedIds) {
         return 'a `siblingEdits` entry is outside the {unit, rev} shape, so it names no spec and no rev: ' + JSON.stringify(e)
       }
       if (e.rev <= deriveReadRev(e.unit)) {
-        return 'sibling ' + e.unit + ' was edited at rev ' + e.rev + ', not above the rev ' +
-          deriveReadRev(e.unit) + ' the audit read — a sibling edit is a rev bump'
+        return 'sibling ' + e.unit + ' was edited at rev ' + e.rev + ', not above ' +
+          renderReadRev(e.unit) + ' — a sibling edit is a rev bump'
       }
       if (rosterIds.indexOf(e.unit) === -1) {
         return 'sibling edit ' + e.unit + ' is outside this roster — a promoted unit\'s own spec is no sibling, ' +
@@ -2257,7 +2284,7 @@ function deriveDispositionFault(d, promotedIds) {
         return 'unit ' + id + ' carries no `planState` — it is the only fact here about what a unit is, and an ' +
           'absent state cannot read as unbuilt, so the caller copies it from `' + DRIVER + ' --plan ' + slug + ' --paths`'
       }
-      if (state.indexOf('DONE') === 0) {
+      if (checkPlanDone(state)) {
         return 'unit ' + id + ' is frozen at `planState` ' + state + ' — a built spec is never edited, and a ' +
           'correction to it is a new unit built on top'
       }
@@ -2484,7 +2511,8 @@ if (!specAudit) {
           '`id` the integer raw id, `nature` exactly `local` or `new-mechanism`, `specs` the unit ids on the ' +
           'finding\'s `**Specs:**` line, or where none is printed the non-empty unit ids the fix would change, ' +
           '`unit` the spec folded into or the unit promoted to, and `rev` that spec\'s rev now. A refuted finding ' +
-          'has no entry.'
+          'has no entry.' +
+          (byNature ? '' : ' Every entry\'s `nature` is `new-mechanism`, because nothing folds under this rule.')
         : ''),
     renderStageOpts('disposal', { label: renderAgentLabel('audit round ' + roundNo, 'dispose'), phase: 'Disposal', schema: DISPOSAL_SCHEMA }),
   )
@@ -2757,6 +2785,12 @@ if (recordAfter) {
 // are placeholders. `''` on the absent path and with the audit off, which is how a run preflighted before
 // the cutoff keeps today's hand-out.
 const chainRecord = specAudit && disposalDeclared ? renderChainRecord(subject, auditedIds, dispositions, siblingEdits) : ''
+// TOOL-dFoldedAudit-15 S7 - THE ACTION BESIDE `chainRecord`, one expression for both returns that carry it,
+// so an attended run with every unit terminal holds a route as well as a command.
+function renderChainAction(stopClause) {
+  return 'RECORD this round: commit the disposal\'s folds and specs, ' + renderChainStep(chainRecord) +
+    renderChainRoute(stopClause)
+}
 // ==================================================== THE HAND-OUT, and what is graded before it
 // S4/S4b - THE PER-UNIT REFUSAL, and in attended mode it happens HERE rather than at `--dispatch`.
 // IT DID NOT LEAVE WITH THE BUILD AGENT (TOOL-aHoistedPass-6): it grades which units may be
@@ -2800,7 +2834,7 @@ if (attended) {
         'value nobody supplied.'
       break
     }
-    if (st.indexOf('DONE') === 0) { skippedDone.push(u.id); continue }
+    if (checkPlanDone(st)) { skippedDone.push(u.id); continue }
     if (st === 'READY') continue
     if (st === 'MISSING' || st === 'THIN' || st === 'FORKED') {
       planRefusal =
@@ -2850,7 +2884,9 @@ if (attended && !buildUnits.length) {
     promotedIds: promotedIds,
     dispositions: dispositions,
     siblingEdits: siblingEdits,
-    ...(chainRecord ? { chainRecord: chainRecord } : {}),
+    ...(chainRecord
+      ? { chainRecord: chainRecord, nextAction: renderChainAction('no unit awaits dispatch, because every one is terminal') }
+      : {}),
     // THE DEGRADED TERM IS NOT SKIPPED HERE. This return was written with a hard-coded clean note,
     // which bypasses the composition the main return performs — and `specRefused` is live on this
     // path, so a run that refused specs and then found nothing to build reported 'complete'.
@@ -2910,8 +2946,7 @@ const handOut = {
   siblingEdits: siblingEdits,
   ...(chainRecord ? { chainRecord: chainRecord } : {}),
   nextAction: chainRecord
-    ? 'RECORD this round: commit the disposal\'s folds and specs, ' + renderChainStep(chainRecord) +
-      renderChainRoute('dispatch the roster below, one main-loop Workflow call per unit')
+    ? renderChainAction('dispatch the roster below, one main-loop Workflow call per unit')
     : promotedIds.length
     ? 'AUDIT the promoted specs before any of them is dispatched: re-invoke this harness with round: ' +
       (roundNo + 1) + ', auditIds: ' + JSON.stringify(promotedIds) + ' and no subjectRound and no ' +

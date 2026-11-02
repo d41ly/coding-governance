@@ -310,7 +310,7 @@ the /session-kickoff engine, its project manifest, and the ratchet that keeps th
 
 ## spec-tokens
 
-Seven joins that resolve a live spec's leg names, witness paths and line citations, refuse a bar invocation as an observation, owe a guarded leg its name, re...
+The joins that resolve a live spec's leg names, witness paths and line citations, refuse a bar invocation as an observation, owe a guarded leg its name, refu...
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/spec-tokens.md`
 - decisions 0

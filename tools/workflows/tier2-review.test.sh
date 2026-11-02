@@ -1731,12 +1731,16 @@ async function runLedgerArms() {
 // The failing case is staged by dropping the `isSpec` clause from the tally, which reds the diff-kind
 // control, and by dropping the clause's body, which reds AC2: both observed at the close, not by the pass
 // that wrote this. An arm reads the return, the prompt and the render; none proves a live synthesis obeys.
+// TOOL-dFoldedAudit-15 S8: the address is owed under a declared `disposal` alone, so these arms declare one,
+// and the last runs without it. Its failing case, observed at the close and not by the pass that wrote this:
+// `addressOwed` reading `isSpec` nulls that arm's counts.
 async function runAddressArms() {
+  const SPEC_DECLARED = Object.assign({}, SPEC, { disposal: 'by-nature' })
   const buildSynthItem = (over) => (label, prompt) => ({ path: 'memory/reviews/r.md', summary: 's',
     items: [Object.assign({ severity: 'HIGH', ids: [...prompt.split('UNVERIFIED findings')[0].matchAll(/id=(\d+) \[/g)].map((x) => parseInt(x[1], 10)) }, over)] })
   const scanSynth = (run) => run.trace.filter((t) => t.label.indexOf('synth') === 0)[0].prompt
   // ---- AC1: the item's address comes back beside the counts, and the prompt asks for the line.
-  let r = await runReview(SPEC, buildStubs({ synth: buildSynthItem({ specs: ['TOOL-x-1'] }) }))
+  let r = await runReview(SPEC_DECLARED, buildStubs({ synth: buildSynthItem({ specs: ['TOOL-x-1'] }) }))
   if (checkNoThrow(r, 'address carried')) {
     const a = r.result.addresses
     ck(Array.isArray(a) && a.length === 1 && a[0].severity === 'HIGH' && a[0].ids.length === 5 && a[0].specs.join() === 'TOOL-x-1',
@@ -1746,12 +1750,12 @@ async function runAddressArms() {
   }
   // ---- AC2: a HIGH with no well-formed address is a tally fault, in three spellings, and a minor owes none.
   for (const [name, over] of [['an empty list', { specs: [] }], ['no key', {}], ['a token that is no id', { specs: ['not an id'] }]]) {
-    r = await runReview(SPEC, buildStubs({ synth: buildSynthItem(over) }))
+    r = await runReview(SPEC_DECLARED, buildStubs({ synth: buildSynthItem(over) }))
     if (checkNoThrow(r, 'address ' + name))
       ck(r.result.blockers === null && r.result.highs === null && /^UNVERIFIED/.test(r.result.note) && r.result.addresses.length === 0,
         'address: ' + name + ' nulls both counts, and the note opens UNVERIFIED: ' + r.result.note)
   }
-  r = await runReview(SPEC, buildStubs({ synth: buildSynthItem({ severity: 'MEDIUM' }) }))
+  r = await runReview(SPEC_DECLARED, buildStubs({ synth: buildSynthItem({ severity: 'MEDIUM' }) }))
   if (checkNoThrow(r, 'address minor'))
     ck(r.result.blockers === 0 && r.result.highs === 0 && r.result.addresses.length === 0, 'address: a MEDIUM with no specs returns integer counts')
   // ---- AC3: a diff review's HIGH owes none, and neither its prompt nor its return moves.
@@ -1762,6 +1766,14 @@ async function runAddressArms() {
     ck(!Object.prototype.hasOwnProperty.call(r.result, 'addresses'), 'address: a diff review\'s return has no `addresses` key')
   }
   ck(src.indexOf('**Specs:**') !== -1, 'address: the render moved with its template')
+  // ---- FA15 AC10: an undeclared spec audit keeps today's synthesis: a HIGH with no address counts, and
+  // ---- neither the prompt nor the schema asks for one.
+  r = await runReview(SPEC, buildStubs({ synth: buildSynthItem({}) }))
+  if (checkNoThrow(r, 'address undeclared')) {
+    ck(r.result.blockers === 0 && r.result.highs === 5, 'address: an undeclared spec audit\'s HIGH with no specs counts')
+    ck(scanSynth(r).indexOf('**Specs:**') === -1, 'address: the undeclared prompt carries no **Specs:** line')
+    ck(Array.isArray(r.result.addresses) && r.result.addresses.length === 0, 'address: an undeclared return\'s `addresses` stays empty')
+  }
 }
 
 // ==== TOOL-aOrientedCast-10 — `efforts`, each stage spawned at the reasoning effort its caller names ====
@@ -2256,7 +2268,9 @@ printf '%s\n' "$out"
 # RAISED 343 -> 354 by TOOL-dFoldedAudit-5: 11 assertions, counted off the `address:` arms — the carried
 # item (3), the three malformed items (3), the minor (1), the diff kind (3) and the render (1). Counted by
 # hand, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=354
+# RAISED 354 -> 357 by TOOL-dFoldedAudit-15: the undeclared spec audit's three `ck` sites beside the address
+# arms. Not measured by a run: the pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=357
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

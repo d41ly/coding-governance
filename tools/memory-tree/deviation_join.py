@@ -452,6 +452,15 @@ def read_header_rev(text, hdr):
     return None
 
 
+def read_header_token(text, hdr):
+    """The status word of a spec's `**Status:**` header, as the units table reads it, or None."""
+    for ln in (text or "").split("\n"):
+        m = hdr.match(ln)
+        if m:
+            return m.group("token")
+    return None
+
+
 def read_baseline_line(text):
     """The sha the record's `[clause-ids]` section records as `Baseline:`, or None."""
     section = text.split("\n## [clause-ids]", 1)[1].split("\n## ", 1)[0] if "\n## [clause-ids]" in text else ""
@@ -563,14 +572,15 @@ def read_population(root, conf, commits):
             texts[rel] = (root / rel).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
         return texts[rel]
 
-    audits = [r for r in rels if "/reviews/" in r and binds.get(r, {}).get("state") == "bound"
-              and binds[r]["kind"] == "spec-audit" and binds[r]["pins"]]
+    # ONE AUDIT POPULATION (TOOL-dFoldedAudit-15 S25), so a pinned record and a citable one cannot part.
+    spec_audits = [r for r in rels if "/reviews/" in r and binds.get(r, {}).get("state") == "bound"
+                   and binds[r]["kind"] == "spec-audit"]
+    audits = [r for r in spec_audits if binds[r]["pins"]]
     # What a §9 entry may cite, per build (TOOL-dFoldedAudit-6 S2): `audits` above drops an unpinned record,
     # and a scoped round's record pins no sibling its repair moves.
     by_build = {}
-    for r in rels:
-        if "/reviews/" in r and binds.get(r, {}).get("state") == "bound" and binds[r]["kind"] == "spec-audit":
-            by_build.setdefault(derive_slug(r), []).append(r)
+    for r in spec_audits:
+        by_build.setdefault(derive_slug(r), []).append(r)
     handbacks = [r for r in rels if "/prompts/" in r and DIVERGENCE.search(read_text(r))]
     # THE ONE ADDING-COMMIT READER (TOOL-dTrueNorth-20 S32), the audit-writer test's too: the oldest add
     # of each record, one glob pathspec per folder and the records never on argv.
@@ -608,7 +618,11 @@ def read_population(root, conf, commits):
         rev = read_header_rev(before, HDR_RE)
         now = read_header_rev(after, HDR_RE)
         moved = range(rev + 1, now + 1) if rev is not None and now is not None else ()
-        if check_audit_fold(after or "", unit, moved, by_build.get(b, ()), read_text):
+        # THE EXEMPTION IS NEVER ASKED OF A FROZEN SPEC (TOOL-dFoldedAudit-15 S6): a CLOSED or WONTDO spec takes
+        # no fold, so a cited bump on one is a rewrite. The `before` header answers, because the status a
+        # fold moves off is the fact, and `check_audit_fold` holds only the current text.
+        if (read_header_token(before, HDR_RE) not in ("CLOSED", "WONTDO")
+                and check_audit_fold(after or "", unit, moved, by_build.get(b, ()), read_text)):
             continue                                    # an audit's own fold, cited by its §9 entries
         address = f"{unit}@rev-{rev if rev is not None else '?'}"
         if after_pass:
@@ -865,7 +879,8 @@ PLANTS = ("baseline", "clause", "subject-pass", "pass-none", "status-flip", "two
           "rotated",                                         # TOOL-dTrueNorth-24's
           "spec-notes",                                      # TOOL-dTrueNorth-26's
           "audit-fold", "audit-fold-pass", "audit-fold-stranger", "audit-fold-foreign",
-          "audit-fold-norev") + UNMEASURED_PLANTS            # TOOL-dFoldedAudit-6's
+          "audit-fold-norev",                                # TOOL-dFoldedAudit-6's
+          "audit-fold-closed") + UNMEASURED_PLANTS           # TOOL-dFoldedAudit-15's
 # The subject-trailer plant's second unit, Y, whose `Pass:` trailer rides a commit whose subject names X.
 SUBJECT_TRAILER_Y = "FIX-dTrueNorth-97"
 # The successor the rotated plant's supersede row names; no spec carries it, as none carries the base's.
@@ -896,7 +911,7 @@ PLANT_UNITS = {p: f"FIX-dTrueNorth-{n}" for n, p in enumerate(
      "fix-record", "audit-nopin", "record-late", "pass-revision", "status-only", "malformed-field",
      "malformed-risk", "malformed-follow", "duplicate-n", "malformed-supersedes", "subject-trailer",
      "pipe-after", "rotated", "spec-notes", "audit-fold", "audit-fold-pass", "audit-fold-stranger",
-     "audit-fold-foreign", "audit-fold-norev"), 10)}
+     "audit-fold-foreign", "audit-fold-norev", "audit-fold-closed"), 10)}
 DECISIONS_TEXT = "\n".join([
     "# Decisions", "",
     "- FIX-dClosedLoop-2 · the spec-run close by carry-forward, and dTrueNorth's extra unit FIX-dTrueNorth-99 approved "
@@ -1250,7 +1265,8 @@ def add_plant(fx, plant):
         # `audit-fold-pass` does it past a first pass. `audit-fold-stranger` cites a record of this build
         # that never names the unit, and `audit-fold-foreign` one of the other chain build that does, which
         # is why each commits a second record. `audit-fold-norev` is the cited fold, then a material edit
-        # at rev-2: an older entry cites the record, and the edit moved no header.
+        # at rev-2: an older entry cites the record, and the edit moved no header. `audit-fold-closed` is
+        # `audit-fold-pass` with the spec at CLOSED before the cited fold (TOOL-dFoldedAudit-15 S6).
         pin = f"{TN}reviews/2026-10-21-review-{u}.md"
         stranger = f"{TN}reviews/2026-10-21-review-{AUDIT_STRANGER}.md"
         foreign = f"memory/builds/{FIXTURE_BUILDS[1]}/reviews/2026-10-21-review-{u}-foreign.md"
@@ -1260,8 +1276,10 @@ def add_plant(fx, plant):
                + pathlib.PurePosixPath(cited).stem)
         fx.write_spec(u, 1)
         fx.write_commit({pin: fx.render_audit(u, 1), **other}, f"review(dTrueNorth): {u}'s spec audit", ["Pass: none"])
-        if plant == "audit-fold-pass":
+        if plant in ("audit-fold-pass", "audit-fold-closed"):
             fx.write_pass(u)
+        if plant == "audit-fold-closed":
+            fx.write_commit({fx.derive_spec_path(u): fx.render_spec(u, 1, status="CLOSED")}, f"{u} closes")
         fx.write_spec(u, 2, line="the fixture line, folded", extra=log)
         if plant == "audit-fold-norev":
             fx.write_spec(u, 2, line="the fixture line, edited in place", extra=log)
@@ -1394,7 +1412,8 @@ PLANT_EXITS = dict({p: 1 for p in ("baseline", "clause", "subject-pass", "two-br
                                    "owner-unknown-id", "add", "handback", "audit-pin", "pass-revision",
                                    "malformed-field", "malformed-risk", "malformed-follow",
                                    "malformed-supersedes", "duplicate-n", "record-late", "pipe-after",
-                                   "audit-fold-stranger", "audit-fold-foreign", "audit-fold-norev")},
+                                   "audit-fold-stranger", "audit-fold-foreign", "audit-fold-norev",
+                                   "audit-fold-closed")},
                    **{p: 0 for p in ("pass-none", "status-flip", "header-rev", "gen", "status-gen", "quote",
                                      "amended-joined", "approver", "defer", "fix-record", "audit-nopin",
                                      "below-risk", "owner-cause", "status-only", "subject-trailer", "rotated",
@@ -1417,6 +1436,7 @@ def derive_plant_needle(plant):
             "audit-fold-stranger": "past its audited revision rev-1",
             "audit-fold-foreign": "past its audited revision rev-1",
             "audit-fold-norev": "past its audited revision rev-1",
+            "audit-fold-closed": f"at {u}@rev-1 (spec-revised): {nobody}",
             "audit-nopin": f"no audit pin: ", "approver-none": "it records no approver",
             "owner-bare": "names the owner and cites no decision id", "owner-er": "names the owner and cites no decision id",
             "owner-row5": f"whose row does not name {APPROVER_PLANTS['owner-row5'][0]}",

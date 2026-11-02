@@ -16,8 +16,9 @@ before stage 3, and it wins any difference. The stages below are the workflows o
 - The orientation card carries a READY line and a `## task` whose eight fields are filled, the brief
   sits under `memory/builds/<slug>/prompts/`, and the owner's go is quoted under its
   `## Owner confirmation`. Any of the three missing: stop, and run `/session-kickoff`.
-- No run-state file exists, so this run is ATTENDED: the one driver verb used is
-  `unattended.sh --plan <slug> --paths`. Merge and push each wait for the owner's explicit ask.
+- No run-state file exists, so this run is ATTENDED: the driver verbs used are
+  `unattended.sh --plan <slug> --paths`, plus `--record-round` and `--chain-verdict` where a
+  hand-out's `nextAction` orders them. Merge and push each wait for the owner's explicit ask.
 - A fork goes to the owner through `AskUserQuestion`, never to a park: no mandate delegates it (M3).
 - You write no freeform agent prompt. A direct spawn is an `Agent` call whose `subagent_type` is the
   role, whose `prompt` is the output of this line, unchanged, and whose `description` is the name
@@ -45,8 +46,8 @@ Otherwise they read the card's `**Reuse:**` field. This Skill spawns no scout.
 Read `unattended.sh --plan <slug> --paths`, then call `tools/workflows/unattended-build.js` by
 `scriptPath` as the verbs guide's "Drive the build as ONE program" bullet composes it
 (`memory/guides/UNATTENDED-VERBS.md`), with these differences: `mode: 'attended'`; every
-`units[]` entry carries its `planState` from that read; no `runStateExists`; `base` is the READY
-line's; `roles` from `handoff.py harness-args unattended-build`; `efforts` from
+`units[]` entry carries its `planState` and `rev` from that read; no `runStateExists`; `base` is the
+READY line's; `roles` from `handoff.py harness-args unattended-build`; `efforts` from
 `handoff.py stage-efforts spec-write`; `specAudit` only where the build
 README declares `spec-audit:`; `disposal` beside it, the value on that read's
 `spec-disposal:` line, omitted on `absent`. Act on its `nextAction`.

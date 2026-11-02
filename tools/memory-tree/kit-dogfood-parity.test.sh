@@ -419,9 +419,9 @@ if [ -f "$method_ship" ] && [ -f "$method_live" ]; then
       *) echo "kit-parity: $method_ship has no '$lit' in M4, so a spec audit's disposal or a closing review's is no longer stated"; st=1 ;;
     esac
   done
-  case "$method_m4" in
-    *PRECISION*) echo "kit-parity: $method_ship still holds PRECISION in M4, and precision bounds no chain"; st=1 ;;
-  esac
+  if grep -qi precision <<<"$method_m4"; then
+    echo "kit-parity: $method_ship still holds PRECISION in M4, and precision bounds no chain"; st=1
+  fi
   case "$method_m8" in
     *'where M4 promotes them'*) ;;
     *) echo "kit-parity: $method_ship has no 'where M4 promotes them' in M8, so a closing review's text moved"; st=1 ;;

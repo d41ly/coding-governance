@@ -79,12 +79,13 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   the build README's AUTHORED roster pair against the tracked specs, so a planned unit nobody has
   specced is reported as MISSING — that question cannot be answered from a region rendered out of
   the specs that exist. A trailing `--paths` swaps the padded table for TAB-separated rows carrying
-  a FOURTH field, the spec path this verb already resolves per unit and otherwise discards, empty
-  for a unit no tracked spec defines; the two `NOT A UNIT` diagnostics are keyed on a filename
-  rather than an id and stay padded in both modes, so a caller splits on TAB and skips any line
-  with fewer than four fields. The `roster:` and `next:` lines are unchanged, which is what makes
-  one `--paths` invocation the resume path's single source for both "which unit is next" and "where
-  is its spec".
+  a FOURTH field, the spec path this verb already resolves per unit and otherwise discards, and a FIFTH,
+  that spec's header rev, each empty for a unit no tracked spec defines; the two `NOT A UNIT` diagnostics
+  are keyed on a filename rather than an id and stay padded in both modes, so a caller splits on TAB and
+  skips any line with fewer than four fields. The `roster:` and `next:` lines are unchanged, which is
+  what makes one `--paths` invocation the resume path's single source for both "which unit is next" and
+  "where is its spec". A `spec-disposal:` line sits between those two, carries no TAB and holds the value
+  a caller copies as `disposal`.
   SEVERAL SLUGS may be given, and the single-slug form is then byte-identical to what it always
   was, because the framing appears only for two or more. Each build's output is opened by
   `unattended-plan-open: <slug>` and closed by `unattended-plan-rc: <slug> <rc>`, and each runs in
@@ -273,8 +274,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   round that is not a terminal exit, and a round on a subject whose loop has already ended. Check 2
   reads a row of the first shape carrying both counts as owing `blockers + highs`, plus one for the
   minors when any stood, new non-WONTDO unit ids, and a row of the second as owing nothing on `fold`
-  or no disposition and `promoted - minors`, at least one, on `promote`, and reds a short sum or a
-  disposition its counts do not derive; every other row keeps the floor of one.
+  or no disposition and, on `promote`, one per blocker and high its folds cannot account for plus one
+  for its minors, at least one, and reds a short sum or a disposition its counts do not derive; every
+  other row keeps the floor of one.
 - `--record-round` — `--record-round <slug> --subject <s> --audited "<ids>" --blockers <b> --highs <h>`
   with a repeatable `--finding <id>/<severity>/<nature>/<spec>[,<spec>]/<unit>/<rev>` and a repeatable
   `--sibling <unit>@rev-<n>`: appends ONE spec-audit round to the build's one tracked chain record,
@@ -285,9 +287,11 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   number is the record's own, the last plus one and never the harness's `round`, and `--subject` is
   the generation, so a replay is refused. A row is a `local` or `new-mechanism` finding or a sibling
   edit, and a sibling edit counts as a fold. Before writing a byte it refuses a token outside its
-  grammar, a slug with no build folder, a terminal run, two `-chain-rounds.md` files, a tracked record
-  gone from the worktree, and rows disposing fewer BLOCKER or HIGH ids than `--blockers` or `--highs`
-  count, so a round whose HIGHs reached neither a promotion nor a fold is a refusal.
+  grammar, a slug with no build folder, two `-chain-rounds.md` files, a tracked record gone from the
+  worktree, rows disposing fewer BLOCKER or HIGH ids than `--blockers` or `--highs` count, so a round
+  whose HIGHs reached neither a promotion nor a fold is a refusal, and a `local` or `--sibling` row that
+  never reached the tree: a unit no tracked spec carries, a rev below 2 or above the spec's header, or a
+  rev with no Revision log entry.
 - `--chain-verdict` — `--chain-verdict <slug>`: derives whether a spec audit's chain goes on from that
   record and the roster alone, and writes nothing. It prints one line, and every word exits 0:
   `unattended: chain <slug> · round <N> · <word> · reason <reason>[ · audit <ids>][ · override specs-audited <ids>]`.
@@ -779,9 +783,9 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   date and `review.spec-audit.disposal` give together: `by-nature`, `promote-all`, `absent`, or
   `refused - <why>`, with the run dated today where no run-state file exists and the key at its kit
   default where no policy kit resolves. Under
-  `by-nature` every `units[]` entry also carries its `planState` from `--plan <slug> --paths`,
-  because a disposal naming a unit with no `planState` is refused and its hand-out carries no
-  roster.
+  `by-nature` every `units[]` entry also carries its `planState` and `rev` from
+  `--plan <slug> --paths`, because a disposal naming a unit with no `planState` is refused and its
+  hand-out carries no roster, and a fold into a unit no audit read compares against that `rev`.
   The unit harness then builds ONE unit per call from its brief and its spec. Every call is made by
   `scriptPath`, never by `name`: the fan-out guard's read-window narrowing is conditional on
   `scriptPath`. **Every harness call also carries `roles`**: the JSON the roles kit's

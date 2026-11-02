@@ -95,6 +95,8 @@ function readOutputTokens() {
 //   byDesign: "known/tracked issues reviewers must NOT re-report",
 //   reviewDir: "where synth writes the report (repo-relative)",
 //   kind: "diff-review" | "spec-audit",   // DEFAULTS to "diff-review" when absent
+//   disposal: "by-nature" | "promote-all", // spec-audit ONLY: the caller's declared `spec-disposal:` value.
+//                                         // Present, each BLOCKER or HIGH item owes its `specs`; absent, none does
 //   subjects: [{ path, blob, id, rev, prevBlob }], // spec-audit ONLY; blob is 7-40 hex, per subject; id,
 //                                         // REQUIRED at every round, is the unit id the spec defines and
 //                                         // rev the integer N of the rev-N its status header carries at
@@ -197,6 +199,10 @@ if (KINDS.indexOf(kind) === -1) {
   )
 }
 const isSpec = kind === 'spec-audit'
+// TOOL-dFoldedAudit-15 S8 - THE ADDRESS IS OWED ON A DECLARED `disposal` ALONE, the caller's own copy of the
+// `spec-disposal:` line. Only the chain reads an address, so an undeclared spec audit keeps today's
+// synthesis and meets no tally fault it was never told about.
+const addressOwed = isSpec && a.disposal !== undefined
 // TOOL-dLadderedRemote-4 - a DIFF review's base is REQUIRED, and refused before any agent when absent.
 // It defaulted to a literal remote ref, which names nothing on a node whose remote is not called
 // that, and this runtime has no git to resolve the right one. A spec audit has no range and owes none.
@@ -1900,8 +1906,9 @@ const synth = await agent(
     `return agree. ` +
     // TOOL-dFoldedAudit-5 S1 - THE ADDRESS, on a spec subject alone. A spec audit's chain stops when every
     // high sits in the previous round's own work, which cannot be derived from a record naming no spec a
-    // high would change. A diff review has no such chain, so its prompt holds no byte of this.
-    (isSpec
+    // high would change. A diff review has no such chain, so its prompt holds no byte of this, and neither
+    // does an undeclared spec audit's (TOOL-dFoldedAudit-15 S8).
+    (addressOwed
       ? `On each BLOCKER or HIGH item also return \`specs\`, the unit ids whose spec the item's fix would ` +
         `change, naming every one of them, because a narrower list can stop the audit's chain early. In the ` +
         `report, put one line directly under each BLOCKER or HIGH item, exactly \`**Specs:** <unit id> <unit id>\`, ` +
@@ -1942,8 +1949,8 @@ const synth = await agent(
               severity: { type: 'string', enum: ['BLOCKER', 'HIGH', 'MEDIUM', 'LOW'] },
               ids: { type: 'array', items: { type: 'integer' } },
               // TOOL-dFoldedAudit-5 S1 - optional, because this object is shared with the diff kind, whose
-              // schema stays as it was. A spec kind's tally below is what requires it, on a BLOCKER or HIGH item.
-              ...(isSpec ? { specs: { type: 'array', items: { type: 'string' } } } : {}),
+              // schema stays as it was. The tally below is what requires it, on a BLOCKER or HIGH item.
+              ...(addressOwed ? { specs: { type: 'array', items: { type: 'string' } } } : {}),
             },
           },
         },
@@ -1961,11 +1968,12 @@ const synth = await agent(
 // note below names the ids. An id that is not confirmed is ignored: the prompt permits UNVERIFIED
 // ones, and neither count is defined over anything else.
 //
-// TOOL-dFoldedAudit-5 S2 and S3 - ON A SPEC SUBJECT, A BLOCKER OR HIGH ITEM HOLDING A CONFIRMED ID CARRIES
-// ITS ADDRESS, and one with no well-formed `specs` is a tally fault: the path a misplaced id takes, so
-// both counts go null and the build harness refuses the stated absence. Only the SHAPE is tested, the
-// id grammar, because this file holds the subjects alone and a high may name an older spec; the harness
-// tests the roster. `addresses` is `[]` wherever the tally did not accept the items.
+// TOOL-dFoldedAudit-5 S2 and S3 - ON A SPEC SUBJECT UNDER A DECLARED `disposal`, A BLOCKER OR HIGH ITEM
+// HOLDING A CONFIRMED ID CARRIES ITS ADDRESS, and one with no well-formed `specs` is a tally fault: the path
+// a misplaced id takes, so both counts go null and the build harness refuses the stated absence. Only the
+// SHAPE is tested, the id grammar, because this file holds the subjects alone and a high may name an older
+// spec; the harness tests the roster. `addresses` is `[]` wherever the tally did not accept the items, and
+// on every undeclared spec audit.
 let blockers = null
 let highs = null
 let tallyFault = ''
@@ -1993,7 +2001,7 @@ if (synth) {
       else severityById.set(id, sev)
     }
     if (holdsConfirmed) perItem[sev]++
-    if (isSpec && holdsConfirmed && (sev === 'BLOCKER' || sev === 'HIGH')) {
+    if (addressOwed && holdsConfirmed && (sev === 'BLOCKER' || sev === 'HIGH')) {
       const held = it.ids.filter((id) => confirmedIds.has(id))
       if (Array.isArray(it.specs) && it.specs.length && it.specs.every((s) => typeof s === 'string' && PIN_ID.test(s)))
         addressed.push({ ids: held, severity: sev, specs: it.specs })

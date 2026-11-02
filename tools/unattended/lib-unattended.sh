@@ -1840,11 +1840,7 @@ read_brief_cutoff() { # commit · key -> the value on stdout · 2 when it cannot
 read_fold_cutoff() { # run-state file -> the value on stdout · 2 when it cannot be known
   local _fc_f _fc_b _fc_a _fc_c _fc_v
   [ -f "$1" ] || { printf '%s' "${SPEC_FOLD_CUTOFF:-}"; return 0; }
-  _fc_f=$(extract_run_facts < "$1" | awk '
-    { sub(/\r$/, "") }
-    /^base:/ && !sb { sb = 1; b = substr($0, 6); sub(/^ +/, "", b) }
-    /^anchor-sha:/ && !sa { sa = 1; a = substr($0, 12); sub(/^ +/, "", a) }
-    END { print b "|" a }')
+  _fc_f=$(extract_run_facts < "$1" | awk '{ sub(/\r$/, "") } /^base:/ && !sb { sb = 1; b = substr($0, 6); sub(/^ +/, "", b) } /^anchor-sha:/ && !sa { sa = 1; a = substr($0, 12); sub(/^ +/, "", a) } END { print b "|" a }')
   _fc_b=${_fc_f%%|*}; _fc_a=${_fc_f#*|}
   [ -n "$_fc_b" ] || return 2
   _fc_c=$_fc_b
