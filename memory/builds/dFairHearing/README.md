@@ -104,7 +104,7 @@ ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHea
 | [TOOL-dFairHearing-1 — the owed replays: the design-audit preset run blind at blob 767187aa, and the verdicts that flip the dark switches](spec/2026-10-23-spec-TOOL-dFairHearing-1.md) | 15 | 2 | DEFERRED | rev-4 | 2026-10-23 |
 | [TOOL-dFairHearing-21 — the held-out freeze check hashes the bytes it scores and refuses a shallow history](spec/2026-10-23-spec-TOOL-dFairHearing-21.md) | 15 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dFairHearing-15 — the review's bug-class checklist, selected by the pinned range and handed by the harness itself](spec/2026-10-23-spec-TOOL-dFairHearing-15.md) | 16 | 2 | DEFERRED | rev-5 | 2026-10-23 |
-| [TOOL-dFairHearing-17 — each review round's state, computed by the harness and carried in its record](spec/2026-10-23-spec-TOOL-dFairHearing-17.md) | 17 | 2 | DEFERRED | rev-3 | 2026-10-23 |
+| [TOOL-dFairHearing-17 — each review round's state, computed by the harness and carried in its record](spec/2026-10-23-spec-TOOL-dFairHearing-17.md) | 17 | 2 | DEFERRED | rev-4 | 2026-11-02 |
 | [TOOL-dFairHearing-18 — the whole-design walk as a preset of the design audit, and its recall grade](spec/2026-10-23-spec-TOOL-dFairHearing-18.md) | 18 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dFairHearing-20 — a gapped whole-design walk reds the harness's returned counts, not only its prose](spec/2026-10-23-spec-TOOL-dFairHearing-20.md) | 19 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dFairHearing-23 — the round-1 spec audit's 49 minors: one contract per shared name, criteria a correct build can pass, and the fixtures and records the moved code needs](spec/2026-10-23-spec-TOOL-dFairHearing-23.md) | 19 | 2 | DEFERRED | rev-2 | 2026-10-23 |

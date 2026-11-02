@@ -68,7 +68,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 8 unit(s) · node d · opened 2026-11-01 · streams tooling
+**Build status:** CLOSED · 8 unit(s) · node d · opened 2026-11-01 · streams tooling
 ids TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8
 
 <!-- gen:build-units -->
@@ -81,10 +81,10 @@ ids TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudi
 | [TOOL-dFoldedAudit-5 — each HIGH records its specs and a verb derives the chain's stop verdict](spec/2026-11-01-spec-TOOL-dFoldedAudit-5.md) | 50 | 2 | CLOSED | rev-2 | 2026-11-02 |
 | [TOOL-dFoldedAudit-6 — an audit's own fold owes no hand `spec-revised` deviation record](spec/2026-11-01-spec-TOOL-dFoldedAudit-6.md) | 60 | 2 | CLOSED | rev-3 | 2026-11-02 |
 | [TOOL-dFoldedAudit-1 — M4 and its carriers state the spec-audit disposal and chain stop](spec/2026-11-01-spec-TOOL-dFoldedAudit-1.md) | 70 | 2 | CLOSED | rev-8 | 2026-11-02 |
-| [TOOL-dFoldedAudit-8 — dClosedLoop's unbuilt specs and its frozen design take the same rules](spec/2026-11-01-spec-TOOL-dFoldedAudit-8.md) | 80 | 2 | INPROGRESS | rev-2 | 2026-11-01 |
+| [TOOL-dFoldedAudit-8 — dClosedLoop's unbuilt specs and its frozen design take the same rules](spec/2026-11-01-spec-TOOL-dFoldedAudit-8.md) | 80 | 2 | CLOSED | rev-2 | 2026-11-02 |
 <!-- /gen:build-units -->
 
-Records: 68 bound to this build, across 3 record folder(s).
+Records: 70 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
