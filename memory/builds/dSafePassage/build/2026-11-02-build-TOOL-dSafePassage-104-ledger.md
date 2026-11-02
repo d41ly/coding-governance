@@ -17,7 +17,7 @@ did.
 
 **Evidences:** TOOL-dSafePassage-104
 - AC1 — owed at the close: `bash tools/memory-tree/check-memory-hygiene.sh` at the build commit prints no line naming `memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-103.md`.
-- AC2 — at HEAD `e0dd80b2d`, before the pass commit: probe 1 printed nothing and exited 1; probe 2 printed line 3, `**Status:** CLOSED · rev-3 · 2026-11-02 …`; probe 3 printed a count of 1; probe 4 printed a count of 1.
+- AC2 — at HEAD `e0dd80b2d`, before the pass commit: probe 1 printed nothing and exited 1; probe 2 printed line 3, `**Status:** CLOSED · rev-3 · 2026-11-02 …`; probe 3 printed a count of 1; probe 4 printed a count of 1. The red case, observed by the main loop with each probe given the revision `4467aa796`: probe 1 printed a count of 1 and exited 0, and probe 2 printed nothing and exited 1.
 - AC3 — `python tools/lexicon/lexicon.py` on the working tree exited 0, printing `lexicon: P1 verb   graded=7262 offenders=1211 (debt=94 + unruled=1117) waived=0` and `lexicon OK`.
 - AC4 — `python tools/lexicon/lexicon.py --offenders` carried two `tools/policy/check_policy.py` lines, `verb grade_check` and `verb ask`, and no `ask#2`.
 - AC5 — owed at the close: `python tools/policy/check_policy.py --fixture census-window-edge`. In its place `run_census_window_edge('census-window-edge')` returned `(2, 0)`, its planted line reading `refused tools/govkit/registry.toml, vendor/gov/govkit/registry.toml · RED as planted`. With `ask` replaced in memory by `lambda call, *a: call(*a)`, the conversion dropped, the same call raised `Refusal`. A direct probe: `ask(lambda a, b: (a, b), 1, 2)` answered `(1, 2)`, and `ask` over a function raising `policy.Refusal("x/y.json", 0, "planted")` answered `refused x/y.json`.
