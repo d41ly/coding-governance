@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-10 — a chain round joins to the terminal review row and the spec-audit records it claims
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 110
+**Status:** INPROGRESS · rev-2 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 110
 
 <!-- gen:spec-records -->
 
