@@ -9,7 +9,10 @@ expansion or an optional component (PLAY-dOrderedCharter-16).
 The register is `layers.toml` beside this file: one `[[layer]]` row per layer and a top-level `shared`
 list of tool directories that hold inline-copied primitives and no layer. Each kit descriptor,
 `<tool root>/*/kit.toml` and `<tool root>/govkit/entries/*.kit.toml`, declares `layer = "<tag>"`, and a
-core kit declares `optional = [{ part, point, fallback }]` for each edge it is allowed to keep.
+core kit declares `optional = [{ part, point, fallback }]` for each edge it is allowed to keep. A
+`part` is relative to the kit's home; a flat entry, `home = "."`, spells a file under the tool root
+`{prefix}/<file>`, and a part spelling the tool root literally is a contract red
+(PLAY-dOrderedCharter-62).
 
 An EDGE runs from a file a core kit ships, one its descriptor does not withhold with
 `role = "project-owned"`, to a non-core kit, and is found by kind: `import` (an `import` or `from`
@@ -86,6 +89,19 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
+
 HERE = pathlib.Path(__file__).absolute().parent
 MEMORY_TREE = resolve_kit_dir("memory-tree", "import_walk.py", HERE)
 sys.path.insert(0, str(MEMORY_TREE))
@@ -152,7 +168,7 @@ def read_descriptors(root, tool_root, tracked):
                     continue
                 inc = r.get("include")
                 for s in (inc if isinstance(inc, list) else [inc] if inc else []):
-                    s = s.replace("{prefix}", tool_root)
+                    s = resolve_prefix_token(s, tool_root)
                     p = s if r.get("root_relative") else base + "/" + s
                     if p in tset:
                         files.append(p)
@@ -164,8 +180,10 @@ def read_descriptors(root, tool_root, tracked):
                 pats_w += inc if isinstance(inc, list) else [inc] if inc else []
             files = [p for p in tracked if p.startswith(home_d + "/")
                      and not any(fnmatch.fnmatchcase(p[len(home_d) + 1:], w) for w in pats_w)]
+        optional = [o for o in d.get("optional") or [] if isinstance(o, dict)]
         kits.append({"path": dpath, "id": d.get("id") or dpath, "home": home_d, "layer": d.get("layer"),
-                     "optional": [o for o in d.get("optional") or [] if isinstance(o, dict)],
+                     "optional": optional,
+                     "parts": {resolve_prefix_token(o.get("part"), tool_root) for o in optional},
                      "requires_if": [e for e in d.get("requires_if") or [] if isinstance(e, dict)],
                      "files": sorted(set(files))})
     return kits
@@ -318,7 +336,7 @@ def derive_edges(root, kits, rows, tracked):
                         add_edge(f, line, kind, k, h)
     out = []
     for (f, line, target), (kind, src) in sorted(edges.items()):
-        parts = {o.get("part") for o in src["optional"]}
+        parts = src["parts"]
         rel = f[len(src["home"]) + 1:] if src["home"] and f.startswith(src["home"] + "/") else f
         out.append((f, line, kind, src["id"], target, f in parts or rel in parts))
     return out, notes
@@ -399,6 +417,9 @@ def check_layers(root, tool_root, register, listing=False):
             reds.append("descriptor %s names layer '%s', which no row holds" % (k["path"], k["layer"]))
         for o in k["optional"]:
             reds += check_point(o.get("point"), "descriptor %s's optional row for %r names" % (k["path"], o.get("part")), declared)
+            if str(o.get("part") or "").startswith(tool_root + "/"):
+                reds.append("descriptor %s's optional row part %r spells the tool root literally: spell it {prefix}/%s"
+                            % (k["path"], o.get("part"), str(o["part"])[len(tool_root) + 1:]))
     for r in rows:
         if r.get("kind") == "core" and not any(k["layer"] == r.get("tag") for k in kits):
             reds.append("row '%s': a core layer with no kit" % r.get("tag"))
@@ -460,7 +481,8 @@ def write_layer_row(register, tag, kind, of, definition):
 
 
 PLANTS = ("import", "dynamic", "probe", "copy", "shell", "requires-if", "unslotted", "slotted",
-          "ex1-pair", "no-layer", "unknown-layer", "undeclared-point", "quoted", "unshipped")
+          "ex1-pair", "no-layer", "unknown-layer", "undeclared-point", "quoted", "unshipped",
+          "flat-slotted", "flat-literal")
 
 
 def build_layers_fixture(top, plant):
@@ -474,7 +496,7 @@ def build_layers_fixture(top, plant):
     ]
     if plant == "ex1-pair":
         rows.append(("layer.exp2", "expansion", None, ["point.exp.hook"], []))
-    reg = "shared = []\n"
+    reg = "shared = [\"govkit\"]\n"  # the flat plants' entries directory
     for tag, kind, of, dec, use in rows:
         reg += "\n[[layer]]\ntag = %s\nkind = %s\n%sdefinition = \"fixture\"\ndeclares = %s\nuses = %s\n" % (
             json.dumps(tag), json.dumps(kind), "of = %s\n" % json.dumps(of) if of else "", json.dumps(dec), json.dumps(use))
@@ -512,6 +534,13 @@ def build_layers_fixture(top, plant):
         "tools/expkit/kit.toml": 'id = "expkit"\nhome = "expkit"\nlayer = "layer.exp"\n',
         "tools/expkit/go.sh": "#!/usr/bin/env bash\necho go\n",
     }
+    if plant in ("flat-slotted", "flat-literal"):  # a flat core entry whose extensionless file runs expkit
+        part = "{prefix}/flatgo" if plant == "flat-slotted" else "tools/flatgo"
+        files["tools/%s/entries/flatkit.kit.toml" % "govkit"] = (
+            'id = "flatkit"\nhome = "."\nlayer = "layer.core"\n'
+            'optional = [{ part = "%s", point = "point.core.slot", fallback = "fixture" }]\n'
+            '[[files]]\ninclude = ["flatgo"]\n' % part)
+        files["tools/flatgo"] = '#!/usr/bin/env bash\nbash "$ROOT/tools/expkit/go.sh"\n'
     for rel, text in files.items():
         p = top / rel
         p.parent.mkdir(parents=True, exist_ok=True)

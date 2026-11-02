@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-62 — the layer check resolves `{prefix}` in an optional row's part and refuses a part that spells the tool root
 
-**Status:** DEFERRED · rev-1 · 2026-11-03 · node d · Tier-2 · base 8bec4cef · streams playbook · order 3 · advances PLAY-dOrderedCharter-38
+**Status:** CLOSED · rev-1 · 2026-11-03 · node d · Tier-2 · base 8bec4cef · streams playbook · order 3 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-03-build-PLAY-dOrderedCharter-62-ledger.md](../build/2026-11-03-build-PLAY-dOrderedCharter-62-ledger.md) | journal | — |
 | [2026-11-03-prompt-PLAY-dOrderedCharter-62-1-spec-writer.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-62-1-spec-writer.md) | journal | — |
 | [2026-11-03-prompt-PLAY-dOrderedCharter-62-build-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-62-build-brief.md) | journal | — |
 | [2026-11-03-prompt-PLAY-dOrderedCharter-62-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-62-spec-brief.md) | research | PLAY-dOrderedCharter-17 |

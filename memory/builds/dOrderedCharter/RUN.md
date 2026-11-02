@@ -48,3 +48,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-02T22:03:42Z brief · item PLAY-dOrderedCharter-17 · reason f70b313113de memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-17-build-brief.md
 
 2026-11-02T22:20:45Z rescope · item add PLAY-dOrderedCharter-62 · reason unit 17's builder found (run wf_2c160031-b97) that check_layers.py matches a flat govkit entry's optional part only as a full tools/<file> path, which the install-prefix ban refuses, and never resolves {prefix}/; the check is CLOSED units 16 and 61's, so its correction is a new unit before 17
+
+2026-11-02T23:22:11Z dispatch · item ab1edfb5 PLAY-dOrderedCharter-62 · reason tools/playbook/check_layers.py tools/playbook/adopt-playbook.sh tools/playbook/README.md memory/map/generated/symbols.json memory/builds/dOrderedCharter/spec/2026-11-03-spec-PLAY-dOrderedCharter-62.md memory/builds/dOrderedCharter/build/2026-11-03-build-PLAY-dOrderedCharter-62-ledger.md
+
+2026-11-02T23:22:22Z brief · item PLAY-dOrderedCharter-62 · reason ce2111399082 memory/builds/dOrderedCharter/prompts/2026-11-03-prompt-PLAY-dOrderedCharter-62-build-brief.md

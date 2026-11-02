@@ -208,6 +208,8 @@ shell|1|tools/corekit/run.sh:4 · shell · core kit corekit depends on non-core 
 requires-if|1|tools/corekit/kit.toml:4 · requires-if · core kit corekit depends on non-core kit expkit
 unslotted|1|tools/corekit/core.py:7 · import · core kit corekit depends on non-core kit mapkit
 slotted --list|0|layers: edge tools/corekit/core.py:7 · import · corekit -> mapkit · allowed
+flat-slotted --list|0|layers: edge tools/flatgo:2 · shell · flatkit -> expkit · allowed
+flat-literal|1|optional row part 'tools/flatgo' spells the tool root literally: spell it {prefix}/flatgo
 ex1-pair|1|row 'layer.exp' uses point.exp.hook, which 'layer.exp2' declares
 no-layer|1|descriptor tools/mapkit/kit.toml declares no layer
 unknown-layer|1|descriptor tools/mapkit/kit.toml names layer 'layer.nowhere', which no row holds

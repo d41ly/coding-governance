@@ -161,7 +161,9 @@ optional = [{ part = "gen_build_index.py", point = "point.memory.record-home", f
 
 `optional` is a core kit's declared slot: an edge from the file it names as `part` to a non-core kit
 is allowed, its `point` declared by exactly one core row, its `fallback` what the core does when the
-component is absent.
+component is absent. A `part` is relative to the kit's home; a flat entry, `home = "."` under
+`govkit/entries/`, spells a file under the tool root `{prefix}/<file>`, and a part spelling the tool
+root literally is a contract red that names the spelling to write.
 
 ```
 python check_layers.py                 # the gate: the contract, the edges and EX-1 over the tree
