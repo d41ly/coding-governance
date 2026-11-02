@@ -4,7 +4,7 @@ node: d
 opened: 2026-11-02
 streams: tooling
 roster: TOOL
-ids: TOOL-dCountedConsumers-1
+ids: TOOL-dCountedConsumers-1 TOOL-dCountedConsumers-2
 ---
 
 # dCountedConsumers — help/policy.md names the policy keys that have consumers today
@@ -42,12 +42,13 @@ None.
 | # | Unit | Mechanism |
 |---|---|---|
 | 1 | `TOOL-dCountedConsumers-1` | help/policy.md's consumer paragraph names every consumed key family, with a link for each |
+| 2 | `TOOL-dCountedConsumers-2` | the trace signal counts a help page as product, so a unit whose product is a help page has its commit |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node d · opened 2026-11-02 · streams tooling
-ids TOOL-dCountedConsumers-1
+ids TOOL-dCountedConsumers-1 TOOL-dCountedConsumers-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -55,7 +56,7 @@ ids TOOL-dCountedConsumers-1
 | [TOOL-dCountedConsumers-1 — help/policy.md names every policy key family a reader consumes today](spec/2026-11-02-spec-TOOL-dCountedConsumers-1.md) | 10 | 1 | CLOSED | rev-1 | 2026-11-02 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 3 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
