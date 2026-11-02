@@ -10,6 +10,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 
 <!-- /gen:spec-records -->
 
@@ -208,6 +209,8 @@ Additive. With an empty overlay the composition is gov's rows, so the rendered h
 to TOOL-dFairHearing-13's render. The step gate's `lens` class joins on its first landing and reads as
 joining, never red, on that landing (`tools/govkit/step_gate.py:32-35`).
 
+§6 runs a sibling's file by its basename: `gov_tag.py` is `tools/playbook/gov_tag.py` (TOOL-dBoundRoles-14 S5).
+
 ### Files touched (estimate)
 
 - `tools/playbook/namespaces.toml` (S1)
@@ -245,9 +248,9 @@ joining, never red, on that landing (`tools/govkit/step_gate.py:32-35`).
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python tools/workflows/render_lenses.py members` runs over this tree after the build, it
-  prints one `lens.<key>` line per `[[lens]]` row of `tools/workflows/lenses.toml` and no other, and
-  `python tools/playbook/gov_tag.py show lens.coherence` resolves the tag to that row; `render_lenses.py
+- **AC1** — When `python render_lenses.py members` runs over this tree after the build, it
+  prints one `lens.<key>` line per `[[lens]]` row of `lenses.toml` and no other, and
+  `python gov_tag.py show lens.coherence` resolves the tag to that row; `render_lenses.py
   new adopter.security` writes nothing and prints a `[[lens]]` row and an `instructions_edit.py` command.
   Red when: a tag is typed in a row instead of derived, or the factory writes the overlay.
   figure: DERIVED, the catalogue's row count at the run.

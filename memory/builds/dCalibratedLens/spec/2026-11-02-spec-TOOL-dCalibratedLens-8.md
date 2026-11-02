@@ -2,7 +2,7 @@
 
 **Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 14 · advances TOOL-dCalibratedLens-18
 
-**Carries:** cl-dClosedLoop-0465@4003d147 whole
+**Carries:** cl-dClosedLoop-0465@f1db8527 whole
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-8-deviation-81.md](../build/2026-11-02-build-TOOL-dCalibratedLens-8-deviation-81.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 
 <!-- /gen:spec-records -->
 
@@ -201,18 +202,18 @@ None. A record written before this unit has no `cause` column; `fill` adds one o
 
 ## 6. Acceptance criteria
 
-The fixture is `python tools/workflows/review_cause.py --fixture --plant <case>`: a scratch repository
+The fixture is `python review_cause.py --fixture --plant <case>`: a scratch repository
 under `%TEMP%` with a short name, holding a review record with an appendix and the work orders each case
 names.
 
 - **AC1** — When `--plant not-in-view` plants a diff-review record whose confirmed row cites
-  `tools/y.py:40` in its `reason` and a builder's work order that spells only `tools/x.py`, `review_cause.py
-  fill <record>` prints `not-in-view/no-map` for that row and `-` for a refuted row.
+  `tools/y.py:40` in its `reason` and a builder's work order that spells only another planted
+  path, `review_cause.py fill <record>` prints `not-in-view/no-map` for that row and `-` for a refuted row.
   Red when: the address is not read from `reason`, so the row reads `unaddressed`.
 - **AC2** — When `--plant spec-subject` plants a spec-audit record whose confirmed row's only path is the
   audited spec itself, `fill` prints `unaddressed/no-map`.
   Red when: the record's own subject counts as an address, so every spec finding reads `in-view`.
-- **AC3** — When `--plant in-view-map` plants the AC1 record with a work order that spells `tools/y.py`
+- **AC3** — When `--plant in-view-map` plants the AC1 record with a work order that spells the cited path
   and holds `slot map · filled`, `fill` prints `in-view/map`.
   Red when: the map state is read from anything but the work order's state line.
 - **AC4** — When `--plant no-order` plants the AC1 record and no work order, `fill` prints

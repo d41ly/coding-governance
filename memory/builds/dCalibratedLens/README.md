@@ -103,7 +103,7 @@ ids TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL
 | [TOOL-dCalibratedLens-14 — lens removal by a swap or an exclusion, a repository lens's replay result, and scenario promotion as `flow.promote` says](spec/2026-11-02-spec-TOOL-dCalibratedLens-14.md) | 17 | 2 | OPEN | rev-1 | 2026-11-02 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 3 record folder(s).
+Records: 11 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -121,7 +121,7 @@ Coverage of dCalibratedLens's 17 clause(s) and 15 owned node(s), over 17 spec(s)
 - carried in parts: 0 (none)
 - moved, retired or deferred: none
 - uncarried: 0 (none)
-- stale: 3 (cl-dClosedLoop-0465, cl-dClosedLoop-0467, cl-dClosedLoop-0468)
+- stale: 0 (none)
 - ambiguous: 0 (none)
 - owned nodes no spec names: none
 - specs derived from no clause: none

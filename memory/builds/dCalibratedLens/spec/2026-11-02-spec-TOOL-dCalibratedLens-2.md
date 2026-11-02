@@ -11,7 +11,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-15 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 
 <!-- /gen:spec-records -->
 
@@ -132,6 +134,8 @@ The build run re-grounds on each and stops the unit when one is absent.
 - **hands-off** `TOOL-dCalibratedLens-9` — `PROVIDERS`, which gains the `probe` entry
 - **hands-off** `TOOL-dCalibratedLens-12` — `PROVIDERS`, which gains the `item` entry
 - **hands-off** `TOOL-dCalibratedLens-15` — `PROVIDERS`, which gains the `cap` entry
+- **hands-off** `TOOL-dCalibratedLens-4` — the value ledger view `views/value-ledger.md`, whose `kind=cap` rows give the `cost` its review-cost read takes
+- **hands-off** `TOOL-dCalibratedLens-17` — the module `tools/loop/loop_review.py`, `read_loop_policy` for `trace.cost`, and the help page `help/loop-review.md` it adds a section to
 - **consumes-from** external — TOOL-dDeclaredLoop-1 and -12 (the loop kit and its item rows), TOOL-dLinkedLibrary-6 (the library-view seam), TOOL-dTotalRecall-1 (the registry), TOOL-dWitnessedBar-8 S3 (the flake record), each DEFERRED at base; `runlog.py journal`, landed
 
 ## 4. Design
@@ -234,6 +238,8 @@ by node and by day, and the view must equal its render on every node (§8 F2).
 | `loop-review/` | memory-root folder, sanctioned by check 3 | none |
 | `loop-review selftest` | gate leg | none |
 
+§6 runs a sibling's file by its basename: `loop_lib.py` is `tools/loop/loop_lib.py` (TOOL-dDeclaredLoop-12).
+
 ### Files touched (estimate)
 
 - `tools/loop/loop_review.py`: new (S1 to S6)
@@ -280,7 +286,7 @@ by node and by day, and the view must equal its render on every node (§8 F2).
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python tools/loop/loop_review.py --fixture --plant catch-verdict-records` runs, a
+- **AC1** — When `python loop_review.py --fixture --plant catch-verdict-records` runs, a
   fixture whose flake record holds `alpha` at first rc 1 and re-run rc 1 and `beta` at first rc 1 and
   re-run rc 0, `price --dry-run` prints the `alpha` row with `catches` 1, `false-reds` 0 and that record's
   `Ended` date as `last-catch`, and the `beta` row with `catches` 0 and `false-reds` 1.
@@ -291,7 +297,7 @@ by node and by day, and the view must equal its render on every node (§8 F2).
   plant `catch-source-refused`, a policy file the reader refuses, prints the `NOTE:` line and prices
   from `verdict-records`.
   Red when: the key's value is ignored, or a refused read prices from neither source.
-  fixture: a throwaway repository and its common dir's `runlog/gates.log` under `%TEMP%` with a short
+  fixture: a throwaway repository and its common dir's `gates.log` under `%TEMP%` with a short
   name; policy is read at the committed revision, so the plant commits `.governance/policy.toml`.
 - **AC3** — When the plant `window-edge` sets `review.loop.window-days = 30` and places one own event 31
   days before `--at` and a leg first added 10 days before it, `price --dry-run --at <at>` prints the old
@@ -299,10 +305,10 @@ by node and by day, and the view must equal its render on every node (§8 F2).
   with `state` `new`.
   Red when: an event outside the window is counted, or `last-catch` is cut to the window.
   figure: dates DERIVED from the planted `--at`.
-- **AC4** — When `python tools/memory-tree/library_views.py --fixture --plant value-ledger` arms the
+- **AC4** — When `python library_views.py --fixture --plant value-ledger` arms the
   view over two snapshots, the render's H1 names the newer key and its table equals that snapshot's;
   `value-ledger-empty` renders `No value-ledger snapshot yet.` with no finding; `value-ledger-hand-edit`
-  edits one cell of the view and the host's check names `views/value-ledger.md` as drifted.
+  edits one cell of the view and the host's check names `value-ledger.md` as drifted.
   Red when: the older snapshot renders, an empty home reds, or a hand edit passes.
 - **AC5** — When `price --key 2026-W45 --at 2026-11-02T09:00:00Z` runs in the fixture, it writes
   `<MEMORY_ROOT>/loop-review/2026-11-02-value-ledger-2026-W45.md` whose five fields read as §4 "The
@@ -311,17 +317,17 @@ by node and by day, and the view must equal its render on every node (§8 F2).
   Red when: a malformed key reaches a path, or a dry run writes.
 - **AC6** — When `grep -n -A8 'name = "review.loop.catch-source"' tools/policy/catalogue.toml` runs, it
   shows `summary` and `usage`; `grep -cx 'review.loop.catch-source' tools/policy/unsummarised-keys.txt`
-  prints `0`; `grep -n '"review.loop.catch-source"' tools/loop/loop_review.py` names S4's literal read.
+  prints `0`; `grep -n '"review.loop.catch-source"' loop_review.py` names S4's literal read.
   Red when: a field is missing, or the key is read through a variable.
-- **AC7** — When `grep -n 'name = "value-ledger"' tools/memory-tree/record-kinds.toml` and `grep -n
+- **AC7** — When `grep -n 'name = "value-ledger"' record-kinds.toml` and `grep -n
   'D:loop-review' tools/memory-tree/check-memory-hygiene.sh` run, each prints one line, and the second
   sits inside check 3's sanctioned `case` arm.
   Red when: either line is absent, so a tracked snapshot reds check 3 as an unsanctioned directory.
-- **AC8** — When `python tools/loop/loop_lib.py --check` runs over the tree, it refuses no row, and
-  `grep -n 'item.loop.price' tools/loop/loop.toml` prints the row's tag line.
+- **AC8** — When `python loop_lib.py --check` runs over the tree, it refuses no row, and
+  `grep -n 'item.loop.price' loop.toml` prints the row's tag line.
   Red when: the row's route names an undeclared item.
   permission: `loop_lib.py` is TOOL-dDeclaredLoop-12's, built before this unit's build run.
-- **AC9** — When `grep -n 'review.loop.catch-source' help/loop-review.md` runs, it prints the section's
+- **AC9** — When `grep -n 'review.loop.catch-source' loop-review.md` runs, it prints the section's
   line naming both values; `grep -n 'loop-review.md' help/README.md` prints the index line.
   Red when: the page or its index line is absent.
 

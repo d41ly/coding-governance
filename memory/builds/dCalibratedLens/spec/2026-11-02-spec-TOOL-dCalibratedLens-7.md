@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 
 <!-- /gen:spec-records -->
 
@@ -148,7 +149,7 @@ red and its flake are: a refutation is a reported defect the verify stage found 
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python tools/loop/loop_review.py --fixture --plant shape-review` writes the two review
+- **AC1** — When `python loop_review.py --fixture --plant shape-review` writes the two review
   records of §4 and a third `spec-audit` `panel-5` record dated before the window, `price --dry-run`
   prints `spec-audit/panel-5` with cost `3000tok/2`, `catches` 3, `false-reds` 3 and `last-catch` the
   first record's date, and `since` the old record's date.
@@ -165,7 +166,7 @@ red and its flake are: a refutation is a reported defect the verify stage found 
   `unknown` and one missing `Kind`, `price --dry-run` prints that row's cost `-` and the summary's
   `1 unknown tokens` and `1 skipped`.
   Red when: `unknown` is summed as 0, or a malformed record raises.
-- **AC5** — When `grep -n 'spec-audit/' help/loop-review.md` runs, it prints the line naming the shape
+- **AC5** — When `grep -n 'spec-audit/' loop-review.md` runs, it prints the line naming the shape
   row's id form.
   Red when: the line is absent.
 

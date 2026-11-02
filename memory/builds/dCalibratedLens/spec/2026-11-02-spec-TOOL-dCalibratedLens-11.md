@@ -2,7 +2,7 @@
 
 **Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 13 · advances TOOL-dCalibratedLens-18
 
-**Carries:** cl-dClosedLoop-0468@8f541e2a whole
+**Carries:** cl-dClosedLoop-0468@b4b68e80 whole
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-11-deviation-111.md](../build/2026-11-02-build-TOOL-dCalibratedLens-11-deviation-111.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 
 <!-- /gen:spec-records -->
 
@@ -204,7 +205,7 @@ reads one back.
 
 ## 6. Acceptance criteria
 
-The fixture is TOOL-dCalibratedLens-3's (its S12), `python tools/loop/loop_review.py --fixture --plant <case>`: a
+The fixture is TOOL-dCalibratedLens-3's (its S12), `python loop_review.py --fixture --plant <case>`: a
 scratch repository and a bare remote under `%TEMP%` with short names, holding planted landing refs
 written with `render_landing_body` (DEPL-dShippedRelease-1 S1), release exits, run records, plan records
 and owner items. This unit adds the cases each criterion names; "the record carries" means the record holds the Metrics
@@ -235,8 +236,9 @@ line opening with the quoted text.
   `route-backs-per-build: 1.0 · of 3` and `first-pass-verdict-rate` keeps `of 2`.
   Red when: an aggregated record is dropped from route-backs, or read for first pass.
 - **AC7** — When `--plant delivery-drift` plants a plan record whose `Affected systems` is `runlog` and a
-  landing whose first-parent diff touches `tools/runlog/model.py`, `tools/loop/loop_review.py` and
-  `memory/builds/x/README.md`, `python plan_fields.py drift x --paths <file>` prints `drift — loop` alone,
+  landing whose first-parent diff touches `tools/runlog/model.py`, `loop_review.py` and
+  the records file `README.md` of build `x`, `python plan_fields.py drift x --paths <file>` prints
+  `drift — loop` alone,
   and the record carries `scope-drift: 100% · of 1 · unplanned 0`; with a second landing of a build with
   no plan record, `unplanned 1`.
   Red when: a records path reads as drift, or an unplanned build counts as drifted.

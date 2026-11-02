@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 
 <!-- /gen:spec-records -->
 
@@ -232,23 +233,23 @@ None: the leg, the verb and the field are new, and no policy value moves.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python tools/loop/measure.py --fixture --plant factory` runs, it prints
+- **AC1** — When `python measure.py --fixture --plant factory` runs, it prints
   `derive_measured_value` returning 27 over rows 1 to 30 at `min_rows` 30, 9 over rows 1 to 10 at
   `min_rows` 10, `refused 29 of 30 rows` over rows 1 to 29, and `skipped 2` over 30 numeric rows plus
   one `true` and one `"12"`, the value still 27.
   Red when: a skipped row counts as zero, or the rank is taken as `int(0.9 * n)`.
   figure: every expected value is DERIVED by the nearest-rank rule over the planted rows.
-- **AC2** — When `python tools/loop/measure.py --fixture --plant caps-raise` commits `AGENTS.md` 30
+- **AC2** — When `python measure.py --fixture --plant caps-raise` commits `AGENTS.md` 30
   times at 1000 to 30000 bytes with CRLF endings, and a limits row `AGENTS.md` at 20480, the step
   prints `caps — AGENTS.md · bytes · current 20480 (default) · rows 30 · p90 27000 · raise` and,
   beneath it, the output of `policy_edit.py propose budgets."AGENTS.md" 27000`; `caps-lower`, the row
   at 40000, prints `lower`; `caps-hold`, the row at 27000, prints `hold` and no command.
   Red when: the bytes count CRs, or a `hold` prints a command.
   fixture: a scratch repository under `%TEMP%` with a short name; the loop kit runs from the tree.
-- **AC3** — When `python tools/loop/measure.py --fixture --plant caps-thin` commits `AGENTS.md` 29
+- **AC3** — When `python measure.py --fixture --plant caps-thin` commits `AGENTS.md` 29
   times, the step prints `rows 29 · p90 - · refused: 29 of 30 rows` and no command.
   Red when: a cap with too little evidence is proposed.
-- **AC4** — When `python tools/loop/measure.py --fixture --plant caps-class` commits 30 changes across
+- **AC4** — When `python measure.py --fixture --plant caps-class` commits 30 changes across
   three files under `memory/builds/tX/spec/` and one under `memory/builds/tX/build/`, the
   `memory/builds/*/spec/` line prints `rows 30`; a commit outside the window `review.loop.window-days`
   names, planted at 61 days before `--now`, is not counted.
@@ -258,11 +259,11 @@ None: the leg, the verb and the field are new, and no policy value moves.
   and no line for `orientation-card`, `cited-file-cap` or `line-length`.
   Red when: a cap outside the switch or a family cap gets a line, or a switch cap gets none.
   figure: the line count is DERIVED from `budgets.py census`.
-- **AC6** — When `python tools/loop/measure.py --fixture --plant caps-raise` finishes, the scratch
+- **AC6** — When `python measure.py --fixture --plant caps-raise` finishes, the scratch
   repository's `.governance/policy.toml`, `tools/template-size-limits.txt` and `memory/DECISIONS.md`
   hash as they did before the step, and `git status --porcelain` there prints nothing.
   Red when: a re-derivation writes the policy directly, the shape the recheck finding C5-F6 names.
-- **AC7** — When `python tools/loop/measure.py --fixture --plant caps-cost` writes a value ledger view
+- **AC7** — When `python measure.py --fixture --plant caps-cost` writes a value ledger view
   holding a `kind=cap` row for `AGENTS.md` with `cost` 5400, the line ends `cost 5400` and its p90 is
   the same 27000 as `caps-raise`; with no view the line ends `cost searched-none`.
   Red when: the cost changes the derived value, or a missing view reads as `cost 0`.
@@ -272,13 +273,13 @@ None: the leg, the verb and the field are new, and no policy value moves.
   `limits:coding-governance-agents.template.md`.
   Red when: a row is dropped, reordered or its family flag misspelt.
   figure: the row count is DERIVED by the `grep`.
-- **AC9** — When `python tools/loop/measure.py --fixture --plant caps-record` runs `loop_review.py
+- **AC9** — When `python measure.py --fixture --plant caps-record` runs `loop_review.py
   gather` and `record` in the scratch repository, the written `loop-review` record carries a `caps`
   field holding the step's lines, and `loop_review.py file --dry-run` names one proposal keyed `cap`
   and `AGENTS.md`.
   Red when: the field is absent or a `raise` line files no proposal.
   permission: `loop_review.py` is TOOL-dCalibratedLens-3's, built before this unit's pass.
-- **AC10** — When `python tools/run-gates/leg_factory.py --check` runs after the pass, it exits 0, and
+- **AC10** — When `python leg_factory.py --check` runs after the pass, it exits 0, and
   `grep -n '"loop measure fixtures"' tools/gate-legs.json` names the rendered leg.
   Red when: the leg is edited into the manifest alone, so the factory's check reds.
 - **AC11** — When `grep -n "Re-derived from evidence" help/size-caps.md` runs, it names the section.

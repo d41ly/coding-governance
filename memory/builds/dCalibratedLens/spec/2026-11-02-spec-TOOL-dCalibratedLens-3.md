@@ -15,7 +15,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-15 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 
 <!-- /gen:spec-records -->
 
@@ -132,6 +134,16 @@ re-grounds on each and stops the unit when one is absent.
 - **consumes-from** `TOOL-dCalibratedLens-2` — the module `tools/loop/loop_review.py`, `read_loop_policy`, `derive_loop_window`, the `price` verb and its `item.loop.price` row, the snapshot path the record's `**Ledger:**` field names, and the home `loop-review/` check 3 admits
 - **hands-off** `TOOL-dCalibratedLens-5` — the slot between `item.loop.price` and `item.loop.file`, which `item.loop.propose` takes, and the proposal shape `run_loop_file` reads
 - **hands-off** `TOOL-dCalibratedLens-11` — `METRICS`, which gains the delivery metrics and the owner queue's depth
+- **hands-off** `TOOL-dCalibratedLens-4` — `tools/loop/loop_review.py`, its `gather`, `record` and `file` verbs and the `loop-review` record kind, which carry its caps step, its `caps` field and its proposals
+- **hands-off** `TOOL-dCalibratedLens-6` — `tools/loop/loop_review.py`, its `gather`, `record` and `file` verbs and the `loop-review` record kind, which carry its field and its proposals
+- **hands-off** `TOOL-dCalibratedLens-8` — `METRICS`, which the `not-in-view-share` entry joins, `run_loop_file` and the `loop-review` record
+- **hands-off** `TOOL-dCalibratedLens-9` — `METRICS`, which gains the `compactions` entry, and the window the walk hands every reading
+- **hands-off** `TOOL-dCalibratedLens-10` — `METRICS` and `run_loop_file`, through which its proposal is filed
+- **hands-off** `TOOL-dCalibratedLens-12` — the window the walk hands `price`
+- **hands-off** `TOOL-dCalibratedLens-14` — the `loop-review` record and the `gather` and `file` verbs, which it extends and hands its proposals to
+- **hands-off** `TOOL-dCalibratedLens-15` — `METRICS`, which gains `cap-breaches` and `cap-counted`; `run_loop_walk` and the proposal shape `run_loop_file` reads; the record's Metrics lines and its home
+- **hands-off** `TOOL-dCalibratedLens-16` — `tools/loop/loop_review.py`, its `gather`, `record` and `file` verbs and the `loop-review` record kind, which carry its fields and its proposals
+- **hands-off** `TOOL-dCalibratedLens-17` — `METRICS`, which gains four entries, the record whose Metrics lines carry them, its home the trend reads, and the `--fixture` plants its cases join
 - **consumes-from** external — TOOL-dWellOiledMachine-59 and -13 with asks TOOL-dTendedCadence-27, -29 and -30 and §8 F2's ask; TOOL-dDeclaredLoop-12; TOOL-dWellOiledMachine-27 S1; TOOL-dTotalRecall-1; DEPL-dShippedRelease-1; each DEFERRED at base
 - **hands-off** external — dWellOiledMachine builds §8 F2's ask, `derive_period`'s `monthly` and `every-n-landings` forms
 
@@ -230,6 +242,8 @@ The home is the record home `point.memory.record-home` names for this layer's pe
 | `loop-review` | cadence row, its cadence segment, and record kind | none |
 | `landings` | cadence-row field, §8 F2's ask | none |
 
+§6 runs a sibling's file by its basename: `cadence.py` is `tools/runtime/cadence.py` (TOOL-dWellOiledMachine-59).
+
 ### Files touched (estimate)
 
 - `tools/loop/loop_review.py`: the walk, the four verbs and the fixture cases (S2, S3, S5 to S8, S12)
@@ -272,14 +286,14 @@ The home is the record home `point.memory.record-home` names for this layer's pe
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python tools/loop/loop_review.py --fixture --plant cadence-weekly` runs `lease --dry-run
+- **AC1** — When `python loop_review.py --fixture --plant cadence-weekly` runs `lease --dry-run
   --key 2026-W45`, it prints `loop — 2026-W45 · item.loop.lease · taken`, and `--key 2026-11` exits 2
   naming the key and `weekly`; `cadence-monthly` takes `2026-11` and refuses `2026-W45`;
   `cadence-every-n-landings` takes `n2.0123456789ab` and refuses `2026-W45`; with no key and no
   `--dry-run` it exits 2 printing `run under cadence.py run loop-review`.
   Red when: a key of another value's form is taken, or a missing key runs the walk.
 - **AC2** — When the plants `cadence-weekly`, `cadence-monthly` and `cadence-every-n-landings` run
-  `python tools/runtime/cadence.py tick --dry-run --now 2026-11-02T09:00:00Z`, the `loop-review` row's
+  `python cadence.py tick --dry-run --now 2026-11-02T09:00:00Z`, the `loop-review` row's
   period keys are `2026-W45`, `2026-11` and, over five planted landing records with `landings = 2`,
   `n2.` and the first 12 hex of the fourth; with one landing record it prints the not-due line.
   Red when: the row's period ignores `review.loop.cadence`, or a first-parent count stands for landings.
@@ -302,17 +316,17 @@ The home is the record home `point.memory.record-home` names for this layer's pe
   stdin, it writes `<MEMORY_ROOT>/loop-review/<date>-loop-review-2026-W45.md` with the four fields of §4
   "The record", its `**Ledger:**` the snapshot path price wrote; `--key ../x` exits 2, writing nothing.
   Red when: a malformed key reaches a path, or the record names no snapshot.
-- **AC7** — When `python tools/loop/loop_review.py run --check` runs over the tree, it prints `loop — 5
+- **AC7** — When `python loop_review.py run --check` runs over the tree, it prints `loop — 5
   item(s) · ok`; `run --dry-run --key 2026-W45` in the fixture prints the items in the order lease,
   gather, price, file, record, each with its outcome; the plant `dangling-route`, a route naming no row,
   exits 2 naming it.
   Red when: the walk runs out of `needs` order, or a dangling route passes.
-- **AC8** — When `grep -n 'name = "loop-review"' tools/memory-tree/record-kinds.toml` and `grep -n -A8
+- **AC8** — When `grep -n 'name = "loop-review"' record-kinds.toml` and `grep -n -A8
   'name = "review.loop.cadence"' tools/policy/catalogue.toml` run, the first prints the row and the second
   shows `summary` and `usage`; `grep -cxE 'review\.loop\.(cadence|window-days)'
   tools/policy/unsummarised-keys.txt` prints `0`.
   Red when: either row lacks a field, or a name stays undrained.
-- **AC9** — When `grep -n 'every-n-landings' help/loop-review.md` runs, it prints the section's line
+- **AC9** — When `grep -n 'every-n-landings' loop-review.md` runs, it prints the section's line
   naming the period key form and the `landings` field.
   Red when: the section is absent.
 

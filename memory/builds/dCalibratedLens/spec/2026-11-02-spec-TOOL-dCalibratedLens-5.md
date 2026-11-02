@@ -12,6 +12,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-5-deviation-51.md](../build/2026-11-02-build-TOOL-dCalibratedLens-5-deviation-51.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 
 <!-- /gen:spec-records -->
 
@@ -263,6 +264,8 @@ check = "record-kinds"
 | `units` | return field, finding field, appendix column, `returned` shape field | none |
 | `unit.cite-units` | instruction unit | none |
 
+§6 runs a sibling's file by its basename: `record_kinds.py` is `tools/memory-tree/record_kinds.py` (TOOL-dTotalRecall-1).
+
 ### Files touched (estimate)
 
 - `tools/loop/loop_review.py` (S4 to S8, the fixture plants)
@@ -335,7 +338,7 @@ check = "record-kinds"
   unit.cite-units, unit.reuse-first`, and `grep -n 'tag = "unit.cite-units"' tools/roles/instructions.toml`
   prints the row.
   Red when: the line is absent or lists a unit outside the load set.
-- **AC4** — When `python tools/loop/loop_review.py --fixture --plant effectiveness` commits two agent
+- **AC4** — When `python loop_review.py --fixture --plant effectiveness` commits two agent
   ledgers whose added `returned` lines carry `units` and one review record with two confirmed rows naming
   `unit.b`, over planted load sets, `gather --dry-run` prints the `instruction-units` line with the
   planted counts, and a ledger line added before the window is not counted.
@@ -365,7 +368,7 @@ check = "record-kinds"
   second `keep` the same day writes a second file ending `-2.md`; `keep` with an empty `--words` exits 2
   and writes nothing.
   Red when: a pricer ignores the keep, a keep never lapses, or a second keep overwrites the first.
-- **AC9** — When `python tools/memory-tree/record_kinds.py --check` runs in a scratch worktree holding one
+- **AC9** — When `python record_kinds.py --check` runs in a scratch worktree holding one
   keep record that lacks `Words`, it exits 1 naming the record; with the field restored it exits 0.
   Red when: the `keep` row's fields do not reach the field check.
   fixture: `record_kinds.py` is TOOL-dTotalRecall-1's, absent at `8bec4cef`.
@@ -373,7 +376,7 @@ check = "record-kinds"
   `summary` and `usage`, `grep -cx 'review.loop.retire' tools/policy/unsummarised-keys.txt` prints `0`, and
   `git grep -n '"review.loop.retire"' -- tools/loop` prints the one literal reader.
   Red when: the row lacks a field, the name stays listed, or the key has no literal reader.
-- **AC11** — When `grep -n "demote-then-propose" help/loop-review.md` and `grep -n "units" help/roles.md`
+- **AC11** — When `grep -n "demote-then-propose" loop-review.md` and `grep -n "units" help/roles.md`
   run, each prints the new section's line.
   Red when: either page lacks it.
 

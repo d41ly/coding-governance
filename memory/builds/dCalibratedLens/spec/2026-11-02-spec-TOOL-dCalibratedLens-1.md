@@ -10,7 +10,11 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-1-reuse-scout.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-1-reuse-scout.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-2-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-2-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-3-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-3-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md) | research | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-15 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 
 <!-- /gen:spec-records -->
 
@@ -270,7 +274,7 @@ spawns a stage lens until the owner opts a stage in or a preset owes it.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python tools/workflows/render_lenses.py tools/workflows/lenses.toml < tools/workflows/tier2-review.template.js`
+- **AC1** — When `python render_lenses.py lenses.toml < tools/workflows/tier2-review.template.js`
   runs, the output holds four literals marked `gov:lens-slots plan`, `test`, `deploy` and `maintain`,
   each listing the `key:` lines of §4 "The rows" for its stage in slot order.
   Red when: a stage literal is missing a row, holds a key of another stage, or is not rendered.
@@ -281,7 +285,7 @@ spawns a stage lens until the owner opts a stage in or a preset owes it.
 - **AC3** — When `node tools/hooks/agent-cap.js --only=scripts` runs over the re-rendered harness, it
   exits 0.
   Red when: the receiver's ternary over seven literals is denied, so no review can spawn.
-- **AC4** — When `python tools/workflows/review_pin.py --subject <a design record> --stage deploy`
+- **AC4** — When `python review_pin.py --subject <a design record> --stage deploy`
   runs, it prints `{"preset": "deploy"}`; with `--stage build` it prints the subject mapping's line,
   as without the flag; with `--stage nightly` it exits 2 naming `nightly` and the marked literals.
   Red when: the stage is ignored, or an unmarked stage prints a preset.
@@ -307,7 +311,8 @@ spawns a stage lens until the owner opts a stage in or a preset owes it.
   `review.deploy.effort = "medium"`, its JSON line carries `"preset": "deploy"` and an `efforts`
   object reading `medium` for the three review keys.
   Red when: `--stage` is not passed through, or `efforts` is absent.
-  fixture: the `--trigger` fixture TOOL-dDeclaredLoop-20 lands in `tools/unattended/unattended.test.sh`.
+  fixture: the `--trigger` fixture TOOL-dDeclaredLoop-20 lands in the unattended kit's suite, whose arm
+  §7's `New arm:` line declares.
 - **AC10** — When `python tools/policy/policy.py lists --check` runs, it exits 0, and
   `grep -c 'review.<stage>.effort' tools/policy/unsummarised-keys.txt` prints 0.
   Red when: the row has no `summary` or `usage`, or the name is still listed.

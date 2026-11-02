@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 |
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 |
 
 <!-- /gen:spec-records -->
 
@@ -211,7 +212,7 @@ empty series.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python tools/runtime/ledgers.py fixture --case estimate` plants ten act records of
+- **AC1** — When `python ledgers.py fixture --case estimate` plants ten act records of
   `item.build.unit` whose `Wall` runs 1 to 10 minutes and `python ledgers.py estimate` runs over it, it
   prints `{"kind": "item.build.unit", "hours": 0.15, "rows": 10, "basis": "p90"}`, and the fixture's
   fan-one reservation still carries `hours` 0.15; with nine records it prints `"hours": 1.5`, `"rows": 9`,
@@ -221,16 +222,16 @@ empty series.
   figure: DERIVED, the p90 of the planted walls at observation time.
 - **AC2** — When the same case plants the ten records with `Wall: withheld`, as `trace.cost` `tokens`
   writes them, `ledgers.py estimate` prints `"rows": 0` and `"basis": "ceiling"` for the kind, and
-  `python tools/loop/loop_review.py --fixture --plant capacity-tokens` prints a `reservation-estimates`
+  `python loop_review.py --fixture --plant capacity-tokens` prints a `reservation-estimates`
   line carrying `item.build.unit 1.5h ceiling/0` and `trace.cost tokens`.
   Red when: a withheld wall is counted as a row, or the line omits the `trace.cost` value.
-- **AC3** — When `python tools/runtime/beat.py fixture --case members` plants one lease beating now and
+- **AC3** — When `python beat.py fixture --case members` plants one lease beating now and
   one past `leases.expiry-hours`, `beat.py members --json` prints one object, the live tag's, carrying
   `node-capacity` and a `node-plan` list; and when `ledgers.py fixture --case charge` plants two
   reservations on pool `personal`, one past its `expires-utc`, `ledgers.py pools` prints
   `"reserved-hours"` equal to the live one's `hours` and `"reservations": 1`.
   Red when: the stale member is printed, or the expired reservation is summed.
-- **AC4** — When `python tools/loop/loop_review.py --fixture --plant capacity` runs `gather --dry-run`
+- **AC4** — When `python loop_review.py --fixture --plant capacity` runs `gather --dry-run`
   over stubbed runtime verbs printing two members, two pools and two kinds, it prints the `node-beats`,
   `pool-ledgers` and `reservation-estimates` lines of §4 "The lines" byte for byte, in that order, after
   TOOL-dCalibratedLens-3's own entries.
@@ -254,7 +255,7 @@ empty series.
   `load@c <value> new`; with a committed record whose `node-beats` line is planted unparseable, the
   source reads `1 unread`.
   Red when: a vanished node is dropped silently, or an unreadable record is read as an empty series.
-- **AC9** — When `grep -n "capacity-trend" help/loop-review.md` and `grep -n "ledgers.py estimate"
+- **AC9** — When `grep -n "capacity-trend" loop-review.md` and `grep -n "ledgers.py estimate"
   help/runtime.md` run, each prints the line naming it, and the first page names the five directions.
   Red when: either page lacks the section.
 

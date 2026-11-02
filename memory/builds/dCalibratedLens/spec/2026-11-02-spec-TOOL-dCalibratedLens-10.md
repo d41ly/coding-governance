@@ -2,7 +2,7 @@
 
 **Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 12 · advances TOOL-dCalibratedLens-18
 
-**Carries:** cl-dClosedLoop-0467@58bd6ee5 whole
+**Carries:** cl-dClosedLoop-0467@0bd9d49f whole
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-10-deviation-101.md](../build/2026-11-02-build-TOOL-dCalibratedLens-10-deviation-101.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 
 <!-- /gen:spec-records -->
 
@@ -244,20 +245,20 @@ held to `^[0-9]+$`, so no argument is a path.
   leaves its baseline.
   Red when: an `absent` case counts the matched row as a pass, or the baseline falls.
 - **AC3** — When the plant `suite` holds three cases, one held, one whose `**Loads:**` file a later commit
-  changes, and one replayed below its baseline, `python tools/workflows/evals/check_evals.py` in the
+  changes, and one replayed below its baseline, `python check_evals.py` in the
   fixture prints `held`, `owed` naming the changed path, and `fell`, and exits 1; with only the held case
   it exits 0; with no case it prints `unarmed` and exits 1.
   Red when: a moved load reads `held`, or an empty suite exits 0.
-- **AC4** — When the plant `guard` tracks `tools/x/instructions.toml` outside the leg's guard, and a case
-  loads a path outside it, the check prints `guard misses tools/x/instructions.toml` and `unguarded`, and
-  exits 1.
+- **AC4** — When the plant `guard` tracks a kit's `instructions.toml` outside the leg's guard, and a case
+  loads a path outside it, the check prints `guard misses` naming that manifest's path and `unguarded`,
+  and exits 1.
   Red when: a manifest the guard misses passes, so a change to it never selects the leg.
-- **AC5** — When `python -c "import json; print([l for l in json.load(open('tools/gate-legs.json')) if l['name'] == 'instruction-eval'])"`
-  runs, it prints one row with `subject` `kit` and argv naming `evals/check_evals.py`;
+- **AC5** — When the leg manifest `gate-legs.json` is read with `json.load` and filtered to the row
+  whose `name` is `instruction-eval`, it holds one row with `subject` `kit` and an `argv` naming `check_evals.py`;
   `python tools/govkit/govkit.py shipped --epoch` prints no `tools/workflows/evals/` path; and `grep -n
   'name = "instruction-eval"' tools/govkit/registry.toml` prints the `[[exempt_leg]]` row.
   Red when: a kit ships the entry, so `changed` ignores the guard.
-- **AC6** — When `python tools/workflows/evals/check_evals.py` runs over the tree, it prints one line for
+- **AC6** — When `python check_evals.py` runs over the tree, it prints one line for
   `design-audit-runtime-record`, `held` or `owed` naming the paths that moved, and never `unarmed`.
   Red when: the seed case is missing or refused.
   figure: DERIVED, the verdict depends on the tree at observation time.
@@ -267,7 +268,7 @@ held to `^[0-9]+$`, so no argument is a path.
   with `units` `-`, and finding 9, refuted, are each refused by name; a second `--add-case` for finding 7
   is refused naming the existing case.
   Red when: a finding with no cited unit becomes a case, or a finding gets two.
-- **AC8** — When `python tools/loop/loop_review.py --fixture --plant eval-candidates` holds two confirmed
+- **AC8** — When `python loop_review.py --fixture --plant eval-candidates` holds two confirmed
   findings citing units in the window, one named by a case's `**From:**`, `propose --dry-run` prints one
   `eval-case <stem>#<id> add-case` proposal, and `gather --dry-run` prints `eval-candidates: 1
   finding(s) · 1 case(s) · …`.

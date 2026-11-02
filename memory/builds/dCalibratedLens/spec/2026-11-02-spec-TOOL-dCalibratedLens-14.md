@@ -10,6 +10,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 
 <!-- /gen:spec-records -->
 
@@ -157,6 +158,11 @@ The swap then runs as TOOL-dFairHearing-3 S2 runs it, so an exclusion compiles t
 and the literal keeps five slots. The harness reads no policy and no overlay; `review_pin.py` reads
 only its arguments, as at base.
 
+An exclusion of an opt-in key `review.opt-in` names is not this rule's case: TOOL-dCalibratedLens-13
+S5's `check_opt_in_exclusions` refuses an `instructions.exclude` entry naming a tag
+`derive_opt_in_tags` returns, at the composition read, so `--exclude` here governs only the removal
+of a default and the opt-in that fills its slot.
+
 ### The proposed row
 
 ```toml
@@ -174,6 +180,13 @@ parent can comply. The command printed beside it:
 python tools/playbook/instructions_edit.py add --manifest overlay --row '<the row>' \
   --promoted-from 'change <stem>, <stem>'
 ```
+
+### The proposal step and the decline
+
+`derive_scenario_proposals` joins `PROPOSERS` (TOOL-dCalibratedLens-5 S6) as one entry, so `propose`
+runs it in list order beside that unit's three. Its keeps are read with `read_keep_records`
+(TOOL-dCalibratedLens-5 S8), and S7's rule governs them, never that unit's window lapse: a keep keyed
+(`scenario`, `<After>`) holds that `After` until a build carries a changed form.
 
 ### Each value
 
@@ -268,12 +281,13 @@ window, so the Loop Review raises nothing on a tree with none.
   ["lens.blast-radius"]` and no `review.opt-in`, it refuses naming `instructions.exclude`; with
   `review.opt-in` filling the slot its JSON line carries the swap.
   Red when: `--trigger` passes no `--exclude`.
-  fixture: the `--trigger` fixture TOOL-dDeclaredLoop-20 lands in `tools/unattended/unattended.test.sh`.
-- **AC5** — When `python tools/workflows/render_lenses.py` checks a scratch overlay holding three
+  fixture: the `--trigger` fixture TOOL-dDeclaredLoop-20 lands in the unattended kit's suite, whose arm
+  §7's `New arm:` line declares.
+- **AC5** — When `python render_lenses.py` checks a scratch overlay holding three
   repository lens rows, one with no `replay`, one whose `replay` names a tracked file and one whose
   `replay` names no tracked file, only the third is refused, its message naming its tag and `replay`.
   Red when: the first is refused, so a repository lens owes a replay, or the third passes.
-- **AC6** — When `python tools/loop/loop_review.py --fixture --plant promote-two-builds` runs, under
+- **AC6** — When `python loop_review.py --fixture --plant promote-two-builds` runs, under
   `loop-proposes` with two builds applying one change under `scenario.feature`, the record's
   `scenario-proposals` field names that `After` once with both slugs; with one of the two held, or
   with the second build under another scenario, it reads `0`.
@@ -285,7 +299,7 @@ window, so the Loop Review raises nothing on a tree with none.
 - **AC8** — When the AC6 fixture runs under `owner-only` and under `off`, the field reads
   `none — flow.promote owner-only` and `none — flow.promote off`, and `file` files no owner item.
   Red when: either value raises a proposal.
-- **AC9** — When `python tools/playbook/instructions_edit.py fixture --plant promote-off` runs, an
+- **AC9** — When `python instructions_edit.py fixture --plant promote-off` runs, an
   `add --manifest overlay` of a `[[scenario]]` row with `--promoted-from` under `flow.promote = "off"`
   exits 1 naming `flow.promote` and writes no row and no change record; the same write with no
   `--promoted-from` is not refused by this check.
@@ -293,7 +307,7 @@ window, so the Loop Review raises nothing on a tree with none.
 - **AC10** — When the same fixture plants the write under `owner-only` with the owner's proof, the
   change record it writes carries `Promoted-from: change <stem>, <stem>`.
   Red when: the edge is lost, so the promotion names no change.
-- **AC11** — When `python tools/loop/scenario.py --fixture --plant promoted-in-flight` runs, a build
+- **AC11** — When `python scenario.py --fixture --plant promoted-in-flight` runs, a build
   under `scenario.feature` that complies gains the promoted scenario on its next transition record's
   `scenario=` field, and a build that skipped a promoted item in a walked step keeps its scenarios and
   prints `scenario: <tag> held — skip`.
@@ -304,7 +318,7 @@ window, so the Loop Review raises nothing on a tree with none.
 - **AC13** — When `python tools/policy/policy.py lists --check` runs, it exits 0, and
   `grep -c '^flow.promote$' tools/policy/unsummarised-keys.txt` prints 0.
   Red when: the row has no `summary` or `usage`, or the name is still listed.
-- **AC14** — When `grep -c 'flow.promote' help/policy.md help/loop.md` and
+- **AC14** — When `grep -c 'flow.promote' help/policy.md loop.md` and
   `grep -c '\-\-exclude' tools/workflows/README.md` run, each file counts at least one.
   Red when: a page describes promotion or exclusion without the key or the flag.
 

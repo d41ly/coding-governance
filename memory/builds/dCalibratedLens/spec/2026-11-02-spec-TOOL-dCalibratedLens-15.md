@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 
 <!-- /gen:spec-records -->
@@ -112,6 +113,7 @@ at base and cited where used.
 
 - **consumes-from** `TOOL-dCalibratedLens-2` — `PROVIDERS`, which gains the `cap` entry, the provider shape and the `-` catches rule
 - **consumes-from** `TOOL-dCalibratedLens-3` — `METRICS`, which gains `cap-breaches` and `cap-counted`; `run_loop_walk` and the proposal shape `run_loop_file` reads; the record's Metrics lines and its home
+- **hands-off** `TOOL-dCalibratedLens-4` — the `kind=cap` rows of the value ledger, each breach priced by its bytes and its reads in the `cost` column
 - **consumes-from** external — TOOL-dWitnessedBar-29 (the `warn.<k>` verdict keys) and TOOL-dWitnessedBar-4 (the `tree` key), DEFERRED at base and of an ancestor build
 
 ## 4. Design

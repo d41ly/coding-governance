@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 
 <!-- /gen:spec-records -->
 
@@ -181,7 +182,7 @@ which is TOOL-dTotalRecall-9's reading today.
   `<a>` a `gov-builder` marker and a `reads:` list of three keys at 1200, 3400 and 500 bytes and `<b>`
   a marker with no list, it prints the single line `<a>`, `gov-builder`, `5100`, tab-separated.
   Red when: an unsliced work order prints a line, or the bytes are not the list's sum.
-- **AC2** — When `python tools/loop/measure.py --fixture --plant item-budget-measured` commits 31
+- **AC2** — When `python measure.py --fixture --plant item-budget-measured` commits 31
   `gov-builder` work orders at 1000 to 31000 bytes under `measured`, the step prints `item-budgets —
   gov-builder · work orders 30 · p90 28000 B · measured`.
   Red when: the oldest work order is counted, or all 31 are.
@@ -212,7 +213,7 @@ which is TOOL-dTotalRecall-9's reading today.
   `item-budgets` field holds the S4 line, and `loop_review.py file --dry-run` names one proposal keyed
   `item-budget` and `gov-builder`.
   Red when: the field is absent or the measured role files no proposal.
-- **AC9** — When `grep -n "Each role's item budget" help/loop.md` runs, it names the section.
+- **AC9** — When `grep -n "Each role's item budget" loop.md` runs, it names the section.
   Red when: the section is absent.
 
 ## 7. Gates

@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-17 |
+| [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-17 |
 
 <!-- /gen:spec-records -->
 
@@ -205,12 +206,12 @@ bound refuses until 30 builds have run under its value.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python tools/runtime/journal.py classes` runs, it prints one line per member of
+- **AC1** — When `python journal.py classes` runs, it prints one line per member of
   `JOURNAL_CLASSES` in tuple order, as many lines as `python -c "import journal;
   print(len(journal.JOURNAL_CLASSES))"` run in `tools/runtime/` prints.
   Red when: a member is missing or the order differs.
   figure: the count is DERIVED from the tuple.
-- **AC2** — When `python tools/loop/measure.py --fixture --plant stall-left-out` journals one `cycle`
+- **AC2** — When `python measure.py --fixture --plant stall-left-out` journals one `cycle`
   line and plants `cycle` into `NOT_TRENDED`, `check_trend_classes` exits 1 printing `stall trend —
   refused · cycle`; the plant `stall-new-class` adds a class `livelock` to the planted
   tuple, journals one such line, and the trend counts it, exit 0.
@@ -250,7 +251,7 @@ bound refuses until 30 builds have run under its value.
 - **AC10** — When `bounds-budget` finishes, `git status --porcelain` in the scratch repository prints
   nothing.
   Red when: the step writes `.governance/policy.toml`.
-- **AC11** — When `grep -n "Stalls and loops, trended" help/loop.md` runs, it names the section.
+- **AC11** — When `grep -n "Stalls and loops, trended" loop.md` runs, it names the section.
   Red when: the section is absent.
 
 ## 7. Gates
