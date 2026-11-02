@@ -204,7 +204,7 @@ lenses that use it. 2 (order 1), 3 (2), 7 (3), 9 (4), 12 (5), 15 (6), 4 (7), 6 (
   from returns and findings that cite unit tags; the `propose` verb pruning units that bear no load and tightening
   those broken often, as `review.loop.retire` says (`propose-ratify` default, `demote-then-propose`, `report`), each
   value seen on its planted case; a charter amendment proposed for a rule whose override records recur
-  (TOOL-dOrderedCharter-2 S4's override kind, through `instructions_edit.py`, TOOL-dOrderedCharter-15). PRIMITIVE
+  (PLAY-dOrderedCharter-2 S4's override kind, through `instructions_edit.py`, PLAY-dOrderedCharter-15). PRIMITIVE
   GAP: no return or finding grammar cites a unit tag. Owns `item.loop.propose`, `policy-key.review.loop.retire`.
 - **TOOL-dCalibratedLens-10** — Items 10 (gap-review-14). S10: re-run as a held leg when an instruction unit
   changes; a confirmed finding whose cause is an instruction adds a case.
@@ -233,7 +233,7 @@ lenses that use it. 2 (order 1), 3 (2), 7 (3), 9 (4), 12 (5), 15 (6), 4 (7), 6 (
   one ran and never owing one; and scenario promotion as `flow.promote` says (`loop-proposes` default,
   `owner-only`, `off`): the Loop Review proposing a scenario from a recorded change two or more builds carried
   (TOOL-dDeclaredLoop-28 S3's `flow.adapt` records), ratified through `instructions.edit` with `promoted-from`
-  edges (TOOL-dOrderedCharter-15), into `tools/loop/scenarios.toml` (TOOL-dDeclaredLoop-27 S4); builds in flight
+  edges (PLAY-dOrderedCharter-15), into `tools/loop/scenarios.toml` (TOOL-dDeclaredLoop-27 S4); builds in flight
   moving only at a step boundary and only if they comply; a declined proposal recorded, keyed by the change's
   content, and not proposed again until a build carries a changed form; each value seen on its planted case, a
   declined proposal the next review does not raise among them. Owns `policy-key.flow.promote`.
