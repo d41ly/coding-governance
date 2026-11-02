@@ -16,3 +16,14 @@ round 1 · finding 48 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-2 �
 round 1 · finding 49 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-3 · unit TOOL-dCalibratedLens-27 · rev 1
 round 1 · finding 50 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-9 · unit TOOL-dCalibratedLens-28 · rev 1
 round 1 · finding 52 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-6 · unit TOOL-dCalibratedLens-29 · rev 1
+round 2 · subject dCalibratedLens-spec-set-r2 · audited TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30
+round 2 · finding 30 · BLOCKER · new-mechanism · specs TOOL-dCalibratedLens-25 · unit TOOL-dCalibratedLens-31 · rev 1
+round 2 · finding 26 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-19 · unit TOOL-dCalibratedLens-32 · rev 1
+round 2 · finding 2 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-19 · unit TOOL-dCalibratedLens-33 · rev 1
+round 2 · finding 11 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-19 · unit TOOL-dCalibratedLens-34 · rev 1
+round 2 · finding 1 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-19 · unit TOOL-dCalibratedLens-35 · rev 1
+round 2 · finding 6 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-23 · unit TOOL-dCalibratedLens-36 · rev 1
+round 2 · finding 24 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-25 · unit TOOL-dCalibratedLens-37 · rev 1
+round 2 · finding 19 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-29 · unit TOOL-dCalibratedLens-38 · rev 1
+round 2 · finding 27 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-21 · unit TOOL-dCalibratedLens-39 · rev 1
+round 2 · finding 31 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-27 · unit TOOL-dCalibratedLens-40 · rev 1
