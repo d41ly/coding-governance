@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-17 — origin/main reconciled into the run branch: the eight conflicted paths merged additively
 
-**Status:** INPROGRESS · rev-2 · 2026-11-02 · node d · Tier-1 · base 8a5328a9 · streams tooling · order 170
+**Status:** INPROGRESS · rev-3 · 2026-11-02 · node d · Tier-1 · base 8a5328a9 · streams tooling · order 170
 
 <!-- gen:spec-records -->
 
@@ -10,11 +10,13 @@
 | [2026-11-02-build-TOOL-dFoldedAudit-17-2-builder-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-2-builder-return.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-17-3-spec-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-3-spec-return.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-17-4-builder-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-4-builder-return.md) | journal | — |
+| [2026-11-02-build-TOOL-dFoldedAudit-17-5-spec-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-5-spec-return.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-1-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-2-builder.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-2-builder.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-3-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-3-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-4-builder.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-4-builder.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-5-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-5-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-17-6-builder.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-6-builder.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-build-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-fix-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-fix2-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-fix2-brief.md) | research | — |
@@ -30,11 +32,11 @@ keeps both sides' content. The close's `--prepare` then meets no conflict. The o
 
 ## 2. Scope (IN)
 
-- **S1** — The merge, in a scratch clone of the run branch under `%TEMP%`, whose `origin` is the run
-  repository's GitHub remote, whose hooks are the tracked `.githooks/` and whose merge drivers are the run
-  repository's `rows` and `ours`. The clone fetches `origin` and
-  runs `git merge --no-ff --no-commit origin/main`. A conflict on any path outside §4's table stops the
-  unit before any resolution. Observed by AC1.
+- **S1** — The merge runs in the run worktree itself, on `branch/gov-build-m4-spec-audit-694e7b`,
+  which the shared config gives the hooks path and both merge drivers, `rows` and `ours`. The clean
+  worktree fetches `origin`, the GitHub remote, and runs `git merge --no-ff --no-commit origin/main`. A
+  conflict on any path outside §4's table, or any failed step before M, stops the unit, and
+  `git merge --abort` restores the worktree. Observed by AC1.
 - **S2** — `.memory-tree.conf` keeps both blocks unchanged: main's `SPEC_AC_ORDER_CUTOFF`
   (`TOOL-dSafePassage-34`) first, then this build's `SPEC_SUPERSEDE_CUTOFF` (`TOOL-dFoldedAudit-4`).
   Observed by AC2, AC3 and AC6.
@@ -51,14 +53,17 @@ keeps both sides' content. The close's `--prepare` then meets no conflict. The o
 - **S7** — `memory/guides/SESSION-KICKOFF.md` keeps main's `last-body-change`. Its `last-audit` stamp is
   re-taken by the checker's rule twice: at the merge commit on the branch tip, and in the follow-up
   commit on the merge commit's sha. Observed by AC2 and AC12.
-- **S8** — Generated files are re-rendered, never hand-merged. The merge commit carries the map and the
-  build index as their writers render them. `.governance/policy.json` enters the merge commit as one
-  parent's blob and is re-rendered in the follow-up commit. Observed by AC10 and AC11.
+- **S8** — Generated files are re-rendered, never hand-merged. The merge commit carries the map and
+  every file `gen_build_index.py --write` rewrites, as their writers render them. Those are
+  `memory/LIVE.md`, the 2026-11 ledger, the dClosedLoop as-built view and dSafePassage's README
+  generated block. Each is a render, not an authored write. `.governance/policy.json` enters the merge
+  commit as one parent's blob and is re-rendered in the follow-up commit. Observed by AC10 and AC11.
 - **S9** — Every commit runs with `GOV_PYTHON` exported to the Python 3.15 interpreter §4 names, because
   main's resolver floor is 3.15. NOT OBSERVED by a criterion: it is a precondition of the two commits,
   and a hook that resolves no usable launcher refuses the commit (`.githooks/pre-commit:286-288`).
-- **S10** — The run branch takes the clone's two commits by fast-forward, and its remote-tracking
-  `origin/main` names the merged tip. Observed by AC13.
+- **S10** — M and F are committed in the run worktree, on the run branch, each ending with the
+  charter's trailer. The shared remote-tracking `origin/main` that S1's fetch moved names M's second
+  parent. Observed by AC13.
 
 ## 3. Non-goals (OUT)
 
@@ -70,13 +75,16 @@ keeps both sides' content. The close's `--prepare` then meets no conflict. The o
   second is the close's.
 - A kit version mint. The merge brings main's version markers and the lander mints at landing.
 - This unit's status flip to CLOSED, its acceptance ledger and its pass commit. They are the main
-  loop's, after the fast-forward, and neither M nor F carries the flip.
+  loop's, after F, and neither M nor F carries the flip.
+- A clone of the run branch, `--no-verify`, or a `GOV_DEFAULT_BRANCH` override of the branch guard.
+- Undoing M once it is committed. A refused F stops the unit and is reported, with no reset.
 - Running any suite or the bar inside the pass.
 - The parked question of the two unattended suites, recorded in this build's `RUN.md`.
 
 ## 4. Design
 
-Line numbers are this tree's at `951f44e4`, PINNED 2026-11-02, unless a line says otherwise. The trial
+Line numbers are this tree's at `951f44e4`, PINNED 2026-11-02, unless a line says otherwise. Those a
+rev-3 sentence adds are the run worktree's at `4d779489`, unless they name main. The trial
 merge is `git merge-tree --write-tree --name-only` over `951f44e4` and `8a5328a9`, taken 2026-11-02.
 
 ### The conflict set
@@ -107,22 +115,44 @@ twenty-four. The two it gained are `tools/roles/SKILL.template.md` and `.claude/
 and main moves each from `roles@1.10` to `roles@1.11` on its kit marker line alone, so they stay a pair.
 A later tip still re-derives by the last subsection's rule.
 
-### S1 — the clone
+### S1 — the run worktree
 
-A clone of the local repository names that repository as `origin`. There `origin/main` is local `main`,
-`2a6f3975`, and not the GitHub tip the trial measured. So the clone takes the run repository's remote
-URL before it fetches. A fresh clone also carries no `core.hooksPath`, and its commits would skip every
-hook, so the clone sets it.
+The merge runs in the run worktree, on `branch/gov-build-m4-spec-audit-694e7b`, where units 1 to 16
+committed. Pre-commit's branch guard (`.githooks/pre-commit:71-93`) refuses a commit on a non-default
+branch only in a primary tree, which it tells by the git dir equalling the common dir (`:75-77`). A
+clone is a primary tree, and the guard refused M there in the builder's second dispatch
+(`memory/builds/dFoldedAudit/build/2026-11-02-build-TOOL-dFoldedAudit-17-4-builder-return.md`). The
+run worktree is a linked worktree: its git dir is `.git/worktrees/gov-build-m4-spec-audit-694e7b` and
+its common dir `.git`, measured 2026-11-02, so the guard admits its commits.
 
-Nor does a clone carry the merge drivers. `.gitattributes` routes `memory/LIVE.md`, `memory/ledger/*.md`
-and the dClosedLoop as-built record to `merge=ours` (`.gitattributes:90-91` and `:100`), and the authored
-indexes to `merge=rows` (`:77-84`). Both drivers are defined only in the run repository's `.git/config`,
-which `git -C "$REPO" config --get-regexp '^merge\.'` prints as `merge.rows.driver bash
-tools/memory-tree/merge-rows.sh %O %A %B %P` and `merge.ours.driver true`, measured 2026-11-02. The
-trial merge ran in the run repository, where both are set. Without them the clone conflicts on those
-three `merge=ours` paths besides the eight. With both set, `git merge-tree --write-tree --name-only` in
-the clone printed exactly the eight. That is the builder's first dispatch, recorded in the return the
-conflict-set section names. So the clone copies both after the hooks path, and prints them back.
+The worktree reads the run repository's shared `.git/config`, measured 2026-11-02 with
+`git config --show-origin`:
+
+| Key | Value |
+|---|---|
+| `core.hooksPath` | `C:\projects\coding-governance\.githooks` |
+| `merge.rows.driver` | `bash tools/memory-tree/merge-rows.sh %O %A %B %P` |
+| `merge.ours.driver` | `true` |
+| `remote.origin.url` | `https://github.com/d41ly/coding-governance` |
+
+`.gitattributes` routes `memory/LIVE.md`, `memory/ledger/*.md` and the dClosedLoop as-built record to
+`merge=ours` (`.gitattributes:90-91` and `:100`), and the authored indexes to `merge=rows` (`:77-84`).
+Both drivers are set, so the merge conflicts on the eight alone, as the trial merge in this repository
+showed. `origin` is GitHub, so `git fetch origin` reads main's tip directly and moves the shared
+`refs/remotes/origin/main`.
+
+The hooks path is the primary tree's checkout, at local `main` `2a6f3975`. Its `.githooks/` is
+byte-identical to the branch's, and main changes only three pre-push files there, so
+`.githooks/pre-commit` is the same at the branch, local `main` and `84acebdc`. M and F meet the
+pre-commit that main runs. The hook sources the tracked resolver from the work tree it grades
+(`.githooks/pre-commit:282-286`), so mid-merge that is the merged `tools/lib/resolve-python.sh` with
+main's floor.
+
+The write gate places a target by its own toplevel (`tools/hooks/scratch-guard.js:1142-1144`) and reads
+the routed spec in that tree (`:884`). A hand resolution in the worktree therefore meets this spec at
+INPROGRESS, and this unit is routed, so the gate admits it. The session-start route line resolves its
+tree from `CLAUDE_PROJECT_DIR` or the cwd (`:1473-1478`), and this pass saw it report the spec absent.
+That line describes another tree and is not the gate's verdict.
 
 `GOV_PYTHON` names Python 3.15.2. Both sides' resolvers try a caller's override, then `GOV_PYTHON`, then
 `python3` (`tools/lib/resolve-python.sh:30`, and line 36 of main's copy at `84acebdc`), so the exported
@@ -131,13 +161,13 @@ the 3.15 floor.
 
 ```bash
 export GOV_PYTHON=C:/Users/d41ly/AppData/Local/Programs/Python/Python315/python.exe
-REPO=C:/projects/coding-governance
-RUNWT=$REPO/.claude/worktrees/gov-build-m4-spec-audit-694e7b
-CL="$TEMP/dFoldedAudit-17-merge"
-git clone --branch branch/gov-build-m4-spec-audit-694e7b "$REPO" "$CL" && cd "$CL"
-git remote set-url origin "$(git -C "$REPO" remote get-url origin)"
-git config core.hooksPath .githooks
-git -C "$REPO" config --get-regexp '^merge\.' | while read -r key val; do git config "$key" "$val"; done
+RUNWT=C:/projects/coding-governance/.claude/worktrees/gov-build-m4-spec-audit-694e7b
+P="$TEMP/dFoldedAudit-17-probes"; mkdir -p "$P"
+cd "$RUNWT"
+test "$(git branch --show-current)" = branch/gov-build-m4-spec-audit-694e7b
+test "$(git rev-parse --path-format=absolute --git-dir)" != "$(git rev-parse --path-format=absolute --git-common-dir)"
+test -z "$(git status --porcelain)"
+git config --get core.hooksPath
 git config --get-regexp '^merge\.'
 git fetch origin
 git merge --no-ff --no-commit origin/main
@@ -146,7 +176,17 @@ git diff --name-only --diff-filter=U
 
 `--no-commit` holds the merge open, so the generated renders and the stamp land in the merge commit.
 The builder records `git rev-parse origin/main`. Every figure below is PINNED at `8a5328a9`, and the
-last subsection says what re-derives when the tip has moved.
+last subsection says what re-derives when the tip has moved. The probes and `drift.err` live in `$P`,
+outside the worktree, so `git status` shows the merge's own paths alone.
+
+### The stop
+
+The worktree is clean before the merge, so the merge is its only change. Any failed step before M
+leaves `MERGE_HEAD` set. That covers a conflict outside §4's table, a missing driver, a resolution that
+does not hold, and a refused M. `git merge --abort` then restores the worktree to the branch tip. That
+is the unit's stop, and the builder reports which step failed. Once M is committed no step undoes it.
+A refused F leaves M on the branch and F's changes staged, and the builder stops and reports without a
+reset.
 
 ### S2 to S6 — the hand resolutions
 
@@ -219,18 +259,49 @@ reconcile `37b3bf32` and its follow-up `f25d719e` did:
   come from `git log -G`, which lists no merge commit, so a stamp inside the merge commit is not seen. The
   follow-up commit stamps `last-audit: <later now> @ <the merge commit's full sha>`.
 
-The datetime is ISO-8601 with its offset and always advances (`:1405`). Each commit message carries a
-`Manifest delta:` line. Main's watched changes are one conf key, the method guide's kit marker, the
-inline resolver block in five scripts and four gate legs. No §B line names the resolver floor or those
-legs, measured 2026-11-02, so the expected delta is none, and the builder re-reads §B to confirm it.
-The stall check then counts 5 non-merge watched commits since `201eb127`, below its 10 (`:1633-1653`).
+The stamp's sha is `HEAD` on any branch, the rule `STAMP_SHA_RULE` holds at `:1405`. Its datetime is
+ISO-8601 with its offset (`:1442-1443`) and always advances
+(`skills/session-kickoff/MANIFEST-TEMPLATE.md:30`). Each commit message carries the kit's record line
+(`skills/session-kickoff/SKILL.md:121-122`):
+
+```
+manifest-audit: delta none · watch-commits-since-stamp: <n>
+```
+
+`<n>` is DERIVED by `git rev-list --count <old-stamp-sha>..HEAD -- <watch…>`, counted before that
+commit's re-stamp.
+
+Main's watched changes are two `.memory-tree.conf` changes, the method guide's kit marker, the inline
+resolver block in five scripts and four gate legs. The conf changes are the `SPEC_AC_ORDER_CUTOFF`
+block S2 resolves, and `docs-undocumented.txt` added to `PROJECT_REGISTRY_EXTRA` by
+`TOOL-dSafePassage-13`, at line 925 of main's conf. That addition sits outside the conflicted hunk and
+merges clean, and no §B line names the key.
+
+One §B line names the resolver floor. It is `memory/guides/SESSION-KICKOFF.md:219` at `84acebdc`, and
+line 223 of the conflicted blob. Main added it in `1f7d1966`, whose parent `201eb127` is the sha its
+`last-body-change` names, and it is current at main's tip. So the expected delta stays none, measured
+2026-11-02, and the builder re-reads §B to confirm it. The stall check then counts 5 non-merge watched
+commits since `201eb127`, below its 10 (`:1633-1653`).
 
 ### S8 — generated files
 
 Before the merge commit, `"$GOV_PYTHON" tools/codebase-map/gen_map.py --write` renders
 `memory/map/generated/`, which settles `symbols.json` and the auto-merged `CARDS.md`. Then
-`"$GOV_PYTHON" tools/memory-tree/gen_build_index.py --write` renders `memory/LIVE.md` and the build
-indexes. Both are staged with the merge. The hooks need this: the codebase-map leg grades the work tree
+`"$GOV_PYTHON" tools/memory-tree/gen_build_index.py --write` rewrites these files, each a render and
+none an authored write:
+
+| File | Why it moves |
+|---|---|
+| `memory/LIVE.md` | `merge=ours`, both sides changed it |
+| `memory/ledger/2026-11.md` | `merge=ours`, both sides changed it |
+| `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` | `merge=ours`, both sides changed it |
+| `memory/builds/dSafePassage/README.md`, its generated block | main alone changed it |
+
+The set was measured by the builder's second dispatch on 2026-11-02, and `git diff --name-only` from
+the merge base to each side confirms the "both sides" and "main alone" cells. The `ours` driver keeps
+the branch's bytes for the first three, and the render re-derives them from both sides' records, as
+`.gitattributes:95-96` says of the view. A later tip may move another file the writer owns. Whatever
+`--write` rewrites is staged and named in M's body. Both writers' output is staged with the merge. The hooks need this: the codebase-map leg grades the work tree
 whenever a `.py` file is staged (`.githooks/pre-commit:280-307`), and hygiene check 9 delegates to the
 build index's `--check`.
 
@@ -241,31 +312,31 @@ mirror renders at HEAD and records the catalogue's blob (`tools/policy/policy.py
 merged catalogue is a new blob, so it is stale until a commit holds the merge. The follow-up commit runs
 `"$GOV_PYTHON" tools/policy/policy.py mirror --write`, which the guard admits as a render at HEAD.
 
-### S10 — the commits and the fast-forward
+### S10 — the commits
 
 | Commit | Subject | Carries |
 |---|---|---|
 | M | `merge: origin/main into branch/gov-build-m4-spec-audit-694e7b — dFoldedAudit reconciled before its landing` | the resolutions, the renders, the first stamp |
 | F | `records(dFoldedAudit): the kickoff manifest re-stamped and the policy mirror re-rendered at the reconcile merge <M8>` | the second stamp, the mirror |
 
-Both end with `Pass: none` and the run's trailer. `--check-commit` admits a `none` trailer
-(`tools/unattended/unattended.sh:14087`), and the routed-commits leg does not grade a merge's content
-(`tools/memory-tree/routed_commits.py:33-34`). M's body names each resolution in one line.
+Both end with `Pass: none`, then the charter's trailer:
 
-Then, in the run worktree:
-
-```bash
-git -C "$RUNWT" fetch "$CL" HEAD && git -C "$RUNWT" merge --ff-only FETCH_HEAD
-git -C "$RUNWT" fetch origin
+```
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
 ```
 
-The second fetch moves the shared `refs/remotes/origin/main` only when the clone fetched a later tip.
-The close's drift read then compares against the pin the merge took. A refused fast-forward means the
-run branch moved since the clone, and the unit stops and reports.
+`--check-commit` admits a `none` trailer (`tools/unattended/unattended.sh:14087`), and the
+routed-commits leg does not grade a merge's content (`tools/memory-tree/routed_commits.py:33-34`).
+M's body names each resolution in one line.
+
+Both commits land on `branch/gov-build-m4-spec-audit-694e7b` in the run worktree, so nothing follows
+them. S1's fetch already moved the shared `refs/remotes/origin/main` to the tip M takes as its second
+parent, and the close's drift read compares against that ref. A fetch by another session in between
+can move it past that tip, and AC13 then reds.
 
 ### The probes
 
-Probe P, `twoparent.py` under the clone's scratch, prints each line a side added that the result lacks:
+Probe P, `twoparent.py` in `$P`, prints each line a side added that the result lacks:
 
 ```python
 import subprocess, sys
@@ -295,7 +366,7 @@ Run on M, it prints exactly the thirteen lines this design rewrites, and nothing
 Simulated 2026-11-02 over the merge tree's marked blobs with these resolutions applied, it printed twelve
 of them. The thirteenth, the branch's `last-audit` line, is absent only once M re-takes the stamp.
 
-Probe D, `pin.py` under the same scratch, reads the pin the way the ratchet does:
+Probe D, `pin.py` in `$P`, run from the worktree's root, reads the pin the way the ratchet does:
 
 ```python
 import subprocess, sys
@@ -332,6 +403,10 @@ The merge also carries every path main moved, and the two writers re-render the 
 
 ### Alternatives rejected
 
+- **A scratch clone of the run branch.** A clone is a primary tree, so on a non-default branch the
+  branch guard refuses its commits (`.githooks/pre-commit:77-92`). Its only overrides are `--no-verify`
+  and `GOV_DEFAULT_BRANCH`, and either one bypasses the guard rather than meeting it. The second
+  dispatch met that refusal at M.
 - **Taking one side of any hand-resolved file.** Each side's lines carry a landed unit's behaviour, and
   probe P is what shows none was lost.
 - **Pin 38 with a `37 -> 38` line.** The merged tree arms 38 keys at the merge and 39 at the close, so
@@ -343,8 +418,8 @@ The merge also carries every path main moved, and the two writers re-render the 
 
 ## 5. Acceptance criteria
 
-Run in the clone, with `GOV_PYTHON` exported. `HEAD` is M unless a criterion says F or the run worktree.
-Probes P and D are §4's.
+Run in the run worktree, with `GOV_PYTHON` exported and `P` set as §4's S1 block sets it. `HEAD` is M
+unless a criterion says F. Probes P and D are §4's.
 
 ```bash
 EIGHT=".governance/policy.json .memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/map/features/spec-tokens.md memory/map/generated/symbols.json tools/check-spec-tokens.py tools/check-spec-tokens.test.sh tools/drift-audit/drift_signals.py"
@@ -355,8 +430,9 @@ SIX=".memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/map/features/spec
   eight paths of `$EIGHT`.
   figure: PINNED, measured by `git merge-tree --write-tree` over `951f44e4` and `8a5328a9` on 2026-11-02,
   and over `d9d556dd` and `84acebdc` the same day, both in the run repository with its two merge drivers.
-  Red when: the fetched tip conflicts on a ninth path, or the clone lacks a merge driver, which adds the
-  three `merge=ours` paths. Either stops the unit before any resolution.
+  Red when: the fetched tip conflicts on a ninth path, or the shared config lacks a merge driver, which
+  adds the three `merge=ours` paths. Either stops the unit with `git merge --abort` before any
+  resolution.
 - **AC2** — When `git grep -n -E '^(<<<<<<<|>>>>>>>)( |$)' HEAD -- $EIGHT` runs it prints nothing, and
   `git diff --check HEAD^1 HEAD -- $SIX` and `git diff --check HEAD^2 HEAD -- $SIX` print nothing.
   figure: PINNED, on the unresolved merge tree the grep prints 46 lines and the diff check 21 marker
@@ -376,11 +452,11 @@ SIX=".memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/map/features/spec
   runs, it prints those three lines in that order, the last reading `FLOOR_ASSERTIONS=215`.
   figure: DERIVED, main's 203 plus this build's twelve at `8a5328a9`.
   Red when: either side's floor survives, or this build's line still reads `199 -> 211`.
-- **AC6** — When `"$GOV_PYTHON" twoparent.py "$(git merge-base HEAD^1 HEAD^2)" HEAD^1 HEAD^2 $SIX`
+- **AC6** — When `"$GOV_PYTHON" "$P/twoparent.py" "$(git merge-base HEAD^1 HEAD^2)" HEAD^1 HEAD^2 $SIX`
   runs, it prints exactly the thirteen lines of §4's probe P table.
   figure: PINNED at `8a5328a9`; a later tip re-derives the table by §4's rule.
   Red when: a line either side added is absent and is not one this design rewrites.
-- **AC7** — When `"$GOV_PYTHON" pin.py` runs from the clone's root, it prints `37 39 True`.
+- **AC7** — When `"$GOV_PYTHON" "$P/pin.py"` runs from the worktree's root, it prints `37 39 True`.
   figure: PINNED, main's pin at `8a5328a9`; `37 38 True` at `951f44e4`.
   Red when: the pin is not 39, or no comment within 14 lines names `37 -> 39`.
 - **AC8** — When `"$GOV_PYTHON" tools/check-spec-tokens.py | grep -c '^spec-tokens: \(supersede\|ac-order\) join'`
@@ -389,10 +465,11 @@ SIX=".memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/map/features/spec
   permission: scratch-guard refuses a leg's exact argv to a role agent (`tools/hooks/scratch-guard.js:1373-1379`).
   Where it refuses this one, the main loop observes it at the close.
   Red when: `main()` reads one key only, so the other join raises before its line prints.
-- **AC9** — When `"$GOV_PYTHON" tools/drift-audit/drift_report.py --check 2>drift.err` runs, `grep -c cutoff_keys_armed drift.err`
-  prints 0, and its stdout row for `cutoff_keys_armed` reads 38 with `ok (pin 39, drain it)`.
+- **AC9** — When `"$GOV_PYTHON" tools/drift-audit/drift_report.py --check 2>"$P/drift.err"` runs,
+  `grep -c cutoff_keys_armed "$P/drift.err"` prints 0, and its stdout row for `cutoff_keys_armed` reads
+  38 with `ok (pin 39, drain it)`.
   permission: this is the `drift-audit records` leg's argv, and AC8's note applies.
-  fixture: the base ref is the clone's `refs/remotes/origin/main`, the tip the clone fetched.
+  fixture: the base ref is the shared `refs/remotes/origin/main`, the tip S1's fetch set.
   figure: PINNED, 38 armed in the union of both sides' confs, measured 2026-11-02.
   Red when: the pin stays 38 or 37, or its history lacks `37 -> 39`, so a `RATCHET WEAKENED` line prints.
 - **AC10** — When `"$GOV_PYTHON" tools/codebase-map/gen_map.py --check` and
@@ -406,11 +483,11 @@ SIX=".memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/map/features/spec
   On M the stamp ends in `HEAD^1`'s full sha. Then `bash skills/session-kickoff/manifest-check.sh` exits 0 on F.
   permission: this is the `kickoff-manifest ratchet` leg's argv, and AC8's note applies.
   Red when: F still carries M's stamp, which the full leg reds with `fail 5`.
-- **AC13** — When `git merge-tree --write-tree HEAD refs/remotes/origin/main` runs in the run worktree
-  after the fast-forward it exits 0, and `git rev-parse HEAD^1^2 refs/remotes/origin/main` prints one sha
-  twice.
+- **AC13** — When `git merge-tree --write-tree HEAD refs/remotes/origin/main` runs on F it exits 0,
+  and `git rev-parse HEAD^1^2 refs/remotes/origin/main` prints one sha twice.
   figure: PINNED, before this unit it exits 1 and names the eight paths, measured at `951f44e4`.
-  Red when: the run branch did not take M and F, or its remote-tracking ref lags the merged tip.
+  Red when: the run branch does not carry M and F, or the shared remote-tracking ref has moved off the
+  tip M merged.
 
 ## 6. Gates
 
@@ -438,6 +515,22 @@ none
   carried by neither M nor F; the build brief's contrary sentence is withdrawn by the re-dispatch note.
 - rev-2 · 2026-11-02 · §4 · the conflict set re-read at `origin/main` `84acebdc`: none of the eight paths
   moved since `8a5328a9`, the floor, the pin and `last-body-change` hold, and the later-tip rule stays.
+- rev-3 · 2026-11-02 · S1 · S10 · §3 · §4 · AC1 · AC6 · AC7 · AC9 · AC13 · the merge runs in the run
+  worktree, since the branch guard (`.githooks/pre-commit:71-93`) refused M in the clone's primary tree.
+  The clone, the driver copy and the fast-forward are gone, the probes and `drift.err` sit in `$P`
+  outside the worktree, and `git merge --abort` before M is named as the unit's stop.
+- rev-3 · 2026-11-02 · S7 · §4 · one §B line names the resolver floor, line 223 of the conflicted blob
+  and `:219` on main, added by `1f7d1966` on `201eb127` and current, so the delta stays none; the record
+  line is spelled as the kit spells it, with `<n>` derived.
+- rev-3 · 2026-11-02 · §4 · S7 · main's `docs-undocumented.txt` addition to `PROJECT_REGISTRY_EXTRA` is
+  noted as merging clean, outside the conflicted hunk and named by no §B line.
+- rev-3 · 2026-11-02 · S8 · §4 · every file `gen_build_index.py --write` rewrites is named, each a
+  render: `memory/LIVE.md`, the 2026-11 ledger, the dClosedLoop as-built view and dSafePassage's
+  README generated block.
+- rev-3 · 2026-11-02 · §4 · `:1405` re-cited as the stamp-sha rule it holds; the ISO-8601 form is cited
+  at `:1442-1443` and the always-advances rule at `MANIFEST-TEMPLATE.md:30`.
+- rev-3 · 2026-11-02 · S10 · §4 · both commits carry the charter's trailer,
+  `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
 
 ## 9. Reuse audit
 

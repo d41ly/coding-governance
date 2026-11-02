@@ -101,10 +101,10 @@ ids TOOL-dFoldedAudit-15 TOOL-dFoldedAudit-16 TOOL-dFoldedAudit-17
 | [TOOL-dFoldedAudit-12 — the DEGRADED by-hand route ends in the chain record and verdict](spec/2026-11-02-spec-TOOL-dFoldedAudit-12.md) | 140 | 2 | CLOSED | rev-1 | 2026-11-02 |
 | [TOOL-dFoldedAudit-15 — the closing review's mediums and lows closed as one batch](spec/2026-11-02-spec-TOOL-dFoldedAudit-15.md) | 150 | 2 | CLOSED | rev-2 | 2026-11-02 |
 | [TOOL-dFoldedAudit-16 — the flagged bar's own reds cleared: the fork-site registry and the armed-cutoff pin](spec/2026-11-02-spec-TOOL-dFoldedAudit-16.md) | 160 | 2 | CLOSED | rev-2 | 2026-11-02 |
-| [TOOL-dFoldedAudit-17 — origin/main reconciled into the run branch: the eight conflicted paths merged additively](spec/2026-11-02-spec-TOOL-dFoldedAudit-17.md) | 170 | 1 | INPROGRESS | rev-2 | 2026-11-02 |
+| [TOOL-dFoldedAudit-17 — origin/main reconciled into the run branch: the eight conflicted paths merged additively](spec/2026-11-02-spec-TOOL-dFoldedAudit-17.md) | 170 | 1 | INPROGRESS | rev-3 | 2026-11-02 |
 <!-- /gen:build-units -->
 
-Records: 128 bound to this build, across 4 record folder(s).
+Records: 130 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
