@@ -15,7 +15,7 @@
 | push-main self-test | HOST | every case printed ok; it timed out twice at its 580 s ceiling |
 | measure-legs selftest | HOST | AC6, AC7 and AC15 are timing reads; the past run recorded this leg inherited |
 | foreign-prefix parity | INHERITED by its contents | measure-legs again, and policy fixtures' probe marker |
-| pre-push self-test | pending | BASE run in the clone |
+| pre-push self-test | HOST | green at BASE and at HEAD `0e3c26cf9` in fresh clones; the worktree run read the lexicon kit's install location, not this build's code |
 | govkit selftest | pending | OC8 and OC13 read `KIT_DIR derived empty — no .git above the kit`, a scratch-target read |
 
 ## Every leg line
