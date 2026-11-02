@@ -348,7 +348,10 @@ PINS: dict[str, int] = {
     # TOOL-aRoutedQuill-7 PROMPT_BRIEF_SKELETON_CUTOFF in .unattended.conf; no key stopped being armed.
     # 34 -> 36 at dTrueNorth's close, 2026-10-22, under decision TOOL-dTrueNorth-28: TOOL-dTrueNorth-1 arms
     # SPEC_CARRIES_CUTOFF and TOOL-dTrueNorth-5 SPEC_AUDIT_PIN_CUTOFF in .memory-tree.conf; no key stopped being armed.
-    "cutoff_keys_armed": 36,
+    # 36 -> 38 at dFoldedAudit's close, 2026-11-02, under decision TOOL-dFoldedAudit-16: TOOL-dFoldedAudit-4
+    # arms SPEC_SUPERSEDE_CUTOFF in .memory-tree.conf and TOOL-dFoldedAudit-7 SPEC_FOLD_CUTOFF in .unattended.conf,
+    # armed at the close; no key stopped being armed. origin/main reads 37 for TOOL-dSafePassage-34, so 37 -> 38 there.
+    "cutoff_keys_armed": 38,
     # 26 - MEASURED at TOOL-aMendedFleet-37, which added the signal, at its own commit: 26 of 27
     # feature dossiers older than their paths, every one but the codebase-map dossier that unit
     # refreshed. Report-only; the pin is a declared DRAIN, one dossier re-read at a time, and the

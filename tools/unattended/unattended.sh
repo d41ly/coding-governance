@@ -12695,13 +12695,16 @@ review_counts() { # run-state file · subject -> the blocker counts, in order
 # `spec-fold` and `spec-promote` are that rule's two sentences, used only there. The final branch is
 # UNREACHABLE, because the verb refuses `fold` at every exit that rule does not admit and an empty
 # disposition beside anything standing, and it says so loudly rather than printing something reassuring.
+# It leaves its sentence in `_exitnote` too, the convention `runmd_of` follows, so the `folds` callers
+# read it with no fork (TOOL-dFoldedAudit-16).
 review_exit_note() { # disposition -> the sentence
   case "$1" in
-    promote|closing) printf '%s' "every finding confirmed at this exit is PROMOTED to a unit of this build: one per BLOCKER and HIGH, and the MEDIUMs and LOWs batched into one unit, two only across disjoint write sets. Not folded, not parked, not waived, not re-reviewed" ;;
-    spec-fold) printf '%s' "every finding confirmed at this exit FOLDS into the spec it names, rev bumped, and none needs a new mechanism" ;;
-    spec-promote) printf '%s' "a finding that needs a new mechanism is PROMOTED to a unit of this build, a BLOCKER or HIGH to its own, the MEDIUMs and LOWs batched into one unit or two across disjoint write sets, and every other finding FOLDS into the spec it names" ;;
-    *)       printf '%s' "NO DISPOSITION WAS RECORDED, which the state gate should have refused before this line could print" ;;
+    promote|closing) _exitnote="every finding confirmed at this exit is PROMOTED to a unit of this build: one per BLOCKER and HIGH, and the MEDIUMs and LOWs batched into one unit, two only across disjoint write sets. Not folded, not parked, not waived, not re-reviewed" ;;
+    spec-fold) _exitnote="every finding confirmed at this exit FOLDS into the spec it names, rev bumped, and none needs a new mechanism" ;;
+    spec-promote) _exitnote="a finding that needs a new mechanism is PROMOTED to a unit of this build, a BLOCKER or HIGH to its own, the MEDIUMs and LOWs batched into one unit or two across disjoint write sets, and every other finding FOLDS into the spec it names" ;;
+    *)       _exitnote="NO DISPOSITION WAS RECORDED, which the state gate should have refused before this line could print" ;;
   esac
+  printf '%s' "$_exitnote"
 }
 
 # WHICH RULE A SPEC AUDIT'S EXIT TAKES (TOOL-dFoldedAudit-2). `_se_rule` answers `old`, `counted` or
@@ -13023,8 +13026,8 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   if [ "$_se_rule" = folds ]; then
     dby=NATURE
     case "$disposition" in
-      fold)    exitnote=$(review_exit_note spec-fold) ;;
-      promote) exitnote="$(review_exit_note spec-promote); this exit owes at least $owe new unit(s), the floor check 2 grades" ;;
+      fold)    review_exit_note spec-fold >/dev/null; exitnote=$_exitnote ;;
+      promote) review_exit_note spec-promote >/dev/null; exitnote="$_exitnote; this exit owes at least $owe new unit(s), the floor check 2 grades" ;;
     esac
   fi
   case "$state" in

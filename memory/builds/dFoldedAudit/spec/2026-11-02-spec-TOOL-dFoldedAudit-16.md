@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-16 — the flagged bar's own reds cleared: the fork-site registry and the armed-cutoff pin
 
-**Status:** INPROGRESS · rev-2 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 160
+**Status:** CLOSED · rev-2 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 160
 
 <!-- gen:spec-records -->
 

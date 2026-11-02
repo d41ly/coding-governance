@@ -2438,7 +2438,7 @@ for _sw_row in disposal:by-nature chain-stop:own-work chain-ceiling:4; do
   out=$(run_switch_probe "$_sw_tmp/n" "${_sw_row%%:*}"); rc=$?
   same "AC4 with no policy kit ${_sw_row%%:*} takes the kit default" "$out" "${_sw_row#*:}"
   same "AC4 ${_sw_row%%:*} exits 0 with no policy kit" "$rc" "0"
-  hit "$(cat "$_sw_tmp/err")" "no policy kit resolves beside this kit"
+  hit "$(<"$_sw_tmp/err")" "no policy kit resolves beside this kit"
   _sw_defaults="$_sw_defaults $out"
 done
 out=$(run_switch_probe "$_sw_tmp/n" bogus); rc=$?
@@ -2694,7 +2694,7 @@ check_chain_refused() { # the reason's opening words · the flags after the slug
   out=$(run_chain --record-round dFix "$@"); rc=$?
   same "FA5 AC5 [$_fc_want] exits 1" "$rc" "1"
   hit "$out" "UNATTENDED check 118 FAILED — the spec-audit chain record refuses this: $_fc_want"
-  same "FA5 AC5 [$_fc_want] left the record's bytes" "$(cat "$_fc_r/$_fc_f")" "$_fc_bytes"
+  same "FA5 AC5 [$_fc_want] left the record's bytes" "$(<"$_fc_r/$_fc_f")" "$_fc_bytes"
 }
 # AC4: the record, written with no run-state file, its round the verb's own count.
 write_chain_fixture
@@ -2705,15 +2705,16 @@ _fc_f=$(read_chain_file)
 same "FA5 AC4 one record, tracked" "$(grep -c 'chain-rounds.md$' <<<"$_fc_f")" "1"
 same "FA5 AC4 no run-state file was made" "$(cd "$_fc_r" && git ls-files memory/builds/dFix/RUN.md)" ""
 same "FA5 AC4 the second non-blank line binds the first id" "$(grep -v '^$' "$_fc_r/$_fc_f" | sed -n 2p)" "**Serves:** journal FIX-dFix-1"
-hit "$(cat "$_fc_r/$_fc_f")" "round 1 · finding 7 · HIGH · local · specs FIX-dFix-1 · unit FIX-dFix-1 · rev 2"
+hit "$(<"$_fc_r/$_fc_f")" "round 1 · finding 7 · HIGH · local · specs FIX-dFix-1 · unit FIX-dFix-1 · rev 2"
 write_fixture_round dFix-spec-set-r2 FIX-dFix-3 0 0 --finding 9/LOW/local/FIX-dFix-3/FIX-dFix-3/2
-hit "$(cat "$_fc_r/$_fc_f")" "round 2 · subject dFix-spec-set-r2 · audited FIX-dFix-3"
+hit "$(<"$_fc_r/$_fc_f")" "round 2 · subject dFix-spec-set-r2 · audited FIX-dFix-3"
 same "FA5 AC4 a second round adds no file" "$(read_chain_file)" "$_fc_f"
 # AC5: each refusal, each leaving the record's bytes alone. The last is a row short of the review's count.
-_fc_bytes=$(cat "$_fc_r/$_fc_f")
+_fc_bytes=$(<"$_fc_r/$_fc_f")
 check_chain_refused "a --finding is outside" --subject s3 --audited FIX-dFix-1 --blockers 0 --highs 0 --finding 7/HIGH/local/FIX-dFix-1/FIX-dFix-1
 check_chain_refused "--audited holds a token that is no unit id" --subject s3 --audited "FIX-dFix-1;x" --blockers 0 --highs 0
-check_chain_refused "--audited holds a token that is no unit id" --subject s3 --audited "$(printf 'FIX-dFix-1\nround 9 · subject z · audited FIX-dFix-1')" --blockers 0 --highs 0
+printf -v _fc_embedded 'FIX-dFix-1\nround 9 · subject z · audited FIX-dFix-1'
+check_chain_refused "--audited holds a token that is no unit id" --subject s3 --audited "$_fc_embedded" --blockers 0 --highs 0
 check_chain_refused "--subject is outside" --subject "s · 3" --audited FIX-dFix-1 --blockers 0 --highs 0
 check_chain_refused "a --sibling is outside" --subject s3 --audited FIX-dFix-1 --blockers 0 --highs 0 --sibling FIX-dFix-1@rev-x
 check_chain_refused "an earlier round of the record already carries this --subject" --subject dFix-spec-set-r1 --audited FIX-dFix-1 --blockers 0 --highs 0
@@ -2925,7 +2926,7 @@ check_chain_refused "a --sibling is outside" $_cj_round --finding 7/HIGH/local/F
 # ---- AC5's 2099 is the one that reads the clock. The failing cases, observed at the close and not by the
 # ---- pass that wrote this: `read_spec_disposal` answering `by-nature` at its head reds AC1, AC4 and AC5;
 # ---- the line printing the kit default reds AC3; the fold branch deleted reds AC8.
-_sd_fold=7/HIGH/local/TOOL-tFix-1/TOOL-tFix-1/2; _sd_tab=$(printf '\t')
+_sd_fold=7/HIGH/local/TOOL-tFix-1/TOOL-tFix-1/2; printf -v _sd_tab '\t'
 write_disposal_fixture() { # write_fold_fixture's arguments -> that fixture and one tracked unit, so `--plan` has a row
   write_fold_fixture "$@"
   mkdir -p "${_fa_run%/*}/spec"
@@ -2951,7 +2952,7 @@ same "FA13 AC1 the read exits 0" "$rc" "0"
 same "FA13 AC1 the line follows roster:" "$(grep -A1 '^roster: ' <<<"$out" | sed -n 2p)" "spec-disposal: absent"
 same "FA13 AC7 next: is the last line" "$(tail -1 <<<"$out" | cut -d' ' -f1)" "next:"
 same "FA13 AC7 the line carries no TAB" "$(grep '^spec-disposal: ' <<<"$out" | grep -cF "$_sd_tab")" "0"
-miss "$(cat "$_sw_tmp/err")" "no policy kit resolves"
+miss "$(<"$_sw_tmp/err")" "no policy kit resolves"
 # ...and neither other form prints it, whatever the cutoff.
 for _sd_cut in "" 2026-11-01; do
   write_disposal_fixture "" "$_sd_cut"
@@ -2962,7 +2963,7 @@ done
 # it agrees with the spec exit.
 write_disposal_fixture "" 2026-11-01
 hit "$(run_disposal --plan tFix --paths)" "spec-disposal: by-nature"
-hit "$(cat "$_sw_tmp/err")" "no policy kit resolves"
+hit "$(<"$_sw_tmp/err")" "no policy kit resolves"
 write_disposal_fixture "$_fa_dated" 2026-11-01
 hit "$(run_disposal --plan tFix --paths)" "spec-disposal: by-nature"
 run_fold --subject S1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 2 --folded 3 --promoted 0 --disposition fold >/dev/null

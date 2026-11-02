@@ -3057,8 +3057,9 @@ build_dispose_fa3() { printf -v _fa3_d '{"disposed":true,"standing":[],"folded":
   "$1" "$2" "$3" "$4" "${5:+\"dispositions\":$5,}" "${6:-[]}"; }
 # One strict run: args · the `record` double · the `record-exit` double, spelled first because the
 # stub matches a label by prefix, so `record` would answer it.
-run_strict_fa3() { local recexit=''; [ -z "${3:-}" ] || recexit="\"record-exit\":$3,"
-  RUN_WF_SCHEMA=strict run_wf "$1" "$(printf '{"spec-write":%s,"workflow":%s,%s"record":%s,"dispose":%s}' "$SPEC_OK" "$_fa3_review" "$recexit" "$2" "$_fa3_d")"; }
+run_strict_fa3() { local recexit='' runners; [ -z "${3:-}" ] || recexit="\"record-exit\":$3,"
+  printf -v runners '{"spec-write":%s,"workflow":%s,%s"record":%s,"dispose":%s}' "$SPEC_OK" "$_fa3_review" "$recexit" "$2" "$_fa3_d"
+  RUN_WF_SCHEMA=strict run_wf "$1" "$runners"; }
 # A return the guard refuses: args · a name · the reason the trace must hold.
 check_refused_fa3() { o=$(run_strict_fa3 "$1" "$_rec")
   has    "$2: disposal NOT done" "$o" "disposal: NOT done"
@@ -3331,7 +3332,7 @@ check_order_fa12() { local name=$1 rest=$2 want; shift 2
 build_review_fa3 1 1 0 '[{"id":3}]' "$FA3_A3"; rec BOUNDED >/dev/null; _fa3_d=null
 o=$(run_strict_fa3 "$FA3_NAT" "$FA3_HELD" "$_rec"); r=$(read_field_fa12 note)
 has    "FA12 AC1 a dead stage at a held exit is named" "$o" "disposal: NOT done"
-same   "FA12 AC1 ...and the run returns" "$(printf '%s\n' "$o" | grep -c '^THROW ')" "0"
+hasnt_ "FA12 AC1 ...and the run returns" $'\n'"$o" $'\nTHROW '
 for fa12 in '--record-round tB --subject tB-spec-set-r1 --audited "A-tB-1 A-tB-2"' '--blockers 1 --highs 0' \
   '--chain-verdict tB' '--finding <id>/<severity>/<nature>/<spec>[,<spec>]/<unit>/<rev>' \
   'CONTINUE: re-invoke this harness with round: 2' 'STOP: dispatch every unit' 'HOLD: run the recipe it prints'; do
