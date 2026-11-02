@@ -224,3 +224,4 @@ memory/builds/dTendedCadence/README.md
 memory/builds/dCalibratedLens/README.md
 memory/builds/dConvergedCharter/README.md
 memory/builds/dEasedEffort/README.md
+memory/builds/dCountedConsumers/README.md
