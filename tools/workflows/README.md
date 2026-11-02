@@ -303,6 +303,40 @@ so a design-audit run never reuses a unit-spec run's lens files; a run without i
 spec audit names its preset in RUN INTEGRITY and carries `preset` on every return, beside `intensity`.
 It ships dark: nothing in this kit passes `'design-audit'` yet.
 
+`optIn` swaps an opt-in lens into a default slot of the run's literal: `{ "<opt-in lens>": "<default
+lens it replaces>" }`, absent meaning `{}`. The literal keeps five slots, so the swapped lens runs where
+the default would have and the default does NOT run; its coverage is dropped for that run. Each default
+slot is rendered as a `deriveSlotLens('<literal>', { key, brief })` call, which returns the
+`OPTIN_LENSES` row the swap names, carrying `replaces: <default key>`, so the finder label, the lens
+file and the lens-yield row all name the opt-in. Its shape is refused before any agent, beside
+`intensity` and `preset`: not an object, or a key or value outside `^[a-z][a-z0-9-]*$`. Its membership
+is refused by name before the resume probe, in this order: an opt-in already a lens of the literal; one
+no shipped row offers for that literal; a default the literal lacks; and one default named by two
+keys. A light diff run selects its slots by each slot's default key, so a swap into a light slot runs
+there. A non-empty `optIn` joins the review key, each swap is logged before the first agent and named in
+RUN INTEGRITY, and every return carries `optIn` beside `intensity`. A lens note keyed to a replaced
+default is refused, since the swapped lens is the one that runs. Only an `optin = true` row of
+`lenses.toml` can be swapped in, and today none is: each opt-in row ships `optin = false` until its
+losing test is recorded.
+
+`review_pin.py`, beside the harness, is the stand-in for `review.pin`: it prints the `preset` and
+`optIn` of one spec-audit call as one JSON line, and runs nothing.
+
+```
+python <kit>/review_pin.py --subject <path> [--subject <path> ...]
+                           [--opt-in none|'<json>'] [--design-record-preset unit-spec|design-audit]
+```
+
+A subject is a spec subject when the harness's own `SPEC_SUBJECT_PATH`, read from the `tier2-review.js`
+beside the module, matches it; every other subject is a design record. A set holding any spec subject
+prints `unit-spec`; a set of design records alone prints `--design-record-preset`, whose default,
+`DESIGN_RECORD_PRESET`, is `unit-spec` until the design-audit replay's verdict. `--opt-in` is the
+`review.opt-in` value: `none`, the default, or a JSON object keyed by literal name whose values are
+`optIn` maps, and the entry for the printed preset rides as `optIn`. It checks `--opt-in`'s shape only;
+membership is the harness's. It exits 2 naming `SPEC_SUBJECT_PATH`, `--opt-in` or `--subject` on a
+harness with no predicate line, a malformed value or no subject. `unattended-build.js` forwards a
+caller's `optIn` and `preset` to its audit stage's review call unchanged, and unchecked.
+
 Every finding carries `lens`, the key of the lens the harness dispatched, never the label the agent
 echoed back, and every finding line in a skeptic prompt, the synthesis prompt and the run log names
 it as `lens=<key>`. On a spec subject under a declared `disposal` a complete return also carries
@@ -376,7 +410,11 @@ brief = "Coherence: ..."     # one line, raw text; the render escapes \ and '
 A literal's name is what its marker declares: `diff-review` for the diff kind's literal, a
 spec-audit preset name otherwise. The set is read from the template's markers and typed nowhere
 else. A row's place in the file is its slot order. A row with `default_in = []` and `optin = false`
-is catalogued and selected by nothing.
+is catalogued and selected by nothing. Every `optin = true` row also renders under the line
+`const OPTIN_LENSES = [ // gov:lens-optins`, whose body is the same token, as `{ key, presets, brief }`:
+the set `optIn` may swap in. The six opt-in rows, `security`, `alternatives`, `cost`, `portability`,
+`adopter-migration` and `topology`, ship `optin = false`; recording a blind-replay test a row does not
+lose flips that row and nothing else.
 
 The renderer refuses, exit 2, naming the row and the rule: a file that is not TOML or carries a key
 beside `lens`, or a python below 3.11 (rule 1); a missing, extra or mistyped field, a bad key, an

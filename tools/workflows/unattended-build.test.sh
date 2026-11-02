@@ -521,6 +521,15 @@ has "S1 the AUDIT stage invokes tier2-review as a SUB-WORKFLOW from the script" 
 # TOOL-aMendedFleet-111 AC8: the spec-audit call passes `workerType: 'none'`, so every judge writes its
 # file and the deferred `next`'s promise that a re-run reuses them holds. Staged red by deleting it.
 has "aMF-111 AC8 the spec-audit call passes workerType none" "$(printf '%s\n' "$o" | grep '^wargs:')" '"workerType":"none"'
+# TOOL-dFairHearing-3 AC9: the caller's `optIn` and `preset` reach the review call unchanged, and a caller
+# that passes neither sends neither key. Red against the base harness, which forwards neither.
+w=$(printf '%s\n' "$o" | grep '^wargs:')
+hasnt_ "FH3 AC9 a call with no optIn sends no optIn key" "$w" '"optIn"'
+hasnt_ "FH3 AC9 ...and no preset key" "$w" '"preset"'
+o=$(run_wf "${UNITS%\}}"',"optIn":{"topology":"blast-radius"},"preset":"design-audit"}' "$(returns CONVERGED 0)")
+w=$(printf '%s\n' "$o" | grep '^wargs:')
+has "FH3 AC9 the review call receives optIn unchanged" "$w" '"optIn":{"topology":"blast-radius"}'
+has "FH3 AC9 ...and preset unchanged" "$w" '"preset":"design-audit"'
 
 # S3 — CONVERGING paired with 0 blockers is REFUSED BY NAME. A loop with nothing left to
 # converge on has converged, so the pairing is this repo's signature for a record no verb
@@ -3718,7 +3727,10 @@ has    "FA15 AC25 the undeclared throw" "$o" "a disposal passes the hand-out's \
 # AC10 (2), AC13's six calls of the FA3 refusal helper (30), AC20 (2 and one call, 7), AC22 (1, one call and
 # 2, 8), AC17 (2 and three calls, 17), AC21 (5) and AC25 (2). Not measured by a run: the pass that wrote it
 # runs no suite.
-FLOOR_ASSERTIONS=899
+# RAISED 899 -> 903 by TOOL-dFairHearing-3: the four `FH3 AC9` sites, two absences on a call without the
+# arguments and two forwarded values on one with them. Not measured by a run: the pass that wrote it runs
+# no suite.
+FLOOR_ASSERTIONS=903
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

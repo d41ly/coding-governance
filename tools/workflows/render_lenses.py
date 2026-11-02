@@ -7,8 +7,11 @@ A workflow script has no filesystem at run time, so the review harness cannot re
 itself: the install render is its one derivation, beside the four tokens the parity script fills.
 A MARKER is a line ending `= [ // gov:lens-slots <literal>`, and the line after it is exactly
 `{{LENS_SLOTS}}`; that line becomes every row whose `default_in` names the literal, in file order,
-each brief single-quoted with `\\` and `'` escaped. Every other byte passes through unchanged. The
-literal set is DERIVED from the template's markers and typed nowhere else.
+each as a `deriveSlotLens('<literal>', { key, brief })` slot, so the harness can swap an opt-in into
+it at run time (TOOL-dFairHearing-3), each brief single-quoted with `\\` and `'` escaped. An OPT-IN
+marker is a line ending `= [ // gov:lens-optins`, its next line the same token, which becomes every
+`optin = true` row as `{ key, presets, brief }`. Every other byte passes through unchanged. The
+literal set is DERIVED from the template's lens-slots markers and typed nowhere else.
 
 Exit 0 = rendered · 2 = refused, one stderr line naming the row (its `key`, or its index when the key
 is the fault) and the rule. The rules are numbered as this kit's README, section "The lens
@@ -22,6 +25,7 @@ import sys
 
 TOKEN = "{{LENS_SLOTS}}"
 MARKER = re.compile(r"= \[ // gov:lens-slots (\S+)$")
+OPTIN_MARKER = re.compile(r"= \[ // gov:lens-optins$")
 FIELDS = {"key": str, "brief": str, "kinds": list, "presets": list, "default_in": list, "optin": bool}
 KINDS = ("diff-review", "spec-audit")
 KEY = re.compile(r"[a-z][a-z0-9-]*")
@@ -117,28 +121,34 @@ def check_catalogue(rows, literals):
 def render_lens_slots(text, rows):
     """`text` with every marked `{{LENS_SLOTS}}` line filled; Refused on an unmarked token (rule 11)."""
     lines = text.split("\n")
-    marks = {}
+    marks = {}  # the token's line -> its literal, or None under the opt-in marker
     for i, line in enumerate(lines):
         m = MARKER.search(line)
-        if m:
+        o = OPTIN_MARKER.search(line)
+        if m or o:
             if i + 1 >= len(lines) or lines[i + 1] != TOKEN:
                 raise Refused("rule 11: the marker on line %d (%s) is not followed by a line that is "
-                              "exactly %s" % (i + 1, m.group(1), TOKEN))
-            marks[i + 1] = m.group(1)
+                              "exactly %s" % (i + 1, m.group(1) if m else "gov:lens-optins", TOKEN))
+            marks[i + 1] = m.group(1) if m else None
     for i, line in enumerate(lines):
         if TOKEN in line and i not in marks:
             raise Refused("rule 11: %s on line %d stands without a `gov:lens-slots` marker line above "
-                          "it" % (TOKEN, i + 1))
-    check_catalogue(rows, list(dict.fromkeys(marks.values())))
+                          "it, nor a `gov:lens-optins` one" % (TOKEN, i + 1))
+    check_catalogue(rows, list(dict.fromkeys(v for v in marks.values() if v is not None)))
     out = []
     for i, line in enumerate(lines):
         if i not in marks:
             out.append(line)
             continue
         for r in rows:
-            if marks[i] in r["default_in"]:
-                brief = r["brief"].replace("\\", "\\\\").replace("'", "\\'")
-                out += ["  {", "    key: '%s'," % r["key"], "    brief:", "      '%s'," % brief, "  },"]
+            brief = r["brief"].replace("\\", "\\\\").replace("'", "\\'")
+            if marks[i] is None and r["optin"]:
+                out += ["  {", "    key: '%s'," % r["key"],
+                        "    presets: [%s]," % ", ".join("'%s'" % p for p in r["presets"]),
+                        "    brief:", "      '%s'," % brief, "  },"]
+            elif marks[i] is not None and marks[i] in r["default_in"]:
+                out += ["  deriveSlotLens('%s', {" % marks[i], "    key: '%s'," % r["key"], "    brief:",
+                        "      '%s'," % brief, "  }),"]
     return "\n".join(out)
 
 

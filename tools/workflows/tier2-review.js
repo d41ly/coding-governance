@@ -123,6 +123,12 @@ function readOutputTokens() {
 //   preset: "unit-spec" | "design-audit", // spec-audit ONLY, DEFAULTS to "unit-spec": the CALLER's choice of
 //                                         // lens literal, design-audit running DESIGN_LENSES, aimed at a design
 //                                         // or architecture record; refused outside the set and on a diff review
+//   optIn: { "<opt-in lens key>": "<default lens key>" }, // DEFAULTS to {}: the CALLER's swap. Each key is a
+//                                         // shipped opt-in lens (OPTIN_LENSES) offered for the run's literal, run
+//                                         // in the slot of the default it names, so the literal keeps five. Refused
+//                                         // before any agent when not an object of lens keys, and by name on a key
+//                                         // already a lens, one no row offers, a default the literal lacks, or one
+//                                         // default named twice; logged, in RUN INTEGRITY, and in the key when set
 //   checklist: "<preamble>\n- <item>\n  <continuation>" | ["<item>", ...], // the project's recurring
 //                                         // bug classes, each item swept by exactly one lens; absent -> a WARNING.
 //                                         // The STRING form may carry the by-design block the checker prints
@@ -234,6 +240,16 @@ if (!isSpec && a.preset !== undefined)
   throw new Error('tier2-review: `preset` picks a spec-audit lens literal, and a diff-review has none; leave it out. Got ' + JSON.stringify(a.preset) + '.')
 if (typeof preset !== 'string' || PRESETS.indexOf(preset) === -1)
   throw new Error('tier2-review: `preset` must be one of ' + PRESETS.join(' | ') + '. Got ' + JSON.stringify(a.preset) + '.')
+// TOOL-dFairHearing-3 S1 - `optIn`, the CALLER's swap of an opt-in lens into a default slot of the run's
+// literal, `{ "<opt-in>": "<default it replaces>" }`, absent meaning {}. Its SHAPE is refused here, beside
+// `intensity` and `preset`, before the literals read it; its MEMBERSHIP is checked once beside `lensNotes`
+// below, because that needs the literal's default keys. A lens key has the catalogue's key grammar.
+const LENS_KEY_SHAPE = /^[a-z][a-z0-9-]*$/
+const optIn = a.optIn === undefined ? {} : a.optIn
+if (!optIn || typeof optIn !== 'object' || Array.isArray(optIn) ||
+    Object.keys(optIn).some((k) => !LENS_KEY_SHAPE.test(k) || typeof optIn[k] !== 'string' || !LENS_KEY_SHAPE.test(optIn[k])))
+  throw new Error('tier2-review: `optIn` must be an object mapping an opt-in lens key to the default lens key it replaces, ' +
+    'each matching ' + LENS_KEY_SHAPE.source + '. Got ' + JSON.stringify(a.optIn) + '.')
 // TOOL-aMendedFleet-67 S1/S2 - `workerType`, the agent type the JUDGES spawn as: every finder and every
 // skeptic, never the resume probe or the synthesis, which read and write the lens files and the report.
 // Shape-checked here, before any spawn. The built-in types that omit the charter hold no Write tool,
@@ -796,32 +812,49 @@ const SPEC_FINDING_SCHEMA = {
 // lens-slots marker with the rows whose `default_in` names it, at install and in the parity leg,
 // because this script has no filesystem to read the catalogue from. A lens is added or swapped as a
 // row there, never by an edit here. The fan-out leg holds every marked literal to exactly five slots.
+// TOOL-dFairHearing-3 S2 - THE SWAP. Every default slot renders as `deriveSlotLens('<literal>', {...})`,
+// which, when the slot belongs to the run's literal, records its default key and returns the shipped
+// opt-in row `optIn` maps to that default, carrying `replaces`, and the slot unchanged otherwise. So the
+// literal keeps five elements after every swap, and every reader keyed on `L.key` names the lens that
+// ran. OPTIN_LENSES is the render of the catalogue's `optin = true` rows; nothing fans over it. Declared
+// above the literals, because each slot calls in here when its literal is evaluated.
+const OPTIN_LENSES = [ // gov:lens-optins
+]
+const SLOT_LITERAL = isSpec ? preset : 'diff-review'
+const SLOT_DEFAULTS = [] // the run literal's default keys, in slot order
+function deriveSlotLens(literal, L) {
+  if (literal !== SLOT_LITERAL) return L
+  SLOT_DEFAULTS.push(L.key)
+  const k = Object.keys(optIn).find((x) => optIn[x] === L.key)
+  const row = k && OPTIN_LENSES.find((r) => r.key === k && r.presets.indexOf(literal) !== -1)
+  return row ? { key: row.key, brief: row.brief, replaces: L.key } : L
+}
 const DIFF_LENSES = [ // gov:lens-slots diff-review
-  {
+  deriveSlotLens('diff-review', {
     key: 'security',
     brief:
       'Security: trust boundaries for THIS kind of code. Commands built from interpolated input (shell, SQL, regex, paths), path traversal and symlinks, secrets reaching logs or output, authorization or enforcement that can be bypassed, and output from another program or agent trusted without validation.',
-  },
-  {
+  }),
+  deriveSlotLens('diff-review', {
     key: 'correctness',
     brief:
       'Correctness: logic bugs, wrong conditionals and edge cases, off-by-one, type and encoding coercion drift, error and empty-input paths, and two copies of one rule that disagree.',
-  },
-  {
+  }),
+  deriveSlotLens('diff-review', {
     key: 'seams',
     brief:
       'Integration seams + dead plumbing: values computed→passed→never read, stale caches not reset on every mutation path, indexes that don\'t serve their query, half-applied merges, cross-language catalog drift.',
-  },
-  {
+  }),
+  deriveSlotLens('diff-review', {
     key: 'verification',
     brief:
       'Verification: does every behaviour this diff changes have a check that can FAIL? Report a test or gate whose fixture never triggers the rule, a predicate that matches nothing, a skip that reads as a pass, and a changed behaviour with no check at all.',
-  },
-  {
+  }),
+  deriveSlotLens('diff-review', {
     key: 'intent',
     brief:
       'Intent: does the diff do what its stated intent says? Read the range\'s commit messages and any spec or design document the diff touches or those messages name, then report an acceptance criterion with no code behind it, a stated mechanism that is not the one built, and scope beyond what was asked.',
-  },
+  }),
 ]
 // TOOL-aSightedSkeptic-7 S3 - a LIGHT diff review's lenses, as KEYS (spec F1: 70 of the 76 classed
 // findings in the owner's sample, inside the protocol's three-to-six range). Not a third lens set: the
@@ -834,31 +867,31 @@ const LIGHT_LENSES = ['correctness', 'seams', 'verification']
 // literal is their render. Five lenses aimed at the measured escape classes; `coherence` keeps the
 // first slot so a fixture keyed on the first lens keeps its ids.
 const SPEC_LENSES = [ // gov:lens-slots unit-spec
-  {
+  deriveSlotLens('unit-spec', {
     key: 'coherence',
     brief:
       'Coherence: does the spec set agree with itself, and can its acceptance decide anything? Report a section-2 item no section-6 criterion observes; a criterion whose observation cannot FAIL on today\'s tree, because it is already green before the unit is built; a criterion that cannot PASS on a correct build, because it demands what the design does not produce or a figure the build cannot reach; section 2 against section 3; section 4 Design against section 7 Gates; and, across the subjects and the sibling context, the four axes scope, interface, ordering and acceptance: a name, path or key spelled two ways, a unit depending on one ordered after it, two units claiming one file or one landing slot, and an overview acceptance no unit\'s criteria imply.',
-  },
-  {
+  }),
+  deriveSlotLens('unit-spec', {
     key: 'grounding',
     brief:
       'Grounding: is every claim sections 4 and 10 make about the world TRUE where the subjects stand? Check each claim about existing code, a tool\'s flags or output, a record, a count, a platform behaviour or a cost against the source, never against the spec. Hunt the traps this platform sets: MSYS argument and path rewriting, drive-letter and backslash paths, CRLF in a working copy and a text-mode read that drops a CR, and a stated wall-clock goal nobody timed. A claim marked UNVERIFIED is a finding only where the design rests on it.',
-  },
-  {
+  }),
+  deriveSlotLens('unit-spec', {
     key: 'reuse',
     brief:
       'Reuse: functionality is reused and extended, never rebuilt. Report a design that builds what already exists, such as a function, a checker, a gate leg, a driver verb or a record shape, instead of extending it; a section-10 seam that is cited but is not the one section 4 extends, or that does not exist; and a question a decision record or an ask already decided, decided asks included. Probe before you claim: the codebase-map kit\'s reuse_lookup.py with a behaviour phrase, the memory-recall kit\'s query.py with a plain-English question and 8-14 --terms in this corpus\'s own jargon, and grep, because the lookup cannot see every layer and prints the ones it skipped. Locate each tool with git ls-files; where one is absent, say so in the finding and use grep. Read the asks through the memory-tree kit\'s gen_build_index.py --asks --json --all --path <every path the spec\'s Files touched estimate names>, falling back to the backlog shards when its mode field says shards. THE BAR: a reuse finding names the existing seam or record by path or id AND quotes the spec text that duplicates or contradicts it. That a related record exists is not a finding.',
-  },
-  {
+  }),
+  deriveSlotLens('unit-spec', {
     key: 'blast-radius',
     brief:
       'Blast radius: what does this change trip that the spec does not list? For every name, value or rule the spec renames, retires or changes, grep the name AND the value, and report each consumer, carrier, test arm or document the spec does not name. Join section 4\'s files-touched list against the gate-leg manifest (gate-legs.json, where the project keeps one) and report a guarded leg section 7 omits; report a declared size or time budget the change will cross; and report the repo\'s own machinery the spec forgets: version carriers, codebase-map keys, record and filename rules, a --dispatch write set, and a render an adopter regenerates.',
-  },
-  {
+  }),
+  deriveSlotLens('unit-spec', {
     key: 'failure-envelope',
     brief:
       'Failure envelope: what will the built thing meet that the spec never says it handles? Report the input classes the design is silent on (empty, malformed, multi-line, unterminated, huge, concurrent), signals, partial failure and a dead dependency; a security or write surface section 5 did not price; and a spec that names one INSTANCE where the class was meant, such as one file of two or one caller of three. A spec is built as a ceiling: in this kit\'s own trial (aBlindedTrial, report section 4.3), when a spec named the class for one input file and not the other, the builder handled exactly the file it named.',
-  },
+  }),
 ]
 
 // TOOL-dFairHearing-2 S2/S3 - the `design-audit` preset's lenses, for a design or architecture record,
@@ -866,31 +899,31 @@ const SPEC_LENSES = [ // gov:lens-slots unit-spec
 // `grounding`, `reuse` and `failure-envelope` in design briefs of their own, and `alternatives-and-cost`
 // in the slot `blast-radius` holds above. `PRESETS` in the argument checks names it.
 const DESIGN_LENSES = [ // gov:lens-slots design-audit
-  {
+  deriveSlotLens('design-audit', {
     key: 'coherence',
     brief:
       'Coherence: does the design record agree with itself and with the records it cites? Report a stated goal, requirement or invariant no mechanism in the record delivers; one rule, name, path, key or number stated two ways; a step that depends on one ordered after it; two mechanisms claiming one file, one owner or one landing slot; and, across the subjects and the sibling context, a decision one record takes that another contradicts.',
-  },
-  {
+  }),
+  deriveSlotLens('design-audit', {
     key: 'grounding',
     brief:
       'Grounding: is every claim the design makes about the world TRUE where the subjects stand? Check each claim about existing code, a tool\'s flags or output, a record, a count, a platform behaviour or a cost against the source, never against the design. Flag every load-bearing claim that rests on a docs line or a single observation as an untested assumption, name the observation that would overturn it, and probe it where the probe rules allow. Hunt the traps this platform sets: MSYS argument and path rewriting, drive-letter and backslash paths, CRLF in a working copy and a text-mode read that drops a CR, and a stated wall-clock goal nobody timed.',
-  },
-  {
+  }),
+  deriveSlotLens('design-audit', {
     key: 'reuse',
     brief:
       'Reuse and precedent: functionality is reused and extended, never rebuilt, and every choice keeps faith with what was decided. Report a mechanism that rebuilds an existing function, checker, gate leg, driver verb or record shape; and a choice that re-opens a decision row, an owner ruling or a decided ask, or drops a condition a ruling rested on, naming the id and quoting both texts. Probe before you claim: the codebase-map kit\'s reuse_lookup.py with a behaviour phrase, the memory-recall kit\'s query.py with a plain-English question and 8-14 --terms in this corpus\'s own jargon, and grep. THE BAR: a finding names the existing seam, record or ruling by path or id AND quotes the design text that duplicates or contradicts it.',
-  },
-  {
+  }),
+  deriveSlotLens('design-audit', {
     key: 'failure-envelope',
     brief:
       'Failure envelope and trust boundaries: what will the built system meet that the design never says it handles? Report the input classes it is silent on (empty, malformed, multi-line, unterminated, huge, concurrent), signals, partial failure and a dead dependency; every trust boundary the design creates or relies on, an enforcement a rule, a setting, a second path or a dead dependency bypasses, input trusted without validation, and a guarded action left allowed on failure; and a design that names one instance where the class was meant.',
-  },
-  {
+  }),
+  deriveSlotLens('design-audit', {
     key: 'alternatives-and-cost',
     brief:
       'Alternatives and cost: is there a materially simpler or cheaper mechanism meeting the same contract, and what does this one cost? Report an existing seam, a checker in place of an agent, or one process in place of many that meets the same requirement or invariant, saying which; and every agent, session, spawn, token and wall-clock cost the design adds that carries no ceiling, no enforcer, or a ceiling nobody measured.',
-  },
+  }),
 ]
 
 // The ONE dialect <prefix>/hooks/agent-cap.js admits here: sibling top-level array literals and a
@@ -904,11 +937,13 @@ const LENSES = !isSpec ? DIFF_LENSES : preset === 'design-audit' ? DESIGN_LENSES
 // S3 - checked on EVERY run of either kind, before the resume probe: a renamed lens would otherwise
 // empty the light set, and a light run would review nothing while reporting clean. An INDEX names the
 // offender, since `''` is itself a key this refuses (the D6 class).
-const lightBadIdx = LIGHT_LENSES.findIndex((k) => !DIFF_LENSES.some((L) => L.key === k))
+// TOOL-dFairHearing-3 S4 - against the diff literal's DEFAULT keys, so a swap that put an opt-in in a
+// light slot never reds this check.
+const lightBadIdx = LIGHT_LENSES.findIndex((k) => !DIFF_LENSES.some((L) => (L.replaces || L.key) === k))
 if (!LIGHT_LENSES.length)
   throw new Error('tier2-review: LIGHT_LENSES is empty, so a light run would review nothing while reporting clean.')
 if (lightBadIdx !== -1)
-  throw new Error('tier2-review: LIGHT_LENSES names ' + JSON.stringify(LIGHT_LENSES[lightBadIdx]) + ', which DIFF_LENSES does not carry.')
+  throw new Error('tier2-review: LIGHT_LENSES names ' + JSON.stringify(LIGHT_LENSES[lightBadIdx]) + ', which DIFF_LENSES does not carry as a default.')
 
 // TOOL-aSightedSkeptic-5 S4/S6 - `lensNotes`, a project addendum per lens. It is validated HERE,
 // against the CURRENT kind's keys and before the resume probe, the first agent, so a typo'd key
@@ -935,6 +970,27 @@ if (lensNotesBad) {
       'legal keys: ' + LENS_KEYS.join(' | ') + '. Got ' + JSON.stringify(lensNotesGot) + '.',
   )
 }
+// TOOL-dFairHearing-3 S3 - `optIn`'s MEMBERSHIP, checked once, here, against what evaluating the literals
+// recorded: SLOT_DEFAULTS, the run literal's default keys, and OPTIN_LENSES, the shipped opt-in rows.
+// Nothing it reads is an agent's output, so it still refuses before the first spawn. One rule at a
+// time, in this order, so the refusal names the first rule broken.
+const optInKeys = Object.keys(optIn)
+const buildOptInError = (why) => new Error('tier2-review: `optIn` ' + why + '. Got ' + JSON.stringify(optIn) + '.')
+for (const k of optInKeys)
+  if (SLOT_DEFAULTS.indexOf(k) !== -1) throw buildOptInError('names ' + k + ', which is already a lens of `' + SLOT_LITERAL + '`; an opt-in takes a default\'s slot and never doubles one')
+const offeredOptIns = OPTIN_LENSES.filter((r) => r.presets.indexOf(SLOT_LITERAL) !== -1).map((r) => r.key)
+for (const k of optInKeys)
+  if (offeredOptIns.indexOf(k) === -1)
+    throw buildOptInError('names ' + k + ', and no shipped row offers it: there is no opt-in of `' + SLOT_LITERAL + '` by that key (shipped: ' + (offeredOptIns.join(' | ') || 'none') + ')')
+for (const k of optInKeys)
+  if (SLOT_DEFAULTS.indexOf(optIn[k]) === -1)
+    throw buildOptInError('swaps ' + k + ' for ' + optIn[k] + ', and `' + SLOT_LITERAL + '` has no default `' + optIn[k] + '` (its defaults: ' + SLOT_DEFAULTS.join(' | ') + ')')
+const twiceKey = optInKeys.find((k, i) => optInKeys.findIndex((x) => optIn[x] === optIn[k]) !== i)
+if (twiceKey !== undefined) throw buildOptInError('has `' + optIn[twiceKey] + '` replaced twice; a default slot takes one opt-in')
+// S5 - each swap ANNOUNCED before the first agent, naming the default whose coverage this run drops.
+const swappedLenses = LENSES.filter((L) => L.replaces)
+for (const L of swappedLenses)
+  log(`optIn: ${L.key} runs in the slot of ${L.replaces} — this run drops the ${L.replaces} lens's coverage`)
 // TOOL-dFairHearing-2 S5 - a spec audit off the default preset says so before the first agent.
 if (preset !== 'unit-spec')
   log(`preset ${preset} — this spec audit runs the ${preset} lenses, not the unit-spec ones: ${LENS_KEYS.join(', ')}`)
@@ -951,7 +1007,8 @@ if (intentAbsent)
 // TOOL-aSightedSkeptic-7 S4/S6 - the lenses a light run SKIPS, in LENSES order; [] on a spec audit and
 // on a full run. Derived once, announced here before the first agent, and read by the Find thunk, the
 // reuse loop, the counts and the checklist split, which runs over the lenses that RUN (S7).
-const skippedLenses = !isSpec && intensity === 'light' ? LENS_KEYS.filter((k) => LIGHT_LENSES.indexOf(k) === -1) : []
+// TOOL-dFairHearing-3 S4 - selected by each slot's DEFAULT key, so a swap into a light slot runs there.
+const skippedLenses = !isSpec && intensity === 'light' ? LENSES.filter((L) => LIGHT_LENSES.indexOf(L.replaces || L.key) === -1).map((L) => L.key) : []
 const runningLensKeys = LENS_KEYS.filter((k) => skippedLenses.indexOf(k) === -1)
 const lensesRunning = runningLensKeys.length
 if (skippedLenses.length)
@@ -1048,9 +1105,12 @@ const REVIEW_SHAPE = 'lenses5-r3'
 // role cannot make one stale, and the other finder key is never read.
 // TOOL-dFairHearing-2 S4 - and `preset`, ONLY off its `unit-spec` default, so a design-audit run never
 // reuses a unit-spec run's lens files on the same subjects and every key a run without it derives holds.
+// TOOL-dFairHearing-3 S5 - and `optIn`, ONLY when not empty, so a swapped run never resumes an unswapped
+// one's lens files and every key a run without it derives holds.
 const inputPrint = deriveFnv1a(renderCanonical(Object.assign({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist, intensity: intensity, ...(isSpec ? { probeRules: PROBE_RULES } : {}),
   ...(prevBlobCount ? { prevBlobs: subjects.map((x) => (x && typeof x === 'object' && x.prevBlob !== undefined ? x.prevBlob : null)) } : {}) }, workerType ? { workerType: workerType } : {},
-  roledJudges ? { roles: { find: roles[finderKey] || null, verify: roles.skeptic || null } } : {}, preset !== 'unit-spec' ? { preset: preset } : {})))
+  roledJudges ? { roles: { find: roles[finderKey] || null, verify: roles.skeptic || null } } : {}, preset !== 'unit-spec' ? { preset: preset } : {},
+  optInKeys.length ? { optIn: optIn } : {})))
 const specSubject = isSpec
   ? deriveFnv1a(subjects.map((x) => (x && typeof x === 'object' ? `${x.path}@${x.blob}` : String(x))).join('\n'))
   : ''
@@ -1379,7 +1439,7 @@ if (lensesDead === lensesRunning) {
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: 0, lensesDead,
     lensesReused: reusedLens.size,
     note: `DEFERRED: no lens completed (${lensesDead}/${lensesRunning} died) — nothing was reviewed; ${renderRerunTail(deadLensLabels.join(', '), false)}`,
-    round, priorFindings: priorFindings.length, intensity, ...(isSpec ? { preset } : {}), skippedLenses,
+    round, priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses,
     // TOOL-aSightedSkeptic-8 S5 - nothing was judged on this path.
     ledger: [], confirmedFindings: [], appendix: '', lensYield,
   }
@@ -1402,7 +1462,7 @@ if (allFindings.length === 0) {
     shape: shapeLine,
     exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: deadLensLabels, durable,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: liveResults.length, lensesDead,
-    lensesReused: reusedLens.size, note, round, priorFindings: priorFindings.length, intensity, ...(isSpec ? { preset } : {}), skippedLenses,
+    lensesReused: reusedLens.size, note, round, priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses,
     ledger: [], confirmedFindings: [], appendix: '', lensYield, // TOOL-aSightedSkeptic-8 S5 - no finding raised
   }
 }
@@ -1739,7 +1799,7 @@ if (confirmed.length + unverified.length === 0) {
     note: deferred
       ? `DEFERRED: every finding raised was refuted, but ${lensesDead}/${lensesRunning} lenses died — ${renderRerunTail(pendingLabels.join(', '), false)}`
       : 'all findings adjudicated and refuted',
-    round, priorFindings: priorFindings.length, intensity, ...(isSpec ? { preset } : {}), skippedLenses,
+    round, priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses,
     // TOOL-aSightedSkeptic-8 S5 - no report is written on this path (spec F3), so the return is the
     // only place this ledger and appendix exist; a caller may write them.
     ledger, confirmedFindings, appendix, lensYield,
@@ -1770,7 +1830,7 @@ if (pendingLabels.length) {
     lensesRun: liveResults.length, lensesDead, skepticsDead, lensesReused: reusedLens.size, batchesReused,
     report: null, summary: '', blockers: null, highs: null,
     note: `DEFERRED: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) did not return — ${renderRerunTail(pendingLabels.join(', '), false)}`,
-    round, priorFindings: priorFindings.length, intensity, ...(isSpec ? { preset } : {}), skippedLenses,
+    round, priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses,
     ledger, confirmedFindings, appendix, lensYield, // TOOL-aSightedSkeptic-8 S5 - what was judged so far; `exit` says partial
   }
 }
@@ -1862,6 +1922,10 @@ const synth = await agent(
       : '') +
     // TOOL-dFairHearing-2 S5 - spec kind only, so the report says which lens literal ran.
     (isSpec ? `preset: ${preset} - the ${preset} lenses ran: ${LENS_KEYS.join(', ')}.\n` : '') +
+    // TOOL-dFairHearing-3 S5 - a run where a swap ran names each, and the default whose coverage it dropped.
+    (swappedLenses.length
+      ? `optIn: ${swappedLenses.map((L) => `${L.key} ran in the slot of ${L.replaces}`).join(', ')} - the replaced lens(es) did NOT run, so their classes went unswept.\n`
+      : '') +
     // TOOL-aSightedSkeptic-7 S6 - a light run names every skipped lens; a full run carries no clause.
     (skippedLenses.length
       ? `Intensity: light - the ${skippedLenses.join(', ')} lens(es) were NOT run, so their classes were swept only ` +
@@ -2174,6 +2238,8 @@ return {
   priorFindings: priorFindings.length,
   // TOOL-aSightedSkeptic-7 S6 - on every exit path, so a light run is never read as a full one.
   intensity,
+  // TOOL-dFairHearing-3 S5 - beside `intensity` on every exit path, the swaps the caller asked for; {} when none.
+  optIn,
   // TOOL-dFairHearing-2 S5 - beside `intensity` on every exit path of the spec kind, which lens literal ran.
   ...(isSpec ? { preset } : {}),
   skippedLenses,

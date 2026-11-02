@@ -227,6 +227,12 @@ function chunk(a, n) {
 //                                                   //   dispatch.args; the three review keys go to the
 //                                                   //   audit's review call. An absent key runs at the
 //                                                   //   agent type's own level, else the session's.
+//   optIn: { "<opt-in lens>": "<default lens>" },   // optional (TOOL-dFairHearing-3): forwarded unchanged
+//                                                   //   to the audit's review call, never checked here:
+//                                                   //   the review harness's boundary is the one check.
+//                                                   //   `review_pin.py` prints it. Absent, no key is sent
+//   preset: "unit-spec" | "design-audit"            // optional: forwarded the same way, unchecked; the
+//                                                   //   review harness picks its lens literal by it
 // }
 // TOOL-aEvidencedLens-5 - the two fold args are REFUSED at a callee round of 1 (a fresh generation has
 // no previous round) and refused by name when malformed, before any agent spawns.
@@ -1739,6 +1745,11 @@ const auRaw = !specAudit ? null : await workflow(
     specs: auditSpecs,
     ...(checklist !== null ? { checklist: checklist } : {}),
     ...(priorFindings ? { priorFindings: priorFindings } : {}),
+    // TOOL-dFairHearing-3 S10 - the caller's swap and lens literal, as `review_pin.py` printed them,
+    // forwarded unchanged and UNCHECKED: the callee refuses both at its argument boundary, once. No key
+    // when the caller passed none, so every existing call keeps its arguments.
+    ...(a.optIn !== undefined ? { optIn: a.optIn } : {}),
+    ...(a.preset !== undefined ? { preset: a.preset } : {}),
   },
 )
 

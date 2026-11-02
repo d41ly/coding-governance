@@ -7,6 +7,8 @@
 # kind's literal and a spec-audit preset name otherwise. The row grammar and the rules the renderer
 # checks are in this kit's README, section "The lens catalogue". The slot count is the fan-out leg's,
 # never this file's: a sixth default row renders a sixth slot, and check-verifier-fanout.sh reds it.
+# An `optin = true` row is also rendered under the `// gov:lens-optins` marker, as OPTIN_LENSES, the set
+# a caller's `optIn` may swap into a default slot of a literal its `presets` names.
 
 [[lens]]
 key = "security"
@@ -127,3 +129,56 @@ presets = ["design-audit"]
 default_in = ["design-audit"]
 optin = false
 brief = "Alternatives and cost: is there a materially simpler or cheaper mechanism meeting the same contract, and what does this one cost? Report an existing seam, a checker in place of an agent, or one process in place of many that meets the same requirement or invariant, saying which; and every agent, session, spawn, token and wall-clock cost the design adds that carries no ceiling, no enforcer, or a ceiling nobody measured."
+
+# The OPT-IN rows (TOOL-dFairHearing-3): no `default_in`, so no literal runs one unless a caller's
+# `optIn` swaps it into a default slot. Each stays `optin = false`, catalogued and selectable by
+# nothing, until a blind replay it does not lose is recorded; that test flips its row and nothing else.
+# The six tests are one ask in dCalibratedLens's BACKLOG.md.
+
+[[lens]]
+key = "security"
+kinds = ["spec-audit"]
+presets = ["unit-spec"]
+default_in = []
+optin = false
+brief = "Security: trust boundaries the design creates or relies on; an enforcement a rule, setting, second path or dead dependency bypasses; input trusted without validation; a guarded action left allowed on failure."
+
+[[lens]]
+key = "alternatives"
+kinds = ["diff-review", "spec-audit"]
+presets = ["diff-review", "unit-spec"]
+default_in = []
+optin = false
+brief = "Alternatives: a materially simpler or cheaper mechanism meeting the same contract: an existing seam, a checker instead of an agent, one process instead of many. Say which acceptance or invariant it meets."
+
+[[lens]]
+key = "cost"
+kinds = ["diff-review", "spec-audit"]
+presets = ["diff-review", "unit-spec"]
+default_in = []
+optin = false
+brief = "Cost: agents, sessions, spawns, tokens and wall time added; one with no ceiling, no enforcer, or a ceiling nobody measured."
+
+[[lens]]
+key = "portability"
+kinds = ["diff-review"]
+presets = ["diff-review"]
+default_in = []
+optin = false
+brief = "Portability: CRLF and autocrlf in fresh worktrees, text-mode reads, MSYS rewriting, path length, Git for Windows signal semantics, spawn cost under antivirus, clock skew."
+
+[[lens]]
+key = "adopter-migration"
+kinds = ["diff-review", "spec-audit"]
+presets = ["diff-review", "unit-spec", "design-audit"]
+default_in = []
+optin = false
+brief = "Adopter migration: what an adopter on the prior version meets: a changed key, shape, render or gate with no upgrade step; non-additive data; versions that must move in lockstep with no check; an assumed install layout."
+
+[[lens]]
+key = "topology"
+kinds = ["diff-review", "spec-audit"]
+presets = ["diff-review", "unit-spec", "design-audit"]
+default_in = []
+optin = false
+brief = "Topology: worktrees, merges and concurrent runs: linked-worktree `GIT_DIR`, absolute hooks paths, a merge read as additions, half-staged moves, leases outliving holders, commits under a running suite."

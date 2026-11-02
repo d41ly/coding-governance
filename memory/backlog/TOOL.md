@@ -407,6 +407,7 @@ Cite ids, never line numbers.
 | [TOOL-dBriefedPass-6](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THE --dispatch ORDER GATE HAS NO TEST ARM AND ITS FAILING CASE HAS… |
 | [TOOL-dBriefedPass-7](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | tools/workflows/unattended-build.test.sh is a 21-arm suite registered… |
 | [TOOL-dCalibratedLens-18](../builds/dCalibratedLens/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dCalibratedLens-19](../builds/dCalibratedLens/BACKLOG.md) | OPEN | LOW | — | 2026-11-02 | run the losing test of each of the six opt-in review lenses… |
 | [TOOL-dCarriedReceipt-1](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | --review's convergence predicate is scoped to ONE run's run-state file… |
 | [TOOL-dCarriedReceipt-2](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | --review makes CONVERGED terminal for a subject (unattended.sh:3135,… |
 | [TOOL-dCarriedReceipt-3](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | a FOLD pass legitimately spans many units, and the dispatch machinery… |
@@ -444,7 +445,7 @@ Cite ids, never line numbers.
 | [TOOL-dDerivedDocket-75](../builds/dDerivedDocket/BACKLOG.md) | OPEN | LOW | — | 2026-09-30 | NODE d RUNS AN ABSOLUTE core.hooksPath FROM A WRITER NOBODY KNOWS. The… |
 | [TOOL-dDerivedDocket-76](../builds/dDerivedDocket/BACKLOG.md) | OPEN | MED | — | 2026-09-30 | THE UNATTENDED KIT'S COMPENSATING CHECK IS UNPAID FOR THIS LANDING.… |
 | [TOOL-dEasedEffort-3](../builds/dEasedEffort/BACKLOG.md) | OPEN | BLOCKER | — | 2026-11-02 | inherited red: leg recall floor arms red at 529b98a4, older than the… |
-| [TOOL-dFairHearing-19](../builds/dFairHearing/BACKLOG.md) | INPROGRESS | MED | TOOL-dFairHearing-3 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dFairHearing-19](../builds/dFairHearing/BACKLOG.md) | DEFERRED | MED | TOOL-dFairHearing-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dFoldedVerdict-7](../builds/dFoldedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THREE CARRIERS WERE FOUND SITTING EXACTLY ON THEIR DECLARED CEILING IN… |
 | [TOOL-dFoldedVerdict-9](../builds/dFoldedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-02 | RETIRING ANOTHER BUILD'S UNIT LEFT TWO CONSEQUENCES ON THAT BUILD'S OWN… |
 | [TOOL-dFurnishedOrders-21](../builds/dFurnishedOrders/BACKLOG.md) | DEFERRED | MED | TOOL-dFurnishedOrders-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |

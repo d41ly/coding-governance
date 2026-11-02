@@ -196,6 +196,31 @@ armPreset('preset: a non-string is refused', Object.assign({ preset: 7 }, DESIGN
 armPreset('preset: an empty string is refused', Object.assign({ preset: '' }, DESIGN_SPEC), 'refused', 'unit-spec | design-audit')
 armPreset('preset: unit-spec beside the diff kind is refused naming it', { kind: 'diff-review', preset: 'unit-spec' }, 'refused', 'diff-review')
 
+// ---- TOOL-dFairHearing-3 AC1 — `optIn`'s SHAPE, refused in the prelude before the literals read it ----
+// The proceeding arm reads the RESOLVED value back, so it cannot pass over a prelude that never reads
+// `optIn`: on the base render the read throws `optIn is not defined`, a harness fault. A refusal must
+// START `tier2-review: \`optIn\``, so an unrelated throw cannot satisfy one.
+function armOptIn(name, value, want) {
+  let got = null
+  let threw = null
+  try {
+    got = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn optIn')(Object.assign({}, base, GOOD_SPEC, { optIn: value }), () => {}, null, null, null)
+  } catch (e) { threw = e.message }
+  if (threw && /has already been declared|is not defined|Unexpected|Invalid or unexpected/.test(threw)) {
+    console.log('HARNESS-BROKEN ' + name + ' -> ' + threw)
+    fail++
+    return
+  }
+  ck(want === 'refused' ? !!threw && threw.indexOf('tier2-review: `optIn`') === 0 : !threw && JSON.stringify(got) === want,
+    name + (threw ? ' (threw: ' + threw + ')' : ' (resolved ' + JSON.stringify(got) + ')'))
+}
+armOptIn('optIn: {} proceeds', {}, '{}')
+armOptIn('optIn: absent proceeds as {}', undefined, '{}')
+armOptIn('optIn: an array is refused', [], 'refused')
+armOptIn('optIn: a non-string value is refused', { topology: 7 }, 'refused')
+armOptIn('optIn: a key outside the lens-key grammar is refused', { 'Topology!': 'reuse' }, 'refused')
+armOptIn('optIn: null is refused', null, 'refused')
+
 // ---- TOOL-aEvidencedLens-2 AC3 — `scratch`, required on a spec audit and refused by shape ---------
 // The proceeding arms read the RESOLVED value back, so none passes over a prelude that never reads
 // `scratch`: on the base render the read throws `scratch is not defined`, a harness fault. A refusal
@@ -1753,6 +1778,7 @@ async function runLedgerArms() {
   await runEffortsArms()
   await runAddressArms()
   await runPresetArms()
+  await runOptInArms()
 }
 
 // ==== TOOL-dFairHearing-2 — the design-audit preset: its lenses, its review key and its announcements ====
@@ -1764,7 +1790,8 @@ async function runPresetArms() {
     const ls = src.split('\n')
     const at = ls.findIndex((l) => l.startsWith('const ' + name + ' = ['))
     const end = ls.findIndex((l, i) => i > at && l === ']')
-    return at === -1 || end === -1 ? [] : new Function('return [' + ls.slice(at + 1, end).join('\n') + ']')()
+    // TOOL-dFairHearing-3 - each slot is a `deriveSlotLens(<literal>, L)` call; read here as L itself.
+    return at === -1 || end === -1 ? [] : new Function('deriveSlotLens', 'return [' + ls.slice(at + 1, end).join('\n') + ']')((lit, L) => L)
   }
   const DL = readLiteral('DESIGN_LENSES')
   const SL = readLiteral('SPEC_LENSES')
@@ -1799,6 +1826,112 @@ async function runPresetArms() {
     ck(ru.result.preset === 'unit-spec' && !!rdf.result && !Object.prototype.hasOwnProperty.call(rdf.result, 'preset'),
       'preset: a default spec audit returns preset unit-spec, and a diff review carries no preset field')
   }
+}
+
+// ==== TOOL-dFairHearing-3 — the opt-in swap over scratch renders, and review_pin.py (AC2-AC5, AC7, AC8) ====
+// The shipped catalogue ships no opt-in, so each swap arm renders the TEMPLATE over a scratch copy of
+// `lenses.toml` with the named opt-in rows flipped to `optin = true`, fills `{{FANOUT_CAP}}` with the
+// live harness's cap, and runs that render whole. Every arm is RED against the base harness, which
+// reads no `optIn` and renders no `deriveSlotLens`, and against a tree with no `review_pin.py`. The
+// python is the one this shell resolved, so an absent one reds these arms by name.
+async function runOptInArms() {
+  const path = require('path')
+  const { spawnSync } = require('child_process')
+  const kit = path.dirname(FILE)
+  const py = process.argv[5] || ''
+  const tpl = fs.readFileSync(path.join(kit, 'tier2-review.template.js'), 'utf8')
+  const cap = (/async function boundedParallel\(thunks, cap = (\d+)\)/.exec(src) || [])[1]
+  const scratch = fs.mkdtempSync(path.join(require('os').tmpdir(), 'optin-'))
+  // A scratch render with `keys` shipped as opt-ins, or the refusal that stopped it, as `why`.
+  const renderOptIns = (keys) => {
+    let text = fs.readFileSync(path.join(kit, 'lenses.toml'), 'utf8')
+    for (const k of keys) {
+      const re = new RegExp('(key = "' + k + '"\\r?\\n(?:[^\\n]*\\n){2}default_in = \\[\\]\\r?\\n)optin = false')
+      if (!re.test(text)) return { why: 'no opt-in row `' + k + '` to flip in lenses.toml' }
+      text = text.replace(re, '$1optin = true')
+    }
+    if (!py) return { why: 'no python was resolved' }
+    if (!cap) return { why: 'no `cap = <n>` in the live harness to fill {{FANOUT_CAP}} with' }
+    const cat = path.join(scratch, keys.join('_') + '.toml')
+    fs.writeFileSync(cat, text)
+    const r = spawnSync(py, ['-B', path.join(kit, 'render_lenses.py'), cat], { input: tpl, encoding: 'utf8', env: Object.assign({}, process.env, { PYTHONUTF8: '1' }) })
+    if (r.status !== 0) return { why: 'the render exited ' + r.status + ': ' + (r.stderr || String(r.error)) }
+    return { src: r.stdout.split('{{FANOUT_CAP}}').join(cap).replace(/^\s*export\s+const\s+meta\s*=/m, 'const meta =') }
+  }
+  const readSlots = (text, name) => {
+    const ls = text.split('\n')
+    const at = ls.findIndex((l) => l.startsWith('const ' + name + ' = ['))
+    const end = ls.findIndex((l, i) => i > at && l === ']')
+    return at === -1 || end === -1 ? [] : new Function('deriveSlotLens', 'return [' + ls.slice(at + 1, end).join('\n') + ']')((lit, L) => L)
+  }
+  const scanFinds = (run) => run.trace.filter((t) => t.label.indexOf('find:') === 0)
+  const SWAP = Object.assign({}, SPEC, { optIn: { topology: 'blast-radius' } })
+  const top = renderOptIns(['topology'])
+  ck(!!top.src, 'optIn: the scratch render with topology shipped as an opt-in exists' + (top.why ? ' (' + top.why + ')' : ''))
+  if (top.src) {
+    // ---- AC2: topology runs in blast-radius's slot, the other four in place, five finders in order.
+    const SL = readSlots(src, 'SPEC_LENSES')
+    const OL = readSlots(top.src, 'OPTIN_LENSES')
+    const want = SL.length === 5 && OL.length === 1 ? [SL[0], SL[1], SL[2], OL[0], SL[4]] : []
+    const r2 = await runReview(SWAP, ALL_OK, top.src)
+    const f2 = scanFinds(r2)
+    ck(!r2.threw && want.length === 5 && f2.length === 5 && f2.every((t, i) => t.label === 'find:' + want[i].key && t.prompt.indexOf('LENS: ' + want[i].brief + '\n') !== -1) &&
+      want.map((L) => L.key).join(' ') === 'coherence grounding reuse topology failure-envelope',
+      'optIn: AC2 a unit-spec swap runs topology in the blast-radius slot, five finders in order: ' + (r2.threw || f2.map((t) => t.label).join(' ')))
+    ck(!!r2.result && JSON.stringify(r2.result.optIn) === '{"topology":"blast-radius"}' &&
+      r2.logs.some((l) => l.indexOf('optIn: topology runs in the slot of blast-radius') === 0),
+      'optIn: AC2 the return carries the swap, and the log names the dropped default')
+    // ---- AC3: the four named refusals, each before the stub agent is called.
+    const both = renderOptIns(['topology', 'adopter-migration'])
+    for (const [render, v, word] of [[top, { coherence: 'reuse' }, 'already a lens'], [top, { portability: 'reuse' }, 'no opt-in of `unit-spec`'],
+      [top, { topology: 'nope' }, 'no default `nope`'], [both, { topology: 'reuse', 'adopter-migration': 'reuse' }, '`reuse` replaced twice']]) {
+      const r = render.src ? await runReview(Object.assign({}, SPEC, { optIn: v }), ALL_OK, render.src) : { threw: render.why, trace: [] }
+      ck(typeof r.threw === 'string' && r.threw.indexOf('tier2-review: `optIn`') === 0 && r.threw.indexOf(word) !== -1 && r.trace.length === 0,
+        'optIn: AC3 ' + JSON.stringify(v) + ' refuses before any agent, naming "' + word + '": ' + r.threw)
+    }
+    // ---- AC5: the key moves with a swap, and without one equals the live harness's key.
+    const k0 = await runReview(SPEC, ALL_OK)
+    const k1 = await runReview(SPEC, ALL_OK, top.src)
+    ck(!!k0.result && !!k1.result && !!r2.result && k1.result.key === k0.result.key && r2.result.key !== k1.result.key,
+      'optIn: AC5 a swap moves the review key, and a run without one keeps the key: ' + (k1.result && k1.result.key) + ' / ' + (r2.result && r2.result.key))
+  }
+  // ---- AC4: a light diff run takes a swap into a light slot, and skips by the default keys.
+  const port = renderOptIns(['portability'])
+  const r4 = port.src ? await runReview(Object.assign({}, DIFF, { intensity: 'light', optIn: { portability: 'seams' } }), ALL_OK, port.src) : { threw: port.why, trace: [] }
+  ck(!r4.threw && scanFinds(r4).map((t) => t.label).join(' ') === 'find:correctness find:portability find:verification' &&
+    !!r4.result && r4.result.skippedLenses.join(' ') === 'security intent',
+    'optIn: AC4 a light swap runs portability in the seams slot and skips security and intent: ' + (r4.threw || scanFinds(r4).map((t) => t.label).join(' ')))
+  // ---- AC7/AC8: review_pin.py prints one call's arguments, and refuses a malformed one by name.
+  const pin = path.join(kit, 'review_pin.py')
+  const runPin = (argv, at) => {
+    if (!py) return { status: -1, stdout: '', stderr: 'no python was resolved' }
+    const r = spawnSync(py, ['-B', at || pin].concat(argv), { encoding: 'utf8', env: Object.assign({}, process.env, { PYTHONUTF8: '1' }) })
+    return { status: r.status, stdout: r.stdout || '', stderr: (r.stderr || '') + (r.error ? String(r.error) : '') }
+  }
+  // AC7's no-flag design preset is the module's DESIGN_RECORD_PRESET, read off the module, never typed here.
+  const dflt = (/^DESIGN_RECORD_PRESET = "([a-z-]+)"/m.exec(fs.existsSync(pin) ? fs.readFileSync(pin, 'utf8') : '') || [])[1]
+  const S1 = 'memory/builds/dX/spec/2026-01-01-spec-TOOL-dX-1.md'
+  const D = ['--subject', 'memory/builds/dX/build/a.md', '--subject', 'memory/builds/dX/build/b.md']
+  for (const [what, argv, want] of [
+    ['one spec subject', ['--subject', S1], '{"preset": "unit-spec"}'],
+    ['two design subjects', D, '{"preset": "' + dflt + '"}'],
+    ['two design subjects under the design-audit flag', D.concat(['--design-record-preset', 'design-audit']), '{"preset": "design-audit"}'],
+    ['a mixed set under that flag', ['--subject', 'memory/builds/dX/build/a.md', '--subject', S1, '--design-record-preset', 'design-audit'], '{"preset": "unit-spec"}'],
+    ['the spec subject with an opt-in', ['--subject', S1, '--opt-in', '{"unit-spec": {"topology": "blast-radius"}}'], '{"preset": "unit-spec", "optIn": {"topology": "blast-radius"}}'],
+  ]) {
+    const r = runPin(argv)
+    ck(!!dflt && r.status === 0 && r.stdout === want + '\n', 'pin: AC7 ' + what + ' prints ' + want + ' (got ' + r.status + ': ' + (r.stdout || r.stderr).trim() + ')')
+  }
+  const lone = path.join(scratch, 'pin')
+  fs.mkdirSync(lone)
+  if (fs.existsSync(pin)) fs.copyFileSync(pin, path.join(lone, 'review_pin.py'))
+  fs.writeFileSync(path.join(lone, 'tier2-review.js'), 'const NOT_THE_PREDICATE = 1\n')
+  for (const [what, argv, at, word] of [['a harness with no SPEC_SUBJECT_PATH line', ['--subject', S1], path.join(lone, 'review_pin.py'), 'SPEC_SUBJECT_PATH'],
+    ['--opt-in [1]', ['--subject', S1, '--opt-in', '[1]'], null, '--opt-in'], ['no --subject', [], null, '--subject']]) {
+    const r = runPin(argv, at)
+    ck(r.status === 2 && r.stdout === '' && r.stderr.indexOf(word) !== -1, 'pin: AC8 ' + what + ' exits 2 naming ' + word + ' (got ' + r.status + ': ' + r.stderr.trim().split('\n').pop() + ')')
+  }
+  fs.rmSync(scratch, { recursive: true, force: true })
 }
 
 // ==== TOOL-dFoldedAudit-5 — THE ADDRESS, each spec-kind BLOCKER or HIGH naming the specs its fix changes ====
@@ -2131,8 +2264,11 @@ function runLensArms() {
   const optin = '\n[[lens]]\nkey = "extra-lens"\nkinds = ["diff-review", "spec-audit"]\npresets = ["unit-spec", "diff-review"]\n' +
     'default_in = []\noptin = true\nbrief = "An opt-in lens nothing selects by default."\n'
   const withOptin = runRender(writeCatalogue('optin', fs.readFileSync(path.join(kit, 'lenses.toml'), 'utf8') + optin), tpl)
-  ck(withOptin.status === 0 && shipped.status === 0 && withOptin.stdout === shipped.stdout,
-    'lens: an opt-in row added as data changes no marked literal')
+  // TOOL-dFairHearing-3 - the row now renders under the opt-in marker, and still into no slot literal.
+  ck(withOptin.status === 0 && shipped.status === 0 && ['DIFF_LENSES', 'SPEC_LENSES', 'DESIGN_LENSES'].every((n) =>
+    extractLensBody(shipped.stdout, n) !== null && extractLensBody(withOptin.stdout, n) === extractLensBody(shipped.stdout, n)) &&
+    extractLensBody(shipped.stdout, 'OPTIN_LENSES') === '' && extractLensBody(withOptin.stdout, 'OPTIN_LENSES').indexOf("key: 'extra-lens'") !== -1,
+    'lens: an opt-in row added as data changes no marked literal, and renders into OPTIN_LENSES alone')
   // One scratch catalogue per refusal rule, over a two-literal template: each exits 2, writes
   // nothing, and names its rule and its subject.
   const TPL = 'const D = [ // gov:lens-slots diff-review\n{{LENS_SLOTS}}\n]\nconst S = [ // gov:lens-slots unit-spec\n{{LENS_SLOTS}}\n]\n'
@@ -2541,7 +2677,11 @@ printf '%s\n' "$out"
 # arms, three proceeding and four refusals (7), the two lens sets and the briefs (3), the key (2), the
 # returns, RUN INTEGRITY and the log (2) and the default and diff returns (1). Counted by hand, not by a
 # run: the pass runs no suite.
-FLOOR_ASSERTIONS=387
+# RAISED 387 -> 410 by TOOL-dFairHearing-3: 23 assertions, counted off the `optIn:` and `pin:` arms — six
+# prelude shape arms (6), the scratch render (1), the swap's finders and its return and log (2), the four
+# named refusals (4), the key (1), the light swap (1), five review_pin.py prints (5) and three refusals (3).
+# Counted by hand, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=410
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

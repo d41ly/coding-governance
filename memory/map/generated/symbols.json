@@ -303,6 +303,11 @@
       "file": "tools/workflows/render_lenses.py"
     },
     {
+      "id": "Refused",
+      "kind": "class",
+      "file": "tools/workflows/review_pin.py"
+    },
+    {
       "id": "Report",
       "kind": "class",
       "file": "tools/govkit/govkit.py"
@@ -1516,6 +1521,16 @@
       "id": "buildNativePath",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "buildOptInError",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "buildOptInError",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "buildOpts",
@@ -7283,6 +7298,16 @@
       "file": "tools/unattended/run-lease.js"
     },
     {
+      "id": "deriveSlotLens",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveSlotLens",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "deriveSubjectPair",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -8331,6 +8356,11 @@
       "id": "derive_phase",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "derive_pin",
+      "kind": "function",
+      "file": "tools/workflows/review_pin.py"
     },
     {
       "id": "derive_plant_needle",
@@ -11530,6 +11560,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/workflows/review_pin.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/workflows/review_replay.py"
     },
     {
@@ -12811,6 +12846,11 @@
       "id": "parse_observed",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
+      "id": "parse_opt_in",
+      "kind": "function",
+      "file": "tools/workflows/review_pin.py"
     },
     {
       "id": "parse_pin",
@@ -16566,6 +16606,11 @@
       "id": "read_spec_revs",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_spec_subject_path",
+      "kind": "function",
+      "file": "tools/workflows/review_pin.py"
     },
     {
       "id": "read_spec_uids",
