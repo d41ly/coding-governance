@@ -32,9 +32,9 @@ from __future__ import annotations
 import ast
 import functools
 import hashlib
+import importlib.util
 import io
 import json
-import ntpath
 import os
 import pathlib
 import posixpath
@@ -46,7 +46,7 @@ import time
 
 KIT_GOVKIT_VERSION = "1.14"  # gov:kit govkit@1.14 — kit identity; set HERE, never from a conf
 
-RECEIPT_SCHEMA = 3  # bumped by any unit that adds a per-role row field; readers accept 1, 2 and 3
+RECEIPT_SCHEMA = 4  # readers accept 1 to 4; 4 is reached by the step govkit/receipt-schema-4, or by a first install's apply or adopt
 
 # The REPO-LOCAL GATE POLICY keys, one tuple that check 7h3's predicate compiles its alternation from
 # (TOOL-dDerivedDocket-24 S14). `GATE_SELFTESTS` is TOOL-dUnstalledConvoy-28's; `INHERITED_RED` and
@@ -105,15 +105,52 @@ try:
     import tomllib
 except ModuleNotFoundError:  # pragma: no cover - the message is the product on an old interpreter
     sys.stderr.write(
-        "govkit: this tool needs tomllib (CPython 3.11+). The descriptors are TOML and there is no\n"
+        "govkit: this tool needs tomllib, which ships with every interpreter at the floor\n"
+        "govkit: python-floor.txt in gov's lib dir declares. The descriptors are TOML and there is no\n"
         "govkit: vendored parser: a second TOML dialect is a second source of truth about the same\n"
         "govkit: files, which is the defect class this unit exists to close.\n"
     )
     raise SystemExit(2)
 
 
-class Refusal(RuntimeError):
-    """A condition that stops govkit before it reads or writes anything further."""
+def load_upgrade_steps():
+    """The upgrade-step reader beside this file, imported by its PATH (TOOL-dSafePassage-1).
+
+    `Refusal` lives there, and is bound here below, so the reader and this engine raise ONE class
+    and every catcher of `govkit.Refusal` still resolves. By path rather than by `sys.path`, because
+    a caller that loads this file by its own path adds no directory to it. Where the reader is
+    already loaded from that file, the running program included, it is that module, never a second
+    copy with a second `Refusal`. A copy of this engine without the file beside it stops here.
+    """
+    path = pathlib.Path(__file__).resolve().parent / "upgrade_steps.py"
+    mod = sys.modules.get("upgrade_steps")
+    if mod is not None and getattr(mod, "__file__", None) and pathlib.Path(mod.__file__).resolve() == path:
+        return mod
+    if not path.is_file():
+        sys.stderr.write(f"govkit: no upgrade_steps.py beside {path.parent.as_posix()} — the engine "
+                         f"reads its succession rows and its `Refusal` from it, so a copy of the "
+                         f"engine carries both files\n")
+        raise SystemExit(2)
+    spec = importlib.util.spec_from_file_location("upgrade_steps", path)
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules["upgrade_steps"] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+upgrade_steps = load_upgrade_steps()
+Refusal = upgrade_steps.Refusal
+# TOOL-dSafePassage-35 S24: argv resolution's closure is the step module's own. govkit binds back
+# each moved name a reader still spells off govkit, as it binds `blob_at`. `_BASH`, the cache
+# `resolve_bash` reassigns, is the step module's alone: a copy here would be an alias no reset reaches.
+resolve_bash = upgrade_steps.resolve_bash
+resolve_shell_argv = upgrade_steps.resolve_shell_argv
+resolve_tokens = upgrade_steps.resolve_tokens
+demand_safe_token = upgrade_steps.demand_safe_token
+target_context = upgrade_steps.target_context
+OPT_IN_ALL = upgrade_steps.OPT_IN_ALL
+SEEDED_TOKENS = upgrade_steps.SEEDED_TOKENS
+TOKEN_RX = upgrade_steps.TOKEN_RX
 
 
 # ---------------------------------------------------------------------------- repo + git plumbing
@@ -150,7 +187,6 @@ def repo_root() -> pathlib.Path:
     return tool_root.parent
 
 
-@functools.lru_cache(maxsize=None)
 def derive_tool_root(root: pathlib.Path | str) -> str:
     """TOOL-aRepatriatedFork-29 S1 — the repo-relative directory the kits sit under, for `root`.
 
@@ -158,7 +194,9 @@ def derive_tool_root(root: pathlib.Path | str) -> str:
     kits sit at the repo root. For any other `root` — a scratch fixture a caller hands in — it is the
     parent of the one directory under `root` holding a `<govkit>/registry.toml`, searched at depths
     0 to 2. None found, or more than one, is a refusal: a guessed prefix is the shape that makes a
-    broken install look like a working one.
+    broken install look like a working one. The answer is not memoised, because a caller may move
+    the tree under one root between two calls, as the upgrade walk's clone does
+    (TOOL-dSafePassage-89).
     """
     root = pathlib.Path(root).resolve()
     own = GOVKIT_DIR.parent
@@ -233,6 +271,32 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
+def read_policy_value(key: str, root: pathlib.Path | str, rev: str | None = None) -> tuple:
+    """-> (value, source, reason) for policy key `key` in the repository at `root`, as the policy
+    kit's `policy.py get` answers it: the committed policy at the landed revision, or at `rev` when
+    one is given, an unset key reading the catalogue default (TOOL-dSafePassage-6, -9, -13).
+
+    govkit reaches the policy kit as a subprocess and never imports it, finding it through the
+    inlined `resolve_kit_dir` from this directory; no kit found raises its LookupError, and a reader
+    refusal or any other failed read is a Refusal carrying the reader's own line.
+    """
+    kit = resolve_kit_dir("policy", "policy.py", GOVKIT_DIR)
+    argv = [sys.executable, str(kit / "policy.py"), "get", key, "--json", *(["--rev", rev] if rev else [])]
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    try:
+        p = subprocess.run(argv, cwd=str(root), capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", stdin=subprocess.DEVNULL, env=env)
+    except OSError as exc:
+        raise Refusal(f"govkit: policy.py get {key} did not run: {exc}") from None
+    try:
+        hit = json.loads(p.stdout) if p.returncode == 0 else None
+    except ValueError:
+        hit = None
+    if not isinstance(hit, dict) or "value" not in hit:
+        raise Refusal((p.stderr or "").strip() or f"govkit: policy.py get {key} exited {p.returncode}")
+    return hit["value"], hit.get("source"), hit.get("reason")
+
+
 def resolve_tool_path(root: pathlib.Path | str, *parts: str) -> pathlib.Path:
     """`root` joined to its derived tool root and then to `parts` — a name spelled kit-relatively."""
     tr = derive_tool_root(root)
@@ -277,8 +341,10 @@ def git(root: pathlib.Path, *args: str) -> str:
     return out.stdout
 
 
-def tracked(root: pathlib.Path) -> list[str]:
-    return [p for p in git(root, "ls-files", "-z").split("\0") if p]
+def tracked(root: pathlib.Path, at: str | None = None) -> list[str]:
+    """The index's paths, or with `at` the paths the tree at that commit holds (TOOL-dSafePassage-65 S2)."""
+    args = ("ls-tree", "-r", "--name-only", "-z", at) if at else ("ls-files", "-z")
+    return [p for p in git(root, *args).split("\0") if p]
 
 
 # ------------------------------------------------------------------------------------- the model
@@ -418,10 +484,16 @@ UNLANDED_REASON = {
     # so selfcheck arm 3b refuses a descriptor that spells it. Here so arm 7g demands its dispatch row.
     "adopter-owned": "the target declares it owns these bytes in its deploy.toml [[own]] — gov grades "
                      "the contract other kits call, never the bytes",
+    # TOOL-dSafePassage-9 S3. Like `adopter-owned`, reached only through `update` and so not in
+    # `ROLE_KINDS`: the row's verdict cell (`differs`, `absent`) records it, and every later run
+    # dispatches the row by this role. Here so arm 7g demands its dispatch row.
+    "retired-edited": "the target edited a file gov no longer ships, so gov keeps the target's bytes "
+                      "and orders it",
 }
 
 
-def expand_rules(root: pathlib.Path, desc: dict, ctx: dict[str, str]) -> list[dict]:
+def expand_rules(root: pathlib.Path, desc: dict, ctx: dict[str, str],
+                 at: str | None = None) -> list[dict]:
     """Every (rule index, source, destination template, role) the descriptor names, BEFORE precedence.
 
     A `**` include enumerates the tracked files under `home`; everything else is literal. A rule that
@@ -440,16 +512,18 @@ def expand_rules(root: pathlib.Path, desc: dict, ctx: dict[str, str]) -> list[di
         # provides and measurably reaches further.
         if derive_opted_out(rule, ctx):
             continue      # neither its sources nor a source-less destination: the target declined
-        for src in resolve_rule_pool(root, desc, rule, ctx, home):
+        pool = resolve_rule_pool(root, desc, rule, ctx, home, at=at)
+        for src in pool:
             for dest, miss in resolve_dests(desc, rule, src, ctx, home):
                 out.append({"rule": i, "src": src, "dest": dest, "role": role, "miss": miss})
-        if not resolve_rule_pool(root, desc, rule, ctx, home):
+        if not pool:
             for dest in rule_destinations(desc, rule):
                 out.append({"rule": i, "src": None, "dest": dest, "role": role, "miss": []})
     return out
 
 
-def resolve_entry(root: pathlib.Path, desc: dict, ctx: dict[str, str]) -> dict:
+def resolve_entry(root: pathlib.Path, desc: dict, ctx: dict[str, str],
+                  at: str | None = None) -> dict:
     """Apply precedence. TWO operations, TWO keys — the distinction the whole unit turns on.
 
     A `project-owned` rule is a SOURCE-level carve-out: it removes its sources from every EARLIER
@@ -465,9 +539,10 @@ def resolve_entry(root: pathlib.Path, desc: dict, ctx: dict[str, str]) -> dict:
     called it `engine`.
 
     Returns writes (resolved destination -> row), unlanded rows with their reasons, the carved source
-    set, and the census of destinations whose winner is not the first rule that matched them.
+    set, and the census of destinations whose winner is not the first rule that matched them. With
+    `at`, a `**` rule pools the files gov tracks at that commit (TOOL-dSafePassage-65 S2).
     """
-    rows = expand_rules(root, desc, ctx)
+    rows = expand_rules(root, desc, ctx, at=at)
 
     carve_at: dict[str, int] = {}
     for r in rows:
@@ -506,11 +581,6 @@ def canonical_ctx(eid: str) -> dict[str, str]:
     tr = derive_tool_root(repo_root())
     return {"prefix": tr or ".", "kit_id": eid, "kit": f"{tr}/{eid}" if tr else eid,
             "memory_root": "memory", OPT_IN_ALL: "yes"}
-
-
-#: The canonical ctx's marker that every `opt_in` rule lands. Reserved: `target_context` refuses a
-#: target that spells it, because it would take every opt-in of that kit without naming one.
-OPT_IN_ALL = "opt_in_all"
 
 
 def derive_opted_out(rule: dict, ctx: dict[str, str]) -> bool:
@@ -1131,90 +1201,6 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
     return derive_install_order(sorted(dk), descs)
 
 
-# The negative lookbehind is load-bearing and was bought by a failing arm. A discharge probe is a
-# SHELL command, and shell parameter expansion is spelled `${name}` — so a bare `\{([a-z_]+)\}`
-# matched the `{k}` inside `${k}` in a probe's own loop variable and reported a missing answer named
-# `k`. Two syntaxes sharing a brace is the collision; refusing to match after a `$` is the fix.
-TOKEN_RX = re.compile(r"(?<!\$)\{([a-z_]+)\}")
-
-
-_BASH: str | None = None
-
-
-def resolve_bash() -> str:
-    """The bash that shares THIS filesystem, not whatever the NAME `bash` resolves to.
-
-    MEASURED on node d, 2026-08-20: a descriptor declares `argv = ["bash", ...]`, govkit is a
-    WINDOWS python, and subprocess resolving the bare name goes through the Windows loader —
-    which finds C:/Windows/System32/bash.exe, the WSL launcher, before git-bash. WSL then sees a
-    different filesystem (the target resolves under /mnt/c/) and a different interpreter: its
-    python3 is 3.10.12, so the playbook adopter died on `import tomllib`, which needs 3.11. The
-    whole `govkit acceptance matrix` leg was RED for that reason and for no other.
-
-    This is the documented class `memory/gotchas/subprocess-resolves-a-different-shell.md`, and
-    the remedy it names is this one: name the EXECUTABLE, never the command. corpus_ids.py
-    carries the same function for the memory-tree kit. It is duplicated rather than imported
-    because govkit is COPY-INSTALLED as a standalone directory and cannot reach that module.
-
-    A candidate is accepted only if it RUNS — existing on disk is not evidence, the same mistake
-    <prefix>/lib/resolve-python.sh documents for the Microsoft Store python3 stub.
-
-    WHAT THIS DOES NOT DO: it does not make a target's own scripts portable, and it does not
-    check the interpreter those scripts then pick. It fixes which SHELL runs them and nothing
-    else. GOV_BASH overrides, and an override that is set and unusable is a Refusal here rather
-    than a silent fall-through — the operator would believe they had chosen.
-    """
-    global _BASH
-    if _BASH:
-        return _BASH
-
-    def check_runs(cand: str) -> bool:
-        try:
-            return subprocess.run([cand, "-c", ":"], capture_output=True).returncode == 0
-        except OSError:
-            return False
-
-    override = os.environ.get("GOV_BASH")
-    if override:
-        if check_runs(override):
-            _BASH = override
-            return _BASH
-        raise Refusal(f"govkit: GOV_BASH is set to {override!r} and does not run. An override "
-                      f"that is set and unusable is this failure, not a fall-through.")
-    for d in os.environ.get("PATH", "").split(os.pathsep):
-        for name in ("bash.exe", "bash"):
-            cand = os.path.join(d, name)
-            if not os.path.isfile(cand):
-                continue
-            low = cand.replace("\\", "/").lower()
-            if "/system32/" in low or "/windowsapps/" in low:
-                continue          # a launcher for a DIFFERENT filesystem
-            if not check_runs(cand):
-                continue          # on disk, cannot execute
-            _BASH = cand
-            return _BASH
-    raise Refusal("govkit: no usable bash on PATH that shares this filesystem — every candidate "
-                  "was either a System32/WindowsApps launcher or did not run. Set GOV_BASH.")
-
-
-def resolve_shell_argv(argv: list[str]) -> list[str]:
-    """Replace a LEADING bare `bash` with the resolved executable; every other argv is untouched.
-
-    Only position 0 and only the bash names. A `bash` appearing as an ARGUMENT is a value the
-    target chose and is none of govkit's business, and `sh` is left alone because substituting
-    bash for it would change the language a target asked for.
-
-    Falls back to the argv unchanged when no bash resolves, so a machine with none behaves
-    exactly as it does today instead of newly refusing on a path that never needed this.
-    """
-    if not argv or argv[0] not in ("bash", "bash.exe"):
-        return list(argv)
-    try:
-        return [resolve_bash()] + list(argv[1:])
-    except Refusal:
-        return list(argv)
-
-
 def run_target_argv(argv: list[str] | tuple[str, ...],
                     target: pathlib.Path) -> subprocess.CompletedProcess:
     """Run a kit's resolved target-side argv in `target`, its output captured and decoded as UTF-8
@@ -1228,77 +1214,6 @@ def run_target_argv(argv: list[str] | tuple[str, ...],
     """
     return subprocess.run(resolve_shell_argv(list(argv)), cwd=str(target), capture_output=True,
                           text=True, encoding="utf-8", errors="replace")
-
-
-def resolve_tokens(s: str, ctx: dict[str, str]) -> tuple[str, list[str]]:
-    """Substitute `{token}`s from the target's answers. Unresolved tokens are RETURNED, not emitted.
-
-    A path with a brace still in it is not a path. Emitting one is how a deployer writes a literal
-    `{memory_root}` directory into somebody's repository, so the caller is handed the missing names
-    and decides — which for `plan` and `apply --unattended` is a refusal that names the key.
-    """
-    missing: list[str] = []
-
-    def sub(m: re.Match) -> str:
-        k = m.group(1)
-        if k in ctx:
-            return ctx[k]
-        missing.append(k)
-        return m.group(0)
-
-    return TOKEN_RX.sub(sub, s), missing
-
-
-# THE ONE PLACE TARGET-SUPPLIED TEXT BECOMES PART OF A COMMAND, so it is the one place to refuse.
-#
-# Every token value below comes out of the TARGET's `.governance/deploy.toml`, a file in a repository
-# gov does not own. Those values are interpolated by `resolve_tokens` into argv templates GOV wrote —
-# `[check].argv`, `[[hole]].discharge.command`, `[[gate_leg]].argv` — several of which are
-# `["bash", "-c", "... {kit} ..."]` or `["python", "-c", "... sys.path.insert(0, '{kit}') ..."]`.
-# A shell metacharacter or a quote break in a value therefore becomes CODE.
-#
-# REPRODUCED, twice, on this engine before this guard existed: a target whose `deploy.toml` carried
-# `prefix = "tools; touch PWNED-BY-CHECK ;"` made a READ-ONLY `govkit check` — no `--write`, no
-# `--run-discharge`, nothing printed — create that file in the target. A second reproduction broke
-# out of a `python -c` string the same way. `resolve_shell_argv` is no defence: it rewrites argv[0]
-# and nothing else.
-#
-# WHY IT WAS MISSED, stated because the miss is the interesting part. The fold before this one
-# labelled each spawn by WHO AUTHORED THE ARGV TEMPLATE and concluded these sites were gov's. That is
-# the wrong question. The template is gov's and the VALUES SUBSTITUTED INTO IT are the target's, so
-# the resulting command is target-influenced wherever a token appears — and the declaration asserting
-# otherwise was itself the artifact written to stop this class recurring.
-#
-# A CHARACTER CLASS, not an escaper. Escaping is per-consumer — a value safe in argv is not safe
-# inside `bash -c` — and this value reaches several. What every legitimate answer in this repo's
-# descriptors actually is: a path fragment. So the refusal is narrow, total, and needs no consumer
-# to be correct.
-# `\Z` AND NOT `$`: Python's `$` matches BEFORE a final newline, so "tools\n" passed this class
-# for as long as it has existed. Round 4 measured it. A trailing newline in a value spliced into a
-# `bash -c` string ends the command and starts another one, which is the exact escape the class
-# was written to stop.
-TOKEN_VALUE_RE = re.compile(r"\A[A-Za-z0-9_./~@+-]*\Z")
-# THE ONE ADMITTED COLON, anchored, and nothing else. Round 3 measured that the class above refuses
-# `user_skills = "C:/Users/x/.claude/skills"` -- a correct answer on the platform this project's own
-# primary node runs on -- with a message about command injection naming nothing the operator did
-# wrong. `kickoff-manifest` is in the DEFAULT selection and its rule is `{user_skills}/session-kickoff`,
-# so that sat on the common path for every Windows adopter. No arm caught it: both fixtures spell the
-# answer in forms that pass (`~/.claude/skills`, `/tmp/gk-fake-skills`).
-#
-# WHY THIS IS A NARROW WIDENING AND NOT A HOLE. The threat the class exists for is a value leaving its
-# argument inside a `bash -c` or `python -c` template, which needs a shell metacharacter: `;` `|` `&`
-# `$` a backtick, a quote, a newline, a redirect. `:` is none of those -- it is bash's null command and
-# is inert as argument text. What a colon CAN do is make a path absolute on Windows, and that is a
-# containment question, answered one function down by `demand_contained_dest`, which reds a
-# drive-lettered DESTINATION. So the two guards keep their own jobs: this one grades characters, that
-# one grades escape.
-#
-# ANCHORED AT POSITION 1 AND REQUIRING A FORWARD SLASH. `C:/x` passes; `C:x`, `C:\x`, `a:b` and
-# `C:/a;b` do not -- the remainder after the drive is graded by the class above exactly as before, so
-# an interior colon or any metacharacter still refuses. Backslash stays refused deliberately: §11
-# pins forward slashes on this platform, and admitting both spellings would double the surface for
-# nothing.
-DRIVE_PREFIX_RE = re.compile(r"^[A-Za-z]:/")
 
 
 def demand_contained_dest(dest: str, where: str) -> str:
@@ -1321,181 +1236,19 @@ def demand_contained_dest(dest: str, where: str) -> str:
     cheerfully PREVIEWS 26 escaping writes is its own defect, because the preview is what an operator
     approves. A guard in the write loop alone would leave the preview lying.
 
-    PURE STRING CONTAINMENT, no target root needed and none taken: a destination is a repo-relative
-    POSIX path, so it escapes exactly when it normalises to `..`-leading or is absolute. A drive
-    letter counts as absolute -- this tool's own node runs on Windows, where `C:/x` is not relative
-    and `ntpath` is the only thing that knows it.
+    PURE STRING CONTAINMENT, no target root needed and none taken. The decision is
+    `upgrade_steps.derive_contained_rel`'s, the one answer the step module's before-image paths
+    share (TOOL-dSafePassage-72 S2): a destination escapes when it normalises to `.`, `..` or a
+    `../` climb, is rooted, UNC or drive-absolute, or holds a colon anywhere (§8 F1).
     """
-    norm = posixpath.normpath(dest.replace("\\", "/"))
-    if (norm == ".." or norm.startswith("../") or posixpath.isabs(norm)
-            or ntpath.isabs(dest) or (len(dest) > 1 and dest[1] == ":")):
+    if upgrade_steps.derive_contained_rel(dest) is None:
         raise Refusal(
-            f"the resolved destination {dest!r} leaves the target repository (normalises to "
-            f"{norm!r}) -- refusing the whole run. Destinations are repo-relative by construction, "
+            f"the resolved destination {dest!r} leaves the target repository -- refusing the whole "
+            f"run. Destinations are repo-relative by construction, "
             f"and one that escapes is a write into a tree the operator did not name. Source: "
             f"{where}. This is almost always a `prefix` in the target's .governance/deploy.toml "
             f"carrying `..` or an absolute path")
     return dest
-
-
-# ---- TWO CLASSES, BECAUSE THERE ARE TWO KINDS OF VALUE AND ONE CLASS GRADED BOTH.
-# ---- The strict class above was written for `prefix` -- which becomes a PATH and is interpolated
-# ---- into `bash -c` and `python -c` argv templates -- and was then applied to every `answers.*`
-# ---- and every `kit.<eid>.*` value as well. Those are not all paths. The playbook charter's
-# ---- placeholders are rendered into a MARKDOWN DOCUMENT, and a legitimate override for one carries
-# ---- spaces by nature: `gate_runner = "bash <prefix>/run-gates/run-gates.sh"` is a command a reader
-# ---- runs, `id_families = "PLAY KICK TOOL DEPL"` is a list.
-# ----
-# ---- MEASURED, AND IT WAS NOT HYPOTHETICAL. The single class red the `govkit acceptance matrix`
-# ---- leg from the commit that introduced it, and it stayed red across two commits because no full
-# ---- bar ran in between. The live adopter's answers happen to be all path-shaped, so nothing else
-# ---- noticed. That is the same mistake as the drive letter, twice: writing one character class for
-# ---- `prefix` and applying it to every value that passes through the same function.
-# ----
-# ---- THE PROSE CLASS IS STILL AN ALLOWLIST, and it still refuses every injection vector this build
-# ---- reproduced. It adds space, comma, equals and colon -- none of which can end an argument or
-# ---- start a command -- and admits nothing that can: no `;` `|` `&` `$`, no backtick, no quote, no
-# ---- redirect, no parenthesis or brace, no glob, no backslash, no control character. `tools; touch
-# ---- PWNED ;` and `$(id)` are refused by it exactly as before.
-# ----
-# ---- WHAT THE PROSE CLASS DOES NOT PROMISE. An earlier version of this comment said a spaced value
-# ---- reaching a `bash -c` template merely WORD-SPLITS, that this is "a correctness bug for the
-# ---- operator who wrote it" and "not code execution". THAT WAS FALSE and round 4 proved it: for a
-# ---- `python {kit}/<script>` template the injected word becomes the script python runs. A comment
-# ---- asserting a guarantee the code does not hold is worse than no comment, because the next reader
-# ---- budgets against it.
-# ---- The prose class is sound ONLY for a value whose sole consumer is a rendered document, and
-# ---- nothing here establishes that per key. What makes it safe today is `SEEDED_TOKENS` above:
-# ---- every token that reaches an argv is gov's own and a target cannot supply one. The escape half
-# ---- is owned by `demand_contained_dest`, which grades destinations whichever class they came
-# ---- through.
-# ---- THE KEYS GOV COMPUTES FOR ITSELF, and which a TARGET may therefore never supply.
-# ---- ROUND 4's blocker, and it is round 2's blocker reopened by round 2's own fix. `target_context`
-# ---- seeds `prefix`, `kit_id` and `kit` from a `prefix` graded by the STRICT class, then walked the
-# ---- target's `[answers]` and `[kit.<eid>]` tables and assigned `ctx[k]` UNCONDITIONALLY through
-# ---- the PROSE class -- which admits a space. Nothing stopped a target routing a document-class
-# ---- value into a shell-class key.
-# ----
-# ---- REPRODUCED: `[answers] kit = "-m pwned "` makes `ctx["kit"]` that string, and drift-audit's
-# ---- shipped hole probe resolves to `python -m pwned /drift_report.py --check` with ZERO
-# ---- unresolved tokens. Six shipped descriptors interpolate `{kit}` inside a `-c` string, and
-# ---- `cmd_check` spawns every one of them from a READ-ONLY verb with no opt-in flag.
-# ----
-# ---- THE ENGINE ALREADY KNEW THE SET. `needed_answers` declares exactly these five and refuses to
-# ---- ask an operator for any of them, while `target_context` let a target supply all five: two
-# ---- functions, one set, opposite answers. That is what this constant ends -- it is READ by both.
-# ---- THE SET IS THE THREE KEYS SEEDED ABOVE THE LOOPS, and it is NOT `needed_answers`' five.
-# ---- Measured before narrowing, because widening a refusal without enumerating its population is
-# ---- the mistake this whole review round is about. `memory_root` is applied by `ctx.setdefault`
-# ---- AFTER the loops, so a target that supplies it legitimately wins -- and gov's OWN selftest
-# ---- fixtures supply it in `[answers]` at four sites, as does a live adopter. Refusing it would
-# ---- have broken the suite and every real install to close a hole it is not part of. `relpath` is
-# ---- never a ctx key at all: `resolve_dests` substitutes it per rule with `.replace`, so a target
-# ---- supplying it reaches nothing.
-# ---- `needed_answers` means "do not ASK for these five"; this means "do not READ these three".
-# ---- Different questions, and collapsing them was the first cut of this fix.
-SEEDED_TOKENS = ("prefix", "kit_id", "kit")
-# The subset a per-ENTRY `[kit.<eid>]` table may set, graded by the STRICT path class. See
-# `target_context` for why the split is per-table rather than a name ban.
-PER_KIT_PATH_TOKENS = ("prefix", "kit")
-
-
-ANSWER_VALUE_RE = re.compile(r"\A[A-Za-z0-9_./~@+:, =-]*\Z")
-
-
-def demand_safe_token(key: str, value: str, where: str, prose: bool = False) -> str:
-    """Refuse a target-supplied token value that could leave its argument and become code.
-
-    `prose=False` (the default) is the STRICT class, for a value that becomes a path or is
-    interpolated into an argv this engine runs. A leading `<letter>:/` is dropped before grading and
-    the REMAINDER graded normally, so a Windows drive letter is admitted and an interior colon is
-    not.
-
-    `prose=True` is for a value whose only consumer renders it into a document. See the block above
-    `ANSWER_VALUE_RE` for what it admits, what it still refuses, and what it deliberately does not
-    promise.
-    """
-    rx = ANSWER_VALUE_RE if prose else TOKEN_VALUE_RE
-    body = value if prose else (value[2:] if DRIVE_PREFIX_RE.match(value) else value)
-    if not rx.match(body):
-        bad = "".join(sorted({c for c in body if not rx.match(c)}))
-        raise Refusal(
-            f"the target descriptor's '{key}' is {value!r}, which carries {bad!r}. Token values are "
-            f"interpolated into argv this engine RUNS — several shipped probes are `bash -c` and "
-            f"`python -c` strings — so a value outside [A-Za-z0-9_./~@+-] can leave its argument and "
-            f"become code. Refusing to resolve it ({where}). "
-            + ("This value is rendered into a document, so spaces and commas are fine here and "
-               "shell metacharacters are not"
-               if prose else
-               "Every legitimate value here is a path fragment, optionally behind a `C:/` drive "
-               "letter")
-            + "; if you need one that is not, that is a change to this rule and not to a descriptor")
-    return value
-
-
-def target_context(target: pathlib.Path, deploy: dict, eid: str, desc: dict) -> dict[str, str]:
-    """The token values for one entry, from the target descriptor's answers.
-
-    EVERY VALUE IS VALIDATED HERE, at the boundary, rather than at the several places they are
-    consumed. See `demand_safe_token` for what was reproduced without it.
-    """
-    # WHERE A TARGET MAY SPEAK ABOUT A SEEDED TOKEN, per TABLE and per KEY rather than by name.
-    #
-    # `ce4ef9f3` closed a live injection: a target could put a PROSE-class value -- one that admits
-    # a space -- on a key this engine interpolates into a `bash -c` template, and a READ-ONLY
-    # `check` would run it. That fix refused `prefix`, `kit_id` and `kit` from both target tables.
-    #
-    # The refusal is a SUPERSET of the defect, and the surplus is load-bearing for an adopter. The
-    # top-level `prefix` below is target-supplied too, and it is safe for exactly one reason: it is
-    # graded by the STRICT class, which admits no space, quote, semicolon, backtick or pipe, so a
-    # value cannot leave its argument. The defect was the CLASS, not the key. So:
-    #
-    #   [answers]    refuses all three. It is GLOBAL: a `kit` there collapses every entry into one
-    #                home and a `kit_id` renames all of them, so no value is ever legitimate.
-    #   [kit.<eid>]  accepts `prefix` and `kit`, graded STRICTLY. A per-entry install home is a path
-    #                fragment the OPERATOR owns and this engine cannot derive -- an adopter whose
-    #                memory-tree lives at `scripts/` rather than `scripts/memory-tree/` has no other
-    #                way to say so, and before this it had none at all. `kit_id` stays refused
-    #                everywhere: that is the ENTRY's identity, joined to the receipt's `kit` field,
-    #                and not a path.
-    per_kit = (deploy.get("kit") or {}).get(eid) or {}
-    for _tbl, _label, _allowed in ((deploy.get("answers") or {}, "answers", ()),
-                                   (per_kit, f"kit.{eid}", PER_KIT_PATH_TOKENS)):
-        for k in _tbl:
-            if k in SEEDED_TOKENS and k not in _allowed:
-                raise Refusal(
-                    f"the target descriptor supplies '{_label}.{k}', which this engine derives "
-                    f"({', '.join(SEEDED_TOKENS)}). These are interpolated into argv this engine "
-                    f"RUNS -- a `{{{k}}}` inside a `bash -c` or `python -c` template becomes the "
-                    f"command. A per-ENTRY install home is settable as `kit.<entry>.prefix` or "
-                    f"`kit.<entry>.kit`, graded by the strict path class; the global `[answers]` "
-                    f"table and `kit_id` are not. Remove the key: {_label}.{k}")
-    prefix = demand_safe_token(
-        f"kit.{eid}.prefix" if per_kit.get("prefix") else "prefix",
-        (per_kit.get("prefix") or deploy.get("prefix") or "tools").strip("/"),
-        f"entry '{eid}'")
-    # DERIVED unless the target names it. `{kit}` follows a per-entry `prefix` when only that is
-    # given, so an adopter who moves a whole kit family says it once.
-    _kit = per_kit.get("kit")
-    kit = (demand_safe_token(f"kit.{eid}.kit", _kit.strip("/"), f"entry '{eid}'")
-           if isinstance(_kit, str) and _kit else f"{prefix}/{eid}")
-    ctx: dict[str, str] = {
-        "prefix": prefix,
-        "kit_id": eid,
-        "kit": kit,
-    }
-    for k, v in (deploy.get("answers") or {}).items():
-        if isinstance(v, str):
-            ctx[k] = demand_safe_token(f"answers.{k}", v, f"entry '{eid}'", prose=True)
-    for k, v in per_kit.items():
-        if k == OPT_IN_ALL:
-            raise Refusal(f"the target descriptor supplies 'kit.{eid}.{k}', which is reserved: it would "
-                          f"take every opt-in of that entry without naming one. Set each rule's own "
-                          f"`opt_in` key instead")
-        if isinstance(v, str) and k not in PER_KIT_PATH_TOKENS:
-            ctx[k] = demand_safe_token(f"kit.{eid}.{k}", v, f"entry '{eid}'", prose=True)
-    ctx.setdefault("memory_root", "memory")
-    return ctx
 
 
 def resolve_adopter_argv(target: pathlib.Path, deploy: dict, eid: str,
@@ -2730,16 +2483,8 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     #          structurally cannot see a missing GRID cell — which is how the grid shipped with no
     #          answer for a file deleted on both sides, and the verdict routed to a restore of a blob
     #          that does not exist. A refusal counts as a row; silence does not.
-    known_roles = set(UNLANDED_REASON) | set(LANDABLE_ROLES) | {"attributes", "gate-leg", "ci"}
-    for role in sorted(known_roles):
-        if role not in UPDATE_ROLE:
-            r.fail(f"role '{role}' has no row in `update`'s dispatch — a role a later unit adds and "
-                   f"leaves out of the table is one `update` will meet and cannot classify")
-    for o in OURS_STATES:
-        for t in THEIRS_STATES:
-            if (o, t) not in VERDICT_GRID:
-                r.fail(f"the verdict grid has no cell for (ours={o}, theirs={t}) — every pair must "
-                       f"name a verdict, including the one where both sides are gone")
+    for _gap in derive_dispatch_gaps(UPDATE_ROLE, UNLANDED_REASON, LANDABLE_ROLES, VERDICT_GRID):
+        r.fail(_gap)
     # DEPL-cMendedVintage-24 S6. AND THE DECLARED WRITING SET IS A SUBSET OF WHAT THAT TABLE MAPS TO.
     # Two preconditions and `update`'s closing tally all take their population from this set; a
     # member misspelled here matches no row, empties all three populations at once, and every one of
@@ -3773,6 +3518,32 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                f"`{_akey[_nm]}` instead")
     r.note(f"adopter names: {len(_anames)} from {len(_adopters)} adopters.toml row(s) over "
            f"{len(_shipped)} shipped file(s) · {sum(_measured.values())} site(s)")
+
+    # ---- 11: TOOL-dSafePassage-6. EVERY FORWARDER IS ITS RENDER, AND NONE CLOSES BEFORE ITS WINDOW.
+    #          `shims.py`'s parity over `shims.toml` (each open row's forwarder equals its render,
+    #          each closed row's file is gone) and its window (a `closed = true` row is refused until
+    #          `install.deprecation-window` releases are cut since its landing, and while no release
+    #          exists). The count prints on every run, a zero included, since gov ships no shim yet.
+    #          DOES NOT CHECK: that a forwarder's target exists — the step gate sees a vanished member.
+    #          A govkit copied without `shims.py` beside it (a self-test's scratch gov) declares no
+    #          shim to grade, and the arm says it stood down rather than printing a graded zero.
+    _sh_src = GOVKIT_DIR / "shims.py"
+    if not _sh_src.is_file():
+        r.note(f"shims: arm 11 stood down, graded nothing: no {_sh_src.name} beside {GOVKIT_DIR.as_posix()}")
+        return r.emit()
+    _sh_spec = importlib.util.spec_from_file_location("shims", _sh_src)
+    shims = importlib.util.module_from_spec(_sh_spec)
+    _sh_spec.loader.exec_module(shims)
+    try:
+        _sh_rows = shims.read_shim_rows(root)
+        _sh_n, _sh_parity = shims.check_shim_parity(root)
+        _sh_held = shims.check_shim_windows(root)
+    except Refusal as exc:
+        _sh_rows, _sh_n, _sh_parity, _sh_held = [], 0, [str(exc)], []
+    for _f in (*_sh_parity, *_sh_held):
+        r.fail(_f)
+    _sh_closed = sum(bool(row["closed"]) for row in _sh_rows)
+    r.note(f"shims: {_sh_n} row(s) graded · {_sh_n - _sh_closed} open · {_sh_closed} closed")
     return r.emit()
 
 
@@ -4001,6 +3772,7 @@ def planned_writes(root: pathlib.Path, target: pathlib.Path, deploy: dict,
     written.
     """
     commit = git(root, "rev-parse", "HEAD").strip()
+    source = test_source_target(root, target)
     out: list[dict] = []
     for eid in selection:
         d, _dpath = descs[eid]
@@ -4032,6 +3804,10 @@ def planned_writes(root: pathlib.Path, target: pathlib.Path, deploy: dict,
             # write. Measured on the lexicon kit before this changed: plan 3, apply 12.
             for src in resolve_rule_pool(root, d, rule, ctx, home):
                 for resolved, missing in resolve_dests(d, rule, src, ctx, home):
+                    if missing and source:
+                        # TOOL-dSafePassage-8 S3. In gov's own tree the row's bytes already sit
+                        # where they are read from, so an unanswered destination is its source.
+                        resolved, missing = src, []
                     for k in missing:
                         r.fail(f"entry '{eid}' needs answer '{k}' to resolve a destination for "
                                f"'{src}', and the target descriptor supplies none — refusing before "
@@ -4188,50 +3964,45 @@ def scan_entry_argv(descs: dict[str, tuple[dict, str]], selection: list[str], ta
 # three and `adopt`'s one — now routes through `write_atomic`, and the assertion reds on any left.
 #
 # `"install.sums"` IS THE THIRD (TOOL-dRedressedBar-19 S40): `.governance/install.sums`, the flat
-# sidecar of the receipt that `check` compares with it both ways. It is written beside the receipt at
-# `apply`'s RECEIPT step, `update`'s three and `adopt`'s one, each through `write_atomic` and each
-# BEFORE its receipt, so an interrupt between the two leaves a new sidecar beside the old receipt,
-# which `check` reports until the next apply rewrites both, and never a truncated sidecar.
+# sidecar of the receipt that `check` compares with it both ways. It is written beside the receipt by
+# ONE writer, `write_install_receipt` (TOOL-dSafePassage-62 S2), which `apply`'s RECEIPT step,
+# `update`'s write before its step walk and its three after it, and `adopt`'s one all call: each file
+# through `write_atomic` and the sidecar BEFORE its receipt, so an interrupt between the two leaves a
+# new sidecar beside the old receipt, which `check` reports until the next apply rewrites both, and
+# never a truncated sidecar.
 ADOPTER_BAR_PATHS = ('gr["file"]', 'receipt_path', '"install.sums"')
 
 
-def write_atomic(dest: pathlib.Path, text: str) -> None:
-    """Persist `text` at `dest` through a sibling temp file and `os.replace`, so a run that dies
-    mid-write leaves the PREVIOUS file rather than a truncated one (DEPL-cMendedVintage-21 S1).
+# The one atomic writer moved to `upgrade_steps.py` (TOOL-dSafePassage-26 S15), so the step
+# program and the walk write through the same function; govkit's callers read it here.
+write_atomic = upgrade_steps.write_atomic
 
-    THE ONE WRITER for every destination `ADOPTER_BAR_PATHS` declares: the gate-leg manifest an
-    adopter's whole bar reads, the receipt, `.governance/install.json` (TOOL-dRedressedBar-17), and
-    its sidecar `.governance/install.sums`, written before the receipt (TOOL-dRedressedBar-19).
-    Two verbs write the manifest since DEPL-cMendedVintage-13, and an exception between opening it
-    and finishing it would hand the adopter a manifest that is not JSON — every leg of their bar,
-    gone, on a deployer step that was only adding one. A receipt cut short the same way is one the
-    next `apply`, `update` or `adopt` cannot parse.
 
-    WHAT THIS DOES NOT CLAIM. No fsync and no directory sync, so this is not crash consistency:
-    what it closes is a half-written file left by an EXCEPTION mid-write. Power loss is out of
-    scope and always was.
+def write_install_receipt(target: pathlib.Path, receipt_path: pathlib.Path, doc: dict) -> None:
+    """Write `.governance/install.sums` from every `doc["files"]` row carrying `sha256`, then the
+    receipt `doc` at `receipt_path`, each through `write_atomic` and in that order
+    (TOOL-dRedressedBar-19 S40). The one writer of the pair (TOOL-dSafePassage-62 S2)."""
+    write_atomic(target / ".governance" / "install.sums",
+                 "".join(f"{f['sha256']}  {f['path']}\n" for f in doc["files"] if "sha256" in f))
+    write_atomic(receipt_path, json.dumps(doc, indent=2) + "\n")
 
-    The temp file is a SIBLING, inside the destination's own directory. Two reasons, and both are
-    load-bearing: `os.replace` raises across a filesystem boundary, which a shared temp root makes
-    reachable and a sibling makes impossible; and a shared root is writable by principals the
-    destination's directory is not, so the file to be renamed into place could be swapped before
-    the rename. A stale sibling from a crashed run of an earlier vintage is overwritten here rather
-    than swept, because an unknown temp file of unknown vintage is not this engine's to delete.
-    """
-    tmp = dest.with_name(dest.name + ".govkit-new")
-    try:
-        tmp.write_text(text, encoding="utf-8", newline="\n")
-        os.replace(tmp, dest)
-    finally:
-        # THE CLEANUP RUNS ON THE SUCCESS PATH TOO, where `os.replace` has already consumed `tmp`
-        # and this raises FileNotFoundError — an OSError, swallowed. Swallowed rather than
-        # re-raised because this sits in a `finally`: an exception thrown from here REPLACES the
-        # one that brought us here, and the caller would be told the temp file could not be
-        # removed instead of why the write failed.
-        try:
-            tmp.unlink()
-        except OSError:
-            pass
+
+def derive_receipt_schema(prior) -> dict:
+    """The `schema` and `steps` keys of the receipt `apply` or `adopt` writes over `prior`, the
+    parsed receipt the run rewrites, or None for a first install (TOOL-dSafePassage-3 S5).
+
+    A first install is born at RECEIPT_SCHEMA with an empty `steps`. A prior at schema 4 or more
+    keeps its schema and, where it holds the key, its `steps` verbatim: the field records EVENTS,
+    so D2's rule holds for it and a re-run never re-measures it. Any other prior — below 4, no
+    `schema`, a non-int, or `{}` for a receipt `--re-adopt` could not parse — is written at 3 with
+    no `steps`, so only the step govkit/receipt-schema-4 lifts an existing receipt to 4. A carried
+    `steps` is not checked here: `check` reports a malformed one through `read_step_states`."""
+    if prior is None:
+        return {"schema": RECEIPT_SCHEMA, "steps": []}
+    s = prior.get("schema") if isinstance(prior, dict) else None
+    if isinstance(s, int) and not isinstance(s, bool) and s >= 4:
+        return {"schema": s, **({"steps": prior["steps"]} if "steps" in prior else {})}
+    return {"schema": 3}
 
 
 def check_leg_claimable(argv: list[str], runner_leg: object) -> bool:
@@ -5423,6 +5194,12 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     deploy = load_deploy(target)
     selection = receipt.get("kits") or []
+    # TOOL-dSafePassage-3 S3: the per-step record, through its one parser; a malformed one is
+    # reported here, where nothing is written, rather than by the walk mid-update.
+    try:
+        upgrade_steps.read_step_states(receipt)
+    except Refusal as e:
+        r.fail(f"{receipt_path.as_posix()}: the receipt's step record is malformed: {e}")
 
     # ---- DEPL-aRepatriatedFork-1 S5. `[charter]` is the render-only value class: `target_context`
     # ---- never reads it, so a key a selected kit needs as an argv or destination token, answered
@@ -5673,9 +5450,17 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
         print(f"govkit check — {_ln}")
     _owned_src = {f.get("source") for f in rows if f.get("role") == "adopter-owned"}
 
+    # TOOL-dSafePassage-1 S4. A claimed id a `[[retired]]` row names is a SUCCESSION, reported and
+    # counted as no problem; `update` carries the claim. One with no succession row still reds.
+    retired = upgrade_steps.read_retired(root, None, None)
     for eid in selection:
         if eid not in descs:
-            r.fail(f"the receipt claims kit '{eid}', which is not a registry entry")
+            try:
+                _ret = upgrade_steps.resolve_claim(eid, descs, retired)
+            except Refusal:
+                r.fail(f"the receipt claims kit '{eid}', which is not a registry entry")
+                continue
+            print(f"govkit check — {eid}: retired, successor {_ret.successor}")
             continue
         d, _ = descs[eid]
         ctx = target_context(target, deploy, eid, d)
@@ -6177,20 +5962,33 @@ def run_fragment_merges(target: pathlib.Path, rows: list[dict], landed: set[str]
     return added
 
 
-def remove_wired_fragments(target: pathlib.Path, rows: list[dict], frags: list[str], verb: str) -> None:
+def remove_wired_fragments(target: pathlib.Path, rows: list[dict], frags: list[str], verb: str,
+                           cause: str = "rollback") -> list[str]:
     """TOOL-aRepatriatedFork-11 S4: a rolled-back kit takes back out exactly the settings entries
     `run_fragment_merges` added for it, through `settings-merge.py --unwire`, so no entry is left
     pointing at a hook file the rollback removed. Called BEFORE the kit's files are restored,
-    because a landed fragment is deleted by that restore and `--unwire` reads the fragment."""
+    because a landed fragment is deleted by that restore and `--unwire` reads the fragment.
+
+    TOOL-dSafePassage-9 S1: `cause="withdrawn"` is `update`'s withdrawn arm taking out the entry of
+    a fragment gov no longer ships, before any deletion. Returns the fragments it unwired."""
     sm = next((str(f["path"]) for f in rows if f.get("kit") == "settings-merge"
                and str(f.get("path", "")).endswith("settings-merge.py")), None)
     settings = os.environ.get("GOV_SETTINGS_JSON") or ".claude/settings.json"
+    done = ("unwired, gov no longer ships it" if cause == "withdrawn" else "unwired by the rollback")
+    unwired: list[str] = []
     for p in frags:
         out = subprocess.run([sys.executable, str(sm), settings, "--unwire", "--fragment", p],
                              cwd=str(target), capture_output=True, text=True, encoding="utf-8") if sm else None
-        print(f"govkit {verb} — hooks: {p} "
-              + ("unwired by the rollback" if out is not None and out.returncode == 0 else
-                 "could NOT be unwired by the rollback; remove its entry from " + settings + " by hand"))
+        if out is not None and out.returncode == 0:
+            unwired.append(p)
+            print(f"govkit {verb} — hooks: {p} {done}")
+        elif cause == "withdrawn":
+            print(f"govkit {verb} — hooks: {p} could NOT be unwired, so its entry stays wired in "
+                  f"{settings} and the fragment is kept; remove the entry by hand")
+        else:
+            print(f"govkit {verb} — hooks: {p} could NOT be unwired by the rollback; remove its "
+                  f"entry from {settings} by hand")
+    return unwired
 
 
 def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
@@ -6644,7 +6442,8 @@ def resolve_dests(desc: dict, rule: dict, src: str, ctx: dict, home: str) -> lis
     return [(f"{ctx['kit']}/{rel}", [])]
 
 
-def resolve_rule_pool(root: pathlib.Path, desc: dict, rule: dict, ctx: dict, home: str) -> list[str]:
+def resolve_rule_pool(root: pathlib.Path, desc: dict, rule: dict, ctx: dict, home: str,
+                      at: str | None = None) -> list[str]:
     """The source paths a rule actually lands. ONE spelling for `plan` AND `apply`.
 
     THIS SEAM EXISTS BECAUSE THE TWO DISAGREED. `plan` resolved sources through `rule_sources()`,
@@ -6663,7 +6462,7 @@ def resolve_rule_pool(root: pathlib.Path, desc: dict, rule: dict, ctx: dict, hom
     srcs = inc if isinstance(inc, list) else ([inc] if inc else [])
     if any(s == "**" for s in srcs):
         claimed = scan_claimed_paths(desc, rule, ctx, home)
-        return [f for f in tracked(root)
+        return [f for f in tracked(root, at)
                 if home and f.startswith(home + "/")
                 and not ({d for d, _m in resolve_dests(desc, rule, f, ctx, home)} & claimed)]
     return rule_sources(desc, rule)
@@ -6703,16 +6502,9 @@ def scan_claimed_paths(desc: dict, wildcard_rule: dict, ctx: dict, home: str) ->
     return claimed
 
 
-def blob_at(root: pathlib.Path, commit: str, path: str) -> bytes | None:
-    """Bytes from the gov git INDEX at a recorded commit — never from the working tree.
-
-    This is the receipt's whole provenance claim. Reading the working tree would make the receipt
-    say "these bytes came from <commit>" about bytes that came from whatever the operator had
-    checked out and half-edited at the time.
-    """
-    out = subprocess.run(["git", "-C", str(root), "show", f"{commit}:{path}"],
-                         capture_output=True, check=False)
-    return out.stdout if out.returncode == 0 else None
+# The one revision-blob reader moved to `upgrade_steps.py` (TOOL-dSafePassage-26 S14); a
+# selftest patching `govkit.blob_at` still reaches every caller below, which reads this name.
+blob_at = upgrade_steps.blob_at
 
 
 # ---------------------------------------------------------------- the two identities (DEPL-dCarriedReceipt-7)
@@ -7037,6 +6829,14 @@ IN_PROGRESS_MARKERS = ("MERGE_HEAD", "REBASE_HEAD", "CHERRY_PICK_HEAD")
 # One spelling of where the lock lives. Both verbs take it and the refusal prints it, so a second
 # literal would be a second answer to the same question.
 WRITE_LOCK_REL = ".governance/outbox/.update.lock"
+# TOOL-dSafePassage-2 S7 and S8. Beside the lock: the guard a reclaim holds while it replaces a dead
+# holder's lock, and the staging journal, one `{"path", "oid"}` line appended before each index write,
+# so the run that reclaims a killed holder's lock can tell that holder's staging from an operator's.
+RECLAIM_GUARD_SUFFIX = ".reclaim"
+STAGING_JOURNAL_SUFFIX = ".staged"
+STAGING_JOURNAL_REL = WRITE_LOCK_REL + STAGING_JOURNAL_SUFFIX
+# S5. The order an `attended` step's stop writes, keyed by `render_order_slug` of the step id.
+ATTENDED_ORDER_PREFIX = "update-attended-step-"
 
 # The lock THIS process created, and nothing else. A run that REFUSED on somebody else's lock must
 # never unlink the file it just refused over, which is the one way a lock becomes an amplifier.
@@ -7096,8 +6896,14 @@ def demand_index_resolved(target: pathlib.Path, verb: str) -> None:
 
 def dirty_claimed_paths(target: pathlib.Path, claimed: list[str],
                         landed_oids: dict[str, str] | None = None,
-                        region_owned: dict[str, tuple[str, str]] | None = None) -> list[str]:
+                        region_owned: dict[str, tuple[str, str]] | None = None,
+                        journal: dict[str, str | None] | None = None) -> list[str]:
     """S4, and the DEFINITION of dirty for this whole build, implemented in one place.
+
+    `journal` (TOOL-dSafePassage-2 S8) is a reclaimed dead holder's staging journal, `{path: the
+    last oid it staged there, None for a deletion}`. It widens carve-out 3 by exactly those entries:
+    an index blob equal to the journaled oid, or a staged deletion journaled as one, is that killed
+    run's staging. A different blob at a journaled path stays dirty.
 
     A claimed path is dirty when it differs index-versus-HEAD or worktree-versus-index — `git diff
     --cached` and `git diff` over that path, and deliberately NOT `git status --porcelain`, which
@@ -7200,11 +7006,13 @@ def dirty_claimed_paths(target: pathlib.Path, claimed: list[str],
     # Carve-out 3 needs the index BLOBS, not just the names, and only for paths that could take it:
     # staged, not unstaged, and carrying a recorded oid. Read once, and skipped entirely when the
     # caller passed no oids — which is every caller that has no receipt in hand.
+    landed_oids, journal = landed_oids or {}, journal or {}
     ours = {p for p in staged
-            if p not in unstaged and (landed_oids or {}).get(p)}
+            if p not in unstaged and (landed_oids.get(p) or journal.get(p))}
     if ours:
         _idx, _ = index_read(target, sorted(ours))
-        ours = {p for p in ours if _idx.get(p, (None, None))[1] == landed_oids[p]}
+        ours = {p for p in ours
+                if _idx.get(p, (None, None))[1] in {landed_oids.get(p), journal.get(p)} - {None}}
 
     region = region_owned or {}
 
@@ -7289,7 +7097,7 @@ def dirty_claimed_paths(target: pathlib.Path, claimed: list[str],
         if path not in in_index:
             if (target / path).exists():
                 continue                        # carve-out 2 — `-7` S4 owns this tree
-            if path in in_head:
+            if path in in_head and not (path in journal and journal[path] is None):
                 dirty.append(f"{path} (deleted from the index, still in HEAD)")
             continue                            # carve-out 1 — a committed deletion is not dirty
         if path in ours:
@@ -7318,7 +7126,8 @@ def derive_graded_rows(receipt: dict | None) -> list[dict]:
             if UPDATE_ROLE.get(row.get("role", "engine")) in WRITING_DISPOSITIONS]
 
 
-def demand_claimed_paths_clean(target: pathlib.Path, verb: str, receipt: dict | None) -> None:
+def demand_claimed_paths_clean(target: pathlib.Path, verb: str, receipt: dict | None,
+                               journal: dict[str, str | None] | None = None) -> None:
     """S4's refusal, scoped to the receipt's own population.
 
     A deployer that refuses over an unrelated edit in a repository it does not own is a deployer
@@ -7382,7 +7191,8 @@ def demand_claimed_paths_clean(target: pathlib.Path, verb: str, receipt: dict | 
         target, [row.get("path") for row in _rows],
         {row["path"]: row["oid"] for row in _rows if row.get("path") and row.get("oid")},
         {row["path"]: (_om, _cm) for row in _rows
-         if row.get("path") and UPDATE_ROLE.get(row.get("role", "engine")) == "pins"})
+         if row.get("path") and UPDATE_ROLE.get(row.get("role", "engine")) == "pins"},
+        journal)
     if dirty:
         raise Refusal(
             f"{len(dirty)} path(s) this target's receipt claims are DIRTY: " + ", ".join(dirty)
@@ -7392,54 +7202,81 @@ def demand_claimed_paths_clean(target: pathlib.Path, verb: str, receipt: dict | 
 
 
 def describe_write_lock(lock: pathlib.Path) -> str:
-    """Who holds the lock and for how long — or the fact that the file cannot say.
+    """Who holds the lock, on which host and for how long — or the fact that the file cannot say.
 
     An unreadable lock is reported as unreadable rather than described as anonymous: a stale lock
-    an operator cannot diagnose is indistinguishable from a live run they must wait for.
+    an operator cannot diagnose is indistinguishable from a live run they must wait for. A lock an
+    older govkit wrote names no host, and is judged on this one (TOOL-dSafePassage-2 S6).
     """
     try:
         held = json.loads(lock.read_text(encoding="utf-8"))
         age = int(max(0.0, time.time() - float(held.get("started") or 0.0)))
-        return (f"pid {held.get('pid', '?')} running `{held.get('verb', '?')}`, started "
-                f"{held.get('started_utc', '?')}, {age}s ago")
-    except (OSError, ValueError, TypeError):
-        return "its lock file records no readable pid or start time, so it is almost certainly stale"
+        return (f"pid {held.get('pid', '?')} on host {held.get('host', '(unrecorded)')} running "
+                f"`{held.get('verb', '?')}`, started {held.get('started_utc', '?')}, {age}s ago")
+    except (OSError, ValueError, TypeError, AttributeError):
+        return "its lock file records no readable pid or start time"
 
 
-def take_write_lock(target: pathlib.Path, verb: str) -> None:
+def take_write_lock(target: pathlib.Path, verb: str) -> dict[str, str | None] | None:
     """S5. `O_EXCL`, so the CREATION is the acquisition rather than a check followed by a create.
 
     Per TARGET, not per (target, verb): `apply` and `update` both write the receipt, so letting the
-    two interleave is the case this exists for. The file records who holds it and since when,
+    two interleave is the case this exists for. The file records who holds it, where and since when,
     because a lock that refuses without saying who holds it is a mystery rather than an error.
+
+    TOOL-dSafePassage-2 S7. A lock already there goes to `write_reclaimed_lock`, which takes it over
+    only from a holder the process census proves dead on this host; then the take returns that
+    holder's staging journal, for the dirty precondition to read its staging as gov's own (S8).
+    A live, unjudgeable or contended holder refuses, naming the holder. A fresh take returns None
+    and clears a journal no lock stands beside, so no stale line can vouch for anything.
     """
     global _HELD_LOCK
     lock = target.joinpath(*WRITE_LOCK_REL.split("/"))
+    journal_path = target.joinpath(*STAGING_JOURNAL_REL.split("/"))
     lock.parent.mkdir(parents=True, exist_ok=True)
+    record = upgrade_steps.add_boot_start({"pid": os.getpid(), "verb": verb, "started": time.time(),
+                                           "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                                           "host": upgrade_steps.THIS_HOST})
     try:
         fd = os.open(str(lock), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
     except FileExistsError:
-        raise Refusal(
-            f"another govkit write holds {lock.as_posix()} — {describe_write_lock(lock)}. Two "
-            f"writing runs against one target interleave on the receipt, which is exactly what "
-            f"this lock exists to prevent, so `{verb}` is refusing rather than joining in. Wait "
-            f"for that run to finish; if that process is gone the lock is STALE and `rm "
-            f"{lock.as_posix()}` clears it") from None
+        held = describe_write_lock(lock)
+        verdict, holder, why = upgrade_steps.write_reclaimed_lock(lock, record)
+        if verdict != "reclaimed":
+            remedy = {
+                "live": "Wait for that run to finish. A lock whose holder has ended is reclaimed by "
+                        "the next run on this host, by itself",
+                "busy": "Re-run once it settles: a lock whose holder has ended is reclaimed by the "
+                        "next run on this host, by itself",
+            }.get(verdict, "Nothing proves its holder gone, so it is not reclaimed: once you know "
+                           f"that run has ended, delete {lock.as_posix()} by hand. A lock whose "
+                           f"holder is gone from this host's process table is reclaimed by the next "
+                           f"run without that")
+            raise Refusal(
+                f"another govkit write holds {lock.as_posix()} — {held}. Two writing runs against "
+                f"one target interleave on the receipt, which is exactly what this lock exists to "
+                f"prevent, so `{verb}` is refusing rather than joining in: {verdict}, {why}. "
+                f"{remedy}") from None
+        print(f"govkit {verb} — reclaimed {lock.as_posix()}: its holder, {held}, {why}")
+        _HELD_LOCK = lock
+        return upgrade_steps.read_staging_journal(target)
     with os.fdopen(fd, "w", newline="\n") as fh:
-        fh.write(json.dumps({"pid": os.getpid(), "verb": verb, "started": time.time(),
-                             "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())},
-                            indent=2) + "\n")
+        fh.write(json.dumps(record, indent=2) + "\n")
     _HELD_LOCK = lock
+    journal_path.unlink(missing_ok=True)
+    return None
 
 
 def release_write_lock() -> None:
     """Run by every exit path of both writing verbs, refusals included — it is a `finally`, never a
     line at the bottom of a success branch. A lock only a clean run releases is a lock that survives
-    the first refusal and then blocks every run after it."""
+    the first refusal and then blocks every run after it. The staging journal goes first, so a
+    release cut short leaves a lock with no journal, whose reclaim then vouches for nothing."""
     global _HELD_LOCK
     if _HELD_LOCK is None:
         return
     try:
+        _HELD_LOCK.with_name(_HELD_LOCK.name + STAGING_JOURNAL_SUFFIX).unlink(missing_ok=True)
         _HELD_LOCK.unlink()
     except OSError:
         pass
@@ -7447,17 +7284,21 @@ def release_write_lock() -> None:
 
 
 def demand_writable_target(target: pathlib.Path, verb: str, receipt: dict | None) -> None:
-    """Steps 1 and 2 of the build's precondition order, in that order, for a run that WILL write.
+    """Steps 1 and 2 of the build's precondition order, for a run that WILL write.
 
     A read-only run does not come here, on purpose: taking the lock creates `.governance/outbox/`
     and a file inside it, and a read-only verb that leaves a byte behind is the whole risk
     `update`'s default guards against. There is nothing for these preconditions to protect on a run
     that writes nothing.
+
+    THE LOCK IS TAKEN BEFORE THE DIRTY-PATH TEST since TOOL-dSafePassage-2 S8: a reclaimed dead
+    holder's staging journal is that test's input, and the reclaim is what reads it. A refusal
+    after the take still releases the lock, through the caller's `finally`.
     """
     demand_no_operation_in_progress(target, verb)
     demand_index_resolved(target, verb)
-    demand_claimed_paths_clean(target, verb, receipt)
-    take_write_lock(target, verb)
+    journal = take_write_lock(target, verb)
+    demand_claimed_paths_clean(target, verb, receipt, journal)
 
 
 def demand_forward_vintage(root: pathlib.Path, base_commit: str | None, to_commit: str) -> None:
@@ -7478,8 +7319,30 @@ def demand_forward_vintage(root: pathlib.Path, base_commit: str | None, to_commi
             f"is not an ancestor of it. A DOWNGRADE IS NOT AN UPDATE: every clean row takes the raw "
             f"arm rather than the three-way, so it would be rewound to the older bytes, and the "
             f"receipt would be re-stamped backwards so that nothing afterwards records it happened. "
-            f"Pass a --to that descends from {base_commit}, or re-install deliberately if a "
-            f"rollback is really what you want")
+            f"Pass a --to that descends from {base_commit}, or roll back deliberately with "
+            f"`update --rollback --to {to_commit}`, which runs each later upgrade step's down "
+            f"first and records the rollback (TOOL-dSafePassage-4)")
+
+
+def check_rollback_vintage(root: pathlib.Path, base_commit: str | None, to_commit: str,
+                           reverse_rows: list) -> None:
+    """TOOL-dSafePassage-4 S2. `demand_forward_vintage`'s place under `update --rollback`: `--to`
+    must be an ANCESTOR of the vintage the receipt records, the ancestry test reversed. It refuses a
+    receipt with no `gov_commit`, which names nothing to roll back from; a `--to` that is not an
+    ancestor of it; and a `--to` equal to it with no step to down, which is nothing to roll back."""
+    if not base_commit:
+        raise Refusal("--rollback: this target's receipt records no gov_commit, so there is no vintage "
+                      "to roll back from; a rollback moves an install back from the commit its receipt "
+                      "names")
+    ok = subprocess.run(["git", "-C", str(root), "merge-base", "--is-ancestor",
+                         to_commit, base_commit], capture_output=True).returncode == 0
+    if not ok:
+        raise Refusal(f"--rollback: --to resolves to {to_commit}, which is not an ancestor of "
+                      f"{base_commit}, the commit this target's receipt records. A rollback only "
+                      f"moves an install back; `update` without --rollback moves it forward")
+    if to_commit == base_commit and not reverse_rows:
+        raise Refusal(f"--rollback: --to is the receipt's own commit {base_commit[:8]} and no upgrade "
+                      f"step introduced after it is applied, so there is nothing to roll back")
 
 
 def demand_published_vintage(root: pathlib.Path, to_commit: str) -> None:
@@ -7675,7 +7538,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         step(STEP_BASELINE, "no runner declared" if gr.get("kind") == "none"
              else "this target's descriptor declares no [gate_runner] at all")
 
-    rows: list[dict] = []       # every file gov is responsible for — the receipt, schema 3
+    rows: list[dict] = []       # every file gov is responsible for — the receipt, at derive_receipt_schema's schema
     staged: list[str] = []      # only what this run actually wrote
 
     # ---- ATTRIBUTES. The pin block is written EARLY — before any content — because it is what the
@@ -7977,8 +7840,10 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                                 and o.get("id") in {h.get("id") for k in _carried_kits
                                                     if k in descs
                                                     for h in descs[k][0].get("hole", [])}))]
+    # TOOL-dSafePassage-3 S5: `schema` and `steps` from the receipt this run rewrites, `steps` last.
+    _rs = derive_receipt_schema(receipt)
     _rcpt_doc = {
-        "schema": RECEIPT_SCHEMA, "gov_source": str(root), "gov_commit": commit,
+        "schema": _rs["schema"], "gov_source": str(root), "gov_commit": commit,
         "prefix": (deploy.get("prefix") or "tools"), "kits": selection + _carried_kits,
         "files": rows + _carried_rows,
         "orders": (receipt or {}).get("orders") or [], "baseline": baseline,
@@ -7986,7 +7851,8 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         "hook_block": {"state": hook_state},
         "gate_runner": (receipt or {}).get("gate_runner") or {
             "kind": gr.get("kind", "absent"), "file": gr.get("file"),
-            "emitted": [], "legs_withheld": False}}
+            "emitted": [], "legs_withheld": False},
+        **({"steps": _rs["steps"]} if "steps" in _rs else {})}
     (target / ".governance").mkdir(exist_ok=True)
     write_atomic(receipt_path, json.dumps(_rcpt_doc, indent=2) + "\n")
     print(f"govkit apply — receipt written ahead of CONFIGURE: {len(_rcpt_doc['files'])} row(s), "
@@ -8397,14 +8263,12 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         "gate_runner": {"kind": gr.get("kind", "absent"), "file": gr.get("file"),
                         "emitted": emitted, "legs_withheld": _legs_withheld}})
     # TOOL-dRedressedBar-19 S40: the sidecar first, the receipt last, each through `write_atomic`.
-    write_atomic(target / ".governance" / "install.sums",
-                 "".join(f"{w['sha256']}  {w['path']}\n" for w in _rcpt_doc["files"] if "sha256" in w))
-    write_atomic(receipt_path, json.dumps(_rcpt_doc, indent=2) + "\n")
+    write_install_receipt(target, receipt_path, _rcpt_doc)
     if _carried_kits:
         print(f"govkit apply — receipt KEEPS {len(_carried_kits)} kit(s) this selection did not "
               f"name, with their {len(_carried_rows)} row(s) verbatim: {', '.join(_carried_kits)}")
     step(STEP_RECEIPT, f"{len(_rcpt_doc['files'])} row(s), "
-                       f"{len(_rcpt_doc['kits'])} kit(s), schema {RECEIPT_SCHEMA}")
+                       f"{len(_rcpt_doc['kits'])} kit(s), schema {_rcpt_doc['schema']}")
     return r.emit()
 
 
@@ -8422,7 +8286,9 @@ VERDICT_GRID = {
     ("equal", "absent"): "withdrawn",
     ("differs", "equal"): "patched",
     ("differs", "differs"): "diverged",
-    ("differs", "absent"): "patched",
+    # TOOL-dSafePassage-9 S2. Gov retired a file the target edited: kept, ordered as
+    # `install.retired-edits` says, and never graded `patched` with no order nor `forked`.
+    ("differs", "absent"): "retired-edited",
     ("absent", "equal"): "missing",
     ("absent", "differs"): "missing",
     ("absent", "absent"): "converged",
@@ -8454,11 +8320,249 @@ RAW_WRITE_VERDICTS = ("stale", "missing")
 # not have been taken from.
 TOUCHING_VERDICTS = tuple(RAW_WRITE_VERDICTS) + ("diverged", "renamed")
 
+# TOOL-dSafePassage-9 §4. The verdicts the write loop's ordered arm takes, ahead of its `how` guard,
+# so a first-time engine row, a retired seed row and a row already carrying the role all reach it.
+# Neither moves a byte: each keeps the target's copy and writes one outbox order.
+ORDERED_VERDICTS = ("retired-edited", "render-edited")
+
+# TOOL-dSafePassage-9 S2. The verdicts the seed override passes through. `retired-edited` and
+# `withdrawn` are the two the grid gives only where gov holds no blob at the row's `source`, so a
+# seed row gov still ships keeps the override and a retired one keeps its own verdict.
+SEED_KEPT_VERDICTS = ("missing", "renamed", "retired-edited", "withdrawn")
+
 # DEPL-dCarriedReceipt-14 S3. The six fields `-11` S4 rewrites AS A SET, snapshotted together and
 # restored together. `path` and `source` are in it because a rolled-back rename that kept its
 # post-rename spelling beside pre-rename identities is exactly the split `-7` S9 refuses the whole
 # next run on; `sha256` and `oid` because a row stamped forward over reverted bytes re-creates `-8`.
 ROLLBACK_FIELDS = ("path", "source", "sha256", "commit", "gov_oid", "oid")
+
+
+def write_kit_restore(target: pathlib.Path, eid: str, receipt: dict, snap_rows: list[dict],
+                      written_paths: set[str], landed_new: list[str], withdrawn_rows: list[dict],
+                      wired: list[str], unwired_withdrawn: list[str], r
+                      ) -> tuple[list[str], list[str], list[tuple[str, str]], list[str], set[str]]:
+    """Put one kit's writes from this `update` run back to their pre-run index entries.
+
+    TOOL-dSafePassage-66 S1. The verify pass's per-kit restore (DEPL-aHalvedInstall-4,
+    DEPL-cMendedVintage-2), lifted out at its second call site: `update` runs it for each HELD kit
+    before the first upgrade step, so a walk killed inside a step leaves that kit at its pre-run
+    bytes, and the verify pass runs it for a kit whose own check reds. It undoes the kit's wiring,
+    puts each `snap_rows` path back, and puts the receipt row's `ROLLBACK_FIELDS` back with it.
+
+    Returns the lists the verify pass prints and writes in its order: `restored`, `removed`
+    (landed paths deleted), `unrestored` as (path, what refused), `untouched`, and the withdrawn
+    paths whose row was kept, which picks the `NOT restored` sentence. It mutates `landed_new`,
+    `withdrawn_rows` and `receipt["files"]` in place, as the inline restore did.
+    """
+    # TOOL-aRepatriatedFork-11 S4. FIRST, while the landed fragments are still on disk.
+    remove_wired_fragments(target, receipt.get("files") or [], wired, "update")
+    # NO ARM REACHES THE THREE PLUMBING FAILURES BELOW, and the skip announces itself
+    # rather than passing for coverage. Each fires only when the TARGET's own git refuses a
+    # call — an entry `update-index` will not take, a worktree file `checkout-index` cannot
+    # replace, an index `git rm --cached` will not touch — and this suite manufactures none
+    # of those modes; `land_through_index`'s post-`git mv` failure is in exactly the same
+    # position and says so where it stands. What each of them leaves is a PART-restored
+    # target, and each says that in its own message, because a silent partial restore is
+    # worse than the write it was undoing.
+    restored: list[str] = []
+    # DEPL-dSealedTally-1 S7. A REMOVED LANDING PRINTS UNDER ITS OWN VERB. A landed
+    # path had no index entry to restore, so reporting it as `restored` describes
+    # something that did not happen -- and the order's "was restored to the index
+    # entry it had" sentence is false of it.
+    removed_landed: list[str] = []
+    untouched: list[str] = []
+    # DEPL-cMendedVintage-2 S1. EVERY FAILURE ABOVE NAMES ITSELF HERE, paired with the git
+    # operation that refused. A failed path used to appear in NONE of the three lists below,
+    # which reads as a path nothing touched -- while the tail reverted its receipt row
+    # anyway. The list is (path, why) rather than a bare path because the order prints the
+    # refusing operation, and a second lookup to recover it is a second place to get wrong.
+    unrestored: list[tuple[str, str]] = []
+    # DEPL-cMendedVintage-18 S3. THE WITHDRAWN PATHS WHOSE ROW WAS KEPT ANYWAY, so the order
+    # can say what is true of them. The `unrestored` sentence below is written for a path
+    # this run REWROTE; a path this run DELETED and could not put back is a different fact
+    # and gets a different sentence, read off the same predicate that decided the row.
+    kept_withdrawn: set[str] = set()
+    # DEPL-cMendedVintage-10 S2. THE ATTRIBUTES ENTRY JOINS EVERY KIT'S ROLLBACK, because it
+    # belongs to no kit: the block gov wrote is the UNION over every claimed kit, so there is
+    # no one kit whose rollback owns it. A second restore is idempotent — the same pre-run
+    # index entry, put back a second time — and each rolled-back kit's order then names the
+    # file, which is what an operator reading one order needs to see.
+    for s in [x for x in snap_rows
+              if x["kit"] == eid or x["origin"] == "attributes"]:
+        for p in s["paths"]:
+            # B1's THIRD SITE, closed by enumeration rather than by symptom. `snap_rows` is
+            # built from `acted` BEFORE the write loop's own containment check, and this
+            # loop `unlink()`s and `checkout-index`es each path — so a receipt row spelling
+            # `../../x` that the write loop refused could still be reached here, on the
+            # rollback path, where the operation is a DELETE. Narrow (it needs a kit whose
+            # check goes red after the run) and not reproduced, which is stated rather than
+            # dressed up: it is guarded because the class is the same and the cost is one
+            # condition, not because a fixture demonstrated it.
+            try:
+                demand_contained_dest(p, f"rollback of kit '{eid}'")
+            except Refusal as _esc:
+                r.fail(f"rolling back kit '{eid}': refusing to touch '{p}' — {_esc}")
+                unrestored.append((p, "refused as outside the target"))
+                continue
+            if p not in written_paths:
+                untouched.append(p)
+                continue
+            entry = s["index"].get(p)
+            if entry is None:
+                # `absent` before the write. The bytes at this path are ones this run put
+                # there — a rename destination, or a `missing` restore — so unstaging and
+                # unlinking returns the target to what it had, which was nothing.
+                upgrade_steps.write_staging_line(target, p, None)
+                rmv = subprocess.run(
+                    ["git", "-C", str(target), "rm", "-q", "--cached", "--ignore-unmatch",
+                     "--", p], capture_output=True, text=True, check=False)
+                if rmv.returncode != 0:
+                    r.fail(f"rolling back kit '{eid}': '{p}' was absent from the index "
+                           f"before this run and `git rm --cached` would not unstage it: "
+                           f"{rmv.stderr.strip()}. The target is now PART restored — say so "
+                           f"rather than reporting a rollback that did not happen")
+                    unrestored.append((p, "`git rm --cached` would not unstage it"))
+                    continue
+                if (target / p).is_file():
+                    (target / p).unlink()
+                restored.append(p)
+                continue
+            mode, oid = entry
+            upgrade_steps.write_staging_line(target, p, oid)
+            upx = subprocess.run(
+                ["git", "-C", str(target), "update-index", "--add", "--cacheinfo",
+                 f"{mode},{oid},{p}"], capture_output=True, text=True, check=False)
+            if upx.returncode != 0:
+                r.fail(f"rolling back kit '{eid}': `git update-index` would not restore "
+                       f"{mode},{oid[:12]},{p}: {upx.stderr.strip()}. The target is now "
+                       f"PART restored")
+                unrestored.append((p, "`git update-index` would not take its pre-run entry"))
+                continue
+            (target / p).parent.mkdir(parents=True, exist_ok=True)
+            cox = subprocess.run(
+                ["git", "-C", str(target), "checkout-index", "-f", "--", p],
+                capture_output=True, text=True, check=False)
+            if cox.returncode != 0:
+                r.fail(f"rolling back kit '{eid}': the index now names {oid[:12]} at '{p}' "
+                       f"and `git checkout-index` could not write the worktree file: "
+                       f"{cox.stderr.strip()}. The target is now PART restored — a silent "
+                       f"partial restore is worse than the write it was undoing")
+                # S4. THE ONLY HALF-DONE ONE, and the sentence is measured rather than
+                # reasoned: `update-index` above already took the pre-run blob, and
+                # `checkout-index -f` unlinks the existing file BEFORE it writes the
+                # replacement -- so when it refuses, the worktree file is GONE rather than
+                # holding this run's bytes. Index and worktree disagree; which bytes sit on
+                # disk is git's business at that point and this line does not promise any.
+                unrestored.append(
+                    (p, "`git checkout-index` could not write the worktree file, and the "
+                        "index was ALREADY reverted to the pre-run blob, so the index and "
+                        "the worktree now disagree at this path"))
+                continue
+            restored.append(p)
+
+        # DEPL-dSealedTally-1 S3. A LANDED ENTRY IS REMOVED, NOT RESTORED, and the two
+        # halves the table branch below performs are both WRONG for it: restoring
+        # `ROLLBACK_FIELDS` would write receipt fields onto a row that should cease to
+        # exist, and the `withdrawn_rows` removal is about rows this run withdrew,
+        # which has nothing to say about a row this run MINTED.
+        if s.get("origin") == "landed":
+            # F3. THE ROW GOES ONLY IF THE FILE WENT. This branch ran once per ENTRY, after
+            # the per-path loop, and dropped the receipt row whatever that loop decided --
+            # so a path whose removal was REFUSED by containment, or whose `git rm --cached`
+            # failed, left a gov-written file staged in a repository gov does not own,
+            # named in no line of the rollback order and withdrawable by nothing, because
+            # the row that would have named it was gone.
+            _left_landed = [p for p in s["paths"] if p not in restored]
+            for _lp in [p for p in s["paths"] if p in restored]:
+                while _lp in landed_new:
+                    landed_new.remove(_lp)
+                restored.remove(_lp)
+                removed_landed.append(_lp)
+            if _left_landed:
+                r.fail(f"rolling back kit '{eid}': the landed path(s) "
+                       f"{', '.join(sorted(_left_landed))} could not be removed, so their "
+                       f"receipt row is KEPT. The target is PART restored and those bytes "
+                       f"are still staged; the row is what a later `update` needs in order "
+                       f"to see them at all")
+            else:
+                try:
+                    receipt["files"].remove(s["row"])
+                except ValueError:
+                    pass
+            continue
+
+        # DEPL-cMendedVintage-2 S2. THE ROW GOES BACK ONLY IF THE FILE DID. This is
+        # `_left_landed` thirty lines up, one level out: the landed branch already refuses
+        # to drop a row whose path it could not remove, and the block below reverted a row
+        # whatever the path loop decided. A failed restore therefore left the file holding
+        # this run's bytes while its row claimed the pre-run `sha256`, and the run persisted
+        # that -- the exact disagreement `-7` and `-8` were built to prevent, arriving
+        # through the failure path instead of the success one.
+        #
+        # `p in written_paths` IS LOAD-BEARING. An entry's path this run never wrote is
+        # collected into `untouched`, and reverting the row is correct for it; without the
+        # filter a single untouched path in a renamed entry would pin that row forward and
+        # invert the fix. The row that stays forward describes the bytes actually on disk,
+        # which costs the operator a re-offer they will not get -- stated in the order,
+        # because a receipt that agrees with the tree beats one that re-offers work over an
+        # unrepaired path.
+        # DEPL-cMendedVintage-18 S1. THE REMOVAL IS NOT THE REVERT, and `-2` gated the two
+        # together on the assumption that no snapshot entry is also a withdrawn row.
+        # `_touching` admits `withdrawn` whenever `--write-withdrawals` is passed, so on
+        # those runs the assumption is false. `withdrawn_rows` is the DELETE list — the
+        # filter far below STRIPS every row still in it from the receipt — so taking the row
+        # OUT of it is what SAVES the row, and the gate that is right for the revert is
+        # exactly wrong for this. MEASURED on a `--write-withdrawals` run whose rollback
+        # `checkout-index` a required smudge filter refused: the row vanished from the
+        # receipt while `update-index` had just re-staged the pre-run blob at that path, so
+        # the target carried gov's bytes and its receipt admitted to none of them. It now
+        # runs for every entry that reached this tail, whatever the path loop decided.
+        _was_withdrawn = s["row"] in withdrawn_rows
+        if _was_withdrawn:
+            withdrawn_rows.remove(s["row"])
+
+        _left = [p for p in s["paths"] if p in written_paths and p not in restored]
+        if _left:
+            if _was_withdrawn:
+                kept_withdrawn.update(_left)
+            continue
+
+        # DEPL-cMendedVintage-10 S2. THE SYNTHESIZED ROW GOES BACK WHOLE. The three fields
+        # the pin write refreshes are `mode`, `block_sha256` and `patterns`, and none of
+        # them is in ROLLBACK_FIELDS — so the field-by-field revert below would put the
+        # bytes back and leave the row describing the block that was just removed. Cleared
+        # and re-filled in place rather than replaced, because `receipt["files"]` holds this
+        # dict by identity and rebinding the name would leave the receipt at this run's
+        # values.
+        if s["origin"] == "attributes":
+            # DEPL-cMendedVintage-17 S3. AND IT COMES BACK OUT OF THE WITHDRAWAL SET FIRST.
+            # The withdrawal path drops this row by appending it here, and the filter that
+            # consumes the list runs long after this loop — so restoring the dict's contents
+            # without also un-dropping it would put the block back on disk and still delete
+            # the row that says gov owns it. DEPL-cMendedVintage-18 hoisted that un-drop
+            # above the `_left` gate, where one statement now serves this branch and the
+            # table one alike; this branch carried its own copy of it until then.
+            s["row"].clear()
+            s["row"].update(s["fields"])
+            continue
+
+        # S3 + S5. THE ROW'S OWN FIELDS, restored TOGETHER. Restoring bytes and leaving the
+        # row stamped forward re-creates `-8` exactly — the next run reads the row as
+        # `equal` against bytes that were reverted — and restoring only some of the six is
+        # the split `-7` S9 refuses the whole next run on.
+        for k in ROLLBACK_FIELDS:
+            if k in s["fields"]:
+                s["row"][k] = s["fields"][k]
+            else:
+                s["row"].pop(k, None)
+
+    # TOOL-dSafePassage-9 S1. WHAT THIS RUN UNWIRED COMES BACK WITH THE BYTES: the withdrawn
+    # fragments of this kit are wired again now that its files are restored.
+    if unwired_withdrawn:
+        run_fragment_merges(target, receipt.get("files") or [], set(unwired_withdrawn),
+                            set(), "update")
+
+    return restored, removed_landed, unrestored, untouched, kept_withdrawn
 
 
 def raw_write_cells(grid: dict) -> list[tuple[str, str, str]]:
@@ -8471,6 +8575,24 @@ def raw_write_cells(grid: dict) -> list[tuple[str, str, str]]:
     """
     return sorted((o, t, v) for (o, t), v in grid.items()
                   if o == "differs" and v in RAW_WRITE_VERDICTS)
+
+
+def derive_dispatch_gaps(update_role: dict, unlanded_reason: dict, landable_roles, grid: dict) -> list[str]:
+    """Selfcheck arm 7g's two completeness loops (TOOL-dSafePassage-9 S3): every known role has a
+    dispatch row, and every (ours, theirs) pair has a grid cell. A function so a fixture can drive it
+    over a copy of the tables and watch it speak; selfcheck calls it with the module's own."""
+    gaps: list[str] = []
+    known_roles = set(unlanded_reason) | set(landable_roles) | {"attributes", "gate-leg", "ci"}
+    for role in sorted(known_roles):
+        if role not in update_role:
+            gaps.append(f"role '{role}' has no row in `update`'s dispatch — a role a later unit adds and "
+                        f"leaves out of the table is one `update` will meet and cannot classify")
+    for o in OURS_STATES:
+        for t in THEIRS_STATES:
+            if (o, t) not in grid:
+                gaps.append(f"the verdict grid has no cell for (ours={o}, theirs={t}) — every pair must "
+                            f"name a verdict, including the one where both sides are gone")
+    return gaps
 
 
 # What `update` does per ROLE. A role whose row is a refusal is still a ROW: silence is what lets a
@@ -8500,6 +8622,9 @@ UPDATE_ROLE = {
     # target declared it owns these bytes, so `update` counts the row and reports the contract parity
     # other kits call it by. Never `r.fail`, so the row never withholds the re-stamp.
     "adopter-owned": "contract",
+    # TOOL-dSafePassage-9 S3. Classified every run, and its `retired-edited` verdict takes the write
+    # loop's ordered arm: the target's bytes are kept and one order is written, never a write.
+    "retired-edited": "order",
 }
 
 # DEPL-cMendedVintage-24 S1. THE DISPOSITIONS A WRITING VERB CAN PUT BYTES AT, declared once, beside
@@ -8991,6 +9116,7 @@ def land_through_index(root: pathlib.Path, target: pathlib.Path, path: str, src:
     entry = index.get(entry_path or path)
     mode = resolve_landed_mode(entry[0] if entry else None,
                                gov_tree_mode(root, to_commit, src) if src else None)
+    upgrade_steps.write_staging_line(target, path, oid)  # TOOL-dSafePassage-2 S8, before the index write
     up = subprocess.run(["git", "-C", str(target), "update-index", "--add", "--cacheinfo",
                          f"{mode},{oid},{path}"], capture_output=True, text=True, check=False)
     if up.returncode != 0:
@@ -9068,7 +9194,7 @@ def write_conflict_candidate(outbox: pathlib.Path, row: dict, base: bytes, ours:
     text-mode reconstruction. The directory shares the order's slug, which `render_order_slug`
     keeps injective and contained. Returns `(directory, reproduction line)` for the order.
     """
-    rel = f".governance/outbox/update-conflict-{render_order_slug(row['path'])}"
+    rel = ".governance/outbox/" + render_row_order_key("conflict", row["path"])
     d = outbox / pathlib.Path(rel).name
     d.mkdir(parents=True, exist_ok=True)
     for name, data in (("base", base), ("ours", ours), ("theirs", theirs),
@@ -9122,6 +9248,87 @@ def measure_rendered_rows(root: pathlib.Path, target: pathlib.Path, rows: list[d
     return out
 
 
+def check_render_edited(target: pathlib.Path, row: dict) -> bool:
+    """TOOL-dSafePassage-9 S5: is a `rendered` row's working file no longer the blob its receipt
+    recorded at its last render? The working file is cleaned by the target's own filters, as
+    `measure_rendered_rows` stamped `oid`; the index is not read, because a regenerate may leave its
+    output unstaged. A row with no `oid` but the `output_sha256` `apply` recorded (TOOL-dSafePassage-63
+    S1) is edited when that hash names none of the file's raw bytes, those bytes with CRLF folded to
+    LF, or the folded bytes written as CRLF: a line-ending-only difference reads unedited, as it does
+    through a clean filter. A row with neither field, or no file, cannot prove an edit: False. A
+    clean hash that exits non-zero or prints nothing cannot prove it unedited: True."""
+    path, rec = str(row.get("path")), row.get("oid")
+    dp = target / path
+    if not dp.is_file():
+        return False
+    if not rec:
+        out = row.get("output_sha256")
+        if not out:
+            return False
+        lf = (raw := dp.read_bytes()).replace(b"\r\n", b"\n")
+        return out not in {_sha(raw), _sha(lf), _sha(lf.replace(b"\n", b"\r\n"))}
+    cl = subprocess.run(["git", "-C", str(target), "hash-object", f"--path={path}", "--", str(dp)],
+                        capture_output=True, text=True, encoding="utf-8", check=False)
+    # TOOL-dSafePassage-76 S6: a hash git cannot take, a failing required clean filter say, proves
+    # nothing unedited, so it reads edited and the kit is held rather than the bytes re-rendered.
+    return cl.returncode != 0 or not cl.stdout.strip() or cl.stdout.strip() != rec
+
+
+def read_retired_edits_mode(target: pathlib.Path) -> str:
+    """TOOL-dSafePassage-9 S6: the target's `install.retired-edits`, `order` or `keep`, as gov's
+    policy reader answers it at the target's landed revision; an unset key reads the catalogue
+    default. A value outside the two, a reader refusal or no policy kit is a Refusal naming the key."""
+    try:
+        value, source, reason = read_policy_value("install.retired-edits", target)
+    except (LookupError, Refusal) as exc:
+        raise Refusal(f"install.retired-edits could not be read: {exc}") from None
+    if value not in ("order", "keep"):
+        raise Refusal(f"install.retired-edits = {value!r} is neither `order` nor `keep` "
+                      f"({source}: {reason})")
+    return value
+
+
+def render_row_order_key(kind: str, path: str) -> str:
+    """THE ONE SPELLING of a row-keyed order's name, `update-<kind>-<slug>`, the slug
+    `render_order_slug` of a row's path or a step's id (TOOL-dSafePassage-35 S39): `write_row_order`
+    names the order by it and `write_conflict_candidate` its candidate directory, so the two share
+    one key."""
+    return f"update-{kind}-{render_order_slug(path)}"
+
+
+def write_row_order(outbox: pathlib.Path, kind: str, key: str, text: str) -> pathlib.Path:
+    """THE ONE WRITER of a row-keyed outbox order (TOOL-dSafePassage-9 S4, TOOL-dSafePassage-26
+    S18): `update-<kind>-<slug>.md`, the slug `render_order_slug` of `key`, a row's path or a step's
+    id, holding `text`. The conflict, withdrawn, retired-edited and render-edited arms and the
+    attended step's order all write through it, so no two keys collide on a basename. Returns the
+    path."""
+    order = outbox / (render_row_order_key(kind, key) + ".md")
+    order.parent.mkdir(parents=True, exist_ok=True)
+    order.write_text(text, encoding="utf-8", newline="\n")
+    return order
+
+
+def render_row_order(kind: str, row: dict, to_commit: str, body: str) -> str:
+    """The text of a row verdict's order (TOOL-dSafePassage-9 S4): its title, the row's source,
+    commit and vintage lines, then `body`."""
+    title = (f"{row['path']} was edited since its last render" if kind == "render-edited"
+             else f"gov no longer ships {row['path']}")
+    return (f"# {title}\n\n"
+            f"source {row.get('source')}\n"
+            f"last gov commit {row.get('commit')}\n"
+            f"vintage asked for {to_commit}\n\n"
+            f"{body}")
+
+
+def render_retired_edited_line(row: dict, mode: str, order_path: str | None) -> str:
+    """The report line of a row the ordered arm kept (TOOL-dSafePassage-9 S4): the order's path
+    under `order`, the mode that kept it under `keep`, so neither value leaves the row silent."""
+    if mode == "keep":
+        return (f"  kept, no order  [{row.get('role')}] {row['path']} · kept, no order "
+                f"(install.retired-edits = keep)")
+    return f"  ordered          [{row.get('role')}] {row['path']} · order {order_path}"
+
+
 def render_hole_verdict(eid: str, hid: str, verdict: str, detail: str, why: str,
                         rolled: bool) -> str:
     """The one line `update` prints for a hole re-probed after its kit's render.
@@ -9141,31 +9348,120 @@ def render_hole_verdict(eid: str, hid: str, verdict: str, detail: str, why: str,
             f"confirmed — {why}")
 
 
+def test_source_target(root: pathlib.Path, target: pathlib.Path) -> bool:
+    """True where `target` resolves to `root`, the gov checkout running the verb: SOURCE MODE
+    (TOOL-dSafePassage-8 S1). An adopter cannot reach it, since its target is never gov's own tree."""
+    return pathlib.Path(root).resolve() == pathlib.Path(target).resolve()
+
+
+def read_plan_destinations(root: pathlib.Path) -> dict[str, dict]:
+    """TOOL-dSafePassage-21 S1. Each `write` destination `planned_writes` derives for gov's own deploy file
+    and selection over gov's own tree `root`, keyed in plan order to the source receipt's `files` row
+    for it, the first row per destination. The ONE derivation source mode's receipt writer and the
+    step gate's `file` class both read. WRITES NOTHING; a plan with problems is a Refusal naming them."""
+    root = pathlib.Path(root)
+    r = Report()
+    reg = load_registry(root)
+    descs = read_descriptors(root, reg, r)
+    deploy = load_deploy(root)
+    plan = [] if r.problems else planned_writes(
+        root, root, deploy, descs, resolve_selection(reg, descs, "default", [], deploy), r)
+    if r.problems:
+        raise Refusal("gov's plan over its own tree refuses: " + "; ".join(r.problems))
+    out: dict[str, dict] = {}
+    for pw in plan:
+        # TOOL-dSafePassage-35 S1: the population `apply` lands, under its consumers' filter, so an
+        # `order` pin row (`.gitattributes:<pattern>`) or a `side-effect` row never joins.
+        if pw["kind"] == "write" and not pw["missing"]:
+            out.setdefault(pw["dest"], {"path": pw["dest"], "kit": pw["kit"], "role": pw["role"],
+                                        "source": pw["src"]})
+    return out
+
+
 def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
                write_withdrawals: bool = False,
-               kits: list[str] | None = None, accept_role_moves: bool = False) -> int:
+               kits: list[str] | None = None, accept_role_moves: bool = False,
+               rollback: bool = False) -> int:
     """The verb. Its BODY is `_cmd_update`; see `cmd_apply` for why the split exists."""
     try:
-        return _cmd_update(root, target, to_rev, write, write_withdrawals, kits, accept_role_moves)
+        return _cmd_update(root, target, to_rev, write, write_withdrawals, kits, accept_role_moves,
+                           rollback)
     finally:
         release_write_lock()
 
 
 def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
                 write_withdrawals: bool = False,
-                kits: list[str] | None = None, accept_role_moves: bool = False) -> int:
+                kits: list[str] | None = None, accept_role_moves: bool = False,
+                rollback: bool = False) -> int:
     """Move an installed target forward to a newer gov commit. READ-ONLY unless `--write`.
 
     The default is read-only because this verb's failure mode is silent data loss in a repository the
     operator owns and gov does not, and the muscle-memory invocation must not be the destructive one.
+
+    `rollback` (TOOL-dSafePassage-4) moves it BACK to an ancestor: `check_rollback_vintage` in
+    `demand_forward_vintage`'s place, each later step's down before any file row moves, the
+    ordinary write loop toward `--to`, and a stamp that keeps the `schema` the downs left.
     """
+    if rollback and kits:
+        raise Refusal("--rollback moves the whole receipt back, every kit and every step with it, so "
+                      "it takes no --kits; run it unscoped")
     r = Report()
     reg = load_registry(root)
     descs = read_descriptors(root, reg, r)
     if r.problems:
         return r.emit()
-    if pathlib.Path(root).resolve() == target.resolve():
-        raise Refusal("--target resolves to the gov checkout itself")
+    if test_source_target(root, target):
+        # ---- TOOL-dSafePassage-8 S1. SOURCE MODE: gov's own tree, as the lander runs it at every
+        # ---- landing. The receipt records gov's planned destinations and its steps and grades no
+        # ---- row: gov's files are their own sources. No vintage: the merge it lands in is rewritten
+        # ---- after the walk, so the `steps` list is the vintage, a step pending until listed applied.
+        if rollback or kits:
+            raise Refusal("on gov's own tree `update` walks every declared step in source mode, so it "
+                          "takes no --kits and no --rollback")
+        receipt_path = target / ".governance" / "install.json"
+        prior = (json.loads(receipt_path.read_text(encoding="utf-8")) if receipt_path.is_file()
+                 else None)
+        if prior is not None and (not isinstance(prior, dict) or prior.get("mode") != "source"):
+            raise Refusal(f"{receipt_path.as_posix()} is on gov's own tree and is not a source-mode "
+                          f"receipt (\"mode\": \"source\"); refusing to walk over it")
+        out = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", f"{to_rev}^{{commit}}"],
+                             capture_output=True, text=True, encoding="utf-8")
+        if out.returncode != 0:
+            raise Refusal(f"--to '{to_rev}' does not resolve in this gov checkout")
+        to_commit = out.stdout.strip()
+        if not write:
+            _src_pending = upgrade_steps.derive_pending_steps(root, prior or {}, to_commit)
+            print(f"govkit update — source mode on gov's own tree · steps: {len(_src_pending)} pending")
+            for _sw_row in _src_pending:
+                print(f"govkit update —   would walk {_sw_row.id}")
+            print("govkit update — read-only. NOTHING was written; re-run with --write to perform it.")
+            return r.emit()
+        # The write preconditions apply. No file row is claimed: source mode writes none, so the
+        # dirty-path test, which guards a row write, has no population here.
+        demand_writable_target(target, "update", None)
+        deploy = load_deploy(target)
+        _files = read_plan_destinations(root)
+        receipt = {"schema": RECEIPT_SCHEMA, "mode": "source", "gov_source": ".",
+                   "prefix": str(deploy.get("prefix") or "tools"), "kits": list(deploy.get("kits") or []),
+                   "files": list(_files.values()), **derive_receipt_schema(prior)}
+        _text = json.dumps(receipt, indent=2) + "\n"
+        if prior is None or json.dumps(prior, indent=2) + "\n" != _text:
+            receipt_path.parent.mkdir(parents=True, exist_ok=True)
+            write_atomic(receipt_path, _text)
+        print(f"govkit update — source mode on gov's own tree · {len(receipt['files'])} file row(s) "
+              f"recorded, never graded · {to_commit[:8]}")
+        _src_pending = upgrade_steps.derive_pending_steps(root, receipt, to_commit)
+        _sw_walk = upgrade_steps.run_step_walk(root, target, receipt_path, receipt, _src_pending)
+        print(f"govkit update — steps: {_sw_walk['pending']} pending · {_sw_walk['applied']} applied "
+              f"· {_sw_walk['skipped']} skipped · stopped at {_sw_walk['stopped'] or 'none'}")
+        if _sw_walk["stopped"]:
+            r.fail(f"the upgrade-step walk stopped at {_sw_walk['stopped']} on gov's own tree: "
+                   f"{_sw_walk['failure']}")
+        _declared = upgrade_steps.read_steps(root, to_commit, None)
+        for _miss in upgrade_steps.check_gov_first(receipt, _declared, target):
+            r.fail(f"gov first: {_miss}")
+        return r.emit()
 
     receipt_path = target / ".governance" / "install.json"
     if not receipt_path.is_file():
@@ -9228,15 +9524,45 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # downgrade is a preview of something that will never be allowed to happen.
     if write:
         demand_writable_target(target, "update", receipt)
-    demand_forward_vintage(root, base_commit, to_commit)
+    # TOOL-dSafePassage-4 S2, S3. Under --rollback the ancestry test is reversed and the reverse
+    # set is read here, so a refusal of it lands before any write; only this one refusal is lifted.
+    _rb_rows: list = []
+    if rollback:
+        _rb_rows = upgrade_steps.derive_reverse_steps(root, receipt, to_commit)
+        check_rollback_vintage(root, base_commit, to_commit, _rb_rows)
+    else:
+        demand_forward_vintage(root, base_commit, to_commit)
     demand_published_vintage(root, to_commit)
 
     claimed = receipt.get("kits") or []
+    # ---- TOOL-dSafePassage-1 S4. SUCCESSION, read through the one reader. A claimed kit that is no
+    # ---- longer a registry entry and carries a `[[retired]]` row is CARRIED to its successor — the
+    # ---- claim and every row attributed to it move to that entry, whose descriptor classifies them
+    # ---- below — or RELEASED when the successor is `none`, its rows routed to the `withdrawn` arm:
+    # ---- a report and an outbox order, deleted only under `--write-withdrawals`. A claimed id with
+    # ---- no succession row is `resolve_claim`'s refusal, before anything is written. A row whose
+    # ---- kit an earlier release already dropped from the claim is carried or released the same way,
+    # ---- so a released kit's rows never fall back into the verdict table as an unknown kit's.
+    retired = upgrade_steps.read_retired(root, None, None)
+    successors: dict[str, str] = {}
     for eid in claimed:
-        if eid not in descs:
-            raise Refusal(f"the receipt claims kit '{eid}', which is no longer a registry entry — "
-                          f"refusing rather than dropping it, which would leave its files owned by "
-                          f"nobody")
+        _ret = upgrade_steps.resolve_claim(eid, descs, retired)
+        if _ret is not None:
+            successors[eid] = _ret.successor
+    for _ret in retired:
+        if _ret.id not in successors and any(w.get("kit") == _ret.id for w in receipt.get("files") or []):
+            successors[_ret.id] = _ret.successor
+    for _old, _new in successors.items():
+        print(f"govkit update — retired {_old}: " + (
+            f"claimed by its successor {_new}" if _new != "none" else
+            "released, its successor is none, so each of its rows reads withdrawn"))
+    released = {e for e, s in successors.items() if s == "none"}
+    if successors:
+        claimed = list(dict.fromkeys(successors.get(e, e) for e in claimed if e not in released))
+        receipt["kits"] = claimed
+        for _w in receipt.get("files") or []:
+            if successors.get(_w.get("kit"), "none") != "none":
+                _w["kit"] = successors[_w["kit"]]
     # ---- TOOL-aRoutedQuill-5 S4, owner F1: an entry that JOINED the registry's default set after
     # ---- this receipt's vintage is installed by `update`, as `apply --kits` would install it. The
     # ---- widening is the owner's, recorded in the registry; a `--kits`-scoped run gains nothing,
@@ -9267,6 +9593,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         claimed = receipt["kits"]
         _deploy_w = add_deploy_kits(target, gained)
         if _deploy_w:
+            upgrade_steps.write_staging_line(target, _deploy_w)  # S8: each index write journals first
             subprocess.run(["git", "-C", str(target), "add", "--", _deploy_w], capture_output=True)
             print(f"govkit update — default-gained: appended {', '.join(gained)} to {_deploy_w}'s kits")
     elif gained:
@@ -9320,14 +9647,16 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # A receipt written before schema 3 carries no `gov_oid` at all, so every engine row in one would
     # read as S9's half-populated pair. Fill it ONCE, from EVIDENCE — gov's own blob at the row's
     # recorded `commit` — and never from `sha256`, which hashes the bytes that landed and is not an
-    # object name. SCOPED TO `schema < RECEIPT_SCHEMA`: a schema-3 receipt is NEVER back-filled,
-    # because a schema-3 row carrying `commit` and no `gov_oid` is exactly the corruption S9 exists
-    # to catch, and filling it in is how a text-merged receipt gets laundered into a plausible one.
+    # object name. SCOPED TO `schema < 3`, never `schema < RECEIPT_SCHEMA` (TOOL-dSafePassage-3 S4):
+    # schema 3 is the one that introduced `gov_oid`, so a receipt at 3 or above is NEVER back-filled,
+    # because such a row carrying `commit` and no `gov_oid` is exactly the corruption S9 exists to
+    # catch, and filling it in is how a text-merged receipt gets laundered into a plausible one. Tied
+    # to the constant, the pin moved with every schema bump and laundered every schema-3 receipt.
     # Scoped to LANDABLE_ROLES for S1's reason: those are the only rows whose destination holds a
     # whole-file gov blob. A `merged` row's gov bytes are a BLOCK inside a file the target owns and
     # an `attributes` row's are a block `lf_pins` composes — neither has a blob to name, and neither
     # gets one invented for it here.
-    if schema < RECEIPT_SCHEMA:
+    if schema < 3:
         for row in rows_all:
             if row.get("role", "engine") not in LANDABLE_ROLES or row.get("gov_oid"):
                 continue
@@ -9381,11 +9710,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             + ("`commit` and no `gov_oid`" if has_commit else "`gov_oid` and no `commit`")
             + ". The two are written together and are meaningless apart, so this pairing is the "
               "corruption shape a text merge of `install.json` produces — REFUSING the whole run "
-              "rather than acting on half of it. A receipt below schema "
-            + f"{RECEIPT_SCHEMA} has `gov_oid` filled from gov's blob at the row's own `commit` "
-              "before this check, so a row that still lacks it either could not be upgraded — gov "
-              "has no blob for that source at that commit — or was written at schema "
-            + f"{RECEIPT_SCHEMA} and has since been split"
+              "rather than acting on half of it. "
+              "A receipt below schema 3 has `gov_oid` filled from gov's blob at the row's own "
+              "`commit` before this check, so a row that still lacks it either could not be "
+              "upgraded — gov has no blob for that source at that commit — or was written at "
+              "schema 3 or above and has since been split"
         )
 
     # ---- S4. A claimed path PRESENT IN THE WORKTREE and ABSENT FROM THE INDEX, over the same
@@ -9670,6 +9999,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             _held_kits.setdefault(str(kit), []).append(str(path))
 
     _role_res: dict[str, dict] = {}
+    _head_commit = git(root, "rev-parse", "HEAD").strip()
     for row in rows_all:
         role = row.get("role", "engine")
         how = UPDATE_ROLE.get(role)
@@ -9702,13 +10032,31 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # decide what this run may do.
         if row.get("kit") in descs:
             if row["kit"] not in _role_res:
-                d, _ = descs[row["kit"]]
+                # TOOL-dSafePassage-65 S3. A `--to` other than the checkout's HEAD (a rollback, a
+                # fetched tip) resolves each role from the descriptor and pool AT `--to`, the vintage
+                # whose bytes this run moves to; a kit gained after it resolves as the working tree does.
+                d, dpath = descs[row["kit"]]
+                d_at = (read_descriptor_at(root, to_commit, dpath)
+                        if to_commit != _head_commit else None)
+                at = to_commit if d_at is not None else None
+                d = d_at if d_at is not None else d
                 _role_res[row["kit"]] = resolve_entry(
-                    root, d, target_context(target, deploy, row["kit"], d))
+                    root, d, target_context(target, deploy, row["kit"], d), at=at)
             res = _role_res[row["kit"]]
             w = res["writes"].get(row["path"])
             now = w["role"] if w else next(
                 (u["role"] for u in res["unlanded"] if u["dest"] == row["path"]), None)
+            # TOOL-dSafePassage-64 S1. `retired-edited` IS NO DESCRIPTOR'S ROLE: the write loop sets
+            # it because gov held no blob at the row's source, so once gov ships the path again the
+            # state's one premise is false and the row takes back the role gov now declares, in this
+            # run and with no flag. Its `commit`, `source` and `gov_oid` stay, so the verdict grid
+            # grades it from the vintage it landed at (`patched` keeps the edit, a moved gov side
+            # reaches the three-way). Never into a kit-writing disposition, whose regenerate would
+            # write over the edit with no conflict (DEPL-cMendedVintage-27 S1).
+            if (role == "retired-edited" and now
+                    and UPDATE_ROLE.get(now) not in KIT_WRITING_DISPOSITIONS):
+                row["role"] = role = now
+                how = UPDATE_ROLE.get(now)
             if now and now != role:
                 # S3. TWO BRANCHES, NEVER ONE WIDENED. A schema-1 receipt's ROLE is untrusted for a
                 # different reason: unit 1 measured that such a receipt stamps `engine` on a file
@@ -9950,6 +10298,17 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # below, once, rather than onto every row: the printed row is PARSED by name elsewhere —
         # `-7`'s AC9 arm reads the verdict off a line whose last field is the path — and a trailing
         # clause here made that arm read "(no row)" for a row this branch had just printed.
+        # TOOL-dSafePassage-1 S4. A RELEASED kit's row reads `withdrawn` without the classifier: gov
+        # retired the kit with no successor, so no vintage of it is gov's to land, and the existing
+        # arm is the disposition — under `--write` a report and an outbox order, a deletion only under
+        # `--write-withdrawals`; a role `update` never writes is reported only, as every row is.
+        if row.get("kit") in released:
+            tally["withdrawn"] = tally.get("withdrawn", 0) + 1
+            print(f"  {'withdrawn':<18} [{role:<13}] {row['path']}")
+            acted.append({"row": row, "c": {"verdict": "withdrawn", "renamed_to": None},
+                          "verdict": "withdrawn", "how": how})
+            continue
+
         if how == "table" and row.get("evidence") == "unattributed":
             tally["unattributed"] = tally.get("unattributed", 0) + 1
             print(f"  {'unattributed':<18} [{role:<13}] {row['path']}")
@@ -9988,7 +10347,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         if how == "seed" or how == "report-reseed":
             if c["t_state"] == "differs":
                 v = "reseed-available"
-            elif v not in ("missing", "renamed"):
+            elif v not in SEED_KEPT_VERDICTS:
                 # DEPL-dCarriedReceipt-11 S0c. `renamed` IS EXEMPT FROM THIS OVERRIDE, beside
                 # `missing`, and the exemption is the sharpest thing in that unit. This line rewrites
                 # any surviving verdict on a seed row to `current`/`patched` — which for a row whose
@@ -9998,6 +10357,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 # `current` while the file behind it had moved. That is a silent-green of exactly
                 # the kind the comment at the reported-only branch below records an incident for.
                 v = "current" if c["o_state"] == "equal" else "patched"
+        # TOOL-dSafePassage-9 S5. AN EDITED RENDER IS HELD, never capped at `re-rendered`: the kit's
+        # regenerate would run over the edit, so the whole kit is held back and the row ordered.
+        if how == "adopter" and check_render_edited(target, row):
+            v = "render-edited"
+            _add_held(row.get("kit"), row["path"])
         if how == "adopter" and v in ("diverged", "stale"):
             v = "re-rendered"          # CAP at report; the adopter owns these bytes
         if v == "patched" and c["carry"] in ("eol", "relocate"):
@@ -10207,6 +10571,23 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # not go looking for the saving.
         return _land, _ref
 
+    def derive_walk_hold(findings: int) -> str | None:
+        """Why this run walks no step forward, or None when it walks. TOOL-dSafePassage-84.
+
+        DEFINED ONCE AND CALLED TWICE, by the read-only preview and by the write run's walk branch, so
+        the preview cannot list a step the write run would not walk for `--kits` or for the schema. The
+        preview passes no findings (TOOL-dSafePassage-84 §8 F1), so a write run's findings hold is its
+        own."""
+        if kits:
+            return ("a --kits run walks no step, since a subset would run a later step before an "
+                    "earlier one")
+        if findings:
+            return f"this run already has {findings} finding(s)"
+        if schema < 3:
+            return (f"the receipt is at schema {schema}, and its first step starts from 3: a clean "
+                    "`update --write` lifts it to 3, and the next one walks them")
+        return None
+
     # ===================== THE UNCLAIMED-SOURCE PREVIEW, ON THE READ-ONLY PATH ==================
     # THE `would land` BRANCHES WERE DEAD CODE. The landing block sits far below this return, so on
     # a read-only run it never executed: `unclaimed sources` appeared in no output, and the ternaries
@@ -10229,8 +10610,51 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             print(f"govkit update —   would land {_p0}")
         for _p0, _why0 in _pv_ref:
             print(f"govkit update —   would REFUSE {_p0}: {_why0}")
+        # TOOL-dSafePassage-2 S4, F2. The pending steps are NAMED and nothing is spawned, a witness
+        # included: a witness is step code over the target, and this run writes no byte. Under
+        # --rollback the steps named are the reverse set's, in down order (TOOL-dSafePassage-4 S5).
+        _sw_pending = [] if rollback else upgrade_steps.derive_pending_steps(root, receipt, to_commit)
+        if rollback:
+            print(f"govkit update — steps: {len(_rb_rows)} to roll back")
+            for _sw_row in _rb_rows:
+                print(f"govkit update —   would roll back {_sw_row.id}")
+        # ponytail: the preview's findings are not the write run's at the walk, so it passes none
+        # (TOOL-dSafePassage-84 §8 F1).
+        elif _sw_hold := derive_walk_hold(0):
+            print(f"govkit update — steps: not walked — {_sw_hold} · {len(_sw_pending)} pending")
+        else:
+            print(f"govkit update — steps: {len(_sw_pending)} pending")
+            for _sw_row in _sw_pending:
+                print(f"govkit update —   would walk {_sw_row.id}")
         print("govkit update — read-only. NOTHING was written; re-run with --write to perform it.")
         return r.emit()
+
+    # ======================= TOOL-dSafePassage-4 S5, S6 — THE REVERSE WALK ========================
+    # HERE, after the preview and before the pre-write snapshot, so every down meets the tree its up
+    # left and no file row moves before the downs; the write loop below then moves the rows to --to
+    # as for any --to. The record is begun before the first down, so a killed rollback leaves what
+    # it began, and `_write_rb_finish` rewrites it at each return below. A stopped reverse walk ends the
+    # run here with its finding, gov_commit unmoved; a re-run resumes at the row it stopped at.
+    def _write_rb_finish(stamp: str) -> None:
+        if rollback:
+            upgrade_steps.write_rollback_record(
+                target, base_commit, to_commit, _rb_started, _rb_walk["downs"],
+                (len(changed), len(renamed) // 2, len(deleted), withheld, conflicts), stamp)
+
+    if rollback:
+        _rb_started = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        _rb_record = upgrade_steps.write_rollback_record(target, base_commit, to_commit, _rb_started)
+        print(f"govkit update — rollback: {len(_rb_rows)} step(s) to roll back · record "
+              f"{_rb_record.relative_to(target).as_posix()}")
+        _rb_walk = upgrade_steps.run_reverse_walk(root, target, receipt_path, receipt, _rb_rows, to_commit)
+        if _rb_walk["stopped"]:
+            r.fail(f"the rollback's reverse walk stopped at {_rb_walk['stopped']}: {_rb_walk['failure']}. "
+                   f"No file row moved and gov_commit is unmoved; the next `update --rollback --to "
+                   f"{to_commit[:8]} --write` resumes there")
+            upgrade_steps.write_rollback_record(
+                target, base_commit, to_commit, _rb_started, _rb_walk["downs"], (0, 0, 0, 0, 0),
+                f"not moved, the reverse walk stopped at {_rb_walk['stopped']}")
+            return r.emit()
 
     # DEPL-dSealedTally-1 S1. THE WRITE PATH'S OWN CALL, and it has to be here rather than
     # reusing the preview above: that call sits inside `if not write:` and the branch RETURNS,
@@ -10247,6 +10671,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
 
     outbox = target / ".governance" / "outbox"
     outbox.mkdir(parents=True, exist_ok=True)
+    # The target-code switch, read once ABOVE the write loop (TOOL-dSafePassage-9 S1), so the
+    # withdrawn arm's unwire and the re-render and wiring steps below read the one value.
+    _rerender_on = os.environ.get("GOVKIT_RERENDER") != "0"
+    # TOOL-dSafePassage-9 S1. Per kit, the withdrawn fragments this run unwired, which a rollback of
+    # that kit wires again once its files are restored. And the mode, read once per run.
+    _unwired_withdrawn: dict[str, list[str]] = {}
+    _retired_mode: str | None = None
     changed, deleted, conflicts = [], [], 0
     # DEPL-dCarriedReceipt-11 S6. BOTH SPELLINGS of every performed rename, in the shape `changed`
     # and `deleted` already take. `git mv` stages both ends, so this is not a second `git add` and
@@ -10288,6 +10719,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # the failure this whole unstage exists to prevent, arriving through the one input that
         # cannot be tested by the absence of a diff. The file is gov's own output and gov has just
         # deleted it, so there is nothing of the operator's to lose.
+        upgrade_steps.write_staging_line(target, f".governance/outbox/{_stale_order.name}", None)
         subprocess.run(["git", "-C", str(target), "rm", "-q", "-f", "--cached", "--ignore-unmatch",
                         "--", f".governance/outbox/{_stale_order.name}"],
                        capture_output=True, check=False)
@@ -10311,7 +10743,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         if a["how"] != "table" or (a["verdict"] not in _touching and not a.get("mode_to")):
             continue
         _paths = [a["row"]["path"]]
-        if a["verdict"] == "renamed" and a["c"].get("renamed_to"):
+        # TOOL-dSafePassage-91: an in-place row's destination is its own path, so it is recorded once
+        # and the rollback restores it once.
+        if a["verdict"] == "renamed" and a["c"].get("renamed_to") and a["c"]["renamed_to"][1] != _paths[0]:
             _paths.append(a["c"]["renamed_to"][1])
         # DEPL-dSealedTally-1. `origin` DECLARED, so the restore branch can tell a receipt
         # row it must put back from a row this run MINTED and must remove.
@@ -10422,6 +10856,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             if pins_path.is_file() else None
         _pw_new, _pw_mode = write_block(_pw_cur, _pw_om, _pw_cm, _pw_text, "append")
         pins_path.write_text(_pw_new, encoding="utf-8", newline="\n")
+        upgrade_steps.write_staging_line(target, _pw_row["path"])
         subprocess.run(["git", "-C", str(target), "add", "--", _pw_row["path"]],
                        capture_output=True, check=False)
         # THE RECEIPT ROW FOLLOWS THE BYTES. `mode` and `block_sha256` describe what is on disk, and
@@ -10464,6 +10899,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             _pd_lines = _pd_cur.split("\n")
             pins_path.write_text("\n".join(_pd_lines[:_pd_span[0]] + _pd_lines[_pd_span[1] + 1:]),
                                  encoding="utf-8", newline="\n")
+            upgrade_steps.write_staging_line(target, pins_drop["path"])
             subprocess.run(["git", "-C", str(target), "add", "--", pins_drop["path"]],
                            capture_output=True, check=False)
             _ga_removed = True
@@ -10510,6 +10946,38 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                    f"may write, whatever the verdict says")
             continue
 
+        # TOOL-dSafePassage-9 §4, THE ORDERED ARM, ahead of the `how` guard so an engine row, a
+        # retired seed row and a row already carrying the role all reach it. No byte moves: the
+        # target's copy is kept, `--write-withdrawals` included, and one order is written unless
+        # `install.retired-edits = keep`. An edited render is always ordered, whatever the mode.
+        if v in ORDERED_VERDICTS:
+            if v == "retired-edited" and _retired_mode is None:
+                try:
+                    _retired_mode = read_retired_edits_mode(target)
+                except Refusal as _rm_err:
+                    r.fail(f"'{row['path']}' is retired-edited and its order mode is unknown — {_rm_err}")
+                    continue
+            _mode = _retired_mode if v == "retired-edited" else "order"
+            _ord_rel = None
+            if _mode == "order":
+                _ord = write_row_order(outbox, v, row["path"], render_row_order(
+                    v, row, to_commit,
+                    (f"gov no longer ships this file, and the copy here carries the target's edit. "
+                     f"Nothing was deleted. Once the edit has moved where it belongs, delete the "
+                     f"file and the next `update` closes the row.\n"
+                     if v == "retired-edited" else
+                     f"The target edited this rendered file since its last render, so its kit "
+                     f"'{row.get('kit')}' was HELD BACK and its regenerate did not run over the "
+                     f"edit. Move the edit into the kit's template or conf, restore the rendered "
+                     f"file, and re-run `update`.\n")))
+                _ord_rel = _ord.relative_to(target).as_posix()
+            _rl = render_retired_edited_line(row, _mode, _ord_rel)
+            if _rl:
+                print(_rl)
+            if v == "retired-edited" and row.get("role") != "retired-edited":
+                row["role"] = "retired-edited"
+            continue
+
         # THE ROLE DECIDES, not the verdict. `how` is what the role dispatch computed; branching on
         # the verdict alone writes gov's RAW bytes for a role declared never-written — measured, a
         # `rendered` row on a `missing` verdict landed an unrendered template, placeholders and all,
@@ -10532,6 +11000,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # those. The entry keeps the blob the target already holds; only its mode moves, and the
         # working file gains the execute bits so a POSIX `git add` does not take them away again.
         if a.get("mode_to") and v not in TOUCHING_VERDICTS:
+            upgrade_steps.write_staging_line(target, row["path"], c["ours_oid"])
             _mup = subprocess.run(["git", "-C", str(target), "update-index", "--cacheinfo",
                                    f"{a['mode_to']},{c['ours_oid']},{row['path']}"],
                                   capture_output=True, text=True, check=False)
@@ -10603,6 +11072,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # ---- rather than half-applied at a new path.
             new_src, new_dest = c["renamed_to"]
             ndp = (target / new_dest).resolve()
+            # TOOL-dSafePassage-88: the target's descriptor answers this row's own path, as it does for
+            # every row when gov moves its tool root, so the file stays and only its source changes.
+            # TOOL-dSafePassage-90: only the exact spelling is the row's own path. A case-only rename on
+            # a case-insensitive filesystem names the row's own file under a second spelling, and the
+            # rollback restores a row's spellings as separate paths, so the move is refused, by name.
+            _own = target / row["path"]
+            in_place = new_dest == row["path"]
             try:
                 ndp.relative_to(target.resolve())
             except ValueError:
@@ -10632,8 +11108,21 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                        f"whether this target already holds it is UNKNOWN. Skipping this row "
                        f"rather than moving onto a path that may be occupied: {_idx_read_err}")
                 continue
-            if new_dest in _at_dest or ndp.exists():
+            if not in_place and (new_dest in _at_dest or ndp.exists()):
+                _alias = ndp.exists() and _own.exists() and ndp.samefile(_own)
+                _case = _alias and new_dest.casefold() == row["path"].casefold()
                 r.fail(f"gov moved '{row.get('source')}' to '{new_src}', which resolves to "
+                       f"'{new_dest}' — this row's own file '{row['path']}' under a second spelling, "
+                       f"as a case-only rename is on a case-insensitive filesystem. Refusing the move: "
+                       f"a rollback cannot restore one file held under two spellings. The file is "
+                       f"untouched, so do not move or remove it; run `update` from a checkout on a "
+                       f"case-sensitive filesystem, where the new spelling is a second path" if _case else
+                       f"gov moved '{row.get('source')}' to '{new_src}', which resolves to "
+                       f"'{new_dest}' — the row's own file '{row['path']}' under another name (a link "
+                       f"or a filesystem alias). Refusing the move: a rollback cannot restore one file "
+                       f"held under two names. The file is untouched. If '{new_dest}' is a link you "
+                       f"made, remove the link and re-run" if _alias else
+                       f"gov moved '{row.get('source')}' to '{new_src}', which resolves to "
                        f"'{new_dest}' — and this target ALREADY holds a file there. Refusing rather "
                        f"than overwriting it: `update` moves one row and would be destroying "
                        f"another file's bytes to do it. Move or remove '{new_dest}' and re-run")
@@ -10664,11 +11153,10 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 merged, _how = three_way(c["ours"], _b3, _t3)
                 if _how == "conflict":
                     conflicts += 1
-                    _order = outbox / f"update-conflict-{render_order_slug(row['path'])}.md"
-                    _orders_written.add(_order)
                     _cdir, _cline = write_conflict_candidate(outbox, row, _b3, c["ours"], _t3,
                                                              merged)
-                    _order.write_text(
+                    _orders_written.add(write_row_order(
+                        outbox, "conflict", row["path"],
                         f"# update conflict — {row['path']} (gov RENAMED this file)\n\n"
                         f"gov moved  {row.get('source')} -> {new_src}\n"
                         f"carry  {c['carry'] or '(none — the difference is a local delta)'}\n"
@@ -10679,8 +11167,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                         f"Resolve by hand, then re-run `update`.\n\n"
                         f"candidate {_cdir}/candidate\n"
                         f"files     {_cdir}/base {_cdir}/ours {_cdir}/theirs\n"
-                        f"reproduce {_cline}\n",
-                        encoding="utf-8", newline="\n")
+                        f"reproduce {_cline}\n"))
                     r.fail(f"'{row['path']}' was renamed by gov to '{new_src}' and the three-way "
                            f"conflicts — left untouched at its old path, order written")
                     continue
@@ -10692,14 +11179,18 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # ONE report: the row is left exactly as it was, and nothing about it is rewritten.
             old_path = row["path"]
             mv_err: str | None = None
-            try:
-                ndp.parent.mkdir(parents=True, exist_ok=True)
-                mv = subprocess.run(["git", "-C", str(target), "mv", "--", old_path, new_dest],
-                                    capture_output=True, text=True, check=False)
-                if mv.returncode != 0:
-                    mv_err = mv.stderr.strip() or f"git mv exited {mv.returncode}"
-            except OSError as e:
-                mv_err = str(e)
+            if not in_place:
+                try:
+                    ndp.parent.mkdir(parents=True, exist_ok=True)
+                    upgrade_steps.write_staging_line(target, old_path, None)
+                    upgrade_steps.write_staging_line(target, new_dest,
+                                                     (index0.get(old_path) or (None, "worktree"))[1])
+                    mv = subprocess.run(["git", "-C", str(target), "mv", "--", old_path, new_dest],
+                                        capture_output=True, text=True, check=False)
+                    if mv.returncode != 0:
+                        mv_err = mv.stderr.strip() or f"git mv exited {mv.returncode}"
+                except OSError as e:
+                    mv_err = str(e)
             if mv_err:
                 r.fail(f"'{row['path']}' could not be moved to '{new_dest}': {mv_err} — the row is "
                        f"left exactly as it was, at its old path and its old vintage")
@@ -10714,7 +11205,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 # `checkout-index` cannot replace — and this suite manufactures none of those; the
                 # two older call sites above are in exactly the same position. What it leaves is a
                 # moved file whose bytes are still the pre-move ones, reported and not re-stamped.
-                r.fail(f"'{row['path']}' was moved to '{new_dest}' and the bytes could not be "
+                r.fail(f"'{row['path']}' could not be landed in place: {why}. The row is NOT advanced, "
+                       f"and a re-run retries it" if in_place else
+                       f"'{row['path']}' was moved to '{new_dest}' and the bytes could not be "
                        f"landed: {why}. The move is staged and the row is NOT advanced, so a re-run "
                        f"sees the file at its new path with its old vintage")
                 continue
@@ -10731,13 +11224,20 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             row["sha256"] = _sha(data)
             row["commit"] = to_commit
             row["version"] = _resolve_ver_at(row)
-            renamed.extend([old_path, new_dest])
+            if in_place:
+                changed.append(new_dest)
+            else:
+                renamed.extend([old_path, new_dest])
             # The DESTINATION line. The verdict row above names the old path, which is the only
             # spelling the receipt had when it was printed; where the file went is the other half,
             # and it ends in the byte arm rather than in a path so that nothing parsing this output
             # for a row's verdict can mistake this line for one.
-            print(f"  moved            [{row.get('role')}] {old_path} -> {new_dest} · "
-                  f"bytes {byte_arm}")
+            if in_place:
+                print(f"  in place         [{row.get('role')}] {new_dest} · source {new_src} · "
+                      f"bytes {byte_arm}")
+            else:
+                print(f"  moved            [{row.get('role')}] {old_path} -> {new_dest} · "
+                      f"bytes {byte_arm}")
         elif v == "withdrawn":
             # ---- DEPL-dCarriedReceipt-11 S8 + S9. THE ENGINE'S ONLY UNGUARDED DELETE, CLOSED. What
             # ---- stood here removed a tracked file from a repository gov does not own — unlinked
@@ -10750,23 +11250,37 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # `--force`: it enables a narrower class of action and overrides no refusal. The order is
             # written either way, because a deletion that happened and a deletion that was withheld
             # are both things the operator has to be able to read afterwards.
-            _why = ("It WAS deleted: this run carried --write-withdrawals."
+            # TOOL-dSafePassage-9 S1. A WITHDRAWN HOOK FRAGMENT IS UNWIRED FIRST, before any
+            # deletion, because `--unwire` reads the fragment. Declined by the target-code switch or
+            # failed, the entry stays wired, one line says so, and the fragment is not deleted.
+            _frag_kept = False
+            if str(row["path"]).endswith(".fragment.json"):
+                if not _rerender_on:
+                    _frag_kept = True
+                    print(f"govkit update — hooks: {row['path']} left WIRED — GOVKIT_RERENDER=0 is "
+                          f"exported, and unwiring runs the target's own settings-merge.py; the "
+                          f"fragment is kept")
+                elif remove_wired_fragments(target, receipt.get("files") or [], [row["path"]],
+                                            "update", cause="withdrawn"):
+                    _unwired_withdrawn.setdefault(str(row.get("kit")), []).append(row["path"])
+                else:
+                    _frag_kept = True
+            _why = ("NOTHING was deleted: its hook entry could not be taken out of the settings "
+                    "file first, and the line naming it says why."
+                    if write_withdrawals and _frag_kept else
+                    "It WAS deleted: this run carried --write-withdrawals."
                     if write_withdrawals else
                     "NOTHING was deleted. `update` no longer removes a tracked file from a "
                     "repository gov does not own on the strength of a verdict alone. Re-run with "
                     "--write-withdrawals if this file really should go.")
             # RE-KEYED WITH THE OTHER TWO, and NOT collected into `_orders_written`: this writer had
             # the identical basename collision, and the reap below can never reach its output.
-            (outbox / f"update-withdrawn-{render_order_slug(row['path'])}.md").write_text(
-                f"# gov no longer ships {row['path']}\n\n"
-                f"source {row.get('source')}\n"
-                f"last gov commit {row.get('commit')}\n"
-                f"vintage asked for {to_commit}\n\n"
-                f"gov's tree holds no blob for that source at the requested vintage, and no rename "
-                f"pair at >= {RENAME_SIMILARITY_PERCENT}% similarity names a replacement for it.\n\n"
-                f"{_why}\n",
-                encoding="utf-8", newline="\n")
-            if not write_withdrawals:
+            write_row_order(outbox, "withdrawn", row["path"], render_row_order(
+                "withdrawn", row, to_commit,
+                f"gov's tree holds no blob for that source at the requested vintage, and "
+                f"no rename pair at >= {RENAME_SIMILARITY_PERCENT}% similarity names a "
+                f"replacement for it.\n\n{_why}\n"))
+            if not write_withdrawals or _frag_kept:
                 withheld += 1
                 continue
             if dp.is_file():
@@ -10802,12 +11316,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             merged, how = three_way(c["ours"], _b3, _t3)
             if how == "conflict":
                 conflicts += 1
-                _order = outbox / f"update-conflict-{render_order_slug(row['path'])}.md"
-                _orders_written.add(_order)
                 # S3. THE FOUR FILES ARE THE ONES THE MERGE WAS HANDED, carried rung included, so
                 # the printed line reproduces `candidate` byte for byte.
                 _cdir, _cline = write_conflict_candidate(outbox, row, _b3, c["ours"], _t3, merged)
-                _order.write_text(
+                _orders_written.add(write_row_order(
+                    outbox, "conflict", row["path"],
                     f"# update conflict — {row['path']}\n\n"
                     f"carry  {c['carry'] or '(none — the difference is a local delta)'}\n"
                     f"base   {base_commit} sha {_sha(c['base'])}\n"
@@ -10816,8 +11329,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                     f"The file was left BYTE-IDENTICAL. Resolve by hand, then re-run `update`.\n\n"
                     f"candidate {_cdir}/candidate\n"
                     f"files     {_cdir}/base {_cdir}/ours {_cdir}/theirs\n"
-                    f"reproduce {_cline}\n",
-                    encoding="utf-8", newline="\n")
+                    f"reproduce {_cline}\n"))
                 r.fail(f"'{row['path']}' diverged and the three-way conflicts — left untouched, "
                        f"order written")
             else:
@@ -10869,6 +11381,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # not round-trip exactly would replace gov's blob with a near-miss nobody asked for. The staging
     # this verb owes is done, and it is done from the blob rather than from the disk.
     if deleted:
+        for _sw_p in deleted:
+            upgrade_steps.write_staging_line(target, _sw_p, None)
         git_pathspec(target, ["rm", "-q", "--ignore-unmatch"], deleted)
 
     # ---- DEPL-dSealedTally-1 S2. MOVED HERE, AND THE BLOCK IS SPLIT ------------------------
@@ -11126,6 +11640,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # tracked — and every LATER `update` then refused the install forever, blaming the
             # operator: *present in the WORKTREE and absent from its INDEX*. One `--write` wedged
             # the adopter permanently, with no adversary and no tampering.
+            upgrade_steps.write_staging_line(target, _dest)
             _add0 = git_pathspec(target, ["add"], [_dest])
             if _add0.returncode != 0:
                 # F6. THE ROW GOES BACK TOO. It is minted above, BEFORE this stage, so a
@@ -11199,6 +11714,73 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         print(f"govkit update — HELD BACK {_eid_h}: {len(_paths_h)} row(s) refused "
               f"({', '.join(_paths_h)}), so none of this kit's writes from this run will stand")
 
+    # WHAT THE WRITE LOOP ACTUALLY DID, frozen before any rollback edits these lists. The snapshot's
+    # population is what the loop was GOING to act on; this is what it reached. A row refused at its
+    # own arm — a conflicting three-way, a rename destination the target already holds — is in the
+    # first and not the second, and rolling one of those back is not merely wasted: the occupied
+    # rename destination is an UNTRACKED operator file whose snapshot entry is `absent`, so the
+    # `absent` arm below would unlink bytes this run never wrote and the refusal exists to protect.
+    # DEPL-dSealedTally-1 S4. THE LANDED DESTINATIONS COUNT AS WRITTEN. Without this a landed
+    # path is classified untouched by the closing tally, which reports it as a file this run
+    # never wrote -- while it sits staged in the adopter's index.
+    # DEPL-cMendedVintage-10 S2. AND THE PIN BLOCK, when this run wrote it. The rollback loop skips
+    # any snapshot path that is not in this set — correctly, because a path this run never touched
+    # has nothing to undo — so leaving `.gitattributes` out would make its snapshot entry decorative:
+    # recorded, carried through the whole verb, and stepped over at the one moment it is for.
+    # DEPL-cMendedVintage-17 S3. AND WHEN THE WITHDRAWAL REMOVED IT, for the same reason: a path
+    # missing from this set is stepped over by the rollback loop, and a removal the rollback steps
+    # over is a block gov deleted from a repository whose kit then rolled back.
+    written_paths = (set(changed) | set(renamed) | set(deleted) | set(_landed_new)
+                     | ({_pins_snap["paths"][0]}
+                        if (_ga_written or _ga_removed) and _pins_snap else set()))
+
+    # TOOL-dSafePassage-66 S1. A HELD KIT GOES BACK HERE, BEFORE THE FIRST STEP, not in the verify
+    # pass after the walk. The hold set is final at the HELD BACK lines above, and every input of the
+    # restore is bound by now. Restored there, a walk killed inside a step ended the run first and
+    # left the kit at the tip, where the next run's restore found the tip as its pre-run state and
+    # the kit never came back (`verdict-printed-before-the-step-that-reverts-it`). The receipt below
+    # is written after this, so it records the kit's rows at their pre-run values. Its fragments are
+    # never wired and its regenerate never runs, so the restore meets only the write loop's writes.
+    # Scoped to `touched_kits`, the verify pass's population: a held kit outside it owns no
+    # snapshot row and would only restore the shared attributes row with no order naming it.
+    _held_restore: dict[str, tuple] = {}
+    for _eid_h in [e for e in touched_kits if e in _held_kits]:
+        _held_restore[_eid_h] = write_kit_restore(
+            target, _eid_h, receipt, snap_rows, written_paths, _landed_new, withdrawn_rows, [],
+            _unwired_withdrawn.get(_eid_h, []), r)
+
+    # ======================= TOOL-dSafePassage-2 S4 — THE UPGRADE-STEP WALK =======================
+    # HERE, after the write loop and before the re-render, so a step meets the new vintage's files
+    # and the renders, hook wiring and per-kit verify below meet the migrated tree. Oldest first,
+    # each step skipped where its witness holds, the receipt advanced per step on disk; a failed or
+    # killed step stops the walk with its failure recorded and the steps before it left applied, and
+    # no down runs, here or in the verify rollback below. Only on an unscoped run that has no finding
+    # yet (§8 F3): a subset of the steps would run a later one before an earlier one out of scope.
+    # And only over a receipt at schema 3 or above (TOOL-dSafePassage-78 S2): the first step starts
+    # from 3, and the lift to 3 is this run's own stamp below, after the walk, so the next run walks.
+    # The condition is `derive_walk_hold`'s, which the preview reads too, with no findings
+    # (TOOL-dSafePassage-84). A stopped walk is a finding, so the `gov_commit` stamp below is withheld.
+    _sw_pending = [] if rollback else upgrade_steps.derive_pending_steps(root, receipt, to_commit)
+    if rollback:
+        # TOOL-dSafePassage-4 S5: the reverse walk above took the steps back; none walks forward.
+        print("govkit update — steps: not walked — a rollback walks no step forward")
+    elif _sw_hold := derive_walk_hold(len(r.problems)):
+        print(f"govkit update — steps: not walked — {_sw_hold} · {len(_sw_pending)} pending")
+    else:
+        # TOOL-dSafePassage-62 S1. THE ROWS THE WRITE LOOP STAMPED REACH THE DISK BEFORE THE FIRST
+        # STEP, `gov_commit` unmoved. Below schema 4 the walk persists nothing (TOOL-dSafePassage-15
+        # S1), so a step killed here left a receipt naming the old bytes for every file the loop moved,
+        # and a rollback read each one as an adopter's edit and kept it. Above schema 4 the walk's
+        # first record writes the same receipt; this closes the window before it.
+        write_install_receipt(target, receipt_path, receipt)
+        _sw_walk = upgrade_steps.run_step_walk(root, target, receipt_path, receipt, _sw_pending)
+        print(f"govkit update — steps: {_sw_walk['pending']} pending · {_sw_walk['applied']} applied "
+              f"· {_sw_walk['skipped']} skipped · stopped at {_sw_walk['stopped'] or 'none'}")
+        if _sw_walk["stopped"]:
+            r.fail(f"the upgrade-step walk stopped at {_sw_walk['stopped']}: {_sw_walk['failure']}"
+                   + (f" — {_sw_walk['order']} says what to run by hand" if _sw_walk["order"] else "")
+                   + ". The steps before it stay applied; the next `update --write` resumes there")
+
     # ======================= DEPL-dRetiredFork-3 S1 + S2 — RE-RENDER AND REGENERATE =============
     # BYTES LANDING IS NOT AN UPDATE FINISHING. `UPDATE_ROLE["rendered"]` is `"adopter"` but the
     # disposition CAPS at report, and no `[adopt].argv` is spawned anywhere in this verb — the only
@@ -11224,7 +11806,6 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # under the operator's uid, so a check running under the run's own uid can be defeated by whoever
     # runs it — and the mitigation is that the target never supplies the argv, not that the uid is
     # trusted.
-    _rerender_on = os.environ.get("GOVKIT_RERENDER") != "0"
     _rr_ran: list[str] = []
     _rr_declined: list[tuple[str, str]] = []
     # DEPL-cMendedVintage-1 S1. A STRICT SUBSET OF `_rr_declined`, and the subset is the point: it
@@ -11523,26 +12104,6 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # IT RUNS UNCONDITIONALLY UNDER `--write`. There is no flag, in any spelling, because an opt-in
     # verifier verifies the runs that were already careful.
 
-    # WHAT THE WRITE LOOP ACTUALLY DID, frozen before any rollback edits these lists. The snapshot's
-    # population is what the loop was GOING to act on; this is what it reached. A row refused at its
-    # own arm — a conflicting three-way, a rename destination the target already holds — is in the
-    # first and not the second, and rolling one of those back is not merely wasted: the occupied
-    # rename destination is an UNTRACKED operator file whose snapshot entry is `absent`, so the
-    # `absent` arm below would unlink bytes this run never wrote and the refusal exists to protect.
-    # DEPL-dSealedTally-1 S4. THE LANDED DESTINATIONS COUNT AS WRITTEN. Without this a landed
-    # path is classified untouched by the closing tally, which reports it as a file this run
-    # never wrote -- while it sits staged in the adopter's index.
-    # DEPL-cMendedVintage-10 S2. AND THE PIN BLOCK, when this run wrote it. The rollback loop skips
-    # any snapshot path that is not in this set — correctly, because a path this run never touched
-    # has nothing to undo — so leaving `.gitattributes` out would make its snapshot entry decorative:
-    # recorded, carried through the whole verb, and stepped over at the one moment it is for.
-    # DEPL-cMendedVintage-17 S3. AND WHEN THE WITHDRAWAL REMOVED IT, for the same reason: a path
-    # missing from this set is stepped over by the rollback loop, and a removal the rollback steps
-    # over is a block gov deleted from a repository whose kit then rolled back.
-    written_paths = (set(changed) | set(renamed) | set(deleted) | set(_landed_new)
-                     | ({_pins_snap["paths"][0]}
-                        if (_ga_written or _ga_removed) and _pins_snap else set()))
-
     # DEPL-cMendedVintage-24 S5. THE CLASS LEFT-SHIFT, and the reason this unit is not just one more
     # name in a list. The defect it closes was a hand-maintained membership test that had to be
     # re-derived every time a verb learned to write a role it previously only read, with no signal at
@@ -11681,205 +12242,14 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 continue
             n_rolled += 1
             _rolled_kits.add(eid)
-            # TOOL-aRepatriatedFork-11 S4. FIRST, while the landed fragments are still on disk.
-            remove_wired_fragments(target, receipt.get("files") or [], _wired_new.get(eid, []), "update")
-            # NO ARM REACHES THE THREE PLUMBING FAILURES BELOW, and the skip announces itself
-            # rather than passing for coverage. Each fires only when the TARGET's own git refuses a
-            # call — an entry `update-index` will not take, a worktree file `checkout-index` cannot
-            # replace, an index `git rm --cached` will not touch — and this suite manufactures none
-            # of those modes; `land_through_index`'s post-`git mv` failure is in exactly the same
-            # position and says so where it stands. What each of them leaves is a PART-restored
-            # target, and each says that in its own message, because a silent partial restore is
-            # worse than the write it was undoing.
-            restored: list[str] = []
-            # DEPL-dSealedTally-1 S7. A REMOVED LANDING PRINTS UNDER ITS OWN VERB. A landed
-            # path had no index entry to restore, so reporting it as `restored` describes
-            # something that did not happen -- and the order's "was restored to the index
-            # entry it had" sentence is false of it.
-            removed_landed: list[str] = []
-            untouched: list[str] = []
-            # DEPL-cMendedVintage-2 S1. EVERY FAILURE ABOVE NAMES ITSELF HERE, paired with the git
-            # operation that refused. A failed path used to appear in NONE of the three lists below,
-            # which reads as a path nothing touched -- while the tail reverted its receipt row
-            # anyway. The list is (path, why) rather than a bare path because the order prints the
-            # refusing operation, and a second lookup to recover it is a second place to get wrong.
-            unrestored: list[tuple[str, str]] = []
-            # DEPL-cMendedVintage-18 S3. THE WITHDRAWN PATHS WHOSE ROW WAS KEPT ANYWAY, so the order
-            # can say what is true of them. The `unrestored` sentence below is written for a path
-            # this run REWROTE; a path this run DELETED and could not put back is a different fact
-            # and gets a different sentence, read off the same predicate that decided the row.
-            kept_withdrawn: set[str] = set()
-            # DEPL-cMendedVintage-10 S2. THE ATTRIBUTES ENTRY JOINS EVERY KIT'S ROLLBACK, because it
-            # belongs to no kit: the block gov wrote is the UNION over every claimed kit, so there is
-            # no one kit whose rollback owns it. A second restore is idempotent — the same pre-run
-            # index entry, put back a second time — and each rolled-back kit's order then names the
-            # file, which is what an operator reading one order needs to see.
-            for s in [x for x in snap_rows
-                      if x["kit"] == eid or x["origin"] == "attributes"]:
-                for p in s["paths"]:
-                    # B1's THIRD SITE, closed by enumeration rather than by symptom. `snap_rows` is
-                    # built from `acted` BEFORE the write loop's own containment check, and this
-                    # loop `unlink()`s and `checkout-index`es each path — so a receipt row spelling
-                    # `../../x` that the write loop refused could still be reached here, on the
-                    # rollback path, where the operation is a DELETE. Narrow (it needs a kit whose
-                    # check goes red after the run) and not reproduced, which is stated rather than
-                    # dressed up: it is guarded because the class is the same and the cost is one
-                    # condition, not because a fixture demonstrated it.
-                    try:
-                        demand_contained_dest(p, f"rollback of kit '{eid}'")
-                    except Refusal as _esc:
-                        r.fail(f"rolling back kit '{eid}': refusing to touch '{p}' — {_esc}")
-                        unrestored.append((p, "refused as outside the target"))
-                        continue
-                    if p not in written_paths:
-                        untouched.append(p)
-                        continue
-                    entry = s["index"].get(p)
-                    if entry is None:
-                        # `absent` before the write. The bytes at this path are ones this run put
-                        # there — a rename destination, or a `missing` restore — so unstaging and
-                        # unlinking returns the target to what it had, which was nothing.
-                        rmv = subprocess.run(
-                            ["git", "-C", str(target), "rm", "-q", "--cached", "--ignore-unmatch",
-                             "--", p], capture_output=True, text=True, check=False)
-                        if rmv.returncode != 0:
-                            r.fail(f"rolling back kit '{eid}': '{p}' was absent from the index "
-                                   f"before this run and `git rm --cached` would not unstage it: "
-                                   f"{rmv.stderr.strip()}. The target is now PART restored — say so "
-                                   f"rather than reporting a rollback that did not happen")
-                            unrestored.append((p, "`git rm --cached` would not unstage it"))
-                            continue
-                        if (target / p).is_file():
-                            (target / p).unlink()
-                        restored.append(p)
-                        continue
-                    mode, oid = entry
-                    upx = subprocess.run(
-                        ["git", "-C", str(target), "update-index", "--add", "--cacheinfo",
-                         f"{mode},{oid},{p}"], capture_output=True, text=True, check=False)
-                    if upx.returncode != 0:
-                        r.fail(f"rolling back kit '{eid}': `git update-index` would not restore "
-                               f"{mode},{oid[:12]},{p}: {upx.stderr.strip()}. The target is now "
-                               f"PART restored")
-                        unrestored.append((p, "`git update-index` would not take its pre-run entry"))
-                        continue
-                    (target / p).parent.mkdir(parents=True, exist_ok=True)
-                    cox = subprocess.run(
-                        ["git", "-C", str(target), "checkout-index", "-f", "--", p],
-                        capture_output=True, text=True, check=False)
-                    if cox.returncode != 0:
-                        r.fail(f"rolling back kit '{eid}': the index now names {oid[:12]} at '{p}' "
-                               f"and `git checkout-index` could not write the worktree file: "
-                               f"{cox.stderr.strip()}. The target is now PART restored — a silent "
-                               f"partial restore is worse than the write it was undoing")
-                        # S4. THE ONLY HALF-DONE ONE, and the sentence is measured rather than
-                        # reasoned: `update-index` above already took the pre-run blob, and
-                        # `checkout-index -f` unlinks the existing file BEFORE it writes the
-                        # replacement -- so when it refuses, the worktree file is GONE rather than
-                        # holding this run's bytes. Index and worktree disagree; which bytes sit on
-                        # disk is git's business at that point and this line does not promise any.
-                        unrestored.append(
-                            (p, "`git checkout-index` could not write the worktree file, and the "
-                                "index was ALREADY reverted to the pre-run blob, so the index and "
-                                "the worktree now disagree at this path"))
-                        continue
-                    restored.append(p)
-
-                # DEPL-dSealedTally-1 S3. A LANDED ENTRY IS REMOVED, NOT RESTORED, and the two
-                # halves the table branch below performs are both WRONG for it: restoring
-                # `ROLLBACK_FIELDS` would write receipt fields onto a row that should cease to
-                # exist, and the `withdrawn_rows` removal is about rows this run withdrew,
-                # which has nothing to say about a row this run MINTED.
-                if s.get("origin") == "landed":
-                    # F3. THE ROW GOES ONLY IF THE FILE WENT. This branch ran once per ENTRY, after
-                    # the per-path loop, and dropped the receipt row whatever that loop decided --
-                    # so a path whose removal was REFUSED by containment, or whose `git rm --cached`
-                    # failed, left a gov-written file staged in a repository gov does not own,
-                    # named in no line of the rollback order and withdrawable by nothing, because
-                    # the row that would have named it was gone.
-                    _left_landed = [p for p in s["paths"] if p not in restored]
-                    for _lp in [p for p in s["paths"] if p in restored]:
-                        while _lp in _landed_new:
-                            _landed_new.remove(_lp)
-                        restored.remove(_lp)
-                        removed_landed.append(_lp)
-                    if _left_landed:
-                        r.fail(f"rolling back kit '{eid}': the landed path(s) "
-                               f"{', '.join(sorted(_left_landed))} could not be removed, so their "
-                               f"receipt row is KEPT. The target is PART restored and those bytes "
-                               f"are still staged; the row is what a later `update` needs in order "
-                               f"to see them at all")
-                    else:
-                        try:
-                            receipt["files"].remove(s["row"])
-                        except ValueError:
-                            pass
-                    continue
-
-                # DEPL-cMendedVintage-2 S2. THE ROW GOES BACK ONLY IF THE FILE DID. This is
-                # `_left_landed` thirty lines up, one level out: the landed branch already refuses
-                # to drop a row whose path it could not remove, and the block below reverted a row
-                # whatever the path loop decided. A failed restore therefore left the file holding
-                # this run's bytes while its row claimed the pre-run `sha256`, and the run persisted
-                # that -- the exact disagreement `-7` and `-8` were built to prevent, arriving
-                # through the failure path instead of the success one.
-                #
-                # `p in written_paths` IS LOAD-BEARING. An entry's path this run never wrote is
-                # collected into `untouched`, and reverting the row is correct for it; without the
-                # filter a single untouched path in a renamed entry would pin that row forward and
-                # invert the fix. The row that stays forward describes the bytes actually on disk,
-                # which costs the operator a re-offer they will not get -- stated in the order,
-                # because a receipt that agrees with the tree beats one that re-offers work over an
-                # unrepaired path.
-                # DEPL-cMendedVintage-18 S1. THE REMOVAL IS NOT THE REVERT, and `-2` gated the two
-                # together on the assumption that no snapshot entry is also a withdrawn row.
-                # `_touching` admits `withdrawn` whenever `--write-withdrawals` is passed, so on
-                # those runs the assumption is false. `withdrawn_rows` is the DELETE list — the
-                # filter far below STRIPS every row still in it from the receipt — so taking the row
-                # OUT of it is what SAVES the row, and the gate that is right for the revert is
-                # exactly wrong for this. MEASURED on a `--write-withdrawals` run whose rollback
-                # `checkout-index` a required smudge filter refused: the row vanished from the
-                # receipt while `update-index` had just re-staged the pre-run blob at that path, so
-                # the target carried gov's bytes and its receipt admitted to none of them. It now
-                # runs for every entry that reached this tail, whatever the path loop decided.
-                _was_withdrawn = s["row"] in withdrawn_rows
-                if _was_withdrawn:
-                    withdrawn_rows.remove(s["row"])
-
-                _left = [p for p in s["paths"] if p in written_paths and p not in restored]
-                if _left:
-                    if _was_withdrawn:
-                        kept_withdrawn.update(_left)
-                    continue
-
-                # DEPL-cMendedVintage-10 S2. THE SYNTHESIZED ROW GOES BACK WHOLE. The three fields
-                # the pin write refreshes are `mode`, `block_sha256` and `patterns`, and none of
-                # them is in ROLLBACK_FIELDS — so the field-by-field revert below would put the
-                # bytes back and leave the row describing the block that was just removed. Cleared
-                # and re-filled in place rather than replaced, because `receipt["files"]` holds this
-                # dict by identity and rebinding the name would leave the receipt at this run's
-                # values.
-                if s["origin"] == "attributes":
-                    # DEPL-cMendedVintage-17 S3. AND IT COMES BACK OUT OF THE WITHDRAWAL SET FIRST.
-                    # The withdrawal path drops this row by appending it here, and the filter that
-                    # consumes the list runs long after this loop — so restoring the dict's contents
-                    # without also un-dropping it would put the block back on disk and still delete
-                    # the row that says gov owns it. DEPL-cMendedVintage-18 hoisted that un-drop
-                    # above the `_left` gate, where one statement now serves this branch and the
-                    # table one alike; this branch carried its own copy of it until then.
-                    s["row"].clear()
-                    s["row"].update(s["fields"])
-                    continue
-
-                # S3 + S5. THE ROW'S OWN FIELDS, restored TOGETHER. Restoring bytes and leaving the
-                # row stamped forward re-creates `-8` exactly — the next run reads the row as
-                # `equal` against bytes that were reverted — and restoring only some of the six is
-                # the split `-7` S9 refuses the whole next run on.
-                for k in ROLLBACK_FIELDS:
-                    if k in s["fields"]:
-                        s["row"][k] = s["fields"][k]
-                    else:
-                        s["row"].pop(k, None)
+            if _held_v:
+                # TOOL-dSafePassage-66 S2. RESTORED ALREADY, before the first upgrade step: this
+                # prints and orders what that restore did, and puts nothing back a second time.
+                restored, removed_landed, unrestored, untouched, kept_withdrawn = _held_restore[eid]
+            else:
+                restored, removed_landed, unrestored, untouched, kept_withdrawn = write_kit_restore(
+                    target, eid, receipt, snap_rows, written_paths, _landed_new, withdrawn_rows,
+                    _wired_new.get(eid, []), _unwired_withdrawn.get(eid, []), r)
 
             # DEPL-aRepatriatedFork-17 S1. THE RE-RENDER'S OUTPUTS COME BACK TOO, through the same
             # two plumbing calls the loop above makes, plus the snapshot's own worktree bytes: the
@@ -11894,6 +12264,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 _now_b = (target / p).read_bytes() if (target / p).is_file() else None
                 if _now_b == _was_b:
                     continue
+                upgrade_steps.write_staging_line(target, p, None if _was_i is None else _was_i[1])
                 if _was_i is None:
                     subprocess.run(["git", "-C", str(target), "rm", "-q", "-f", "--cached",
                                     "--ignore-unmatch", "--", p], capture_output=True, check=False)
@@ -12088,6 +12459,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             _cand = outbox / _stale.stem
             if _cand.is_dir():
                 for _cf in _cand.iterdir():
+                    upgrade_steps.write_staging_line(
+                        target, f".governance/outbox/{_stale.stem}/{_cf.name}", None)
                     _cf.unlink()
                 _cand.rmdir()
                 subprocess.run(["git", "-C", str(target), "rm", "-r", "-q", "-f", "--cached",
@@ -12097,6 +12470,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # records in full: a target that COMMITS its outbox otherwise hands the renormalize
             # below a pinned path missing from the worktree, and gov refuses over its own deletion.
             _reaped.add(f".governance/outbox/{_stale.name}")
+            upgrade_steps.write_staging_line(target, f".governance/outbox/{_stale.name}", None)
             subprocess.run(["git", "-C", str(target), "rm", "-q", "-f", "--cached",
                             "--ignore-unmatch", "--", f".governance/outbox/{_stale.name}"],
                            capture_output=True, check=False)
@@ -12162,6 +12536,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                        f"renormalize rather than folding somebody's work-in-progress into an index "
                        f"gov does not own")
             elif _rn_lf:
+                for _sw_p in _rn_lf:
+                    upgrade_steps.write_staging_line(target, _sw_p)
                 git_pathspec(target, ["add", "--renormalize"], _rn_lf)
                 print(f"govkit update — renormalize: re-staged {len(_rn_lf)} pinned path(s)")
             else:
@@ -12395,16 +12771,22 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # skips that guard entirely and overwrites the project-owned file the first run refused to touch.
     # A partial update leaves the receipt describing what it did, at the commit it came from.
     if r.problems:
-        write_atomic(target / ".governance" / "install.sums",
-                     "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f))
-        write_atomic(receipt_path, json.dumps(receipt, indent=2) + "\n")
+        write_install_receipt(target, receipt_path, receipt)
         print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
               f"deleted {len(deleted)}, withheld {withheld}, "
               f"{conflicts} conflict(s). The receipt is NOT re-stamped: this run had findings, and a "
               f"stamp would tell the next run that guards which fired here have already been passed")
+        _write_rb_finish(f"not moved, this run had {len(r.problems)} finding(s)")
         return r.emit()
 
-    receipt["schema"] = RECEIPT_SCHEMA
+    # TOOL-dSafePassage-3 S5: the re-stamp lifts a schema-1 or schema-2 receipt to 3 and never past
+    # it, because schema 4 carries `steps` and only the step govkit/receipt-schema-4 writes that.
+    # TOOL-dSafePassage-2 S3: read off the receipt, not the local taken at load — the walk re-read
+    # a step's `schema` into it, and the stamp never writes over a field a step wrote.
+    # TOOL-dSafePassage-4 S5: under --rollback it never raises a schema either, so a receipt a
+    # down lowered keeps the schema the downs left.
+    receipt["schema"] = (receipt.get("schema", schema) if rollback
+                         else max(receipt.get("schema", schema), 3))
     # DEPL-dGaugedVintage-8 S1. THE STAMP MUST NOT OUTRUN THE ROWS THIS RUN NEVER GRADED. An
     # `evidence: "unattributed"` row is skipped above (`how == "table"` branch) before
     # `classify_row`, by DEPL-dCarriedReceipt-13's ratified design, and it is graded against the
@@ -12432,20 +12814,18 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"and this run graded none of them, so advancing gov_commit would move the base they "
               f"must be attributed from. Clear them with "
               f"`govkit adopt --re-adopt --pin <path>=<rev> --write`")
-        write_atomic(target / ".governance" / "install.sums",
-                     "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f))
-        write_atomic(receipt_path, json.dumps(receipt, indent=2) + "\n")
+        write_install_receipt(target, receipt_path, receipt)
+        _write_rb_finish(f"not moved, {ungraded} row(s) carry evidence unattributed")
         return r.emit()
 
     receipt["gov_commit"] = to_commit
-    write_atomic(target / ".governance" / "install.sums",
-                 "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f))
-    write_atomic(receipt_path, json.dumps(receipt, indent=2) + "\n")
+    write_install_receipt(target, receipt_path, receipt)
     # DEPL-cMendedVintage-4 S3. dGaugedVintage-8 S2's "what it overrode" clause went with the
     # override: reaching here now proves `ungraded` is 0, so the clause could only ever render empty.
     print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
           f"deleted {len(deleted)}, withheld {withheld}, "
           f"{conflicts} conflict(s); receipt re-stamped at {to_commit[:8]}")
+    _write_rb_finish(f"moved to {to_commit[:8]}")
     return r.emit()
 
 
@@ -13027,8 +13407,11 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     # ---- D2 below. This sentence used to say they are "NOT written", four lines above the block
     # ---- that writes them.
     (target / ".governance").mkdir(exist_ok=True)
-    envelope = {"schema": RECEIPT_SCHEMA, "gov_source": str(root), "gov_commit": commit,
+    # `schema` is set by `derive_receipt_schema` below, once the prior receipt is read; the key is
+    # opened here so it stays the envelope's first (TOOL-dSafePassage-3 S5).
+    envelope = {"schema": None, "gov_source": str(root), "gov_commit": commit,
                 "prefix": (deploy.get("prefix") or "tools"), "kits": selection, "files": rows}
+    _prior = None
     # ---- D2, from this build's closing review. S10's "this verb installs nothing" is true and was
     # ---- the wrong reason to DROP these five keys: `--re-adopt` runs over a receipt somebody else
     # ---- wrote, and `apply` writes exactly these to record what an INSTALL DID. Re-measuring
@@ -13067,11 +13450,12 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
             print(f"govkit adopt — carried {len(_carried)} install-record key(s) forward from the "
                   f"receipt being replaced: {', '.join(_carried)}. Re-measuring provenance does not "
                   f"un-perform an install, and dropping these bricks the next `apply`")
-    write_atomic(target / ".governance" / "install.sums",
-                 "".join(f"{w['sha256']}  {w['path']}\n" for w in rows if "sha256" in w))
-    write_atomic(receipt_path, json.dumps(envelope, indent=2) + "\n")
+    # TOOL-dSafePassage-3 S5: `schema` in place and, where it is given, `steps` as the last key —
+    # carried verbatim from the receipt `--re-adopt` replaces, for D2's reason, or a first install's.
+    envelope.update(derive_receipt_schema(_prior))
+    write_install_receipt(target, receipt_path, envelope)
     print(f"govkit adopt — receipt written: {len(rows)} row(s), {len(selection)} kit(s), "
-          f"schema {RECEIPT_SCHEMA}, gov_commit {commit[:8]}")
+          f"schema {envelope['schema']}, gov_commit {commit[:8]}")
     if staged:
         # S5. STAGED WITH THE BYTES IT MEASURED, so the fork edit and its receipt are one commit.
         _ga = subprocess.run(["git", "-C", str(target), "add", "--", *ADOPT_STAGED_RECEIPT],
@@ -13253,6 +13637,19 @@ def read_descriptors(root: pathlib.Path, reg: dict, r: Report) -> dict[str, tupl
     return descs
 
 
+def read_descriptor_at(root: pathlib.Path, commit: str, dpath: str) -> dict | None:
+    """TOOL-dSafePassage-65 S1. The descriptor at `dpath` as gov holds it AT `commit`, joined as
+    `read_descriptors` joins the working tree's. None where the blob is absent there."""
+    blob = blob_at(root, commit, dpath)
+    if blob is None:
+        return None
+    try:
+        desc = tomllib.loads(blob.decode("utf-8"))
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
+        raise Refusal(f"{dpath} at {commit[:8]} is not valid TOML: {e}") from e
+    return resolve_descriptor_paths(desc, derive_tool_root(root))
+
+
 def resolve_descriptor_paths(desc: dict, tool_root: str) -> dict:
     """TOOL-aRepatriatedFork-29 S1, §8 F2 — a descriptor's gov-side paths, joined to the tool root ONCE.
 
@@ -13418,6 +13815,11 @@ def derive_epoch_state(root: pathlib.Path, eid: str, desc: dict, base: str, head
     return "moved", f"FAILED · last bump {bumps[0][:10]} precedes last move {w[:10]}", w, n
 
 
+# The landing's one base ladder lives in `upgrade_steps.py` (TOOL-dSafePassage-26 S1), which
+# `cmd_epoch`, `upgrade_steps.py frozen` and the step gate all call.
+resolve_landing_base = upgrade_steps.resolve_landing_base
+
+
 def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
     """TOOL-aRepatriatedFork-15 S1, S5 — a kit whose shipped bytes move bumps its version.
 
@@ -13454,35 +13856,10 @@ def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
         for p in r.problems:
             sys.stderr.write(f"govkit: {p}\n")
         return 2
-    boundary = base is not None
-    # An ALL-ZERO value reads as UNSET (TOOL-aMendedFleet-111 S3): the hook exports the remote's old
-    # sha, forty zeros on a push that CREATES the default branch, and no commit carries that name.
-    if base is None and os.environ.get("GATE_PUSH_BASE", "").strip("0"):
-        base, boundary = os.environ["GATE_PUSH_BASE"], True
-    if base is None:
-        # The default base is `check-verdict-epoch.sh`'s: the merge-base with the default branch,
-        # the remote's first. No base is a FAILED exit 1 and never a zero-status skip, because
-        # run-gates judges a leg by its exit code and a silent 0 reads as a pass forever. The
-        # remote and its branch are the ladder's (TOOL-dLadderedRemote-2); a refusal is that
-        # failed exit, naming it, and no remote at all leaves only the local branch.
-        remote, dflt, _observed, refusal = resolve_remote(root)
-        if refusal:
-            print(f"epoch: FAILED · no base to compare against · {refusal}")
-            return 1
-        dflt = dflt or "main"
-        for ref in ((f"{remote}/{dflt}", dflt) if remote else (dflt,)):
-            mb = subprocess.run(["git", "-C", str(root), "merge-base", ref, "HEAD"],
-                                capture_output=True, text=True, encoding="utf-8")
-            if mb.returncode == 0 and mb.stdout.strip():
-                base = mb.stdout.strip()
-                break
-    rb = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet",
-                         f"{base}^{{commit}}"], capture_output=True, text=True, encoding="utf-8") if base else None
-    if rb is None or rb.returncode != 0:
-        print(f"epoch: FAILED · no base to compare against ({base or 'no merge-base with the default branch'})"
-              " · fetch full history, set GOV_DEFAULT_BRANCH, or pass --base <rev>")
+    base, boundary, why = resolve_landing_base(root, base)
+    if not base:
+        print(f"epoch: FAILED · no base to compare against{why}")
         return 1
-    base = rb.stdout.strip()
     failed = 0
     for eid in sorted(descs):
         kind, text, w, n = derive_epoch_state(root, eid, descs[eid][0], base)
@@ -13604,7 +13981,7 @@ USAGE = """usage:
   govkit.py plan --target <path> [--kits a,b | --all] [--coverage] [--emit-declines] [--run-discharge]
   govkit.py check --target <path> [--run-discharge]
   govkit.py apply --target <path> [--kits a,b | --all] [--resume]
-  govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals] [--accept-role-moves]
+  govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals] [--accept-role-moves] [--rollback]
   govkit.py adopt  --target <path> [--to <rev>] [--pin <path>=<rev> ...] [--re-adopt] [--write]
                    [--staged] [--suggest-pins]
   govkit.py intake --target <path> [--kits a,b | --all] [--answer key=value ...]
@@ -13633,7 +14010,10 @@ stamp is withheld, and `govkit adopt --re-adopt --pin <path>=<rev> --write` is w
 the pin is the operator asserting the vintage the adoption walk could not find, and a re-adopt
 without one re-measures the same bytes to the same answer. The default is read-only because that verb's failure mode is silent data loss in a
 repository the operator owns and gov does not, and the muscle-memory invocation must not be the
-destructive one. `intake` writes the target descriptor
+destructive one. `update --rollback --to <rev>` moves an install BACK to an ancestor of its receipt's
+commit: each upgrade step introduced after `<rev>` runs its down, newest first, before any file row
+moves, and the run leaves `.governance/outbox/update-reverted-<from8>-<to8>.md`; it takes no `--kits`,
+and does nothing without `--to`. A failed `update` never rolls back by itself. `intake` writes the target descriptor
 ONCE and refuses to overwrite one that exists — a subcommand that parses and does
 nothing looks exactly like one that works, from the outside, and this unit exists because that class
 of silence ships broken installs.
@@ -13666,6 +14046,9 @@ def parse_args(argv: list[str]) -> tuple:
     # DEPL-aRepatriatedFork-17 S5, S6, S9. All three opt-in scope flags: each enables a narrower
     # class of action, defaults OFF and overrides no refusal.
     staged = accept_role_moves = suggest_pins = False
+    # TOOL-dSafePassage-4 S1. `update --rollback --to <rev>`: a scope flag on `update` that lifts the
+    # downgrade refusal for a recorded rollback only. It does nothing without an explicit `--to`.
+    rollback = to_given = False
     i = 1
     while i < len(argv):
         a = argv[i]
@@ -13723,8 +14106,11 @@ def parse_args(argv: list[str]) -> tuple:
             emit_declines = True
             i += 1
         elif a == "--to" and i + 1 < len(argv):
-            to_rev = argv[i + 1]
+            to_rev, to_given = argv[i + 1], True
             i += 2
+        elif a == "--rollback":
+            rollback = True
+            i += 1
         elif a == "--all":
             mode = "all"
             i += 1
@@ -13735,7 +14121,7 @@ def parse_args(argv: list[str]) -> tuple:
             raise Refusal(f"unknown or incomplete argument: {a}")
     return (verb, target, mode, kits, resume, answers, write, to_rev, write_withdrawals,
             pins, re_adopt, coverage, emit_declines, run_discharge, staged, accept_role_moves,
-            suggest_pins)
+            suggest_pins, rollback and to_given)
 
 
 # ======================= DEPL-dRetiredFork-6 — `contribute` ====================================
@@ -14095,7 +14481,7 @@ def main(argv: list[str]) -> int:
             return cmd_mint(repo_root(), opts["--base"], opts.get("--head"))
         (verb, target, mode, kits, RESUME, ANSWERS, WRITE, TO_REV, WRITE_WD,
          PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES, RUN_DISCHARGE, STAGED, ACCEPT_ROLE_MOVES,
-         SUGGEST_PINS) = parse_args(argv)
+         SUGGEST_PINS, ROLLBACK) = parse_args(argv)
         root = repo_root()
         if verb == "contribute":
             if target is None:
@@ -14123,7 +14509,7 @@ def main(argv: list[str]) -> int:
                 # byte-identical to the unscoped run, with nothing saying the scope was ignored.
                 return cmd_update(root, target, TO_REV, write=WRITE,
                                   write_withdrawals=WRITE_WD, kits=kits,
-                                  accept_role_moves=ACCEPT_ROLE_MOVES)
+                                  accept_role_moves=ACCEPT_ROLE_MOVES, rollback=ROLLBACK)
             if verb == "adopt":
                 return cmd_adopt(root, target, TO_REV, PINS, RE_ADOPT, write=WRITE,
                                  staged=STAGED, suggest_pins=SUGGEST_PINS)

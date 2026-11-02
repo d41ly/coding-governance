@@ -15,6 +15,7 @@ Every fixture is a throwaway repo under `mktemp`-equivalent. Nothing is written 
 from __future__ import annotations
 
 import ast as _ast
+import base64
 import contextlib
 import hashlib
 import importlib.util
@@ -123,9 +124,7 @@ def govkit_steps() -> tuple:
     A second copy of this vocabulary in the harness is the two-spellings class inside the arm that
     exists to grade it: the harness would keep passing against its own idea of the order.
     """
-    sys.path.insert(0, str(HERE))
-    import govkit  # noqa: E402
-    return govkit.STEPS
+    return govkit_module().STEPS
 
 
 def govkit_kind_marks() -> dict:
@@ -134,23 +133,38 @@ def govkit_kind_marks() -> dict:
     The harness used to spell one of these (`SKIP`) itself, and the engine's table never contained
     it — so the arm reading plan rows matched nothing and reported vacuously green.
     """
-    sys.path.insert(0, str(HERE))
-    import govkit  # noqa: E402
-    return govkit.KIND_MARKS
+    return govkit_module().KIND_MARKS
 
 
 def govkit_update_role() -> dict:
     """The engine's OWN update dispatch table, for the reason `govkit_kind_marks` gives."""
-    sys.path.insert(0, str(HERE))
-    import govkit  # noqa: E402
-    return govkit.UPDATE_ROLE
+    return govkit_module().UPDATE_ROLE
+
+
+GOVKIT_HELD: list = []   # the one engine at GOVKIT this process took first
 
 
 def govkit_module():
-    """The engine module itself, for arms that call a resolver directly rather than a verb."""
-    sys.path.insert(0, str(HERE))
-    import govkit  # noqa: E402
-    return govkit
+    """The engine module itself, for arms that call a resolver directly rather than a verb.
+
+    It HOLDS the first engine at `GOVKIT` and re-binds the module table to it on every call
+    (TOOL-dSafePassage-99): a staged copy loaded in process runs its own `load_govkit()`, which
+    writes the copy's engine to `sys.modules["govkit"]`, and an `import` would answer that copy,
+    whose `Refusal` is not the class the suite's catchers name. Loading `GOVKIT` afresh on a miss
+    would mint a third `Refusal`, so the held object is the answer.
+    """
+    if not GOVKIT_HELD:
+        sys.path.insert(0, str(HERE))
+        mod = sys.modules.get("govkit")
+        if mod is None or pathlib.Path(getattr(mod, "__file__", "") or "").resolve() != GOVKIT:
+            spec = importlib.util.spec_from_file_location("govkit", GOVKIT)
+            mod = importlib.util.module_from_spec(spec)
+            sys.modules["govkit"] = mod
+            spec.loader.exec_module(mod)
+        GOVKIT_HELD.append(mod)
+    sys.modules["govkit"] = GOVKIT_HELD[0]
+    sys.modules["upgrade_steps"] = GOVKIT_HELD[0].upgrade_steps
+    return GOVKIT_HELD[0]
 GOVKIT = HERE / "govkit.py"
 FAILURES: list[str] = []
 
@@ -281,6 +295,27 @@ def check(label: str, cond: bool, detail: str = "") -> None:
     else:
         FAILURES.append(label)
         print(f"FAIL {label}{(' — ' + detail) if detail else ''}")
+
+
+@contextlib.contextmanager
+def set_environ(values: dict):
+    """TOOL-dSafePassage-91 S3: `values` set in this process's environment for the block, a `None`
+    unsetting its key, and the previous state restored after. Shaped as `measure_legs.set_environ`,
+    which this copy-installed kit cannot import across kits."""
+    held = {k: os.environ.get(k) for k in values}
+    for k, v in values.items():
+        if v is None:
+            os.environ.pop(k, None)
+        else:
+            os.environ[k] = v
+    try:
+        yield
+    finally:
+        for k, v in held.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
 
 
 # ================= DEPL-cMendedVintage-20 — A RETIRED FLAG, GRADED BY CLASS ==================
@@ -676,28 +711,8 @@ def write_vintage_receipt(govroot: pathlib.Path, target: pathlib.Path,
     return kept, dropped
 
 
-def make_target(tmp: pathlib.Path, deploy: str | None) -> pathlib.Path:
-    t = tmp / "target"
-    t.mkdir(parents=True, exist_ok=True)
-    git(t, "init", "-q", "-b", "main")
-    git(t, "config", "user.email", "t@e")
-    git(t, "config", "user.name", "t")
-    # PINNED, not inherited. DEPL-dCarriedReceipt-7 S5 lands bytes through `checkout-index`, so the
-    # TARGET's own filters decide its worktree — which is the whole point, and which makes every
-    # arm asserting worktree bytes depend on the DEVELOPER's global `core.autocrlf` until it is
-    # pinned here. It is `true` by default on a Windows git install, and measured: eight arms
-    # asserting `b"v3\n"` went red on this machine for that reason alone. The filter is still
-    # exercised, deliberately and per fixture, by the clones `-7`'s own arms build with
-    # `-c core.autocrlf=true`.
-    git(t, "config", "core.autocrlf", "false")
-    (t / "README.md").write_text("target\n", encoding="utf-8")
-    if deploy is not None:
-        gov = t / ".governance"
-        gov.mkdir(exist_ok=True)
-        (gov / "deploy.toml").write_text(deploy, encoding="utf-8", newline="\n")
-    git(t, "add", "-A")
-    git(t, "commit", "-qm", "base")
-    return t
+sys.path.insert(0, str(HERE))
+from fixture_target import build_scratch_gov, build_target  # noqa: E402 — TOOL-dSafePassage-5 S12, -26 S19: the factories
 
 
 DEPLOY_FULL = f"""gov_source = "local"
@@ -735,7 +750,7 @@ def check_playbook_hole_modes(tmp: pathlib.Path) -> None:
             '[answers]\nplaybook_path = "CHARTER.md"\n')
 
     def run_fixture(name: str, kits: list[str], deploy: str) -> subprocess.CompletedProcess:
-        t = make_target(tmp / name, deploy)
+        t = build_target(tmp / name, deploy)
         (t / "CHARTER.md").write_text("{{PROJECT_NAME}}\n", encoding="utf-8", newline="\n")
         (t / ".governance" / "install.json").write_text(
             json.dumps({"schema": 2, "gov_source": "local", "kits": kits,
@@ -770,7 +785,7 @@ def check_answers_parity(tmp: pathlib.Path) -> None:
         "render_playbook_parity", KIT_DIRS["playbook"] / "render_playbook.py")
     rp = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(rp)
-    t = make_target(tmp / "answers-parity", (
+    t = build_target(tmp / "answers-parity", (
         f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["memory-tree", "kickoff-manifest"]\n\n'
         '[answers]\nmemory_root = "docs/mem"\nmanifest_path = "docs/SESSION-KICKOFF.md"\n'
         'user_skills = "~/.claude/skills"\n\n[kit.kickoff-manifest]\nmanifest_path = "x.md"\n\n'
@@ -875,7 +890,7 @@ def check_pytest_ini_probe(tmp: pathlib.Path) -> None:
     line = "hole 'pytest-ini-knobs' is UNDISCHARGED"
 
     def run_fixture(name: str, files: dict[str, str]) -> tuple[pathlib.Path, subprocess.CompletedProcess]:
-        t = make_target(tmp / name, deploy)
+        t = build_target(tmp / name, deploy)
         for rel, body in files.items():
             (t / rel).parent.mkdir(parents=True, exist_ok=True)
             (t / rel).write_text(body, encoding="utf-8", newline="\n")
@@ -914,6 +929,7 @@ def check_shipped_verb(tmp: pathlib.Path) -> None:
     (fx / PFX / "demo").mkdir(parents=True, exist_ok=True)
     shutil.copy(GOVKIT, fx / PFX / KIT_NAMES["govkit"] / "govkit.py")
     shutil.copy2(GOVKIT.parent / "adopters.toml", fx / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+    shutil.copy2(GOVKIT.parent / "upgrade_steps.py", fx / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
     (fx / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
         '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/govkit/entries/demo.kit.toml"\n',
         encoding="utf-8", newline="\n")
@@ -962,6 +978,7 @@ def check_epoch_verb(tmp: pathlib.Path) -> None:
         (fx / d).mkdir(parents=True, exist_ok=True)
     shutil.copy(GOVKIT, fx / PFX / KIT_NAMES["govkit"] / "govkit.py")
     shutil.copy2(GOVKIT.parent / "adopters.toml", fx / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+    shutil.copy2(GOVKIT.parent / "upgrade_steps.py", fx / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
     files = {
         f"{PFX}{KIT_NAMES['govkit']}/registry.toml":
             '[[entry]]\nid = "vk"\ndescriptor = "{prefix}/govkit/entries/vk.kit.toml"\n\n'
@@ -1049,6 +1066,7 @@ def check_mint_verb(tmp: pathlib.Path) -> None:
     gk = fx / PFX / KIT_NAMES["govkit"] / "govkit.py"
     shutil.copy(GOVKIT, gk)
     shutil.copy2(GOVKIT.parent / "adopters.toml", gk.parent / "adopters.toml")
+    shutil.copy2(GOVKIT.parent / "upgrade_steps.py", gk.parent / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
     files = {
         f"{PFX}{KIT_NAMES['govkit']}/registry.toml":
             '[[entry]]\nid = "vk"\ndescriptor = "{prefix}/govkit/entries/vk.kit.toml"\n\n'
@@ -1245,6 +1263,7 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
     (g / PFX / "demo").mkdir(parents=True)
     shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
     shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+    shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
     (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
         '[surface]\nglobs = ["{prefix}/*"]\n\n[selection]\ndefault = ["demo"]\n\n'
         '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
@@ -1265,8 +1284,8 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
         return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), *args],
                               capture_output=True, text=True, encoding="utf-8", env=env)
 
-    def build_target(name: str, path: str, impl: str, run_src: str) -> pathlib.Path:
-        t = make_target(tmp / name, OWN_DEPLOY.format(path=path, impl=impl))
+    def build_own_target(name: str, path: str, impl: str, run_src: str) -> pathlib.Path:
+        t = build_target(tmp / name, OWN_DEPLOY.format(path=path, impl=impl))
         (t / PFX / "demo").mkdir(parents=True)
         for f in ("use.py", "seed.txt", "tpl.md"):
             shutil.copy2(g / PFX / "demo" / f, t / PFX / "demo" / f)
@@ -1278,25 +1297,25 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
     # file each names EXISTS, so the refusal is the path grade's and not the missing-file one's.
     for tag, bad, said in (("space", f"{PFX}demo/run x.py", "'own.path'"),
                            ("dotdot", "../run.py", "leaves the target repository")):
-        t = build_target(f"own-ac1-{tag}", bad, "demo:run.py", OWN_RUN)
+        t = build_own_target(f"own-ac1-{tag}", bad, "demo:run.py", OWN_RUN)
         (t / bad).write_text(OWN_RUN, encoding="utf-8", newline="\n")
         p = run_govkit("adopt", "--target", str(t), "--write")
         check(f"[aRF-13 AC1] a `path` with a {tag} is refused at exit 1, naming the [[own]] row",
               p.returncode == 1 and "[[own]] row 1" in p.stdout and said in p.stdout
               and not (t / ".governance" / "install.json").exists(), p.stdout + p.stderr)
     # AC2 — `implements` naming a seed source refuses, naming the role that owns those bytes.
-    t = build_target("own-ac2", f"{PFX}demo/seed.txt", "demo:seed.txt", OWN_RUN)
+    t = build_own_target("own-ac2", f"{PFX}demo/seed.txt", "demo:seed.txt", OWN_RUN)
     p = run_govkit("adopt", "--target", str(t), "--write")
     check("[aRF-13 AC2] an [[own]] row implementing a seed source is refused, naming `seed`",
           p.returncode == 1 and "ships as seed" in p.stdout, p.stdout + p.stderr)
-    t = build_target("own-ac2r", f"{PFX}demo/tpl.md", "demo:tpl.md", OWN_RUN)
+    t = build_own_target("own-ac2r", f"{PFX}demo/tpl.md", "demo:tpl.md", OWN_RUN)
     p = run_govkit("adopt", "--target", str(t), "--write")
     check("[aRF-13 AC2] ...and one whose source a rendered rule reaches beside an engine one",
           p.returncode == 1 and "ships as rendered" in p.stdout, p.stdout + p.stderr)
 
     # The owned program keeps `alpha` and the probe, and LACKS `beta`: one clause of two fails.
     lacking = "alpha = 1\n\nif __name__ == '__main__':\n    print('hello')\n"
-    t = build_target("own-main", f"{PFX}demo/run.py", "demo:run.py", lacking)
+    t = build_own_target("own-main", f"{PFX}demo/run.py", "demo:run.py", lacking)
     p = run_govkit("adopt", "--target", str(t), "--write")
     rec = json.loads((t / ".governance" / "install.json").read_text(encoding="utf-8"))
     row = next((f for f in rec["files"] if f["path"] == f"{PFX}demo/run.py"), {})
@@ -1358,7 +1377,7 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
     git(g, "commit", "-qam", "gov moves")
     head = subprocess.run(["git", "-C", str(g), "rev-parse", "HEAD"], capture_output=True,
                           text=True, encoding="utf-8").stdout.strip()
-    ctl = build_target("own-ac4", f"{PFX}demo/run.py", "demo:run.py", lacking)
+    ctl = build_own_target("own-ac4", f"{PFX}demo/run.py", "demo:run.py", lacking)
     shutil.copy2(rp, ctl / ".governance" / "install.json")
     shutil.copy2(t / ".governance" / "install.sums", ctl / ".governance" / "install.sums")
     p = run_govkit("update", "--target", str(t), "--write")
@@ -1414,6 +1433,7 @@ def check_apply_owned(tmp: pathlib.Path) -> None:
     (g / PFX / "demo").mkdir(parents=True)
     shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
     shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+    shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
     (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(SAFE_REG, encoding="utf-8", newline="\n")
     for name, body in (("kit.toml", OWN_KIT), ("run.py", OWN_RUN), ("seed.txt", "seed\n"),
                        ("use.py", "from run import alpha, beta\n"), ("tpl.md", "tpl\n")):
@@ -1428,7 +1448,7 @@ def check_apply_owned(tmp: pathlib.Path) -> None:
 
     # AC1 — adopt records the owned row, then `apply --resume` must leave its bytes and role alone.
     lacking = "alpha = 1\n\nif __name__ == '__main__':\n    print('hello')\n"
-    t = make_target(tmp / "own", OWN_DEPLOY.format(path=f"{PFX}demo/run.py", impl="demo:run.py"))
+    t = build_target(tmp / "own", OWN_DEPLOY.format(path=f"{PFX}demo/run.py", impl="demo:run.py"))
     (t / PFX / "demo").mkdir(parents=True)
     (t / "docs").mkdir()
     for f in ("use.py", "seed.txt", "tpl.md"):
@@ -1481,7 +1501,7 @@ def check_apply_owned(tmp: pathlib.Path) -> None:
 
     # DEPL-aRepatriatedFork-21 S2, closing review round 1 residual (e). A FIRST apply over an owning
     # target has no receipt row to carry, so it builds one; the row carries every key adopt's does.
-    f1 = make_target(tmp / "first", OWN_DEPLOY.format(path=f"{PFX}demo/run.py", impl="demo:run.py"))
+    f1 = build_target(tmp / "first", OWN_DEPLOY.format(path=f"{PFX}demo/run.py", impl="demo:run.py"))
     (f1 / PFX / "demo").mkdir(parents=True)
     (f1 / PFX / "demo" / "run.py").write_text(lacking, encoding="utf-8", newline="\n")
     settle(f1, "the target's own program")
@@ -1493,7 +1513,7 @@ def check_apply_owned(tmp: pathlib.Path) -> None:
           and frow.get("oid") == (adopted or {}).get("oid"), json.dumps(frow) + p.stdout[-600:])
 
     # AC4 — no [[own]] rows: gov's run.py lands as `engine` and no owned skip is printed.
-    n = make_target(tmp / "non", SAFE_DEPLOY)
+    n = build_target(tmp / "non", SAFE_DEPLOY)
     run_govkit("apply", "--target", str(n))
     (n / "docs").mkdir()
     (n / "docs" / "tpl.md").write_text("tpl\n", encoding="utf-8", newline="\n")
@@ -1730,10 +1750,9 @@ def check_update_safety(tmp: pathlib.Path) -> None:
         (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
         shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
         shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+        shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
         (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_bytes(SAFE_REG.encode("utf-8"))
-        for a in (("init", "-q", "-b", "main"), ("config", "user.email", "t@e"),
-                  ("config", "user.name", "t"), ("config", "core.autocrlf", "false")):
-            git(g, *a)
+        build_scratch_gov(g)  # TOOL-dSafePassage-26 S19: the factory lifted from here
         return g, write_gov17(g, kit, files, "A")
 
     def run_gov17(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
@@ -1741,7 +1760,7 @@ def check_update_safety(tmp: pathlib.Path) -> None:
                               capture_output=True, text=True, encoding="utf-8", env=env)
 
     def build_target17(g: pathlib.Path, tag: str) -> pathlib.Path:
-        t = make_target(tmp / f"{tag}-t", SAFE_DEPLOY)
+        t = build_target(tmp / f"{tag}-t", SAFE_DEPLOY)
         p = run_gov17(g, "apply", "--target", str(t))
         check(f"[aRF-17] the {tag} fixture installs, or every arm over it grades nothing",
               p.returncode == 0, p.stdout[-900:] + p.stderr[-600:])
@@ -2108,6 +2127,35 @@ def check_update_safety(tmp: pathlib.Path) -> None:
         check(f"[aHI-4 {_ht}] ...and the run fails rather than re-stamping",
               p.returncode == 1 and "NOT re-stamped" in p.stdout, p.stdout[-800:])
 
+    # ---- TOOL-dSafePassage-35 AC1. A scratch gov whose kit plants an `lf_pin` and a `project-owned`
+    # ---- rule beside an engine file: gov's plan destinations, and so the step gate's `file` class,
+    # ---- hold the engine file and neither `order` row. The plan holding both rows, with nothing
+    # ---- missing, is the liveness: a filter on `missing` alone admits them.
+    kit_p1 = (SAFE_HEAD + 'version_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n'
+              '[[files]]\ninclude = ["eng.txt"]\nrole = "engine"\n\n'
+              '[[files]]\ninclude = ["own.md"]\nrole = "project-owned"\n\n'
+              '[[lf_pin]]\npattern = "{kit}/*.sh"\nwhy = "a fixture pin"\n\n'
+              '[adopt]\nargv = []\nmutates_index = false\n')
+    g, _p1a = build_gov17("p1", kit_p1, {"eng.txt": "e\n", "own.md": "o\n"})
+    (g / ".governance").mkdir(exist_ok=True)
+    (g / ".governance" / "deploy.toml").write_text(SAFE_DEPLOY, encoding="utf-8", newline="\n")
+    sys.path.insert(0, str(HERE))
+    import step_gate  # noqa: E402, PLC0415
+    _p1g = step_gate.gk
+    _p1r = _p1g.Report()
+    _p1reg = _p1g.load_registry(g)
+    _p1ds = _p1g.read_descriptors(g, _p1reg, _p1r)
+    _p1dp = _p1g.load_deploy(g)
+    _p1plan = _p1g.planned_writes(g, g, _p1dp, _p1ds, _p1g.resolve_selection(_p1reg, _p1ds, "default", [], _p1dp), _p1r)
+    _p1o = {p["dest"] for p in _p1plan if p["kind"] == "order" and not p["missing"]}
+    _p1d = set(_p1g.read_plan_destinations(g))
+    _p1m = step_gate.read_file_members(g)
+    check("[dSP-35] AC1 a planted lf_pin and project-owned rule are plan rows, and neither joins the "
+          "plan destinations or the file class, the engine file does",
+          {f"{PFX}demo/own.md", f".gitattributes:{PFX}demo/*.sh"} <= _p1o and _p1d == {f"{PFX}demo/eng.txt"}
+          and _p1m == {"{prefix}/demo/eng.txt"}, f"order rows {sorted(_p1o)}; destinations {sorted(_p1d)}; "
+          f"members {sorted(_p1m)}")
+
     # ---- DEPL-aHalvedInstall-5 AC1-AC3. The two refusal channels unit 4's held set missed: the
     # ---- classification walk (a receipt row whose role the dispatch refuses) and the landing loop (a
     # ---- source new this vintage whose destination the target occupies) — each with a changed clean
@@ -2322,7 +2370,7 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     old = "".join(f"line {i}\n" for i in range(20))
     g, a1 = build_gov17("sp", kit_cf, {"prog.py": old, "other.py": old})
     write_gov17(g, kit_cf, {"prog.py": "".join(f"mid {i}\n" for i in range(20))}, "A2")
-    t = make_target(tmp / "sp-t", SAFE_DEPLOY)
+    t = build_target(tmp / "sp-t", SAFE_DEPLOY)
     (t / PFX / "demo").mkdir(parents=True)
     (t / PFX / "demo" / "prog.py").write_bytes(old.replace("line 7\n", "line seven\n").encode())
     (t / PFX / "demo" / "other.py").write_bytes(
@@ -2407,6 +2455,7 @@ def measure_mode_carry(tmp: pathlib.Path, source: str, arms: set) -> dict:
         (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
         (g / PFX / KIT_NAMES["govkit"] / "govkit.py").write_bytes(source.encode("utf-8"))
         shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")
+        shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
         (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_bytes(SAFE_REG.encode("utf-8"))
         for a in (("init", "-q", "-b", "main"), ("config", "user.email", "t@e"),
                   ("config", "user.name", "t"), ("config", "core.autocrlf", "false")):
@@ -2418,8 +2467,8 @@ def measure_mode_carry(tmp: pathlib.Path, source: str, arms: set) -> dict:
         return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), *args],
                               capture_output=True, text=True, encoding="utf-8", env=e)
 
-    def build_target(g: pathlib.Path, tag: str) -> pathlib.Path:
-        t = make_target(tmp / f"{tag}-t", SAFE_DEPLOY)
+    def build_levelled_target(g: pathlib.Path, tag: str) -> pathlib.Path:
+        t = build_target(tmp / f"{tag}-t", SAFE_DEPLOY)
         p = run_gov(g, "apply", "--target", str(t))
         add_result("LIVE", f"[aLC-1] the {tag} fixture installs", p.returncode == 0,
                    p.stdout[-900:] + p.stderr[-600:])
@@ -2440,7 +2489,7 @@ def measure_mode_carry(tmp: pathlib.Path, source: str, arms: set) -> dict:
                '[[files]]\ninclude = ["seed.txt"]\nrole = "seed"\n\n' + tail)
         g, _a = build_gov("cm", kit, {"hook.sh": "#!/bin/sh\necho hook\n", "own.sh": "own v1\n",
                                       "both.sh": "both v1\n", "seed.txt": "seed\n", "a.txt": "a\n"})
-        t = build_target(g, "cm")
+        t = build_levelled_target(g, "cm")
         os.chmod(t / kp / "own.sh", (t / kp / "own.sh").stat().st_mode | 0o111)
         git(t, "update-index", "--chmod=+x", "--", kp + "own.sh")
         settle(t, "the adopter makes own.sh executable")
@@ -2505,7 +2554,7 @@ def measure_mode_carry(tmp: pathlib.Path, source: str, arms: set) -> dict:
                '[[files]]\ninclude = "**"\nrole = "engine"\n\n' + tail)
         chk = "! git ls-files -s \"$(dirname \"$0\")/hook.sh\" | grep -q '^100755'\n"
         g, _a = build_gov("rb", kit, {"hook.sh": "#!/bin/sh\necho hook\n", "check.sh": chk})
-        t = build_target(g, "rb")
+        t = build_levelled_target(g, "rb")
         write_gov(g, kit, {}, ("hook.sh",), "B")
         p = run_gov(g, "update", "--target", str(t), "--write")
         add_result("LIVE", "[aLC-1] LIVENESS the rb run decided a mode carry",
@@ -2525,7 +2574,7 @@ def measure_mode_carry(tmp: pathlib.Path, source: str, arms: set) -> dict:
         g, _a = build_gov("nd", kit, {"ren.sh": "ren 1\nren 2\nren 3\nren 4\n",
                                       "div.sh": "div 1\ndiv 2\ndiv 3\ndiv 4\n",
                                       "mis.sh": "mis v1\n", "sta.sh": "sta v1\n"})
-        t = build_target(g, "nd")
+        t = build_levelled_target(g, "nd")
         for rel in ("ren.sh", "div.sh", "mis.sh", "sta.sh"):
             os.chmod(t / kp / rel, (t / kp / rel).stat().st_mode | 0o111)
             git(t, "update-index", "--chmod=+x", "--", kp + rel)
@@ -2801,7 +2850,7 @@ def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = 
             encoding="utf-8"))["config"]["defaults"]["GATE_FILE"]
         deploy = (DEPLOY_REGISTRY_DEFAULT.replace("[answers]\n", '[answers]\ngate_file = "%s"\n' % gate_file)
                   .rstrip("\n") + "\n" + "\n".join(lines) + "\n")
-    t = make_target(pathlib.Path(tmp) / ("roles-runner" if runner else "roles-default" if charter
+    t = build_target(pathlib.Path(tmp) / ("roles-runner" if runner else "roles-default" if charter
                                          else "roles-no-doc"), deploy)
     # The seed's CHARTER, read from the memory-tree kit's own conf example rather than typed.
     doc = _re.findall(r'^CHARTER="?([^"\n]*)"?', (KIT_DIRS["memory-tree"] / ".memory-tree.conf.example")
@@ -2873,6 +2922,2636 @@ def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = 
               for ln in lines), str(lines))
 
 
+# ================= TOOL-dSafePassage-1 — THE UPGRADE-STEP KIND, ITS READER AND ITS LEG =================
+# Every arm builds its own scratch gov: the engine and the step reader copied beside a registry and
+# descriptors written here, on a `main` branch with no remote, so the landed ref is the local `main`.
+STEPS_ENV = {k: v for k, v in os.environ.items() if k not in ("GOV_REMOTE", "GATE_PUSH_BASE")}
+STEPS_ENV.update(GOV_DEFAULT_BRANCH="main", GOVKIT_NO_REMOTE_PROBE="1")
+
+
+def build_steps_gov(g: pathlib.Path, files: dict) -> str:
+    """A scratch gov for TOOL-dSafePassage-1's arms: `govkit.py`, `upgrade_steps.py` and
+    `adopters.toml` copied, then `files` (paths under the install prefix), committed on `main`.
+    Returns the commit."""
+    gk = g / PFX / KIT_NAMES["govkit"]
+    gk.mkdir(parents=True, exist_ok=True)
+    for name in ("govkit.py", "upgrade_steps.py", "adopters.toml"):
+        shutil.copy2(GOVKIT.parent / name, gk / name)
+    for rel, body in files.items():
+        (g / PFX / rel).parent.mkdir(parents=True, exist_ok=True)
+        (g / PFX / rel).write_bytes(body.encode("utf-8"))
+    for a in (("init", "-q", "-b", "main"), ("config", "user.email", "t@e"),
+              ("config", "user.name", "t"), ("config", "core.autocrlf", "false")):
+        git(g, *a)
+    settle(g, "base")
+    return run_gov_git(g, "rev-parse", "HEAD")
+
+
+def check_upgrade_steps(tmp: pathlib.Path) -> None:
+    """TOOL-dSafePassage-1 AC1 AC2 AC3 AC4 AC5 AC16 — the step reader, its derived commit and order,
+    and the frozen leg, each planted case on its own scratch gov and each observed against a control
+    that stays green, so a reader that refused everything fails the controls."""
+    gkn = KIT_NAMES["govkit"]
+    prog = "{gov}/" + gkn + "/steps/s1.py"
+
+    def render_row(sid: str, extra: str = "", argv0: str = "python", program: str = prog,
+                   surfaces: str = '["conf-key:.demo.conf#KEY"]') -> str:
+        return (f'\n[[upgrade]]\nid = "{sid}"\n'
+                + "".join(f'{k} = ["{argv0}", "{program}", "{k}", "{{target}}"]\n'
+                          for k in ("up", "down", "witness"))
+                + f"surfaces = {surfaces}\nneeds-target = false\n{extra}")
+
+    reg = ('[surface]\nglobs = ["{prefix}/*"]\n\n'
+           '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+           '[[entry]]\nid = "other"\ndescriptor = "{prefix}/other/kit.toml"\n')
+    demo_head, other = 'id = "demo"\nhome = "demo"\n', 'id = "other"\nhome = "other"\n'
+    files = {f"{gkn}/registry.toml": reg, "demo/kit.toml": demo_head, "other/kit.toml": other,
+             f"{gkn}/steps/s1.py": "print('s1')\n", f"{gkn}/steps.toml": "# steps\n"}
+
+    def run_steps(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, str(g / PFX / gkn / "upgrade_steps.py"), *args],
+                              capture_output=True, text=True, encoding="utf-8", env=STEPS_ENV)
+
+    def write_file(g: pathlib.Path, rel: str, body: str) -> None:
+        (g / PFX / rel).write_bytes(body.encode("utf-8"))
+
+    def read_listed(out: str) -> list:
+        return [ln.split(" · ") for ln in out.splitlines()
+                if ln.startswith("upgrade-steps: ") and ln.split(" · ")[0][len("upgrade-steps: "):].isdigit()]
+
+    # ---- AC1: one commit adds a steps-file row and a descriptor row; the steps-file row is first.
+    g = tmp / "sp-order"
+    build_steps_gov(g, files)
+    write_file(g, "demo/kit.toml", demo_head + render_row("demo/one"))
+    write_file(g, f"{gkn}/steps.toml", "# steps\n" + render_row("lib/one"))
+    settle(g, "both rows")
+    head = run_gov_git(g, "rev-parse", "HEAD")
+    p = run_steps(g, "list")
+    rows = read_listed(p.stdout)
+    check("[dSP-1 AC1] one commit landing a steps-file row and a descriptor row lists the steps-file row first",
+          p.returncode == 0 and [r[1] for r in rows] == ["lib/one", "demo/one"]
+          and all(r[2] == head for r in rows) and rows[1][3] == f"{PFX}demo/kit.toml",
+          p.stdout + p.stderr)
+
+    # ---- TOOL-dSafePassage-26 AC36: a descriptor that moved, the registry naming its new path,
+    # ---- keeps its row's introducing commit at the first commit holding it at the old path; a
+    # ---- shallow clone, whose history is cut, refuses at exit 2 naming the remedy.
+    g = tmp / "sp-moved"
+    build_steps_gov(g, {**files, "demo/kit.toml": demo_head + render_row("demo/one")})
+    first = run_gov_git(g, "rev-parse", "HEAD")
+    (g / PFX / "demo" / "conf").mkdir()
+    git(g, "mv", f"{PFX}demo/kit.toml", f"{PFX}demo/conf/kit.toml")
+    write_file(g, f"{gkn}/registry.toml", reg.replace('"{prefix}/demo/kit.toml"', '"{prefix}/demo/conf/kit.toml"'))
+    settle(g, "the descriptor moves")
+    p = run_steps(g, "list")
+    rows = read_listed(p.stdout)
+    check("[dSP-26 AC36] a moved descriptor's row is introduced at the first commit holding it at its old path",
+          p.returncode == 0 and [r[1:3] for r in rows] == [["demo/one", first]], p.stdout + p.stderr)
+    shallow = tmp / "sp-shallow"
+    git(tmp, "clone", "-q", "--depth", "1", "--no-local", g.as_uri(), shallow.name)
+    p = run_steps(shallow, "list")
+    check("[dSP-26 AC36] a shallow clone's list exits 2 naming git fetch --unshallow",
+          p.returncode == 2 and "git fetch --unshallow" in p.stderr, f"rc={p.returncode} " + p.stdout + p.stderr)
+
+    # ---- AC2: each planted row exits 2 naming its file, row and key; the control lists green.
+    g = tmp / "sp-refuse"
+    build_steps_gov(g, {**files, "demo/kit.toml": demo_head + render_row("demo/first")})
+    p = run_steps(g, "list")
+    check("[dSP-1 AC2] CONTROL a well-formed row lists at exit 0",
+          p.returncode == 0 and "demo/first" in p.stdout, p.stdout + p.stderr)
+    kit = f"{PFX}demo/kit.toml [[upgrade]] row"
+    planted = (
+        ("an unknown key", "demo/kit.toml", demo_head + render_row("demo/first", "bogus = 1\n"), f"{kit} 1 key bogus"),
+        ("an authored introduced", "demo/kit.toml", demo_head + render_row("demo/first", 'introduced = "abc"\n'),
+         f"{kit} 1 key introduced"),
+        ("a {bogus} placeholder", "demo/kit.toml", demo_head + render_row("demo/first", program="{bogus}/s1.py"),
+         f"{kit} 1 key up"),
+        ("argv[0] node", "demo/kit.toml", demo_head + render_row("demo/first", argv0="node"), f"{kit} 1 key up"),
+        ("an untracked {gov}/ program", "demo/kit.toml",
+         demo_head + render_row("demo/first", program="{gov}/" + gkn + "/steps/nope.py"), f"{kit} 1 key up"),
+        ("a duplicate id", "demo/kit.toml", demo_head + render_row("demo/first") + render_row("demo/first"),
+         f"{kit} 2 key id"),
+        ("another entry's id in a descriptor", "demo/kit.toml", demo_head + render_row("other/x"), f"{kit} 1 key id"),
+        ("a registry entry's id in the steps file", f"{gkn}/steps.toml", "# steps\n" + render_row("demo/y"),
+         f"{PFX}{gkn}/steps.toml [[upgrade]] row 1 key id"),
+        ("a surfaces item with no colon", "demo/kit.toml", demo_head + render_row("demo/first", surfaces='["nocolon"]'),
+         f"{kit} 1 key surfaces"),
+        ("a [[retired]] successor that is not live", f"{gkn}/registry.toml",
+         reg + '\n[[retired]]\nid = "gone"\nsuccessor = "nosuch"\nsurfaces = []\n',
+         f"{PFX}{gkn}/registry.toml [[retired]] row 1 key successor"),
+        ("an id that is not <entry>/<slug>", "demo/kit.toml", demo_head + render_row("demo/Bad_Slug"),
+         f"{kit} 1 key id"),
+        ("a row with no witness", "demo/kit.toml",
+         demo_head + render_row("demo/first").replace('witness = ["python", "' + prog + '", "witness", "{target}"]\n', ""),
+         f"{kit} 1 key witness"),
+        ("a needs-target that is no bool", "demo/kit.toml",
+         demo_head + render_row("demo/first").replace("needs-target = false", 'needs-target = "no"'),
+         f"{kit} 1 key needs-target"),
+        ("a descriptor that is not TOML", "demo/kit.toml", demo_head + "[[upgrade]\n",
+         f"{PFX}demo/kit.toml: not valid TOML"),
+        ("a [[retired]] id still live", f"{gkn}/registry.toml",
+         reg + '\n[[retired]]\nid = "demo"\nsuccessor = "none"\nsurfaces = []\n',
+         f"{PFX}{gkn}/registry.toml [[retired]] row 1 key id"),
+        ("an authored retired commit", f"{gkn}/registry.toml",
+         reg + '\n[[retired]]\nid = "gone"\nsuccessor = "none"\nsurfaces = []\nretired = "abc"\n',
+         f"{PFX}{gkn}/registry.toml [[retired]] row 1 key retired"),
+        ("a step retired to an entry", f"{gkn}/registry.toml",
+         reg + '\n[[retired]]\nid = "demo/old"\nsuccessor = "other"\nsurfaces = []\n',
+         f"{PFX}{gkn}/registry.toml [[retired]] row 1 key successor"),
+        ("a descriptor the registry names and the tree lacks", f"{gkn}/registry.toml",
+         reg + '\n[[entry]]\nid = "ghost"\ndescriptor = "{prefix}/ghost/kit.toml"\n',
+         f"{PFX}ghost/kit.toml: the registry names this descriptor for 'ghost' and it is absent"),
+        ("an `upgrade` that is no array of tables", "demo/kit.toml", "upgrade = 1\n" + demo_head,
+         f"{PFX}demo/kit.toml: `upgrade` at the working tree is not an array of tables"),
+        ("an argv that is a string", "demo/kit.toml",
+         demo_head + render_row("demo/first").replace('up = ["python", "' + prog + '", "up", "{target}"]', 'up = "python x"'),
+         f"{kit} 1 key up: an argv is a non-empty list"),
+        ("a row with no surfaces", "demo/kit.toml",
+         demo_head + render_row("demo/first").replace('surfaces = ["conf-key:.demo.conf#KEY"]\n', ""),
+         f"{kit} 1 key surfaces: required"),
+        ("a [[retired]] row with no surfaces", f"{gkn}/registry.toml",
+         reg + '\n[[retired]]\nid = "gone"\nsuccessor = "none"\n',
+         f"{PFX}{gkn}/registry.toml [[retired]] row 1 key surfaces: required"),
+        ("an unknown [[retired]] key", f"{gkn}/registry.toml",
+         reg + '\n[[retired]]\nid = "gone"\nsuccessor = "none"\nsurfaces = []\nbogus = 1\n',
+         f"{PFX}{gkn}/registry.toml [[retired]] row 1 key bogus"),
+        ("a [[retired]] successor that is no string", f"{gkn}/registry.toml",
+         reg + '\n[[retired]]\nid = "gone"\nsuccessor = 1\nsurfaces = []\n',
+         f"{PFX}{gkn}/registry.toml [[retired]] row 1 key successor: required"),
+        # TOOL-dSafePassage-26 AC9: `{to}` resolves in a down alone, so an up holding it is refused.
+        ("a {to} in an up argv", "demo/kit.toml",
+         demo_head + render_row("demo/first").replace('"up", "{target}"]', '"up", "{target}", "{to}"]'),
+         f"{kit} 1 key up: '{{to}}' carries {{to}}, which resolves only in a step's down"),
+    )
+    for label, rel, body, want in planted:
+        write_file(g, rel, body)
+        p = run_steps(g, "list")
+        check(f"[dSP-1 AC2] {label} exits 2 naming its file, row and key",
+              p.returncode == 2 and want in p.stderr, f"rc={p.returncode} " + p.stdout + p.stderr)
+        git(g, "checkout", "-q", "--", ".")
+    # ---- TOOL-dSafePassage-17 AC1: `reverted` is "down-exit" or an argv; any other value is refused.
+    for value, want_rc in (('"maybe"', 2), ('"down-exit"', 0), ('["python", "' + prog + '", "reverted", "{target}"]', 0)):
+        write_file(g, "demo/kit.toml", demo_head + render_row("demo/first", f"reverted = {value}\n"))
+        p = run_steps(g, "list")
+        check(f"[dSP-17 AC1] reverted = {value} exits {want_rc}" + (" naming its file, row and key" if want_rc else ""),
+              p.returncode == want_rc and (not want_rc or f"{kit} 1 key reverted" in p.stderr),
+              f"rc={p.returncode} " + p.stdout + p.stderr)
+        git(g, "checkout", "-q", "--", ".")
+    p = subprocess.run([sys.executable, str(g / PFX / gkn / "upgrade_steps.py"), "list"], capture_output=True,
+                       text=True, encoding="utf-8", env={**STEPS_ENV, "GOV_REMOTE": "nosuch"})
+    check("[dSP-1 S3] a remote ladder that refuses refuses `list`, naming GOV_REMOTE, at exit 2",
+          p.returncode == 2 and "GOV_REMOTE names nosuch" in p.stderr, p.stdout + p.stderr)
+
+    # ---- The reader's refusals no planted row reaches, called in process on this scratch gov.
+    steps = govkit_module().upgrade_steps
+
+    def read_refusal(call) -> str:
+        try:
+            call()
+        except steps.Refusal as e:
+            return str(e)
+        return ""
+
+    empty_tree = subprocess.run(["git", "-C", str(g), "mktree"], input="", capture_output=True,
+                                text=True, encoding="utf-8").stdout.strip()
+    bare = subprocess.run(["git", "-C", str(g), "commit-tree", empty_tree, "-m", "no registry"],
+                          capture_output=True, text=True, encoding="utf-8").stdout.strip()
+    check("[dSP-1 S3] a revision that names no commit is refused",
+          "names no commit" in read_refusal(lambda: steps.read_steps(g, "no-such-rev", None)))
+    check("[dSP-1 S3] a revision holding no registry is refused, never read as an empty population",
+          "no registry at" in read_refusal(lambda: steps.read_steps(g, bare, None)), bare)
+    check("[dSP-1 S3] a landed ref git cannot walk is refused, never read as every row unlanded",
+          "git log over no-such-ref failed" in read_refusal(
+              lambda: steps.derive_introduced(g, "no-such-ref", [f"{PFX}demo/kit.toml"], "upgrade", ["demo/first"])))
+    check("[dSP-1 S3] a malformed step id has no before-image path",
+          "is not a step id" in read_refusal(lambda: steps.derive_image_path(g, "nope")))
+    check("[dSP-1 S3] a before-image path climbing out of the target is refused",
+          "is not a path inside the target" in read_refusal(lambda: steps.check_contained(g, "../x")))
+    # TOOL-dSafePassage-76 AC1: no before-image path inside the git directory, by a `.git` segment in
+    # any case with trailing dots or spaces, or by where it resolves, a separate git directory's too.
+    t76, s76 = tmp / "sp76-t", tmp / "sp76-sep"
+    subprocess.run(["git", "init", "-q", str(t76)], env=steps.build_tree_git_env(), capture_output=True, check=True)
+    subprocess.run(["git", "init", "-q", f"--separate-git-dir={s76 / 'gd'}", str(s76)],
+                   env=steps.build_tree_git_env(), capture_output=True, check=True)
+    for rel76 in (".git/hooks/post-checkout", ".GIT/config", ".git./x", ".git /x"):
+        got76 = read_refusal(lambda rel76=rel76: steps.check_contained(t76, rel76))
+        check(f"[dSP-76] a before-image path {rel76!r} inside the git directory is refused, naming it",
+              "inside the repository's git directory" in got76 and repr(rel76) in got76, got76)
+    check("[dSP-76] a plain before-image path inside the target is not refused",
+          read_refusal(lambda: steps.check_contained(t76, "docs/a.md")) == "")
+    got76 = read_refusal(lambda: steps.check_contained(s76, "gd/config"))
+    check("[dSP-76] a path inside a separate git directory is refused, naming that directory",
+          "inside the repository's git directory" in got76 and (s76 / "gd").resolve().as_posix() in got76, got76)
+    # S3's one parse: a working-tree image that does not parse is a refusal naming it, never a traceback.
+    (t76 / ".governance" / "steps" / "demo").mkdir(parents=True)
+    (t76 / ".governance" / "steps" / "demo" / "first.before.json").write_text("not json\n", encoding="utf-8")
+    got76 = read_refusal(lambda: steps.read_image_paths(t76, "demo/first"))
+    check("[dSP-76] a before-image that does not parse is refused by read_image_paths, naming it",
+          ".governance/steps/demo/first.before.json does not parse" in got76, got76)
+    check("[dSP-1 S3] a value with no TOML scalar spelling is refused",
+          "no TOML scalar spelling" in read_refusal(lambda: steps.render_toml_scalar([1])))
+    im = tmp / "sp-image"
+    (im / ".governance" / "steps" / "demo").mkdir(parents=True)
+    (im / ".governance" / "steps" / "demo" / "first.before.json").write_text(
+        json.dumps({"step": "demo/first", "paths": {"a.txt": {"before": None, "after": "0" * 64}}}),
+        encoding="utf-8", newline="\n")
+    check("[dSP-1 S3] a re-run computing another after-state than the image records is refused",
+          "would not converge" in read_refusal(lambda: steps.write_before_image(im, "demo/first",
+                                                                                lambda before: {"a.txt": b"x"})))
+
+    # TOOL-dSafePassage-74 AC2: a single-quoted step row and a single-quoted [[retired]] row, both
+    # committed after a double-quoted control row, each read at its committing sha, never unlanded.
+    g = tmp / "sp-quotes"
+    first = build_steps_gov(g, {**files, "demo/kit.toml": demo_head + render_row("demo/first")})
+    write_file(g, "demo/kit.toml", demo_head + render_row("demo/first")
+               + render_row("demo/single").replace('id = "demo/single"', "id = 'demo/single'"))
+    write_file(g, f"{gkn}/registry.toml", reg + "\n[[retired]]\nid = 'gone'\nsuccessor = \"none\"\nsurfaces = []\n")
+    settle(g, "single-quoted rows")
+    second = run_gov_git(g, "rev-parse", "HEAD")
+    got74 = [(r.id, r.introduced) for r in steps.read_steps(g, "HEAD", "main")]
+    check("[dSP-74] AC2 a single-quoted step row reads its committing sha, ordered after the earlier row",
+          got74 == [("demo/first", first), ("demo/single", second)], str(got74))
+    got74 = [(r.id, r.retired) for r in steps.read_retired(g, "HEAD", "main")]
+    check("[dSP-74] AC2 a single-quoted [[retired]] row reads its committing sha",
+          got74 == [("gone", second)], str(got74))
+    # TOOL-dSafePassage-87 AC6: an id whose slash is a TOML unicode escape and a multi-line literal id,
+    # neither of whose raw text a quote-widened pre-filter finds, each read the commit that added them;
+    # a staged copy carrying that pre-filter reads both unlanded, so the first check reds under it.
+    write_file(g, "demo/kit.toml", demo_head + render_row("demo/first")
+               + render_row("demo/single").replace('id = "demo/single"', "id = 'demo/single'")
+               + render_row("demo/esc").replace('id = "demo/esc"', 'id = "demo\\u002Fesc"')
+               + render_row("demo/ml").replace('id = "demo/ml"', "id = '''\ndemo/ml'''"))
+    settle(g, "an escaped and a multi-line literal row")
+    third = run_gov_git(g, "rev-parse", "HEAD")
+    got87 = [(r.id, r.introduced) for r in steps.read_steps(g, "HEAD", "main")][-2:]
+    check("[dSP-87 AC6] an escaped id and a multi-line literal id each read the commit that added them",
+          got87 == [("demo/esc", third), ("demo/ml", third)], str(got87))
+    src87 = (HERE / "upgrade_steps.py").read_text(encoding="utf-8")
+    anchor87 = '                try:\n                    held = {r.get("id")'
+    mutant87 = "                if not any(f'\"{i}\"' in text or f\"'{i}'\" in text for i in want): continue\n"
+    spec87 = importlib.util.spec_from_file_location(
+        "us87_widened", build_staged_copy(tmp / "dsp87-quote-widened", src87.replace(anchor87, mutant87 + anchor87)))
+    us87 = importlib.util.module_from_spec(spec87)
+    spec87.loader.exec_module(us87)
+    got87 = [(r.id, r.introduced) for r in us87.read_steps(g, "HEAD", "main")][-2:]
+    check("[dSP-87 AC6] a copy carrying the quote-widened pre-filter reads both rows unlanded — reds",
+          src87.count(anchor87) == 1 and got87 == [("demo/esc", us87.UNLANDED), ("demo/ml", us87.UNLANDED)], str(got87))
+
+    # TOOL-dSafePassage-72 AC1 to AC5: one predicate answers containment for the step module and for
+    # govkit's destinations, and `check_contained` refuses a link on any existing segment before a
+    # read or write. A form that could leave the scratch tree reaches only `check_contained` and
+    # `read_image_paths`; the planted links point inside it. Not covered: a hard link, a device name.
+    bs = "\\"
+    bad72 = [".." + bs + "E.txt", bs + "Windows" + bs + "x", bs + bs + "srv" + bs + "share" + bs + "x", "C:x",
+             "C:/x", "ab:c", "x/a:b", "/x", "../x", "a/../../x", "..", "", ".", "a/.."]
+    got72 = ([r for r in bad72 if steps.derive_contained_rel(r) is not None],
+             [steps.derive_contained_rel(r) for r in ("a/b", "a" + bs + "b", "a/../b")])
+    check("[dSP-72] AC1 derive_contained_rel refuses every escaping form and normalises a contained one",
+          got72 == ([], ["a/b", "a/b", "b"]), str(got72))
+    gk72 = govkit_module()
+    leaked72 = [d for d in bad72 if "leaves the target repository" not in read_refusal(
+        lambda d=d: gk72.demand_contained_dest(d, "selftest"))]
+    check("[dSP-72] AC2 demand_contained_dest refuses every escaping form and returns a contained one",
+          leaked72 == [] and gk72.demand_contained_dest("a/b", "selftest") == "a/b", str(leaked72))
+
+    def write_image72(t: pathlib.Path, step: str, paths: dict) -> None:
+        img = t / ".governance" / "steps" / step.split("/")[0] / f"{step.split('/')[1]}.before.json"
+        img.parent.mkdir(parents=True, exist_ok=True)
+        img.write_text(json.dumps({"step": step, "paths": paths}), encoding="utf-8", newline="\n")
+
+    pwned = {"before": base64.b64encode(b"pwned\n").decode(), "after": None}
+    lexical72 = [".." + bs + "ESCAPED.txt", bs + "rooted.txt", bs + bs + "localhost" + bs + "c$" + bs + "unc.txt"]
+    odd72 = ["a" + chr(0) + "b/x.txt"] + (["a?b/x.txt", "a|b/x.txt"] if os.name == "nt" else [])
+    for n, rel in enumerate(lexical72 + odd72):
+        t72 = tmp / "dsp72-forms" / f"c{n}" / "target"
+        write_image72(t72, "demo/first", {rel: pwned})
+        want = "is not a path inside the target" if rel in lexical72 else "does not read as a path on this node"
+        got = [read_refusal(lambda: steps.check_contained(t72, rel)),
+               read_refusal(lambda: steps.read_image_paths(t72, "demo/first"))]
+        check(f"[dSP-72] AC3 {rel!r} is refused by check_contained and read_image_paths, {want!r}",
+              all(want in g for g in got), str(got))
+
+    def write_link72(link: pathlib.Path, to: pathlib.Path) -> None:
+        if os.name == "nt":
+            subprocess.run(["cmd", "/c", "mklink", "/J", str(link), str(to)], capture_output=True)
+        else:
+            os.symlink(to, link, target_is_directory=True)
+
+    root72 = tmp / "dsp72-links"
+    t72, out72 = root72 / "target", root72 / "outside"
+    for d in (t72 / "plain", out72, root72 / "gone-to"):
+        d.mkdir(parents=True)
+    (out72 / "secret.txt").write_bytes(b"secret\n")
+    write_link72(t72 / "lnk", out72)
+    write_link72(t72 / "gone", root72 / "gone-to")
+    (root72 / "gone-to").rmdir()
+    write_image72(t72, "demo/first", {"lnk/planted.txt": pwned})
+    down72 = read_refusal(lambda: steps.write_from_before_image(t72, "demo/first"))
+    check("[dSP-72] AC4 a down through a linked segment is refused naming it, writing nothing outside",
+          "lnk" in down72 and "reparse point" in down72 and not (out72 / "planted.txt").exists(), down72)
+    up72 = read_refusal(lambda: steps.write_before_image(t72, "demo/second",
+                                                         lambda before: {"lnk/secret.txt": b"x"}))
+    check("[dSP-72] AC4 an up naming a path through a link is refused and writes no image",
+          "lnk" in up72 and "reparse point" in up72
+          and not (t72 / ".governance/steps/demo/second.before.json").exists(), up72)
+    gone72 = read_refusal(lambda: steps.check_contained(t72, "gone/x.txt"))
+    check("[dSP-72] AC4 a dangling link is refused, never read as absent", "reparse point" in gone72, gone72)
+    t72b = root72 / "target-b"
+    t72b.mkdir()
+    write_link72(t72b / ".governance", out72)
+    img72 = read_refusal(lambda: steps.derive_image_path(t72b, "demo/first"))
+    check("[dSP-72] AC4 a before-image whose .governance is a link is refused naming it",
+          ".governance" in img72 and "reparse point" in img72, img72)
+    write_image72(t72, "demo/third", {"plain/f.txt": {"before": base64.b64encode(b"orig\n").decode(),
+                                                      "after": None}})
+    restored72 = steps.write_from_before_image(t72, "demo/third")
+    check("[dSP-72] AC4 control: a path under a plain directory restores, so the walk refuses only links",
+          restored72 == ["plain/f.txt"] and (t72 / "plain/f.txt").read_bytes() == b"orig\n",
+          str(restored72))
+    check("[dSP-72] AC4 outside/ holds only what was planted there",
+          sorted(p.name for p in out72.iterdir()) == ["secret.txt"], str(list(out72.iterdir())))
+    write_image72(t72, "demo/held", {"lnk/secret.txt": {"before": None, "after": None}})
+    handed72: list = []
+    held72 = read_refusal(lambda: steps.write_before_image(t72, "demo/held",
+                                                           lambda before: handed72.append(before) or {}))
+    check("[dSP-72] AC5 a held image's path through a link is refused before derive_after is handed it",
+          "lnk" in held72 and handed72 == [], held72)
+    # TOOL-dSafePassage-87 AC1: a `..` segment is refused even where it normalises inside, since the
+    # kernel resolves `lnk` before applying `..`, so the normalised form is not what a step opens.
+    for rel87 in ("a/../b", "lnk/../planted.txt"):
+        got87 = [read_refusal(lambda: steps.check_contained(t72, rel87))]
+        write_image72(t72, "demo/dotdot", {rel87: pwned})
+        got87.append(read_refusal(lambda: steps.read_image_paths(t72, "demo/dotdot")))
+        check(f"[dSP-87 AC1] {rel87!r} is refused by check_contained and read_image_paths for its '..' segment",
+              all("holds a '..' segment" in g for g in got87), str(got87))
+
+    # ---- AC3 and AC16: the commit is main's first-parent landing, never a branch commit.
+    g = tmp / "sp-land"
+    build_steps_gov(g, files)
+    write_file(g, "demo/kit.toml", demo_head + render_row("demo/first"))
+    settle(g, "first lands on main")
+    x = run_gov_git(g, "rev-parse", "HEAD")
+    git(g, "checkout", "-q", "-b", "feat")
+    write_file(g, f"{gkn}/steps.toml", "# steps\n" + render_row("lib/second", surfaces='["file:.second.txt"]'))
+    settle(g, "second on the branch")
+    git(g, "checkout", "-q", "main")
+    write_file(g, "other/kit.toml", other + "# main moves\n")
+    settle(g, "main moves")
+    git(g, "checkout", "-q", "feat")
+    git(g, "merge", "-q", "--no-ff", "-m", "main into feat", "main")
+    p = run_steps(g, "list")
+    got = {r[1]: r[2] for r in read_listed(p.stdout)}
+    check("[dSP-1 AC3] on a branch that merged main: the landed row reads main's commit, the branch's row unlanded",
+          got == {"demo/first": x, "lib/second": "unlanded"}, p.stdout + p.stderr)
+    p = run_steps(g, "list", "--window")
+    check("[dSP-1 AC16] a home only an unlanded step names prints open, a landed step's home closed",
+          "window: .second.txt · open" in p.stdout
+          and "window: .demo.conf · closed by demo/first" in p.stdout, p.stdout + p.stderr)
+
+    # ---- TOOL-dSafePassage-20 AC1 AC2 AC3: every output kind of the reader crosses the one writer.
+    for kind20, v20, want20 in (("a 40-hex commit", x, x), ("UNLANDED", steps.UNLANDED, None),
+                                ("None", None, None)):
+        check(f"[dSP-20 AC1] resolve_recorded_introduced maps {kind20} to {'itself' if want20 else 'None'}",
+              steps.resolve_recorded_introduced(v20) == want20)
+    check("[dSP-20 AC1] ...and refuses any other value, naming it",
+          "'main'" in read_refusal(lambda: steps.resolve_recorded_introduced("main")))
+    rec20 = {"schema": 4, "steps": []}
+    why20 = read_refusal(lambda: steps.set_step_state(rec20, "s1", steps.UNLANDED, "applied"))
+    first20 = [dict(r) for r in rec20["steps"]]
+    why20 += read_refusal(lambda: steps.set_step_state(rec20, "s1", x, "applied"))
+    check("[dSP-20 AC2] the writer records the reader's unlanded as null, then a landed commit over it",
+          not why20 and first20 == [{"id": "s1", "introduced": None, "state": "applied"}]
+          and rec20["steps"] == [{"id": "s1", "introduced": x, "state": "applied"}], why20 + str(rec20))
+    rows20 = steps.read_steps(g, None, "main")
+    rec20 = {"schema": 4, "steps": []}
+    why20 = read_refusal(lambda: [steps.set_step_state(rec20, r.id, r.introduced, "applied") for r in rows20])
+    check("[dSP-20 AC3] the reader's rows pass through the writer: the landed row its commit, the unlanded one null",
+          not why20 and {r.id: r.introduced for r in rows20} == {"demo/first": x, "lib/second": steps.UNLANDED}
+          and {s["id"]: s["introduced"] for s in rec20["steps"]} == {"demo/first": x, "lib/second": None},
+          why20 + str(rec20))
+    git(g, "checkout", "-q", "main")
+    git(g, "merge", "-q", "--no-ff", "-m", "land feat", "feat")
+    m = run_gov_git(g, "rev-parse", "HEAD")
+    p = run_steps(g, "list")
+    got = {r[1]: r[2] for r in read_listed(p.stdout)}
+    check("[dSP-1 AC3] once main merges the branch at M, the second row reads M, not its branch commit",
+          got == {"demo/first": x, "lib/second": m}, p.stdout + p.stderr)
+    p = run_steps(g, "list", "--window")
+    check("[dSP-1 AC16] ...and its home now prints closed by its step",
+          "window: .second.txt · closed by lib/second" in p.stdout, p.stdout + p.stderr)
+
+    # ---- AC4 and AC5: frozen landed rows, each case one commit on a branch off main.
+    g = tmp / "sp-frozen"
+    landed = demo_head + render_row("demo/first")
+    main_sha = build_steps_gov(g, {**files, "demo/kit.toml": landed})
+
+    def run_frozen_on(rel: str, body: str, more: tuple = ()) -> subprocess.CompletedProcess:
+        git(g, "checkout", "-q", "-B", "br", "main")
+        write_file(g, rel, body)
+        for mrel, mbody in more:
+            write_file(g, mrel, mbody)
+        settle(g, "branch change")
+        out = run_steps(g, "frozen", "--base", main_sha)
+        git(g, "checkout", "-q", "main")
+        return out
+
+    p = run_frozen_on("demo/kit.toml", landed.replace('"down", "{target}"]', '"down", "{target}", "--x"]'))
+    check("[dSP-1 AC4] an edited landed `down` argv exits 1 naming the id and the field",
+          p.returncode == 1 and "demo/first: its landed `down` was edited" in p.stdout, p.stdout + p.stderr)
+    p = run_frozen_on("demo/kit.toml", landed + 'reverted = "down-exit"\n')
+    check("[dSP-17 AC7] an edited landed `reverted` exits 1 naming the id and the field",
+          p.returncode == 1 and "demo/first: its landed `reverted` was edited" in p.stdout, p.stdout + p.stderr)
+    p = run_frozen_on("demo/kit.toml", demo_head)
+    check("[dSP-1 AC4] a removed landed row exits 1 naming the id",
+          p.returncode == 1 and "demo/first: the landed [[upgrade]] row is gone" in p.stdout, p.stdout + p.stderr)
+    p = run_frozen_on(f"{gkn}/steps/s1.py", "print('s1')\n#\n")
+    check("[dSP-1 AC4] one edited byte of a landed {gov}/ program exits 1 naming the path",
+          p.returncode == 1 and f"demo/first: {PFX}{gkn}/steps/s1.py, a program" in p.stdout, p.stdout + p.stderr)
+    p = run_frozen_on("demo/kit.toml", demo_head + render_row("demo/second"),
+                      ((f"{gkn}/registry.toml", reg + '\n[[retired]]\nid = "demo/first"\nsuccessor = "demo/second"\n'
+                                                     'surfaces = ["conf-key:.demo.conf#KEY"]\n'),))
+    check("[dSP-1 AC4] the removal with a [[retired]] row naming it and its successor exits 0",
+          p.returncode == 0 and "1 landed row(s)" in p.stdout, p.stdout + p.stderr)
+    p = run_frozen_on("demo/kit.toml", landed + render_row("demo/fixed"))
+    check("[dSP-1 AC5] a correction shipped as a new step beside the unchanged landed row exits 0",
+          p.returncode == 0 and "0 problem(s)" in p.stdout, p.stdout + p.stderr)
+    g = tmp / "sp-empty"
+    empty_sha = build_steps_gov(g, files)
+    p = run_steps(g, "frozen", "--base", empty_sha)
+    check("[dSP-1 AC5] over a base holding no rows the leg exits 0 printing `0 landed row(s)`",
+          p.returncode == 0 and "0 landed row(s)" in p.stdout, p.stdout + p.stderr)
+    # TOOL-dSafePassage-89: one root whose tool root moves between two reads reads the moved registry.
+    t89 = tmp / "dsp89"
+    (t89 / "pinned" / gkn).mkdir(parents=True)
+    (t89 / "pinned" / gkn / "registry.toml").write_text("", encoding="utf-8")
+    got89 = [steps.read_registry_at(t89, None)[:2]]
+    (t89 / "pinned").rename(t89 / "moved")
+    msg89 = read_refusal(lambda: got89.append(steps.read_registry_at(t89, None)[:2]))
+    check("[dSP-89] a root whose tool root moved between two reads reads the moved registry",
+          got89 == [("pinned", f"pinned/{gkn}/registry.toml"), ("moved", f"moved/{gkn}/registry.toml")]
+          and not msg89, f"{got89} {msg89}")
+
+
+def check_succession(tmp: pathlib.Path) -> None:
+    """TOOL-dSafePassage-1 AC6 AC7 AC8 AC9 — `update` and `check` read a retired kit's succession.
+
+    Each target installs the kit `old` at gov commit A; gov then retires it at B, to `new` in one
+    scratch gov and to `none` in another. A receipt claiming an id neither live nor retired is the
+    control that still refuses, so an engine that dropped every unknown claim fails AC8."""
+    gkn = KIT_NAMES["govkit"]
+    kit_body = ('home = "demo"\nversion_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n'
+                '[[files]]\ninclude = "**"\nrole = "engine"\n\n[adopt]\nargv = []\nmutates_index = false\n')
+    reg_a = '[surface]\nglobs = ["{prefix}/*"]\n\n[[entry]]\nid = "old"\ndescriptor = "{prefix}/demo/kit.toml"\n'
+
+    def run_gk(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, str(g / PFX / gkn / "govkit.py"), *args],
+                              capture_output=True, text=True, encoding="utf-8", env=STEPS_ENV)
+
+    def build_pair(tag: str, successor: str) -> tuple:
+        g = tmp / f"{tag}-gov"
+        build_steps_gov(g, {f"{gkn}/registry.toml": reg_a, "demo/kit.toml": 'id = "old"\n' + kit_body,
+                            "demo/a.txt": "a\n", "demo/b.txt": "b\n"})
+        t = build_target(tmp / f"{tag}-t", f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["old"]\n')
+        p = run_gk(g, "apply", "--target", str(t))
+        check(f"[dSP-1] the {tag} fixture installs `old`, or every arm over it grades nothing",
+              p.returncode == 0, p.stdout[-900:] + p.stderr[-600:])
+        settle(t, "the install")
+        reg_b = '[surface]\nglobs = ["{prefix}/*"]\n'
+        if successor != "none":
+            reg_b += f'\n[[entry]]\nid = "{successor}"\ndescriptor = "{{prefix}}/demo/kit.toml"\n'
+            (g / PFX / "demo" / "kit.toml").write_bytes((f'id = "{successor}"\n' + kit_body).encode("utf-8"))
+        else:
+            (g / PFX / "demo" / "kit.toml").unlink()
+        reg_b += f'\n[[retired]]\nid = "old"\nsuccessor = "{successor}"\nsurfaces = []\n'
+        (g / PFX / gkn / "registry.toml").write_bytes(reg_b.encode("utf-8"))
+        settle(g, "B: old retires")
+        return g, t
+
+    def read_receipt(t: pathlib.Path) -> dict:
+        return json.loads((t / ".governance" / "install.json").read_text(encoding="utf-8"))
+
+    # ---- AC6, AC9: successor `new`.
+    g, t = build_pair("succ", "new")
+    p = run_gk(g, "check", "--target", str(t))
+    check("[dSP-1 AC9] `check` on a receipt claiming a retired kit prints its successor and counts no problem for it",
+          "old: retired, successor new" in p.stdout and "claims kit 'old'" not in p.stdout, p.stdout + p.stderr)
+    p = run_gk(g, "update", "--target", str(t))
+    check("[dSP-1 AC6] `update` carries a retired kit to its successor instead of refusing the run",
+          "govkit update — retired old: claimed by its successor new" in p.stdout
+          and "no longer a registry entry" not in p.stdout + p.stderr and p.returncode == 0,
+          p.stdout[-1500:] + p.stderr)
+    p = run_gk(g, "update", "--target", str(t), "--write")
+    rec = read_receipt(t)
+    check("[dSP-1 AC6] ...and with --write the receipt's `kits` holds `new`, not `old`, its rows carried",
+          p.returncode == 0 and rec.get("kits") == ["new"]
+          and {f.get("kit") for f in rec.get("files", []) if f.get("source")} == {"new"},
+          p.stdout[-1500:] + p.stderr + json.dumps(rec.get("kits")))
+
+    # ---- AC8, AC9: a claim neither live nor retired still refuses before writing, and `check` counts it.
+    rp = t / ".governance" / "install.json"
+    rec["kits"] = ["ghost"]
+    rp.write_text(json.dumps(rec, indent=2), encoding="utf-8", newline="\n")
+    settle(t, "a ghost claim")
+    held = rp.read_bytes()
+    p = run_gk(g, "update", "--target", str(t), "--write")
+    check("[dSP-1 AC8] a claimed id with no succession row still refuses `update`, naming it, and writes nothing",
+          p.returncode == 2 and "claims kit 'ghost', which is no longer a registry entry" in p.stderr
+          and rp.read_bytes() == held, p.stdout[-900:] + p.stderr)
+    p = run_gk(g, "check", "--target", str(t))
+    check("[dSP-1 AC9] ...and `check` still counts it as a problem",
+          p.returncode == 1 and "the receipt claims kit 'ghost', which is not a registry entry" in p.stdout,
+          p.stdout[-900:] + p.stderr)
+
+    # ---- AC7: successor `none` — each row `withdrawn` with an order, no file deleted.
+    g, t = build_pair("rel", "none")
+    p = run_gk(g, "update", "--target", str(t), "--write")
+    outbox = t / ".governance" / "outbox"
+    rows = [f["path"] for f in read_receipt(t).get("files", []) if f.get("source")]
+    check("[dSP-1 AC7] a kit retired to `none` names each of its rows `withdrawn` with an outbox order",
+          "retired old: released" in p.stdout and rows
+          and all(f"withdrawn          [engine       ] {r}" in p.stdout for r in rows)
+          and all(any(o.name.startswith("update-withdrawn-") and r.split("/")[-1].split(".")[0] in o.name
+                      for o in outbox.glob("*.md")) for r in rows), p.stdout[-1800:] + p.stderr)
+    check("[dSP-1 AC7] ...and deletes none of their files",
+          all((t / r).is_file() for r in rows) and p.returncode == 0, p.stdout[-900:] + p.stderr)
+
+
+def check_fanout_step(tmp: pathlib.Path) -> None:
+    """TOOL-dSafePassage-1 AC10 AC11 AC12 — S6's up, down and witness argvs over scratch targets,
+    each run under `-I` as the runner runs it, the limit read back through gov's own policy reader."""
+    step_py = HERE / "steps" / "fanout_cap.py"
+    policy_py = KIT_DIRS["policy"] / "policy.py"
+    scaffold = subprocess.run([sys.executable, str(policy_py), "scaffold"], capture_output=True).stdout
+
+    def run_step(verb: str, t: pathlib.Path) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, "-I", str(step_py), verb, str(t)], capture_output=True,
+                              text=True, encoding="utf-8")
+
+    def read_limit(t: pathlib.Path, rev: str) -> str:
+        return subprocess.run([sys.executable, str(policy_py), "get", "runtime.agents-in-flight", "--rev", rev],
+                              cwd=str(t), capture_output=True, text=True, encoding="utf-8").stdout.strip()
+
+    def build_capped(tag: str, conf: bytes) -> pathlib.Path:
+        t = build_target(tmp / tag, None)
+        (t / ".governance").mkdir(exist_ok=True)
+        (t / ".governance" / "policy.toml").write_bytes(scaffold.replace(b"\r\n", b"\n"))
+        (t / ".agent-cap.conf").write_bytes(conf)
+        settle(t, "a capped target")
+        return t
+
+    def read_tree(t: pathlib.Path) -> dict:
+        return {p.relative_to(t).as_posix(): p.read_bytes() for p in t.rglob("*")
+                if p.is_file() and ".git" not in p.relative_to(t).parts}
+
+    t = build_capped("fs-ac10", b"FANOUT_CAP=2\n")
+    sha0 = run_gov_git(t, "rev-parse", "HEAD")
+    w0, up = run_step("witness", t), run_step("up", t)
+    settle(t, "the step")
+    w1 = run_step("witness", t)
+    check("[dSP-1 AC10] the up moves FANOUT_CAP=2 into the key: the limit reads 2 before and after, the file gone",
+          up.returncode == 0 and read_limit(t, sha0) == "2" and read_limit(t, "HEAD") == "2"
+          and not (t / ".agent-cap.conf").exists()
+          and "agents-in-flight = 2\n" in (t / ".governance" / "policy.toml").read_text(encoding="utf-8"),
+          up.stdout + up.stderr + read_limit(t, "HEAD"))
+    check("[dSP-1 AC10] ...and its witness exits 0 after, where it exited 1 before",
+          w0.returncode == 1 and w1.returncode == 0, w0.stdout + w1.stdout)
+
+    image = pathlib.Path(".governance", "steps", "agent-cap", "fanout-cap-to-agents-in-flight.before.json").as_posix()
+    t = build_capped("fs-ac11", b"\xef\xbb\xbfFANOUT_CAP=\"3\"\r\n")
+    pre = read_tree(t)
+    up = run_step("up", t)
+    mid = read_tree(t)
+    check("[dSP-1 AC11] LIVENESS the up over a BOM-led CRLF conf really moved it: the file gone, the key 3, an image",
+          up.returncode == 0 and ".agent-cap.conf" not in mid and image in mid
+          and b"agents-in-flight = 3\n" in mid.get(".governance/policy.toml", b""), up.stdout + up.stderr)
+    down = run_step("down", t)
+    check("[dSP-1 AC11] a down after the up leaves a BOM-led CRLF conf and the policy file byte-identical",
+          down.returncode == 0 and read_tree(t) == pre
+          and not (t / ".governance" / "steps" / "agent-cap").exists(), down.stdout + down.stderr)
+    t = build_target(tmp / "fs-ac17", None)
+    down = run_step("down", t)
+    status = run_gov_git(t, "status", "--porcelain")
+    check("[dSP-17 AC5] a down on a target that never held the conf, with no image, exits 0 and writes nothing",
+          down.returncode == 0 and status == "", down.stdout + down.stderr + status)
+
+    t = build_capped("fs-ac11k", b"FANOUT_CAP=2\n")
+    pre = read_tree(t)
+    run_step("up", t)
+    for rel, data in pre.items():
+        (t / rel).write_bytes(data)  # back to the before state with the image kept: an up killed after it
+    killed = read_tree(t)
+    down = run_step("down", t)
+    check("[dSP-1 AC11] a down after an up killed once its before-image was written exits 0 and leaves the before state",
+          image in killed and down.returncode == 0 and read_tree(t) == pre, down.stdout + down.stderr)
+
+    t = build_capped("fs-ac11e", b"FANOUT_CAP=2\n")
+    run_step("up", t)
+    pol = t / ".governance" / "policy.toml"
+    pol.write_bytes(pol.read_bytes() + b"# edited after the up\n")
+    mid = read_tree(t)
+    down = run_step("down", t)
+    check("[dSP-1 AC11] a down over a policy file edited after the up exits 1 naming it and changes nothing",
+          down.returncode == 1 and ".governance/policy.toml" in down.stderr and read_tree(t) == mid,
+          down.stdout + down.stderr)
+
+    # TOOL-dSafePassage-26 S30: AC12 is read with FANOUT_CAP=abc alone; another key is the hook's
+    # grammar too, so the up keeps it, takes out only the FANOUT_CAP line, and leaves the file.
+    t = build_capped("fs-ac12abc", b"FANOUT_CAP=abc\n")
+    pre = read_tree(t)
+    up = run_step("up", t)
+    check("[dSP-1 AC12] a conf holding 'FANOUT_CAP=abc': the up exits 1 naming the file "
+          "and writes no byte, before-image included",
+          up.returncode == 1 and ".agent-cap.conf" in up.stderr and read_tree(t) == pre, up.stdout + up.stderr)
+    t = build_capped("fs-ac29other", b"OTHER=1\nFANOUT_CAP=2\n")
+    up = run_step("up", t)
+    w1 = run_step("witness", t)
+    check("[dSP-26 AC29] a conf holding OTHER=1 and FANOUT_CAP=2: the up exits 0 leaving OTHER=1, the key 2, "
+          "and its witness holds",
+          up.returncode == 0 and (t / ".agent-cap.conf").read_bytes() == b"OTHER=1\n" and w1.returncode == 0
+          and "agents-in-flight = 2\n" in (t / ".governance" / "policy.toml").read_text(encoding="utf-8"),
+          up.stdout + up.stderr + w1.stdout)
+
+    t = build_capped("fs-dirty", b"FANOUT_CAP=2\n")
+    (t / ".agent-cap.conf").write_bytes(b"FANOUT_CAP=3\n")
+    pre = read_tree(t)
+    up = run_step("up", t)
+    check("[dSP-1 S6] a conf differing from its blob at HEAD: the up exits 1 naming it and writes no byte",
+          up.returncode == 1 and ".agent-cap.conf: differs from its blob at HEAD" in up.stderr
+          and read_tree(t) == pre, up.stdout + up.stderr)
+    # F9: the one writer edits one line in place and refuses an edit tomllib does not read back.
+    steps = govkit_module().upgrade_steps
+    got = steps.render_policy_text("# kept\r\n[runtime]\r\nagents-in-flight = 6 # x\r\n", "runtime", "agents-in-flight", 2)
+    check("[dSP-1 S6 F9] render_policy_text rewrites the key's own line and keeps the file's CRLF and other lines",
+          got == "# kept\r\n[runtime]\r\nagents-in-flight = 2\r\n", repr(got))
+    try:
+        steps.render_policy_text("runtime.agents-in-flight = 6\n", "runtime", "agents-in-flight", 2)
+        _why = ""
+    except steps.Refusal as e:
+        _why = str(e)
+    check("[dSP-1 S6 F9] ...and refuses a key held as a dotted key, which a second table would shadow",
+          "setting runtime.agents-in-flight leaves text tomllib does not read" in _why, _why)
+    try:
+        steps.render_policy_text('[runtime]\nnote = """\nagents-in-flight = 6\n"""\n', "runtime", "agents-in-flight", 2)
+        _why = ""
+    except steps.Refusal as e:
+        _why = str(e)
+    check("[dSP-1 S6 F9] ...and refuses an edit that lands inside a string, so tomllib reads no value back",
+          "does not read back" in _why, _why)
+
+    t = build_capped("fs-utf8", b"\xff\n")
+    pre = read_tree(t)
+    up = run_step("up", t)
+    check("[dSP-1 S6] a conf that is not UTF-8: the up exits 1 naming it and writes no byte",
+          up.returncode == 1 and ".agent-cap.conf: not UTF-8" in up.stderr and read_tree(t) == pre,
+          up.stdout + up.stderr)
+    t = build_target(tmp / "fs-badpol", None)
+    (t / ".governance").mkdir(exist_ok=True)
+    (t / ".governance" / "policy.toml").write_bytes(b"[runtime\n")
+    (t / ".agent-cap.conf").write_bytes(b"FANOUT_CAP=2\n")
+    settle(t, "a policy file no revision of which is valid")
+    pre = read_tree(t)
+    up = run_step("up", t)
+    check("[dSP-1 S6] a policy read the reader refuses at HEAD: the up exits 1 naming it and writes no byte",
+          up.returncode == 1 and "policy.py get runtime.agents-in-flight refused at HEAD" in up.stderr
+          and read_tree(t) == pre, up.stdout + up.stderr)
+
+    t = build_capped("fs-f10", b"FANOUT_CAP=9\n")
+    pol0 = (t / ".governance" / "policy.toml").read_bytes()
+    up = run_step("up", t)
+    check("[dSP-1 S6 F10] a FANOUT_CAP that lowers nothing retires the file and leaves the policy file byte-identical",
+          up.returncode == 0 and not (t / ".agent-cap.conf").exists()
+          and (t / ".governance" / "policy.toml").read_bytes() == pol0, up.stdout + up.stderr)
+
+
+def check_steps_recordable() -> None:
+    """TOOL-dSafePassage-16 AC1 AC2 — the step record's precondition and its one writer over the
+    spec's five receipt shapes: the predicate reads the table's answer and writes nothing, and the
+    writer refuses exactly where the predicate reads False and appends one row where it reads True."""
+    us = govkit_module().upgrade_steps
+    sid = "govkit/receipt-schema-4"
+    for label, rec, want in (
+            ("schema 3 with no `steps`", {"schema": 3}, False),
+            ("schema 4 with `steps` []", {"schema": 4, "steps": []}, True),
+            ("schema 4 with no `steps`", {"schema": 4}, False),
+            ("schema 3 with `steps` []", {"schema": 3, "steps": []}, False),
+            ("the string schema \"4\"", {"schema": "4", "steps": []}, False)):
+        before = json.dumps(rec, sort_keys=True)
+        got = us.test_steps_recordable(rec)
+        check(f"[dSP-16 AC1] test_steps_recordable reads {want} on {label}, writing nothing",
+              got is want and json.dumps(rec, sort_keys=True) == before, f"{got!r} {rec}")
+        try:
+            us.set_step_state(rec, sid, None, "applied")
+            refused = False
+        except us.Refusal:
+            refused = True
+        ok = (not refused and rec["steps"] == [{"id": sid, "introduced": None, "state": "applied"}]) if want \
+            else (refused and json.dumps(rec, sort_keys=True) == before)
+        check(f"[dSP-16 AC2] set_step_state {'appends one row' if want else 'refuses'} on {label}, "
+              "as the predicate reads", ok, str(rec))
+
+
+def build_staged_copy(root: pathlib.Path, text: str) -> pathlib.Path:
+    """TOOL-dSafePassage-71 S1: copy this kit's whole directory to `root / HERE.name`, without
+    `__pycache__` (a stale `.pyc` can run in place of the break), write `text` as the copy's engine
+    and return its path. `upgrade_steps.py` reaches files beside it by import, by path and as text,
+    so a staged break that hand-picks its siblings dies on the next one it misses."""
+    dst = root / HERE.name
+    shutil.copytree(HERE, dst, ignore=shutil.ignore_patterns("__pycache__"))
+    py = dst / "upgrade_steps.py"
+    py.write_text(text, encoding="utf-8", newline="\n")
+    return py
+
+
+def read_handpicked_copies(text: str) -> tuple[list[int], int]:
+    """TOOL-dSafePassage-71 S3: the 1-based lines of `text` outside the staged-copy helper's body that
+    join a bare local name, other than `HERE`, to the engine's file name, and how many lines inside
+    that body do. The body is located by `_ast`; no helper found gives an inside count of 0."""
+    shape = _re.compile(r'(?<![\w.])(?<!/ )(?!HERE\b)[A-Za-z_]\w* / "upgrade_steps\.py"')
+    body = next(((n.lineno, n.end_lineno) for n in _ast.walk(_ast.parse(text))
+                 if isinstance(n, _ast.FunctionDef) and n.name == "build_staged_copy"), (0, -1))
+    hits = [i for i, ln in enumerate(text.splitlines(), 1) if shape.search(ln)]
+    return [i for i in hits if not body[0] <= i <= body[1]], sum(body[0] <= i <= body[1] for i in hits)
+
+
+def check_staged_copies(tmp: pathlib.Path) -> None:
+    """TOOL-dSafePassage-71 S4: no arm of this suite stages a copy of the engine by hand, the
+    predicate names a planted hand-picked line, and the helper's copy holds the kit's file set.
+    Not checked: a path built by `joinpath`, an f-string or a name held in a variable; a copy in any
+    other file; what a gov-tree copy carries; the sibling kit a copy resolves through `resolve_kit_dir`."""
+    own = (HERE / "selftest.py").read_text(encoding="utf-8")
+    outside, inside = read_handpicked_copies(own)
+    check("[dSP-71] AC4 no line of selftest.py outside build_staged_copy stages the engine in a bare "
+          "local directory, and the helper's own write is seen",
+          not outside and inside >= 1, f"outside: {outside}; inside: {inside}")
+    planted = own + "(rooted / " + '"upgrade_steps' + '.py"' + ").write_text(src)\n"
+    got = read_handpicked_copies(planted)[0]
+    check("[dSP-71] AC4 a hand-picked copy appended to selftest.py is named by its line",
+          got == [len(planted.splitlines())], f"named: {got}")
+    d = build_staged_copy(tmp, "").parent
+    rel = lambda r: {p.relative_to(r).as_posix() for p in r.rglob("*")  # noqa: E731
+                     if p.is_file() and "__pycache__" not in p.parts}
+    check("[dSP-71] AC3 build_staged_copy leaves the kit directory's file set, outside __pycache__",
+          rel(d) == rel(HERE), f"missing: {sorted(rel(HERE) - rel(d))}; extra: {sorted(rel(d) - rel(HERE))}")
+
+    # TOOL-dSafePassage-99 S3: a staged copy's own `load_govkit()` writes the copy's engine to the
+    # module table, and `govkit_module()` still answers the one engine at GOVKIT afterwards.
+    held99 = govkit_module()
+    shutil.rmtree(tmp / "dsp99-copy", ignore_errors=True)
+    spec99 = importlib.util.spec_from_file_location("us99_copy", build_staged_copy(
+        tmp / "dsp99-copy", (HERE / "upgrade_steps.py").read_text(encoding="utf-8")))
+    us99_copy = importlib.util.module_from_spec(spec99)
+    spec99.loader.exec_module(us99_copy)
+    copy99 = us99_copy.load_govkit()
+    file99 = lambda m: pathlib.Path(getattr(m, "__file__", "") or "").resolve()  # noqa: E731
+    check("[dSP-99] a staged copy's load_govkit() displaces the engine in sys.modules",
+          sys.modules.get("govkit") is copy99 and file99(copy99) != GOVKIT, str(file99(copy99)))
+    gk99 = govkit_module()
+    check("[dSP-99] govkit_module() answers the held engine at GOVKIT after the staged load, "
+          "and re-binds govkit and upgrade_steps to it",
+          gk99 is held99 and file99(gk99) == GOVKIT and sys.modules.get("govkit") is gk99
+          and sys.modules.get("upgrade_steps") is gk99.upgrade_steps
+          and gk99.Refusal is gk99.upgrade_steps.Refusal, str(file99(gk99)))
+    imports99 = [n.lineno for n in _ast.walk(_ast.parse(own))
+                 if (isinstance(n, _ast.Import) and any(a.name == "govkit" for a in n.names))
+                 or (isinstance(n, _ast.ImportFrom) and n.module == "govkit")]
+    check("[dSP-99] no import statement in selftest.py names the engine, so every reader goes "
+          "through govkit_module()", imports99 == [], f"lines: {imports99}")
+    # The window this bounds: before govkit_module() re-binds the table, the same call finds copy99
+    # there, whose file is not the govkit.py beside the held step module, and loads a third engine
+    # by path (upgrade_steps.py load_govkit). This grades the window's closing edge, not the window.
+    got99 = held99.upgrade_steps.load_govkit()
+    check("[dSP-99] the held step module's own load_govkit() answers the held engine once "
+          "govkit_module() has re-bound the table", got99 is held99, str(file99(got99)))
+
+
+def check_step_isolation(tmp: pathlib.Path) -> None:
+    """TOOL-dSafePassage-7 AC1 to AC7 — `upgrade_steps.py fixture isolation` with every plant: each
+    half of the contract green, each `-stub` plant red naming its canary, the needs-target check's
+    four verdicts, the unknown-token refusal, and the callers probe green over the shipped files and
+    red over a planted spawn of `row["up"]`. The phase-without-argv refusal is reached in process.
+    TOOL-dSafePassage-24 AC1 to AC4 ride the same fixture: the four `local-*` plants refused, their
+    `-stub` twins red naming the executor's canary; TOOL-dSafePassage-29 AC1, AC2 and AC4 add
+    `local-gpg`, `local-hook` and the class arm over `git help --config`; TOOL-dSafePassage-30 AC1
+    to AC3 add the three `submodule-*` plants and their `-stub` twins; TOOL-dSafePassage-36 AC1 and
+    AC2 add the two linked-worktree plants and a walk copy rooted at the common dir;
+    TOOL-dSafePassage-37 AC1 to AC3 add `local-recent-objects-hook`, `local-ext-transport`, their
+    `-stub` twins, the step environment's third pair and the class arm's `hook` suffix.
+    TOOL-dSafePassage-45 AC1 to AC11 add the derived pair count under two parent configs, its six
+    plants, the credential-key arm and four staged copies. TOOL-dSafePassage-47 AC1 to AC3 add
+    `submodule-name-slashed` and two walk copies."""
+    us_py = HERE / "upgrade_steps.py"
+
+    def run_fixture(py: pathlib.Path, *plant: str, env: dict | None = None) -> tuple[int, str]:
+        p = subprocess.run([sys.executable, str(py), "fixture", "isolation", *(("--plant", *plant) if plant else ())],
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600,
+                           env={**os.environ, **env} if env else None)
+        return p.returncode, p.stdout + p.stderr
+
+    for plant, want, needles in (
+            ((), 0, ("fixture/clean · up · ok", "outside the allowlist and the contract: none",
+                     " · core.hooksPath holds []", "sys.flags.isolated 1",
+                     "fixture/clean · isolated")),
+            (("hook",), 0, ("hook canary: absent",)),
+            (("hook-stub",), 1, ("hook canary: present · ", "hook-post-index-change", "hook-pre-commit")),
+            (("module",), 0, ("module canary: absent",)),
+            (("module-stub",), 1, ("module canary: present · module-json.py, module-sitecustomize.py",)),
+            (("credential",), 0, ("credential canary: absent", "token: absent", "credential.helper reads ['']")),
+            (("credential-stub",), 1, ("credential canary: present · credential-helper",
+                                       "token: present · GH_TOKEN reached the step")),
+            (("needs-target",), 1, ("fixture/reaches · needs-target · its up exits 1 under the contract and no "
+                                    "canary ran, so it needs target code: declare needs-target = true",
+                                    "fixture/reaches-attended · attended · it declares needs-target = true",
+                                    "fixture/reaches-attended · own canary absent")),
+            (("breach",), 1, ("fixture/opens · breach · target code ran under the contract: adopter_only",)),
+            (("token",), 1, ("fixture/token · refused · fixture/token: '{unknown}' holds {unknown}, which this "
+                             "run does not answer, so nothing was spawned",)),
+            (("callers",), 0, ("one spawn site of a step argv, inside run_step_isolated",)),
+            # TOOL-dSafePassage-26 AC12: the fixture asserts GIT_CONFIG_COUNT is 3 plus the parent's
+            # line-ending pairs above, and here a step hashes a CRLF file as the parent does.
+            (("autocrlf",), 0, ("fixture/hash · up · ok · the step's oid ", " · equal"))):
+        rc, out = run_fixture(us_py, *plant)
+        check(f"[dSP-7] fixture isolation {' '.join(plant) or '(base)'} exits {want} and names "
+              f"{', '.join(needles)}", rc == want and "isolation: FAILED" not in out
+              and all(n in out for n in needles), out)
+
+    # TOOL-dSafePassage-35 AC8, AC24: a credential in the target's remote URL refuses the step naming
+    # the key and its file and printing no part of it, an scp-form remote runs; and the target's local
+    # core.autocrlf=false wins over the parent's global true in the step's hash. Each failing case is
+    # the fixture's own expectation, printed as `isolation: FAILED`.
+    for plant, want, needles in (
+            ("local-url-userinfo", 1, ("remote.gk-fixture.url in .git/config, so nothing was spawned",
+                                       "scp-form remote · not refused · git add exits 0")),
+            ("autocrlf-local", 0, ("fixture/hash · up · ok · the step's oid ", " · equal"))):
+        rc, out = run_fixture(us_py, plant)
+        check(f"[dSP-35] fixture isolation {plant} exits {want} and names {', '.join(needles)}",
+              rc == want and "isolation: FAILED" not in out and all(n in out for n in needles)
+              and "gk-planted-user" not in out and "gk-planted-secret" not in out, out)
+
+    # TOOL-dSafePassage-38 AC1, AC2: a URL credential in a value or a key segment no instance row
+    # names refuses the step, the refusal naming the key redacted and printing neither planted token.
+    for plant, needle in (
+            ("submodule-url-userinfo", "submodule.s.url in .git/config, so nothing was spawned"),
+            ("insteadof-userinfo", "url.https://<redacted>@example.invalid/.insteadof in .git/config, so nothing"),
+            ("http-url-key-userinfo", "http.https://<redacted>@example.invalid/.sslkey in .git/config, so nothing")):
+        rc, out = run_fixture(us_py, plant)
+        check(f"[dSP-38] fixture isolation {plant} exits 1, names {needle} and prints no planted credential",
+              rc == 1 and "isolation: FAILED" not in out and needle in out
+              and "dspuser38" not in out and "dsppass38" not in out, out)
+
+    # TOOL-dSafePassage-44 AC1: an ssh-scheme bare user is kept and a password or another scheme's
+    # user is not; the plant spawns, and a copy whose predicate has no exemption refuses it.
+    cred44 = govkit_module().upgrade_steps.test_credential_bearing
+    cases44 = ((("remote.origin.url", "ssh://git@github.com/o/r.git"), False),
+               (("remote.origin.url", "git+ssh://git@h/r"), False),
+               (("url.ssh://git@github.com/.insteadof", "https://github.com/"), False),
+               (("remote.origin.url", "ssh://u:p@h/r"), True), (("branch.main.remote", "https://u@h/r"), True))
+    wrong = [(a, want) for a, want in cases44 if cred44(*a) != want]
+    check("[dSP-44] AC1 test_credential_bearing keeps the three ssh-scheme bare users and refuses "
+          "ssh://u:p@h/r and https://u@h/r", not wrong, f"wrong: {wrong}")
+    rc, out = run_fixture(us_py, "ssh-scheme-bare-user")
+    check("[dSP-44] AC1 fixture isolation ssh-scheme-bare-user exits 0 with its step spawned",
+          rc == 0 and "isolation: FAILED" not in out and "ssh-scheme bare user · not refused · git add exits 0" in out, out)
+    src = us_py.read_text(encoding="utf-8")
+    exempt = 'not (m.group(1).lower() in SSH_BARE_USER_SCHEMES and ":" not in m.group(2))'
+    rc, out = run_fixture(build_staged_copy(tmp / "no-ssh-exemption", src.replace(exempt, "True")), "ssh-scheme-bare-user")
+    check("[dSP-44] AC1 a copy whose predicate has no ssh exemption refuses fixture isolation ssh-scheme-bare-user",
+          src.count(exempt) == 1 and rc == 1 and "an ssh-scheme remote with a bare user was refused" in out, out)
+
+    # TOOL-dSafePassage-45 AC1, AC2, S4: the step environment's count is the GIT_CONFIG_KEY_<n> pairs
+    # present and protocol.ext.allow sits at index 2, under a parent with core.autocrlf set and one
+    # with it unset; a fixture copy asserting a bare 3 reds.
+    us45 = govkit_module().upgrade_steps
+    cfgs = {"set": tmp / "dsp45-crlf.gitconfig", "unset": tmp / "dsp45-empty.gitconfig"}
+    cfgs["set"].write_text("[core]\n\tautocrlf = true\n", encoding="utf-8", newline="\n")
+    cfgs["unset"].write_text("", encoding="utf-8", newline="\n")
+    (tmp / "dsp45-env").mkdir(exist_ok=True)
+    for name, cfg in cfgs.items():
+        parent = {"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": str(cfg)}
+        with set_environ(parent):
+            env = us45.build_step_env(tmp / "dsp45-env", tmp / "dsp45-env")
+        present = sum(k.startswith("GIT_CONFIG_KEY_") for k in env)
+        check(f"[dSP-45] AC1 core.autocrlf {name}: GIT_CONFIG_COUNT is the {present} pair(s) present, index 2 "
+              f"protocol.ext.allow = never, index 3 core.autocrlf only where set",
+              env.get("GIT_CONFIG_COUNT") == str(present)
+              and (env.get("GIT_CONFIG_KEY_2"), env.get("GIT_CONFIG_VALUE_2")) == ("protocol.ext.allow", "never")
+              and env.get("GIT_CONFIG_KEY_3") == ("core.autocrlf" if name == "set" else None),
+              str({k: v for k, v in env.items() if k.startswith("GIT_CONFIG_")}))
+        rc, out = run_fixture(us_py, env=parent)
+        check(f"[dSP-45] AC2 fixture isolation (base) under core.autocrlf {name} exits 0 with clean ok",
+              rc == 0 and "isolation: FAILED" not in out and "fixture/clean · up · ok" in out, out)
+    derived = 'check_ok(rep.get("count") == str(rep.get("pairs"))'
+    src = us_py.read_text(encoding="utf-8")
+    rc, out = run_fixture(build_staged_copy(tmp / "dsp45-bare-count", src.replace(derived, 'check_ok(rep.get("count") == "3"')),
+                      env={"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": str(cfgs["set"])})
+    check("[dSP-45] AC1 a fixture copy asserting GIT_CONFIG_COUNT 3 reds under core.autocrlf set",
+          src.count(derived) == 1 and rc == 1 and "GIT_CONFIG_COUNT is not the GIT_CONFIG_KEY_<n> pairs present" in out, out)
+
+    # AC4, AC5, AC6: a proxy's scheme-less userinfo and a dotted user name in a key refuse the step,
+    # neither printing any 3-character piece of its planted password, nor do TOOL-dSafePassage-38's
+    # plants; the redactor runs to the last `@`; a predicate copy splitting the key on dots reds.
+    cb45 = us45.test_credential_bearing
+    for plant, needle, secret, plain in (
+            ("proxy-schemeless-userinfo", "http.proxy in .git/config, so nothing", "dsppass45", "dspuser45"),
+            ("insteadof-dotted-userinfo", "url.https://<redacted>@host/.insteadof in .git/config, so nothing",
+             "dsppass45", "first.last"),
+            ("submodule-url-userinfo", "submodule.s.url in .git/config", "dsppass38", "dspuser38"),
+            ("insteadof-userinfo", "url.https://<redacted>@example.invalid/.insteadof", "dsppass38", "dspuser38"),
+            ("http-url-key-userinfo", "http.https://<redacted>@example.invalid/.sslkey", "dsppass38", "dspuser38")):
+        rc, out = run_fixture(us_py, plant)
+        pieces = [secret[i:i + 3] for i in range(len(secret) - 2) if secret[i:i + 3] in out]
+        check(f"[dSP-45] AC4 AC5 AC6 fixture isolation {plant} exits 1, names {needle} and prints no "
+              f"3-character piece of {secret} nor {plain}",
+              rc == 1 and "isolation: FAILED" not in out and needle in out and not pieces and plain not in out,
+              f"pieces printed: {pieces}\n{out}")
+    cases45 = ((("http.proxy", "proxy:3128"), False), (("http.proxy", "dspuser45:dsppass45@proxy:3128"), True),
+               (("remote.origin.proxy", "u@proxy:1"), True), (("http.https://h/.proxy", "u:p@proxy"), True),
+               (("url.https://first.last:pw@host/.insteadof", "https://h/"), True),
+               (("url.ssh://git@github.com/.insteadof", "https://github.com/"), False))
+    wrong = [(a, want) for a, want in cases45 if cb45(*a) != want]
+    check("[dSP-45] AC4 AC5 test_credential_bearing refuses a scheme-less proxy credential and a dotted user, "
+          "and keeps a plain proxy host and TOOL-dSafePassage-44's ssh bare user", not wrong, f"wrong: {wrong}")
+    got = us45.render_redacted_config("http.https://u:p@ss@h/.sslkey")
+    check("[dSP-45] AC6 render_redacted_config redacts to the last @ before the host",
+          got == "http.https://<redacted>@h/.sslkey", got)
+    whole = 'for text in (inner, value or "")'
+    rc, out = run_fixture(build_staged_copy(tmp / "dsp45-dot-split", src.replace(whole, 'for text in (*key.split(".")[1:-1], value or "")')),
+                      "insteadof-dotted-userinfo")
+    check("[dSP-45] AC5 a predicate copy testing the key's dot-split segments reds fixture isolation insteadof-dotted-userinfo",
+          src.count(whole) == 1 and rc == 1 and "isolation: FAILED" in out, out)
+
+    # AC9, AC10: the walk lists a repository by git's own shape, so a ref named config is no row, and
+    # a config or a .gitmodules git cannot read refuses naming it; a nested row is mapped through its
+    # parent's .gitmodules, or by name where the parent is unpopulated. A walk copy listing any
+    # directory holding a `config` and descending into it reds the ref plant.
+    for plant, want, needles in (
+            ("submodule-ref-named-config", 0, ("isolation: population · ", "/.git/modules/sub · reached by sub",
+                                               "fixture/status · up · ok")),
+            ("submodule-config-malformed", 1, (".git/modules/sub/config or a file it includes does not read",)),
+            ("gitmodules-malformed", 1, ("/.gitmodules does not read",)),
+            ("submodule-nested-name-differs", 1, ("filter.canary.clean in .git/modules/nm/modules/in/config (submodule lib/p/q)",
+                                                  "filter.canary.clean in .git/modules/nm/modules/in/config "
+                                                  "(submodule lib/p/in, by name)"))):
+        rc, out = run_fixture(us_py, plant)
+        check(f"[dSP-45] AC9 AC10 fixture isolation {plant} exits {want} and names {', '.join(needles)}",
+              rc == want and "isolation: FAILED" not in out and all(n in out for n in needles), out)
+    shape = 'if not ((c / "HEAD").is_file() and (c / "objects").is_dir() and (c / "refs").is_dir()):'
+    into = 'walks.append((c / "modules", c / "modules",'
+    rc, out = run_fixture(build_staged_copy(tmp / "dsp45-config-walk", src.replace(shape, 'if not (c / "config").is_file():')
+                                        .replace(into, "walks.append((c, c,")), "submodule-ref-named-config")
+    check("[dSP-45] AC9 a walk copy listing any directory holding a config reds fixture isolation submodule-ref-named-config",
+          src.count(shape) == 1 and src.count(into) == 1 and rc == 1 and "isolation: FAILED" in out, out)
+
+    # TOOL-dSafePassage-47 AC1 to AC3: the walk's shape test, its read's refusal and its descent
+    # through a name segment. AC1 and AC2 ride the dSP-45 rows above; `submodule-name-slashed` is
+    # refused through `lib/`. A walk copy classifying by the `rev-parse --git-dir` exit skips the
+    # malformed repository, and one that never descends a non-candidate misses `lib/x`.
+    rc, out = run_fixture(us_py, "submodule-name-slashed")
+    check("[dSP-47] AC3 fixture isolation submodule-name-slashed exits 1 naming filter.canary.clean in "
+          ".git/modules/lib/x/config", rc == 1 and "isolation: FAILED" not in out
+          and "filter.canary.clean in .git/modules/lib/x/config (submodule lib/x)" in out, out)
+    segment = "walks.append((base, c, w, parts, mark))"
+    for name, text, plant in (
+            ("rev-parse", src.replace(shape, 'if subprocess.run(["git", f"--git-dir={c}", "rev-parse", "--git-dir"], '
+                                             "env=env, capture_output=True).returncode:"), "submodule-config-malformed"),
+            ("no-descent", src.replace(segment, "pass"), "submodule-name-slashed")):
+        rc, out = run_fixture(build_staged_copy(tmp / f"dsp47-{name}", text), plant)
+        check(f"[dSP-47] AC2 AC3 a {name} walk copy reds fixture isolation {plant}",
+              src.count(shape) == 1 and src.count(segment) == 1 and rc == 1 and "isolation: FAILED" in out, out)
+
+    # AC11: the credential class has one source, so the refused table carries none of its rows.
+    dup = [r[0] for r in us45.STEP_REFUSED_KEYS if r[0] in ("remote.<x>.url", "remote.<x>.pushurl", "http.proxy",
+                                                            "remote.<x>.proxy", "http.sslKey", "http.sslCert",
+                                                            "http.cookieFile")]
+    check("[dSP-45] AC11 STEP_REFUSED_KEYS holds no row test_credential_bearing grades", not dup, f"rows: {dup}")
+
+    # TOOL-dSafePassage-24 AC1 to AC4: an executor in the target's own config refuses the step before
+    # any spawn, naming the key and its file ON the refusal line; each `-stub` twin skips the check and
+    # its canary runs.
+    head = "isolation: fixture/clean · refused · fixture/clean up: the target's own git config declares what git runs"
+    for plant, on_refusal, needles in (
+            ("local-filter", ("a credential, filter.canary.clean in .git/config, so nothing was spawned",),
+             ("filter canary: absent",)),
+            ("local-filter-stub", (), ("fixture/clean · up · ok", "filter canary: present · filter-clean")),
+            ("local-process", ("a credential, filter.canary.process in .git/config, so nothing was spawned",),
+             ("process canary: absent",)),
+            ("local-process-stub", (), ("fixture/clean · up · ok", "process canary: present · filter-process")),
+            ("local-fsmonitor", ("a credential, core.fsmonitor in .git/config, so nothing was spawned",),
+             ("fsmonitor canary: absent", "core.fsmonitor=false · not refused · git add exits 0")),
+            ("local-fsmonitor-stub", (), ("fixture/clean · up · ok", "fsmonitor canary: present · fsmonitor")),
+            ("local-include", ("a credential, filter.canary.clean in ", "/included.gitconfig, so nothing was spawned"),
+             ("include canary: absent",)),
+            ("local-include-stub", (), ("fixture/clean · up · ok", "include canary: present · filter-clean")),
+            # TOOL-dSafePassage-29 AC1 and AC2: the step commits, so a signing program and a
+            # config-declared hook are reached where the check is skipped.
+            ("local-gpg", ("a credential, gpg.program in .git/config, so nothing was spawned",),
+             ("gpg canary: absent",)),
+            ("local-gpg-stub", (), ("fixture/clean · up · ok", "gpg canary: present · gpg-program")),
+            ("local-hook", ("a credential, hook.canary.command in .git/config, so nothing was spawned",),
+             ("hook canary: absent",)),
+            ("local-hook-stub", (), ("fixture/clean · up · ok", "hook canary: present · hook-command"))):
+        rc, out = run_fixture(us_py, plant)
+        line = next((ln for ln in out.splitlines() if ln.startswith(head)), None)
+        check(f"[dSP-24] fixture isolation {plant} exits 1, "
+              + (f"its refusal line naming {' … '.join(on_refusal)}, " if on_refusal else "refusing nothing, ")
+              + f"and names {', '.join(needles)}",
+              rc == 1 and "isolation: FAILED" not in out and all(n in out for n in needles)
+              and (line is not None and all(n in line for n in on_refusal) if on_refusal else line is None), out)
+
+    # TOOL-dSafePassage-30 AC1 to AC3: a filter in a submodule's own config, one level down, two levels
+    # down, or not checked out, refuses the superproject's `git status` step naming the key, its file
+    # and the submodule path; each `-stub` twin skips the check, and a populated one's filter runs.
+    head = "isolation: fixture/status · refused · fixture/status up: the target's own git config declares what git runs"
+    for plant, on_refusal, needles in (
+            ("submodule-filter", ("filter.canary.clean in .git/modules/sub/config (submodule sub), so nothing",),
+             ("filter canary: absent",)),
+            ("submodule-filter-stub", (), ("fixture/status · up · ok", "filter canary: present · filter-clean")),
+            ("submodule-nested", ("filter.canary.clean in .git/modules/sub/modules/inner/config (submodule sub/inner)",),
+             ("nested canary: absent",)),
+            ("submodule-nested-stub", (), ("fixture/status · up · ok", "nested canary: present · filter-clean")),
+            ("submodule-unpopulated", ("filter.canary.clean in .git/modules/sub/config (submodule sub), so nothing",),
+             ("unpopulated canary: absent",)),
+            ("submodule-unpopulated-stub", (), ("fixture/status · up · ok",))):
+        rc, out = run_fixture(us_py, plant)
+        line = next((ln for ln in out.splitlines() if ln.startswith(head)), None)
+        check(f"[dSP-30] fixture isolation {plant} exits 1, "
+              + (f"its refusal line naming {' … '.join(on_refusal)}, " if on_refusal else "refusing nothing, ")
+              + f"and names {', '.join(needles)}",
+              rc == 1 and "isolation: FAILED" not in out and all(n in out for n in needles)
+              and (line is not None and all(n in line for n in on_refusal) if on_refusal else line is None), out)
+
+    # TOOL-dSafePassage-36 AC1 and AC2: a linked-worktree target's walk is rooted at its own git dir,
+    # so its own de-initialised submodule's filter refuses the step and the main worktree's does not;
+    # the `-stub` twin's filter runs, and a copy whose walk is rooted at the common dir reds both.
+    head = "isolation: fixture/update · refused · fixture/update up: the target's own git config declares what git runs"
+    wt_on = ("filter.canary.clean in ", "/.git/worktrees/wt/modules/sub/config (submodule sub), so nothing")
+    for plant, want, on_refusal, needles in (
+            ("submodule-unpopulated-worktree", 1, wt_on, ("unpopulated-worktree canary: absent",)),
+            ("submodule-unpopulated-worktree-stub", 1, (), ("fixture/update · up · ok",
+                                                            "unpopulated-worktree canary: present · filter-clean")),
+            ("submodule-main-only", 0, (), ("fixture/update · up · ok", "main-only canary: absent"))):
+        rc, out = run_fixture(us_py, plant)
+        line = next((ln for ln in out.splitlines() if ln.startswith(head)), None)
+        check(f"[dSP-36] fixture isolation {plant} exits {want}, "
+              + (f"its refusal line naming {' … '.join(on_refusal)}, " if on_refusal else "refusing nothing, ")
+              + f"and names {', '.join(needles)}",
+              rc == want and "isolation: FAILED" not in out and all(n in out for n in needles)
+              and (line is not None and all(n in line for n in on_refusal) if on_refusal else line is None), out)
+    # TOOL-dSafePassage-37 AC1 and AC2: a target's gc.recentObjectsHook refuses a gc step before any
+    # spawn, its `-stub` twin's gc running the hook; an ext:: remote under a local protocol.allow =
+    # always meets git's own refusal inside the step, its `-stub` twin, lacking the pair, running it.
+    for plant, on_refusal, needles in (
+            ("local-recent-objects-hook", ("isolation: fixture/gc · refused · fixture/gc up: ",
+                                           "gc.recentobjectshook in .git/config, so nothing was spawned"),
+             ("recent-objects-hook canary: absent",)),
+            ("local-recent-objects-hook-stub", (), ("fixture/gc · up · ok",
+                                                    "recent-objects-hook canary: present · recent-objects-hook")),
+            ("local-ext-transport", (), ("fixture/fetch · up · failed · rc ", "transport 'ext' not allowed",
+                                         "ext-transport canary: absent")),
+            ("local-ext-transport-stub", (), ("fixture/fetch · up · failed", "ext-transport canary: present · ext-transport"))):
+        rc, out = run_fixture(us_py, plant)
+        line = next((ln for ln in out.splitlines() if " · refused · " in ln), None)
+        check(f"[dSP-37] fixture isolation {plant} exits 1, "
+              + (f"its refusal line naming {' … '.join(on_refusal)}, " if on_refusal else "refusing nothing, ")
+              + f"and names {', '.join(needles)}",
+              rc == 1 and "isolation: FAILED" not in out and all(n in out for n in needles)
+              and (line is not None and all(n in line for n in on_refusal) if on_refusal else line is None), out)
+    env = govkit_module().upgrade_steps.build_step_env(tmp)
+    # TOOL-dSafePassage-45 S3, S4: the count is the pairs present, never a total typed here.
+    check("[dSP-37] AC2 build_step_env carries GIT_CONFIG_COUNT equal to the GIT_CONFIG_KEY_<n> pairs present "
+          "and the pair protocol.ext.allow = never at index 2",
+          env.get("GIT_CONFIG_COUNT") == str(sum(k.startswith("GIT_CONFIG_KEY_") for k in env))
+          and (env.get("GIT_CONFIG_KEY_2"), env.get("GIT_CONFIG_VALUE_2"))
+          == ("protocol.ext.allow", "never"), str({k: v for k, v in env.items() if k.startswith("GIT_CONFIG_")}))
+
+    walk = '                mods = d / "modules"'
+    src = us_py.read_text(encoding="utf-8")
+    rooted = build_staged_copy(tmp / "common-rooted", src.replace(walk, '                mods = (pathlib.Path(run_repo_git('
+                                                                  'target, "rev-parse", "--path-format=absolute", '
+                                                                  '"--git-common-dir").strip()) if not via else d) '
+                                                                  '/ "modules"'))
+    for plant in ("submodule-unpopulated-worktree", "submodule-main-only"):
+        rc, out = run_fixture(rooted, plant)
+        check(f"[dSP-36] a walk copy rooted at the common dir reds fixture isolation {plant}",
+              src.count(walk) == 1 and rc == 1 and "isolation: FAILED" in out, out)
+
+    # TOOL-dSafePassage-42 S8, S22, AC5 and AC13: a checked-out submodule's core.fsmonitor is refused
+    # before any index read runs it, and a de-initialised submodule is named by the path its
+    # .gitmodules maps it to, or by its name where no mapping is left; a walk copy that reads the
+    # index before grading runs the fsmonitor.
+    for plant, needles in (
+            ("submodule-fsmonitor", ("core.fsmonitor in .git/modules/sub/config (submodule sub)",
+                                     "fsmonitor canary: absent")),
+            ("submodule-name-differs", ("filter.canary.clean in .git/modules/nm/config (submodule lib/p)",
+                                        "filter.canary.clean in .git/modules/nm/config (submodule nm, by name)",
+                                        "name-differs canary: absent"))):
+        rc, out = run_fixture(us_py, plant)
+        check(f"[dSP-42] AC5 AC13 fixture isolation {plant} exits 1 and names {', '.join(needles)}",
+              rc == 1 and "isolation: FAILED" not in out and all(n in out for n in needles), out)
+    gate = "if not read_config(d, label) and work is not None:"
+    first = build_staged_copy(tmp / "index-first", src.replace(gate, 'if work is not None and run_repo_git(work, "ls-files", '
+                                                               '"-s") is not None and not read_config(d, label):'))
+    rc, out = run_fixture(first, "submodule-fsmonitor")
+    check("[dSP-42] AC5 a walk copy that reads the index before grading reds fixture isolation submodule-fsmonitor",
+          src.count(gate) == 1 and rc == 1 and "fsmonitor canary: present" in out and "isolation: FAILED" in out, out)
+
+    # TOOL-dSafePassage-29 S3 and AC4, the class arm: every executor-shaped key `git help --config`
+    # lists matches a `STEP_REFUSED_KEYS` or a `STEP_UNREFUSED_KEYS` row, the counts re-derived on
+    # every run; an empty listing reds, and a table copy missing `gpg.program` names it.
+    # TOOL-dSafePassage-37 S1: a last segment ending in `hook` is kept too. TOOL-dSafePassage-42 S7:
+    # and the last segments `tunnel`, `httpd` and `smtpserver`.
+    us = govkit_module().upgrade_steps
+    names = ("program", "command", "cmd", "editor", "gitproxy", "uploadpack", "receivepack", "driver", "clean",
+             "smudge", "process", "textconv", "external", "fsmonitor", "sshcommand", "askpass", "helper",
+             "hookspath", "pager", "path", "update", "extraheader", "tunnel", "httpd", "smtpserver")
+    hp = subprocess.run(["git", "help", "--config"], capture_output=True, text=True, encoding="utf-8",
+                        errors="replace", timeout=120)
+    kept = [k for k in (ln.strip() for ln in hp.stdout.splitlines()) if k
+            and (k.rsplit(".", 1)[-1].lower() in names or k.lower().endswith(("command", "cmd", "hook")))]
+    matched = lambda table: [k for k in kept if any(  # noqa: E731
+        _re.fullmatch(_re.sub(r"<[^>]+>", ".+", _re.escape(r[0])), k, _re.I) for r in table)]
+    refused, unrefused = matched(us.STEP_REFUSED_KEYS), matched(us.STEP_UNREFUSED_KEYS)
+    neither = [k for k in kept if k not in refused and k not in unrefused]
+    check(f"[dSP-29 AC4] git help --config: {len(kept)} executor-shaped key(s) kept, {len(refused)} matching "
+          f"STEP_REFUSED_KEYS and {len(unrefused)} STEP_UNREFUSED_KEYS, none matching neither",
+          hp.returncode == 0 and bool(kept) and not neither,
+          f"git help --config exits {hp.returncode}; matching neither: {neither or 'none'}"
+          + ("; the listing kept no key" if not kept else ""))
+    less = [r for r in us.STEP_REFUSED_KEYS if r[0] != "gpg.program"]
+    check("[dSP-29 AC4] with the gpg.program row taken out of a copy of the table, the arm names gpg.program",
+          bool(kept) and [k for k in kept if k not in matched(less) and k not in unrefused] == ["gpg.program"])
+    hooked = {"gc.recentObjectsHook", "advice.ignoredHook", "uploadpack.packObjectsHook"}
+    less = [r for r in us.STEP_REFUSED_KEYS if r[0] != "gc.recentObjectsHook"]
+    check("[dSP-37] AC3 the kept set holds the three hook-named keys, and with the gc.recentObjectsHook row "
+          "taken out of a copy of the table, the arm names it",
+          hooked <= set(kept) and [k for k in kept if k not in matched(less) and k not in unrefused]
+          == ["gc.recentObjectsHook"], f"hook-named keys kept: {sorted(hooked & set(kept))}")
+    runs42 = {"imap.tunnel", "instaweb.httpd", "sendemail.smtpServer"}
+    less = [r for r in us.STEP_REFUSED_KEYS if r[0] != "imap.tunnel"]
+    check("[dSP-42] AC4 the kept set holds imap.tunnel, instaweb.httpd and sendemail.smtpServer, and with the "
+          "imap.tunnel row taken out of a copy of the table, the arm names it",
+          runs42 <= set(kept) and [k for k in kept if k not in matched(less) and k not in unrefused]
+          == ["imap.tunnel"], f"kept: {sorted(runs42 & set(kept))}")
+    # S7's values: any tunnel or httpd, an absolute smtpServer, never a host name.
+    v42 = tmp / "dsp42-values"
+    subprocess.run(["git", "init", "-q", str(v42)], env=us.build_tree_git_env(), capture_output=True, check=True)
+    for host, want in (("/usr/bin/x", 3), ("smtp.example.com", 2)):
+        for k, v in (("imap.tunnel", "x"), ("instaweb.httpd", "x"), ("sendemail.smtpServer", host)):
+            subprocess.run(["git", "-C", str(v42), "config", k, v], env=us.build_tree_git_env(), check=True)
+        found = us.check_target_local_config(v42)
+        check(f"[dSP-42] AC4 sendemail.smtpServer = {host}: the check names {want} of the three keys",
+              len(found) == want and all(any(k.lower() in e for e in found) for k in sorted(runs42)[:want]), str(found))
+
+    # TOOL-dSafePassage-45 AC3: git-send-email's own absoluteness test, in the identity form too.
+    for i, (k, v, want) in enumerate((("sendemail.smtpserver", "/usr/bin/x", 1), ("sendemail.smtpserver", "C:/x/sendmail.exe", 1),
+                                      ("sendemail.smtpserver", "c:evil", 1), ("sendemail.work.smtpserver", "/x", 1),
+                                      ("sendemail.smtpserver", "smtp.example.com", 0))):
+        v45 = tmp / f"dsp45-smtp-{i}"
+        subprocess.run(["git", "init", "-q", str(v45)], env=us.build_tree_git_env(), capture_output=True, check=True)
+        subprocess.run(["git", "-C", str(v45), "config", k, v], env=us.build_tree_git_env(), check=True)
+        found = us.check_target_local_config(v45)
+        check(f"[dSP-45] AC3 {k} = {v}: the check names {want} key(s)", len(found) == want, str(found))
+
+    # TOOL-dSafePassage-48 AC1, AC2: every send-email executor key is refused in its identity form,
+    # `sendemail.sendmailCmd` too, and a key that runs nothing is not; the eight cases are graded by
+    # the check's own predicate over one config row each, and table copies without the
+    # `sendemail.<x>.ccCmd` form or the `sendemail.sendmailCmd` row red on exactly that key.
+    cases48 = ((("sendemail.sendmailcmd", "x"), True), (("sendemail.work.sendmailcmd", "x"), True),
+               (("sendemail.work.cccmd", "x"), True), (("sendemail.work.tocmd", "x"), True),
+               (("sendemail.work.headercmd", "x"), True), (("sendemail.work.smtpserver", "/usr/bin/x"), True),
+               (("sendemail.work.to", "a@example.com"), False), (("sendemail.work.smtpserver", "smtp.example.com"), False))
+    full48, read48 = us.STEP_REFUSED_KEYS, us.read_target_local_config
+
+    def measure_wrong48(table) -> list:
+        us.STEP_REFUSED_KEYS = table
+        try:
+            out = []
+            for (k, v), want in cases48:
+                us.read_target_local_config = lambda _t, _r, k=k, v=v: [(".git/config", k, v, "")]
+                if bool(us.check_target_local_config(tmp)) != want:
+                    out.append(k)
+            return out
+        finally:
+            us.STEP_REFUSED_KEYS, us.read_target_local_config = full48, read48
+    got48 = measure_wrong48(full48)
+    check("[dSP-48] AC1 the check refuses sendmailCmd and the identity forms of the send-email keys, "
+          "and neither sendemail.work.to nor a host-name smtpServer", not got48, f"wrong: {got48}")
+    for drop, key in (("sendemail.<x>.ccCmd", "sendemail.work.cccmd"), ("sendemail.sendmailCmd", "sendemail.sendmailcmd")):
+        got48 = measure_wrong48(tuple(r for r in full48 if r[0] != drop))
+        check(f"[dSP-48] AC1 a table copy without the {drop} row passes {key}", got48 == [key], f"wrong: {got48}")
+    rc, out = run_fixture(us_py, "sendemail-identity-cmd")
+    check("[dSP-48] AC2 fixture isolation sendemail-identity-cmd exits 1, refused naming sendemail.work.cccmd "
+          "in .git/config, its canary absent",
+          rc == 1 and "isolation: FAILED" not in out and "sendemail.work.cccmd in .git/config, so nothing was spawned" in out
+          and "sendemail canary: absent" in out, out)
+
+    # TOOL-dSafePassage-49 S8, AC10: the class arm widened to identity forms. Each kept key, and each
+    # expected unlisted executor key, in a section `git help --config` lists as `<section>.<placeholder>.*`
+    # also stands as `<section>.dsp49.<rest>`, and every key of both matches a row; table copies
+    # without `sendemail.<x>.ccCmd` or `sendemail.sendmailCmd` name exactly that key.
+    # TOOL-dSafePassage-51 S9: the expected unlisted executor keys live here, never in the module
+    # they guard: git-send-email declares `sendmailcmd` in its option table (`:394`) and runs it
+    # through `sh -c` (`:1787`), and `git help --config` does not list it.
+    unlisted = {"sendemail.sendmailCmd"}
+    placed = {m.group(1) for m in (_re.match(r"^([a-z]+)\.<[a-z]+>\.\*$", ln.strip()) for ln in hp.stdout.splitlines()) if m}
+    kept49 = [*kept, *sorted(unlisted)]
+    widened = [k.split(".", 1)[0] + ".dsp49." + k.split(".", 1)[1] for k in kept49 if k.split(".", 1)[0].lower() in placed]
+
+    def read_unrowed49(table) -> list:
+        return [k for k in kept49 + widened if not any(_re.fullmatch(_re.sub(r"<[^>]+>", ".+", _re.escape(r[0])), k, _re.I)
+                                                      for r in (*table, *us.STEP_UNREFUSED_KEYS))]
+    check(f"[dSP-49] AC10 the class arm widened: {len(placed)} placeholder section(s), {len(widened)} widened "
+          f"key(s), every kept and widened key matching a row", hp.returncode == 0 and bool(widened) and not read_unrowed49(us.STEP_REFUSED_KEYS),
+          f"placeholder sections {sorted(placed)}; widened {widened}; matching no row: {read_unrowed49(us.STEP_REFUSED_KEYS)}")
+    for drop, key in (("sendemail.<x>.ccCmd", "sendemail.dsp49.cccmd"), ("sendemail.sendmailCmd", "sendemail.sendmailcmd")):
+        got49 = [k.lower() for k in read_unrowed49(tuple(r for r in us.STEP_REFUSED_KEYS if r[0] != drop))]
+        check(f"[dSP-49] AC10 a table copy without the {drop} row names {key}", got49 == [key], f"named: {got49}")
+
+    # AC9, AC13: a submodule git will not open, and a `.gitmodules` that is no regular file, each refuse
+    # the step before any spawn, naming it; a walk copy without the `rev-parse` refusal, and a read
+    # with no file test, red.
+    src49 = us_py.read_text(encoding="utf-8")
+    for plant, needle, label, old, new in (
+            ("submodule-format-unknown", "/.git/modules/sub: git will not open this repository",
+             "a walk copy without the rev-parse refusal", "                    if opened.returncode:",
+             "                    if False:"),
+            ("gitmodules-unreadable", "/.gitmodules does not read: it is no regular file",
+             "a .gitmodules read with no file test", "            if not stat.S_ISREG(st.st_mode):",
+             "            if False:")):
+        rc, out = run_fixture(us_py, plant)
+        check(f"[dSP-49] AC9 AC13 fixture isolation {plant} exits 1, refused before any spawn naming {needle}",
+              rc == 1 and "isolation: FAILED" not in out and needle in out and "fixture/status · up ·" not in out, out)
+        rc, out = run_fixture(build_staged_copy(tmp / f"dsp49-{plant}", src49.replace(old, new)), plant)
+        check(f"[dSP-49] AC9 AC13 {label} reds fixture isolation {plant}",
+              src49.count(old) == 1 and rc == 1 and "isolation: FAILED" in out, out)
+
+    # TOOL-dSafePassage-51 AC3 to AC6, AC9: the walk's config read before its rev-parse, no link
+    # followed under modules/, the rolled-back row rule reached by move 3, the arm's unlisted key
+    # held here, and a `.gitmodules` typed by `stat` before any open. Failing cases are staged
+    # copies: a walk running rev-parse first, a walk following links, a reverse walk keeping s2
+    # rolled-back with its failure, and a read spawning `config -f` before its stat. Not run: that
+    # copy's FIFO plant on POSIX, whose blocked git would outlive the bound.
+    first51 = "                if not read_config(d, label) and work is not None:"
+    revparse51 = ('                if work is None and subprocess.run(["git", f"--git-dir={d}", "rev-parse", "--git-dir"], '
+                  "cwd=str(d), env=env, capture_output=True).returncode:\n"
+                  '                    raise Refusal(f"{d.as_posix()}: git will not open this repository")\n' + first51)
+    link51 = "if test_path_linked(c):"  # TOOL-dSafePassage-56 S1: the child test is a call of it
+    for plant, needle, label, old, new in (
+            ("submodule-config-malformed", " exits 128, so .git/modules/sub/config or a file it includes does not read",
+             "a walk copy running rev-parse before the config read", first51, revparse51),
+            ("submodule-modules-link-loop", "/.git/modules/a/loop is a link under modules/",
+             "a walk copy following links", link51, "if False:")):
+        t51 = time.monotonic()
+        rc, out = run_fixture(us_py, plant)
+        check(f"[dSP-51] AC3 AC4 fixture isolation {plant} exits 1 within 60 seconds, refused naming {needle}",
+              rc == 1 and time.monotonic() - t51 < 60 and "isolation: FAILED" not in out and "Traceback" not in out
+              and needle in out, out)
+        rc, out = run_fixture(build_staged_copy(tmp / f"dsp51-{plant}", src49.replace(old, new)), plant)
+        check(f"[dSP-51] AC3 AC4 {label} reds fixture isolation {plant}",
+              src49.count(old) == 1 and rc == 1 and "isolation: FAILED" in out, out)
+    back51 = '            state = "applied"\n'
+    p51 = subprocess.run([sys.executable, str(build_staged_copy(tmp / "dsp51-rolled-back", src49.replace(
+        back51, '            state = state or "applied"\n'))), "fixture", "rollback", "--plant", "rolled-back-witness-holds"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
+    out = p51.stdout + p51.stderr
+    check("[dSP-51] AC5 a reverse-walk copy whose move 3 keeps s2 rolled-back with its failure raises Refusal naming "
+          "fx/s2 and exits non-zero", src49.count(back51) == 1 and p51.returncode != 0
+          and "Refusal: 'fx/s2': a rolled-back row carries no `failure`" in out, out[-3000:])
+    check("[dSP-51] AC6 upgrade_steps.py holds no list of the unlisted executor keys the class arm expects",
+          "UNLISTED_EXECUTOR" + "_KEYS" not in src49, "")  # split, so TOOL-dSafePassage-59 AC7's grep reads none
+    fifo = hasattr(os, "mkfifo")
+    rc, out = run_fixture(us_py, "gitmodules-fifo")
+    check("[dSP-51] AC9 fixture isolation gitmodules-fifo " + ("exits 1 refused naming .gitmodules" if fifo
+                                                              else "prints its skip line and exits 0"),
+          (rc == 1 and "/.gitmodules does not read" in out and "isolation: FAILED" not in out) if fifo
+          else (rc == 0 and "isolation: skip — gitmodules-fifo" in out), out)
+    # TOOL-dSafePassage-59 S8: AC9 is read with `os.lstat` alone, the `os.stat` it named not taken.
+    typed51 = "            try:\n                st = os.lstat(gm)\n"
+    for label, text, want in (("the module", src49, True), ("a read copy spawning config -f before its lstat", src49.replace(
+            typed51, '            run_repo_git(work, "config", "-f", ".gitmodules", "--list", ok=(0, 1))\n' + typed51), False)):
+        fn = next((n for n in _ast.walk(_ast.parse(text)) if isinstance(n, _ast.FunctionDef) and n.name == "read_submodule_paths"), None)
+        calls = [(n.lineno, _ast.unparse(n.func)) for n in _ast.walk(fn) if isinstance(n, _ast.Call)] if fn else []
+        typed = [ln for ln, f in calls if f == "os.lstat"]
+        opened = [ln for ln, f in calls if f == "run_repo_git" or f.endswith("open")]
+        got = bool(typed) and bool(opened) and max(typed) < min(opened)
+        check(f"[dSP-51] AC9 {label}: read_submodule_paths types .gitmodules by lstat before any spawn or open"
+              + ("" if want else " — reds"), src49.count(typed51) == 1 and got == want, f"calls: {calls}")
+
+    # TOOL-dSafePassage-53 AC2, AC3: a path git never created is the walk's empty population, and an
+    # existing one that will not list is refused naming it and its error class. Failing cases are
+    # staged copies: TOOL-dSafePassage-51's single `except OSError`, under which a `git init`
+    # repository is refused, and a handler passing every OSError, under which the plant is not refused.
+    # Not covered: a PermissionError listing, which this host cannot stage without changing an ACL.
+    absent53 = "                    except FileNotFoundError:\n                        continue\n"
+    refuse53 = "                    except OSError as e:\n"
+    lone53 = src49.replace(absent53, "")
+    for n, (label, text) in enumerate((("the module", src49),
+                                       ("a walk copy with TOOL-dSafePassage-51's single except OSError", lone53))):
+        mod = us
+        if n:
+            spec53 = importlib.util.spec_from_file_location("us53_lone", build_staged_copy(tmp / "dsp53-lone", text))
+            mod = importlib.util.module_from_spec(spec53)
+            spec53.loader.exec_module(mod)
+        repo53 = tmp / f"dsp53-empty-{n}"
+        subprocess.run(["git", "init", "-q", str(repo53)], capture_output=True, check=True)
+        rows = mod.read_target_repositories(repo53, lambda d, label: False)
+        green = isinstance(rows, list) and [r["git_dir"] for r in rows] == [(repo53 / ".git").resolve().as_posix()]
+        check(f"[dSP-53] AC3 {label}: read_target_repositories over a git init repository with no .git/modules "
+              + ("returns its one git directory" if not n else "— reds"),
+              not (repo53 / ".git" / "modules").exists() and green == (not n)
+              and (not n or src49.count(absent53) == 1), str(rows))
+    every53 = src49.replace(refuse53 + "                        raise Refusal(",
+                            "                    except OSError:\n                        continue\n"
+                            "                        raise Refusal(")
+    needle53 = "/.git/modules/a/modules does not list (NotADirectoryError"
+    rc, out = run_fixture(us_py, "submodule-modules-not-a-directory")
+    check(f"[dSP-53] AC2 fixture isolation submodule-modules-not-a-directory exits 1, refused naming {needle53}",
+          rc == 1 and needle53 in out and "isolation: FAILED" not in out and "Traceback" not in out, out)
+    rc, out = run_fixture(build_staged_copy(tmp / "dsp53-every", every53), "submodule-modules-not-a-directory")
+    check("[dSP-53] AC2 a walk copy passing every OSError reds fixture isolation submodule-modules-not-a-directory",
+          src49.count(refuse53) == 1 and rc == 1 and "isolation: FAILED" in out, out)
+
+    # TOOL-dSafePassage-54 AC1, AC2: the sound baseline, the tree git's own `submodule add` writes
+    # (the `submodule-sound-no-nested` plant) and gov's own tree, whose git dir holds no `modules/`,
+    # each walked with no refusal. The failing case is `lone53`, TOOL-dSafePassage-51's single
+    # `except OSError`, under which both are refused. Not covered: another git version's layout.
+    lone54 = build_staged_copy(tmp / "dsp54-lone", lone53)
+    spec54 = importlib.util.spec_from_file_location("us54_lone", lone54)
+    mod54 = importlib.util.module_from_spec(spec54)
+    spec54.loader.exec_module(mod54)
+    gd54 = run_gov_git(GOV_ROOT, "rev-parse", "--absolute-git-dir")
+    for n, (label, py, mod) in enumerate((("the module", us_py, us),
+                                          ("a walk copy with TOOL-dSafePassage-51's single except OSError", lone54, mod54))):
+        rc, out = run_fixture(py, "submodule-sound-no-nested")
+        green = (rc == 0 and out.count("isolation: population · ") == 2 and "/.git/modules/sub · reached by sub" in out
+                 and not any(x in out for x in ("isolation: FAILED", " · refused · ", "Traceback")))
+        check(f"[dSP-54] AC1 {label}: fixture isolation submodule-sound-no-nested "
+              + ("exits 0, the target and .git/modules/sub listed, no refusal" if not n else "— reds"),
+              green == (not n) and (not n or rc == 1), out)
+        rows = mod.read_target_repositories(GOV_ROOT, lambda d, label: False)
+        green = isinstance(rows, list) and [r["git_dir"] for r in rows] == [pathlib.Path(gd54).resolve().as_posix()]
+        check(f"[dSP-54] AC2 {label}: read_target_repositories over gov's own tree "
+              + ("returns its one git directory, no Refusal" if not n else "— reds"),
+              bool(gd54) and not (pathlib.Path(gd54) / "modules").exists() and green == (not n), str(rows))
+
+    # TOOL-dSafePassage-56 AC1 to AC3: `test_path_linked` reads a junction or symlink True, a plain
+    # directory and an absent path False, and the walk tests every path it enters, so a `modules`
+    # linked back to `.git/modules` or outside it is refused naming it. The failing case is a walk
+    # copy testing only listed children: the nested plant loops to an OSError naming a deeper path,
+    # and the outside plant names `filter.canary.clean`. Not covered: another reparse point.
+    dir56 = tmp / "dsp56"
+    (dir56 / "plain").mkdir(parents=True)
+    if os.name == "nt":
+        subprocess.run(["cmd", "/c", "mklink", "/J", str(dir56 / "link"), str(dir56 / "plain")], capture_output=True)
+    else:
+        os.symlink(dir56 / "plain", dir56 / "link", target_is_directory=True)
+    got56 = [us.test_path_linked(dir56 / n) for n in ("link", "plain", "absent")]
+    check("[dSP-56] AC1 test_path_linked reads a junction or symlink, a plain directory and an absent path "
+          "True, False, False", got56 == [True, False, False], str(got56))
+    entry56 = "                    if test_path_linked(cur):\n"
+    only56 = build_staged_copy(tmp / "dsp56-children", src49.replace(entry56, "                    if False:\n"))
+    for plant, ac in (("submodule-modules-link-nested", "AC2"), ("submodule-modules-link-outside", "AC3")):
+        for py in (us_py, only56):
+            t56 = time.monotonic()
+            rc, out = run_fixture(py, plant)
+            if py == us_py:
+                check(f"[dSP-56] {ac} fixture isolation {plant} exits 1 within 60 seconds, refused naming "
+                      ".git/modules/a/modules, no Traceback and no filter.canary.clean",
+                      rc == 1 and time.monotonic() - t56 < 60 and "isolation: FAILED" not in out
+                      and "/.git/modules/a/modules is a link the walk would enter" in out
+                      and not any(x in out for x in ("Traceback", "filter.canary.clean")), out)
+            else:
+                check(f"[dSP-56] {ac} a walk copy testing only listed children reds fixture isolation {plant}",
+                      src49.count(entry56) == 1 and rc == 1 and "isolation: FAILED" in out
+                      and (ac == "AC2" or "filter.canary.clean" in out), out[-3000:])
+
+    # TOOL-dSafePassage-59 AC3 to AC6: `test_path_linked` is one `lstat` and its reparse tag; the
+    # walk refuses `.git/modules` itself linked and a dangling link under it; `.gitmodules` is
+    # tested for a link on its `lstat` before any spawn or open. Failing cases are staged copies: a
+    # test reading `S_ISLNK` alone, a walk not testing the root, a walk filtering by `os.path.isdir`
+    # before the link test, and a `.gitmodules` read taking `os.stat`. Not covered: the S_ISLNK-alone
+    # red on POSIX, where a directory symlink still reads linked; the symlink plant where the host
+    # refuses one, which sees only its skip line; a reparse point neither symlink nor junction.
+    tag59 = '    return stat.S_ISLNK(st.st_mode) or getattr(st, "st_reparse_tag", 0) != 0\n'
+    got59 = [us.test_path_linked(dir56 / n) for n in ("link", "plain", "absent")]
+    check("[dSP-59] AC3 test_path_linked reads a junction or symlink, a plain directory and an absent path "
+          "True, False, False", got59 == [True, False, False], str(got59))
+    if os.name == "nt":
+        spec59 = importlib.util.spec_from_file_location("us59_islnk", build_staged_copy(
+            tmp / "dsp59-islnk", src49.replace(tag59, "    return stat.S_ISLNK(st.st_mode)\n")))
+        mod59 = importlib.util.module_from_spec(spec59)
+        spec59.loader.exec_module(mod59)
+        check("[dSP-59] AC3 a test_path_linked copy testing S_ISLNK alone reads the junction as no link — reds",
+              src49.count(tag59) == 1 and mod59.test_path_linked(dir56 / "link") is False, "")
+    child59 = "                        if test_path_linked(c):\n"
+    for plant, ac, needle, label, old, new in (
+            ("submodule-modules-root-link", "AC4", "/.git/modules is a link the walk would enter",
+             "a walk copy listing the root without testing it", entry56, "                    if False:\n"),
+            ("submodule-modules-link-dangling", "AC5", "/.git/modules/dangling is a link under modules/",
+             "a walk copy filtering by os.path.isdir before the link test", child59,
+             "                        if not os.path.isdir(c):\n                            continue\n" + child59)):
+        t59 = time.monotonic()
+        rc, out = run_fixture(us_py, plant)
+        check(f"[dSP-59] {ac} fixture isolation {plant} exits 1 within 60 seconds, refused naming {needle}, no Traceback",
+              rc == 1 and time.monotonic() - t59 < 60 and "isolation: FAILED" not in out and needle in out
+              and "Traceback" not in out, out)
+        rc, out = run_fixture(build_staged_copy(tmp / f"dsp59-{plant}", src49.replace(old, new)), plant)
+        check(f"[dSP-59] {ac} {label} reds fixture isolation {plant}",
+              src49.count(old) == 1 and rc == 1 and "isolation: FAILED" in out, out[-3000:])
+    stat59 = "                st = os.lstat(gm)\n"
+    follow59 = src49.replace(stat59, "                st = os.stat(gm)\n")
+    for label, text, want in (("the module", src49, True), ("a .gitmodules read copy taking os.stat", follow59, False)):
+        fn = next((n for n in _ast.walk(_ast.parse(text)) if isinstance(n, _ast.FunctionDef) and n.name == "read_submodule_paths"), None)
+        calls = [(n.lineno, _ast.unparse(n)) for n in _ast.walk(fn) if isinstance(n, _ast.Call)] if fn else []
+        lst = [ln for ln, c in calls if c.startswith("os.lstat(")]
+        lnk = [ln for ln, c in calls if c == "stat.S_ISLNK(st.st_mode)"]
+        opened = [ln for ln, c in calls if c.startswith("run_repo_git(") or c.split("(")[0].endswith("open")]
+        got = bool(lst and lnk and opened) and min(lst) < min(lnk) < min(opened)
+        check(f"[dSP-59] AC6 {label}: read_submodule_paths tests S_ISLNK on its os.lstat result before its config -f "
+              "spawn and any open" + ("" if want else " — reds"), src49.count(stat59) == 1 and got == want, f"calls: {calls}")
+    for n, py in enumerate((us_py, build_staged_copy(tmp / "dsp59-follow", follow59))):
+        rc, out = run_fixture(py, "gitmodules-symlink")
+        if "isolation: skip — gitmodules-symlink" in out:
+            check("[dSP-59] AC6 fixture isolation gitmodules-symlink prints its skip line and exits 0 where the host "
+                  "refuses a symlink", rc == 0, out)
+            break
+        check("[dSP-59] AC6 " + ("fixture isolation gitmodules-symlink exits 1, refused naming .gitmodules" if not n
+                                 else "a .gitmodules read copy taking os.stat reds fixture isolation gitmodules-symlink"),
+              rc == 1 and (("/.gitmodules does not read: it is a link" in out and "isolation: FAILED" not in out)
+                           if not n else "isolation: FAILED" in out), out[-3000:])
+
+    # AC14: a key's tested subsection is redacted to its last `@`, a space or a `/` in the password
+    # included; the plant is graded over the refusal's named entries, the text between
+    # TOOL-dSafePassage-24's fixed lead and tail, for 3-character pieces, and over the whole output
+    # for the password and its halves of 3 or more characters; a redactor copy stopping at a space reds.
+    for text in ("http.https://u:se\x20cret@h/.sslkey", "http.https://u:se/cret@h/.sslkey"):
+        got = us.render_redacted_config(text)
+        check(f"[dSP-49] AC14 render_redacted_config({text!r}) is the subsection redacted to its last @",
+              got == "http.https://<redacted>@h/.sslkey", got)
+    pw49 = "se cret"
+    stop49 = "        if m and at >= m.end():"
+    for py, label in ((us_py, "fixture isolation subsection-password-space exits 1"),
+                      (build_staged_copy(tmp / "dsp49-space-redactor", src49.replace(stop49, "        if False:")),
+                       "a redactor copy stopping at a space: fixture isolation subsection-password-space")):
+        rc, out = run_fixture(py, "subsection-password-space")
+        line = next((ln for ln in out.splitlines() if " · refused · " in ln), "")
+        entries = line.partition("sends as a credential, ")[2].partition(", so nothing was spawned")[0]
+        pieces = sorted({pw49[i:i + 3] for i in range(len(pw49) - 2)} & {entries[i:i + 3] for i in range(len(entries) - 2)})
+        halves = [h for h in (pw49, *pw49.split(" ")) if len(h) >= 3 and h in out]
+        green = (rc == 1 and "isolation: FAILED" not in out
+                 and "http.https://<redacted>@h/.sslkey in .git/config" in entries and not pieces and not halves)
+        check(f"[dSP-49] AC14 {label}" + (", its named entries holding the redacted key and no 3-character piece of "
+                                          "the password, the output neither it nor a half" if py == us_py else " reds"),
+              green if py == us_py else src49.count(stop49) == 1 and not green and "isolation: FAILED" in out,
+              f"entries {entries!r}; pieces {pieces}; halves {halves}\n{out}")
+
+    # TOOL-dSafePassage-45 AC7, the credential-key arm: every key `git help --config` lists whose last
+    # segment ends in a CREDENTIAL_KEY_SUFFIXES entry matches a STEP_CREDENTIAL_KEYS or a
+    # STEP_REFUSED_KEYS row, re-derived on every run; an empty listing reds, and a table copy
+    # missing `imap.pass` names it.
+    secret = [k for k in (ln.strip() for ln in hp.stdout.splitlines())
+              if k and k.rsplit(".", 1)[-1].lower().endswith(us.CREDENTIAL_KEY_SUFFIXES)]
+    rows = lambda table, keys: [k for k in keys if any(  # noqa: E731
+        _re.fullmatch(_re.sub(r"<[^>]+>", ".+", _re.escape(r[0])), k, _re.I) for r in table)]
+    unrowed = [k for k in secret if k not in rows(us.STEP_CREDENTIAL_KEYS, secret) and k not in rows(us.STEP_REFUSED_KEYS, secret)]
+    check(f"[dSP-45] AC7 git help --config: {len(secret)} secret-suffixed key(s), each a STEP_CREDENTIAL_KEYS or "
+          f"STEP_REFUSED_KEYS row", hp.returncode == 0 and bool(secret) and not unrowed,
+          f"matching no row: {unrowed or 'none'}" + ("; the listing kept no key" if not secret else ""))
+    less = [r for r in us.STEP_CREDENTIAL_KEYS if r[0] != "imap.pass"]
+    check("[dSP-45] AC7 with the imap.pass row taken out of a copy of STEP_CREDENTIAL_KEYS, the arm names imap.pass",
+          [k for k in secret if k not in rows(less, secret) and k not in rows(us.STEP_REFUSED_KEYS, secret)] == ["imap.pass"])
+    check("[dSP-45] AC7 test_credential_bearing refuses sendemail.smtppass and keeps user.signingkey",
+          us.test_credential_bearing("sendemail.smtppass", "x") and not us.test_credential_bearing("user.signingkey", "ABCD"))
+
+    # AC6's red: the kit copied whole, a direct spawn of `row["up"]` planted into the copy.
+    text = us_py.read_text(encoding="utf-8") + '\n\ndef planted_spawn(row):\n    return subprocess.run(row["up"])\n'
+    rc, out = run_fixture(build_staged_copy(tmp / "callers", text), "callers")
+    check("[dSP-7] AC6 a planted spawn of row[\"up\"] reds the callers probe, naming its line",
+          rc == 1 and f"upgrade_steps.py:{len(text.splitlines())}, in planted_spawn" in out, out)
+
+    row = us.StepRow("fixture/x", ["python", "-c", "pass"], ["python", "-c", "pass"], ["python", "-c", "pass"],
+                     "atomic", [], False, "fixture", 1, None)
+    try:
+        us.run_step_isolated(row, "resume", tmp, tmp)
+        refused = ""
+    except us.Refusal as e:
+        refused = str(e)
+    check("[dSP-7] S3 a phase with no argv is refused, naming the step and the phase",
+          "fixture/x: no `resume` argv" in refused, refused)
+    check("[dSP-7] S3 a row declaring needs-target is attended and spawns nothing",
+          us.run_step_isolated(row._replace(needs_target=True), "up", tmp, tmp)
+          == {"verdict": "attended", "rc": None, "tail": ""})
+
+    # TOOL-dSafePassage-69 S4: an up that fails with nothing on stderr stops with a tail naming that and
+    # stdout's last line, and a witness, a verdict, keeps its empty tail.
+    quiet_target = tmp / "dsp69-target"
+    quiet_target.mkdir(parents=True)
+    subprocess.run(["git", "init", "-q", str(quiet_target)], check=True, capture_output=True)
+    quiet = row._replace(up=["python", "-c", "print('the reason'); raise SystemExit(3)"],
+                         witness=["python", "-c", "print('the reason'); raise SystemExit(3)"])
+    up, wit = (us.run_step_isolated(quiet, ph, quiet_target, GOV_ROOT) for ph in ("up", "witness"))
+    check("[dSP-69] an up that fails with nothing on stderr stops with a tail naming that and its stdout",
+          up["verdict"] == "failed" and up["rc"] == 3 and "\n" not in up["tail"]
+          and all(n in up["tail"] for n in ("fixture/x up", "nothing on stderr", "the reason"))
+          and wit["tail"] == "", f"up {up}; witness {wit}")
+
+    # TOOL-dSafePassage-75 S3: launchers reporting 3.12 first on PATH and GOV_PYTHON at the floor; the
+    # floor row's witness, run under the contract on gov's own tree, resolves the override and holds.
+    floor_row = next(r for r in us.read_steps(GOV_ROOT, None, None) if r.id == "lib/python-floor-3.15")
+    fakes = tmp / "dsp75-below"
+    fakes.mkdir(exist_ok=True)
+    for nm in ("python3", "python", "py"):  # shaped as resolve-python.test.sh's write_fake_launcher
+        (fakes / nm).write_bytes(b'#!/usr/bin/env bash\necho "3.12 $0"\n')
+        (fakes / nm).chmod(0o755)
+    with set_environ({"PATH": str(fakes) + os.pathsep + os.environ.get("PATH", ""),
+                      "GOV_PYTHON": sys.executable}):
+        got = us.run_step_isolated(floor_row, "witness", GOV_ROOT, GOV_ROOT)
+    check("[dSP-75] the floor row's witness under the contract, 3.12 fakes on PATH and GOV_PYTHON at the floor, is ok",
+          got["verdict"] == "ok" and got["rc"] == 0, str(got))
+    check_floor_bash(tmp)
+
+
+def check_floor_bash(tmp: pathlib.Path) -> None:
+    """TOOL-dSafePassage-87 AC5 and TOOL-dSafePassage-91 S3, the floor row's witness on one PATH whose
+    every bash is unusable: with GOV_BASH the parent's bash it holds, and with GOV_BASH unset the
+    floor stub reaches its fallback to bare `bash`, its tail graded by `test_floor_fallback`, which
+    TOOL-dSafePassage-92 grades over every host shape the bar runs on. Called from `check_step_isolation`."""
+    us = govkit_module().upgrade_steps
+    floor_row = next(r for r in us.read_steps(GOV_ROOT, None, None) if r.id == "lib/python-floor-3.15")
+    # TOOL-dSafePassage-87 S4: PATH's first bash a text file that does not run, every other PATH entry
+    # holding a bash dropped but a System32 or WindowsApps launcher, which resolve_bash skips, and
+    # GOV_BASH the parent's own bash: the floor stub resolves bash as the parent does, so it holds.
+    bash87 = us.resolve_bash()
+    fake87 = tmp / "dsp87-nobash"
+    fake87.mkdir(exist_ok=True)
+    for nm in ("bash", "bash.exe"):
+        (fake87 / nm).write_bytes(b"not a program\n")
+        (fake87 / nm).chmod(0o755)
+
+    def test_launcher87(d: str) -> bool:
+        return any(s in d.replace("\\", "/").lower() for s in ("/system32", "/windowsapps"))
+
+    keep87 = [d for d in os.environ.get("PATH", "").split(os.pathsep) if d and (test_launcher87(d) or not any(
+        os.path.isfile(os.path.join(d, n)) for n in ("bash", "bash.exe")))]
+    path87 = os.pathsep.join([str(fake87)] + keep87)
+    with set_environ({"PATH": path87, "GOV_BASH": bash87, "GOV_PYTHON": sys.executable}):
+        got = us.run_step_isolated(floor_row, "witness", GOV_ROOT, GOV_ROOT)
+    check("[dSP-87 AC5] the floor row's witness, PATH's bash unusable and GOV_BASH the parent's bash, is ok",
+          got["verdict"] == "ok" and got["rc"] == 0, str(got))
+
+    def test_floor_fallback(tail: str) -> bool:
+        # TOOL-dSafePassage-92: the stub reached its spawn unless the tail shows a crash, its own early
+        # exit or the Refusal. A crash is a traceback, its header or a frame line, unless it is a failed
+        # spawn: its last line an OSError, by class, under a subprocess.py frame. The word bash is never
+        # required: the WSL launcher with no distribution answers in UTF-16 or on stdout, and a failed
+        # spawn's frames fill the 20-line tail on Windows.
+        last = next((ln for ln in reversed(tail.splitlines()) if ln.strip()), "")
+        spawn_failed = 'subprocess.py"' in tail and last.split(":", 1)[0] in {
+            c.__name__ for c in (OSError, *OSError.__subclasses__())}
+        crashed = ("Traceback" in tail or 'File "' in tail) and not spawn_failed
+        return not crashed and not any(s in tail for s in ("python_floor.py:", "upgrade_steps.Refusal", "Set GOV_BASH"))
+
+    def read_fallback_argv(steps: types.ModuleType) -> object:
+        # TOOL-dSafePassage-94: what `steps` hands the stub for a bare bash, read in this process with
+        # its cached bash cleared, or the exception the call raised. A spawn crash's tail cannot show
+        # which spawn crashed, so this read is what proves the call reaches its fallback.
+        try:
+            held = steps._BASH
+        except AttributeError as e:  # TOOL-dSafePassage-95: a copy that did not load has no memo
+            return e
+        steps._BASH = None
+        try:
+            return steps.resolve_shell_argv(["bash", "x"])
+        except Exception as e:  # noqa: BLE001 - a crash inside resolve_bash is what this reads
+            return e
+        finally:
+            steps._BASH = held
+
+    # TOOL-dSafePassage-94: the regression that read must see, check_runs no longer catching a spawn's
+    # OSError, staged in a copy of upgrade_steps.py, so the read is seen red on every run.
+    # TOOL-dSafePassage-95: staged by build_staged_copy, its anchor replaced once, and a copy that
+    # does not load is a labelled FAIL rather than a crash of the suite.
+    src94 = (HERE / "upgrade_steps.py").read_text(encoding="utf-8")
+    anchor94 = "returncode == 0\n        except OSError:"
+    sentinel94 = "dsp95-sentinel"
+    steps94 = types.ModuleType("dsp94_upgrade_steps")
+    shutil.rmtree(tmp / "dsp94-narrowed", ignore_errors=True)  # TOOL-dSafePassage-96: a reused tmp stages afresh
+    try:
+        spec94 = importlib.util.spec_from_file_location("dsp94_upgrade_steps", build_staged_copy(
+            tmp / "dsp94-narrowed", src94.replace(anchor94, "returncode == 0\n        except ValueError:", 1)))
+        steps94 = importlib.util.module_from_spec(spec94)
+        spec94.loader.exec_module(steps94)
+        steps94._BASH = sentinel94  # TOOL-dSafePassage-95: a memo only the raise path's restore gives back
+    except Exception as e:  # noqa: BLE001 - a copy that does not load is what this records
+        check("[dSP-95] the staged copy of upgrade_steps.py loads", False, repr(e))
+
+    # TOOL-dSafePassage-91: the same PATH with GOV_BASH unset, so no bash resolves and the stub falls
+    # back to bare `bash` (python_floor.py:36) rather than dying on resolve_bash's Refusal. What bare
+    # `bash` resolves to (on Windows the loader's System32 WSL launcher, elsewhere PATH or nothing), and
+    # so the rc, is the node's, so only the tail is graded, by `test_floor_fallback`.
+    with set_environ({"PATH": path87, "GOV_BASH": None, "GOV_PYTHON": sys.executable}):
+        got = us.run_step_isolated(floor_row, "witness", GOV_ROOT, GOV_ROOT)
+        argv94, cut94 = read_fallback_argv(us), read_fallback_argv(steps94)
+    check("[dSP-91 L2] the floor row's witness, no bash resolving and GOV_BASH unset, falls back to bare bash",
+          test_floor_fallback(got["tail"]), str(got))
+    check("[dSP-94] resolve_shell_argv on that PATH, GOV_BASH unset and no bash cached, hands back bare bash",
+          argv94 == ["bash", "x"], repr(argv94))
+    check("[dSP-94] the same read, check_runs narrowed to catch ValueError, reads the spawn's OSError",
+          src94.count(anchor94) == 1 and isinstance(cut94, OSError), f"anchor count {src94.count(anchor94)}; {cut94!r}")
+    check("[dSP-95] the read gives the parent's bash cache back",
+          argv94 == ["bash", "x"] and us._BASH == bash87, f"argv94 {argv94!r}; {us._BASH!r}")
+    check("[dSP-95] the read that raises gives the copy's bash cache back",
+          isinstance(cut94, OSError) and getattr(steps94, "_BASH", None) == sentinel94,
+          f"cut94 {cut94!r}; {getattr(steps94, '_BASH', None)!r}")
+
+    # TOOL-dSafePassage-92: the same predicate over every host shape the bar runs on, so a node with a
+    # WSL distribution still grades the hosts without one. The five tracebacks are the real stub's, run
+    # from a copy beside a stand-in step module, or none, whose resolve_shell_argv fails as each shape
+    # needs. Each is run as the witness is, by run_step_isolated, so it is spawned, decoded and cut as
+    # the [dSP-91 L2] tail is.
+    root92 = tmp / "dsp92"
+    stub92 = root92 / HERE.name
+    stand94 = stub92.joinpath("upgrade_steps.py")  # TOOL-dSafePassage-95: the stand-in, one name
+    (stub92 / "steps").mkdir(parents=True, exist_ok=True)
+    shutil.copy2(HERE / "steps" / "python_floor.py", stub92 / "steps" / "python_floor.py")
+    (stub92 / "registry.toml").write_text("", encoding="utf-8")  # derive_tool_root's one tool root
+    text92 = root92 / "dsp92-text.exe"  # a program that is a text file, as fake87's bash is
+    text92.write_bytes(b"not a program\n")
+    text92.chmod(0o755)
+
+    def read_stub_tail(resolve_src: str | None) -> str:
+        # TOOL-dSafePassage-94: no shape runs the last one's bytecode, which the stub's loader writes
+        shutil.rmtree(stub92 / "__pycache__", ignore_errors=True)
+        if resolve_src is None:
+            stand94.unlink(missing_ok=True)
+        else:
+            stand94.write_text("def resolve_kit_dir(home, script, gov):\n    return gov\n\n\n"
+                               + resolve_src, encoding="utf-8", newline="\n")
+            os.utime(stand94, ns=(0, 0))  # one mtime for every stand-in: only size parts two
+        return us.run_step_isolated(floor_row, "witness", GOV_ROOT, root92)["tail"]
+
+    wsl92 = "Windows Subsystem for Linux has no installed distributions.\r\n"
+    for what, tail92, want in (
+            ("the WSL launcher's no-distribution text in UTF-16", wsl92.encode("utf-16-le").decode("utf-8", "replace"), True),
+            ("that text on stdout, so the tail is empty", "", True),
+            ("a spawn that finds no bash", read_stub_tail(
+                'def resolve_shell_argv(argv):\n    return ["dsp92-absent"] + argv[1:]\n'), True),
+            ("a spawn of a bash that is a text file", read_stub_tail(
+                f'def resolve_shell_argv(argv):\n    return [{str(text92)!r}] + argv[1:]\n'), True),
+            ("a raise on python_floor.py:36, which the traceback echoes", read_stub_tail(
+                'def resolve_shell_argv(argv):\n    raise RuntimeError("none")\n'), False),
+            ("a raise deep enough to push the Traceback line out of the tail", read_stub_tail(
+                'def resolve0():\n    raise RuntimeError("none")\n'
+                + "".join(f"def resolve{i}():\n    return resolve{i - 1}()\n" for i in range(1, 9))
+                + 'def resolve_shell_argv(argv):\n    return [resolve8()] + argv[1:]\n'), False),
+            ("an OSError raised before the spawn, no step module to load", read_stub_tail(None), False)):
+        check(f"[dSP-92] the fallback predicate reads {what} as {'the fallback' if want else 'a crash'}",
+              test_floor_fallback(tail92) is want, repr(tail92[-600:]))
+
+    # TOOL-dSafePassage-94: two stand-ins of one size in a row, so the first's bytecode, if left,
+    # would run in place of the second.
+    absent94 = 'def resolve_shell_argv(argv):\n    return ["dsp92-absent"] + argv[1:]\n'
+    second94 = 'def resolve_shell_argv(argv):\n    raise RuntimeError("dsp94-second")\n'
+    read_stub_tail(absent94)
+    pyc94 = any((stub92 / "__pycache__").glob("upgrade_steps.*.pyc"))  # TOOL-dSafePassage-95: the red's precondition
+    tail94 = read_stub_tail(second94)
+    mtime94 = os.stat(stand94).st_mtime_ns
+    check("[dSP-94] a stand-in the size of the one before it runs its own source, not that one's bytecode",
+          len(second94) == len(absent94) and pyc94 and mtime94 == 0 and "dsp94-second" in tail94,
+          f"pyc {pyc94}; mtime_ns {mtime94}; tail {tail94[-600:]!r}")
+
+
+def check_step_gate_fixture() -> None:
+    """TOOL-dSafePassage-10 AC2 to AC9 — `step_gate.py --fixture` over every class row's own plant,
+    each red with no row and green with one, `content-edit` green with 0 vanished, `empty-class` and
+    `no-plant` refused naming their row, and the own-record witness counted beside the step rows.
+    The classes are read from the registry, so a joining class's row arms its own case here."""
+    import tomllib  # noqa: PLC0415
+    sg_py = HERE / "step_gate.py"
+    with open(HERE / "surface-classes.toml", "rb") as fh:
+        ids = [c["id"] for c in tomllib.load(fh)["class"]]
+    cases = [(cid, 1, 0, rf"^step-gate: RED {_re.escape(cid)}:\S") for cid in ids] + [
+        ("content-edit", 0, 0, r"^step-gate: \d+ classes · \d+ members at the tip · 0 vanished · 0 witnessed · 0 joining$"),
+        ("empty-class", 2, 2, r"^step-gate: REFUSED · class sg-fixture is empty at the tip"),
+        ("no-plant", 2, 2, r"^step-gate: REFUSED · .*\(id sg-fixture\) key plant: required"),
+        ("own-record", 0, 0, r"^step-gate: \d+ classes · \d+ members at the tip · 1 vanished · 1 witnessed · 0 joining$"),
+        ("own-record-unnamed", 1, 0, r"^step-gate: RED sg-fixture:gone vanished "),
+        # TOOL-dSafePassage-26 AC37: a raising reader is a refusal naming class, side and error; a
+        # class whose source the base lacks reads empty there and is counted as joining.
+        ("reader-raises", 2, 2, r"^step-gate: REFUSED · class sg-fixture's reader raised on the tip side: RuntimeError: "),
+        ("base-without-source", 0, 0, r"^step-gate: \d+ classes · .* 0 vanished · 0 witnessed · 1 joining \(sg-fixture\)$"),
+        # TOOL-dSafePassage-35 AC3: a branch carrying the last landing's source receipt that stops
+        # shipping a file still reds, because the file class reads the plan alone.
+        ("stale-receipt", 1, 0, r"^step-gate: RED file:\S")]
+    for case, bare, rowed, needle in cases:
+        for with_row, want in ((False, bare), (True, rowed)):
+            p = subprocess.run([sys.executable, str(sg_py), "--fixture", "--plant", case,
+                                *(("--with-row",) if with_row else ())], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace", timeout=900)
+            out = p.stdout + p.stderr
+            named = bool(_re.search(needle, out, _re.M)) if not with_row or want == 2 else True
+            if case in ("file", "stale-receipt") and not with_row:
+                # TOOL-dSafePassage-35 AC3: the red names the member the plant's `git rm` took out.
+                _pm = _re.search(r"· planted (file:\S+)", out)
+                named = named and bool(_pm) and f"RED {_pm[1]} vanished" in out
+            check(f"[dSP-10] step-gate fixture {case}{' --with-row' if with_row else ''} exits {want}"
+                  f"{'' if with_row and want != 2 else ' and names ' + needle}",
+                  p.returncode == want and named, out[-3000:])
+
+
+def check_fixture_target() -> None:
+    """TOOL-dSafePassage-67 AC1 — `fixture_target.py --selftest`: under a planted global config,
+    live on an unpinned control first, the factory's target holds `base` with no canary and no
+    copied hook, and `run_git` raises on a refused commit."""
+    p = subprocess.run([sys.executable, "-I", str(HERE / "fixture_target.py"), "--selftest"],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace",
+                       timeout=300)
+    out = p.stdout + p.stderr
+    check("[dSP-67] fixture_target.py --selftest exits 0 and prints its PASS line",
+          p.returncode == 0 and bool(_re.search(r"^fixture-target: PASS · (\d+) of \1 observations hold$",
+                                                out, _re.M)), out[-3000:])
+
+
+def check_step_walk() -> None:
+    """TOOL-dSafePassage-2 AC1 to AC9 — `upgrade_steps.py fixture walk|lock|update` with every plant:
+    the walk's order, skip, stop, kill and resume, its attended stop, the lock's reclaim of a dead or
+    reused holder and its refusal of a live, foreign or unreadable one, the guard's race and its dead
+    holder, and the walk inside `update` with its staging journal across a kill. The `schema-3` plants
+    are TOOL-dSafePassage-15's AC1 to AC4: a schema-3 receipt walks through the schema step, recording
+    nothing until its up lands schema 4. `lock-live-slow-census` is TOOL-dSafePassage-22's AC1: a live
+    holder behind a census three seconds slow still reads live. `kill-after-up` is TOOL-dSafePassage-40's
+    AC1 and AC3: a row a record or an image says an up wrote is never marked `via` `witness`. Each plant's failing case is staged by the plant; the fixture
+    prints `<family>: FAILED` on any unmet expectation."""
+    us_py = HERE / "upgrade_steps.py"
+    for family, plant, want, needles in (
+            ("walk", None, 0, ("step fx/s1 · applied\nstep fx/s2 · applied\nstep fx/s3 · applied\n"
+                               "step fx/s4 · applied", "walk: fx/s3 introduced at M")),
+            ("walk", "not-pending", 0, ("walk: canaries of s2 and s5: none",)),
+            ("walk", "witness-holds", 0, ("step fx/s2 · skipped (witness holds)",
+                                          "walk: fx/s2 up canary absent · row applied · via witness")),
+            ("walk", "fail-k", 1, ("step fx/s3 · failed · exit 1: fx: s3 up fails by its plant",
+                                   "walk: 4 pending · 2 applied · 0 skipped · stopped at fx/s3",
+                                   "walk: rows whose up ran carrying via: none")),
+            ("walk", "kill-step", 0, ("last applied ['fx/s2'] · fx/s3 failed · interrupted: started ",
+                                      "walk: the re-run's target and receipt equal an uninterrupted walk's",
+                                      "walk: fx/s3 up spawned 2 time(s) · resume not spawned")),
+            ("walk", "resume", 0, ("step fx/s3 · applied · by its resume",
+                                   "walk: fx/s3 up spawned 1 time(s) · resume spawned")),
+            ("walk", "attended", 1, ("step fx/s2 · failed · attended: the step needs the target's code",
+                                     "up canary absent", "step fx/s2 · skipped (witness holds)")),
+            ("walk", "schema-3", 0, ("step govkit/receipt-schema-4 · applied\nstep fx/s1 · applied\n"
+                                     "step fx/s2 · applied\nstep fx/s3 · applied\nstep fx/s4 · applied",
+                                     "walk: the receipt reads schema 4 · first row govkit/receipt-schema-4 applied")),
+            ("walk", "schema-3-fail", 1, ("step govkit/receipt-schema-4 · failed · exit 1: fx: schema up fails by "
+                                          "its plant (not recorded: receipt below schema 4)",
+                                          "walk: the receipt's bytes equal their bytes before the run")),
+            # TOOL-dSafePassage-26 AC30: a cut-short before-image is rewritten over unchanged paths
+            # and stops the up, naming it, over a changed one.
+            ("walk", "truncated-image", 1, ("walk: unchanged · fx/s3 applied · image rewritten",
+                                            "exit 1: upgrade_steps.Refusal: .governance/steps/fx/s3.before.json",
+                                            "walk: changed · fx/s3 failed · rc 1")),
+            # TOOL-dSafePassage-87 AC7: an unparsable image under a holding witness, never committed,
+            # stops the walk naming a remedy that applies, and the remedy's re-run passes the step.
+            ("walk", "truncated-image-held", 0, ("walk: held · rc 1 · remedy named",
+                                                 "walk: held · after the remedy · fx/s2 applied · rc 0")),
+            # TOOL-dSafePassage-40 AC1, AC3: a row whose up ran, by its record or its image, is
+            # passed by its witness with no `via`.
+            ("walk", "kill-after-up", 0, ("last applied ['fx/s2'] · fx/s3 failed · interrupted: started ",
+                                          "walk: after the kill · s3.txt and its image present",
+                                          "walk: the re-run · fx/s3 applied · via None",
+                                          "walk: failed record, no image · fx/s2 applied · via None",
+                                          "walk: no record, image present · fx/s2 applied · via None")),
+            # TOOL-dSafePassage-76 AC2: a walk killed in s1's second witness; the re-run stages its writes.
+            ("walk", "kill-before-stage", 0, ("walk: after the kill · staged nothing · s1.txt and its image present",
+                                              "walk: the re-run · git diff --cached --name-only lists s1.txt yes · "
+                                              ".governance/steps/fx/s1.before.json yes · fx/s1 applied")),
+            ("walk", "schema-3-kill", 0, (" whole · the up's temporary file present",
+                                          "walk: the re-run's target and receipt equal an uninterrupted walk's")),
+            ("lock", "lock-dead", 0, ("govkit update — reclaimed ", "lock: taken")),
+            ("lock", "lock-reused", 0, ("a reused pid", "lock: taken")),
+            ("lock", "lock-live", 1, ("refusing rather than joining in: live, ", "reclaimed by the next run")),
+            ("lock", "lock-live-slow-census", 1, ("refusing rather than joining in: live, ",
+                                                  "reclaimed by the next run", "lock: the planted lock unchanged")),
+            ("lock", "lock-wall-step", 1, ("refusing rather than joining in: live, ",
+                                           "lock: the planted lock unchanged")),
+            ("lock", "lock-wall-step-no-boot", 1, ("refusing rather than joining in: unknown, pid ",
+                                                   "lock: the planted lock unchanged")),
+            ("lock", "lock-foreign-host", 1, ("unknown, it was taken on host 'gk-elsewhere.invalid'",
+                                              "is reclaimed by the next run")),
+            ("lock", "lock-unreadable", 1, ("unknown, its record names no readable pid",
+                                            "is reclaimed by the next run")),
+            # TOOL-dSafePassage-26 AC32: a dead pid's lock from another platform is not reclaimed.
+            ("lock", "lock-foreign-namespace", 1, ("refusing rather than joining in: unknown, it was taken "
+                                                   "under platform 'gk-elsewhere'",
+                                                   "lock: the planted lock unchanged")),
+            # TOOL-dSafePassage-31 AC2, AC3: a dead pid's lock from another pid namespace, or with
+            # none recorded, is not reclaimed by a Linux judge; with no namespace on either side it is.
+            ("lock", "lock-foreign-pidns", 1, ("refusing rather than joining in: unknown, it was taken under "
+                                               "pid_ns 'pid:[4026532244]'", "lock: the planted lock unchanged")),
+            ("lock", "lock-no-pidns", 1, ("refusing rather than joining in: unknown, it was taken with no pid_ns",
+                                          "lock: the planted lock unchanged",
+                                          "lock: with no pid_ns here, the take exits 0")),
+            # TOOL-dSafePassage-35 AC23: a live pid's lock from another boot of this host and platform
+            # is reclaimed; one carrying no namespace key reads unknown under a Linux pid_ns, and the
+            # census judges it with none on either side.
+            ("lock", "lock-other-boot", 0, ("this host has booted since, as 'gk-boot-after', which ended its holder",
+                                            "lock: taken")),
+            ("lock", "lock-no-namespace", 1, ("refusing rather than joining in: unknown, it was taken with no pid_ns",
+                                              "lock: the planted lock unchanged",
+                                              "lock: with no pid_ns here, the take exits 0")),
+            ("lock", "lock-race", 0, ("busy, ",)),
+            ("lock", "guard-dead", 0, ("busy, cleared the guard .update.lock.reclaim",
+                                       "lock: first take exits 1 · guard cleared · lock unchanged")),
+            ("update", None, 0, ("govkit update — steps: 2 pending · 2 applied · 0 skipped · stopped at none",)),
+            ("update", "read-only", 0, ("govkit update —   would walk fx/s1\ngovkit update —   would walk fx/s2",
+                                        "update: step canaries none")),
+            ("update", "scoped", 0, ("govkit update — steps: not walked — a --kits run walks no step",
+                                     "update: step canaries none")),
+            ("update", "scoped-read-only", 0, ("govkit update — steps: not walked — a --kits run walks no step",
+                                               "update: step canaries none")),
+            ("update", "update-fail", 1, ("govkit update — steps: 2 pending · 1 applied · 0 skipped · stopped at fx/s2",
+                                          "update: gov_commit A · steps {'fx/s1': 'applied', 'fx/s2': 'failed'}")),
+            ("update", "kill-walk", 0, ("govkit update — reclaimed ", "update: the re-run's bytes equal an "
+                                        "uninterrupted run's")),
+            ("update", "kill-walk-edit", 2, ("DIRTY: tools/demo/one.txt",)),
+            # TOOL-dSafePassage-26 AC31: on gov's own tree a needs-target row's witness runs.
+            ("update", "needs-target-source", 0, ("update: source mode, witness absent · exit 1 · fx/s2 failed",
+                                                  "update: source mode, witness holds · exit 0 · fx/s2 applied")),
+            ("update", "schema-3-update", 0, ("update: the receipt reads schema 4 · steps [('govkit/receipt-schema-4', "
+                                              "'applied'), ('fx/s1', 'applied'), ('fx/s2', 'applied')]",
+                                              "update: the killed target's re-run exits 0 · its receipt, carry aside, "
+                                              "equals the uninterrupted run's"))):
+        p = subprocess.run([sys.executable, str(us_py), "fixture", family, *(("--plant", plant) if plant else ())],
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
+        out = p.stdout + p.stderr
+        tag = ("dSP-15" if (plant or "").startswith("schema-3")
+               else "dSP-40" if plant == "kill-after-up"
+               else "dSP-76" if plant == "kill-before-stage"
+               else "dSP-84" if plant == "scoped-read-only"
+               else "dSP-87" if plant == "truncated-image-held"
+               else "dSP-33" if family == "walk" and plant in ("witness-holds", "fail-k")
+               else "dSP-22" if plant == "lock-live-slow-census"
+               else "dSP-31" if plant in ("lock-foreign-pidns", "lock-no-pidns")
+               else "dSP-35" if plant in ("lock-other-boot", "lock-no-namespace")
+               else "dSP-26" if plant in ("truncated-image", "lock-foreign-namespace", "needs-target-source")
+               else "dSP-32" if (plant or "").startswith("lock-wall-step") else "dSP-2")
+        check(f"[{tag}] fixture {family} {plant or '(base)'} exits {want} and names {', '.join(needles)}",
+              p.returncode == want and f"{family}: FAILED" not in out and all(n in out for n in needles), out[-3000:])
+
+    # TOOL-dSafePassage-35 AC4: the slow-census plant's delay is large enough to matter. A staged
+    # judge copy that reads the clock AFTER the census puts the live holder past REUSE_MARGIN_S, so
+    # the plant run against it reclaims, and its expectations print `lock: FAILED`.
+    clock = "        now, now_boot = time.time(), read_boot_clock()\n        rows, _counts = census.scan_processes()\n"
+    late = "        rows, _counts = census.scan_processes()\n        now, now_boot = time.time(), read_boot_clock()\n"
+    src = us_py.read_text(encoding="utf-8")
+    with tempfile.TemporaryDirectory(prefix="gk-judge-", ignore_cleanup_errors=True) as td:
+        jd = build_staged_copy(pathlib.Path(td), src.replace(clock, late))
+        pm = govkit_module().resolve_kit_dir("process-monitor", "census.py", HERE)
+        (pathlib.Path(td) / pm.name).mkdir()
+        shutil.copy(pm / "census.py", pathlib.Path(td) / pm.name / "census.py")
+        p = subprocess.run([sys.executable, str(jd), "fixture", "lock", "--plant",
+                            "lock-live-slow-census"], capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", timeout=600)
+    out = p.stdout + p.stderr
+    check("[dSP-35] AC4 lock-live-slow-census against a judge copy reading the clock after the census "
+          "reclaims the live holder and prints lock: FAILED",
+          src.count(clock) == 1 and "lock: taken" in out and "lock: FAILED" in out, out[-3000:])
+
+    # The walk's three refusals, in process, over a scratch repository: a step that leaves the receipt
+    # unreadable, a step's writes git will not stage while another process holds the index lock, and
+    # a before-image naming a path outside the target.
+    us = govkit_module().upgrade_steps
+    seen = ["python", "-c", "import pathlib, sys; sys.exit(not (pathlib.Path(sys.argv[1]) / 'x.txt').is_file())",
+            "{target}"]
+    writes = ["python", "-c", "import json, pathlib, sys; t = pathlib.Path(sys.argv[1]); (t / 'x.txt').write_text('x'); "
+              "i = t / '.governance/steps/fx/x.before.json'; i.parent.mkdir(parents=True, exist_ok=True); "
+              "i.write_text(json.dumps({'step': 'fx/x', 'paths': {'x.txt': {'before': None, 'after': None}}}))",
+              "{target}"]
+    spoils = ["python", "-c", "import sys; open(sys.argv[1], 'w').write('not json')", "{target}/.governance/install.json"]
+    escapes = [a.replace("'x.txt': {", "'../x.txt': {") for a in writes]
+    for case, witness, up, needle in (("spoiled", spoils, writes, "does not read back after the spawn"),
+                                      ("unstaged", seen, writes, "refused the step's writes"),
+                                      ("escaping", seen, escapes, "'../x.txt' is not a path inside the target")):
+        with tempfile.TemporaryDirectory(prefix="gk-walk-ref-") as td:
+            t = pathlib.Path(td)
+            subprocess.run(["git", "init", "-q", str(t)], check=True)
+            if case == "unstaged":
+                (t / ".git" / "index.lock").write_text("", encoding="utf-8")
+            (t / ".governance").mkdir()
+            rp = t / ".governance" / "install.json"
+            rp.write_text('{"schema": 4, "steps": []}\n', encoding="utf-8")
+            row = us.StepRow("fx/x", up, ["python", "-c", "pass"], witness, None, [], False, "fx", 1, None)
+            try:
+                us.run_step_walk(HERE.parent.parent, t, rp, json.loads(rp.read_text(encoding="utf-8")), [row])
+                refused = ""
+            except us.Refusal as e:
+                refused = str(e)
+            check(f"[dSP-2] S2 the walk refuses a {case} step, naming it",
+                  (case == "escaping" or "fx/x" in refused) and needle in refused,
+                  refused)
+
+
+def check_step_rollback() -> None:
+    """TOOL-dSafePassage-4 AC1 to AC7 — `upgrade_steps.py fixture rollback|rollback-update` with every
+    plant: the reverse order, a partial `--to`, the downs after a kill and after a failed up, the
+    stop at a failed down and its resume, the stop over a witness that still holds, an unrecorded
+    row downed, the one caller, and `update --rollback` with its preview, record, stamp and four
+    refusals. Each plant's failing case is staged by the plant; the fixture prints `<family>: FAILED`
+    on any unmet expectation. TOOL-dSafePassage-43's AC3 is the `down-fails` and `witness-stays` rows;
+    TOOL-dSafePassage-18's AC1 to AC3 are the `rollback` family's `schema-step` rows, the schema step's
+    down writing no row; TOOL-dSafePassage-19's AC1 and AC2 are the `rollback-update` family's, a
+    rollback past the schema step stamping schema 3 with no `steps` and converging after a kill.
+    TOOL-dSafePassage-17's AC2 to AC4 are the `witness-only`, `node-witness`, `node-witness-refuses`
+    and `witness-stays` rows: a down with no before-image, or under `reverted = "down-exit"`, is
+    judged by its exit, and one whose image was present still by its witness. TOOL-dSafePassage-33's
+    AC2 and AC3 are the `image-lost` and `witness-only` rows, the scoped no-image rule: a row its up
+    applied whose image went missing stops naming the image, and one applied `via` its witness is
+    still downed by its exit; AC4 is the `schema-step-kill-before-stamp` row, and the in-process
+    verdict table below covers the no-record branch that row's re-run reaches. TOOL-dSafePassage-62's
+    AC1 and AC2 are the `schema-up-kill` row: an update killed in the schema step's up left rows naming
+    the bytes its file pass moved, and the rollback from there returns them. TOOL-dSafePassage-39's AC1
+    and AC3 are the two `-down-killed` rows, a rollback killed in s2's down keeping its `via` mark for
+    the re-run, and AC2 the writer's carry below. TOOL-dSafePassage-40's AC2 is the
+    `kill-after-up-image-lost` row: a row whose up ran before a kill, its image lost, stops.
+    TOOL-dSafePassage-70's AC1 is the `schema-step-kill-shipped-rows` row: a rollback killed past the
+    schema step's down, over rows whose witnesses still hold, downs them again on the re-run,
+    records nothing and stamps; its AC2 is the `schema-step-early` row. TOOL-dSafePassage-73's AC3 is
+    the `witness-only-reup` row: s2, up by its witness again after a rollback, keeps its `via` mark."""
+    us_py = HERE / "upgrade_steps.py"
+    rolled = "\n".join(f"step fx/{s} · rolled-back" for s in ("s4", "s3", "s2", "s1"))
+    same = "rollback: the target's bytes equal their bytes before the walk"
+    for family, plant, want, needles in (
+            ("rollback", None, 0, (rolled, same)),
+            ("rollback", "partial-to", 0, ("step fx/s4 · rolled-back\nstep fx/s3 · rolled-back\nrollback: 2 reached",
+                                           "rollback: s1.txt and s2.txt present")),
+            ("rollback", "after-kill", 0, ("rollback: after the kill · fx/s3 failed · s3.txt present",
+                                           "step fx/s4 · skipped (nothing applied)\nstep fx/s3 · rolled-back", same)),
+            ("rollback", "after-fail", 0, ("rollback: down canaries before the reverse walk: none",
+                                           "step fx/s4 · skipped (nothing applied)\nstep fx/s3 · rolled-back", same)),
+            ("rollback", "down-fails", 1, ("step fx/s3 · STOPPED · down exit 1: fx: s3 down fails by its plant",
+                                           "stop text opens with an entry of DOWN_STOP_PREFIXES: yes",
+                                           "rollback: the re-run · s4 downed 1 time(s) in all · bytes equal")),
+            ("rollback", "witness-stays", 1, ("step fx/s2 · STOPPED · witness still holds after down",
+                                              "stop text opens with an entry of DOWN_STOP_PREFIXES: yes")),
+            ("rollback", "unrecorded", 0, (rolled, same)),
+            ("rollback", "witness-only", 0, ("rollback: fx/s2 applied by witness alone, no before-image",
+                                             "rollback: fx/s2 recorded via witness", rolled, same)),
+            ("rollback", "image-lost", 1, ("rollback: fx/s4 applied · via None · image present before the plant deletes it",
+                                           "step fx/s4 · STOPPED · witness still holds after down; before-image "
+                                           ".governance/steps/fx/s4.before.json absent\nrollback: 1 reached",
+                                           "· s4.txt in place")),
+            ("rollback", "kill-after-up-image-lost", 1, (
+                "rollback: the re-run · fx/s3 applied · via None · image present before the plant deletes it",
+                "step fx/s4 · rolled-back\nstep fx/s3 · STOPPED · witness still holds after down; before-image "
+                ".governance/steps/fx/s3.before.json absent\nrollback: 2 reached", "· s3.txt in place")),
+            ("rollback", "node-witness", 0, ("rollback: fx/s2 applied by witness alone, no before-image", rolled, same)),
+            ("rollback", "node-witness-refuses", 1, ("step fx/s3 · rolled-back\nstep fx/s2 · STOPPED · down exit 1: "
+                                                     "fx: s2 down fails by its plant\nrollback: 3 reached",
+                                                     "stop text opens with an entry of DOWN_STOP_PREFIXES: yes")),
+            ("rollback", "witness-only-down-killed", 0, (
+                "rollback: after the kill · fx/s2 applied · via witness · down interrupted",
+                "step fx/s2 · rolled-back\nstep fx/s1 · rolled-back\nrollback: 2 reached · stopped at none",
+                "rollback: the re-run · fx/s2 rolled-back · bytes equal")),
+            ("rollback", "unrecorded-witness-down-killed", 0, (
+                "rollback: after the kill · fx/s2 applied · via witness · down interrupted",
+                "step fx/s2 · rolled-back\nstep fx/s1 · rolled-back\nrollback: 2 reached · stopped at none",
+                "rollback: the re-run · fx/s2 rolled-back · bytes equal")),
+            # TOOL-dSafePassage-49 AC3: s2 recorded rolled-back once the rows are derived, its witness
+            # holding, is downed by move 3's `applied` record and ends rolled-back with no failure.
+            ("rollback", "rolled-back-witness-holds", 0, (
+                "rollback: rows derived ['fx/s4', 'fx/s3', 'fx/s2', 'fx/s1'] · then fx/s2 recorded rolled-back",
+                rolled, same)),
+            # TOOL-dSafePassage-73 AC3: up, down, up again over s2's witness alone, and down again.
+            # The four lines are anchored to the second walk's line, since the first reverse prints them too.
+            ("rollback", "witness-only-reup", 0, ("rollback: fx/s2 recorded via witness after a rollback\n" + rolled
+                                                  + "\nrollback: 4 reached · stopped at none", same)),
+            # TOOL-dSafePassage-76 AC3: a rollback killed after s1's down restored; the re-run stages
+            # the removals from the index's copy of the image, or refuses one that does not parse.
+            ("rollback", "kill-after-down-stage", 0, (
+                "rollback: after the kill · fx/s1 applied · down interrupted: ",
+                "rollback: the re-run · git diff --cached --name-status lists D s1.txt yes · "
+                "D .governance/steps/fx/s1.before.json yes · fx/s1 rolled-back")),
+            ("rollback", "kill-after-down-stage-garbled", 1, (
+                "rollback: refused · Refusal: fx/s1: the index's copy of its before-image .governance/steps/fx/s1.before.json",
+                "rollback: the re-run's refusal names the image and the restored paths to stage by hand: yes")),
+            ("rollback", "callers", 0, ("rollback: callers · one caller, update's _cmd_update",
+                                        "in planted_caller\n")),
+            ("rollback", "schema-step", 0, ("step fx/s1 · rolled-back\nstep govkit/receipt-schema-4 · rolled-back",
+                                            "rollback: the receipt reads schema 3 without steps · last verdict "
+                                            "('govkit/receipt-schema-4', 'rolled-back')")),
+            ("rollback", "schema-step-kill", 0, ("rollback: after the kill · the receipt reads schema ",
+                                                 "rollback: the receipt reads schema 3 without steps · last verdict "
+                                                 "('govkit/receipt-schema-4', 'rolled-back')",
+                                                 "rollback: the re-run's receipt equals an uninterrupted rollback's")),
+            ("rollback", "schema-step-early", 1, ("step fx/s3 · rolled-back\nstep fx/s2 · STOPPED · receipt below "
+                                                  "schema 4 before the last down\nrollback: 3 reached · stopped at fx/s2",)),
+            ("rollback-update", None, 0, ("rollback-update: the stopped run exits 1 · file rows and gov_commit held at B",
+                                          "rollback-update: s1's down found tools/demo/one.txt at B, before the write loop moved it",
+                                          "rollback-update: record · down fx/s1: rolled-back",
+                                          "rollback-update: record · gov_commit: moved to ")),
+            ("rollback-update", "read-only", 0, ("govkit update —   would roll back fx/s1\n",
+                                                 "rollback-update: step spawns during the read-only run: none")),
+            ("rollback-update", "refused", 1, ("roll back deliberately with `update --rollback --to ",
+                                               "rollback-update: refused · update exits 2 · receipt unchanged")),
+            ("rollback-update", "descendant", 1, ("rollback-update: descendant · update exits 2 · receipt unchanged",
+                                                  "which is not an ancestor of")),
+            ("rollback-update", "scoped", 1, ("rollback-update: scoped · update exits 2 · receipt unchanged",
+                                              "so it takes no --kits")),
+            ("rollback-update", "no-base", 1, ("rollback-update: no-base · update exits 2 · receipt unchanged",
+                                               "receipt records no gov_commit")),
+            ("rollback-update", "schema-step", 0, ("rollback-update: t exits 0 · schema 3 · no steps · gov_commit A",
+                                                   "rollback-update: record · down govkit/receipt-schema-4: rolled-back",
+                                                   "rollback-update: record · gov_commit: moved to ")),
+            ("rollback-update", "schema-step-kill-before-stamp", 0, (
+                "rollback-update: t2 exits 0 · schema 3 · no steps · gov_commit A",
+                "rollback-update: after the kill · schema 3 · no steps · gov_commit B · record not finished with 0 down line(s)",
+                "rollback-update: the re-run exits 0 · its receipt's bytes equal the twin's · the target's bytes equal "
+                "the twin's · the record has the twin's finished shape",
+                "rollback-update: re-run record · down fx/s1: skipped (nothing applied)\n"
+                "rollback-update: re-run record · down govkit/receipt-schema-4: skipped (nothing applied)")),
+            ("rollback-update", "schema-step-kill-shipped-rows", 0, (
+                "rollback-update: the re-run exits 0 · its receipt's bytes equal the twin's · the target's bytes equal "
+                "the twin's · the record has the twin's finished shape",
+                "rollback-update: re-run record · down fx/s2: rolled-back\n"
+                "rollback-update: re-run record · down fx/s1: rolled-back\n"
+                "rollback-update: re-run record · down govkit/receipt-schema-4: skipped (nothing applied)",
+                "rollback-update: the re-run's record equals the twin's line for line except started and the schema step",
+                "rollback-update: on t fx/s2's down ran 2 time(s) · fx/s1's down ran 2 time(s)")),
+            # TOOL-dSafePassage-76 AC4: a retired step id owing no down passes the rollback to B, and
+            # one owing a down refuses the rollback to A.
+            ("rollback-update", "retired-step", 1, (
+                "rollback-update: updated to C · exits 0 · fx/s2 applied",
+                "rollback-update: update --rollback --to B --write exits 0 · update --rollback --to A --write "
+                "exits 2, naming fx/s2, its [[retired]] row and that its down is owed: yes")),
+            ("rollback-update", "schema-up-kill", 0, (
+                "rollback-update: after the kill · gov_commit A · tools/demo/one.txt row at B",
+                "rollback-update: the rollback exits 0 · tools/demo/one.txt b'v1\\n' · schema 3 · no steps · gov_commit A"))):
+        p = subprocess.run([sys.executable, str(us_py), "fixture", family, *(("--plant", plant) if plant else ())],
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
+        out = p.stdout + p.stderr
+        tag = ("dSP-49" if plant == "rolled-back-witness-holds"
+               else "dSP-76" if plant in ("kill-after-down-stage", "kill-after-down-stage-garbled", "retired-step")
+               else "dSP-73" if plant == "witness-only-reup"
+               else "dSP-62" if plant == "schema-up-kill"
+               else "dSP-70" if plant == "schema-step-kill-shipped-rows"
+               else "dSP-39" if plant in ("witness-only-down-killed", "unrecorded-witness-down-killed")
+               else "dSP-33" if plant == "image-lost"
+               else "dSP-40" if plant == "kill-after-up-image-lost"
+               else "dSP-17" if plant in ("witness-only", "node-witness", "node-witness-refuses")
+               else "dSP-4" if not (plant or "").startswith("schema-step")
+               else "dSP-19" if family == "rollback-update" else "dSP-18")
+        check(f"[{tag}] fixture {family} {plant or '(base)'} exits {want} and names {', '.join(needles)}",
+              p.returncode == want and f"{family}: FAILED" not in out and all(n in out for n in needles), out[-3000:])
+
+    # The refusals no fixture plant reaches, in process: a receipt row HEAD no longer declares, and
+    # a --to equal to the receipt's commit with nothing to roll back.
+    gk = govkit_module()
+    us = gk.upgrade_steps
+    # TOOL-dSafePassage-33 AC1, S3: the mark's writer refuses it off `applied` or under another
+    # value, and the verdict table's no-image rows split on the last record.
+    for state33, via33, admit33 in (("applied", "witness", True), ("failed", "witness", False),
+                                    ("rolled-back", "witness", False), ("applied", "up", False)):
+        r33 = {"schema": 4, "steps": []}
+        try:
+            us.set_step_state(r33, "a/one", None, state33, "boom" if state33 == "failed" else None, via33)
+            got33 = ""
+        except us.Refusal as e:
+            got33 = str(e)
+        check(f"[dSP-33 AC1] the writer {'admits' if admit33 else 'refuses'} `via` {via33!r} on a {state33} row",
+              (not got33 and r33["steps"][0].get("via") == via33) if admit33
+              else ("'a/one'" in got33 and r33["steps"] == []), got33 or str(r33))
+    # TOOL-dSafePassage-39 AC2: a call passing no `via` carries the mark while the row stays applied
+    # and drops it on a state change.
+    for state39, fail39, keeps39 in (("applied", None, True), ("applied", "down interrupted: x", True),
+                                     ("failed", "exit 1: x", False), ("rolled-back", None, False)):
+        r39 = {"schema": 4, "steps": [{"id": "a/one", "introduced": None, "state": "applied", "via": "witness"}]}
+        got39 = us.set_step_state(r39, "a/one", None, state39, fail39).get("via")
+        check(f"[dSP-39 AC2] the writer {'keeps' if keeps39 else 'drops'} the mark on a rewrite to {state39}"
+              + (f" with {fail39!r}" if fail39 else ""), got39 == ("witness" if keeps39 else None), str(r39))
+    row33 = us.StepRow("fx/x", ["u"], ["d"], ["w"], None, [], False, "fx", 1, None)
+    for image33, record33, want33 in (
+            (False, None, (True, "down")),
+            (False, {"id": "fx/x", "introduced": None, "state": "applied", "via": "witness"}, (True, "down")),
+            (False, {"id": "fx/x", "introduced": None, "state": "applied"}, (None, "witness")),
+            (False, {"id": "fx/x", "introduced": None, "state": "failed", "failure": "exit 1: x"}, (None, "witness")),
+            (True, {"id": "fx/x", "introduced": None, "state": "applied", "via": "witness"}, (None, "witness"))):
+        got33 = us.derive_down_verdict(row33, image33, 0, record33)
+        check(f"[dSP-33 S3] derive_down_verdict, image {'present' if image33 else 'absent'}, last record "
+              f"{record33 and (record33['state'], record33.get('via'))}, reads {want33}", got33 == want33, str(got33))
+    # TOOL-dSafePassage-73 AC1: both walks' "no up on record" question; the base read the
+    # `rolled-back`, no-image cell False in the forward walk.
+    got73 = [us.test_up_unrecorded(s, i) for s in (None, "rolled-back", "failed", "applied") for i in (False, True)]
+    check("[dSP-73] test_up_unrecorded reads no record or `rolled-back`, with no image, as no up on record",
+          got73 == [True, False, True, False, False, False, False, False], str(got73))
+    try:
+        us.derive_reverse_steps(HERE.parent.parent, {"schema": 4, "steps": [
+            {"id": "gone/step", "introduced": None, "state": "applied"}]}, "HEAD")
+        refused = ""
+    except us.Refusal as e:
+        refused = str(e)
+    check("[dSP-4] S3 the reverse set refuses a receipt row HEAD no longer declares, naming it",
+          "gone/step" in refused and "no longer declares" in refused, refused)
+    # Over a scratch repository of two commits, `old` then `new`, never gov's own history, which a
+    # shallow clone or a commit made while the suite runs would move under the arm.
+    with tempfile.TemporaryDirectory(prefix="gk-rb-vintage-") as td:
+        repo = pathlib.Path(td) / "r"
+        us.run_fixture_git(td, "init", "-q", "-b", "main", "r")
+        sha = {}
+        for name in ("old", "new"):
+            us.run_fixture_git(repo, "commit", "-q", "--allow-empty", "-m", name)
+            sha[name] = us.run_fixture_git(repo, "rev-parse", "HEAD")
+        for case, base, to, rows, needle in (("no base", None, sha["old"], [], "records no gov_commit"),
+                                             ("a descendant", sha["old"], sha["new"], [], "is not an ancestor of"),
+                                             ("nothing to roll back", sha["new"], sha["new"], [], "nothing to roll back"),
+                                             ("an ancestor", sha["new"], sha["old"], [], ""),
+                                             ("its own commit with a step to down", sha["new"], sha["new"], ["a row"], "")):
+            try:
+                gk.check_rollback_vintage(repo, base, to, rows)
+                refused = ""
+            except gk.Refusal as e:
+                refused = str(e)
+            check(f"[dSP-4] S2 check_rollback_vintage {'refuses' if needle else 'passes'} {case}",
+                  needle in refused if needle else refused == "", refused or "passed")
+
+
+def check_receipt_schema(tmp: pathlib.Path) -> None:
+    """TOOL-dSafePassage-3 AC1 AC2 AC4 AC5 AC6 AC7 AC8 AC9 AC14 — the receipt's schema 4: the
+    back-fill pinned below 3, who writes 4, the step `govkit/receipt-schema-4`, and the `steps`
+    field's one writer and one reader. Each case is its own scratch target installed by `apply`
+    with ONE forced schema, taken-out field or planted state."""
+    gk = govkit_module()
+    us = gk.upgrade_steps
+    step_py = HERE / "steps" / "receipt_schema_4.py"
+    kit = "check-wiring"
+
+    def derive_receipt_path(t: pathlib.Path) -> pathlib.Path:
+        return t / ".governance" / "install.json"
+
+    def read(t: pathlib.Path) -> dict:
+        return json.loads(derive_receipt_path(t).read_text(encoding="utf-8"))
+
+    def build_installed(tag: str) -> tuple[pathlib.Path, subprocess.CompletedProcess]:
+        t = build_target(tmp / tag, DEPLOY_FULL)
+        p = run("apply", "--target", str(t), "--kits", kit)
+        settle(t, "the install")
+        return t, p
+
+    def write_plant(t: pathlib.Path, fn) -> bytes:
+        rec = read(t)
+        fn(rec)
+        derive_receipt_path(t).write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
+        settle(t, "the planted receipt")
+        return derive_receipt_path(t).read_bytes()
+
+    def build_schema_plant(schema: int):
+        def set_schema(rec: dict) -> None:
+            rec["schema"] = schema
+            rec.pop("steps", None)
+        return set_schema
+
+    def run_step(verb: str, t: pathlib.Path) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, "-I", str(step_py), verb, str(t)], capture_output=True,
+                              text=True, encoding="utf-8")
+
+    def read_refusal(fn) -> str:
+        try:
+            fn()
+        except us.Refusal as e:
+            return str(e)
+        return ""
+
+    # ---- AC4: a first install is born at schema 4 with an empty `steps` as its last key, by either verb.
+    t, p = build_installed("rs-ac4a")
+    rec = read(t)
+    check("[dSP-3 AC4] a first `apply` writes schema 4 with `\"steps\": []` as the receipt's last key",
+          p.returncode == 0 and rec.get("schema") == 4 and rec.get("steps") == [] and list(rec)[-1] == "steps"
+          and "schema 4" in p.stdout, f"{p.returncode} {list(rec)} {p.stdout[-300:]}")
+    t, _p = build_installed("rs-ac4b")
+    derive_receipt_path(t).unlink()
+    settle(t, "the receipt gone, the files kept: a first adopt")
+    p = run("adopt", "--target", str(t), "--write")
+    rec = read(t) if derive_receipt_path(t).is_file() else {}
+    check("[dSP-3 AC4] a first `adopt --write` writes the same: schema 4, `\"steps\": []` last",
+          p.returncode == 0 and rec.get("schema") == 4 and rec.get("steps") == [] and list(rec)[-1] == "steps",
+          f"{p.returncode} {list(rec)} {(p.stdout + p.stderr)[-400:]}")
+
+    # ---- AC1 / AC2: the `gov_oid` back-fill runs below schema 3 only.
+    def build_split_row_plant(schema: int):
+        def set_split_row(rec: dict) -> None:
+            build_schema_plant(schema)(rec)
+            row = next(f for f in rec["files"] if f.get("role", "engine") == "engine" and f.get("commit"))
+            set_split_row.path, set_split_row.oid = row["path"], row.pop("gov_oid", None)
+        return set_split_row
+
+    t, _p = build_installed("rs-ac1")
+    cut = build_split_row_plant(3)
+    b1 = write_plant(t, cut)
+    p = run("update", "--target", str(t))
+    check("[dSP-3 AC1] a schema-3 receipt whose engine row keeps `commit` with no `gov_oid` refuses by name, "
+          "never back-filled, with RECEIPT_SCHEMA at 4",
+          gk.RECEIPT_SCHEMA == 4 and bool(cut.oid) and p.returncode == 2
+          and any("`commit` and no `gov_oid`" in ln and cut.path in ln for ln in p.stderr.splitlines())
+          and derive_receipt_path(t).read_bytes() == b1, p.stdout[-300:] + p.stderr)
+    _steps = lambda q: [ln for ln in q.stdout.splitlines() if ln.startswith("govkit update — steps:")]
+    t, _p = build_installed("rs-ac2")
+    cut = build_split_row_plant(2)
+    write_plant(t, cut)
+    pv = run("update", "--target", str(t))
+    p = run("update", "--target", str(t), "--write")
+    row = next((f for f in read(t)["files"] if f.get("path") == cut.path), {})
+    check("[dSP-3 AC2] the same row at schema 2 is back-filled from gov's blob at its `commit` and classified",
+          bool(cut.oid) and p.returncode == 0 and "REFUSING" not in p.stderr and row.get("gov_oid") == cut.oid,
+          f"{row.get('gov_oid')} != {cut.oid} · " + (p.stdout + p.stderr)[-400:])
+    check("[dSP-3 AC2] ...and the clean run lifts it to schema 3, no further and with no `steps`",
+          read(t).get("schema") == 3 and "steps" not in read(t), str(read(t).get("schema")))
+    check("[dSP-84 AC2] the read-only run over the schema-2 receipt prints the write run's `steps:` line "
+          "and lists no `would walk`",
+          pv.returncode == 0 and "would walk" not in pv.stdout and _steps(pv) == _steps(p)
+          and any("the receipt is at schema 2" in ln for ln in _steps(p)),
+          f"{_steps(pv)} != {_steps(p)}")
+
+    # ---- TOOL-dSafePassage-84 AC5: a write run over a schema-4 receipt that already has a finding (the
+    # ---- unknown-role refusal) walks no step: the findings hold `derive_walk_hold` carries.
+    t, _p = build_installed("rs-84f")
+    write_plant(t, lambda rec: next(f for f in rec["files"] if f.get("role", "engine") == "engine")
+          .update(role="gk-unknown-role"))
+    p = run("update", "--target", str(t), "--write")
+    check("[dSP-84 AC5] a write run over a schema-4 receipt that already has a finding walks no step "
+          "and names the finding",
+          p.returncode == 1 and read(t).get("steps") == []
+          and any("steps: not walked — this run already has 1 finding(s)" in ln for ln in _steps(p)),
+          f"{_steps(p)} · {read(t).get('steps')}")
+
+    # ---- AC9: a clean `update --write` that walks no step, a `--kits` run, never moves a receipt past
+    # ---- 3 by itself, and keeps a 4.
+    for tag, fn, want in (("rs-ac9a", build_schema_plant(3), 3), ("rs-ac9b", lambda rec: None, 4)):
+        t, _p = build_installed(tag)
+        write_plant(t, fn)
+        p = run("update", "--target", str(t), "--write", "--kits", kit)
+        rec = read(t)
+        check(f"[dSP-3 AC9] a clean `update --write` over a schema-{want} receipt leaves it at {want}",
+              p.returncode == 0 and rec.get("schema") == want and ("steps" in rec) == (want == 4),
+              f"{p.returncode} {rec.get('schema')} " + (p.stdout + p.stderr)[-300:])
+
+    # ---- AC5: the step's witness, up and down over a receipt `apply` wrote, forced back to 3.
+    t, _p = build_installed("rs-ac5")
+    b3 = write_plant(t, build_schema_plant(3))
+    w0, up = run_step("witness", t), run_step("up", t)
+    rec = read(t)
+    w1 = run_step("witness", t)
+    check("[dSP-3 AC5] the witness exits 1 at schema 3; the up takes it to schema 4 with an empty `steps`; "
+          "the witness then exits 0",
+          w0.returncode == 1 and up.returncode == 0 and rec.get("schema") == 4 and rec.get("steps") == []
+          and list(rec)[-1] == "steps" and w1.returncode == 0, w0.stdout + up.stdout + up.stderr + w1.stdout)
+    down = run_step("down", t)
+    check("[dSP-3 AC5] ...and the down restores the schema-3 bytes exactly",
+          down.returncode == 0 and derive_receipt_path(t).read_bytes() == b3, down.stdout + down.stderr)
+
+    # ---- AC6: the up's and down's refusals write nothing, and a foreign shape is normalised.
+    t, _p = build_installed("rs-ac6a")
+    b2 = write_plant(t, build_schema_plant(2))
+    up = run_step("up", t)
+    check("[dSP-3 AC6] the up over a schema-2 receipt exits 1 naming the schema and writes nothing",
+          up.returncode == 1 and "schema 2" in up.stderr and derive_receipt_path(t).read_bytes() == b2, up.stdout + up.stderr)
+    t, _p = build_installed("rs-ac6b")
+    b4 = write_plant(t, lambda rec: rec.__setitem__(
+        "steps", [{"id": "lib/python-floor-3.15", "introduced": None, "state": "applied"}]))
+    down = run_step("down", t)
+    check("[dSP-3 AC6] the down while another step reads applied exits 1 naming it and writes nothing",
+          down.returncode == 1 and "lib/python-floor-3.15" in down.stderr and derive_receipt_path(t).read_bytes() == b4,
+          down.stdout + down.stderr)
+    t, _p = build_installed("rs-ac6c")
+    write_plant(t, lambda rec: rec.pop("steps"))
+    down = run_step("down", t)
+    rec = read(t)
+    check("[dSP-3 AC6] the down over a schema-4 receipt with no `steps` leaves schema 3 without the field",
+          down.returncode == 0 and rec.get("schema") == 3 and "steps" not in rec, down.stdout + down.stderr)
+    for verb in ("up", "down"):
+        t, _p = build_installed(f"rs-ac6{verb}")
+        bx = write_plant(t, lambda rec: rec.__setitem__("schema", "4"))
+        got = run_step(verb, t)
+        check(f"[dSP-3 S6] the {verb} over a receipt whose schema is not a number exits 1 and writes nothing",
+              got.returncode == 1 and "not a number" in got.stderr and derive_receipt_path(t).read_bytes() == bx,
+              got.stdout + got.stderr)
+
+    # ---- AC7: the one writer, in process.
+    r3 = {"schema": 3}
+    check("[dSP-3 AC7] set_step_state refuses a schema-3 receipt and gives it no `steps`",
+          "at schema 3" in read_refusal(lambda: us.set_step_state(r3, "govkit/receipt-schema-4", None, "applied"))
+          and "steps" not in r3, str(r3))
+    r4 = {"schema": 4, "steps": []}
+    us.set_step_state(r4, "a/one", "0" * 40, "applied")
+    check("[dSP-3 AC7] on a schema-4 receipt it appends `{id, introduced, state}`",
+          r4["steps"] == [{"id": "a/one", "introduced": "0" * 40, "state": "applied"}], str(r4))
+    for label, call, why in (
+            ("`state` done", lambda: us.set_step_state(r4, "a/two", None, "done"), "is not one of"),
+            ("a failed row with no `failure`", lambda: us.set_step_state(r4, "a/two", None, "failed"), "a failed row's `failure`"),
+            ("a `failure` on an applied row that is no down stop", lambda: us.set_step_state(r4, "a/two", None, "applied", "x"), "opens with none of the down stops"),
+            ("an empty `failure`", lambda: us.set_step_state(r4, "a/two", None, "failed", ""), "non-empty string"),
+            ("an id that is not a string", lambda: us.set_step_state(r4, 7, None, "applied"), "`id` is not"),
+            ("an `introduced` that is not a commit", lambda: us.set_step_state(r4, "a/two", "abc", "applied"), "neither a 40-hex")):
+        got = read_refusal(call)
+        check(f"[dSP-3 AC7] it refuses {label}, leaving the field as it was",
+              why in got and len(r4["steps"]) == 1, got)
+    us.set_step_state(r4, "a/two", None, "failed", "the up exited 1")
+    us.set_step_state(r4, "a/one", None, "rolled-back")
+    check("[dSP-3 AC7] a second call for an id moves its row to the end, and None keeps a known commit",
+          [r["id"] for r in r4["steps"]] == ["a/two", "a/one"] and r4["steps"][-1]["introduced"] == "0" * 40
+          and r4["steps"][0]["failure"] == "the up exited 1", str(r4))
+    # ---- TOOL-dSafePassage-43 AC1: §4's six rows through the one writer. An `applied` row admits
+    # every full down-stop text and no other `failure`; `failed` needs one, `rolled-back` takes none.
+    stops43 = ("down interrupted: started 2026-10-23T00:00:00Z, no exit recorded", "down exit 1: boom",
+               "witness still holds after down", "witness still holds after down; before-image a.txt absent",
+               "reverted check exits 1")
+    for state43, text43, admit43 in ([("applied", None, True), ("failed", "the up exited 1", True)]
+                                     + [("applied", t, True) for t in stops43]
+                                     + [("applied", "interrupted: started 2026-10-23T00:00:00Z, no exit recorded", False),
+                                        ("applied", "exit 1: x", False), ("rolled-back", "down exit 1: boom", False),
+                                        ("failed", None, False)]):
+        r43 = {"schema": 4, "steps": []}
+        got43 = read_refusal(lambda: us.set_step_state(r43, "a/one", None, state43, text43))
+        check(f"[dSP-43 AC1] the writer {'admits' if admit43 else 'refuses'} a {state43} row with "
+              + (f"`failure` {text43!r}" if text43 else "no `failure`"),
+              (not got43 and r43["steps"] == [{"id": "a/one", "introduced": None, "state": state43}
+                                               | ({"failure": text43} if text43 else {})]) if admit43
+              else ("'a/one'" in got43 and (state43 != "applied" or repr(text43) in got43) and r43["steps"] == []),
+              got43 or str(r43))
+    # ---- TOOL-dSafePassage-49 AC4, S16, S20: the row rule is one predicate, so `test_step_row`, the
+    # writer and a reader over a one-row receipt agree on every row of its table, a wrong-typed or
+    # empty `failure` refused in each state by a Refusal; a copy admitting any `failure` on an
+    # applied row reds the `interrupted:` and `exit 1: x` rows.
+    lost49 = "interrupted: started 2026-10-23T00:00:00Z, no exit recorded"
+    table49 = ([(s49, f49, "Refusal") for s49 in us.STEP_STATES for f49 in (5, "")]
+               + [("applied", None, "admitted")] + [("applied", t49, "admitted") for t49 in stops43]
+               + [("applied", lost49, "Refusal"), ("applied", "exit 1: x", "Refusal"),
+                  ("failed", "the up exited 1", "admitted"), ("failed", None, "Refusal"),
+                  ("rolled-back", None, "admitted"), ("rolled-back", "down exit 1: boom", "Refusal")])
+
+    def read_rule_wrong49(mod) -> list:
+        def read_verdict(fn) -> str:
+            try:
+                fn()
+            except mod.Refusal:
+                return "Refusal"
+            except Exception as e:  # noqa: BLE001 -- a traceback's class is the defect graded
+                return type(e).__name__
+            return "admitted"
+        wrong = []
+        for state, fail, want in table49:
+            row = {"id": "a/one", "introduced": None, "state": state} | ({} if fail is None else {"failure": fail})
+            got = (read_verdict(lambda: mod.test_step_row("a/one", state, fail)),  # noqa: B023 -- called at once
+                   read_verdict(lambda: mod.set_step_state({"schema": 4, "steps": []}, "a/one", None, state, fail)),  # noqa: B023
+                   read_verdict(lambda: mod.read_step_states({"schema": 4, "steps": [row]})))  # noqa: B023
+            if got != (want,) * 3:
+                wrong.append((state, fail, got))
+        return wrong
+    wrong49 = read_rule_wrong49(us)
+    check(f"[dSP-49 AC4] test_step_row, the writer and the reader agree on the row rule's {len(table49)} rows, "
+          "5 and \"\" refused by a Refusal in each state", not wrong49, f"wrong: {wrong49}")
+    src49 = (HERE / "upgrade_steps.py").read_text(encoding="utf-8")
+    opening49 = 'if state == "applied" and failure is not None and not failure.startswith(DOWN_STOP_PREFIXES):'
+    spec49 = importlib.util.spec_from_file_location(
+        "us49_any_failure", build_staged_copy(tmp / "dsp49-any-failure", src49.replace(opening49, "if False:")))
+    any49 = importlib.util.module_from_spec(spec49)
+    spec49.loader.exec_module(any49)
+    wrong49 = read_rule_wrong49(any49)
+    check("[dSP-49 AC4] a copy admitting any `failure` on an applied row reds exactly the `interrupted:` and "
+          "`exit 1: x` rows", src49.count(opening49) == 1
+          and [(st, f) for st, f, _g in wrong49] == [("applied", lost49), ("applied", "exit 1: x")], f"wrong: {wrong49}")
+
+    # AC5, AC6: the module's one opening test sits in `test_step_row`, the rollback fixture's
+    # included, and every string opening with a DOWN_STOP_PREFIXES entry sits in its assignment; a
+    # reader copy restating the rule, and a fixture copy retyping a stop text, red.
+    def read_openings49(text: str) -> list:
+        tree, parent = _ast.parse(text), {}
+        for n in _ast.walk(tree):
+            for c in _ast.iter_child_nodes(n):
+                parent[c] = n
+        out = []
+        for n in _ast.walk(tree):
+            if (isinstance(n, _ast.Call) and isinstance(n.func, _ast.Attribute) and n.func.attr == "startswith"
+                    and any(isinstance(a, _ast.Name) and a.id == "DOWN_STOP_PREFIXES" for a in n.args)):
+                f = parent.get(n)
+                while f is not None and not isinstance(f, _ast.FunctionDef):
+                    f = parent.get(f)
+                out.append(f.name if f is not None else "<module>")
+        return sorted(out)
+
+    def read_literals49(text: str) -> list:
+        tree, inside = _ast.parse(text), set()
+        for n in _ast.walk(tree):
+            if isinstance(n, _ast.Assign) and any(isinstance(t, _ast.Name) and t.id == "DOWN_STOP_PREFIXES" for t in n.targets):
+                inside |= {id(c) for c in _ast.walk(n)}
+        return [(n.lineno, n.value) for n in _ast.walk(tree) if isinstance(n, _ast.Constant)
+                and isinstance(n.value, str) and n.value.startswith(us.DOWN_STOP_PREFIXES) and id(n) not in inside]
+    reader49 = '        test_step_row(row["id"], state, row.get("failure"))'
+    restated = reader49 + ('\n        if state == "applied" and row.get("failure") and not row["failure"].startswith(DOWN_STOP_PREFIXES):'
+                           '\n            raise Refusal(f"{at}: a stopped down\'s `failure` only")')
+    check("[dSP-49 AC5] one opening test of DOWN_STOP_PREFIXES in the module, inside test_step_row; a reader "
+          "copy restating the rule finds two", read_openings49(src49) == ["test_step_row"] and src49.count(reader49) == 1
+          and read_openings49(src49.replace(reader49, restated)) == ["read_step_states", "test_step_row"],
+          f"over the module: {read_openings49(src49)}")
+    retyped = 'f"{DOWN_STOP_PREFIXES[1]}1: fx: s3 down fails by its plant"'
+    check("[dSP-49 AC6] no string opening with a DOWN_STOP_PREFIXES entry outside its assignment, f-string parts "
+          "included; a fixture copy retyping s3's `down exit 1:` text finds it", not read_literals49(src49)
+          and src49.count(retyped) == 1
+          and [v for _n, v in read_literals49(src49.replace(retyped, '"down exit 1: fx: s3 down fails by its plant"'))]
+          == ["down exit 1: fx: s3 down fails by its plant"], f"over the module: {read_literals49(src49)}")
+
+    # ---- ...and the one reader's refusals.
+    for label, rec, why in (
+            ("a `steps` field below schema 4", {"schema": 3, "steps": []}, "the field is schema 4's"),
+            ("a schema-4 receipt without the field", {"schema": 4}, "is absent"),
+            ("a `steps` that is not a list", {"schema": 4, "steps": {}}, "requires a list"),
+            ("a row that is not an object", {"schema": 4, "steps": ["a/one"]}, "not an object")):
+        got = read_refusal(lambda: us.read_step_states(rec))
+        check(f"[dSP-3 S3] read_step_states refuses {label}", why in got, got)
+    check("[dSP-3 S3] ...and reads a receipt below schema 4 without the field as no rows",
+          us.read_step_states({"schema": 2}) == [], "")
+
+    # ---- AC8: `check` counts a malformed field as a problem naming the row, and a valid one as none.
+    # TOOL-dSafePassage-43 AC2: the reader inherits the writer's rule, so `check` counts a down stop
+    # on an applied row as none and any other `failure` there as one problem naming the row.
+    for tag, rows, bad in (("rs-ac8a", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "done"}], "'done'"),
+                           ("rs-ac8b", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "applied"}], None),
+                           ("rs-43a", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "applied",
+                                        "failure": "down exit 1: boom"}], None),
+                           ("rs-43b", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "applied",
+                                        "failure": "exit 1: boom"}], "'exit 1: boom'"),
+                           # TOOL-dSafePassage-49 AC5: a wrong-typed or empty `failure` is a counted
+                           # problem naming the row, never a traceback.
+                           ("rs-49a", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "applied",
+                                        "failure": 5}], "`failure` 5 is neither"),
+                           ("rs-49b", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "applied",
+                                        "failure": ""}], "`failure` '' is neither")):
+        t, _p = build_installed(tag)
+        write_plant(t, lambda rec, _r=rows: rec.__setitem__("steps", _r))
+        p = run("check", "--target", str(t))
+        out = p.stdout + p.stderr
+        hit = [ln for ln in out.splitlines() if "step record is malformed" in ln]
+        check(f"[{'dSP-43 AC2' if tag.startswith('rs-43') else 'dSP-49 AC5' if tag.startswith('rs-49') else 'dSP-3 AC8'}] `check` over a "
+              f"{'malformed' if bad else 'valid'} `steps` ({tag}) "
+              + ("counts a problem naming the row" if bad else "counts none for the field"),
+              (len(hit) == 1 and "'govkit/receipt-schema-4'" in hit[0] and bad in hit[0] and p.returncode == 1
+               and "Traceback" not in out)
+              if bad else not hit, out[-600:])
+
+    # ---- AC14: a re-run keeps an existing receipt's schema and `steps`, by either verb.
+    row = {"id": "govkit/receipt-schema-4", "introduced": None, "state": "applied"}
+    for verb in ("apply", "adopt"):
+        for label, fn in (("schema-4", lambda rec: rec.__setitem__("steps", [dict(row)])), ("schema-3", build_schema_plant(3))):
+            t, _p = build_installed(f"rs-ac14{verb[:2]}{label[-1]}")
+            write_plant(t, fn)
+            p = (run("apply", "--target", str(t), "--kits", kit) if verb == "apply"
+                 else run("adopt", "--target", str(t), "--re-adopt", "--write"))
+            rec = read(t)
+            want = 4 if label == "schema-4" else 3
+            check(f"[dSP-3 AC14] a re-run `{verb}` over a planted {label} receipt keeps it: schema {want}, "
+                  + ("the one row byte-equal" if want == 4 else "no `steps` key")
+                  + f", and prints `schema {want}`",
+                  p.returncode == 0 and rec.get("schema") == want
+                  and (json.dumps(rec.get("steps")) == json.dumps([row]) if want == 4 else "steps" not in rec)
+                  and f"schema {want}" in p.stdout, f"{p.returncode} {rec.get('schema')} {rec.get('steps')} "
+                  + (p.stdout + p.stderr)[-400:])
+
+
+def check_source_mode(tmp: pathlib.Path) -> None:
+    """TOOL-dSafePassage-8 AC1 to AC4, AC8 and AC9 — gov first, on gov's own tree. `plan --target`
+    gov's checkout exits 0 and writes nothing (AC1); a scratch target carrying gov's own deploy file
+    refuses a metacharacter in an answer a template interpolates and ignores one in an answer none
+    does (AC2). A clone of this checkout, carrying this suite's govkit and upgrade_steps, updated in
+    source mode writes a schema-4 source receipt whose steps are the declared ids, applied, and whose
+    files are the plan's destinations, unhashed (AC3); a re-run runs no up and leaves its bytes (AC8);
+    check-wiring and check-install-prefix read it as no receipt (AC9); `check_gov_first` names an
+    applied step whose witness is planted red, and a planted row whose witness never holds stops the
+    walk (AC4); and source mode's three refusals each name their case."""
+    tmp.mkdir(parents=True, exist_ok=True)
+    us = govkit_module().upgrade_steps
+
+    def run_gitc(repo, *args):
+        return subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True,
+                              encoding="utf-8", errors="replace")
+
+    def run_gk(gk, *args, cwd=None):
+        return subprocess.run([sys.executable, str(gk), *args], capture_output=True, text=True,
+                              encoding="utf-8", errors="replace", cwd=str(cwd) if cwd else None, timeout=900)
+
+    # AC1 — gov's own deploy file, planned in place.
+    st0 = run_gitc(GOV_ROOT, "status", "--porcelain").stdout
+    p = run_gk(GOVKIT, "plan", "--target", str(GOV_ROOT))
+    check("[dSP-8] AC1 plan --target gov's own checkout exits 0 and writes nothing",
+          p.returncode == 0 and "NOTHING was written" in p.stdout
+          and run_gitc(GOV_ROOT, "status", "--porcelain").stdout == st0, (p.stdout + p.stderr)[-2000:])
+
+    # AC2 — a scratch target with gov's deploy file: an interpolated answer is graded, another is not.
+    base = (GOV_ROOT / ".governance" / "deploy.toml").read_text(encoding="utf-8")
+    base = "".join(ln for ln in base.splitlines(keepends=True) if not ln.startswith("stream_ownership"))
+    t2 = tmp / "t2"
+    (t2 / ".governance").mkdir(parents=True)
+    run_gitc(t2, "init", "-q")
+    outs = {}
+    for case, line in (("memory_root", 'memory_root = "x; touch PWNED"\n'),
+                       ("without", ""), ("stream_ownership", 'stream_ownership = "a; b"\n')):
+        (t2 / ".governance" / "deploy.toml").write_text(base.replace("[answers]\n", "[answers]\n" + line, 1),
+                                                        encoding="utf-8", newline="\n")
+        outs[case] = run_gk(GOVKIT, "plan", "--target", str(t2))
+    q = outs["memory_root"]
+    check("[dSP-8] AC2 a metacharacter in an interpolated answer refuses plan, naming answers.memory_root",
+          q.returncode == 2 and "answers.memory_root" in q.stderr and not (t2 / "PWNED").exists(), q.stderr[-2000:])
+    a, b = outs["without"], outs["stream_ownership"]
+    check("[dSP-8] AC2 a metacharacter in an answer no template names leaves plan as it is without it",
+          (a.returncode, a.stdout, a.stderr) == (b.returncode, b.stdout, b.stderr), b.stderr[-2000:])
+
+    # AC3 — a source-mode clone with no receipt.
+    clone = tmp / "gf"
+    run_gitc(tmp, "clone", "-q", str(GOV_ROOT), str(clone))
+    kit = clone / PFX / HERE.name
+    for name in ("govkit.py", "upgrade_steps.py"):
+        shutil.copyfile(HERE / name, kit / name)
+    gk, rp = kit / "govkit.py", clone / ".governance" / "install.json"
+    p = run_gk(gk, "update", "--target", str(clone), "--write", cwd=clone)
+    rec = json.loads(rp.read_text(encoding="utf-8")) if rp.is_file() else {}
+    declared = us.read_steps(clone, "HEAD", None)
+    states = {r.get("id"): r.get("state") for r in rec.get("steps") or []}
+    pl = run_gk(gk, "plan", "--target", str(clone), cwd=clone)
+    dests = extract_plan_writes(pl.stdout, with_kept=True)
+    files = [f for f in rec.get("files") or []]
+    check("[dSP-8] AC3 update --write on a clone of gov exits 0 and writes a schema-4 source receipt, no gov_commit",
+          p.returncode == 0 and rec.get("schema") == 4 and rec.get("mode") == "source" and "gov_commit" not in rec,
+          (p.stdout + p.stderr)[-2000:])
+    check("[dSP-8] AC3 its steps are the declared ids both ways, each applied",
+          bool(declared) and states == {r.id: "applied" for r in declared}, f"{states}")
+    check("[dSP-8] AC3 its files are the destinations plan lists, none carrying sha256, oid or gov_oid",
+          bool(files) and {f.get("path") for f in files} == dests
+          and not any(k in f for f in files for k in ("sha256", "oid", "gov_oid")),
+          f"{len(files)} rows, {len(dests)} destinations")
+    check("[dSP-8] AC3 no path under .governance/outbox/ is left, the lock included",
+          run_gitc(clone, "status", "--porcelain", "--untracked-files=all", "--", ".governance/outbox").stdout == ""
+          and not (clone / ".governance" / "outbox" / ".update.lock").exists())
+
+    # AC8 — the re-run runs no up and leaves the receipt's bytes.
+    was = rp.read_bytes() if rp.is_file() else b""
+    p = run_gk(gk, "update", "--target", str(clone), "--write", cwd=clone)
+    check("[dSP-8] AC8 a second source walk runs no step and leaves the receipt's bytes",
+          p.returncode == 0 and "steps: 0 pending · 0 applied · 0 skipped" in p.stdout and rp.read_bytes() == was,
+          (p.stdout + p.stderr)[-2000:])
+
+    # AC4, second half — the landing check re-runs each applied witness rather than trusting the row.
+    red = declared[-1].id if declared else ""
+    misses = us.check_gov_first(rec, [r._replace(witness=["python", "-c", "raise SystemExit(1)"])
+                                      if r.id == red else r for r in declared], clone)
+    check("[dSP-8] AC4 check_gov_first names an applied step whose witness is planted red, and only it",
+          misses == [f"{red}: listed applied, and its witness does not hold on gov's tree"], f"{misses}")
+
+    # AC9 — two row readers print the same lines and exit the same way with the receipt and without.
+    seen = []
+    for _ in ("with", "without"):
+        seen.append([(r.returncode, r.stdout, r.stderr) for r in (
+            subprocess.run(["bash", str(clone / PFX / leg)], capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", cwd=str(clone), timeout=900)
+            for leg in ("check-wiring.sh", "check-install-prefix.sh"))])
+        if rp.is_file():
+            rp.replace(tmp / "gf-receipt.json")
+    (tmp / "gf-receipt.json").replace(rp)
+    check("[dSP-8] AC9 check-wiring and check-install-prefix read the source receipt as no receipt",
+          seen[0] == seen[1], f"{[s[0] for s in seen[0]]} vs {[s[0] for s in seen[1]]}")
+
+    # TOOL-dSafePassage-21 AC3, as TOOL-dSafePassage-35 S3 reads it — the step gate's `file` class
+    # reads the plan alone, so the source receipt `update --write` just wrote is the comparand: its
+    # `files` paths, in member spelling, equal the class.
+    sys.path.insert(0, str(HERE))
+    import step_gate  # noqa: E402, PLC0415
+    _tr = step_gate.gk.derive_tool_root(clone)
+    from_receipt = {step_gate.derive_member_path(r["path"], _tr)
+                    for r in json.loads(rp.read_text(encoding="utf-8")).get("files") or []}
+    from_plan = step_gate.read_file_members(clone)
+    check("[dSP-21] AC3 the source receipt's files rows, in member spelling, equal the file class (the plan)",
+          bool(from_receipt) and from_receipt == from_plan,
+          f"receipt only {sorted(from_receipt - from_plan)[:5]}, plan only {sorted(from_plan - from_receipt)[:5]}")
+
+    # AC4, first half — a planted row whose up exits 0 and whose witness never holds stops the walk.
+    with open(kit / "steps.toml", "a", encoding="utf-8", newline="\n") as fh:
+        fh.write('\n[[upgrade]]\nid = "govkit/planted-witness-fails"\nup = ["python", "-c", "pass"]\n'
+                 'down = ["python", "-c", "pass"]\nwitness = ["python", "-c", "raise SystemExit(1)"]\n'
+                 'surfaces = []\nneeds-target = false\n')
+    run_gitc(clone, "-c", "user.name=gk", "-c", "user.email=gk@invalid", "commit", "-q", "--no-verify", "-m", "plant",
+         "--", f"{PFX}{HERE.name}/steps.toml")
+    p = run_gk(gk, "update", "--target", str(clone), "--write", cwd=clone)
+    after = {r.get("id"): r.get("state") for r in json.loads(rp.read_text(encoding="utf-8")).get("steps") or []}
+    check("[dSP-8] AC4 a planted witness that never holds stops the walk, the steps before it applied",
+          p.returncode == 1 and "govkit/planted-witness-fails · failed · witness does not hold after up" in p.stdout
+          and "gov first: govkit/planted-witness-fails" in p.stdout
+          and all(after.get(r.id) == "applied" for r in declared), (p.stdout + p.stderr)[-2000:])
+
+    # Source mode's refusals, each before a write.
+    for label, args, needle in (("--kits", ("--kits", "memory-tree"), "takes no --kits and no --rollback"),
+                                ("an unresolvable --to", ("--to", "gk-no-such-rev"), "does not resolve"),
+                                ("a receipt not in source mode", (), "is not a source-mode receipt")):
+        if not args:
+            rp.write_text('{"schema": 3, "files": []}\n', encoding="utf-8", newline="\n")
+        p = run_gk(gk, "update", "--target", str(clone), "--write", *args, cwd=clone)
+        check(f"[dSP-8] S1 source mode refuses {label}", p.returncode == 2 and needle in p.stderr, p.stderr[-2000:])
+
+
 def main() -> int:
     # DEPL-dGaugedVintage-10. The measurer-currency probe reads a remote advertisement, and this
     # suite spawns a fresh `update` process dozens of times — one network round-trip each, which
@@ -2919,7 +5598,7 @@ def main() -> int:
         check("that refusal names the path", str(notrepo.name) in p.stderr, p.stderr)
 
         # --- plan refuses a target carrying no descriptor, and says who writes one.
-        bare = make_target(tmp / "a", None)
+        bare = build_target(tmp / "a", None)
         p = run("plan", "--target", str(bare))
         check("plan refuses a target with no deploy.toml", p.returncode == 2)
         check("that refusal refuses to GUESS an answer",
@@ -2927,7 +5606,7 @@ def main() -> int:
 
         # --- plan over a real descriptor lists writes and WRITES NOTHING. The on-disk effect is the
         # --- assertion: a read-only verb that leaves a byte behind is the whole risk of this verb.
-        full = make_target(tmp / "b", DEPLOY_FULL)
+        full = build_target(tmp / "b", DEPLOY_FULL)
         before = sorted(q.relative_to(full).as_posix() for q in full.rglob("*") if q.is_file())
         p = run("plan", "--target", str(full), "--kits", "memory-tree")
         after = sorted(q.relative_to(full).as_posix() for q in full.rglob("*") if q.is_file())
@@ -2945,7 +5624,7 @@ def main() -> int:
 
         # --- plan REFUSES when an answer a selected kit needs is absent, and NAMES THE KEY.
         # --- This is the arm that separates "refuses" from "refuses usefully".
-        noans = make_target(tmp / "c", DEPLOY_NO_ANSWERS)
+        noans = build_target(tmp / "c", DEPLOY_NO_ANSWERS)
         p = run("plan", "--target", str(noans), "--kits", "playbook")
         check("plan reds when a needed answer is missing", p.returncode == 1, p.stdout)
         check("plan NAMES the missing answer key", "needs answer 'playbook_path'" in p.stdout,
@@ -3024,11 +5703,23 @@ def main() -> int:
         check_mode_carry(tmp / "mc")
         check_mode_never_down(tmp / "nd")
         check_hold_region()
+        check_upgrade_steps(tmp / "dsp")
+        check_succession(tmp / "dsc")
+        check_fanout_step(tmp / "dfs")
+        check_receipt_schema(tmp / "drs")
+        check_steps_recordable()
+        check_step_isolation(tmp / "dsi")
+        check_step_walk()
+        check_staged_copies(tmp / "dst")
+        check_step_rollback()
+        check_source_mode(tmp / "dgf")
+        check_step_gate_fixture()
+        check_fixture_target()
 
         # ================= apply =================
         # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO
         # adopter, so these arms measure the LAND path rather than somebody else's adopter.
-        ap = make_target(tmp / "d", DEPLOY_FULL)
+        ap = build_target(tmp / "d", DEPLOY_FULL)
         p = run("apply", "--target", str(ap), "--kits", "check-wiring")
         check("apply exits 0 over a clean target", p.returncode == 0, p.stdout + p.stderr)
         check("apply landed the flat destination its descriptor DECLARES, not a kit-relative default",
@@ -3090,7 +5781,7 @@ def main() -> int:
         # Before precedence existed, gov's filled module landed byte-identical in the target and the
         # receipt called it `engine`. The arm asserts the BYTES, not just the role: a role that is
         # right about the wrong file is the failure this replaces.
-        cm = make_target(tmp / "u1a", DEPLOY_FULL)
+        cm = build_target(tmp / "u1a", DEPLOY_FULL)
         p = run("apply", "--target", str(cm), "--kits", "codebase-map,memory-tree")
         rec = json.loads((cm / ".governance" / "install.json").read_text(encoding="utf-8"))
         govroot = GOV_ROOT
@@ -3140,8 +5831,7 @@ def main() -> int:
         # because destination last-wins already elects the seed template. So on gov's tree this arm
         # has no red state at all, and a fixture built from a real descriptor would pass by finding
         # nothing — inside the arm written to close the data-loss path.
-        sys.path.insert(0, str(HERE))
-        import govkit as _G
+        _G = govkit_module()
         _root = _G.repo_root()
         CARVED = {"id": "scratch", "home": f"{PFX}memory-tree", "files": [
             {"include": "**", "role": "engine"},
@@ -3213,7 +5903,7 @@ def main() -> int:
 
         # AC10 — the playbook lands BYTES. It sits first in the default selection and, tagged
         # project-owned, landed nothing at all while its placeholder hole probed two absent paths.
-        pb = make_target(tmp / "u1b", DEPLOY_FULL)
+        pb = build_target(tmp / "u1b", DEPLOY_FULL)
         # THE APPLY'S OWN VERDICT IS PART OF THE ARM. This call DISCARDED the CompletedProcess, so
         # when `apply` refused, the refusal that named the cause was thrown away and the arm reported
         # the empty directory listing instead. Measured on the post-merge bar of the aFusedCharter
@@ -3255,7 +5945,7 @@ def main() -> int:
 
         def stale_target(name: str, deploy: str = DEPLOY_FULL,
                          kits: str = "check-wiring") -> pathlib.Path:
-            t = make_target(tmp / name, deploy)
+            t = build_target(tmp / name, deploy)
             run("apply", "--target", str(t), "--kits", kits)
             # BOTH identities from OLD, and no row OLD never shipped: `write_vintage_receipt`'s
             # header says why each half is load-bearing. Measured before either: nine arms red on
@@ -3389,7 +6079,7 @@ def main() -> int:
         # --- output: four fragment lines in B carry it too). A-absent is the stop still accepted.
         _rb11gk = govkit_module()
         _rb11src = f"{PFX}{KIT_NAMES['hooks']}/agent-cap.js"
-        _rb11a = make_target(tmp / "rq11a", DEPLOY_FULL)
+        _rb11a = build_target(tmp / "rq11a", DEPLOY_FULL)
         run("apply", "--target", str(_rb11a), "--kits", "settings-merge")
         settle(_rb11a, "the first apply")
         _rb11hk = idx_of(_rb11src)
@@ -3421,7 +6111,7 @@ def main() -> int:
         check("[dRB-12] AC2 a third identical apply over fixture A exits 1",
               _rb11pa3.returncode == 1, f"rc {_rb11pa3.returncode} · {_rb11pa3.stdout[-900:]}")
 
-        _rb11n = make_target(tmp / "rq11n", DEPLOY_FULL)
+        _rb11n = build_target(tmp / "rq11n", DEPLOY_FULL)
         run("apply", "--target", str(_rb11n), "--kits", "settings-merge")
         settle(_rb11n, "the first apply")
         (_rb11n / ".claude").mkdir(exist_ok=True)
@@ -3502,7 +6192,7 @@ def main() -> int:
         # --- rows, and the next apply of either was refused as foreign. Every figure is read from the
         # --- receipt the narrower apply read, so nothing here pins a row count. The carry is keyed
         # --- on the claim: keyed on the selection, it also kept the prior `(govkit)` attributes row.
-        _rb12 = make_target(tmp / "rq12", DEPLOY_FULL)
+        _rb12 = build_target(tmp / "rq12", DEPLOY_FULL)
         _rb12rp = _rb12 / ".governance" / "install.json"
         _rb12three = "agent-cap,settings-merge,kickoff-manifest"
         _rb12keeps = "govkit apply — receipt KEEPS "
@@ -3647,7 +6337,7 @@ def main() -> int:
         # --- the hook, and the stop was accepted with the hook unwired. The receipt is now written
         # --- ahead of CONFIGURE. Each fact is read on the line it names, and no exit code is
         # --- asserted: the run's exit belongs to agent-cap's own argv (spec 14 §8 F1, unit 15).
-        _rb14 = make_target(tmp / "rq14", DEPLOY_FULL + '\n[kit.agent-cap]\nprefix = "scripts"\n')
+        _rb14 = build_target(tmp / "rq14", DEPLOY_FULL + '\n[kit.agent-cap]\nprefix = "scripts"\n')
         _rb14p = run("apply", "--target", str(_rb14), "--kits",
                      "agent-cap,settings-merge,kickoff-manifest")
         _rb14so = _rb14p.stdout.splitlines()
@@ -4027,7 +6717,7 @@ def main() -> int:
         # zeros and whose every hash was rewritten to nonsense, exited 0. `check` contained exactly
         # one filesystem test — on the receipt's own path — and never opened the file list, never
         # read the sidecar it writes, and called no hash function.
-        ev = make_target(tmp / "u5a", DEPLOY_FULL)
+        ev = build_target(tmp / "u5a", DEPLOY_FULL)
         run("apply", "--target", str(ev), "--kits", "check-wiring")
         pc = run("check", "--target", str(ev))
         # DEPL-dBackdatedFixture-3. THE EXPECTATION COMES FROM THE DESCRIPTOR (DEPL-aTetheredConvoy-5
@@ -4053,7 +6743,7 @@ def main() -> int:
               pc.stdout + pc.stderr)
 
         # AC2 — one modified engine file is a finding naming the path and BOTH hashes.
-        ev2 = make_target(tmp / "u5b", DEPLOY_FULL)
+        ev2 = build_target(tmp / "u5b", DEPLOY_FULL)
         run("apply", "--target", str(ev2), "--kits", "check-wiring")
         tgt = ev2 / PFX / "check-wiring.sh"
         tgt.write_bytes(tgt.read_bytes() + b"\n# drift\n")
@@ -4066,7 +6756,7 @@ def main() -> int:
         # AC5 — provenance at check time, plus the DEAD PROBE half. A loop that resolved zero of a
         # non-zero population measured nothing, and reporting that as clean is the failure direction
         # this repo names.
-        ev3 = make_target(tmp / "u5c", DEPLOY_FULL)
+        ev3 = build_target(tmp / "u5c", DEPLOY_FULL)
         run("apply", "--target", str(ev3), "--kits", "check-wiring")
         rp = ev3 / ".governance" / "install.json"
         rec = json.loads(rp.read_text(encoding="utf-8"))
@@ -4081,7 +6771,7 @@ def main() -> int:
 
         # AC4 — the sidecar and the receipt are asserted against EACH OTHER. The sidecar is the
         # artifact a target verifies with bash alone and nothing in this repo read it before.
-        ev4 = make_target(tmp / "u5d", DEPLOY_FULL)
+        ev4 = build_target(tmp / "u5d", DEPLOY_FULL)
         run("apply", "--target", str(ev4), "--kits", "check-wiring")
         sp = ev4 / ".governance" / "install.sums"
         lines = sp.read_text(encoding="utf-8").splitlines()
@@ -4094,7 +6784,7 @@ def main() -> int:
               and "the receipt carries" in pc.stdout, pc.stdout)
 
         # THE WHOLE HOLE, end to end. This is the fixture that exited 0 before this unit.
-        ev5 = make_target(tmp / "u5e", DEPLOY_FULL)
+        ev5 = build_target(tmp / "u5e", DEPLOY_FULL)
         run("apply", "--target", str(ev5), "--kits", "check-wiring")
         rp = ev5 / ".governance" / "install.json"
         rec = json.loads(rp.read_text(encoding="utf-8"))
@@ -4125,7 +6815,7 @@ memory_root = "memory"
 manifest_path = "docs/KICK.md"
 user_skills = "/tmp/gk-fake-skills"
 """
-        mt = make_target(tmp / "u5f", MACH)
+        mt = build_target(tmp / "u5f", MACH)
         pa = run("apply", "--target", str(mt), "--kits", "kickoff-manifest")
         check("apply prints the OBSERVE step id", "/OBSERVE]" in pa.stdout, pa.stdout)
         ob = mt / ".governance" / "outbox"
@@ -4166,7 +6856,7 @@ user_skills = "/tmp/gk-fake-skills"
         # The [[outcome]] evaluator: six descriptors declared these blocks and ZERO code read them,
         # so an exit code shared by six unrelated branches was the whole report. A fixture asserts a
         # MEANING now, which is what the acceptance layer needs and could not have.
-        cmt = make_target(tmp / "u5g", DEPLOY_FULL)
+        cmt = build_target(tmp / "u5g", DEPLOY_FULL)
         pa = run("apply", "--target", str(cmt), "--kits", "memory-tree")
         check("a declared outcome is reported by its MEANING, not as a bare integer",
               "seed-and-stop" in pa.stdout or "refused-foreign-tree" in pa.stdout
@@ -4182,7 +6872,7 @@ user_skills = "/tmp/gk-fake-skills"
         # BOTH DIRECTIONS, because the failing one is what nobody tests: a predicate that matched on an
         # EMPTY declaration would silently stop configuring every adopter in the fleet, and the arms
         # asserting the decline would all still be green.
-        _in12 = make_target(tmp / "u12a", DEPLOY_FULL.replace(
+        _in12 = build_target(tmp / "u12a", DEPLOY_FULL.replace(
             'kits = ["memory-tree"]', 'kits = ["memory-tree"]\ninert = ["memory-tree"]'))
         _pi12 = run("apply", "--target", str(_in12), "--write")
         check("[-12] apply DECLINES a kit the target holds inert, and names the posture",
@@ -4197,7 +6887,7 @@ user_skills = "/tmp/gk-fake-skills"
               _pi12.stdout)
         check("[-12] and that report does not claim an accepted stop that never happened",
               "stopped at an accepted outcome" not in _pi12.stdout, _pi12.stdout)
-        _no12 = make_target(tmp / "u12b", DEPLOY_FULL)
+        _no12 = build_target(tmp / "u12b", DEPLOY_FULL)
         _pn12 = run("apply", "--target", str(_no12), "--write")
         check("[-12] the same fixture WITHOUT the key still runs that kit's adopter",
               (_no12 / ".memory-tree.conf").is_file() and "DECLINED" not in _pn12.stdout,
@@ -4672,7 +7362,7 @@ user_skills = "/tmp/gk-fake-skills"
                               'dedupe_key = "name"\ncommand = ["true"]\nrun_all_env = {}\n'
                               'observed_ran = ["a{name}"]\nobserved_failed = ["b{name}"]'),
                              "only 'json-array' is implemented")):
-            bt = make_target(tmp / ("u4r%d" % (abs(hash(bad)) % 9999)), None)
+            bt = build_target(tmp / ("u4r%d" % (abs(hash(bad)) % 9999)), None)
             (bt / ".governance").mkdir(exist_ok=True)
             (bt / ".governance" / "deploy.toml").write_text(
                 f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["check-wiring"]\n'
@@ -4800,7 +7490,7 @@ user_skills = "/tmp/gk-fake-skills"
         # --- CLI it never wrote (DEPL-dGaugedVintage-3). The kit declares no forked rule now, so a
         # --- fresh target receives all three. The INCOMPLETE report that existed for that state is
         # --- graded over the synthetic `demo` fork in the DEPL-dCarriedReceipt-10 block below.
-        inc = make_target(tmp / "incomplete", DEPLOY_FULL)
+        inc = build_target(tmp / "incomplete", DEPLOY_FULL)
         p = run("apply", "--target", str(inc), "--kits", "memory-recall,memory-tree")
         out = p.stdout + p.stderr
         _mr = inc / PFX / KIT_NAMES["memory-recall"]
@@ -4814,12 +7504,12 @@ user_skills = "/tmp/gk-fake-skills"
         check("[aRF-36] rev-3 ...and the skip names the key that takes it",
               f"SKIPPED [opt-in       ] {PFX}{KIT_NAMES['memory-recall']}/recall-opened.js" in out
               and "with_hook" in out, out[-900:])
-        _optin = make_target(tmp / "optin36", DEPLOY_FULL + "\n[kit.memory-recall]\nwith_hook = \"yes\"\n")
+        _optin = build_target(tmp / "optin36", DEPLOY_FULL + "\n[kit.memory-recall]\nwith_hook = \"yes\"\n")
         _po = run("apply", "--target", str(_optin), "--kits", "memory-recall,memory-tree")
         check("[aRF-36] rev-3 a target declaring [kit.memory-recall] with_hook = \"yes\" gets the hook",
               (_optin / PFX / KIT_NAMES["memory-recall"] / "recall-opened.js").is_file(),
               (_po.stdout + _po.stderr)[-900:])
-        _all = make_target(tmp / "optall36", DEPLOY_FULL + "\n[kit.memory-recall]\nopt_in_all = \"yes\"\n")
+        _all = build_target(tmp / "optall36", DEPLOY_FULL + "\n[kit.memory-recall]\nopt_in_all = \"yes\"\n")
         _pa = run("apply", "--target", str(_all), "--kits", "memory-recall,memory-tree")
         check("[aRF-36] rev-3 a target spelling the canonical ctx's reserved key is refused by name",
               _pa.returncode != 0 and "reserved" in (_pa.stdout + _pa.stderr)
@@ -5406,7 +8096,7 @@ user_skills = "/tmp/gk-fake-skills"
               "a graded join on a function's closing line is reported as an escape")
 
         # --- AC8 the POSITIVE half: a FOREIGN kit, one no receipt claims, refuses before writing.
-        for_ = make_target(tmp / "e", DEPLOY_FULL)
+        for_ = build_target(tmp / "e", DEPLOY_FULL)
         (for_ / PFX).mkdir(parents=True, exist_ok=True)
         (for_ / PFX / "check-wiring.sh").write_text("KIT_CHECK_WIRING_VERSION=9.9\n",
                                                         encoding="utf-8")
@@ -5420,7 +8110,7 @@ user_skills = "/tmp/gk-fake-skills"
         # --- TOOL-aRepatriatedFork-24 AC8: a foreign kit at the INTAKE'S OWN prefix. The probe asked
         # --- only at gov's prefix and the root, so a `scripts/` intake over a `scripts/` install read
         # --- as a clean target and the apply went ahead. Red against `2143b6d6`'s probe.
-        for_s = make_target(tmp / "e24", DEPLOY_FULL.replace(f'prefix = "{PFX[:-1]}"', 'prefix = "scripts"', 1))
+        for_s = build_target(tmp / "e24", DEPLOY_FULL.replace(f'prefix = "{PFX[:-1]}"', 'prefix = "scripts"', 1))
         (for_s / "scripts").mkdir(parents=True, exist_ok=True)
         (for_s / "scripts" / "check-wiring.sh").write_text("KIT_CHECK_WIRING_VERSION=9.9\n",
                                                           encoding="utf-8")
@@ -5437,7 +8127,7 @@ user_skills = "/tmp/gk-fake-skills"
         # --- over a foreign kit at GOV'S canonical prefix. The per-entry probe dropped the old pair's
         # --- canonical rung, so this target read as clean and apply installed a second copy.
         # --- Red against `7de665e5`'s probe.
-        for_c = make_target(tmp / "e24c", DEPLOY_FULL.replace(f'prefix = "{PFX[:-1]}"', 'prefix = "scripts"', 1))
+        for_c = build_target(tmp / "e24c", DEPLOY_FULL.replace(f'prefix = "{PFX[:-1]}"', 'prefix = "scripts"', 1))
         (for_c / PFX).mkdir(parents=True, exist_ok=True)
         (for_c / PFX / "check-wiring.sh").write_text("KIT_CHECK_WIRING_VERSION=9.9\n", encoding="utf-8")
         p = run("apply", "--target", str(for_c), "--kits", _sel24)
@@ -5452,7 +8142,7 @@ user_skills = "/tmp/gk-fake-skills"
         # --- POSITIVE on-disk assertion rather than deleted — an arm that asserts a refusal string
         # --- is the classic one that keeps passing after the string merely moves, so its
         # --- replacement has to observe an effect. The full behaviour is in the unit 6 block above.
-        p = run("apply", "--target", str(make_target(tmp / "f", DEPLOY_FULL)),
+        p = run("apply", "--target", str(build_target(tmp / "f", DEPLOY_FULL)),
                 "--kits", "pytest-parallel-guardrails")
         check("a merged rule now LANDS rather than refusing", p.returncode == 0, p.stdout)
         check("and it reports the mode it used, on disk",
@@ -5464,7 +8154,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("that refusal calls it a stated non-goal", "stated non-goal" in p.stderr, p.stderr)
 
         # --- --resume needs an install to resume.
-        p = run("apply", "--target", str(make_target(tmp / "g", DEPLOY_FULL)),
+        p = run("apply", "--target", str(build_target(tmp / "g", DEPLOY_FULL)),
                 "--kits", "check-wiring", "--resume")
         check("--resume refuses with no receipt", p.returncode == 2)
         check("that refusal says there is no install to resume",
@@ -5473,7 +8163,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ================= intake =================
         # AC12: given a prepared answer stream, intake writes a descriptor `apply` accepts with no
         # further prompting. The arm is the CHAIN, not the file: intake then apply, no hand editing.
-        ik = make_target(tmp / "h", None)
+        ik = build_target(tmp / "h", None)
         p = run("intake", "--target", str(ik), "--kits", "check-wiring")
         check("intake exits 0 when the selection needs no answers", p.returncode == 0,
               p.stdout + p.stderr)
@@ -5483,7 +8173,7 @@ user_skills = "/tmp/gk-fake-skills"
               p.stdout + p.stderr)
 
         # --- intake refuses to invent an answer, and NAMES the ones it wants.
-        ik2 = make_target(tmp / "i", None)
+        ik2 = build_target(tmp / "i", None)
         p = run("intake", "--target", str(ik2), "--kits", "playbook")
         check("intake refuses when an answer is missing", p.returncode == 2)
         check("intake names the missing answers", "playbook_path" in p.stderr, p.stderr)
@@ -5509,7 +8199,7 @@ user_skills = "/tmp/gk-fake-skills"
         # The pre-unit behaviour emitted the literal `tools` whatever was supplied, so the one
         # committed non-default descriptor in the fleet was a file the tool that owns it could not
         # have written. Each arm below fails against that draft.
-        ik3 = make_target(tmp / "i3", None)
+        ik3 = build_target(tmp / "i3", None)
         p = run("intake", "--target", str(ik3), "--kits", "gate-lint",
                 "--answer", "prefix=scripts")
         check("intake with --answer prefix= exits 0", p.returncode == 0, p.stdout + p.stderr)
@@ -5519,7 +8209,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("the run reports the prefix and names its source",
               'prefix "scripts" (from --answer)' in p.stdout, p.stdout)
 
-        ik4 = make_target(tmp / "i4", None)
+        ik4 = build_target(tmp / "i4", None)
         p = run("intake", "--target", str(ik4), "--kits", "gate-lint")
         check("an OMITTED prefix still defaults to tools",
               'prefix = "tools"' in (ik4 / ".governance" / "deploy.toml").read_text(
@@ -5529,7 +8219,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         # An EMPTY value is the default, never an empty prefix: `prefix = ""` would resolve every
         # destination to a bare relative path, which is a silent mis-install rather than a refusal.
-        ik5 = make_target(tmp / "i5", None)
+        ik5 = build_target(tmp / "i5", None)
         p = run("intake", "--target", str(ik5), "--kits", "gate-lint", "--answer", "prefix=")
         check("an EMPTY --answer prefix= falls back to tools",
               'prefix = "tools"' in (ik5 / ".governance" / "deploy.toml").read_text(
@@ -5542,7 +8232,7 @@ user_skills = "/tmp/gk-fake-skills"
         # [gate_runner] block is emitted from a seed whose {prefix} and {kit} tokens resolve here,
         # so a draft that fixes only the `prefix = ` line writes a descriptor declaring one prefix
         # whose runner paths spell another. Observed as a staged break before this arm was written.
-        ik6 = make_target(tmp / "i6", None)
+        ik6 = build_target(tmp / "i6", None)
         p = run("intake", "--target", str(ik6), "--kits", "run-gates",
                 "--answer", "prefix=scripts")
         check("intake emits a [gate_runner] under a non-default prefix", p.returncode == 0,
@@ -5562,7 +8252,7 @@ user_skills = "/tmp/gk-fake-skills"
         # re-stamp. So ONE `.gitattributes` row froze a target's `gov_commit` forever, and every
         # kit selection carrying an lf_pin produces exactly such a row. Reproduced on a real target
         # before the fix: `update --write` exited 1 and `gov_commit` never moved.
-        ap = make_target(tmp / "u2pins", None)
+        ap = build_target(tmp / "u2pins", None)
         p = run("intake", "--target", str(ap), "--kits", "push-main")
         check("[-2] intake accepts push-main", p.returncode == 0, p.stdout + p.stderr)
         p = run("apply", "--target", str(ap), "--kits", "push-main")
@@ -5762,7 +8452,7 @@ user_skills = "/tmp/gk-fake-skills"
         EDIT = "committed\nAN OPERATOR EDIT\n"
 
         # ---- AC1: `update --write` over a pinned path named with a SPACE.
-        _sp = make_target(tmp / "gs25a", DEPLOY_FULL)
+        _sp = build_target(tmp / "gs25a", DEPLOY_FULL)
         check("[-25] AC1 fixture: apply installs cleanly before anything is dirtied",
               run("apply", "--target", str(_sp)).returncode == 0, "")
         settle(_sp, "applied")
@@ -5787,7 +8477,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         # ---- AC2: `apply` over a pinned path carrying a NON-ASCII byte. A DIFFERENT VERB and a
         # ---- different route into the same guard, which is why it is not the same fixture.
-        _na = make_target(tmp / "gs25b", DEPLOY_FULL)
+        _na = build_target(tmp / "gs25b", DEPLOY_FULL)
         _bad = _na / "memory" / "caf\u00e9.md"
         _bad.parent.mkdir(parents=True, exist_ok=True)
         _bad.write_text("committed\n", encoding="utf-8", newline="\n")
@@ -5852,6 +8542,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -5899,8 +8590,8 @@ user_skills = "/tmp/gk-fake-skills"
             return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"),
                                    "selfcheck"], capture_output=True, text=True, encoding="utf-8", errors="replace")
 
-        def run_in_gov(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
-            return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), *args],
+        def run_in_gov(g: pathlib.Path, *args: str, root: str = PFX) -> subprocess.CompletedProcess:
+            return subprocess.run([sys.executable, str(g / root / KIT_NAMES["govkit"] / "govkit.py"), *args],
                                   capture_output=True, text=True, encoding="utf-8", errors="replace")
 
         def build_scratch_gov_kit(tag: str, kit_toml: str) -> pathlib.Path:
@@ -5915,6 +8606,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -6152,6 +8844,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -6444,8 +9137,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("a pin row naming a leg the manifest no longer declares REDS",
               _r4.returncode == 1 and "pins 'demo two'" in _r4.stdout, _r4.stdout + _r4.stderr)
 
-        sys.path.insert(0, str(HERE))
-        import govkit  # noqa: E402
+        govkit = govkit_module()
 
         # ---- L1: THE REFUSAL BRANCHES THIS BUILD ADDED, each reached by an arm ----------------
         # Six of twelve were unverified text — any of them could be misspelled, unreachable, or emit
@@ -6532,8 +9224,7 @@ user_skills = "/tmp/gk-fake-skills"
         # appears dozens of times across this tree in docs, arms and refusal strings.
         # THE KEYS ARE govkit's OWN `POLICY_KEYS` (TOOL-dDerivedDocket-24 S14), imported rather than
         # restated, so this arm grades the alternation the engine compiles and not a copy of it.
-        sys.path.insert(0, str(HERE))
-        import govkit as _gk_mod  # noqa: E402
+        _gk_mod = govkit_module()
         # THE ENGINE'S OWN OBJECT (TOOL-dThriftyLanding-11). This arm compiled a hand copy of the
         # pattern, so a defect in the engine's could pass here; it now grades `build_policy_re()`.
         _pol_re = _gk_mod.build_policy_re()
@@ -6733,7 +9424,7 @@ user_skills = "/tmp/gk-fake-skills"
         # destroyed by every re-apply, silently, with the descriptor reading exactly as intended.
         with tempfile.TemporaryDirectory() as td3:
             tmp3 = pathlib.Path(td3)
-            t = make_target(tmp3, None)
+            t = build_target(tmp3, None)
             run("intake", "--target", str(t), "--kits", "drift-audit")
             first = run("apply", "--target", str(t), "--kits", "drift-audit,memory-tree")
             owned = t / PFX / KIT_NAMES["drift-audit"] / "drift_signals.py"
@@ -6807,7 +9498,7 @@ user_skills = "/tmp/gk-fake-skills"
 
             # ...AND OVER THE DEFAULT SELECTION, which is the operand that matters to an operator who
             # types no `--kits`. The `**` kit alone cannot see a divergence that lives in the roles.
-            t2 = make_target(tmp3 / "dflt", DEPLOY_REGISTRY_DEFAULT)
+            t2 = build_target(tmp3 / "dflt", DEPLOY_REGISTRY_DEFAULT)
             ap2 = run("apply", "--target", str(t2))
             check("apply over the DEFAULT selection ran", ap2.returncode == 0, ap2.stdout + ap2.stderr)
             rec2 = json.loads((t2 / ".governance" / "install.json").read_text(encoding="utf-8"))
@@ -6837,7 +9528,7 @@ user_skills = "/tmp/gk-fake-skills"
             # preview agreed with it. Asserted as a SUBSET relation on the preview's write set: the
             # declared single kit's rows are a strict subset of what the registry default writes,
             # which is a property no re-baselining of a row count can accidentally satisfy.
-            t3 = make_target(tmp3 / "declared", DEPLOY_FULL)
+            t3 = build_target(tmp3 / "declared", DEPLOY_FULL)
             pl3 = run("plan", "--target", str(t3))
             check("a target's own `kits` list is honoured by a no---kits plan", pl3.returncode == 0,
                   pl3.stdout + pl3.stderr)
@@ -6907,8 +9598,7 @@ user_skills = "/tmp/gk-fake-skills"
             # used to assert it was riding the playbook's role and died when that role was corrected.
             # Keyed on `derive_rule_kind` directly, it cannot be redefined out from under itself by
             # an entry edit, and it still reds if `order` ever stops being the answer.
-            sys.path.insert(0, str(HERE))
-            import govkit as _gk  # noqa: E402
+            _gk = govkit_module()
             _rep = _gk.Report()
             _po = {"role": "project-owned"}
             check("an un-covered project-owned rule derives ORDER",
@@ -7087,7 +9777,7 @@ user_skills = "/tmp/gk-fake-skills"
                 # second apply there can refuse for the pre-existing-kits reason instead of the
                 # merged-region one — and the arm would then pass or fail on fixture order rather
                 # than on the behaviour it names. `plan` above is read-only, so it can share `t2`.
-                tm = make_target(tmp3 / f"merged-{kit}", DEPLOY_FULL)
+                tm = build_target(tmp3 / f"merged-{kit}", DEPLOY_FULL)
                 ap = run("apply", "--target", str(tm), "--kits", kit)
                 check(f"{kit}: ...and apply refuses over it",
                       "no verb here can write a gov-owned region" in ap.stdout + ap.stderr,
@@ -7097,7 +9787,7 @@ user_skills = "/tmp/gk-fake-skills"
             # KEYED ON codebase-map, NOT ON playbook. The playbook's two rules are `seed` and LAND,
             # so it skips nothing to name — this arm was reading the role the landed-zero-bytes
             # defect wore. codebase-map's `map_extractors.py` is a real project-owned skip.
-            t3 = make_target(tmp3 / "skips", DEPLOY_FULL)
+            t3 = build_target(tmp3 / "skips", DEPLOY_FULL)
             sk = run("apply", "--target", str(t3), "--kits", "codebase-map,memory-tree")
             check("apply names each skipped rule, its role and its destination",
                   f"SKIPPED [project-owned] {PFX}{KIT_NAMES['codebase-map']}/map_extractors.py" in sk.stdout,
@@ -7287,7 +9977,7 @@ user_skills = "/tmp/gk-fake-skills"
             git(host, "init", "-q", "-b", "main")
             git(host, "config", "user.email", "t@e")
             git(host, "config", "user.name", "t")
-            git(host, "config", "core.autocrlf", "false")   # pinned, for `make_target`'s reason
+            git(host, "config", "core.autocrlf", "false")   # pinned, for `build_target`'s reason
             (host / "README.md").write_text("host\n", encoding="utf-8", newline="\n")
             git(host, "add", "-A")
             git(host, "commit", "-qm", "base")
@@ -7330,7 +10020,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- AC2: a NORMAL repo whose selection declares NO lf_pin. check-wiring is the kit for
         # ---- the mirror-image reason: the path form works fine here, so the only thing this arm
         # ---- can be measuring is that the probe left `if pins:`.
-        n2 = make_target(tmp / "ac2", None)
+        n2 = build_target(tmp / "ac2", None)
         run("intake", "--target", str(n2), "--kits", "check-wiring")
         run("apply", "--target", str(n2), "--kits", "check-wiring")
         settle(n2, "the install")
@@ -7416,7 +10106,7 @@ user_skills = "/tmp/gk-fake-skills"
         # The loop does not sleep-and-hope: it WATCHES for the lock to appear and only then starts
         # the second run, and if three attempts never catch the first run holding it, the arm FAILS
         # rather than reporting a green it did not earn.
-        cc = make_target(tmp / "ac5", None)
+        cc = build_target(tmp / "ac5", None)
         run("intake", "--target", str(cc), "--kits", "memory-tree")
         run("apply", "--target", str(cc), "--kits", "memory-tree")
         settle(cc, "the install")
@@ -7450,8 +10140,9 @@ user_skills = "/tmp/gk-fake-skills"
             check("[-12] AC5 the second concurrent update --write refuses ON THE LOCK",
                   _second.returncode == 2 and ".update.lock" in _second.stderr
                   and "another govkit write holds" in _second.stderr, _second.stderr)
-            check("[-12] AC5 the refusal names the holder and how to clear a stale lock",
-                  "pid " in _second.stderr and "rm " in _second.stderr, _second.stderr)
+            # TOOL-dSafePassage-2 S6: the remedy names the reclaim, in place of a hand `rm`.
+            check("[-12] AC5 the refusal names the holder and how a stale lock is reclaimed",
+                  "pid " in _second.stderr and "reclaimed by the next run" in _second.stderr, _second.stderr)
             check("[-12] AC5 and the first run completed", _first_rc == 0, _first_out)
         check("[-12] AC5 after both runs the lock file is gone", not _lk.exists(), "")
 
@@ -7464,6 +10155,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -7498,7 +10190,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         # The target installs at whatever gov's HEAD is, so it is built HERE — between B and D —
         # which is how its receipt comes to record the MIDDLE vintage with history on both sides.
-        t7 = make_target(tmp / "ac7", None)
+        t7 = build_target(tmp / "ac7", None)
         gov_run(gv, "intake", "--target", str(t7), "--kits", "demo")
         gov_run(gv, "apply", "--target", str(t7), "--kits", "demo")
         settle(t7, "the demo install")
@@ -7614,7 +10306,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- compares the INDEX BLOB against the oid the receipt recorded, so it excuses gov's own
         # ---- staging and nothing else. The negative half below is what makes that a carve-out and
         # ---- not a hole, and it is the reason this is asserted as a PAIR.
-        _oa = make_target(tmp / "owner-a", None)
+        _oa = build_target(tmp / "owner-a", None)
         run("intake", "--target", str(_oa), "--kits", "memory-tree")
         _poa = run("apply", "--target", str(_oa), "--kits", "memory-tree")
         _oarec = json.loads((_oa / ".governance" / "install.json").read_text(encoding="utf-8"))
@@ -7719,7 +10411,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ----
         # ---- BOTH VERBS ARE ARMED, because a `plan` that cheerfully previews escaping writes is its
         # ---- own defect: the preview is what an operator approves.
-        _tv = make_target(tmp / "traversal", None)
+        _tv = build_target(tmp / "traversal", None)
         (_tv / ".governance").mkdir(parents=True, exist_ok=True)
         (_tv / ".governance" / "deploy.toml").write_text(
             'prefix = "../../PWNED"\n', encoding="utf-8", newline="\n")
@@ -7773,7 +10465,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ----
         # ---- THE PAIR IS THE POINT: the character grader admits the drive letter, and the ESCAPE
         # ---- grader still reds a drive-lettered destination. Two guards, two jobs, asserted apart.
-        _dvt = make_target(tmp / "drive-win", None)
+        _dvt = build_target(tmp / "drive-win", None)
         (_dvt / ".governance").mkdir(parents=True, exist_ok=True)
         (_dvt / ".governance" / "deploy.toml").write_text(
             f'prefix = "{PFX[:-1]}"\n\n[answers]\nmanifest_path = "docs/MANIFEST.md"\n'
@@ -7819,7 +10511,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- and stopping there would have left the CLASS open at a site that fails SILENTLY,
         # ---- which is exactly the rule this build had already broken once in the same round.
         def build_gr_target(tag: str, runner_file: str) -> pathlib.Path:
-            _t = make_target(tmp / f"gr-{tag}", None)
+            _t = build_target(tmp / f"gr-{tag}", None)
             (_t / ".governance").mkdir(parents=True, exist_ok=True)
             (_t / ".governance" / "deploy.toml").write_text(
                 f'prefix = "{PFX[:-1]}"\n\n[gate_runner]\nkind = "manifest"\n'
@@ -8017,7 +10709,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- `attributes` row whose file is on disk, the literal form could elect it, and that row
         # ---- is now one the shadow refusal DOES cover -- so the arm would have graded the ruling
         # ---- against the one row the ruling no longer applies to.
-        _ob = make_target(tmp / "owner-b", None)
+        _ob = build_target(tmp / "owner-b", None)
         run("intake", "--target", str(_ob), "--kits", "memory-tree")
         run("apply", "--target", str(_ob), "--kits", "memory-tree")
         settle(_ob, "the install")
@@ -8104,7 +10796,7 @@ user_skills = "/tmp/gk-fake-skills"
             return "(no row)"
 
         MTR = f"{PFX}{KIT_NAMES['memory-tree']}/README.md"
-        i7 = make_target(tmp / "id7", DEPLOY_FULL)
+        i7 = build_target(tmp / "id7", DEPLOY_FULL)
         run("apply", "--target", str(i7), "--kits", "memory-tree")
         settle(i7, "the install")
         c7 = clone_crlf(i7, "id7-clone")
@@ -8182,13 +10874,15 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- AC5: the schema. `-2` had to land first for this fixture to reach a finding-free run
         # ---- at all — its `attributes` row used to take `refuse` and freeze the re-stamp forever.
         c5 = clone_crlf(i7, "id7-c5")
+        _s5 = json.loads((c5 / ".governance" / "install.json").read_text(encoding="utf-8")).get("schema")
         _a5 = run("update", "--target", str(c5), "--write")
         _r5 = json.loads((c5 / ".governance" / "install.json").read_text(encoding="utf-8"))
         _eng5 = [f for f in _r5["files"] if f.get("role") == "engine"]
         check("[-7] AC5 a --write run with no findings exits 0", _a5.returncode == 0,
               _a5.stdout + _a5.stderr)
-        check("[-7] AC5 ...and re-stamps the receipt at the engine's own schema",
-              _r5.get("schema") == govkit_module().RECEIPT_SCHEMA, str(_r5.get("schema")))
+        # The re-stamp caps at 3 since TOOL-dSafePassage-3, so a first install's receipt keeps its 4.
+        check("[-7] AC5 ...and re-stamps the receipt keeping its own schema",
+              _r5.get("schema") == _s5 == govkit_module().RECEIPT_SCHEMA, f"{_s5} -> {_r5.get('schema')}")
         check("[-7] AC5 the fixture's engine population is non-empty, so the next arm CAN fail",
               len(_eng5) > 0, str(len(_eng5)))
         check("[-7] AC5 every engine row carries gov_oid, oid AND sha256",
@@ -8208,6 +10902,7 @@ user_skills = "/tmp/gk-fake-skills"
             _rp = _co / ".governance" / "install.json"
             _rr = json.loads(_rp.read_text(encoding="utf-8"))
             _rr["schema"] = _sch
+            _rr.pop("steps", None)  # TOOL-dSafePassage-26 S25: below schema 4 a receipt has no steps
             for _f in _rr["files"]:
                 _f.pop("gov_oid", None)
                 _f.pop("oid", None)
@@ -8228,6 +10923,7 @@ user_skills = "/tmp/gk-fake-skills"
         _rp1 = s1 / ".governance" / "install.json"
         _rr1 = json.loads(_rp1.read_text(encoding="utf-8"))
         _rr1["schema"] = 1
+        _rr1.pop("steps", None)  # TOOL-dSafePassage-26 S25, as matrix's build_role_pair does
         _lied = None
         for _f in _rr1["files"]:
             _f.pop("gov_oid", None)
@@ -8253,6 +10949,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -8282,7 +10979,7 @@ user_skills = "/tmp/gk-fake-skills"
             Run through the SCRATCH gov's own copy of the engine, which is the seam that acts —
             a break staged into this repo's `govkit.py` does not reach a copy taken before it.
             """
-            t = make_target(tmp / name, None)
+            t = build_target(tmp / name, None)
             for verb in ("intake", "apply"):
                 subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), verb,
                                 "--target", str(t), "--kits", "demo"], capture_output=True)
@@ -8387,9 +11084,9 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-7] AC9 the fixture's field-less row really carries neither identity",
               not _r9.get("commit") and not _r9.get("gov_oid")
               and _r9.get("evidence") == "unattributed", str(_r9)[:200])
-        check("[-7] AC9 ...and its receipt is at the CURRENT schema, so no migration fills them in",
+        check("[-7] AC9 ...and its receipt is at schema 3 or above, so no migration fills them in",
               json.loads((it9 / ".governance" / "install.json").read_text(
-                  encoding="utf-8")).get("schema") == govkit_module().RECEIPT_SCHEMA, "")
+                  encoding="utf-8")).get("schema") >= 3, "")
         _x9 = (it9 / PFX / "demo" / "extra.txt").read_bytes()
         _a9 = gov_update(ig, it9, "--write")
         check("[-7] AC9 the run completes over the field-less row and exits 0",
@@ -8425,7 +11122,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- `merged` arm patched out of S9, that row's `commit`-without-`gov_oid` tripped the
         # ---- exactly-one branch and the WHOLE run refused before any row was classified — on the
         # ---- first update against any target that ever applied such a rule.
-        t11 = make_target(tmp / "id11", None)
+        t11 = build_target(tmp / "id11", None)
         run("intake", "--target", str(t11), "--kits", "push-main")
         run("apply", "--target", str(t11), "--kits", "push-main")
         settle(t11, "the push-main install")
@@ -8487,7 +11184,7 @@ user_skills = "/tmp/gk-fake-skills"
             guarantee under test is the one that survives a commit, and an uncommitted edit never
             reaches the classifier at all.
             """
-            t = make_target(tmp / name, DEPLOY_FULL)
+            t = build_target(tmp / name, DEPLOY_FULL)
             run("apply", "--target", str(t), "--kits", "check-wiring")
             # BOTH identities from the SAME vintage, or the fixture is `-7` S9's corruption rather
             # than an older install, and every run below refuses before it classifies. The SAME
@@ -8944,6 +11641,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -9303,7 +12001,7 @@ user_skills = "/tmp/gk-fake-skills"
               "carry" not in [f for f in _r7b["files"] if f["path"] == HAZ9][0],
               str([f for f in _r7b["files"] if f["path"] == HAZ9][0]))
         check("[-9] AC7 ...and the receipt still reads schema 3 — this unit moves no schema number",
-              _r7b.get("schema") == 3 == GK9.RECEIPT_SCHEMA, str(_r7b.get("schema")))
+              _r7b.get("schema") == 3, str(_r7b.get("schema")))
         for _sch9 in (1, 2):
             def _older(rec: dict, _s=_sch9) -> None:
                 rec["schema"] = _s
@@ -9371,6 +12069,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -9442,7 +12141,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- hand-name five kinds, so a kind added to the table alone was counted and never
         # ---- printed. The summary clause is derived from the same table now.
         _gp = fork_gov("plan", fork_kit())
-        _tp = make_target(tmp / "fork-plan-t",
+        _tp = build_target(tmp / "fork-plan-t",
                           f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
         _pp = run_in_gov(_gp, "plan", "--target", str(_tp), "--kits", "demo")
         _prows = _extract_plan_rows(_pp.stdout)
@@ -9472,7 +12171,7 @@ user_skills = "/tmp/gk-fake-skills"
         FORK_TARGET_BYTES = "# the target's own copy — gov's is derived FROM this\nimport ok\n"
 
         def fork_target(g: pathlib.Path, name: str) -> pathlib.Path:
-            t = make_target(tmp / name,
+            t = build_target(tmp / name,
                             f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
             p = t / PFX / "demo" / "forked-one.py"
             p.parent.mkdir(parents=True, exist_ok=True)
@@ -9516,7 +12215,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- TOOL-aRepatriatedFork-36 retired its forked rule; the detection keys on the ROLE,
         # ---- never on the kit id, so this fixture grades the same branch.
         _gi = fork_gov("incomplete", fork_kit())
-        _ti = make_target(tmp / "fork-incomplete-t",
+        _ti = build_target(tmp / "fork-incomplete-t",
                           f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
         _ip = run_in_gov(_gi, "apply", "--target", str(_ti), "--kits", "demo")
         _io = _ip.stdout + _ip.stderr
@@ -9675,26 +12374,28 @@ user_skills = "/tmp/gk-fake-skills"
         }
 
 
-        def build_rename_gov(tag: str, kit_a: str = _11_KIT_A) -> pathlib.Path:
+        def build_rename_gov(tag: str, kit_a: str = _11_KIT_A, root: str = PFX,
+                             src: dict | None = None) -> pathlib.Path:
             """A scratch gov carrying ONE `demo` kit and a copy of the engine.
 
             THE COPY IS TAKEN HERE, at fixture-build time — a break staged into this repo's `govkit.py`
             AFTER the copy runs the UNPATCHED engine and the arm reports on nothing.
             """
             g = tmp / f"rn-{tag}-gov"
-            (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
-            shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
-            shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
-            (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
+            (g / root / KIT_NAMES["govkit"]).mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / root / KIT_NAMES["govkit"] / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / root / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / root / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
+            (g / root / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
                 '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
                 '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n',
                 encoding="utf-8", newline="\n")
-            d = g / PFX / "demo"
+            d = g / root / "demo"
             d.mkdir(parents=True, exist_ok=True)
             (d / "kit.toml").write_text(kit_a, encoding="utf-8", newline="\n")
-            for rel, body in _11_SRC.items():
+            for rel, body in (src or _11_SRC).items():
                 (d / rel).write_text(body, encoding="utf-8", newline="\n")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
@@ -9738,7 +12439,7 @@ user_skills = "/tmp/gk-fake-skills"
             later arms are grading a broken install. The local delta is an EDIT AFTER the install, which is
             the state the three-way exists for.
             """
-            t = make_target(tmp / name, f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+            t = build_target(tmp / name, f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
             (t / PFX / "demo").mkdir(parents=True, exist_ok=True)
             (t / PFX / "demo" / "rendered.txt").write_text(
                 "the adopter rendered this\n", encoding="utf-8", newline="\n")
@@ -10212,6 +12913,7 @@ user_skills = "/tmp/gk-fake-skills"
         (_gs2 / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
         shutil.copy2(GOVKIT, _gs2 / PFX / KIT_NAMES["govkit"] / "govkit.py")
         shutil.copy2(GOVKIT.parent / "adopters.toml", _gs2 / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+        shutil.copy2(GOVKIT.parent / "upgrade_steps.py", _gs2 / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
         (_gs2 / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
             '[surface]\nglobs = ["{prefix}/*"]\n\n'
             '[selection]\ndefault = ["mvkit"]\n\n'
@@ -10237,7 +12939,7 @@ user_skills = "/tmp/gk-fake-skills"
         git(_gs2, "add", "-A")
         git(_gs2, "commit", "-qm", "mvkit A")
 
-        _ts2 = make_target(tmp / "st2-t",
+        _ts2 = build_target(tmp / "st2-t",
                            f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["mvkit"]\n')
         _ap2 = run_in_gov(_gs2, "apply", "--target", str(_ts2), "--kits", "mvkit")
         check("[-ST2] the mvkit fixture installs GREEN, or every arm below grades a broken "
@@ -10399,6 +13101,7 @@ user_skills = "/tmp/gk-fake-skills"
         (_gl / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
         shutil.copy2(GOVKIT, _gl / PFX / KIT_NAMES["govkit"] / "govkit.py")
         shutil.copy2(GOVKIT.parent / "adopters.toml", _gl / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+        shutil.copy2(GOVKIT.parent / "upgrade_steps.py", _gl / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
         (_gl / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
             '[surface]\nglobs = ["{prefix}/*"]\n\n'
             '[selection]\ndefault = ["landkit"]\n\n'
@@ -10427,7 +13130,7 @@ user_skills = "/tmp/gk-fake-skills"
         git(_gl, "add", "-A")
         git(_gl, "commit", "-qm", "landkit A")
 
-        _tl = make_target(tmp / "st1-t",
+        _tl = build_target(tmp / "st1-t",
                           f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["landkit"]\n')
         _apl = run_in_gov(_gl, "apply", "--target", str(_tl), "--kits", "landkit")
         check("[-ST1] the landkit fixture installs GREEN, or every arm below grades a broken "
@@ -10547,6 +13250,104 @@ user_skills = "/tmp/gk-fake-skills"
               and [f for f in json.loads((_t11b / ".governance" / "install.json").read_text(
                   encoding="utf-8"))["files"] if f["path"] == f"{PFX}demo/moved.txt"], "")
 
+        # TOOL-dSafePassage-88: gov moves its tool root and the target keeps its prefix, so each renamed
+        # row resolves to its own path and lands there, never refused as its own occupant.
+        _kit88 = ('id = "demo"\nhome = "demo"\nversion_from = { none = "fixture" }\n\n[check]\nnone = "a fixture kit"\n\n'
+                  '[[files]]\ninclude = "**"\nrole = "engine"\n\n[adopt]\nargv = []\nmutates_index = false\n')
+        _g88 = build_rename_gov("inplace", _kit88, "pinned", {"keep.txt": "one\ntwo\nthree\nfour\n"})
+        _gk88 = _g88 / "pinned" / KIT_NAMES["govkit"]
+        _t88 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-inplace-t")
+        _ap88 = subprocess.run([sys.executable, str(_gk88 / "govkit.py"), "apply", "--target", str(_t88),
+                                "--kits", "demo"], capture_output=True, text=True, encoding="utf-8", errors="replace")
+        settle(_t88, "the install")
+        git(_g88, "mv", "pinned", "moved")
+        (_g88 / "moved" / "demo" / "keep.txt").write_text("one\ntwo\nthree\nFOUR\n", encoding="utf-8", newline="\n")
+        git(_g88, "add", "-A")
+        git(_g88, "commit", "-qm", "B")
+        _up88 = subprocess.run([sys.executable, str(_g88 / "moved" / KIT_NAMES["govkit"] / "govkit.py"), "update",
+                                "--target", str(_t88), "--write"],
+                               capture_output=True, text=True, encoding="utf-8", errors="replace")
+        _row88 = [f.get("source") for f in json.loads((_t88 / ".governance" / "install.json").read_text(
+            encoding="utf-8"))["files"] if f["path"] == "pinned/demo/keep.txt"]
+        check("[dSP-88] a rename gov's tool-root move makes lands at the row's own path, under the new source",
+              _ap88.returncode == 0 and _up88.returncode == 0
+              and "ALREADY holds a file there" not in _up88.stdout
+              and read_bytes11(_t88 / "pinned" / "demo" / "keep.txt") == b"one\ntwo\nthree\nFOUR\n"
+              and _row88 == ["moved/demo/keep.txt"] and not (_t88 / "moved").exists(),
+              f"apply {_ap88.returncode} update {_up88.returncode} {_row88} " + _up88.stdout[-1500:])
+        # TOOL-dSafePassage-90: a case-only rename. Where the filesystem folds case the new spelling is
+        # the row's own file, so the move is refused by name and nothing is written; where it does not,
+        # the new spelling is a second path and moves. Either way the target's INDEX is read, never the
+        # receipt row, which the arm writes whether or not `git mv` ran.
+        settle(_t88, "the in-place update")
+        _fold90 = (_t88 / "pinned" / "demo" / "KEEP.TXT").exists()
+        git(_g88, "mv", "moved/demo/keep.txt", "moved/demo/Keep.txt")
+        git(_g88, "commit", "-qm", "C")
+        _cs90 = subprocess.run([sys.executable, str(_g88 / "moved" / KIT_NAMES["govkit"] / "govkit.py"), "update",
+                                "--target", str(_t88), "--write"],
+                               capture_output=True, text=True, encoding="utf-8", errors="replace")
+        _ix90 = [p for p in gout(_t88, "ls-files", "--", "pinned/demo").split()
+                 if p.lower() == "pinned/demo/keep.txt"]
+        check("[dSP-90] a case-only rename is refused by name where the filesystem folds case, and moves where it does not",
+              (_cs90.returncode == 1 and "case-only rename is on a case-insensitive filesystem" in _cs90.stdout
+               and _ix90 == ["pinned/demo/keep.txt"]
+               and read_bytes11(_t88 / "pinned" / "demo" / "keep.txt") == b"one\ntwo\nthree\nFOUR\n")
+              if _fold90 else (_cs90.returncode == 0 and _ix90 == ["pinned/demo/Keep.txt"]),
+              f"fold {_fold90} update {_cs90.returncode} {_ix90} " + _cs90.stdout[-1500:])
+
+        # TOOL-dSafePassage-91: an in-place row in a held-back kit. Gov's root moves, so keep.txt is in
+        # place, and other.txt is renamed onto the adopter's own file, so the kit is rolled back. The
+        # in-place row is snapshotted at its one path, so the order restores it once.
+        _g91 = build_rename_gov("inplace-held", _kit88, "pinned", {"keep.txt": "one\ntwo\n", "other.txt": "other\n"})
+        _t91 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-inplace-held-t")
+        _ap91 = subprocess.run([sys.executable, str(_g91 / "pinned" / KIT_NAMES["govkit"] / "govkit.py"), "apply",
+                                "--target", str(_t91), "--kits", "demo"],
+                               capture_output=True, text=True, encoding="utf-8", errors="replace")
+        (_t91 / "pinned" / "demo" / "renamed.txt").write_text("the adopter's own file\n", encoding="utf-8", newline="\n")
+        settle(_t91, "the install and the adopter's own file")
+        git(_g91, "mv", "pinned", "moved")
+        git(_g91, "mv", "moved/demo/other.txt", "moved/demo/renamed.txt")
+        git(_g91, "commit", "-qm", "B")
+        _up91 = subprocess.run([sys.executable, str(_g91 / "moved" / KIT_NAMES["govkit"] / "govkit.py"), "update",
+                                "--target", str(_t91), "--write"],
+                               capture_output=True, text=True, encoding="utf-8", errors="replace")
+        _ord91 = _t91 / ".governance" / "outbox" / "update-rollback-demo.md"
+        _rs91 = _ord91.read_text(encoding="utf-8").splitlines().count("restored  pinned/demo/keep.txt") \
+            if _ord91.is_file() else None
+        check("[dSP-91 L1] a held-back kit's in-place row is restored once, and its order names it once",
+              _ap91.returncode == 0 and _up91.returncode == 1 and "ALREADY holds a file there" in _up91.stdout
+              and _rs91 == 1 and read_bytes11(_t91 / "pinned" / "demo" / "keep.txt") == b"one\ntwo\n",
+              f"apply {_ap91.returncode} update {_up91.returncode} restored {_rs91} " + _up91.stdout[-1500:])
+
+        # TOOL-dSafePassage-93: the adopter's own hard link at gov's new name. The new name is the row's
+        # own file under another name, never a second spelling, so the move is refused naming the link.
+        # Gov's B changes the last line, so a write through either name moves bytes the check reads, and
+        # the two names must still be one file. A hard link stands in for a symlink: NTFS makes one
+        # without a privilege, and `samefile` answers both alike.
+        _g93 = build_rename_gov("link", _kit88, "pinned", {"keep.txt": "one\ntwo\nthree\nfour\n"})
+        _t93 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-link-t")
+        _ap93 = run_in_gov(_g93, "apply", "--target", str(_t93), "--kits", "demo", root="pinned")
+        _keep93, _link93 = (_t93 / "pinned" / "demo" / n for n in ("keep.txt", "linked.txt"))
+        try:
+            os.link(_keep93, _link93)
+            _ln93 = ""
+        except OSError as _e93:
+            _ln93 = f"os.link failed: {_e93}; "
+        settle(_t93, "the install and the adopter's own link")
+        git(_g93, "mv", "pinned/demo/keep.txt", "pinned/demo/linked.txt")
+        (_g93 / "pinned" / "demo" / "linked.txt").write_text("one\ntwo\nthree\nFOUR\n", encoding="utf-8", newline="\n")
+        git(_g93, "add", "-A")
+        git(_g93, "commit", "-qm", "B")
+        _up93 = (run_in_gov(_g93, "update", "--target", str(_t93), "--write", root="pinned")
+                 if _ap93.returncode == 0 and not _ln93 else None)
+        check("[dSP-93] a rename onto the adopter's own link to the row's file is refused naming the link, not case folding",
+              _up93 is not None and _up93.returncode == 1 and "under another name (a link" in _up93.stdout
+              and "case-only rename is on a case-insensitive filesystem" not in _up93.stdout
+              and all(read_bytes11(f) == b"one\ntwo\nthree\nfour\n" for f in (_keep93, _link93))
+              and os.path.samefile(_keep93, _link93),
+              f"{_ln93}apply {_ap93.returncode} update {_up93 and _up93.returncode} "
+              + (_up93 or _ap93).stdout[-1500:])
+
         _g11c = build_rename_gov("mvfail")
         _t11c = build_rename_target(_g11c, "rn-mvfail-t")
         (_t11c / PFX / "demo" / "sub").write_text(
@@ -10579,7 +13380,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- same class the receipt-path guard beside it exists for, one field further along.
         _g11d = build_rename_gov("escape")
         _A11d = gout(_g11d, "rev-parse", "HEAD").strip()
-        _t11d = make_target(tmp / "rn-escape-t",
+        _t11d = build_target(tmp / "rn-escape-t",
                             'gov_source = "local"\nprefix = "../escape"\nkits = ["demo"]\n')
         (_t11d / PFX / "demo").mkdir(parents=True, exist_ok=True)
         (_t11d / PFX / "demo" / "moved.txt").write_text(
@@ -10626,6 +13427,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -10803,6 +13605,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 "[selection]\ndefault = [" + ", ".join(f'"{e}"' for e in kits) + "]\n\n"
@@ -10841,7 +13644,7 @@ user_skills = "/tmp/gk-fake-skills"
         def build_verify_target(g: pathlib.Path, name: str, kits) -> pathlib.Path:
             """An installed target, built by running the real `apply` rather than by authoring a
             receipt — so every arm below grades an install this engine can actually produce."""
-            t = make_target(tmp / f"v14-{name}",
+            t = build_target(tmp / f"v14-{name}",
                             f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ['
                             + ", ".join(f'"{e}"' for e in kits) + "]\n")
             _ap = run_in_gov(g, "apply", "--target", str(t), "--kits", ",".join(kits))
@@ -11867,9 +14670,9 @@ user_skills = "/tmp/gk-fake-skills"
         })
         # AC2 — THE POST-APPLY STEADY STATE, and the fixture must NOT commit after the apply. Every
         # other fixture in this file settles, which is how the `-12` burden could be re-created by
-        # this unit's widening and no arm would have noticed. `make_target` + the real `apply`, with
+        # this unit's widening and no arm would have noticed. `build_target` + the real `apply`, with
         # no `settle` behind it, is that state exactly: gov's block staged, nothing committed.
-        _t24p = make_target(tmp / "v24-postapply",
+        _t24p = build_target(tmp / "v24-postapply",
                             f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
         _a24p = run_in_gov(_gp, "apply", "--target", str(_t24p), "--kits", "demo")
         check("[-24] AC2 LIVENESS the post-apply fixture installed green and left gov's block "
@@ -12267,6 +15070,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / "demo").mkdir(parents=True)
             shutil.copy2(HERE / "govkit.py", g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(HERE / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(HERE / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(A13_REG, encoding="utf-8",
                                                                   newline="\n")
             (g / PFX / "demo" / "kit.toml").write_text(kit_toml, encoding="utf-8", newline="\n")
@@ -12616,6 +15420,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / "demo").mkdir(parents=True)
             shutil.copy2(HERE / "govkit.py", g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(HERE / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(HERE / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(A4_REG, encoding="utf-8",
                                                                   newline="\n")
             (g / PFX / "demo" / "kit.toml").write_text(kit_toml, encoding="utf-8", newline="\n")
@@ -13130,7 +15935,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- Graded on the POPULATION rather than through a second `update` run, because the
         # ---- population IS the fix and a run would also have to clear `-7` S4 and the lock to say
         # ---- anything -- a fixture that cannot reach the case is how this build lost two rounds.
-        _mgt = make_target(tmp / 'merged-dirty', None)
+        _mgt = build_target(tmp / 'merged-dirty', None)
         (_mgt / 'pyproject.toml').write_text('[tool.x]\nk = 1\n', encoding='utf-8', newline='\n')
         settle(_mgt, 'a target owning a pyproject')
         run('intake', '--target', str(_mgt), '--kits', 'pytest-parallel-guardrails')
@@ -13165,7 +15970,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- TWO KITS, THE ESCAPE IN THE LAST ONE, and the assertion is the PROPERTY rather than
         # ---- the message: after the refusal the target holds no gov-written file at all. Measured
         # ---- with the hoist reverted, the same fixture left 33 dirty paths behind.
-        _h3t = make_target(tmp / 'h3-order', None)
+        _h3t = build_target(tmp / 'h3-order', None)
         (_h3t / '.governance').mkdir(parents=True, exist_ok=True)
         (_h3t / '.governance' / 'deploy.toml').write_text(
             f'gov_source = "local"\nprefix = "{PFX[:-1]}"\n'
@@ -13715,6 +16520,7 @@ user_skills = "/tmp/gk-fake-skills"
         (_g5sib / PFX / "sib").mkdir(parents=True)
         shutil.copy2(HERE / "govkit.py", _g5sib / PFX / KIT_NAMES["govkit"] / "govkit.py")
         shutil.copy2(HERE / "adopters.toml", _g5sib / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+        shutil.copy2(HERE / "upgrade_steps.py", _g5sib / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
         (_g5sib / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
             '[surface]\nglobs = ["{prefix}/*"]\n\n[selection]\ndefault = ["demo", "sib"]\n\n'
             '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
@@ -14104,6 +16910,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / "demo").mkdir(parents=True)
             shutil.copy2(HERE / "govkit.py", g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(HERE / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(HERE / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(A6_REG, encoding="utf-8",
                                                                   newline="\n")
             (g / PFX / "demo" / "kit.toml").write_text(a6_kit(leg_argv), encoding="utf-8",
@@ -14602,6 +17409,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n[selection]\ndefault = ["review-harness"]\n\n'
                 '[[entry]]\nid = "review-harness"\ndescriptor = "{prefix}/workflows/kit.toml"\n\n'
@@ -14699,7 +17507,7 @@ user_skills = "/tmp/gk-fake-skills"
             """An install `apply` wrote at vintage A, with one local delta, which both measured
             consumers carry somewhere, and the checklist script a flat memory-tree install puts where
             the renderer's probe looks for it."""
-            t = make_target(tmp / name, _pvDEPLOY.format(kits='["review-harness"]'))
+            t = build_target(tmp / name, _pvDEPLOY.format(kits='["review-harness"]'))
             (t / "scripts").mkdir(exist_ok=True)
             (t / "scripts" / "gotchas.py").write_text("# a stub checklist\n", encoding="utf-8", newline="\n")
             seed_pv_policy(t)
@@ -14727,7 +17535,7 @@ user_skills = "/tmp/gk-fake-skills"
             row names, and edited a project-owned file whose row records a base. It never kept the
             seed its out-of-release kit ships. `template_fork` replaces the protocol TEMPLATE's copy
             before the receipt is written, so `adopt` records it unattributed, as core's forks were."""
-            t = make_target(tmp / name, _pvDEPLOY.format(kits=json.dumps(list(kits))))
+            t = build_target(tmp / name, _pvDEPLOY.format(kits=json.dumps(list(kits))))
             for _src, _dst in (_pvKITDIRS[_k] for _k in kits):
                 for _rel in gout(g, "ls-files", "--", _src + "/").split():
                     _name = pathlib.PurePosixPath(_rel).name
@@ -15621,8 +18429,7 @@ user_skills = "/tmp/gk-fake-skills"
     # kit-subject leg invisible to `read_gate_verdicts`, so an upgrading adopter's apply saw a leg
     # that was green before, holding NO state after, and tripped "a leg that vanished is not a leg
     # that passed" on every one of them.
-    sys.path.insert(0, str(HERE))
-    import govkit as _GK
+    _GK = govkit_module()
     _OBS_KEYS = _GK.OBSERVED_KEYS
     check("OBSERVED_KEYS is derived from OBSERVED_STATES rather than re-typed",
           _OBS_KEYS == tuple(k for _s, k in _GK.OBSERVED_STATES), str(_OBS_KEYS))
@@ -15726,8 +18533,7 @@ user_skills = "/tmp/gk-fake-skills"
     # own python3 (3.10.12, no tomllib). Every arm below is the difference between a fix and a
     # line anyone can delete: without them nothing reds until a node with WSL runs a FULL bar,
     # and the leg is GUARDED, so a scoped bar never would.
-    sys.path.insert(0, str(HERE))
-    import govkit  # noqa: E402
+    govkit = govkit_module()
 
     rb = govkit.resolve_bash()
     low = rb.replace(chr(92), "/").lower()
@@ -15786,8 +18592,8 @@ user_skills = "/tmp/gk-fake-skills"
     # An override that is SET and unusable must be THIS failure, never a quiet fall-through:
     # the operator would believe they had chosen. The memo is cleared around the arm so it
     # measures the resolver rather than the answer the arms above cached.
-    keep_bash, keep_env = govkit._BASH, os.environ.get("GOV_BASH")
-    govkit._BASH = None
+    keep_bash, keep_env = govkit.upgrade_steps._BASH, os.environ.get("GOV_BASH")
+    govkit.upgrade_steps._BASH = None
     os.environ["GOV_BASH"] = str(HERE / "no-such-bash-xyzzy")
     try:
         govkit.resolve_bash()
@@ -15795,7 +18601,7 @@ user_skills = "/tmp/gk-fake-skills"
     except govkit.Refusal:
         refused = True
     finally:
-        govkit._BASH = keep_bash
+        govkit.upgrade_steps._BASH = keep_bash
         if keep_env is None:
             os.environ.pop("GOV_BASH", None)
         else:
@@ -15978,6 +18784,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(M13_REG, encoding="utf-8",
                                                                   newline="\n")
             for eid, leg, eng, chk in (("demo", leg_name, leg_engine, with_check),
@@ -16535,13 +19342,17 @@ user_skills = "/tmp/gk-fake-skills"
               (_p21c.stdout + _p21c.stderr)[-900:])
 
         _gsrc21 = GOVKIT.read_text(encoding="utf-8")
-        _broken21 = _gsrc21.replace(
+        # TOOL-dSafePassage-26 S15: the break is staged in the file DEFINING `write_atomic`, the step
+        # module since the helper moved there, and the routing walk below reads that module and
+        # every step program beside the engine too.
+        _usrc21 = (GOVKIT.parent / "upgrade_steps.py").read_text(encoding="utf-8")
+        _broken21 = _usrc21.replace(
             _SWAP21, "        raise RuntimeError('govkit selftest: staged mid-write break')", 1)
         check("[-21] AC1 LIVENESS the staged break matched the line it names, so a renamed or "
               "reindented replace call reds here rather than staging nothing",
-              _broken21 != _gsrc21, "the engine does not spell " + _SWAP21.strip())
-        (_g21 / PFX / KIT_NAMES["govkit"] / "govkit.py").write_text(_broken21, encoding="utf-8",
-                                                             newline="")
+              _broken21 != _usrc21, "the step module does not spell " + _SWAP21.strip())
+        (_g21 / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py").write_text(_broken21, encoding="utf-8",
+                                                                    newline="")
         git(_g21, "add", "-A")
         git(_g21, "commit", "-qm", "a raise staged between the temp write and the replace")
         _t21 = build_runner21("m21")
@@ -16641,7 +19452,17 @@ user_skills = "/tmp/gk-fake-skills"
             return dests, direct, routed
 
         _mk21 = tuple(govkit_module().ADOPTER_BAR_PATHS)
-        _dest21, _direct21, _routed21 = read_bar_writes21(_mk21, _gsrc21)
+        # Every source the one-writer rule reads (S15): the engine, the step module and each step
+        # program. A direct write in any of them reds; the routed sites are the union's.
+        _srcs21 = [("govkit.py", _gsrc21), ("upgrade_steps.py", _usrc21)] + [
+            (f"steps/{_sp.name}", _sp.read_text(encoding="utf-8"))
+            for _sp in sorted((GOVKIT.parent / "steps").glob("*.py"))]
+        _dest21, _direct21, _routed21 = set(), [], []
+        for _sn21, _ss21 in _srcs21:
+            _d, _x, _r = read_bar_writes21(_mk21, _ss21)
+            _dest21 |= _d
+            _direct21 += [(_sn21, *_e) for _e in _x]
+            _routed21 += [(_sn21, _l) for _l in _r]
         check("[-21] AC2 LIVENESS the declared set still reaches a destination in this engine, so "
               "a renamed `[gate_runner].file` read reds here rather than emptying the population",
               bool(_dest21), "ADOPTER_BAR_PATHS matched no assignment at all")
@@ -16855,6 +19676,169 @@ user_skills = "/tmp/gk-fake-skills"
                                                          "observed_ran": ["GATE ok    {name}"]})
         check("[aPrimedIndex-1] the verdict reader skips the runner's preflight, so a leg still reads",
               _rvm.get("fixture leg") == "green", repr(_rvm))
+
+    # ---- TOOL-dSafePassage-6 AC1 to AC7. THE FORWARDERS, THROUGH THE GENERATOR'S OWN FIXTURE. Every
+    # ---- language under every mode forwards exit 3, the arguments `a` and `b c` and the stdin `in`,
+    # ---- prints or stays silent as its mode says and journals one argument-free line; every window
+    # ---- pair of AC6 holds or allows a closed row; an unlanded row is held; and `--check` reds a
+    # ---- forwarder edited by hand. Each case asserts its exit AND its summary line. Run four at a
+    # ---- time: each plant is its own scratch repository, and serially they cost ~3 minutes.
+    import concurrent.futures as _cf
+    _shim_cases = [(f"[dSafePassage-6] AC3-AC5 plant {_l} --mode {_m} forwards intact and {_m} reports as it should",
+                    ["--plant", _l, "--mode", _m], 0, "observation(s) matched")
+                   for _l in ("sh", "js", "py", "module") for _m in ("warn", "journal", "unset", "bogus")]
+    # TOOL-dSafePassage-26 S9: the window plant takes the expected verdict and exits by the one plant
+    # contract, 0 on a match; each pair is asserted with its case and against the other verdict.
+    _shim_cases += [(f"[dSafePassage-6] AC6 window {_w} with {_n} release(s) {_v} a closed row, "
+                     f"--expect {_e} {'matching' if _rc == 0 else 'missing'}",
+                     ["--plant", "window", "--window", str(_w), "--releases", str(_n), "--expect", _e], _rc,
+                     "1 of 1 observation(s) matched" if _rc == 0 else "0 of 1 observation(s) matched")
+                    for _w, _n, _v in ((0, 0, "held"), (0, 1, "allowed"), (1, 0, "held"), (1, 1, "allowed"),
+                                       (2, 0, "held"), (2, 1, "held"), (2, 2, "allowed"), (4, 0, "held"),
+                                       (4, 3, "held"), (4, 4, "allowed"))
+                    for _e, _rc in ((_v, 0), ("allowed" if _v == "held" else "held", 1))]
+    _shim_cases += [("[dSafePassage-6] AC6 an unlanded row is held whatever its releases",
+                     ["--plant", "window", "--window", "0", "--releases", "2", "--unlanded", "--expect", "held"], 0,
+                     "1 of 1 observation(s) matched"),
+                    ("[dSafePassage-6] AC1 --check reds a forwarder edited by hand",
+                     ["--plant", "parity-edit"], 0, "3 of 3 observation(s) matched"),
+                    # TOOL-dSafePassage-26 AC16, AC33: an id another begins with, or a comment spells
+                    # first, lands at its own row; a js forwarder whose target never started exits 127.
+                    ("[dSafePassage-26] AC16 window-prefix-id: each id lands at its own row",
+                     ["--plant", "window-prefix-id"], 0, "2 of 2 observation(s) matched"),
+                    ("[dSafePassage-26] AC16 window-comment-id: a comment spelling the id is no landing",
+                     ["--plant", "window-comment-id"], 0, "1 of 1 observation(s) matched"),
+                    ("[dSafePassage-26] AC33 missing-target: the js forwarder exits 127 naming the error",
+                     ["--plant", "missing-target", "--lang", "js"], 0, "2 of 2 observation(s) matched")]
+
+    def _run_shim_case(case):
+        return case, subprocess.run([sys.executable, str(HERE / "shims.py"), "--fixture", *case[1]],
+                                    capture_output=True, text=True, encoding="utf-8", errors="replace")
+
+    with _cf.ThreadPoolExecutor(max_workers=4) as _pool:
+        for (_label, _argv, _rc, _line), _p in _pool.map(_run_shim_case, _shim_cases):
+            _last = (_p.stdout.strip().splitlines() or [""])[-1]
+            check(_label, _p.returncode == _rc and _line in _last and (_rc == 1) == ("MISS" in _p.stdout),
+                  f"exit {_p.returncode}, expected {_rc}: {_p.stdout[-1200:]}{_p.stderr[-400:]}")
+
+    # ---- TOOL-dSafePassage-9 AC1-AC6, AC8, AC9, AC12. WITHDRAWN FRAGMENTS, RETIRED EDITS AND EDITED
+    # ---- RENDERS, through the unit's own fixture: every plant matches its case (exit 0, no MISS), and
+    # ---- each stub stages the red its criterion names (exit 1). Four at a time, as above.
+    _rte_cases = [(f"[dSafePassage-9] plant {' '.join(_a)} matches its case", list(_a), 0)
+                  for _a in (("fragment-withdrawn",), ("fragment-withdrawn", "--write-withdrawals"),
+                             ("fragment-withdrawn", "--rerender-off"), ("fragment-rollback",),
+                             ("edited-gone",), ("edited-row",), ("keep",), ("seed-retired-edited",),
+                             ("seed-retired-clean",), ("render-edited",), ("render-clean",),
+                             ("dispatch-gap",))]
+    # TOOL-dSafePassage-63 AC1 AC2: an edited render with no `oid` proven from `output_sha256`, and a
+    # line-ending-only rewrite read unedited; `oid-only` stages AC1's red.
+    _rte_cases += [(f"[dSafePassage-63] plant {_pl} matches its case", [_pl], 0)
+                   for _pl in ("render-edited-no-oid", "render-eol-no-oid")]
+    # TOOL-dSafePassage-64 AC1: a `retired-edited` row takes back `engine` once gov ships it again.
+    _rte_cases += [("[dSafePassage-64] plant edited-reshipped matches its case", ["edited-reshipped"], 0)]
+    # TOOL-dSafePassage-65 AC1: a rollback resolves the row's role from the descriptor at `--to`.
+    _rte_cases += [("[dSafePassage-65] plant edited-rolled-back matches its case", ["edited-rolled-back"], 0)]
+    # TOOL-dSafePassage-66 AC1 AC2: a held kit is put back before the first step, so a walk killed
+    # inside `fx/s1` leaves it at its pre-run bytes and row; `render-edited` above carries AC2's
+    # `eng.txt` and the order's `restored` line.
+    _rte_cases += [("[dSafePassage-66] plant render-edited-kill matches its case", ["render-edited-kill"], 0)]
+    # TOOL-dSafePassage-76 AC6: a render git cannot hash through a failing required clean filter
+    # reads edited, so its kit is held, its order written and its bytes kept.
+    _rte_cases += [("[dSafePassage-76] plant render-filter-broken matches its case", ["render-filter-broken"], 0)]
+    _rte_cases += [(f"[dSafePassage-9] plant {_pl} --stub {_st} stages its red", [_pl, "--stub", _st], 1)
+                   for _pl, _st in (("edited-row", "forked"), ("keep", "report-omits"),
+                                    ("render-edited", "today"), ("seed-retired-edited", "seed-override"),
+                                    ("render-edited-no-oid", "oid-only"))]
+
+    def _run_rte_case(case):
+        return case, subprocess.run([sys.executable, str(HERE / "fixtures" / "retired_edits.py"),
+                                     "--plant", *case[1]], capture_output=True, text=True,
+                                    encoding="utf-8", errors="replace")
+
+    with _cf.ThreadPoolExecutor(max_workers=4) as _pool:
+        for (_label, _argv, _rc), _p in _pool.map(_run_rte_case, _rte_cases):
+            _last = (_p.stdout.strip().splitlines() or [""])[-1]
+            check(_label, _p.returncode == _rc and "observation(s) matched" in _last
+                  and (_rc == 1) == ("MISS" in _p.stdout),
+                  f"exit {_p.returncode}, expected {_rc}: {_p.stdout[-1200:]}{_p.stderr[-400:]}")
+
+    # ---- TOOL-dSafePassage-13 AC1, AC3-AC8. THE DOCS LEG, through its own fixture: every plant exits
+    # ---- as section 4's table says and prints the line its criterion names, and `stale-page` under
+    # ---- `warn` exits 0 with a WARN line and under `off` prints one line naming the key.
+    _docs_cases = [(["none"], 0, r"^docs: \d+ classes · .* 0 stale · commands 2 tested, 1 skipped, 0 unrowed"),
+                   (["stale-page"], 1, r"^docs: STALE help/guide\.md:\d+ fx-verb:tool: the page holds [0-9a-f]{8}, the row is now [0-9a-f]{8}$"),
+                   (["bad-flag"], 1, r"^docs: COMMAND help/guide\.md:\d+ .*flag '--section'"),
+                   (["bad-verb"], 1, r"^docs: COMMAND help/guide\.md:\d+ .*verb 'rendr'"),
+                   (["unrowed"], 1, r"^docs: UNROWED help/guide\.md:\d+ tools/fx/other\.py"),
+                   (["broken-link"], 1, r"^docs: LINK help/guide\.md:\d+ gone\.md"),
+                   (["broken-fragment"], 1, r"^docs: FRAGMENT help/guide\.md:\d+ .*#no-such-heading"),
+                   (["external-link"], 0, r"^docs: .* links 2 checked, 1 external"),
+                   (["undocumented"], 1, r"^docs: UNDOCUMENTED fx-page:guide"),
+                   (["drained-row"], 1, r"^docs: DRAINED .* row fx-page:guide"),
+                   (["grown-list"], 1, r"^docs: GROWN .*: 2 rows, above its low-water 1"),
+                   (["orphan-anchor"], 1, r"^docs: ORPHAN help/more\.md:\d+ usage anchor fx-key:NOPE"),
+                   (["restated-row"], 1, r"^docs: RESTATED fx-hook:fx-hook"),
+                   (["reader-rows"], 1, r"^docs: STALE help/more\.md:\d+ fx-mod:thing"),
+                   (["none-rows"], 1, r"^docs: CLASS fx-none: usage none carries `rows`"),
+                   (["leg-row"], 1, r"^docs: STALE help/more\.md:\d+ fx-leg:fx-leg"),
+                   (["unclassed"], 1, r"^docs: CLASS fx-extra: a registered class with no \[\[class\]\] row"),
+                   (["empty-class"], 2, r"^docs: REFUSED · class fx-key has usage key and no member"),
+                   (["untested"], 2, r"^docs: REFUSED · .*no page command was tested"),
+                   (["stale-page", "--enforce", "warn"], 0, r"^docs: WARN STALE help/guide\.md:\d+ fx-verb:tool"),
+                   (["stale-page", "--enforce", "off"], 0, r"\Adocs: help\.enforce = off · --enforce\n\Z"),
+                   # TOOL-dSafePassage-26 AC35: a `> ` prompt, a continued console line and an
+                   # unbalanced quote each red naming the page and line; an apostrophe in a comment is none.
+                   (["console-prompt"], 1, r"^docs: COMMAND help/guide\.md:\d+ .*flag '--section'"),
+                   (["continued-flag"], 1, r"^docs: COMMAND help/guide\.md:\d+ .*flag '--section'"),
+                   (["unbalanced-quote"], 1, r"^docs: SPLIT help/guide\.md:\d+: a command line the shell grammar cannot split"),
+                   (["comment-apostrophe"], 0, r"^docs: \d+ classes · .* commands 2 tested, 1 skipped, 0 unrowed"),
+                   # TOOL-dSafePassage-87 AC10: the fixture laid out under `scripts`, its page commands
+                   # spelled `<prefix>/`, tests both, so the leg resolves them off the tool root.
+                   (["scripts-prefix"], 0, r"^docs: \d+ classes · .* commands 2 tested, 1 skipped, 0 unrowed")]
+
+    def _run_docs_case(case):
+        return case, subprocess.run([sys.executable, str(HERE / "docs_leg.py"), "--fixture", "--plant", *case[0]],
+                                    capture_output=True, text=True, encoding="utf-8", errors="replace")
+
+    with _cf.ThreadPoolExecutor(max_workers=4) as _pool:
+        for (_argv, _rc, _needle), _p in _pool.map(_run_docs_case, _docs_cases):
+            check(f"[dSafePassage-13] docs fixture {' '.join(_argv)} exits {_rc} and names {_needle}",
+                  _p.returncode == _rc and bool(_re.search(_needle, _p.stdout, _re.M)),
+                  f"exit {_p.returncode}: {_p.stdout[-1500:]}{_p.stderr[-400:]}")
+
+    # ---- TOOL-dSafePassage-5 AC1, AC11. THE UPGRADE-WALK LEG's two observations that build no
+    # ---- release-0 tree: `--list` names the pin and gov's landed ref and walks the schema step first
+    # ---- and the floor step second; `--pin HEAD` refuses a pin that already carries a step row.
+    # ---- TOOL-dSafePassage-68 first, in process: the child's stand-ins take and pass on every
+    # ---- parameter of the real functions, read live, and two edits of the shipped CHILD are named.
+    import upgrade_walk as _uwm  # noqa: E402
+    _us = govkit_module().upgrade_steps
+    _got = _uwm.check_child_forwarding(_us)
+    check("[dSP-68] the upgrade-walk child's stand-ins take and pass on every parameter of what they rebind",
+          _got == [], "; ".join(_got))
+    _a = _uwm.CHILD.replace("def run(row, phase, target, gov_root, *args, **kwargs):",
+                            "def run(row, phase, target, gov_root):")
+    _kill = "real_run(row, phase, shadow, gov_root"
+    _b = _uwm.CHILD.replace(_kill + ", *args, **kwargs)", _kill + ")")
+    _got_a, _got_b = _uwm.check_child_forwarding(_us, _a), _uwm.check_child_forwarding(_us, _b)
+    _kill_line = next((i for i, ln in enumerate(_b.splitlines(), 1) if _kill + ")" in ln), 0)
+    check("[dSP-68] the predicate names a stand-in that cannot take `to`, and a call that stops passing on",
+          _a != _uwm.CHILD and _b != _uwm.CHILD
+          and any("run_step_isolated" in p and "to)" in p for p in _got_a)
+          and len(_got_b) == 1 and _got_b[0].startswith(f"run_step_isolated: CHILD line {_kill_line} "),
+          f"a: {_got_a} · b: {_got_b}")
+    _uw = [sys.executable, str(HERE / "upgrade_walk.py"), "--list"]
+    _p = subprocess.run(_uw, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    _uw_steps = _re.findall(r"^upgrade-walk: step \d+ · (\S+)", _p.stdout, _re.M)
+    check("[dSafePassage-5] upgrade_walk.py --list names the pin and walks the schema step, then the floor step",
+          _p.returncode == 0 and bool(_re.search(r"^upgrade-walk: pin [0-9a-f]{40} · landed ref [0-9a-f]{40}",
+                                                 _p.stdout, _re.M))
+          and _uw_steps[:2] == ["govkit/receipt-schema-4", "lib/python-floor-3.15"],
+          f"exit {_p.returncode}: {_p.stdout[-1500:]}{_p.stderr[-400:]}")
+    _p = subprocess.run(_uw + ["--pin", "HEAD"], capture_output=True, text=True, encoding="utf-8", errors="replace")
+    check("[dSafePassage-5] upgrade_walk.py --list --pin HEAD exits 2 naming an [[upgrade]] row the pin carries",
+          _p.returncode == 2 and "carries an [[upgrade]] row at" in _p.stdout,
+          f"exit {_p.returncode}: {_p.stdout[-1500:]}{_p.stderr[-400:]}")
 
     print()
     if FAILURES:

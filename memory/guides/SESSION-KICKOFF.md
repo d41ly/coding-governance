@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-28T11:41:42+02:00 @ c3292622aa1caa11c5ef7b2a299135eb57ebb0af
+last-audit: 2026-11-01T21:08:52+02:00 @ 37b3bf3285bd68493a58e067179e11709e981c8a
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 8b0492fe213c0d54d453c6e7cfc145c10e73e049
+last-body-change: 201eb127cec4700c6f247978ea5c07a178181f2f
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -216,3 +216,4 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
 - A spent budget blocks RECORDING work, not doing it. The read-path ceiling that did that is
   RETIRED (`TOOL-dSpentCeiling-1`). Lesson: measure with the checker before and after, never
   estimate, and record every movement beside the number.
+- Every gate, hook and the lander resolve python through `tools/lib/resolve-python.sh`, which refuses a launcher below the floor `tools/lib/python-floor.txt` declares; `bash tools/lib/python-floor.sh preflight` names each candidate and the install command (`help/python-floor.md`, `TOOL-dSafePassage-11`).

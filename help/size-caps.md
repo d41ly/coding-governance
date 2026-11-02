@@ -2,13 +2,13 @@
 
 **What it is.** Many gates refuse a file for being too big: the charter template over 48 KiB, a
 guide over its byte or line cap, a manifest line over 400 bytes, a role body over its slot's ceiling.
-Every such cap now reads ONE switch in the policy file, `budgets.enforce`, and it **warns** by
+Every such cap now reads ONE switch in the policy file, `budgets.enforce`, and it **warns** by <!-- usage: policy:budgets.enforce 7c00d9a7 -->
 default: a file over its cap prints a `BUDGET WARN` line and the gate passes. Set the switch to
 `refuse` and every cap refuses as it used to. A cap you want refusing whatever the switch says goes
-in `budgets.pinned`.
+in `budgets.pinned`. <!-- usage: policy:budgets.pinned 35ca426c -->
 
 The caps are listed, one row each, in the census `tools/policy/caps.toml`: the name a cap goes by
-under `budgets.*`, its class, its unit, the gate that measures it and where its value is declared
+under `budgets.*`, its class, its unit, the gate that measures it and where its value is declared <!-- usage: policy:budgets.* 64ab2df1 -->
 today. The policy kit's `budgets.py` answers every gate's question, so the switch and the pins live
 in one place.
 
@@ -37,7 +37,7 @@ in one place.
 
   The refusal names the rule that set it, `budgets.pinned names it` or `budgets.enforce is refuse`.
 
-- **Ask what a cap is:** `python tools/policy/budgets.py resolve AGENTS.md` prints one row,
+- **Ask what a cap is:** `python tools/policy/budgets.py resolve AGENTS.md` prints one row, <!-- usage: script:tools/policy/budgets.py#resolve cfbc2b02 -->
   `<cap> <value> <mode> <source>`, tab-separated. `python tools/policy/budgets.py check AGENTS.md
   25000` prints the verdict line and exits 1 when it refuses. Both read the policy file **as
   committed at the landed revision**, as `policy.py get` does, never your working tree.

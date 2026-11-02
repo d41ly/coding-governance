@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-42 — the spec audit of units 27 to 35: its 27 minors, per-row postconditions, discriminating criteria, one blanked population and the texts that cite them
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-7 · 2026-10-28 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,9 +10,17 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-42-deviation-88.md](../build/2026-10-23-build-TOOL-dSafePassage-42-deviation-88.md) | deviation | — |
 | [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
+| [2026-10-26-build-TOOL-dSafePassage-42-ledger.md](../build/2026-10-26-build-TOOL-dSafePassage-42-ledger.md) | journal | — |
+| [2026-11-01-build-TOOL-dSafePassage-1-runlog-0a000b40.md](../build/2026-11-01-build-TOOL-dSafePassage-1-runlog-0a000b40.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65 TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83 TOOL-dSafePassage-84 TOOL-dSafePassage-86 TOOL-dSafePassage-87 TOOL-dSafePassage-88 TOOL-dSafePassage-89 TOOL-dSafePassage-90 TOOL-dSafePassage-91 TOOL-dSafePassage-92 TOOL-dSafePassage-93 TOOL-dSafePassage-94 TOOL-dSafePassage-95 TOOL-dSafePassage-96 TOOL-dSafePassage-97 TOOL-dSafePassage-98 TOOL-dSafePassage-99 TOOL-dSafePassage-100 TOOL-dSafePassage-101 TOOL-dSafePassage-102 TOOL-dSafePassage-103 TOOL-dSafePassage-104 |
 | [2026-10-23-prompt-TOOL-dSafePassage-42-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-42-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-42-hygiene-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-42-hygiene-fix.md) | research | TOOL-dSafePassage-38 TOOL-dSafePassage-39 |
+| [2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md) | research | TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-59 |
+| [2026-10-26-prompt-TOOL-dSafePassage-42-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-42-build-brief.md) | journal | — |
+| [2026-10-27-prompt-TOOL-dSafePassage-28-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-28-1-spec-writer.md) | research | TOOL-dSafePassage-28 |
+| [2026-10-28-prompt-TOOL-dSafePassage-37-close-arms-c-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-37-close-arms-c-brief.md) | research | TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-5 TOOL-dSafePassage-51 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-56 TOOL-dSafePassage-59 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65 TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 |
+| [2026-10-28-prompt-TOOL-dSafePassage-5-close-arms-a-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-5-close-arms-a-brief.md) | research | TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-13 TOOL-dSafePassage-23 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-41 TOOL-dSafePassage-46 TOOL-dSafePassage-50 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-69 |
 | [2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-38 |
+| [2026-10-28-review-TOOL-dSafePassage-1-71-closing-diff-round1.md](../reviews/2026-10-28-review-TOOL-dSafePassage-1-71-closing-diff-round1.md) | diff-review | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-61 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65 TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 |
 
 <!-- /gen:spec-records -->
 
@@ -62,17 +70,13 @@ corrected fixes; id 28's corrected fix is the high `TOOL-dSafePassage-37`.
 
 ### The prepared landing's refusals and their arm (D-7, D-8, D-19, D-14, D-28, D-27)
 
-- **S1** — id 1. TOOL-dSafePassage-28 S3 and AC2 are read per row: the compare-and-swap row asserts
-  the branch at the sha the plant moved it to, checked out, `git status --porcelain` empty and no
-  `.governance/steps` or `.governance/outbox` path left; every other row keeps "at its old sha".
-  Observed by AC1.
-- **S2** — id 10. The `expect` column of `PREPARE_REFUSALS` (TOOL-dSafePassage-28 §4) names each row's
-  expected branch value, `old` or `moved`, and the arm asserts against it. The value is read after
-  `tools/push-main.sh:938`'s refused `git update-ref "refs/heads/$branch" "$t" "$oldb"` and its
-  `git checkout "$branch"` at `:939`, which leave the branch where the plant moved it. Observed by AC1.
-- **S3** — id 31. The compare-and-swap row keeps its clean-tree observation under the moved-branch
-  expectation, so the one row that exercises that refusal still observes what it leaves behind, and
-  the arm reads green on the shipped lander. Observed by AC1.
+- **S1** — id 1. Moved to TOOL-dSafePassage-28, its S3, on 2026-10-27: that unit builds at order 5,
+  before this one, and its arm reads green on the shipped lander only with this item in place. NOT
+  OBSERVED here — TOOL-dSafePassage-28's AC2 observes it.
+- **S2** — id 10. Moved to TOOL-dSafePassage-28, its S3 and its §4 table, on 2026-10-27, for S1's
+  reason. NOT OBSERVED here — TOOL-dSafePassage-28's AC2 observes it.
+- **S3** — id 31. Moved to TOOL-dSafePassage-28, its S3, on 2026-10-27, for S1's reason; nothing of it
+  stands here once S1 has moved. NOT OBSERVED here — TOOL-dSafePassage-28's AC2 observes it.
 - **S4** — id 2. TOOL-dSafePassage-27 §1 is read as: the refused run's leftovers make the next
   `--prepare` refuse at its dirty-tree precondition (`tools/push-main.sh:860-865`,
   `git status --porcelain --ignore-submodules=untracked`, which lists untracked files), before the
@@ -130,9 +134,9 @@ corrected fixes; id 28's corrected fix is the high `TOOL-dSafePassage-37`.
   outside its population. Observed by AC11.
 - **S16** — id 3. Its command is read as `git grep -n` filtered of comment lines, not `git grep -c`,
   which prints `tools/push-main.sh:N` rather than a bare count. Observed by AC11.
-- **S17** — id 13. TOOL-dSafePassage-35 S10's rewritten comment at `tools/push-main.sh:777-783` may
+- **S17** — id 13. TOOL-dSafePassage-35 S10's rewritten comment at `tools/push-main.sh:919-925` may
   keep its phrase; no criterion depends on how a comment is worded. Observed by AC11.
-- **S18** — id 19. `remove_new_untracked` (`tools/push-main.sh:788`) calls
+- **S18** — id 19. `remove_new_untracked` (`tools/push-main.sh:926`) calls
   `write_untracked_snapshot "$now"` for its current set, so the two sets `comm -z -13` compares come
   from one writer, and AC9 is read as one code line spelling the read, inside
   `write_untracked_snapshot`. Observed by AC11.
@@ -149,17 +153,21 @@ corrected fixes; id 28's corrected fix is the high `TOOL-dSafePassage-37`.
   `resolve_tokens` (`:1233`), `target_context` (`:1436`) and `demand_safe_token` (`:1406`), which
   `target_context` calls, move; the constants `_BASH`, `TOKEN_RX`, `OPT_IN_ALL`, `PER_KIT_PATH_TOKENS`,
   `SEEDED_TOKENS`, `ANSWER_VALUE_RE`, `DRIVE_PREFIX_RE` and `TOKEN_VALUE_RE`, and the class `Refusal`,
-  are each moved or copied, govkit re-importing what moves; `resolve_kit_dir` (`:197`) stays the inline
-  copy S24 names. Its §5 risk line is read as five functions and eight constants. Observed by AC10.
+  are each moved or copied, govkit re-importing only the moved names a reader spells off it, never
+  `_BASH`, by TOOL-dSafePassage-35 rev-7 S24; `resolve_kit_dir` (`:197`) stays the inline
+  copy S24 names. Its §5 risk line is read as five functions and eight constants. TOOL-dSafePassage-35
+  rev-6 S24 states this set itself, re-derived at HEAD `56aef62aa` on 2026-10-28 with the same
+  members, and names the ten other names its module borrows through `load_govkit` as kept; this item
+  is a recorded reading of that one. Observed by AC10.
 - **S19** — id 4. TOOL-dSafePassage-35 AC18 is read as a regression guard, green before that unit's
   pass, whose failing case is a later edit to a cited spec. NOT OBSERVED: the criterion stays as
   written, and only its role in the ledger changes.
 - **S20** — id 15. TOOL-dSafePassage-35 S21 is read as a recorded reading that no pass moves, its AC18
   the guard of S19. NOT OBSERVED, for S19's reason.
 - **S24** — id 16. TOOL-dSafePassage-35 S9's pin is read at `tools/govkit/refusal_join.py:41`, where
-  `BRANCH_PIN = 255` is defined, `:235` being its comparison; its S1 is read as: only
-  `tools/govkit/govkit.py:4682-4684` applies the `missing` filter, and `:5059-5061` filters on
-  `kind == "write"` alone. Observed by AC14.
+  `BRANCH_PIN` is defined, `:296` being its comparison at HEAD `56aef62aa`, as that unit's rev-6 S9
+  cites them; its S1 is read as: at `3708a705` only `tools/govkit/govkit.py:4682-4684` applies the
+  `missing` filter, and `:5059-5061` filters on `kind == "write"` alone. Observed by AC14.
 
 ### The lock record and its probes (D-12, D-25)
 
@@ -175,12 +183,16 @@ corrected fixes; id 28's corrected fix is the high `TOOL-dSafePassage-37`.
 
 ### The `ac-order` join's key and write set (D-11, D-23, D-26)
 
-- **S9** — id 21. `cutoff_keys_armed` (`tools/drift-audit/drift_signals.py:351`, `weakens: up` at
-  `:459`) rises 36 -> 37 with an in-place comment naming TOOL-dSafePassage-34's
-  `SPEC_AC_ORDER_CUTOFF`, under a `memory/DECISIONS.md` row in TOOL-dTrueNorth-28's form (§8 F1).
-  TOOL-dSafePassage-34 §7 is read with `drift-audit records` and `drift-audit selftest`. Between
-  TOOL-dSafePassage-34's pass and this one the signal reads 37 against 36; no pass runs the bar
-  (BUILD-METHOD M6), and the bar's one run at the close reads this raise. Observed by AC6.
+- **S9** — id 21. `cutoff_keys_armed` (`tools/drift-audit/drift_signals.py:352`, `weakens: up` at
+  `:460`) rises 36 -> 37 in TOOL-dSafePassage-34's pass, the commit that arms `SPEC_AC_ORDER_CUTOFF`,
+  with an in-place comment naming TOOL-dSafePassage-34 and ER:388, as TOOL-dSafePassage-46 S1 reads
+  it and TOOL-dSafePassage-34 S6 builds it (§8 F1). Its `memory/DECISIONS.md` row, in
+  TOOL-dTrueNorth-28's form (`memory/DECISIONS.md:239`), is the main loop's, written at the close in a
+  `Pass: none` commit: `--dispatch` refuses a pass declaring a shared mutable record
+  (`tools/unattended/unattended.sh:14004`, check 49), and BUILD-METHOD M6 clause 3 names that file
+  one. This pass moves no pin and writes neither file. TOOL-dSafePassage-34 §7 is read with
+  `drift-audit records` and `drift-audit selftest`. Observed by AC6: its pin half at this pass, its
+  row half by the main loop at the close.
 - **S23** — id 7. TOOL-dSafePassage-34's write set is read with
   `memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-8.md`, which joins its
   `--dispatch --writes` when its S3 edits that spec, as TOOL-dSafePassage-35 §4 declares its own spec
@@ -201,7 +213,7 @@ corrected fixes; id 28's corrected fix is the high `TOOL-dSafePassage-37`.
 ### Edges
 
 - **consumes-from** `TOOL-dSafePassage-27` — the one snapshot, its Goal and AC2, which S4, S5 and S6 read, and its added landings, which S27 prices
-- **consumes-from** `TOOL-dSafePassage-28` — `PREPARE_REFUSALS`, its derived count and its fixture landings, which S1, S2, S3, S12, S13 and S27 amend and price
+- **consumes-from** `TOOL-dSafePassage-28` — `PREPARE_REFUSALS`, its derived count and its fixture landings, which S12, S13 and S27 amend and price
 - **consumes-from** `TOOL-dSafePassage-29` — `STEP_REFUSED_KEYS` and the help section's rewrite, which S7 extends and S21 keeps whole
 - **consumes-from** `TOOL-dSafePassage-30` — `read_target_repositories` and `reached_by`, which S8 reorders and S22 spells
 - **consumes-from** `TOOL-dSafePassage-31` — the lock record and its WSL probe, which S10 and S25 read
@@ -215,16 +227,6 @@ corrected fixes; id 28's corrected fix is the high `TOOL-dSafePassage-37`.
 
 ## 4. Design
 
-### The compare-and-swap row
-
-```
-PREPARE_REFUSALS (stage, plant, expect):
-  ...
-  compare-and-swap   regen.py commits on the branch, then exits 0   moved
-assert per row: rc 1; branch == (oldb if expect == old else the plant's commit); branch checked out
-                `git status --porcelain` empty; no .governance/steps or outbox path
-```
-
 ### The derived count
 
 ```
@@ -235,9 +237,9 @@ count = rows of body, not heredoc and not continued, whose code holds \breturn 1
 
 ### Inventory
 
-Minted: the plants `submodule-fsmonitor` and `submodule-name-differs`; the `expect` values `old` and
-`moved`; the `reached_by` marker `by name`. No function, conf key, gate leg or policy key; S9 raises
-one drift pin and S27 re-prices one budget row. No new `raise Refusal` site: S7's rows and S8's order
+Minted: the plants `submodule-fsmonitor` and `submodule-name-differs`; the `reached_by` marker
+`by name`. No function, conf key, gate leg or policy key; S9 reads the
+drift pin TOOL-dSafePassage-34's pass raises, and S27 re-prices one budget row. No new `raise Refusal` site: S7's rows and S8's order
 use TOOL-dSafePassage-24's one site, so `tools/govkit/refusal_join.py`'s `BRANCH_PIN` does not move.
 
 ### Migration
@@ -258,9 +260,7 @@ disjoint write sets, and the pass is one unit.
 - `tools/govkit/upgrade_steps.py`
 - `tools/govkit/govkit.py`
 - `tools/govkit/selftest.py`
-- `tools/drift-audit/drift_signals.py`
 - `tools/run-gates/selftest-budgets.txt`
-- `memory/DECISIONS.md`
 - `help/upgrade-steps.md`
 
 ### Alternatives rejected
@@ -281,7 +281,8 @@ disjoint write sets, and the pass is one unit.
 - error / empty / loading states: S13's anchor matching nothing is a zero count, which
   TOOL-dSafePassage-28 §5 already reds.
 - observability: S22's refusal spells a submodule by its path, or says it names one by its name.
-- risks: S9 raises a shrink-only pin, recorded with its reason; S14's closure moves names other suites
+- risks: S9's shrink-only pin rises in TOOL-dSafePassage-34's pass, its reason in place and its
+  decision row the main loop's at the close; S14's closure moves names other suites
   may monkeypatch, and govkit re-imports each.
 - testing: the probes and fixtures of §6 and the arms of §7.
 - migration: none.
@@ -289,20 +290,16 @@ disjoint write sets, and the pass is one unit.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the compare-and-swap row's fixture landing `bash tools/push-main.sh --prepare --slug fx`
-  runs with the planted `regen.py` that moves the branch, it exits 1, `git rev-parse refs/heads/<branch>`
-  prints the plant's commit, `git symbolic-ref HEAD` names the branch and `git status --porcelain`
-  prints nothing; `git grep -n "PREPARE_REFUSALS" -- tools/push-main.test.sh` shows `moved` for that row
-  and `old` for every other.
-  Red when: the row asserts the old sha and reds on a correct lander, or drops its clean-tree check.
-  fixture: TOOL-dSafePassage-28's scratch clones under `%TEMP%`.
+The criterion AC1 moved to TOOL-dSafePassage-28 on 2026-10-27, as its AC2, with S1, S2 and S3; the
+label is not reused here.
+
 - **AC2** — When TOOL-dSafePassage-27's fixture retry `bash tools/push-main.sh --prepare --slug fx`
   runs after the refused run, it exits 0 and its stderr holds no "working tree has uncommitted changes
   or untracked files" line; on a lander copy whose regeneration refusal cleans against a snapshot taken
   after the walk, the retry prints that refusal naming a `.governance/steps` or `.governance/outbox`
   path.
   Red when: the retry's check cannot tell a leftover from the paths the retry makes again.
-- **AC3** — When `git show 3708a705:tools/push-main.sh | sed -n '918p;920p'` runs, it prints
+- **AC3** — When `git show "3708a705:tools/push-main.sh" | sed -n '918p;920p'` runs, it prints
   `rm -f "$rgsnap"` and the `git add -A` line.
   Red when: the cite S5 states names another line.
   figure: PINNED at `3708a705`.
@@ -318,9 +315,10 @@ disjoint write sets, and the pass is one unit.
   Red when: the population walk's index read runs the fsmonitor before any config is graded.
 - **AC6** — When `python tools/drift-audit/drift_report.py --json` runs after the pass,
   `cutoff_keys_armed` reads a value equal to its tolerance, and
-  `git grep -n -e "TOOL-dSafePassage-34" -- tools/drift-audit/drift_signals.py memory/DECISIONS.md`
-  prints the raise comment and the decision row.
-  Red when: the armed count exceeds its pin.
+  `git grep -n -e "TOOL-dSafePassage-34" -- tools/drift-audit/drift_signals.py` prints the raise
+  comment. At the close, after the main loop's records commit,
+  `git grep -n -e "TOOL-dSafePassage-34" -- memory/DECISIONS.md` prints the decision row.
+  Red when: the armed count exceeds its pin, or the raise carries no comment naming its unit.
   figure: DERIVED by the run; 37 of 37 expected after TOOL-dSafePassage-34's key.
 - **AC7** — When a `python -c` probe calls `take_write_lock` with `read_boot_clock` stubbed to a float
   and `read_pid_namespace` to `pid:[4026532221]`, the record holds both `started_boot` and `pid_ns`, and
@@ -353,7 +351,7 @@ disjoint write sets, and the pass is one unit.
   `(submodule nm, by name)`.
   Red when: the refusal spells the name where a path exists.
 - **AC14** — When `grep -n "^BRANCH_PIN" tools/govkit/refusal_join.py` and
-  `git show 3708a705:tools/govkit/govkit.py | sed -n '4684p;5061p'` run, the first prints line 41 and
+  `git show "3708a705:tools/govkit/govkit.py" | sed -n '4684p;5061p'` run, the first prints line 41 and
   only the first `govkit.py` line tests `missing`.
   Red when: either cite S24 states is wrong.
   figure: PINNED at `3708a705` and HEAD.
@@ -374,10 +372,10 @@ disjoint write sets, and the pass is one unit.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `drift-audit selftest` · `drift-audit records` · `push-main self-test` · `measure-legs selftest` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `drift-audit selftest` · `drift-audit records` · `push-main self-test` · `measure-legs selftest` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/govkit/selftest.py · covers AC4 AC5 AC13 · the self-test runs the two plants this unit adds and the widened class arm, its failing cases staged by a walk copy that reads the index first and by a table copy missing the `imap.tunnel` row · none
-New arm: tools/push-main.test.sh · covers AC1 AC9 · the compare-and-swap row under its `moved` expectation and the blanked derived count, their failing cases staged by a row expecting `old` and by a lander copy carrying a commented `return 1` · none
+New arm: tools/push-main.test.sh · covers AC9 · the blanked derived count, its failing case staged by a lander copy carrying a commented `return 1` · none
 
 ## 8. Open questions
 
@@ -395,13 +393,43 @@ New arm: tools/push-main.test.sh · covers AC1 AC9 · the compare-and-swap row u
 - rev-1 · 2026-10-23 · initial draft, the batch of the spec audit of units 27 to 35's 12 MEDIUM and 15
   LOW findings, one scope item per raw id.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 36 to 42, written by the disposal stage: `TOOL-dSafePassage-45`, `TOOL-dSafePassage-46`; the existing `TOOL-dSafePassage-34` bullet names the move; no other section moved.
+- rev-3 · 2026-10-26 · AC3 · AC14 · §7 · AC3's and AC14's `git show` revision paths are quoted; the §7
+  leg line gains `policy fixtures`, whose guard a §4 Files touched path trips, per the spec-tokens
+  repair handoff
+  `memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-31-1-spec-writer.md`; no
+  criterion's meaning moved.
+- rev-4 · 2026-10-27 · S1 · S2 · S3 · §3 · §4 · AC1 · §7 · §10 · S1, S2 and S3, the per-row `expect`
+  reading of `PREPARE_REFUSALS`, moved with their criterion AC1 to TOOL-dSafePassage-28, which builds
+  at order 5 and whose arm read red on the shipped lander without them; S1 to S3 stay as pointer
+  stubs; the Edges' `TOOL-dSafePassage-28` bullet, §4's compare-and-swap design and its two minted
+  values, §7's push-main arm line and §10's `:938-942` seam follow; §4 Files touched is unchanged,
+  because S12 and S18 still write `tools/push-main.test.sh` and `tools/push-main.sh`; by
+  `memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-28-1-spec-writer.md`.
+- rev-5 · 2026-10-27 · S9 · AC6 · §4 · §5 · §10 · S9's pin raise lands in TOOL-dSafePassage-34's
+  pass, as TOOL-dSafePassage-46 S1 reads it, and its `memory/DECISIONS.md` row is the main loop's, at
+  the close in a `Pass: none` commit, because `--dispatch` refuses a pass declaring a shared mutable
+  record (check 49); S9's sentence on the signal reading 37 against 36 is gone; AC6 reads the raise
+  comment at this pass and the row at the close; §4 Files touched drops
+  `tools/drift-audit/drift_signals.py` and `memory/DECISIONS.md`, which this pass no longer writes,
+  and §4 Inventory, §5's risk and §10's pin cite follow; §8 F1's ruling is unchanged; by
+  `memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-34-2-spec-writer.md`.
+- rev-6 · 2026-10-28 · S14 · S17 · S18 · S24 · the cross-read of TOOL-dSafePassage-35 rev-6: S14
+  notes that unit's S24 now states the closure itself, with the same members; S17's and S18's lander
+  cites and S24's comparison cite move to the lines that unit cites at HEAD `56aef62aa`, and S24
+  drops the stale pin value; no criterion's meaning moved; by
+  `memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-35-1-spec-writer.md`.
+- rev-7 · 2026-10-28 · S14 · the cross-read of TOOL-dSafePassage-35 rev-7: S14's "govkit
+  re-importing what moves" disagreed with that unit's S24, which now binds back only the moved names
+  a reader spells off govkit and never `_BASH`, the cache a bound-back copy would leave stale; AC10,
+  "defined there or imported by govkit from there", holds as written; by
+  `memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-35-4-spec-writer.md`.
 
 ## 10. Reuse audit
 
 The seams extended are named per item: `scan_shell_lines` (`tools/memory-tree/check-arms.py:305`), the
-lander's refusals (`tools/push-main.sh:860-865`, `:938-942`) and `remove_new_untracked` (`:784-793`),
+lander's dirty-tree refusal (`tools/push-main.sh:860-865`) and `remove_new_untracked` (`:784-793`),
 the parity arm's population (`tools/lib/resolve-python.test.sh:169`, `:218`), `take_write_lock`
-(`tools/govkit/govkit.py:7430`), the drift pin (`tools/drift-audit/drift_signals.py:351`), the budget
+(`tools/govkit/govkit.py:7430`), the drift pin (`tools/drift-audit/drift_signals.py:352`), the budget
 row (`tools/run-gates/selftest-budgets.txt:88`), `SPEC_DATE` (`tools/check-spec-tokens.py:896`), and the
 specced seams of units 27 to 41. `python tools/codebase-map/reuse_lookup.py "carry a row field forward
 when its writer rewrites the row"` and the probes of units 36 to 41 ranked name-token matches only;

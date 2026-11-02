@@ -1,6 +1,6 @@
 # The agent limit, `runtime.agents-in-flight`
 
-**What it is.** How many agents one session may have running at once, its direct `Agent` spawns and
+**What it is.** How many agents one session may have running at once, its direct `Agent` spawns and <!-- usage: policy:runtime.agents-in-flight 925508d8 -->
 the agents of a `Workflow` run. It is one key in the policy file, `.governance/policy.toml`, with a
 default in the policy kit's catalogue. The harness enforces it, through two of its own settings the
 policy kit writes into `.claude/settings.json`: `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` refuses a direct
@@ -64,7 +64,7 @@ BLOCKED by agent-cap: rule 7 (TOOL-dGroundRules-10) refused this Workflow call â
   .claude/settings.json: env.CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS is 8, above runtime.agents-in-flight 6.
 ```
 
-To clear it, run `python tools/policy/policy.py settings --write` in that checkout; it writes one
+To clear it, run `python tools/policy/policy.py settings --write` in that checkout; it writes one <!-- usage: script:tools/policy/policy.py#settings 25ed90f9 -->
 file, so a refusal naming another layer is cleared by naming that file after `--write`, or by
 removing the value from it. A branch that
 raises the key renders the raise into its own settings, and rule 7 refuses them until the raise lands,

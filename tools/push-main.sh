@@ -425,7 +425,7 @@ read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleane
 # prints nothing. Always 0: the landing already happened, so a failure to start is a line, not a code.
 # WHAT THIS DOES NOT CHECK: whether the bar it started ever finished or published a verdict.
 run_post_merge() {  # -> 0 always; one stderr line whenever the landed tip declares anything
-  local tip blob pm py dir gcd log pid winpid
+  local tip blob pm py dir gcd log pid winpid got rc
   tip=$(git rev-parse HEAD 2>/dev/null) || return 0
   blob=$(git show "$tip:.githooks/gate-env.sh" 2>/dev/null) || return 0
   pm=$(read_policy_key "$blob" GATE_POST_MERGE)
@@ -437,15 +437,16 @@ run_post_merge() {  # -> 0 always; one stderr line whenever the landed tip decla
     *)     echo "push-main: post-merge bar NOT started — GATE_POST_MERGE at ${tip:0:8} is '$pm', outside 'local ci'." >&2
            return 0 ;;
   esac
-  if ! py=$(resolve_python 2>/dev/null); then
+  got=$(resolve_lander_kit run-gates post-merge.sh); rc=$?
+  if [ "$rc" = 1 ]; then
     echo "push-main: post-merge bar NOT started — no usable python launcher, so the run-gates kit could not be located. The landing stands." >&2
     return 0
   fi
-  # The FILE test, for check_merge_losses's reason: the resolver answers beside THIS script, `$top` is the cwd's.
-  if ! dir=$(resolve_kit_dir "$py" run-gates post-merge.sh "$self_dir" 2>/dev/null) || [ ! -f "$top/$dir/post-merge.sh" ]; then
+  if [ "$rc" != 0 ]; then
     echo "push-main: post-merge bar NOT started — no run-gates kit holding post-merge.sh beside this lander. The landing stands." >&2
     return 0
   fi
+  py=${got%%$'\t'*} dir=${got#*$'\t'}
   gcd=$(cd "$(git rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd) || gcd=""
   if [ -z "$gcd" ]; then
     echo "push-main: post-merge bar NOT started — the git common dir could not be resolved. The landing stands." >&2
@@ -636,28 +637,148 @@ resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
   # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
-  _rp_tried=""
+  # THE FLOOR is declared once, in python-floor.txt in gov's lib dir. The literal below is its
+  # generated copy, held equal to it by the floor module's `check` and by these blocks' parity rows,
+  # because a copy-installed kit has no lib dir to read. A candidate that runs below it is passed
+  # over and named, exactly as a candidate that does not run.
+  _rp_floor="3.15"
+  _rp_fv=$(( ${_rp_floor%%.*} * 1000 + ${_rp_floor#*.} ))
+  _rp_tried=""; _rp_seen=""; _rp_best=""; _rp_bv=0; _rp_bver=""; _rp_o1=""; _rp_og=""; _rp_i=0
   for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    _rp_i=$((_rp_i + 1))
     [ -n "$_rp_c" ] || continue
     _rp_tried="$_rp_tried $_rp_c"
-    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
-      printf '%s\n' "$_rp_c"
-      return 0
+    # ONE spawn per candidate, isolated: its major.minor and its own executable, forward-slashed,
+    # because a backslashed C:\ path handed to MSYS bash loses its separators.
+    _rp_out=$("$_rp_c" -I -c 'import sys; print("%d.%d" % sys.version_info[:2], sys.executable.replace("\\", "/"))' 2>/dev/null) || _rp_out=""
+    _rp_out=${_rp_out%$'\r'}
+    if [[ ${_rp_out%% *} =~ ^([0-9]+)\.([0-9]+)$ ]]; then
+      _rp_cv=$(( 10#${BASH_REMATCH[1]} * 1000 + 10#${BASH_REMATCH[2]} ))
+      if [ "$_rp_cv" -ge "$_rp_fv" ]; then
+        # An override, the caller's or GOV_PYTHON, names the command a consumer spawns, a wrapper
+        # or a venv launcher included, and is echoed as given. Only the three launcher names give
+        # way to the direct executable where the probe named a file; the launcher's own name
+        # otherwise. The `[ -f ]` HOLDS on a Windows App Execution Alias, so a Store Python whose
+        # own sys.executable is an alias is echoed as printed: a gap the run-gates kit's
+        # check_app_alias closes for the legs it measures, and this block does not.
+        _rp_exe=${_rp_out#* }
+        if [ "$_rp_i" -gt 2 ] && [ "$_rp_exe" != "$_rp_out" ] && [ -f "$_rp_exe" ]; then printf '%s\n' "$_rp_exe"; else printf '%s\n' "$_rp_c"; fi
+        return 0
+      fi
+      _rp_why="ran ${_rp_out%% *}, below the floor $_rp_floor"
+      if [ "$_rp_cv" -gt "$_rp_bv" ]; then _rp_best=$_rp_c; _rp_bv=$_rp_cv; _rp_bver=${_rp_out%% *}; fi
+    else
+      _rp_why="did not run"
     fi
+    _rp_seen="${_rp_seen}resolve_python:   $_rp_c: $_rp_why"$'\n'
+    [ "$_rp_i" != 1 ] || _rp_o1=$_rp_why
+    [ "$_rp_i" != 2 ] || _rp_og=$_rp_why
   done
   {
-    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
-    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
-    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
-    echo "resolve_python: tried:$_rp_tried"
+    echo "resolve_python: no usable python launcher at the floor $_rp_floor (python-floor.txt in gov's lib dir)."
+    echo "resolve_python: Each candidate was RUN with -I -c — being on PATH is not evidence (the Microsoft Store"
+    echo "resolve_python: python3 stub answers \`command -v\` and exits 9009 without running anything)."
+    printf '%s' "$_rp_seen"
     if [ -n "${1:-}" ]; then
-      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+      echo "resolve_python: the caller's override '$1' was tried FIRST and $_rp_o1."
     fi
     if [ -n "${GOV_PYTHON:-}" ]; then
-      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and $_rp_og. An override that is"
       echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
       echo "resolve_python: operator believes they chose, and would not have."
     fi
+    # THE INSTALL COMMAND, as platforms.provision says. The policy kit's own reader answers it at the
+    # landed revision, run by the newest candidate that ran, since its tomllib needs 3.11, and never
+    # through the policy shim, which resolves a launcher itself and would re-enter this refusal.
+    _rp_prov=name; _rp_pwhy=""
+    if [ -z "$_rp_best" ]; then
+      _rp_pwhy="no reader ran, because no candidate ran"
+    elif [ "$_rp_bv" -lt 3011 ]; then
+      _rp_pwhy="no reader ran, because the newest candidate that ran, $_rp_best, is $_rp_bver, below the 3.11 the reader needs"
+    else
+      IFS= read -r -d '' _rp_rkd <<'RKD' || :
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+      case "${BASH_SOURCE[0]:-}" in */*) _rp_here=${BASH_SOURCE[0]%/*} ;; *) _rp_here=. ;; esac
+      _rp_kit=$("$_rp_best" -I -c "${_rp_rkd%$'\n'}"'
+import sys
+try:
+    print(resolve_kit_dir("policy", "policy.py", sys.argv[1]).as_posix())
+except LookupError as e:
+    sys.exit(str(e))' "$_rp_here" 2>&1) || _rp_pwhy="no reader ran, because ${_rp_kit%$'\r'}"
+      if [ -z "$_rp_pwhy" ]; then
+        _rp_kit=${_rp_kit%$'\r'}
+        _rp_val=$("$_rp_best" "$_rp_kit/policy.py" get platforms.provision 2>/dev/null) || _rp_pwhy="the reader, policy.py get, exited $?"
+        _rp_val=${_rp_val%$'\r'}
+        case "$_rp_pwhy:$_rp_val" in
+          :name|:uv|:off) _rp_prov=$_rp_val ;;
+          :*) _rp_pwhy="the reader, policy.py get, printed '$_rp_val', which is no value of the key" ;;
+        esac
+      fi
+    fi
+    [ -z "$_rp_pwhy" ] || echo "resolve_python: platforms.provision reads its catalogue default, name: $_rp_pwhy."
+    if [ "$_rp_prov" = uv ]; then
+      if [ ! -t 2 ]; then _rp_no="not offered, because stderr is not a terminal"
+      elif ! uv --version >/dev/null 2>&1; then _rp_no="not offered, because uv does not run"
+      else
+        printf 'resolve_python: platforms.provision is uv. Run `uv python install %s` now? [y/N] ' "$_rp_floor"
+        _rp_a=""; read -r _rp_a </dev/tty || :
+        if [ "$_rp_a" = y ]; then
+          uv python install "$_rp_floor" || :
+          echo "resolve_python: re-run once the floor is on PATH, or name it in GOV_PYTHON."
+          _rp_prov=offered
+        else
+          _rp_no="declined at the prompt"
+        fi
+      fi
+      [ "$_rp_prov" = offered ] || echo "resolve_python: platforms.provision is uv, and the install was $_rp_no."
+    fi
+    case "$_rp_prov" in
+      off) echo "resolve_python: platforms.provision is off, so this refusal names no install command." ;;
+      name|uv)
+        echo "resolve_python: install the floor with: uv python install $_rp_floor"
+        case "${OSTYPE:-}" in msys*|cygwin*|win*) echo "resolve_python: or, on Windows: py install $_rp_floor" ;; esac ;;
+    esac
+    # LAST, verbatim: the first line names the refusal and this one the candidates, and the lines
+    # between them carry the outcomes, the overrides and the install (TOOL-dSafePassage-26 S20).
+    echo "resolve_python: tried:$_rp_tried"
   } >&2
   return 1
 }
@@ -718,6 +839,25 @@ except LookupError as e:
 r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
+# `resolve_lander_kit <kit home> <file>` is every lander stage's ONE kit resolution
+# (TOOL-dSafePassage-26 S52): the python the resolver runs, then the kit directory `resolve_kit_dir`
+# finds from THIS script's own directory, and the FILE test under the toplevel (TOOL-aMendedFleet-111
+# S2: the resolver answers relative to this script's tree, and `$top` is the cwd's, so a tree without
+# the kit made python exit 2 and read as a DEAD PROBE). It echoes `<python><TAB><kit dir>` and
+# returns 0; else it echoes the skip reason and returns 1 for no python, 2 for no kit. Each stage
+# prints its own line from that code, and `run_gov_first` turns a missing python into a refusal.
+resolve_lander_kit() {  # kit home · file -> "<python>\t<kit dir>" · 0; else the reason · 1 no python, 2 no kit
+  local py dir
+  if ! py=$(resolve_python 2>/dev/null); then
+    echo "no usable python launcher"
+    return 1
+  fi
+  if ! dir=$(resolve_kit_dir "$py" "$1" "$2" "$self_dir" 2>/dev/null) || [ ! -f "$top/$dir/$2" ]; then
+    echo "no $1 kit holding $2 beside this lander"
+    return 2
+  fi
+  printf '%s\t%s\n' "$py" "$dir"
+}
 # `check_merge_losses R T` runs the lexicon kit's `--merge-losses` over `R..T`, the merges a prepared
 # landing would publish, so a merge that LOST a definition a parent carried is refused here, before
 # the branch moves, rather than after the bar at the push. Exit 1 of the mode returns 1 with its
@@ -725,17 +865,17 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 # hook grades the same range again at the push and binds there. The kit is found from THIS script's
 # own directory, the tool root it was installed into, never from a typed prefix.
 check_merge_losses() {  # R · T -> 1 when a merge in R..T loses a definition; 0 otherwise, any skip printed
-  local py dir out rc
-  if ! py=$(resolve_python 2>/dev/null); then
+  local py dir out rc got
+  got=$(resolve_lander_kit lexicon lexicon.py); rc=$?
+  if [ "$rc" = 1 ]; then
     echo "push-main: the merge-loss check did NOT run — no usable python launcher; the pre-push hook grades the landing again." >&2
     return 0
   fi
-  # The FILE test (TOOL-aMendedFleet-111 S2): the resolver answers relative to THIS script's tree,
-  # and `$top` is the cwd's, so a tree without the kit made python exit 2 and read as a DEAD PROBE.
-  if ! dir=$(resolve_kit_dir "$py" lexicon lexicon.py "$self_dir" 2>/dev/null) || [ ! -f "$top/$dir/lexicon.py" ]; then
+  if [ "$rc" != 0 ]; then
     echo "push-main: the merge-loss check did NOT run — no lexicon kit beside this lander; the pre-push hook grades the landing again." >&2
     return 0
   fi
+  py=${got%%$'\t'*} dir=${got#*$'\t'}
   out=$("$py" "$top/$dir/lexicon.py" --merge-losses "$1..$2" 2>&1); rc=$?
   case "$rc" in
     0) return 0 ;;
@@ -755,15 +895,17 @@ check_merge_losses() {  # R · T -> 1 when a merge in R..T loses a definition; 0
 # not echoed. On a failed write or a refused declaration the verb's output goes to stderr and this
 # returns 1.
 run_regen() {  # -> 0 regenerated or announced-skipped · 1 a write failed or the declaration was refused
-  local py dir out rc
-  if ! py=$(resolve_python 2>/dev/null); then
+  local py dir out rc got
+  got=$(resolve_lander_kit run-gates regen.py); rc=$?
+  if [ "$rc" = 1 ]; then
     echo "push-main: generated outputs were NOT regenerated — no usable python launcher; the push bar's preflight grades them."
     return 0
   fi
-  if ! dir=$(resolve_kit_dir "$py" run-gates regen.py "$self_dir" 2>/dev/null) || [ ! -f "$top/$dir/regen.py" ]; then
+  if [ "$rc" != 0 ]; then
     echo "push-main: generated outputs were NOT regenerated — no regen.py beside this lander; the push bar's preflight grades them."
     return 0
   fi
+  py=${got%%$'\t'*} dir=${got#*$'\t'}
   out=$("$py" "$top/$dir/regen.py" --write 2>&1); rc=$?
   if [ "$rc" -eq 0 ]; then
     printf '%s\n' "$out" | grep -v -e ' · moved: none$' || true
@@ -775,18 +917,36 @@ run_regen() {  # -> 0 regenerated or announced-skipped · 1 a write failed or th
 }
 
 # `remove_new_untracked <snapshot>` cleans every untracked file the snapshot does not hold, the snapshot
-# being a sorted NUL-separated `git ls-files --others --exclude-standard -z` taken before `run_regen`.
-# The reset after a failed regeneration restores tracked files only, and a regeneration also CREATES
-# files (a new ledger shard, a render's temporary), which then dirtied the tree the next landing
-# requires clean (TOOL-aPrimedIndex-8). Both callers take the snapshot on a tree they required clean,
-# so every path cleaned is one the regeneration made. NUL-safe end to end; an unreadable state cleans
-# nothing.
+# being what the snapshot writer below wrote before the stage. The reset after a failed stage
+# restores tracked files only, and a stage also CREATES files (a new ledger shard, a render's
+# temporary, gov first's receipt, before-images and orders), which then dirtied the tree the next
+# landing requires clean (TOOL-aPrimedIndex-8). NUL-safe end to end; an unreadable state cleans nothing.
+#
+# The snapshot writer, given <file>, writes into it the sorted NUL-separated list of untracked,
+# not-ignored paths `git ls-files` prints, <file> being the caller's `mktemp`. It returns
+# non-zero when <file> is empty (the `mktemp` failed), or `git ls-files` or the sort fails, read
+# through PIPESTATUS, and each caller refuses on that before its stage runs, so a snapshot that
+# cannot be written never falls through to a walk or a regeneration (TOOL-dSafePassage-35 S10, S11).
+# `remove_new_untracked` writes its current set with it too. Its three stage callers, each on a tree
+# it required clean, so every path cleaned is one the stage made:
+# `cmd_prepare`'s one snapshot, before gov first and kept through the regeneration, its tree the
+# minted merge (TOOL-dSafePassage-27); the attended path's gov-first snapshot, its tree the mint
+# commit (TOOL-dSafePassage-25 S2); and the attended regeneration's, its tree gov first's commit.
+write_untracked_snapshot() {  # snapshot file -> nothing on stdout
+  local st
+  [ -n "${1:-}" ] && [ -f "$1" ] || return 1
+  git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$1"
+  st="${PIPESTATUS[0]}${PIPESTATUS[1]}"
+  [ "$st" = "00" ]
+}
+
 remove_new_untracked() {  # snapshot file -> nothing on stdout
   local now
   [ -f "${1:-}" ] || return 0
   now=$(mktemp) || return 0
-  if git ls-files --others --exclude-standard -z > "$now" 2>/dev/null; then
-    LC_ALL=C sort -z -o "$now" "$now"
+  # the current set from the snapshot's own writer, so the two sets `comm` compares are one shape
+  # (TOOL-dSafePassage-42 S18)
+  if write_untracked_snapshot "$now"; then
     LC_ALL=C comm -z -13 "$1" "$now" | xargs -0 -r git clean -f -q -- >/dev/null 2>&1 || true
   fi
   rm -f "$now"
@@ -800,16 +960,18 @@ remove_new_untracked() {  # snapshot file -> nothing on stdout
 # gov, prints one line and returns 0: the landing proceeds exactly as it did before this existed.
 # The minter's lines go to stdout on success; on a refusal to stderr, and this returns 1.
 run_minter() {  # base · [head] -> 0 minted, clean or announced-skipped · 1 the minter refused
-  local py dir out rc
-  if ! py=$(resolve_python 2>/dev/null); then
+  local py dir out rc got
+  got=$(resolve_lander_kit govkit govkit.py); rc=$?
+  if [ "$rc" = 1 ]; then
     echo "push-main: kit versions were NOT minted — no usable python launcher; the push bar's epoch legs grade the landing."
     return 0
   fi
-  # The FILE test, for check_merge_losses's reason: a missing deployer is a skip, never a refusal.
-  if ! dir=$(resolve_kit_dir "$py" govkit govkit.py "$self_dir" 2>/dev/null) || [ ! -f "$top/$dir/govkit.py" ]; then
+  # A missing deployer is a skip, never a refusal.
+  if [ "$rc" != 0 ]; then
     echo "push-main: kit versions were NOT minted — no govkit deployer beside this lander; the push bar's epoch legs grade the landing."
     return 0
   fi
+  py=${got%%$'\t'*} dir=${got#*$'\t'}
   out=$("$py" "$top/$dir/govkit.py" mint --base "$1" ${2:+--head "$2"} 2>&1); rc=$?
   if [ "$rc" -eq 0 ]; then
     printf '%s\n' "$out" | grep -v -e ' · clean$' -e ' · skip · ' || true
@@ -820,16 +982,51 @@ run_minter() {  # base · [head] -> 0 minted, clean or announced-skipped · 1 th
   return 1
 }
 
+# ---- GOV FIRST, at the landing — TOOL-dSafePassage-8 --------------------------------------------
+# `run_gov_first` runs the deployer's `update --target <this tree> --write` in its SOURCE mode: every
+# upgrade step this landing declares walks on gov's own tree before any adopter meets it, recorded in
+# gov's source-mode receipt in the WORKING TREE, and the deployer's landing check re-runs each applied
+# step's witness; the caller commits the receipt. Found the way the minter finds the deployer. No
+# deployer beside the lander, which is every adopter, prints one line and returns 0. A deployer with
+# no python REFUSES: no later gate runs a step on gov, so a skip would land a step gov never ran. The
+# walk's lines go to stdout on success; on a refusal to stderr, and this returns 1.
+run_gov_first() {  # -> 0 walked or announced-skipped · 1 a step, the landing check or the resolver refused
+  local py dir out rc got kit=govkit anchor=govkit.py
+  got=$(resolve_lander_kit "$kit" "$anchor"); rc=$?
+  if [ "$rc" = 1 ]; then
+    if [ -f "$self_dir/$kit/$anchor" ] || [ -f "$self_dir/../$kit/$anchor" ]; then
+      echo "push-main: the upgrade steps could NOT be run on gov first — a govkit deployer is beside this lander and no usable python launcher runs it, and no later gate runs a step on gov." >&2
+      return 1
+    fi
+    echo "push-main: steps were NOT run on gov first — no govkit deployer beside this lander, so this is not gov's tree."
+    return 0
+  fi
+  if [ "$rc" != 0 ]; then
+    echo "push-main: steps were NOT run on gov first — no govkit deployer beside this lander, so this is not gov's tree."
+    return 0
+  fi
+  py=${got%%$'\t'*} dir=${got#*$'\t'}
+  out=$("$py" "$top/$dir/govkit.py" update --target "$top" --write 2>&1); rc=$?
+  if [ "$rc" -eq 0 ]; then
+    printf '%s\n' "$out"
+    return 0
+  fi
+  echo "push-main: the upgrade steps REFUSED on gov first (exit $rc):" >&2
+  # The indent with no fork; a CR before a line end drops, as Git for Windows' `sed` drops it.
+  out=${out//$'\r\n'/$'\n'}; out=${out%$'\r'}
+  printf '  %s\n' "${out//$'\n'/$'\n  '}" >&2
+  return 1
+}
+
 # `read_mint_unit <range>` prints the unit id the attended mint commit names (TOOL-aRoutedQuill-3
 # S11): the newest one <range>'s own commits attribute, by the memory-tree kit's routed-commits
 # reading, so the commit its pre-push leg grades names a unit like every other routed commit. Found
 # the way the deployer is found. No python, no kit or no attributed commit prints nothing, and the
 # mint then names no unit, which that leg reds exactly as it reds the range that owed the mint.
 read_mint_unit() {  # range -> the unit id on stdout, or nothing
-  local py dir out
-  py=$(resolve_python 2>/dev/null) || return 0
-  dir=$(resolve_kit_dir "$py" memory-tree routed_commits.py "$self_dir" 2>/dev/null) || return 0
-  [ -f "$top/$dir/routed_commits.py" ] || return 0
+  local py dir out got
+  got=$(resolve_lander_kit memory-tree routed_commits.py) || return 0
+  py=${got%%$'\t'*} dir=${got#*$'\t'}
   # Output and status apart (TOOL-aRoutedQuill-12 S11): a refusal prints on stdout and exits 2, and
   # piped straight into `head` its first line became the unit id.
   out=$("$py" "$top/$dir/routed_commits.py" --newest-unit "$1" 2>/dev/null) || return 0
@@ -905,17 +1102,36 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
     echo "push-main: the kit versions this landing owes could not be minted (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
     return 1
   fi
+  # GOV FIRST INTO THE MERGE (TOOL-dSafePassage-8 S4): after the mint and before the regeneration,
+  # so gov's receipt joins the one rewritten merge. ONE snapshot, taken before it and kept until the
+  # regeneration passes (TOOL-dSafePassage-27), so a refused walk (TOOL-dSafePassage-25) and a
+  # refused regeneration below both clean the receipt, the before-images and the orders the walk
+  # created, which the reset leaves untracked. A snapshot taken after the walk would hold them.
+  gfsnap=$(mktemp)
+  if ! write_untracked_snapshot "$gfsnap"; then
+    rm -f "$gfsnap"
+    git reset -q --hard "$t" >/dev/null 2>&1 || true
+    git checkout "$branch" >/dev/null 2>&1 || true
+    echo "push-main: gov first could not snapshot the untracked files before its walk, so the walk did not run. Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
+    return 1
+  fi
+  if ! run_gov_first; then
+    git reset -q --hard "$t" >/dev/null 2>&1 || true
+    remove_new_untracked "$gfsnap"; rm -f "$gfsnap"
+    git checkout "$branch" >/dev/null 2>&1 || true
+    echo "push-main: the upgrade steps this landing declares did not hold on gov first (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
+    return 1
+  fi
   # REGENERATE INTO THE MERGE (TOOL-aPrimedIndex-4): after the mint, because a minted version can
   # itself stale an output that stamps it; folded by the same rewrite, same parents and subject.
-  rgsnap=$(mktemp) && git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$rgsnap"
   if ! run_regen; then
     git reset -q --hard "$t" >/dev/null 2>&1 || true
-    remove_new_untracked "$rgsnap"; rm -f "$rgsnap"
+    remove_new_untracked "$gfsnap"; rm -f "$gfsnap"
     git checkout "$branch" >/dev/null 2>&1 || true
     echo "push-main: the generated outputs this landing owes could not be regenerated (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
     return 1
   fi
-  rm -f "$rgsnap"
+  rm -f "$gfsnap"
   if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
     git add -A
     if ! t=$(git commit-tree "$(git write-tree)" -p "$R" -p "$oldb" -m "$msg") || ! git update-ref --no-deref HEAD "$t"; then
@@ -1095,9 +1311,39 @@ while [ "$attempt" -le "$max" ]; do
     fi
   fi
 
+  # GOV FIRST, on every attempt, after the mint (TOOL-dSafePassage-8 S4): its own commit, named and
+  # trailered as the mint commit is, so the routed-commits leg and the pass reader read it alike. A
+  # refusal cleans what the walk created against a snapshot taken before it (TOOL-dSafePassage-25).
+  gfsnap=$(mktemp)
+  if ! write_untracked_snapshot "$gfsnap"; then
+    rm -f "$gfsnap"
+    echo "push-main: gov first could not snapshot the untracked files before its walk, so the walk did not run. Aborted (no push)." >&2
+    exit 1
+  fi
+  if ! run_gov_first; then
+    git reset -q --hard HEAD >/dev/null 2>&1 || true
+    remove_new_untracked "$gfsnap"; rm -f "$gfsnap"
+    echo "push-main: the upgrade steps this landing declares did not hold on gov first (named above). Aborted (no push)." >&2
+    exit 1
+  fi
+  rm -f "$gfsnap"
+  if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
+    git add -A
+    gf_unit=$(read_mint_unit "$mt..HEAD")
+    if ! git commit -q --no-verify -m "steps: gov first onto $remote/$def at ${mt:0:8}${gf_unit:+ for $gf_unit}" -m "Pass: none"; then
+      echo "push-main: could not commit gov's receipt of the upgrade steps. Aborted (no push)." >&2
+      exit 1
+    fi
+  fi
+
   # REGENERATE, on every attempt, after the mint (TOOL-aPrimedIndex-4): its own commit, named and
   # trailered as the mint commit is, so the routed-commits leg and the pass reader read it alike.
-  rgsnap=$(mktemp) && git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$rgsnap"
+  rgsnap=$(mktemp)
+  if ! write_untracked_snapshot "$rgsnap"; then
+    rm -f "$rgsnap"
+    echo "push-main: the regeneration could not snapshot the untracked files before it ran, so it did not run. Aborted (no push)." >&2
+    exit 1
+  fi
   if ! run_regen; then
     git reset -q --hard HEAD >/dev/null 2>&1 || true
     remove_new_untracked "$rgsnap"; rm -f "$rgsnap"

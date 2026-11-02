@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-41 — the `ac-order` join lands in the pass that arms it, so no commit carries the join without its cutoff key
 
-**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-5 · 2026-10-28 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,7 +11,15 @@
 | [2026-10-23-build-TOOL-dSafePassage-41-deviation-134.md](../build/2026-10-23-build-TOOL-dSafePassage-41-deviation-134.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-41-deviation-87.md](../build/2026-10-23-build-TOOL-dSafePassage-41-deviation-87.md) | deviation | — |
 | [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
+| [2026-10-26-build-TOOL-dSafePassage-41-ledger.md](../build/2026-10-26-build-TOOL-dSafePassage-41-ledger.md) | journal | — |
+| [2026-11-01-build-TOOL-dSafePassage-1-runlog-0a000b40.md](../build/2026-11-01-build-TOOL-dSafePassage-1-runlog-0a000b40.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65 TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83 TOOL-dSafePassage-84 TOOL-dSafePassage-86 TOOL-dSafePassage-87 TOOL-dSafePassage-88 TOOL-dSafePassage-89 TOOL-dSafePassage-90 TOOL-dSafePassage-91 TOOL-dSafePassage-92 TOOL-dSafePassage-93 TOOL-dSafePassage-94 TOOL-dSafePassage-95 TOOL-dSafePassage-96 TOOL-dSafePassage-97 TOOL-dSafePassage-98 TOOL-dSafePassage-99 TOOL-dSafePassage-100 TOOL-dSafePassage-101 TOOL-dSafePassage-102 TOOL-dSafePassage-103 TOOL-dSafePassage-104 |
+| [2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md) | research | TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-42 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-59 |
+| [2026-10-26-prompt-TOOL-dSafePassage-41-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-41-build-brief.md) | journal | — |
+| [2026-10-28-prompt-TOOL-dSafePassage-41-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-41-1-spec-writer.md) | research | — |
+| [2026-10-28-prompt-TOOL-dSafePassage-41-2-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-41-2-spec-writer.md) | journal | — |
+| [2026-10-28-prompt-TOOL-dSafePassage-5-close-arms-a-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-5-close-arms-a-brief.md) | research | TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-13 TOOL-dSafePassage-23 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-42 TOOL-dSafePassage-46 TOOL-dSafePassage-50 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-69 |
 | [2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-38 TOOL-dSafePassage-42 |
+| [2026-10-28-review-TOOL-dSafePassage-1-71-closing-diff-round1.md](../reviews/2026-10-28-review-TOOL-dSafePassage-1-71-closing-diff-round1.md) | diff-review | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-61 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65 TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 |
 
 <!-- /gen:spec-records -->
 
@@ -29,6 +37,21 @@ carries a join that names that spec, and the leg is red until the next order lan
 sequences the key with the join. This unit is id 22's promotion: the join is built in this unit's one
 pass, after TOOL-dSafePassage-34 has declared and read the key, so the commit that first carries the
 join also carries the key it reads.
+
+The join's live population is smaller than the key's date suggests. `LIVE` matches OPEN, SPECCED,
+INPROGRESS and BLOCKED only, so a DEFERRED or CLOSED spec is never graded. The unattended harness
+holds every dSafePassage spec DEFERRED until its pass, which flips it to CLOSED. The build brief moves
+this unit's own spec to INPROGRESS before its first product write, and the join reads the working
+tree: at `c2ee6f0f5` it lists files with `git ls-files` (`tools/check-spec-tokens.py:515`) and reads
+each spec from disk in the loop at `:1517`. So during this
+pass the join grades exactly one live spec dated on or after the key: this one. At the close it grades
+none. The builder measured this on 2026-10-28 at `c2ee6f0f5`: 1 graded of 37 live with this spec at
+INPROGRESS, 0 out of order. This unit re-ran the same probe with this spec DEFERRED: 0 graded of 36
+live. No other build holds a live spec dated 2026-10-23 or later. TOOL-dSafePassage-34 is CLOSED and
+read-only, so this unit states how to read it. Its §4 says "a join seen grading nothing is not a
+gate", and its AC3, carried here as AC2 (S3), can be met only during this pass and never at the
+close. Hygiene check 29 has the same limit and says so in its run line
+(`tools/memory-tree/gen_build_index.py:2961-2962` at `c2ee6f0f5`).
 
 ## 2. Scope (IN)
 
@@ -73,7 +96,7 @@ join also carries the key it reads.
 |---|---|---|---|
 | 6 | TOOL-dSafePassage-26 | no `ac-order` join | unchanged by the join |
 | 7 | TOOL-dSafePassage-34 | the key declared, read and validated; TOOL-dSafePassage-8's AC8 above AC9 | unchanged by the join |
-| 8 | this unit | the join, reading the key | the join grades specs dated 2026-10-23 or later and names none |
+| 8 | this unit | the join, reading the key | the join grades only the live specs dated 2026-10-23 or later: during the pass, this spec at INPROGRESS, and it names none; at the close, none, because the pass commit flips this spec to CLOSED |
 
 ### Inventory
 
@@ -127,13 +150,22 @@ shares no file with `TOOL-dSafePassage-35`, the other unit at order 8.
   the spec and `AC2`; with the key blank it names nothing; with the spec dated a day before the key it
   names nothing.
   Red when: an out-of-order criterion passes the join, or the join grades a spec the key holds out.
-- **AC2** — When `python tools/check-spec-tokens.py` runs over the tree after the pass, its `ac-order`
-  line names no spec and states a graded count of at least this build's live specs.
-  Red when: TOOL-dSafePassage-8 is live and still lists AC9 before AC8, or the count is zero.
-  figure: the count is DERIVED by the run; 25 was measured at `c9675455` (TOOL-dSafePassage-34 §1).
+- **AC2** — When `python tools/check-spec-tokens.py` runs over the tree during the pass, with the join
+  built and this spec at `INPROGRESS` in the working tree, its `ac-order` line grades at least 1 live
+  spec dated on or after `SPEC_AC_ORDER_CUTOFF` and finds 0 out of order. The same line run at the
+  close may grade 0, because the harness flips every spec of this build to CLOSED. Under `[gate]`
+  that 0 is not coverage. Coverage is AC1's fixture plus this pass-time line. Hygiene check 29 says
+  the same of itself: "under the unattended harness a spec goes OPEN to CLOSED in its build commit,
+  so this check grades attended builds only" (`tools/memory-tree/gen_build_index.py:2961-2962`).
+  Red when: the pass-time line grades 0 specs, or names any spec out of order.
+  fixture: this spec at INPROGRESS, which the tree holds only between the builder's status move and
+  the pass commit; with this spec DEFERRED the tree holds no live spec at or after the key.
+  figure: the count is DERIVED by the run. The builder's predicate probe measured 1 graded of 37
+  live on 2026-10-28, at `c2ee6f0f5`.
+  cost: one full spec-token run, minutes rather than seconds.
 - **AC3** — When `git log --reverse --format=%H -S "ac-order" -- tools/check-spec-tokens.py` runs after
   the pass, its first commit is TOOL-dSafePassage-34's or this unit's pass commit, and
-  `git show <that commit>:tools/check-spec-tokens.py` carries `AC_ORDER_KEY`; at this unit's pass commit
+  `git show <that-commit>:tools/check-spec-tokens.py` carries `AC_ORDER_KEY`; at this unit's pass commit
   the join's grading condition reads it.
   Red when: TOOL-dSafePassage-26's pass, or any commit without the key, is the first to carry the join.
 
@@ -153,6 +185,15 @@ none
   (HIGH, item D-6).
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 36 to 42, written by the disposal stage: `TOOL-dSafePassage-46`; no other section moved.
 - rev-3 · 2026-10-23 · §3 · an Edges bullet is amended for the promotions of the spec audit of units 43 to 46, written by the disposal stage: `TOOL-dSafePassage-46`; no other section moved.
+- rev-4 · 2026-10-26 · AC3 · AC3's revision placeholder is one word, `<that-commit>`, per the
+  spec-tokens repair handoff
+  `memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-31-1-spec-writer.md`; no
+  criterion's meaning moved.
+- rev-5 · 2026-10-28 · §1 · §4 · AC2 · AC2 is observed during the pass, with this spec at INPROGRESS,
+  and its close-time 0 is stated as not coverage. §1 and the order table say which specs at or after
+  the key are live, and when. Per the builder's DIVERGENCE brief
+  `memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-41-1-spec-writer.md`; no
+  change to `LIVE` or the key.
 
 ## 10. Reuse audit
 

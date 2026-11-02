@@ -105,8 +105,9 @@ def build_tempdir():
     directory in the OS temp dir, which the OS reclaims.
 
     `shutil.rmtree(ignore_errors=True)` rather than
-    `TemporaryDirectory(ignore_cleanup_errors=True)`: the latter is 3.10+, this kit ships to trees
-    with no declared Python floor, and guessing wrong is a TypeError on an adopter first run.
+    `TemporaryDirectory(ignore_cleanup_errors=True)`: the latter is newer than some interpreters
+    this kit meets in an adopter's tree, whose floor is not gov's python-floor.txt, and guessing
+    wrong is a TypeError on an adopter first run.
     """
     td = tempfile.mkdtemp()
     try:
