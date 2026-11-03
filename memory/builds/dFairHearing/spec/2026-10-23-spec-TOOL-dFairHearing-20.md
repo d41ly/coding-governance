@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dFairHearing-20-deviation-201.md](../build/2026-10-23-build-TOOL-dFairHearing-20-deviation-201.md) | deviation | — |
+| [2026-11-03-build-TOOL-dFairHearing-20-1-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-20-1-builder-return.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-20-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-20-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief-2.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief-2.md) | research | TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief.md) | research | TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 |

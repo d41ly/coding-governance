@@ -139,3 +139,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-03T11:14:47Z dispatch · item d562f515 TOOL-dFairHearing-18 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh tools/workflows/lenses.toml tools/workflows/replay_scorer.py tools/workflows/README.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-18.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dFairHearing/README.md memory/map/generated/symbols.json
 
 2026-11-03T11:14:50Z brief · item TOOL-dFairHearing-18 · reason 3af974ad6026 memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-18-build-brief.md
+
+2026-11-03T11:39:23Z brief · item TOOL-dFairHearing-20 · reason 5b2b438a5912 memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-20-build-brief.md
+
+2026-11-03T11:53:22Z dispatch · item 46921281 TOOL-dFairHearing-20 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh tools/workflows/README.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-20.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dFairHearing/README.md memory/map/generated/symbols.json
