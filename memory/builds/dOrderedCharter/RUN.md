@@ -96,3 +96,9 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-03T14:07:03Z dispatch · item 8f63a0e0 PLAY-dOrderedCharter-63 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh memory/map/generated/symbols.json memory/builds/dOrderedCharter/spec/2026-11-03-spec-PLAY-dOrderedCharter-63.md memory/builds/dOrderedCharter/build/2026-11-03-build-PLAY-dOrderedCharter-63-ledger.md memory/builds/dOrderedCharter/README.md
 
 2026-11-03T14:07:21Z brief · item PLAY-dOrderedCharter-63 · reason 06aabed1ee4d memory/builds/dOrderedCharter/prompts/2026-11-03-prompt-PLAY-dOrderedCharter-63-build-brief.md
+
+2026-11-03T14:47:58Z brief · item PLAY-dOrderedCharter-28 · reason c357d49e6d7f memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-28-build-brief.md
+
+2026-11-03T15:08:51Z dispatch · item e05e1c08 PLAY-dOrderedCharter-28 · reason tools/playbook/edges.toml tools/playbook/edge_grammar.py tools/playbook/namespaces.toml tools/playbook/gov_tag.py tools/playbook/README.md tools/playbook/adopt-playbook.sh tools/gate-legs.json tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/govkit/usage.toml tools/run-gates/ceiling-evidence.txt memory/map/features/playbook.md help/tags.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-28.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-28-ledger.md memory/builds/dOrderedCharter/build/2026-11-03-build-PLAY-dOrderedCharter-28-deviation-283.md memory/builds/dOrderedCharter/README.md memory/LIVE.md
+
+2026-11-03T15:55:45Z brief · item PLAY-dOrderedCharter-28 · reason bb9eaa29cecc memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-28-build-brief.md

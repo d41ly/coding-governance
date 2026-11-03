@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-28 — the shared edge grammar at every site the memory plan names: twelve new types, native-id classes and the two pinned forms
 
-**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 8 · advances PLAY-dOrderedCharter-38
+**Status:** INPROGRESS · rev-5 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 8 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0058@bc160feb whole
 
@@ -165,7 +165,7 @@ revision's unit text extracted by the unit registry's reader (shared interface S
 ### The resolve plants
 
 `resolve-tag` (`layer=layer.memory`), `resolve-pinned-tag`, `resolve-section`
-(`implements=doc.build-method#m5-recall-and-reuse`), `resolve-family`
+(`part-of=doc.build-method#m5-recall-and-reuse`, `part-of` the registered type whose `to` is `any`), `resolve-family`
 (`serves=PLAY-dOrderedCharter-28`), `resolve-clause` and `resolve-pinned-clause`, each exiting 0
 with its target's row; `bad-section` (`doc.build-method#`), `bad-block` (two types on one line
 under a heading) and `bad-note-refs` (`gov:note layer.memory — x → y refs=a b`), each exiting 1.
@@ -285,6 +285,7 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC4 AC5 AC6 · the playb
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 - rev-4 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-5 · 2026-11-03 · §4 · from `2026-11-03-prompt-PLAY-dOrderedCharter-28-divergence-brief.md` Item 1: the `resolve-section` plant is written `part-of=doc.build-method#m5-recall-and-reuse`, since `implements`' `to` in `tools/playbook/edges.toml` is `feature` and `spec` and admits no `doc` section, so AC6 reads true as written.
 
 ## 10. Reuse audit
 
