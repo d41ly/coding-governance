@@ -78,7 +78,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 38 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 38 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14
 ids TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-19 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-24 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28
 ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-41
@@ -113,7 +113,7 @@ ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHea
 | [TOOL-dFairHearing-28 — the hook suite's census re-pinned to 59 and 14, measured by a script file whose pattern no shell can fold](spec/2026-10-23-spec-TOOL-dFairHearing-28.md) | 21 | 2 | CLOSED | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-29 — the five escaped-quote arms of the hook's suite checked by name, at their home and gone from the old one](spec/2026-10-23-spec-TOOL-dFairHearing-29.md) | 21 | 2 | CLOSED | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-25 — the owed replays run after the replay contract is corrected, and their verdicts set the dark switches](spec/2026-10-23-spec-TOOL-dFairHearing-25.md) | 22 | 2 | DEFERRED | rev-5 | 2026-11-03 |
-| [TOOL-dFairHearing-31 — the version-line check resolves the bar's own base first, and refuses by name when it cannot, rather than passing on an empty diff](spec/2026-10-23-spec-TOOL-dFairHearing-31.md) | 22 | 2 | DEFERRED | rev-3 | 2026-11-03 |
+| [TOOL-dFairHearing-31 — the version-line check resolves the bar's own base first, and refuses by name when it cannot, rather than passing on an empty diff](spec/2026-10-23-spec-TOOL-dFairHearing-31.md) | 22 | 2 | INPROGRESS | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-30 — unit 15's with-and-without replay run with one fresh clone per record and arm, so no arm reviews a tree holding the other's report](spec/2026-10-23-spec-TOOL-dFairHearing-30.md) | 23 | 2 | DEFERRED | rev-6 | 2026-11-03 |
 | [TOOL-dFairHearing-33 — the version check reads every declared kit version constant through govkit's own reader, so no carrier's form escapes a typed pattern](spec/2026-10-23-spec-TOOL-dFairHearing-33.md) | 23 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-34 — the version check reads every gov:kit marker in every file the build changed, not four typed directories](spec/2026-10-23-spec-TOOL-dFairHearing-34.md) | 23 | 2 | DEFERRED | rev-3 | 2026-11-03 |
@@ -126,7 +126,7 @@ ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHea
 | [TOOL-dFairHearing-40 — the round-5 spec audit's 35 minors: one build-wide version reading on one base, an attempt checker that refuses what it cannot place, and criteria a correct build can pass](spec/2026-10-23-spec-TOOL-dFairHearing-40.md) | 28 | 2 | DEFERRED | rev-4 | 2026-11-03 |
 <!-- /gen:build-units -->
 
-Records: 224 bound to this build, across 4 record folder(s).
+Records: 225 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
