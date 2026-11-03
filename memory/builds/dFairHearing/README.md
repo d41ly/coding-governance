@@ -78,7 +78,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 38 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 38 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14
 ids TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-19 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-24 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28
 ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-41
@@ -108,25 +108,25 @@ ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHea
 | [TOOL-dFairHearing-18 — the whole-design walk as a preset of the design audit, and its recall grade](spec/2026-10-23-spec-TOOL-dFairHearing-18.md) | 18 | 2 | CLOSED | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-20 — a gapped whole-design walk reds the harness's returned counts, not only its prose](spec/2026-10-23-spec-TOOL-dFairHearing-20.md) | 19 | 2 | CLOSED | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-23 — the round-1 spec audit's 49 minors: one contract per shared name, criteria a correct build can pass, and the fixtures and records the moved code needs](spec/2026-10-23-spec-TOOL-dFairHearing-23.md) | 19 | 2 | CLOSED | rev-6 | 2026-11-03 |
-| [TOOL-dFairHearing-25 — the owed replays run after the replay contract is corrected, and their verdicts set the dark switches](spec/2026-10-23-spec-TOOL-dFairHearing-25.md) | 20 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-26 — every rule 0 and rule 5 arm of the hook's suite found at its new home and gone from the old one, counted by label whatever helper writes it](spec/2026-10-23-spec-TOOL-dFairHearing-26.md) | 20 | 2 | CLOSED | rev-4 | 2026-11-03 |
-| [TOOL-dFairHearing-27 — the spec audit of units 20 to 23, its 31 minors: criteria a correct build can pass, refusals that name their cause, and the readers a move leaves behind](spec/2026-10-23-spec-TOOL-dFairHearing-27.md) | 21 | 2 | DEFERRED | rev-3 | 2026-11-03 |
+| [TOOL-dFairHearing-27 — the spec audit of units 20 to 23, its 31 minors: criteria a correct build can pass, refusals that name their cause, and the readers a move leaves behind](spec/2026-10-23-spec-TOOL-dFairHearing-27.md) | 21 | 2 | INPROGRESS | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-28 — the hook suite's census re-pinned to 59 and 14, measured by a script file whose pattern no shell can fold](spec/2026-10-23-spec-TOOL-dFairHearing-28.md) | 21 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-29 — the five escaped-quote arms of the hook's suite checked by name, at their home and gone from the old one](spec/2026-10-23-spec-TOOL-dFairHearing-29.md) | 21 | 2 | DEFERRED | rev-3 | 2026-11-03 |
-| [TOOL-dFairHearing-30 — unit 15's with-and-without replay run with one fresh clone per record and arm, so no arm reviews a tree holding the other's report](spec/2026-10-23-spec-TOOL-dFairHearing-30.md) | 21 | 2 | DEFERRED | rev-4 | 2026-11-03 |
+| [TOOL-dFairHearing-25 — the owed replays run after the replay contract is corrected, and their verdicts set the dark switches](spec/2026-10-23-spec-TOOL-dFairHearing-25.md) | 22 | 2 | DEFERRED | rev-5 | 2026-11-03 |
 | [TOOL-dFairHearing-31 — the version-line check resolves the bar's own base first, and refuses by name when it cannot, rather than passing on an empty diff](spec/2026-10-23-spec-TOOL-dFairHearing-31.md) | 22 | 2 | DEFERRED | rev-3 | 2026-11-03 |
-| [TOOL-dFairHearing-35 — unit 15's replay scored by one attempt rule fixed before the runs, so no figure rests on the attempt a runner prefers](spec/2026-10-23-spec-TOOL-dFairHearing-35.md) | 22 | 2 | DEFERRED | rev-3 | 2026-11-03 |
-| [TOOL-dFairHearing-32 — the round-3 spec audit's 32 minors: criteria that observe what their specs change, one source per procedure, and refusals that name their cause](spec/2026-10-23-spec-TOOL-dFairHearing-32.md) | 23 | 2 | DEFERRED | rev-4 | 2026-11-03 |
+| [TOOL-dFairHearing-30 — unit 15's with-and-without replay run with one fresh clone per record and arm, so no arm reviews a tree holding the other's report](spec/2026-10-23-spec-TOOL-dFairHearing-30.md) | 23 | 2 | DEFERRED | rev-6 | 2026-11-03 |
 | [TOOL-dFairHearing-33 — the version check reads every declared kit version constant through govkit's own reader, so no carrier's form escapes a typed pattern](spec/2026-10-23-spec-TOOL-dFairHearing-33.md) | 23 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-34 — the version check reads every gov:kit marker in every file the build changed, not four typed directories](spec/2026-10-23-spec-TOOL-dFairHearing-34.md) | 23 | 2 | DEFERRED | rev-3 | 2026-11-03 |
-| [TOOL-dFairHearing-36 — the round-4 spec audit's 13 minors on units 28, 29 and 31: probes that read every node's bytes alike, misses seen red, and the bar's own base](spec/2026-10-23-spec-TOOL-dFairHearing-36.md) | 24 | 2 | DEFERRED | rev-3 | 2026-11-03 |
-| [TOOL-dFairHearing-37 — the round-4 spec audit's 19 minors on units 30 and 32: one replay procedure that isolates each arm, criteria over the scored attempt, and checks that can go red](spec/2026-10-23-spec-TOOL-dFairHearing-37.md) | 24 | 2 | DEFERRED | rev-3 | 2026-11-03 |
-| [TOOL-dFairHearing-38 — a `selected` verdict observed by the parser `gotchas.py` has, so a correct build passes and a shipped flag reds](spec/2026-10-23-spec-TOOL-dFairHearing-38.md) | 25 | 2 | DEFERRED | rev-2 | 2026-11-03 |
-| [TOOL-dFairHearing-39 — a criterion quoting an error text its tool never emits, carried into the bug-class catalogue a spec commit selects](spec/2026-10-23-spec-TOOL-dFairHearing-39.md) | 25 | 2 | DEFERRED | rev-1 | 2026-10-23 |
-| [TOOL-dFairHearing-40 — the round-5 spec audit's 35 minors: one build-wide version reading on one base, an attempt checker that refuses what it cannot place, and criteria a correct build can pass](spec/2026-10-23-spec-TOOL-dFairHearing-40.md) | 26 | 2 | DEFERRED | rev-2 | 2026-11-03 |
+| [TOOL-dFairHearing-35 — unit 15's replay scored by one attempt rule fixed before the runs, so no figure rests on the attempt a runner prefers](spec/2026-10-23-spec-TOOL-dFairHearing-35.md) | 24 | 2 | DEFERRED | rev-5 | 2026-11-03 |
+| [TOOL-dFairHearing-32 — the round-3 spec audit's 32 minors: criteria that observe what their specs change, one source per procedure, and refusals that name their cause](spec/2026-10-23-spec-TOOL-dFairHearing-32.md) | 25 | 2 | DEFERRED | rev-6 | 2026-11-03 |
+| [TOOL-dFairHearing-36 — the round-4 spec audit's 13 minors on units 28, 29 and 31: probes that read every node's bytes alike, misses seen red, and the bar's own base](spec/2026-10-23-spec-TOOL-dFairHearing-36.md) | 26 | 2 | DEFERRED | rev-4 | 2026-11-03 |
+| [TOOL-dFairHearing-37 — the round-4 spec audit's 19 minors on units 30 and 32: one replay procedure that isolates each arm, criteria over the scored attempt, and checks that can go red](spec/2026-10-23-spec-TOOL-dFairHearing-37.md) | 26 | 2 | DEFERRED | rev-5 | 2026-11-03 |
+| [TOOL-dFairHearing-38 — a `selected` verdict observed by the parser `gotchas.py` has, so a correct build passes and a shipped flag reds](spec/2026-10-23-spec-TOOL-dFairHearing-38.md) | 27 | 2 | DEFERRED | rev-3 | 2026-11-03 |
+| [TOOL-dFairHearing-39 — a criterion quoting an error text its tool never emits, carried into the bug-class catalogue a spec commit selects](spec/2026-10-23-spec-TOOL-dFairHearing-39.md) | 27 | 2 | DEFERRED | rev-2 | 2026-11-03 |
+| [TOOL-dFairHearing-40 — the round-5 spec audit's 35 minors: one build-wide version reading on one base, an attempt checker that refuses what it cannot place, and criteria a correct build can pass](spec/2026-10-23-spec-TOOL-dFairHearing-40.md) | 28 | 2 | DEFERRED | rev-4 | 2026-11-03 |
 <!-- /gen:build-units -->
 
-Records: 214 bound to this build, across 4 record folder(s).
+Records: 218 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -181,13 +181,15 @@ Coverage of dFairHearing's 18 clause(s) and 10 owned node(s), over 38 spec(s) at
 | 17 | `TOOL-dFairHearing-17` | no |
 | 18 | `TOOL-dFairHearing-18` | no |
 | 19 | `TOOL-dFairHearing-20`, `TOOL-dFairHearing-23` | no |
-| 20 | `TOOL-dFairHearing-25`, `TOOL-dFairHearing-26` | yes |
-| 21 | `TOOL-dFairHearing-27`, `TOOL-dFairHearing-28`, `TOOL-dFairHearing-29`, `TOOL-dFairHearing-30` | no |
-| 22 | `TOOL-dFairHearing-31`, `TOOL-dFairHearing-35` | yes |
-| 23 | `TOOL-dFairHearing-32`, `TOOL-dFairHearing-33`, `TOOL-dFairHearing-34` | yes |
-| 24 | `TOOL-dFairHearing-36`, `TOOL-dFairHearing-37` | yes |
-| 25 | `TOOL-dFairHearing-38`, `TOOL-dFairHearing-39` | yes |
-| 26 | `TOOL-dFairHearing-40` | no |
+| 20 | `TOOL-dFairHearing-26` | no |
+| 21 | `TOOL-dFairHearing-27`, `TOOL-dFairHearing-28`, `TOOL-dFairHearing-29` | no |
+| 22 | `TOOL-dFairHearing-25`, `TOOL-dFairHearing-31` | yes |
+| 23 | `TOOL-dFairHearing-30`, `TOOL-dFairHearing-33`, `TOOL-dFairHearing-34` | yes |
+| 24 | `TOOL-dFairHearing-35` | no |
+| 25 | `TOOL-dFairHearing-32` | no |
+| 26 | `TOOL-dFairHearing-36`, `TOOL-dFairHearing-37` | yes |
+| 27 | `TOOL-dFairHearing-38`, `TOOL-dFairHearing-39` | yes |
+| 28 | `TOOL-dFairHearing-40` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

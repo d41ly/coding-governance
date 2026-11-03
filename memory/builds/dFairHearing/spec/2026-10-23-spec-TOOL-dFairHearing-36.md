@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-36 — the round-4 spec audit's 13 minors on units 28, 29 and 31: probes that read every node's bytes alike, misses seen red, and the bar's own base
 
-**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 24 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 26 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -297,6 +297,9 @@ suite takes no `New arm:` line: it only loses an arm, as unit 26 §7 states.
   the revision its pinned 73 and 5 were measured at. Unit 16 moved every rule-0 and rule-5 arm out of
   the live hook suite, so over that file both probes print 0 `gone` lines at `9c1a2857a` and the
   criterion was red before any pass. Unit 40 S11 states the same input (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 3).
+- rev-4 · 2026-11-03 · header order · §4 · the header's order 24 to 26, keeping this unit in one order
+  with `TOOL-dFairHearing-37`, the other batch over the disjoint write set §4 states (fix brief
+  2026-11-03-prompt-TOOL-dFairHearing-25-reorder-fix-brief, item 2).
 
 ## 10. Reuse audit
 

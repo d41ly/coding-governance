@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-25 — the owed replays run after the replay contract is corrected, and their verdicts set the dark switches
 
-**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 20 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 22 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,10 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-4-edge-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-4-edge-fix-brief.md) | research | TOOL-dFairHearing-4 TOOL-dFairHearing-18 TOOL-dFairHearing-27 |
 | [2026-11-02-prompt-TOOL-dFairHearing-25-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-25-build-brief.md) | research | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md) | research | TOOL-dFairHearing-10 TOOL-dFairHearing-22 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-1 TOOL-dFairHearing-21 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-23 TOOL-dFairHearing-26 |
+| [2026-11-03-prompt-TOOL-dFairHearing-25-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-25-1-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-25-2-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-25-2-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-25-fold-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-25-fold-fix-brief.md) | research | TOOL-dFairHearing-30 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-37 TOOL-dFairHearing-40 |
+| [2026-11-03-prompt-TOOL-dFairHearing-25-reorder-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-25-reorder-fix-brief.md) | research | TOOL-dFairHearing-30 TOOL-dFairHearing-35 |
 | [2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md) | spec-audit | TOOL-dFairHearing-4 TOOL-dFairHearing-14 TOOL-dFairHearing-26 TOOL-dFairHearing-27 |
 
 <!-- /gen:spec-records -->
@@ -27,17 +31,19 @@ replays before `TOOL-dFairHearing-23` (order 19) corrects the contract those rep
 review-replay manifest's terms (its S4), the bundle-and-fetch recipe (S17, S18), the spec-audit
 placement (S22) and replay 1's flip site (S40). Spec 1's own clone step, `git clone --branch fh-base`
 on a bundle holding only `refs/replay/fh-base`, is the step spec 23 AC10 names as exiting 128. This
-unit, ordered directly after unit 23, runs replay 1's two design-audit runs and unit 15's eight
-with-and-without runs on the corrected contract, and the switch state at its commit is what those
-verdicts say.
+unit, ordered after unit 23 and after `TOOL-dFairHearing-27`, which corrects unit 23's recipe, runs
+replay 1's two design-audit runs and unit 15's eight with-and-without runs on the corrected
+contract, and the switch state at its commit is what those verdicts say. Every correction a later
+unit had written to the procedure these runs follow is carried here, before them (§8 F2).
 
 ## 2. Scope (IN)
 
 - **S1** — Replay 1, run once on the corrected contract: the two design-audit runs of
   `TOOL-dFairHearing-1` S5, with the arguments its §4 "The isolation" names. Each run takes its own
-  clone, made by the recipe in `tools/workflows/README.md`'s replay section (unit 23 S17) under a
-  fresh name, `fhr1` and `fhr2`. A clone directory that already exists is refused, never reused, and
-  the clone's `HEAD` must equal the commit the recipe was given. Observed by AC1.
+  clone, made by the replay section of `tools/workflows/README.md` (unit 23 S17, unit 27 S22's
+  envelope, and S8's placement step) under a fresh name per attempt (S10). A clone directory that
+  already exists is refused, never reused, and the clone's `HEAD` must equal the commit the recipe was
+  given. Observed by AC1.
 - **S2** — The placement. The commit each replay-1 clone checks out is `6cfd21619` plus one commit
   adding `memory/builds/dFairHearing/README.md` as at base `3708a705`, and the call names `reviewDir`
   `memory/builds/dFairHearing/reviews`, unit 23 S22's placement. Blindness is held as spec 1 AC4 holds
@@ -49,7 +55,7 @@ verdicts say.
   `tools/workflows/replay_scorer.py --experiment`, unit 12's factory. Each replay-1 run is scored by `review_replay.py --known-set
   --candidate --matched` (spec 1 S3). Spec 1 §4's void rule reads S4's terms: a run whose report is
   not parsed, whose `RUN INTEGRITY` names a dead finder or skeptic, or whose transcripts read outside
-  the clone and the scratchpad is re-run, never scored. Observed by AC3.
+  the clone and the scratchpad is re-run under S10's cap, never scored. Observed by AC3.
 - **S4** — Unit 15's replay, run once on the corrected contract: the eight runs of
   `TOOL-dFairHearing-15` S5 over its §4 corpus, arms `selected` and `ungated`. Each record's range head
   gets its own clone by the same recipe, a fresh name per clone, `HEAD` equal to that range head.
@@ -64,8 +70,39 @@ verdicts say.
   file of spec 15 S6 changes otherwise. Observed by AC5 and AC6.
 - **S6** — One verdict record, `memory/builds/dFairHearing/build/<date>-build-TOOL-dFairHearing-25-replay-verdicts.md`,
   opening `**Serves:** research TOOL-dFairHearing-25 TOOL-dFairHearing-1 TOOL-dFairHearing-15`. It
-  names each replay's figures, bar and verdict, its raw outputs, the commit the runs started from and
-  unit 23's build commit, and the class set the `ungated` arm carried. Observed by AC7.
+  names each replay's figures, bar and verdict, its raw outputs, the orchestrating commit and blobs S7
+  binds, unit 23's build commit, and the class set the `ungated` arm carried. Observed by AC7.
+- **S7** — The orchestrating commit, carried from `TOOL-dFairHearing-32` S14 (ids 5 and 13 of the
+  round-3 spec audit). Before the first run, this repository's `HEAD` is read by `git rev-parse
+  --verify HEAD`, its exit checked, and the verdict record names it as the orchestrating commit, on a
+  line apart from each clone's `HEAD`. Beside it the record names the blob of
+  `tools/workflows/README.md`, `tools/workflows/tier2-review.js` and `tools/workflows/replay_scorer.py`
+  as the runs read them, each by `git hash-object`. The binding is evidence the writer does not
+  choose: the commit that adds the record has the orchestrating commit as its first parent, each named
+  blob equals that commit's blob at its path, and the orchestrating commit descends from unit 23's
+  build commit. This replaces S6's "the commit the runs started from" and AC7's ancestry test.
+  Observed by AC7.
+- **S8** — One replay procedure, carried from `TOOL-dFairHearing-32` S17 (id 21) and S18 (id 31). The
+  replay section of `tools/workflows/README.md`, as unit 27 S22 leaves it (the stale refusal, every
+  step's exit checked, the exact-commit check and the EXIT trap), is the procedure every run here
+  follows, and §4 restates none of it. Before the first run, this unit adds the placement step of §4
+  to that section: a commit the source history lacks is made by `git commit-tree` over a tree written
+  through a temporary `GIT_INDEX_FILE`, referenced only by the transient ref the recipe bundles. The
+  working tree, the index and `HEAD` of this repository never move. This replaces the transient
+  branch §4 named and §5's claim that id 36 is covered by this unit's exact-commit check. Observed by
+  AC8.
+- **S9** — One EXIT trap, carried from `TOOL-dFairHearing-37` S19 (id 37 of the round-4 spec audit),
+  counted as `TOOL-dFairHearing-40` S20 (id 5 of the round-5 audit) counts it. The placement step and
+  the recipe set one trap holding both `rm -f "$idx"` and `git update-ref -d refs/replay/<name>`, so
+  neither replaces the other. Over the replay section's fenced bash lines, sliced from its heading to
+  the next `## ` with comment lines left out, one line opens `trap '`. Observed by AC8.
+- **S10** — Attempts, carried from `TOOL-dFairHearing-32` S20 (id 29) and S21's replay-1 half (id 30).
+  A re-run takes a new clone named per attempt, `fhr<run><a>`: `<run>` 1 or 2, `<a>` the attempt
+  letter from `a`, so the first attempts are `fhr1a` and `fhr2a`. A voided clone stays on disk until
+  the record cites it. A run takes at most two attempts. After a second void, the record states
+  replay 1 `not run`, `DESIGN_RECORD_PRESET` keeps its default and spec 1 S9's R-1 ask is filed, as
+  S5's miss. This replaces S1's fixed names `fhr1` and `fhr2` and S3's unbounded re-run. Observed by
+  AC1 and AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -73,9 +110,13 @@ verdicts say.
   applies the void rule to replay 1's runs alone, so no corrected term touches their verdicts.
 - No change to the known set, the matched-list reader, the calibration or the bars: spec 1 S1 to S4
   stand and this unit reads them.
-- No change to the recipe, the manifest grammar or the placement: they are unit 23's, read here.
+- No change to the manifest grammar or to the recipe's own steps: they are units 23 and 27's, read
+  here. The placement step and its one trap (S8, S9) are this unit's one change to the replay
+  section, made before its first run.
+- No reading of the records after the runs. The re-reads are `TOOL-dFairHearing-32`'s: its S13, S19,
+  and the post-run halves of its S14, S17, S20 and S21.
 - No fix of the minors the same audit raised on unit 23. Ids 13, 36 and 39 land with
-  `TOOL-dFairHearing-27`, after this unit; §5 says why none of them moves a verdict here.
+  `TOOL-dFairHearing-27`, before this unit; §5 says why none of them moves a verdict here.
 - No help page: `help/` covers neither the review harness nor the scorer factory.
 
 ### Edges
@@ -84,7 +125,8 @@ verdicts say.
 - **consumes-from** `TOOL-dFairHearing-1` — the known set, `parse_known_set`, `--matched`, the calibration, replay 1's arguments and bar, and the R-1 ask rule
 - **consumes-from** `TOOL-dFairHearing-15` — the `resume:checklist` agent, the corpus, the two arms and their instrument, and the decision rule
 - **hands-off** `TOOL-dFairHearing-30` — finding id 28 (item H2) of the round-3 spec audit: unit 15's with-and-without replay, run with one fresh clone per record and arm, and its decision; this unit's S4, AC4, the unit-15 half of S5, AC6 and the unit-15 lines of S6 and AC7 are superseded by its S1 to S5 and AC1 to AC4
-- **hands-off** `TOOL-dFairHearing-32` — the same audit's minors on this spec, ids 4, 5, 9, 13, 21, 24, 29, 30 and 31: its S13 to S21, each naming what it supersedes
+- **hands-off** `TOOL-dFairHearing-37` — this unit's verdict record, whose call-time orchestrating commit its AC3 reads after the runs
+- **hands-off** `TOOL-dFairHearing-32` — the same audit's minors on this spec, ids 4, 5, 9, 13, 21, 24, 29, 30 and 31: what reads this unit's records after the runs, its S13, S16, S19 and the post-run halves of S14, S17, S20 and S21; what had to hold before the runs, from its S14, S17, S18, S20 and S21, is carried here as S7, S8 and S10
 
 ## 4. Design
 
@@ -99,22 +141,32 @@ verdicts this unit would then have to reverse.
 
 ### The run, per clone
 
+The procedure is the replay section of `tools/workflows/README.md` (S8), run once per attempt clone,
+`<name>` the clone's S10 name and `<commit>` the commit given. Its exact-commit check, unit 27 S22's,
+is the liveness check. For replay 1, `<commit>` is the placement commit of S2, made by the step
+below and reachable only from the transient ref. Unit 15's runs are unit 30's.
+
+### The placement step (S8, S9)
+
 ```bash
-test ! -e "$TEMP/<name>" || exit 2                     # a stale directory is refused, never reused
-# the recipe of tools/workflows/README.md, each step's exit status checked
-test "$(git -C "$TEMP/<name>" rev-parse HEAD)" = "<the commit given>"   # the liveness check
-git show-ref refs/replay/<name>                        # prints nothing afterwards
+idx=$(mktemp -p "$SCRATCH")
+trap 'rm -f "$idx"; git update-ref -d refs/replay/<name> 2>/dev/null' EXIT   # the one trap
+GIT_INDEX_FILE="$idx" git read-tree 6cfd21619
+GIT_INDEX_FILE="$idx" git update-index --add --cacheinfo 100644,<blob>,memory/builds/dFairHearing/README.md
+tree=$(GIT_INDEX_FILE="$idx" git write-tree)
+git update-ref refs/replay/<name> "$(git commit-tree "$tree" -p 6cfd21619 -m placement)"
+# then the recipe, bundling refs/replay/<name>, with its own trap line taken out
 ```
 
-For replay 1, `<the commit given>` is the placement commit of S2. It is made on a transient branch
-at `6cfd21619` in this repository and deleted with the transient ref, so this repository keeps
-neither. For unit 15, it is the record's range head. The exact-commit comparison is this unit's own
-liveness check. It does not wait for `TOOL-dFairHearing-27`'s recipe fix (finding id 36).
+`<blob>` is `git rev-parse 3708a705:memory/builds/dFairHearing/README.md`, which printed
+`606886dda5815c5979992ea50842b2a3368061a5` on 2026-11-03. `$SCRATCH` is the run's scratch directory.
+Each command's exit status is checked, and no step touches the working tree, the index or `HEAD`.
 
 ### What the verdict record proves
 
-Each run starts from a commit that descends from unit 23's build commit, and the record names both
-shas. That ancestry is the property finding id 1 found missing: no verdict that sets a switch rests
+The runs read the procedure files whose blobs S7 names, and the commit that adds the record holds
+exactly those blobs over a first parent, the orchestrating commit, that descends from unit 23's build
+commit. That ancestry is the property finding id 1 found missing: no verdict that sets a switch rests
 on a contract the build had already declared defective.
 
 ### Files touched (estimate)
@@ -134,25 +186,27 @@ verdict leaves. `tools/workflows/tier2-review.js` is the template's render.
 ### Alternatives rejected
 
 - **Re-run after units 1 and 15 have run** — §8 F1 (a).
+- **Run first, and let the later units patch the records** — §8 F2 option 2.
 - **Move the corrected items before order 15** — the skeptic's first fix. This unit's order is fixed
-  one above the unit it repairs, and that unit is `TOOL-dFairHearing-23`.
+  above the unit it repairs, `TOOL-dFairHearing-23`, and above `TOOL-dFairHearing-27`, which corrects that unit's recipe.
 
 ## 5. Production-readiness checklist
 
-- security — the clones and bundles sit under `%TEMP%`, outside the repository. The transient refs
-  and the placement branch are deleted in the step that made them. The lenses keep the spec kind's
-  read-only probe rules.
+- security — the clones and bundles sit under `%TEMP%`, outside the repository. The placement makes
+  no branch: its commit is reachable only from the transient ref, which the one EXIT trap deletes
+  with the temporary index (S9). The lenses keep the spec kind's read-only probe rules.
 - perf / scale — replay 1 costs about 24 agents and 430k output tokens (spec 1 §5). Unit 15's replay
   costs about 8 review runs, roughly 100 agents (spec 15 AC8).
 - error / empty / loading states — a stale clone directory, a `HEAD` that is not the given commit, a
-  void run and a manifest the factory refuses are each named and re-run or refused, never scored.
-- observability — the verdict record carries every figure beside its bar, its raw output and both
-  shas.
-- risks — `TOOL-dFairHearing-27` lands three corrections to unit 23's code after this unit, and none
+  void run and a manifest the factory refuses are each named and re-run or refused, never scored; a
+  third attempt is never made (S10).
+- observability — the verdict record carries every figure beside its bar, its raw output, the
+  orchestrating commit and its blobs (S7).
+- risks — `TOOL-dFairHearing-27` lands three corrections to unit 23's code before this unit, and none
   of them moves a verdict here. Id 13 adds the item-only row of the spec-kind ref reader, but every
   replay-1 pair must cite its known row's `[tag]` (spec 1 S3), and unit 15's corpus is diff-review
-  records, scored by line (`tools/workflows/review_replay.py:87-97`, chosen by kind at `:248`). Id 36 is covered by §4's own
-  exact-commit check. Id 39 can widen the `ungated` arm by the classes whose gate token wraps onto the
+  records, scored by line (`tools/workflows/review_replay.py:87-97`, chosen by kind at `:248`). Id 36 is unit 27 S22's envelope,
+  which S8 follows. Id 39 can widen the `ungated` arm by the classes whose gate token wraps onto the
   next line, so S6 lists the arm's class set and the batch's corrected predicate can be checked
   against it.
 - testing — the criteria below. This unit adds no suite arm: its outputs are records and verdicts.
@@ -162,17 +216,17 @@ verdict leaves. `tools/workflows/tier2-review.js` is the template's render.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When each replay-1 clone is made, `git -C "$TEMP/fhr1" rev-parse HEAD` equals the
-  placement commit and `git -C "$TEMP/fhr1" rev-list --all` names no commit absent from `git rev-list
-  6cfd21619` except that one. `git -C "$TEMP/fhr1" diff --name-only 6cfd21619 HEAD` prints exactly
-  `memory/builds/dFairHearing/README.md`, and `git -C "$TEMP/fhr1" rev-parse
+- **AC1** — When each replay-1 attempt's clone is made, `git -C "$TEMP/<clone>" rev-parse HEAD` equals
+  the placement commit and `git -C "$TEMP/<clone>" rev-list --all` names no commit absent from `git
+  rev-list 6cfd21619` except that one. `git -C "$TEMP/<clone>" diff --name-only 6cfd21619 HEAD` prints
+  exactly `memory/builds/dFairHearing/README.md`, and `git -C "$TEMP/<clone>" rev-parse
   6cfd21619:memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md` prints
-  `767187aa4073f6e64cb2b2ef6b798f0a538347fd`. Afterwards, `git show-ref refs/replay/fhr1` in this
-  repository prints nothing. The same holds for `fhr2`, and a second recipe run into an existing
-  `fhr1` exits 2 before any fetch.
+  `767187aa4073f6e64cb2b2ef6b798f0a538347fd`. This holds for every clone the record names, `fhr1a`,
+  `fhr2a` and any S10 re-run, and a second recipe run into an existing `fhr1a` exits 2 before any
+  fetch. Afterwards, `git for-each-ref refs/replay/` in this repository prints nothing.
   Red when: a clone reaches a later object, a reused directory ends at another commit, or a ref
   survives.
-  fixture: the clones under `%TEMP%/fhr1` and `%TEMP%/fhr2`, made by the pass.
+  fixture: the clones under `%TEMP%`, made by the pass.
 - **AC2** — When each replay-1 run returns, its report sits under the clone's
   `memory/builds/dFairHearing/reviews/`, and its `**Serves:** spec-audit` line names the runtime
   record. Replaying that call's payload on stdin through `node spec-audit-optin.js`, the opt-in pack
@@ -203,11 +257,29 @@ verdict leaves. `tools/workflows/tier2-review.js` is the template's render.
   --all-ungated` over a fixture catalogue prints the range's selection first, then every class naming
   no manifest leg, and the acquiring command carries the flag.
   Red when: the product changes against the decision.
-- **AC7** — When the verdict record lands, it names unit 23's build commit and the commit the runs
-  started from. `git merge-base --is-ancestor <unit 23's commit> <the runs' commit>` exits 0, and
-  `git log -1 --format=%s <unit 23's commit>` names `TOOL-dFairHearing-23`. The record also lists the
+- **AC7** — When the verdict record lands, `git log --diff-filter=A --format=%P -1 -- <record>` prints
+  a first parent equal to the orchestrating commit the record names. `git merge-base --is-ancestor
+  <unit 23's commit> <that commit>` exits 0, and `git log -1 --format=%s <unit 23's commit>` names
+  `TOOL-dFairHearing-23`. Each blob the record names equals `git rev-parse <the adding commit>:<path>`
+  for its path, and each clone's `HEAD` stands on a line of its own. The record also lists the
   `ungated` arm's classes.
-  Red when: a run started from a commit that does not contain unit 23's corrections.
+  Red when: a run started from a commit that does not contain unit 23's corrections, a procedure file
+  changed between the runs and the commit, or a clone's `HEAD` stands in for the orchestrating commit.
+- **AC8** — When `grep -n "commit-tree" tools/workflows/README.md` runs, it prints the placement step
+  inside the replay section. Over that section's fenced bash lines, sliced from its heading to the
+  next `## ` with comment lines left out, `grep -c "^\s*trap '"` prints 1, and a copy whose prose holds
+  the word `trap ` still prints 1. A scratch run of the placement and the recipe in a fixture
+  repository, with `git bundle create` forced to fail, leaves `git for-each-ref refs/replay/` printing
+  nothing, `test ! -e "$idx"` exiting 0, and that repository's `git status --porcelain` and `HEAD`
+  unchanged.
+  Red when: a failed bundle leaves a transient ref or the temporary index, the placement moves the
+  working tree, or a second trap line replaces the first.
+  fixture: the repository under `%TEMP%/fpl`, made by the probe and removed after it.
+- **AC9** — When the verdict record lands, it lists for each replay-1 run one or two attempts, each
+  under its own `fhr<run><a>` clone, none named twice, with each void attempt's cause beside it. A run
+  whose two attempts are void reads `not run`, and `grep -n "R-1" memory/builds/dFairHearing/BACKLOG.md`
+  prints its ask.
+  Red when: a clone serves two attempts, a third attempt runs, or a twice-void run is scored.
 
 ## 7. Gates
 
@@ -226,6 +298,21 @@ each observed directly by §6.
   only to flip it back. (b) closes the finding with one run per replay and leaves units 1 and 15
   every item the corrected contract does not touch. RESOLVED (agent, 2026-10-23, delegated): (b),
   rung 3. widens: none · relaxes: none
+- **F2 — The replays' pre-run corrections sit in units ordered after the runs: fold them here, or run
+  first?** Units 32, 37 and 40 each correct the procedure these runs and unit 15's replay follow (the
+  orchestrating-commit binding, one clone envelope, the placement step, per-attempt clones and their
+  cap, the void and re-run rule, the per-arm clone, path and status, the attempt checker, and the
+  reports kept on disk), and each also reads the records the runs leave, so no order puts them both
+  before and after the replays (the return of fix brief
+  2026-11-03-prompt-TOOL-dFairHearing-25-reorder-fix-brief). Options: (1) fold each correction that
+  must hold before a run into the replay unit's own spec, 25, 30 or 35, under M4's repair rule ("A
+  repair unit corrects an UNBUILT sibling's spec itself", owner 2026-11-01), and leave in 32, 37 and
+  40 only what reads or completes the records afterwards; (2) run the replays at their orders on the
+  procedure as written, and let 32, 37 and 40 patch the records after. (2) spends the ten runs on the
+  old procedure and patches the records after, the defect class unit 35 was promoted to close. (1)
+  leaves no follow-up. Recommendation: (1). RESOLVED (agent, 2026-11-03, delegated): option 1, M3's
+  most feature-rich survivor; this unit's S7 to S10, unit 30's S7 to S10 and unit 35's S7 to S9 carry
+  the folded items. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -236,6 +323,19 @@ each observed directly by §6.
 - rev-3 · 2026-11-03 · §7 · the leg line adds `policy fixtures`, whose guard §4's
   `tools/memory-tree/gotchas.py` trips (2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief,
   item 1).
+- rev-4 · 2026-11-03 · header · §1 · §3 · §4 · §5 · the header's order 20 to 22, after
+  `TOOL-dFairHearing-27`, whose S22 corrects the recipe these runs follow; §1, §3, §4 and §5 re-word
+  this unit's position to match (fix brief 2026-11-03-prompt-TOOL-dFairHearing-25-reorder-fix-brief,
+  items 2 and 3).
+- rev-5 · 2026-11-03 · §1 · S1 · S3 · S6 · S7 · S8 · S9 · S10 · §3 · §4 · §5 · AC1 · AC7 · AC8 · AC9 ·
+  §8 F2 · the replays' pre-run corrections folded in (fix brief
+  2026-11-03-prompt-TOOL-dFairHearing-25-fold-fix-brief, items 1 and 2). S7 carries unit 32 S14's
+  orchestrating-commit binding (ids 5 and 13), rewriting AC7; S8 carries unit 32 S17's one clone
+  envelope (id 21) and S18's placement through a temporary index (id 31), replacing §4's block and
+  transient branch; S9 carries unit 37 S19's one EXIT trap (id 37), counted as unit 40 S20 counts it
+  (id 5); S10 carries unit 32 S20's per-attempt clones and two-attempt cap (id 29) and S21's replay-1
+  void and re-run rule (id 30), renaming AC1's clones. §8 F2 records the fork. §3 takes a hands-off
+  edge to unit 37, whose AC3 reads this unit's record.
 
 ## 10. Reuse audit
 

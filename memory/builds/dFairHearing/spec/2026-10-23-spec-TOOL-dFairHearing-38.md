@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-38 — a `selected` verdict observed by the parser `gotchas.py` has, so a correct build passes and a shipped flag reds
 
-**Status:** DEFERRED · rev-2 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 25 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 27 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -160,6 +160,9 @@ none
   round-5 spec audit of specs 33 to 37.
 - rev-2 · 2026-11-03 · §1 · §4 · the `--for-diff` branch re-cited at `9c1a2857a`, :1335-1339 having
   moved to :1366-1370; §4's probe printed `branch 1366-1370 lines 5` and `all-ungated 0` there (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief,
+  item 2).
+- rev-3 · 2026-11-03 · header order · §3 Edges · the header's order 25 to 27: its §3 consumes from
+  units 35 and 37, now at 24 and 26 (fix brief 2026-11-03-prompt-TOOL-dFairHearing-25-reorder-fix-brief,
   item 2).
 
 ## 10. Reuse audit

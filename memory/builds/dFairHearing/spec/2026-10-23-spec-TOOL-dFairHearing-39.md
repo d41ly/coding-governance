@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-39 — a criterion quoting an error text its tool never emits, carried into the bug-class catalogue a spec commit selects
 
-**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 25 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-2 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 27 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -138,6 +138,8 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 11 (item H1, HIGH, shared with id 1) of the
   round-5 spec audit of specs 33 to 37.
+- rev-2 · 2026-11-03 · header order · §3 Edges · the header's order 25 to 27: its §3 consumes from
+  unit 37, now at 26 (fix brief 2026-11-03-prompt-TOOL-dFairHearing-25-reorder-fix-brief, item 2).
 
 ## 10. Reuse audit
 

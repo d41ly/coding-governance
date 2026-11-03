@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-40 — the round-5 spec audit's 35 minors: one build-wide version reading on one base, an attempt checker that refuses what it cannot place, and criteria a correct build can pass
 
-**Status:** DEFERRED · rev-2 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 26 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 28 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-38-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-38-promoted-fix-brief.md) | research | TOOL-dFairHearing-38 TOOL-dFairHearing-39 |
 | [2026-10-23-prompt-TOOL-dFairHearing-40-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-40-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFairHearing-40-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-40-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-25-fold-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-25-fold-fix-brief.md) | research | TOOL-dFairHearing-25 TOOL-dFairHearing-30 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-37 |
 | [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 |
 
 <!-- /gen:spec-records -->
@@ -36,7 +37,7 @@ Each item names its report id, its report item, the unit it lands on and the cri
 it. Where a report item merges ids, the later id points at the first one's mechanism.
 
 - **S1** — id 2 (M1, units 33 and 34, AC1). The build-wide half of unit 27 S15's rule is read at this
-  unit's commit, after units 36 and 37 edit kit files at order 24 (unit 37 edits
+  unit's commit, after units 36 and 37 edit kit files at order 26 (unit 37 edits
   `tools/workflows/tier2-review.template.js`, review-harness's `version_from` carrier per
   `tools/workflows/kit.toml:8`). `constants.py` and `markers.py`, as S18, S19, S26 and S34 correct
   them, run over `<base>..HEAD` with `<base>` from S3. Unit 33 AC1 and unit 34 AC1 keep their reading
@@ -55,42 +56,44 @@ it. Where a report item merges ids, the later id points at the first one's mecha
   origin/main` is `base.py`'s, each read only by its own criterion. Unit 36 §4's sentence "It prints the
   line unit 31's probe prints, so units 33 and 34 read its sha the same way" is superseded by S3's
   statement. Observed by AC2.
-- **S6** — id 14 (M3, unit 35 S1, S2 and §4). The attempt checker gains a third outcome, `failed`: the
-  harness call was made and returned no usable report. A `failed` attempt counts as a completed void
-  attempt and takes one of the two eligible slots. Any line inside the attempts table, from its header
-  row to the first line not opening with `|`, that opens like an attempt row (`| <1-4> | <arm> |`, the
-  arm matched ignoring case) and does not match the full row grammar exits 1 naming its line number.
-  Rows of the record's other tables are never read. Observed by AC3.
-- **S7** — id 21 (M3). S6's mechanism: the staged `Completed` row is refused naming its line, never
-  dropped. Observed by AC3.
-- **S8** — id 35 (M3). S6's mechanism: a call that died or timed out is `failed`, so its label is never
-  the runner's choice between `refused` and `completed`. Observed by AC3.
-- **S9** — id 13 (M4, unit 35 S2, AC1). The void column is re-derived, never trusted. For each attempt
-  row, `void.py` (§4) derives its void cause from evidence the record names: the report's parse, the
-  dead agents its `Run integrity` block names, and for a cell citing an outside read, the transcript line
-  it quotes. A cell that disagrees, a `refused` row whose clone holds a report, or a named report not on
-  disk is red. Observed by AC4.
-- **S10** — id 4 (M5, unit 35 AC3, unit 37 AC11). Unit 35 AC3 holds unless the checker exited 3, in
-  which case the record states `no decision`, no pooled figure is computed and unit 35 AC4's empty diff
-  holds. Unit 37 AC11 reads "each scored clone", the scored clones are distinct, and a `void after cap`
-  pair is listed with its reason. Observed by AC5.
+- **S6** — id 14 (M3, unit 35 S1, S2 and §4). The checker's `failed` outcome, a completed void attempt
+  that takes one of the two eligible slots, and its refusal of an attempt-opening row it cannot parse
+  are carried by unit 35 S7, before unit 35 scores. This item keeps the read after: the checker,
+  re-run over unit 30's record at this unit's commit, prints what unit 35's `## Scoring` quotes.
+  Observed by AC3.
+- **S7** — id 21 (M3). A `Completed` row refused naming its line, never dropped: carried by unit 35
+  S7. NOT OBSERVED here: unit 35 AC2 observes it.
+- **S8** — id 35 (M3). A call that died or timed out is `failed`, so its label is never the runner's
+  choice between `refused` and `completed`: carried by unit 30 S9, which labels it, and unit 35 S7,
+  which reads it. NOT OBSERVED here: unit 35 AC2 observes it.
+- **S9** — id 13 (M4, unit 35 S2, AC1), read after unit 35 scores. The void column is re-derived, never
+  trusted. For each attempt row, `void.py` (§4) derives its void cause from evidence the record names:
+  the report's parse, the dead agents its `Run integrity` block names, and for a cell citing an outside
+  read, the transcript line it quotes. A cell that disagrees, a `refused` row whose clone holds a
+  report, or a named report not on disk is red. What had to hold before the runs is carried: unit 30
+  S9 writes each outside-read cell with its transcript line, and unit 30 S10 and unit 35 S9 keep the
+  reports and transcripts on disk until this pass. Observed by AC4.
+- **S10** — id 4 (M5, unit 35 AC3, unit 37 AC11). Unit 35 AC3's half, which holds unless the checker
+  exited 3, is carried by unit 35 S8. Unit 37 AC11 reads "each scored clone", the scored clones are
+  distinct, and a `void after cap` pair is listed with its reason. Observed by AC5.
 - **S11** — id 12 (M6, unit 36 AC3). Unit 36 AC3's suite input is
   `git show 3708a705:tools/hooks/agent-cap.test.sh` written to a scratch file and passed as every suite
   path, so its pinned 73 and 5 are read over the revision they were measured at. Observed by AC6.
-- **S12** — id 15 (M7, unit 37 S8 and §4). The per-arm step (§4) refuses, exit 2 naming the variable,
-  when `SCRATCH` or `ORCH` is empty, and builds the clone's parent from `TEMP`, else `TMPDIR`, refusing
-  when both are empty, so no path is built from an unset variable. The README states that `TEMP` is the
-  Windows name and `TMPDIR` the POSIX one. Observed by AC7.
-- **S13** — id 38 (M7). The orchestrating commit is read as its own call, `git -C "$ORCH" rev-parse
-  --verify HEAD`, with its status checked before the log line is written. Observed by AC7.
-- **S14** — id 22 (M8, unit 37 S8, AC8). The run log line S8 claims is observed: after the per-arm
-  block runs over a clean fixture clone up to the harness call, the log holds exactly one
-  `orchestrating <40 hex> clone ` line whose sha equals `ORCH`'s `HEAD`. Observed by AC7.
+- **S12** — id 15 (M7, unit 37 S8 and §4). The per-arm step refuses, exit 2 naming the variable, when
+  `SCRATCH` or `ORCH` is empty, and builds the clone's parent from `TEMP`, else `TMPDIR`, refusing when
+  both are empty. Carried by unit 30 S7 before its runs, where unit 37 S8 moved. NOT OBSERVED here:
+  unit 30 AC5 observes it.
+- **S13** — id 38 (M7). The orchestrating commit read as its own call, `git -C "$ORCH" rev-parse
+  --verify HEAD`, its status checked before the log line: carried by unit 30 S7. NOT OBSERVED here:
+  unit 30 AC5 observes it.
+- **S14** — id 22 (M8, unit 37 S8, AC8). The run log line observed over a clean fixture clone: carried
+  by unit 30 S7 and its AC5, where unit 37 AC8 moved. NOT OBSERVED here.
 - **S15** — id 18 (M9, unit 37 S9, AC9). Unit 37 AC9's absence probe reads both `.js` files through
   `renderLexedView` (`tools/hooks/agent-cap.js:452` at `9c1a2857a`), which blanks strings, cuts `//` comments, blanks
   template text and copies each `${…}` body with its brace depth saved in `interpDepths`. It replaces
   the two-pass reader unit 37 S9 describes. Observed by AC8.
-- **S16** — id 25 (M10, unit 35 S3, S6). When unit 35's record states `ungated`, no prose carrier tells
+- **S16** — id 25 (M10, unit 35 S3, S6), completion work after unit 35's decision, correcting none of
+  its criteria. When unit 35's record states `ungated`, no prose carrier tells
   a caller to pass `gotchas.py --for-diff` stdout as the review harness's `checklist`, because spec 15
   S1 lets a caller's checklist win. The carriers are `memory/guides/MERGE-BAR.md`,
   `memory/guides/SESSION-KICKOFF.md`, `memory/HYGIENE.md` and its template
@@ -100,7 +103,7 @@ it. Where a report item merges ids, the later id points at the first one's mecha
   Observed by AC9.
 - **S17** — id 28 (M11, unit 37 S13, AC12). The cure of a disagreement between `resolveKitDir` in
   `tools/hooks/agent-cap.js` and `tools/lib/resolve_kit_dir.py` on rows 8 and 9 is this unit's, after
-  units 36 and 37, so neither order-24 pass writes the hook. Unit 37 records the two rows' result, and
+  units 36 and 37, so neither order-26 pass writes the hook. Unit 37 records the two rows' result, and
   the Red when clause of its AC12 is answered here. Where the port disagrees, this unit makes it test
   `.git` by existence and catch a `JSON.parse` failure, and owes the hook's legs. Observed by AC10.
 - **S18** — id 31 (M12, unit 33 §4, S3, AC3). `constants.py` catches `RuntimeError`, the base of
@@ -111,12 +114,12 @@ it. Where a report item merges ids, the later id points at the first one's mecha
   descriptor is absent at the base. The registry is read at both ends, and an entry present at the base
   and absent at the head is a refusal naming it. Unit 33 §5's line "a kit removed by the build refuses
   rather than passes" is then true. Observed by AC11 and AC12.
-- **S20** — id 5 (L1, unit 37 AC17, AC5). Unit 37 AC17 counts `trap '` only on lines of the replay
-  section's fenced bash blocks, the section sliced from its heading to the next `## ` and comments
-  excluded. Unit 37 AC5 observes an absence in place of its count: no `ls-files --literal-pathspecs`
-  spelling, string or argv form, remains in `replay_scorer.py`. Observed by AC13.
-- **S21** — id 6 (L2, unit 35 §4). The checker exits 1 naming the line when a row's last cell is empty.
-  Observed by AC3.
+- **S20** — id 5 (L1, unit 37 AC17, AC5). The trap count, `trap '` only on lines of the replay
+  section's fenced bash blocks with comments excluded, is carried by unit 25 S9 and its AC8, where unit
+  37 AC17 moved. Unit 37 AC5 observes an absence in place of its count: no `ls-files
+  --literal-pathspecs` spelling, string or argv form, remains in `replay_scorer.py`. Observed by AC13.
+- **S21** — id 6 (L2, unit 35 §4). The checker exits 1 naming the line when a row's last cell is empty:
+  carried by unit 35 S7. NOT OBSERVED here: unit 35 AC2 observes it.
 - **S22** — id 7 (L3, unit 36 AC6). Unit 36's ledger labels AC6 precondition evidence, as its S7 labels
   the other green-at-base criteria. Observed by AC14.
 - **S23** — id 8 (L4, unit 37 AC15). Unit 37 AC15 first requires its grep to print the
@@ -141,7 +144,7 @@ it. Where a report item merges ids, the later id points at the first one's mecha
   `ungated` class set unit 35's `## Scoring` records is re-derived with the corrected function over the
   class records at unit 30's commit and compared; this unit's ledger states `unchanged` or names each
   class that moved. Observed by AC17.
-- **S31** — id 30 (L11, units 36 and 37 §4). The `--dispatch --writes` set of each order-24 pass counts
+- **S31** — id 30 (L11, units 36 and 37 §4). The `--dispatch --writes` set of each order-26 pass counts
   its own acceptance ledger record, and unit 36's counts the ledgers of units 28, 29 and 31 it writes
   supersessions into. The README's generated build-index blocks are a shared render the main loop
   regenerates after the passes, written by neither. Observed by AC18.
@@ -165,9 +168,10 @@ it. Where a report item merges ids, the later id points at the first one's mecha
 
 ## 3. Non-goals (OUT)
 
-- No re-review, and no fold into the specs of units 33 to 37: each item makes the corrected statement
-  true and reopens no severity.
-- No re-run of a replay and no re-decision. When the corrected checker or the void re-derivation reads
+- No re-review, and no fold into the specs of units 33, 34, 36 and 37. The items unit 35's scoring and
+  unit 30's runs needed before they ran are folded into those specs under M4's repair rule (unit 25 §8
+  F2). Each item left here makes the corrected statement true and reopens no severity.
+- No re-run of a replay and no re-decision. When the checker re-run or the void re-derivation reads
   unit 30's record differently from unit 35's recorded output, AC3 or AC4 goes red and the main loop
   parks the decision; this unit never re-scores.
 - No HIGH finding: ids 1 and 11 are `TOOL-dFairHearing-38` and `-39`.
@@ -180,13 +184,13 @@ it. Where a report item merges ids, the later id points at the first one's mecha
 
 ### Edges
 
-- **consumes-from** `TOOL-dFairHearing-30` — the verdict record, each attempt's clone and report path, which S9, S24 and S30 read
+- **consumes-from** `TOOL-dFairHearing-30` — the verdict record, each attempt's clone and report path, and the reports and transcripts its S10 keeps, which S9, S24 and S30 read
 - **consumes-from** `TOOL-dFairHearing-32` — `resolveKitDir`, the port S17 cures where it disagrees
 - **consumes-from** `TOOL-dFairHearing-33` — `constants.py`, S2, S3, §4, AC1 and AC3, which S1, S3, S4, S18, S19, S26, S28 and S29 correct
 - **consumes-from** `TOOL-dFairHearing-34` — `markers.py`, §3 and AC1, which S1, S3, S4 and S32 correct
-- **consumes-from** `TOOL-dFairHearing-35` — the attempt rule, its checker, the `## Scoring` section and AC3, which S6 to S10, S16, S21, S24 and S30 correct or read
+- **consumes-from** `TOOL-dFairHearing-35` — the checker its S7 carries, the `## Scoring` section and the decision, which S6, S9, S16, S24 and S30 read after it scores
 - **consumes-from** `TOOL-dFairHearing-36` — `base.py`, AC3 and AC6 and its §4, which S3, S5, S11, S22, S27, S31 and S35 read or correct
-- **consumes-from** `TOOL-dFairHearing-37` — S6, S8, S9, S13, S15, the per-arm step and AC5, AC8, AC9, AC11, AC12, AC15 and AC17, which S10, S12 to S15, S17, S20, S23, S30, S31, S33 and S34 correct
+- **consumes-from** `TOOL-dFairHearing-37` — S6, S9, S13, S15 and AC5, AC9, AC11, AC12 and AC15, which S10, S15, S17, S20, S23, S30, S31, S33 and S34 correct
 
 ## 4. Design
 
@@ -226,43 +230,14 @@ wrote `_dpath`. A base holding no registry blob holds no entry, so every entry i
 `markers.py` is unit 34 §4's script unchanged. Measured on 2026-10-23: the branch-reconcile kit's
 descriptor and version file are both added by `0baf2e47a`, and its parent holds neither.
 
-### The attempt checker, corrected (S6 to S8, S21)
+### The attempt checker (S6 to S8, S21)
 
-```python
-# attempts.py <record> — unit 15's replay: the scored attempt of each record and arm, by rule
-import re, sys
-ROW = re.compile(r"^\|\s*([1-4])\s*\|\s*(selected|ungated)\s*\|\s*(\d+)\s*\|\s*(\S+)\s*\|"
-                 r"\s*(refused|completed|failed)\s*\|\s*(.*?)\s*\|\s*$")
-OPENS = re.compile(r"^\|\s*[1-4]\s*\|\s*(selected|ungated)\s*\|", re.I)
-HEADER = re.compile(r"^\|\s*record\s*\|\s*arm\s*\|", re.I)
-rows, seen, inside = {}, set(), False
-for no, line in enumerate(open(sys.argv[1], encoding="utf-8"), 1):
-    if HEADER.match(line):
-        inside = True
-        continue
-    if inside and not line.startswith("|"):
-        inside = False
-    if not inside or not OPENS.match(line):
-        continue
-    m = ROW.match(line)
-    if not m:
-        sys.exit(f"attempts: line {no} opens an attempt row and does not parse: {line.strip()}")
-    r, a, n, clone, outcome, void = m.groups()
-    if not void:
-        sys.exit(f"attempts: line {no} has an empty last cell")
-    if (r, a, int(n)) in seen:
-        sys.exit(f"attempts: attempt {n} of record {r} {a} is listed twice")
-    seen.add((r, a, int(n)))
-    rows.setdefault((r, a), []).append((int(n), clone, outcome, void))
-```
-
-The rest is unit 35 §4's checker with one change: `done` holds the `completed` and `failed` attempts,
-and `scored` is the first of `done[:2]` that is `completed` with void `-`. A `failed` attempt's last
-cell names what came back instead of a report.
+Carried by unit 35 §4 (its S7), before unit 35 scores. S6's re-read runs that checker over unit 30's
+record at this unit's commit.
 
 ### The void re-derivation (S9)
 
-`void.py <record>` reads the attempts table with the grammar above and, for each row, the report path
+`void.py <record>` reads the attempts table with unit 35 §4's grammar and, for each row, the report path
 unit 30's record names beside that clone (unit 30 S5).
 
 | Row | Must hold | Red when |
@@ -274,29 +249,12 @@ unit 30's record names beside that clone (unit 30 S5).
 It prints `agrees <record> <arm> <attempt>` for each row that holds, and exits 1 naming the first row
 that does not. A report or a transcript the record names and that is no longer on disk is red, as not
 re-derivable, so the evidence stays until this unit's pass. The residual: an outside read on an attempt whose cell
-reads `-`, which the pass did not record, is not re-derived; spec 1 §4's probe at order 21 is its only
+reads `-`, which the pass did not record, is not re-derived; spec 1 §4's probe at order 23 is its only
 observation.
 
-### The per-arm step, corrected (S12 to S14)
+### The per-arm step (S12 to S14)
 
-```bash
-test -n "$SCRATCH" || { echo "SCRATCH is empty"; exit 2; }
-test -n "$ORCH" || { echo "ORCH is empty"; exit 2; }
-t="${TEMP:-$TMPDIR}"
-test -n "$t" || { echo "no temp directory: TEMP and TMPDIR are both empty"; exit 2; }
-if command -v cygpath >/dev/null 2>&1; then t=$(cygpath -m "$t"); fi
-c="$t/f<r><a><n>"
-test ! -e "$c" || { echo "stale: $c"; exit 2; }
-# the recipe over "$c" at the record's range head, with its exact-commit check
-s=$(git -C "$c" status --porcelain --untracked-files=all) || { echo "status failed: $c"; exit 2; }
-test -z "$s" || { echo "dirty: $c"; exit 2; }
-o=$(git -C "$ORCH" rev-parse --verify HEAD) || { echo "orchestrating head unreadable: $ORCH"; exit 2; }
-echo "orchestrating $o clone $c" >> "$SCRATCH/run.log"
-# the harness call, `repo` set to "$c"; a refused attempt takes the next <n> and a new clone
-```
-
-`ORCH` is the orchestrating repository's root. It replaces unit 37 §4's block in the README's replay
-section.
+Carried by unit 30 §4 (its S7), written into the README's replay section before unit 30's runs.
 
 ### The absence probe's view (S15, S34)
 
@@ -316,7 +274,6 @@ whose `JSON.parse` throws as absent, as :33 catches `ValueError`.
 
 ### Files touched (estimate)
 
-- `tools/workflows/README.md`
 - `tools/workflows/tier2-review.template.js`
 - `tools/workflows/tier2-review.js`
 - `tools/workflows/tier2-review.test.sh`
@@ -340,7 +297,7 @@ assertions. Under the build folder, only this unit's acceptance ledger is writte
   quoting keeps the path one argument.
 - **State as a non-goal that a caller's checklist keeps the selection (S16).** It leaves the decision
   applying only to callers that pass none, where the carriers can say so for the cost of a grep.
-- **Re-run units 33 and 34 at order 25.** Unit 33 and 34's own readings stay at their commits; one
+- **Re-run units 33 and 34 at order 27.** Unit 33 and 34's own readings stay at their commits; one
   build-wide reading at the last order is the one that sees every unit.
 
 ## 5. Production-readiness checklist
@@ -349,20 +306,20 @@ assertions. Under the build folder, only this unit's acceptance ledger is writte
   double-quoted bash string cannot hold literally; no new write path.
 - perf / scale — two `git show` reads per declared constant and per modified file; one parse per
   attempt report.
-- error / empty / loading states — every probe refuses by name: an unplaceable or empty attempt row, an
-  unset variable, an unreadable head, a registry entry dropped, a moved carrier.
-- observability — the run log names the orchestrating commit beside each clone; each probe prints its
-  population before its verdict.
-- risks — a difference between the corrected checker and unit 35's recorded output stops the build
+- error / empty / loading states — every probe refuses by name: a registry entry dropped, a moved
+  carrier, a void cell the evidence does not support.
+- observability — each probe prints its population before its verdict.
+- risks — a difference between the checker re-run and unit 35's recorded output stops the build
   rather than re-deciding; a deleted report reds S9 as not re-derivable.
 - testing — scratch probes and fixtures per criterion; the §7 arms observed RED then GREEN at the close.
 - migration — none for adopters beyond the harness's quoted `repo` and its refusal of three characters.
-- user docs — `tools/workflows/README.md`, the replay section; there is no `help/` page (§3).
+- user docs — none: the replay section is units 25 and 30's; there is no `help/` page (§3).
 
 ## 6. Acceptance criteria
 
-`constants.py`, `markers.py`, `base.py`, `attempts.py` and `void.py` are the scripts of §4 and of units
-33, 34 and 36 as §4 corrects them, written under the pass's scratch directory. A clone or fixture
+`constants.py`, `markers.py`, `base.py` and `void.py` are the scripts of §4 and of units 33, 34 and 36
+as §4 corrects them, and `attempts.py` is unit 35 §4's, each written under the pass's scratch
+directory. A clone or fixture
 repository goes under `%TEMP%/<short name>`.
 
 - **AC1** — When `python base.py .` runs at this unit's commit with `GATE_BASE` unset and prints `base
@@ -379,14 +336,10 @@ repository goes under `%TEMP%/<short name>`.
   fixture: a two-commit repository under `%TEMP%/fsa` cloned to `%TEMP%/fsb`, made by the probe and
   removed after it.
 - **AC3** — When `python attempts.py <unit 30's verdict record>` runs at this unit's commit, its
-  `scored` and `void after cap` lines equal those unit 35's `## Scoring` section quotes. Over scratch
-  tables it exits 1 naming the line for a row reading `Completed`, a row whose last cell is empty and a
-  row reading `| 4 | Selected |`; a record 4 `selected` reading failed then completed prints `scored 4
-  selected 2`, and failed, failed, completed prints `void after cap 4 selected` and exits 3. A row of a
-  second table opening `| 1 |` outside the attempts table is not read.
-  Red when: a row is dropped without a message, a `failed` attempt is scored or takes no slot, or the
-  corrected checker scores an attempt unit 35's record did not.
-  fixture: the tables under the pass's scratch directory, written by the probe.
+  `scored` and `void after cap` lines equal those unit 35's `## Scoring` section quotes. The staged
+  tables are unit 35 AC2's.
+  Red when: unit 30's record, edited after unit 35's commit, no longer yields the attempts unit 35
+  scored.
 - **AC4** — When `python void.py <unit 30's verdict record>` runs at this unit's commit, it prints one
   `agrees` line per attempt row and exits 0. Over a scratch copy whose attempt-1 void cell is changed to
   cite an outside read the transcript does not hold, it exits 1 naming that row, and over one whose
@@ -394,26 +347,15 @@ repository goes under `%TEMP%/<short name>`.
   Red when: a void cell the evidence does not support decides which attempt is scored.
   fixture: the record copies under the pass's scratch directory; the reports and transcripts unit 30's
   record names, on disk.
-- **AC5** — When `python attempts.py <unit 30's verdict record>` exits 3, unit 30's record states
-  `no decision` beside each void pair with its reason and names no pooled figure, `git diff <unit 35's
-  parent> <unit 35's commit> -- tools/memory-tree/gotchas.py` prints nothing, and the clones unit 37's
-  ledger grades for AC11 are exactly those the `scored` lines name. When it exits 0, unit 35 AC3 and
-  unit 37 AC11 are answered as written.
-  Red when: a correct void-after-cap build is held to the four parsed records or the eight clones that
-  unit 35 AC3 and unit 37 AC11 required.
+- **AC5** — When `python attempts.py <unit 30's verdict record>` runs, the clones unit 37's ledger
+  grades for AC11 are exactly those its `scored` lines name, and each `void after cap` pair is listed
+  in unit 30's record with its reason. Unit 35 AC3's exit-3 case is unit 35's own since the fold.
+  Red when: a correct void-after-cap build is held to the eight clones unit 37 AC11 required.
 - **AC6** — When the hook suite as it stood at base `3708a705`, read by `git show` at that revision as
   §2 S11 spells it, is written to a scratch file and given as every suite path, `census.py` prints 73 `gone` lines and `members.py` prints 5, under both
   `PYTHONUTF8=1` and `PYTHONUTF8=0`.
   Red when: the counts are read over the working suite, from which units 26, 28 and 29 moved the arms.
   figure: 73 and 5 are PINNED, measured at `3708a705` on 2026-10-23 (unit 36 §4).
-- **AC7** — When the README's per-arm block runs in a scratch shell with `SCRATCH` empty, then `ORCH`
-  empty, then `TEMP` and `TMPDIR` both empty, each exits 2 naming the variable before any clone path
-  is used. With `ORCH` naming a directory that is no repository, it exits 2 printing `orchestrating head
-  unreadable` before the harness call. Over a clean fixture clone with every variable set,
-  `grep -c "^orchestrating [0-9a-f]\{40\} clone " run.log` prints 1 and that sha equals
-  `git -C "$ORCH" rev-parse HEAD`.
-  Red when: a path is built from an unset variable, or the log line is absent, empty or unanchored.
-  fixture: one clone under `%TEMP%/fpa`, made by the probe and removed after it.
 - **AC8** — When the S15 probe reads `tools/hooks/agent-cap.js` and `check-verifier-fanout.js`, neither
   holds a `MAX_LENSES` identifier. Scratch copies holding `` `x ${f({k: MAX_LENSES})}` ``,
   `` `${ {a:1}.a + MAX_LENSES }` `` and `` `${ `${MAX_LENSES}` }` `` each fail the probe, and copies
@@ -447,12 +389,10 @@ repository goes under `%TEMP%/<short name>`.
   prints `new branch-reconcile 1.0`.
   Red when: an `absent` or `new` outcome is refused, dropped or misprinted.
   figure: the lines are PINNED, measured on 2026-10-23 at `7d98741e3` and `0baf2e47a`.
-- **AC13** — When `tools/workflows/README.md` is sliced from its replay section heading to the next
-  `## ` and its fenced bash lines are read, `grep -c "^\s*trap '"` over them prints 1, and a copy whose
-  prose holds the word `trap ` still prints 1. In the workflows kit, `grep -cE
-  "ls-files.{0,8}--literal-pathspecs" replay_scorer.py` prints 0, and the valid-path control of unit
-  37 AC5 holds.
-  Red when: a comment or a second section doubles the count, or the argv form reads as a miss.
+- **AC13** — When `grep -cE "ls-files.{0,8}--literal-pathspecs" replay_scorer.py` runs in the
+  workflows kit, it prints 0, and the valid-path control of unit 37 AC5 holds. The replay section's
+  trap count is unit 25 AC8's.
+  Red when: the argv form reads as a miss.
 - **AC14** — When `git grep -n "^- AC6 — "` runs over unit 36's acceptance ledger, the line it prints
   holds `precondition`.
   Red when: a criterion green at base is recorded as observing S8 and S9.
@@ -516,6 +456,20 @@ New arm: tools/lib/resolve-python.test.sh · covers AC10 · unit 37's rows 8 and
 - rev-2 · 2026-11-03 · §4 · the absence probe's reason for slicing re-grounded: since unit 16 the hook
   runs `main()` only as the entry point, and the probe slices because `renderLexedView` is not
   exported; the slice and its `ReferenceError` refusal are unchanged (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 2).
+- rev-3 · 2026-11-03 · header · S1 · S17 · S31 · §4 · the header's order 26 to 28, above units 38
+  and 39, now at 27; S1, S17, S31, §4 and the rejected alternative re-word the positions of units 30, 36 and 37
+  to match (fix brief 2026-11-03-prompt-TOOL-dFairHearing-25-reorder-fix-brief, items 2 and 3).
+- rev-4 · 2026-11-03 · S6 · S7 · S8 · S9 · S10 · S12 · S13 · S14 · S16 · S20 · §3 · §4 · §5 · AC3 ·
+  AC5 · AC7 · AC13 · the items unit 35's scoring and unit 30's runs needed before they ran moved to
+  those units (fix brief 2026-11-03-prompt-TOOL-dFairHearing-25-fold-fix-brief, items 2, 3 and 5; unit
+  25 §8 F2). S6, S7, S8 and S21's checker grammar (ids 14, 21, 35 and 6) is carried by unit 35 S7 and
+  §4, S6 keeping the re-run of AC3 and AC3 its staged tables moving to unit 35 AC2; S8's `failed`
+  label by unit 30 S9 too; S9's reports and transcripts kept on disk (id 13) by unit 30 S10 and unit 35
+  S9, S9 keeping the re-derivation; S10's unit-35 half (id 4) by unit 35 S8, AC5 keeping unit 37
+  AC11's half; S12, S13 and S14's per-arm corrections (ids 15, 38 and 22) by unit 30 S7 and AC5, AC7
+  leaving this spec and the README leaving §4's write set; S20's trap count (id 5) by unit 25 S9 and
+  AC8, AC13 keeping the absence half. S16 is completion work after the decision. §3's edges on units
+  30, 35 and 37 read rather than correct what moved.
 
 ## 10. Reuse audit
 
@@ -523,7 +477,7 @@ Every item extends a seam an earlier unit mints or the base tree carries: units 
 probes corrected in place, govkit's readers (`read_descriptors`, `resolve_version_value_at`,
 `derive_registry_path` and `blob_at` in `tools/govkit/govkit.py`), `resolve_compare_base`
 (`tools/codebase-map/map_lib.py:1507`), unit 35's attempt checker, `renderLexedView`
-(`tools/hooks/agent-cap.js:452`), both at `9c1a2857a`, the README replay section and unit 23 S45's carrier wording.
+(`tools/hooks/agent-cap.js:452`), both at `9c1a2857a`, and unit 23 S45's carrier wording.
 `python tools/codebase-map/reuse_lookup.py "refuse a table row a parser recognises but cannot parse"`
 ranked the generic `rows`, `row` and `parse` stems and no row-refusing reader, so no existing seam fits
 the attempt-table refusal; it stays in the scratch checker. The recall query returned the audit's M3 and
