@@ -1,4 +1,4 @@
-# TOOL-dCalibratedLens-42 — the `graded-by-a-row` case calls `derive_record_kind` in the form TOOL-dTotalRecall-53 S21 gives it, and refuses any other form by name
+# TOOL-dCalibratedLens-42 — the `graded-by-a-row` case calls `derive_record_kind` in the form dTotalRecall's unit 53 gives it at its S21, and refuses any other form by name
 
 **Status:** DEFERRED · rev-1 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 5 · advances TOOL-dCalibratedLens-18
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-03-build-TOOL-dCalibratedLens-42-deviation-421.md](../build/2026-11-03-build-TOOL-dCalibratedLens-42-deviation-421.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-42-deviation-422.md](../build/2026-11-03-build-TOOL-dCalibratedLens-42-deviation-422.md) | deviation | — |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-42-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-42-1-spec-writer.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-42-promoted-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-42-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
 

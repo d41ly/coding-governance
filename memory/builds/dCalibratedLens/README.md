@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-18 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48
+ids: TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-18 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 TOOL-dCalibratedLens-49 TOOL-dCalibratedLens-50 TOOL-dCalibratedLens-51 TOOL-dCalibratedLens-52 TOOL-dCalibratedLens-53
 spec-audit: 2026-10-21
 parents: dTendedCadence dFairHearing
 may: PLAY-dClosedLoop-3
@@ -82,6 +82,7 @@ ids TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dC
 ids TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-18 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24
 ids TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36
 ids TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48
+ids TOOL-dCalibratedLens-49 TOOL-dCalibratedLens-50 TOOL-dCalibratedLens-51 TOOL-dCalibratedLens-52 TOOL-dCalibratedLens-53
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -95,7 +96,7 @@ ids TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL
 | [TOOL-dCalibratedLens-27 — a failing reading or proposer becomes an `unread` line, and the record is checked before anything is filed, so no period re-runs forever](spec/2026-11-02-spec-TOOL-dCalibratedLens-27.md) | 3 | 2 | DEFERRED | rev-2 | 2026-11-02 |
 | [TOOL-dCalibratedLens-43 — `read_loop_records` lists the loop-review folder by prefix and filters by its id rule in Python, and a plant proves the listing is never empty](spec/2026-11-03-spec-TOOL-dCalibratedLens-43.md) | 3 | 2 | DEFERRED | rev-1 | 2026-11-03 |
 | [TOOL-dCalibratedLens-7 — the value ledger's shape rows, priced from the shape-run records `review.cost` and the journal reconcile write](spec/2026-11-02-spec-TOOL-dCalibratedLens-7.md) | 3 | 2 | DEFERRED | rev-2 | 2026-11-02 |
-| [TOOL-dCalibratedLens-32 — the `three-homes` plant's red twin restaged as the real `loop-review` row reverted to the bare folder, which TOOL-dTotalRecall-42 S4 refuses](spec/2026-11-02-spec-TOOL-dCalibratedLens-32.md) | 4 | 2 | DEFERRED | rev-2 | 2026-11-03 |
+| [TOOL-dCalibratedLens-32 — the `three-homes` plant's red twin restaged as the real `loop-review` row reverted to the bare folder, which dTotalRecall's unit 42 refuses at its S4](spec/2026-11-02-spec-TOOL-dCalibratedLens-32.md) | 4 | 2 | DEFERRED | rev-2 | 2026-11-03 |
 | [TOOL-dCalibratedLens-33 — the three Loop Review homes observed disjoint by listing each home, never inferred from the record-kind check](spec/2026-11-02-spec-TOOL-dCalibratedLens-33.md) | 4 | 2 | DEFERRED | rev-2 | 2026-11-03 |
 | [TOOL-dCalibratedLens-34 — the bug class of a staged break whose red rests on an ancestor clause a newer revision replaced, recorded so a spec review is handed it](spec/2026-11-02-spec-TOOL-dCalibratedLens-34.md) | 4 | 2 | DEFERRED | rev-2 | 2026-11-03 |
 | [TOOL-dCalibratedLens-35 — every record the `three-homes` plant writes is graded by a registry row, and the keep joins the plant when unit 5 lands its row](spec/2026-11-02-spec-TOOL-dCalibratedLens-35.md) | 4 | 2 | DEFERRED | rev-2 | 2026-11-03 |
@@ -103,7 +104,7 @@ ids TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL
 | [TOOL-dCalibratedLens-9 — probe cost priced in the value ledger, and compactions counted per item kind](spec/2026-11-02-spec-TOOL-dCalibratedLens-9.md) | 4 | 2 | DEFERRED | rev-2 | 2026-11-02 |
 | [TOOL-dCalibratedLens-12 — the Loop Review pricing cost per item kind from trace rows](spec/2026-11-02-spec-TOOL-dCalibratedLens-12.md) | 5 | 2 | DEFERRED | rev-2 | 2026-11-02 |
 | [TOOL-dCalibratedLens-28 — no population is read through `gov_record.py find`: probe records and Loop Review records are listed from the index, acts read through the paging act reader](spec/2026-11-02-spec-TOOL-dCalibratedLens-28.md) | 5 | 2 | DEFERRED | rev-2 | 2026-11-02 |
-| [TOOL-dCalibratedLens-42 — the `graded-by-a-row` case calls `derive_record_kind` in the form TOOL-dTotalRecall-53 S21 gives it, and refuses any other form by name](spec/2026-11-03-spec-TOOL-dCalibratedLens-42.md) | 5 | 2 | DEFERRED | rev-1 | 2026-11-03 |
+| [TOOL-dCalibratedLens-42 — the `graded-by-a-row` case calls `derive_record_kind` in the form dTotalRecall's unit 53 gives it at its S21, and refuses any other form by name](spec/2026-11-03-spec-TOOL-dCalibratedLens-42.md) | 5 | 2 | DEFERRED | rev-1 | 2026-11-03 |
 | [TOOL-dCalibratedLens-15 — each size breach priced by its bytes and its reads, and a persisting or grown breach raised to the owner](spec/2026-11-02-spec-TOOL-dCalibratedLens-15.md) | 6 | 2 | DEFERRED | rev-2 | 2026-11-02 |
 | [TOOL-dCalibratedLens-4 — the measured-value factory, and the `budgets.*` caps re-derived from evidence and review cost](spec/2026-11-02-spec-TOOL-dCalibratedLens-4.md) | 7 | 2 | DEFERRED | rev-4 | 2026-11-03 |
 | [TOOL-dCalibratedLens-21 — one carrier for a multi-line reading: the record's Metrics lines, one per entry, never a `fields`-form field](spec/2026-11-02-spec-TOOL-dCalibratedLens-21.md) | 8 | 2 | DEFERRED | rev-3 | 2026-11-03 |
@@ -135,7 +136,7 @@ ids TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL
 | [TOOL-dCalibratedLens-48 — the round-3 spec audit's 25 minors batched: each correction carried by the sibling it lands on](spec/2026-11-03-spec-TOOL-dCalibratedLens-48.md) | 21 | 2 | DEFERRED | rev-1 | 2026-11-03 |
 <!-- /gen:build-units -->
 
-Records: 94 bound to this build, across 4 record folder(s).
+Records: 96 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

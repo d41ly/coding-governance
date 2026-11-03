@@ -407,6 +407,11 @@ Cite ids, never line numbers.
 | [TOOL-dBriefedPass-6](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THE --dispatch ORDER GATE HAS NO TEST ARM AND ITS FAILING CASE HAS… |
 | [TOOL-dBriefedPass-7](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | tools/workflows/unattended-build.test.sh is a 21-arm suite registered… |
 | [TOOL-dCalibratedLens-18](../builds/dCalibratedLens/BACKLOG.md) | DEFERRED | MED | TOOL-dCalibratedLens-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dCalibratedLens-49](../builds/dCalibratedLens/BACKLOG.md) | OPEN | HIGH | — | 2026-11-03 | held red: suite line-length gate selftest red at 84acebdc on the daily… |
+| [TOOL-dCalibratedLens-50](../builds/dCalibratedLens/BACKLOG.md) | OPEN | HIGH | — | 2026-11-03 | held red: suite memory-recall kit selftest red at 84acebdc on the daily… |
+| [TOOL-dCalibratedLens-51](../builds/dCalibratedLens/BACKLOG.md) | OPEN | HIGH | — | 2026-11-03 | held red: suite manifest-check self-test red at 84acebdc on the daily… |
+| [TOOL-dCalibratedLens-52](../builds/dCalibratedLens/BACKLOG.md) | OPEN | HIGH | — | 2026-11-03 | held red: suite upgrade-walk red at 84acebdc on the daily held job, run… |
+| [TOOL-dCalibratedLens-53](../builds/dCalibratedLens/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | CHECK 24 READS A SPEC TITLE'S FOREIGN ID AS A ROSTER UNIT. The… |
 | [TOOL-dCarriedReceipt-1](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | --review's convergence predicate is scoped to ONE run's run-state file… |
 | [TOOL-dCarriedReceipt-2](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | --review makes CONVERGED terminal for a subject (unattended.sh:3135,… |
 | [TOOL-dCarriedReceipt-3](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | a FOLD pass legitimately spans many units, and the dispatch machinery… |

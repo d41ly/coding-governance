@@ -1,4 +1,4 @@
-# TOOL-dCalibratedLens-32 — the `three-homes` plant's red twin restaged as the real `loop-review` row reverted to the bare folder, which TOOL-dTotalRecall-42 S4 refuses
+# TOOL-dCalibratedLens-32 — the `three-homes` plant's red twin restaged as the real `loop-review` row reverted to the bare folder, which dTotalRecall's unit 42 refuses at its S4
 
 **Status:** DEFERRED · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-32-deviation-321.md](../build/2026-11-02-build-TOOL-dCalibratedLens-32-deviation-321.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-32-deviation-322.md](../build/2026-11-03-build-TOOL-dCalibratedLens-32-deviation-322.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-31-promoted-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-31-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 |
 | [2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md](../reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 |
 
