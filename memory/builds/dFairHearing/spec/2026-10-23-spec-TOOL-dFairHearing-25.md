@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-25 — the owed replays run after the replay contract is corrected, and their verdicts set the dark switches
 
-**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 22 · advances TOOL-dFairHearing-19
+**Status:** INPROGRESS · rev-5 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 22 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -18,6 +18,7 @@
 | [2026-11-03-prompt-TOOL-dFairHearing-25-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-25-1-spec-writer.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-25-2-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-25-2-spec-writer.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-25-fold-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-25-fold-fix-brief.md) | research | TOOL-dFairHearing-30 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-37 TOOL-dFairHearing-40 |
+| [2026-11-03-prompt-TOOL-dFairHearing-25-pass-a-build-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-25-pass-a-build-brief.md) | research | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-25-reorder-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-25-reorder-fix-brief.md) | research | TOOL-dFairHearing-30 TOOL-dFairHearing-35 |
 | [2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md) | spec-audit | TOOL-dFairHearing-4 TOOL-dFairHearing-14 TOOL-dFairHearing-26 TOOL-dFairHearing-27 |
 
