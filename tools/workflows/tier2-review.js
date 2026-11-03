@@ -159,7 +159,10 @@ function readOutputTokens() {
 //                                         // item-by-scenario grid; runs is review.design-audit.runs (1-3, absent 2),
 //                                         // run this invocation's run (1 to runs), seed review.design-audit.seed
 //                                         // (reverted-escapes | synthetic | none, absent reverted-escapes), keySha
-//                                         // the key's 64-hex SHA-256, required unless seed is none (TOOL-dFairHearing-18)
+//                                         // the key's 64-hex SHA-256, required unless seed is none (TOOL-dFairHearing-18).
+//                                         // A walk table with a gap is walkRed: blockers, highs, roundCount and
+//                                         // roundState return null and the note opens BLOCKED:, since a gapped
+//                                         // walk's counts are no clean reading (TOOL-dFairHearing-20)
 //   batchBy: "id" | "address",           // DEFAULTS to "id": the order the findings are sliced into skeptic
 //                                         // batches in, "address" sorting them by deriveAddressKey so two
 //                                         // lenses citing one place meet one skeptic; refused outside the set
@@ -1939,6 +1942,9 @@ const allFindings = finderReturns
 // A dead walker leaves its slice gapped, and the run defers before any synthesis as every lens death does.
 const walkReturns = isWalk ? finderReturns.map((r, i) => (r && skippedLenses.indexOf(FINDER_SLOTS[i].L.key) === -1 ? r : null)) : []
 const walkGaps = isWalk ? deriveWalkGaps(walkSlices, walkReturns) : []
+// TOOL-dFairHearing-20 S1 - the walk's red, defined once: the synthesis prompt's BLOCKED sentence, the round line's
+// inputs and the final return read it, and none re-derives it from walkGaps.
+const walkRed = isWalk && walkGaps.length > 0
 // One row per cell of the grid, item by item in the order given, each through the scenarios in order: the owning
 // walker's one row for the cell, its fields `null` where it gave none or two, and the verdict as the record reads
 // it: `holds`, the finding ids `<R><w>-F<id>`, or `not on path: <reason>`.
@@ -1963,7 +1969,7 @@ function deriveWalkRows() {
   return rows
 }
 const walkRows = isWalk ? deriveWalkRows() : []
-if (walkGaps.length)
+if (walkRed)
   log(`WARNING: the walk table has ${walkGaps.length} gap(s) — the walk is RED and the synthesis is told its verdict is BLOCKED: ${walkGaps.join('; ')}`)
 else if (isWalk) log(`walk table: ${walkRows.length} cell(s), no gap`)
 // The cells handed to and refuted by the skeptics, null until the verify stage hands them.
@@ -2579,7 +2585,8 @@ const synthShape = renderStageShape('synth', verifiedCounts, findersRunning + ba
 log(synthShape)
 // TOOL-dFairHearing-17 S3/S4 - the count is the binding grades' blockers and highs, known before the synthesis
 // (spec section 8 F2), so the record line it copies and the final return carry one state.
-const synthRound = deriveRoundFields(verifiedCounts.blocker + verifiedCounts.high)
+// TOOL-dFairHearing-20 S3 - a gapped walk has no count the rule may read, so the record line reads count=- state=-.
+const synthRound = deriveRoundFields(walkRed ? null : verifiedCounts.blocker + verifiedCounts.high)
 const roundLine = renderRoundLine({ round: round, roundLimit: roundLimit, priorCounts: priorCounts, roundCount: synthRound.roundCount, roundState: synthRound.roundState })
 log(roundLine)
 // TOOL-aEvidencedLens-6 S6 - the per-lens counts that exist before the synthesis, for its verbatim block.
@@ -2589,7 +2596,7 @@ phase('Synthesize')
 const walkTableText = isWalk ? renderWalkTable(walk, walkRows) : ''
 const synth = await agent(
   `Write the Tier-2 review report for: ${context}\n\n` +
-    (walkGaps.length
+    (walkRed
       ? `WALK GAPS - the harness checked each walker's walk table against its slice, and the walk table has ${walkGaps.length} gap(s): ` +
         `a cell with no row or two, a row outside its slice, an empty field, or a malformed verdict. The walk is RED. The report ` +
         `lists each gap below FIRST, before any finding, and its \`## Verdict:\` token is BLOCKED.\n` +
@@ -2726,7 +2733,7 @@ const synth = await agent(
       ? `walk: run ${walk.run} of ${walk.runs}, sliced by ${WALK_SLICING[walk.run - 1]}, seed ${walk.seed}; ${walkRows.length} cell(s); ` +
         (skippedLenses.length ? `walker slot(s) with no slice, so not dispatched: ${skippedLenses.join(', ')}` : 'every walker slot had a slice') +
         `; clean cells sampled ${cellsSampled}, refuted ${cellsRefuted}; walk gaps ${walkGaps.length}` +
-        (walkGaps.length ? ' - the walk is RED' : '') + `.\n`
+        (walkRed ? ' - the walk is RED' : '') + `.\n`
       : '') +
     // TOOL-dFairHearing-3 S5 - a run where a swap ran names each, and the default whose coverage it dropped.
     (swappedLenses.length
@@ -3186,8 +3193,9 @@ return {
   // dropped: an integer when a synthesis ran, null when none did, never a fabricated 0 and never an
   // absent key. TOOL-dMergedTally-1 - both are derived above from the item list, over RAW confirmed
   // ids, and are null as well when that list does not place every confirmed id exactly once.
-  blockers,
-  highs,
+  // TOOL-dFairHearing-20 S2 - null on a gapped walk too, whatever the item list holds: no caller reads it as clean.
+  blockers: walkRed ? null : blockers,
+  highs: walkRed ? null : highs,
   // TOOL-dFoldedAudit-5 S3 - one `{ids, severity, specs}` per BLOCKER or HIGH item, on a spec subject only.
   ...(isSpec ? { addresses } : {}),
   // TOOL-aSightedSkeptic-6 S7 - absent where no synthesis ran, as no adjudicated count exists there.
@@ -3211,6 +3219,9 @@ return {
     // speak of UNUSABLE verdicts: a batch that returned with an id missing, spurious or contradicted.
     !synth
       ? `DEFERRED: the synthesis agent died, so NO report was written; ${confirmed.length} confirmed finding(s) are in the run log${durable ? ' and on disk' : ''} — ${durable ? 're-run with identical args to dispatch only the synthesis' : renderRerunTail('', true)}`
+      // TOOL-dFairHearing-20 S2 - a gapped walk ranks after a dead synthesis and before a tally fault.
+      : walkRed
+        ? `BLOCKED: the walk table has ${walkGaps.length} gap(s); blockers, highs, roundCount and roundState are null`
       : tallyFault
         ? `UNVERIFIED: the report was written, but its item list does not place every confirmed finding exactly once (${tallyFault}), so blockers and highs are null`
         // TOOL-aSightedSkeptic-6 S8 - the uncertain count apart from the no-verdict count, so a run whose
@@ -3224,7 +3235,7 @@ return {
             : unverified.length
               ? `PARTIAL: ${unverified.length} finding(s) are unverified — ${uncertainFindings.length} answered uncertain by a skeptic, ${noVerdict.length} with no usable verdict`
               : 'complete') +
-    (dispositionFault ? `; the DISPOSITIONS were refused (${dispositionFault}), so dispositions is null and blockers and highs stand` : ''),
+    (dispositionFault ? `; the DISPOSITIONS were refused (${dispositionFault}), so dispositions is null${walkRed ? '' : ' and blockers and highs stand'}` : ''),
   round,
   // TOOL-dFairHearing-17 S3 - the state the record line carries, both null where the synthesis died.
   ...(synth ? synthRound : deriveRoundFields(null)),

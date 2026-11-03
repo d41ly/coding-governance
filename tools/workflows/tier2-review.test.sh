@@ -2265,7 +2265,24 @@ async function runWalkArms() {
     const vs = r.trace.filter((t) => t.label.indexOf('verify:') === 0).map((t) => t.label)
     ck(JSON.stringify(vs) === '["verify:cells"]' && r.trace.some((t) => t.label === 'synth') && r.result.exit === 'complete',
       'walk: a walk raising no finding dispatches one verify:cells batch and the synthesis: ' + JSON.stringify(vs))
+    // ---- TOOL-dFairHearing-20 AC2: the complete no-finding walk keeps its integer counts and CONVERGED.
+    const csp = r.trace.find((t) => t.label === 'synth')
+    ck(JSON.stringify(r.result.walkGaps) === '[]' && r.result.blockers === 0 && r.result.highs === 0 && r.result.roundCount === 0 &&
+      r.result.roundState === 'CONVERGED' && !!csp && !/token is BLOCKED/.test(csp.prompt),
+      'walk red: a complete no-finding walk returns blockers 0, highs 0, count 0 and CONVERGED, its prompt no BLOCKED sentence: ' + r.result.roundState)
   }
+  // ---- TOOL-dFairHearing-20 AC1/AC3: the same no-finding walk with one planted empty cell. Against the harness at
+  // TOOL-dFairHearing-18's commit it returns roundState CONVERGED and blockers 0 beside the gap, and both arms red.
+  r = await runReview(WD, buildStubs({ 'resume:probe': buildProbe(), 'find:': buildWalker({ findings: 0, blank: 'walk-3' }) }))
+  if (checkNoThrow(r, 'walk red: planted empty cell, no finding')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    ck(r.result.walkGaps.length === 1 && r.result.blockers === null && r.result.highs === null && r.result.roundCount === null &&
+      r.result.roundState === null && r.result.note.indexOf('BLOCKED: the walk table has 1 gap(s)') === 0,
+      'walk red: a gapped no-finding walk nulls blockers, highs, roundCount and roundState, its note opening BLOCKED: ' + r.result.roundState + ' ' + r.result.blockers)
+    ck(!!sp && /<<<ROUND\nreview-round [^\n]* count=- state=-\nROUND>>>/.test(sp.prompt),
+      'walk red: the gapped walk\'s round line reads count=- and state=-')
+  }
+  ck(src.split('\n').filter((l) => /\bconst walkRed\b/.test(l)).length === 1, 'walk red: the harness defines walkRed once')
   // ---- AC5: 40 clean cells of 42 over two skeptic batches, walkers 1 and 2 raising one finding each.
   const IT6 = Array.from({ length: 6 }, (_, i) => ({ tag: 'it' + i, step: 's' }))
   const SC7 = Array.from({ length: 7 }, (_, j) => ({ id: 'S' + (j + 1), name: 'n', walks: 'w' }))
@@ -3767,7 +3784,10 @@ printf '%s\n' "$out"
 # holds-only draw and counts (3), and AC6's walker prompts, unseeded prompts and the one WALK_RULES definition (3).
 # The re-pointed unknown-preset arm adds none. Counted by hand and by scratch probes of the same calls, not by a
 # run: the pass runs no suite.
-FLOOR_ASSERTIONS=598
+# RAISED 598 -> 602 by TOOL-dFairHearing-20: 4 assertions, counted off the `walk red:` arms — AC2's complete walk (1),
+# AC1's nulled return (1), AC3's round line (1) and the one walkRed definition (1). Counted by hand and by a scratch
+# probe of the same calls, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=602
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

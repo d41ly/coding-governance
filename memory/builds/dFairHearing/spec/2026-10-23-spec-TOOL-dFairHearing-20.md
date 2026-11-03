@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-20 — a gapped whole-design walk reds the harness's returned counts, not only its prose
 
-**Status:** INPROGRESS · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 19 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 19 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 

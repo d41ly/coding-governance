@@ -565,7 +565,10 @@ Every return carries seven fields beside the counts:
   are `null` on every `deferred-platform` exit; a complete exit with no confirmed finding carries `0`
   and the rule over `0`. `roundState` is also `null`, beside an integer `roundCount`, on a round above 1
   with no `priorCounts`, which a `WARNING:` line names. Pass `roundCount` on as the next round's
-  `priorCounts` entry.
+  `priorCounts` entry. A whole-design run whose walk table has a gap, `walkRed`, returns `blockers`, `highs`, `roundCount` and `roundState` as `null` and a `note` opening `BLOCKED: the walk table has <n> gap(s)`,
+  ranked after a dead synthesis's `DEFERRED:` and before a tally fault's `UNVERIFIED:`, and its record line reads
+  `count=- state=-` (TOOL-dFairHearing-20): a gapped walk's count is no clean reading, so no caller routing on
+  the counts may take its `0` and `CONVERGED` as one.
 
 - `shape` — one record line, also logged, in this fixed grammar:
   `review-shape kind=<diff-review|spec-audit> round=<n> intensity=<full|light> at=<find|verify|synth> raw=<n|-> confirmed=<n|-> refuted=<n|-> merged=<n|-> unverified=<n|-> blocker=<n|-> high=<n|-> medium=<n|-> low=<n|-> agents=<n> out-tokens=<n|unknown>`.
