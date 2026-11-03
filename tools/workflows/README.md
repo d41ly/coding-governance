@@ -1039,7 +1039,14 @@ recipe as one script from the repository, so its failure envelope holds (TOOL-dF
 ```bash
 set -e
 test ! -e "$TEMP/<name>" || { echo "replay: $TEMP/<name> exists"; exit 2; }
-trap 'git update-ref -d refs/replay/<name> 2>/dev/null' EXIT
+idx=$(mktemp -p "${SCRATCH:?}")
+trap 'rm -f "$idx"; git update-ref -d refs/replay/<name> 2>/dev/null' EXIT   # the one trap
+# the placement step, only for a <commit> the source history lacks (TOOL-dFairHearing-25 S8):
+GIT_INDEX_FILE="$idx" git read-tree <base>
+GIT_INDEX_FILE="$idx" git update-index --add --cacheinfo 100644,<blob>,<path>
+tree=$(GIT_INDEX_FILE="$idx" git write-tree)
+commit=$(git commit-tree "$tree" -p <base> -m placement)   # <commit> below is then "$commit"
+# the recipe
 mkdir -p "$TEMP/<name>b"
 git update-ref refs/replay/<name> <commit>
 git bundle create "$TEMP/<name>b/h.bundle" refs/replay/<name>
@@ -1051,13 +1058,21 @@ test "$(git -C "$TEMP/<name>" rev-parse HEAD)" = "$(git rev-parse <commit>)"   #
 ```
 
 An existing `$TEMP/<name>` refuses with exit 2 before any ref is written, so a stale clone is never
-read as this replay's; `set -e` checks every step's exit status; and the EXIT trap deletes the
-transient `refs/replay/<name>` however the script ends, a failed `git bundle create` included, so
-`git show-ref refs/replay/<name>` in the repository prints nothing afterwards. The last line is the
-liveness check: a clone whose `HEAD` is not `<commit>` replays the wrong tree and is not scored.
+read as this replay's; `set -e` checks every step's exit status; and the EXIT trap, the only one,
+deletes the temporary index and the transient `refs/replay/<name>` however the script ends, a failed
+`git bundle create` included, so `git show-ref refs/replay/<name>` in the repository prints nothing
+afterwards. `$SCRATCH` is the run's scratch directory. The last line is the liveness check: a clone
+whose `HEAD` is not `<commit>` replays the wrong tree and is not scored.
 
-**A replayed spec audit passes the opt-in pack.** Its `<commit>` is a scratch commit on the original
-adding `memory/builds/dFairHearing/README.md` as it stands at `3708a705`, whose front matter is the
+**The placement step** makes a `<commit>` the source history lacks: `<base>` plus one file, `<blob>`
+at `<path>`. It writes that tree through the temporary `GIT_INDEX_FILE` and commits it by
+`git commit-tree`, so the working tree, the index and `HEAD` of the repository never move, no branch
+is made, and the commit is reachable only from the transient ref the recipe bundles. A replay of a
+commit the history holds leaves the four placement lines out.
+
+**A replayed spec audit passes the opt-in pack.** Its `<commit>` is the placement on `<base>`
+`6cfd21619`, adding `memory/builds/dFairHearing/README.md` as it stands at `3708a705` (`<blob>` is
+`git rev-parse 3708a705:memory/builds/dFairHearing/README.md`), whose front matter is the
 owner-landed `spec-audit: 2026-10-21` with no `authorized-by`, and its `reviewDir` is
 `memory/builds/dFairHearing/reviews`, the folder that README opts in. A replay that spawns agents
 directly renders each prompt as a `gov:handoff` file, all rule 6 of the agent-cap hook admits; a
