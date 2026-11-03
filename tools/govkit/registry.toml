@@ -708,6 +708,10 @@ name = "layer dependencies (the core never depends on an expansion)"
 why = "it runs `<prefix>/playbook/check_layers.py`, which grades gov's own kit sources against gov's own layer register, `<prefix>/playbook/layers.toml`: every descriptor's `layer` row and every edge from a file a core kit ships to a non-core kit. The script and the register ship with the playbook-render kit's `**` include, so an adopter receives them, but the LEG is gov's: the kits it grades are authored here, and an adopter that copy-installs them has no edge of its own to grade. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-16."
 
 [[exempt_leg]]
+name = "tags (the resolver's checks)"
+why = "it runs `<prefix>/playbook/gov_tag.py check`, the tag resolver's checks over gov's own tree: the citations of gov's guides, help pages and kit READMEs against the namespaces `<prefix>/playbook/namespaces.toml` registers, read from gov's own index. The resolver and its registry ship with the playbook-render kit's `**` include, so an adopter receives them, but the LEG is gov's: the documents it grades and the namespaces it grades them against are authored here. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-19."
+
+[[exempt_leg]]
 name = "step-rows-frozen"
 why = "it runs `<prefix>/govkit/upgrade_steps.py frozen`, the deployer's own step reader grading gov's landed `[[upgrade]]` and `[[retired]]` rows against the push base. The deployer is a registry exemption that never travels into a target, and a step row is authored in gov's descriptors, so the rows are frozen where they land; an adopter has no deployer and no row to freeze. TOOL-dSafePassage-1."
 

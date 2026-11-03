@@ -1,0 +1,28 @@
+# namespaces.toml — the tag namespace registry (PLAY-dOrderedCharter-19 S2). Read by tag_index.read_namespaces.
+#
+# One [[namespace]] row per namespace: `ns`, the word a tag opens with; `owner`, the chain build that owns it;
+# `layer`, the layer register row it belongs to; `source`, what it is minted from; `extractor`, the
+# `<module>:<function>` that reads that source; `role`, `selects` or `describes`; `purpose-source`, the record
+# that states why it exists; `join-armed-by`, the build that arms its joins. A namespace word is read from here
+# and never typed beside it. PLAY-dOrderedCharter-10 adds its eight rows; PLAY-dOrderedCharter-22 grades
+# `purpose-source` and `owner`.
+
+[[namespace]]
+ns = "doc"
+owner = "dOrderedCharter"
+layer = "layer.instruction"
+source = "the CHARTER path, memory/guides/*.md, memory/HYGIENE.md, memory/TEMPLATE-SPEC.md"
+extractor = "tag_index:extract_doc"
+role = "describes"
+purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md#design-tags"
+join-armed-by = "dOrderedCharter"
+
+[[namespace]]
+ns = "unit"
+owner = "dOrderedCharter"
+layer = "layer.instruction"
+source = "each [[unit]] row of every <kit>/instructions.toml and of .governance/instructions.toml"
+extractor = "tag_index:extract_unit"
+role = "selects"
+purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md#design-tags"
+join-armed-by = "dOrderedCharter"

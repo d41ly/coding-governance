@@ -1332,12 +1332,16 @@ owner = "dGroundRules"
 name = "tags.slice"
 allowed = ["leaf", "subtree"]
 default = "leaf"
+summary = "What `gov tag show` returns for a tag: its own row, or its subtree, every tag with it as a dot-prefix."
+usage = 'tags.slice = "subtree"'
 owner = "dOrderedCharter"
 
 [[key]]
 name = "tags.retired-cites"
 allowed = ["refuse-new", "warn", "allow"]
 default = "refuse-new"
+summary = "What `gov tag check` does with new text citing a retired tag: refuse it, warn, or allow it; a retired name minted again is refused under every value."
+usage = 'tags.retired-cites = "warn"'
 owner = "dOrderedCharter"
 
 [[key]]
@@ -1350,6 +1354,8 @@ owner = "dOrderedCharter"
 name = "tags.bare-refs"
 allowed = ["charter-only", "unique", "never"]
 default = "charter-only"
+summary = "How `gov tag check` reads a bare name, a tag less its namespace: as a charter practice only, against every namespace and red where two match, or red anywhere outside the charter."
+usage = 'tags.bare-refs = "unique"'
 owner = "dOrderedCharter"
 
 [[key]]

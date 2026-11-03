@@ -38,6 +38,7 @@ import ast
 import json
 import os
 import subprocess
+import sys
 import re
 import tomllib
 from dataclasses import dataclass, field
@@ -1370,201 +1371,79 @@ def affordance_offenders(dossier_texts: dict[str, str], exempt) -> list[str]:
     ]
 
 
-def drop_touched_exemptions(exempt, touched) -> frozenset[str]:
-    """S4a — the touch-triggered backfill rule: shrink the affordance-exempt set by every feature
-    a `map_diff` range TOUCHED (i.e. every attribution owner). Touching a feature's files drops
-    its grace MECHANICALLY, so the next gate run demands its `## Reuse affordance` block with no
-    human remembering (review #5/#32). ``touched`` is a map_diff attribution result (owner ->
-    paths) or any iterable of feature names; ``foundation``/``UNMAPPED`` are never in the exempt
-    list, so passing the whole attribution dict is safe.
-
-    ponytail: the S4a rule is exactly this set difference — the machinery is attribute_paths."""
-    return frozenset(exempt) - set(touched)
-
-
 # ======================================================================================
-# Coverage (pure)
+# The join factory, moved to the core (PLAY-dOrderedCharter-19 S9)
 # ======================================================================================
+# `compute_coverage`, `Coverage`, `drop_touched_exemptions`, `derive_baseline_additions` and the compare
+# base live in the memory-tree kit's `coverage_join.py`, which this kit requires, so no core build imports
+# this optional kit or reads its conf. Every consumer here imports them from there. This module keeps the
+# four names below and the two-argument `derive_baseline_additions` so that an adopter's older copy of the
+# gate, which reaches the coverage join or the two-argument baseline read through this module, still runs: a hold
+# `install.deprecation-window` releases, declared by PLAY-dOrderedCharter-31's `module-export` row.
+# The memory-tree directory is found through the inlined sibling-kit resolver, never a spelled path, and
+# APPENDED to the import path, so a memory-tree module never shadows one of this kit's own.
 
 
-@dataclass
-class Coverage:
-    unclaimed: dict[str, list[str]]
-    stale_claims: dict[str, list[str]]  # inventory -> ["owner: key", ...]
-    stale_baseline: dict[str, list[str]]
-    lazy_baseline: dict[str, list[str]]
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
 
-    @property
-    def clean(self) -> bool:
-        return not (
-            self.unclaimed or self.stale_claims or self.stale_baseline or self.lazy_baseline
-        )
-
-
-def compute_coverage(
-    inventories: dict[str, list[str]],
-    owners: dict[str, dict[str, tuple[str, ...]]],
-    baseline: dict[str, tuple[str, ...]],
-) -> Coverage:
-    """The four both-direction asserts. 1: inventory - (claims|baseline) = 0 (coverage).
-    2: claims - inventory = 0 (no stale claim — dossiers can't rot into fiction).
-    3: baseline - inventory = 0 (stale-line guard). 4: baseline & claims = 0 (a claimed key's
-    baseline line must be deleted — mechanical shrink pressure)."""
-    unclaimed: dict[str, list[str]] = {}
-    stale_claims: dict[str, list[str]] = {}
-    stale_baseline: dict[str, list[str]] = {}
-    lazy_baseline: dict[str, list[str]] = {}
-    for inv_id, keys in inventories.items():
-        inv = set(keys)
-        claimed: set[str] = set()
-        for owner, claims in sorted(owners.items()):
-            owned = set(claims.get(inv_id, ()))
-            claimed |= owned
-            for key in sorted(owned - inv):
-                stale_claims.setdefault(inv_id, []).append(f"{owner}: {key}")
-        base = set(baseline.get(inv_id, ()))
-        if missing := sorted(inv - claimed - base):
-            unclaimed[inv_id] = missing
-        if stale := sorted(base - inv):
-            stale_baseline[inv_id] = stale
-        if lazy := sorted(base & claimed):
-            lazy_baseline[inv_id] = lazy
-    return Coverage(unclaimed, stale_claims, stale_baseline, lazy_baseline)
-
-
-def _read_git_text(root: Path, *args: str) -> str | None:
-    """stdout of one `git -C root ...` call, or None when git is absent or the call fails."""
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
     try:
-        r = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
-                           encoding="utf-8", errors="replace")
-    except (FileNotFoundError, OSError):
-        return None
-    return r.stdout if r.returncode == 0 else None
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
 
 
-# The remote ladder (TOOL-dLadderedRemote-2), INLINED byte-identically from the canonical copy
-# named on its marker line and gated by the resolve-python self-test.
-# >>> remote_ladder_py -- canonical copy: resolve_remote.py in the gov lib dir (byte-identical; gated)
-def resolve_remote(root):
-    """-> (remote, branch, observed, refusal) for the repository at <root>. Fetches nothing.
+try:
+    MEMORY_TREE_DIR = resolve_kit_dir("memory-tree", "coverage_join.py", Path(os.path.abspath(__file__)).parent)
+except LookupError as _exc:
+    raise MapError(f"codebase-map requires the memory-tree kit's coverage_join.py: {_exc}") from None
+if str(MEMORY_TREE_DIR) not in sys.path:
+    sys.path.append(str(MEMORY_TREE_DIR))
 
-    remote    GOV_REMOTE, else branch.<current>.remote unless it is ".", else the ONLY remote.
-              Several remotes and none chosen, or a chosen name that is not a remote here, is a
-              REFUSAL naming GOV_REMOTE. No remote at all is remote "" and NO refusal: the caller
-              keeps its own no-remote fallback.
-    observed  the branch refs/remotes/<remote>/HEAD names, or "". A caller whose GOV_DEFAULT_BRANCH
-              only CROSS-CHECKS the observation reads this one.
-    branch    GOV_DEFAULT_BRANCH, else observed, else "".
-    A refusal empties the other three, so no caller can pick a remote the ladder refused.
-    """
-    import os
-    import subprocess
-
-    def read(*args):
-        try:
-            p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
-                               encoding="utf-8", errors="replace")
-        except OSError:
-            return ""
-        return p.stdout.strip() if p.returncode == 0 else ""
-
-    names = read("remote").split()
-    listed = " ".join(names) or "none"
-    # FULL refs, never `--short`: a tag or branch sharing the name makes the short form ambiguous
-    # (`heads/x`, `remotes/r/x`), and the prefix is stripped exactly instead.
-    cur = read("symbolic-ref", "--quiet", "HEAD")
-    cur = cur[len("refs/heads/"):] if cur.startswith("refs/heads/") else ""
-    remote, how = os.environ.get("GOV_REMOTE") or "", "GOV_REMOTE"
-    if not remote and cur:
-        remote, how = read("config", "branch." + cur + ".remote"), "branch." + cur + ".remote"
-        if remote == ".":
-            remote = ""
-    if not remote and len(names) == 1:
-        remote = names[0]
-    if not remote and len(names) > 1:
-        where = "branch " + cur if cur else "a detached HEAD"
-        return "", "", "", ("cannot choose a remote: GOV_REMOTE is unset, %s has no configured remote, "
-                            "and this repository has %d remotes (%s). Name it: export GOV_REMOTE=<remote>."
-                            % (where, len(names), listed))
-    if remote and remote not in names:
-        return "", "", "", ("%s names %s, which is no remote of this repository (%s). Name one that is: "
-                            "export GOV_REMOTE=<remote>." % (how, remote, listed))
-    observed = ""
-    if remote:
-        pre = "refs/remotes/" + remote + "/"
-        head = read("symbolic-ref", "--quiet", pre + "HEAD")
-        if head.startswith(pre) and len(head) > len(pre):
-            observed = head[len(pre):]
-    return remote, os.environ.get("GOV_DEFAULT_BRANCH") or observed, observed, ""
-# <<< remote_ladder_py
-
-
-# The compare base (TOOL-dGroundRules-21 S7), INLINED byte-identically from the canonical copy
-# named on its marker line and gated by the resolve-python self-test: the merge bar's own rule,
-# copied rather than imported because a kit may not read a sibling kit (TOOL-dLadderedRemote-2,
-# TOOL-aStandingWrit-5).
-# >>> compare_base_py -- canonical copy: compare_base.py in the gov lib dir (byte-identical; gated)
-def resolve_compare_base(root):
-    """-> (sha or None, why): the revision a shrink-only list at <root> is compared against.
-
-    The merge bar rule: the remote the inlined ladder resolves and the branch its HEAD names (`main`
-    when none is named), its merge-base with HEAD where that is a PROPER ancestor of HEAD, else the
-    remote tip. So a branch is graded on what IT changed, and a key the default branch deleted after
-    the branch opened is not misread as one the branch added. Fetches nothing: no remote-tracking
-    ref, no answer; a ladder refusal is no answer either, and says why. The OBSERVED branch, never
-    GOV_DEFAULT_BRANCH: an environment value must not move the base a shrink-only assert grades.
-    """
-    import subprocess
-
-    def read(*args):
-        try:
-            p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
-                               encoding="utf-8", errors="replace")
-        except OSError:
-            return ""
-        return p.stdout.strip() if p.returncode == 0 else ""
-
-    remote, _branch, observed, refusal = resolve_remote(root)
-    if refusal:
-        return None, refusal
-    if not remote:
-        return None, "no remote to compare against"
-    branch = observed or "main"
-    tip = read("rev-parse", "--verify", "-q", "refs/remotes/" + remote + "/" + branch + "^{commit}")
-    if not tip:
-        return None, "no %s/%s ref to compare against (never fetched)" % (remote, branch)
-    head = read("rev-parse", "--verify", "-q", "HEAD")
-    mb = read("merge-base", "HEAD", tip)
-    if mb and mb != head:
-        return mb, "merge-base of HEAD and %s/%s" % (remote, branch)
-    return tip, "%s/%s tip" % (remote, branch)
-# <<< compare_base_py
+import coverage_join as _coverage_join  # noqa: E402
+from coverage_join import Coverage, compute_coverage, drop_touched_exemptions, resolve_compare_base  # noqa: E402,F401
 
 
 def derive_baseline_additions(root: Path, base: str) -> tuple[dict[str, list[str]] | None, str]:
-    """Per inventory id of the WORKING baseline, the keys `base`'s baseline did not carry — or
-    None with the reason when there is no comparison to make. A baseline absent at `base`, or one
-    that does not parse there, is NO comparison, never an empty one: read as empty, every key would
-    read as added. An inventory id absent at `base` counts every key as added, so a new inventory
-    cannot open with a baselined key. The note carries both sides' key counts, so a comparison over
-    nothing is visible as such."""
+    """The two-argument form an older gate copy calls: memory-tree's `derive_baseline_additions` over
+    this map's `baseline.toml`, a working file that does not parse raised as `MapError`, as before."""
     path = map_root(root) / "baseline.toml"
     rel = path.relative_to(root).as_posix()
-    text = _read_git_text(root, "show", f"{base}:./{rel}")  # `./`: relative to root, not the git top
-    if text is None:
-        return None, f"no {rel} at {base[:12]}"
     try:
-        old = tomllib.loads(text)
+        return _coverage_join.derive_baseline_additions(root, base, rel)
     except tomllib.TOMLDecodeError as exc:
-        return None, f"{rel} does not parse at {base[:12]}: {exc}"
-    try:
-        new = tomllib.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
-    except tomllib.TOMLDecodeError as exc:  # the WORKING file raises, as load_map_tree does
         raise MapError(f"{rel}: toml parse error: {exc}") from exc
-    added = {inv: sorted(set(keys) - set(old.get(inv, ()))) for inv, keys in sorted(new.items())}
-    note = (f"base carried {sum(len(v) for v in old.values())} key(s), "
-            f"working carries {sum(len(v) for v in new.values())}")
-    return {inv: keys for inv, keys in added.items() if keys}, note
 
 
 def owners_of(tree: MapTree) -> dict[str, dict[str, tuple[str, ...]]]:

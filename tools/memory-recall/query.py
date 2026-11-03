@@ -245,6 +245,7 @@ def git(repo: pathlib.Path, *args: str) -> str:
 # resolver this kit has.
 
 
+# >>> common_git_dir -- canonical copy: common_dir.py in the gov lib dir (byte-identical; gated)
 def common_git_dir(repo: pathlib.Path) -> pathlib.Path:
     """The MAIN repository's git directory, shared by every worktree.
 
@@ -255,6 +256,7 @@ def common_git_dir(repo: pathlib.Path) -> pathlib.Path:
     raw = git(repo, "rev-parse", "--git-common-dir").strip()
     p = pathlib.Path(raw)
     return p.resolve() if p.is_absolute() else (repo / raw).resolve()
+# <<< common_git_dir
 
 
 def read_worktree_head(repo: pathlib.Path) -> str | None:

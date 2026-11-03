@@ -235,12 +235,9 @@ runtime.restarts
 runtime.secret-home
 runtime.secret-scan
 runtime.spawn-backend
-tags.bare-refs
 tags.bundle
 tags.bundle-rows
 tags.positional
-tags.retired-cites
-tags.slice
 tests.landing-levels
 tests.product
 tests.without-cadence

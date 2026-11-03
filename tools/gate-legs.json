@@ -1825,6 +1825,18 @@
     "ceiling": 120
   },
   {
+    "name": "tags (the resolver's checks)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/gov_tag.py",
+      "check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 180,
+    "pack": "tags"
+  },
+  {
     "name": "policy fixtures",
     "argv": [
       "python",

@@ -367,6 +367,8 @@ remote_ladder_sh|$ROOT/$KIT_REL/resolve-remote.sh|$KIT_REL/resolve-remote
 compare_base_py|$ROOT/$KIT_REL/compare_base.py|$KIT_REL/compare_base
 git_env_leaks_py|$ROOT/$KIT_REL/git_env_leaks.py|$KIT_REL/git_env_leaks
 resolve_bash_py|$ROOT/$KIT_REL/resolve_bash.py|$KIT_REL/resolve_bash
+coverage_join|$ROOT/$KIT_REL/coverage_join.py|$KIT_REL/coverage_join
+common_git_dir|$ROOT/$KIT_REL/common_dir.py|$KIT_REL/common_dir
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -397,6 +399,10 @@ resolve_bash_py|$ROOT/$KIT_REL/resolve_bash.py|$KIT_REL/resolve_bash
 # memory-tree kit's GIT_ENV_LEAKS member for member; each had a copy with no canonical to drift from.
 # resolve_bash_py (TOOL-dGroundRules-25 S28) is the run-gates kit's bash rule the policy kit's checker
 # carries; the other copies return another shape and are TOOL-dSettledRoster-6's ask.
+# coverage_join (PLAY-dOrderedCharter-19 S9) is the join factory, compute_coverage and its siblings,
+# moved out of the codebase-map kit so no core build imports it; its one copy is memory-tree's
+# coverage_join.py, which every codebase-map consumer imports. common_git_dir (S10) is the main
+# repository's git directory, the recall kit's query log's home and the tag index's.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one

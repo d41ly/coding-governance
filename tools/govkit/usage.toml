@@ -98,6 +98,40 @@ entry = "{prefix}/playbook/adopt-playbook.sh"
 flags = ["--target=", "--check", "--selftest"]
 
 [[usage]]
+id = "script:{prefix}/playbook/gov_tag.py#show"
+shape = "verb"
+entry = "{prefix}/playbook/gov_tag.py"
+verb = "show"
+flags = ["--json"]
+
+[[usage]]
+id = "script:{prefix}/playbook/gov_tag.py#where"
+shape = "verb"
+entry = "{prefix}/playbook/gov_tag.py"
+verb = "where"
+flags = ["--json"]
+
+[[usage]]
+id = "script:{prefix}/playbook/gov_tag.py#refs"
+shape = "verb"
+entry = "{prefix}/playbook/gov_tag.py"
+verb = "refs"
+flags = ["--json"]
+
+[[usage]]
+id = "script:{prefix}/playbook/gov_tag.py#check"
+shape = "verb"
+entry = "{prefix}/playbook/gov_tag.py"
+verb = "check"
+flags = ["--json", "--base="]
+
+[[usage]]
+id = "script:{prefix}/playbook/gov_tag.py"
+shape = "verb"
+entry = "{prefix}/playbook/gov_tag.py"
+flags = ["--rebuild", "--list-positional", "--fixture", "--plant=", "--set="]
+
+[[usage]]
 id = "script:{prefix}/run-gates/measure_legs.py"
 shape = "verb"
 entry = "{prefix}/run-gates/measure_legs.py"

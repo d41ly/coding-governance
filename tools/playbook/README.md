@@ -196,3 +196,26 @@ a here-document, and says so on every run. `--new` appends a row the contract ad
 descriptor key a kit adds to join it. The imports come from memory-tree's `import_walk.py`, the walk
 the verdict-epoch gate shares, and the shell lexer from its `check-arms.py`. The leg is gov's own; `adopt-playbook.sh --selftest` runs every
 fixture plant.
+
+## Tags, the index and the resolver
+
+PLAY-dOrderedCharter-19. A tag is `<ns>.<seg>(.<seg>)*`, each segment `[a-z0-9][a-z0-9-]*`, at most 64
+bytes; `tag_index.py` compiles it once as `TAG_RE` and `TAG_MAX_BYTES`, and `parse_tag` names the rule a
+string breaks. The namespace words are the rows of `namespaces.toml`, each with its `owner`, `layer`,
+`source`, `extractor` (`<module>:<function>`), `role`, `purpose-source` and `join-armed-by`, read by
+`read_namespaces`. This kit registers `doc` (the charter, the guides, `HYGIENE.md` and
+`TEMPLATE-SPEC.md`, a section per `##` heading) and `unit` (each `[[unit]]` row of an
+`instructions.toml`, empty and printed `unarmed` until rows land).
+
+The index is `<git-common-dir>/gov/index.db`, one SQLite file per node shared by every worktree, never
+committed. Rows are keyed by blob, so a commit re-parses only the blobs it changed and one blob at two
+paths is parsed once; a worktree's uncommitted edits are its own `dirty_path` rows, served to it alone.
+Blobs are read through memory-tree's `tree_lib.read_blobs_at` and the conf through its `id_grammar`, both
+reached with the inline `resolve_kit_dir`, as `policy_value.py` reaches the policy kit's `policy.py get`.
+
+`gov_tag.py` is the resolver, standing in for `gov tag`: `show`, `where`, `refs` and `check`, with
+`--rebuild`, `--list-positional` and `--fixture --plant <case>`. `check` grades the backticked and
+bracketed Markdown spans outside `<MEMORY_ROOT>/builds/` (`resolves`, `retired`, the bare-name rule and
+`owned`) and counts what it does not grade. `aliases.toml` maps each positional label that never moved
+to its section; `positional-refs.txt` keeps the live positional references, one `<path>` TAB `<ref>` row
+each, as `--list-positional` prints them. The `tags` leg runs `check`; the user page is `help/tags.md`.

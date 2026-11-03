@@ -58,6 +58,7 @@ except (AttributeError, ValueError):
     pass
 
 import map_lib as m  # noqa: E402
+import coverage_join as cj  # noqa: E402 - memory-tree's, on the path map_lib's import appends
 
 # map_extractors (the project layer) is imported LAZILY inside the paths that need it, so the
 # module stays importable in the kit repo, where selftest.py exercises it without a project
@@ -109,7 +110,7 @@ def _drop_affordance_exempt(touched: dict[str, list[str]]) -> None:
     Writes only when the set actually shrinks; the dropped dossiers must carry a `## Reuse
     affordance` block on the next gate run. LF write, matching gen_map's artifact writer."""
     exempt = m.load_affordance_exempt()
-    kept = m.drop_touched_exemptions(exempt, touched)
+    kept = cj.drop_touched_exemptions(exempt, touched)
     dropped = sorted(exempt - kept)
     if not dropped:
         print("\n# affordance-exempt: no touched feature was graced - unchanged")

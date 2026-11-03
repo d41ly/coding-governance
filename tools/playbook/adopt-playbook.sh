@@ -221,3 +221,49 @@ unshipped|1|0 allowed, 1 red;
 PLANTS
 if [ "$_lf" != 0 ]; then echo "FAIL — $_lf layer-check arm(s) failed"; exit 1; fi
 echo "PASS — the layer check's plants"
+
+# THE TAG RESOLVER'S ARMS (PLAY-dOrderedCharter-19 S13, S14). Each row runs `gov_tag.py --fixture` over one
+# plant in its own scratch repository, `<plant and --set flags>|<exit>|<a line it must print>|<a line it
+# must not print>`, the last field optional; exit and lines are asserted together. Every policy key a plant
+# reads is `--set`, so no row reads a policy file.
+_tk="--set tags.bare-refs=charter-only --set tags.retired-cites=refuse-new"
+_tf=0
+while IFS='|' read -r _tp _trc _twant _tnot; do
+  [ -n "$_tp" ] || continue
+  # shellcheck disable=SC2086  # the plant field carries its own flags, word-split on purpose
+  _tout=$("$PY_BIN" "$HERE/gov_tag.py" --fixture --plant $_tp 2>&1); _tgot=$?
+  case "$_tgot:$_tout" in
+    "$_trc:"*"$_twant"*)
+      case "$_tout" in
+        *"${_tnot:-<none>}"*) _tf=$((_tf+1)); printf 'arm FAIL  tags plant %s — printed %s\n' "$_tp" "$_tnot" ;;
+        *) printf 'arm ok    tags plant %s\n' "$_tp" ;;
+      esac ;;
+    *) _tf=$((_tf+1)); printf 'arm FAIL  tags plant %s — wanted rc=%s + %s, got rc=%s\n' "$_tp" "$_trc" "$_twant" "$_tgot"
+       printf '%s\n' "$_tout" | sed 's/^/      /' ;;
+  esac
+done <<PLANTS
+none $_tk|0|tags: green · 0 red
+rebuild|0|dumps equal
+two-paths|0|incremental rows equal a cold build's
+dirty|0|both worktrees share one index|SERVES ANOTHER'S
+one-commit|0|built, 1 blob parsed
+slice --set tags.slice=leaf|0|tags: layer.memory · tools/corekit/core.tags:3|layer.memory.recall
+slice --set tags.slice=subtree|0|tags: layer.memory.recall · tools/corekit/core.tags:4
+retired $_tk|1|new text cites retired practice.old
+retired --set tags.retired-cites=warn --set tags.bare-refs=charter-only|0|tags: WARN memory/guides/ALPHA.md:11 · new text cites retired practice.old
+retired --set tags.retired-cites=allow --set tags.bare-refs=charter-only|0|tags: green · 0 red|cites retired
+retired-old $_tk|0|tags: green · 0 red
+retired-reminted $_tk|1|retired name minted again · practice.old
+retired-reminted --set tags.retired-cites=warn --set tags.bare-refs=charter-only|1|retired name minted again · practice.old
+retired-reminted --set tags.retired-cites=allow --set tags.bare-refs=charter-only|1|retired name minted again · practice.old
+bare $_tk|0|bare \`land\` -> practice.land
+bare --set tags.bare-refs=unique --set tags.retired-cites=refuse-new|1|bare \`memory\` is ambiguous: layer.memory and practice.memory
+bare --set tags.bare-refs=never --set tags.retired-cites=refuse-new|1|bare \`land\` outside the charter
+bare-charter --set tags.bare-refs=never --set tags.retired-cites=refuse-new|0|tags: green · 0 red
+owned $_tk|1|kit expkit (layer.exp) mints layer.fixture-x in core namespace layer
+owned-core $_tk|0|tags: green · 0 red
+scope $_tk|0|tags: unarmed unit (1 not graded)|· unresolved ·
+scope-guide $_tk|1|memory/guides/ALPHA.md:13 · unresolved · \`doc.nope\` names no row
+PLANTS
+if [ "$_tf" != 0 ]; then echo "FAIL — $_tf tag-resolver arm(s) failed"; exit 1; fi
+echo "PASS — the tag resolver's plants"

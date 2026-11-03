@@ -142,6 +142,7 @@ spec-tokens self-test	kit	selftests
 step-gate	repo	declarations
 step-rows-frozen	repo	declarations
 straggler-guard arms	repo	declarations
+tags (the resolver's checks)	repo	declarations
 template size <=48KiB	repo	product
 template size gate selftest	kit	selftests
 testsuite counts (every bar self-test prints one)	repo	declarations

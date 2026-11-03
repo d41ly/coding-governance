@@ -135,6 +135,7 @@
       "step-gate",
       "step-rows-frozen",
       "straggler-guard arms",
+      "tags (the resolver's checks)",
       "template size <=48KiB",
       "template size gate selftest",
       "testsuite counts (every bar self-test prints one)",
