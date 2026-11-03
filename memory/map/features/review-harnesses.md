@@ -12,20 +12,23 @@ gate-legs = [
   "workflow script syntax",
   "review-join ban (no ref-keyed join)",
   "review-join self-test",
+  "spec-audit opt-in pack self-test",
   "review-replay selftest",
   "tier2-review self-test",
   "unattended-build self-test",
 ]
 kits = []
 git-hooks = []
-harness-hooks = []
+harness-hooks = ["PreToolUse tools/workflows/spec-audit-optin.js"]
 workflow-scripts = [
+  "check-review-join.js",
   "check-workflow-syntax.js",
   "drift-audit-code.js",
   "drift-audit-code.template.js",
   "drift-audit-state.js",
   "drift-audit-state.template.js",
   "orient-counterfactual.js",
+  "spec-audit-optin.js",
   "tier2-review.js",
   "tier2-review.template.js",
   "unattended-build.template.js",
@@ -54,10 +57,12 @@ inlined byte-alike into all three harnesses on purpose. The governance template 
 duplication explicitly rather than treating it as debt, so the charter's factory-at-instance-two rule
 does not apply to these files.
 
-**The fan-out is bounded at the tool call, not in the file.** `tools/hooks/agent-cap.js` reads the
-inline `script` string on a `Workflow` call and denies a raw fan-out primitive, an `agent(` fanned
-over a receiver it cannot prove bounded, or a bound it cannot resolve to an integer at or below its
-own constant. Two authoring traps live here: the batching assignment must be ONE line ending in its
+**The fan-out is bounded in the committed file, since TOOL-dFairHearing-16.** The review kit's
+`check-verifier-fanout.js`, run by the merge bar over every harness, denies an `agent(` fanned over a
+receiver it cannot prove bounded, or a bound it cannot resolve to an integer at or below the hook's
+constant; `check-review-join.js` holds the ref-keyed join ban, and the `spec-audit-optin.js` pack, a
+PreToolUse hook on `Workflow` calls, the spec-audit opt-in. All three read `tools/hooks/agent-cap.js`'s
+exports. Two authoring traps live here: the batching assignment must be ONE line ending in its
 marker comment, and a trailing semicolon on a bound constant declaration defeats the binder.
 
 **A sidechain agent holds no `Agent` tool**, so a harness cannot delegate a review kind to a child

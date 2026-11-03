@@ -13,10 +13,11 @@ PreToolUse guards — fan-out bounded across Workflow+Agent, scratch bounded acr
 - gate-legs 10: `agent-cap self-test`, `scratch-guard self-test`, `format-guard self-test`, `verifier fan-out`, `verifier fan-out self-test`, `review-protocol parity (kit vs dogfood)`, `agent-cap restatement`, `agent-cap restatement self-test`, `hook destinations (every declared hook path ships)`, `hook destinations self-test`
 - kits 1: `hooks`
 - harness-hooks 4: `PreToolUse tools/hooks/agent-cap.js`, `PreToolUse tools/hooks/scratch-guard.js`, `SubagentStart tools/hooks/scratch-guard.js`, `Stop tools/hooks/format-guard.js`
-- gotcha-classes 9: `bash-c-multiline-flattens-under-msys.md`, `held-suite-guard-misses-a-sibling-kit.md`, `git-rm-cached-refuses-a-diverged-index-blob.md`
+- workflow-scripts 1: `check-verifier-fanout.js`
+- gotcha-classes 9: `bash-c-multiline-flattens-under-msys.md`, `held-suite-guard-misses-a-sibling-kit.md`
 - guides 1
-- globs 11
-- cut 18 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- globs 12
+- cut 20 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## annotation-style
 
@@ -233,11 +234,12 @@ Workflow review harnesses — one pipeline, three implementations, one hardened
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/review-harnesses.md`
 - decisions 0
-- gate-legs 6: `workflow script syntax`, `review-join ban (no ref-keyed join)`, `review-join self-test`, `review-replay selftest`, `tier2-review self-test`, `unattended-build self-test`
-- workflow-scripts 9: `check-workflow-syntax.js`, `drift-audit-code.js`, `drift-audit-code.template.js`, `drift-audit-state.js`, `drift-audit-state.template.js`, `orient-counterfactual.js`, `tier2-review.js`, `tier2-review.template.js`, `unattended-build.template.js`
-- gotcha-classes 7: `degradation-known-but-unreported.md`, `node-check-is-not-a-syntax-gate.md`, `observed-by-claim-no-arm-discharges.md`, `test-oracle-read-from-a-historical-sha.md`, `portability-sweep.md`, `topology-sweep.md`, `adopter-migration-sweep.md`
-- globs 1
-- cut 1 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- gate-legs 7: `workflow script syntax`, `review-join ban (no ref-keyed join)`, `review-join self-test`, `spec-audit opt-in pack self-test`, `review-replay selftest`, `tier2-review self-test`, `unattended-build self-test`
+- harness-hooks 1: `PreToolUse tools/workflows/spec-audit-optin.js`
+- workflow-scripts 11: `check-review-join.js`, `check-workflow-syntax.js`, `drift-audit-code.js`, `drift-audit-code.template.js`, `drift-audit-state.js`, `drift-audit-state.template.js`, `orient-counterfactual.js`, `spec-audit-optin.js`, `tier2-review.js`, `tier2-review.template.js`, `unattended-build.template.js`
+- gotcha-classes 7: `degradation-known-but-unreported.md`, `node-check-is-not-a-syntax-gate.md`
+- globs 1: `tools/workflows/*`
+- cut 5 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## roles
 

@@ -119,8 +119,9 @@ helper reading the fresh mirror that does not answer the lowered value;
 `limit-settings-render` commits two policy values and runs `policy.py settings`; the seven `limit-hook-`
 cases copy the hooks kit's agent-cap.js and scratch-guard.js beside a copy of this kit, so rule 7 reads
 the fixture's own limit, and judge each call by its exit code and the text its criterion names;
-`limit-hook-writer-split` (TOOL-dGroundRules-18) pipes the workflows kit's build-harness template,
-rendered at 6, through `--only=scripts`, so rule 2 judges its `gov:fixed-writers` split by that limit.
+`limit-hook-writer-split` (TOOL-dGroundRules-18) runs the workflows kit's build-harness template,
+rendered at 6, through that kit's `check-verifier-fanout.js` over the hook copy, which holds rule 2
+since TOOL-dFairHearing-16, so rule 2 judges its `gov:fixed-writers` split by that limit.
 
 THE SIZE CAPS (TOOL-dGroundRules-9) add two arms and three kinds of case. `arm_limits_readers` reds a
 tracked code file outside this kit, the memory root, `help/` and the self-tests that reads the
@@ -2944,6 +2945,8 @@ def run_limit_case(name):
             checks.append((name, "no slot ledger under the git common dir", not ledger.exists(),
                            f"{ledger.as_posix()} {'exists' if ledger.exists() else 'is absent'}"))
         elif name == "limit-hook-rules-kept":
+            # Every row ADMITS since TOOL-dFairHearing-16: rules 1 and 3 retired, and rules 2 and 5 left
+            # the hook for the review kit, whose checks `limit-hook-writer-split` runs.
             repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))
             write_settings(repo, render_limit_env(2))
             checks += [
@@ -2952,10 +2955,9 @@ def run_limit_case(name):
                 check_hook_call(name, "boundedParallel(thunks, 50)", hook, render_workflow(
                     repo, "const r = await boundedParallel(thunks, 50)\n"), admits),
                 check_hook_call(name, "a verifier per finding", hook, render_workflow(
-                    repo, "const v = await boundedParallel(all.map((f) => () => agent(f.claim)), 5)\n"),
-                    has("MAX_VERIFIERS")),
+                    repo, "const v = await boundedParallel(all.map((f) => () => agent(f.claim)), 5)\n"), admits),
                 check_hook_call(name, "a ref-keyed verdict join", hook, render_workflow(
-                    repo, "const m = new Map()\nm.set(f.ref, v)\n"), has("ref-keyed verdict join"))]
+                    repo, "const m = new Map()\nm.set(f.ref, v)\n"), admits)]
         elif name == "limit-hook-env-cap":
             repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))
             write_settings(repo, render_limit_env(2))
@@ -3017,20 +3019,29 @@ def run_limit_case(name):
             # TOOL-dGroundRules-18: the build harness's template rendered at 6, its spec-writer split judged by
             # rule 2 against the landed limit; a verifier split at 6 against MAX_VERIFIERS whatever the limit;
             # and the writer split against MAX_VERIFIERS once no policy-mirror.js sits beside the hooks kit.
+            # TOOL-dFairHearing-16: rule 2 is the workflows kit's check-verifier-fanout.js, run over the
+            # fixture's hook copy, whose writer bound reads the fixture's policy kit, from the fixture as
+            # its working directory; a finding is its exit 1.
             wf = resolve_kit_dir("workflows", "unattended-build.template.js", KIT)
             render = (wf / "unattended-build.template.js").read_text(encoding="utf-8").replace("{{FANOUT_CAP}}", "6")
-            scripts = ("--only=scripts",)
+            finds = lambda *needles: lambda rc, o, e: rc == 1 and all(n in e for n in needles)  # noqa: E731
+
+            def judge(repo, hook, script, what, want):
+                case = Path(repo, "fanout-case.js")
+                case.write_text(script, encoding="utf-8", newline="\n")
+                return check_run(name, what, ["node", str(wf / "check-verifier-fanout.js"), "--hook", str(hook), str(case)],
+                                 want, cwd=repo)
             for i, (n, script, what, want) in enumerate((
-                    (6, render, "the render at 6 under a landed limit of 6", admits),
+                    (6, render, "the render at 6 under a landed limit of 6", lambda rc, o, e: rc == 0),
                     (4, render, "the render at 6 under a landed limit of 4",
-                     has("gov:fixed-writers", "resolves to 6", f"above the bound 4: {AGENTS_KEY}")),
+                     finds("gov:fixed-writers", "resolves to 6", f"above the bound 4: {AGENTS_KEY}")),
                     (6, VERIFIER_SPLIT, "a verifier split at 6 under a landed limit of 6",
-                     has("gov:fixed-verifiers", "above the bound 5: MAX_VERIFIERS")))):
+                     finds("gov:fixed-verifiers", "above the bound 5: MAX_VERIFIERS")))):
                 repo, kit, hook = build_limit_repo(t / f"r{i}", LIMIT_POLICY.format(n=n))
-                checks.append(check_hook_call(name, what, hook, render_workflow(repo, script), want, args=scripts, cwd=repo))
+                checks.append(judge(repo, hook, script, what, want))
             (kit / "policy-mirror.js").unlink()
-            checks.append(check_hook_call(name, "the render at 6, policy-mirror.js removed", hook, render_workflow(
-                repo, render), has("gov:fixed-writers", "above the bound 5: MAX_VERIFIERS, as no policy kit"), args=scripts, cwd=repo))
+            checks.append(judge(repo, hook, render, "the render at 6, policy-mirror.js removed",
+                                finds("gov:fixed-writers", "above the bound 5: MAX_VERIFIERS, as no policy kit")))
         elif name == "limit-settings-elsewhere":
             # TOOL-dGroundRules-21 S34: GOV_SETTINGS_JSON names the settings in force, for the render and rule 7.
             repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))

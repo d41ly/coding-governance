@@ -23,7 +23,7 @@ gate-legs = [
 kits = ["hooks"]
 git-hooks = []
 harness-hooks = ["PreToolUse tools/hooks/agent-cap.js", "PreToolUse tools/hooks/scratch-guard.js", "SubagentStart tools/hooks/scratch-guard.js", "Stop tools/hooks/format-guard.js"]
-workflow-scripts = []
+workflow-scripts = ["check-verifier-fanout.js"]
 skill-engines = []
 rendered-skills = []
 gotcha-classes = ["bash-c-multiline-flattens-under-msys.md", "held-suite-guard-misses-a-sibling-kit.md", "git-rm-cached-refuses-a-diverged-index-blob.md",
@@ -46,6 +46,7 @@ globs = [
   "tools/check-agent-cap-restatement.test.sh",
   "tools/agent-cap-restatement-waivers.txt",
   "tools/workflows/check-verifier-fanout.sh",
+  "tools/workflows/check-verifier-fanout.js",
   "tools/workflows/check-verifier-fanout.test.sh",
   "tools/workflows/check-protocol-parity.test.sh",
   "tools/workflows/REVIEW-PROTOCOL.template.md",

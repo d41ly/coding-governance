@@ -35,16 +35,16 @@ set -o pipefail
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "review-join: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
-SELF_EXCLUDE='(^|/)(check-review-join\.(sh|js|test\.sh)|agent-cap\.js)$'
+SELF_EXCLUDE='(^|/)check-review-join\.(sh|js|test\.sh)$'
 # BASENAME-anchored, because the exclusion must travel with the population it scopes:
 # parametrising one and not the other converts a fork into a red bar. Basename is the
 # right form HERE -- these are individual FILES -- and the wrong form for the population,
 # which is a subtree whose name is the thing that varies. See the parked decision.
-# TOOL-dTieredTribunal-14 S6 - the hook joins the exclusion because it now HOLDS the ban table.
-# Measured, not defensive: the retired-identifier ban is a bare regex literal, a regex literal
-# survives the hook's own literal blanking, and the predicate run over the hook returns one hit on
-# exactly the table's line. This file's header already declared the doctrine and said SELF_EXCLUDE
-# keeps it true if the predicate is ever written in JavaScript. After S1 it is.
+# The ban table is check-review-join.js's since TOOL-dFairHearing-16, and that file is excluded by
+# name: the retired-identifier ban is a bare regex literal, and a regex literal survives the literal
+# blanking, so the predicate run over its own table returns one hit on exactly the table's line.
+# agent-cap.js held the table from TOOL-dTieredTribunal-14 S6 until then, and left the exclusion
+# with it: it holds no ban now, so it is judged like any other script.
 
 # ---- WHERE THIS KIT LIVES, DERIVED -- TOOL-dRetiredFork-10 ------------------------------------
 # This script spells no install prefix. It is `tools/` here, `scripts/` at both measured adopters,
@@ -335,15 +335,13 @@ if [ "$EXPLICIT" = 0 ] && [ -z "$FILES" ]; then
   exit 1
 fi
 
-# TOOL-dTieredTribunal-14 S5 - THE PREDICATE MOVED. It lives in <prefix>/hooks/agent-cap.js as rule 5,
-# and this gate delegates to it so both entry points share one predicate. The reason is the modality:
-# an ad-hoc review harness is an inline `script` string on a Workflow tool call and is NEVER a file,
-# so this gate covered the already-compliant committed harnesses and none of the observed failures.
-# The hook sees that string. Its three bans, and the `why` text this gate's own self-test asserts,
-# are pinned in that rule; the stripper is the hook's `blankLiterals`, which BLANKS string contents
-# where the retired in-file scanner kept them, and that narrowing is recorded in section 4 Migration.
-# The retired tool's NAME is deliberately not written under this path: this gate has one predicate
-# and it is the hook's, so a reader grepping for the old one should find nothing here.
+# TOOL-dFairHearing-16 - THE PREDICATE MOVED AGAIN. It was <prefix>/hooks/agent-cap.js's rule 5 from
+# TOOL-dTieredTribunal-14 S5, run here through the hook's `join` selector, and the owner's NT-27 made it
+# this gate's alone: check-review-join.js beside this gate holds the three bans, their `why` text,
+# which this gate's own self-test asserts, and the deny message, and nothing else carries the ban.
+# Its views are the hook's, read through the hook's exports from the hook resolved above, so the
+# stripper still BLANKS string contents where the retired in-file scanner kept them. The retired
+# tool's NAME is deliberately not written under this path: a reader grepping for it finds nothing.
 SCAN=()
 while IFS= read -r f; do [ -n "$f" ] && [ -f "$f" ] && SCAN+=("$f"); done <<<"$FILES"
 if [ "${#SCAN[@]}" = 0 ]; then
@@ -352,34 +350,35 @@ if [ "${#SCAN[@]}" = 0 ]; then
 fi
 
 command -v node >/dev/null 2>&1 || { echo "review-join: node is not on PATH, so the predicate cannot run — refusing rather than passing"; exit 2; }
+JOINJS="$HERE/check-review-join.js"
+[ -f "$JOINJS" ] || { echo "review-join: no check-review-join.js beside this gate at $HERE — the ban table lives there, so a gate without it must say so, not pass"; exit 2; }
 
 hits=""
 for f in "${SCAN[@]}"; do
-  # The payload is built by node itself: a JSON encoder written in shell is one more place for a
-  # backslash or a backtick in a script under judgement to change the meaning of the thing judged.
-  out=$(node -e '
-      const fs = require("fs")
-      process.stdout.write(JSON.stringify({
-        tool_name: "Workflow",
-        tool_input: { script: fs.readFileSync(process.argv[1], "utf8") },
-      }))' "$f" | node "$HOOK" --only=join 2>&1) && rc=0 || rc=$?
-  # This loop used to read "the pipeline exited non-zero" as "rule 5 fired". Two symptoms, one root.
-  # The hook exits 2 on its OWN environment refusal before any rule runs, and that message carries
+  out=$(node "$JOINJS" --hook "$HOOK" "$f" 2>&1) && rc=0 || rc=$?
+  # This loop used to read "the predicate exited non-zero" as "rule 5 fired". Two symptoms, one root.
+  # The hook exited 2 on its OWN environment refusal before any rule ran, and that message carries
   # no line starting with two spaces and L, so the sed emptied it and the gate printed a ref-keyed
-  # join with a blank body - sending an operator off to rewrite a join that is not there. And with
-  # no pipefail only the hook's status was read, so a builder that threw fed empty stdin to a
-  # JSON.parse whose catch exits 0 and the file was recorded CLEAN. A status this gate cannot
-  # interpret is a refusal, never a verdict: its own header preaches that a probe which cannot move
-  # must say so, and it was the counterexample.
-  if [ "$rc" != 0 ] && [ "$rc" != 2 ]; then
+  # join with a blank body - sending an operator off to rewrite a join that is not there. And a
+  # builder that threw once fed empty stdin to a JSON.parse whose catch exits 0, so the file was
+  # recorded CLEAN. A status this gate cannot interpret is a refusal, never a verdict: its own header
+  # preaches that a probe which cannot move must say so, and it was the counterexample. The predicate
+  # is check-review-join.js now: 1 is a join, 2 its own refusal (the hook's exports or the file
+  # unreadable), and a 1 naming no line is a refusal too.
+  if [ "$rc" != 0 ] && [ "$rc" != 1 ] && [ "$rc" != 2 ]; then
     echo "review-join: the predicate returned $rc on $f, which is neither clean nor a rule hit - refusing rather than reporting"
     printf '%s\n' "$out" | sed 's/^/    /'
     exit 2
   fi
   if [ "$rc" = 2 ]; then
+    echo "review-join: the predicate exited 2 on $f, so that is its own refusal and not a join"
+    printf '%s\n' "$out" | sed 's/^/    /'
+    exit 2
+  fi
+  if [ "$rc" = 1 ]; then
     body=$(printf '%s' "$out" | sed -n '/^  L/,$p')
     if [ -z "$body" ]; then
-      echo "review-join: the predicate exited 2 on $f without naming a line, so that is its own refusal and not a join"
+      echo "review-join: the predicate exited 1 on $f without naming a line, so that is its own refusal and not a join"
       printf '%s\n' "$out" | sed 's/^/    /'
       exit 2
     fi
@@ -542,7 +541,7 @@ if [ "$EXPLAIN" = 1 ]; then
   # Section 5 observability, behind --explain and NOT in the default run: AC1 requires this gate's
   # ordinary output to stay byte-identical to its pre-change run, so an unconditional new line would
   # fail the very criterion it was added to serve. The resolution is fully visible here instead.
-  echo "review-join: --explain — predicate at $HOOK, population under $POP_SAYS"
+  echo "review-join: --explain — predicate at $JOINJS over the views of $HOOK, population under $POP_SAYS"
   echo "review-join: --explain — the population, and why each file is or is not judged:"
   printf '%s\n' "$arm2" | sed -n 's/^EXPLAIN /    /p'
 fi

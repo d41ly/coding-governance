@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-16 — agent-cap's review rules moved to the review kit, each seen red at its new home before the hook stops carrying it
 
-**Status:** INPROGRESS · rev-7 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-7 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0083@bd47ee4e whole
 
@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dFairHearing-16-deviation-169.md](../build/2026-10-23-build-TOOL-dFairHearing-16-deviation-169.md) | deviation | — |
 | [2026-11-03-build-TOOL-dFairHearing-16-1-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-16-1-builder-return.md) | journal | — |
 | [2026-11-03-build-TOOL-dFairHearing-16-2-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-16-2-builder-return.md) | journal | — |
+| [2026-11-03-build-TOOL-dFairHearing-16-deviation-161.md](../build/2026-11-03-build-TOOL-dFairHearing-16-deviation-161.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-departures-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-departures-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-3 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-30 TOOL-dFairHearing-32 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |

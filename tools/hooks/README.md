@@ -68,20 +68,27 @@ exactly like one that is wired. The `check-wiring.sh --session` and process-moni
 are NOT graded by any arm: their matchers are re-matched on apply and never read afterwards, so a
 hand narrowing passes green (the aReplayedCard closing review, F12).
 
-## What the hook DENIES, and how to satisfy it
+## What the review kit's script checks DENY, and how to satisfy them
+
+Since `TOOL-dFairHearing-16` (the owner's NT-27) this hook runs no script rule. The verify-stage total
+and the loop markers below are the review kit's `check-verifier-fanout.js`, the ref-keyed join ban its
+`check-review-join.js`, each run by the merge bar's gate beside it over every committed harness, and
+the spec-audit opt-in is its `spec-audit-optin.js`, a `PreToolUse` hook on `Workflow` calls. They read
+this hook's views, `MAX_VERIFIERS` and readers through its exports, which is why the grammar is
+stated here, beside the constants it turns on. How to run each: `<prefix>/workflows/README.md`.
 
 - Not a raw `parallel(` / `pipeline(` primitive, any more. TOOL-dGroundRules-10 retired that ban, the
   resolution of every concurrency width and the per-prompt slot ledger (TOOL-dGroundRules-10): the
   harness's own settings bound how many run at once. The verify-stage remedy the hook prints still
   fans through `boundedParallel(thunks, 5)`, its width the hook's `MAX_VERIFIERS`, as an example.
-- Any `agent(` fanned over a receiver the hook cannot PROVE bounded. The batching assignment carries
+- Any `agent(` fanned over a receiver the check cannot PROVE bounded. The batching assignment carries
   a `gov:fixed-verifiers` marker, and EVERY top-level value branch of that assignment must qualify on
   its own — a marked line is admitted only when all of its branches do, never when the first one that
   matches does. A branch qualifies in one of three ways and no fourth: a bounded split, spelling
-  `chunk(x, Math.ceil(x.length / K))` or `splitInto(x, K)` with a `K` the hook can resolve; an array
+  `chunk(x, Math.ceil(x.length / K))` or `splitInto(x, K)` with a `K` the check can resolve; an array
   LITERAL whose element count it can count here; or an identifier it has already proven bounded,
   alone or followed by operations that cannot grow it. A branch it cannot delimit never qualifies, so
-  an expression the hook cannot read lands on the deny side rather than being waved through.
+  an expression the check cannot read lands on the deny side rather than being waved through.
 - An `agent(` inside a `for (const x of <identifier>)` body. This is the ONE loop shape the hook
   admits, and only under `gov:sequential-agents(<K>)` written as a line comment on the LOOP HEADER.
   It exists because a ratified `parallelism route: none` verdict forbids the bounded PARALLEL fan the
@@ -115,7 +122,7 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
   something inferred from a name. Every top-level branch of that right-hand side is judged on its own
   text, and the chain after a bounded root must CONSUME to a close: a tail this file cannot delimit
   is refused rather than assumed shrink-only.
-- Any marker `K` it cannot resolve to an integer ≤5, the hook's `MAX_VERIFIERS`: the `K` of a
+- Any marker `K` the check cannot resolve to an integer ≤5, the hook's `MAX_VERIFIERS`: the `K` of a
   `gov:fixed-verifiers` split or of a `gov:sequential-agents` header. The burden is on the fan-out.
 - A `gov:fixed-writers` split whose `K` is above the agent limit (TOOL-dGroundRules-18). A WRITER
   split, the spec stage's in the build harness, is no verify stage, so its bound is
@@ -133,10 +140,10 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
   `.get`/`.set`/`.has`/`.delete` called on one, and the retired `verdictByRef` identifier in any
   position. Key the join on the integer id the orchestrator assigns before the skeptic sees the
   finding. This rule reads the literal-blanked view, so a mention inside a string is not a hit, and a
-  REGEX literal is — which is why a gate holding the ban table excludes itself from its own
-  population.
-- An UNDECLARED SPEC AUDIT. A `Workflow` call whose structured `args` carry `kind: "spec-audit"` is
-  denied unless the build README at `<args.repo>/<parent of args.reviewDir>/README.md` carries
+  REGEX literal is — which is why the gate excludes `check-review-join.js`, which holds the ban table,
+  from its own population.
+- An UNDECLARED SPEC AUDIT, the review kit's `spec-audit-optin.js` pack. A `Workflow` call whose
+  structured `args` carry `kind: "spec-audit"` is denied unless the build README at `<args.repo>/<parent of args.reviewDir>/README.md` carries
   `spec-audit: <YYYY-MM-DD>` in its FRONT MATTER — the slice between the opening `---` and the next,
   the same scope `scratch-guard.js` reads `authorized-by:` in, through the one reader both hooks
   share. A body mention (a fenced example) is not front matter, and `spec-audit: yes` is a claim
@@ -156,7 +163,7 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
   place it. A subject that is absolute or `~`-rooted is denied too: a direct spec-audit subject is
   repo-relative by the harness's contract, and a same-slug `builds/` folder in a second checkout is
   otherwise indistinguishable from this one. A PROJECT-WIDE DEFAULT (`TOOL-aBlindedTrial-7`): when
-  the README is readable and carries NO key, the hook reads `SPEC_AUDIT_DEFAULT` from
+  the README is readable and carries NO key, the pack reads `SPEC_AUDIT_DEFAULT` from
   `<args.repo>/.unattended.conf` — the worktree copy, last assignment wins, both quote styles and a
   trailing `# comment` read as the shell would — and a date admits, a non-date denies by name, a
   missing file or a blank is no default. The README key wins whatever it says, so a malformed key
@@ -169,24 +176,24 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
   another build is denied, and an absent or empty `reviewDir` takes the harness's
   `memory/builds/<slug>/reviews` default), and in a live run must equal the fact. TWO LIMITS, stated
   rather than implied. The `workflow()` a running harness calls from INSIDE its script is a runtime
-  call and not a tool call, so the hook judges only the call that STARTS the harness, and the rest is
-  the unattended driver's to refuse (`TOOL-aBlindedTrial-3`); and in an ATTENDED session this hook
+  call and not a tool call, so the pack judges only the call that STARTS the harness, and the rest is
+  the unattended driver's to refuse (`TOOL-aBlindedTrial-3`); and in an ATTENDED session the pack
   reads the WORKTREE README and conf while that driver reads the README at BASE and the conf at its
   default-branch side, so the two can disagree for exactly one uncommitted edit. An `args` string that does
-  not parse shows the hook no `kind` and is admitted here; the harness itself throws on it, so no
-  audit runs.
+  not parse shows the pack no `kind` and is admitted; the harness itself throws on it, so no audit
+  runs. A pack with no hooks kit beside it cannot load those readers, so it denies a call whose args
+  may be a spec audit, naming the reader, and admits every other.
 
-## Running ONE rule
+## Every `--only=` refuses
 
-`--only=<rule>` narrows the hook over a closed set: `join` is rule 5 alone, and `scripts` is rules 2
-and 5, the rules that read a script, without rules 0, 6 and 7, which judge the call. Anything
-outside the set is REFUSED with the set named, rather than silently matching nothing. It exists so a
-file gate can share this predicate instead of re-implementing it: the review-join gate asks for
-`join`, and the verifier fan-out gate for `scripts`, because it feeds committed scripts as inline
-`script` payloads that rule 6 refuses wherever a role index exists.
+Every argument opening `--only=` is REFUSED, exit 2, before stdin is read (`TOOL-dFairHearing-16`).
+The selector narrowed this hook to the rules that read a script, rules 2 and 5, for the two review
+gates; both rules left for the review kit, so a selector kept here would read a script and run no
+rule, a call that could never go red. The refusal names `check-verifier-fanout.js` and
+`check-review-join.js`, where the script rules run, so a gate older than this hook reds by name.
 
-**A WIRED command must never carry it.** `--only=join` in `.claude/settings.json` would turn the cap
-rules off with no diff and a hook that still looks wired. `<prefix>/check-wiring.sh` asserts its absence.
+**A WIRED command never carries it**: it would now block every call. `<prefix>/check-wiring.sh`
+asserts its absence.
 
 An array LITERAL of ≤5 elements — the finder-lens fan — is a RECEIVER the hook can size, which is
 one of the three ways a receiver branch qualifies above; it needs no helper. The allowance is a
@@ -202,7 +209,7 @@ queues) in `.claude/settings.json`, and every landing regenerates that render. T
 settings from the working tree, so a hand-raised `env`, or a render left behind a lowering, would run
 past the landed limit. Rule 7 refuses that at the next call.
 
-On every `Agent` and `Workflow` call outside `--only=`, after rule 6, the hook locates
+On every `Agent` and `Workflow` call, after rule 6, the hook locates
 `policy-mirror.js` in the `policy` kit beside its own kit, reads the landed limit through
 `readPolicy`, then the settings file in force, `GOV_SETTINGS_JSON` else `.claude/settings.json`,
 resolved as `check-wiring.sh` resolves it, and `.claude/settings.local.json`, each at the payload
@@ -212,7 +219,7 @@ either is absent, not a positive integer, or above the limit, naming the file, t
 numbers and the render command. A refused policy read refuses with its line. With no `policy` kit
 beside the hooks kit it adds no rule; beside one, a `cwd` in no checkout refuses, a settings file
 that does not parse refuses naming it, and a throw at any step refuses naming the step, since a rule
-that cannot finish does not admit (S38). After rule 7 an `Agent` call is admitted.
+that cannot finish does not admit (S38). After rule 7 every call is admitted.
 
 **What it does not see**: an environment override of the two variables, which the harness applies
 and no hook can read. That a session started before a lowering keeps its settings until it restarts
@@ -249,7 +256,7 @@ A `Workflow` call passes only by a `scriptPath` listed in `harnesses` (never an 
 `name:` run), with `args.roles` a non-empty object whose every value is an `agent`-true role: pass
 what `handoff.py harness-args <harness>` prints.
 
-ORDER: first, before rule 7 and rule 0. Skipped under any `--only=`. A throw inside the rule refuses.
+ORDER: first, before rule 7. A throw inside the rule refuses.
 
 **What it does not stop**, said rather than implied: a hook-less or `--bare` run; the agents a running
 harness spawns through its own `agent()`, which is a runtime call and not a tool call; a
@@ -374,8 +381,8 @@ and the push-time leg owns that guarantee. A hook-less or `--bare` run fires no 
 status flipped to INPROGRESS without the owner's approval admits, because the gate reads a status
 the agent writes: approval is recorded, not proven. The gate stops forgetting, not evasion.
 
-`readConfKey(bytes, key)` is this home's one shell-grammar conf reader; `agent-cap.js`'s
-`readSpecAuditDefault` delegates to it.
+`readConfKey(bytes, key)` is this home's one shell-grammar conf reader; the review kit's
+`spec-audit-optin.js` reads it, through `readSpecAuditDefault`.
 
 **The role arm: WHO writes a spec or a product file** (`TOOL-aOrientedCast-6`). The same gate reads
 the payload's `agent_type` against the role index `.claude/roles.json` at the target's toplevel,

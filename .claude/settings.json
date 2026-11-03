@@ -27,6 +27,15 @@
             "command": "node \"${CLAUDE_PROJECT_DIR}/tools/unattended/gate-guard.js\""
           }
         ]
+      },
+      {
+        "matcher": "Workflow",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/workflows/spec-audit-optin.js\""
+          }
+        ]
       }
     ],
     "SessionStart": [

@@ -33,7 +33,7 @@ role = "engine"
 # this file, so that runbook removes them separately. The suites remain in the public repository for
 # anyone who edits a kit.
 [[files]]
-include = ["check-review-join.test.sh", "check-verifier-fanout.test.sh", "tier2-review.test.sh", "unattended-build.test.sh"]
+include = ["check-review-join.test.sh", "check-verifier-fanout.test.sh", "spec-audit-optin.test.sh", "tier2-review.test.sh", "unattended-build.test.sh"]
 role = "project-owned"
 
 [[files]]
@@ -175,3 +175,8 @@ guard = []
 [[lf_pin]]
 pattern = "{kit}/*.js"
 why = "measured: 350 CR bytes made the shipped harness unlaunchable while its own syntax leg stayed green"
+
+# The spec-audit opt-in pack's fragment (TOOL-dFairHearing-16), pinned as the hooks kit pins its own.
+[[lf_pin]]
+pattern = "{kit}/spec-audit-optin.fragment.json"
+why = "check-wiring.sh reads the fragment with sed; a trailing CR lands inside the captured matcher and the arm reports UNWIRED against a correctly wired repo"

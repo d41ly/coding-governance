@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 148 · kits: 20 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 154 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 149 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 154 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -137,6 +137,7 @@ Inventories: gate-legs: 148 · kits: 20 · git-hooks: 4 · harness-hooks: 12 · 
 | `shell-hygiene selftest` | gate-lint |
 | `spawn budget (forks per hot entrypoint)` | gate-lint |
 | `spec tokens (a spec's own names resolve)` | spec-tokens |
+| `spec-audit opt-in pack self-test` | review-harnesses |
 | `spec-tokens self-test` | spec-tokens |
 | `step-gate` | govkit |
 | `step-rows-frozen` | govkit |
@@ -202,6 +203,7 @@ Inventories: gate-legs: 148 · kits: 20 · git-hooks: 4 · harness-hooks: 12 · 
 | `PreToolUse tools/hooks/agent-cap.js` | agent-cap |
 | `PreToolUse tools/hooks/scratch-guard.js` | agent-cap |
 | `PreToolUse tools/unattended/gate-guard.js` | unattended |
+| `PreToolUse tools/workflows/spec-audit-optin.js` | review-harnesses |
 | `SessionStart skills/session-kickoff/manifest-check.sh` | session-kickoff |
 | `SessionStart tools/check-wiring.sh` | foundation |
 | `SessionStart tools/process-monitor/procmon-hook.js` | process-monitor |
@@ -214,12 +216,15 @@ Inventories: gate-legs: 148 · kits: 20 · git-hooks: 4 · harness-hooks: 12 · 
 
 | key | claimant |
 |---|---|
+| `check-review-join.js` | review-harnesses |
+| `check-verifier-fanout.js` | agent-cap |
 | `check-workflow-syntax.js` | review-harnesses |
 | `drift-audit-code.js` | review-harnesses |
 | `drift-audit-code.template.js` | review-harnesses |
 | `drift-audit-state.js` | review-harnesses |
 | `drift-audit-state.template.js` | review-harnesses |
 | `orient-counterfactual.js` | review-harnesses |
+| `spec-audit-optin.js` | review-harnesses |
 | `tier2-review.js` | review-harnesses |
 | `tier2-review.template.js` | review-harnesses |
 | `unattended-build.js` | unattended |

@@ -1,11 +1,12 @@
 # `<prefix>/workflows/` — the review harness and the gates over it
 
-Three gates in this directory read the tree and delegate their verdict to the agent-cap hook:
+Three gates in this directory read the tree; two of them run a rule that lives beside them and reads
+the agent-cap hook's views (see "The rules that left the hook" below):
 
 | gate | what it judges |
 |---|---|
-| `check-review-join.sh` | no ref-keyed verdict join, and every agent wave a source scan can see is counted |
-| `check-verifier-fanout.sh` | the committed harnesses obey the verify-stage cap |
+| `check-review-join.sh` | no ref-keyed verdict join, through `check-review-join.js`, and every agent wave a source scan can see is counted |
+| `check-verifier-fanout.sh` | the committed harnesses obey the verify-stage cap and the loop markers, through `check-verifier-fanout.js` |
 | `check-workflow-syntax.js` | every workflow script parses, and a second pass reds a pathless `git commit` on any code line, `git -C` included, printing how many lines it graded; a zero beside the build harness render is a dead probe |
 
 `tier2-review.js` is the ready-made harness they exist to protect. It carries this directory's
@@ -156,6 +157,45 @@ node <prefix>/workflows/check-workflow-syntax.js
 Each also accepts explicit files, which is how the suites drive their fixtures. The `--explain`
 output is where the resolved predicate path is reported: the default run's bytes are pinned by an
 acceptance criterion, so diagnostics that would change them live behind the flag.
+
+## The rules that left the hook — `TOOL-dFairHearing-16`
+
+Three of the agent-cap hook's rules are this kit's since the owner's NT-27, each seen red at its new
+home before the hook stopped carrying it. The hook keeps rules 6 and 7, which judge the call, and
+exports the readers these homes share with it: its views, `runBothViews`, `MAX_VERIFIERS`,
+`MAX_LENSES`, the writer bound, the args reader and the slug walk. Every `--only=` the hook was
+given before now refuses, exit 2, naming the two script homes.
+
+| rule | home | runs from |
+|---|---|---|
+| the verify-stage total and the loop markers (`gov:fixed-verifiers`, `gov:fixed-writers`, `gov:sequential-agents`) | `check-verifier-fanout.js` | `check-verifier-fanout.sh`, per harness |
+| the ref-keyed verdict join ban | `check-review-join.js` | `check-review-join.sh` alone, per script |
+| the spec-audit opt-in | `spec-audit-optin.js` | the `PreToolUse` wiring, on `Workflow` calls |
+
+The two script homes are CLIs as well as modules, and take the hook as `--hook`:
+
+```bash
+node <prefix>/workflows/check-verifier-fanout.js --hook <prefix>/hooks/agent-cap.js <file>…
+node <prefix>/workflows/check-review-join.js --hook <prefix>/hooks/agent-cap.js <file>…
+```
+
+Each prints a finding as the hook printed it and exits 1, exits 0 clean, and exits 2 when it cannot
+load the hook's exports or read a file. A writer split's bound is read at the working directory. An
+inline `script` on a `Workflow` call is no longer judged at the tool call: the harness's own
+concurrency settings bound it, and the gates judge every harness that lands.
+
+**The spec-audit opt-in pack** is a hook of its own, wired through its fragment beside it:
+
+```bash
+python <prefix>/settings-merge.py --fragment <prefix>/workflows/spec-audit-optin.fragment.json
+```
+
+A default install wires it through govkit, and `<prefix>/check-wiring.sh` grades it with the same
+per-fragment loop that grades the hooks kit's fragments, reporting it UNWIRED in a tree that unwired
+it. It reads `extractWorkflowArgs` and `extractBuildSlug` from the hook and `readFrontMatterKey` and
+`readConfKey` from scratch-guard.js, both in the hooks kit beside this one; a copy with no hooks kit
+beside it denies a call whose args may be a spec audit, naming the reader it could not load, and
+admits every other. What the rule denies is stated in `<prefix>/hooks/README.md`.
 
 ## `tier2-review.js` — the five diff lenses, and `lensNotes`
 

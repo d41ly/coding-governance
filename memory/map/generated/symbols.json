@@ -895,7 +895,7 @@
     {
       "id": "arm_growth_denies",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
     },
     {
       "id": "arm_keeps",
@@ -1385,12 +1385,12 @@
     {
       "id": "boundedBranch",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "boundedK",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "boundedParallel",
@@ -3415,6 +3415,21 @@
     {
       "id": "check",
       "kind": "function",
+      "file": "tools/workflows/check-review-join.test.sh"
+    },
+    {
+      "id": "check",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
+    },
+    {
+      "id": "check",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.test.sh"
+    },
+    {
+      "id": "check",
+      "kind": "function",
       "file": "tools/workflows/unattended-unit.js"
     },
     {
@@ -3580,7 +3595,7 @@
     {
       "id": "checkSeqMarker",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "checkSession",
@@ -3600,7 +3615,7 @@
     {
       "id": "checkSpecAuditDeclared",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/spec-audit-optin.js"
     },
     {
       "id": "checkSpoke",
@@ -3846,6 +3861,11 @@
       "id": "check_agentcap",
       "kind": "function",
       "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "check_all",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.test.sh"
     },
     {
       "id": "check_ancestor",
@@ -4313,6 +4333,11 @@
       "file": "tools/lexicon/subtokens.py"
     },
     {
+      "id": "check_copy",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.test.sh"
+    },
+    {
       "id": "check_count_sources",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -4581,6 +4606,11 @@
       "id": "check_fragment_wiring",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_fragments",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
     },
     {
       "id": "check_frozen",
@@ -5940,7 +5970,12 @@
     {
       "id": "check_spec_audit",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/workflows/spec-audit-optin.test.sh"
+    },
+    {
+      "id": "check_spec_audit_optin",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
     },
     {
       "id": "check_spec_exit",
@@ -10060,7 +10095,7 @@
     {
       "id": "fanoutFindings",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "field",
@@ -10535,7 +10570,7 @@
     {
       "id": "intConsts",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "inventory_ids",
@@ -10630,7 +10665,7 @@
     {
       "id": "joinCall",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "join_aliases",
@@ -10640,12 +10675,17 @@
     {
       "id": "js",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/workflows/check-review-join.test.sh"
+    },
+    {
+      "id": "js",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
     },
     {
       "id": "jso",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/workflows/check-review-join.test.sh"
     },
     {
       "id": "json_artifact_inventory",
@@ -10791,6 +10831,21 @@
       "id": "load",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "loadHook",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.js"
+    },
+    {
+      "id": "loadHook",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.js"
+    },
+    {
+      "id": "loadReaders",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.js"
     },
     {
       "id": "loadRoleIndex",
@@ -11670,6 +11725,16 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/workflows/check-review-join.js"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.js"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/workflows/check_by_design_parity.py"
     },
     {
@@ -11686,6 +11751,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.js"
     },
     {
       "id": "make_repo",
@@ -12420,7 +12490,7 @@
     {
       "id": "msg",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
     },
     {
       "id": "mut",
@@ -12690,7 +12760,7 @@
     {
       "id": "openersOf",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "order_verb_of",
@@ -12745,7 +12815,7 @@
     {
       "id": "parseBranches",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "parseChecklist",
@@ -13965,7 +14035,7 @@
     {
       "id": "readSpecAuditDefault",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/spec-audit-optin.js"
     },
     {
       "id": "readStatusCells",
@@ -17368,6 +17438,16 @@
       "file": "tools/memory-recall/recall_conf.py"
     },
     {
+      "id": "refuse",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.js"
+    },
+    {
+      "id": "refuse",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.js"
+    },
+    {
       "id": "refuse_if_terminal",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -17835,17 +17915,22 @@
     {
       "id": "renderDeny",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
-    },
-    {
-      "id": "renderDeny",
-      "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "renderDeny",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "renderDeny",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.js"
+    },
+    {
+      "id": "renderFanoutDeny",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "renderFixLine",
@@ -17876,6 +17961,11 @@
       "id": "renderIntent",
       "kind": "function",
       "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "renderJoinDeny",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.js"
     },
     {
       "id": "renderLensFileName",
@@ -17945,7 +18035,7 @@
     {
       "id": "renderPerLineBlanked",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-review-join.js"
     },
     {
       "id": "renderPrompt",
@@ -20030,6 +20120,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.test.sh"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/workflows/tier2-review.test.sh"
     },
     {
@@ -20651,6 +20746,11 @@
       "id": "resolve_python",
       "kind": "function",
       "file": "tools/workflows/check-verifier-fanout.test.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.test.sh"
     },
     {
       "id": "resolve_python",
@@ -21798,6 +21898,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_fan",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
+    },
+    {
       "id": "run_fixture",
       "kind": "function",
       "file": "tools/govkit/fixtures/retired_edits.py"
@@ -22103,6 +22208,16 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "run_home",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.test.sh"
+    },
+    {
+      "id": "run_home",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
+    },
+    {
       "id": "run_hook",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
@@ -22176,6 +22291,11 @@
       "id": "run_isolation_fixture",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "run_join",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.test.sh"
     },
     {
       "id": "run_kill",
@@ -22266,6 +22386,11 @@
       "id": "run_limit_call",
       "kind": "function",
       "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
+      "id": "run_limit_call",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
     },
     {
       "id": "run_limit_case",
@@ -23225,12 +23350,12 @@
     {
       "id": "scan",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "scan",
       "kind": "function",
-      "file": "tools/memory-tree/row_grammar.py"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "scanCommandHeads",
@@ -23243,9 +23368,19 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "scanFanout",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.js"
+    },
+    {
+      "id": "scanJoin",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.js"
+    },
+    {
       "id": "scanJoinFindings",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-review-join.js"
     },
     {
       "id": "scanLauncherOptions",
@@ -26945,7 +27080,7 @@
     {
       "id": "topLevelArgs",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "tracked",
@@ -27875,7 +28010,7 @@
     {
       "id": "write_limit_stub",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
     },
     {
       "id": "write_lin_fix",
@@ -27940,7 +28075,7 @@
     {
       "id": "write_nest_pair",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
     },
     {
       "id": "write_normaliser",
