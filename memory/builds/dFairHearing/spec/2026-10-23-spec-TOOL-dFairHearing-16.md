@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-16 — agent-cap's review rules moved to the review kit, each seen red at its new home before the hook stops carrying it
 
-**Status:** INPROGRESS · rev-6 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dFairHearing-19
+**Status:** INPROGRESS · rev-7 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0083@bd47ee4e whole
 
@@ -10,11 +10,14 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dFairHearing-16-deviation-169.md](../build/2026-10-23-build-TOOL-dFairHearing-16-deviation-169.md) | deviation | — |
 | [2026-11-03-build-TOOL-dFairHearing-16-1-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-16-1-builder-return.md) | journal | — |
+| [2026-11-03-build-TOOL-dFairHearing-16-2-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-16-2-builder-return.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-departures-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-departures-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-3 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-30 TOOL-dFairHearing-32 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-11-02-prompt-TOOL-dFairHearing-16-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-16-build-brief.md) | research | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-16-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-16-1-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-16-2-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-16-2-fix-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-16-3-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-16-3-spec-writer.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-16-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-16-fix-brief.md) | research | TOOL-dFairHearing-22 TOOL-dFairHearing-26 TOOL-dFairHearing-28 TOOL-dFairHearing-29 |
 | [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
@@ -94,7 +97,10 @@ commit.
   `--only=scripts`, and the rule-2 and rule-5 rows of `limit-hook-rules-kept` expect the hook to admit,
   as its rows for rules 1 and 3 already do. `tools/gate-legs.json` gains the leg
   `spec-audit opt-in pack self-test`, and `tools/workflows/kit.toml` withholds the new suite as it
-  withholds its siblings and pins the fragment's line endings. Observed by AC8.
+  withholds its siblings and pins the fragment's line endings. The leg guards no path: it carries no
+  `guard` key, as `review-replay selftest` carries none, so it runs on every bar that runs the
+  self-tests, whatever the diff touches, and no live spec writing under `tools/hooks/`, `tools/lib/`
+  or `tools/workflows/` owes it a §7 entry (§8 F10). Observed by AC8.
 - **S6** — The wiring check. `tools/check-wiring.sh` grades the pack's fragment as it grades the hooks
   kit's: the scratch arm's per-fragment grading becomes one function both arms call, and
   `tools/check-wiring.test.sh` gains the pack's unwired case. Observed by AC9.
@@ -103,6 +109,14 @@ commit.
   `--only=` now refuses. The default-install table of `WIRE-INTO-PROJECT.md` gains the pack's row;
   the dossiers `memory/map/features/agent-cap.md` and `memory/map/features/review-harnesses.md` claim
   the three new files and the new leg. Observed by AC10 and AC11.
+- **S8** — The stranded citation. The move takes `tools/hooks/agent-cap.js` from 2008 lines to 947,
+  and `TOOL-aOrientedCast-28`, a live spec of another build, cites the hook at a line past that end.
+  By §8 F8 and F9, the unit's commit adds one waiver row, one ask in this build's `BACKLOG.md` and
+  one deviation record, as §4 "The stranded citation" states. Observed by AC12.
+- **S9** — The kickoff manifest re-stamp. The commit that stages `tools/gate-legs.json`, a file the
+  kickoff manifest watches, stages `memory/guides/SESSION-KICKOFF.md` with its `last-audit:` line
+  re-stamped, as §4 "The kickoff manifest re-stamp" states. TOOL-dFairHearing-23 S28 scheduled
+  this re-stamp for later, and the pre-commit leg refuses the commit that defers it. Observed by AC13.
 
 ## 3. Non-goals (OUT)
 
@@ -118,16 +132,30 @@ commit.
 - The review protocol's statement of where each rule lives, which TOOL-dFairHearing-10 brings in line.
 - A check of inline Workflow scripts' verifier total at the tool call. NT-27 moves the rule to the
   merge bar's harness check, and the harness's own concurrency settings bound an inline script.
+- Re-grounding the line cites this move strands in DEFERRED specs. The cites join grades live
+  specs alone (`LIVE`, `tools/check-spec-tokens.py:356`), so each such cite reds only when its spec
+  goes live. Measured at `cd2bc576d` against the builder's patch, where `tools/hooks/agent-cap.js`
+  goes from 2008 lines to 947 and `tools/hooks/agent-cap.test.sh` from 2359 to 677, the cites this
+  move strands, inside today's file and past the moved one, are these. In this build, units 22, 23,
+  32 and 37 cite the hook: each re-grounds its own cites before its build, as unit 13's rev-3 and
+  this unit's rev-6 did, and the edges below say so for 22, 23 and 32. In other builds,
+  TOOL-dFurnishedOrders-6 and -37, TOOL-dIndexedDesign-5 and -38, TOOL-dMindYourWords-17 and
+  TOOL-dWellOiledMachine-7, -8, -10, -19, -43 and -45 cite the hook, and TOOL-dBoundRoles-66 cites
+  its suite. When each goes live, the cure is the same ask-and-waiver route as §8 F8, unless its
+  own build re-grounds it first. This unit files nothing for them now. The other DEFERRED cites of
+  the hook and its suite, in dBoundRoles (18 specs), dKeptSession, dOrderedCharter and dTotalRecall,
+  already point past today's ends, so this move strands none of them.
 
 ### Edges
 
 - **consumes-from** `TOOL-dFairHearing-13` — the native slot arm in the `verifier fan-out` leg, beside which the moved rules land in the same gate; without it the gate's header and clean line this unit extends are today's
 - **hands-off** `TOOL-dFairHearing-10` — the review protocol's enforcement and predicate sections, rewritten to name where each moved rule now lives
 - **hands-off** external — dBoundRoles retires agent-cap and moves the helpers this unit exports; dGroundRules, which retired rules 1, 3 and 4 and the slot ledger, has landed
-- **hands-off** `TOOL-dFairHearing-22` — finding id 40 (item H3) of the round-1 spec audit: the hook denies a spec-audit call while `spec-audit-optin.js` is not beside it, so a partial `govkit update` cannot fail open as §4 Rollout prices it
-- **hands-off** `TOOL-dFairHearing-23` — finding ids 6, 10, 20, 29, 30, 31 and 33 of the round-1 spec audit: the version half of S7 and AC11, which rev-6 dropped once the lander's mint had landed (its S12, S13, AC6), AC8's grep half replaced by counting the moved arms (its S16, AC9), `MAX_LENSES`'s home taken by `LENS_SLOTS` (its S42, AC33), the new leg's registry, budget and foreign-prefix rows (its S26, AC17), the fixtures copying `check-verifier-fanout.js` (its S27, AC18) and the kickoff manifest re-stamp after the gate-legs.json edit (its S28, AC19)
+- **hands-off** external — the line cites of the hook and its suite that this move strands in other builds' DEFERRED specs (§3 above): each is cured when it goes live, by the ask-and-waiver route of §8 F8 or by its own build's re-grounding, and this unit files nothing for them now
+- **hands-off** `TOOL-dFairHearing-22` — finding id 40 (item H3) of the round-1 spec audit: the hook denies a spec-audit call while `spec-audit-optin.js` is not beside it, so a partial `govkit update` cannot fail open as §4 Rollout prices it; and that unit re-grounds its own cites of the hook, which this move strands, before its build
+- **hands-off** `TOOL-dFairHearing-23` — finding ids 6, 10, 20, 29, 30, 31 and 33 of the round-1 spec audit: the version half of S7 and AC11, which rev-6 dropped once the lander's mint had landed (its S12, S13, AC6), AC8's grep half replaced by counting the moved arms (its S16, AC9), `MAX_LENSES`'s home taken by `LENS_SLOTS` (its S42, AC33), the new leg's registry, budget and foreign-prefix rows (its S26, AC17), the fixtures copying `check-verifier-fanout.js` (its S27, AC18) and the kickoff manifest's line 99 (its S28, AC19), where the re-stamp this unit's gate-legs.json edit owes is this unit's own (S9); and that unit re-grounds its own cites of the hook, which this move strands, before its build
 - **hands-off** `TOOL-dFairHearing-26` — finding id 10 (item H2) of the spec audit of units 20 to 23: every rule 0 and rule 5 arm counted by label at its new suite and gone from the hook's, any arm left behind moved (its S1 to S3, AC1 to AC3)
-- **hands-off** `TOOL-dFairHearing-32` — findings ids 12, 17 and 37 of the round-3 spec audit: the hook finds this unit's opt-in pack, `spec-audit-optin.js`, through one port of `resolve_kit_dir` held to the canonical by a truth table (its S25 to S27)
+- **hands-off** `TOOL-dFairHearing-32` — findings ids 12, 17 and 37 of the round-3 spec audit: the hook finds this unit's opt-in pack, `spec-audit-optin.js`, through one port of `resolve_kit_dir` held to the canonical by a truth table (its S25 to S27); and that unit re-grounds its own cites of the hook, which this move strands, before its build
 - **hands-off** `TOOL-dFairHearing-36` — finding id 24 of the round-4 spec audit: the leg this unit adds runs the pack's suite that receives units 28 and 29's moved arms, and that unit names it and reads its argv
 
 
@@ -177,7 +205,7 @@ since.
   the hook denies a verifier per finding and a ref-keyed join. `tools/check-wiring.sh:992-996` reds a
   wired agent-cap command carrying any `--only`, and `tools/check-wiring.test.sh:446-460` stages it.
 - Rule 7 refuses a payload `cwd` in no checkout wherever `policy-mirror.js` sits beside the hooks
-  kit (`tools/hooks/agent-cap.js:1782-1785`), so the hook's suite runs a copy beside `scratch-guard.js`
+  kit (`checkSettingsInForce`'s no-checkout refusal, :1782-1785), so the hook's suite runs a copy beside `scratch-guard.js`
   and no policy kit (`tools/hooks/agent-cap.test.sh:34-39`).
 - The hooks kit's fragment idiom: `tools/hooks/scratch-guard.fragment.json` names `event`, `matcher`,
   `marker` and `hook_path` with a `{kit}` token, and govkit wires every landed `*.fragment.json`
@@ -215,6 +243,64 @@ Each `.js` home is a CLI as well as a module: given files, `check-verifier-fanou
 and 2 when they cannot load agent-cap's exports or read a file. Each deny message keeps its bytes,
 because the moved arms assert them.
 
+### The stranded citation
+
+The cites join of `tools/check-spec-tokens.py` reds a backticked `<path>:<line>` past a tracked
+file's end (`CITE`, :341, and the line count, :1708-1715), in live specs alone (`LIVE`, :356).
+Measured at `cd2bc576d` against the builder's patch, the move strands one cite in a live spec of
+another build. TOOL-aOrientedCast-28 (OPEN) cites the hook's `:1972-1994` at its line 138: rule 0's
+`RUN.md` read, which S4 moves into `checkSpecAuditDeclared` in `spec-audit-optin.js`. The join keys
+that hit tools/hooks/agent-cap.js:1972. The same spec's `:2092`, at its line 91, is already past
+today's 2008 lines and already waived, by the row TOOL-dGroundRules-10 added
+(`memory/project/spec-token-waivers.txt:35`), which ask TOOL-dGroundRules-108 retires. The bare
+`:2220` beside it names no path, so the join does not grade it, and a row keyed on it would red as
+stale (:1817-1821). By §8 F8 and F9, in the commit that moves rule 0:
+
+- `memory/project/spec-token-waivers.txt` gains one row in its `<token>`, tab, `<reason>` grammar
+  (:3), keyed tools/hooks/agent-cap.js:1972. Its reason names `[cite]`, TOOL-aOrientedCast-28's
+  live spec, that this unit's move took the file from 2008 lines to 947, the ask below and the
+  count, 33 rows to 34 (41 lines to 42) at `cd2bc576d` and re-measured at the build, under the
+  standing ruling (ER:388, TOOL-dFairHearing-16 F8) (dFairHearing). It is worded as the row at :35.
+- `memory/builds/dFairHearing/BACKLOG.md` gains ask TOOL-dFairHearing-41, the build's next unminted
+  id at `cd2bc576d`, which is added to the README's `ids:` roster, in the row grammar of
+  TOOL-dGroundRules-108 (`memory/builds/dGroundRules/BACKLOG.md:15`). It asks TOOL-aOrientedCast-28
+  to cite `agent-cap.js` by symbol where it cites `:1972-1994`, `:2092` and `:2220`, and is accepted
+  when that spec does so or is terminal, with the row this unit adds leaving in that commit. Under
+  `## Dispositions` it takes a `SEV` row (LOW: one waiver row holds one `[cite]` hit on another
+  build's live spec, and no verdict moves) and a `KEEP` row (filed by this unit's build pass; the
+  cure is a revision of another build's spec, outside this build's writes), as
+  `memory/builds/dGroundRules/BACKLOG.md:43-44` dispose of TOOL-dGroundRules-108.
+- `memory/builds/dFairHearing/build/2026-11-03-build-TOOL-dFairHearing-16-deviation-161.md`, or the
+  next free number from 160 to 168 if 161 is taken, follows the grammar under "Deviation records" in
+  `memory/HYGIENE.md`, with deviation 73 of dGroundRules as its template. Its fields: Departs from
+  `TOOL-dRetiredFork-20@rev-2 [spec-token waivers]`; Hand-off `spec-to-code`; Cause
+  `builder discovery`; Risk `loosening`; Approver `author`, the run's main loop citing ER:388
+  (`PLAY-dClosedLoop-6`), recorded in §8 F8; Follow-through `ask TOOL-dFairHearing-41`; Caused-by
+  TOOL-dFairHearing-16; `**Bound:** spec-token-waivers shrink-only count`; `**Tier:** middle` (the
+  registry header's rule, no clause's); `**Surface:** memory/project/spec-token-waivers.txt`; and a
+  `**Reason:**` naming F8's refused options. These are the keys the README's fork rule joins to a
+  `relaxes:` and a `widens:` value (`memory/builds/dFairHearing/README.md:45-48`).
+
+The commit's `Decided:` trailer cites F8 under rung 5 (ER:388) and carries
+`widens: memory/project/spec-token-waivers.txt` and `relaxes: spec-token-waivers shrink-only count`.
+
+### The kickoff manifest re-stamp
+
+The kickoff manifest watches `tools/gate-legs.json` (`memory/guides/SESSION-KICKOFF.md:6`). The
+pre-commit leg's check 5 (C5s, `skills/session-kickoff/manifest-check.sh:1775-1790`) refuses a
+commit staging a watched file unless the staged manifest's `last-audit:` stamp differs from HEAD's,
+so the re-stamp rides the same commit; a later commit cannot carry it. In the commit that adds the
+leg, the unit first re-verifies the manifest's claims that `tools/gate-legs.json` feeds: a shipped
+self-test declares `subject = "kit"` (:62), the leg list is single-sourced from that file (:90), and
+every `subject = kit` or `chunk = selftests` leg is held by default (:95). The new leg, with
+`subject` `kit` and `chunk` `selftests`, leaves all three true. The unit then re-stamps `last-audit:`
+by the stamp rule (:23, and `STAMP_SHA_RULE` at `skills/session-kickoff/manifest-check.sh:1525`).
+The sha is HEAD when the commit is staged, so the commit's parent. The datetime is later than the
+stamp it replaces, which is `2026-11-02T14:44:18+02:00` at `cd2bc576d`. The commit message carries
+the delta line the ratchet asks for (:20-22), naming the new leg. No other line of the manifest
+moves. TOOL-dFairHearing-23 S28 had scheduled this re-stamp for after the build's watched edits,
+and its rev-3 drops that.
+
 ### Files touched (estimate)
 
 - `tools/hooks/agent-cap.js`
@@ -239,6 +325,11 @@ because the moved arms assert them.
 - `WIRE-INTO-PROJECT.md`
 - `memory/map/features/agent-cap.md`
 - `memory/map/features/review-harnesses.md`
+- `memory/project/spec-token-waivers.txt`
+- `memory/builds/dFairHearing/BACKLOG.md`
+- `memory/builds/dFairHearing/README.md`
+- `memory/builds/dFairHearing/build/2026-11-03-build-TOOL-dFairHearing-16-deviation-161.md` (new)
+- `memory/guides/SESSION-KICKOFF.md`
 
 ### Rollout
 
@@ -276,7 +367,10 @@ session started before the wiring reads the new hook once the settings watcher c
   then denies every spec audit; the review kit already requires the agent-cap kit
   (`tools/workflows/kit.toml`, `requires`). A review-kit gate older than its hook, after an update
   naming the hooks kit alone, still calls `--only=` and now reds naming the two homes, rather than
-  passing every harness with rule 2 run nowhere (§8 F7).
+  passing every harness with rule 2 run nowhere (§8 F7). The waiver row relaxes the spec-token
+  registry's shrink-only count by one until TOOL-aOrientedCast-28 re-cites the hook. The row is
+  keyed on one token and reds as stale once no live spec makes that hit, so it cannot outlive the
+  cure (§8 F8).
 - testing — AC1 to AC11 as direct runs of each home and of a copy of the hook over planted
   fixtures; the moved and new arms under section 7.
 - migration — an adopter's update wires the pack through govkit; a hand copy runs
@@ -336,11 +430,13 @@ under rule 7 (§4 Evidence).
   `grep -n "spec-audit-optin.js" .claude/settings.json` prints the wired command under a `Workflow`
   matcher.
   Red when: the hook still denies the call, or the pack is not wired here.
-- **AC8** — When `python -c "import json; print([l['name'] for l in json.load(open( 'tools/gate-legs.json' )) if 'spec-audit-optin' in ' '.join(l['argv'])])"`
-  runs, it prints the one leg, and `grep -n "spec-audit-optin" tools/workflows/kit.toml` prints the
+- **AC8** — When `python -c "import json; print([(l['name'], l.get('guard')) for l in json.load(open( 'tools/gate-legs.json' )) if 'spec-audit-optin' in ' '.join(l['argv'])])"`
+  runs, it prints the one leg with `None` for its guard, which is what `l.get('guard')` reads for
+  `review-replay selftest` too, and `grep -n "spec-audit-optin" tools/workflows/kit.toml` prints the
   suite's withholding rule and the fragment's line-ending pin; `grep -cE '"rule[025]\b' tools/hooks/agent-cap.test.sh`
   prints 0, where it prints 116 at the pass's starting commit.
-  Red when: a labelled arm of a moved rule is left in the hook's suite, or the new suite has no leg.
+  Red when: a labelled arm of a moved rule is left in the hook's suite, the new suite has no leg, or
+  the leg carries a guard.
   figure: 116 is PINNED, measured at `8b2b995f` on 2026-11-03. The grep counts labelled arms only. An
   unlabelled deny arm left behind reds the hook's suite, whose hook no longer denies; an unlabelled
   admit arm left behind is not seen.
@@ -356,10 +452,27 @@ under rule 7 (§4 Evidence).
 - **AC11** — When `grep -n "spec-audit-optin\|check-review-join.js" memory/map/features/review-harnesses.md`
   runs, it prints the claims, where it prints nothing at the pass's starting commit.
   Red when: a new file is claimed by no dossier.
+- **AC12** — A scratch probe applies the cites join's own pattern and line count
+  (`tools/check-spec-tokens.py:341`, :1708-1715) to every spec whose status header the join's
+  `LIVE` matches (:356), keying each hit as the join does. When it runs over the unit's tree, its
+  `agent-cap.js` hits are the two keys on TOOL-aOrientedCast-28, 1972 and 2092, and no other, and
+  `grep -c "^tools/hooks/agent-cap.js:" memory/project/spec-token-waivers.txt` prints 2.
+  `grep -n "TOOL-dFairHearing-41" memory/builds/dFairHearing/BACKLOG.md` prints the ask row, its
+  `SEV` row and its `KEEP` row. A grep of the deviation record S8 names for
+  `^- \*\*\(Bound\|Tier\|Surface\|Reason\):\*\*` prints four lines.
+  Red when: a live hit has no row, a row names a hit no live spec makes, the ask is missing, or the
+  record lacks a key the README's fork rule joins.
+- **AC13** — When `git diff --name-only <unit>~1 <unit>` runs over the unit's commit, it lists both
+  `tools/gate-legs.json` and `memory/guides/SESSION-KICKOFF.md`. In
+  `git diff <unit>~1 <unit> -- memory/guides/SESSION-KICKOFF.md`, only the `last-audit:` line
+  changes; its sha is `git rev-parse <unit>~1`, and its datetime is later than the line it
+  replaces.
+  Red when: the commit stages the watched file without the re-stamp, or the stamp names a sha other
+  than its parent or a datetime that does not advance.
 
 ## 7. Gates
 
-`agent-cap self-test` · `scratch-guard self-test` · `hook destinations self-test` · `verifier fan-out self-test` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out` · `review-join ban (no ref-keyed join)` · `workflow script syntax` · `check-wiring self-test` · `transition-audit arms` · `straggler-guard arms` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `agent-cap restatement` · `review-protocol parity (kit vs dogfood)` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene` · `policy fixtures` · `playbook parity`
+`agent-cap self-test` · `scratch-guard self-test` · `hook destinations self-test` · `verifier fan-out self-test` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out` · `review-join ban (no ref-keyed join)` · `workflow script syntax` · `check-wiring self-test` · `transition-audit arms` · `straggler-guard arms` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `agent-cap restatement` · `review-protocol parity (kit vs dogfood)` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene` · `policy fixtures` · `playbook parity` · `spec tokens (a spec's own names resolve)` · `kickoff-manifest ratchet`
 
 New arm: tools/workflows/check-verifier-fanout.test.sh · covers AC2 · rule 2's arms moved from the hook's suite, each planting its receiver or marker case · none
 New arm: tools/workflows/check-review-join.test.sh · covers AC4 · rule 5's arms moved from the hook's suite, each planting a ref-keyed join · none
@@ -426,6 +539,51 @@ New arm: tools/policy/check_policy.py · covers none · the limit-hook-writer-sp
   where (a) reds it by name, so (a) satisfies the most criteria and leaves no follow-up. It stays
   inside F4's grant, because the selector exists only to run the moved rules. Recommendation (a).
   Rung 3. RESOLVED (agent, 2026-11-03, delegated): (a). widens: none · relaxes: none
+- **F8 — How does the move meet the cite it strands in another build's live spec?** TOOL-aOrientedCast-28
+  (OPEN) cites the hook's `:1972-1994`, and at 947 lines the cites join reds it on every dispatch
+  (§4 "The stranded citation"). (a) Waive the one hit, ask that build to cite by symbol, and record
+  the deviation. This relaxes the shrink-only registry's count by one, as TOOL-dGroundRules-10 §8
+  F7/F8 and TOOL-dGroundRules-18 §8 F2 did for the same spec. (b) Revise TOOL-aOrientedCast-28's
+  line 138. That is an outside write the README's write rule refuses
+  (`memory/builds/dFairHearing/README.md:49-50`) and the fix brief's non-goals name: veto 2 outside
+  the grant. (c) Keep the hook at 1994 lines or more, padding it or leaving rule 0's read where it
+  sits. Padding is dead bytes against the charter's `[yagni]` rule, and leaving the read puts rule 0
+  in two homes against §4's order, so veto 1 discards (c). (a) trips only the registry's own
+  declared count, a ceiling the owner moves, so no option survives the vetoes and the standing
+  ruling takes (a). Recommendation (a). Rung 5: RESOLVED (agent, 2026-11-03, delegated): (a),
+  citing ER:388 (`PLAY-dClosedLoop-6`), the main loop's ruling, and the precedent of
+  TOOL-dGroundRules-10 §8 F7/F8 and TOOL-dGroundRules-18 §8 F2. It is recorded as deviation-161
+  with the `**Bound:**`, `**Tier:**`, `**Surface:**` and `**Reason:**` §4 names, and the commit's
+  `Decided:` trailer carries the keys below.
+  widens: memory/project/spec-token-waivers.txt · relaxes: spec-token-waivers shrink-only count
+- **F9 — Where does F8's ask live?** (a) In this build's own `BACKLOG.md`, minted
+  TOOL-dFairHearing-41 under this build's slug, as dGroundRules filed TOOL-dGroundRules-108 and -109
+  in its own `BACKLOG.md` for the same spec. (b) In aOrientedCast's `BACKLOG.md`, as the fix brief
+  names it. The chain plan's P0.6 rule 3 admits a foreign ask there only while that build's run has
+  not landed (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:612-613`).
+  aOrientedCast's run has landed: its `RUN.md` reads phase HELD with `units-at-landing:`, and its
+  merge `39ed3d035` is in this branch's history. That folder also holds no `BACKLOG.md`, so (b)
+  creates a file in another build's folder, where the README's write rule admits only an ask row. No
+  build's `BACKLOG.md` holds a foreign-id ask today (measured over all 151 at `cd2bc576d`). (c) File
+  no ask, and let the new row's reason name TOOL-dGroundRules-108, which already asks the same
+  re-citation. That ask is another build's: its acceptance counts two rows and names neither this
+  unit nor its row, and this build may not edit it. So the follow-through would be an ask whose text
+  does not name what it retires. (b) fails P0.6 rule 3 and the write rule, so veto 1 discards it.
+  (a) and (c) both meet every criterion, and (a) leaves no follow-up whose text is wrong, so (a)
+  meets more. Recommendation (a). Rung 3. RESOLVED (agent, 2026-11-03, delegated): (a).
+  widens: none · relaxes: none
+- **F10 — What does the new leg guard?** (a) No path, as `review-replay selftest` guards none
+  (`tools/workflows/kit.toml:163-173`). The leg runs on every bar that runs the self-tests, and
+  those are held by default (`memory/guides/SESSION-KICKOFF.md:95`). (b) `{prefix}/hooks/`,
+  `{prefix}/lib/` and `{prefix}/workflows/`, as its sibling suites are guarded. That reds the guards
+  join on TOOL-aOrientedCast-28, whose files touched list `tools/workflows/unattended-build.template.js`
+  while its §7 lacks the leg, so it needs a second waiver row and ask under F8's ruling. (c) The
+  pack's own files and the two hooks it loads, a narrow guard. It skips the suite when a helper
+  under `tools/lib/` or a resolver it reaches changes, which is the change a guard exists to catch.
+  (b) adds a second relaxation where (a) relaxes nothing, and (c) runs the suite on fewer diffs
+  than (a), so (a) meets the most criteria and leaves no follow-up. The cost is the suite's run on a
+  self-test bar whose diff never reaches the pack. Recommendation (a). Rung 3. RESOLVED (agent,
+  2026-11-03, delegated): (a). widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -461,6 +619,27 @@ New arm: tools/policy/check_policy.py · covers none · the limit-hook-writer-sp
 - rev-6 · 2026-11-03 · §4 · §7 · §8 F2 · F3 · the files touched add `tools/policy/check_policy.py`
   and drop the version lines, the leg line adds `policy fixtures` and `playbook parity`, and F2 and F3
   are re-read at `8b2b995f` with their picks unchanged (same brief, item 5).
+- rev-7 · 2026-11-03 · S8 · §4 · §5 · §6 AC12 · §8 F8 · F9 · the cite the move strands in
+  TOOL-aOrientedCast-28 is met by one waiver row, ask TOOL-dFairHearing-41 in this build's own
+  `BACKLOG.md` and deviation-161 under ER:388, with the mark carrying `widens:` and `relaxes:`. F9
+  files the ask here, not in aOrientedCast's folder, because that run has landed (fix brief
+  2026-11-03-prompt-TOOL-dFairHearing-16-2-fix-brief, item 1).
+- rev-7 · 2026-11-03 · §3 · the non-goals measure the cites this move strands in DEFERRED specs, the
+  edges to TOOL-dFairHearing-22, -23 and -32 say each re-grounds its own before its build, and a new
+  external edge leaves the other builds' cites to the ask-and-waiver route when each goes live (same
+  brief, item 2). Unit 37 is named in the non-goal rather than by an edge, because a hands-off edge
+  needs a reciprocal one in its spec.
+- rev-7 · 2026-11-03 · S9 · §3 · §4 · §6 AC13 · the commit that stages `tools/gate-legs.json`
+  re-stamps the kickoff manifest's `last-audit:`, moved here from TOOL-dFairHearing-23 S28, and the
+  files touched add `memory/guides/SESSION-KICKOFF.md`, the waiver registry, this build's
+  `BACKLOG.md`, README and deviation record (same brief, item 3).
+- rev-7 · 2026-11-03 · S5 · AC8 · §8 F10 · the new leg guards no path, as `review-replay selftest`
+  guards none, and AC8 reads its guard (same brief, item 4).
+- rev-7 · 2026-11-03 · §4 · §7 · §10 · the Evidence line and the reuse audit cite rule 7's refusal
+  and the selector by symbol, since at 947 lines those line cites would red this spec while it is
+  live. The leg line adds `spec tokens (a spec's own names resolve)` and `kickoff-manifest ratchet`,
+  the legs that judge S8 and S9, and the reuse audit adds this rev's seams and recall query (same
+  brief, item 5).
 
 ## 10. Reuse audit
 
@@ -470,17 +649,27 @@ with the views and readers two homes share exported, the `require.main` idiom of
 `tools/hooks/scratch-guard.js:1614-1615`, the two gates' existing hook resolution and
 self-exclusions that already name each `.js` home, the hooks kit's fragment shape, govkit's derived
 fragment wiring, and the scratch arm of `tools/check-wiring.sh`. F7's refusal reuses the selector's
-own refusal of a member outside its set (`tools/hooks/agent-cap.js:1845-1850`), with the set gone.
+own refusal of a member outside its set (`ONLY_RULES` in the hook's `main()`, :1845-1850 at
+`8b2b995f`), with the set gone.
 `python tools/codebase-map/reuse_lookup.py "check a committed workflow
 harness bounds its verifier count and loop markers without the hook"` ranked `boundedParallel` and
 generic `check` symbols, and `python tools/codebase-map/reuse_lookup.py "deny a spec audit workflow
 call whose build declares no opt-in date"` ranked none of the hook's functions: the lookup's symbol
 tier did not surface the three rule functions the source read found, which is where the hits
 disagreed with source. For rev-6, the second recall query below returned `TOOL-dTieredTribunal-14`
-S4, the selector's origin and its vacuous-selector refusal, which F7 cites.
+S4, the selector's origin and its vacuous-selector refusal, which F7 cites. Rev-7 extends existing
+seams and adds none: the spec-token waiver registry and its row grammar
+(`memory/project/spec-token-waivers.txt:3-5`), the ask, disposition and deviation shapes that
+TOOL-dGroundRules-10 and -18 used for the same spec, the manifest's own bundle path
+(`skills/session-kickoff/manifest-check.sh:1775-1790`), and the unguarded leg form of
+`review-replay selftest`. The third recall query below returned TOOL-dGroundRules-108 and
+TOOL-dGroundRules-10's "The stranded citations" first, and §4 follows both.
 
 Recall terms used: `python tools/memory-recall/query.py "where do agent-cap's review rules move when
 agent-cap retires" --terms "agent-cap retired NT-27 verifier total loop markers fixed-verifiers
 sequential-agents check-review-join spec-audit opt-in pack"`, and at `8b2b995f` on 2026-11-03
 `python tools/memory-recall/query.py "a hook selector mode left running no rule after its rules move
-out" --terms "only selector vacuous agent-cap scripts join refuse retired mode"`
+out" --terms "only selector vacuous agent-cap scripts join refuse retired mode"`, and at `cd2bc576d`
+on 2026-11-03 `python tools/memory-recall/query.py "a move shrinks a file and another build's live
+spec cites its lines past the end" --terms "spec-token waiver cite stranded agent-cap line re-cite
+symbol ER:388 shrink-only"`

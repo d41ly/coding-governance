@@ -14,3 +14,4 @@ Build this unit from `memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFair
 - Writes stay inside the spec's files touched and this build's folder; a write outside both is a departure, recorded or returned.
 - Temp files go in the run's scratch root, never under the repo.
 - A divergence from the spec stops the unit: return `DIVERGENCE:`, never improvise.
+- The second pass (run `wf_9c258c6b-d04`) built the whole unit and saved it as a patch on `cd2bc576d`: `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dfairhearing-fe4e9c/db957487-b5c0-4a88-ab27-88dd90bc468f/scratchpad/u16probe/TOOL-dFairHearing-16-build.patch`. The spec moved to rev-7 after it: the waiver row, this build's ask TOOL-dFairHearing-41, deviation-161, the manifest re-stamp and an unguarded new leg. Apply the patch as a draft, then bring it to rev-7; drop the new leg's guard the patch still carries.

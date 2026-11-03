@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-23 — the round-1 spec audit's 49 minors: one contract per shared name, criteria a correct build can pass, and the fixtures and records the moved code needs
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 19 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 19 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -127,9 +127,12 @@ merges ids, each id is its own item and the later ones point at the first one's 
 - **S27** — id 30 (M18, AC18). Every fixture of `check-verifier-fanout.test.sh` that copies the gate
   (`:199`, `:212`, `:231`) copies `check-verifier-fanout.js` and `render_lenses.py` beside it, and a new
   arm runs a gate copy with no `.js` beside it and expects exit 2 naming the file.
-- **S28** — id 33 (M19, AC19). `memory/guides/SESSION-KICKOFF.md` is re-stamped after this build's
-  changes to its watched `tools/gate-legs.json` and `coding-governance-agents.template.md`, its derived
-  claims re-checked, and its line 99 says the harness acquires the checklist on the diff kind.
+- **S28** — id 33 (M19, AC19). Line 99 of `memory/guides/SESSION-KICKOFF.md` says the harness
+  acquires the checklist on the diff kind. This unit schedules no `last-audit:` re-stamp. The
+  pre-commit leg refuses a commit that stages a watched file without one
+  (`skills/session-kickoff/manifest-check.sh:1775-1790`), so each commit staging
+  `tools/gate-legs.json` or `coding-governance-agents.template.md` re-stamps the manifest itself, as
+  `TOOL-dFairHearing-16` S9 does for its leg.
 - **S29** — id 35 (M20, AC20). The key-pinning arms of `TOOL-dFairHearing-2` AC4,
   `TOOL-dFairHearing-3` AC5 and `TOOL-dFairHearing-9` AC7 in `tools/workflows/tier2-review.test.sh`
   compare the no-argument key with the one the current harness derives under the current template's
@@ -478,10 +481,8 @@ workflows kit's file under `tools/workflows/`; `$DREC` and `$SPEC` are §4's exa
   `check-verifier-fanout.js`.
   Red when: the missing `.js` prints clean.
 - **AC19** — When `sed -n 99p memory/guides/SESSION-KICKOFF.md` runs, it no longer says "run before a
-  review"; and the `last-audit:` line names a sha at which `git merge-base --is-ancestor <sha> HEAD`
-  succeeds and after which `git log <sha>..HEAD -- tools/gate-legs.json coding-governance-agents.template.md`
-  lists no commit.
-  Red when: a watched file moved after the stamp.
+  review".
+  Red when: line 99 still tells a reader to run the checklist before a review.
 - **AC20** — When `grep -n "REVIEW_SHAPE" tier2-review.test.sh` runs, it prints the read the three
   key arms derive their expected key from; and `grep -c "3708a705" tier2-review.test.sh`
   prints no line inside those arms.
@@ -608,6 +609,12 @@ New arm: tools/memory-tree/gotchas.py (its selftest) · covers AC12 · a class g
 - rev-1 · 2026-10-23 · initial draft, promoting the round-1 spec audit's 37 MEDIUM and 12 LOW findings
   as one batch.
 - rev-2 · 2026-10-23 · §3 · the audit of units 20 to 23 disposed: hands-off edges to TOOL-dFairHearing-25, -26 and -27.
+- rev-3 · 2026-11-03 · S28 · AC19 · the `last-audit:` re-stamp after `tools/gate-legs.json` moves to
+  TOOL-dFairHearing-16 S9, because the pre-commit leg refuses a commit that stages a watched file
+  without a re-stamp, so no later unit can carry it. S28 keeps line 99 and schedules no re-stamp.
+  AC19 drops its stamp half, which could never pass: a bundled stamp names the bundling commit's
+  parent, so `git log <sha>..HEAD` over the watched files always lists that commit (fix brief
+  2026-11-03-prompt-TOOL-dFairHearing-16-2-fix-brief, item 3).
 
 ## 10. Reuse audit
 
