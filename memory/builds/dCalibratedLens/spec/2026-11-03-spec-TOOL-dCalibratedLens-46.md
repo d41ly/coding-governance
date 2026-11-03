@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-46 — the loop legs' and `tier2-review self-test`'s guards widened in every spelling the leg is declared in, and rendered where the manifest is a render
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 20 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-1 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 20 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

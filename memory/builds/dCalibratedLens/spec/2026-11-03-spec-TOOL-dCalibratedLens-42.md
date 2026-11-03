@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-42 — the `graded-by-a-row` case calls `derive_record_kind` in the form TOOL-dTotalRecall-53 S21 gives it, and refuses any other form by name
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 5 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-1 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 5 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

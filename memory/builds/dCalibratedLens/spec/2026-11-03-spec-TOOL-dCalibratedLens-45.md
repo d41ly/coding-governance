@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-45 — a render error in the shape arm is that form's FAIL line, and a shape with no distinct second form is rendered once and said so
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 14 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-1 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 14 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

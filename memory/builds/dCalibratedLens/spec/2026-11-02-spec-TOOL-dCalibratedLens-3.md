@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-3 — the Loop Review: a cadence step run as `review.loop.cadence` says, its lease keyed by the selected period, its walk and its record
 
-**Status:** OPEN · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 2 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 2 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0460@401ecbd8 whole
 **Carries:** node:record-kind.loop-review

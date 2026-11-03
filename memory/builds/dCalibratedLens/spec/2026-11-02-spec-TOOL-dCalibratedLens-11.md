@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-11 — the Loop Review's delivery metrics and the owner queue's depth, read with no bound
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 13 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 13 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0468@b4b68e80 whole
 

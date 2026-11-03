@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-1 — each stage review's lenses and effort: four stage literals in the lens catalogue, chosen by the breakpoint's stage, run at `review.<stage>.effort`
 
-**Status:** OPEN · rev-3 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 16 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-3 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 16 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0458@5429e502 whole
 **Carries:** node:policy-key.review.<stage>.effort

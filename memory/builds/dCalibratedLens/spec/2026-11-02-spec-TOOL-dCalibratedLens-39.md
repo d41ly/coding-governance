@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-39 — `read_metrics_lines` answers an ordered list of `(name, value, source)` triples with every repeated name kept, held by a plant against a dict-shaped splitter
 
-**Status:** OPEN · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 9 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 9 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

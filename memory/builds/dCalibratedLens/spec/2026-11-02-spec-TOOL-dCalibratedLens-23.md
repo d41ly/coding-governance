@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-23 — the instruction-eval seed lands held, and a guarded edit's owed replay is recorded before the close bar
 
-**Status:** OPEN · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 13 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 13 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-40 — an isolated failure's `<why>` folded to one line with no field separator, and a reading the writer would refuse read as `unread · refused value`
 
-**Status:** OPEN · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-13 — the `lens` kind and namespace: gov's lenses tagged, a repository's lenses from its overlay, the fixed set with the five slots, and lens tags joined to the step gate
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 15 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 15 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0470@dfafc75a whole
 **Carries:** node:tag-namespace.lens

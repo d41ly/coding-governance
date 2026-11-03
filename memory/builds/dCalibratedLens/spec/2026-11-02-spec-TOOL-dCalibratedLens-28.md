@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-28 — no population is read through `gov_record.py find`: probe records and Loop Review records are listed from the index, acts read through the paging act reader
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 5 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 5 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

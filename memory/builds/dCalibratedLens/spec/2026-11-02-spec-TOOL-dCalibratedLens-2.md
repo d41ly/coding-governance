@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-2 — the shared value ledger: its snapshot, its view, its row grammar and the `price` verb
 
-**Status:** OPEN · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 1 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 1 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0459@facc646b whole
 **Carries:** node:record-kind.value-ledger

@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-20 — every Loop Review record carries a `**Serves:**` line naming its kind, so the registry's field check reaches it
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 3 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 3 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

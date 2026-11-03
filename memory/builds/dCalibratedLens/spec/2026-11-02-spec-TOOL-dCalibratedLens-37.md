@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-37 — a fence edit selects the format guard's suite through `AGENTS.md` alone, a guard pathspec check 7c classes exactly once
 
-**Status:** OPEN · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 13 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 13 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

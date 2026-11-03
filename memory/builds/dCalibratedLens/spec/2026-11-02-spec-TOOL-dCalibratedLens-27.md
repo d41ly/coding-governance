@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-27 — a failing reading or proposer becomes an `unread` line, and the record is checked before anything is filed, so no period re-runs forever
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 3 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 3 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

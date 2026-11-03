@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-36 — the eval seed's `**Loads:**` stated, every edit to them since its replay listed, and its `held` read only after the main loop's replay
 
-**Status:** OPEN · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 14 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 14 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

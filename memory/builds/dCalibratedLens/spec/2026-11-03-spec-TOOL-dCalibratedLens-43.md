@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-43 — `read_loop_records` lists the loop-review folder by prefix and filters by its id rule in Python, and a plant proves the listing is never empty
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 3 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-1 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 3 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

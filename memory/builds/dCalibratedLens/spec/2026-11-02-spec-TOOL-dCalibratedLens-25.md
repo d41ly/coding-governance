@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-25 — the `returned` line's units field sits before the agent id, and the format guard's fixtures and guard follow the fence
 
-**Status:** OPEN · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 12 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 12 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

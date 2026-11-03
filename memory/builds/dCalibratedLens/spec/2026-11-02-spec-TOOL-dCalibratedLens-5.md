@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-5 — instruction effectiveness from returns and findings that cite unit tags, and the Loop Review's proposals under `review.loop.retire`, with the keep record
 
-**Status:** OPEN · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 11 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 11 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0462@cad135ef whole
 **Carries:** node:item.loop.propose

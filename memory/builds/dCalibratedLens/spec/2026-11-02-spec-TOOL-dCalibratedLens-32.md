@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-32 — the `three-homes` plant's red twin restaged as the real `loop-review` row reverted to the bare folder, which TOOL-dTotalRecall-42 S4 refuses
 
-**Status:** OPEN · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

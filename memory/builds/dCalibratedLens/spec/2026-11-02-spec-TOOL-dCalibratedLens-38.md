@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-38 — the work orders' adding commits read through `tree_lib.read_adding_commits` and their policy text through `read_blobs_at`, proved on a re-added and a renamed work order
 
-**Status:** OPEN · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 10 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 10 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

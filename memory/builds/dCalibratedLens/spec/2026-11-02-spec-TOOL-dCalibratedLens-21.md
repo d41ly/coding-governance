@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-21 — one carrier for a multi-line reading: the record's Metrics lines, one per entry, never a `fields`-form field
 
-**Status:** OPEN · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 8 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 8 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

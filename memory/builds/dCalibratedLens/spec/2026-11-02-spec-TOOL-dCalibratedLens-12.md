@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-12 — the Loop Review pricing cost per item kind from trace rows
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 5 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 5 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0469@653feb80 whole
 

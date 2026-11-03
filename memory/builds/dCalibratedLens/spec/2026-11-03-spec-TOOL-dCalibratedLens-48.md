@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-48 — the round-3 spec audit's 25 minors batched: each correction carried by the sibling it lands on
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 21 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-1 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 21 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

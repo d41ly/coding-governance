@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-34 — the bug class of a staged break whose red rests on an ancestor clause a newer revision replaced, recorded so a spec review is handed it
 
-**Status:** OPEN · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

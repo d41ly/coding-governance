@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-35 — every record the `three-homes` plant writes is graded by a registry row, and the keep joins the plant when unit 5 lands its row
 
-**Status:** OPEN · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

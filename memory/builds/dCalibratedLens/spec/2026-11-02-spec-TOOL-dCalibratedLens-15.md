@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-15 — each size breach priced by its bytes and its reads, and a persisting or grown breach raised to the owner
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 6 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 6 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0472@bf8d8ee5 whole
 

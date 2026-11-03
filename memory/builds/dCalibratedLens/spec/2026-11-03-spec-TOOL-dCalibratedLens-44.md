@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-44 — every line the shape arm renders is held free of a literal bracket, apart from a markdown link, so a `SPEC` line that leaks its group reds
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 14 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-1 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 14 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

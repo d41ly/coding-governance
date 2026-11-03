@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-17 — the node beats and the pools' ledgers trended, and the reservation estimate per item kind re-derived from `trace.cost`
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 10 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 10 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0474@b1852db0 whole
 

@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-41 — the round-2 spec audit's 28 minors batched: each correction carried by the sibling it lands on, and the loop legs' guards widened to the files their plants read
 
-**Status:** OPEN · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 19 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 19 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

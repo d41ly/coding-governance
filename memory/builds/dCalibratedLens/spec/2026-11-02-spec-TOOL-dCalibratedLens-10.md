@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-10 — instruction evals: a replay suite of recorded items with known outcomes, scored through the scorer factory, owed again by a held leg when an instruction unit changes
 
-**Status:** OPEN · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 12 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 12 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0467@0bd9d49f whole
 

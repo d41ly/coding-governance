@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-8 — the not-in-view cause on every confirmed finding, and the Loop Review's 38-finding reading of its share
 
-**Status:** OPEN · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 14 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 14 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0465@f1db8527 whole
 

@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-29 — the work-order population read without argv: paths on stdin, one history pass, one policy read per policy revision, timed over the real tree
 
-**Status:** OPEN · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 9 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 9 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 

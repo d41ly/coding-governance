@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-7 — the value ledger's shape rows, priced from the shape-run records `review.cost` and the journal reconcile write
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 3 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 3 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0464@b1127f93 whole
 

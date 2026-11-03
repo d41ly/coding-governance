@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-16 — the stall and loop classes trended per scenario, item and rule, and their bounds re-derived once 30 builds have run under them
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 9 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 9 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0473@17126ed2 whole
 

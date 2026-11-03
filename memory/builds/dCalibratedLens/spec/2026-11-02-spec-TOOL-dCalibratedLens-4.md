@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-4 — the measured-value factory, and the `budgets.*` caps re-derived from evidence and review cost
 
-**Status:** OPEN · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 7 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 7 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0461@ea09b304 whole
 

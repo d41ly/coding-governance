@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-6 — each role's `memory.item-budget` derived from its p90 over 30 sliced work orders under `measured`
 
-**Status:** OPEN · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 8 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 8 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0463@33710e39 whole
 

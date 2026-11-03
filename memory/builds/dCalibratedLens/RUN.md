@@ -96,3 +96,97 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-03T00:04:39Z rescope · item add TOOL-dCalibratedLens-48 · reason spec-audit round 3 (reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md) minors batched into one unit, 16 MEDIUM and 9 LOW by raw id: 2 3 4 29 5 6 8 13 14 19 15 20 24 28 31 32 7 16 26 9 10 17 18 21 33; repairs no unit in particular
 
 2026-11-03T00:46:27Z review · item dCalibratedLens-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 6 · minors 25 · disposition promote
+
+2026-11-03T01:32:02Z rescope · item defer TOOL-dCalibratedLens-1 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:05Z rescope · item defer TOOL-dCalibratedLens-2 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:08Z rescope · item defer TOOL-dCalibratedLens-3 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:10Z rescope · item defer TOOL-dCalibratedLens-4 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:13Z rescope · item defer TOOL-dCalibratedLens-5 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:16Z rescope · item defer TOOL-dCalibratedLens-6 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:18Z rescope · item defer TOOL-dCalibratedLens-7 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:20Z rescope · item defer TOOL-dCalibratedLens-8 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:22Z rescope · item defer TOOL-dCalibratedLens-9 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:24Z rescope · item defer TOOL-dCalibratedLens-10 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:27Z rescope · item defer TOOL-dCalibratedLens-11 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:30Z rescope · item defer TOOL-dCalibratedLens-12 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:32Z rescope · item defer TOOL-dCalibratedLens-13 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:34Z rescope · item defer TOOL-dCalibratedLens-14 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:36Z rescope · item defer TOOL-dCalibratedLens-15 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:38Z rescope · item defer TOOL-dCalibratedLens-16 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:41Z rescope · item defer TOOL-dCalibratedLens-17 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:43Z rescope · item defer TOOL-dCalibratedLens-19 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:45Z rescope · item defer TOOL-dCalibratedLens-20 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:47Z rescope · item defer TOOL-dCalibratedLens-21 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:49Z rescope · item defer TOOL-dCalibratedLens-22 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:51Z rescope · item defer TOOL-dCalibratedLens-23 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:53Z rescope · item defer TOOL-dCalibratedLens-24 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:56Z rescope · item defer TOOL-dCalibratedLens-25 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:32:58Z rescope · item defer TOOL-dCalibratedLens-26 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:01Z rescope · item defer TOOL-dCalibratedLens-27 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:04Z rescope · item defer TOOL-dCalibratedLens-28 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:07Z rescope · item defer TOOL-dCalibratedLens-29 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:09Z rescope · item defer TOOL-dCalibratedLens-30 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:12Z rescope · item defer TOOL-dCalibratedLens-31 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:14Z rescope · item defer TOOL-dCalibratedLens-32 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:16Z rescope · item defer TOOL-dCalibratedLens-33 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:19Z rescope · item defer TOOL-dCalibratedLens-34 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:21Z rescope · item defer TOOL-dCalibratedLens-35 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:23Z rescope · item defer TOOL-dCalibratedLens-36 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:26Z rescope · item defer TOOL-dCalibratedLens-37 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:28Z rescope · item defer TOOL-dCalibratedLens-38 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:30Z rescope · item defer TOOL-dCalibratedLens-39 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:32Z rescope · item defer TOOL-dCalibratedLens-40 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:35Z rescope · item defer TOOL-dCalibratedLens-41 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:37Z rescope · item defer TOOL-dCalibratedLens-42 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:39Z rescope · item defer TOOL-dCalibratedLens-43 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:42Z rescope · item defer TOOL-dCalibratedLens-44 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:44Z rescope · item defer TOOL-dCalibratedLens-45 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:46Z rescope · item defer TOOL-dCalibratedLens-46 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:48Z rescope · item defer TOOL-dCalibratedLens-47 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T01:33:51Z rescope · item defer TOOL-dCalibratedLens-48 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18

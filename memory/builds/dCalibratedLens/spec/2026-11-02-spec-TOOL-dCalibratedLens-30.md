@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-30 — the round-1 spec audit's 41 minors batched: each correction carried by the sibling it lands on, and six arms that hold the classes no sibling owns
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 18 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 18 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
