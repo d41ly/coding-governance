@@ -3,7 +3,8 @@
 One authored record per class. The table below is GENERATED from each record's front matter
 and its DERIVED anchors — do not hand-edit between the markers.
 
-Hand a reviewer the classes their diff can hit:
+The review harness acquires the classes a diff can hit on the diff kind, so a reviewer is
+handed them without a lookup. For a reader who wants the checklist:
 
 ```bash
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>
