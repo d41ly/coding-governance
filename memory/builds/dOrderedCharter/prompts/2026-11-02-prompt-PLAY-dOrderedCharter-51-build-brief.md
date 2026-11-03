@@ -66,3 +66,14 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Your spec header's `advances PLAY-dOrderedCharter-38` stays `advances` when you flip it to `CLOSED`; you are not the last unit.
 - The unattended kit's own self-test suites are WAIVED for this build's landing (README, "Build-level rules"); a
   criterion they would observe is named as owed with PLAY-dClosedLoop-12, never run.
+
+## Owed by the unit before yours
+
+- PLAY-dOrderedCharter-22's pass made `tools/playbook/gov_tag.py` import `tools/memory-tree/design_lib.py`, and the
+  `playbook render selftest` leg's guard in `tools/gate-legs.json` does not name it (class
+  held-suite-guard-misses-a-sibling-kit). Add it to that guard in your pass, re-stamp the kickoff manifest in the same
+  commit (`gate-legs.json` is on its `watch:` list), and declare both paths in `--dispatch`.
+- `tools/playbook/README.md`'s section "Tags, the index and the resolver" lists the registry's fields but not unit 22's
+  `purpose` arm or `memory/project/chain.toml` (class a-folded-field-leaves-its-row-shape-docs-behind): add one
+  paragraph naming both, beside the paragraph your own unit owes there.
+- Record both as one `report` deviation naming unit 22's builder return.
