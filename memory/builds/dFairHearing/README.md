@@ -96,9 +96,9 @@ ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHea
 | [TOOL-dFairHearing-7 — refuted claims and same-address twins handed to the synthesizer to flag](spec/2026-10-23-spec-TOOL-dFairHearing-7.md) | 8 | 2 | CLOSED | rev-1 | 2026-11-02 |
 | [TOOL-dFairHearing-11 — every agent the review harness spawns is typed from a declared stage, and an opted-in review step runs twin finder runs the synthesis merges](spec/2026-10-23-spec-TOOL-dFairHearing-11.md) | 9 | 2 | CLOSED | rev-2 | 2026-11-03 |
 | [TOOL-dFairHearing-8 — fix verdicts judged by class behind a switch, and every confirmed finding given one disposition from the report's grammar](spec/2026-10-23-spec-TOOL-dFairHearing-8.md) | 10 | 2 | CLOSED | rev-2 | 2026-11-03 |
-| [TOOL-dFairHearing-16 — agent-cap's review rules moved to the review kit, each seen red at its new home before the hook stops carrying it](spec/2026-10-23-spec-TOOL-dFairHearing-16.md) | 11 | 2 | INPROGRESS | rev-5 | 2026-10-23 |
+| [TOOL-dFairHearing-16 — agent-cap's review rules moved to the review kit, each seen red at its new home before the hook stops carrying it](spec/2026-10-23-spec-TOOL-dFairHearing-16.md) | 11 | 2 | INPROGRESS | rev-6 | 2026-11-03 |
 | [TOOL-dFairHearing-10 — the review records brought back in line with the code at their sources, each live copy re-rendered](spec/2026-10-23-spec-TOOL-dFairHearing-10.md) | 12 | 2 | DEFERRED | rev-2 | 2026-10-23 |
-| [TOOL-dFairHearing-22 — agent-cap fails closed on a spec-audit call when the opt-in pack is not beside it](spec/2026-10-23-spec-TOOL-dFairHearing-22.md) | 12 | 2 | DEFERRED | rev-2 | 2026-10-23 |
+| [TOOL-dFairHearing-22 — agent-cap fails closed on a spec-audit call when the opt-in pack is not beside it](spec/2026-10-23-spec-TOOL-dFairHearing-22.md) | 12 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-12 — the scorer factory: one replay scorer, with aScoutedSeam's grader as its second instance](spec/2026-10-23-spec-TOOL-dFairHearing-12.md) | 13 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dFairHearing-14 — the experiment shape's method, enforced or recorded by the scorer factory](spec/2026-10-23-spec-TOOL-dFairHearing-14.md) | 14 | 2 | DEFERRED | rev-5 | 2026-10-23 |
 | [TOOL-dFairHearing-1 — the owed replays: the design-audit preset run blind at blob 767187aa, and the verdicts that flip the dark switches](spec/2026-10-23-spec-TOOL-dFairHearing-1.md) | 15 | 2 | DEFERRED | rev-4 | 2026-10-23 |
@@ -109,10 +109,10 @@ ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHea
 | [TOOL-dFairHearing-20 — a gapped whole-design walk reds the harness's returned counts, not only its prose](spec/2026-10-23-spec-TOOL-dFairHearing-20.md) | 19 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dFairHearing-23 — the round-1 spec audit's 49 minors: one contract per shared name, criteria a correct build can pass, and the fixtures and records the moved code needs](spec/2026-10-23-spec-TOOL-dFairHearing-23.md) | 19 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dFairHearing-25 — the owed replays run after the replay contract is corrected, and their verdicts set the dark switches](spec/2026-10-23-spec-TOOL-dFairHearing-25.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-23 |
-| [TOOL-dFairHearing-26 — every rule 0 and rule 5 arm of the hook's suite found at its new home and gone from the old one, counted by label whatever helper writes it](spec/2026-10-23-spec-TOOL-dFairHearing-26.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-23 |
+| [TOOL-dFairHearing-26 — every rule 0 and rule 5 arm of the hook's suite found at its new home and gone from the old one, counted by label whatever helper writes it](spec/2026-10-23-spec-TOOL-dFairHearing-26.md) | 20 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-27 — the spec audit of units 20 to 23, its 31 minors: criteria a correct build can pass, refusals that name their cause, and the readers a move leaves behind](spec/2026-10-23-spec-TOOL-dFairHearing-27.md) | 21 | 2 | DEFERRED | rev-2 | 2026-10-23 |
-| [TOOL-dFairHearing-28 — the hook suite's census re-pinned to 59 and 14, measured by a script file whose pattern no shell can fold](spec/2026-10-23-spec-TOOL-dFairHearing-28.md) | 21 | 2 | DEFERRED | rev-2 | 2026-10-23 |
-| [TOOL-dFairHearing-29 — the five escaped-quote arms of the hook's suite checked by name, at their home and gone from the old one](spec/2026-10-23-spec-TOOL-dFairHearing-29.md) | 21 | 2 | DEFERRED | rev-2 | 2026-10-23 |
+| [TOOL-dFairHearing-28 — the hook suite's census re-pinned to 59 and 14, measured by a script file whose pattern no shell can fold](spec/2026-10-23-spec-TOOL-dFairHearing-28.md) | 21 | 2 | DEFERRED | rev-3 | 2026-11-03 |
+| [TOOL-dFairHearing-29 — the five escaped-quote arms of the hook's suite checked by name, at their home and gone from the old one](spec/2026-10-23-spec-TOOL-dFairHearing-29.md) | 21 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-30 — unit 15's with-and-without replay run with one fresh clone per record and arm, so no arm reviews a tree holding the other's report](spec/2026-10-23-spec-TOOL-dFairHearing-30.md) | 21 | 2 | DEFERRED | rev-3 | 2026-10-23 |
 | [TOOL-dFairHearing-31 — the version-line check resolves the bar's own base first, and refuses by name when it cannot, rather than passing on an empty diff](spec/2026-10-23-spec-TOOL-dFairHearing-31.md) | 22 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dFairHearing-35 — unit 15's replay scored by one attempt rule fixed before the runs, so no figure rests on the attempt a runner prefers](spec/2026-10-23-spec-TOOL-dFairHearing-35.md) | 22 | 2 | DEFERRED | rev-2 | 2026-10-23 |
@@ -126,7 +126,7 @@ ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHea
 | [TOOL-dFairHearing-40 — the round-5 spec audit's 35 minors: one build-wide version reading on one base, an attempt checker that refuses what it cannot place, and criteria a correct build can pass](spec/2026-10-23-spec-TOOL-dFairHearing-40.md) | 26 | 2 | DEFERRED | rev-1 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 144 bound to this build, across 4 record folder(s).
+Records: 147 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
