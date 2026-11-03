@@ -97,3 +97,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-03T04:20:12Z dispatch · item 69930b48 TOOL-dFairHearing-10 · reason tools/workflows/REVIEW-PROTOCOL.template.md memory/guides/REVIEW-PROTOCOL.md tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/hooks/agent-cap.js tools/roles/agents/gov-synthesizer.agent.md .claude/agents/gov-synthesizer.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-10.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dFairHearing/README.md
 
 2026-11-03T04:20:22Z brief · item TOOL-dFairHearing-10 · reason 1179ccdeab88 memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-10-build-brief.md
+
+2026-11-03T04:31:18Z brief · item TOOL-dFairHearing-22 · reason 493c97e6e651 memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-22-build-brief.md
+
+2026-11-03T04:42:29Z dispatch · item 461ec997 TOOL-dFairHearing-22 · reason tools/hooks/agent-cap.js tools/hooks/agent-cap.test.sh tools/hooks/README.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-22.md memory/builds/dFairHearing/README.md memory/LIVE.md memory/backlog/TOOL.md memory/map/generated/symbols.json
