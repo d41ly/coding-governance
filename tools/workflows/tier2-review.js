@@ -1405,7 +1405,7 @@ const verdictResults = await boundedParallel(
           `or \`duplicate of prior <ref>\` for a prior round's original; (6) a PREFERENCE that names no defect the rubric grades, not even a low.\n` +
           `Evidence that reads \`-\` was not recorded: probe the claim yourself and never confirm on the finder's word. ` +
           `A probe you could not run inside its bound is a finding you cannot establish; apply the default by the finder's grade, and never call it evidence that does not reproduce.\n\n`
-        : (roles.skeptic ? `For EACH finding below, ` : `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — `) + `read the actual code (Read/Grep the cited file:line and callers) and decide "confirmed" (real, reachable, impactful) or "refuted" (not reachable / not a bug / by-design / duplicate).\n\n`) +
+        : (roles.skeptic ? `For EACH finding below, ` : `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — `) + `read the actual code (Read/Grep the cited line and its callers) and decide "confirmed" (real, reachable, impactful) or "refuted" (not reachable / not a bug / by-design / duplicate).\n\n`) +
         // TOOL-aSightedSkeptic-6 S4 - the default follows the FINDER's grade (spec section 8 F3). An
         // unsure skeptic refuting a real blocker loses the defect; one answering uncertain on every
         // low-precision nit floods disposal. So only a costly finding is left outstanding.
@@ -1755,7 +1755,7 @@ const synth = await agent(
     `Each CONFIRMED finding's bracketed grade is its BINDING grade under this rubric: put each confirmed id in an item ` +
     `whose severity is that grade, merge findings of one binding grade only, and where you judge a different grade right, ` +
     `write the reason in the report beside that finding.` +
-    `\n\nWrite a markdown report (severity-ranked, blockers first, each with ${isSpec ? 'its file and section address' : 'file:line'} + fix + a left-shift gate suggestion) to a file under ${repo}/${reviewDir}. ` +
+    `\n\nWrite a markdown report (severity-ranked, blockers first, each with ${isSpec ? 'its file and section address' : 'the blob-pinned line <path>@<sha8>:<line> at the reviewed sha'} + fix + a left-shift gate suggestion) to a file under ${repo}/${reviewDir}. ` +
     // TOOL-aSightedSkeptic-2 S3 - a REJECTED fix never reaches the report as the fix.
     `Each CONFIRMED finding's fix line says whether a skeptic judged its fix. Where it is REJECTED, write the skeptic's ` +
     `corrected fix into the report, never the rejected one; where the note gives no correction, say the fix is still to be ` +

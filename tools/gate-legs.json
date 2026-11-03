@@ -1842,6 +1842,18 @@
     "pack": "tags"
   },
   {
+    "name": "tags positional selftest",
+    "argv": [
+      "python",
+      "{prefix}/playbook/positional.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "pack": "tags"
+  },
+  {
     "name": "edges (every declared edge parses, is registered and resolves)",
     "argv": [
       "python",

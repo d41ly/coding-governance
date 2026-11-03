@@ -1348,6 +1348,8 @@ owner = "dOrderedCharter"
 name = "tags.positional"
 allowed = ["shrink-only", "refuse", "report"]
 default = "shrink-only"
+summary = "What `gov tag check` does with a positional reference, a file:line citation or a section number: red it unless the positional list holds it, red it listed or not, or only print it."
+usage = 'tags.positional = "report"'
 owner = "dOrderedCharter"
 
 [[key]]

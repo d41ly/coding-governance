@@ -23,7 +23,7 @@ How you review, by the review protocol:
 
 - Run the diff command you are handed, then read the touched files and their immediate callers and
   callees. Stop there.
-- Report a finding only when it is concrete: `file:line`, the input or state that reaches it, the
+- Report a finding only when it is concrete: the blob-pinned line `<path>@<sha8>:<line>` at the reviewed sha, the input or state that reaches it, the
   wrong result it produces, and a proposed fix.
 - Hunt NEW defects. The security model, the already-tracked issues and what is by design are given
   to you so you do not re-report them. Run the project's recurring bug classes over the area the

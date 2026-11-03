@@ -152,7 +152,7 @@ memory tree and a design pass is where a new surface is first decided (PLAY-aDis
 ## The Tier-2 pattern
 
 Dimension finders (security / correctness / data-integrity / dead-code / integration-seams) emit
-`file:line` findings **scoped to an immutable base SHA**, then skeptics try to REFUTE each before it
+findings cited as the blob-pinned line `<path>@<sha8>:<line>` at the reviewed sha, **scoped to an immutable base SHA**, then skeptics try to REFUTE each before it
 is recorded. Feed the finders the security model, the open asks on the files under review — the
 rows `gen_build_index.py --asks --json --path <every path the diff touches>` prints, ranked by
 severity and capped, with `--limit 0` lifting the cap, or the backlog shards when its `mode` field

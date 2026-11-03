@@ -9,7 +9,9 @@
 prints every citation of it, a build record's too; `check` runs the `retired`, `resolves` and `owned`
 arms over the citations outside `<MEMORY_ROOT>/builds/`, and the shape check, the joins and the
 name-check slot (PLAY-dOrderedCharter-10), and the `purpose` arm, the namespace rows' `owner` and
-`purpose-source` and the chain registry joined to the design view (PLAY-dOrderedCharter-22). An address is a tag, `doc.<name>#<seg>`, or a
+`purpose-source` and the chain registry joined to the design view (PLAY-dOrderedCharter-22), and the `positional` arm, the
+tree's positional references against `positional-refs.txt` with every pinned line and symbol citation resolved
+(PLAY-dOrderedCharter-26, `positional.py`). An address is a tag, `doc.<name>#<seg>`, or a
 positional label `aliases.toml` maps. `--gc` collects the index rows of every extractor version no live
 worktree derives (PLAY-dOrderedCharter-51 S5). Every line opens `tags:`; `--json` is the index's only JSON.
 Exit 0 green, 1 red, 2 a refusal (an unreadable registry, a refused policy read, a locked index).
@@ -199,7 +201,10 @@ def run_check(con, root, ctx, kit_rel, *, sets, base, as_json, state) -> int:
     from edge_grammar import check_native_classes   # PLAY-dOrderedCharter-28 S2: the native-id classes
     x_reds, x_lines = check_native_classes(root, root / kit_rel / "namespaces.toml")
     p_lines += x_lines
-    reds += r_reds + o_reds + n_reds + p_reds + x_reds
+    from positional import check_positional, read_positional_mode  # PLAY-dOrderedCharter-26: the positional arm
+    q_reds, q_lines, positional = check_positional(root, kit_rel, read_positional_mode(root, sets), ctx["memory_root"])
+    p_lines += q_lines
+    reds += r_reds + o_reds + n_reds + p_reds + x_reds + q_reds
     tags = sum(counts.values())
     unread = con.execute("SELECT COUNT(*) FROM view_path WHERE path NOT LIKE '%.md'").fetchone()[0]
     summary = {
@@ -207,7 +212,7 @@ def run_check(con, root, ctx, kit_rel, *, sets, base, as_json, state) -> int:
         "retired_cited": cited, "bare_refs": c["bare"], "records_not_graded": c["records"], "paths_not_markdown": unread,
         "shape_graded": len(shaped), "file_names_not_graded": c["file_names"], "name_check": slot,
         "unarmed": {ns: c["unarmed"].get(ns, 0) for ns, n in counts.items() if not n},
-        "purpose": purpose, "reds": reds, "warns": warns, "blobs_parsed": state["parsed"],
+        "purpose": purpose, "positional": positional, "reds": reds, "warns": warns, "blobs_parsed": state["parsed"],
         "extractor_runs": sum(state["runs"].values()), "skipped_fresh": sum(state["skipped"].values()),
     }
     if as_json:
@@ -320,7 +325,8 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "escaped-word", "file-name", "new-extractor", "extractor-edit", "tagless", "schema",
           "no-owner", "ghost-owner", "no-purpose-source", "bad-purpose-source", "member-no-field", "pending-source",
           "registry-ghost", "registry-missing", "registry-joined", "new-no-purpose", "two-versions",
-          "served-across")
+          "served-across", "positional-seed", "positional-new", "positional-stale", "positional-listed",
+          "positional-symbol", "positional-pinned", "positional-pin")
 #: PLAY-dOrderedCharter-44's `extractor-edit`: the fixture extractor's module edited to stop yielding one tag
 EDITED_EXTRACTOR = FIXTURE_EXTRACTOR.replace("elif len(word) == 1:",
                                              'elif len(word) == 1 and word[0] != "layer.memory.recall":')
@@ -451,6 +457,7 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
         "tools/expkit/kit.toml": 'id = "expkit"\nlayer = "layer.exp"\n',
         "tools/expkit/exp.tags": "",
         "memory/project/chain.toml": FIXTURE_CHAIN,
+        f"{kit}/positional-refs.txt": "",  # PLAY-dOrderedCharter-26: present and empty, so the arm is unarmed
     }
     if plant in PURPOSE_PLANTS:
         old, new = PURPOSE_PLANTS[plant]
@@ -525,6 +532,8 @@ def run_plant(root, top, plant, sets) -> int:
 
     def run_verb(*args, **kw):  # every verb of a plant reads the fixture's own kit directory
         return run_kit_verb(*args, kit_rel=FIXTURE_KIT, **kw)
+    if plant.startswith("positional-"):
+        return run_positional_plant(root, top, plant, say, lambda: run_verb(root, "check", None, sets=sets))
 
     def read_cold_dump():  # the rows a build from nothing writes for the same HEAD
         remove_index(root)
@@ -724,6 +733,114 @@ def run_plant(root, top, plant, sets) -> int:
         say(f"{half}: rc={run_verb(root, 'check', None, sets=sets)}")
         return rc
     return run_verb(root, "check", None, sets=sets)
+
+
+#: PLAY-dOrderedCharter-26 S8: the positional plants' code file and its citations, spelled in parts so this
+#: file holds no file:line citation and no pinned line of its own
+POS_CODE = "tools/corekit/code.py"
+POS_MOD = "one = 1\ntwo = 2\nthree = 3\n"
+POS_SYMBOLS = {
+    "tools/corekit/mod.py": "DELTA = 1\n\n\ndef alpha():\n    pass\n\n\nclass Beta:\n    def gamma(self):\n        pass\n",
+    "tools/corekit/run.sh": "#!/usr/bin/env bash\nepsilon() {\n  :\n}\n",
+    "tools/corekit/app.js": "function zeta() {}\nconst eta = 1\n",
+}
+
+
+def derive_cite(n, oid=None) -> str:
+    return f"{POS_CODE}{'@' + oid if oid else ''}:{n}"
+
+
+def run_positional_plant(root, top, plant, say, check) -> int:
+    """S8's seven plants over the fixture's own list. `check` runs the fixture's whole `check`, whose
+    `positional` arm each plant moves; a plant of several steps returns 0 only when every step held."""
+    import positional as pos
+    kit, guide = FIXTURE_KIT, "memory/guides/ALPHA.md"
+    list_path = pos.derive_list_path(root, kit)
+
+    def read_rows():
+        return pos.read_list(list_path) or []
+    if plant == "positional-seed":
+        write_commit(root, {POS_CODE: POS_MOD, "AGENTS.md": "# Charter\n\nsee HYGIENE check 5\n",
+                            guide: GUIDE + f"\nsee {derive_cite(1)}, {derive_cite('2-3')} and {derive_cite(1)} again\n",
+                            "memory/guides/BETA.md": f"# Beta\n\nread BUILD-METHOD M5, and {derive_cite(1)}\n",
+                            f"{kit}/positional-refs.txt": "AGENTS.md\tHYGIENE check 5\n"}, "citations")
+        pos.run_seed(root, kit)
+        want = {"AGENTS.md\tHYGIENE check 5", f"{guide}\t{derive_cite(1)}", f"{guide}\t{derive_cite('2-3')}",
+                f"memory/guides/BETA.md\t{derive_cite(1)}", "memory/guides/BETA.md\tBUILD-METHOD M5"}
+        got = read_rows()
+        same = sorted(got) == sorted(want)
+        say("seed: the list holds every expected row and no other" if same else f"seed: the list DIFFERS: {got}")
+        again = pos.run_seed(root, kit)
+        say(f"a second seed: rc={again}")
+        rc = check()
+        return 0 if same and again == 1 and rc == 0 else 1
+    if plant in ("positional-new", "positional-stale", "positional-listed"):
+        two = f" and {derive_cite(2)}"
+        cited = GUIDE + f"\nsee {derive_cite(1)}" + (two if plant == "positional-stale" else "") + ", per BUILD-METHOD M5\n"
+        write_commit(root, {POS_CODE: POS_MOD, guide: cited}, "citations")
+        pos.run_seed(root, kit)
+        if plant == "positional-listed":
+            return check()
+        if plant == "positional-new":
+            write_files(root, {guide: cited + f"\nand {derive_cite(2)}, per BUILD-METHOD M9\n"})
+            rc = check()
+            write_files(root, {guide: cited})
+            say(f"without the plants: rc={check()}")
+            return rc
+        before = len(read_rows())
+        write_files(root, {guide: cited.replace(two, "")})
+        rc1 = check()
+        stale = rc1 == 1 and any(r.endswith(derive_cite(2)) for r in read_rows())
+        say(f"removed: rc={rc1}, stale {'named' if stale else 'NOT named'}")
+        pos.run_shrink(root, kit)
+        after, rc2 = len(read_rows()), check()
+        say(f"after shrink: {after - 1} rows, rc={rc2}")  # the M5 row aside
+        write_files(root, {guide: cited.replace(two, f" and {derive_cite(3)}")})
+        pos.run_shrink(root, kit)
+        again, rc3 = len(read_rows()), check()
+        say(f"a new citation planted: shrink left {again - 1} rows, rc={rc3}")
+        return 0 if stale and after == before - 1 and rc2 == 0 and again == after and rc3 == 1 else 1
+    if plant == "positional-symbol":
+        cites = (("mod.py", "alpha"), ("mod.py", "Beta.gamma"), ("mod.py", "DELTA"), ("run.sh", "epsilon"),
+                 ("app.js", "zeta"), ("app.js", "eta"))
+        live = "".join(f"see `tools/corekit/{p}#{s}`\n" for p, s in cites)
+        ghost = "tools/corekit/mod.py#ghost"
+        others = f"\n<!-- usage: script:{ghost} -->\n\nescaped ``{ghost}``\n\nand `tools/corekit/kit.toml#ghost`\n"
+        files = dict(POS_SYMBOLS, **{guide: GUIDE + "\n" + live + f"and `{ghost}`\n" + others,
+                                    "memory/builds/x/record.md": f"`{ghost}`\n",
+                                    "tools/corekit/extra.toml": f'purpose-source = "{ghost}"\n',
+                                    "tools/corekit/cites.py": f'GHOST = "{ghost}"\n'})
+        write_commit(root, files, "symbol citations")
+        rc = check()
+        write_files(root, {guide: GUIDE + "\n" + live + others})
+        say(f"without the live ghost: rc={check()}")
+        return rc
+    if plant == "positional-pinned":
+        write_commit(root, {POS_CODE: POS_MOD}, "the code")
+        blob = run_git(root, "rev-parse", "--short=8", f"HEAD:{POS_CODE}").strip()
+        commit = run_git(root, "rev-parse", "--short=8", "HEAD").strip()
+        good = f"\nsee {derive_cite(2, blob)} and {derive_cite(3, commit)}\n"
+        bad = f"\nand {derive_cite(1, '0' * 8)} and {derive_cite(9, blob)}\n"
+        write_commit(root, {guide: GUIDE + good + bad, "memory/builds/x/record.md": f"{derive_cite(1, '0' * 8)}\n"},
+                     "pins")
+        rc = check()
+        write_files(root, {guide: GUIDE + good})
+        say(f"without the live bad pins: rc={check()}")
+        return rc
+    # positional-pin: the unlisted citation re-pinned, and a file outside the repository refused
+    write_commit(root, {POS_CODE: POS_MOD, guide: GUIDE + f"\nsee {derive_cite(2)}\n"}, "a citation")
+    blob = run_git(root, "rev-parse", "--short=8", f"HEAD:{POS_CODE}").strip()
+    pinned = pos.run_pin(root, kit, root / guide)
+    text = (root / guide).read_text(encoding="utf-8")
+    rc = check()
+    ok = pinned == 0 and derive_cite(2, blob) in text and derive_cite(2) + "\n" not in text and rc == 0
+    say(f"pin {'rewrote the citation to the blob at HEAD' if ok else 'did NOT rewrite the citation'}; check: rc={rc}")
+    outside = top / "outside.md"
+    outside.write_text(f"see {derive_cite(2)}\n", encoding="utf-8")
+    out_rc = pos.run_pin(root, kit, outside)
+    kept = outside.read_text(encoding="utf-8") == f"see {derive_cite(2)}\n"
+    say(f"pin outside the repository: rc={out_rc}, {'nothing written' if kept else 'the file WRITTEN'}")
+    return 0 if ok and out_rc == 1 and kept else 1
 
 
 def main(argv=None) -> int:

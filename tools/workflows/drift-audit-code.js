@@ -117,7 +117,7 @@ its recorded description is now wrong:
 ${a.byDesign || '(none supplied — assume nothing is known and expect a lower precision)'}
 
 EVIDENCE RULES (these decide whether your finding survives the skeptic):
-- Every finding needs a real path:line you actually read. Forward slashes only, never backslashes.
+- Every finding needs a real line you actually read, cited as the blob-pinned line <path>@<sha8>:<line> at the audited sha. Forward slashes only, never backslashes.
 - "Dead"/"unused" requires that you ACTUALLY searched for consumers across ALL of: direct imports,
   re-exports through barrels/index files, dynamic imports, framework file-convention exports,
   string-keyed registries, generated artifacts, decorators/annotations that register a symbol at
@@ -351,10 +351,10 @@ const verdictBatches = await boundedParallel(
     agent(
       `You are a DEFAULT-REFUTE skeptic auditing findings from a whole-repo drift audit of ${REPO}
 (ships at ${BASE}). Your job is to REFUTE. Assume each finding is wrong until its evidence forces you
-to agree. Open the cited file:line yourself and run the searches the finder claims to have run.
+to agree. Open the cited pinned line yourself and run the searches the finder claims to have run.
 
 Refute when ANY of these hold:
-- the cited file:line does not say what the finding claims;
+- the cited pinned line does not say what the finding claims;
 - a consumer/caller/reference DOES exist that the finder missed — check barrels, re-exports, dynamic
   imports, framework file conventions, string-keyed registries, generated artifacts, decorators, CLI
   entrypoints, tests and seed data;
@@ -453,7 +453,7 @@ functionality, duplicate or reinvented functionality?
 
 Write it so a tired reader has the answer in the first ten lines. Structure:
 1. Verdict up front: is there drift, how much, and what is the single worst thing.
-2. Severity-ordered table of CONFIRMED findings (id, severity, file:line, one-line claim).
+2. Severity-ordered table of CONFIRMED findings (id, severity, <path>@<sha8>:<line>, one-line claim).
 3. PARTIAL findings, with the corrected severity beside the original.
 4. UNVERIFIED findings listed explicitly — NOT refuted, NOT cleared. State plainly that no skeptic
    reached them. If the count is zero, say so and say why that is positive evidence.
@@ -464,7 +464,7 @@ Write it so a tired reader has the answer in the first ten lines. Structure:
    the mechanism, not the instances.
 8. A prioritized do-this-next list, cheapest-high-value first, each item naming the file to touch.
 
-Rules: every claim keeps its file:line. Do not soften or round. Do not invent findings not in the
+Rules: every claim keeps its blob-pinned line, <path>@<sha8>:<line>. Do not soften or round. Do not invent findings not in the
 data. Report precision and the raw/confirmed/partial/refuted/unverified counts honestly, and state
 the correction DIRECTION beside precision — precision 1.00 with zero refutations means nothing was
 fabricated, not that the severities were right. Where findings contradict each other, say so rather

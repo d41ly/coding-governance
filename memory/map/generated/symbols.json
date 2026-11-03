@@ -4553,6 +4553,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "check_file_line_row",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "check_filed_before_cutoff",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -5368,6 +5373,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "check_pins",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "check_placeholder",
       "kind": "function",
       "file": "tools/roles/handoff.py"
@@ -5386,6 +5396,11 @@
       "id": "check_point",
       "kind": "function",
       "file": "tools/playbook/check_layers.py"
+    },
+    {
+      "id": "check_positional",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
     },
     {
       "id": "check_pp_value",
@@ -6146,6 +6161,11 @@
       "id": "check_survivors",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
+    },
+    {
+      "id": "check_symbols",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
     },
     {
       "id": "check_table_row",
@@ -7693,6 +7713,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_cite",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
+    },
+    {
       "id": "derive_claim_ago",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -8386,6 +8411,11 @@
       "id": "derive_lineage",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "derive_list_path",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
     },
     {
       "id": "derive_live_rows",
@@ -11750,6 +11780,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/playbook/render_playbook.py"
     },
     {
@@ -14493,6 +14528,11 @@
       "file": "tools/policy/guard.py"
     },
     {
+      "id": "read_blob_lines",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "read_blobs",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
@@ -15153,6 +15193,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "read_file_line_rows",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "read_file_members",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
@@ -15341,6 +15386,11 @@
       "id": "read_git_dirs",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "read_git_grep",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
     },
     {
       "id": "read_git_lines",
@@ -15908,6 +15958,11 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "read_list",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "read_listing",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -16418,6 +16473,11 @@
       "file": "tools/playbook/gov_tag.py"
     },
     {
+      "id": "read_positional_mode",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "read_post_claim_returns",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -16833,6 +16893,11 @@
       "file": "tools/playbook/edge_grammar.py"
     },
     {
+      "id": "read_section_rows",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "read_serves_ids",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -17221,6 +17286,16 @@
       "id": "read_sweep_expectations",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_symbol_citations",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "read_symbol_defs",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
     },
     {
       "id": "read_tag_rows",
@@ -22058,6 +22133,11 @@
       "file": "tools/playbook/gov_tag.py"
     },
     {
+      "id": "run_check",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "run_checks",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
@@ -22893,6 +22973,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "run_pin",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "run_pk_gate",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -22961,6 +23046,11 @@
       "id": "run_pm_decide",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "run_positional_plant",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
     },
     {
       "id": "run_post_merge",
@@ -23218,6 +23308,11 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
+      "id": "run_seed",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/gate-lint/encoding_posture.py"
@@ -23246,6 +23341,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
     },
     {
       "id": "run_selftest",
@@ -23291,6 +23391,11 @@
       "id": "run_ships_join",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_shrink",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
     },
     {
       "id": "run_shuffle_control",
@@ -28406,6 +28511,11 @@
       "id": "write_lin_fix",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "write_list",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
     },
     {
       "id": "write_list",
