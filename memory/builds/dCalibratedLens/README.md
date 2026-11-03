@@ -135,7 +135,7 @@ ids TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL
 | [TOOL-dCalibratedLens-48 — the round-3 spec audit's 25 minors batched: each correction carried by the sibling it lands on](spec/2026-11-03-spec-TOOL-dCalibratedLens-48.md) | 21 | 2 | DEFERRED | rev-1 | 2026-11-03 |
 <!-- /gen:build-units -->
 
-Records: 93 bound to this build, across 4 record folder(s).
+Records: 94 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

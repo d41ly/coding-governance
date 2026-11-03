@@ -9,6 +9,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-03-build-TOOL-dCalibratedLens-1-departures-spec.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-departures-spec.md) | journal | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-1-deviation-12.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-deviation-12.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-1-deviation-13.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-deviation-13.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-1-deviation-14.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-deviation-14.md) | deviation | — |
