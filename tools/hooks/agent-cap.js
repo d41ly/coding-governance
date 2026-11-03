@@ -399,8 +399,9 @@ function runBothViews(rule, script) {
 const MAX_VERIFIERS = 5
 // ONE NUMBER, ratified by the owner 2026-08-10 (spec F2). The lens allowance used to sit at 6 and
 // read as a deliberate find-stage affordance; it was not. It was the trailing-comma miscount above,
-// and no shipped harness has ever had six lenses — tier2-review has four, both drift-audit waves
-// have five. With the count fixed, 5 is what the charter says and what every harness already obeys.
+// and no shipped harness has ever had six lenses — tier2-review runs five on both kinds, diff and
+// spec, and both drift-audit waves have five. With the count fixed, 5 is what the charter says and
+// what every harness already obeys.
 const MAX_LENSES = 5
 // TOOL-dGroundRules-10 F2 — a VERIFIER split's comparand is MAX_VERIFIERS, the verify total. TOOL-dGroundRules-18 — a WRITER
 // split's is the agent limit (receiver (a)), read through rule 7's `readPolicy` once, only for a script carrying the marker.

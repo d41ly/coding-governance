@@ -940,8 +940,9 @@ const SPEC_FINDING_SCHEMA = {
 // TOOL-aSightedSkeptic-5 - FIVE lenses, the owner's set. `regressions` is retired: it was told to run
 // "the PROJECT's checklist" and was handed none, and its sweep is now split over these five through
 // `args.checklist`. `verification` hunts the defect this repo finds most, a check that cannot fail,
-// which no brief named. No brief names a web surface. Five is the most the agent-cap hook admits on
-// an array-literal receiver, so a sixth lens is denied at the tool call rather than chosen against.
+// which no brief named. No brief names a web surface. Five is the most the verifier fan-out leg's
+// check-verifier-fanout.js admits on an array-literal receiver, so a sixth lens reds the merge bar
+// rather than being chosen against.
 // TOOL-dFairHearing-13 - the catalogue, this kit's `lenses.toml`, is the source of every lens, and
 // each lens literal here is its RENDER: render_lenses.py fills the slot token under a literal's
 // lens-slots marker with the rows whose `default_in` names it, at install and in the parity leg,
@@ -992,8 +993,8 @@ const DIFF_LENSES = [ // gov:lens-slots diff-review
   }),
 ]
 // TOOL-aSightedSkeptic-7 S3 - a LIGHT diff review's lenses, as KEYS (spec F1: 70 of the 76 classed
-// findings in the owner's sample, inside the protocol's three-to-six range). Not a third lens set: the
-// skip happens inside the Find thunk, so the receiver the agent-cap hook sizes keeps its shape.
+// findings in the owner's sample). Not a third lens set: the skip happens inside the Find thunk, so
+// the receiver the verifier fan-out leg sizes keeps its shape.
 const LIGHT_LENSES = ['correctness', 'seams', 'verification']
 
 // TOOL-aEvidencedLens-1 - this array holds the M4 spec-audit lenses. The method and the memory-tree
@@ -1061,8 +1062,8 @@ const DESIGN_LENSES = [ // gov:lens-slots design-audit
   }),
 ]
 
-// The ONE dialect <prefix>/hooks/agent-cap.js admits here: sibling top-level array literals and a
-// marked ternary. A map, object or registry of lens sets is DENIED at the tool call, so this shape
+// The ONE dialect <prefix>/workflows/check-verifier-fanout.js admits here: sibling top-level array
+// literals and a marked ternary. A map, object or registry of lens sets reds the fan-out leg, so this shape
 // is fixed by the enforcement point rather than chosen. TOOL-dTieredTribunal-13 tightened the branch
 // this line sits on to require EVERY value branch bounded, and all three branches here are literals,
 // the spec kind's two picked by `preset` (TOOL-dFairHearing-2). All are rendered from the lens catalogue
@@ -1187,7 +1188,7 @@ if (unreadNotes.length)
 // exactly one share and the split is a pure function of the items and the keys: a reused lens file
 // (S7) held the share this run would hand it. Round-robin, not contiguous `chunk`: a contiguous split
 // hands one lens a run of neighbouring classes and the last lens the short remainder (spec F1 and §10).
-// It runs over the keys of the lenses that RUN (S7 below), never by reshaping the LENSES receiver the agent-cap hook sizes.
+// It runs over the keys of the lenses that RUN (S7 below), never by reshaping the LENSES receiver the fan-out leg sizes.
 function deriveChecklistShares(items, keys) {
   const shares = {}
   for (const k of keys) shares[k] = []
