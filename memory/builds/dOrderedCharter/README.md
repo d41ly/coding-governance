@@ -128,7 +128,7 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 TOOL
 | [PLAY-dOrderedCharter-28 — the shared edge grammar at every site the memory plan names: twelve new types, native-id classes and the two pinned forms](spec/2026-10-23-spec-PLAY-dOrderedCharter-28.md) | 8 | 2 | CLOSED | rev-5 | 2026-11-03 |
 | [PLAY-dOrderedCharter-26 — file:line citations held in the positional population, new text citing a symbol or a pinned line](spec/2026-10-23-spec-PLAY-dOrderedCharter-26.md) | 9 | 2 | CLOSED | rev-7 | 2026-11-03 |
 | [PLAY-dOrderedCharter-25 — gov tag bundle, a tag's members, regions and instructions in one call, and the two edge checks](spec/2026-10-23-spec-PLAY-dOrderedCharter-25.md) | 10 | 2 | DEFERRED | rev-7 | 2026-11-03 |
-| [PLAY-dOrderedCharter-47 — a record written on a branch that never held the positional check is graded print-only, by its adding commit's ancestry](spec/2026-10-24-spec-PLAY-dOrderedCharter-47.md) | 10 | 2 | DEFERRED | rev-3 | 2026-11-03 |
+| [PLAY-dOrderedCharter-47 — a record written on a branch that never held the positional check is graded print-only, by its adding commit's ancestry](spec/2026-10-24-spec-PLAY-dOrderedCharter-47.md) | 10 | 2 | CLOSED | rev-3 | 2026-11-04 |
 | [PLAY-dOrderedCharter-48 — the sources that tell a writer to cite path and line are a query over the directive sources, every hit re-pointed or kept by name](spec/2026-10-24-spec-PLAY-dOrderedCharter-48.md) | 10 | 2 | DEFERRED | rev-4 | 2026-11-03 |
 | [PLAY-dOrderedCharter-50 — the rows a new leg, key or retirement owes are written by the pass that creates them, through one owed-rows probe](spec/2026-10-24-spec-PLAY-dOrderedCharter-50.md) | 10 | 2 | DEFERRED | rev-5 | 2026-11-03 |
 | [PLAY-dOrderedCharter-53 — a file:line citation is grandfathered by the commit that wrote its line, never by the age of its file](spec/2026-10-24-spec-PLAY-dOrderedCharter-53.md) | 11 | 2 | DEFERRED | rev-2 | 2026-11-03 |
@@ -172,7 +172,7 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 TOOL
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 <!-- /gen:build-units -->
 
-Records: 309 bound to this build, across 4 record folder(s).
+Records: 310 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

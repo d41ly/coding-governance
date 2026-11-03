@@ -254,7 +254,10 @@ reached with the inline `resolve_kit_dir`, as `policy_value.py` reaches the poli
 bracketed Markdown spans outside `<MEMORY_ROOT>/builds/` (`resolves`, `retired`, the bare-name rule and
 `owned`) and counts what it does not grade. `aliases.toml` maps each positional label that never moved
 to its section; `positional-refs.txt` keeps the live positional references, one `<path>` TAB `<ref>` row
-each, as `--list-positional` prints them. The `tags` leg runs `check`; the user page is `help/tags.md`.
+each, as `--list-positional` prints them. An unlisted file:line citation in a `<MEMORY_ROOT>/builds/`
+record whose adding commit does not descend from the commit that added `positional.py` is printed
+`positional — grandfathered:` and never red, since it was written on a branch that never held the
+check (PLAY-dOrderedCharter-47). The `tags` leg runs `check`; the user page is `help/tags.md`.
 
 PLAY-dOrderedCharter-22 adds the `purpose` arm to `check`. Each registry row's `owner` names a build of
 the chain registry, `memory/project/chain.toml` (one `[[build]]` row per build, its `slug` and its

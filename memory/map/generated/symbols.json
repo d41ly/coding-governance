@@ -15448,6 +15448,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "read_grandfathered",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "read_grant_key_at",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"

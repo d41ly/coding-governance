@@ -15,7 +15,12 @@ in SYMBOL_EXTENSIONS, or a blob-pinned line, `<path>@<oid>:<n>[-<m>]`.
 `check` is the `positional` arm of `gov_tag.py check`, run alone: the tree against the list both ways,
 as `tags.positional` says (`shrink-only`, `refuse` or `report`), every pinned line read against its
 blob and every symbol citation against its file's definitions. An unresolved pin or symbol under
-`<MEMORY_ROOT>/builds/` is printed and never red: those records are frozen. `seed` writes the rows
+`<MEMORY_ROOT>/builds/` is printed and never red: those records are frozen. So is an unlisted file:line
+citation in a record there whose adding commit does not descend from `L`, the commit that added this
+module (PLAY-dOrderedCharter-47): it was written on a branch that never held the check, and prints
+`positional — grandfathered:`. With no `L`, the module staged and not landed, every record is graded.
+A record deleted and re-added after `L` is graded from its original add, the oldest the reader keeps,
+so a record first added before `L` stays grandfathered. `seed` writes the rows
 once and refuses a list already holding a file:line row; `shrink` drops the stale rows and never adds
 one; `pin` rewrites a file's unlisted file:line citations to the blob-pinned line at `--at` (HEAD).
 Exit 0 green, 1 red, 2 a refusal (a refused policy read, an unreadable list, a git failure).
@@ -246,6 +251,27 @@ def check_symbols(root, frozen) -> tuple[list, list, int, int]:
     return reds, printed, len(cites), passed
 
 
+def read_grandfathered(root, kit_rel, frozen, paths) -> dict:
+    """{path: adding sha} for each of `paths` under `frozen` added by a commit outside the set that holds
+    the check: `L`, the oldest add of this module at `kit_rel`, and `git rev-list --ancestry-path L..HEAD`.
+    Both adds are read through `tree_lib.read_adding_commits`; no `L` grandfathers nothing."""
+    wanted = {p for p in paths if p.startswith(frozen)}
+    if not wanted:
+        return {}
+    tree_lib, _id_grammar = ti.load_memory_tree()
+    module = f"{kit_rel}/positional.py"
+    try:
+        landing = tree_lib.read_adding_commits(root, module, {module}).get(module)
+        if not landing:
+            return {}
+        held = {landing, *tree_lib.read_git_output(
+            root, ("rev-list", "--ancestry-path", f"{landing}..HEAD")).decode("utf-8").split()}
+        added = tree_lib.read_adding_commits(root, f":(glob){frozen}**", wanted)
+    except OSError as exc:
+        raise ti.TagError(str(exc)) from None
+    return {p: sha for p, sha in added.items() if sha not in held}
+
+
 def check_positional(root, kit_rel, mode, memory_root) -> tuple[list, list, dict]:
     """The `positional` arm: the tree against the list both ways over both reference kinds, then every pin
     and every symbol citation. -> (reds, the lines it prints, its counts)."""
@@ -266,7 +292,14 @@ def check_positional(root, kit_rel, mode, memory_root) -> tuple[list, list, dict
         tag = aliases.get(ref)
         return f"cite `{tag}`, the alias row's tag" if tag else "cite the tag an aliases.toml row maps it to"
 
-    findings = [f"{say}unlisted · {r.replace(chr(9), ' · ')} · {derive_remedy(r)}" for r in sorted(tree - listed)]
+    unlisted, grandfathered = sorted(tree - listed), []
+    old = read_grandfathered(root, kit_rel, frozen,
+                             {r.partition("\t")[0] for r in unlisted if check_file_line_row(r)})
+    for r in [r for r in unlisted if check_file_line_row(r) and r.partition("\t")[0] in old]:
+        path, _, ref = r.partition("\t")
+        grandfathered.append(f"positional — grandfathered: {path} {ref} (added in {old[path][:8]}, before the check)")
+        unlisted.remove(r)
+    findings = [f"{say}unlisted · {r.replace(chr(9), ' · ')} · {derive_remedy(r)}" for r in unlisted]
     findings += [f"{say}stale · {r.replace(chr(9), ' · ')} · the reference is gone from the tree; "
                  f"positional.py shrink drops the row" for r in sorted(listed - tree)]
     if mode == "refuse":
@@ -275,17 +308,18 @@ def check_positional(root, kit_rel, mode, memory_root) -> tuple[list, list, dict
     p_reds, p_printed, pins = check_pins(root, kit_rel, frozen)
     s_reds, s_printed, symbols, passed = check_symbols(root, frozen)
     findings += [f"{say}pin · {x}" for x in p_reds] + [f"{say}symbol · {x}" for x in s_reds]
-    lines = [f"{say}pin, frozen record, printed · {x}" for x in p_printed]
+    lines = grandfathered + [f"{say}pin, frozen record, printed · {x}" for x in p_printed]
     lines += [f"{say}symbol, frozen record, printed · {x}" for x in s_printed]
     held = sum(1 for r in rows if check_file_line_row(r))
     if not held:
         lines.append(f"{say}unarmed: {rel} holds no file:line row")
     counts = {"mode": mode, "file_line_rows": held, "section_rows": len(rows) - held,
-              "unlisted": len(tree - listed), "stale": len(listed - tree), "pins": pins,
+              "unlisted": len(unlisted), "grandfathered": len(grandfathered), "stale": len(listed - tree), "pins": pins,
               "pins_red": len(p_reds), "pins_printed": len(p_printed), "symbols": symbols,
               "symbols_red": len(s_reds), "symbols_printed": len(s_printed), "passed_over": passed}
     lines.append(f"{say}{mode} · {held} file:line and {len(rows) - held} section rows listed, "
-                 f"{counts['unlisted']} unlisted, {counts['stale']} stale; {pins} pins read, {len(p_reds)} red, "
+                 f"{counts['unlisted']} unlisted, {len(grandfathered)} grandfathered, "
+                 f"{counts['stale']} stale; {pins} pins read, {len(p_reds)} red, "
                  f"{len(p_printed)} printed; {symbols} symbol citations read, {len(s_reds)} red, "
                  f"{len(s_printed)} printed, {passed} passed over at another suffix")
     if mode == "report":
@@ -386,7 +420,8 @@ def run_pin(root, kit_rel, file, rev="HEAD") -> int:
 # ------------------------------------------------------------------------------------------ the selftest
 
 #: `<plant and flags>|<exit>|<a line it must print>`: each row reads `gov_tag.py --fixture --plant <row>`'s
-#: run. `{code}` is the fixture's code file, so this file holds no file:line citation and no pinned line.
+#: run. `{code}` is the fixture's code file and `{x}` the forked-before plant's, so this file holds no
+#: file:line citation and no pinned line.
 SELFTEST_ROWS = """\
 none|0|tags: positional · unarmed
 positional-seed|0|seed: the list holds every expected row and no other
@@ -411,13 +446,18 @@ positional-pinned|1|pin, frozen record, printed · memory/builds/x/record.md · 
 positional-pinned|1|without the live bad pins: rc=0
 positional-pin|0|pin rewrote the citation to the blob at HEAD; check: rc=0
 positional-pin|0|pin outside the repository: rc=1, nothing written
+positional-forked-before|0|positional — grandfathered: memory/builds/x/build/record.md {x}:1 (added in
+positional-forked-before|0|tags: positional · unlisted · memory/builds/x/build/after.md · {x}:2
+positional-forked-before|0|tags: positional · unlisted · tools/notes.md · {x}:1
+positional-forked-before|0|the pre-fork record: rc=0; a record after the merge: rc=1; the pre-fork record moved under tools: rc=1
 """
 
 
 def run_selftest() -> int:
     """The `tags positional selftest` leg: every positional plant, red and green, each row's exit and line."""
     failed, runs = 0, {}
-    rows = [r.replace("{code}", "tools/corekit/code.py").split("|") for r in SELFTEST_ROWS.splitlines() if r.strip()]
+    rows = [r.replace("{code}", "tools/corekit/code.py").replace("{x}", "x.py").split("|")
+            for r in SELFTEST_ROWS.splitlines() if r.strip()]
     for plant, rc, want in rows:
         if plant not in runs:  # one run per plant and flags, read by each of its rows
             runs[plant] = subprocess.run([sys.executable, str(KIT_DIR / "gov_tag.py"), "--fixture", "--plant",

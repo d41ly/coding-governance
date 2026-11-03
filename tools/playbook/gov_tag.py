@@ -326,7 +326,7 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "no-owner", "ghost-owner", "no-purpose-source", "bad-purpose-source", "member-no-field", "pending-source",
           "registry-ghost", "registry-missing", "registry-joined", "new-no-purpose", "two-versions",
           "served-across", "positional-seed", "positional-new", "positional-stale", "positional-listed",
-          "positional-symbol", "positional-pinned", "positional-pin")
+          "positional-symbol", "positional-pinned", "positional-pin", "positional-forked-before")
 #: PLAY-dOrderedCharter-44's `extractor-edit`: the fixture extractor's module edited to stop yielding one tag
 EDITED_EXTRACTOR = FIXTURE_EXTRACTOR.replace("elif len(word) == 1:",
                                              'elif len(word) == 1 and word[0] != "layer.memory.recall":')
@@ -751,7 +751,7 @@ def derive_cite(n, oid=None) -> str:
 
 
 def run_positional_plant(root, top, plant, say, check) -> int:
-    """S8's seven plants over the fixture's own list. `check` runs the fixture's whole `check`, whose
+    """S8's seven plants and PLAY-dOrderedCharter-47's forked-before plant over the fixture's own list. `check` runs the fixture's whole `check`, whose
     `positional` arm each plant moves; a plant of several steps returns 0 only when every step held."""
     import positional as pos
     kit, guide = FIXTURE_KIT, "memory/guides/ALPHA.md"
@@ -827,6 +827,25 @@ def run_positional_plant(root, top, plant, say, check) -> int:
         write_files(root, {guide: GUIDE + good})
         say(f"without the live bad pins: rc={check()}")
         return rc
+    if plant == "positional-forked-before":  # PLAY-dOrderedCharter-47 S4: a branch forked before the check lands
+        record, after, cite = "memory/builds/x/build/record.md", "memory/builds/x/build/after.md", "see x.py:{}\n"
+        run_git(root, "checkout", "-q", "-b", "side")
+        write_commit(root, {record: cite.format(1)}, "a record on a branch forked before the check")
+        run_git(root, "checkout", "-q", "main")
+        write_commit(root, {f"{kit}/positional.py": "# the check\n"}, "the check lands")
+        run_git(root, "merge", "-q", "--no-ff", "side", "-m", "the side branch merged")
+        rc1 = check()
+        write_commit(root, {after: cite.format(2)}, "a record after the merge")
+        rc2 = check()
+        write_commit(root, {after: None}, "the post-merge record removed")
+        run_git(root, "checkout", "-q", "side")  # moved on its own branch, so its add is not the check's either
+        write_commit(root, {record: None, "tools/notes.md": cite.format(1)}, "the record moved outside the records")
+        run_git(root, "checkout", "-q", "main")
+        run_git(root, "merge", "-q", "--no-ff", "side", "-m", "the move merged")
+        rc3 = check()
+        say(f"the pre-fork record: rc={rc1}; a record after the merge: rc={rc2}; "
+            f"the pre-fork record moved under tools: rc={rc3}")
+        return 0 if (rc1, rc2, rc3) == (0, 1, 1) else 1
     # positional-pin: the unlisted citation re-pinned, and a file outside the repository refused
     write_commit(root, {POS_CODE: POS_MOD, guide: GUIDE + f"\nsee {derive_cite(2)}\n"}, "a citation")
     blob = run_git(root, "rev-parse", "--short=8", f"HEAD:{POS_CODE}").strip()
