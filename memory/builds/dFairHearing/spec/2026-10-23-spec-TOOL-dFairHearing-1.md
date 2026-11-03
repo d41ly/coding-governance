@@ -13,6 +13,7 @@
 | [2026-10-23-build-TOOL-dFairHearing-1-deviation-19.md](../build/2026-10-23-build-TOOL-dFairHearing-1-deviation-19.md) | deviation | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-1-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-1-builder-return.md) | journal | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-2-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-2-builder-return.md) | journal | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-3-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-3-builder-return.md) | journal | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-calibration.md](../build/2026-11-03-build-TOOL-dFairHearing-1-calibration.md) | research | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-deviation-12.md](../build/2026-11-03-build-TOOL-dFairHearing-1-deviation-12.md) | deviation | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-known-set.md](../build/2026-11-03-build-TOOL-dFairHearing-1-known-set.md) | research | — |
@@ -55,6 +56,7 @@
 | [2026-11-03-prompt-TOOL-dFairHearing-1-9-synthesizer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-9-synthesizer.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-1-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-fix-brief.md) | research | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-1-pass-b-build-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-pass-b-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-pass-b2-build-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-pass-b2-build-brief.md) | research | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-23-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-23-brief.md) | research | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-23-v2-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-23-v2-brief.md) | research | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-control-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-control-brief.md) | research | — |
