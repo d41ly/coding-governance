@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dFairHearing-16-deviation-169.md](../build/2026-10-23-build-TOOL-dFairHearing-16-deviation-169.md) | deviation | — |
 | [2026-11-03-build-TOOL-dFairHearing-16-1-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-16-1-builder-return.md) | journal | — |
 | [2026-11-03-build-TOOL-dFairHearing-16-2-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-16-2-builder-return.md) | journal | — |
+| [2026-11-03-build-TOOL-dFairHearing-16-3-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-16-3-builder-return.md) | journal | — |
 | [2026-11-03-build-TOOL-dFairHearing-16-deviation-161.md](../build/2026-11-03-build-TOOL-dFairHearing-16-deviation-161.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-departures-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-departures-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-3 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-30 TOOL-dFairHearing-32 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-23 |
