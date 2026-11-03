@@ -13,6 +13,7 @@
 | [2026-11-03-build-TOOL-dFairHearing-25-1-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-25-1-builder-return.md) | journal | — |
 | [2026-11-03-build-TOOL-dFairHearing-25-2-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-25-2-builder-return.md) | journal | — |
 | [2026-11-04-build-TOOL-dFairHearing-25-3-builder-return.md](../build/2026-11-04-build-TOOL-dFairHearing-25-3-builder-return.md) | journal | — |
+| [2026-11-04-build-TOOL-dFairHearing-25-4-builder-return.md](../build/2026-11-04-build-TOOL-dFairHearing-25-4-builder-return.md) | journal | — |
 | [2026-11-04-build-TOOL-dFairHearing-25-matched-fhr1b.md](../build/2026-11-04-build-TOOL-dFairHearing-25-matched-fhr1b.md) | research | — |
 | [2026-11-04-build-TOOL-dFairHearing-25-matched-fhr1c.md](../build/2026-11-04-build-TOOL-dFairHearing-25-matched-fhr1c.md) | research | — |
 | [2026-11-04-build-TOOL-dFairHearing-25-matched-fhr2b.md](../build/2026-11-04-build-TOOL-dFairHearing-25-matched-fhr2b.md) | research | — |
