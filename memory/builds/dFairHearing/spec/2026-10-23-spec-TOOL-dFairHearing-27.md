@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-27 — the spec audit of units 20 to 23, its 31 minors: criteria a correct build can pass, refusals that name their cause, and the readers a move leaves behind
 
-**Status:** INPROGRESS · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
+**Status:** INPROGRESS · rev-4 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,12 +9,16 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dFairHearing-27-deviation-271.md](../build/2026-10-23-build-TOOL-dFairHearing-27-deviation-271.md) | deviation | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
+| [2026-11-03-build-TOOL-dFairHearing-27-1-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-27-1-builder-return.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-25-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-25-promoted-fix-brief.md) | research | TOOL-dFairHearing-25 TOOL-dFairHearing-26 |
 | [2026-10-23-prompt-TOOL-dFairHearing-27-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-27-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-27-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-27-2-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-4-edge-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-4-edge-fix-brief.md) | research | TOOL-dFairHearing-4 TOOL-dFairHearing-18 TOOL-dFairHearing-25 |
 | [2026-11-02-prompt-TOOL-dFairHearing-27-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-27-build-brief.md) | research | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-27-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-1-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-27-2-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-2-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-27-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-fix-brief.md) | research | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 | [2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md) | spec-audit | TOOL-dFairHearing-4 TOOL-dFairHearing-14 TOOL-dFairHearing-25 TOOL-dFairHearing-26 |
 
@@ -80,7 +84,9 @@ one's mechanism.
   `.governance/install.json`'s `kits` claims `review-harness`, the remedy is `govkit update --kits
   review-harness`. Otherwise, or with no receipt, it is `govkit apply --kits review-harness`, because
   `update` refuses a kit the receipt does not claim (`tools/govkit/govkit.py:9614-9620` at `9c1a2857a`). The
-  hand-copy remedy stays. This supersedes unit 22 S2's fixed first remedy and AC1's string.
+  hand-copy remedy stays. This supersedes unit 22 S2's fixed first remedy and AC1's string. The suite's
+  existing arm `pack AC1` (`tools/hooks/agent-cap.test.sh:312` at `d8b324ea2`) runs with no receipt
+  in its fixture, so the text it expects becomes `govkit apply --kits review-harness`.
 - **S14** — id 21 (M9, unit 23, AC9). `tools/workflows/check-verifier-fanout.sh` carries no
   `LENS_SLOTS` assignment, so the number keeps one home, `tools/workflows/check-verifier-fanout.js`
   (unit 23 S42). The shell constant that `TOOL-dFairHearing-13` §4 mints does not survive this unit.
@@ -97,7 +103,11 @@ one's mechanism.
   `tools/check-playbook-parity.test.sh` follow: the hook plant (:278 at `9c1a2857a`), the README plant
   (:281-282) and the arm `AC2 MAX_LENSES drifts from the hook README's stated bound` (:400-402). Both
   REVIEW-PROTOCOL copies, at the sentence holding the lens allowance as `MAX_LENSES` (:190 at
-  `9c1a2857a`), name `LENS_SLOTS` in `check-verifier-fanout.js`.
+  `9c1a2857a`), name `LENS_SLOTS` in `check-verifier-fanout.js`. The same holds for their sentence
+  saying the fan-out leg reads `MAX_LENSES` through the hook's exports (:44 at `d8b324ea2`). The leg
+  reads `MAX_VERIFIERS` and the writer bound from the hook and `LENS_SLOTS` from its own file
+  (`tools/workflows/check-verifier-fanout.js:35-49`). Then no reader is left, so `MAX_LENSES` leaves
+  `tools/hooks/agent-cap.js` too: its definition (:405) and its export (:912).
 - **S17** — id 26 (M12, unit 23, AC12). `tools/govkit/subject-pins.tsv` carries a row for
   `spec-audit opt-in pack self-test`, regenerated with `python tools/govkit/govkit.py selfcheck --write`
   once the leg is live (`tools/govkit/govkit.py:2764-2765` at `9c1a2857a`).
@@ -143,9 +153,11 @@ one's mechanism.
   an UNVERIFIED platform claim: the audit measured clones succeeding under the scratchpad with
   `core.longpaths` true. Fixtures go under `%TEMP%` by the run mandate's own convention, and no
   product file records the unmeasured limit.
-- **S29** — id 29 (L5, unit 23, AC24). `render()` in `tools/memory-tree/gotchas.py` (:447-460) and its
-  output `memory/gotchas/INDEX.md` say that the harness acquires the checklist on the diff kind, and
-  keep the command for a reader who wants it. Unit 23 AC36's path set includes both.
+- **S29** — id 29 (L5, unit 23, AC24). `render()` in `tools/memory-tree/gotchas.py` (:480-497 at
+  `d8b324ea2`) and its output `memory/gotchas/INDEX.md` say that the harness acquires the checklist on
+  the diff kind, and keep the command for a reader who wants it. Unit 23 AC36's path set includes
+  both. This unit's pass writes `render()`. The main loop's records commit writes the output (§4 "The
+  gotchas index").
 - **S30** — id 40 (L6, unit 23, AC25). `scan_pairing_sites` exits 2 by name when its `git ls-files`
   read fails or finds no `*.py`, never returning `[]`. Unit 23 AC16 gains a positive half.
 - **S31** — id 41 (L7, unit 23, AC26). Unit 23 AC33's and AC35's absence checks read a view of the file
@@ -224,6 +236,29 @@ trap 'git update-ref -d refs/replay/<name> 2>/dev/null' EXIT
 test "$(git -C "$TEMP/<name>" rev-parse HEAD)" = "$(git rev-parse <commit>)"
 ```
 
+### The gotchas index (S29)
+
+This unit's pass writes `tools/memory-tree/gotchas.py` and leaves `memory/gotchas/INDEX.md`
+unwritten. `--dispatch` refuses a declaration that names a generated index together with its
+generator (`tools/unattended/unattended.sh:14599-14616` at `d8b324ea2`, check 49, which is the
+build method's condition 3). The memory-tree descriptor declares this pair
+(`tools/memory-tree/kit.toml:505-509`).
+
+The main loop's records commit, the one right after this unit's pass commit, runs `python
+tools/memory-tree/gotchas.py --write` (`cmd_write`, `tools/memory-tree/gotchas.py:627-635`) and
+stages the index. That is a shared render, which the build README's writes rule allows
+(`memory/builds/dFairHearing/README.md:49-50`).
+
+The pass commit is not refused for the stale index:
+
+- The pre-commit hook runs the hygiene gate only as `--staged` (`.githooks/pre-commit:226-229`).
+- Under `--staged`, checks 17 to 19 are held (`tools/memory-tree/check-memory-hygiene.sh:19-21`):
+  the `gotchas.py --check` call runs only when `STAGED` is 0 (:3146-3147).
+- The run-branch push declares no branch bar (`.githooks/pre-push:2-4`).
+
+A full run between the two commits does red check 17 (`tools/memory-tree/gotchas.py:556-563`). So
+the `memory hygiene` leg and AC24's index half are read at the records commit.
+
 ### Files touched (estimate)
 
 - `tools/workflows/render_lenses.py`
@@ -249,11 +284,11 @@ test "$(git -C "$TEMP/<name>" rev-parse HEAD)" = "$(git rev-parse <commit>)"
 - `tools/check-playbook-parity.sh`
 - `tools/check-playbook-parity.test.sh`
 - `tools/memory-tree/gotchas.py`
-- `memory/gotchas/INDEX.md`
 - `memory/guides/SESSION-KICKOFF.md`
 
-`tools/workflows/tier2-review.js`, `memory/guides/REVIEW-PROTOCOL.md` and `memory/gotchas/INDEX.md` are
-renders. The spec files of units 20 to 23 are not touched: every correction is stated here.
+`tools/workflows/tier2-review.js` and `memory/guides/REVIEW-PROTOCOL.md` are renders. The records
+commit renders `memory/gotchas/INDEX.md` ("The gotchas index"). The spec files of units 20 to 23 are
+not touched: every correction is stated here.
 
 ### Alternatives rejected
 
@@ -262,6 +297,12 @@ renders. The spec files of units 20 to 23 are not touched: every correction is s
   reaches the same scope with no deployer change.
 - **Hold the shell `LENS_SLOTS` beside the JS one with a parity arm (S14)** — two homes and a guard,
   where one home needs none.
+- **The pass stages the re-rendered index without declaring it (S29)** — `--check-commit` admits a
+  generated index outside a pass's declaration (`tools/unattended/unattended.sh:14248`). This is the
+  fallback. It is not taken because the fix brief sends the render to the records commit, which
+  keeps the pass commit's paths equal to its declaration.
+- **S29's `render()` reword as a unit of its own** — not needed. Check 17 is held under `--staged`,
+  so the pass commit is not refused ("The gotchas index").
 
 ## 5. Production-readiness checklist
 
@@ -327,8 +368,11 @@ renders. The spec files of units 20 to 23 are not touched: every correction is s
   cost: one apply and one update into a scratch target, under a minute.
 - **AC8** — When a scratch copy of the hook runs a spec-audit payload with no pack, a receipt claiming
   `agent-cap` alone makes its stderr name `govkit apply --kits review-harness` and not `update --kits
-  review-harness`. A receipt claiming both makes it name `govkit update --kits review-harness`.
-  Red when: the unclaimed case is sent to a verb govkit refuses.
+  review-harness`. A receipt claiming both makes it name `govkit update --kits review-harness`. When
+  `grep -n "pack AC1" tools/hooks/agent-cap.test.sh` runs, the arm's line carries `govkit apply --kits
+  review-harness` and not `govkit update --kits review-harness`.
+  Red when: the unclaimed case is sent to a verb govkit refuses, or the receipt-less arm still expects
+  the `update` remedy.
 - **AC9** — When `grep -cE "LENS_SLOTS ?= ?[0-9]" check-verifier-fanout.sh` runs, it prints 0, and over
   `check-verifier-fanout.js` it prints 1.
   Red when: the shell constant survives beside the JS one.
@@ -338,8 +382,8 @@ renders. The spec files of units 20 to 23 are not touched: every correction is s
 - **AC11** — When `git grep -n MAX_LENSES -- tools memory/guides ':!tools/workflows/check-verifier-fanout.js'`
   runs, it prints nothing. A scratch copy of `check-playbook-parity.sh` run over this tree extracts a
   non-empty value on both sides of the `lens-array bound` pair, equal to 5.
-  Red when: the pair's sed extracts nothing, or a REVIEW-PROTOCOL copy names a constant that does not
-  exist.
+  Red when: the pair's sed extracts nothing, a REVIEW-PROTOCOL copy names a constant that does not
+  exist, or `tools/hooks/agent-cap.js` still defines or exports `MAX_LENSES`.
 - **AC12** — When `grep -n "spec-audit opt-in pack self-test" tools/govkit/subject-pins.tsv` runs, it
   prints one row.
   Red when: the live leg has no pinned row, which govkit's selfcheck reds.
@@ -384,14 +428,22 @@ renders. The spec files of units 20 to 23 are not touched: every correction is s
   Red when: the header ships without the sentence.
 - **AC22** — When `awk '/\/\/ ---- /{arm=$0} /3708a705/{print arm}' tools/workflows/tier2-review.test.sh`
   runs, slicing the suite at each arm header, it prints no header naming `TOOL-dFairHearing-2 AC4`,
-  `TOOL-dFairHearing-3 AC5` or `TOOL-dFairHearing-9 AC7`. The same probe with `REVIEW_SHAPE` in place
-  of `3708a705` prints all three.
-  Red when: an arm compares with base's harness.
+  `TOOL-dFairHearing-3 AC5` or `TOOL-dFairHearing-9 AC7`. Swap `3708a705` for the three arms' labels,
+  `derives one key|a swap moves the review key|derive one review key`, and pipe to `sort -u`: the probe
+  then prints three headers, one naming each of the three, so each label sits in its own arm's slice.
+  Red when: an arm compares with base's harness, or a label sits under another arm's header, so the
+  first half reads a slice that is not the arm's.
 - **AC23** — When `git grep -n "Windows path limit" -- tools` runs, it prints nothing.
   Red when: a product file records the unmeasured claim.
-- **AC24** — When `git grep -n "Hand a reviewer the classes" -- tools/memory-tree/gotchas.py memory/gotchas/INDEX.md`
-  runs, it prints nothing, and `INDEX.md` names the harness acquiring the checklist.
-  Red when: the catalogue index still sends a reviewer to the by-hand lookup.
+- **AC24** — When `git grep -n "Hand a reviewer the classes" <unit> -- tools/memory-tree/gotchas.py`
+  runs at this unit's pass commit `<unit>`, it prints nothing. The same check runs at the main loop's
+  records commit `<records>`, whose parent is `<unit>` (`git rev-parse <records>~1` equals
+  `<unit>`): `git grep -n "Hand a reviewer the classes" <records> -- memory/gotchas/INDEX.md` prints
+  nothing, and that `INDEX.md` names the harness acquiring the checklist. With `<records>` checked
+  out, `python tools/memory-tree/gotchas.py --write` leaves `git status --porcelain --
+  memory/gotchas/INDEX.md` empty.
+  Red when: the catalogue index still sends a reviewer to the by-hand lookup, or the index committed
+  at `<records>` is not the render that `<unit>`'s `gotchas.py` makes.
 - **AC25** — When a scratch copy of the tree plants a module with the pairing comprehension (unit 12
   AC6's shape) under the copy's factory directory, `scan_pairing_sites` names it. The same module
   under the copy's `memory/` is not named. A copy where `git ls-files` fails makes the scan exit 2 by
@@ -448,6 +500,21 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC19 AC20 · a run-2 ban
   rule unit 16 S9 follows, since unit 23's rev-3 S28 schedules none. AC16's stamp half, which could
   never pass because a bundled stamp names its commit's parent, reads that commit's diff as unit 16
   AC13 does (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 4).
+- rev-4 · 2026-11-03 · §4 · S29 · `memory/gotchas/INDEX.md` leaves Files touched. `--dispatch` check 49
+  refused its pairing with `gotchas.py`. The new sub-head "The gotchas index" sends the render to the
+  main loop's records commit, because check 17 is held under the pre-commit hook's `--staged`. S29 is
+  re-cited at `d8b324ea2`. Alternatives rejected names the undeclared-stage fallback (fix brief
+  2026-11-03-prompt-TOOL-dFairHearing-27-fix-brief, items 1 and 2).
+- rev-4 · 2026-11-03 · AC24 · the generator half is read at the pass commit. The index half and a
+  re-render that leaves the index unchanged are read at the records commit (same brief, item 2).
+- rev-4 · 2026-11-03 · S16 · AC11 · `MAX_LENSES` leaves `tools/hooks/agent-cap.js`, its definition and
+  its export. So does the REVIEW-PROTOCOL copies' sentence on the hook's exports, which AC11's grep
+  also reads (same brief, item 4).
+- rev-4 · 2026-11-03 · S13 · AC8 · the receipt-less arm `pack AC1` expects the `apply` remedy (same
+  brief, item 4).
+- rev-4 · 2026-11-03 · AC22 · the second half slices by the three arms' labels, not by `REVIEW_SHAPE`.
+  No arm reads that literal (unit 23 S29 and its rev-5), so a header naming it would satisfy the probe
+  and observe nothing (same brief, item 4).
 
 ## 10. Reuse audit
 

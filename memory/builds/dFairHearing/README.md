@@ -109,7 +109,7 @@ ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHea
 | [TOOL-dFairHearing-20 — a gapped whole-design walk reds the harness's returned counts, not only its prose](spec/2026-10-23-spec-TOOL-dFairHearing-20.md) | 19 | 2 | CLOSED | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-23 — the round-1 spec audit's 49 minors: one contract per shared name, criteria a correct build can pass, and the fixtures and records the moved code needs](spec/2026-10-23-spec-TOOL-dFairHearing-23.md) | 19 | 2 | CLOSED | rev-6 | 2026-11-03 |
 | [TOOL-dFairHearing-26 — every rule 0 and rule 5 arm of the hook's suite found at its new home and gone from the old one, counted by label whatever helper writes it](spec/2026-10-23-spec-TOOL-dFairHearing-26.md) | 20 | 2 | CLOSED | rev-4 | 2026-11-03 |
-| [TOOL-dFairHearing-27 — the spec audit of units 20 to 23, its 31 minors: criteria a correct build can pass, refusals that name their cause, and the readers a move leaves behind](spec/2026-10-23-spec-TOOL-dFairHearing-27.md) | 21 | 2 | INPROGRESS | rev-3 | 2026-11-03 |
+| [TOOL-dFairHearing-27 — the spec audit of units 20 to 23, its 31 minors: criteria a correct build can pass, refusals that name their cause, and the readers a move leaves behind](spec/2026-10-23-spec-TOOL-dFairHearing-27.md) | 21 | 2 | INPROGRESS | rev-4 | 2026-11-03 |
 | [TOOL-dFairHearing-28 — the hook suite's census re-pinned to 59 and 14, measured by a script file whose pattern no shell can fold](spec/2026-10-23-spec-TOOL-dFairHearing-28.md) | 21 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-29 — the five escaped-quote arms of the hook's suite checked by name, at their home and gone from the old one](spec/2026-10-23-spec-TOOL-dFairHearing-29.md) | 21 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-25 — the owed replays run after the replay contract is corrected, and their verdicts set the dark switches](spec/2026-10-23-spec-TOOL-dFairHearing-25.md) | 22 | 2 | DEFERRED | rev-5 | 2026-11-03 |
@@ -126,7 +126,7 @@ ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHea
 | [TOOL-dFairHearing-40 — the round-5 spec audit's 35 minors: one build-wide version reading on one base, an attempt checker that refuses what it cannot place, and criteria a correct build can pass](spec/2026-10-23-spec-TOOL-dFairHearing-40.md) | 28 | 2 | DEFERRED | rev-4 | 2026-11-03 |
 <!-- /gen:build-units -->
 
-Records: 218 bound to this build, across 4 record folder(s).
+Records: 222 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
