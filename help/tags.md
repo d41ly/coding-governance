@@ -155,33 +155,73 @@ id pinned to a hash (`kit.y@1a2b3c4d`). The set, as `--list` prints it:
 | `part-of` | `has-part` | any | any | none |
 | `implements` | `implemented-by` | any | `feature`, `spec` | none |
 | `tests` | `tested-by` | any | any | none |
-| `decides` | `decided-by` | `decision` | any | none |
+| `decides` | `decided-by` | `decision` | any, `commit`, `item` | none |
 | `instructs` | `instructed-by` | `unit` | `selects` | none |
 | `enforces` | `enforced-by` | any | `unit`, `practice` | none |
-| `after` | `before` | `build` | `build` | none |
+| `after` | `before` | `build`, `session` | `build`, `session` | none |
 | `supersedes` | `superseded-by` | any | any | tag |
 | `amends` | `amended-by` | any | any | tag |
 | `patches` | `patched-by` | `build` | `build`, `item` | none |
 | `owner` | `owns` | any | `build`, `layer` | none |
 | `layer` | `in-layer` | `kit` | `layer` | none |
 | `cites` | `cited-by` | any | any | none, and derived from the text |
+| `serves` | `served-by` | `record`, `work-order`, `commit` | `family-id`, `item`, `build` | none |
+| `made-by` | `made` | `commit`, `record` | `act`, `owner` | none |
+| `caused-by` | `causes` | `record` | any | none |
+| `follows` | `followed-by` | `act` | `work-order` | none |
+| `answers` | `answered-by` | `return`, `answer` | `work-order`, `fork` | none |
+| `runs-in` | `hosts` | `act`, `claim`, `commit` | `session` | none |
+| `carries` | `carried-by` | `landing` | `family-id`, `commit` | none |
+| `carries-clause` | `carried-in` | `family-id` | `clause-id` | clause |
+| `pinned-at` | `pinned-by` | `record`, `probe`, `claim` | `commit`, `tree` | none |
+| `reads` | `read-by` | `item`, `role` | `kind` | none |
+| `writes` | `written-by` | `item`, `role` | `kind` | none |
+| `promoted-from` | `promoted-to` | `unit`, `scenario` | any | none, and written by `instructions.edit` alone |
 
 `any` is every registered namespace and every native id. `selects` is every namespace whose row in
 `namespaces.toml` has `role = "selects"`, so a selector namespace a later build registers is an
-`instructs` target without a change to `edges.toml`. A word no row registers yet, such as `feature`
-or `item`, admits nothing until its build registers it.
+`instructs` target without a change to `edges.toml`. A word no row registers yet, such as `feature`,
+`item`, `commit` or `session`, admits nothing until its build registers it, and an id under such a
+word is counted `unarmed`.
+
+**Native ids.** An id that is no tag belongs to a native class, one `[[native]]` row of
+`namespaces.toml` naming its `owner`, the `pattern` that compiles it and the `resolver` that lists its
+members. Two are registered: `family-id`, the `PLAY-dOrderedCharter-24` ids, owner dOrderedCharter,
+resolved against the ids a spec defines; and `clause-id`, the `cl-dTrueNorth-0001` clause ids, owner
+dTrueNorth, resolved against the design view. `python tools/playbook/gov_tag.py check` prints each
+class with its owner and its member count.
+
+**Pinned forms.** A pin is written `@` and eight hex digits. A pinned tag (`kit.y@1a2b3c4d`) is
+legal only on `amends` and `supersedes`, and resolves when some committed revision of the tag's unit
+text hashes to it. A pinned clause id (`cl-dTrueNorth-0001@1a2b3c4d`) is legal only on
+`carries-clause`, and resolves when the clause's text at the design baseline or in some committed
+revision of the design view hashes to it, so a pin written before a deviation moved the clause still
+resolves.
+
+**Where edges are read.** Beyond the `**Edges:**` line: a record's `**Serves:**` line as `serves` and
+its `**Caused-by:**` and `**Made-by:**` lines; a spec's `**Carries:**` line as `carries-clause`; a
+work order's `gov:handoff` marker's `unit=` and `build=` as `serves`; an instruction unit's `edges`,
+`select`, `required-by` and `enforced-by`; a code note's `refs=` segment; and a commit's trailers,
+`Pass:`, `Gov-Unit:` and `Gov-Item:` as `serves`, `Gov-Act:` as `made-by`, `Gov-Session:` as
+`runs-in` and `Decided:` as `decides`. The trailer keys are the `[[trailer]]` rows of `edges.toml`.
 
 These lines are red: a malformed edge line, every one named in a single refusal; a type the set does
-not hold; a declared inverse or a declared `cites`; a target outside its type's `To`; and a pin on a
-type whose `Pin` is none. Nothing grades an edge's source against `From`, resolves a target to a
-row, or checks a pin's hash yet. No leg runs the edge check yet; it joins the `tags` leg later.
+not hold; a declared inverse or a declared `cites`; a target outside its type's `To`; a pin on any
+type but the two above, or one written behind `:`, `/` or `=`, or with a hash that is not eight hex
+digits; a pin that matches no revision; a `promoted-from` edge anywhere but `instructions.edit`'s
+change record; and a target that resolves to nothing. A `serves` id no spec defines is counted, not
+red, since the hygiene check already reds it. Nothing grades an edge's source against `From`, and an
+id's section (`PLAY-dOrderedCharter-24#goal`) stays `unarmed`.
 
 - **List the set:** `python tools/playbook/edge_grammar.py --list` prints each type with its inverse,
-  `From`, `To` and `Pin`, then `edges: 13 types, 12 declared, 1 derived`.
+  `From`, `To` and `Pin`, then `edges: 25 types, 24 declared, 1 derived` and the trailer keys.
 - **Check a file:** `python tools/playbook/edge_grammar.py --parse memory/guides/BUILD-METHOD.md`
   prints each edge and each red, then the derived inverses or the red count. It exits 1 on a red.
+- **Check the tree:** `python tools/playbook/edge_grammar.py --check` reads every site and the commit
+  trailers since the compare base (`--base <rev>` names another), resolves every target, and prints one
+  line per red, then the edges by type and by site. The `edges` leg of the `tags` pack runs it.
 - **See it red:** `python tools/playbook/edge_grammar.py --fixture --plant outside-to` checks a planted
-  `layer=kit.x` and exits 1. <!-- usage: script:tools/playbook/edge_grammar.py bdab2d19 -->
+  `layer=kit.x` and exits 1. <!-- usage: script:tools/playbook/edge_grammar.py 71d8d8a6 -->
 
 ## The three keys
 

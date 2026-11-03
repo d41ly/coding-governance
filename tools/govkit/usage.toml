@@ -135,7 +135,7 @@ flags = ["--rebuild", "--gc", "--list-positional", "--fixture", "--plant=", "--s
 id = "script:{prefix}/playbook/edge_grammar.py"
 shape = "verb"
 entry = "{prefix}/playbook/edge_grammar.py"
-flags = ["--list", "--parse=", "--fixture", "--plant="]
+flags = ["--list", "--parse=", "--check", "--base=", "--fixture", "--plant="]
 
 [[usage]]
 id = "script:{prefix}/run-gates/measure_legs.py"

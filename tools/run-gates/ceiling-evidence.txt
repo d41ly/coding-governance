@@ -50,6 +50,7 @@ docs	2.7	1	d	2026-10-27	docs_leg.py on the worktree at 1b64e20a with the pass st
 drift-audit records	35.5	2	a	2026-09-24	runner
 drift-audit selftest	292.5	1	a	2026-09-24	runner
 drift-audit wiring	9.8	1	a	2026-09-06	runner
+edges (every declared edge parses, is registered and resolves)	35.0	1	d	2026-11-03	edge_grammar.py --check --base ce13efbe on the worktree with the pass applied and the tag index warm, 35s wall by date arithmetic, under a concurrent foreign gate run, build pass of PLAY-dOrderedCharter-28
 encoding posture (text IO names its encoding)	4.2	2	a	2026-09-24	runner
 every held leg is budgeted, every budget row resolves	35.6	2	a	2026-09-24	runner
 extract-arms self-test	23.1	2	a	2026-09-24	runner

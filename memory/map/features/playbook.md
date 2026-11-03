@@ -8,7 +8,7 @@ streams = ["playbook", "tooling"]
 decisions = ["TOOL-aSiftedPlaybook-1"]
 
 [claims]
-gate-legs = ["template size gate selftest", "playbook parity", "playbook parity selftest", "playbook render wiring", "playbook render selftest", "charter size", "micro-format definitions", "micro-format gate selftest", "line length", "line-length gate selftest", "layer dependencies (the core never depends on an expansion)", "tags (the resolver's checks)"]
+gate-legs = ["template size gate selftest", "playbook parity", "playbook parity selftest", "playbook render wiring", "playbook render selftest", "charter size", "micro-format definitions", "micro-format gate selftest", "line length", "line-length gate selftest", "layer dependencies (the core never depends on an expansion)", "tags (the resolver's checks)", "edges (every declared edge parses, is registered and resolves)"]
 kits = ["playbook"]
 git-hooks = []
 harness-hooks = []
@@ -51,6 +51,7 @@ map had no playbook dossier until now.
 
 - `{{ROLE_ROSTER}}` is derived by `derive_role_roster` in `tools/playbook/render_playbook.py`, which reaches the roles kit through `resolve_kit_dir` and substitutes its `roster` verb's stdout verbatim, so the roles kit stays the one reader of role files and this kit spells no sibling path (TOOL-aOrientedCast-18).
 - The tag resolver `tools/playbook/gov_tag.py` and its index `tag_index.py` read blobs and the conf through memory-tree's `tree_lib` and `id_grammar`, and policy through `policy_value.py`'s `policy.py get` subprocess, each reached by the inline `resolve_kit_dir`; the index is `<git-common-dir>/gov/index.db`, derived and never committed, and the `tags (the resolver's checks)` leg runs `check` (PLAY-dOrderedCharter-19).
+- The edge check `tools/playbook/edge_grammar.py --check` reads every site's edges through one adapter per site, the spec's `**Carries:**` line through `design_lib.parse_binding_lines` and the `**Serves:**` line through `tree_lib.read_bindings`, never a second regex, and resolves them through the tag index, the `[[native]]` classes' resolvers and the design view's committed revisions; it is the `edges` leg of the `tags` pack (PLAY-dOrderedCharter-28).
 - Its `[[regenerate]]` render row is staged, stage 1: run-gates' `regen.py` re-renders it on `--regen`, and every bar proves it fresh with this kit's `[check]` first (TOOL-aPrimedIndex-1).
 - **The size ceiling is 49152 bytes, and that is a REVERSAL.** It read 32 KiB and "never raise the
   limit" in four carriers until 2026-08-16, when the owner ordered the raise

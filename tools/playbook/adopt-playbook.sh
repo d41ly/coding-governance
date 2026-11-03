@@ -322,7 +322,10 @@ echo "PASS — the tag resolver's plants"
 # THE EDGE GRAMMAR'S ARMS (PLAY-dOrderedCharter-24 §4). Each row runs `edge_grammar.py --fixture` over one
 # plant, the same row shape as the tag resolver's: the two-line block and a fenced line green, each
 # malformed plant naming both its bad lines in one refusal, the closed set's reds, and a selector a fixture
-# registry adds admitted with `edges.toml` unchanged.
+# registry adds admitted with `edges.toml` unchanged. The rows from `promoted-elsewhere` on are
+# PLAY-dOrderedCharter-28's §4 plants: the one-writer type, the pin reds, and each address form resolved
+# over a scratch repository whose unit and clause texts moved under a second commit, beside the malformed
+# section, block and note refs segment.
 _tf=0
 run_plant_rows edges "$HERE/edge_grammar.py" <<'PLANTS'
 good-block|0|edges: site.md:6 · tests · kit.y, kit.z
@@ -348,6 +351,21 @@ pin-on-none|1|part-of=kit.x@1a2b3c4d · pins a target, and part-of's row says pi
 selector-registered|0|edges: green · 1 edge(s)
 selector-registered|0|edges: edges.toml unchanged
 selector-describes|1|edges: site.md:1 · instructs=feature.x · is outside instructs's to [selects]
+promoted-elsewhere|1|is written by instructions.edit alone, its one writer
+pin-no-at|1|holds the target 'practice.land:1a2b3c4d', and a pin is written `@<hash8>`
+pin-bad-hash|1|holds the target 'practice.land@1a2b3c', whose pin hash is not eight hex digits
+pin-no-text|1|pins 00000000, which matches no text in its unit's history
+pin-other-type|1|part-of=kit.x@1a2b3c4d · pins a target, and part-of's row says pin = "none": a pin on a type whose row admits none
+resolve-pinned-tag|0|edges: green · 1 edge(s)|matches no text
+clause-no-rev|1|pins cl-dAlpha-0001@00000000, which matches no revision of its clause
+resolve-pinned-clause|0|edges: resolved · spec.md:3 · carries-clause=cl-dAlpha-0001@|matches no revision
+resolve-tag|0|edges: resolved · site.md:1 · layer=layer.memory · layer.memory · tools/corekit/core.tags:3
+resolve-section|0|edges: resolved · site.md:1 · part-of=doc.build-method#m5-recall-and-reuse · doc.build-method#m5-recall-and-reuse · memory/guides/BUILD-METHOD.md
+resolve-family|0|edges: resolved · site.md:1 · serves=PLAY-dOrderedCharter-28 · family-id PLAY-dOrderedCharter-28 (owner dOrderedCharter)
+resolve-clause|0|edges: resolved · site.md:1 · carries-clause=cl-dAlpha-0001 · clause-id cl-dAlpha-0001
+bad-section|1|site.md:5: `**Edges:** implements=doc.build-method#` holds the target 'doc.build-method#', a malformed section target
+bad-block|1|site.md:5: `**Edges:** tests=kit.y implements=kit.z` carries a second `type=` pair
+bad-note-refs|1|site.py:1: `# gov:note layer.memory — x → y refs=a b` refs segment holds the target 'a b'
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf edge-grammar arm(s) failed"; exit 1; fi
 echo "PASS — the edge grammar's plants"

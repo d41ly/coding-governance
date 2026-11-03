@@ -30,6 +30,7 @@
       "drift-audit records",
       "drift-audit selftest",
       "drift-audit wiring",
+      "edges (every declared edge parses, is registered and resolves)",
       "encoding posture (text IO names its encoding)",
       "every held leg is budgeted, every budget row resolves",
       "extract-arms self-test",

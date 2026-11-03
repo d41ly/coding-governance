@@ -196,7 +196,10 @@ def run_check(con, root, ctx, kit_rel, *, sets, base, as_json, state) -> int:
     o_reds = ti.check_owned(con, ctx, root / kit_rel / "layers.toml")
     n_reds, slot = run_name_check(root, shaped)
     p_reds, p_lines, purpose = run_purpose_check(con, root, ctx)
-    reds += r_reds + o_reds + n_reds + p_reds
+    from edge_grammar import check_native_classes   # PLAY-dOrderedCharter-28 S2: the native-id classes
+    x_reds, x_lines = check_native_classes(root, root / kit_rel / "namespaces.toml")
+    p_lines += x_lines
+    reds += r_reds + o_reds + n_reds + p_reds + x_reds
     tags = sum(counts.values())
     unread = con.execute("SELECT COUNT(*) FROM view_path WHERE path NOT LIKE '%.md'").fetchone()[0]
     summary = {

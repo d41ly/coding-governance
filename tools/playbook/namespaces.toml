@@ -109,3 +109,21 @@ extractor = "tag_index:extract_repo"
 role = "selects"
 purpose-source = ".governance/instructions.toml#help"
 join-armed-by = "dOrderedCharter"
+
+# The native-id classes (PLAY-dOrderedCharter-28 S2), read by edge_grammar.read_native_classes: one [[native]]
+# row per class, `class`, the word an edge row's `from` or `to` names it by; `owner`, the build that registered
+# it; `pattern`, the `<module>:<name>` that compiles its ids, never a second regex; `resolver`, what prints its
+# members, a `<module>:--<flag>` script or a `<module>:<function>`. Each later class is registered, and its
+# resolution armed, by the build that brings it.
+
+[[native]]
+class = "family-id"
+owner = "dOrderedCharter"
+pattern = "id_grammar:grammar_for"
+resolver = "corpus_ids:--print-defined-ids"
+
+[[native]]
+class = "clause-id"
+owner = "dTrueNorth"
+pattern = "design_lib:_CL"
+resolver = "design_lib:read_design_view"

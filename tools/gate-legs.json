@@ -1733,6 +1733,7 @@
       "{prefix}/memory-tree/id_grammar.py",
       "{prefix}/memory-tree/coverage_join.py",
       "{prefix}/memory-tree/design_lib.py",
+      "{prefix}/memory-tree/corpus_ids.py",
       "{prefix}/lexicon/"
     ],
     "argv": [
@@ -1834,6 +1835,18 @@
       "python",
       "{prefix}/playbook/gov_tag.py",
       "check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 180,
+    "pack": "tags"
+  },
+  {
+    "name": "edges (every declared edge parses, is registered and resolves)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/edge_grammar.py",
+      "--check"
     ],
     "chunk": "declarations",
     "subject": "repo",

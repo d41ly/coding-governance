@@ -281,5 +281,24 @@ refusal, and `parse_edge_target` classifies a target as `tag`, `pinned-tag`, `se
 or `pinned-id`. `check_edges` reds an unregistered type, a declared inverse or `cites`, a target outside
 its row's `to` and a pin on a `pin = "none"` row. `edge_grammar.py --list`, `--parse <file>` and
 `--fixture --plant <case>` are its CLI, and the selftest runs every plant. A pin's hash is
-`design_lib.derive_pin_hash`, memory-tree's one normaliser, which `derive_clause_hash` calls. No leg runs
-the check yet, and nothing grades an edge's `from` or resolves a target: PLAY-dOrderedCharter-28's.
+`design_lib.derive_pin_hash`, memory-tree's one normaliser, which `derive_clause_hash` calls.
+
+PLAY-dOrderedCharter-28 adds the memory plan's twelve types (`serves`, `made-by`, `caused-by`, `follows`,
+`answers`, `runs-in`, `carries`, `carries-clause`, `pinned-at`, `reads`, `writes`, `promoted-from`),
+widens `decides` and `after`, and gives a row an optional `writer`: `promoted-from`'s is
+`instructions.edit`, so the type read at any other site is red. `edges.toml`'s `[[trailer]]` rows map each
+commit trailer key to its type, read by `read_trailer_keys`. `namespaces.toml`'s `[[native]]` rows
+register the native-id classes, `family-id` (pattern `id_grammar:grammar_for`, resolver `corpus_ids.py
+--print-defined-ids`) and `clause-id` (pattern `design_lib:_CL`, resolver `read_design_view`), read by
+`read_native_classes`; `gov_tag.py check` prints each with its owner and population
+(`check_native_classes`). A pinned tag is legal only where a row's `pin` is `tag` and resolves when some
+committed revision of its unit's text hashes to it (`read_text_history` over `tree_lib.read_blobs_at`);
+a pinned clause id only where `pin` is `clause`, resolving against every committed revision of the
+design view, the baseline's included. One adapter per site reads edges: `read_header_edges`
+(`**Serves:**` through `tree_lib.read_bindings`, `**Caused-by:**`, `**Made-by:**`), `read_section_edges`,
+`read_unit_edges`, `read_note_refs`, `read_trailer_edges`, `read_handoff_edges` (the roles kit's
+`MARKER_RE`) and `read_carries_edges` (`design_lib.parse_binding_lines`, the carries line's one parser).
+`resolve_edge` resolves one target; `--check [--base <rev>]` runs every adapter over the tree and the
+trailers since the compare base, and is the `edges` leg of the `tags` pack. It does not grade an edge's
+`from`, since no source namespace is registered, nor resolve an `id#tag` target, `unarmed` until
+dTotalRecall arms the record namespace; a `serves` id no spec defines is counted, check 21's verdict.
