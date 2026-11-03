@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-11-deviation-111.md](../build/2026-11-02-build-TOOL-dCalibratedLens-11-deviation-111.md) | deviation | — |
 | [2026-11-02-build-TOOL-dCalibratedLens-11-deviation-112.md](../build/2026-11-02-build-TOOL-dCalibratedLens-11-deviation-112.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-11-deviation-113.md](../build/2026-11-03-build-TOOL-dCalibratedLens-11-deviation-113.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
@@ -313,8 +314,7 @@ New arm: tools/runlog/selftest.py · covers AC10 · a scratch copy of a committe
   the build files the ask "dShippedRelease: a reader verb for `refs/gov/release-exit/<sha>`, printing
   its four keys" in `memory/builds/dShippedRelease/BACKLOG.md` while the field reads `core` alone and
   says `release-exit unread`; (b) a parser of the exit record's body in the loop kit. (b) is a second
-  parser of a record its kit owns. RESOLVED (agent, 2026-11-02, delegated): (a), rung 3. widens: none ·
-  relaxes: none
+  parser of a record its kit owns. RESOLVED (agent, 2026-11-02, delegated): (a), rung 3. widens: none · relaxes: none
 - **F4 — The brief's PRIMITIVE GAP: change failure rate and time to restore name no source record.**
   Options: (a) the landing record's `core` field (DEPL-dShippedRelease-13) and the release exit record,
   which are the night pass's "a default-branch red or a failed release verify"; (b) the bar's verdict
@@ -324,8 +324,7 @@ New arm: tools/runlog/selftest.py · covers AC10 · a scratch copy of a committe
   on `owner_items.py` sharing one reader with `decide_owner_items`; (b) the Loop Review reading the
   mailbox itself through `unattended.sh --mail read project`; (c) an ask to dWellOiledMachine. (b) is a
   second spelling of which mailbox row is an owner item; (c) leaves the field unread until another build
-  acts. RESOLVED (agent, 2026-11-02, delegated): (a), rung 3, the one-fact reading. widens: none ·
-  relaxes: none
+  acts. RESOLVED (agent, 2026-11-02, delegated): (a), rung 3, the one-fact reading. widens: none · relaxes: none
 
 ## 9. Revision log
 

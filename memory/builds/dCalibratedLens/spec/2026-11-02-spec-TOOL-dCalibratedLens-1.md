@@ -11,6 +11,7 @@
 |---|---|---|
 | [2026-11-03-build-TOOL-dCalibratedLens-1-deviation-12.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-deviation-12.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-1-deviation-13.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-deviation-13.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-deviation-14.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-deviation-14.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-1-reuse-scout.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-1-reuse-scout.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-2-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-2-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-3-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-3-spec-writer.md) | journal | — |
@@ -403,8 +404,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC9 · a `--trigger` call
   `--trigger` to `review_pin.py`, with `PLAN_RECORD_PRESET` set for a plan subject. (b) A record-kind
   mapping per stage, TOOL-dRankedPlan-6's shape. (c) A per-stage table typed in the harness. (b) cannot
   read a landing record held in a ref; (c) is a second answer to the stage the breakpoint already
-  knows. Recommendation (a). RESOLVED (agent, 2026-11-02, delegated): (a), rung 3. widens: none ·
-  relaxes: none
+  knows. Recommendation (a). RESOLVED (agent, 2026-11-02, delegated): (a), rung 3. widens: none · relaxes: none
 - **F4 — Where does the Maintain review sit?** PRIMITIVE GAP: `derive_breakpoints` reads five stages
   and no row of it reads `review.maintain`, which v2:1656 lists. (a) Maintain's literal runs where
   `review.breakpoints` places a review at an `item.maintain.*` boundary, and the build files an ask on

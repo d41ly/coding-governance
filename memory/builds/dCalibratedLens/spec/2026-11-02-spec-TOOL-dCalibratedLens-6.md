@@ -11,6 +11,7 @@
 | [2026-11-03-build-TOOL-dCalibratedLens-6-deviation-62.md](../build/2026-11-03-build-TOOL-dCalibratedLens-6-deviation-62.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-6-deviation-63.md](../build/2026-11-03-build-TOOL-dCalibratedLens-6-deviation-63.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-6-deviation-64.md](../build/2026-11-03-build-TOOL-dCalibratedLens-6-deviation-64.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-6-deviation-65.md](../build/2026-11-03-build-TOOL-dCalibratedLens-6-deviation-65.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
@@ -324,15 +325,13 @@ New arm: tools/loop/measure.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 · the 
   a value through the proposal; (b) proposals alone, so `measured` reads 96 KB until the owner writes;
   (c) the Loop Review writing the policy file, which the brief's S8 forbids and the guard refuses
   (§4). v2:1370 and systems.md:504 say `measured` reads "each role's own p90" after 30, which only (a)
-  does without a policy write. Rung 1. RESOLVED (agent, 2026-11-02, delegated): (a). widens: none ·
-  relaxes: none
+  does without a policy write. Rung 1. RESOLVED (agent, 2026-11-02, delegated): (a). widens: none · relaxes: none
 - **F3 — Which work orders are the 30?** The brief's S3 has every reading use `review.loop.window-days`.
   (a) The role's newest 30 under `measured`, whatever their age; (b) those inside the window, refusing
   a role with fewer than 30 there; (c) every work order under `measured`, ever. The clause reads "its
   p90 over 30 sliced work orders", and v2:1370 "until 30 sliced work orders per role are measured",
   a count, not a period. (a) is that count and stays current. Rung 1. RESOLVED (agent, 2026-11-02,
-  delegated): (a); the window bounds the Loop Review's period readings, not this count. widens: none ·
-  relaxes: none
+  delegated): (a); the window bounds the Loop Review's period readings, not this count. widens: none · relaxes: none
 - **F4 — The key has no per-role form, so the owner cannot set a role's own value.** (a) An ask on
   dTotalRecall, the key's owner, whose S6 already reads "a per-role value"; (b) this unit widens the
   catalogue row and the policy kit's `allowed` grammar itself, another build's key in a built kit;

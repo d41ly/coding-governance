@@ -11,6 +11,7 @@
 | [2026-11-02-build-TOOL-dCalibratedLens-8-deviation-81.md](../build/2026-11-02-build-TOOL-dCalibratedLens-8-deviation-81.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-8-deviation-82.md](../build/2026-11-03-build-TOOL-dCalibratedLens-8-deviation-82.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-8-deviation-83.md](../build/2026-11-03-build-TOOL-dCalibratedLens-8-deviation-83.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-8-deviation-84.md](../build/2026-11-03-build-TOOL-dCalibratedLens-8-deviation-84.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
@@ -310,8 +311,7 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC8 · the DISPOSAL 
   (`review_replay.py`) and `review.dispose`'s module is the loop kit's (`tools/loop/review_dispose.py`).
   Options: (a) a review-kit module importing the parser within its kit, run by `review.dispose`; (b) a
   `cause` verb on `review_dispose.py`, which would need a second appendix parser, a kit importing no
-  sibling. RESOLVED (agent, 2026-11-02, delegated): (a), rung 3, reuse of the one parser. widens: none ·
-  relaxes: none
+  sibling. RESOLVED (agent, 2026-11-02, delegated): (a), rung 3, reuse of the one parser. widens: none · relaxes: none
 - **F4 — Which findings does the 38-finding window count, and from when?** Options: (a) the first 38
   confirmed findings whose author's work order carried a filled map slot, read from the cell; (b) the 38
   after the map renderer's landing commit. (b) counts findings whose authors never got the map, under

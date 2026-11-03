@@ -10,6 +10,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-14-deviation-142.md](../build/2026-11-02-build-TOOL-dCalibratedLens-14-deviation-142.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-14-deviation-143.md](../build/2026-11-03-build-TOOL-dCalibratedLens-14-deviation-143.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
@@ -399,8 +400,7 @@ New arm: tools/loop/scenario.py · covers AC11 AC12 · fixture plants of a compl
   with it passes every check. (b) Its walked path also shows no `skip` against the promoted
   composition, by `compare_path`. (a) alone moves a build that already passed a step the promoted
   scenario adds an item to, so its record would claim a flow it did not walk. Recommendation (b),
-  which includes (a). RESOLVED (agent, 2026-11-02, delegated): (b), rung 3. widens: none ·
-  relaxes: none
+  which includes (a). RESOLVED (agent, 2026-11-02, delegated): (b), rung 3. widens: none · relaxes: none
 - **F7 — How does the owner's write carry `promoted-from`?** PRIMITIVE GAP: PLAY-dOrderedCharter-15
   S7 defines the `Promoted-from` field and no flag passes it. (a) This unit adds `--promoted-from` to
   the write verbs. (b) An ask on dOrderedCharter, leaving the ratification without its edge until it
