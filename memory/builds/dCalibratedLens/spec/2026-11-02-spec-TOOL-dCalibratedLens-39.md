@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-39 — `read_metrics_lines` answers an ordered list of `(name, value, source)` triples with every repeated name kept, held by a plant against a dict-shaped splitter
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 9 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 9 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-39-deviation-391.md](../build/2026-11-02-build-TOOL-dCalibratedLens-39-deviation-391.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-31-promoted-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-31-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 |
+| [2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md](../reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 |
 
 <!-- /gen:spec-records -->
 
@@ -32,15 +33,20 @@ It repairs `TOOL-dCalibratedLens-21`.
   id-30 bullet (rev-3, r2 id 27): `read_metrics_lines(text)` returns a list of `(name, value,
   source)` triples, one per line of the record's `## Metrics` section in the order the lines appear,
   a repeated name kept as one triple per line, each line split on its first `: ` and its last ` · `;
-  no caller reads it as a mapping. Unit 21 S1 (rev-2, id 27) states the same answer for the lines
+  no caller reads it as a mapping. The section is the lines after the `## Metrics` heading up to the
+  next line opening `## ` or the end of the text, and a blank line inside it is skipped; unit 3's
+  record template puts one after the heading and one before `## Filed` (round-3 id 33, unit 3's r3
+  id-33 bullet). Unit 21 S1 (rev-2, id 27) states the same answer for the lines
   its list-form readings write. Observed by AC1.
 - **S2** — The plant `metrics-repeat` of `python loop_review.py --fixture` in
   `tools/loop/loop_review.py`. It renders one record through `render_loop_record` with a planted
   Metrics list of `surface: a · src`, `caps: one · bytes · measure.py caps`, `caps: two · bytes ·
   measure.py caps` and `review-yield: 1/2/3 · src`, reads the text back through
-  `read_metrics_lines`, and holds when the answer equals those four triples in that order. It prints
-  `metrics-repeat — ok`, and otherwise `metrics-repeat — FAIL` with the triples it read. Observed by
-  AC1 and AC2.
+  `read_metrics_lines`, and holds when the answer equals those four triples in that order. The plant
+  first asserts that the rendered text carries the template's blank line after `## Metrics` and a
+  `## Filed` heading after the four lines, so the bounds are exercised on a real record (round-3 id
+  33). It prints `metrics-repeat — ok`, and otherwise `metrics-repeat — FAIL` with the triples it read.
+  Observed by AC1, AC2 and AC3.
 
 ## 3. Non-goals (OUT)
 
@@ -93,12 +99,13 @@ It repairs `TOOL-dCalibratedLens-21`.
 
 - security — N/A: a pure read of a rendered text.
 - perf / scale — one render and one split per plant run.
-- error / empty / loading states — a record with no Metrics line answers `[]`; a line with no `: `
-  or no ` · ` is a `ValueError` naming the line, never skipped.
+- error / empty / loading states — a record with no Metrics line answers `[]`; a blank line is
+  skipped, the section ends at the next `## ` heading or the end of the text, and any other line with
+  no `: ` or no ` · ` is a `ValueError` naming the line, never skipped.
 - observability — the plant prints the triples it read on failure.
 - risks — a caller written as `dict(read_metrics_lines(...))`: the review of that caller's diff is
   handed this unit's plant as the contract.
-- testing — AC1 and AC2 by the pass.
+- testing — AC1 to AC3 by the pass.
 - migration — N/A.
 - user docs — N/A.
 
@@ -110,6 +117,10 @@ It repairs `TOOL-dCalibratedLens-21`.
 - **AC2** — When the plant runs with `read_metrics_lines` staged as a name-to-pair mapping turned back
   into triples, it prints `metrics-repeat — FAIL` and three triples, the first `caps` line lost.
   Red when: a dict-shaped splitter passes the plant.
+- **AC3** — When the plant runs with `read_metrics_lines` staged to read every line after the heading
+  without skipping a blank line, it prints `metrics-repeat — FAIL` naming the `ValueError` on the blank
+  line, and with the section's end staged out it reads the `## Filed` lines as Metrics and fails.
+  Red when: a splitter that raises on a real record, or reads past its section, passes the plant.
 
 ## 7. Gates
 
@@ -118,7 +129,7 @@ It repairs `TOOL-dCalibratedLens-21`.
 The loop kit's leg `loop-review selftest` (TOOL-dCalibratedLens-2 S11) is not in the manifest at base
 and is named here in prose; it runs the plant once that unit lands.
 
-New arm: tools/loop/loop_review.py · covers AC1 AC2 · the `metrics-repeat` plant, staged red by a `read_metrics_lines` built as a name-to-pair mapping · none
+New arm: tools/loop/loop_review.py · covers AC1 AC2 AC3 · the `metrics-repeat` plant, staged red by a `read_metrics_lines` built as a name-to-pair mapping · none
 
 ## 8. Open questions
 
@@ -129,14 +140,19 @@ none
 - rev-1 · 2026-11-02 · initial draft, promoted from id 27 (HIGH, item H6) of the round-2 spec audit
   `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`; units 3 and 21 amended at the disposal
   (their rev-3 and rev-2).
+- rev-2 · 2026-11-03 · §5 §7 §10 S1 S2 AC3 · amended at the disposal of the round-3 spec audit
+  `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`, from `TOOL-dCalibratedLens-48`: the Metrics
+  section's bounds and its blank lines, with AC3 staging both (id 33); §10 records this unit's own
+  probe phrase (id 21).
 
 ## 10. Reuse audit
 
 The seam extended is unit 3's `read_metrics_lines`, the one Metrics splitter of the set, and its
 writer `render_loop_record`; the plant reads through both and copies neither. `python
-tools/codebase-map/reuse_lookup.py "render an optional bracket group of a shape definition into an
-emitted line"`, run once for this disposal's set, ranked name stems only; the loop kit is absent at
-base, so no code seam fits beyond the sibling specs. The recall probe returned TOOL-cMendedVintage-19,
+tools/codebase-map/reuse_lookup.py "split a record's Metrics section into name value source
+triples"` ranked name stems only (`records` in `tools/memory-tree/gotchas.py`, `extract_records`,
+`read_records` in `tools/memory-tree/deviation_join.py` and `tools/runlog/extract.py`); none splits a
+Metrics section, and the loop kit is absent at base, so no code seam fits beyond the sibling specs. The recall probe returned TOOL-cMendedVintage-19,
 the placement ruling this unit's order follows.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a staged break that an ancestor

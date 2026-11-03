@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-8 — the not-in-view cause on every confirmed finding, and the Loop Review's 38-finding reading of its share
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 14 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 14 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0465@f1db8527 whole
 
@@ -187,6 +187,18 @@ names; the unit it names owns the finding and its proof.
   stated count still gets the column. The Files touched line saying this unit writes none of
   `review_replay.py` is withdrawn, and `read_appendix_table` joins the Inventory.
 
+### Amendments (round-3 spec audit)
+
+The round-3 spec audit
+(`reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md`) confirmed the
+findings below, and its disposal amended this text. Its ids restart at 1, so each bullet spells
+`r3 id`; each supersedes the text it names, and the unit it names owns the finding and its proof.
+
+- **r3 id 3 · id 4's bullet (M2, `TOOL-dCalibratedLens-48`)** — This unit's edit to
+  `tools/workflows/unattended-build.template.js` is a guard path of `TOOL-dCalibratedLens-10`'s held
+  leg `instruction-eval` and no load of its seed case, so the edit selects the leg and owes the seed
+  nothing. The editors that owe the one replay are units 5 and 1 (`TOOL-dCalibratedLens-36` S1).
+
 ### Files touched (estimate)
 
 - `tools/workflows/review_cause.py` (new: S1, S2, S4, S6; it imports `review_replay.py` within the kit
@@ -313,6 +325,9 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC8 · the DISPOSAL 
 - rev-2 · 2026-11-02 · §4 §7 S1 · amended at the disposal of the round-1 spec audit
   `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1 spec
   audit)": ids 4 (`TOOL-dCalibratedLens-23`) and 33 (`TOOL-dCalibratedLens-30`).
+- rev-3 · 2026-11-03 · §4 · amended at the disposal of the round-3 spec audit
+  `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`, §4 "Amendments (round-3 spec audit)": r3 id
+  3 (`TOOL-dCalibratedLens-48`), the guard-path edit owing the seed nothing.
 
 ## 10. Reuse audit
 

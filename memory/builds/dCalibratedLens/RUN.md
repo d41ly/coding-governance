@@ -80,3 +80,19 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-02T21:51:04Z rescope · item add TOOL-dCalibratedLens-40 · reason spec-audit round 2 (reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) id 31 HIGH, item H7: an unsanitised why in an unread line blocks every period's record; repairs TOOL-dCalibratedLens-27
 
 2026-11-02T21:51:06Z rescope · item add TOOL-dCalibratedLens-41 · reason spec-audit round 2 (reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) minors batched into one unit, 22 MEDIUM and 6 LOW by raw id: 3 4 5 16 23 39 7 33 10 20 38 12 13 15 17 21 22 32 34 35 36 40 8 9 18 29 28 41; repairs no unit in particular
+
+2026-11-03T00:04:26Z rescope · item add TOOL-dCalibratedLens-42 · reason spec-audit round 3 (reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md) id 1 HIGH, item H1: unit 35 calls derive_record_kind with the signature TOOL-dTotalRecall-53 S21 replaced; repairs TOOL-dCalibratedLens-35
+
+2026-11-03T00:04:28Z rescope · item add TOOL-dCalibratedLens-43 · reason spec-audit round 3 (reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md) id 11 HIGH, item H2: read_loop_records lists with a glob that git ls-tree never matches; repairs TOOL-dCalibratedLens-3
+
+2026-11-03T00:04:30Z rescope · item add TOOL-dCalibratedLens-44 · reason spec-audit round 3 (reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md) id 12 HIGH, item H3 (shared with id 27): unit 31's guard admits a SPEC line that still carries its literal brackets; repairs TOOL-dCalibratedLens-31
+
+2026-11-03T00:04:32Z rescope · item add TOOL-dCalibratedLens-45 · reason spec-audit round 3 (reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md) id 27 HIGH, item H3 (shared with id 12): unit 31's staged break cannot go red on SPEC and leaves a render error unspecified; repairs TOOL-dCalibratedLens-31
+
+2026-11-03T00:04:34Z rescope · item add TOOL-dCalibratedLens-46 · reason spec-audit round 3 (reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md) id 22 HIGH, item H4: unit 41 widens three guards by hand-editing a rendered manifest; repairs TOOL-dCalibratedLens-41
+
+2026-11-03T00:04:36Z rescope · item add TOOL-dCalibratedLens-47 · reason spec-audit round 3 (reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md) id 23 HIGH, item H5: unit 37 adds AGENTS.md to a guard by hand-editing the rendered manifest; repairs TOOL-dCalibratedLens-37
+
+2026-11-03T00:04:39Z rescope · item add TOOL-dCalibratedLens-48 · reason spec-audit round 3 (reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md) minors batched into one unit, 16 MEDIUM and 9 LOW by raw id: 2 3 4 29 5 6 8 13 14 19 15 20 24 28 31 32 7 16 26 9 10 17 18 21 33; repairs no unit in particular
+
+2026-11-03T00:46:27Z review · item dCalibratedLens-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 6 · minors 25 · disposition promote

@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-21 — one carrier for a multi-line reading: the record's Metrics lines, one per entry, never a `fields`-form field
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 8 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 8 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -55,7 +55,10 @@ first multi-line reading to land. It repairs `TOOL-dCalibratedLens-4`.
 - **S4** — A reader answering one value carrying a line break is never handed to the writer: the
   walk's isolation boundary writes `<name>: unread · refused value` for it (round-2 id 31,
   `TOOL-dCalibratedLens-40`), so the list form is the only way a reading writes several lines and a
-  multi-line answer cannot exit the walk. Observed by AC4.
+  multi-line answer cannot exit the walk. For a list answer the refusal is per entry: the entry
+  carrying the break is written `<name>: unread · refused value` in its place and the other entries as
+  answered (round-3 id 32, unit 3's r3 id-32 bullet, held by `TOOL-dCalibratedLens-40`'s case).
+  Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -170,6 +173,9 @@ none
   `TOOL-dCalibratedLens-40`); the plant parsing through `read_metrics_lines` (id 21), the empty list's
   `searched-none` line (id 40) and AC1 stated a precondition (ids 4, 18, 29), all
   `TOOL-dCalibratedLens-41`; §3 gains the hands-off to unit 39.
+- rev-3 · 2026-11-03 · S4 · amended at the disposal of the round-3 spec audit
+  `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`, from `TOOL-dCalibratedLens-48`: the
+  refusal's scope for a list answer is the entry (id 32).
 
 ## 10. Reuse audit
 

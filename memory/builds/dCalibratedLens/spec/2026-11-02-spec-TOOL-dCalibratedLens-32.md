@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-32 — the `three-homes` plant's red twin restaged as the real `loop-review` row reverted to the bare folder, which TOOL-dTotalRecall-42 S4 refuses
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-32-deviation-321.md](../build/2026-11-02-build-TOOL-dCalibratedLens-32-deviation-321.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-31-promoted-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-31-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 |
+| [2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md](../reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 |
 
 <!-- /gen:spec-records -->
 
@@ -32,12 +33,15 @@ registry row, so the arm observes unit 19's own S1. It repairs `TOOL-dCalibrated
   unit's S2. Observed by AC1.
 - **S2** — The red twin, a case `bare-home` of the `three-homes` plant in `tools/loop/loop_review.py`.
   In the plant's scratch worktree, after the green run, it copies the tree's own
-  `tools/memory-tree/record-kinds.toml`, rewrites in place only the `home` value of the
+  `tools/memory-tree/record-kinds.toml`, rewrites in its own copy only the `home` value of the
   `loop-review` row to `memory/loop-review/`, and re-runs `record_kinds.py --check` as a bounded
-  subprocess (60 s). The case holds when the check exits 1 and its output names `loop-review`; it
+  subprocess (60 s). The mutation never outlives the case: before it returns, the case writes the
+  shipped bytes back and compares the scratch registry with them, and a difference fails the plant
+  naming the case (round-3 ids 4 and 29), so no other case of the plant grades a mutated row whatever
+  the case order. The case holds when the check exits 1 and its output names `loop-review`; it
   prints `bare-home — ok`, and otherwise `bare-home — FAIL · exit <n>` naming the lines it read.
   An absent `record_kinds.py` prints `bare-home — unread · record_kinds.py absent` and fails the
-  plant. Observed by AC1 and AC2.
+  plant. Observed by AC1, AC2 and AC3.
 
 ## 3. Non-goals (OUT)
 
@@ -104,6 +108,10 @@ registry row, so the arm observes unit 19's own S1. It repairs `TOOL-dCalibrated
 - **AC2** — When the case runs with its in-place rewrite skipped, the check exits 0 and the case
   prints `bare-home — FAIL · exit 0`.
   Red when: the case reports `ok` without the mutation, so it could never red.
+- **AC3** — When the plant runs with its case list staged in reverse, `bare-home` before
+  `disjoint-homes` and `graded-by-a-row`, each case prints its `ok` line and the registry check after
+  `bare-home` reads the shipped bytes.
+  Red when: a case's verdict depends on the order the cases run in.
 
 ## 7. Gates
 
@@ -112,7 +120,7 @@ registry row, so the arm observes unit 19's own S1. It repairs `TOOL-dCalibrated
 The loop kit's leg `loop-review selftest` (TOOL-dCalibratedLens-2 S11) is not in the manifest at base
 and is named here in prose; it runs the plant once that unit lands.
 
-New arm: tools/loop/loop_review.py · covers AC1 AC2 · the `bare-home` case, staged red by skipping its in-place rewrite of the `loop-review` row's home · none
+New arm: tools/loop/loop_review.py · covers AC1 AC2 AC3 · the `bare-home` case, staged red by skipping its in-place rewrite of the `loop-review` row's home · none
 
 ## 8. Open questions
 
@@ -123,15 +131,20 @@ none
 - rev-1 · 2026-11-02 · initial draft, promoted from id 26 (HIGH, item H1, shared with ids 2 and 11) of
   the round-2 spec audit `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`; unit 19 amended at
   the disposal (its rev-2).
+- rev-2 · 2026-11-03 · S2 AC3 §10 · amended at the disposal of the round-3 spec audit
+  `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`, from `TOOL-dCalibratedLens-48`: S2's
+  mutation is restored and re-checked before the next case, and AC3 runs the cases in reverse
+  (ids 4 and 29); §10 records this unit's own probe phrase (id 21).
 
 ## 10. Reuse audit
 
 The seam extended is unit 19's `three-homes` plant and its scratch worktree; the red is
 TOOL-dTotalRecall-42 S4's own refusal, read through the shipped `record_kinds.py --check` rather
-than re-derived. `python tools/codebase-map/reuse_lookup.py "render an optional bracket group of a
-shape definition into an emitted line"`, run once for this disposal's set, ranked name stems only;
-`record_kinds.py` is absent at base, so no code seam fits beyond the plant and the ancestor's
-spec. The recall probe returned TOOL-cMendedVintage-19, the placement ruling this unit's order
+than re-derived. `python tools/codebase-map/reuse_lookup.py "rewrite a registry row's home to a bare
+folder and expect the check to refuse it"` ranked name stems only (`rows` and `row` in the hygiene
+and merge-rows suites, `check`, `checks` in `tools/memory-tree/corpus_ids.py`); none mutates a
+registry row, and `record_kinds.py` is absent at base, so no code seam fits beyond the plant and the
+ancestor's spec. The recall probe returned TOOL-cMendedVintage-19, the placement ruling this unit's order
 follows.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a staged break that an ancestor

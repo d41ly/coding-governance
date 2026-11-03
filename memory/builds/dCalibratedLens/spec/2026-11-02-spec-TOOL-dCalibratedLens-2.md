@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-2 — the shared value ledger: its snapshot, its view, its row grammar and the `price` verb
 
-**Status:** OPEN · rev-3 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 1 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 1 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0459@facc646b whole
 **Carries:** node:record-kind.value-ledger
@@ -143,7 +143,7 @@ The build run re-grounds on each and stops the unit when one is absent.
 - **hands-off** `TOOL-dCalibratedLens-20` — `render_ledger_snapshot` and `write_ledger_snapshot`, whose Serves line that unit's `serves-kinds` plant grades (id 36)
 - **hands-off** `TOOL-dCalibratedLens-26` — `read_catch_events`, `derive_ledger_rows` and `price`, whose observed-leg rule that unit's catch plants prove (id 48)
 - **hands-off** `TOOL-dCalibratedLens-30` — `price` and the `cost` grammar, which the minors batch's `cost-grammar` arm validates (id 9)
-- **hands-off** `TOOL-dCalibratedLens-41` — the `loop-review selftest` row of S11, whose guard that unit widens to the files the loop plants run (round-2 id 13)
+- **hands-off** `TOOL-dCalibratedLens-46` — the `loop-review selftest` row of S11, whose guard that unit widens, in the row's declaration, to the files the loop plants run (round-2 id 13, round-3 id 22)
 
 ## 4. Design
 
@@ -473,6 +473,10 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC7 · a fixtu
   `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`, §4 "Amendments (round-2 spec audit)": r2 id
   17 (`TOOL-dCalibratedLens-41`), the docs-mode rule of id 48's observation; §3 gains the hands-off to
   unit 41.
+- rev-4 · 2026-11-03 · §3 · amended at the disposal of the round-3 spec audit
+  `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`: §3's hands-off of the row's guard names
+  `TOOL-dCalibratedLens-46` in place of unit 41, which takes the widening into the leg's declaration
+  (r3 id 22).
 
 ## 10. Reuse audit
 

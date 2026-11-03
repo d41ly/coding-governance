@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-40 — an isolated failure's `<why>` folded to one line with no field separator, and a reading the writer would refuse read as `unread · refused value`
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-40-deviation-401.md](../build/2026-11-02-build-TOOL-dCalibratedLens-40-deviation-401.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-31-promoted-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-31-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-41 |
+| [2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md](../reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 |
 
 <!-- /gen:spec-records -->
 
@@ -34,16 +35,22 @@ always writable and parsable, and proves it with the two inputs that broke it. I
   `<exception class>: <message>` with every line break made a space and every ` · ` made `, `, the
   fold `render_shape_line` applies to a field value (`tools/roles/handoff.py:708-719`); and a reading
   whose answered value or source carries a line break is written `<name>: unread · refused value`,
-  never handed to the writer. Unit 21 S4 and its fourth criterion (rev-2, r2 id 31) read that line
-  for a multi-line answer, so units 21 and 27 agree. Observed by AC1 and AC2.
+  never handed to the writer. For a reading that answers a list of pairs the refusal is per entry:
+  the entry carrying the break is written `<name>: unread · refused value` in its place in list order,
+  and the reading's other entries are written as answered, so a caller filtering by name still reads
+  every good entry; a scalar answer is the one-entry case (round-3 id 32, unit 3's r3 id-32 bullet and
+  unit 21 S4 at rev-3). Unit 21 S4 and its fourth criterion (rev-2, r2 id 31) read that line for a
+  multi-line answer, so units 21 and 27 agree. Observed by AC1, AC2 and AC3.
 - **S2** — The proof, a case `reader-raises-multiline` of unit 27's `reader-raises` plant in
   `tools/loop/loop_review.py`: one planted `METRICS` reader raises `RuntimeError` whose message is
   `git failed\nfatal: bad · ref`, and a second answers a value carrying a line break. `run --dry-run
   --key 2026-W45` exits 0, and `read_metrics_lines` over the printed record answers, for each of the
   two entries, one triple whose value is `unread`, the first with the source
-  `RuntimeError: git failed fatal: bad, ref` and the second `refused value`. The case prints
-  `reader-raises-multiline — ok`, and otherwise a FAIL line naming the entry and what it read.
-  Observed by AC1 and AC2.
+  `RuntimeError: git failed fatal: bad, ref` and the second `refused value`. A third planted reader
+  answers a list of two pairs, `(one, src)` and a value carrying a line break; the record answers
+  `(<name>, one, src)` then `(<name>, unread, refused value)` for it, in list order (round-3 id 32).
+  The case prints `reader-raises-multiline — ok`, and otherwise a FAIL line naming the entry and what
+  it read. Observed by AC1, AC2 and AC3.
 
 ## 3. Non-goals (OUT)
 
@@ -97,7 +104,7 @@ always writable and parsable, and proves it with the two inputs that broke it. I
 - observability — the folded message keeps the exception class and the whole text.
 - risks — a reader whose real value is the word `unread`: none of the set's readers answers it, and
   the source field tells the two apart.
-- testing — AC1 and AC2 by the pass.
+- testing — AC1 to AC3 by the pass.
 - migration — N/A: no period has run at base.
 - user docs — N/A: `help/loop-review.md` gains the `unread` word through unit 3's amendment.
 
@@ -109,6 +116,10 @@ always writable and parsable, and proves it with the two inputs that broke it. I
 - **AC2** — When the case runs with the boundary's fold staged out, the walk exits 1 at the
   pre-render or the case prints a FAIL line whose value is not `unread`.
   Red when: the unfolded `<why>` passes, so the fold is unobserved.
+- **AC3** — When the case runs with the refusal staged to cover the whole list reading, the record
+  answers one `unread · refused value` triple for the third reader and no `one` triple, and the case
+  prints a FAIL line naming that reader.
+  Red when: one multi-line entry costs a list reading its good entries, or the scope goes unobserved.
 
 ## 7. Gates
 
@@ -117,7 +128,7 @@ always writable and parsable, and proves it with the two inputs that broke it. I
 The loop kit's leg `loop-review selftest` (TOOL-dCalibratedLens-2 S11) is not in the manifest at base
 and is named here in prose; it runs the plant once that unit lands.
 
-New arm: tools/loop/loop_review.py · covers AC1 AC2 · the `reader-raises-multiline` case, staged red by the isolation boundary writing the raw exception message · none
+New arm: tools/loop/loop_review.py · covers AC1 AC2 AC3 · the `reader-raises-multiline` case, staged red by the isolation boundary writing the raw exception message · none
 
 ## 8. Open questions
 
@@ -128,15 +139,20 @@ none
 - rev-1 · 2026-11-02 · initial draft, promoted from id 31 (HIGH, item H7) of the round-2 spec audit
   `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`; units 3, 27 and 21 amended at the disposal
   (their rev-3, rev-2 and rev-2).
+- rev-2 · 2026-11-03 · §7 §10 S1 S2 AC3 · amended at the disposal of the round-3 spec audit
+  `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`, from `TOOL-dCalibratedLens-48`: the refusal's
+  scope for a list answer is the entry, planted in S2 and staged by AC3 (id 32), and units 3 and 21
+  carry the same rule; §10 records this unit's own probe phrase (id 21).
 
 ## 10. Reuse audit
 
 The seams extended are unit 3's isolation boundary and its one splitter `read_metrics_lines`, and
 the fold is the rule `render_shape_line` in `tools/roles/handoff.py` already applies to a field value,
 restated for one writer rather than imported across kits. `python tools/codebase-map/reuse_lookup.py
-"render an optional bracket group of a shape definition into an emitted line"`, run once for this
-disposal's set, ranked `render` and `render_line` name stems, none a value fold the loop kit can
-import; the loop kit is absent at base. The recall probe returned TOOL-cMendedVintage-19, the
+"fold a value so it adds no field"` ranked name stems only (`field` in
+`tools/run-gates/profile_bar.test.sh`, `add_health_event`, `add_scratch_worktree`,
+`check_audit_fold`); none is a value fold the loop kit can import, and the loop kit is absent at
+base. The recall probe returned TOOL-cMendedVintage-19, the
 placement ruling this unit's order follows.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a staged break that an ancestor

@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-10 — instruction evals: a replay suite of recorded items with known outcomes, scored through the scorer factory, owed again by a held leg when an instruction unit changes
 
-**Status:** OPEN · rev-3 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 12 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 12 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0467@0bd9d49f whole
 
@@ -235,6 +235,34 @@ proof.
   paths S5 now names, so which edits owe it is decidable from the case; `TOOL-dCalibratedLens-36`'s
   `seed-loads` plant proves an edit outside them leaves it held and an edit inside owes it.
 
+### Amendments (round-3 spec audit)
+
+The round-3 spec audit
+(`reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md`) confirmed the
+findings below, and its disposal amended this text. Its ids restart at 1, so each bullet spells
+`r3 id`; each supersedes the text it names, and the unit it names owns the finding and its proof.
+
+- **r3 id 2 · AC6, id 4's bullet (M1, `TOOL-dCalibratedLens-48`)** — The seed is already owed when
+  this unit lands, because unit 5 (order 11) edits two of its loads after the replayed sha. At this
+  unit's order AC6 accepts `owed` naming the paths unit 5 moved, and red on `owed` applies only at the
+  close, after the main loop records the one replay (`TOOL-dCalibratedLens-23` S2 and AC2). The id-4
+  bullet's "AC6 reds on `owed`" reads at the close and nowhere else.
+- **r3 id 3 · id 4's bullet (M2, `TOOL-dCalibratedLens-48`)** — The units that edit the seed's loads,
+  and so owe the one replay, are `TOOL-dCalibratedLens-5` and `TOOL-dCalibratedLens-1`;
+  `TOOL-dCalibratedLens-8` edits a guard path the seed does not load and owes it nothing.
+- **r3 id 13 · S5, §4 "The guard" (M7, `TOOL-dCalibratedLens-48`)** — The seed's `**Loads:**` names the
+  three audit agents in their rendered form, `.claude/agents/gov-spec-reviewer.md`,
+  `.claude/agents/gov-skeptic.md` and `.claude/agents/gov-synthesizer.md`, in place of their
+  `.agent.md` sources: the rendered file is what an agent loads, and it carries the source, the roles
+  policy's `effort:` line and the charter blocks `tools/roles/render_agents.py` builds it from. The
+  guard gains `.claude/agents/`, a pathspec check 7c classes `verbatim-repo-root`, so each load stays
+  inside the guard and S3's `unguarded` red does not fire.
+- **r3 id 31 · S3 (M14, `TOOL-dCalibratedLens-48`)** — The owed rule reads the working tree: a case is
+  `owed` when `git diff --name-only <replayed sha> -- <the case's Loads>` names a path, staged or
+  not, or `git ls-files --others --exclude-standard -- <the case's Loads>` names an untracked one. A
+  bar run on a tree with an uncommitted edit to a loaded path reads `owed` for the bytes it reads,
+  never `held` for bytes the replay never saw.
+
 ### Files touched (estimate)
 
 - `tools/workflows/replay_scorer.py` (S1 to S3, S6, the fixture plants)
@@ -299,8 +327,10 @@ proof.
   `python tools/govkit/govkit.py shipped --epoch` prints no `tools/workflows/evals/` path; and `grep -n
   'name = "instruction-eval"' tools/govkit/registry.toml` prints the `[[exempt_leg]]` row.
   Red when: a kit ships the entry, so `changed` ignores the guard.
-- **AC6** — (amended, id 4) When `python check_evals.py` runs over the tree, it prints one line for
-  `design-audit-runtime-record`, `held` or `owed` naming the paths that moved, and never `unarmed`.
+- **AC6** — (amended, id 4; r3 id 2) When `python check_evals.py` runs over the tree at this unit's
+  order, it prints one line for `design-audit-runtime-record`, `owed` naming the paths unit 5 moved
+  after the replayed sha, or `held` where none moved, and never `unarmed`; red on `owed` is
+  `TOOL-dCalibratedLens-23` AC2's, at the close after the main loop's replay.
   Red when: the seed case is missing or refused.
   figure: DERIVED, the verdict depends on the tree at observation time.
 - **AC7** — When the plant `add-case` runs `--add-case --from <record> --finding 7` over a review record
@@ -377,6 +407,11 @@ New arm: tools/loop/loop_review.py · covers AC8 · the `eval-candidates` plant,
 - rev-3 · 2026-11-02 · §3 §4 S5 · amended at the disposal of the round-2 spec audit
   `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`, §4 "Amendments (round-2 spec audit)": r2 id
   6 (`TOOL-dCalibratedLens-36`), the seed's `**Loads:**` stated; §3 gains the hands-off to unit 36.
+- rev-4 · 2026-11-03 · §4 S3 S5 AC6 · amended at the disposal of the round-3 spec audit
+  `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`, §4 "Amendments (round-3 spec audit)": r3 ids
+  2, 3, 13 and 31 (`TOOL-dCalibratedLens-48`), AC6 at this unit's order, the editors of the loads, the
+  rendered agent files as loads with `.claude/agents/` in the guard, and the owed rule over the
+  working tree.
 
 ## 10. Reuse audit
 

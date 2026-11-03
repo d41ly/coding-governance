@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-23 — the instruction-eval seed lands held, and a guarded edit's owed replay is recorded before the close bar
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 13 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 13 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -33,11 +33,13 @@ verdicts on the landed leg. It repairs `TOOL-dCalibratedLens-10`.
   its §4 "Amendments (round-1 spec audit)", id 4): unit 10 S5 — the seed's `**Replayed:**` and
   `**Baseline:**` are the adjudicated score TOOL-dFairHearing-25's verdict record states for the
   design-audit replay of the runtime record, a build-run precondition, and `none` is not admitted at
-  landing; its AC6 reds on `owed`. Units 8 and 1 name `instruction-eval` in their §7 prose: each edits a
-  guard path. The replay is a rule, not an instance (round-2 id 36): ONE replay of every owed case is
+  landing; its AC6 reds on `owed` at the close (round-3 id 2). Units 5 and 1 name `instruction-eval`
+  in their §7 prose: each edits a load of the seed; unit 8's guard-path edit selects the leg and owes
+  the seed nothing (round-3 id 3). The replay is a rule, not an instance (round-2 id 36): ONE replay of every owed case is
   recorded by the main loop, through the procedure unit 10 S8 writes into `tools/workflows/README.md`,
   after the last commit that touches a path the seed loads, judged right before the close bar by
-  `git diff --name-only <replayed sha> HEAD` over the seed's `**Loads:**`; `check_evals.py` is read
+  `git diff --name-only <replayed sha>` over the seed's `**Loads:**` against the working tree, with
+  the untracked loads, as unit 10 S3 reads it (round-3 id 31); `check_evals.py` is read
   again after every later fix pass, and a fix that touches a loaded path, unit 24's red path in unit
   1's `tools/workflows/tier2-review.template.js` or a closing review's fix among them, owes the replay
   again before the bar. NOT OBSERVED here — a procedure of the main loop, observed by AC2 at the
@@ -81,7 +83,8 @@ verdicts on the landed leg. It repairs `TOOL-dCalibratedLens-10`.
   its order (round-2 id 6). The seed's loads are unit 10 S5's as amended: the review harness
   template, `tools/workflows/lenses.toml`, the three audit agents' files and the charter template.
 - Edits to those loads, read from each spec's Files touched: unit 5 (order 11)
-  `coding-governance-agents.template.md` and `tools/workflows/tier2-review.template.js`; unit 1
+  `coding-governance-agents.template.md`, `tools/workflows/tier2-review.template.js` and the
+  re-rendered `.claude/agents/` files (round-3 id 13); unit 1
   (order 16) `tools/workflows/tier2-review.template.js` and `tools/workflows/lenses.toml`.
 - Guard-path edits outside the loads, which owe the seed nothing: unit 5's `instructions.toml`,
   `unattended-build.template.js` and `unattended-unit.js`, unit 8's `unattended-build.template.js`,
@@ -127,9 +130,10 @@ last commit touching a loaded path  ->  replay recorded (main loop, README proce
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `grep -n '^- \*\*id 4 · '` runs over the specs of units 10, 8 and 1, each prints its
-  §4 "Amendments (round-1 spec audit)" bullet, unit 10's admitting no seed at `**Replayed:** none`.
-  Red when: a guard-path editor names no leg, or the seed may still land owed.
+- **AC1** — When `grep -n 'instruction-eval'` runs over the specs of units 5 and 1, each names the leg,
+  unit 5 in its §7 prose and unit 1 in its id-4 bullet on §7, and `grep -n '^- \*\*id 4 · '` over unit 10's spec prints its §4 "Amendments
+  (round-1 spec audit)" bullet admitting no seed at `**Replayed:** none` (round-3 id 3).
+  Red when: an editor of the seed's loads names no leg, or the seed may still land owed.
 - **AC2** — When `python check_evals.py` runs from the workflows kit's `evals` directory over the tree
   after the main loop records the replay of S1, and again after any later fix pass, it prints the
   seed's `held` line and exits 0.
@@ -163,6 +167,11 @@ none
   `TOOL-dCalibratedLens-36`); S1 is a rule over the last commit touching a loaded path, re-read after
   every later fix (id 36), and AC1 stated a precondition (ids 4, 18, 29), both
   `TOOL-dCalibratedLens-41`.
+- rev-3 · 2026-11-03 · §4 S1 AC1 · amended at the disposal of the round-3 spec audit
+  `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`, from `TOOL-dCalibratedLens-48`: the editors
+  of the seed's loads are units 5 and 1 and AC1 greps them (id 3), AC6's red is at the close (id 2),
+  the rule reads the working tree (id 31), and §4 counts the re-rendered agent files among the loads
+  (id 13).
 
 ## 10. Reuse audit
 

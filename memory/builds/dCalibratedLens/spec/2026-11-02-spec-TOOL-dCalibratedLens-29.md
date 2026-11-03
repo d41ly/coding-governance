@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-29 — the work-order population read without argv: paths on stdin, one history pass, one policy read per policy revision, timed over the real tree
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 9 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 9 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -32,9 +32,10 @@ history in one pass, and proves the step over the real tree within a stated boun
   "Amendments (round-1 spec audit)", id 52, and rev-3, round-2 ids 19, 34 and 35):
   `python tools/roles/handoff.py reads -` reads the paths from stdin, one per line, and refuses a path
   argument beyond `-`. S2 takes every sliced work order's adding commit from
-  `tree_lib.read_adding_commits(root, "memory/builds/*/prompts/*.md", wanted)`
-  (`tools/memory-tree/tree_lib.py:302-325`), the one adding-commit reader, whose single
-  `git log --no-renames --diff-filter=A --reverse` keeps the oldest add (round-2 id 19,
+  `tree_lib.read_adding_commits(root, "memory/builds/*/prompts/*.md", wanted, newest=True,
+  timeout=120)` (`tools/memory-tree/tree_lib.py:302-325`), the one adding-commit reader, whose single
+  `git log --no-renames --diff-filter=A --reverse` with `newest=True` keeps a re-added work order's
+  newest add, the add that wrote its bytes at `HEAD` (round-2 id 19 and round-3 ids 15 and 20,
   `TOOL-dCalibratedLens-38`). A tracked work order the reader leaves unanswered, a merge-added one
   say, is counted into one stderr line `item-budgets — <n> work order(s) with no adding commit` and
   left out of the population, never raised (round-2 id 34). Each adding commit's
@@ -43,7 +44,8 @@ history in one pass, and proves the step over the real tree within a stated boun
   id 35), and `policy.py get memory.item-budget --rev <one commit of the group> --json` runs once per
   group, the absent group's answer being the catalogue default. `tree_lib` is reached through
   `resolve_kit_dir`, as `load_tree_lib` in `tools/policy/check_policy.py` reaches it. The step runs
-  under a 120 s bound and a timeout reads `item-budgets: unread · timed out`. §5's perf line states the
+  under a 120 s bound, passed to both shared readers as their `timeout` keyword, and a timeout reads
+  `item-budgets: unread · timed out` (round-3 id 20). §5's perf line states the
   passes. Observed by AC2.
 - **S2** — The proof over the real tree, at this unit's order: `python measure.py --fixture --plant
   item-budget-tree` runs the step over this repository's own tracked work orders, prints one
@@ -159,6 +161,10 @@ none
   unmapped-path line (id 34), the absent policy group (id 35), the host-independent staged break (id
   41), the guard pointer (id 13) and AC1 stated a precondition (ids 4, 18, 29), all
   `TOOL-dCalibratedLens-41`; §3 gains the hands-off to unit 38.
+- rev-3 · 2026-11-03 · S1 · amended at the disposal of the round-3 spec audit
+  `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`, from `TOOL-dCalibratedLens-48`: S1's reader
+  call keeps the newest add (id 15) and carries the 120 s bound through the readers' `timeout`
+  keyword (id 20), both `TOOL-dCalibratedLens-38` S3.
 
 ## 10. Reuse audit
 

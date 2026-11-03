@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-5 — instruction effectiveness from returns and findings that cite unit tags, and the Loop Review's proposals under `review.loop.retire`, with the keep record
 
-**Status:** OPEN · rev-3 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 11 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 11 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0462@cad135ef whole
 **Carries:** node:item.loop.propose
@@ -330,6 +330,23 @@ proof.
   plant in `tools/loop/loop_review.py`, so that plant's `graded-by-a-row` case grades three records
   from this order on; AC9 also runs that plant and reads `graded-by-a-row — ok` for the keep.
 
+### Amendments (round-3 spec audit)
+
+The round-3 spec audit
+(`reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md`) confirmed the
+findings below, and its disposal amended this text. Its ids restart at 1, so each bullet spells
+`r3 id`; each supersedes the text it names, and the unit it names owns the finding and its proof.
+
+- **r3 id 3 · §7 (M2, `TOOL-dCalibratedLens-48`)** — This unit edits three of the loads of
+  `TOOL-dCalibratedLens-10`'s seed case, `coding-governance-agents.template.md`,
+  `tools/workflows/tier2-review.template.js` and the `.claude/agents/` files it re-renders, so the
+  seed is owed from this pass and §7 names the leg `instruction-eval` in prose. The one replay is
+  the main loop's, recorded after the last commit touching a loaded path and before the close bar
+  (`TOOL-dCalibratedLens-23` S1).
+- **r3 id 5 · AC9, r2 id 1's bullet (M4, `TOOL-dCalibratedLens-48`)** — The `graded-by-a-row` case
+  counts and names what it grades, so AC9 reads `graded-by-a-row — ok · 3 records` naming the keep's
+  path (`TOOL-dCalibratedLens-35` S2).
+
 ### Files touched (estimate)
 
 - `tools/loop/loop_review.py` (S4 to S8, the fixture plants)
@@ -439,7 +456,8 @@ proof.
   Red when: a pricer ignores the keep, a keep never lapses, or a second keep overwrites the first.
 - **AC9** — (amended, ids 36, 37; r2 id 1) When `python record_kinds.py --check` runs in a scratch worktree holding one
   keep record that lacks `Words`, it exits 1 naming the record; with the field restored it exits 0;
-  and `python loop_review.py --fixture --plant three-homes` prints `graded-by-a-row — ok` for the keep.
+  and `python loop_review.py --fixture --plant three-homes` prints `graded-by-a-row — ok · 3 records`
+  naming the keep's path (r3 id 5).
   Red when: the `keep` row's fields do not reach the field check.
   fixture: `record_kinds.py` is TOOL-dTotalRecall-1's, absent at `8bec4cef`.
 - **AC10** — When `grep -n -A8 'name = "review.loop.retire"' tools/policy/catalogue.toml` runs it shows
@@ -456,6 +474,9 @@ proof.
 
 The loop kit's leg `loop-review selftest` (TOOL-dCalibratedLens-2 S11) is not in the manifest at base and
 is named here in prose; it grades the loop arm once that unit lands.
+
+The leg `instruction-eval` (TOOL-dCalibratedLens-10) is not in the manifest at base and is named here
+in prose: this unit edits three of its seed case's loads, so the seed is owed from this pass (r3 id 3).
 
 New arm: tools/loop/loop_review.py · covers AC4 AC5 AC6 AC7 AC8 · the `--fixture` plants `effectiveness`, `retire`, `units-and-overrides`, `retire-values` and `keep`, staged red by a proposer that ignores keeps, a `report` that files, and a threshold one short · none
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 · arm 9's `agents --run` fixture gains a result carrying `units` and one carrying none, staged red by a `units` field rendered `unknown`, which holds the line out of the ledger · none
@@ -528,6 +549,10 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC2 · an appendix fixtu
   `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`, §4 "Amendments (round-2 spec audit)": r2 id
   1 (`TOOL-dCalibratedLens-35`), the keep added to the `three-homes` plant; §3 gains the
   consumes-from of unit 35.
+- rev-4 · 2026-11-03 · §4 §7 AC9 · amended at the disposal of the round-3 spec audit
+  `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`, §4 "Amendments (round-3 spec audit)": r3 ids
+  3 and 5 (`TOOL-dCalibratedLens-48`), the `instruction-eval` seed this unit owes and AC9's counted
+  line.
 
 ## 10. Reuse audit
 

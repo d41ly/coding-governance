@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-3 — the Loop Review: a cadence step run as `review.loop.cadence` says, its lease keyed by the selected period, its walk and its record
 
-**Status:** OPEN · rev-3 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 2 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 2 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0460@401ecbd8 whole
 **Carries:** node:record-kind.loop-review
@@ -156,6 +156,7 @@ re-grounds on each and stops the unit when one is absent.
 - **hands-off** `TOOL-dCalibratedLens-30` — `read_loop_records` and the walk's window, which the minors batch's `keep-after-review` and `at-year-back` arms run (ids 6, 30)
 - **hands-off** `TOOL-dCalibratedLens-39` — `read_metrics_lines` and `render_loop_record`, whose list-of-triples answer that unit's `metrics-repeat` plant holds (round-2 id 27)
 - **hands-off** `TOOL-dCalibratedLens-40` — the walk's isolation boundary and `read_metrics_lines`, whose folded `<why>` that unit's `reader-raises-multiline` case reads (round-2 id 31)
+- **hands-off** `TOOL-dCalibratedLens-43` — `read_loop_records` and the `--fixture` frame, whose prefix listing that unit's `records-listed` plant holds (round-3 id 11)
 
 ## 4. Design
 
@@ -345,6 +346,27 @@ proof.
   each record at, never `git ls-files`, so a record staged and not committed is neither listed nor
   read.
 
+### Amendments (round-3 spec audit)
+
+The round-3 spec audit
+(`reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md`) confirmed the
+findings below, and its disposal amended this text. Its ids restart at 1, so each bullet spells
+`r3 id`; each supersedes the text it names, and the unit it names owns the finding and its proof.
+
+- **r3 id 11 · r2 id 38's bullet, id 30's bullet (H2, `TOOL-dCalibratedLens-43`)** —
+  `read_loop_records` lists `git ls-tree -r --name-only HEAD -- memory/loop-review/`, the folder
+  prefix, and keeps a name only when `fnmatch.fnmatchcase(name,
+  "memory/loop-review/*-loop-review-*.md")` holds: `git ls-tree` matches a path as a literal prefix
+  and never as a glob, so the r2 bullet's glob form lists nothing. It still reads the revision and
+  never the index, so a record staged and not committed is neither listed nor read.
+- **r3 id 33 · r2 id 27's bullet (L7, `TOOL-dCalibratedLens-48`)** — `read_metrics_lines(text)` reads
+  the lines after the `## Metrics` heading up to the next line opening `## ` or the end of the text,
+  and skips a blank line; every other line is one triple or a `ValueError` naming it.
+- **r3 id 32 · r2 id 31's bullet (M15, `TOOL-dCalibratedLens-48`)** — For a reading that answers a
+  list of pairs, the refusal of a value or source carrying a line break is per entry: that entry is
+  written `<name>: unread · refused value` in its place in list order, and the reading's other
+  entries are written as answered. A scalar answer is the one-entry case.
+
 ### Files touched (estimate)
 
 - `tools/loop/loop_review.py`: the walk, the four verbs and the fixture cases (S2, S3, S5 to S8, S12)
@@ -501,6 +523,10 @@ New arm: tools/loop/loop_review.py · covers AC1 AC3 AC4 AC5 AC6 AC7 · the `--f
   `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`, §4 "Amendments (round-2 spec audit)": r2 ids
   27 (`TOOL-dCalibratedLens-39`) and 31 (`TOOL-dCalibratedLens-40`), and r2 ids 7, 22, 20 and 38
   (`TOOL-dCalibratedLens-41`); §3 gains the hands-offs to units 39 and 40.
+- rev-4 · 2026-11-03 · §3 §4 S2 S5 S8 · amended at the disposal of the round-3 spec audit
+  `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`, §4 "Amendments (round-3 spec audit)": r3 id
+  11 (`TOOL-dCalibratedLens-43`), the prefix listing; r3 ids 33 and 32 (`TOOL-dCalibratedLens-48`),
+  the Metrics section's bounds and the per-entry refusal; §3 gains the hands-off to unit 43.
 
 ## 10. Reuse audit
 

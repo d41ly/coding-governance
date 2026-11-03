@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-6 — each role's `memory.item-budget` derived from its p90 over 30 sliced work orders under `measured`
 
-**Status:** OPEN · rev-3 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 8 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 8 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0463@33710e39 whole
 
@@ -85,7 +85,7 @@ role win.
 - **consumes-from** `TOOL-dCalibratedLens-3` — `tools/loop/loop_review.py`, its `gather`, `record` and `file` verbs and the `loop-review` record kind, which carry S4's field and S5's proposals
 - **consumes-from** external — TOOL-dTotalRecall-9's `render_handoff` `reads:` list, `check_read_set`, `record find` and `record show`; TOOL-dDeclaredLoop-2's `policy_edit.py propose`; the policy kit's `policy.py get --rev`, landed
 - **hands-off** `TOOL-dCalibratedLens-29` — `handoff.py reads -` and `derive_role_item_budgets`, which that unit times over the real tree (id 52)
-- **hands-off** `TOOL-dCalibratedLens-38` — `derive_role_item_budgets`' history read, which that unit's `item-budget-history` plant holds to the oldest add (round-2 id 19)
+- **hands-off** `TOOL-dCalibratedLens-38` — `derive_role_item_budgets`' history read, which that unit's `item-budget-history` plant holds to the newest add (round-2 id 19, round-3 id 15)
 
 ## 4. Design
 
@@ -200,6 +200,24 @@ proof.
   they are read at (unit 3's `read_loop_records` as amended), so a newer record staged and not
   committed is not listed, and the newest committed record's line is read.
 
+### Amendments (round-3 spec audit)
+
+The round-3 spec audit
+(`reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md`) confirmed the
+findings below, and its disposal amended this text. Its ids restart at 1, so each bullet spells
+`r3 id`; each supersedes the text it names, and the unit it names owns the finding and its proof.
+
+- **r3 id 11 · S6, AC7, r2 id 38's bullet (H2, `TOOL-dCalibratedLens-43`)** — The records are listed
+  by unit 3's `read_loop_records` as its r3 id-11 bullet amends it, the folder prefix
+  `memory/loop-review/` with the id rule applied in Python, since `git ls-tree` never matches a glob.
+  AC7's plant also asserts that the committed record is in that listing, so the answer it reads is
+  non-empty.
+- **r3 id 15 · S2, r2 id 19's bullet (M10, `TOOL-dCalibratedLens-38` by way of
+  `TOOL-dCalibratedLens-48`)** — The adding commits come from
+  `tree_lib.read_adding_commits(root, "memory/builds/*/prompts/*.md", wanted, newest=True,
+  timeout=120)`: each work order maps to its newest add, the add that wrote the bytes S2 measures at
+  `HEAD`, and the step's 120 s bound is carried by the reader (r3 id 20).
+
 ### Files touched (estimate)
 
 - `tools/roles/handoff.py` — S1
@@ -269,7 +287,8 @@ proof.
   `memory over budget: gov-builder 30000 B > 28000 B`; with no record it prints no over-budget line and
   the stderr line `memory budget — measured · gov-builder · 96000 B · no loop-review record`.
   With a newer record staged and not committed, it reads the newest committed record's line (r2 id
-  38).
+  38), and `read_loop_records` in the plant lists the committed record, so the answer it reads from
+  is non-empty (r3 id 11).
   Red when: the check reads 96,000 bytes while a measured line exists, a missing record reads as 0,
   or a staged record hides the committed one.
   permission: `record_find.py` and `gov_record.py` are TOOL-dTotalRecall-9's, built before this pass.
@@ -336,6 +355,10 @@ New arm: tools/loop/measure.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 · the 
   `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`, §4 "Amendments (round-2 spec audit)": r2 id
   19 (`TOOL-dCalibratedLens-38`), and r2 ids 34, 35, 10 and 38 (`TOOL-dCalibratedLens-41`); §3 gains
   the hands-off to unit 38.
+- rev-4 · 2026-11-03 · §3 §4 S2 S6 AC7 · amended at the disposal of the round-3 spec audit
+  `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`, §4 "Amendments (round-3 spec audit)": r3 id
+  11 (`TOOL-dCalibratedLens-43`), the prefix listing and AC7's non-empty assertion; r3 id 15
+  (`TOOL-dCalibratedLens-48`), the newest add; §3's hands-off to unit 38 names the newest add.
 
 ## 10. Reuse audit
 

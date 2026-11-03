@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-41 — the round-2 spec audit's 28 minors batched: each correction carried by the sibling it lands on, and the loop legs' guards widened to the files their plants read
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 19 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 19 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-41-deviation-411.md](../build/2026-11-02-build-TOOL-dCalibratedLens-41-deviation-411.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-31-promoted-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-31-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 |
+| [2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md](../reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-36 |
 
 <!-- /gen:spec-records -->
 
@@ -19,8 +20,9 @@ The round-2 spec audit of units 19 to 30,
 `reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md`, exited BOUNDED with 38 confirmed
 findings; `TOOL-dCalibratedLens-31` to `-40` take its BLOCKER and its nine HIGH. This unit is
 BUILD-METHOD M4's batch of its 22 MEDIUM and 6 LOW by raw id, one scope item per id, in report order.
-They land on units 1, 2, 3, 6, 20 to 24 and 26 to 30, so the batch repairs no unit in particular and
-builds last, order 19, above every unit of the build. They do not split into two disjoint write sets:
+They land on units 1, 2, 3, 6 and 19 to 30, unit 25 by its third criterion, which moved to
+`TOOL-dCalibratedLens-37` (round-3 id 10), so the batch repairs no unit in particular and builds
+last, order 19, above every unit of the build at its writing. They do not split into two disjoint write sets:
 the corrections meet in `tools/loop/loop_review.py` and `tools/loop/measure.py`, which several
 siblings write, so one unit carries them.
 
@@ -32,8 +34,10 @@ rev bump of that spec with a §9 line naming this unit and the review record by 
 or criterion rewritten in place for units 19 to 30 and, for units 1 to 17, a bullet `- **r2 id <n> ·
 …**` in a §4 "Amendments (round-2 spec audit)" section with the criterion text itself rewritten where
 a criterion is what the finding names. Each sibling then builds the corrected design and observes it
-through its own criterion. The two corrections no sibling owns, ids 13 and 28, widen guards in
-`tools/gate-legs.json`, and this unit builds them.
+through its own criterion. The two corrections no sibling owned, ids 13 and 28, widen three guards;
+the round-3 spec audit (`reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md`, id 22)
+found them made in a manifest the leg factory will render, so `TOOL-dCalibratedLens-46` builds them
+in each leg's declaration, and this unit builds no file of its own.
 
 ## 2. Scope (IN)
 
@@ -68,18 +72,18 @@ through its own criterion. The two corrections no sibling owns, ids 13 and 28, w
 - **S10** — id 20, M5, landing on units 3 and 30. Unit 6 joins the caller list of unit 3's id-30
   bullet and of unit 30's S16. NOT OBSERVED here — a spec-text correction.
 - **S11** — id 38, M5, landing on units 3 and 6. `read_loop_records` lists
-  `git ls-tree -r --name-only HEAD -- 'memory/loop-review/*-loop-review-*.md'`, the revision it reads,
-  never the index; unit 6's seventh criterion plants a staged, uncommitted newest record. NOT OBSERVED
-  here — unit 6's seventh criterion.
+  `git ls-tree -r --name-only HEAD -- memory/loop-review/`, the folder prefix, and keeps a name only
+  when `fnmatch.fnmatchcase(name, "memory/loop-review/*-loop-review-*.md")` holds, since `git ls-tree`
+  matches a path as a literal prefix and never as a glob (round-3 id 11, `TOOL-dCalibratedLens-43`);
+  it reads the revision, never the index; unit 6's seventh criterion plants a staged, uncommitted
+  newest record and asserts the committed one is listed. NOT OBSERVED here — unit 6's seventh
+  criterion and `TOOL-dCalibratedLens-43`'s `records-listed` plant.
 - **S12** — id 12, M6, landing on unit 20. S3 and the third criterion fail the plant itself, naming
   the cut record, when a cut-field run exits 0; the `home-kind mismatch` gloss is gone. NOT OBSERVED
   here — unit 20's third criterion.
-- **S13** — id 13, M7, this unit's build. In `tools/gate-legs.json` the `loop-review selftest`
-  guard gains `{prefix}/memory-tree/record_kinds.py`, `{prefix}/memory-tree/record-kinds.toml`,
-  `{prefix}/runlog/runlog.py` and `{prefix}/runlog/runlog_lib.py`, the files the plants of units 19,
-  20, 26, 32, 33 and 35 run; and the `loop measure fixtures` guard gains `{prefix}/roles/handoff.py`,
-  `{prefix}/memory-tree/tree_lib.py` and `{prefix}/policy/policy.py`, the files the plants of units
-  29 and 38 run. Observed by AC1.
+- **S13** — id 13, M7. The `loop-review selftest` and `loop measure fixtures` guards gain the files
+  the loop plants run and what those files import. Built by `TOOL-dCalibratedLens-46` S3 and S4, in
+  each leg's declaration (round-3 ids 22 and 28). NOT OBSERVED here — `TOOL-dCalibratedLens-46` AC1.
 - **S14** — id 15, M8, landing on units 1 and 24. Unit 1's third criterion's own text carries the
   `node -e` payload pipe, and unit 24's first criterion greps that criterion, not the amendment
   bullet. NOT OBSERVED here — unit 24's second criterion runs the payload.
@@ -106,9 +110,10 @@ through its own criterion. The two corrections no sibling owns, ids 13 and 28, w
   fixture plants a pre-policy commit. NOT OBSERVED here — unit 29's second criterion.
 - **S21** — id 36, M15, landing on unit 23. S1 is a rule: the replay is recorded after the last commit
   touching a path the seed loads, judged right before the close bar by `git diff --name-only <replayed
-  sha> HEAD` over those loads; `check_evals.py` is re-read after every later fix pass, unit 24's red
-  path and the closing review's fixes named as triggers. NOT OBSERVED here — unit 23's second
-  criterion, the main loop's.
+  sha>` over those loads against the working tree, with the untracked loads, as unit 10 S3 reads it
+  (round-3 id 31); `check_evals.py` is re-read after every later fix pass, unit 24's red path and the
+  closing review's fixes named as triggers. NOT OBSERVED here — unit 23's second criterion, the main
+  loop's.
 - **S22** — id 40, M16, landing on unit 21. A list reading that answers no pair writes one line
   `<name>: searched-none · <source>`, and the `metrics-multi` plant carries an empty-list case.
   NOT OBSERVED here — unit 21's second criterion.
@@ -121,8 +126,9 @@ through its own criterion. The two corrections no sibling owns, ids 13 and 28, w
   observes only the disposal text and is green at writing, as unit 30's does. NOT OBSERVED here — a
   spec-text correction, made with S2's.
 - **S26** — id 29, L3, the same correction as S25. NOT OBSERVED here — a spec-text correction.
-- **S27** — id 28, L4, this unit's build. The `tier2-review self-test` guard in `tools/gate-legs.json`
-  gains `{prefix}/hooks/agent-cap.js`, the hook unit 24's arm runs. Observed by AC2.
+- **S27** — id 28, L4. The `tier2-review self-test` guard gains `{prefix}/hooks/agent-cap.js`, the
+  hook unit 24's arm runs, and what it loads. Built by `TOOL-dCalibratedLens-46` S5, in the leg's
+  declaration (round-3 ids 22 and 28). NOT OBSERVED here — `TOOL-dCalibratedLens-46` AC2.
 - **S28** — id 41, L5, landing on unit 29. The argv staged break is a step that refuses when the argv
   it would pass exceeds 32,767 bytes, so the red does not depend on the host's limit. NOT OBSERVED
   here — unit 29's second criterion under its staged break.
@@ -130,14 +136,13 @@ through its own criterion. The two corrections no sibling owns, ids 13 and 28, w
 ## 3. Non-goals (OUT)
 
 - A class gate per left-shift line. Each item's correction is the sibling's to build and observe;
-  this unit builds only the two guard edits no sibling owns.
+  the two guard edits no sibling owned are `TOOL-dCalibratedLens-46`'s (round-3 id 22).
 - The HIGH and BLOCKER corrections: `TOOL-dCalibratedLens-31` to `-40`.
 - Re-reviewing any sibling. The next audit reads every spec this disposal moved.
 
 ### Edges
 
-- **consumes-from** `TOOL-dCalibratedLens-2` — the `loop-review selftest` row, whose guard S13 widens; without it there is no row to edit
-- **consumes-from** `TOOL-dCalibratedLens-4` — the `loop measure fixtures` row, whose guard S13 widens
+- **hands-off** `TOOL-dCalibratedLens-46` — the guard widenings of S13 and S27, which that unit makes in each leg's declaration (round-3 id 22)
 
 ## 4. Design
 
@@ -158,45 +163,38 @@ No identifier is minted.
 
 ### Files touched (estimate)
 
-- `tools/gate-legs.json` — S13 and S27
+None. The guard files of S13 and S27 are `TOOL-dCalibratedLens-46`'s.
 
 ### Alternatives rejected
 
 - **Guards in units 2 and 4's own rows at their passes.** The files are read by plants landed at
-  orders 3 to 10; a guard naming a file before its reader exists is speculative, and one owner at the
-  end edits each row once.
+  orders 3 to 14; a guard naming a file before its reader exists is speculative, and one owner at the
+  end edits each row once, `TOOL-dCalibratedLens-46`.
 - **Two batch units.** Every correction but S13 and S27 is sibling text, so there is no second write
   set to build concurrently.
 
 ## 5. Production-readiness checklist
 
-- security — N/A: selector edits.
-- perf / scale — the two loop legs and `tier2-review self-test` run on more edits, each a cost of
-  seconds.
+- security — N/A: sibling text only.
+- perf / scale — N/A.
 - error / empty / loading states — N/A.
-- observability — `--legs-for` names the leg for each added path.
-- risks — check 7c classes each added pathspec as kit-relative, since each opens `{prefix}/`.
-- testing — AC1 and AC2 by the pass; each sibling's amended criterion at its own pass.
+- observability — each sibling's §9 line names this unit and the record.
+- risks — a sibling's correction read as this unit's coverage: each S-item names the criterion that
+  observes it in the sibling, and AC1 is a precondition, not an observation of a build.
+- testing — AC1 at writing; each sibling's amended criterion at its own pass.
 - migration — N/A.
 - user docs — N/A.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python tools/check-spec-tokens.py --legs-for` runs over `record_kinds.py`,
-  `record-kinds.toml`, `runlog.py`, `runlog_lib.py`, `handoff.py`, `tree_lib.py` and `policy.py` at
-  their kit paths after this unit's pass, the first four each name `loop-review selftest` and the last
-  three each name `loop measure fixtures`.
-  Red when: a plant's cross-kit file still selects no leg that runs the plant.
-- **AC2** — When the same query runs over the hook `agent-cap.js` at its kit path, it names
-  `tier2-review self-test`.
-  Red when: a hook edit still skips the suite whose arm runs the hook.
+- **AC1** — When `grep -n "TOOL-dCalibratedLens-46"` runs over the specs of units 2 and 4 and this
+  one, units 2 and 4 each hand their row's guard to unit 46 and this spec's S13 and S27 name it as
+  their builder; green at writing, a precondition of unit 46's criteria.
+  Red when: a guard widening is claimed by two units, or by none.
 
 ## 7. Gates
 
-`govkit selfcheck` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `policy fixtures` · `tier2-review self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates`
-
-The loop kit's legs `loop-review selftest` and `loop measure fixtures` (TOOL-dCalibratedLens-2 S11,
-TOOL-dCalibratedLens-4 S9) are not in the manifest at base and are named here in prose.
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates`
 
 ## 8. Open questions
 
@@ -207,14 +205,21 @@ none
 - rev-1 · 2026-11-02 · initial draft, the batch of the round-2 spec audit
   `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`'s 22 MEDIUM and 6 LOW; units 1, 2, 3, 6, 20
   to 24 and 26 to 30 amended at the disposal.
+- rev-2 · 2026-11-03 · §1 §3 §4 §5 §6 §7 §10 S11 S13 S21 S27 AC1 AC2 · amended at the disposal of the
+  round-3 spec audit `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`: S11 lists by folder prefix
+  (id 11, `TOOL-dCalibratedLens-43`); S13 and S27 and their criteria move to
+  `TOOL-dCalibratedLens-46` (id 22), carrying the module closure of id 28; from
+  `TOOL-dCalibratedLens-48`, §1's landing list names units 19 and 25 (id 10), S21's rule reads the
+  working tree (id 31) and §10 records this unit's own probe phrase (id 21); §3 hands the guards to
+  unit 46.
 
 ## 10. Reuse audit
 
-The seam extended is the guard column of `tools/gate-legs.json` and the existing `--legs-for` query
-of `tools/check-spec-tokens.py`, which observes it; every other correction extends the sibling it
-lands on. `python tools/codebase-map/reuse_lookup.py "render an optional bracket group of a shape
-definition into an emitted line"`, run once for this disposal's set, ranked name stems only; the
-guard rows were read by hand. The recall probe returned TOOL-cMendedVintage-19, the placement ruling;
+Every correction extends the sibling it lands on, rewritten in place with a rev bump and a §9 line;
+the guard rows are `TOOL-dCalibratedLens-46`'s. `python tools/codebase-map/reuse_lookup.py "rewrite a
+sibling spec's text with a revision bump at a disposal"` ranked name stems only (`read_text`,
+`write_text`, `read_spec_revisions`, `load_text`); no seam fits beyond the sibling specs, since a
+disposal is authored text. The recall probe returned TOOL-cMendedVintage-19, the placement ruling;
 a batch that repairs no unit in particular takes the order above every unit.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a staged break that an ancestor

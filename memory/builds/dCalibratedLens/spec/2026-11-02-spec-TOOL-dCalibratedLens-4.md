@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-4 — the measured-value factory, and the `budgets.*` caps re-derived from evidence and review cost
 
-**Status:** OPEN · rev-3 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 7 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 7 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0461@ea09b304 whole
 
@@ -109,7 +109,7 @@ every movement to the owner through the guarded policy command, writing no polic
 - **consumes-from** external — TOOL-dDeclaredLoop-2's `policy_edit.py propose`; TOOL-dWitnessedBar-11's `leg_factory.py`; the policy kit's `budgets.py` and `policy.py get`, landed
 - **hands-off** `TOOL-dCalibratedLens-21` — the caps step as a `METRICS` entry, whose lines that unit's `metrics-multi` plant writes (id 2)
 - **hands-off** `TOOL-dCalibratedLens-30` — `derive_cap_readings` under the walk's window, which the minors batch's `at-year-back` arm runs (id 6)
-- **hands-off** `TOOL-dCalibratedLens-41` — the `loop measure fixtures` row of S9, whose guard that unit widens to the files the measure plants run (round-2 id 13)
+- **hands-off** `TOOL-dCalibratedLens-46` — the `loop measure fixtures` row of S9, whose guard that unit widens, in the row's declaration, to the files the measure plants run (round-2 id 13, round-3 id 22)
 
 ## 4. Design
 
@@ -383,6 +383,10 @@ New arm: tools/policy/check_policy.py · covers AC8 · the case `budgets-census`
 - rev-3 · 2026-11-02 · §3 · amended at the disposal of the round-2 spec audit
   `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`: §3 gains the hands-off to unit 41, which
   widens the `loop measure fixtures` guard (r2 id 13).
+- rev-4 · 2026-11-03 · §3 · amended at the disposal of the round-3 spec audit
+  `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`: §3's hands-off of the row's guard names
+  `TOOL-dCalibratedLens-46` in place of unit 41, which takes the widening into the leg's declaration
+  (r3 id 22).
 
 ## 10. Reuse audit
 

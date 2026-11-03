@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-31 — a shape's optional `[ · …]` group rendered as its content or dropped, and every fenced shape's rendered line admitted by the format guard
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 13 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 13 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-11-02-build-TOOL-dCalibratedLens-31-deviation-311.md](../build/2026-11-02-build-TOOL-dCalibratedLens-31-deviation-311.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-31-promoted-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-31-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-31-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-31-1-spec-writer.md) | journal | — |
+| [2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md](../reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 |
 
 <!-- /gen:spec-records -->
 
@@ -37,17 +38,22 @@ holds the renderer and the guard to one another over every shape the fence defin
   renders as nothing, so its text never reaches the line. A placeholder outside every group still
   raises `RolesError` when `fields` lacks it, as today, and each value's ` · ` and line breaks are
   still folded as today. Observed by AC1 and AC2.
-- **S2** — The arm, in `tools/roles/adopt-roles.test.sh`: it reads the charter fence of the
-  repository's `AGENTS.md` with `roles_lib.extract_microformat_shapes`, renders each definition
-  twice through `render_shape_line` (once with every placeholder filled by the sample value `x`, once
-  with only the placeholders outside every group filled), and pipes both lines to one `node`
-  process that loads the hooks kit's `format-guard.js`, found by `roles_lib.resolve_kit_dir` as the
-  suite's arm 6 finds it, and asserts that `buildShapeRegex` of that definition admits each line. One
-  assertion per definition and form; the suite's `FLOOR_ASSERTIONS` rises by the count. A definition
-  ending in the repeat marker `…` (the `gates` shape) is a variable-length shape no renderer prints
-  from a dict; the arm lists its head as `not rendered` and asserts nothing for it. A missing
-  hooks kit or `node` SKIPs the arm by name and lowers the floor by its count, as arm 6 does.
-  Observed by AC3.
+- **S2** — The arm, in `tools/hooks/format-guard.test.sh` beside its AC6 parity arm, the suite whose
+  guard names the hook and, once `TOOL-dCalibratedLens-47` lands, the roles renderer and `AGENTS.md`
+  (round-3 id 6). The suite resolves the roles kit with its own `resolve_kit_dir` as it resolves the
+  runlog kit (`tools/hooks/format-guard.test.sh:234`). A python step reads the charter fence of the
+  repository's `AGENTS.md` with `roles_lib.extract_microformat_shapes` and renders each definition
+  through `render_shape_line` in two forms: every placeholder filled by the sample value `x`, and
+  only the placeholders outside every group filled. It writes each line as UTF-8 bytes through
+  `sys.stdout.buffer.write`, as `tools/roles/handoff.py:933` does, and one `node` process that loads
+  the hook beside the suite reads its stdin as `utf8` and asserts that `buildShapeRegex` of that
+  definition admits each line (round-3 id 14). One assertion per definition and form; the suite's
+  `FLOOR_ASSERTIONS` rises by the count. A definition ending in the repeat marker `…` (the `gates`
+  shape) is a variable-length shape no renderer prints from a dict; the arm lists its head as
+  `not rendered` and asserts nothing for it. A missing roles kit or `node` SKIPs the arm by name and
+  lowers the floor by its count. Beside the guard's verdict, each line is held free of a literal
+  bracket by `TOOL-dCalibratedLens-44` (round-3 id 12); a render error and a shape with one form are
+  `TOOL-dCalibratedLens-45`'s (round-3 id 27). Observed by AC3.
 
 ## 3. Non-goals (OUT)
 
@@ -55,13 +61,16 @@ holds the renderer and the guard to one another over every shape the fence defin
   follows it.
 - The `units` field's position and the guard's fixtures R1u to R3u: `TOOL-dCalibratedLens-25` S1 and
   S2, unchanged.
-- The leg's guard: `TOOL-dCalibratedLens-37`, id 24.
-- A skip read as coverage. The arm SKIPs only where the hooks kit is absent; in this repository it is
+- The leg's guard: `TOOL-dCalibratedLens-47`, round-3 ids 23 and 6.
+- A skip read as coverage. The arm SKIPs only where the roles kit is absent; in this repository it is
   present, and this repository's run is the coverage.
 
 ### Edges
 
 - **consumes-from** `TOOL-dCalibratedLens-25` — the `returned` fence carrying the `[ · units <units>]` group, the first group `print_agent_lines` renders; without it the arm still renders the `SPEC` shape's group, but no printed line exercises S1
+- **hands-off** `TOOL-dCalibratedLens-44` — the shape arm in `tools/hooks/format-guard.test.sh` and the lines it renders, which that unit's bracket assertion holds (round-3 id 12)
+- **hands-off** `TOOL-dCalibratedLens-45` — the arm's python step and its two forms, whose render errors that unit reports as FAIL lines (round-3 id 27)
+- **hands-off** `TOOL-dCalibratedLens-47` — the shape arm in `tools/hooks/format-guard.test.sh`, which runs the renderer that unit adds to the `format-guard self-test` guard (round-3 id 6)
 
 ## 4. Design
 
@@ -79,8 +88,11 @@ holds the renderer and the guard to one another over every shape the fence defin
   (`AGENTS.md:76`) says the bracket never appears in an emission.
 - `tools/hooks/format-guard.js:554` exports `buildShapeRegex`, so a `node -e` caller reads the
   guard's own regex rather than a copy.
-- `tools/roles/adopt-roles.test.sh:160-173`: arm 6 resolves the hooks kit through
-  `roles_lib.resolve_kit_dir("hooks", "agent-cap.js", …)` and SKIPs naming what is absent.
+- `tools/runlog/prose.py:34-51`: `build_shape_regex`, a Python port of the guard's group split, which
+  the suite's AC6 arm (`tools/hooks/format-guard.test.sh:578-610`) holds to the hook (round-3 id 17).
+- `tools/run-gates/run-gates.sh:3249-3251` holds every `subject = kit` or `chunk = selftests` leg when
+  `GATE_SELFTESTS` is empty, and under `changed` (`:3070-3082`) a leg selects by its kit's shipped
+  sources, or by its guard where no entry ships its suite (round-3 id 6).
 
 ### The rendering, by example
 
@@ -97,15 +109,22 @@ No identifier is minted. The arm adds assertions to an existing suite.
 ### Files touched (estimate)
 
 - `tools/roles/handoff.py` — S1
-- `tools/roles/adopt-roles.test.sh` — S2
+- `tools/hooks/format-guard.test.sh` — S2
 
 ### Alternatives rejected
 
 - **Render the group always, brackets stripped.** A definition whose group names a field the deriver
   lacks would raise or print `unknown`, where the shape says the field is optional.
-- **An arm in the format guard's own suite.** That suite's leg is guarded on the hooks kit only
-  (`tools/gate-legs.json`), so a renderer edit would not select it; the roles adopter self-test
-  carries no guard and runs on every bar.
+- **The arm in the roles adopter self-test.** That leg carries no guard and is held on a default bar
+  like every self-test (`run-gates.sh:3249-3251`); under `changed` an edit to `format-guard.js`
+  never selects it, so the guard side of the contract would go unobserved. The hooks suite is
+  selected by the hook and, through `TOOL-dCalibratedLens-47`'s entries, by the renderer, so one leg
+  sees both sides (round-3 id 6).
+- **Reuse `prose.py`'s group split from `render_shape_line`.** The roles kit requires
+  `kickoff-manifest` and `memory-tree` only (`tools/roles/kit.toml:12`); reaching the runlog kit at
+  print time adds a kit dependency for a ten-line split. The renderer keeps its own split, and this
+  arm is what holds it to the guard, as AC6 holds `prose.py`'s, so a grammar change reds rather than
+  drifts (round-3 id 17).
 
 ## 5. Production-readiness checklist
 
@@ -129,15 +148,19 @@ No identifier is minted. The arm adds assertions to an existing suite.
   bracket, and when the dict lacks `role` the call raises `RolesError` naming `role`.
   Red when: an absent optional field raises, or an absent required field renders.
 - **AC3** — When `node -e` loads `format-guard.js` and tests the lines the S2 arm renders for every
-  fenced definition of `AGENTS.md`, `buildShapeRegex` admits each, and under the staged break (S1
-  reverted) it refuses the `SPEC` and `returned` lines.
-  Red when: any rendered line is refused, or the reverted renderer passes.
+  fenced definition of `AGENTS.md`, `buildShapeRegex` admits each. Under the staged break (S1
+  reverted) the guard refuses the all-filled `returned` and `merged` lines; the `SPEC` line it still
+  admits is caught by `TOOL-dCalibratedLens-44`'s bracket assertion, and `returned`'s second form
+  raises `RolesError` naming `units`, which `TOOL-dCalibratedLens-45` prints as that form's FAIL line
+  (round-3 ids 12, 27 and 9). A run with `PYTHONUTF8=0` set prints the same verdicts (round-3 id 14).
+  Red when: any rendered line is refused, the reverted renderer's `returned` and `merged` lines pass
+  the guard, or a non-ASCII field crashes the pipe.
 
 ## 7. Gates
 
-`roles adopter self-test` · `policy fixtures` · `micro-format definitions` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates`
+`format-guard self-test` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `roles adopter self-test` · `policy fixtures` · `micro-format definitions` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates`
 
-New arm: tools/roles/adopt-roles.test.sh · covers AC3 · every fenced definition rendered through `render_shape_line` and fed to `buildShapeRegex`, staged red by the renderer with its group handling removed · FLOOR_ASSERTIONS raised by the assertions added
+New arm: tools/hooks/format-guard.test.sh · covers AC3 · every fenced definition rendered through `render_shape_line` and fed to `buildShapeRegex`, staged red by the renderer with its group handling taken out · FLOOR_ASSERTIONS raised by the assertions added
 
 ## 8. Open questions
 
@@ -147,16 +170,25 @@ none
 
 - rev-1 · 2026-11-02 · initial draft, promoted from id 30 (BLOCKER, item B1) of the round-2 spec audit
   `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`; unit 25 amended at the disposal (its rev-2).
+- rev-2 · 2026-11-03 · §3 §4 §7 §10 S2 AC3 · amended at the disposal of the round-3 spec audit
+  `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`: S2 names the bracket assertion of
+  `TOOL-dCalibratedLens-44` (id 12) and the render-error envelope of `TOOL-dCalibratedLens-45` (id 27),
+  and AC3's staged red reads the lines that go red (ids 12, 27, and 9 of `TOOL-dCalibratedLens-48`);
+  from `TOOL-dCalibratedLens-48`, the arm moves to the hooks suite with the §4 rationale corrected
+  (id 6), its pipe is UTF-8 bytes (id 14), and `prose.py`'s split is named with why the renderer keeps
+  its own (id 17); §3 gains the hands-offs to units 44, 45 and 47.
 
 ## 10. Reuse audit
 
 The seam extended is the shape grammar both consumers already share: `render_shape_line` in
 `tools/roles/handoff.py` gains the `[ · …]` rule `buildShapeRegex` in `tools/hooks/format-guard.js`
-already applies, and the arm calls the exported guard function rather than a copy. `python
+already applies, and the arm calls the exported guard function rather than a copy. A third reader of
+the same split exists, `build_shape_regex` in `tools/runlog/prose.py`, held to the hook by the suite's
+AC6 arm; §4 records why the renderer does not import it. `python
 tools/codebase-map/reuse_lookup.py "render an optional bracket group of a shape definition into an
 emitted line"` ranked name stems only (`shape` in `tools/govkit/matrix.py`, `render`, `render_line`
-in `tools/runlog/runlog_lib.py`); none renders a bracket group, so the rule is added to the one
-renderer rather than minted beside it. The recall probe returned TOOL-cMendedVintage-19, the
+in `tools/runlog/runlog_lib.py`); the map's name-stem ranking did not surface `prose.py`, which the
+round-3 audit found by reading the suite. The recall probe returned TOOL-cMendedVintage-19, the
 placement ruling this unit's order follows.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a staged break that an ancestor
