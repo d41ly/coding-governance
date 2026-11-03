@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-26 — every rule 0 and rule 5 arm of the hook's suite found at its new home and gone from the old one, counted by label whatever helper writes it
 
-**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 20 · advances TOOL-dFairHearing-19
+**Status:** INPROGRESS · rev-4 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 20 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
