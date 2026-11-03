@@ -896,8 +896,8 @@ function main() {
     }
   }
 
-  // Rules 6 and 7 are this hook's last rules: the script rules and the spec-audit opt-in left for the
-  // review kit (TOOL-dFairHearing-16), so a call either rule admitted is admitted.
+  // Last, the spec-audit opt-in pack's presence (TOOL-dFairHearing-22), defined below main(); the opt-in itself is the pack's.
+  { const deny = checkOptinPackPresent(data); if (deny) { process.stderr.write(deny); process.exit(2) } }
   process.exit(0)
 }
 
@@ -945,4 +945,31 @@ function readSettingsLayers(root) {
     try { obj = JSON.parse(text) } catch (e) { throw new Error(`${name} does not parse as JSON: ${e.message}`) }
     return { name, env: obj && typeof obj === 'object' && obj.env && typeof obj.env === 'object' ? obj.env : {} }
   })
+}
+
+// TOOL-dFairHearing-22 — THE OPT-IN PACK'S PRESENCE, after rules 6 and 7. The spec-audit opt-in left
+// this hook for the review kit's spec-audit-optin.js (TOOL-dFairHearing-16), and a partial update
+// that names this kit alone lands the hook without it: the hooks kit cannot require the review kit,
+// which requires it back, a cycle govkit refuses. So a Workflow call carrying the opt-in's own
+// trigger, `kind: 'spec-audit'` or a `specAudit` key in its structured args, is refused unless the
+// pack sits in the workflows kit beside this hook's directory, probed as resolveHarnessName probes
+// the harness. WHAT IT DOES NOT CHECK: that the pack is wired, which check-wiring.sh reports, or that
+// it judges correctly, which its own suite does. A throw refuses. null = allow · string = deny.
+function checkOptinPackPresent(data) {
+  const path = require('path')
+  try {
+    const a = data.tool_name === 'Workflow' ? extractWorkflowArgs(data) : null
+    if (!a || (String(a.kind) !== 'spec-audit' && a.specAudit === undefined)) return null
+    const kits = path.dirname(__dirname)
+    const p = path.join(kits, 'workflows', 'spec-audit-optin.js')
+    if (require('fs').existsSync(p)) return null
+    const renderRel = (f) => path.relative(process.env.CLAUDE_PROJECT_DIR || process.cwd(), f).split(path.sep).join('/')
+    return `BLOCKED by agent-cap: this Workflow call is a spec audit, and the spec-audit opt-in pack ` +
+      `${renderRel(p)} is not beside this hook. The opt-in moved to the review kit (TOOL-dFairHearing-16), ` +
+      `and a hook landed without its pack does not admit an audit nobody judged.\n` +
+      `Install the pack: govkit update --kits review-harness, or wire a hand copy with ` +
+      `python ${renderRel(path.join(kits, 'settings-merge.py'))} --fragment ${renderRel(path.join(kits, 'workflows', 'spec-audit-optin.fragment.json'))}.\n`
+  } catch (e) {
+    return `BLOCKED by agent-cap: the spec-audit pack check (TOOL-dFairHearing-22) threw (${(e && e.message) || e}), and a rule that cannot finish does not admit.\n`
+  }
 }

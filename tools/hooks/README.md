@@ -219,12 +219,26 @@ either is absent, not a positive integer, or above the limit, naming the file, t
 numbers and the render command. A refused policy read refuses with its line. With no `policy` kit
 beside the hooks kit it adds no rule; beside one, a `cwd` in no checkout refuses, a settings file
 that does not parse refuses naming it, and a throw at any step refuses naming the step, since a rule
-that cannot finish does not admit (S38). After rule 7 every call is admitted.
+that cannot finish does not admit (S38). After rule 7 only the pack's presence check below is left.
 
 **What it does not see**: an environment override of the two variables, which the harness applies
 and no hook can read. That a session started before a lowering keeps its settings until it restarts
 is UNVERIFIED (help/agent-limit.md). A set `AGENT_CAP` is read by nothing since TOOL-dGroundRules-10. A ready-made harness that satisfies every
 rule above ships at `<prefix>/workflows/tier2-review.js`.
+
+## The spec-audit pack's presence — the hook carries no opt-in rule
+
+`TOOL-dFairHearing-22`. The hook carries no opt-in rule, only a presence check: whether a build
+declared `spec-audit:` is judged by the review kit's `spec-audit-optin.js` pack alone, the opt-in's
+one home. Last, after rules 6 and 7, a `Workflow` call whose structured `args` carry
+`kind: "spec-audit"` or a `specAudit` key, the pack's own trigger, is refused, exit 2, unless
+`<prefix>/workflows/spec-audit-optin.js` exists beside the hook's own directory; the refusal names
+that path and the two remedies, `govkit update --kits review-harness` or a hand copy wired with
+`<prefix>/settings-merge.py --fragment`. Why: the hooks kit cannot require the review kit, which
+requires it back, so `govkit update --kits agent-cap` lands the hook without the pack, and a hook
+landed without its pack must not admit an audit nobody judged. A throw refuses. **What it does not
+check**: that the pack is wired, which `<prefix>/check-wiring.sh` reports, or that it judges
+correctly, which the pack's own suite does.
 
 ## Rule 6 — every agent prompt is a rendered handoff
 

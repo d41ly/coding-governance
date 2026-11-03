@@ -78,7 +78,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 38 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 38 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14
 ids TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-19 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-24 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28
 ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-41
@@ -98,7 +98,7 @@ ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHea
 | [TOOL-dFairHearing-8 — fix verdicts judged by class behind a switch, and every confirmed finding given one disposition from the report's grammar](spec/2026-10-23-spec-TOOL-dFairHearing-8.md) | 10 | 2 | CLOSED | rev-2 | 2026-11-03 |
 | [TOOL-dFairHearing-16 — agent-cap's review rules moved to the review kit, each seen red at its new home before the hook stops carrying it](spec/2026-10-23-spec-TOOL-dFairHearing-16.md) | 11 | 2 | CLOSED | rev-7 | 2026-11-03 |
 | [TOOL-dFairHearing-10 — the review records brought back in line with the code at their sources, each live copy re-rendered](spec/2026-10-23-spec-TOOL-dFairHearing-10.md) | 12 | 2 | CLOSED | rev-3 | 2026-11-03 |
-| [TOOL-dFairHearing-22 — agent-cap fails closed on a spec-audit call when the opt-in pack is not beside it](spec/2026-10-23-spec-TOOL-dFairHearing-22.md) | 12 | 2 | INPROGRESS | rev-4 | 2026-11-03 |
+| [TOOL-dFairHearing-22 — agent-cap fails closed on a spec-audit call when the opt-in pack is not beside it](spec/2026-10-23-spec-TOOL-dFairHearing-22.md) | 12 | 2 | CLOSED | rev-4 | 2026-11-03 |
 | [TOOL-dFairHearing-12 — the scorer factory: one replay scorer, with aScoutedSeam's grader as its second instance](spec/2026-10-23-spec-TOOL-dFairHearing-12.md) | 13 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-14 — the experiment shape's method, enforced or recorded by the scorer factory](spec/2026-10-23-spec-TOOL-dFairHearing-14.md) | 14 | 2 | DEFERRED | rev-5 | 2026-10-23 |
 | [TOOL-dFairHearing-1 — the owed replays: the design-audit preset run blind at blob 767187aa, and the verdicts that flip the dark switches](spec/2026-10-23-spec-TOOL-dFairHearing-1.md) | 15 | 2 | DEFERRED | rev-4 | 2026-10-23 |

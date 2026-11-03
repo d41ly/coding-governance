@@ -3533,6 +3533,11 @@
       "file": "tools/hooks/format-guard.js"
     },
     {
+      "id": "checkOptinPackPresent",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "checkOriented",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -18068,6 +18073,11 @@
       "file": "tools/workflows/unattended-build.template.js"
     },
     {
+      "id": "renderRel",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "renderRerunTail",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -22526,6 +22536,11 @@
       "id": "run_owned_bar",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "run_pack",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.test.sh"
     },
     {
       "id": "run_parity_plant",

@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Runnable check for the portable agent-cap.js guard on the Workflow and Agent tool calls, the rules it
 # keeps since TOOL-dFairHearing-16: rule 6, the rendered handoff, and rule 7, the settings in force
-# against the landed agent limit, plus the readers it exports and its refusal of every `--only=`.
+# against the landed agent limit, plus the readers it exports, its refusal of every `--only=`, and
+# its refusal of a spec-audit call with no opt-in pack beside it (TOOL-dFairHearing-22).
 # Rules 2, 5 and 0 moved to the review kit and their arms to its suites; the retired rules' arms went
 # with them.
 # Run from the kit directory: bash ./agent-cap.test.sh   (exit 0 = all pass)
@@ -289,7 +290,34 @@ check "name-only run → allow (no source reaches the hook)" 0 '{"tool_name":"Wo
 check "a verify fan over chunk(all, 1) marked gov:fixed-verifiers is admitted: rule 2 is check-verifier-fanout.js's" 0 '{"tool_name":"Workflow","tool_input":{"script":"const b = chunk(all, 1) // gov:fixed-verifiers\nconst r = await boundedParallel(b.map((g) => () => agent(g)), 5)"}}'
 check "a verdict join keyed verdictByRef is admitted: rule 5 is check-review-join.js's" 0 '{"tool_name":"Workflow","tool_input":{"script":"const verdictByRef = new Map()\nverdictByRef.set(f.ref, v)"}}'
 SA0="$TMP/sa0"; mkdir -p "$SA0/memory/builds/tSA/reviews"; printf -- '---\nslug: tSA\n---\n' > "$SA0/memory/builds/tSA/README.md"
-check "an undated spec-audit call is admitted: rule 0 is the review kit's spec-audit-optin.js" 0 "{\"tool_name\":\"Workflow\",\"tool_input\":{\"name\":\"tier2-review\",\"args\":{\"kind\":\"spec-audit\",\"repo\":\"$NODEDIR/sa0\",\"reviewDir\":\"memory/builds/tSA/reviews\"}}}"
+# ---- the opt-in pack's presence (TOOL-dFairHearing-22) -------------------------------------------
+# A spec-audit call is refused unless the review kit's pack sits beside the hook, so a hook landed
+# without it (a partial update naming this kit alone) cannot admit an audit nobody judged. The arms
+# copy the hook into $TMP/arms-hooks/hooks, with no workflows kit beside it, and into
+# $TMP/pack-hooks/hooks, with the tree's own pack copied beside it. Against a hook with no presence
+# check, the dated call and the `specAudit` call are admitted, and the first and third arms red.
+PKWF=$(resolve_kit_dir "$TESTPY" workflows spec-audit-optin.js "$HERE") || PKWF=""
+[ -n "$PKWF" ] && [ -z "${ROOTDIR:-}" ] && ROOTDIR=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null)
+PACK_HOOKS="$TMP/pack-hooks/hooks"; mkdir -p "$PACK_HOOKS" "$TMP/pack-hooks/workflows"; cp "$KIT_HOOK" "$HERE/scratch-guard.js" "$PACK_HOOKS/"
+[ -n "$PKWF" ] && cp "$ROOTDIR/$PKWF/spec-audit-optin.js" "$TMP/pack-hooks/workflows/"
+run_pack() { # name expected_exit hook payload-json [text stderr must carry ...]
+  local name=$1 want=$2 hk=$3 body=$4 got miss=""; shift 4
+  printf '%s' "$body" | (cd "$TMP" && node "$hk") >/dev/null 2>"$TMP/err"; got=$?
+  for n in "$@"; do grep -qF -- "$n" "$TMP/err" || miss="$miss '$n'"; done
+  if [ "$got" = "$want" ] && [ -z "$miss" ]; then echo "ok   $name (exit $got)"; pass=$((pass+1))
+  else echo "FAIL $name (exit $got, want $want${miss:+, stderr missing$miss})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+}
+SAD="$TMP/sad"; mkdir -p "$SAD/memory/builds/tSA/reviews"; printf -- '---\nslug: tSA\nspec-audit: 2026-10-23\n---\n' > "$SAD/memory/builds/tSA/README.md"
+SA_DATED="{\"tool_name\":\"Workflow\",\"tool_input\":{\"name\":\"tier2-review\",\"args\":{\"kind\":\"spec-audit\",\"repo\":\"$NODEDIR/sad\",\"reviewDir\":\"memory/builds/tSA/reviews\"}}}"
+run_pack "pack AC1: a dated spec-audit call with no pack beside the hook is refused, naming the pack and the update" 2 "$HOOK" "$SA_DATED" 'spec-audit-optin.js' 'govkit update --kits review-harness'
+if [ -z "$PKWF" ]; then
+  echo "FAIL pack AC2: no workflows kit holding spec-audit-optin.js beside this hooks kit, so the pack-present arm has no pack to copy"; fail=$((fail+1))
+else
+  run_pack "pack AC2: the same call with the pack beside the hook is admitted" 0 "$PACK_HOOKS/agent-cap.js" "$SA_DATED"
+  run_pack "an undated spec-audit call is admitted: rule 0 is the review kit's spec-audit-optin.js" 0 "$PACK_HOOKS/agent-cap.js" "{\"tool_name\":\"Workflow\",\"tool_input\":{\"name\":\"tier2-review\",\"args\":{\"kind\":\"spec-audit\",\"repo\":\"$NODEDIR/sa0\",\"reviewDir\":\"memory/builds/tSA/reviews\"}}}"
+fi
+run_pack "pack AC2: a diff-review call with no pack beside the hook is admitted" 0 "$HOOK" "{\"tool_name\":\"Workflow\",\"tool_input\":{\"name\":\"tier2-review\",\"args\":{\"kind\":\"diff-review\",\"repo\":\"$NODEDIR/sad\"}}}"
+run_pack "pack AC3: a specAudit call with no kind and no pack is refused, naming the pack" 2 "$HOOK" '{"tool_name":"Workflow","tool_input":{"name":"unattended-build","args":"{\"specAudit\":\"2026-10-23\",\"slug\":\"tSA\",\"repo\":\".\"}"}}' 'spec-audit-optin.js'
 # ...and the selector they took with them. Every `--only=` argument is REFUSED, exit 2, naming both
 # script homes, and BEFORE stdin is read: the payload here is a Bash call, which the hook admits at its
 # tool-name test, so an exit 0 is a refusal that came too late. The four rule-6 arms that ran under a
