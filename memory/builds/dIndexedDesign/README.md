@@ -88,7 +88,7 @@ ids TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-52 TOOL-dI
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dIndexedDesign-9 — spec sections named by tag across tiers: one heading rule, one reader and its twins, and the tagged canon behind a cutoff](spec/2026-10-28-spec-TOOL-dIndexedDesign-9.md) | 1 | 2 | DEFERRED | rev-2 | 2026-10-28 |
-| [TOOL-dIndexedDesign-12 — the structured spec's typed edges: `implements=` and `decides=` read through one spec-site adapter, and `design.seams` reading a tag's bundle](spec/2026-10-28-spec-TOOL-dIndexedDesign-12.md) | 2 | 2 | DEFERRED | rev-2 | 2026-10-28 |
+| [TOOL-dIndexedDesign-12 — the structured spec's typed edges: `implements=` and `decides=` read through one spec-site adapter, and `design.seams` reading a tag's bundle](spec/2026-10-28-spec-TOOL-dIndexedDesign-12.md) | 2 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 | [TOOL-dIndexedDesign-16 — design coverage by policy: the carries join read at each Design exit and each spec revision, `UNCARRIED`, and the coverage lens](spec/2026-10-28-spec-TOOL-dIndexedDesign-16.md) | 3 | 2 | DEFERRED | rev-4 | 2026-10-28 |
 | [TOOL-dIndexedDesign-1 — the Design-to-Build hand-off as `design.handoff` says](spec/2026-10-28-spec-TOOL-dIndexedDesign-1.md) | 4 | 2 | DEFERRED | rev-4 | 2026-10-28 |
 | [TOOL-dIndexedDesign-35 — the coverage lens runs as its own one-agent stage, so `SPEC_LENSES` stays at the agent-cap hook's five-lens bound and no checklist share reaches a lens that does not run](spec/2026-10-28-spec-TOOL-dIndexedDesign-35.md) | 4 | 2 | DEFERRED | rev-3 | 2026-10-28 |

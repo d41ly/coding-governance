@@ -102,7 +102,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 56 unit(s) · node d · opened 2026-10-21 · streams playbook
+**Build status:** DEFERRED · 57 unit(s) · node d · opened 2026-10-21 · streams playbook
 ids PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12
 ids PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24
 ids PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36
@@ -124,6 +124,7 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 TOOL
 | [PLAY-dOrderedCharter-22 — the namespace row's purpose-source and owner fields, and the chain registry's purpose field](spec/2026-10-23-spec-PLAY-dOrderedCharter-22.md) | 6 | 2 | CLOSED | rev-3 | 2026-11-03 |
 | [PLAY-dOrderedCharter-51 — the shared tag index keeps each extractor version's rows apart, and each worktree reads only its own](spec/2026-10-24-spec-PLAY-dOrderedCharter-51.md) | 6 | 2 | CLOSED | rev-1 | 2026-11-03 |
 | [PLAY-dOrderedCharter-24 — the edge-type registry and the edge grammar: one closed set of typed edges, inverses derived, selectors open](spec/2026-10-23-spec-PLAY-dOrderedCharter-24.md) | 7 | 2 | DEFERRED | rev-3 | 2026-11-03 |
+| [PLAY-dOrderedCharter-63 — the spec-token checker reads a spec's liveness from its status header, never from a fenced example](spec/2026-11-03-spec-PLAY-dOrderedCharter-63.md) | 7 | 2 | DEFERRED | rev-1 | 2026-11-03 |
 | [PLAY-dOrderedCharter-28 — the shared edge grammar at every site the memory plan names: twelve new types, native-id classes and the two pinned forms](spec/2026-10-23-spec-PLAY-dOrderedCharter-28.md) | 8 | 2 | DEFERRED | rev-4 | 2026-11-03 |
 | [PLAY-dOrderedCharter-26 — file:line citations held in the positional population, new text citing a symbol or a pinned line](spec/2026-10-23-spec-PLAY-dOrderedCharter-26.md) | 9 | 2 | DEFERRED | rev-5 | 2026-11-03 |
 | [PLAY-dOrderedCharter-25 — gov tag bundle, a tag's members, regions and instructions in one call, and the two edge checks](spec/2026-10-23-spec-PLAY-dOrderedCharter-25.md) | 10 | 2 | DEFERRED | rev-6 | 2026-11-03 |
@@ -171,11 +172,11 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 TOOL
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 <!-- /gen:build-units -->
 
-Records: 278 bound to this build, across 4 record folder(s).
+Records: 279 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62.
+Ids no `spec-audit` record has ever named: PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63.
 
 Ids whose spec moved past its audited revision: PLAY-dOrderedCharter-1@rev-1 PLAY-dOrderedCharter-10@rev-1 PLAY-dOrderedCharter-11@rev-1 PLAY-dOrderedCharter-12@rev-1 PLAY-dOrderedCharter-13@rev-1 PLAY-dOrderedCharter-14@rev-1 PLAY-dOrderedCharter-15@rev-1 PLAY-dOrderedCharter-16@rev-1
 PLAY-dOrderedCharter-17@rev-1 PLAY-dOrderedCharter-18@rev-1 PLAY-dOrderedCharter-19@rev-1 PLAY-dOrderedCharter-2@rev-1 PLAY-dOrderedCharter-20@rev-1 PLAY-dOrderedCharter-21@rev-1 PLAY-dOrderedCharter-22@rev-1 PLAY-dOrderedCharter-23@rev-1 PLAY-dOrderedCharter-24@rev-1 PLAY-dOrderedCharter-25@rev-1
@@ -186,7 +187,7 @@ PLAY-dOrderedCharter-40@rev-1 PLAY-dOrderedCharter-41@rev-1 PLAY-dOrderedCharter
 
 <!-- gen:build-coverage -->
 
-Coverage of dOrderedCharter's 37 clause(s) and 30 owned node(s), over 56 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dOrderedCharter's 37 clause(s) and 30 owned node(s), over 57 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 37
 - carried in parts: 0 (none)
@@ -199,7 +200,8 @@ Coverage of dOrderedCharter's 37 clause(s) and 30 owned node(s), over 56 spec(s)
   `spec/2026-10-24-spec-PLAY-dOrderedCharter-42.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-PLAY-dOrderedCharter-43.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-PLAY-dOrderedCharter-44.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-PLAY-dOrderedCharter-45.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-24-spec-PLAY-dOrderedCharter-46.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-PLAY-dOrderedCharter-47.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-PLAY-dOrderedCharter-48.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-24-spec-PLAY-dOrderedCharter-50.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-PLAY-dOrderedCharter-51.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-PLAY-dOrderedCharter-52.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-PLAY-dOrderedCharter-53.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-24-spec-PLAY-dOrderedCharter-54.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md` (PLAY-dClosedLoop-2), `spec/2026-11-02-spec-PLAY-dOrderedCharter-61.md` (PLAY-dClosedLoop-2), `spec/2026-11-03-spec-PLAY-dOrderedCharter-62.md` (PLAY-dClosedLoop-2)
+  `spec/2026-10-24-spec-PLAY-dOrderedCharter-54.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md` (PLAY-dClosedLoop-2), `spec/2026-11-02-spec-PLAY-dOrderedCharter-61.md` (PLAY-dClosedLoop-2), `spec/2026-11-03-spec-PLAY-dOrderedCharter-62.md` (PLAY-dClosedLoop-2),
+  `spec/2026-11-03-spec-PLAY-dOrderedCharter-63.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0033, cl-dClosedLoop-0034, cl-dClosedLoop-0035, cl-dClosedLoop-0038, cl-dClosedLoop-0042, cl-dClosedLoop-0043, cl-dClosedLoop-0044, cl-dClosedLoop-0050, cl-dClosedLoop-0051, cl-dClosedLoop-0067
 <!-- /gen:build-coverage -->
 
@@ -213,7 +215,7 @@ Coverage of dOrderedCharter's 37 clause(s) and 30 owned node(s), over 56 spec(s)
 | 4 | `PLAY-dOrderedCharter-19` | no |
 | 5 | `PLAY-dOrderedCharter-10`, `PLAY-dOrderedCharter-44` | no |
 | 6 | `PLAY-dOrderedCharter-22`, `PLAY-dOrderedCharter-51` | no |
-| 7 | `PLAY-dOrderedCharter-24` | no |
+| 7 | `PLAY-dOrderedCharter-24`, `PLAY-dOrderedCharter-63` | yes |
 | 8 | `PLAY-dOrderedCharter-28` | no |
 | 9 | `PLAY-dOrderedCharter-26` | no |
 | 10 | `PLAY-dOrderedCharter-25`, `PLAY-dOrderedCharter-47`, `PLAY-dOrderedCharter-48`, `PLAY-dOrderedCharter-50` | no |
