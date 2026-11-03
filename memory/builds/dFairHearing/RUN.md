@@ -105,3 +105,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-03T04:56:49Z brief · item TOOL-dFairHearing-12 · reason 1069488b5cfa memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-12-build-brief.md
 
 2026-11-03T05:12:45Z dispatch · item d059e36f TOOL-dFairHearing-12 · reason tools/workflows/replay_scorer.py tools/workflows/review_replay.py tools/workflows/README.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-12.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dFairHearing/README.md memory/map/generated/symbols.json
+
+2026-11-03T05:27:32Z brief · item TOOL-dFairHearing-14 · reason 9c9706c96a7f memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-14-build-brief.md
+
+2026-11-03T05:48:01Z dispatch · item fd056f69 TOOL-dFairHearing-14 · reason tools/workflows/replay_scorer.py tools/workflows/README.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-14.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dFairHearing/README.md memory/map/generated/symbols.json
