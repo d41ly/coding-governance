@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-18 — the whole-design walk as a preset of the design audit, and its recall grade
 
-**Status:** INPROGRESS · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0085@796d40aa whole
 

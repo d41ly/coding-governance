@@ -150,9 +150,16 @@ function readOutputTokens() {
 //                                         // literal's entry only; a note for a default a swap displaced is unread
 //   intensity: "full" | "light",          // DEFAULTS to "full"; only the CALLER picks light, which runs
 //                                         // LIGHT_LENSES and names the lenses it skipped; a spec-audit refuses light
-//   preset: "unit-spec" | "design-audit", // spec-audit ONLY, DEFAULTS to "unit-spec": the CALLER's choice of
-//                                         // lens literal, design-audit running DESIGN_LENSES, aimed at a design
-//                                         // or architecture record; refused outside the set and on a diff review
+//   preset: "unit-spec" | "design-audit" | "whole-design", // spec-audit ONLY, DEFAULTS to "unit-spec": the
+//                                         // CALLER's choice of lens literal, design-audit running DESIGN_LENSES,
+//                                         // aimed at a design or architecture record, and whole-design the five
+//                                         // walkers of WHOLE_DESIGN_LENSES; refused outside the set and on a diff review
+//   walk: { items: [{ tag, step }], scenarios: [{ id, name, walks }], runs, run, seed, keySha }, // REQUIRED
+//                                         // under preset whole-design and refused under any other: the design's
+//                                         // item-by-scenario grid; runs is review.design-audit.runs (1-3, absent 2),
+//                                         // run this invocation's run (1 to runs), seed review.design-audit.seed
+//                                         // (reverted-escapes | synthetic | none, absent reverted-escapes), keySha
+//                                         // the key's 64-hex SHA-256, required unless seed is none (TOOL-dFairHearing-18)
 //   batchBy: "id" | "address",           // DEFAULTS to "id": the order the findings are sliced into skeptic
 //                                         // batches in, "address" sorting them by deriveAddressKey so two
 //                                         // lenses citing one place meet one skeptic; refused outside the set
@@ -316,12 +323,135 @@ if (typeof unclassed !== 'string' || UNCLASSED.indexOf(unclassed) === -1)
 // `intensity` above: a closed set refused by name outside it, and refused beside the diff kind, which
 // has one literal and so no preset. Each member but the default names the `gov:lens-slots` literal it
 // selects below. It ships dark: no caller in this kit passes `design-audit` until the replay's verdict.
-const PRESETS = ['unit-spec', 'design-audit']
+const PRESETS = ['unit-spec', 'design-audit', 'whole-design']
 const preset = a.preset === undefined ? 'unit-spec' : a.preset
 if (!isSpec && a.preset !== undefined)
   throw new Error('tier2-review: `preset` picks a spec-audit lens literal, and a diff-review has none; leave it out. Got ' + JSON.stringify(a.preset) + '.')
 if (typeof preset !== 'string' || PRESETS.indexOf(preset) === -1)
   throw new Error('tier2-review: `preset` must be one of ' + PRESETS.join(' | ') + '. Got ' + JSON.stringify(a.preset) + '.')
+// TOOL-dFairHearing-18 S1 - `walk`, the whole-design walk's grid, checked ONCE, here, before the resume probe:
+// required under `whole-design` and refused under any other preset, each refusal naming its field. The anchored
+// shapes keep a newline, a pipe and a backtick out of every prompt line and table cell a tag, step or id reaches;
+// `name` and `walks` reach the prompts through renderPromptLine's line-break fold. One invocation is one run
+// (spec section 8 F3): `review.pin` invokes the harness `runs` times, `run` 1 to `runs`.
+const isWalk = preset === 'whole-design'
+const WALK_TAG = /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$/
+const WALK_SCENARIO_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$/
+const WALK_SEEDS = ['reverted-escapes', 'synthetic', 'none']
+const WALK_SLICING = ['scenario', 'step', 'diagonal'] // run 1, 2 and 3
+const WALK_VERDICTS = ['holds', 'finding', 'not-on-path']
+function checkWalk(w) {
+  const buildRefusal = (field, rule, got) => new Error('tier2-review: `' + field + '` ' + rule + '. Got ' + JSON.stringify(got) + '.')
+  if (!w || typeof w !== 'object' || Array.isArray(w))
+    throw buildRefusal('walk', 'must be an object {items, scenarios, runs, run, seed, keySha}', w)
+  const items = w.items
+  if (!Array.isArray(items) || !items.length) throw buildRefusal('walk.items', 'must be a non-empty array of {tag, step}', items)
+  const badItem = items.findIndex((x) => !x || typeof x !== 'object' || typeof x.tag !== 'string' || !WALK_TAG.test(x.tag) ||
+    typeof x.step !== 'string' || !WALK_TAG.test(x.step))
+  if (badItem !== -1) throw buildRefusal('walk.items', 'member ' + badItem + ' must be {tag, step}, each a string matching ' + WALK_TAG.source, items[badItem])
+  const twiceTag = items.findIndex((x, i) => items.findIndex((y) => y.tag === x.tag) !== i)
+  if (twiceTag !== -1) throw buildRefusal('walk.items', 'member ' + twiceTag + ' repeats the tag ' + items[twiceTag].tag + ', and tags are unique', items[twiceTag])
+  const scenarios = w.scenarios
+  if (!Array.isArray(scenarios) || !scenarios.length) throw buildRefusal('walk.scenarios', 'must be a non-empty array of {id, name, walks}', scenarios)
+  const badScenario = scenarios.findIndex((x) => !x || typeof x !== 'object' || typeof x.id !== 'string' || !WALK_SCENARIO_ID.test(x.id) ||
+    typeof x.name !== 'string' || !x.name.trim() || typeof x.walks !== 'string' || !x.walks.trim())
+  if (badScenario !== -1)
+    throw buildRefusal('walk.scenarios', 'member ' + badScenario + ' must be {id, name, walks}, id matching ' + WALK_SCENARIO_ID.source + ' and name and walks non-empty strings', scenarios[badScenario])
+  const twiceId = scenarios.findIndex((x, i) => scenarios.findIndex((y) => y.id === x.id) !== i)
+  if (twiceId !== -1) throw buildRefusal('walk.scenarios', 'member ' + twiceId + ' repeats the id ' + scenarios[twiceId].id + ', and ids are unique', scenarios[twiceId])
+  const runs = w.runs === undefined ? 2 : w.runs
+  if ([1, 2, 3].indexOf(runs) === -1) throw buildRefusal('walk.runs', 'must be review.design-audit.runs, 1, 2 or 3, or absent for 2', w.runs)
+  if (!Number.isInteger(w.run) || w.run < 1 || w.run > runs)
+    throw buildRefusal('walk.run', 'must be the integer from 1 to walk.runs (' + runs + ') naming which run this invocation is', w.run)
+  const seed = w.seed === undefined ? 'reverted-escapes' : w.seed
+  if (WALK_SEEDS.indexOf(seed) === -1) throw buildRefusal('walk.seed', 'must be review.design-audit.seed, one of ' + WALK_SEEDS.join(' | ') + ', or absent for reverted-escapes', w.seed)
+  if ((w.keySha !== undefined && (typeof w.keySha !== 'string' || !/^[0-9a-f]{64}$/.test(w.keySha))) || (w.keySha === undefined && seed !== 'none'))
+    throw buildRefusal('walk.keySha', 'must be the key\'s SHA-256, 64 lower-case hex, and is required unless walk.seed is none', w.keySha)
+  return { items: items.map((x) => ({ tag: x.tag, step: x.step })), scenarios: scenarios.map((x) => ({ id: x.id, name: x.name, walks: x.walks })),
+    runs: runs, run: w.run, seed: seed, keySha: w.keySha === undefined ? null : w.keySha }
+}
+if (isWalk && a.walk === undefined)
+  throw new Error('tier2-review: `walk` is required under preset whole-design: the design\'s items and scenarios, and which run this is. Got undefined.')
+if (!isWalk && a.walk !== undefined)
+  throw new Error('tier2-review: `walk` is read under preset whole-design alone; leave it out under ' + (isSpec ? 'preset ' + preset : 'a diff-review') + '. Got ' + JSON.stringify(a.walk) + '.')
+const walk = isWalk ? checkWalk(a.walk) : null
+// TOOL-aSightedSkeptic-4 S2-S6 - THE SPLIT. Item n goes to keys[(n - 1) % K], so every item is in
+// exactly one share and the split is a pure function of the items and the keys: a reused lens file
+// (S7) held the share this run would hand it. Round-robin, not contiguous `chunk`: a contiguous split
+// hands one lens a run of neighbouring classes and the last lens the short remainder (spec F1 and §10).
+// It runs over the keys of the lenses that RUN (S7 below), never by reshaping the LENSES receiver the fan-out leg sizes.
+// TOOL-dFairHearing-18 S2 - moved up from beside the checklist split, unchanged, so the prelude's walk slicer reaches it.
+function deriveChecklistShares(items, keys) {
+  const shares = {}
+  for (const k of keys) shares[k] = []
+  items.forEach((text, i) => shares[keys[i % keys.length]].push({ n: i + 1, text: text }))
+  return shares
+}
+// TOOL-dFairHearing-18 S2 - THE SLICES, pure: every cell `[itemTag, scenarioId]` of the item-by-scenario grid in
+// exactly one of the five walker slots, in item-then-scenario order. Run 1 deals the scenarios round-robin through
+// deriveChecklistShares, keyed by slot position, the order the walker lenses fill WHOLE_DESIGN_LENSES in; run 2
+// cuts the steps, in first-seen item order, into contiguous bands; run 3 deals cell (i, j) to (i + j) mod 5
+// (spec section 8 F4). An empty slice is a walker slot this run does not dispatch.
+// ponytail: run 2 places each step's band at its item-count midpoint, which is even to within a step; an exact
+// partition search if a design ever needs the bands evener than that.
+function deriveWalkSlices(items, scenarios, run) {
+  const slots = [0, 1, 2, 3, 4]
+  const dealt = deriveChecklistShares(scenarios.map((s) => s.id), slots)
+  const scenarioSlot = new Map()
+  for (const w of slots) for (const x of dealt[w]) scenarioSlot.set(x.text, w)
+  const stepCount = new Map()
+  for (const x of items) stepCount.set(x.step, (stepCount.get(x.step) || 0) + 1)
+  const stepSlot = new Map()
+  let before = 0
+  for (const [step, n] of stepCount) {
+    stepSlot.set(step, Math.min(4, Math.floor(((before + n / 2) * 5) / items.length)))
+    before += n
+  }
+  const slices = slots.map(() => [])
+  items.forEach((x, i) => scenarios.forEach((s, j) => {
+    const w = run === 1 ? scenarioSlot.get(s.id) : run === 2 ? stepSlot.get(x.step) : (i + j) % 5
+    slices[w].push([x.tag, s.id])
+  }))
+  return slices
+}
+// TOOL-dFairHearing-18 S4 - THE GAPS, pure: one `<item> · <scenario> — <what>` per defect of a walker's table
+// against its slice. `returns[w]` is slot w's walker return, null where none came back. A cell of the slice with
+// no row or with two, a row outside the slice, an actor, needs, witness or route empty once trimmed, a verdict
+// outside the three, `finding` with no index or one past the walker's findings, `not-on-path` with an empty
+// reason, and `holds` carrying an index are each a gap. A run with any gap is red.
+function deriveWalkGaps(slices, returns) {
+  const gaps = []
+  slices.forEach((cells, w) => {
+    const r = returns[w]
+    const rows = r && Array.isArray(r.walk) ? r.walk : []
+    const n = r && Array.isArray(r.findings) ? r.findings.length : 0
+    const mine = new Set(cells.map((c) => c[0] + ' · ' + c[1]))
+    const byCell = new Map()
+    for (const x of rows) {
+      const cell = String(x && x.item) + ' · ' + String(x && x.scenario)
+      if (!mine.has(cell)) gaps.push(cell + ' — a row outside walker slot ' + (w + 1) + '\'s slice')
+      else byCell.set(cell, (byCell.get(cell) || []).concat([x]))
+    }
+    for (const cell of mine) {
+      const got = byCell.get(cell) || []
+      if (got.length !== 1) {
+        gaps.push(cell + ' — ' + (got.length ? got.length + ' rows' : 'no row'))
+        continue
+      }
+      const x = got[0]
+      for (const k of ['actor', 'needs', 'witness', 'route'])
+        if (typeof x[k] !== 'string' || !x[k].trim()) gaps.push(cell + ' — ' + k + ' is empty')
+      const idx = Array.isArray(x.findings) ? x.findings : []
+      const past = idx.filter((k) => !Number.isInteger(k) || k < 0 || k >= n)
+      if (WALK_VERDICTS.indexOf(x.verdict) === -1) gaps.push(cell + ' — verdict ' + JSON.stringify(x.verdict) + ' is none of ' + WALK_VERDICTS.join(' | '))
+      else if (x.verdict === 'finding' && !idx.length) gaps.push(cell + ' — verdict finding names no finding index')
+      else if (x.verdict === 'finding' && past.length) gaps.push(cell + ' — finding index ' + past.join(', ') + ' names none of the walker\'s ' + n + ' finding(s)')
+      else if (x.verdict === 'not-on-path' && (typeof x.reason !== 'string' || !x.reason.trim())) gaps.push(cell + ' — not-on-path with an empty reason')
+      else if (x.verdict === 'holds' && idx.length) gaps.push(cell + ' — holds carrying a finding index')
+    }
+  })
+  return gaps
+}
 // TOOL-dFairHearing-3 S1 - `optIn`, the CALLER's swap of an opt-in lens into a default slot of the run's
 // literal, `{ "<opt-in>": "<default it replaces>" }`, absent meaning {}. Its SHAPE is refused here, beside
 // `intensity` and `preset`, before the literals read it; its MEMBERSHIP is checked once beside `lensNotes`
@@ -893,6 +1023,29 @@ const VERDICT_SCHEMA = {
     },
   },
 }
+// TOOL-dFairHearing-18 S6 - a whole-design skeptic's schema: VERDICT_SCHEMA plus an OPTIONAL `cells`, one verdict per
+// clean cell handed, used on this preset alone. A refuted cell carries the skeptic's address and grade.
+const WALK_VERDICT_SCHEMA = {
+  type: 'object',
+  required: VERDICT_SCHEMA.required,
+  properties: Object.assign({}, VERDICT_SCHEMA.properties, {
+    cells: {
+      type: 'array',
+      items: {
+        type: 'object',
+        required: ['cell', 'verdict', 'reason'],
+        properties: {
+          cell: { type: 'string' },
+          verdict: { type: 'string', enum: ['holds', 'refuted'] },
+          reason: { type: 'string' },
+          file: { type: 'string' },
+          where: { type: 'string' },
+          severity: { type: 'string', enum: SEVERITIES },
+        },
+      },
+    },
+  }),
+}
 
 // TOOL-aSightedSkeptic-6 S1/S2 - ONE severity rubric, graded by CONSEQUENCE. Severity drives the
 // costliest disposal there is (a BLOCKER or HIGH is promoted to a unit, TOOL-aProbedUnit-9), and no
@@ -924,6 +1077,17 @@ const PROBE_RULES = [
   'Write temporary files only under a subdirectory of the scratch directory named for your own role, <lens key> for a finder or verify-<batch> for a skeptic, created on first use.',
   'Bound every command at 120 seconds. Never run a merge bar, a *.test.sh suite or a self-test runner, a --selftest flag included.',
   'A probe that needs a write, such as a staged break, or one of the runs banned above, is DESCRIBED in the finding\'s fix as the probe the build must run. It is never performed.',
+]
+// TOOL-dFairHearing-18 S3 - THE WALK RULES, what every whole-design walker is told, held once and interpolated
+// into each walker prompt above that walker's own slice. They interpolate nothing, so they join the input print
+// on a whole-design run alone; the slice, the scenarios and the seed line are rendered per walker.
+const WALK_RULES = [
+  'Walk ONLY the cells listed under CELLS below: each is one item read through one scenario, whose line under SCENARIOS says what it walks.',
+  'Open with a PRE-MORTEM: the design shipped and failed inside your slice. Write down why, then walk the cells to find out whether it would.',
+  'Read each item a failure reaches for its failure mode, its effect and how the failure is detected, and each data flow crossing a trust boundary for its threats.',
+  'For EACH cell return one walk row: the actor, the needs, the witness and the route the scenario finds there, each `=` where it reads as the design declares it and NEVER empty, and the verdict: holds; finding, with `findings` listing the zero-based indexes of the findings in your own findings array that the cell raised; or not-on-path, with a reason saying why the scenario never reaches the item.',
+  'Address each finding by `file` and a `where` naming the [section tag] it sits under, with the clause id or the item tag that carries it.',
+  'A cell with no row or two, a row for a cell outside your slice, an empty field, or a verdict outside the three is a GAP, and the harness reds the run on any gap.',
 ]
 // Built once, after `scratch` is validated; '' on the diff kind, whose prompts stay byte-identical.
 const probeBlock = isSpec
@@ -958,6 +1122,34 @@ const SPEC_FINDING_SCHEMA = {
     },
   },
 }
+// TOOL-dFairHearing-18 S4 - a whole-design walker's schema: the spec kind's plus a REQUIRED `walk`, one row per cell.
+// `findings` holds zero-based indexes into the walker's own findings; the harness maps each to its assigned id.
+// Every other preset keeps SPEC_FINDING_SCHEMA itself, and LENS_SCHEMA is the one each finder and the probe read.
+const WALK_FINDING_SCHEMA = {
+  type: 'object',
+  required: SPEC_FINDING_SCHEMA.required.concat(['walk']),
+  properties: Object.assign({}, SPEC_FINDING_SCHEMA.properties, {
+    walk: {
+      type: 'array',
+      items: {
+        type: 'object',
+        required: ['item', 'scenario', 'actor', 'needs', 'witness', 'route', 'verdict', 'findings'],
+        properties: {
+          item: { type: 'string' },
+          scenario: { type: 'string' },
+          actor: { type: 'string' },
+          needs: { type: 'string' },
+          witness: { type: 'string' },
+          route: { type: 'string' },
+          verdict: { type: 'string', enum: WALK_VERDICTS },
+          findings: { type: 'array', items: { type: 'integer' } },
+          reason: { type: 'string' },
+        },
+      },
+    },
+  }),
+}
+const LENS_SCHEMA = !isSpec ? FINDING_SCHEMA : isWalk ? WALK_FINDING_SCHEMA : SPEC_FINDING_SCHEMA
 
 // --- Phase 1: FIND — one wave of primed lenses, at the width boundedParallel defaults to ----
 // TOOL-dTieredTribunal-11 S11: this said `ONE <=6-wide wave` while the helper above defaults to
@@ -1091,14 +1283,45 @@ const DESIGN_LENSES = [ // gov:lens-slots design-audit
   }),
 ]
 
+// TOOL-dFairHearing-18 S3 - the `whole-design` preset's five walkers, `walk-1` to `walk-5`, the `whole-design` rows
+// of `lenses.toml`, each brief naming its slot alone (spec section 8 F2); what every walker is told is WALK_RULES.
+// A slot's position here is its walker slot, the position deriveWalkSlices deals cells to.
+const WHOLE_DESIGN_LENSES = [ // gov:lens-slots whole-design
+  deriveSlotLens('whole-design', {
+    key: 'walk-1',
+    brief:
+      'Walker slot 1 of 5 of the whole-design walk: walk the cells of your slice under the WALK RULES below.',
+  }),
+  deriveSlotLens('whole-design', {
+    key: 'walk-2',
+    brief:
+      'Walker slot 2 of 5 of the whole-design walk: walk the cells of your slice under the WALK RULES below.',
+  }),
+  deriveSlotLens('whole-design', {
+    key: 'walk-3',
+    brief:
+      'Walker slot 3 of 5 of the whole-design walk: walk the cells of your slice under the WALK RULES below.',
+  }),
+  deriveSlotLens('whole-design', {
+    key: 'walk-4',
+    brief:
+      'Walker slot 4 of 5 of the whole-design walk: walk the cells of your slice under the WALK RULES below.',
+  }),
+  deriveSlotLens('whole-design', {
+    key: 'walk-5',
+    brief:
+      'Walker slot 5 of 5 of the whole-design walk: walk the cells of your slice under the WALK RULES below.',
+  }),
+]
+
 // The ONE dialect <prefix>/workflows/check-verifier-fanout.js admits here: sibling top-level array
 // literals and a marked ternary. A map, object or registry of lens sets reds the fan-out leg, so this shape
 // is fixed by the enforcement point rather than chosen. TOOL-dTieredTribunal-13 tightened the branch
-// this line sits on to require EVERY value branch bounded, and all three branches here are literals,
-// the spec kind's two picked by `preset` (TOOL-dFairHearing-2). All are rendered from the lens catalogue
+// this line sits on to require EVERY value branch bounded, and all four branches here are literals,
+// the spec kind's three picked by `preset` (TOOL-dFairHearing-2, -18). All are rendered from the lens catalogue
 // (TOOL-dFairHearing-13), and a render keeps this shape: the rows fill each literal's body, never its
 // name or this receiver.
-const LENSES = !isSpec ? DIFF_LENSES : preset === 'design-audit' ? DESIGN_LENSES : SPEC_LENSES // gov:fixed-verifiers
+const LENSES = !isSpec ? DIFF_LENSES : preset === 'design-audit' ? DESIGN_LENSES : preset === 'whole-design' ? WHOLE_DESIGN_LENSES : SPEC_LENSES // gov:fixed-verifiers
 // S3 - checked on EVERY run of either kind, before the resume probe: a renamed lens would otherwise
 // empty the light set, and a light run would review nothing while reporting clean. An INDEX names the
 // offender, since `''` is itself a key this refuses (the D6 class).
@@ -1179,7 +1402,11 @@ if (preset !== 'unit-spec')
 // subjects by SPEC_SUBJECT_PATH, or whose preset is off `unit-spec`; every diff review is a landing review, the
 // closing review over the cumulative diff (spec section 8 F5).
 const designRecordAudit = isSpec && (preset !== 'unit-spec' || subjects.every((x) => !SPEC_SUBJECT_PATH.test(String(x && x.path))))
-const twinned = twin === 'always' || (twin === 'design-records' && designRecordAudit) || (twin === 'design-and-landing' && (designRecordAudit || !isSpec))
+// TOOL-dFairHearing-18 - a whole-design run is never twinned: its second reading is `walk.runs`, one invocation per run,
+// each walking the grid its own way, and a twin's run b would walk the same slices again.
+const twinned = !isWalk && (twin === 'always' || (twin === 'design-records' && designRecordAudit) || (twin === 'design-and-landing' && (designRecordAudit || !isSpec)))
+if (isWalk && twin !== 'never')
+  log(`twin ${twin} — a whole-design run is not twinned: its runs are walk.runs, one invocation each, so the finder lenses run once`)
 if (twinned)
   log(`twin ${twin} — this ${kind} runs its finder lenses twice, as run a and run b, and the synthesis merges the two runs`)
 if (fixJudge === 'class')
@@ -1198,13 +1425,22 @@ if (intentAbsent)
 // on a full run. Derived once, announced here before the first agent, and read by the Find thunk, the
 // reuse loop, the counts and the checklist split, which runs over the lenses that RUN (S7).
 // TOOL-dFairHearing-3 S4 - selected by each slot's DEFAULT key, so a swap into a light slot runs there.
-const skippedLenses = !isSpec && intensity === 'light' ? LENSES.filter((L) => LIGHT_LENSES.indexOf(L.replaces || L.key) === -1).map((L) => L.key) : []
+// TOOL-dFairHearing-18 S2 - on a whole-design run, the walker slots whose slice is empty: a slot with no cell is not
+// dispatched, and RUN INTEGRITY reads it as an idle walker slot, never as a light run.
+const walkSlices = isWalk ? deriveWalkSlices(walk.items, walk.scenarios, walk.run) : null
+const skippedLenses = isWalk ? LENSES.filter((L, i) => !walkSlices[i].length).map((L) => L.key)
+  : !isSpec && intensity === 'light' ? LENSES.filter((L) => LIGHT_LENSES.indexOf(L.replaces || L.key) === -1).map((L) => L.key) : []
 const runningLensKeys = LENS_KEYS.filter((k) => skippedLenses.indexOf(k) === -1)
 const lensesRunning = runningLensKeys.length
 // TOOL-dFairHearing-11 S6 - every finder agent the run dispatches, both runs on a twinned one.
 const findersRunning = lensesRunning * (twinned ? 2 : 1)
-if (skippedLenses.length)
+if (skippedLenses.length && !isWalk)
   log(`WARNING: intensity light — the ${skippedLenses.join(', ')} lens(es) were NOT run; their classes are swept only through the checklist shares`)
+if (isWalk)
+  log(`walk: run ${walk.run} of ${walk.runs}, sliced by ${WALK_SLICING[walk.run - 1]}, seed ${walk.seed} — ` +
+    `${walk.items.length * walk.scenarios.length} cell(s), ${walk.items.length} item(s) through ${walk.scenarios.length} scenario(s); ` +
+    LENSES.map((L, i) => `${L.key} ${walkSlices[i].length}`).join(', ') +
+    (skippedLenses.length ? `; walker slot(s) with no slice, not dispatched: ${skippedLenses.join(', ')}` : ''))
 // Closing review round 1, L6 - a note for a lens this run skips reaches no prompt, so the log and RUN
 // INTEGRITY report it apart, as UNREAD. Wording only: the check above still accepts the key (spec 7's
 // non-goal), and the review key still carries it.
@@ -1278,17 +1514,7 @@ for (const s of byDesignSources) log('by-design: ' + s)
 // What RUN INTEGRITY's `Checklist:` line says where nothing was swept, worded per cause.
 const checklistAbsence = checklistWhy !== null ? 'not acquired: ' + checklistWhy
   : acquiredChecklist !== null ? 'acquired with no item' : a.checklist === undefined ? 'absent' : 'supplied with no item'
-// TOOL-aSightedSkeptic-4 S2-S6 - THE SPLIT. Item n goes to keys[(n - 1) % K], so every item is in
-// exactly one share and the split is a pure function of the items and the keys: a reused lens file
-// (S7) held the share this run would hand it. Round-robin, not contiguous `chunk`: a contiguous split
-// hands one lens a run of neighbouring classes and the last lens the short remainder (spec F1 and §10).
-// It runs over the keys of the lenses that RUN (S7 below), never by reshaping the LENSES receiver the fan-out leg sizes.
-function deriveChecklistShares(items, keys) {
-  const shares = {}
-  for (const k of keys) shares[k] = []
-  items.forEach((text, i) => shares[keys[i % keys.length]].push({ n: i + 1, text: text }))
-  return shares
-}
+// TOOL-aSightedSkeptic-4 S2-S6 - THE SPLIT, deriveChecklistShares, defined in the prelude beside the walk slicer.
 // TOOL-aSightedSkeptic-7 S7 - over the RUNNING keys, so a skipped lens takes no share and no item is
 // lost with it. On a full run these are LENS_KEYS, and the split is unchanged.
 const checklistShares = deriveChecklistShares(CHECKLIST_ITEMS, runningLensKeys)
@@ -1377,7 +1603,10 @@ const REVIEW_SHAPE = 'lenses5-r4'
 const inputPrint = deriveFnv1a(renderCanonical(Object.assign({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: runNotes, specs: SPECS, checklist: checklist, intensity: intensity, ...(isSpec ? { probeRules: PROBE_RULES } : {}),
   ...(prevBlobCount ? { prevBlobs: subjects.map((x) => (x && typeof x === 'object' && x.prevBlob !== undefined ? x.prevBlob : null)) } : {}) }, workerType ? { workerType: workerType } : {},
   roledJudges ? { roles: { find: roles[finderKey] || null, verify: roles.skeptic || null } } : {}, preset !== 'unit-spec' ? { preset: preset } : {},
-  optInKeys.length ? { optIn: optIn } : {}, twinned ? { twin: true } : {}, fixJudge === 'class' ? { fixJudge: fixJudge } : {})))
+  optInKeys.length ? { optIn: optIn } : {}, twinned ? { twin: true } : {}, fixJudge === 'class' ? { fixJudge: fixJudge } : {},
+  // TOOL-dFairHearing-18 S1 - and the checked `walk` with WALK_RULES on a whole-design run alone, since the walker
+  // prompts interpolate both, so every other run's key holds and each run of a walk keys apart.
+  isWalk ? { walk: walk, walkRules: WALK_RULES } : {})))
 const specSubject = isSpec
   ? deriveFnv1a(subjects.map((x) => (x && typeof x === 'object' ? `${x.path}@${x.blob}` : String(x))).join('\n'))
   : ''
@@ -1430,8 +1659,8 @@ const probe = await agent(
         commonDir: { type: 'string' },
         base: { type: 'string' },
         head: { type: 'string' },
-        finds: { type: 'array', items: buildKeyedSchema(isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA, []) },
-        verifies: { type: 'array', items: buildKeyedSchema(VERDICT_SCHEMA, ['batch', 'ids']) },
+        finds: { type: 'array', items: buildKeyedSchema(LENS_SCHEMA, []) },
+        verifies: { type: 'array', items: buildKeyedSchema(isWalk ? WALK_VERDICT_SCHEMA : VERDICT_SCHEMA, ['batch', 'ids']) },
         skipped: { type: 'array', items: { type: 'string' } },
         // TOOL-dFairHearing-8 S4 - optional: a probe that omits it reads as no leg manifest read.
         legs: { type: 'array', items: { type: 'string' } },
@@ -1587,6 +1816,25 @@ function renderBrief(role) {
 // TOOL-dFairHearing-11 S6 - ONE LENS'S CALL, for either finder run: its prompt, every option but its stage's,
 // and `ready`, what a skipped or reused lens resolves to without a spawn, else null. Both fans below call it
 // at call time, since the brief needs the shas the probe resolved, and keep their agent( call inline.
+// TOOL-dFairHearing-18 S3 - ONE WALKER'S BRIEF: its run's slicing, WALK_RULES, the scenarios and items its slice
+// holds and no other slot's, its cells, and the seed line, which names the key's SHA-256 only when the walk is seeded.
+function renderWalkBrief(w) {
+  const cells = walkSlices[w]
+  const ids = cells.map((c) => c[1]).filter((x, i, all) => all.indexOf(x) === i)
+  const tags = cells.map((c) => c[0]).filter((x, i, all) => all.indexOf(x) === i)
+  return `WALK — run ${walk.run} of ${walk.runs}, sliced by ${WALK_SLICING[walk.run - 1]}. You are walker slot ${w + 1} of 5, and your slice is ` +
+    `${cells.length} cell(s): ${tags.length} item(s) through ${ids.length} scenario(s).\n` +
+    `WALK RULES:\n- ` + WALK_RULES.join('\n- ') + `\n` +
+    `SCENARIOS of your slice, each with what it walks:\n` +
+    walk.scenarios.filter((s) => ids.indexOf(s.id) !== -1).map((s) => `  - ${s.id} — ${renderPromptLine(s.name)}: ${renderPromptLine(s.walks)}`).join('\n') + `\n` +
+    `ITEMS of your slice, each with its step:\n` +
+    walk.items.filter((x) => tags.indexOf(x.tag) !== -1).map((x) => `  - ${x.tag} (step ${x.step})`).join('\n') + `\n` +
+    `CELLS of your slice, one walk row each:\n` + cells.map((c) => `  - ${c[0]} · ${c[1]}`).join('\n') + `\n` +
+    (walk.seed === 'none'
+      ? `SEED: none — this walk is not seeded.\n`
+      : `SEED: ${walk.seed} — the design carries planted defects, and the key naming them has the SHA-256 ${walk.keySha}. ` +
+        `The key is sealed: never open, search for or ask for it.\n`)
+}
 function buildLensCall(L, run) {
   const name = renderLensFileName(L, run)
   // TOOL-aSightedSkeptic-7 S4 - a skipped lens resolves to a SENTINEL and dispatches nothing. Never
@@ -1594,7 +1842,7 @@ function buildLensCall(L, run) {
   const ready = skippedLenses.indexOf(L.key) !== -1 ? { lens: L.key, path: '', findings: [], skipped: true } : reusedLens.get(name) || null
   return {
     ready: ready,
-    opts: { label: renderAgentLabel(reviewScope, renderLensStage(L, run)), phase: 'Find', schema: isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA },
+    opts: { label: renderAgentLabel(reviewScope, renderLensStage(L, run)), phase: 'Find', schema: LENS_SCHEMA },
     prompt:
       renderBrief('finder') +
       (isSpec
@@ -1614,6 +1862,8 @@ function buildLensCall(L, run) {
         `LENS: ${L.brief}\n` +
         // TOOL-aEvidencedLens-2 S2 - the probe policy directly under the brief; '' on the diff kind.
         probeBlock +
+        // TOOL-dFairHearing-18 S3 - a walker's WALK_RULES and its own slice, under the probe policy; '' on every other preset.
+        (isWalk ? renderWalkBrief(LENSES.indexOf(L)) : '') +
         // TOOL-aSightedSkeptic-5 S5 - this lens's note and no other's, directly under its brief.
         (notedLenses.indexOf(L.key) !== -1 ? `PROJECT NOTE FOR THIS LENS (from the caller's lensNotes): ${runNotes[L.key]}\n` : '') +
         // TOOL-aSightedSkeptic-4 S3 - this lens's checklist share, and no other's.
@@ -1633,7 +1883,9 @@ function buildLensCall(L, run) {
         (!durable
           ? `\nWrite no file. Set path to an empty string.\n`
           : `\nDURABILITY — BEFORE you return, whatever you found, Write the exact JSON object you are about to return, plus one more field "key":"${reviewKey}", to ${keyDir}/${name}, creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.\n`) +
-        (isSpec
+        (isWalk
+          ? `Return JSON {lens:"${L.key}", path, findings:[{file,where,severity,claim,impact,fix,evidence}], walk:[{item,scenario,actor,needs,witness,route,verdict,findings,reason}]}.`
+          : isSpec
           ? `Return JSON {lens:"${L.key}", path, findings:[{file,where,severity,claim,impact,fix,evidence}]}.`
           : `Return JSON {lens:"${L.key}", path, findings:[{file,line,severity,claim,impact,fix}]}.`),
   }
@@ -1676,10 +1928,51 @@ const deadLensLabels = FINDER_SLOTS.filter((s, i) => !finderReturns[i]).map((s) 
 // liveResults, so ids and batch membership do not move.
 // TOOL-dFairHearing-11 S6 - and `run`, the finder run it came from: run a's findings number first, then run
 // b's, so each run is one contiguous id range.
+// TOOL-dFairHearing-18 S4 - on a whole-design run each finding also carries its walker `slot` and its `local` index
+// in that walker's findings array, which is what a walk row's `findings` names.
 const allFindings = finderReturns
-  .flatMap((r, i) => (!r || skippedLenses.indexOf(FINDER_SLOTS[i].L.key) !== -1 ? [] : (r.findings || []).map((f) =>
-    ({ ...f, lens: FINDER_SLOTS[i].L.key, run: FINDER_SLOTS[i].run, ref: `${f.file}:${isSpec ? f.where : f.line}` }))))
+  .flatMap((r, i) => (!r || skippedLenses.indexOf(FINDER_SLOTS[i].L.key) !== -1 ? [] : (r.findings || []).map((f, k) =>
+    ({ ...f, lens: FINDER_SLOTS[i].L.key, run: FINDER_SLOTS[i].run, ref: `${f.file}:${isSpec ? f.where : f.line}`, ...(isWalk ? { slot: i, local: k } : {}) }))))
   .map((f, i) => ({ ...f, id: i + 1 }))
+
+// ---- TOOL-dFairHearing-18 S4/S5 — THE WALK TABLE, joined from the walkers' returns, and its gaps ----------------
+// A dead walker leaves its slice gapped, and the run defers before any synthesis as every lens death does.
+const walkReturns = isWalk ? finderReturns.map((r, i) => (r && skippedLenses.indexOf(FINDER_SLOTS[i].L.key) === -1 ? r : null)) : []
+const walkGaps = isWalk ? deriveWalkGaps(walkSlices, walkReturns) : []
+// One row per cell of the grid, item by item in the order given, each through the scenarios in order: the owning
+// walker's one row for the cell, its fields `null` where it gave none or two, and the verdict as the record reads
+// it: `holds`, the finding ids `<R><w>-F<id>`, or `not on path: <reason>`.
+function deriveWalkRows() {
+  const owner = new Map()
+  walkSlices.forEach((cells, w) => cells.forEach((c) => owner.set(c[0] + ' · ' + c[1], w)))
+  const rows = []
+  for (const it of walk.items)
+    for (const sc of walk.scenarios) {
+      const w = owner.get(it.tag + ' · ' + sc.id)
+      const r = walkReturns[w]
+      const mine = r && Array.isArray(r.walk) ? r.walk.filter((x) => x && x.item === it.tag && x.scenario === sc.id) : []
+      const x = mine.length === 1 ? mine[0] : null
+      const ids = x && x.verdict === 'finding' && Array.isArray(x.findings)
+        ? x.findings.map((k) => allFindings.find((f) => f.slot === w && f.local === k)).filter(Boolean)
+          .map((f) => 'ABC'[walk.run - 1] + (w + 1) + '-F' + f.id).join(', ')
+        : ''
+      rows.push({ item: it.tag, scenario: sc.id, actor: x ? x.actor : null, needs: x ? x.needs : null, witness: x ? x.witness : null,
+        route: x ? x.route : null,
+        verdict: !x ? null : x.verdict === 'holds' ? 'holds' : x.verdict === 'finding' ? ids || null : x.verdict === 'not-on-path' ? 'not on path: ' + String(x.reason) : String(x.verdict) })
+    }
+  return rows
+}
+const walkRows = isWalk ? deriveWalkRows() : []
+if (walkGaps.length)
+  log(`WARNING: the walk table has ${walkGaps.length} gap(s) — the walk is RED and the synthesis is told its verdict is BLOCKED: ${walkGaps.join('; ')}`)
+else if (isWalk) log(`walk table: ${walkRows.length} cell(s), no gap`)
+// The cells handed to and refuted by the skeptics, null until the verify stage hands them.
+let cellsSampled = null
+let cellsRefuted = null
+// What every return past the find stage carries on a whole-design run, read at call time.
+function buildWalkFields() {
+  return isWalk ? { walkTable: walkRows, walkGaps: walkGaps, cellsSampled: cellsSampled, cellsRefuted: cellsRefuted } : {}
+}
 
 // TOOL-aEvidencedLens-6 - THE PER-LENS YIELD, one row per lens that RAN, in dispatch order. `rows` is
 // the ledger (or [] before the verify stage); `items` the synthesis's item list, or null when none can
@@ -1755,10 +2048,10 @@ if (lensesDead === findersRunning) {
     note: `DEFERRED: no lens completed (${lensesDead}/${findersRunning} died) — nothing was reviewed; ${renderRerunTail(deadLensLabels.join(', '), false)}`,
     round, ...deriveRoundFields(null), priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses, twin: null,
     // TOOL-aSightedSkeptic-8 S5 - nothing was judged on this path.
-    ledger: [], confirmedFindings: [], appendix: '', lensYield,
+    ledger: [], confirmedFindings: [], appendix: '', lensYield, ...buildWalkFields(),
   }
 }
-if (allFindings.length === 0) {
+if (allFindings.length === 0 && !isWalk) {
   // A ZERO FROM A PARTIAL FAN IS NOT A CLEAN BILL. It used to return `partial: … survivors found
   // nothing`, which the build harness's clean-round test cannot tell from a result; it defers now.
   const deferred = lensesDead > 0
@@ -1777,7 +2070,7 @@ if (allFindings.length === 0) {
     exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: deadLensLabels, durable,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: liveResults.length, lensesDead,
     lensesReused: reusedLens.size, note, round, ...deriveRoundFields(deferred ? null : 0), priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses, twin: null,
-    ledger: [], confirmedFindings: [], appendix: '', lensYield, // TOOL-aSightedSkeptic-8 S5 - no finding raised
+    ledger: [], confirmedFindings: [], appendix: '', lensYield, ...buildWalkFields(), // TOOL-aSightedSkeptic-8 S5 - no finding raised
   }
 }
 log(`${allFindings.length} raw findings across ${findersRunning} lenses — verifying in batches.`)
@@ -1794,8 +2087,26 @@ phase('Verify')
 // width above renders, which bounds how many run at once (TOOL-dGroundRules-10 F3).
 const MAX_VERIFIERS = 5
 const verifyOrder = batchBy === 'address' ? deriveAddressOrder(allFindings) : allFindings
-const batches = chunk(verifyOrder, Math.ceil(verifyOrder.length / MAX_VERIFIERS)) // gov:fixed-verifiers
+// TOOL-dFairHearing-18 S6 - a whole-design walk that raised no finding still dispatches ONE batch, of clean cells
+// alone, labelled `verify:cells`; every other run's batches are the bounded split as before.
+const batches = verifyOrder.length || !isWalk ? chunk(verifyOrder, Math.ceil(verifyOrder.length / MAX_VERIFIERS)) : [[]] // gov:fixed-verifiers
 log(`${allFindings.length} finding(s) -> ${batches.length} verifier(s) (cap ${MAX_VERIFIERS}) by ${batchBy}`)
+// TOOL-dFairHearing-18 S6 - THE CLEAN CELLS each batch is handed on a whole-design run: eight per batch, the audit's
+// number (spec section 8 F7), from the cells whose verdict is `holds`, sorted by `<item> · <scenario>`, drawn at an
+// even stride and dealt round-robin. A pure function of the table, so a re-run hands the same cells.
+function deriveCellSample(rows, batchCount) {
+  const renderCellKey = (x) => x.item + ' · ' + x.scenario
+  const clean = rows.filter((x) => x.verdict === 'holds').sort((p, q) => (renderCellKey(p) < renderCellKey(q) ? -1 : renderCellKey(p) > renderCellKey(q) ? 1 : 0))
+  const n = Math.min(8 * batchCount, clean.length)
+  const out = Array.from({ length: batchCount }, () => [])
+  for (let k = 0; k < n; k++) out[k % batchCount].push(clean[Math.floor((k * clean.length) / n)])
+  return out
+}
+const batchCells = isWalk ? deriveCellSample(walkRows, batches.length) : batches.map(() => [])
+if (isWalk) {
+  cellsSampled = batchCells.reduce((s, g) => s + g.length, 0)
+  log(`clean cells: ${cellsSampled} of ${walkRows.filter((x) => x.verdict === 'holds').length} sampled over ${batches.length} skeptic batch(es)`)
+}
 // TOOL-dDerivedDocket-29 S4 - A BATCH IS REUSED ONLY FOR THE EXACT FINDINGS IT JUDGED. Its file must
 // carry the run's key AND a fingerprint over the batch's own ids and claims together. The batch number
 // alone is not enough: when a dead lens is re-dispatched the ids after it shift, and a name-keyed
@@ -1803,10 +2114,14 @@ log(`${allFindings.length} finding(s) -> ${batches.length} verifier(s) (cap ${MA
 // their prints come out identical, which is what lets a dead synthesis re-run alone.
 // TOOL-aSightedSkeptic-2 S5 - the FIX joins the print, since the skeptic now judges it: a verify file
 // judged against one fix is never reused for a finding carrying another under the same claim.
-const batchPrints = batches.map((g) => deriveFnv1a(renderCanonical(g.map((f) => [f.id, String(f.claim), String(f.fix)]))))
+// TOOL-dFairHearing-18 S6 - on a whole-design run the batch's clean cells join its print.
+const batchPrints = batches.map((g, gi) => deriveFnv1a(renderCanonical(isWalk
+  ? { findings: g.map((f) => [f.id, String(f.claim), String(f.fix)]), cells: batchCells[gi].map((x) => x.item + ' · ' + x.scenario) }
+  : g.map((f) => [f.id, String(f.claim), String(f.fix)]))))
 // TOOL-dFairHearing-4 S5 - a label no longer tells its ids, so the file carries them as `ids`, and a
-// file without them, the old shape, is never reused.
-const batchLabels = batches.map((g, gi) => `verify:batch-${gi + 1}`)
+// file without them, the old shape, is never reused. TOOL-dFairHearing-18 S6 - the cell-only batch is
+// `verify:cells`, a label neither scheme produces.
+const batchLabels = batches.map((g, gi) => (g.length ? `verify:batch-${gi + 1}` : 'verify:cells'))
 const reusedBatch = batches.map((g, gi) => {
   const name = `verify-batch-${gi + 1}.json`
   const file = presentVerifies.find((v) => v && v.name === name && Array.isArray(v.verdicts) && Array.isArray(v.ids))
@@ -1858,10 +2173,21 @@ const verdictResults = await boundedParallel(
         // TOOL-aEvidencedLens-3 S3 - the spec kind appends the finder's evidence, folded to one line
         // (absent or blank reads `-`). TOOL-aEvidencedLens-12 S2 - renderPromptLine, never renderCell:
         // the skeptic RE-RUNS this command, so a pipe in it must reach the prompt unescaped.
+        (group.length ? '' : `  (none — this batch judges the clean cells below alone)`) +
         group
           .map((f) => `id=${f.id} [${f.severity}] lens=${f.lens} ${f.ref} — ${f.claim} | impact: ${f.impact} | fix: ${f.fix}` +
             (isSpec ? ` | evidence: ${renderPromptLine(f.evidence)}` : ''))
           .join('\n') +
+        // TOOL-dFairHearing-18 S6 - a whole-design batch's clean cells, a third question; '' on every other run.
+        (batchCells[gi].length
+          ? `\n\nCLEAN CELLS, A THIRD QUESTION - the walkers read each cell below as holding, \`=\` meaning the item reads there ` +
+            `as the design declares it. Try hard to REFUTE each: walk the item through the scenario yourself, against the design ` +
+            `and the tree. Return \`cells\`, one {cell, verdict, reason, file, where, severity} per cell below, \`cell\` copied ` +
+            `exactly as it is written before its first " — ": "holds" when it does; "refuted" when you can show it does not, with ` +
+            `file and where addressing the defect, severity graded by the rubric, and reason saying what fails there.\n` +
+            batchCells[gi].map((x) => `- ${x.item} · ${x.scenario} — actor ${renderPromptLine(x.actor)} | needs ${renderPromptLine(x.needs)} | ` +
+              `witness ${renderPromptLine(x.witness)} | route ${renderPromptLine(x.route)}`).join('\n')
+          : '') +
         // TOOL-aSightedSkeptic-2 S2 - the fix is judged as a SECOND, separate question. It never moves
         // the claim's verdict (spec section 8 F1): a real defect with a bad fix is still a real defect.
         // TOOL-dFairHearing-8 S2 - under `fixJudge: 'class'` the second variant, judged by the defect's class; the
@@ -1889,8 +2215,9 @@ const verdictResults = await boundedParallel(
             `creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.`) +
         `\n\nReturn JSON {path, verdicts:[{id:<the integer id shown above>, verdict:"confirmed"|"refuted"|"uncertain", reason, severity:"blocker"|"high"|"medium"|"low" (on a confirmed verdict), fixVerdict:"sound"|"unsound"|"none"${fixJudge === 'class' ? '|"instance"' : ''}, fixNote}]}. ` +
         `Emit EXACTLY one verdict per finding above (${group.length} verdicts, ids ${group.map((f) => f.id).join(', ')}). ` +
-        `Copy the integer id — do NOT re-type the file path, and do not renumber.`,
-        Object.assign({ label: renderAgentLabel(reviewScope, batchLabels[gi]), phase: 'Verify', schema: VERDICT_SCHEMA }, verifyOpts),
+        `Copy the integer id — do NOT re-type the file path, and do not renumber.` +
+        (batchCells[gi].length ? ` Beside verdicts, return cells:[{cell, verdict:"holds"|"refuted", reason, file, where, severity}], one per clean cell above.` : ''),
+        Object.assign({ label: renderAgentLabel(reviewScope, batchLabels[gi]), phase: 'Verify', schema: isWalk ? WALK_VERDICT_SCHEMA : VERDICT_SCHEMA }, verifyOpts),
       ),
   ),
 )
@@ -1904,6 +2231,33 @@ const liveVerdicts = verdictResults.filter(Boolean)
 const skepticsDead = verdictResults.length - liveVerdicts.length
 const deadBatchLabels = batchLabels.filter((lbl, gi) => !verdictResults[gi])
 const batchesReused = reusedBatch.filter(Boolean).length
+// TOOL-dFairHearing-18 S6 - A REFUTED CLEAN CELL becomes a finding of the lens `cell-sample`: the skeptic's address,
+// its reason as the claim, and its grade, numbered after every walker finding. One skeptic raised it and none judged
+// it, so it stands UNVERIFIED (spec section 8 F8). Only a cell its batch was handed counts, once.
+const cellFindings = []
+if (isWalk)
+  verdictResults.forEach((r, gi) => {
+    const handed = batchCells[gi].map((x) => x.item + ' · ' + x.scenario)
+    const seen = []
+    for (const c of r && Array.isArray(r.cells) ? r.cells : []) {
+      const cell = c && typeof c.cell === 'string' ? c.cell.trim() : ''
+      if (handed.indexOf(cell) === -1 || seen.indexOf(cell) !== -1) continue
+      seen.push(cell)
+      if (c.verdict !== 'refuted') continue
+      const file = String(c.file || '')
+      const where = String(c.where || '')
+      // A grade outside the closed four, reachable from a reused file or a stub, reads medium.
+      const severity = SEVERITIES.indexOf(c.severity) !== -1 ? c.severity : 'medium'
+      cellFindings.push({ file: file, where: where, severity: severity, claim: String(c.reason || ''),
+        impact: `the walk read the cell ${cell} as holding, and a skeptic refuted it`, fix: '(none proposed: a refuted clean cell)',
+        evidence: String(c.reason || ''), lens: 'cell-sample', run: 'a', ref: `${file}:${where}`, cell: cell })
+    }
+  })
+for (const f of cellFindings) allFindings.push(Object.assign(f, { id: allFindings.length + 1 }))
+if (isWalk) {
+  cellsRefuted = cellFindings.length
+  log(`clean cells: ${cellsRefuted} of ${cellsSampled} refuted` + (cellsRefuted ? ` — UNVERIFIED cell-sample finding(s), ids ${cellFindings.map((f) => f.id).join(', ')}` : ''))
+}
 // U6: a Map keyed on the assigned integer, populated ONLY for an id this run actually handed out.
 // Three degraded shapes get their own counter instead of silently rewriting a verdict:
 //   spurious   — an id nobody assigned (a hallucinated or renumbered verdict); ignored, counted.
@@ -1998,7 +2352,9 @@ if (twinned) log(twinLine)
 // counted apart, so a run whose skeptics all answered never reads as one where none returned.
 const unverified = allFindings.filter((f) => ['confirmed', 'refuted'].indexOf(verdictById.get(f.id)?.verdict) === -1)
 const uncertainFindings = unverified.filter((f) => verdictById.get(f.id)?.verdict === 'uncertain')
-const noVerdict = unverified.filter((f) => verdictById.get(f.id)?.verdict !== 'uncertain')
+// TOOL-dFairHearing-18 S6 - a refuted clean cell is unverified by design, not for want of a verdict, so it is counted
+// apart, as `cellsRefuted`.
+const noVerdict = unverified.filter((f) => verdictById.get(f.id)?.verdict !== 'uncertain' && f.lens !== 'cell-sample')
 // precision is (confirmed+merged)/(confirmed+merged+refuted): an unjudged or uncertain finding is not
 // evidence either way, and a merged duplicate is a confirmation of its original (TOOL-dFairHearing-5 S4).
 const judged = confirmed.length + merged.length + refuted.length
@@ -2129,6 +2485,15 @@ function renderAppendix(rows) {
     .concat(rows.map((e) => '| ' + cols.map((c) => renderCell(c === 'classes' ? (e.classes || []).join(' ') : e[c])).join(' | ') + ' |'))
     .join('\n')
 }
+// TOOL-dFairHearing-18 S5 - THE WALK TABLE BLOCK, pure, in the whole-design audit's `[walk-table]` grammar: the heading,
+// the `walk-seed` pin the design grade reads, then one row per cell through renderCell, the item backticked.
+function renderWalkTable(w, rows) {
+  return [`## Walk table — run ${w.run} of ${w.runs}, sliced by ${WALK_SLICING[w.run - 1]}`,
+    `walk-seed mode=${w.seed} key-sha256=${w.seed === 'none' || !w.keySha ? '-' : w.keySha}`, '',
+    '| Item | Scenario | Actor | Needs | Witness | Route | Verdict |', '|---|---|---|---|---|---|---|']
+    .concat(rows.map((x) => '| `' + x.item + '` | ' + [x.scenario, x.actor, x.needs, x.witness, x.route, x.verdict].map(renderCell).join(' | ') + ' |'))
+    .join('\n')
+}
 // `-` in every disposition cell: what an exit with no accepted set returns. The synthesis is handed its copy with a
 // `(synthesis)` cell on each confirmed row, the one cell it writes (spec section 8 F2).
 const appendix = renderAppendix(ledger)
@@ -2150,7 +2515,7 @@ for (const f of confirmed) {
 // caller can tell "every finding was refuted" from "the verify stage was degraded".
 // TOOL-dDerivedDocket-29 S5 - every agent label that did not return, lenses first, in dispatch order.
 const pendingLabels = deadLensLabels.concat(deadBatchLabels)
-if (confirmed.length + unverified.length === 0) {
+if (confirmed.length + unverified.length === 0 && !isWalk) {
   // A REFUTATION OVER A PARTIAL FAN DEFERS. It used to return `… treat as partial` beside a null
   // count, which a caller had to parse prose to tell from the clean result on the line below it.
   const deferred = pendingLabels.length > 0
@@ -2173,7 +2538,7 @@ if (confirmed.length + unverified.length === 0) {
     round, ...deriveRoundFields(deferred ? null : 0), priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses, twin: null,
     // TOOL-aSightedSkeptic-8 S5 - no report is written on this path (spec F3), so the return is the
     // only place this ledger and appendix exist; a caller may write them.
-    ledger, confirmedFindings, appendix, lensYield,
+    ledger, confirmedFindings, appendix, lensYield, ...buildWalkFields(),
   }
 }
 
@@ -2202,7 +2567,7 @@ if (pendingLabels.length) {
     report: null, summary: '', blockers: null, highs: null,
     note: `DEFERRED: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) did not return — ${renderRerunTail(pendingLabels.join(', '), false)}`,
     round, ...deriveRoundFields(null), priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses, twin: null,
-    ledger, confirmedFindings, appendix, lensYield, // TOOL-aSightedSkeptic-8 S5 - what was judged so far; `exit` says partial
+    ledger, confirmedFindings, appendix, lensYield, ...buildWalkFields(), // TOOL-aSightedSkeptic-8 S5 - what was judged so far; `exit` says partial
   }
 }
 
@@ -2220,8 +2585,16 @@ log(roundLine)
 // TOOL-aEvidencedLens-6 S6 - the per-lens counts that exist before the synthesis, for its verbatim block.
 const preSynthYield = deriveLensYield(ledger, null)
 phase('Synthesize')
+// TOOL-dFairHearing-18 S4/S5 - the walk's red is the harness's computed fact, and the agent states it.
+const walkTableText = isWalk ? renderWalkTable(walk, walkRows) : ''
 const synth = await agent(
   `Write the Tier-2 review report for: ${context}\n\n` +
+    (walkGaps.length
+      ? `WALK GAPS - the harness checked each walker's walk table against its slice, and the walk table has ${walkGaps.length} gap(s): ` +
+        `a cell with no row or two, a row outside its slice, an empty field, or a malformed verdict. The walk is RED. The report ` +
+        `lists each gap below FIRST, before any finding, and its \`## Verdict:\` token is BLOCKED.\n` +
+        walkGaps.map((g) => `- ${renderPromptLine(g)}`).join('\n') + `\n\n`
+      : '') +
     // TOOL-aSightedSkeptic-6 S6 - the bracket is the BINDING grade, and both grades follow it when the
     // skeptic's differs from the finder's.
     `CONFIRMED findings (survived an adversarial skeptic; the bracketed grade is BINDING):\n` +
@@ -2244,7 +2617,9 @@ const synth = await agent(
           .map((f) => `- id=${f.id} [${f.severity}] lens=${f.lens} ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  fix: ${f.fix}\n  ` +
             (verdictById.get(f.id)?.verdict === 'uncertain'
               ? `status: UNCERTAIN - the skeptic could not establish it: ${verdictById.get(f.id).reason || '(no reason given)'}`
-              : `status: NO USABLE VERDICT came back`))
+              : f.lens === 'cell-sample'
+                ? `status: a CLEAN CELL a skeptic refuted (${f.cell}), raised by one skeptic and judged by none`
+                : `status: NO USABLE VERDICT came back`))
           .join('\n')
       : '  (none)') +
     // TOOL-dFairHearing-7 S3 - under `shown` only, the refuted claims and the same-address pairs, so a refuted
@@ -2346,12 +2721,19 @@ const synth = await agent(
       : '') +
     // TOOL-dFairHearing-2 S5 - spec kind only, so the report says which lens literal ran.
     (isSpec ? `preset: ${preset} - the ${preset} lenses ran: ${LENS_KEYS.join(', ')}.\n` : '') +
+    // TOOL-dFairHearing-18 S2/S6 - the walk's run, its idle walker slots, the clean cells and the gaps; '' off the preset.
+    (isWalk
+      ? `walk: run ${walk.run} of ${walk.runs}, sliced by ${WALK_SLICING[walk.run - 1]}, seed ${walk.seed}; ${walkRows.length} cell(s); ` +
+        (skippedLenses.length ? `walker slot(s) with no slice, so not dispatched: ${skippedLenses.join(', ')}` : 'every walker slot had a slice') +
+        `; clean cells sampled ${cellsSampled}, refuted ${cellsRefuted}; walk gaps ${walkGaps.length}` +
+        (walkGaps.length ? ' - the walk is RED' : '') + `.\n`
+      : '') +
     // TOOL-dFairHearing-3 S5 - a run where a swap ran names each, and the default whose coverage it dropped.
     (swappedLenses.length
       ? `optIn: ${swappedLenses.map((L) => `${L.key} ran in the slot of ${L.replaces}`).join(', ')} - the replaced lens(es) did NOT run, so their classes went unswept.\n`
       : '') +
     // TOOL-aSightedSkeptic-7 S6 - a light run names every skipped lens; a full run carries no clause.
-    (skippedLenses.length
+    (skippedLenses.length && !isWalk
       ? `Intensity: light - the ${skippedLenses.join(', ')} lens(es) were NOT run, so their classes were swept only ` +
         `through the checklist shares; do NOT describe this run as a full review.\n`
       : '') +
@@ -2506,6 +2888,13 @@ const synth = await agent(
     (twinned
       ? `\n\nREVIEW-TWIN LINE - copy the review-twin line between the two marker lines below VERBATIM, alone on its own line, ` +
         `directly below the review-shape line, and neither marker line copied.\n<<<TWIN\n${twinLine}\nTWIN>>>`
+      : '') +
+    // TOOL-dFairHearing-18 S5 - the walk table rides the same copy instruction, directly before the appendix; the
+    // return's `walkTable` holds its rows, and the copy is not verified, as the appendix's is not.
+    (isWalk
+      ? `\n\nWALK TABLE - the block between the two marker lines below goes into the report directly BEFORE the appendix, ` +
+        `copied VERBATIM: unedited, no row added, dropped, reordered or reworded, and neither marker line copied.\n` +
+        `<<<WALK TABLE\n${walkTableText}\nWALK TABLE>>>`
       : '') +
     // TOOL-dFairHearing-8 S8 - the one exception to the copy: each `(synthesis)` cell, written with its disposition.
     (synthAppendix
@@ -2826,9 +3215,11 @@ return {
         ? `UNVERIFIED: the report was written, but its item list does not place every confirmed finding exactly once (${tallyFault}), so blockers and highs are null`
         // TOOL-aSightedSkeptic-6 S8 - the uncertain count apart from the no-verdict count, so a run whose
         // skeptics all answered never reads as one where none returned.
-        : judged === 0 && !uncertainFindings.length
+        // TOOL-dFairHearing-18 S6 - a walk whose walkers raised nothing has nothing to judge, so it falls through to the
+        // arms below, and a refuted clean cell reads as the unverified finding it is.
+        : allFindings.length > cellFindings.length && judged === 0 && !uncertainFindings.length
           ? `UNVERIFIED: ${allFindings.length} finding(s) raised, none judged — no skeptic batch returned a usable verdict — the report lists them as outstanding`
-          : judged === 0
+          : allFindings.length > cellFindings.length && judged === 0
             ? `UNVERIFIED: ${allFindings.length} finding(s) raised, none confirmed or refuted — ${uncertainFindings.length} answered uncertain by a skeptic, ${noVerdict.length} with no usable verdict — the report lists them as outstanding`
             : unverified.length
               ? `PARTIAL: ${unverified.length} finding(s) are unverified — ${uncertainFindings.length} answered uncertain by a skeptic, ${noVerdict.length} with no usable verdict`
@@ -2853,4 +3244,7 @@ return {
   appendix: returnedAppendix,
   // TOOL-aEvidencedLens-6 S5 - on every return; README "return fields" states the row shape.
   lensYield,
+  // TOOL-dFairHearing-18 S5/S6 - on a whole-design run: the joined walk table's rows, its gaps, and the clean cells
+  // handed to the skeptics and refuted by them.
+  ...buildWalkFields(),
 }

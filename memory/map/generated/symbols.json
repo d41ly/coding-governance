@@ -1553,6 +1553,16 @@
       "file": "tools/workflows/orient-counterfactual.js"
     },
     {
+      "id": "buildRefusal",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "buildRefusal",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "buildResolvedTarget",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -1571,6 +1581,16 @@
       "id": "buildTaskDigest",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "buildWalkFields",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "buildWalkFields",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "build_aborted_run",
@@ -3681,6 +3701,16 @@
       "id": "checkUnwalkableTarget",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkWalk",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "checkWalk",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "check_absent",
@@ -7373,6 +7403,16 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "deriveCellSample",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveCellSample",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "deriveChecklistShares",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -7524,6 +7564,36 @@
     },
     {
       "id": "deriveTwinPairs",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "deriveWalkGaps",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveWalkGaps",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "deriveWalkRows",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveWalkRows",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "deriveWalkSlices",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveWalkSlices",
       "kind": "function",
       "file": "tools/workflows/tier2-review.template.js"
     },
@@ -11996,6 +12066,11 @@
       "id": "measure_coverage",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "measure_design_recall",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "measure_dossier_staleness",
@@ -18053,6 +18128,16 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "renderCellKey",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderCellKey",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "renderChainAction",
       "kind": "function",
       "file": "tools/workflows/unattended-build.js"
@@ -18431,6 +18516,26 @@
       "id": "renderVerdict",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "renderWalkBrief",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderWalkBrief",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "renderWalkTable",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderWalkTable",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "render_affordance_exempt",

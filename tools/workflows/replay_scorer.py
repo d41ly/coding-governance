@@ -9,6 +9,7 @@ the self-test's proof, which reads aScoutedSeam's committed records where the tr
     python3 replay_scorer.py --instance scouted-seam --cases <src> --results <src> --judged <arm|a+b> [...]
     python3 replay_scorer.py --instance review-replay --known <src> --candidate <src> [--window N]
     python3 replay_scorer.py --experiment <src> [--repo <clone>]
+    python3 replay_scorer.py --design-recall --key <known-set file> --seed <mode> <record-run-1> [<record-run-2> ...]
     python3 replay_scorer.py --selftest
 
 A `<src>` resolves in one order: an existing working-tree path; else a 40-hex blob id; else
@@ -43,17 +44,27 @@ parsed replies print against its `dispatched` count; a committed label key rotat
 `union` is read per set and pooled. What none of them checks: a variable nobody declared, that no
 prompt author read the held-out file, that one judge read each case, and that evidence is right.
 
+THE DESIGN GRADE (TOOL-dFairHearing-18). `--design-recall` grades a whole-design walk's recall on a seeded key,
+as `review.design-audit.seed` says: each record is one run's review record, read by its `## Walk table — run <r>
+of <runs>` heading, its `walk-seed` line and its confirmed appendix rows, each ref keyed by `extract_tag_ref`; each
+plant is one known-set row of the key, matched on the same file and the same key at window 0. A plant counts once
+per run. Every run must find two thirds of the plants and, with two runs or more, the union five sixths; under
+`--seed none` nothing is graded and no key is read. Refused: a key whose SHA-256 over its bytes is not every
+record's pin, records disagreeing on `runs`, a run missing or repeated, a record seeded another way, a plant
+whose `escaped` disagrees with the seed, and a confirmed row with no file and key.
+
 THE CONFORMANCE ARM. `scan_pairing_sites` names every comprehension, in a tracked `*.py` under the
 tool root this kit sits in (this file excepted), whose filter is `all()` over a second population with
 an `in` test from the outer case to the inner variant, or an `is not None` test naming both. What it
 does not see: a JavaScript harness, and a pairing written as a `for` loop building a common list.
 
-Exit: 0 scored run · 1 red self-test · 2 any refusal or argument error.
+Exit: 0 scored run · 1 red self-test, or a design-recall run under its bar · 2 any refusal or argument error.
 """
 
 import argparse
 import ast
 import contextlib
+import hashlib
 import io
 import json
 import os
@@ -87,6 +98,11 @@ TAG_REF = re.compile(r"\[[a-z][a-z0-9-]*\]")
 POPULATION = re.compile(r"^\*\*Population:\*\* (\d+) · reviewed (\d+) · escaped (\d+) · high (\d+)\s*$", re.MULTILINE)
 ADJUDICATOR = re.compile(r"^\*\*Adjudicator:\*\* (\S.*?)\s*$", re.MULTILINE)
 KNOWN_GRADES = ("high", "medium", "ungraded")
+#: A whole-design record's walk-table heading and seed pin, as tier2-review.js's renderWalkTable writes them (TOOL-dFairHearing-18).
+WALK_HEADING = re.compile(r"^## Walk table — run (\d+) of (\d+), sliced by \S+[ \t]*$", re.MULTILINE)
+WALK_SEED = re.compile(r"^walk-seed mode=(\S+) key-sha256=(\S+)[ \t]*$", re.MULTILINE)
+#: `review.design-audit.seed`'s values, the graded ones first.
+DESIGN_SEEDS = ("reverted-escapes", "synthetic", "none")
 
 # ---- the scouted-seam instance's constant, ported from the grader blob.
 CODE_TOKEN = re.compile(r"-{0,2}[A-Za-z_][\w-]*")
@@ -96,7 +112,7 @@ KIT_DIR = pathlib.Path(__file__).resolve().parent
 #: The two instances the factory exists for; `check_instances` reds when the table lacks one.
 INSTANCE_KEYS = ("review-replay", "scouted-seam")
 #: The arm count `run_selftest` must reach, as review_replay.py declares its own.
-ARMS_DECLARED = 14
+ARMS_DECLARED = 16
 
 
 class Refusal(Exception):
@@ -527,6 +543,72 @@ def measure_known_set(known, cand_text, pairs=None):
         ("reviewed", sum(not r["escaped"] for r in hit), known["reviewed"]),
         ("escaped", sum(r["escaped"] for r in hit), known["escaped"]),
         ("high", sum(r["grade"] == "high" and not r["escaped"] for r in hit), known["high"])]}
+
+
+def measure_design_recall(records, plants, seed, key_sha):
+    """A whole-design walk's recall on a seeded key (TOOL-dFairHearing-18 S7): `(lines, ok)`, or Refusal.
+
+    `records` is `[(src, text)]`, one review record per run; `plants` the known-set rows `parse_known_set`
+    reads off the key; `key_sha` the SHA-256 over the key's bytes, which every record's `walk-seed` pins.
+    Each run's confirmed appendix rows are candidates through `parse_candidates`, scored by `measure_recall`
+    at window 0, so a plant counts once per run. `ok` is false when a run finds under two thirds of the
+    plants or, with two runs or more, the union under five sixths: the audit's bar of eight of twelve a run
+    and ten of twelve together, as fractions so a key of another size grades alike (spec section 8 F5).
+    """
+    if seed not in DESIGN_SEEDS[:2]:
+        raise Refusal(f"--seed {seed!r}: recall is graded under {' or '.join(DESIGN_SEEDS[:2])} alone")
+    escaped = seed == "reverted-escapes"
+    off = next((p for p in plants if p["escaped"] != escaped), None)
+    if off is not None:
+        raise Refusal(f"plant {off['tag']}: escaped {'yes' if off['escaped'] else 'no'}, and every plant under --seed {seed} "
+                      f"reads escaped {'yes' if escaped else 'no'}")
+    if not plants:
+        raise Refusal("the key holds no plant, so no recall can be graded")
+    runs, total = {}, None
+    for src, text in records:
+        head, pin = WALK_HEADING.search(text), WALK_SEED.search(text)
+        if not head or not pin:
+            raise Refusal(f"record {src}: no `## Walk table — run <r> of <runs>` heading or no `walk-seed` line")
+        r, n = int(head.group(1)), int(head.group(2))
+        if total is not None and n != total:
+            raise Refusal(f"record {src}: run {r} of {n}, where an earlier record reads of {total}: the records disagree on runs")
+        total = n
+        if pin.group(1) != seed:
+            raise Refusal(f"record {src}: walk-seed mode={pin.group(1)}, not --seed {seed}")
+        if pin.group(2) != key_sha:
+            raise Refusal(f"record {src}: walk-seed pins key-sha256={pin.group(2)}, and the key's SHA-256 over its bytes is "
+                          f"{key_sha}: the key moved since the walk")
+        if not 1 <= r <= n:
+            raise Refusal(f"record {src}: run {r} of {n} is outside 1 to {n}")
+        if r in runs:
+            raise Refusal(f"run {r} is repeated: {runs[r][0]} and {src}")
+        cands, err = parse_candidates(text, "spec-audit")
+        if err:
+            raise Refusal(f"record {src}: {err}")
+        loose = next((c for c in cands if not c["path"]), None)
+        if loose is not None:
+            raise Refusal(f"record {src}: unscorable — the confirmed ref {loose['ref']!r} names no file and key")
+        runs[r] = (src, cands)
+    if total is None:
+        raise Refusal("no record: hand one review record per run")
+    missing = [r for r in range(1, total + 1) if r not in runs]
+    if missing:
+        raise Refusal(f"run(s) {', '.join(map(str, missing))} of {total} missing: hand one record per run")
+    n, ok, union = len(plants), True, set()
+    lines = [f"design-recall · seed {seed} · key-sha256 {key_sha} · {n} plant(s) · {total} run(s)"]
+
+    def render_row(name, hit, bar):
+        missed = [p["tag"] for p in plants if p["tag"] not in hit]
+        return f"{name}: {len(hit)} of {n} · missed {', '.join(missed) or 'none'} · bar {bar}"
+    for r in sorted(runs):
+        hit = {it["tag"] for it, _ in measure_recall(plants, runs[r][1], 0)["matched"]}
+        union |= hit
+        under = len(hit) * 3 < 2 * n
+        ok = ok and not under
+        lines.append(render_row(f"run {r}", hit, "2/3 " + ("UNDER" if under else "met")))
+    under = total >= 2 and len(union) * 6 < 5 * n
+    lines.append(render_row("union", union, ("5/6 " + ("UNDER" if under else "met")) if total >= 2 else "not applied to one run"))
+    return lines, ok and not under
 
 
 # ---- the scouted-seam instance: aScoutedSeam's grader, ported from blob a0389611 at b0fe68f30.
@@ -1336,12 +1418,75 @@ def run_selftest():
                 or check_refused(lambda: parse_known_set(whole.replace("| b |", "| a |")), "tag a", "repeated")
                 or check_refused(lambda: measure_known_set(known, cand, [("2", "a")]), "pair 2 a", "[supervise]"))
 
+    def check_tag_drive_arm():
+        """TOOL-dFairHearing-18 AC7: the first of two tags, and a drive-lettered path folded as the section reader folds it."""
+        want = [(r"C:\x.md:[a] then [b]", ("/x.md", "[a]")), ("x.md:[walk-table] plan.input", ("x.md", "[walk-table]"))]
+        return next((f"{ref!r} read as {extract_tag_ref(ref)!r}, not {w!r}" for ref, w in want if extract_tag_ref(ref) != w), None)
+
+    def build_design_fixture(tmp, run2_hits_c=False, plant_c_escaped="yes"):
+        """A key of three escaped plants and two run records pinning its SHA-256: the key path and the two record paths."""
+        key = pathlib.Path(tmp, "key.md")
+        reviewed = 1 if plant_c_escaped == "no" else 0
+        key.write_bytes((f"**Serves:** research X-1\n\n**Population:** 3 · reviewed {reviewed} · escaped {3 - reviewed} · high 0\n\n"
+                         "| tag | address | grade | escaped |\n|---|---|---|---|\n| a | d.md:[plan] | high | yes |\n"
+                         f"| b | d.md:[act] | medium | yes |\n| c | d.md:[spawn] | ungraded | {plant_c_escaped} |\n").encode("utf-8"))
+        sha = hashlib.sha256(key.read_bytes()).hexdigest()
+        paths = []
+        for r in (1, 2):
+            refs = ["d.md:[plan] input", "d.md:[act] lifetime"] + (["d.md:[spawn] relaunch"] if r == 2 and run2_hits_c else [])
+            rows = "".join(f"| {i} | walk-{i} | {ref} | high | confirmed |\n" for i, ref in enumerate(refs, 1))
+            path = pathlib.Path(tmp, f"run{r}.md")
+            path.write_text(f"**Serves:** spec-audit PLAY-dX-1\n\n## Verdict: CLEAN WITH FIXES\n\nReview shape: confirmed {len(refs)}.\n\n"
+                            f"## Walk table — run {r} of 2, sliced by {('scenario', 'step')[r - 1]}\n"
+                            f"walk-seed mode=reverted-escapes key-sha256={sha}\n\n| Item | Scenario | Actor | Needs | Witness | Route | Verdict |\n"
+                            f"|---|---|---|---|---|---|---|\n| `plan` | S1 | = | = | = | = | holds |\n\n{APPENDIX_HEADING}\n\n"
+                            f"| id | lens | ref | severity | verdict |\n|---|---|---|---|---|\n{rows}", encoding="utf-8")
+            paths.append(str(path))
+        return str(key), paths
+
+    def run_entry(argv):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            try:
+                rc = main(argv)
+            except SystemExit as exc:
+                rc = exc.code
+        return rc, out.getvalue(), err.getvalue()
+
+    def check_design_recall_arm():
+        """TOOL-dFairHearing-18 AC8, AC9: a plant both runs miss reds the union; a moved key, a missing run, a plant off its seed refuse."""
+        with tempfile.TemporaryDirectory() as tmp:
+            key, recs = build_design_fixture(tmp)
+            argv = ["--design-recall", "--key", key, "--seed", "reverted-escapes"]
+            rc, out, _ = run_entry(argv + recs)
+            if rc != 1 or not all(w in out for w in ("run 1: 2 of 3 · missed c", "run 2: 2 of 3 · missed c", "union: 2 of 3 · missed c")):
+                return f"the planted miss read {rc}: {out!r}"
+            key, recs = build_design_fixture(tmp, run2_hits_c=True)
+            rc, out, _ = run_entry(argv + recs)
+            if rc != 0 or "union: 3 of 3 · missed none" not in out:
+                return f"run 2's hit on the third plant read {rc}: {out!r}"
+            raw = pathlib.Path(key).read_bytes()
+            pathlib.Path(key).write_bytes(raw.replace(b"research X-1", b"research X-2"))
+            rc, _, err = run_entry(argv + recs)
+            if rc != 2 or "SHA-256" not in err:
+                return f"a moved key read {rc}: {err!r}"
+            key, recs = build_design_fixture(tmp)
+            rc, _, err = run_entry(argv + recs[:1])
+            if rc != 2 or "run(s) 2 of 2 missing" not in err:
+                return f"a partial population read {rc}: {err!r}"
+            key, recs = build_design_fixture(tmp, plant_c_escaped="no")
+            rc, _, err = run_entry(argv + recs)
+            if rc != 2 or "plant c" not in err:
+                return f"a plant off its seed read {rc}: {err!r}"
+            rc, out, _ = run_entry(["--design-recall", "--key", str(pathlib.Path(tmp, "absent.md")), "--seed", "none"] + recs)
+            return None if rc == 0 and "not graded" in out else f"--seed none read {rc}: {out!r}"
+
     arms = [("paired-refuses", check_paired_refuses), ("row-refuses", check_row_refuses), ("tag-section", check_tag_section),
             ("instances", check_instances_arm), ("scouted-proof", check_scouted_proof), ("conformance", check_conformance),
             ("deterministic", check_deterministic), ("experiment-evidence", check_evidence_arm),
             ("experiment-freeze", check_freeze_arm), ("experiment-variable", check_variable_arm),
             ("experiment-parsed", check_parsed_arm), ("experiment-judge", check_judge_arm), ("experiment-union", check_union_arm),
-            ("known-set", check_known_set_arm)]
+            ("known-set", check_known_set_arm), ("tag-drive", check_tag_drive_arm), ("design-recall", check_design_recall_arm)]
     passed = skipped = ran = 0
     for name, arm in arms:
         ran += 1
@@ -1376,9 +1521,39 @@ def main(argv):
     ap.add_argument("--window", type=int, default=10)
     ap.add_argument("--experiment", metavar="SRC")
     ap.add_argument("--repo", default=".")
+    ap.add_argument("--design-recall", action="store_true")
+    ap.add_argument("--key", metavar="FILE")
+    ap.add_argument("--seed", metavar="MODE")
+    ap.add_argument("records", nargs="*", metavar="RECORD")
     args = ap.parse_args(argv)
     if args.selftest:
         return run_selftest()
+    if args.records and not args.design_recall:
+        ap.error("a positional record is read by --design-recall alone")
+    if args.design_recall:
+        if args.seed not in DESIGN_SEEDS:
+            ap.error(f"--design-recall needs --seed, one of {', '.join(DESIGN_SEEDS)}, not {args.seed!r}")
+        if args.seed == "none":
+            print("design-recall: recall is not graded under review.design-audit.seed none, and no key was read")
+            return 0
+        if not (args.key and args.records):
+            ap.error("--design-recall needs --key <known-set file> and one review record per run")
+        try:
+            key = pathlib.Path(args.key)
+            if not key.is_file():
+                raise Refusal(f"key {args.key}: no such file; its SHA-256 is taken over the file's bytes")
+            raw = key.read_bytes()
+            try:
+                known = parse_known_set(raw.decode("utf-8"))
+            except UnicodeDecodeError as exc:
+                raise Refusal(f"key {args.key}: not UTF-8 ({exc})") from None
+            records = [(src, read_raw_output(src, args.repo)) for src in args.records]
+            lines, ok = measure_design_recall(records, known["rows"], args.seed, hashlib.sha256(raw).hexdigest())
+        except Refusal as exc:
+            print(f"replay_scorer: REFUSED — {exc}", file=sys.stderr)
+            return 2
+        print("\n".join(lines))
+        return 0 if ok else 1
     if args.experiment:
         # Every line is derived before the first prints, so a refusal leaves no figure on stdout.
         try:

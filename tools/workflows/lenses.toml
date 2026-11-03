@@ -130,6 +130,49 @@ default_in = ["design-audit"]
 optin = false
 brief = "Alternatives and cost: is there a materially simpler or cheaper mechanism meeting the same contract, and what does this one cost? Report an existing seam, a checker in place of an agent, or one process in place of many that meets the same requirement or invariant, saying which; and every agent, session, spawn, token and wall-clock cost the design adds that carries no ceiling, no enforcer, or a ceiling nobody measured."
 
+# The WALKER rows (TOOL-dFairHearing-18): the `whole-design` preset's five slots, each brief naming its slot alone.
+# What every walker is told is the harness's WALK_RULES, interpolated with that walker's own slice of the grid.
+
+[[lens]]
+key = "walk-1"
+kinds = ["spec-audit"]
+presets = ["whole-design"]
+default_in = ["whole-design"]
+optin = false
+brief = "Walker slot 1 of 5 of the whole-design walk: walk the cells of your slice under the WALK RULES below."
+
+[[lens]]
+key = "walk-2"
+kinds = ["spec-audit"]
+presets = ["whole-design"]
+default_in = ["whole-design"]
+optin = false
+brief = "Walker slot 2 of 5 of the whole-design walk: walk the cells of your slice under the WALK RULES below."
+
+[[lens]]
+key = "walk-3"
+kinds = ["spec-audit"]
+presets = ["whole-design"]
+default_in = ["whole-design"]
+optin = false
+brief = "Walker slot 3 of 5 of the whole-design walk: walk the cells of your slice under the WALK RULES below."
+
+[[lens]]
+key = "walk-4"
+kinds = ["spec-audit"]
+presets = ["whole-design"]
+default_in = ["whole-design"]
+optin = false
+brief = "Walker slot 4 of 5 of the whole-design walk: walk the cells of your slice under the WALK RULES below."
+
+[[lens]]
+key = "walk-5"
+kinds = ["spec-audit"]
+presets = ["whole-design"]
+default_in = ["whole-design"]
+optin = false
+brief = "Walker slot 5 of 5 of the whole-design walk: walk the cells of your slice under the WALK RULES below."
+
 # The OPT-IN rows (TOOL-dFairHearing-3): no `default_in`, so no literal runs one unless a caller's
 # `optIn` swaps it into a default slot. Each stays `optin = false`, catalogued and selectable by
 # nothing, until a blind replay it does not lose is recorded; that test flips its row and nothing else.

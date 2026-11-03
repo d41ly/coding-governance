@@ -204,8 +204,9 @@ A diff review fans out over five finder lenses, in this order: `security`, `corr
 check that can fail, and `intent` whether the diff does what its commit messages and specs say; the
 old `regressions` lens is retired. A spec audit runs five lenses of its own, in this order:
 `coherence`, `grounding`, `reuse`, `blast-radius` and `failure-envelope` (TOOL-aEvidencedLens-1),
-or, under the `design-audit` preset (below), the five of `DESIGN_LENSES`. Every set has one source,
-`lenses.toml`, this kit's lens catalogue (below); `DIFF_LENSES`, `SPEC_LENSES` and `DESIGN_LENSES` in
+or, under the `design-audit` preset (below), the five of `DESIGN_LENSES`, and under `whole-design` the five
+walkers of `WHOLE_DESIGN_LENSES`. Every set has one source,
+`lenses.toml`, this kit's lens catalogue (below); `DIFF_LENSES`, `SPEC_LENSES`, `DESIGN_LENSES` and `WHOLE_DESIGN_LENSES` in
 the harness are its render, and the method and the memory-tree README point at the literal. The
 fan-out leg holds each rendered literal to exactly five slots, and five is also the most the
 agent-cap hook admits on that receiver, so no set can grow a sixth.
@@ -434,7 +435,7 @@ The harness accepts the set only when every confirmed id has exactly one legal d
 id has one; otherwise it refuses the set whole, and `blockers` and `highs` keep their own derivation.
 Neither `unclassed` nor `legManifest` joins the review key.
 
-`preset` picks a spec audit's lens literal, `'unit-spec'` or `'design-audit'`, and absent it is
+`preset` picks a spec audit's lens literal, `'unit-spec'`, `'design-audit'` or `'whole-design'` (below), and absent it is
 `'unit-spec'`, the five lenses above. Only the caller picks it, and the kind stays `spec-audit`, so
 the binding line is unchanged. `'design-audit'` runs `DESIGN_LENSES`, the `design-audit` rows of `lenses.toml`, for a design or
 architecture record, whose sections are not a unit spec's: `coherence`, `grounding`, `reuse` and
@@ -444,6 +445,50 @@ the first agent. A preset off the default is logged before the first agent and j
 so a design-audit run never reuses a unit-spec run's lens files; a run without it keeps its key. Every
 spec audit names its preset in RUN INTEGRITY and carries `preset` on every return, beside `intensity`.
 It ships dark: nothing in this kit passes `'design-audit'` yet.
+
+**The whole-design walk, `preset: 'whole-design'`** (TOOL-dFairHearing-18). Five walkers, `WHOLE_DESIGN_LENSES`,
+the `walk-1` to `walk-5` rows of `lenses.toml`, walk every item of a design through every scenario. The
+preset requires a `walk` argument and every other preset refuses one, each refusal naming its field before the
+resume probe:
+
+```js
+walk: { items: [{ tag: 'plan.input', step: 's1' }, ...],        // non-empty; tag and step ^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$, tags unique
+        scenarios: [{ id: 'S1', name: '...', walks: '...' }, ...], // non-empty; id ^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$, unique
+        runs: 2,              // review.design-audit.runs: 1, 2 or 3, absent 2
+        run: 1,               // which run this invocation is, 1 to runs; required
+        seed: 'reverted-escapes', // review.design-audit.seed: reverted-escapes | synthetic | none, absent reverted-escapes
+        keySha: '<64 hex>' }  // the key's SHA-256, required unless seed is none
+```
+
+One invocation is one run: `review.pin` invokes the harness `runs` times, `run` 1 to `runs`, so no run's report
+exists while the next walks. `deriveWalkSlices` deals every cell of the item-by-scenario grid to exactly one
+walker slot: run 1 by scenario, round-robin through `deriveChecklistShares`; run 2 by contiguous step band, the
+steps in first-seen item order; run 3 diagonally, cell (i, j) to slot (i + j) mod 5. A slot with no cell is not
+dispatched, and RUN INTEGRITY names it as an idle walker slot. Each walker is told `WALK_RULES`, held once in the
+harness, its own slice, its scenarios with their `name` and `walks`, and, when seeded, the key's SHA-256 and that
+the key is never to be read. Its schema is the spec kind's plus a required `walk`, one row per cell: `item`,
+`scenario`, `actor`, `needs`, `witness`, `route`, `verdict` (`holds`, `finding` or `not-on-path`), `findings`
+(zero-based indexes into its own findings) and `reason`. `deriveWalkGaps` checks each walker's rows against its
+slice: a cell with no row or two, a row outside the slice, an empty field, a verdict outside the three, a
+`finding` with no index or one past the findings, a `not-on-path` with no reason, and a `holds` carrying an
+index are each a gap, and any gap reds the walk: the synthesis is told the count, to list each gap first, and
+that its verdict token is BLOCKED. The joined table reaches the synthesis between `<<<WALK TABLE` and
+`WALK TABLE>>>`, to be copied verbatim directly before the appendix:
+
+```
+## Walk table — run <r> of <runs>, sliced by <scenario|step|diagonal>
+walk-seed mode=<seed> key-sha256=<keySha|->
+
+| Item | Scenario | Actor | Needs | Witness | Route | Verdict |
+```
+
+A verdict reads `holds`, the finding ids `<R><w>-F<id>` (`R` is `A`, `B` or `C` for runs 1 to 3, `w` the walker
+slot), or `not on path: <reason>`. Every skeptic batch is also handed eight clean cells, drawn at an even stride
+from the `holds` cells sorted by `<item> · <scenario>`, and a walk with no finding still dispatches one cell-only
+batch, `verify:cells`, and still synthesizes. A cell a skeptic refutes becomes an UNVERIFIED finding of the lens
+`cell-sample`. A whole-design run is never twinned. Every return past the find stage carries `walkTable`, the
+joined rows; `walkGaps`, one `<item> · <scenario> — <what>` per gap; `cellsSampled` and `cellsRefuted`, `null`
+until the verify stage. The record's copy of the table is not verified; the return is the source of record.
 
 `optIn` swaps an opt-in lens into a default slot of the run's literal: `{ "<opt-in lens>": "<default
 lens it replaces>" }`, absent meaning `{}`. The literal keeps five slots, so the swapped lens runs where
@@ -838,6 +883,17 @@ arguments' order.
   — the same score `review_replay.py` prints, its inputs read as `<src>`.
 - `python3 {kit}/replay_scorer.py --experiment <src> [--repo <clone>]` — an experiment declared once,
   in a committed JSON manifest beside its raw outputs, scored under the method below.
+- `python3 {kit}/replay_scorer.py --design-recall --key <known-set file> --seed <mode> <record-run-1> [<record-run-2> ...]`
+  — a whole-design walk's recall on a seeded key (TOOL-dFairHearing-18), graded as `review.design-audit.seed`
+  says. Each record is one run's review record, read by its `## Walk table — run <r> of <runs>` heading, its
+  `walk-seed` line and its confirmed appendix rows, each ref keyed by `extract_tag_ref`; each plant is one
+  known-set row of the key, matched on the same file and key. It prints each run's and the union's hits over the
+  plants, then each missed plant's `tag`, and exits 0 when every run finds two thirds of the plants and, with two
+  runs or more, the union five sixths, 1 when one is under its bar, and 2 on a key whose SHA-256 over its bytes
+  is not every record's pin, records disagreeing on `runs`, a run missing or repeated, a record seeded another
+  way, a plant whose `escaped` disagrees with the seed (true under `reverted-escapes`, false under `synthetic`),
+  or a confirmed row with no file and key. `--seed none` prints that recall is not graded, reads no key and
+  exits 0. Making the sealed copy and its key stays the caller's.
 
 **The experiment shape, `--experiment`** (`TOOL-dFairHearing-14`). aScoutedSeam's figures held because
 of how they were measured, and `check_experiment` makes that method a rule where committed outputs

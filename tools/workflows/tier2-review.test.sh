@@ -191,7 +191,7 @@ function armPreset(name, extra, want, word) {
 armPreset('preset: design-audit over a design subject proceeds', Object.assign({ preset: 'design-audit' }, DESIGN_SPEC), 'design-audit')
 armPreset('preset: absent on a spec audit is unit-spec', DESIGN_SPEC, 'unit-spec')
 armPreset('preset: absent on a diff review is unit-spec', {}, 'unit-spec')
-armPreset('preset: an unknown preset is refused naming the set', Object.assign({ preset: 'whole-design' }, DESIGN_SPEC), 'refused', 'unit-spec | design-audit')
+armPreset('preset: an unknown preset is refused naming the set', Object.assign({ preset: 'no-such-preset' }, DESIGN_SPEC), 'refused', 'unit-spec | design-audit')
 armPreset('preset: a non-string is refused', Object.assign({ preset: 7 }, DESIGN_SPEC), 'refused', 'unit-spec | design-audit')
 armPreset('preset: an empty string is refused', Object.assign({ preset: '' }, DESIGN_SPEC), 'refused', 'unit-spec | design-audit')
 armPreset('preset: unit-spec beside the diff kind is refused naming it', { kind: 'diff-review', preset: 'unit-spec' }, 'refused', 'diff-review')
@@ -516,6 +516,77 @@ arm('round state: round 3 with priorCounts [4, 2] and roundLimit 3 -> proceeds',
   const inDomain = ['CONVERGED', 'NON-CONVERGENT', 'BOUNDED', 'CONVERGING']
   ck(!failed && inDomain.every((t) => seen.has(t)) && !seen.has('CEILING'),
     'round state: the parity rows hold each of the four in-domain tokens and no CEILING: ' + [...seen].sort().join(' '))
+}
+
+// ---- TOOL-dFairHearing-18 AC1-AC3 — the `walk` argument, the slicer and the gap check, over the prelude ----
+// Against the base harness, which has no whole-design preset and defines neither function, every arm reds:
+// the preset itself is refused, so no refusal names `walk`, and reading either function is a harness fault.
+const WALK_KEY = 'f'.repeat(64)
+const WALK_OK = { items: [{ tag: 'plan.input', step: 's1' }], scenarios: [{ id: 'S1', name: 'the first', walks: 'one path' }], run: 1, keySha: WALK_KEY }
+const WALK_SPEC = Object.assign({}, DESIGN_SPEC, { preset: 'whole-design' })
+const buildWalk = (over) => Object.assign({}, WALK_SPEC, { walk: Object.assign({}, WALK_OK, over) })
+const WALK_NO = 'tier2-review: `walk'
+arm('walk: whole-design with no walk -> refused naming walk', WALK_SPEC, 'tier2-review: `walk`')
+arm('walk: a walk under preset unit-spec -> refused naming walk', Object.assign({}, DESIGN_SPEC, { preset: 'unit-spec', walk: WALK_OK }), 'tier2-review: `walk`')
+arm('walk: runs 0 -> refused naming walk.runs', buildWalk({ runs: 0 }), WALK_NO + '.runs`')
+arm('walk: runs 4 -> refused naming walk.runs', buildWalk({ runs: 4 }), WALK_NO + '.runs`')
+arm('walk: run 3 past runs 2 -> refused naming walk.run', buildWalk({ runs: 2, run: 3 }), WALK_NO + '.run`')
+arm('walk: seed x -> refused naming walk.seed', buildWalk({ seed: 'x' }), WALK_NO + '.seed`')
+arm('walk: a seeded walk with no keySha -> refused naming walk.keySha', buildWalk({ keySha: undefined }), WALK_NO + '.keySha`')
+arm('walk: a 63-hex keySha -> refused naming walk.keySha', buildWalk({ keySha: 'f'.repeat(63) }), WALK_NO + '.keySha`')
+arm('walk: an item tag carrying a newline -> refused naming walk.items', buildWalk({ items: [{ tag: 'plan\ninput', step: 's1' }] }), WALK_NO + '.items`')
+arm('walk: two scenarios sharing an id -> refused naming walk.scenarios',
+  buildWalk({ scenarios: [{ id: 'S1', name: 'a', walks: 'b' }, { id: 'S1', name: 'c', walks: 'd' }] }), WALK_NO + '.scenarios`')
+arm('walk: an empty items -> refused naming walk.items', buildWalk({ items: [] }), WALK_NO + '.items`')
+let walkFns = null
+{
+  let got = null
+  try {
+    got = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn [walk, deriveWalkSlices, deriveWalkGaps]')(
+      Object.assign({}, base, WALK_SPEC, { walk: { items: WALK_OK.items, scenarios: WALK_OK.scenarios, run: 1, keySha: WALK_KEY } }), () => {}, null, null, null)
+  } catch (e) { console.log('HARNESS-BROKEN walk: the prelude did not yield walk and its two functions -> ' + e.message) }
+  ck(!!got && got[0].runs === 2 && got[0].seed === 'reverted-escapes' && got[0].run === 1,
+    'walk: a valid walk proceeds, reading runs 2 and seed reverted-escapes when both are absent: ' + JSON.stringify(got && got[0]))
+  walkFns = got ? got.slice(1) : null
+}
+// AC2 - ten items in five steps of two through seven scenarios, every run dealing each of the 70 cells exactly once.
+{
+  const items = Array.from({ length: 10 }, (_, i) => ({ tag: 'i' + i, step: 'p' + Math.floor(i / 2) }))
+  const scenarios = Array.from({ length: 7 }, (_, j) => ({ id: 'S' + (j + 1), name: 'n', walks: 'w' }))
+  const slices = (run, sc) => (walkFns ? walkFns[0](items, sc || scenarios, run) : [[], [], [], [], []])
+  const dealtOnce = (sl) => { const all = sl.flat().map((c) => c.join('|')); return all.length === 70 && new Set(all).size === 70 }
+  const scenariosOf = (s) => s.map((c) => c[1]).filter((x, i, all) => all.indexOf(x) === i).join(' ')
+  const itemsOf = (s) => s.map((c) => c[0]).filter((x, i, all) => all.indexOf(x) === i).join(' ')
+  const r1 = slices(1)
+  ck(scenariosOf(r1[0]) === 'S1 S6' && scenariosOf(r1[1]) === 'S2 S7' && [2, 3, 4].every((w) => r1[w].length === 10) &&
+    r1.every((s) => s.length && itemsOf(s) === 'i0 i1 i2 i3 i4 i5 i6 i7 i8 i9') && dealtOnce(r1),
+    'walk: run 1 deals S1 S6 and S2 S7 to slots 1 and 2, one scenario to each other, every slice holding all ten items, each cell once: ' + r1.map(scenariosOf).join(' / '))
+  const r2 = slices(2)
+  ck(r2.every((s, w) => s.length === 14 && itemsOf(s) === 'i' + 2 * w + ' i' + (2 * w + 1)) && dealtOnce(r2),
+    'walk: run 2 gives each slot one step\'s two items through all seven scenarios, each cell once: ' + r2.map(itemsOf).join(' / '))
+  const r3 = slices(3)
+  ck(r3.every((s, w) => s.every((c) => (Number(c[0].slice(1)) + Number(c[1].slice(1)) - 1) % 5 === w)) && dealtOnce(r3),
+    'walk: run 3 gives cell (i, j) to slot (i + j) mod 5 + 1, each cell once')
+  const r13 = slices(1, scenarios.slice(0, 3))
+  ck(r13[3].length === 0 && r13[4].length === 0 && r13[0].length === 10, 'walk: over three scenarios run 1 leaves slots 4 and 5 empty')
+}
+// AC3 - one walker's table against its two-cell slice: complete, the planted whitespace witness, and six planted defects.
+{
+  const slices = [[['a', 'S1'], ['b', 'S1']], [], [], [], []]
+  const row = (item, over) => Object.assign({ item: item, scenario: 'S1', actor: '=', needs: '=', witness: '=', route: '=', verdict: 'holds', findings: [] }, over)
+  const gapsOf = (rows, n) => (walkFns ? walkFns[1](slices, [{ findings: Array.from({ length: n || 0 }, () => ({})), walk: rows }, null, null, null, null]) : null)
+  const whole = gapsOf([row('a'), row('b')])
+  ck(!!whole && whole.length === 0, 'walk: a complete table returns no gap: ' + JSON.stringify(whole))
+  const planted = gapsOf([row('a', { witness: '  ' }), row('b')])
+  ck(!!planted && planted.length === 1 && planted[0].indexOf('a · S1') === 0 && planted[0].indexOf('witness') !== -1,
+    'walk: the planted whitespace witness returns one gap naming the item, the scenario and witness: ' + JSON.stringify(planted))
+  for (const [what, rows, n] of [['a missing row', [row('a')]], ['two rows for one cell', [row('a'), row('a'), row('b')]],
+    ['a row outside the slice', [row('a'), row('b'), row('c')]], ['the verdict maybe', [row('a', { verdict: 'maybe' }), row('b')]],
+    ['a finding index past the findings', [row('a', { verdict: 'finding', findings: [1] }), row('b')], 1],
+    ['not-on-path with an empty reason', [row('a', { verdict: 'not-on-path', reason: '' }), row('b')]]]) {
+    const g = gapsOf(rows, n)
+    ck(!!g && g.length === 1, 'walk: ' + what + ' returns one gap: ' + JSON.stringify(g))
+  }
 }
 
 // ==== TOOL-dDerivedDocket-29 — THE WHOLE SCRIPT, over stub agents ==================================
@@ -2114,6 +2185,7 @@ async function runLedgerArms() {
   await runTwinRunArms()
   await runDispositionArms()
   await runRoundStateArms()
+  await runWalkArms()
 }
 
 // ==== TOOL-dFairHearing-17 AC5 — the round state on the returns and in the synthesis prompt ====
@@ -2144,6 +2216,91 @@ async function runRoundStateArms() {
   r = await runReview(DIFF, buildStubs({ 'find:': buildEmptyLens }))
   ck(!r.threw && r.result.exit === 'complete' && r.result.roundState === 'CONVERGED' && r.result.roundCount === 0,
     'round state: a round whose lenses raise nothing returns CONVERGED and count 0: ' + (r.result && r.result.roundState))
+}
+
+// ==== TOOL-dFairHearing-18 AC4-AC6 — the whole-design walk over stub walkers ====================================
+// Each walker stub returns one row per CELLS line of its own prompt, every field `=` and the verdict holds, plus
+// the findings asked for, the first cell of a walker with a finding reading `finding`. Against the base harness,
+// which refuses the preset, no run completes and every arm reds.
+async function runWalkArms() {
+  const KEY = 'e'.repeat(64)
+  const SCEN = ['S1', 'S2', 'S3', 'S4', 'S5'].map((id) => ({ id: id, name: 'name ' + id, walks: 'walks ' + id }))
+  const ITEMS = ['plan.input', 'plan.output', 'act.spawn', 'act.reap'].map((t, i) => ({ tag: t, step: 's' + (i >> 1) }))
+  const WD = Object.assign({}, SPEC, { preset: 'whole-design', subjects: [{ path: 'memory/builds/dX/build/d.md', blob: 'abc1234', id: 'PLAY-dX-1' }],
+    walk: { items: ITEMS, scenarios: SCEN, run: 1, keySha: KEY } })
+  const readCells = (prompt) => {
+    const at = prompt.indexOf('CELLS of your slice')
+    return at === -1 ? [] : prompt.slice(at).split('\n').slice(1).filter((l) => l.indexOf('  - ') === 0).map((l) => l.slice(4).split(' · '))
+  }
+  const buildWalker = (over) => (label, prompt) => {
+    const o = over || {}
+    const lens = label.slice('find:'.length)
+    const n = typeof o.findings === 'function' ? o.findings(lens) : o.findings || 0
+    const findings = Array.from({ length: n }, (_, k) => ({ file: 'd.md', where: '[plan] ' + lens, severity: 'high', claim: lens + ' claim ' + k, impact: 'i', fix: 'f', evidence: 'read: d.md:1' }))
+    const walk = readCells(prompt).map((c, i) => ({ item: c[0], scenario: c[1], actor: '=', needs: '=', witness: o.blank === lens && i === 0 ? '  ' : '=', route: '=',
+      verdict: n && i === 0 ? 'finding' : 'holds', findings: n && i === 0 ? [0] : [] }))
+    return { lens: lens, path: '/cd/review-lenses/k/find-' + lens + '.json', findings: findings, walk: walk }
+  }
+  const WALK_OK_STUBS = buildStubs({ 'resume:probe': buildProbe(), 'find:': buildWalker({ findings: 1 }) })
+  // ---- AC4: the complete walk's synthesis prompt carries the WALK TABLE block, and the return no gap.
+  let r = await runReview(WD, WALK_OK_STUBS)
+  if (checkNoThrow(r, 'walk: complete run')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    ck(!!sp && sp.prompt.indexOf('<<<WALK TABLE\n## Walk table — run 1 of 2, sliced by scenario\nwalk-seed mode=reverted-escapes key-sha256=' + KEY +
+      '\n\n| Item | Scenario | Actor | Needs | Witness | Route | Verdict |\n') !== -1,
+      'walk: the synthesis prompt carries the WALK TABLE block, its heading, the walk-seed line and the table header')
+    ck(r.result.exit === 'complete' && JSON.stringify(r.result.walkGaps) === '[]' && Array.isArray(r.result.walkTable) && r.result.walkTable.length === 20,
+      'walk: a complete walk returns walkGaps [] beside its 20 walkTable rows: ' + JSON.stringify(r.result.walkGaps))
+  }
+  // The planted empty cell: walker slot 3's first witness is whitespace.
+  r = await runReview(WD, buildStubs({ 'resume:probe': buildProbe(), 'find:': buildWalker({ findings: 1, blank: 'walk-3' }) }))
+  if (checkNoThrow(r, 'walk: planted empty cell')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    ck(r.result.walkGaps.length === 1 && !!sp && sp.prompt.indexOf(r.result.walkGaps[0]) !== -1 && /`## Verdict:` token is BLOCKED/.test(sp.prompt),
+      'walk: the planted empty cell is one gap, named in the synthesis prompt, which says the verdict is BLOCKED: ' + JSON.stringify(r.result.walkGaps))
+  }
+  // The red case: a walk raising no finding still dispatches one cell-only batch and still synthesizes.
+  r = await runReview(WD, buildStubs({ 'resume:probe': buildProbe(), 'find:': buildWalker({ findings: 0 }) }))
+  if (checkNoThrow(r, 'walk: no finding')) {
+    const vs = r.trace.filter((t) => t.label.indexOf('verify:') === 0).map((t) => t.label)
+    ck(JSON.stringify(vs) === '["verify:cells"]' && r.trace.some((t) => t.label === 'synth') && r.result.exit === 'complete',
+      'walk: a walk raising no finding dispatches one verify:cells batch and the synthesis: ' + JSON.stringify(vs))
+  }
+  // ---- AC5: 40 clean cells of 42 over two skeptic batches, walkers 1 and 2 raising one finding each.
+  const IT6 = Array.from({ length: 6 }, (_, i) => ({ tag: 'it' + i, step: 's' }))
+  const SC7 = Array.from({ length: 7 }, (_, j) => ({ id: 'S' + (j + 1), name: 'n', walks: 'w' }))
+  const WD40 = Object.assign({}, WD, { walk: { items: IT6, scenarios: SC7, run: 1, keySha: KEY } })
+  const CELL_LINE = /^- it\d · S\d — /
+  const judgeCells = (label, prompt) => {
+    const v = buildVerdicts('confirmed')(label, prompt)
+    v.cells = prompt.split('\n').filter((l) => CELL_LINE.test(l)).map((l, i) => ({ cell: l.slice(2).split(' — ')[0],
+      verdict: label === 'verify:batch-1' && i === 0 ? 'refuted' : 'holds', reason: 'it fails there', file: 'd.md', where: '[act]', severity: 'high' }))
+    return v
+  }
+  const stubs40 = buildStubs({ 'resume:probe': buildProbe(), 'find:': buildWalker({ findings: (lens) => (lens === 'walk-1' || lens === 'walk-2' ? 1 : 0) }), 'verify:': judgeCells })
+  const a1 = await runReview(WD40, stubs40)
+  const a2 = await runReview(WD40, stubs40)
+  if (checkNoThrow(a1, 'walk: clean-cell sample') && checkNoThrow(a2, 'walk: clean-cell sample, second render')) {
+    const cellsOf = (run) => run.trace.filter((t) => t.label.indexOf('verify:') === 0).map((t) => t.prompt.split('\n').filter((l) => CELL_LINE.test(l)).map((l) => l.slice(2).split(' — ')[0]))
+    const s1 = cellsOf(a1)
+    ck(s1.length === 2 && s1.every((g) => g.length === 8) && s1[0].every((c) => s1[1].indexOf(c) === -1) && JSON.stringify(s1) === JSON.stringify(cellsOf(a2)),
+      'walk: each of two skeptic prompts carries eight clean cells, the sets disjoint and identical on a second render: ' + s1.map((g) => g.length).join(' '))
+    const holds = new Set(a1.result.walkTable.filter((x) => x.verdict === 'holds').map((x) => x.item + ' · ' + x.scenario))
+    ck(holds.size === 40 && s1.flat().every((c) => holds.has(c)), 'walk: every sampled cell is one of the 40 whose verdict is holds: ' + holds.size)
+    ck(a1.result.cellsSampled === 16 && a1.result.cellsRefuted === 1 && a1.result.ledger.some((e) => e.lens === 'cell-sample' && e.verdict === 'unverified'),
+      'walk: one refuted cell returns cellsSampled 16, cellsRefuted 1 and an unverified cell-sample ledger entry: ' + a1.result.cellsSampled + ' ' + a1.result.cellsRefuted)
+  }
+  // ---- AC6: each walker prompt names its own scenario and no other slot's, carries the rules and, seeded, the key's SHA-256.
+  r = await runReview(WD, WALK_OK_STUBS)
+  const finds = r.trace.filter((t) => t.label.indexOf('find:') === 0)
+  ck(finds.length === 5 && finds.every((t, w) => t.prompt.indexOf('WALK RULES:\n- ') !== -1 && t.prompt.indexOf(KEY) !== -1 &&
+    SCEN.every((s, j) => (t.prompt.indexOf('  - ' + s.id + ' — ') !== -1) === (j === w))),
+    'walk: each walker prompt names its own scenario alone, carries WALK_RULES and the key\'s SHA-256: ' + finds.length + ' walker(s)')
+  r = await runReview(Object.assign({}, WD, { walk: { items: ITEMS, scenarios: SCEN, run: 1, seed: 'none' } }), WALK_OK_STUBS)
+  const unseeded = r.trace.filter((t) => t.label.indexOf('find:') === 0)
+  ck(unseeded.length === 5 && unseeded.every((t) => t.prompt.indexOf('SHA-256') === -1 && !/[0-9a-f]{64}/.test(t.prompt)),
+    'walk: under seed none no walker prompt carries a SHA-256: ' + unseeded.length + ' walker(s)')
+  ck(src.split('\n').filter((l) => /\bconst WALK_RULES\b/.test(l)).length === 1, 'walk: the harness defines WALK_RULES once')
 }
 
 // ==== TOOL-dFairHearing-2 — the design-audit preset: its lenses, its review key and its announcements ====
@@ -3604,7 +3761,13 @@ printf '%s\n' "$out"
 # thirteen rule rows (13), the absent-value line (1), AC4's six refusals, the disagreeing round, the proceeding
 # round and the inferred one (9), AC6's parity rows and token set (2) and AC5's stub runs (5). Counted by hand
 # and by a scratch probe of the same calls, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=564
+# RAISED 564 -> 598 by TOOL-dFairHearing-18: 34 assertions, counted off the `walk:` arms — AC1's eleven refusals and
+# the proceeding walk (12), AC2's three runs and the three-scenario deal (4), AC3's complete table, the planted
+# witness and six planted defects (8), AC4's block, return, planted gap and no-finding run (4), AC5's sample,
+# holds-only draw and counts (3), and AC6's walker prompts, unseeded prompts and the one WALK_RULES definition (3).
+# The re-pointed unknown-preset arm adds none. Counted by hand and by scratch probes of the same calls, not by a
+# run: the pass runs no suite.
+FLOOR_ASSERTIONS=598
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"
