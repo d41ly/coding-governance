@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 41 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 41 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -176,7 +176,7 @@ skeptic's corrected fix, as the report states it.
   dominant terminator from `_dominant` (`tools/memory-tree/merge-rows.py:742`, site 6), the folded
   comparison deciding both "changed" and "same bytes", and a missing final terminator supplied before a
   chunk is appended. Unit 45 S4's byte identity holds modulo the terminator. Observed by AC22.
-- **S23** — id 35. `main()` (`tools/memory-tree/merge-rows.py:1538-1552`) gains an `except
+- **S23** — id 35. `main()` (`tools/memory-tree/merge-rows.py:1498-1514`) gains an `except
   TableConflict` arm before the generic one, writing the body through `write_conflict_body` with the
   label `theirs (conflicting: <keys>)` and printing the keys after the body is written, as the
   `ViewShardRefused` arm does. Observed by AC23.
@@ -428,7 +428,7 @@ alone, save S27, which §8 F2 places.
 
 ## 7. Gates
 
-`playbook render selftest` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `row-keyed merge driver replay` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `row-keyed merge driver replay` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 Unit 19's `tags (the resolver's checks)` leg, unit 26's `tags positional selftest` and unit 20's
 `instruction render (one renderer of record)` run S16 to S18, S24 to S26 and S31 over the tree; none
@@ -458,6 +458,7 @@ New arm: tools/memory-tree/merge-rows.test.sh · covers AC22 AC23 · the newline
 - rev-1 · 2026-10-24 · initial draft, the round-2 spec audit's 26 MEDIUM and 5 LOW findings batched by
   report id.
 - rev-2 · 2026-10-24 · §2 · §3 · §4 · §6 · re-grounded on the parents' landed specs by the cross-check record `../build/2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md`, U1 and U7: S27 and AC27 read the `budgets."memory/builds/*/spec/"` cap through `budgets.py resolve`, and S9 is built at unit 49's pass into its census step, which `step-rows-frozen` freezes at that landing.
+- rev-3 · 2026-11-03 · §2 S23 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Items 2 and 4: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips; S23's `main()` citation, past `merge-rows.py`'s 1524 lines, re-pointed at HEAD to its `try` block and two `except` arms, `:1498-1514`.
 
 ## 10. Reuse audit
 

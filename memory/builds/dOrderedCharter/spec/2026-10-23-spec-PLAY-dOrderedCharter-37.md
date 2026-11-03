@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-37 — the help pages: reference pages rendered from each registry's rows, concept, task and tutorial pages beside them, every shown command run, each page linked to its unit by tag
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0067@90e357b7 whole
 
@@ -302,7 +302,7 @@ counted, never green by silence. `help.enforce` governs the verdict, as for the 
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `recall floor`
 
 The `docs` leg TOOL-dSafePassage-13 lands and the `step-gate` leg TOOL-dSafePassage-10 lands keep
 green over every page and class row this unit writes; they are named here in prose because the
@@ -363,6 +363,7 @@ New arm: tools/govkit/surface-classes.toml · covers AC10 · the step gate's arm
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-40, PLAY-dOrderedCharter-46, PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 - rev-4 · 2026-10-24 · §1 · §2 · §3 · §4 · §5 · §6 · §7 · §8 · §10 · re-grounded on the parents' landed specs by the cross-check record `../build/2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md`, rows 21, 50 and 51 and U8: S5's classes register in `tools/govkit/surface-classes.toml` first (F5, and F7 for the units); the policy page lists unsummarised rows (F6); its reader parses the catalogue with `tomllib`; a member anchored elsewhere is linked, and an anchored member leaves `memory/project/docs-undocumented.txt`; AC9 to AC11 added.
+- rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Items 2 and 3: the leg line names `policy fixtures` and `recall floor`, whose guards §4 Files touched trips, `memory/project/docs-undocumented.txt` the latter's, the guards hits the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

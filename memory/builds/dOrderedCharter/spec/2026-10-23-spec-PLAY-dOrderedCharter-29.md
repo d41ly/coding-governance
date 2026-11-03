@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-29 — the one writing practice's checks over records as well as units
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 29 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 29 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0059@0e668fff whole
 
@@ -295,7 +295,7 @@ Live at landing. The two legs run in the `tags` pack.
 
 ## 7. Gates
 
-`govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `playbook render selftest` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `recall floor` · `recall floor arms` · `codebase-map gate coverage` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `playbook render selftest` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `recall floor` · `recall floor arms` · `codebase-map gate coverage` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/playbook/writing_practice.py · covers AC2 AC3 AC4 AC6 AC7 AC8 · the `--fixture --plant` cases, each staging its arm's failing case · none
 New arm: tools/gate-legs.json · covers AC5 · the `writing practice (records and units)` leg over the tree, its failing case a planted unpinned fact in a guide · none
@@ -325,6 +325,7 @@ New arm: tools/playbook/gov_tag.py · covers AC9 · the `retired-section` plant 
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
+- rev-3 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

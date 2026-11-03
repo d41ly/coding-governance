@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-28 — the shared edge grammar at every site the memory plan names: twelve new types, native-id classes and the two pinned forms
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 8 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 8 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0058@bc160feb whole
 
@@ -254,7 +254,7 @@ Additive. Today's `**Serves:**`, `**Caused-by:**`, `**Carries:**`, `Pass:`, `Dec
 
 ## 7. Gates
 
-`memory hygiene` · `playbook render selftest` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `recall floor` · `recall floor arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `lexicon naming predicates`
+`memory hygiene` · `playbook render selftest` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `recall floor` · `recall floor arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `lexicon naming predicates` · `policy fixtures`
 
 New arm: tools/playbook/edge_grammar.py · covers AC7 · the new edge leg over the tree, its failing case staged by changing one `**Carries:**` pin to `00000000` · none
 New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC4 AC5 AC6 · the playbook-render selftest runs every plant of §4 · none
@@ -282,6 +282,7 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC4 AC5 AC6 · the playb
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
+- rev-4 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

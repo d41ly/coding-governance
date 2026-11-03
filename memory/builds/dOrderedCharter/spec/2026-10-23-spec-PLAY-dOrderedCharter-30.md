@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-30 — the portable practice: a role per language, one rule set, each rule paired with its named leg, absorbing `[cross-os]` and `[bytes]`
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 28 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 28 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0060@83e8c234 whole
 
@@ -234,7 +234,7 @@ rendered charter rules change the same way.
 
 ## 7. Gates
 
-`govkit acceptance matrix` · `playbook render selftest` · `check-wiring self-test` · `lexicon naming predicates` · `roles render selftest` · `roles render wiring` · `playbook render wiring` · `encoding posture (text IO names its encoding)` · `python resolver (behaviour + inline parity + idiom ban)` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit acceptance matrix` · `playbook render selftest` · `check-wiring self-test` · `lexicon naming predicates` · `roles render selftest` · `roles render wiring` · `playbook render wiring` · `encoding posture (text IO names its encoding)` · `python resolver (behaviour + inline parity + idiom ban)` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/playbook/core.py · covers AC3 AC4 · the meta-check's `fixture` plants `portable-orphan` and a stale portable pending row, staged by removing one leg's `enforces` tag · none
 
@@ -278,6 +278,7 @@ New arm: tools/playbook/core.py · covers AC3 AC4 · the meta-check's `fixture` 
   `.governance/deploy.toml:28` comment edit leaves the pass commit and is handed back to the owner's
   terminal; F4 added and resolved on rung 1 by TOOL-dGroundRules-6 S4, on the coordinator's
   follow-up, which replaced the first route through unit 31's prepared merge and its hands-off edge.
+- rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

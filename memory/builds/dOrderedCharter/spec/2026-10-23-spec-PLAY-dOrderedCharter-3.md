@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0033@756303be whole
 
@@ -262,7 +262,7 @@ naming `P13`.
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `roles render wiring` · `roles render selftest` · `template size <=48KiB` · `charter size` · `build-method size` · `unattended protocol size` · `govkit acceptance matrix` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `check-wiring self-test` · `lexicon naming predicates` · `manifest-check self-test` · `scratch-guard self-test` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `codebase-map kit selftest` · `drift-audit selftest` · `lexicon selftest` · `pre-push run-log line` · `run-gates run-log line` · `runlog selftest` · `kit/dogfood doc parity`
+`playbook render selftest` · `playbook render wiring` · `roles render wiring` · `roles render selftest` · `template size <=48KiB` · `charter size` · `build-method size` · `unattended protocol size` · `govkit acceptance matrix` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `check-wiring self-test` · `lexicon naming predicates` · `manifest-check self-test` · `scratch-guard self-test` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `codebase-map kit selftest` · `drift-audit selftest` · `lexicon selftest` · `pre-push run-log line` · `run-gates run-log line` · `runlog selftest` · `kit/dogfood doc parity` · `policy fixtures`
 
 New arm: tools/lib/resolve-python.test.sh · covers AC2 · the parity table's `render_envelope` row, its failing case a copy with one byte changed · none
 New arm: tools/playbook/instruction_units.py · covers AC5 AC6 · the `envelopes` verb's selftest plants each defect of AC5 and the unregistered guide of AC6 in a scratch tree · none
@@ -301,6 +301,7 @@ New arm: tools/playbook/instruction_units.py · covers AC5 AC6 · the `envelopes
   measured against its `budgets.*` cap through `budgets.py resolve`, the former limits file being gone;
   a crossing is raised in the minimal guard's one admitted shape, one cap per commit; a document with
   no census row has no cap; the external edges to dSafePassage's step and dGroundRules' census added.
+- rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

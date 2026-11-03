@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-41 — the `cross-os` block stays live, so every v4 template renders after the practice catalogue lands
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -151,7 +151,7 @@ sequenced rather than run together (M6), and before unit 2 at order 20, which mo
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `playbook parity` · `govkit acceptance matrix` · `govkit selftest` · `govkit refusal join` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `playbook render wiring` · `playbook parity` · `govkit acceptance matrix` · `govkit selftest` · `govkit refusal join` · `recall floor arms` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/playbook/render_playbook.py · covers AC5 · the selftest renders gov's template and a seeded v4.4 template after the block rows are read, its failing case staged by marking the `cross-os` row `legacy` · none
 
@@ -171,6 +171,7 @@ New arm: tools/playbook/render_playbook.py · covers AC5 · the selftest renders
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's finding 30 (HIGH, item H3).
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
+- rev-3 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

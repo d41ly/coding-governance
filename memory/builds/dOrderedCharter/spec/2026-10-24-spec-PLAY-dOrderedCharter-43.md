@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-43 — the card import written and checked by the one renderer's entry-files scope, never by a second writer
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 27 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 27 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -162,7 +162,7 @@ loop has recorded unit 8's AC1 green.
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `agent-instructions wiring` · `agent-instructions self-test` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `playbook render wiring` · `agent-instructions wiring` · `agent-instructions self-test` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 · the selftest renders and checks the entry-files scope with and without `--card` over a fixture, its failing case staged by deleting the import line · none
 
@@ -182,6 +182,7 @@ New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 · the selftest
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's finding 49 (HIGH, item H1).
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
+- rev-3 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

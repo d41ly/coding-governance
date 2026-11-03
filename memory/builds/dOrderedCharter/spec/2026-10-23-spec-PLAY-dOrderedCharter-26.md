@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-26 — file:line citations held in the positional population, new text citing a symbol or a pinned line
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 9 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 9 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0056@a91f3d50 whole
 
@@ -266,7 +266,7 @@ Live at landing, at order 9, after unit 19 (order 4) ships the list, `--list-pos
 
 ## 7. Gates
 
-`playbook render selftest` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `check-wiring self-test` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `check-wiring self-test` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 Unit 19's `tags (the resolver's checks)` leg, which lands at order 4, runs the `positional` arm over the
 tree. dGroundRules' policy legs, `policy check` and `policy fixtures`, run `arm_summaries`, the
@@ -307,6 +307,7 @@ New arm: tools/playbook/gov_tag.py · covers AC10 · the `positional` arm inside
   arm counts, an exit 2 refusing; new S9 fills and drains the landed row, the mirror in a second
   commit. On the coordinator's follow-up the helper is `read_policy_value` in unit 19's
   `tools/playbook/policy_value.py`, the playbook kit's one policy helper.
+- rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

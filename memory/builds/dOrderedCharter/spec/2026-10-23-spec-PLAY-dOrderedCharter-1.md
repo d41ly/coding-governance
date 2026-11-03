@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-1 — the practice catalogue and `charter.practices`
 
-**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 17 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
+**Status:** DEFERRED · rev-6 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 17 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
 
 **Carries:** cl-dClosedLoop-0031@419dfa75 whole
 **Carries:** node:policy-key.charter.practices
@@ -277,7 +277,7 @@ catalogue equal HEAD (TOOL-dGroundRules-19 S1).
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `playbook parity` · `charter size` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms`
+`playbook render selftest` · `playbook render wiring` · `playbook parity` · `charter size` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `policy fixtures`
 
 New arm: tools/playbook/render_playbook.py · covers AC2 AC5 AC6 AC8 · the selftest's fixture target plants each refused catalogue, a target with no roles kit, a `drop_blocks` naming `cross-os`, and a committed `charter.practices = []` · none
 
@@ -325,6 +325,7 @@ New arm: tools/playbook/render_playbook.py · covers AC2 AC5 AC6 AC8 · the self
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 - rev-4 · 2026-10-24 · §2 S4, S8 · §3 Non-goals, Edges · §4 Rollout, Files touched · §5 · AC8, AC9 · §7 New arm · §8 F4 · §10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` rows 29 and 30, U3 and U4: `charter.practices` is read with `policy.py get` through PLAY-dOrderedCharter-7's `read_policy_value`; its derived default refuses, so the render computes the `foundation` set itself and says so, and any other refusal refuses; the landed row is filled and drained, never added; F4 asks how practice tags pass the value check.
 - rev-5 · 2026-10-25 · §8 F4 · Status line · the owner's pick folded by `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks` item 5: F4 resolved (a), the probe kept, with the built catalogue's `item` pattern and `check_value`'s set branch as the evidence that the probe should read source `file`; `ratified 2026-10-25` on the Status line.
+- rev-6 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-46 — the overlay's landed revision defined, its unborn-HEAD outcome stated, and a write door rendering the rows it just wrote
 
-**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 32 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 32 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -192,7 +192,7 @@ dispatch sequences them rather than running them together (M6).
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 AC4 AC5 · the playbook-render selftest runs the five overlay plants, each failing case staged by a working-tree read, or for `policy-at-head` by a policy read at the landed ref · none
 
@@ -221,6 +221,7 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 AC4 AC5 · the p
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 - rev-3 · 2026-10-24 · §2 S1, S5, S6 (new) · §3 Edges · §4 Evidence, Why HEAD and not the index, Inventory · §5 testing · AC5 (new) · §7 New arm · §8 F2 (re-resolved) · §10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 44: dGroundRules' reader defaults to the landed ref, not `HEAD`, so the overlay keeps `HEAD` and every `policy.py get` the composition makes passes `--rev HEAD`; the stale "no spec yet" evidence is replaced by its landed specs.
 - rev-4 · 2026-10-25 · §2 S6 · per `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks` item 8, the parent audit's P11: `instructions.exclude`'s default is `[]`, v2's `none`, as dGroundRules' built row holds it.
+- rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-35 — the overlay's row mechanism for every registered kind: adopter-segment tags, field patches, whole-row replacements, exclusions, row pins and stale rows
 
-**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 33 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-6 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 33 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0065@35e9932a whole
 **Carries:** node:policy-key.instructions.exclude
@@ -339,7 +339,7 @@ TOOL-dGroundRules-19 S1).
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10 AC11 AC13 · `run_selftest` runs the fixture over every plant of §6 and asserts each exit and line · none
 
@@ -384,6 +384,7 @@ New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 - rev-4 · 2026-10-24 · §2 S5 · §3 Edges · §4 The composer, Rollout, Files touched · AC12 · §8 F4 (re-resolved) · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` rows 18 and 45, U3 and U4: the landed `instructions.exclude` row is filled and drained, never added, and AC12's red is `policy.py lists --check`; the key is read through `policy.py get` at `--rev HEAD`; orders go through unit 33's handler, keyed on a `path`.
 - rev-5 · 2026-10-25 · §2 S5 · AC12 · item 8 of `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks`, the parent audit's P11: `instructions.exclude`'s default is `[]`, v2's `none`, as dGroundRules' built catalogue holds it.
+- rev-6 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

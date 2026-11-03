@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-15 — the instruction manifest and its guarded write command, each change recorded, and the pack catalogue
 
-**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 16 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
+**Status:** DEFERRED · rev-6 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 16 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
 
 **Carries:** cl-dClosedLoop-0045@f345dc78 whole
 
@@ -310,7 +310,7 @@ when the policy file and the catalogue equal HEAD (TOOL-dGroundRules-5 S1, TOOL-
 
 ## 7. Gates
 
-`playbook render selftest` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/playbook/instructions_edit.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC10 AC11 · a leg running every `fixture --plant` case, each failing case staged by its plant · none
 
@@ -356,6 +356,7 @@ New arm: tools/gate-legs.json · covers AC6 · the `instruction edits (manifest 
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50.
 - rev-4 · 2026-10-24 · §2 S5, S10, S11 (new) · §3 Edges · §4 Rollout, Files touched · §5 security · AC3, AC12 (new) · §8 F4 (new, open for the owner) · §10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 40, U3 and U4: the proof tests stderr, the guard's stream, and how it is run is F4's; both keys are read through `policy_reader`, and a refused read refuses; the two landed rows are filled and drained, never added.
 - rev-5 · 2026-10-25 · Status (ratified) · §2 S5 · §8 F4 · §10 · the owner's answer to F4, item 1 of `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks`: (a), the command's own check that stderr is a terminal, stated directly where S5 and the reuse audit pointed at the open fork.
+- rev-6 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

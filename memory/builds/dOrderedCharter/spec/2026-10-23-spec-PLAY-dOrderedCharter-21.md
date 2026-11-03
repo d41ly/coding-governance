@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-21 — each practice's reach per step rendered as step-scoped units handed in work orders
 
-**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base ce13efbe · streams playbook · order 23 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 23 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0051@44bf9720 whole
 
@@ -165,7 +165,7 @@ Live at landing; every builder handoff gains the block.
 
 ## 7. Gates
 
-`roles render wiring` · `roles render selftest` · `playbook render selftest` · `govkit acceptance matrix`
+`roles render wiring` · `roles render selftest` · `playbook render selftest` · `govkit acceptance matrix` · `policy fixtures`
 
 New arm: tools/roles/check_roles.py · covers AC1 · its selftest's fixture kit omits `step` on one workflow row · none
 New arm: tools/playbook/instruction_units.py · covers AC4 · the `practices` verb's selftest plants a reach line in a scratch charter's practices region · none
@@ -186,6 +186,7 @@ New arm: tools/playbook/instruction_units.py · covers AC4 · the `practices` ve
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

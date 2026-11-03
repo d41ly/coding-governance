@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-25 — gov tag bundle, a tag's members, regions and instructions in one call, and the two edge checks
 
-**Status:** DEFERRED · rev-5 · 2026-11-02 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · closes PLAY-dOrderedCharter-58 PLAY-dOrderedCharter-60 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-6 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · closes PLAY-dOrderedCharter-58 PLAY-dOrderedCharter-60 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0055@dc43d502 whole
 
@@ -211,7 +211,7 @@ Live at landing, at order 10, after units 19 (order 4), 24 (order 7) and 28 (ord
 
 ## 7. Gates
 
-`playbook render selftest` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 Unit 19's `tags (the resolver's checks)` leg, which lands at order 4, runs S5's and S6's arms over the
 tree. dGroundRules' policy legs, `policy check` and `policy fixtures`, run `arm_summaries`, the
@@ -256,6 +256,7 @@ New arm: tools/playbook/gov_tag.py · covers AC6 AC7 · the `tags (the resolver'
 - rev-5 · 2026-11-02 · §3 Edges · closes PLAY-dOrderedCharter-60 by `2026-11-02-prompt-PLAY-dOrderedCharter-17-ask-fold-brief`:
   the filler of the work order's code-notes slot from the bundle is dFurnishedOrders, not dBoundRoles, as
   clause `cl-dClosedLoop-0209` in dFurnishedOrders' row says.
+- rev-6 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

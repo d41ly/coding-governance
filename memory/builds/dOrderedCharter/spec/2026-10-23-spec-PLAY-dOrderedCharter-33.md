@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-33 — pins and drift: each gov change record marked `editorial` or `semantic`, a stale pin acting as `instructions.stale` says, successors re-pointing or orphaning an edge
 
-**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 32 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 32 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0063@a1361320 whole
 **Carries:** node:policy-key.instructions.stale
@@ -324,7 +324,7 @@ file and the catalogue equal HEAD (TOOL-dGroundRules-5 S1, TOOL-dGroundRules-19 
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit runbook parity` · `recall floor arms` · `playbook render selftest` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit runbook parity` · `recall floor arms` · `playbook render selftest` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC8 · `run_selftest` runs `pins.py --fixture` over every plant of §6, each staging its own failing case · none
 New arm: tools/govkit/selftest.py · covers AC9 · an update over the fixture adopter with a stale edge, staged by removing the handler call · none
@@ -362,6 +362,7 @@ New arm: tools/govkit/surface-classes.toml · covers AC7 · the step gate's arms
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §2 S3, S7, S8 (new) · §3 Edges · §4 The walk and the modes, Inventory, Rollout, Files touched · §5 risks · AC4, AC9, AC10 (new) · §8 F4 (re-resolved) · §10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 18, U3, U4 and U5: the drift is a `pins.py` verb `cmd_update` runs, whose orders it writes keyed on a `path`; the mode is read through `read_policy_value` from the target's committed policy; the landed row is filled and drained, never added. Then §2 S5 · §4 The step gate class, Files touched · AC11 (new): the `unit` class gains its `usage.toml` `[[class]]` row, shape `none` with a `why`, in the commit that registers it (TOOL-dSafePassage-13 S1, S8).
 - rev-4 · 2026-10-25 · §2 S3 · §4 Inventory · §5 risks · per `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks`, the parent audit's P3: dSafePassage unit 9's `read_policy_value` takes `rev`, so `cmd_update` reads `instructions.stale` at the target's `HEAD`, the overlay's revision, and the risk of a mode read at the landed ref goes.
+- rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

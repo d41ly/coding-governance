@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-49 — the round-1 spec audit's 73 minors: criteria that can pass, rows a new leg owes, one reader per fact, and seams in build order
 
-**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 39 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 39 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -566,7 +566,7 @@ Live at landing, last and alone (§3).
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `playbook parity` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `codebase-map coverage + freshness` · `memory hygiene` · `memory-hygiene self-test` · `encoding posture (text IO names its encoding)` · `python resolver (behaviour + inline parity + idiom ban)` · `memory-recall kit selftest` · `recall floor` · `recall floor arms` · `roles render selftest` · `roles render wiring` · `cleanup skill wiring` · `unattended skill size` · `lexicon naming predicates` · `verdict epoch (kit version dates the engine)` · `kit epoch (shipped bytes move, the version moves)` · `kit/dogfood doc parity` · `branch-reconcile selftest` · `manifest-check self-test` · `scratch-guard self-test` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `playbook render wiring` · `playbook parity` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `codebase-map coverage + freshness` · `memory hygiene` · `memory-hygiene self-test` · `encoding posture (text IO names its encoding)` · `python resolver (behaviour + inline parity + idiom ban)` · `memory-recall kit selftest` · `recall floor` · `recall floor arms` · `roles render selftest` · `roles render wiring` · `cleanup skill wiring` · `unattended skill size` · `lexicon naming predicates` · `verdict epoch (kit version dates the engine)` · `kit epoch (shipped bytes move, the version moves)` · `kit/dogfood doc parity` · `branch-reconcile selftest` · `manifest-check self-test` · `scratch-guard self-test` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/playbook/adopt-playbook.sh · covers AC8 AC10 AC41 AC42 AC49 · the playbook-render selftest's tree-level tag probes and index plants, each staged by the repaired unit's base rule · none
 New arm: tools/run-gates/run-gates.test.sh · covers AC2 · the canary's key sets with `enforces`, staged by removing it from one set · none
@@ -615,6 +615,7 @@ New arm: tools/run-gates/run-gates.test.sh · covers AC2 · the canary's key set
 - rev-2 · 2026-10-24 · §3 · Edges mirror those units 50, 54 and 55 declare against this unit.
 - rev-3 · 2026-10-24 · §1 · §2 · §3 · §4 · §6 · §7 · §8 · re-grounded by `../build/2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md`, row 50, U1 and U7: S1 follows unit 37's policy page, S30 and S31 read `budgets.*` caps, and the census is a step of its own (F3); trimmed under its cap: §1's id map, the edge glosses, §2's subheadings and §4 Order go, each fact kept.
 - rev-4 · 2026-11-03 · §2 · §3 · §6 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-divergence-brief.md` Item 3: S38 and AC29 (id 44) go, folded into PLAY-dOrderedCharter-19's S9 and AC17 under BUILD-METHOD M4, since unit 19 moves `derive_baseline_additions` before this unit runs; the edge to unit 19 drops S38, every other item and its id kept.
+- rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

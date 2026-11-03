@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-7 — the core: principle registry, meta-check, kinds register, exception register and the core policies
 
-**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 11 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-6 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 11 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0037@0b2c8bff whole
 
@@ -335,7 +335,7 @@ a mirror commit only when the policy file and the catalogue equal HEAD (TOOL-dGr
 
 ## 7. Gates
 
-`playbook render selftest` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/playbook/core.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC8 AC9 AC10 · the `core selftest` leg runs every `fixture --plant` case, each failing case staged by its plant · none
 
@@ -367,6 +367,7 @@ New arm: tools/memory-tree/deviation_join.py · covers AC7 · its existing suite
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50.
 - rev-4 · 2026-10-24 · §2 S9, S10, S11, S12 · §3 Edges · §4 The policy reads, Inventory, Rollout, Files touched · §5 · AC9, AC10, AC11 · §7 · §10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 40, U3 and U4: both keys are read with `policy.py get` through `read_policy_value`, whose contract §4 now states, and a refused read reds; both landed rows are filled and drained, never added; `owner-only-expiring` takes the owner proof spec 15's §8 fork settles, since the guard's `[ -t 2 ]` is no callable.
 - rev-5 · 2026-10-25 · §2 S9 · §3 Edges · §5 security · the owner's pick folded by `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks` item 2: `owner-only-expiring` states the settled proof, stderr being a terminal through PLAY-dOrderedCharter-15's check, in place of a pointer to that unit's open fork.
+- rev-6 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

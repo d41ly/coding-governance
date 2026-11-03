@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-50 — the rows a new leg, key or retirement owes are written by the pass that creates them, through one owed-rows probe
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -205,7 +205,7 @@ adopter receives it.
 
 ## 7. Gates
 
-`run-gates canary` · `govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `playbook render selftest` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`run-gates canary` · `govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `playbook render selftest` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/run-gates/run-gates.test.sh · covers AC1 AC3 · the `enforces` control pair, staged by removing the key from one `KNOWN` copy, and `owed_rows.py --selftest`, staged by planting a leg with no pin row · none
 
@@ -224,6 +224,7 @@ New arm: tools/run-gates/run-gates.test.sh · covers AC1 AC3 · the `enforces` c
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-2 spec audit's finding 23 (HIGH, item H1).
 - rev-2 · 2026-10-24 · §2 · §3 · §4 · §10 · re-grounded on the parents' landed specs by the cross-check record `../build/2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md`, U1: the size population reads `budgets.*` caps through the census and `budgets.py resolve`, since dSafePassage unit 1 removes `tools/template-size-limits.txt`, and the external edge is added.
+- rev-3 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-12 — the statement grammar, its check, and render provenance in a sidecar lock
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 13 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 13 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0042@9958d12b whole
 
@@ -208,7 +208,7 @@ normaliser, and before unit 9 (order 14), whose reader arms the unit half of S7.
 
 ## 7. Gates
 
-`playbook render selftest` · `govkit acceptance matrix` · `manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `playbook render wiring` · `playbook parity` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `govkit acceptance matrix` · `manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `playbook render wiring` · `playbook parity` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/playbook/instruction_units.py · covers AC2 AC3 AC4 · the leg's `fixture --plant` cases, each failing case staged by its plant · none
 
@@ -235,6 +235,7 @@ New arm: tools/playbook/render_playbook.py · covers AC5 · the render selftest 
 - rev-1 · 2026-10-23 · initial draft, the spec run's carrier of `cl-dClosedLoop-0042`.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50, PLAY-dOrderedCharter-55.
+- rev-4 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

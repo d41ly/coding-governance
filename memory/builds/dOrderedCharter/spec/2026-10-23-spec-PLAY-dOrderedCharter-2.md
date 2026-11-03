@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-2 — the charter re-founded in its level-0 envelope, with the override rule and its record
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 20 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 20 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0032@e38b0cb6 whole
 **Carries:** node:policy-key.charter.override
@@ -302,7 +302,7 @@ commit only when the policy file and the catalogue equal HEAD (TOOL-dGroundRules
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `playbook parity` · `charter size` · `template size <=48KiB` · `roles render wiring` · `roles render selftest` · `micro-format definitions` · `micro-format gate selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `check-wiring self-test` · `lexicon naming predicates`
+`playbook render selftest` · `playbook render wiring` · `playbook parity` · `charter size` · `template size <=48KiB` · `roles render wiring` · `roles render selftest` · `micro-format definitions` · `micro-format gate selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `check-wiring self-test` · `lexicon naming predicates` · `policy fixtures`
 
 New arm: tools/check-microformats.test.sh · covers AC4 · a fixture template carrying the `pw` field · none
 New arm: tools/roles/render_agents.py · covers AC6 · the selftest's fixture charter in the marker shape renders a role's cited practice, and one with neither shape refuses R0 · none
@@ -346,6 +346,7 @@ New arm: tools/playbook/render_playbook.py · covers AC2 · the selftest renders
   its landed row filled and drained, the mirror in a second commit; `AGENTS.md` is measured with
   `budgets.py resolve` and a crossing raised on `budgets."AGENTS.md"` in the minimal guard's one
   admitted shape, the former limits file being gone.
+- rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

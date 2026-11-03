@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-27 — each role's load set budgeting the `code` slot
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 22 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 22 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0057@ec297ae3 whole
 
@@ -149,7 +149,7 @@ supplies it.
 
 ## 7. Gates
 
-`roles render wiring` · `roles render selftest` · `playbook render selftest` · `govkit acceptance matrix`
+`roles render wiring` · `roles render selftest` · `playbook render selftest` · `govkit acceptance matrix` · `policy fixtures`
 
 New arm: tools/playbook/load_sets.py · covers AC1 AC3 · its selftest derives each role's set, plants a malformed budget value, a committed policy value the row refuses, and a block one byte over and at the budget · none
 
@@ -169,6 +169,7 @@ New arm: tools/playbook/load_sets.py · covers AC1 AC3 · its selftest derives e
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §2 S2 · §3 Non-goals, Edges · §5 · AC1 · §7 New arm · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 47: `memory.code-budget` is already a catalogue row, read with `policy.py get` through PLAY-dOrderedCharter-7's `read_policy_value` with no wait, a refused read refuses, and the row's summary and usage stay dFurnishedOrders' to fill.
+- rev-4 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

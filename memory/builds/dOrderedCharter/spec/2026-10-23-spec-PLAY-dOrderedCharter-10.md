@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-10 — the namespaced tag system: this build's eight namespaces registered, joined both ways, shape-checked in the core, and their words handed to the lexicon
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 5 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 5 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0040@25b6d46b whole
 **Carries:** node:tag-namespace.reader
@@ -225,7 +225,7 @@ Live at landing on PLAY-dOrderedCharter-19's `tags` leg.
 
 ## 7. Gates
 
-`memory hygiene` · `lexicon naming predicates` · `lexicon selftest` · `playbook render selftest` · `govkit acceptance matrix` · `encoding posture (text IO names its encoding)` · `codebase-map kit selftest`
+`memory hygiene` · `lexicon naming predicates` · `lexicon selftest` · `playbook render selftest` · `govkit acceptance matrix` · `encoding posture (text IO names its encoding)` · `codebase-map kit selftest` · `policy fixtures`
 
 New arm: tools/playbook/adopt-playbook.sh · covers AC2 AC3 AC4 AC5 AC6 AC7 · the playbook-render selftest runs the eight plants of S8 · none
 New arm: tools/lexicon/selftest.py · covers AC8 · a `--tags` case refusing `practice.repo.x` and reading the words from a fixture registry · none
@@ -249,6 +249,7 @@ New arm: tools/playbook/gov_tag.py · covers AC1 · the `tags` leg reds on a pla
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
+- rev-3 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

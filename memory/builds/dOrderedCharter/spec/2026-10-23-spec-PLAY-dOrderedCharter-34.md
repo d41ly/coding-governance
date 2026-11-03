@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-34 — composition and its report: the project block and marked parts from the overlay, budgets and harness limits at render, one composition for every harness, the delta report, and the practice census
 
-**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 35 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-6 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 35 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0064@42692e4c whole
 
@@ -321,7 +321,7 @@ step converts it into overlay units.
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `template size <=48KiB` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `template size <=48KiB` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/playbook/render_playbook.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 · `run_selftest` runs the composition fixture over every plant and asserts each exit, line and written byte · none
 New arm: tools/govkit/selftest.py · covers AC8 · a scratch adopter whose playbook regenerate prints the six state lines and one foreign line, asserting `update` relays the six and not the seventh · none
@@ -377,6 +377,7 @@ New arm: tools/govkit/selftest.py · covers AC8 · a scratch adopter whose playb
 - rev-5 · 2026-10-25 · S3 · §4 Budgets and harness limits · §8 F6 · §10 · item 6 of
   `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md`, the parent audit's P1: `CODEX_MAX` is read
   with `budgets.py home codex-instructions`, unit 6's verb, and this unit parses no census row.
+- rev-6 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

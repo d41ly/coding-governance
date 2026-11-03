@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-20 — the unit schema, the one renderer of record and its templates, the render gate with its legacy list, and one fact in one unit
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 15 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 15 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0050@13d9192b whole
 
@@ -309,7 +309,7 @@ the catalogue equal HEAD (TOOL-dGroundRules-19 S1).
 
 ## 7. Gates
 
-`playbook render selftest` · `govkit acceptance matrix` · `agent-instructions self-test` · `playbook render wiring` · `roles render wiring` · `roles render selftest` · `agent-instructions wiring` · `playbook parity` · `roles catalogue` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `govkit acceptance matrix` · `agent-instructions self-test` · `playbook render wiring` · `roles render wiring` · `roles render selftest` · `agent-instructions wiring` · `playbook parity` · `roles catalogue` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/playbook/instruction_units.py · covers AC1 AC2 AC3 AC4 AC7 AC8 · the `schema`, `one-fact`, `status`, `renderers`, `work-order` and `legacy` fixture cases, each failing case staged by its plant · none
 
@@ -341,6 +341,7 @@ New arm: tools/playbook/render_playbook.py · covers AC5 · the render selftest 
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-43, PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50, PLAY-dOrderedCharter-55.
 - rev-4 · 2026-10-24 · §2 S8 · §3 Edges · §4 Rollout, Files touched · §5 · AC8, AC10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` U3 and U4: `instructions.legacy` is read with `policy.py get` through PLAY-dOrderedCharter-7's `read_policy_value`, a refused read reds the gate, and the landed row is filled and drained, never added.
+- rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

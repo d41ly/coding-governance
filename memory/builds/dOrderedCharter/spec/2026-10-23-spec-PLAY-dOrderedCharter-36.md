@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-36 — the row checks over every registered kind: the fixed set, the exclusion refusals and the widening classifier
 
-**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 34 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-6 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 34 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0066@dcfb4bb2 whole
 
@@ -303,7 +303,7 @@ dGroundRules before S4's policy arm is built, the fixture's `--policy` values st
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10 · `run_selftest` runs the fixture over every plant of S8 and the clean plant, asserting each exit and the line each names · none
 
@@ -340,6 +340,7 @@ New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 - rev-4 · 2026-10-24 · §2 S4 · §3 Edges · §4 The exclusion walk, the first probe · §5 perf · §8 F4 (re-resolved) · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 49: the check reads `instructions.exclude`'s landed `allowed`, a tag-valued key is a row whose `allowed` type bears members, each read through `policy.py get` at `--rev HEAD`, and the build run's first probe confirms the value check admits gov tags.
 - rev-5 · 2026-10-25 · §2 S4 · §4 The exclusion walk, the first probe · item 8 of `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks`, the parent audit's P5 and P11: the default is `[]`, the probe expects the built `item` pattern to admit a gov tag, and `instructions.exclude` is never read as its own requirer.
+- rev-6 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

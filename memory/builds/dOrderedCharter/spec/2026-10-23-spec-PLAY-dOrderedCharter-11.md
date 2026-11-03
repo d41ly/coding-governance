@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-11 — load sets derived per reader and item, budgeted, and refused when a required unit is missing
 
-**Status:** DEFERRED · rev-5 · 2026-11-02 · node d · Tier-2 · base ce13efbe · streams playbook · order 21 · closes PLAY-dOrderedCharter-57 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-6 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 21 · closes PLAY-dOrderedCharter-57 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0041@29cae3c8 whole
 **Carries:** node:policy-key.instructions.checks
@@ -243,7 +243,7 @@ commit only when the policy file and the catalogue equal HEAD (TOOL-dGroundRules
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `roles render wiring` · `roles render selftest` · `govkit acceptance matrix` · `manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates`
+`playbook render selftest` · `playbook render wiring` · `roles render wiring` · `roles render selftest` · `govkit acceptance matrix` · `manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `policy fixtures`
 
 New arm: tools/playbook/load_sets.py · covers AC1 AC2 AC3 AC4 AC7 · its selftest plants the fixture registry with a required unit scoped away from its role, a unit scoped `feature.roles` with no `feature` row registered, and the oversized charter and role block · none
 New arm: skills/session-kickoff/manifest-check.test.sh · covers AC5 · a fixture card write with a scratch cap below the agent list's bytes · none
@@ -295,6 +295,7 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC5 · a fixtur
   `2026-11-02-prompt-PLAY-dOrderedCharter-17-ask-fold-brief`: `derive_load_set` carries the `features`
   argument `TOOL-dFurnishedOrders-18` selects by, its feature part `unarmed` while no `feature` row is
   registered as a selector, seen by AC7 on a fixture with none registered.
+- rev-6 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

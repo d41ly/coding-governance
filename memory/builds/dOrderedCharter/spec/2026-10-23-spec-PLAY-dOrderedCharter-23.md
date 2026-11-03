@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-23 — a build run unattended by default from its request, said in the drive section, and the `[land]` rule read through the request's mandate
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 30 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 30 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0053@8f756a97 whole
 
@@ -181,7 +181,7 @@ Live at landing. Gov's `AGENTS.md` changes in two lines.
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `playbook parity` · `charter size` · `roles render wiring` · `govkit acceptance matrix` · `unattended-build self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `playbook render wiring` · `playbook parity` · `charter size` · `roles render wiring` · `govkit acceptance matrix` · `unattended-build self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/playbook/render_playbook.py · covers AC1 AC2 · a `--selftest` arm rendering a fixture with the unattended and roles descriptors and asserting the two drive lines, staged by dropping the unattended kit's row · none
 
@@ -202,6 +202,7 @@ New arm: tools/playbook/render_playbook.py · covers AC1 AC2 · a `--selftest` a
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
+- rev-3 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

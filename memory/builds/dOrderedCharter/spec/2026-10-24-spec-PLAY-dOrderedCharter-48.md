@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-48 — the sources that tell a writer to cite path and line are a query over the directive sources, every hit re-pointed or kept by name
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -66,7 +66,7 @@ neither. It repairs unit 26 and is built right after it.
 - The reference forms, the list of citations, the remedy verb and the legs: unit 26's.
 - Grandfathering records written before the check: `PLAY-dOrderedCharter-47`.
 - Hook messages under `tools/hooks/`: they narrate a join and direct no writer
-  (`tools/hooks/agent-cap.js:2414`), and the query's pathspecs leave them out by name in §4.
+  (`tools/hooks/agent-cap.js:1962`), and the query's pathspecs leave them out by name in §4.
 
 ### Edges
 
@@ -91,7 +91,7 @@ directive or a document citation. Those are the seed's candidates; the pass judg
 
 ### Why the hooks stay out
 
-`tools/hooks/README.md:119` and `tools/hooks/agent-cap.js:2414` describe why the review join keys on an
+`tools/hooks/README.md:119` and `tools/hooks/agent-cap.js:1962` describe why the review join keys on an
 integer id rather than a `file:line` string. A hook message is read by an agent, but neither line
 directs a citation, and adding the hooks to the pathspecs adds only kept rows. A hook that ever tells
 a writer what to cite is a source this query names in a later unit.
@@ -180,6 +180,7 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC4 · the playbook-render s
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's finding 82 (HIGH, item H9).
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
+- rev-3 · 2026-11-03 · §3 · §4 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 4: `agent-cap.js`'s review-join refusal, cited twice at `:2414`, past the file's 2008 lines, re-pointed at HEAD to `:1962`, the line naming the `file:line` string.
 
 ## 10. Reuse audit
 

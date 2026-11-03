@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-32 — the repository's instruction overlay: `.governance/instructions.toml`, its `repo.` units, pinned edges into gov's units, derived classes and the repository's own policy keys
 
-**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 31 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 31 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0062@fe903e93 whole
 
@@ -334,7 +334,7 @@ terminal.
 
 ## 7. Gates
 
-`govkit acceptance matrix` · `playbook render selftest` · `playbook render wiring` · `playbook parity` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit acceptance matrix` · `playbook render selftest` · `playbook render wiring` · `playbook parity` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC9 AC10 · `run_selftest` runs `overlay.py --fixture` over every plant of §6, each staging its own failing case · none
 New arm: tools/playbook/overlay.py · covers AC6 · `overlay.py check` over gov's tree, its failing case a gov unit planted with a parser source and `class = "open"` · none
@@ -396,6 +396,7 @@ New arm: tools/playbook/overlay.py · covers AC6 · `overlay.py check` over gov'
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-46, PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §2 S7 · §3 non-goals, Edges · §4 The policy keys, Inventory, Files touched · §5 risks · AC8 · §8 F4, F5 (re-resolved) · §10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 43 and U5: the `[[policy]]` read lives in `tools/policy/`, on the reader's revision, seen by its matcher, `validate`, `arm_schema` and the mirror; the composition reads a key through `policy.py get`; the guard owes no admission ask at a landing. Then §2 S9 · §4 The selection claim, Files touched · AC11 · §8 F4's `deploy.toml` half (re-resolved): the comment is the owner's edit at their terminal (TOOL-dGroundRules-6 S4), named in the pass's hand-back, never a step's write, so the pass commits no `.governance/deploy.toml`; F4's overlay half stands.
 - rev-4 · 2026-10-25 · §2 S7 · §4 Files touched · §5 risks · AC8 · §8 F6 (new) · item 7 of `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks`, the parent audit's P4: the mirror records the overlay blob's id and renders `adopter.` keys, and the guard's mirror shape compares `.governance/instructions.toml` with HEAD.
+- rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-19 — the tag grammar, its namespace registry, the derived SQLite tag index and its one resolver, and the join factory moved to the core
 
-**Status:** DEFERRED · rev-6 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 4 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-7 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 4 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0049@a87d159d whole
 **Carries:** node:system.tags
@@ -341,6 +341,9 @@ AC16's measurement, printing its zero graded citations rather than reading them 
 - `tools/run-gates/run-gates.test.sh`
 - `tools/govkit/registry.toml`
 - `tools/govkit/subject-pins.tsv`
+- `tools/govkit/usage.toml`
+- `.lexicon.conf`, the verb pin moved, because the canonical and its copy each count
+- `memory/project/docs-undocumented.txt`, the docs leg's rows for `help/tags.md`
 - `tools/run-gates/ceiling-evidence.txt`
 - `memory/map/features/playbook.md`
 - `tools/playbook/policy_value.py` (new: `read_policy_value`, `PolicyRefused`, its inline `resolve_kit_dir`)
@@ -404,11 +407,12 @@ AC16's measurement, printing its zero graded citations rather than reading them 
 - **AC10** — When the parity row's block extraction is reproduced by
   `diff <(cd tools/lib && sed -n '/>>> coverage_join/,/<<< coverage_join/p' coverage_join.py) <(cd tools/memory-tree && sed -n '/>>> coverage_join/,/<<< coverage_join/p' coverage_join.py)`,
   it prints nothing; `git grep -n "m\.compute_coverage\|m\.resolve_compare_base\|m\.derive_baseline_additions\|m\.drop_touched_exemptions" -- tools/codebase-map`
-  prints nothing; and in a scratch copy with `map_lib.py`'s re-export line deleted and the base's
-  `test_codebase_map.py` restored, `python tools/codebase-map/test_codebase_map.py` exits non-zero
-  naming `compute_coverage`, and with the line kept exits as the tree does.
+  prints nothing; and `python -c "import sys, inspect; sys.path.insert(0,'tools/codebase-map'); import map_lib as m; print([callable(getattr(m, n)) for n in ('compute_coverage', 'Coverage', 'drop_touched_exemptions', 'resolve_compare_base')], len(inspect.signature(m.derive_baseline_additions).parameters))"`
+  prints four `True` and `2`, the names and the two-argument call an older
+  `test_codebase_map.py` makes, while in a scratch copy with `map_lib.py`'s re-export line deleted
+  the same probe exits non-zero naming `compute_coverage`.
   Red when: a consumer still reaches a moved name through `map_lib`, or the re-export is not what
-  keeps an older copy working.
+  keeps an older copy's names resolving.
   fixture: a copy under `%TEMP%`.
 - **AC11** — When the two `common_git_dir` blocks in `tools/memory-recall/query.py` and
   `tag_index.py` are compared with the canonical `common_dir.py` by the
@@ -447,10 +451,15 @@ AC16's measurement, printing its zero graded citations rather than reading them 
   Red when: a build record's citation or a code identifier is graded, a skip prints no count, or
   the plant passes.
 - **AC17** — When `git grep -n "map_root\|load_conf\|MapError" -- tools/lib/coverage_join.py tools/memory-tree/coverage_join.py`
-  runs, it prints nothing; and `python tools/codebase-map/selftest.py` exits 0, its baseline arm
-  (`selftest.py:1588-1594`) calling memory-tree's `derive_baseline_additions(tmp, seeded,
-  "memory/map/baseline.toml")`.
-  Red when: the core reads codebase-map's conf or raises its error.
+  runs, it prints nothing; and a probe calling memory-tree's moved
+  `derive_baseline_additions(tmp, base, rel)`, `rel` being `memory/map/baseline.toml`, in a scratch
+  git repository whose base commit seeds that file with `a = ["k1"]`, answers `({}, note)` for an unchanged working file,
+  `({"a": ["k2"]}, note)` for a working `a = ["k1", "k2"]`, `None` with `no memory/map/baseline.toml at <sha>`
+  for a base without the file, and raises `tomllib.TOMLDecodeError`, never `MapError`, for a
+  working file that does not parse.
+  Red when: the core reads codebase-map's conf or raises its error, or one of the four answers
+  moves.
+  fixture: a scratch git repository under `%TEMP%`.
 
 ## 7. Gates
 
@@ -534,6 +543,7 @@ New arm: tools/codebase-map/selftest.py · covers AC10 AC17 · the selftest's co
   an unarmed namespace's citations (F5); PLAY-dOrderedCharter-49's S38 and AC29 fold into S9 and
   AC17, the core reading no codebase-map conf; `resolve_compare_base` rides as a `compare_base_py`
   copy; stale lines re-cited at HEAD.
+- rev-7 · 2026-11-03 · §4 Files touched · AC10 · AC17 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 1: AC17 observes the moved `derive_baseline_additions` by a probe of its four answers in a scratch repository, and AC10 the re-export by a `map_lib` probe, neither by a suite run, the codebase-map selftest staying on §7's `New arm:` line; Files touched adds `tools/govkit/usage.toml`, `.lexicon.conf` and `memory/project/docs-undocumented.txt`.
 
 ## 10. Reuse audit
 

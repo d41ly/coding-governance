@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-42 — the bindings reader admits every kind the record factory mints, joined to its file name both ways
 
-**Status:** DEFERRED · rev-3 · 2026-11-02 · node d · Tier-2 · base ce13efbe · streams playbook · order 12 · closes PLAY-dOrderedCharter-59 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 12 · closes PLAY-dOrderedCharter-59 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -183,7 +183,7 @@ header.
 
 ## 7. Gates
 
-`memory hygiene` · `build-index selftest` · `memory-hygiene self-test` · `verdict epoch (kit version dates the engine)` · `lexicon naming predicates` · `tier2-review self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
+`memory hygiene` · `build-index selftest` · `memory-hygiene self-test` · `verdict epoch (kit version dates the engine)` · `lexicon naming predicates` · `tier2-review self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `playbook render selftest`
 
 New arm: tools/memory-tree/build_records.py · covers AC4 · its `--fixture --plant typed-kinds` round trip over every typed kind, run by the memory-hygiene self-test, its failing case staged by the base tuple without the three tokens · none
 
@@ -205,6 +205,7 @@ New arm: tools/memory-tree/build_records.py · covers AC4 · its `--fixture --pl
   `2026-11-02-prompt-PLAY-dOrderedCharter-17-ask-fold-brief`: the typed-kind file-name join reads
   `-<kind>-<n>.md` only on the stem `-build-<unit id>-<kind>-<n>.md`, seen by AC6 on a research record
   named `…-return-plan-2.md` staying bound once `plan` joins `TYPED_RECORD_KINDS`.
+- rev-4 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Items 2 and 3: the leg line names `policy fixtures` and `playbook render selftest`, whose guards §4 Files touched trips, `tools/memory-tree/tree_lib.py` the latter's, the guards hits the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 
