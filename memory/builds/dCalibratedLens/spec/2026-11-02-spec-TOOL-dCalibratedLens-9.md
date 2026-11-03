@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-9 — probe cost priced in the value ledger, and compactions counted per item kind
 
-**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0466@f36d2aed whole
 
@@ -9,8 +9,17 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-9-deviation-92.md](../build/2026-11-02-build-TOOL-dCalibratedLens-9-deviation-92.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md) | journal | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-crosscheck-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-crosscheck-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-10 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-03-build-TOOL-dCalibratedLens-9-deviation-93.md](../build/2026-11-03-build-TOOL-dCalibratedLens-9-deviation-93.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-9-1-spec-reviewer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-9-1-spec-reviewer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-9-2-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-9-2-spec-writer.md) | journal | — |
 | [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
@@ -32,15 +41,19 @@ run, which stops this unit when one is absent: TOOL-dCalibratedLens-2 (the modul
 TOOL-dCalibratedLens-3 (`METRICS`, `measure_loop_metrics` and the record's Metrics lines); the probe
 program and its `probe` and `probe-trigger` record kinds (TOOL-dPlacedRequest-7 S4 to S6); the act
 record and its token fields (TOOL-dWellOiledMachine-32 S7, S8); `read_act_records`
-(TOOL-dWellOiledMachine-53 S4); the `Gov-Act:` commit trailer (TOOL-dWellOiledMachine-33 S1); the
+(TOOL-dWellOiledMachine-53 S4) over the uncapped `find --all` (TOOL-dWellOiledMachine-32 §8 F6, owner,
+2026-10-29); the `Gov-Act:` commit trailer (TOOL-dWellOiledMachine-33 S1); the
 `runtime` producer and the `compaction` class of the journal (TOOL-dWellOiledMachine-16 S3) and its
 writer at a compaction (TOOL-dWellOiledMachine-12 S8); and the record door's `find` and `show`
 (TOOL-dTotalRecall-9 S3, S5).
 
 - **S1** — (amended, id 51) The act read across kits. `tools/runtime/ledgers.py` gains the verb `python ledgers.py acts
-  [--build <slug>]`, which calls `read_act_records(repo, build)` once and prints one JSON object per
+  [--build <slug>]`, which makes one call of `read_act_records` and prints one JSON object per
   act record on stdout: `key`, `act`, `item`, `tokens-in`, `tokens-out` and `wall`, each as the record
-  spells it, `withheld` kept as written and an absent field as `null`. The loop kit runs it as a
+  spells it. This unit widens that function, TOOL-dWellOiledMachine-53 S4's, which reads each row's
+  `Item`, `Wall`, `Tokens-In` and `Tokens-Out` through `gov_record.py show <key>`: the same `show`
+  also yields the row's `Act`, a field its other callers ignore. `withheld` is kept as written and
+  an absent field printed as `null`. The loop kit runs it as a
   bounded subprocess (60 s) through the inline `resolve_kit_dir` block the module already carries
   (TOOL-dCalibratedLens-2 S1), since a kit imports no sibling kit. A failed run, a timeout or no
   runtime kit found is a refused read: the provider prints one `ledger — probe · acts unread · <why>`
@@ -181,9 +194,11 @@ names; the unit it names owns the finding and its proof.
   returning the parsed lines; `read_journal_compactions` filters it, and TOOL-dCalibratedLens-16 S3
   calls it and filters by the walk's window.
 - **id 51 · S1, AC1 (M26, `TOOL-dCalibratedLens-30`)** — `ledgers.py acts` gains `--since <date>`,
-  filtering by the act record's file-name date before any record is read, and reads the tracked act
-  records in one process (one `git ls-files`, one `git cat-file --batch`), never one
-  `gov_record.py show` per act; `estimate` (TOOL-dCalibratedLens-17) stays all-time. The 60 s bound
+  filtering by the act record's file-name date before any record is read (a `since` argument S1's
+  widening adds, applied to `find`'s rows before any `show`), and reads the act records through
+  `read_act_records` over `gov_record.py find --all`, the owner's pick at TOOL-dWellOiledMachine-32
+  §8 F6 (b), whose option (c), a `git ls-files` listing, is "a second reader of the records beside
+  the index"; `estimate` (TOOL-dCalibratedLens-17) stays all-time. The 60 s bound
   is sized for the population a window holds, and AC1 also times `acts --since` over 500 planted act
   records under it.
 - **id 11 · S7, AC8 (L1, `TOOL-dCalibratedLens-30`)** — An absent runtime journal file reads
@@ -198,7 +213,7 @@ names; the unit it names owns the finding and its proof.
 
 - `tools/loop/loop_review.py` (S2 to S7, and the `--fixture` cases of §7)
 - `tools/loop/README.md` (S8)
-- `tools/runtime/ledgers.py` (S1, and its `fixture` case of §7)
+- `tools/runtime/ledgers.py` (S1, `read_act_records`'s `Act` read, and its `fixture` case of §7)
 - `help/loop-review.md` (S8, TOOL-dCalibratedLens-2's page)
 - `tools/govkit/usage.toml` — the `[[usage]]` row of each verb or flag added (id 39)
 
@@ -233,8 +248,9 @@ names; the unit it names owns the finding and its proof.
 
 - **AC1** — (amended, id 51) When `python ledgers.py acts` runs from the runtime kit directory in a scratch repository
   holding two act records, one with `Tokens-In: withheld`, it prints two JSON objects whose `key`,
-  `item`, `tokens-in` and `tokens-out` match the records, the withheld one as `"withheld"`.
-  Red when: a withheld field is printed as `0` or the record is dropped.
+  `act`, `item`, `tokens-in` and `tokens-out` match the records, the withheld one as `"withheld"`.
+  Red when: a withheld field is printed as `0`, the record is dropped, or a record's `Act` prints as
+  `null` or not at all.
   fixture: a scratch repository under `%TEMP%`; the act record kind is TOOL-dWellOiledMachine-32's,
   absent at `8bec4cef`.
 - **AC2** — When a probe calls `derive_act_tokens` from `loop_review.py` on `{"tokens-in": "120",
@@ -308,10 +324,12 @@ New arm: tools/runtime/ledgers.py · covers AC1 · a `fixture --case acts-withhe
   is the catch, rung 3, since an undecided probe is the one bearing no load. widens: none · relaxes:
   none
 - **F4 — The brief joins `class=compaction` lines to the act record's `Item`; is the join needed?**
-  RESOLVED (agent, 2026-11-02, delegated): no, rung 1 of the records: the line already carries
-  `item=<item tag|none>`, the act record's `item` for an act session (TOOL-dWellOiledMachine-12 S8), so
-  the count reads the line alone and an act-less session counts as `unattributed`. widens: none ·
-  relaxes: none
+  RESOLVED (agent, 2026-11-03, delegated): no, rung 1 of the records: the line already carries
+  `item=<item tag|none>`, "the act record's `item` for an act session, else the item
+  TOOL-dDeclaredLoop-7's `position.py <slug> --json` names for the binding's build, else `none`"
+  (TOOL-dWellOiledMachine-12 S8), so the count reads the line alone: an act-less session in a build
+  counts under its position item, and only a line reading `item=none` counts as `unattributed`.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -325,6 +343,13 @@ New arm: tools/runtime/ledgers.py · covers AC1 · a `fixture --case acts-withhe
   audit `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1
   spec audit)": ids 50 (`TOOL-dCalibratedLens-28`), and 31, 51, 11 and 39
   (`TOOL-dCalibratedLens-30`); §3 gains the hands-offs to units 28, 16 and 30.
+- rev-3 · 2026-11-03 · §2 §4 §6 §8 §10 S1 AC1 F4 · re-grounded against the parents' specs, S1 widens
+  TOOL-dWellOiledMachine-53 S4's `read_act_records` to read `Act` and AC1 reds a missing `act`, id 51
+  drops the `git ls-files` and `git cat-file --batch` route for `read_act_records` over `find --all`
+  (TOOL-dWellOiledMachine-32 §8 F6 (b), owner), and F4's mark is re-worded to
+  `RESOLVED (agent, 2026-11-03, delegated)` for TOOL-dWellOiledMachine-12 S8's position-item fallback,
+  by the brief prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md (cross-check rows
+  83, 84, 87)
 
 ## 10. Reuse audit
 
@@ -332,7 +357,7 @@ The seams extended are TOOL-dCalibratedLens-2's `PROVIDERS` and provider shape a
 TOOL-dCalibratedLens-3's `METRICS`; the runlog kit's journal verb `cmd_journal`
 (`tools/runlog/runlog.py:151`, its `--producer` choices at `:499`), called as it is rather than copied;
 the runtime kit's `read_act_records` (TOOL-dWellOiledMachine-53 S4), given a CLI verb beside that
-spec's `checks` and `status`; and the `Gov-Act:` trailer (TOOL-dWellOiledMachine-33 S1) as the join
+spec's `checks` and `status` and widened to read `Act`; and the `Gov-Act:` trailer (TOOL-dWellOiledMachine-33 S1) as the join
 key. `python tools/codebase-map/reuse_lookup.py "price the cost of each probe and count compactions per
 item kind"` ranked name stems (`probe`, `counts`, `measure_typed_counts`) and record helpers in
 `tools/runlog/record.py`, none a cost or compaction reader; no existing seam fits the pricing itself,

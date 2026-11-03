@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-2 — the shared value ledger: its snapshot, its view, its row grammar and the `price` verb
 
-**Status:** DEFERRED · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 1 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-5 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 1 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0459@facc646b whole
 **Carries:** node:record-kind.value-ledger
@@ -12,13 +12,22 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-2-chain-rounds.md](../build/2026-11-02-build-TOOL-dCalibratedLens-2-chain-rounds.md) | journal | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md) | journal | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-crosscheck-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-crosscheck-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
 | [2026-11-03-build-TOOL-dCalibratedLens-2-deviation-22.md](../build/2026-11-03-build-TOOL-dCalibratedLens-2-deviation-22.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-2-deviation-23.md](../build/2026-11-03-build-TOOL-dCalibratedLens-2-deviation-23.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-2-deviation-24.md](../build/2026-11-03-build-TOOL-dCalibratedLens-2-deviation-24.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-2-deviation-25.md](../build/2026-11-03-build-TOOL-dCalibratedLens-2-deviation-25.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-15 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-2-1-spec-reviewer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-2-1-spec-reviewer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-2-2-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-2-2-spec-writer.md) | journal | — |
 | [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
@@ -76,8 +85,10 @@ The build run re-grounds on each and stops the unit when one is absent.
   AC2.
 - **S5** — The `price` verb, `run_loop_price(root, key, at, dry_run)`, run as `python loop_review.py
   price [--key <key>] [--at <utc>] [--dry-run]`. The key is `GOV_CADENCE_KEY` (ask
-  TOOL-dTendedCadence-27) or `--key`, held to the period-key grammar of §4 "The snapshot" at the write
-  boundary, anything else exit 2 before a read; `at` is now, or `--at`. It takes the window from
+  TOOL-dTendedCadence-27); `--key <key>` is admitted only with `--dry-run`, as TOOL-dTendedCadence-1 S3
+  admits it, and `--key` without `--dry-run` exits 2. No key at all exits 2,
+  `price — refused: no key; run under cadence.py run loop-review`. The key is held to the period-key
+  grammar of §4 "The snapshot" at the write boundary, anything else exit 2 before a read; `at` is now, or `--at`. It takes the window from
   `derive_loop_window` (S1), builds the rows, and writes the snapshot through `write_ledger_snapshot`;
   `--dry-run` prints the table and writes nothing. It prints `price — <key> · <n> row(s) · source <value> · <path>`
   and exits 0. It commits nothing. Observed by AC1, AC5.
@@ -122,7 +133,7 @@ The build run re-grounds on each and stops the unit when one is absent.
 ## 3. Non-goals (OUT)
 
 - The Loop Review's other items, its lease, its period and its record: unit 3. `price` here runs alone
-  under `--key`, and inside unit 3's walk under `GOV_CADENCE_KEY`.
+  under `GOV_CADENCE_KEY`, or `--dry-run --key`, and inside unit 3's walk under `GOV_CADENCE_KEY`.
 - Row kinds other than `leg`: `shape` (unit 7), `probe` (unit 9), `item` (unit 12) and `cap` (unit 15),
   each a `PROVIDERS` entry. Rules and bug classes get no row: no source attributes a catch to either
   (0 of 129 gotchas carry a catch field, research-observability-a's gap-obs-01), so a row would read
@@ -206,8 +217,11 @@ kind, then id.
 | leg | memory hygiene | 2026-06-30 | 41.2s/3 | 2 | 0 | 2026-10-28 | 60d | catching |
 ```
 
-The key is a period key of unit 3's three forms, held at the write boundary to
-`^\d{4}-(W\d{2}|\d{2})$` or `^n\d+\.[0-9a-f]{12}$`, so no key is a path. `<date>` in the file name is the
+The key is held at the write boundary to `^\d{4}-(W\d{2}|\d{2})$` or `^n\d+\.[0-9a-f]{12}$`, so no
+key is a path. Only the weekly form has a source at base: `derive_period` gives `weekly` and `daily` only
+(TOOL-dWellOiledMachine-13 S5), and unit 3's monthly and `n<k>.<sha12>` forms come only from unit 3 §8
+F2's ask, THE PERIOD KEY HAS NO MONTH AND NO LANDING COUNT. Until that ask lands, `GOV_CADENCE_KEY`
+carries the weekly form alone. `<date>` in the file name is the
 UTC day of `at`. The five `**Key:**`-line fields are the kind's `fields` form; the table is the
 snapshot's body, written as the view will show it.
 
@@ -381,11 +395,11 @@ proof.
 
 - **AC1** — When `python loop_review.py --fixture --plant catch-verdict-records` runs, a
   fixture whose flake record holds `alpha` at first rc 1 and re-run rc 1 and `beta` at first rc 1 and
-  re-run rc 0, `price --dry-run` prints the `alpha` row with `catches` 1, `false-reds` 0 and that record's
+  re-run rc 0, `price --dry-run --key 2026-W45` prints the `alpha` row with `catches` 1, `false-reds` 0 and that record's
   `Ended` date as `last-catch`, and the `beta` row with `catches` 0 and `false-reds` 1.
   Red when: a red-then-green row is counted a catch, or a flake is not counted a false red.
 - **AC2** — When the plant `catch-node-journal` commits `review.loop.catch-source = "node-journal"` and
-  writes one `RED` gates line naming `beta` in `fail.1`, `price --dry-run` prints `beta` with `catches` 1
+  writes one `RED` gates line naming `beta` in `fail.1`, `price --dry-run --key 2026-W45` prints `beta` with `catches` 1
   and `false-reds` `-`, ignores the flake record, and its summary names `source node-journal`; the
   plant `catch-source-refused`, a policy file the reader refuses, prints the `NOTE:` line and prices
   from `verdict-records`.
@@ -393,7 +407,7 @@ proof.
   fixture: a throwaway repository and its common dir's `gates.log` under `%TEMP%` with a short
   name; policy is read at the committed revision, so the plant commits `.governance/policy.toml`.
 - **AC3** — When the plant `window-edge` sets `review.loop.window-days = 30` and places one own event 31
-  days before `--at` and a leg first added 10 days before it, `price --dry-run --at <at>` prints the old
+  days before `--at` and a leg first added 10 days before it, `price --dry-run --key 2026-W45 --at <at>` prints the old
   event's leg with `catches` 0, its `last-catch` that event's date and `state` `idle`, and the young leg
   with `state` `new`.
   Red when: an event outside the window is counted, or `last-catch` is cut to the window.
@@ -403,11 +417,13 @@ proof.
   `value-ledger-empty` renders `No value-ledger snapshot yet.` with no finding; `value-ledger-hand-edit`
   edits one cell of the view and the host's check names `value-ledger.md` as drifted.
   Red when: the older snapshot renders, an empty home reds, or a hand edit passes.
-- **AC5** — When `price --key 2026-W45 --at 2026-11-02T09:00:00Z` runs in the fixture, it writes
+- **AC5** — When `GOV_CADENCE_KEY=2026-W45 price --at 2026-11-02T09:00:00Z` runs in the fixture, it writes
   `<MEMORY_ROOT>/loop-review/2026-11-02-value-ledger-2026-W45.md` whose five fields read as §4 "The
-  snapshot" states; `--dry-run` leaves `git status --porcelain` empty; `--key ../x` and `--key 2026-W4`
-  each exit 2 naming the key, writing nothing.
-  Red when: a malformed key reaches a path, or a dry run writes.
+  snapshot" states; `--dry-run --key 2026-W45` leaves `git status --porcelain` empty; `--dry-run --key
+  ../x` and `--dry-run --key 2026-W4` each exit 2 naming the key, writing nothing; `--key 2026-W45`
+  without `--dry-run` exits 2, and `price` with no `GOV_CADENCE_KEY` exits 2 printing `refused: no key`,
+  each writing nothing.
+  Red when: a malformed key reaches a path, a dry run writes, or `--key` writes outside `--dry-run`.
 - **AC6** — When `grep -n -A8 'name = "review.loop.catch-source"' tools/policy/catalogue.toml` runs, it
   shows `summary` and `usage`; `grep -cx 'review.loop.catch-source' tools/policy/unsummarised-keys.txt`
   prints `0`; `grep -n '"review.loop.catch-source"' loop_review.py` names S4's literal read.
@@ -481,6 +497,11 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC7 · a fixtu
   `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`: §3's hands-off of the row's guard names
   `TOOL-dCalibratedLens-46` in place of unit 41, which takes the widening into the leg's declaration
   (r3 id 22).
+- rev-5 · 2026-11-03 · S5 §3 §4 AC1 AC2 AC3 AC5 · re-grounded against the parents' specs, `--key`
+  admitted only with `--dry-run` and no key refused `refused: no key` (TOOL-dTendedCadence-1 S3, AC3),
+  and §4 "The snapshot" naming unit 3 §8 F2's ask as the only source of the monthly and `n<k>` forms,
+  by the brief prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md (cross-check rows
+  25, 26)
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-16 — the stall and loop classes trended per scenario, item and rule, and their bounds re-derived once 30 builds have run under them
 
-**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 9 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 9 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0473@17126ed2 whole
 
@@ -9,9 +9,15 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-16-deviation-162.md](../build/2026-11-02-build-TOOL-dCalibratedLens-16-deviation-162.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md) | journal | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-03-build-TOOL-dCalibratedLens-16-deviation-163.md](../build/2026-11-03-build-TOOL-dCalibratedLens-16-deviation-163.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-17 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
 | [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
@@ -32,9 +38,13 @@ each bound through the build's measured-value factory, proposing every movement 
   the loop kit reads the tuple without importing a sibling. Observed by AC1.
 - **S2** — (amended, id 49) The trended set, derived. In `tools/loop/measure.py`, `NOT_TRENDED` holds the classes that
   are no stall or loop event: `refusal` (the breaker's input, counted by `breaker-open`),
-  `compaction` (TOOL-dCalibratedLens-9's sizing signal), `map-read-outside-slice`, `hook-failure` and
-  `ledger-refused` (TOOL-dWellOiledMachine-53's). The trended set is every member of the tuple not in
-  `NOT_TRENDED`, so a class the journal gains is trended until someone declares it is not.
+  `compaction` (TOOL-dCalibratedLens-9's sizing signal), `map-read-outside-slice`, `hook-failure`,
+  `ledger-refused` (TOOL-dWellOiledMachine-53's), and `act-launch`, `act-adopt`, `act-killed` and
+  `act-exit`, an act's start, adoption, kill and end, four of the six classes
+  TOOL-dWellOiledMachine-6 S12 adds. Its other two are trended: `relaunch`, a retry loop that
+  `RESUME_ATTEMPTS` caps (its S5), and `limit-hold`, a hold on a session limit (its S9). The trended
+  set is every member of the tuple, plus `cycle` (S3), not in `NOT_TRENDED`, so a class the journal
+  gains is trended until someone declares it is not.
   `check_trend_classes(journal_classes)` refuses, exit 1 and one `stall trend — refused · <class> ·
   <why>` line each, a `NOT_TRENDED` member the tuple lacks, and any of the clause's six, `no-progress`,
   `repeat`, `budget-spent`, `deadline-passed`, `breaker-open` and `cycle`, outside the trended set.
@@ -43,11 +53,17 @@ each bound through the build's measured-value factory, proposing every movement 
   --producer runtime` (`tools/runlog/runlog.py:498`, `cmd_journal` at `:151`), which reads the producer
   file through `read_journal` and prints each line's fields as JSON, the reader contract of
   `point.journal-readers` (TOOL-dWellOiledMachine-16 S7). It keeps each line whose `t` is inside
-  `review.loop.window-days` of the run. Observed by AC4.
+  `review.loop.window-days` of the run. `cycle` has no journal line: "the owner item is the cycle's
+  record" (TOOL-dWellOiledMachine-50 §3). So `read_cycle_items(repo, since)` runs `unattended.sh
+  --mail read project` (KICK-dKeptSession-5 S6) as a bounded subprocess (60 s) found through
+  `resolve_kit_dir`, and gives one line `{"class": "cycle", "t": <first-seen>, "build": <build>}` per
+  `question` row whose `subject` opens `owner item cycle` (TOOL-dWellOiledMachine-48 S1,
+  TOOL-dWellOiledMachine-50 S4) inside the window, joined to the journal's lines. A failed read
+  refuses `cycle` as S2's check does. Observed by AC4 and AC12.
 - **S4** — (amended, id 50) The trend, `derive_stall_trend(lines, acts, transitions)`: one count per (class, scenario,
   item, rule) over the trended set. The item is the `key=` field's item tag, the text before `@`
   (TOOL-dDeclaredLoop-7 S3), else the act record's `Item`, else `-`. The scenario is the `scenario`
-  field of the newest transition record of the act's build at or before the line's `t`
+  field of the newest transition record of the act's build (a `cycle` line's `build`) at or before the line's `t`
   (`read_transitions`, TOOL-dDeclaredLoop-3 S7; the field TOOL-dDeclaredLoop-27 S8 adds), else `-`. The
   rule is the line's `rule=` field, else `-`. `read_act_items(repo, builds)` maps each `Act` to its
   build and `Item`, through `gov_record.py find --kind act --build <slug>` and `gov_record.py show`
@@ -82,17 +98,19 @@ each bound through the build's measured-value factory, proposing every movement 
 
 ## 3. Non-goals (OUT)
 
-- Any detector, deadline or breaker: TOOL-dWellOiledMachine-46, -47, -49 and -50 produce the lines;
-  this unit reads them and decides nothing (rule 11).
-- The three classes TOOL-dWellOiledMachine-79 S12 drops: their writers are the ask of §8 F1, filed on
-  dWellOiledMachine. This unit refuses while the clause's six are not all trended.
+- Any detector, deadline or breaker: TOOL-dWellOiledMachine-46, -47 and -49 produce the lines and
+  TOOL-dWellOiledMachine-50 the cycle owner items; this unit reads them and decides nothing (rule 11).
+- `budget-spent` and `deadline-passed`, two of the three classes TOOL-dWellOiledMachine-79 S12 drops:
+  their writers are the ask of §8 F1, filed on dWellOiledMachine; the third, `cycle`, is read from its
+  owner item (S3). This unit refuses while the clause's six are not all trended.
 - Another node's journal and progress ledger: a node cannot see them, as `review.loop.catch-source`
   records for catches (v2:1345). Each build's node-local rows are kept by the review on the node that
   holds them (S7).
 - Writing a bound: every movement is a proposal; raising a loop bound is a loosening and the owner's
   (stall-and-loop rule 8, `direction = "raise-loosens"` on each key's catalogue row).
 - Build-run preconditions, each landed before this unit's build pass: TOOL-dWellOiledMachine-16 (the
-  journal, its runtime producer and the tuple), -32 (the act record), -46 (the progress ledger),
+  journal, its runtime producer and the tuple), -6 (its S12 classes), -32 (the act record), -46 (the
+  progress ledger), -48 and -50 (the cycle owner item), KICK-dKeptSession-5 (`--mail read`),
   TOOL-dDeclaredLoop-3, -27 and -30 (transitions, the scenario field, the draws),
   TOOL-dTotalRecall-9 (`record find`, `record show`), TOOL-dDeclaredLoop-2 (`policy_edit.py`),
   TOOL-dCalibratedLens-3 and -4, and the ask of §8 F1.
@@ -111,7 +129,8 @@ each bound through the build's measured-value factory, proposing every movement 
 
 - TOOL-dWellOiledMachine-16 S3 declares `JOURNAL_CLASSES` with all six of the clause's classes, and
   TOOL-dWellOiledMachine-79 S12 drops `budget-spent`, `deadline-passed` and `cycle` from it "which no
-  unit writes", so at that build's close three of the clause's classes cannot be journaled (§8 F1).
+  unit writes", so at that build's close three of the clause's classes cannot be journaled (§8 F1);
+  TOOL-dWellOiledMachine-50 §3 writes no `cycle` line, its owner item being the cycle's record.
 - `runlog.py journal --producer <p>` prints a producer file's lines as JSON through `read_journal`
   (`tools/runlog/runlog.py:151-193`); its `--producer` choices are `PRODUCER_FILES`, which gains
   `runtime` inside the shared block (TOOL-dWellOiledMachine-16 S3).
@@ -153,7 +172,7 @@ bounds — flow.wait-ceiling · no evidence source
 
 | Minted | Kind | Lexicon cell |
 |---|---|---|
-| `check_trend_classes`, `read_journal_lines`, `derive_stall_trend`, `read_act_items`, `check_trend_complete`, `read_bound_evidence`, `derive_bound_values` | Python functions in `tools/loop/measure.py` | `py.function`, OK |
+| `check_trend_classes`, `read_journal_lines`, `read_cycle_items`, `derive_stall_trend`, `read_act_items`, `check_trend_complete`, `read_bound_evidence`, `derive_bound_values` | Python functions in `tools/loop/measure.py` | `py.function`, OK |
 | `NOT_TRENDED`, `BOUND_EVIDENCE` | constants | none |
 | `classes` | CLI verb of `tools/runtime/journal.py` | none |
 | `stall-trend`, `bound-evidence` | `loop-review` record fields | none |
@@ -164,7 +183,7 @@ and printed OK.
 
 ### Waits on
 
-**Waits on:** TOOL-dWellOiledMachine-16, -32 and -46; TOOL-dDeclaredLoop-2, -3, -27 and -30;
+**Waits on:** TOOL-dWellOiledMachine-6, -16, -32, -46, -48 and -50; KICK-dKeptSession-5; TOOL-dDeclaredLoop-2, -3, -27 and -30;
 TOOL-dTotalRecall-9; TOOL-dCalibratedLens-3 and -4; and the ask of §8 F1.
 
 ### Migration
@@ -191,7 +210,8 @@ names; the unit it names owns the finding and its proof.
   `check_trend_complete` answers the `stall-trend` reading `unread · <why>`, never exit 1 of the
   walk.
 - **id 50 · S4, AC3 (H10, `TOOL-dCalibratedLens-28`)** — Acts are mapped to builds and items from
-  `ledgers.py acts --build <slug>` (TOOL-dCalibratedLens-9 S1), whose `read_act_records` pages past
+  `ledgers.py acts --build <slug>` (TOOL-dCalibratedLens-9 S1), its `act` field the `Act` that unit
+  widens TOOL-dWellOiledMachine-53 S4's `read_act_records` to read, and whose `read_act_records` pages past
   `gov_record.py find`'s 40-row cap; `find` is not called. AC3 also plants 41 acts of one build, the
   41st carrying the deciding item.
 - **id 31 · S3 (M15, `TOOL-dCalibratedLens-30`)** — `read_journal_lines` calls
@@ -233,7 +253,7 @@ names; the unit it names owns the finding and its proof.
 
 - security — the step reads the journal through its reader, committed records and two CLIs, writes
   only its record's fields, and runs `policy_edit.py propose`, which writes nothing.
-- perf / scale — one `runlog.py journal` call per period, one `record find` and the `record show`
+- perf / scale — one `runlog.py journal` and one `--mail read project` call per period, one `record find` and the `record show`
   calls per build with a transition in the window, one `policy.py get --rev` per distinct commit.
 - error / empty / loading states — no journal: `runlog: <path> absent`, an empty trend and the
   refusal of S2 if the tuple lacks a clause class; an unjoined line: scenario `-`; a node-local source
@@ -253,8 +273,8 @@ names; the unit it names owns the finding and its proof.
   print(len(journal.JOURNAL_CLASSES))"` run in `tools/runtime/` prints.
   Red when: a member is missing or the order differs.
   figure: the count is DERIVED from the tuple.
-- **AC2** — When `python measure.py --fixture --plant stall-left-out` journals one `cycle`
-  line and plants `cycle` into `NOT_TRENDED`, `check_trend_classes` exits 1 printing `stall trend —
+- **AC2** — When `python measure.py --fixture --plant stall-left-out` plants `cycle` into
+  `NOT_TRENDED`, `check_trend_classes` exits 1 printing `stall trend —
   refused · cycle`; the plant `stall-new-class` adds a class `livelock` to the planted
   tuple, journals one such line, and the trend counts it, exit 0.
   Red when: a clause class can be left out with no refusal, or a new class is not trended.
@@ -295,12 +315,17 @@ names; the unit it names owns the finding and its proof.
   Red when: the step writes `.governance/policy.toml`.
 - **AC11** — When `grep -n "Stalls and loops, trended" loop.md` runs, it names the section.
   Red when: the section is absent.
+- **AC12** — When the plant `stall-cycle` serves, as `--mail read project`'s output, one `question`
+  row whose `subject` is `owner item cycle tA tA+tB` and whose `first-seen` lies in the window, over
+  fixture transitions naming build `tA` at `scenario.feature`, with no `cycle` journal line, the step
+  prints `cycle · scenario.feature · - · - · 1` and `check_trend_classes` exits 0.
+  Red when: the owner item is not counted, or `cycle` is refused while its owner item is read.
 
 ## 7. Gates
 
 `docs` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/loop/measure.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10 · the plants of §6, staged against a typed trended set, a trender that drops one class, a scenario read after the line, a bound counted over builds under another value, and a step that writes the policy file · none
+New arm: tools/loop/measure.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10 AC12 · the plants of §6, staged against a typed trended set, a trender that drops one class, a scenario read after the line, a bound counted over builds under another value, and a step that writes the policy file · none
 New arm: tools/runtime/selftest.py · covers AC1 · a case comparing the `classes` verb with the tuple, staged against a verb that skips a member · none
 
 ## 8. Open questions
@@ -311,16 +336,18 @@ New arm: tools/runtime/selftest.py · covers AC1 · a case comparing the `classe
   exhaustion record, the wait and the cycle owner item, three readers where the clause names one
   journal; (c) trend the three that remain, relaxing the clause's own list. `secret-hit`, which the
   same S12 drops, is no stall or loop class and is not in `NOT_TRENDED`, so its absence refuses nothing. (a) keeps the clause's one
-  source and the both-ways check meaningful. Rung 3. RESOLVED (agent, 2026-11-02, delegated): (a), the
-  main loop files it in `memory/builds/dWellOiledMachine/BACKLOG.md` · THREE STALL AND LOOP CLASSES
-  HAVE NO WRITER. cl-dClosedLoop-0473 trends the classes Runtime journals, a budget spent, a deadline
+  source and the both-ways check meaningful, but TOOL-dWellOiledMachine-50 §3 refuses a `cycle` line
+  ("No journal line: a node-tick sweep carries neither the `act` nor the `session` key
+  TOOL-dWellOiledMachine-16 S3 requires; the owner item is the cycle's record"). Rung 3. RESOLVED
+  (agent, 2026-11-03, delegated): (b) for `cycle` alone, read from its owner item (S3), and (a) for the
+  other two, the main loop filing it in `memory/builds/dWellOiledMachine/BACKLOG.md` · TWO STALL AND
+  LOOP CLASSES HAVE NO WRITER. cl-dClosedLoop-0473 trends the classes Runtime journals, a budget spent, a deadline
   passed and a cycle across builds among them (stall-and-loop rule 11), and TOOL-dWellOiledMachine-79
-  S12 drops `budget-spent`, `deadline-passed` and `cycle` from `JOURNAL_CLASSES` as written by no unit
-  · accept `JOURNAL_CLASSES` keeps the three and each is journaled through `write_journal_line`:
-  `budget-spent` when `record_draw` returns `exhausted` (TOOL-dDeclaredLoop-30 S3), `deadline-passed`
-  when a wait TOOL-dWellOiledMachine-47 holds reaches its deadline, naming the deadline's key, and
-  `cycle` when TOOL-dWellOiledMachine-50 raises a cycle owner item, each line keyed `act=` or
-  `session=`, seen on a fixture writing one line of each. Build-run precondition.
+  S12 drops `budget-spent` and `deadline-passed` from `JOURNAL_CLASSES` as written by no unit
+  · accept `JOURNAL_CLASSES` keeps the two and each is journaled through `write_journal_line`:
+  `budget-spent` when `record_draw` returns `exhausted` (TOOL-dDeclaredLoop-30 S3) and `deadline-passed`
+  when a wait TOOL-dWellOiledMachine-47 holds reaches its deadline, naming the deadline's key, each
+  line keyed `act=` or `session=`, seen on a fixture writing one line of each. Build-run precondition.
   widens: none · relaxes: none
 - **F2 — Which classes does the trend cover, and how is one left out?** (a) The tuple less a declared
   `NOT_TRENDED`, the clause's six refused if outside it; (b) the clause's six typed; (c) every class,
@@ -349,6 +376,13 @@ New arm: tools/runtime/selftest.py · covers AC1 · a case comparing the `classe
   (`TOOL-dCalibratedLens-22`), 49 (`TOOL-dCalibratedLens-27`), 50 (`TOOL-dCalibratedLens-28`), and
   31, 6, 18, 30 and 54 (`TOOL-dCalibratedLens-30`); the Files touched row of the registry is
   withdrawn (id 2); §3 gains the consumes-from unit 9 and the hands-off to unit 30.
+- rev-3 · 2026-11-03 · §3 §4 §5 §6 §7 §8 §10 S2 S3 S4 AC2 AC12 F1 · re-grounded against the parents'
+  specs, `NOT_TRENDED` gains four of TOOL-dWellOiledMachine-6 S12's classes and trends `relaunch` and
+  `limit-hold` with their reasons, `cycle` is read from TOOL-dWellOiledMachine-50's owner item by
+  `read_cycle_items` since that unit's §3 writes no journal line, F1's mark is re-picked to
+  `RESOLVED (agent, 2026-11-03, delegated)`, (b) for `cycle` and (a) for the other two, and id 50's
+  `act` field names TOOL-dCalibratedLens-9's widening of `read_act_records`, by the brief
+  prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md (cross-check rows 83, 136, 142)
 
 ## 10. Reuse audit
 
@@ -358,7 +392,8 @@ TOOL-dWellOiledMachine-16's `journal.py`, gaining a `classes` verb beside `write
 `read_transitions` of TOOL-dDeclaredLoop-3 and its scenario field; the draw rows `budget_state` reads;
 the act records through the memory door, the route `read_act_records` runs; the README's generated
 build status (`gen_build_index.py:801`); `policy.py get --rev` (`tools/policy/policy.py:1346`); and
-TOOL-dCalibratedLens-4's factory and proposal. The probe `python tools/codebase-map/reuse_lookup.py
+TOOL-dCalibratedLens-4's factory and proposal; and the mailbox reader `--mail read`
+(KICK-dKeptSession-5 S6) for the cycle owner items. The probe `python tools/codebase-map/reuse_lookup.py
 "count journal lines by class and trend stalls and loops per item and rule across builds"` ranked
 `read_journal`, `check_line`, `render_line` and `build_invocations` (`tools/runlog/runlog_lib.py`) as
 the journal's grammar, which the `journal` verb already wraps, and name stems otherwise (`counts`,
