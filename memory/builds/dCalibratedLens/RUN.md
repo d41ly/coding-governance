@@ -9,12 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-179369421323123925407-38837 cdad7cda
+asks-at-landing: TOOL-dCalibratedLens-18=DEFERRED TOOL-dCalibratedLens-49=OPEN TOOL-dCalibratedLens-50=OPEN TOOL-dCalibratedLens-51=OPEN TOOL-dCalibratedLens-52=OPEN TOOL-dCalibratedLens-53=OPEN
+units-at-landing: TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-48
+gates-run: unattended-17937129006675848178-351894 4040f384
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: ccf601242d2fe6cfdbfef6a2f3551bd9554e3c2c
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -193,3 +195,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-03T01:33:48Z rescope · item defer TOOL-dCalibratedLens-47 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
 
 2026-11-03T01:33:51Z rescope · item defer TOOL-dCalibratedLens-48 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dCalibratedLens-18
+
+2026-11-03T14:45:41Z override · item specs-audited · reason TOOL-dCalibratedLens-42 to -48, the round-3 spec audit's promotions, carry no audit: the owner ruled on 2026-11-03, 'no more reviews if the next round comes back without blockers', and round 3 returned 0 blockers (reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md, the chain record round 3); the build run builds them from their specs as written
+
+2026-11-03T14:45:41Z override · item closing-review-recorded · reason a spec run's diff is specs and records only, no product code; the three-round spec-audit chain is its review (reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md, -19-spec-audit.md and 2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md), as PLAY-dClosedLoop-37 records for every chain spec run
