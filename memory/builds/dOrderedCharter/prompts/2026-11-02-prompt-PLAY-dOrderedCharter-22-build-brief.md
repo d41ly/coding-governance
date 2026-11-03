@@ -66,3 +66,9 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Your spec header's `advances PLAY-dOrderedCharter-38` stays `advances` when you flip it to `CLOSED`; you are not the last unit.
 - The unattended kit's own self-test suites are WAIVED for this build's landing (README, "Build-level rules"); a
   criterion they would observe is named as owed with PLAY-dClosedLoop-12, never run.
+
+## Owed by the unit before yours
+
+- PLAY-dOrderedCharter-44's `schema` arm row in `tools/playbook/adopt-playbook.sh` spells `schema 0 to 1`, a second copy
+  of `tag_index.INDEX_SCHEMA` (class two-answers-to-one-question). Make that row match `schema 0 to` and nothing after,
+  in your pass, declare the path in `--dispatch`, and record it as a `report` deviation naming unit 44's builder return.
