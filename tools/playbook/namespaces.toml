@@ -2,10 +2,13 @@
 #
 # One [[namespace]] row per namespace: `ns`, the word a tag opens with; `owner`, the chain build that owns it;
 # `layer`, the layer register row it belongs to; `source`, what it is minted from; `extractor`, the
-# `<module>:<function>` that reads that source; `role`, `selects` or `describes`; `purpose-source`, the record
-# that states why it exists; `join-armed-by`, the build that arms its joins. A namespace word is read from here
+# `<module>:<function>` that reads that source; `role`, `selects` or `describes`; `purpose-source`, where its
+# members' purposes are read; `join-armed-by`, the build that arms its joins. A namespace word is read from here
 # and never typed beside it. PLAY-dOrderedCharter-10 adds its eight rows; PLAY-dOrderedCharter-22 grades
-# `purpose-source` and `owner`.
+# `purpose-source` and `owner`: `owner` names a `[[build]]` row of <MEMORY_ROOT>/project/chain.toml, and `purpose-source`
+# is `<path>` (path-only), `<path>#<field>` (each member at a .toml path carries the field on its row, a .py path
+# assigns it) or `#<field>` (each member's own file carries it, `h1` a Markdown member's first `# ` line). A source
+# not in the view yet prints `pending` and grades once it lands.
 
 [[namespace]]
 ns = "doc"
@@ -14,7 +17,7 @@ layer = "layer.instruction"
 source = "the CHARTER path, memory/guides/*.md, memory/HYGIENE.md, memory/TEMPLATE-SPEC.md"
 extractor = "tag_index:extract_doc"
 role = "describes"
-purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md#design-tags"
+purpose-source = "#h1"
 join-armed-by = "dOrderedCharter"
 
 [[namespace]]
@@ -24,7 +27,7 @@ layer = "layer.instruction"
 source = "each [[unit]] row of every <kit>/instructions.toml, its scope values as selector rows; .governance/instructions.toml's rows are the repo namespace's"
 extractor = "tag_index:extract_unit"
 role = "selects"
-purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md#design-tags"
+purpose-source = "#help"
 join-armed-by = "dOrderedCharter"
 
 [[namespace]]
@@ -34,7 +37,7 @@ layer = "layer.instruction"
 source = "each [[reader]] row's tag in tools/playbook/readers.toml"
 extractor = "tag_index:extract_reader"
 role = "selects"
-purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md#design-tags"
+purpose-source = "tools/playbook/readers.toml#why"
 join-armed-by = "dOrderedCharter"
 
 [[namespace]]
@@ -44,7 +47,7 @@ layer = "layer.instruction"
 source = "each [[practice]] row's tag in tools/playbook/practices.toml"
 extractor = "tag_index:extract_practice"
 role = "selects"
-purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md#design-tags"
+purpose-source = "tools/playbook/practices.toml#line"
 join-armed-by = "dOrderedCharter"
 
 [[namespace]]
@@ -54,7 +57,7 @@ layer = "layer.instruction"
 source = "LEVELS in tools/playbook/instruction_units.py, level.<name> each"
 extractor = "tag_index:extract_level"
 role = "describes"
-purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md#design-tags"
+purpose-source = "tools/playbook/instruction_units.py#LEVELS"
 join-armed-by = "dOrderedCharter"
 
 [[namespace]]
@@ -64,7 +67,7 @@ layer = "layer.instruction"
 source = "each [[layer]] row's tag in tools/playbook/layers.toml"
 extractor = "tag_index:extract_layer"
 role = "describes"
-purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md#design-tags"
+purpose-source = "tools/playbook/layers.toml#definition"
 join-armed-by = "dOrderedCharter"
 
 [[namespace]]
@@ -74,7 +77,7 @@ layer = "layer.instruction"
 source = "each [[principle]] row's tag in tools/playbook/principles.toml"
 extractor = "tag_index:extract_principle"
 role = "describes"
-purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md#design-tags"
+purpose-source = "tools/playbook/principles.toml#line"
 join-armed-by = "dOrderedCharter"
 
 [[namespace]]
@@ -84,7 +87,7 @@ layer = "layer.instruction"
 source = "each [[kind]] row's tag in tools/playbook/kinds.toml"
 extractor = "tag_index:extract_kind"
 role = "describes"
-purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md#design-tags"
+purpose-source = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-foundations.md"
 join-armed-by = "dOrderedCharter"
 
 [[namespace]]
@@ -94,7 +97,7 @@ layer = "layer.distribution"
 source = "the top-level id of each tracked kit.toml or *.kit.toml descriptor, kit.<id> at its own line"
 extractor = "tag_index:extract_kit"
 role = "describes"
-purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md#design-tags"
+purpose-source = "tools/govkit/registry.toml"
 join-armed-by = "dOrderedCharter"
 
 [[namespace]]
@@ -104,5 +107,5 @@ layer = "layer.instruction"
 source = "each [[unit]] row's repo.<seg> tag in .governance/instructions.toml"
 extractor = "tag_index:extract_repo"
 role = "selects"
-purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md#design-tags"
+purpose-source = ".governance/instructions.toml#help"
 join-armed-by = "dOrderedCharter"

@@ -8,7 +8,8 @@
 `show` returns the tag's row, or its subtree as `tags.slice` says; `where` prints `path:line`; `refs`
 prints every citation of it, a build record's too; `check` runs the `retired`, `resolves` and `owned`
 arms over the citations outside `<MEMORY_ROOT>/builds/`, and the shape check, the joins and the
-name-check slot (PLAY-dOrderedCharter-10). An address is a tag, `doc.<name>#<seg>`, or a
+name-check slot (PLAY-dOrderedCharter-10), and the `purpose` arm, the namespace rows' `owner` and
+`purpose-source` and the chain registry joined to the design view (PLAY-dOrderedCharter-22). An address is a tag, `doc.<name>#<seg>`, or a
 positional label `aliases.toml` maps. Every line opens `tags:`; `--json` is the index's only JSON.
 Exit 0 green, 1 red, 2 a refusal (an unreadable registry, a refused policy read, a locked index).
 
@@ -27,6 +28,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import types
 
 KIT_DIR = pathlib.Path(os.path.abspath(__file__)).parent
 sys.path.insert(0, str(KIT_DIR))
@@ -129,6 +131,30 @@ def run_name_check(root, tags) -> tuple[list, str]:
         f"{NAME_CHECK} · filled"
 
 
+def run_purpose_check(con, root, ctx) -> tuple[list, list, dict]:
+    """The `purpose` arm (PLAY-dOrderedCharter-22 S5): the namespace rows' `owner` and `purpose-source`
+    against the chain registry, then the registry joined to the design view, or one line saying there is
+    no chain to read where the DESIGN_* keys are blank. -> (reds, lines, the summary's counts)."""
+    chain_rel = f"{ctx['memory_root']}/{ti.CHAIN_REGISTRY}"
+    chain = ti.read_chain_registry(root / chain_rel)
+    reds, ns = ti.check_namespace_purpose(con, ctx, chain, chain_rel)
+    from design_lib import read_design_conf  # memory-tree is on sys.path once derive_context has run
+    c_reds, cs = ti.check_chain_registry(root, read_design_conf(root), chain, chain_rel)
+    graded = ns["graded"]
+    lines = [f"tags: purpose · pending {n} · {src}" for n, src in ns["pending"]]
+    lines.append(f"tags: purpose · {len(graded)} graded over {sum(graded.values())} members, "
+                 f"{len(ns['path_only'])} path-only, pending {len(ns['pending'])}")
+    if cs is None:
+        lines.append("tags: purpose · no chain to read: the DESIGN_* keys are blank, so the chain registry is not "
+                     "joined")
+    else:
+        lines.append(f"tags: purpose · {cs['rows']} registry rows joined to {cs['builds']} view builds, "
+                     f"{len(cs['awaiting'])} rows awaiting PM-5's review")
+    counts = {"graded": graded, "path_only": ns["path_only"], "pending": [list(p) for p in ns["pending"]],
+              "chain": cs}
+    return reds + c_reds, lines, counts
+
+
 def run_check(con, root, ctx, kit_rel, *, sets, base, as_json, state) -> int:
     counts = ti.derive_namespace_state(con, ctx)
     armed = counts  # ns -> defined-tag count; 0 is unarmed
@@ -156,7 +182,8 @@ def run_check(con, root, ctx, kit_rel, *, sets, base, as_json, state) -> int:
     r_reds, warns, cited = ti.check_retired(con, ctx, retired_mode, base_spans, armed)
     o_reds = ti.check_owned(con, ctx, root / kit_rel / "layers.toml")
     n_reds, slot = run_name_check(root, shaped)
-    reds += r_reds + o_reds + n_reds
+    p_reds, p_lines, purpose = run_purpose_check(con, root, ctx)
+    reds += r_reds + o_reds + n_reds + p_reds
     tags = sum(counts.values())
     unread = con.execute("SELECT COUNT(*) FROM view_path WHERE path NOT LIKE '%.md'").fetchone()[0]
     summary = {
@@ -164,13 +191,13 @@ def run_check(con, root, ctx, kit_rel, *, sets, base, as_json, state) -> int:
         "retired_cited": cited, "bare_refs": c["bare"], "records_not_graded": c["records"], "paths_not_markdown": unread,
         "shape_graded": len(shaped), "file_names_not_graded": c["file_names"], "name_check": slot,
         "unarmed": {ns: c["unarmed"].get(ns, 0) for ns, n in counts.items() if not n},
-        "reds": reds, "warns": warns, "blobs_parsed": state["parsed"],
+        "purpose": purpose, "reds": reds, "warns": warns, "blobs_parsed": state["parsed"],
         "extractor_runs": sum(state["runs"].values()), "skipped_fresh": sum(state["skipped"].values()),
     }
     if as_json:
         print(json.dumps(summary, indent=2, sort_keys=True))
         return 1 if reds else 0
-    for line in c["notes"] + j_lines + warns + reds:
+    for line in c["notes"] + j_lines + p_lines + warns + reds:
         print(line)
     print(f"tags: {slot}")
     print(f"tags: {len(counts)} namespaces, {tags} tags, {len(shaped)} shape-graded, {c['graded']} citations graded, "
@@ -210,7 +237,7 @@ layer = "layer.instruction"
 source = "the charter and memory/guides/*.md"
 extractor = "tag_index:extract_doc"
 role = "describes"
-purpose-source = "fixture"
+purpose-source = "AGENTS.md"
 join-armed-by = "fixture"
 
 [[namespace]]
@@ -220,7 +247,7 @@ layer = "layer.instruction"
 source = "every *.tags file"
 extractor = "fixture_tags:extract_declared"
 role = "describes"
-purpose-source = "fixture"
+purpose-source = "AGENTS.md"
 join-armed-by = "fixture"
 
 [[namespace]]
@@ -230,7 +257,7 @@ layer = "layer.instruction"
 source = "every *.tags file"
 extractor = "fixture_tags:extract_declared"
 role = "describes"
-purpose-source = "fixture"
+purpose-source = "AGENTS.md"
 join-armed-by = "fixture"
 '''
 FIXTURE_UNIT_ROW = '''
@@ -241,9 +268,11 @@ layer = "layer.instruction"
 source = "every instructions.toml"
 extractor = "tag_index:extract_unit"
 role = "selects"
-purpose-source = "fixture"
+purpose-source = "AGENTS.md"
 join-armed-by = "fixture"
 '''
+#: PLAY-dOrderedCharter-22: the fixture's chain registry, its one build owning every fixture namespace
+FIXTURE_CHAIN = '[[build]]\nslug = "fixture"\npurpose = "the fixture\'s own build"\n'
 FIXTURE_EXTRACTOR = '''"""The fixture's declaring extractor: each line of a `*.tags` file is a tag, `retired <tag>` a retirement."""
 
 
@@ -272,16 +301,18 @@ FIXTURE_KIT = "tools/playbook"
 PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retired", "retired-old",
           "retired-reminted", "bare", "bare-charter", "owned", "owned-core", "scope", "scope-guide",
           "bad-ns", "bad-seg", "long-tag", "ns-word", "unregistered-cite", "dead-selector", "empty-ns",
-          "escaped-word", "file-name", "new-extractor", "extractor-edit", "tagless", "schema")
+          "escaped-word", "file-name", "new-extractor", "extractor-edit", "tagless", "schema",
+          "no-owner", "ghost-owner", "no-purpose-source", "bad-purpose-source", "member-no-field", "pending-source",
+          "registry-ghost", "registry-missing", "registry-joined", "new-no-purpose")
 #: PLAY-dOrderedCharter-44's `extractor-edit`: the fixture extractor's module edited to stop yielding one tag
 EDITED_EXTRACTOR = FIXTURE_EXTRACTOR.replace("elif len(word) == 1:",
                                              'elif len(word) == 1 and word[0] != "layer.memory.recall":')
 
 
-def derive_fixture_row(ns, extractor, role="describes", layer="layer.instruction") -> str:
+def derive_fixture_row(ns, extractor, role="describes", layer="layer.instruction", purpose="AGENTS.md") -> str:
     """One fixture registry row (PLAY-dOrderedCharter-10's plants)."""
     return (f'\n[[namespace]]\nns = "{ns}"\nowner = "fixture"\nlayer = "{layer}"\nsource = "fixture"\n'
-            f'extractor = "{extractor}"\nrole = "{role}"\npurpose-source = "fixture"\njoin-armed-by = "fixture"\n')
+            f'extractor = "{extractor}"\nrole = "{role}"\npurpose-source = "{purpose}"\njoin-armed-by = "fixture"\n')
 
 
 #: PLAY-dOrderedCharter-10 S8: each plant's registry rows and the files it adds to the base fixture
@@ -303,7 +334,55 @@ SHAPE_PLANTS = {
                   "memory/guides/ALPHA.md": "+\nsee `kind.x`\n"}),
     "file-name": (derive_fixture_row("kit", "tag_index:extract_kit", layer="layer.exp"),
                   {"memory/guides/ALPHA.md": "+\nedit `kit.toml`\n"}),
+    # PLAY-dOrderedCharter-22: a guide with no H1 under `#h1`, and a source the fixture does not track yet
+    "member-no-field": ("", {"memory/guides/BETA.md": "## Intro\n\nno title line\n"}),
+    "pending-source": (derive_fixture_row("reader", "tag_index:extract_reader", "selects",
+                                          purpose="tools/playbook/readers.toml#why"), {}),
 }
+#: PLAY-dOrderedCharter-22's registry plants: each edits the base registry's first row, `doc`'s
+PURPOSE_PLANTS = {
+    "no-owner": ('owner = "fixture"', 'owner = ""'),
+    "ghost-owner": ('owner = "fixture"', 'owner = "dGhost"'),
+    "no-purpose-source": ('purpose-source = "AGENTS.md"', 'purpose-source = ""'),
+    "bad-purpose-source": ('purpose-source = "AGENTS.md"', 'purpose-source = "AGENTS.md#practices"'),
+    "member-no-field": ('purpose-source = "AGENTS.md"', 'purpose-source = "#h1"'),
+}
+#: PLAY-dOrderedCharter-22's chain plants: the fixture design's two builds, and each plant's registry rows
+DESIGN_BUILDS = ("dFixtureOne", "dFixtureTwo")
+CHAIN_PLANTS = {
+    "registry-joined": [{"slug": b} for b in DESIGN_BUILDS],
+    "registry-ghost": [{"slug": b} for b in DESIGN_BUILDS] + [{"slug": "dGhost", "purpose": "no view build"}],
+    "registry-missing": [{"slug": DESIGN_BUILDS[0]}],
+    "new-no-purpose": [{"slug": b} for b in DESIGN_BUILDS] + [{"slug": "dFixtureNew"}],
+}
+
+
+def derive_chain_text(rows) -> str:
+    return "".join(f'[[build]]\nslug = "{r["slug"]}"\n' + (f'purpose = "{r["purpose"]}"\n' if "purpose" in r else "")
+                   + "\n" for r in rows)
+
+
+def write_chain_fixture(root, plant) -> None:
+    """The chain plants' design, through memory-tree's `write_design_fixture` (two builds, its pin the
+    baseline), then a commit declaring the four DESIGN_* keys at it, the namespace rows owned by the first
+    build, and the plant's registry; `new-no-purpose` adds a view build no baseline row names."""
+    ti.load_memory_tree()
+    from design_lib import write_design_fixture
+    record, view = "memory/builds/fixture/record.md", "memory/builds/fixture/view.md"
+    repo = types.SimpleNamespace(record=record, view=view, builds=DESIGN_BUILDS,
+                                 clause_ids=("cl-dFixtureOne-0001", "cl-dFixtureOne-0002", "cl-dFixtureTwo-0001"),
+                                 write_commit=lambda files, msg: write_commit(root, files, msg), read_sha=lambda s: s)
+    pin = write_design_fixture(repo)
+    reg = f"{FIXTURE_KIT}/namespaces.toml"
+    conf = (root / ".memory-tree.conf").read_text(encoding="utf-8")
+    files = {".memory-tree.conf": conf + f'DESIGN_RECORD="{record}"\nDESIGN_BASELINE="{pin}"\nDESIGN_VIEW="{view}"\n'
+                                         'DESIGN_NODES="memory/builds/fixture/nodes.py"\n',
+             reg: (root / reg).read_text(encoding="utf-8").replace('owner = "fixture"', f'owner = "{DESIGN_BUILDS[0]}"'),
+             "memory/project/chain.toml": derive_chain_text(CHAIN_PLANTS[plant])}
+    if plant == "new-no-purpose":
+        files[view] = (root / view).read_text(encoding="utf-8") + \
+            "| dFixtureNew | `cl-dFixtureNew-0001` | the fixture's new build's clause | baseline |\n"
+    write_commit(root, files, "the design declared, and the chain registry")
 
 
 def write_files(root: pathlib.Path, files: dict) -> None:
@@ -354,7 +433,11 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
         "tools/corekit/core.tags": "practice.land\npractice.memory\nlayer.memory\nlayer.memory.recall\n",
         "tools/expkit/kit.toml": 'id = "expkit"\nlayer = "layer.exp"\n',
         "tools/expkit/exp.tags": "",
+        "memory/project/chain.toml": FIXTURE_CHAIN,
     }
+    if plant in PURPOSE_PLANTS:
+        old, new = PURPOSE_PLANTS[plant]
+        files[f"{kit}/namespaces.toml"] = files[f"{kit}/namespaces.toml"].replace(old, new, 1)
     if plant in ("retired", "retired-old", "retired-reminted"):
         files["tools/corekit/core.tags"] += "retired practice.old\n"
     if plant == "retired-reminted":
@@ -385,6 +468,8 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
         for rel, text in extra.items():  # a leading `+` appends to the base file
             files[rel] = files[rel] + text[1:] if text.startswith("+") else text
     write_commit(root, files, "base")
+    if plant in CHAIN_PLANTS:
+        write_chain_fixture(root, plant)
     return root
 
 
@@ -547,6 +632,17 @@ def run_plant(root, top, plant, sets) -> int:
             run_git(root, "mv", "tools/expkit/kit.toml", "tools/expkit/expkit.kit.toml")
             write_commit(root, {}, "no tracked kit.toml")
             half = "no tracked kit.toml"
+        say(f"{half}: rc={run_verb(root, 'check', None, sets=sets)}")
+        return rc
+    if plant in ("pending-source", "new-no-purpose"):  # PLAY-dOrderedCharter-22: the source lands, the row gains a purpose
+        rc = run_verb(root, "check", None, sets=sets)
+        if plant == "pending-source":
+            write_commit(root, {"tools/playbook/readers.toml": '[[reader]]\ntag = "reader.every"\n'}, "the source lands")
+            half = "readers.toml landed with a member lacking why"
+        else:
+            rows = CHAIN_PLANTS[plant][:-1] + [{"slug": "dFixtureNew", "purpose": "a build the baseline does not name"}]
+            write_commit(root, {"memory/project/chain.toml": derive_chain_text(rows)}, "the new row's purpose")
+            half = "with a purpose"
         say(f"{half}: rc={run_verb(root, 'check', None, sets=sets)}")
         return rc
     return run_verb(root, "check", None, sets=sets)

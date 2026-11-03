@@ -4178,6 +4178,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "check_chain_registry",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "check_child_forwarding",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
@@ -5144,6 +5149,11 @@
     },
     {
       "id": "check_namespace_joins",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
+      "id": "check_namespace_purpose",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
     },
@@ -7616,6 +7626,11 @@
       "id": "derive_census_tree",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "derive_chain_text",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
     },
     {
       "id": "derive_chain_verdict",
@@ -14553,6 +14568,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_chain_registry",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "read_chain_verdict",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -16313,6 +16333,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_py_assigns",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "read_pybin_alias",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -17156,6 +17181,11 @@
       "id": "read_token",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_toml_field",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "read_toml_tags",
@@ -22763,6 +22793,11 @@
       "file": "tools/lib/resolve-python.test.sh"
     },
     {
+      "id": "run_purpose_check",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
+    },
+    {
       "id": "run_push",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
@@ -27666,6 +27701,11 @@
       "id": "write_cf_deferred_spec",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_chain_fixture",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
     },
     {
       "id": "write_chain_fixture",

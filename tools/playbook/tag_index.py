@@ -968,6 +968,165 @@ def check_namespace_joins(con, ctx, file_names=None) -> tuple[list, list]:
     return reds, lines
 
 
+#: the chain registry, under MEMORY_ROOT: one `[[build]]` row per chain build, `slug` and `purpose`
+CHAIN_REGISTRY = "project/chain.toml"
+
+
+def read_chain_registry(path) -> list[dict]:
+    """The chain registry's `[[build]]` rows (PLAY-dOrderedCharter-22 S3); a missing file holds no row,
+    so every namespace `owner` reds against it. A row with no `slug`, or a slug twice, is a TagError."""
+    path = pathlib.Path(path)
+    try:
+        rows = tomllib.loads(path.read_text(encoding="utf-8")).get("build") or []
+    except FileNotFoundError:
+        return []
+    except (OSError, tomllib.TOMLDecodeError) as exc:
+        raise TagError(f"the chain registry {path.as_posix()} is unreadable: {exc}") from None
+    seen: set[str] = set()
+    for i, row in enumerate(rows, 1):
+        slug = row.get("slug") if isinstance(row, dict) else None
+        if not isinstance(slug, str) or not slug:
+            raise TagError(f"{path.as_posix()}: build row {i} lacks slug")
+        if slug in seen:
+            raise TagError(f"{path.as_posix()}: build '{slug}' is registered twice")
+        seen.add(slug)
+    return rows
+
+
+def read_toml_field(text, tag, field):
+    """The non-empty string `field` of the TOML array-of-tables row whose `tag` is `tag`, else None."""
+    try:
+        data = tomllib.loads(text)
+    except tomllib.TOMLDecodeError:
+        return None
+    for rows in data.values():
+        for row in rows if isinstance(rows, list) else ():
+            if isinstance(row, dict) and row.get("tag") == tag:
+                val = row.get(field)
+                return val if isinstance(val, str) and val.strip() else None
+    return None
+
+
+def read_py_assigns(text) -> set:
+    """The names a Python module assigns at its top level; a module that does not parse assigns none."""
+    import ast
+    try:
+        body = ast.parse(text).body
+    except SyntaxError:
+        return set()
+    targets = [t for n in body if isinstance(n, ast.Assign) for t in n.targets]
+    targets += [n.target for n in body if isinstance(n, ast.AnnAssign)]
+    return {t.id for t in targets if isinstance(t, ast.Name)}
+
+
+def check_namespace_purpose(con, ctx, chain_rows, chain_rel) -> tuple[list, dict]:
+    """S1 and S2 of PLAY-dOrderedCharter-22: every row's `owner` is a build of the chain registry, and its
+    `purpose-source` grades its members, the `#`-free defining rows its own extractor serves for it. A
+    source is `<path>` (tracked, printed path-only), `<path>#<field>` (each member at a `.toml` path
+    carries the field on its row, a `.py` path assigns it; any other suffix is red), or `#<field>` (each
+    member's own file carries it: its TOML row's key, or `h1`, a Markdown file's first `# ` line outside a
+    fence). A source not in the view, a path not served or a `#<field>` with no member, is `pending`:
+    printed and never graded. -> (reds, {"graded": {ns: members}, "path_only": [ns], "pending": [(ns, source)]})."""
+    slugs = {r["slug"] for r in chain_rows}
+    served = {p for (p,) in con.execute("SELECT path FROM view_path")}
+    defined = read_rows(con, DEFINE_KINDS)
+    texts: dict = {}
+
+    def read_served(path):
+        # ponytail: the working tree stands in for the served blob, as the view is HEAD plus this worktree's edits
+        if path not in texts:
+            try:
+                texts[path] = (ctx["root"] / path).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
+            except OSError:
+                texts[path] = ""
+        return texts[path]
+
+    reds: list = []
+    state: dict = {"graded": {}, "path_only": [], "pending": []}
+    for row in ctx["namespaces"]:
+        ns, src = row["ns"], row["purpose-source"]
+        at = f"tags: {ctx['registry']} · purpose · namespace '{ns}'"
+        if row["owner"] not in slugs:
+            reds.append(f"{at} · owner '{row['owner']}' names no build of {chain_rel}")
+        members = [(t, p) for t, p, _n, _k, _b, ex in defined
+                   if ex == row["extractor"] and "#" not in t and t.split(".")[0] == ns]
+        path, hashed, field = src.partition("#")
+        if hashed and not field:
+            reds.append(f"{at} · purpose-source '{src}' names no field after its #")
+            continue
+        if (path and path not in served) or (not path and not members):
+            state["pending"].append((ns, src))
+            continue
+        if not hashed:
+            state["path_only"].append(ns)
+            continue
+        if path:
+            suffix = pathlib.PurePosixPath(path).suffix
+            if suffix not in (".toml", ".py"):
+                reds.append(f"{at} · purpose-source '{src}' reads a field in a {suffix or 'suffixless'} file, "
+                            "which the arm reads no field in")
+                continue
+            held = [m for m in members if m[1] == path]
+            if members and not held:
+                reds.append(f"{at} · purpose-source '{src}' holds none of its {len(members)} members")
+                continue
+            members = held
+        state["graded"][ns] = len(members)
+        for tag, mpath in members:
+            text, suffix = read_served(mpath), pathlib.PurePosixPath(mpath).suffix
+            if suffix == ".toml":
+                ok = read_toml_field(text, tag, field) is not None
+            elif suffix == ".py" and path:
+                ok = field in read_py_assigns(text)
+            elif suffix == ".md" and field == "h1":
+                ok = any(ln[2:].strip() for _n, ln in scan_unfenced(text) if ln.startswith("# "))
+            else:
+                reds.append(f"{at} · member {tag} sits in {mpath}, a file the arm reads no {field} in")
+                continue
+            if not ok:
+                reds.append(f"{at} · member {tag} ({mpath}) lacks {field}")
+    return reds, state
+
+
+def check_chain_registry(root, conf, chain_rows, chain_rel) -> tuple[list, dict | None]:
+    """S3 and S4 of PLAY-dOrderedCharter-22: the registry's slugs joined both ways with the design view's
+    builds, and a row with no `purpose` legal only for a build of v2's `[chain]` at the design baseline,
+    printed as awaiting PM-5's review. `conf`'s DESIGN_* keys all blank is no chain to read, (reds, None);
+    a half-declared design is a TagError. -> (reds, {"rows", "builds", "awaiting": [slug]})."""
+    load_memory_tree()
+    import design_lib
+    try:
+        values = design_lib.read_design_keys(root, conf)
+        if values is None:
+            return [], None
+        view = values["DESIGN_VIEW"]
+        builds = {b for b, *_ in design_lib.read_design_view(view, root)}
+        record, pin = values["DESIGN_RECORD"], values["DESIGN_BASELINE"]
+        shown = design_lib.run_git(root, "show", f"{pin}:{record}")
+        if shown.returncode:
+            raise design_lib.DesignRefusal(f"DESIGN_RECORD {record} is absent at DESIGN_BASELINE {pin[:9]}")
+        baseline = {b for b, *_ in design_lib.read_chain_clauses(shown.stdout.decode("utf-8", "replace"),
+                                                                  f"{record} at {pin[:9]}")}
+    except design_lib.DesignRefusal as exc:
+        raise TagError(f"the chain registry's join cannot read the design: {exc}") from None
+    slugs = [r["slug"] for r in chain_rows]
+    reds = [f"tags: {chain_rel} · purpose · registry row '{s}' names no build of the design view {view}"
+            for s in slugs if s not in builds]
+    reds += [f"tags: {chain_rel} · purpose · chain build '{b}' of the design view has no registry row"
+             for b in sorted(builds - set(slugs))]
+    awaiting = []
+    for row in chain_rows:
+        purpose = row.get("purpose")
+        if isinstance(purpose, str) and purpose.strip():
+            continue
+        if row["slug"] in baseline:
+            awaiting.append(row["slug"])
+        else:
+            reds.append(f"tags: {chain_rel} · purpose · registry row '{row['slug']}' carries no purpose, and no "
+                        "baseline [chain] row names it")
+    return reds, {"rows": len(chain_rows), "builds": len(builds), "awaiting": awaiting}
+
+
 def read_index_rows(con) -> list[str]:
     """Every row of the index, sorted, `built_at` aside: what a rebuild from nothing must reproduce."""
     out = []

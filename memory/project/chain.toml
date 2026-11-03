@@ -1,0 +1,74 @@
+# chain.toml — the chain registry (PLAY-dOrderedCharter-22 S3). Read by tag_index.read_chain_registry.
+#
+# One [[build]] row per chain build: `slug`, the build; `purpose`, what it is for. The slugs are joined both
+# ways with the builds of the design view (`DESIGN_VIEW` in .memory-tree.conf), so a row naming no view build
+# and a view build with no row are each red in `gov_tag.py check`'s `purpose` arm. A row whose build is a row
+# of v2's [chain] at DESIGN_BASELINE may carry no purpose, printed as awaiting dTotalRecall's PM-5 review
+# (under `memory.map-purpose`); every other row must carry one. A namespace row's `owner` in
+# tools/playbook/namespaces.toml names a row here. Rows are in the view's order.
+
+[[build]]
+slug = "dTrueNorth"
+
+[[build]]
+slug = "dGroundRules"
+
+[[build]]
+slug = "dSafePassage"
+
+[[build]]
+slug = "dOrderedCharter"
+
+[[build]]
+slug = "dFairHearing"
+
+[[build]]
+slug = "dDeclaredLoop"
+
+[[build]]
+slug = "dPlacedRequest"
+
+[[build]]
+slug = "dKeptSession"
+
+[[build]]
+slug = "dBoundRoles"
+
+[[build]]
+slug = "dFurnishedOrders"
+
+[[build]]
+slug = "dTotalRecall"
+
+[[build]]
+slug = "dLinkedLibrary"
+
+[[build]]
+slug = "dMindYourWords"
+
+[[build]]
+slug = "dWellOiledMachine"
+
+[[build]]
+slug = "dWitnessedBar"
+
+[[build]]
+slug = "dRankedPlan"
+
+[[build]]
+slug = "dIndexedDesign"
+
+[[build]]
+slug = "dScopedBuild"
+
+[[build]]
+slug = "dShippedRelease"
+
+[[build]]
+slug = "dTendedCadence"
+
+[[build]]
+slug = "dCalibratedLens"
+
+[[build]]
+slug = "dConvergedCharter"

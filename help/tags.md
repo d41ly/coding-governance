@@ -73,6 +73,10 @@ tag-shaped word that is not a citation, quote it another way, with doubled backt
 - **join** — a citation that is no member of its namespace, such as `` `layer.nowhere` ``; and, once
   unit rows exist, a `reader` or `practice` member no unit selects. A describing namespace's unused
   members are listed, never red.
+- **purpose** — a namespace row whose `owner` names no build of the chain registry, or whose
+  `purpose-source` a member lacks; a chain registry row naming no build of the design view, a design
+  build with no row, and a row with no `purpose` for a build v2's `[chain]` did not name at the
+  baseline. See "Where a purpose is read" below.
 
 A backticked span that is the file name of a tracked file, such as `` `kit.toml` ``, is a file name,
 not a citation: it is counted as `<n> file names not graded` and never red. The same span with no such
@@ -86,6 +90,43 @@ check decides alone.
 Nothing it skips is silent. The summary line counts the citations graded, the unresolved, the
 retired cited, the bare references, the citations in build records not graded and the paths outside
 Markdown not read, and prints `tags: unarmed <ns> (<n> not graded)` for each empty namespace.
+
+## Where a purpose is read
+
+Every row of `tools/playbook/namespaces.toml` carries two fields the `purpose` arm grades:
+
+- **`owner`** — the chain build that owns the namespace, a `slug` of `memory/project/chain.toml`.
+- **`purpose-source`** — where the namespace's members say what they are for, in one of three forms:
+
+| Form | Example | What is graded |
+|---|---|---|
+| `<path>` | `tools/govkit/registry.toml` | the path is tracked; no member is graded, and the row prints as path-only |
+| `<path>#<field>` | `tools/playbook/readers.toml#why` | every member at a `.toml` path carries the field on its row; a `.py` path assigns it at the top level. A path of any other suffix is red |
+| `#<field>` | `#h1` | every member's own file carries it: its TOML row's key, or for `h1` a Markdown file's first `# ` line outside a code fence |
+
+A source not in the tree yet, or a `#<field>` namespace with no member, prints as
+`tags: purpose · pending <ns> · <source>` and is counted, never graded. Once the file lands, its row is
+graded with no edit to the registry, and a member lacking the field is red. Either field left empty
+stops `check` at once, exit 2, naming the row.
+
+**The chain registry**, `memory/project/chain.toml`, holds one `[[build]]` row per chain build, a
+`slug` and a `purpose`:
+
+```toml
+[[build]]
+slug = "dOrderedCharter"
+
+[[build]]
+slug = "dExampleMoved"
+purpose = "a build no baseline row names must declare one"
+```
+
+Its slugs must match the builds of the design view (`DESIGN_VIEW` in `.memory-tree.conf`) both ways.
+A build that v2's `[chain]` named at `DESIGN_BASELINE` may leave `purpose` out until dTotalRecall's
+PM-5 unit reviews it, and is counted as awaiting that review; any other row needs one. The summary
+prints `<n> registry rows joined to <n> view builds, <n> rows awaiting PM-5's review`. Where the four
+`DESIGN_*` keys are blank, as in a project that adopted the kit, `check` prints
+`tags: purpose · no chain to read` and grades only the namespace rows.
 
 ## The three keys
 
@@ -106,4 +147,5 @@ slice = "subtree"
 
 It reads no code, grades no citation under `memory/builds/`, and grades no citation into an
 `unarmed` namespace; each is counted in the summary. A tag-shaped word in prose that is not in a
-backticked or bracketed span is not read at all.
+backticked or bracketed span is not read at all. A pending `purpose-source` whose file never lands
+stays pending, printed by name on every run and never red, and a path-only source grades no member.
