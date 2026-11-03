@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-42 — the bindings reader admits every kind the record factory mints, joined to its file name both ways
 
-**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 12 · closes PLAY-dOrderedCharter-59 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 12 · closes PLAY-dOrderedCharter-59 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -50,12 +50,21 @@ before unit 15 (order 16) and unit 2 (order 20) mint their kinds.
   (`tools/memory-tree/tree_lib.py:566-576`, TOOL-dTrueNorth-4 S2) is generalised to each member of
   `TYPED_RECORD_KINDS`: a file named `<date>-build-<unit id>-<kind>-<n>.md` in a `build/` folder whose
   Serves kind is not `<kind>` is malformed, and a record whose Serves kind is a typed kind and whose file
-  is not so named is malformed, each naming the kind. `-<kind>-<n>.md` is read only on that stem, never
-  on any name ending so, as `deviation_named` (`:491`) reads today: the six research records
-  `2026-10-20-build-PLAY-dClosedLoop-1-execution-return-plan-2.md` to `-7.md` stay bound once `plan`
-  joins the tuple (TOOL-dRankedPlan-16 §8 F5). A file off the stem that the deviation join's glob reads
-  is still refused by that join's own file-name check (`tools/memory-tree/deviation_join.py:238-240`).
-  The deviation wording is kept for the deviation kind. Observed by AC3 and AC6.
+  is not so named is malformed, each naming the kind. Both directions read `-<kind>-<n>.md` only on the
+  stem `deviation_name` spells (`tools/memory-tree/tree_lib.py:492-493`), `<kind>` in place of
+  `deviation`, never on any name ending so, as `deviation_named` (`:491`) reads today: the six research
+  records `2026-10-20-build-PLAY-dClosedLoop-1-execution-return-plan-2.md` to `-7.md` stay bound once
+  `plan` joins the tuple (TOOL-dRankedPlan-16 §8 F5), where generalising `:491` would red them. For the
+  deviation kind this narrows the first direction: a file off the stem ending `-deviation-<n>.md` no
+  longer reads malformed in `read_bindings`, and is still refused by the deviation join's own
+  file-name check, `RECORD_NAME` in `read_record` of `tools/memory-tree/deviation_join.py`, over every
+  path its `read_records` glob names. The deviation wording is kept for the deviation kind. Observed by
+  AC3 and AC6.
+  **Readers:** by name: `deviation_named`, the any-name-ending pattern the stem read retires, at
+  `tools/memory-tree/tree_lib.py:491` and its one read at line 569; no other file spells it · by value:
+  `tools/memory-tree/gen_build_index.py:756` prints a `malformed` record's `why` as an `A` row, the
+  TOOL-dTrueNorth-4 AC8 arms at `gen_build_index.py:6031-6036` compare the deviation wording this item
+  keeps, and `tools/memory-tree/deviation_join.py:564` reads the same bindings.
 - **S4** — The round trip, armed. The factory gains `python tools/memory-tree/build_records.py
   --fixture --plant typed-kinds`, in the shape of `deviation_join.py --fixture`: it writes one record
   of every kind `TYPED_RECORD_KINDS` names into a build folder of a scratch git repository, through the
@@ -88,9 +97,12 @@ before unit 15 (order 16) and unit 2 (order 20) mint their kinds.
 Read at `ce13efbe`. `RECORD_KIND_TOKENS` is the five-member tuple at `tools/memory-tree/tree_lib.py:406`;
 `read_bindings` takes the first token of a Serves line as the kind when it is a member (`:544`) and
 otherwise sets `state = "malformed"` naming the five (`:561-565`). `gen_build_index.py` imports the
-tuple (`:187`), and `cmd_print_bindings` (`:682`) is the predicate check 21 reads. The deviation
-kind's both-ways file-name join is `deviation_named` (`tools/memory-tree/tree_lib.py:491`) and its use
-at `:566-576`. Unit 7 S7 extracts the factory from `tools/memory-tree/deviation_join.py` into
+tuple in its `from tree_lib import` block (`:188`, the name at `:189`), and `cmd_print_bindings`
+(`:691`) is the predicate check 21 reads. The deviation kind's both-ways file-name join is
+`deviation_named` (`tools/memory-tree/tree_lib.py:491`, any name ending `-deviation-<n>.md`) and
+`deviation_name` (`:492-493`, the `<date>-build-<unit id>-deviation-<n>.md` stem), used at `:566-577`.
+At HEAD the tracked build records ending `-deviation-<n>.md` all sit on that stem (`git ls-files`,
+PINNED 2026-11-03), so the narrowing moves no record's verdict. Unit 7 S7 extracts the factory from `tools/memory-tree/deviation_join.py` into
 `build_records.py`, in the same kit as `tree_lib.py`; S8 writes `**Serves:** exception <unit id>`.
 Unit 2 S4 writes `**Serves:** override <unit id>` and unit 15 S7 `**Serves:** change <unit id>`;
 neither spec names `tree_lib.py`.
@@ -179,8 +191,11 @@ header.
 - **AC6** — When a probe imports `tree_lib` from a scratch copy of `tools/memory-tree/` whose
   `TYPED_RECORD_KINDS` adds `plan`, and calls `read_bindings` over a scratch git repository holding a
   record `2026-10-20-build-PLAY-dClosedLoop-1-execution-return-plan-2.md` in a `build/` folder whose
-  Serves line says `research`, its state is `bound` and its kind `research`.
-  Red when: the join reads `-plan-<n>.md` on a name off the `-build-<unit id>-<kind>-<n>.md` stem.
+  Serves line says `research`, its state is `bound` and its kind `research`; a record
+  `notes-deviation-1.md` there whose Serves line says `journal` reads `bound` too, and
+  `deviation_join.read_record` over it names its file name.
+  Red when: the join reads `-plan-<n>.md` on a name off the `-build-<unit id>-<kind>-<n>.md` stem, or an
+  off-stem deviation name escapes both readers.
 
 ## 7. Gates
 
@@ -206,6 +221,8 @@ New arm: tools/memory-tree/build_records.py · covers AC4 · its `--fixture --pl
   `2026-11-02-prompt-PLAY-dOrderedCharter-17-ask-fold-brief`: the typed-kind file-name join reads
   `-<kind>-<n>.md` only on the stem `-build-<unit id>-<kind>-<n>.md`, seen by AC6 on a research record
   named `…-return-plan-2.md` staying bound once `plan` joins `TYPED_RECORD_KINDS`.
+- rev-5 · 2026-11-03 · S3 · §4 · AC6 · from `2026-11-03-prompt-PLAY-dOrderedCharter-53-drift-fold-brief.md` (42-1 to 42-3): the stem is `deviation_name` at `tree_lib.py:492-493` and the deviation kind's narrowing is stated and observed; `gen_build_index.py`'s import block and `cmd_print_bindings` re-anchored; the deviation join's file-name check cited as `RECORD_NAME`, by name.
+- rev-5 · 2026-11-03 · S3 · from `2026-11-03-prompt-PLAY-dOrderedCharter-9-readers-brief.md`: S3's `**Readers:**` clause names the readers of the any-name-ending deviation pattern, by name and by value.
 - rev-4 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Items 2 and 3: the leg line names `policy fixtures` and `playbook render selftest`, whose guards §4 Files touched trips, `tools/memory-tree/tree_lib.py` the latter's, the guards hits the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit

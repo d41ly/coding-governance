@@ -127,18 +127,18 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 TOOL
 | [PLAY-dOrderedCharter-63 — the spec-token checker reads a spec's liveness from its status header, never from a fenced example](spec/2026-11-03-spec-PLAY-dOrderedCharter-63.md) | 7 | 2 | CLOSED | rev-1 | 2026-11-03 |
 | [PLAY-dOrderedCharter-28 — the shared edge grammar at every site the memory plan names: twelve new types, native-id classes and the two pinned forms](spec/2026-10-23-spec-PLAY-dOrderedCharter-28.md) | 8 | 2 | CLOSED | rev-5 | 2026-11-03 |
 | [PLAY-dOrderedCharter-26 — file:line citations held in the positional population, new text citing a symbol or a pinned line](spec/2026-10-23-spec-PLAY-dOrderedCharter-26.md) | 9 | 2 | DEFERRED | rev-7 | 2026-11-03 |
-| [PLAY-dOrderedCharter-25 — gov tag bundle, a tag's members, regions and instructions in one call, and the two edge checks](spec/2026-10-23-spec-PLAY-dOrderedCharter-25.md) | 10 | 2 | DEFERRED | rev-6 | 2026-11-03 |
-| [PLAY-dOrderedCharter-47 — a record written on a branch that never held the positional check is graded print-only, by its adding commit's ancestry](spec/2026-10-24-spec-PLAY-dOrderedCharter-47.md) | 10 | 2 | DEFERRED | rev-2 | 2026-10-24 |
-| [PLAY-dOrderedCharter-48 — the sources that tell a writer to cite path and line are a query over the directive sources, every hit re-pointed or kept by name](spec/2026-10-24-spec-PLAY-dOrderedCharter-48.md) | 10 | 2 | DEFERRED | rev-3 | 2026-11-03 |
-| [PLAY-dOrderedCharter-50 — the rows a new leg, key or retirement owes are written by the pass that creates them, through one owed-rows probe](spec/2026-10-24-spec-PLAY-dOrderedCharter-50.md) | 10 | 2 | DEFERRED | rev-4 | 2026-11-03 |
-| [PLAY-dOrderedCharter-53 — a file:line citation is grandfathered by the commit that wrote its line, never by the age of its file](spec/2026-10-24-spec-PLAY-dOrderedCharter-53.md) | 11 | 2 | DEFERRED | rev-1 | 2026-10-24 |
-| [PLAY-dOrderedCharter-7 — the core: principle registry, meta-check, kinds register, exception register and the core policies](spec/2026-10-23-spec-PLAY-dOrderedCharter-7.md) | 11 | 2 | DEFERRED | rev-6 | 2026-11-03 |
-| [PLAY-dOrderedCharter-13 — the ladder renumbered: levels 0 to 7, the charter at level 0, the platform above it](spec/2026-10-23-spec-PLAY-dOrderedCharter-13.md) | 12 | 2 | DEFERRED | rev-4 | 2026-11-03 |
-| [PLAY-dOrderedCharter-42 — the bindings reader admits every kind the record factory mints, joined to its file name both ways](spec/2026-10-24-spec-PLAY-dOrderedCharter-42.md) | 12 | 2 | DEFERRED | rev-4 | 2026-11-03 |
-| [PLAY-dOrderedCharter-12 — the statement grammar, its check, and render provenance in a sidecar lock](spec/2026-10-23-spec-PLAY-dOrderedCharter-12.md) | 13 | 2 | DEFERRED | rev-4 | 2026-11-03 |
-| [PLAY-dOrderedCharter-9 — the instruction-unit registry: one row per unit in each kit's manifest, its one reader, and documents rendered from units](spec/2026-10-23-spec-PLAY-dOrderedCharter-9.md) | 14 | 2 | DEFERRED | rev-4 | 2026-10-24 |
-| [PLAY-dOrderedCharter-20 — the unit schema, the one renderer of record and its templates, the render gate with its legacy list, and one fact in one unit](spec/2026-10-23-spec-PLAY-dOrderedCharter-20.md) | 15 | 2 | DEFERRED | rev-5 | 2026-11-03 |
-| [PLAY-dOrderedCharter-15 — the instruction manifest and its guarded write command, each change recorded, and the pack catalogue](spec/2026-10-23-spec-PLAY-dOrderedCharter-15.md) | 16 | 2 | DEFERRED | rev-6 | 2026-11-03 |
+| [PLAY-dOrderedCharter-25 — gov tag bundle, a tag's members, regions and instructions in one call, and the two edge checks](spec/2026-10-23-spec-PLAY-dOrderedCharter-25.md) | 10 | 2 | DEFERRED | rev-7 | 2026-11-03 |
+| [PLAY-dOrderedCharter-47 — a record written on a branch that never held the positional check is graded print-only, by its adding commit's ancestry](spec/2026-10-24-spec-PLAY-dOrderedCharter-47.md) | 10 | 2 | DEFERRED | rev-3 | 2026-11-03 |
+| [PLAY-dOrderedCharter-48 — the sources that tell a writer to cite path and line are a query over the directive sources, every hit re-pointed or kept by name](spec/2026-10-24-spec-PLAY-dOrderedCharter-48.md) | 10 | 2 | DEFERRED | rev-4 | 2026-11-03 |
+| [PLAY-dOrderedCharter-50 — the rows a new leg, key or retirement owes are written by the pass that creates them, through one owed-rows probe](spec/2026-10-24-spec-PLAY-dOrderedCharter-50.md) | 10 | 2 | DEFERRED | rev-5 | 2026-11-03 |
+| [PLAY-dOrderedCharter-53 — a file:line citation is grandfathered by the commit that wrote its line, never by the age of its file](spec/2026-10-24-spec-PLAY-dOrderedCharter-53.md) | 11 | 2 | DEFERRED | rev-2 | 2026-11-03 |
+| [PLAY-dOrderedCharter-7 — the core: principle registry, meta-check, kinds register, exception register and the core policies](spec/2026-10-23-spec-PLAY-dOrderedCharter-7.md) | 11 | 2 | DEFERRED | rev-7 | 2026-11-03 |
+| [PLAY-dOrderedCharter-13 — the ladder renumbered: levels 0 to 7, the charter at level 0, the platform above it](spec/2026-10-23-spec-PLAY-dOrderedCharter-13.md) | 12 | 2 | DEFERRED | rev-5 | 2026-11-03 |
+| [PLAY-dOrderedCharter-42 — the bindings reader admits every kind the record factory mints, joined to its file name both ways](spec/2026-10-24-spec-PLAY-dOrderedCharter-42.md) | 12 | 2 | DEFERRED | rev-5 | 2026-11-03 |
+| [PLAY-dOrderedCharter-12 — the statement grammar, its check, and render provenance in a sidecar lock](spec/2026-10-23-spec-PLAY-dOrderedCharter-12.md) | 13 | 2 | DEFERRED | rev-5 | 2026-11-03 |
+| [PLAY-dOrderedCharter-9 — the instruction-unit registry: one row per unit in each kit's manifest, its one reader, and documents rendered from units](spec/2026-10-23-spec-PLAY-dOrderedCharter-9.md) | 14 | 2 | DEFERRED | rev-5 | 2026-11-03 |
+| [PLAY-dOrderedCharter-20 — the unit schema, the one renderer of record and its templates, the render gate with its legacy list, and one fact in one unit](spec/2026-10-23-spec-PLAY-dOrderedCharter-20.md) | 15 | 2 | DEFERRED | rev-6 | 2026-11-03 |
+| [PLAY-dOrderedCharter-15 — the instruction manifest and its guarded write command, each change recorded, and the pack catalogue](spec/2026-10-23-spec-PLAY-dOrderedCharter-15.md) | 16 | 2 | DEFERRED | rev-7 | 2026-11-03 |
 | [PLAY-dOrderedCharter-1 — the practice catalogue and `charter.practices`](spec/2026-10-23-spec-PLAY-dOrderedCharter-1.md) | 17 | 2 | DEFERRED | rev-6 | 2026-11-03 |
 | [PLAY-dOrderedCharter-45 — the merge driver's TOML-table class states its whole conflict envelope and proves its output parses](spec/2026-10-24-spec-PLAY-dOrderedCharter-45.md) | 17 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them](spec/2026-10-23-spec-PLAY-dOrderedCharter-3.md) | 18 | 2 | DEFERRED | rev-5 | 2026-11-03 |
@@ -172,7 +172,7 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 TOOL
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 <!-- /gen:build-units -->
 
-Records: 299 bound to this build, across 4 record folder(s).
+Records: 307 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

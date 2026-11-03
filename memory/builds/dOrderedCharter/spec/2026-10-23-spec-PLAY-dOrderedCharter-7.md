@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-7 — the core: principle registry, meta-check, kinds register, exception register and the core policies
 
-**Status:** DEFERRED · rev-6 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 11 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-7 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 11 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0037@0b2c8bff whole
 
@@ -40,7 +40,8 @@
 ## 1. Goal
 
 No principle declares its enforcement today: 22 of the charter's 36 practices are cited by no code file
-and none of the 142 rows of `tools/gate-legs.json` names a principle (gap-found-07), and factories exist for
+and none of the rows of `tools/gate-legs.json` names a principle (gap-found-07; 151 rows at `8aafb0314`,
+PINNED 2026-11-03), and factories exist for
 3 of 13 extension kinds (gap-found-08). P16 says the core cannot be built around. This unit builds the core
 the foundations record places in this build (foundations, "Settled design for the core"): the principle
 registry, the meta-check joining it both ways to the checks that enforce it, the kinds register with each
@@ -57,10 +58,13 @@ build owns.
   Principles are fixed: no policy key reads or writes a row. Observed by AC1.
 - **S2** — The `enforces` key. A row of `tools/gate-legs.json` may carry `"enforces": [<tag>, …]`, each a
   `principle.*` or `practice.*` tag. This unit's own legs carry it, and unit 16's layer gate leg gains
-  `["principle.p28", "principle.p16"]`. Observed by AC2.
-- **S3** — The meta-check, `python tools/playbook/core.py meta-check`, joined both ways through S2's join
-  factory (`compute_coverage`, carried inline as its canonical copy under the `PARITY_ROWS` row unit 19
-  adds): a principle no leg's `enforces` and no kind's `binds` names is red; an `enforces` or `binds` tag no
+  `["principle.p28", "principle.p16"]`. The `enforces` row of `tools/playbook/edges.toml` (`:63-70`)
+  reads `to = ["unit", "practice"]`; this pass adds `principle`, so a `principle.*` target sits inside
+  the type's `to`. Observed by AC2 and AC13.
+- **S3** — The meta-check, `python tools/playbook/core.py meta-check`, joined both ways through the join
+  factory `compute_coverage`, imported from `tools/memory-tree/coverage_join.py:49` as
+  `tools/playbook/tag_index.py:984` imports it, that file the one copy of `tools/lib/coverage_join.py:46`
+  its `PARITY_ROWS` row holds byte-identical (`tools/lib/resolve-python.test.sh:370`, `:402-405`): a principle no leg's `enforces` and no kind's `binds` names is red; an `enforces` or `binds` tag no
   registry row holds is red; a leg carrying no `enforces` is red. Each red is excused only by a row of the
   shrink-only pending list `tools/playbook/core-pending.txt`, keyed `principle`, `practice` or `leg` and
   the name, with the build that arms it; a pending row whose item is now enforced is red as stale. The
@@ -129,6 +133,16 @@ build owns.
   row: it fills each row's `summary` and its `usage`, a line the row admits (`core.bypass = "never"`,
   `core.exceptions = "owner-only-expiring"`), and drains both names in the same commit with
   `python <prefix>/policy/policy.py lists --write`. Observed by AC11.
+- **S13** — The legs' own rows, in this pass, as unit 26 S7 writes its leg's claim. Each of S11's five
+  legs is claimed in the `gate-legs` claim of `memory/map/features/playbook.md`, with what
+  `python tools/codebase-map/gen_map.py --write` rewrites under `memory/map/generated/`, and gets its
+  `tools/govkit/subject-pins.tsv` row by `python tools/govkit/govkit.py selfcheck --write`. `core
+  selftest`, whose fixture is a scratch repository an adopter can run, is a `[[gate_leg]]` row of
+  `tools/playbook/kit.toml`, subject `kit`, as `playbook render selftest` is (`:74-82`). The other four
+  grade gov's own registries, legs, Skills and practice catalogue, so each is an `[[exempt_leg]]` row of
+  `tools/govkit/registry.toml`, as the `tags` leg is (`:711`). Each leg's
+  `tools/run-gates/ceiling-evidence.txt` row is unit 50 S2's `deferred —` line, written at the close
+  from a measured run. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -145,7 +159,8 @@ build owns.
 
 ### Edges
 
-- **consumes-from** `PLAY-dOrderedCharter-19` — the join factory `compute_coverage` and its `PARITY_ROWS` row, the resolver and the `tags` pack
+- **consumes-from** `PLAY-dOrderedCharter-19` — the join factory `compute_coverage` in `coverage_join.py` and its `PARITY_ROWS` row, the resolver and the `tags` pack
+- **consumes-from** `PLAY-dOrderedCharter-24` — `tools/playbook/edges.toml`, whose `enforces` row's `to` S2 widens with `principle`
 - **consumes-from** `PLAY-dOrderedCharter-10` — the `principle`, `practice` and `kind` namespaces and the tag shape check S1 and S4 write under
 - **consumes-from** `PLAY-dOrderedCharter-16` — the layer kind's factory and gate leg, which S4 registers and S2 marks
 - **hands-off** `PLAY-dOrderedCharter-20` — the instruction-unit kind's factory and gate, registered here as pending; and `read_policy_value`, which that unit reads `instructions.legacy` through
@@ -158,8 +173,8 @@ build owns.
 - **hands-off** `PLAY-dOrderedCharter-30` — the `enforces` key, the meta-check and the pending list its rule-to-leg pairs live in
 - **hands-off** `PLAY-dOrderedCharter-32` — the principle registry a `principle.` unit's fixed class reads
 - **hands-off** `PLAY-dOrderedCharter-37` — the kinds register's rows its reference pages render
-- **hands-off** `PLAY-dOrderedCharter-12` — the `enforces` key the grammar leg carries
-- **hands-off** `PLAY-dOrderedCharter-13` — the `enforces` key the ladder leg carries, and the meta-check that joins it
+- **hands-off** `PLAY-dOrderedCharter-12` — the `enforces` key the grammar leg carries, its `principle.*` tags inside the `enforces` row's widened `to`
+- **hands-off** `PLAY-dOrderedCharter-13` — the `enforces` key the ladder leg carries, its `principle.*` tags inside the `enforces` row's widened `to`, and the meta-check that joins it
 - **consumes-from** external — dGroundRules, landed before this build run: `policy.py get` at the landed revision (TOOL-dGroundRules-2 S1, S7, `cl-dClosedLoop-0008`) with an unset key's catalogue default (TOOL-dGroundRules-3 S2), the `core.bypass` and `core.exceptions` rows and the shrink-only list S12 drains (TOOL-dGroundRules-1 S3, S6), and the mirror's `mirror --write` (TOOL-dGroundRules-5 S2, TOOL-dGroundRules-19 S1); the minimal guard's proof is `[ -t 2 ]` inline in `.githooks/pre-commit`, which no Python calls (TOOL-dGroundRules-6 S4, F3), so this edge takes no proof from it
 - **hands-off** `PLAY-dOrderedCharter-9` — `read_policy_value`, over which that unit's `policy_reader` renders a `policy:<key>` unit
 - **hands-off** `PLAY-dOrderedCharter-14` — `read_policy_value`, which that unit reads `memory.load-budget` through
@@ -232,7 +247,8 @@ pending list is written once at the build pass and only shrinks after.
 
 ### Rollout
 
-Live at landing, at order 11: after units 10 (order 5), 16 (order 2) and 19 (order 4), and before units 20
+Live at landing, at order 11: after units 10 (order 5), 16 (order 2), 19 (order 4), 24 (order 7) and 50
+(order 10), and before units 20
 (order 15) and 1 (order 17), whose populations arm S3 and S6 when they land. S12 lands as two commits: the
 row fills with the list drain, then `.governance/policy.json` alone as `policy.py mirror --write`
 regenerates it, since a catalogue edit stales the mirror (TOOL-dGroundRules-5 S1, S2) and the guard admits
@@ -249,6 +265,12 @@ a mirror commit only when the policy file and the catalogue equal HEAD (TOOL-dGr
 - `tools/memory-tree/deviation_join.py`
 - `tools/memory-tree/check-verdict-epoch.sh`
 - `tools/gate-legs.json`
+- `tools/playbook/edges.toml`, the `enforces` row's `to`
+- `memory/map/features/playbook.md`, the legs' claim
+- `memory/map/generated/`, the files `python tools/codebase-map/gen_map.py --write` rewrites
+- `tools/govkit/subject-pins.tsv`, the legs' pin rows
+- `tools/playbook/kit.toml`, `core selftest`'s `[[gate_leg]]` row
+- `tools/govkit/registry.toml`, the four `[[exempt_leg]]` rows
 - `tools/policy/catalogue.toml`, the two existing rows filled
 - `tools/policy/unsummarised-keys.txt`, drained by `lists --write`
 - `.governance/policy.json`, the second commit
@@ -333,10 +355,20 @@ a mirror commit only when the policy file and the catalogue equal HEAD (TOOL-dGr
   Red when: a row is added, a row keeps no summary or usage, a name stays on the shrink-only list, or a
   key is read in a shape the reader-coverage arm does not count.
   fixture: the policy kit's paths are quoted because none is tracked until dGroundRules builds.
+- **AC12** — When `git grep -n -E '^gate-legs = \[.*"core selftest"' -- memory/map/features/playbook.md`
+  runs after the pass, it prints one line naming all five legs;
+  `git grep -c -E '^core (meta-check|kinds|skills conformance|practices conformance|selftest)[[:space:]]' -- tools/govkit/subject-pins.tsv`
+  counts five; `git grep -n -F 'name = "core selftest"' -- tools/playbook/kit.toml` prints one line; and
+  `git grep -n -E 'name = "core (meta-check|kinds|skills conformance|practices conformance)"' -- tools/govkit/registry.toml`
+  prints four.
+  Red when: a leg lands unclaimed or unpinned, or is claimed by both a descriptor and the registry.
+- **AC13** — When `python -c "import tomllib; print([r['to'] for r in tomllib.load(open('tools/playbook/edges.toml', 'rb'))['edge'] if r['type'] == 'enforces'])"`
+  runs after the pass, it prints `[['unit', 'practice', 'principle']]`.
+  Red when: a leg's `principle.*` tag sits outside the `enforces` type's `to`.
 
 ## 7. Gates
 
-`playbook render selftest` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
+`playbook render selftest` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `codebase-map coverage + freshness`
 
 New arm: tools/playbook/core.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC8 AC9 AC10 · the `core selftest` leg runs every `fixture --plant` case, each failing case staged by its plant · none
 
@@ -369,15 +401,20 @@ New arm: tools/memory-tree/deviation_join.py · covers AC7 · its existing suite
 - rev-4 · 2026-10-24 · §2 S9, S10, S11, S12 · §3 Edges · §4 The policy reads, Inventory, Rollout, Files touched · §5 · AC9, AC10, AC11 · §7 · §10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 40, U3 and U4: both keys are read with `policy.py get` through `read_policy_value`, whose contract §4 now states, and a refused read reds; both landed rows are filled and drained, never added; `owner-only-expiring` takes the owner proof spec 15's §8 fork settles, since the guard's `[ -t 2 ]` is no callable.
 - rev-5 · 2026-10-25 · §2 S9 · §3 Edges · §5 security · the owner's pick folded by `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks` item 2: `owner-only-expiring` states the settled proof, stderr being a terminal through PLAY-dOrderedCharter-15's check, in place of a pointer to that unit's open fork.
 - rev-6 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-7 · 2026-11-03 · §1 · S2 S3 S13 · §3 Edges · §4 Rollout, Files touched · AC12 AC13 · §7 · §10 · from
+  `2026-11-03-prompt-PLAY-dOrderedCharter-47-drift-fold-brief.md` findings 7-1 to 7-5 and item 4:
+  `compute_coverage` is imported from memory-tree's `coverage_join.py`; `edges.toml`'s `enforces` `to`
+  gains `principle` in this pass; the five legs write their claim, pin and claiming rows; the
+  `deviation_join.py` lines and the leg count are re-read at `8aafb0314`; §4 Rollout names units 24 and 50.
 
 ## 10. Reuse audit
 
 The seams extended are `tools/gate-legs.json`'s row grammar (a new `enforces` key beside `name`, `argv`,
-`guard`, `chunk`, `subject` and `ceiling`), unit 19's `compute_coverage` (today
-`tools/codebase-map/map_lib.py:1404`) through the `PARITY_ROWS` table of
-`tools/lib/resolve-python.test.sh`, and the deviation record reader of
-`tools/memory-tree/deviation_join.py` (`FIELD` at :145, `RECORD_NAME` at :160, `read_record` at :212,
-`read_records` at :268), which S7 extracts. `python tools/codebase-map/reuse_lookup.py "refuse a principle
+`guard`, `chunk`, `subject` and `ceiling`), unit 19's `compute_coverage` (`tools/lib/coverage_join.py:46`,
+its copy `tools/memory-tree/coverage_join.py:49`, kept by the `PARITY_ROWS` table of
+`tools/lib/resolve-python.test.sh`), and the deviation record reader of
+`tools/memory-tree/deviation_join.py` (`FIELD` at :150, `RECORD_NAME` at :165, `read_record` at :217,
+`read_records` at :273, re-read at `8aafb0314`), which S7 extracts. `python tools/codebase-map/reuse_lookup.py "refuse a principle
 that no gate leg names as what it enforces"` ranked name-token matches (`legs`, `leg`, `CensusRefused`) and
 no registry or meta-check, so no existing seam fits those; scout B found the same by text search. The
 policy keys are read through the policy kit's `get` verb (TOOL-dGroundRules-2 S7) as a subprocess, the one

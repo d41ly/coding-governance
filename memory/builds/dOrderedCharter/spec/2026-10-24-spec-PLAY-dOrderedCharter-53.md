@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-53 — a file:line citation is grandfathered by the commit that wrote its line, never by the age of its file
 
-**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 11 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 11 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 |
 | [2026-11-02-prompt-PLAY-dOrderedCharter-53-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-53-build-brief.md) | journal | — |
 | [2026-11-03-prompt-PLAY-dOrderedCharter-53-1-spec-reviewer.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-53-1-spec-reviewer.md) | journal | — |
+| [2026-11-03-prompt-PLAY-dOrderedCharter-53-1-spec-writer.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-53-1-spec-writer.md) | journal | — |
 | [2026-11-03-prompt-PLAY-dOrderedCharter-53-drift-sweep-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-53-drift-sweep-brief.md) | research | PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-12 |
 
 <!-- /gen:spec-records -->
@@ -33,13 +34,14 @@ that does not descend from `L`. It repairs unit 47 and is built right after it.
 ## 2. Scope (IN)
 
 - **S1** — The provenance. For a record under `memory/builds/` holding at least one unlisted
-  file:line reference that unit 26 S3 would red, `positional.py` reads `git blame --porcelain -M
-  HEAD -- <path>` once and maps each line to the commit that wrote it. Blame follows the file across
-  its renames, and `-M` keeps a line moved within the file attributed to its first writer. Observed
-  by AC1 to AC3.
+  file:line reference that unit 26 S3 would red, `positional.py` reads `git blame --porcelain -M --
+  <path>` once, over the working tree and never naming `HEAD`, and maps each line to the commit that
+  wrote it. Blame follows the file across its renames, `-M` keeps a line moved within the file
+  attributed to its first writer, and an uncommitted line, every line of a record staged but never
+  committed included, reads the all-zero sha. Observed by AC1 to AC3.
 - **S2** — The verdict. A reference is grandfathered when the commit blame names for its line is
-  outside unit 47 S2's descendant set of `L`, and graded under unit 26 S3 when it is inside it. A line
-  blame attributes to no commit, an uncommitted edit, is graded. This supersedes unit 47 S2's "whose
+  outside unit 47 S2's descendant set of `L`, and graded under unit 26 S3 when it is inside it. The
+  all-zero sha counts as inside the descendant set, so an uncommitted line is graded. This supersedes unit 47 S2's "whose
   adding commit, read through `tree_lib.read_adding_commits` over `memory/builds/**`, is outside
   that set" and S3's "In such a record, every unlisted file:line reference" as the grandfathering
   key; unit 47 S1's derivation of `L` and S2's descendant set stand. Observed by AC1 and AC2.
@@ -71,6 +73,9 @@ Read at `ce13efbe`; the seam is unit 47's design over `tree_lib.read_adding_comm
 `git log --reverse --no-renames --diff-filter=A`. `git log --oneline -- memory/builds/dOrderedCharter/RUN.md`
 printed four commits against one add and `README.md` eight, PINNED 2026-10-24 by the audit's probe;
 `memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-1.md` was added in `8aa81a42e` and modified in `41c08120b`.
+In a scratch repository, a line appended to a committed, renamed file blamed `0000000…` without `HEAD`
+and was absent from the output with it, the renamed lines kept their first commit both ways, and a
+staged new file blamed all-zero, PINNED 2026-11-03 by the drift fold's probe.
 
 ### Why blame, and its cost
 
@@ -114,7 +119,7 @@ Live at landing, order 11, after unit 47 at order 10. Unit 7 shares order 11 and
 - observability: each grandfathered reference prints its line and the commit that wrote it.
 - risks: a whitespace-only rewrite of a pre-`L` line re-attributes it to the rewriting commit, which
   grades it; that errs toward grading.
-- testing: AC1 to AC3 by plant under unit 19's selftest arm.
+- testing: AC1 to AC3 by plant, run by unit 26 S7's `tags positional selftest`.
 - migration: none.
 - user docs: unit 47's sentence in `tools/playbook/README.md` names the per-line rule.
 
@@ -125,20 +130,21 @@ Live at landing, order 11, after unit 47 at order 10. Unit 7 shares order 11 and
   `x.py:3` reds.
   Red when: a citation appended after the merge to a pre-fork record is print-only.
 - **AC2** — When `--plant positional-renamed-after` runs, the renamed record's pre-fork `x.py:1` is
-  still printed as grandfathered and the leg's arm exits 0.
+  still printed as grandfathered and the plant exits 0.
   Red when: a rename after the merge strips grandfathering from lines nobody rewrote.
 - **AC3** — When `--plant positional-uncommitted` runs, the uncommitted `x.py:3` reds.
   Red when: an uncommitted line is read as written before the check.
 
 ## 7. Gates
 
-`playbook render selftest` · `govkit acceptance matrix` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `govkit acceptance matrix` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `spec tokens (a spec's own names resolve)` · `tags (the resolver's checks)`
 
-Unit 19's `tags (the resolver's checks)` leg runs the positional arm over the tree, this unit's
-verdict included, and unit 26's `tags positional selftest` runs the positional plants; neither leg is
-in `tools/gate-legs.json` at base, so both stay off the line above.
+Unit 19's `tags (the resolver's checks)` leg (`tools/gate-legs.json:1833`, claimed at
+`tools/govkit/registry.toml:711`) runs the positional arm over the tree, this unit's verdict included.
+Unit 26 S7's `tags positional selftest` runs every `positional-*` plant, these three included; it
+lands at order 9 and is not in `tools/gate-legs.json` at HEAD, so it stays off the line above.
 
-New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 · the playbook-render selftest runs the three plants, each failing case staged by unit 47's per-file adding-commit rule · none
+New arm: tools/playbook/positional.py · covers AC1 AC2 AC3 · unit 26 S7's `tags positional selftest` runs the three plants, each failing case staged by unit 47's per-file adding-commit rule · none
 
 ## 8. Open questions
 
@@ -154,6 +160,7 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 · the playbook-
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-2 spec audit's finding 36 (HIGH, item H4).
+- rev-2 · 2026-11-03 · S1 S2 · §4 · §5 · AC2 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-53-drift-fold-brief.md` (53-1 to 53-3): blame reads the working tree and the all-zero sha is inside the descendant set; the plants run in unit 26's `tags positional selftest`, so the New arm names `positional.py` and `adopt-playbook.sh` leaves it; the line names the landed `tags` leg.
 
 ## 10. Reuse audit
 

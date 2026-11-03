@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-48 — the sources that tell a writer to cite path and line are a query over the directive sources, every hit re-pointed or kept by name
 
-**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -59,8 +59,9 @@ neither. It repairs unit 26 and is built right after it.
   the line and the remedy (re-point it, or add a row with its reason); a row whose text no hit carries
   is red as stale. It acts under `tags.positional` as unit 26 S3's limbs do. Observed by AC4.
 - **S5** — The plants, through unit 19's fixture: `positional-producer-new` (a role source gains
-  "cite it by file:line") and `positional-producer-stale` (a kept row whose line was re-pointed).
-  Observed by AC4.
+  "cite it by file:line") and `positional-producer-stale` (a kept row whose line was re-pointed),
+  each joining the `PLANTS` tuple of `tools/playbook/gov_tag.py` (`:317`) and run by unit 26's
+  `tags positional selftest` leg with every `positional-*` case. Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -71,28 +72,29 @@ neither. It repairs unit 26 and is built right after it.
 
 ### Edges
 
-- **consumes-from** `PLAY-dOrderedCharter-26` — the stable forms, `CODE_EXTENSIONS`, the positional arm and S6's four re-points, which S1 makes a query and S4 joins as a limb; without them there is no form to point at
+- **consumes-from** `PLAY-dOrderedCharter-26` — the stable forms, `CODE_EXTENSIONS`, the positional arm, the `tags positional selftest` leg S5's plants run in and S6's four re-points, which S1 makes a query and S4 joins as a limb; without them there is no form to point at
 - **hands-off** `PLAY-dOrderedCharter-55` — round-2 id 28: the producers limb's plants run in `tags positional selftest`
 
 ## 4. Design
 
 ### Evidence
 
-Read at `ce13efbe`. `tools/roles/agents/gov-spec-writer.agent.md:30` reads "cite it by path and line";
+Read at `ce13efbe`, the line numbers re-read at `8aafb0314`. `tools/roles/agents/gov-spec-writer.agent.md:30` reads "cite it by path and line";
 `tools/workflows/orient-counterfactual.js:111` reads "Cite files by path and line, never ingest them into
-the card."; neither has a `.template.` source. S1's query over the base tree printed 41 hits. Beside
+the card."; neither has a `.template.` source. S1's query printed 41 hits over the base tree and 41 at `8aafb0314`. Beside
 unit 26 S6's four sources (`tools/roles/agents/gov-diff-reviewer.agent.md:26`,
-`tools/workflows/REVIEW-PROTOCOL.template.md:193`, the two drift-audit templates and
+`tools/workflows/REVIEW-PROTOCOL.template.md:155`, the two drift-audit templates and
 `tools/workflows/tier2-review.template.js`, with their renders), it printed the two missed directives
-and `tools/roles/agents/gov-skeptic.agent.md:26` (re-read the cited line), `tools/workflows/README.md:489`
-and `:522`, `tools/workflows/check-review-join.sh:16` and `:20`, `tools/workflows/check-review-join.test.sh:159`,
+and `tools/roles/agents/gov-skeptic.agent.md:26` (re-read the cited line), `tools/workflows/README.md:498`
+and `:531`, `tools/workflows/check-review-join.sh:16` and `:20`, `tools/workflows/check-review-join.test.sh:279`,
 `tools/workflows/review_replay.py:188`, `tools/runlog/SKILL.template.md:54` (a citation of record lines)
 and `tools/memory-tree/HYGIENE.template.md:160` (a registry keyed on path alone), each narration, a read
-directive or a document citation. Those are the seed's candidates; the pass judges them (PINNED 2026-10-24).
+directive or a document citation. Those are the seed's candidates; the pass judges them (PINNED 2026-10-24,
+lines PINNED 2026-11-03).
 
 ### Why the hooks stay out
 
-`tools/hooks/README.md:119` and `tools/hooks/agent-cap.js:1962` describe why the review join keys on an
+`tools/hooks/README.md:130` and `tools/hooks/agent-cap.js:1962` describe why the review join keys on an
 integer id rather than a `file:line` string. A hook message is read by an agent, but neither line
 directs a citation, and adding the hooks to the pathspecs adds only kept rows. A hook that ever tells
 a writer what to cite is a source this query names in a later unit.
@@ -112,6 +114,7 @@ grades the Python names.
 - `tools/roles/agents/gov-spec-writer.agent.md`
 - `.claude/agents/gov-spec-writer.md` (its render)
 - `tools/workflows/orient-counterfactual.js`
+- `tools/playbook/README.md` (the paragraph §5 names)
 
 ### Rollout
 
@@ -146,7 +149,7 @@ the dispatch sequences them (M6).
   `tools/workflows/orient-counterfactual.js:111`, and prints no line of `tools/workflows/tier2-review.js`,
   the render of `tools/workflows/tier2-review.template.js`.
   figure: DERIVED, the population read by the query at the pass; 41 hits at `ce13efbe` before render
-  attribution, PINNED 2026-10-24.
+  attribution, PINNED 2026-10-24, and 41 at `8aafb0314`, PINNED 2026-11-03.
   Red when: the population is typed, or a render is counted beside its source.
 - **AC2** — When the same verb runs after the pass and its output is filtered to hits not on
   `positional-producers.txt`, every line printed names `path#symbol` or a blob-pinned
@@ -163,7 +166,7 @@ the dispatch sequences them (M6).
 
 `playbook render selftest` · `govkit acceptance matrix` · `roles render wiring` · `roles render selftest` · `roles catalogue` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/playbook/adopt-playbook.sh · covers AC4 · the playbook-render selftest runs the two producer plants, each failing case staged by deleting the limb · none
+New arm: tools/playbook/positional.py · covers AC4 · unit 26's `tags positional selftest` leg runs the two producer plants with every `positional-*` case, each failing case staged by deleting the limb · none
 
 ## 8. Open questions
 
@@ -182,6 +185,11 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC4 · the playbook-render s
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's finding 82 (HIGH, item H9).
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 - rev-3 · 2026-11-03 · §3 · §4 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 4: `agent-cap.js`'s review-join refusal, cited twice at `:2414`, past the file's 2008 lines, re-pointed at HEAD to `:1962`, the line naming the `file:line` string.
+- rev-4 · 2026-11-03 · S5 · §3 · §4 · §6 AC1 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-47-drift-fold-brief.md`
+  findings 48-1 to 48-3: the producer plants' arm runs in unit 26's `tags positional selftest` leg, not
+  the playbook-render selftest; `tools/playbook/README.md` joins Files touched; `tools/hooks/README.md`'s
+  line is `:130`; the seed candidates' moved lines are re-pointed at `8aafb0314`, where the query still
+  prints 41 hits.
 
 ## 10. Reuse audit
 
