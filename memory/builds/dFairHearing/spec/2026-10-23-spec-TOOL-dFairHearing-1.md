@@ -14,6 +14,7 @@
 | [2026-11-03-build-TOOL-dFairHearing-1-1-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-1-builder-return.md) | journal | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-2-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-2-builder-return.md) | journal | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-3-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-3-builder-return.md) | journal | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-4-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-4-builder-return.md) | journal | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-calibration.md](../build/2026-11-03-build-TOOL-dFairHearing-1-calibration.md) | research | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-deviation-12.md](../build/2026-11-03-build-TOOL-dFairHearing-1-deviation-12.md) | deviation | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-known-set.md](../build/2026-11-03-build-TOOL-dFairHearing-1-known-set.md) | research | — |
