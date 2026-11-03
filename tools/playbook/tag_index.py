@@ -12,11 +12,20 @@ rebuild. Its tables, keyed by blob or by path and blob so a later build can add 
   blob_row(blob, extractor, tag, kind, line, end_line, text) what a blob holds, whatever path it sits at
   path_row(path, blob, extractor, tag, kind, line)          what a path names, a citation among them
   dirty_path(worktree, path, blob)                          a worktree's uncommitted edits to tracked files
-  tree_built(tree, built_at)                                the freshness key
+  tree_built(tree, built_at)                                the freshness key of a tree
+  blob_parsed(blob, extractor, version)                     the freshness key of a blob (PLAY-dOrderedCharter-44)
 
 A blob row's tag `""` or `#<seg>` is relative to the name its path gives it (a document's `doc.<name>`),
-so one blob at two paths is parsed once and named twice; every other tag is whole. A `parsed` row marks a
-(blob, extractor) or (path, blob, extractor) pair read, so an extractor that found nothing is not re-run.
+so one blob at two paths is parsed once and named twice; every other tag is whole. A `blob_parsed` row
+marks a blob read by one extractor at one version, written when the run yields nothing too, so a build
+runs each extractor over the blobs it has not read at its current version: a newly registered extractor
+reads old blobs, and one whose version moved has its old rows cleared first. A `parsed` path row marks a
+(path, blob, extractor) triple named. The file is stamped `PRAGMA user_version = INDEX_SCHEMA`; a file of
+another stamp is started again from nothing.
+
+AN EXTRACTOR'S VERSION is derived, never typed: the first 12 hex of the SHA-256 of the bytes of the module
+file defining it. An extractor that imports a helper from another module does not see that helper's
+edits in its version: edit the extractor's own module, or `gov_tag.py --rebuild`.
 
 AN EXTRACTOR is `<module>:<function>`, called `fn(ctx, path, None)` to ask whether it reads `path` (the
 path's name, `""` for none, or None when it does not read it) and `fn(ctx, path, text)` for the rows,
@@ -28,7 +37,9 @@ worktree's top-level path and served to that worktree alone; the freshness key e
 """
 from __future__ import annotations
 
+import collections
 import fnmatch
+import hashlib
 import importlib.util
 import os
 import pathlib
@@ -61,7 +72,11 @@ CREATE INDEX IF NOT EXISTS path_row_key ON path_row(path, blob);
 CREATE INDEX IF NOT EXISTS path_row_tag ON path_row(tag);
 CREATE TABLE IF NOT EXISTS dirty_path(worktree TEXT, path TEXT, blob TEXT, PRIMARY KEY(worktree, path));
 CREATE TABLE IF NOT EXISTS tree_built(tree TEXT PRIMARY KEY, built_at REAL);
+CREATE TABLE IF NOT EXISTS blob_parsed(blob TEXT NOT NULL, extractor TEXT NOT NULL, version TEXT NOT NULL,
+                                       PRIMARY KEY(blob, extractor));
 """
+#: the index file's `PRAGMA user_version`; a file stamped otherwise is rebuilt from nothing
+INDEX_SCHEMA = 1
 #: SQLite's busy timeout, seconds: a second writer waits this long on the first, then the verb exits 2.
 BUSY_TIMEOUT = 60
 
@@ -115,9 +130,36 @@ def read_namespaces(path) -> list[dict]:
     return rows
 
 
+CITATIONS = "tag_index:extract_citations"
+
+
+def resolve_extractor_module(mod_name, registry_dir) -> pathlib.Path:
+    """The file defining `<module>`: this one for `tag_index`, else `<module>.py` beside the registry."""
+    if mod_name == "tag_index":
+        return pathlib.Path(os.path.abspath(__file__))
+    return pathlib.Path(registry_dir) / f"{mod_name}.py"
+
+
+def derive_extractor_versions(namespaces, registry_dir) -> dict:
+    """{'<module>:<function>': version} for every row's extractor and extract_citations, each module file
+    hashed once (PLAY-dOrderedCharter-44 S3). An unreadable module refuses, naming the row."""
+    by_file: dict = {}
+    out = {}
+    for name, ns in [(CITATIONS, "")] + [(r["extractor"], r["ns"]) for r in namespaces]:
+        src = resolve_extractor_module(name.partition(":")[0], registry_dir)
+        if src not in by_file:
+            try:
+                by_file[src] = hashlib.sha256(src.read_bytes()).hexdigest()[:12]
+            except OSError as exc:
+                raise TagError(f"namespace '{ns}' extractor {name}: its module {src.as_posix()} is unreadable: "
+                               f"{exc.strerror or exc}") from None
+        out[name] = by_file[src]
+    return out
+
+
 def load_extractors(namespaces, registry_dir) -> dict:
     """{'<module>:<function>': callable} for every row's extractor, and extract_citations."""
-    out = {"tag_index:extract_citations": extract_citations}
+    out = {CITATIONS: extract_citations}
     for row in namespaces:
         name = row["extractor"]
         if name in out:
@@ -126,7 +168,7 @@ def load_extractors(namespaces, registry_dir) -> dict:
         if mod_name == "tag_index":
             mod = sys.modules[__name__]
         else:
-            src = pathlib.Path(registry_dir) / f"{mod_name}.py"
+            src = resolve_extractor_module(mod_name, registry_dir)
             spec = importlib.util.spec_from_file_location(f"tag_extractor_{mod_name}", src)
             if spec is None or not src.is_file():
                 raise TagError(f"extractor {name}: no module {src.as_posix()}")
@@ -398,14 +440,22 @@ def load_memory_tree():
 
 def load_index(root) -> sqlite3.Connection:
     """The node's index, `<git-common-dir>/gov/index.db`, created on first use. WAL off: every worktree
-    opens the one file, and SQLite's lock serialises the writers."""
+    opens the one file, and SQLite's lock serialises the writers. A file holding tables under a
+    `user_version` other than INDEX_SCHEMA is deleted and started again, one line saying so (S4)."""
     db = common_git_dir(pathlib.Path(root)) / "gov" / "index.db"
     db.parent.mkdir(parents=True, exist_ok=True)
     try:
         con = sqlite3.connect(str(db), timeout=BUSY_TIMEOUT)
+        old = con.execute("PRAGMA user_version").fetchone()[0]
+        if old != INDEX_SCHEMA and con.execute("SELECT 1 FROM sqlite_master LIMIT 1").fetchone():
+            con.close()
+            db.unlink()
+            print(f"tag-index — rebuilt: schema {old} to {INDEX_SCHEMA}", file=sys.stderr)
+            con = sqlite3.connect(str(db), timeout=BUSY_TIMEOUT)
         con.execute("PRAGMA journal_mode=DELETE")
         con.executescript(SCHEMA)
-    except sqlite3.Error as exc:
+        con.execute(f"PRAGMA user_version = {INDEX_SCHEMA}")
+    except (sqlite3.Error, OSError) as exc:
         raise TagError(f"the tag index {db.as_posix()} cannot be opened: {exc}") from None
     return con
 
@@ -426,31 +476,45 @@ def derive_context(root, registry) -> dict:
         "registry": pathlib.Path(os.path.relpath(registry, root)).as_posix(),
         "malformed": [r["ns"] for r in rows if not SEG_RE.fullmatch(r["ns"])],
         "namespaces": namespaces,
+        "versions": derive_extractor_versions(namespaces, pathlib.Path(registry).parent),
         "extractors": load_extractors(namespaces, pathlib.Path(registry).parent),
         "worktree": read_git(root, "rev-parse", "--show-toplevel").strip(),
     }
 
 
-def _write_parsed(con, ctx, blobs: dict, read_text) -> int:
-    """Parse every (blob, extractor) no `parsed` row holds; `blobs` maps blob -> [(path, extractor)].
-    Returns the number of blobs parsed."""
-    held = {(b, e) for b, e in con.execute("SELECT blob, extractor FROM blob_row WHERE kind = 'parsed'")}
-    todo = {b: [(p, e) for p, e in pe if (b, e) not in held] for b, pe in blobs.items()}
-    todo = {b: pe for b, pe in todo.items() if pe}
-    if not todo:
-        return 0
-    texts = read_text({b: pe[0][0] for b, pe in todo.items()})
-    for blob, pe in todo.items():
-        text = texts.get(blob)
+def _write_parsed(con, ctx, blobs: dict, read_text, stats) -> None:
+    """Run each extractor over each blob `blob_parsed` holds no row for at the extractor's current version;
+    `blobs` maps blob -> [(path, extractor)]. A version move first clears that extractor's blob and path
+    rows for the blob and un-builds every tree holding it, so no row of the old version is served and the
+    next view of such a tree names its paths again. Counts into `stats`, load_view's."""
+    versions = ctx["versions"]
+    held = {(b, e): v for b, e, v in con.execute("SELECT blob, extractor, version FROM blob_parsed")}
+    todo: dict = {}
+    for blob, pe in blobs.items():
         done: set[str] = set()
         for path, ex in pe:
             if ex in done:
                 continue
             done.add(ex)
+            if held.get((blob, ex)) == versions[ex]:
+                stats["skipped"][ex] += 1
+            else:
+                todo.setdefault(blob, []).append((path, ex))
+    if not todo:
+        return
+    texts = read_text({b: pe[0][0] for b, pe in todo.items()})
+    for blob, pe in todo.items():
+        text = texts.get(blob)
+        for path, ex in pe:
+            if (blob, ex) in held:
+                con.execute("DELETE FROM blob_row WHERE blob=? AND extractor=?", (blob, ex))
+                con.execute("DELETE FROM path_row WHERE blob=? AND extractor=?", (blob, ex))
+                con.execute("DELETE FROM tree_built WHERE tree IN (SELECT tree FROM tree_path WHERE blob=?)", (blob,))
             rows = ctx["extractors"][ex](ctx, path, text) if text is not None else []
-            con.executemany("INSERT INTO blob_row VALUES (?,?,?,?,?,?,?)",
-                            [(blob, ex, *r) for r in rows] + [(blob, ex, "", "parsed", 0, 0, "")])
-    return len(todo)
+            con.executemany("INSERT INTO blob_row VALUES (?,?,?,?,?,?,?)", [(blob, ex, *r) for r in rows])
+            con.execute("INSERT OR REPLACE INTO blob_parsed VALUES (?,?,?)", (blob, ex, versions[ex]))
+            stats["runs"][ex] += 1
+    stats["parsed"] += len(todo)
 
 
 def _write_path_rows(con, pairs) -> None:
@@ -459,8 +523,7 @@ def _write_path_rows(con, pairs) -> None:
         if con.execute("SELECT 1 FROM path_row WHERE path=? AND blob=? AND extractor=? AND kind='parsed'",
                        (path, blob, ex)).fetchone():
             continue
-        rows = con.execute("SELECT tag, kind, line FROM blob_row WHERE blob=? AND extractor=? AND kind != 'parsed'",
-                           (blob, ex)).fetchall()
+        rows = con.execute("SELECT tag, kind, line FROM blob_row WHERE blob=? AND extractor=?", (blob, ex)).fetchall()
         con.executemany("INSERT INTO path_row VALUES (?,?,?,?,?,?)",
                         [(path, blob, ex, name + tag if (tag == "" or tag.startswith("#")) else tag, kind, line)
                          for tag, kind, line in rows] + [(path, blob, ex, "", "parsed", 0)])
@@ -477,13 +540,13 @@ def _derive_applicable(ctx, entries):
     return out
 
 
-def build_index(root, tree, ctx, con) -> int:
+def build_index(root, tree, ctx, con, stats) -> None:
     """Index `tree` (a tree id) of the repository at `root`, unless `tree_built` already holds it: one
-    `git ls-tree -r`, then a parse of each blob no blob row holds, read through memory-tree's
-    `read_blobs_at`, in one transaction. Then rows no tree or worktree holds are removed. Returns the
-    number of blobs parsed, 0 for a tree already built."""
+    `git ls-tree -r`, then each extractor over each blob it has not read at its current version
+    (`_write_parsed`), read through memory-tree's `read_blobs_at`, in one transaction. Then rows no tree
+    or worktree holds are removed. Counts into `stats`, nothing for a tree already built."""
     if con.execute("SELECT 1 FROM tree_built WHERE tree=?", (tree,)).fetchone():
-        return 0
+        return
     tree_lib, _ = load_memory_tree()
     entries = []
     for rec in read_git(root, "ls-tree", "-r", "-z", "--full-tree", tree).split("\0"):
@@ -507,13 +570,12 @@ def build_index(root, tree, ctx, con) -> int:
         with con:
             con.execute("DELETE FROM tree_path WHERE tree=?", (tree,))
             con.executemany("INSERT INTO tree_path VALUES (?,?,?)", [(tree, p, b) for p, b in entries])
-            parsed = _write_parsed(con, ctx, blobs, read_text)
+            _write_parsed(con, ctx, blobs, read_text, stats)
             _write_path_rows(con, pairs)
             con.execute("INSERT OR REPLACE INTO tree_built VALUES (?,?)", (tree, time.time()))
             remove_unheld_rows(con, root, keep={tree})
     except sqlite3.OperationalError as exc:
         raise TagError(f"the tag index is locked or unwritable: {exc}") from None
-    return parsed
 
 
 def read_worktree_trees(root) -> tuple[set, set]:
@@ -533,10 +595,11 @@ def read_worktree_trees(root) -> tuple[set, set]:
 
 def remove_unheld_rows(con, root, keep=()) -> None:
     """Drop the trees no worktree's HEAD names (bar `keep`), the dirty rows of worktrees that are gone,
-    and every path and blob row no remaining tree or dirty row holds."""
+    and every path, blob and `blob_parsed` row no remaining tree or dirty row holds. A tree a version move
+    un-built still holds its `tree_path` rows, so it is read here too."""
     trees, tops = read_worktree_trees(root)
     trees |= set(keep)
-    for (tree,) in con.execute("SELECT tree FROM tree_built").fetchall():
+    for (tree,) in con.execute("SELECT tree FROM tree_built UNION SELECT DISTINCT tree FROM tree_path").fetchall():
         if tree not in trees:
             con.execute("DELETE FROM tree_path WHERE tree=?", (tree,))
             con.execute("DELETE FROM tree_built WHERE tree=?", (tree,))
@@ -546,13 +609,14 @@ def remove_unheld_rows(con, root, keep=()) -> None:
     con.execute("DELETE FROM path_row WHERE NOT EXISTS (SELECT 1 FROM tree_path t WHERE t.path=path_row.path "
                 "AND t.blob=path_row.blob) AND NOT EXISTS (SELECT 1 FROM dirty_path d WHERE d.path=path_row.path "
                 "AND d.blob=path_row.blob)")
-    con.execute("DELETE FROM blob_row WHERE NOT EXISTS (SELECT 1 FROM tree_path t WHERE t.blob=blob_row.blob) "
-                "AND NOT EXISTS (SELECT 1 FROM dirty_path d WHERE d.blob=blob_row.blob)")
+    for table in ("blob_row", "blob_parsed"):
+        con.execute(f"DELETE FROM {table} WHERE NOT EXISTS (SELECT 1 FROM tree_path t WHERE t.blob={table}.blob) "
+                    f"AND NOT EXISTS (SELECT 1 FROM dirty_path d WHERE d.blob={table}.blob)")
 
 
-def build_overlay(root, ctx, con) -> int:
+def build_overlay(root, ctx, con, stats) -> None:
     """Record this worktree's uncommitted edits to tracked files as its own `dirty_path` rows, a deleted
-    file as blob "", replacing the rows it held. Returns the number of blobs parsed."""
+    file as blob "", replacing the rows it held. Counts into `stats`."""
     wt = ctx["worktree"]
     changed = [p for p in read_git(root, "diff", "--name-only", "-z", "HEAD").split("\0") if p]
     entries = []
@@ -579,20 +643,21 @@ def build_overlay(root, ctx, con) -> int:
         with con:
             con.execute("DELETE FROM dirty_path WHERE worktree=?", (wt,))
             con.executemany("INSERT INTO dirty_path VALUES (?,?,?)", [(wt, p, b) for p, b in entries])
-            parsed = _write_parsed(con, ctx, blobs, read_text)
+            _write_parsed(con, ctx, blobs, read_text, stats)
             _write_path_rows(con, pairs)
     except sqlite3.OperationalError as exc:
         raise TagError(f"the tag index is locked or unwritable: {exc}") from None
-    return parsed
 
 
 def load_view(con, root, ctx, tree=None, overlay=True) -> dict:
     """Bring the index up to date for this worktree and fill the temp table `view_path` with the paths it
-    is served: its HEAD tree (or `tree`) and, with `overlay`, its own dirty rows. Returns the counts."""
+    is served: its HEAD tree (or `tree`) and, with `overlay`, its own dirty rows. Returns the tree and the
+    counts: blobs `parsed`, and per extractor its `runs` and its blobs `skipped` as fresh."""
     tree = tree or read_git(root, "rev-parse", "HEAD^{tree}").strip()
-    parsed = build_index(root, tree, ctx, con)
+    stats = {"parsed": 0, "runs": collections.Counter(), "skipped": collections.Counter()}
+    build_index(root, tree, ctx, con, stats)
     if overlay:
-        parsed += build_overlay(root, ctx, con)
+        build_overlay(root, ctx, con, stats)
     con.execute("CREATE TEMP TABLE IF NOT EXISTS view_path(path TEXT PRIMARY KEY, blob TEXT)")
     con.execute("DELETE FROM view_path")
     con.execute("INSERT INTO view_path SELECT path, blob FROM tree_path WHERE tree=?", (tree,))
@@ -603,7 +668,7 @@ def load_view(con, root, ctx, tree=None, overlay=True) -> dict:
                 con.execute("INSERT OR REPLACE INTO view_path VALUES (?,?)", (path, blob))
             else:
                 con.execute("DELETE FROM view_path WHERE path=?", (path,))
-    return {"tree": tree, "parsed": parsed}
+    return {"tree": tree, **stats}
 
 
 VIEW_ROWS = ("SELECT p.tag, p.path, p.line, p.kind, p.blob, p.extractor FROM path_row p JOIN view_path v "
@@ -909,6 +974,7 @@ def read_index_rows(con) -> list[str]:
     for table, cols in (("tree_path", "tree, path, blob"),
                         ("blob_row", "blob, extractor, tag, kind, line, end_line, text"),
                         ("path_row", "path, blob, extractor, tag, kind, line"),
-                        ("dirty_path", "worktree, path, blob"), ("tree_built", "tree")):
+                        ("dirty_path", "worktree, path, blob"), ("tree_built", "tree"),
+                        ("blob_parsed", "blob, extractor, version")):
         out += [f"{table}\t" + "\t".join(map(str, r)) for r in con.execute(f"SELECT {cols} FROM {table}")]
     return sorted(out)

@@ -7538,6 +7538,11 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
+      "id": "derive_build_counts",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
+    },
+    {
       "id": "derive_cache_key",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -7841,6 +7846,11 @@
       "id": "derive_evidence",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "derive_extractor_versions",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "derive_fact",
@@ -19676,6 +19686,11 @@
       "id": "resolve_extractor",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "resolve_extractor_module",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "resolve_floor_interpreter",

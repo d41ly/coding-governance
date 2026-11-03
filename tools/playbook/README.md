@@ -230,6 +230,13 @@ that arms each adds its row:
 The index is `<git-common-dir>/gov/index.db`, one SQLite file per node shared by every worktree, never
 committed. Rows are keyed by blob, so a commit re-parses only the blobs it changed and one blob at two
 paths is parsed once; a worktree's uncommitted edits are its own `dirty_path` rows, served to it alone.
+Freshness is keyed on the blob, the extractor and the extractor's version, the first 12 hex of the
+SHA-256 of its module file, in `blob_parsed`, written when a run yields no row too: a newly registered
+extractor reads the old blobs, an edited module re-runs its extractors with their old rows cleared, and
+a blob that yields nothing is not read again (PLAY-dOrderedCharter-44). A helper imported from another
+module is outside that version, so its edit needs `--rebuild`. The file is stamped `user_version` =
+`INDEX_SCHEMA`; a file of another stamp is rebuilt from nothing, printing `tag-index — rebuilt: schema
+<old> to <new>`.
 Blobs are read through memory-tree's `tree_lib.read_blobs_at` and the conf through its `id_grammar`, both
 reached with the inline `resolve_kit_dir`, as `policy_value.py` reaches the policy kit's `policy.py get`.
 

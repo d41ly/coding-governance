@@ -51,6 +51,13 @@ def read_key(key, root, sets, reader):
     return sets[key] if key in sets else reader()
 
 
+def derive_build_counts(state) -> str:
+    """A build's summary: blobs parsed, extractor runs, and (blob, extractor) pairs skipped as fresh."""
+    n = state["parsed"]
+    return (f"{n} blob{'s' if n != 1 else ''} parsed, {sum(state['runs'].values())} extractor runs, "
+            f"{sum(state['skipped'].values())} skipped as fresh")
+
+
 def run_kit_verb(root, verb, address, *, sets, as_json=False, base=None, kit_rel=None) -> int:
     kit_rel = kit_rel or derive_kit_rel(root)
     ctx = ti.derive_context(root, root / kit_rel / "namespaces.toml")
@@ -59,7 +66,7 @@ def run_kit_verb(root, verb, address, *, sets, as_json=False, base=None, kit_rel
     try:
         state = ti.load_view(con, root, ctx)
         if verb == "rebuild":
-            print(f"tags: index {state['tree'][:12]} built, {state['parsed']} blob{'s' if state['parsed'] != 1 else ''} parsed")
+            print(f"tags: index {state['tree'][:12]} built, {derive_build_counts(state)}")
             return state["parsed"]
         if verb in ("show", "where", "refs") and not address:
             print(f"tags: {verb} needs an address", file=sys.stderr)
@@ -158,6 +165,7 @@ def run_check(con, root, ctx, kit_rel, *, sets, base, as_json, state) -> int:
         "shape_graded": len(shaped), "file_names_not_graded": c["file_names"], "name_check": slot,
         "unarmed": {ns: c["unarmed"].get(ns, 0) for ns, n in counts.items() if not n},
         "reds": reds, "warns": warns, "blobs_parsed": state["parsed"],
+        "extractor_runs": sum(state["runs"].values()), "skipped_fresh": sum(state["skipped"].values()),
     }
     if as_json:
         print(json.dumps(summary, indent=2, sort_keys=True))
@@ -168,7 +176,7 @@ def run_check(con, root, ctx, kit_rel, *, sets, base, as_json, state) -> int:
     print(f"tags: {len(counts)} namespaces, {tags} tags, {len(shaped)} shape-graded, {c['graded']} citations graded, "
           f"{c['unresolved']} unresolved, {cited} retired-cited, {c['bare']} bare refs; {c['file_names']} file names "
           f"not graded; {c['records']} in build records not graded; {unread} paths outside Markdown not read; "
-          f"{state['parsed']} blob{'s' if state['parsed'] != 1 else ''} parsed")
+          f"{derive_build_counts(state)}")
     for ns in summary["unarmed"]:
         print(f"tags: unarmed {ns} ({summary['unarmed'][ns]} not graded)")
     print(f"tags: {'RED' if reds else 'green'} · {len(reds)} red")
@@ -264,7 +272,10 @@ FIXTURE_KIT = "tools/playbook"
 PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retired", "retired-old",
           "retired-reminted", "bare", "bare-charter", "owned", "owned-core", "scope", "scope-guide",
           "bad-ns", "bad-seg", "long-tag", "ns-word", "unregistered-cite", "dead-selector", "empty-ns",
-          "escaped-word", "file-name")
+          "escaped-word", "file-name", "new-extractor", "extractor-edit", "tagless", "schema")
+#: PLAY-dOrderedCharter-44's `extractor-edit`: the fixture extractor's module edited to stop yielding one tag
+EDITED_EXTRACTOR = FIXTURE_EXTRACTOR.replace("elif len(word) == 1:",
+                                             'elif len(word) == 1 and word[0] != "layer.memory.recall":')
 
 
 def derive_fixture_row(ns, extractor, role="describes", layer="layer.instruction") -> str:
@@ -366,6 +377,8 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
             files["memory/guides/ALPHA.md"] += "\nand [doc.nope]\n"
     if plant == "two-paths":
         files["memory/guides/BETA.md"] = GUIDE
+    if plant == "tagless":  # a blob the extractor reads and takes no row from
+        files["tools/corekit/none.tags"] = "# declares nothing\n"
     if plant in SHAPE_PLANTS:
         rows, extra = SHAPE_PLANTS[plant]
         files[f"{kit}/namespaces.toml"] += rows
@@ -407,6 +420,75 @@ def run_plant(root, top, plant, sets) -> int:
 
     def run_verb(*args, **kw):  # every verb of a plant reads the fixture's own kit directory
         return run_kit_verb(*args, kit_rel=FIXTURE_KIT, **kw)
+
+    def read_cold_dump():  # the rows a build from nothing writes for the same HEAD
+        remove_index(root)
+        run_verb(root, "rebuild", None, sets=sets)
+        return read_dump(root)
+
+    def print_equal(incremental, cold):
+        say("incremental rows", "equal" if incremental == cold else "DIFFER from", "a cold build's")
+        return incremental == cold
+    # PLAY-dOrderedCharter-44's four: freshness keyed on blob, extractor and version, and the schema stamp
+    if plant == "new-extractor":
+        run_verb(root, "rebuild", None, sets=sets)
+        reg = f"{FIXTURE_KIT}/namespaces.toml"  # a second extractor over the `*.tags` blobs that hold rows
+        write_commit(root, {reg: (root / reg).read_text(encoding="utf-8")
+                            + derive_fixture_row("kind", "fixture_again:extract_again"),
+                            f"{FIXTURE_KIT}/fixture_again.py": FIXTURE_EXTRACTOR.replace("extract_declared",
+                                                                                         "extract_again")},
+                     "register a second extractor")
+        run_verb(root, "rebuild", None, sets=sets)
+        incremental = read_dump(root)
+        rows = sum(1 for r in incremental if r.startswith("blob_row\t") and "\tfixture_again:extract_again\t" in r)
+        say(f"the new extractor's rows over the old blobs: {rows}")
+        return 0 if print_equal(incremental, read_cold_dump()) and rows else 1
+    if plant == "extractor-edit":
+        run_verb(root, "rebuild", None, sets=sets)
+        write_commit(root, {f"{FIXTURE_KIT}/fixture_tags.py": EDITED_EXTRACTOR}, "edit the extractor")
+        edited = "fixture_tags:extract_declared"
+        con = ti.load_index(root)
+        try:
+            ctx = ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml")
+            state = ti.load_view(con, root, ctx)
+            old = con.execute("SELECT COUNT(*) FROM blob_row WHERE extractor=? AND tag='layer.memory.recall'",
+                              (edited,)).fetchone()[0]
+            old += con.execute("SELECT COUNT(*) FROM blob_parsed WHERE extractor=? AND version!=?",
+                               (edited, ctx["versions"][edited])).fetchone()[0]
+        finally:
+            con.close()
+        others = {ex: n for ex, n in state["runs"].items() if ex != edited}
+        say(f"{edited} re-ran over {state['runs'][edited]} blobs, {state['skipped'][edited]} skipped;",
+            f"the others ran {sum(others.values())} times, {sum(state['skipped'].values())} skipped as fresh;",
+            f"{old} rows of the old version")
+        fresh = state["runs"][edited] and not others and not state["skipped"][edited] and not old
+        return 0 if print_equal(read_dump(root), read_cold_dump()) and fresh else 1
+    if plant == "tagless":
+        run_verb(root, "rebuild", None, sets=sets)
+        write_commit(root, {"AGENTS.md": "# Charter\n\n## Practices\n\nchanged\n"}, "one file")
+        first = run_verb(root, "rebuild", None, sets=sets)
+        con = ti.load_index(root)
+        with con:  # no change, and the tree walked again: only the ledger keeps the tagless blob unread
+            con.execute("DELETE FROM tree_built")
+        con.close()
+        second = run_verb(root, "rebuild", None, sets=sets)
+        say(f"{first} blob parsed after one file changed, {second} on a build with no change")
+        return 0 if (first, second) == (1, 0) else 1
+    if plant == "schema":
+        run_verb(root, "rebuild", None, sets=sets)
+        con = ti.load_index(root)
+        with con:  # a file of unit 19's shape: no stamp, and a `parsed` sentinel among its blob rows
+            blob = con.execute("SELECT blob FROM tree_path LIMIT 1").fetchone()[0]
+            con.execute("INSERT INTO blob_row VALUES (?,?,?,?,?,?,?)", (blob, ti.CITATIONS, "", "parsed", 0, 0, ""))
+            con.execute("PRAGMA user_version = 0")
+        con.close()
+        run_verb(root, "rebuild", None, sets=sets)
+        after = read_dump(root)
+        con = ti.load_index(root)
+        stamp = con.execute("PRAGMA user_version").fetchone()[0]
+        con.close()
+        say(f"stamped {stamp} after the build;")
+        return 0 if print_equal(after, read_cold_dump()) and stamp == ti.INDEX_SCHEMA else 1
     if plant == "rebuild":
         run_verb(root, "rebuild", None, sets=sets)
         first = read_dump(root)
@@ -419,13 +501,9 @@ def run_plant(root, top, plant, sets) -> int:
         run_verb(root, "rebuild", None, sets=sets)
         write_commit(root, {"memory/guides/BETA.md": None}, "drop one path")
         run_verb(root, "rebuild", None, sets=sets)
-        incremental = read_dump(root)
-        remove_index(root)
-        run_verb(root, "rebuild", None, sets=sets)
-        cold = read_dump(root)
-        say("incremental rows", "equal" if incremental == cold else "DIFFER", "a cold build's")
+        same = print_equal(read_dump(root), read_cold_dump())
         rc = run_verb(root, "where", "doc.alpha#intro", sets=sets)
-        return 0 if incremental == cold and rc == 0 else 1
+        return 0 if same and rc == 0 else 1
     if plant == "dirty":
         other = top / "wt2"
         run_git(root, "worktree", "add", "-q", str(other), "-b", "two")

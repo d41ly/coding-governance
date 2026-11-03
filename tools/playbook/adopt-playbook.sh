@@ -227,7 +227,8 @@ echo "PASS — the layer check's plants"
 # must not print>`, the last field optional; exit and lines are asserted together. Every policy key a plant
 # reads is `--set`, so no row reads a policy file. The rows from `bad-ns` on are PLAY-dOrderedCharter-10's
 # nine plants, the shape check and the joins; `dead-selector` and `file-name` print their second half's
-# exit on a `rc=` line, read here as a line.
+# exit on a `rc=` line, read here as a line. The last four are PLAY-dOrderedCharter-44's: the index's
+# freshness keyed on blob, extractor and version, and its schema stamp.
 _tk="--set tags.bare-refs=charter-only --set tags.retired-cites=refuse-new"
 _tf=0
 while IFS='|' read -r _tp _trc _twant _tnot; do
@@ -281,6 +282,10 @@ empty-ns $_tk|0|tags: join kind · unarmed|\`kind.x\`
 file-name $_tk|0|1 file names not graded
 file-name $_tk|0|· unresolved · \`kit.toml\` names no row
 file-name $_tk|0|no tracked kit.toml: rc=1
+new-extractor|0|incremental rows equal a cold build's|old blobs: 0
+extractor-edit|0|the others ran 0 times, 4 skipped as fresh; 0 rows of the old version
+tagless|0|1 blob parsed after one file changed, 0 on a build with no change
+schema|0|tag-index — rebuilt: schema 0 to 1
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf tag-resolver arm(s) failed"; exit 1; fi
 echo "PASS — the tag resolver's plants"

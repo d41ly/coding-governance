@@ -25,7 +25,9 @@ dDeclaredLoop registers them, `role` with dBoundRoles and `record` with dTotalRe
 The resolver is `tools/playbook/gov_tag.py`, which stands in for `gov tag`. It reads a derived index,
 `<git-common-dir>/gov/index.db`: one SQLite file per machine that every worktree shares, built on
 first use, never committed. A commit re-parses only the files it changed, and a worktree's
-uncommitted edits are served to that worktree alone. Deleting the file costs one rebuild.
+uncommitted edits are served to that worktree alone. A newly registered or edited extractor re-reads
+the files it reads on the next build, and an index file of an older format is rebuilt once, printing
+`tag-index — rebuilt: schema <old> to <new>`. Deleting the file costs one rebuild.
 
 ## How to use it
 
