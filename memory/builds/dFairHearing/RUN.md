@@ -169,3 +169,9 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-03T18:59:24Z dispatch · item 36321976 TOOL-dFairHearing-31 · reason memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-31.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dFairHearing/README.md
 
 2026-11-03T19:14:34Z brief · item TOOL-dFairHearing-33 · reason 9616dc5473dd memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-33-build-brief.md
+
+2026-11-03T19:52:43Z dispatch · item 9213f9f5 TOOL-dFairHearing-25 · reason tools/workflows/README.md
+
+2026-11-03T19:52:45Z brief · item TOOL-dFairHearing-25 · reason 54db02565632 memory/builds/dFairHearing/prompts/2026-11-03-prompt-TOOL-dFairHearing-25-pass-a-build-brief.md
+
+2026-11-03T20:08:02Z dispatch · item 9213f9f5 TOOL-dFairHearing-25 · reason tools/workflows/README.md memory/LIVE.md
