@@ -93,3 +93,14 @@ No fork was opened or resolved.
 The writer flagged one more parent line, not edited: tr1:194 says "`hand` is legal until
 TOOL-dTotalRecall-2 registers a door", which reads as if every `hand` row were temporary, while tr2 S9
 keeps a `rows`-form `hand` row at `hand`. It is dTotalRecall's to reconcile, beside tr2:352 above.
+
+## Owner ruling, 2026-11-03
+
+The owner answered this pass's report with "fix, take recommendations on the forks, land it".
+
+- **tr2:352's "S2 and S9":** TOOL-dTotalRecall-2 rev-8 says its §8 F6 ask serves S6 and §4
+  "Minting". Record:
+  [`deviation-25`](../../dTotalRecall/build/2026-11-03-build-TOOL-dTotalRecall-2-deviation-25.md).
+- **tr1:194's "until … registers a door":** TOOL-dTotalRecall-1 rev-5 keeps `hand` legal on any row
+  TOOL-dTotalRecall-2 S9 does not move, as row 2 and TOOL-dMindYourWords-11 rev-3 read it. Record:
+  [`deviation-13`](../../dTotalRecall/build/2026-11-03-build-TOOL-dTotalRecall-1-deviation-13.md).

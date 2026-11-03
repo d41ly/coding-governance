@@ -99,3 +99,12 @@ stays a non-goal. §3's Edges never named wm6 for the record, so they did not mo
 `DEFERRED`, at 28037 bytes, and carries one spec-revised record,
 [`2026-11-03-build-TOOL-dScopedBuild-1-deviation-13`](2026-11-03-build-TOOL-dScopedBuild-1-deviation-13.md).
 No fork was opened or resolved.
+
+## Owner ruling, 2026-11-03
+
+The owner answered this pass's report with "fix, take recommendations on the forks, land it".
+
+- **wm6:179's edge and wm6's F6 citation:** fixed in TOOL-dWellOiledMachine-6 rev-6: the edge names
+  TOOL-dPlacedRequest-34 S22's `--lease status`, and F4 cites TOOL-dTotalRecall-2 §8 F6 by name.
+  Record:
+  [`deviation-65`](../../dWellOiledMachine/build/2026-11-03-build-TOOL-dWellOiledMachine-6-deviation-65.md).

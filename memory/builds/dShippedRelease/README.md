@@ -230,7 +230,7 @@ ids DEPL-dShippedRelease-142 DEPL-dShippedRelease-143 DEPL-dShippedRelease-144 D
 | [DEPL-dShippedRelease-9 — a derived runbook: the operator order for install and update, rendered from the kit descriptors, a hand edit red at render parity](spec/2026-10-30-spec-DEPL-dShippedRelease-9.md) | 31 | 2 | DEFERRED | rev-3 | 2026-11-01 |
 | [DEPL-dShippedRelease-140 — the `mint-` cases move to `tools/govkit/matrix.py`, so no gov-only fact sits in a shipped kit file](spec/2026-11-01-spec-DEPL-dShippedRelease-140.md) | 32 | 2 | DEFERRED | rev-1 | 2026-11-01 |
 | [DEPL-dShippedRelease-145 — `mint-regenerate-kits` runs every kit through `cmd_mint`, so the break its arm names reaches it](spec/2026-11-01-spec-DEPL-dShippedRelease-145.md) | 32 | 2 | DEFERRED | rev-1 | 2026-11-01 |
-| [DEPL-dShippedRelease-78 — the round-1 spec audit's 77 minors, batched: the Readers of what unit 10 retires, the legs and rows each unit owes, honest failure states, and the observations that read the wrong thing](spec/2026-10-30-spec-DEPL-dShippedRelease-78.md) | 32 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-78 — the round-1 spec audit's 77 minors, batched: the Readers of what unit 10 retires, the legs and rows each unit owes, honest failure states, and the observations that read the wrong thing](spec/2026-10-30-spec-DEPL-dShippedRelease-78.md) | 32 | 2 | DEFERRED | rev-4 | 2026-11-03 |
 | [DEPL-dShippedRelease-106 — The round-2 spec audit's 79 minors, batched: the rules units 49 to 78 left unstated, their failure states, and the records that named the wrong seam](spec/2026-10-30-spec-DEPL-dShippedRelease-106.md) | 33 | 2 | DEFERRED | rev-4 | 2026-11-01 |
 | [DEPL-dShippedRelease-125 — the round-3 spec audit's 45 MEDIUM and 7 LOW findings, one batch](spec/2026-11-01-spec-DEPL-dShippedRelease-125.md) | 34 | 2 | DEFERRED | rev-3 | 2026-11-01 |
 | [DEPL-dShippedRelease-131 — a refused pin has one way out, and `dispose-landing` admits it](spec/2026-11-01-spec-DEPL-dShippedRelease-131.md) | 35 | 2 | DEFERRED | rev-2 | 2026-11-01 |
@@ -239,7 +239,7 @@ ids DEPL-dShippedRelease-142 DEPL-dShippedRelease-143 DEPL-dShippedRelease-144 D
 | [DEPL-dShippedRelease-144 — the round-5 spec audit's 32 MEDIUM and 11 LOW findings, batched](spec/2026-11-01-spec-DEPL-dShippedRelease-144.md) | 38 | 2 | DEFERRED | rev-1 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 61 bound to this build, across 4 record folder(s).
+Records: 65 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

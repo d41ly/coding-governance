@@ -72,3 +72,11 @@ lease; tc8 and tc1's `run_cadence_period` take and release their own period leas
 
 - **Parent text that looks wrong (not edited):** wm6's rev-5 cites tr2 §8 F6 as `tr2:337-354`, while
   F6 runs from tr2:340 to tr2:357.
+
+## Owner ruling, 2026-11-03
+
+The owner answered this pass's report with "fix, take recommendations on the forks, land it".
+
+- **wm6's F6 citation:** cited by name, not by line range, in TOOL-dWellOiledMachine-6 rev-6.
+  Record:
+  [`deviation-65`](../../dWellOiledMachine/build/2026-11-03-build-TOOL-dWellOiledMachine-6-deviation-65.md).

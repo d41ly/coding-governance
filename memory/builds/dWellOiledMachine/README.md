@@ -182,7 +182,7 @@ ids TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine
 | [TOOL-dWellOiledMachine-58 — the record door: every coordination write bound to its writer's session binding, and the two closing items it admits](spec/2026-10-26-spec-TOOL-dWellOiledMachine-58.md) | 26 | 2 | DEFERRED | rev-5 | 2026-11-02 |
 | [TOOL-dWellOiledMachine-57 — the secret scan over coordination payloads and adapter boundaries, the door's token-shape refusal, and the request record bound to its intake](spec/2026-10-26-spec-TOOL-dWellOiledMachine-57.md) | 27 | 2 | DEFERRED | rev-3 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-63 — the record door's node writer: a sessionless coordination write admitted for this node's own records](spec/2026-10-27-spec-TOOL-dWellOiledMachine-63.md) | 27 | 2 | DEFERRED | rev-2 | 2026-10-27 |
-| [TOOL-dWellOiledMachine-6 — the supervisor: `resume-tick.sh` grown into the executor's seam, one act session per role act, relaunch by policy, and a reconcile before the first beat](spec/2026-10-26-spec-TOOL-dWellOiledMachine-6.md) | 28 | 2 | DEFERRED | rev-5 | 2026-11-02 |
+| [TOOL-dWellOiledMachine-6 — the supervisor: `resume-tick.sh` grown into the executor's seam, one act session per role act, relaunch by policy, and a reconcile before the first beat](spec/2026-10-26-spec-TOOL-dWellOiledMachine-6.md) | 28 | 2 | DEFERRED | rev-6 | 2026-11-03 |
 | [TOOL-dWellOiledMachine-87 — the record door's node writer admits the sessions and keepalive the `mine` row admits, prior sessions included](spec/2026-10-27-spec-TOOL-dWellOiledMachine-87.md) | 28 | 2 | DEFERRED | rev-2 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-37 — the launch preflight: no hook- or permission-skipping launch, trusted hooks by hash, an allowlisted environment, the credential order, and relative worktree pointers](spec/2026-10-26-spec-TOOL-dWellOiledMachine-37.md) | 29 | 2 | DEFERRED | rev-3 | 2026-10-28 |
 | [TOOL-dWellOiledMachine-78 — one supervisor per build: the tick's liveness read with the recorded image and stamp, `unknown` held as live, and the start claimed exclusively](spec/2026-10-27-spec-TOOL-dWellOiledMachine-78.md) | 29 | 2 | DEFERRED | rev-2 | 2026-10-27 |
@@ -272,7 +272,7 @@ ids TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine
 | [TOOL-dWellOiledMachine-127 — the spec tokens and routed commits ceilings cover this build's close and its landing push, each sized through `derive-ceilings.py --observed` from readings of the leg alone](spec/2026-10-27-spec-TOOL-dWellOiledMachine-127.md) | — | 1 | CLOSED | rev-3 | 2026-10-28 |
 <!-- /gen:build-units -->
 
-Records: 243 bound to this build, across 4 record folder(s).
+Records: 247 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

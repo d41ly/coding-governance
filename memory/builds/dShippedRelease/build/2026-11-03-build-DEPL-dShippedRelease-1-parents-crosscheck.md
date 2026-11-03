@@ -143,3 +143,19 @@ other `:<line>` cite in sr4 names `unattended.sh`, `lib-unattended.sh`, `layer-m
 at 39593 bytes, and carries one spec-revised record,
 [`2026-11-03-build-DEPL-dShippedRelease-4-deviation-43`](2026-11-03-build-DEPL-dShippedRelease-4-deviation-43.md).
 No fork was opened or resolved. The one owner question stays the one under "Parked for the owner".
+
+## Owner ruling, 2026-11-03
+
+The owner answered this pass's report with "fix, take recommendations on the forks, land it".
+
+- **The epoch's two surfaces:** recommendation (a) taken. TOOL-dTotalRecall-2 rev-8 reads the lease
+  holder through TOOL-dPlacedRequest-34 S22's `--lease status`, and its §8 F6 ask narrows to a seventh
+  TAB field holding the `lease`-mode class, the six-field prefix this build's `read_lease_epoch` reads
+  kept. TOOL-dWellOiledMachine-6 rev-6 reads its epoch from the same sixth field. Records:
+  [`deviation-25`](../../dTotalRecall/build/2026-11-03-build-TOOL-dTotalRecall-2-deviation-25.md),
+  [`deviation-65`](../../dWellOiledMachine/build/2026-11-03-build-TOOL-dWellOiledMachine-6-deviation-65.md).
+- **wm6's F6 citation:** cited by name, not by line range, in TOOL-dWellOiledMachine-6 rev-6.
+- **sr78 S59's unnamed read:** DEPL-dShippedRelease-78 rev-4 names `--lease status run release <E>`,
+  its sixth TAB field. Record:
+  [`deviation-781`](2026-11-03-build-DEPL-dShippedRelease-78-deviation-781.md).
+- sr94 and sr125 S17's `--lease fence` read was not part of the ruling and stays as specced.
