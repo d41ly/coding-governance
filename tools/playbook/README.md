@@ -232,8 +232,17 @@ committed. Rows are keyed by blob, so a commit re-parses only the blobs it chang
 paths is parsed once; a worktree's uncommitted edits are its own `dirty_path` rows, served to it alone.
 Freshness is keyed on the blob, the extractor and the extractor's version, the first 12 hex of the
 SHA-256 of its module file, in `blob_parsed`, written when a run yields no row too: a newly registered
-extractor reads the old blobs, an edited module re-runs its extractors with their old rows cleared, and
-a blob that yields nothing is not read again (PLAY-dOrderedCharter-44). A helper imported from another
+extractor reads the old blobs, an edited module re-runs its extractors, and a blob that yields nothing is
+not read again (PLAY-dOrderedCharter-44). Each version's rows stand apart (PLAY-dOrderedCharter-51): two
+worktrees whose extractor bytes differ share the file, so `blob_row`, `path_row` and `blob_parsed` carry
+the version, a build never deletes another version's rows, and every read is joined to the reading
+worktree's own `{extractor: version}` map, so a worktree is served only rows its own extractors wrote. A
+tree is fresh under `tree_built(tree, versions)`, `versions` the first 12 hex of the SHA-256 of that map's
+sorted `extractor=version` lines. `gov_tag.py --gc` deletes the rows of every version no worktree
+`git worktree list` names derives, each read from that worktree's own registry and modules, and refuses,
+exit 2, when one of them cannot be read; it prints `tag-index — collected: <n> rows of <m> versions`. A
+plain build collects nothing, and a worktree deleted without `git worktree prune` keeps its rows until it
+is pruned. A helper imported from another
 module is outside that version, so its edit needs `--rebuild`. The file is stamped `user_version` =
 `INDEX_SCHEMA`; a file of another stamp is rebuilt from nothing, printing `tag-index — rebuilt: schema
 <old> to <new>`.
@@ -241,8 +250,18 @@ Blobs are read through memory-tree's `tree_lib.read_blobs_at` and the conf throu
 reached with the inline `resolve_kit_dir`, as `policy_value.py` reaches the policy kit's `policy.py get`.
 
 `gov_tag.py` is the resolver, standing in for `gov tag`: `show`, `where`, `refs` and `check`, with
-`--rebuild`, `--list-positional` and `--fixture --plant <case>`. `check` grades the backticked and
+`--rebuild`, `--gc`, `--list-positional` and `--fixture --plant <case>`. `check` grades the backticked and
 bracketed Markdown spans outside `<MEMORY_ROOT>/builds/` (`resolves`, `retired`, the bare-name rule and
 `owned`) and counts what it does not grade. `aliases.toml` maps each positional label that never moved
 to its section; `positional-refs.txt` keeps the live positional references, one `<path>` TAB `<ref>` row
 each, as `--list-positional` prints them. The `tags` leg runs `check`; the user page is `help/tags.md`.
+
+PLAY-dOrderedCharter-22 adds the `purpose` arm to `check`. Each registry row's `owner` names a build of
+the chain registry, `memory/project/chain.toml` (one `[[build]]` row per build, its `slug` and its
+`purpose`), and its `purpose-source` grades the namespace's members: `<path>` a tracked file, read
+path-only; `<path>#<field>` a field each member's row carries in a `.toml` file or an assignment in a
+`.py` file; `#<field>` a field each member's own file carries, `h1` being a Markdown file's first `# `
+line. A source the tree does not hold yet is printed `pending` and never graded. Where the conf declares
+the design (`DESIGN_RECORD`, `DESIGN_BASELINE`, `DESIGN_VIEW`, `DESIGN_NODES`), the chain registry's
+slugs are joined both ways with the design view's builds, and a row with no `purpose` is legal only for a
+build the baseline already names; with those keys blank `check` prints that there is no chain to read.

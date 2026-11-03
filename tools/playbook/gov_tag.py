@@ -2,7 +2,7 @@
 
     python gov_tag.py show|where|refs|check <address> [--json]
     python gov_tag.py check [--base <rev>]
-    python gov_tag.py --rebuild | --list-positional
+    python gov_tag.py --rebuild | --gc | --list-positional
     python gov_tag.py --fixture --plant <case> [--set <key>=<value>]
 
 `show` returns the tag's row, or its subtree as `tags.slice` says; `where` prints `path:line`; `refs`
@@ -10,7 +10,8 @@ prints every citation of it, a build record's too; `check` runs the `retired`, `
 arms over the citations outside `<MEMORY_ROOT>/builds/`, and the shape check, the joins and the
 name-check slot (PLAY-dOrderedCharter-10), and the `purpose` arm, the namespace rows' `owner` and
 `purpose-source` and the chain registry joined to the design view (PLAY-dOrderedCharter-22). An address is a tag, `doc.<name>#<seg>`, or a
-positional label `aliases.toml` maps. Every line opens `tags:`; `--json` is the index's only JSON.
+positional label `aliases.toml` maps. `--gc` collects the index rows of every extractor version no live
+worktree derives (PLAY-dOrderedCharter-51 S5). Every line opens `tags:`; `--json` is the index's only JSON.
 Exit 0 green, 1 red, 2 a refusal (an unreadable registry, a refused policy read, a locked index).
 
 The three keys are read through `policy_value.read_policy_value`, the committed policy at its landed
@@ -106,6 +107,18 @@ def run_kit_verb(root, verb, address, *, sets, as_json=False, base=None, kit_rel
         return run_check(con, root, ctx, kit_rel, sets=sets, base=base, as_json=as_json, state=state)
     finally:
         con.close()
+
+
+def run_gc(root, kit_rel) -> int:
+    """`--gc`: the rows of every extractor version no live worktree derives leave the index, one line
+    saying how many; a worktree whose registry cannot be read refuses it, a TagError (exit 2)."""
+    con = ti.load_index(root)
+    try:
+        rows, versions = ti.remove_dead_versions(con, root, kit_rel)
+    finally:
+        con.close()
+    print(f"tag-index — collected: {rows} rows of {versions} versions")
+    return 0
 
 
 NAME_CHECK = "slot point.instruction.name-check"
@@ -303,7 +316,8 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "bad-ns", "bad-seg", "long-tag", "ns-word", "unregistered-cite", "dead-selector", "empty-ns",
           "escaped-word", "file-name", "new-extractor", "extractor-edit", "tagless", "schema",
           "no-owner", "ghost-owner", "no-purpose-source", "bad-purpose-source", "member-no-field", "pending-source",
-          "registry-ghost", "registry-missing", "registry-joined", "new-no-purpose")
+          "registry-ghost", "registry-missing", "registry-joined", "new-no-purpose", "two-versions",
+          "served-across")
 #: PLAY-dOrderedCharter-44's `extractor-edit`: the fixture extractor's module edited to stop yielding one tag
 EDITED_EXTRACTOR = FIXTURE_EXTRACTOR.replace("elif len(word) == 1:",
                                              'elif len(word) == 1 and word[0] != "layer.memory.recall":')
@@ -489,9 +503,12 @@ def run_fixture(plant: str, sets: dict) -> int:
 
 
 def read_dump(root) -> list[str]:
+    """The index rows the fixture worktree at `root` reads at its HEAD, at its own extractor versions."""
+    ctx = ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml")
+    tree = ti.read_git(root, "rev-parse", "HEAD^{tree}").strip()
     con = ti.load_index(root)
     try:
-        return ti.read_index_rows(con)
+        return ti.read_index_rows(con, ctx, tree)
     finally:
         con.close()
 
@@ -536,16 +553,16 @@ def run_plant(root, top, plant, sets) -> int:
         try:
             ctx = ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml")
             state = ti.load_view(con, root, ctx)
-            old = con.execute("SELECT COUNT(*) FROM blob_row WHERE extractor=? AND tag='layer.memory.recall'",
-                              (edited,)).fetchone()[0]
-            old += con.execute("SELECT COUNT(*) FROM blob_parsed WHERE extractor=? AND version!=?",
-                               (edited, ctx["versions"][edited])).fetchone()[0]
+            # PLAY-dOrderedCharter-51 S2: the old version's rows stay for another worktree, and are not served
+            old = con.execute(ti.VIEW_ROWS + " WHERE p.extractor=? AND p.tag='layer.memory.recall'",
+                              (edited,)).fetchall()
+            old = len(old)
         finally:
             con.close()
         others = {ex: n for ex, n in state["runs"].items() if ex != edited}
         say(f"{edited} re-ran over {state['runs'][edited]} blobs, {state['skipped'][edited]} skipped;",
             f"the others ran {sum(others.values())} times, {sum(state['skipped'].values())} skipped as fresh;",
-            f"{old} rows of the old version")
+            f"{old} rows of the old version served")
         fresh = state["runs"][edited] and not others and not state["skipped"][edited] and not old
         return 0 if print_equal(read_dump(root), read_cold_dump()) and fresh else 1
     if plant == "tagless":
@@ -564,7 +581,8 @@ def run_plant(root, top, plant, sets) -> int:
         con = ti.load_index(root)
         with con:  # a file of unit 19's shape: no stamp, and a `parsed` sentinel among its blob rows
             blob = con.execute("SELECT blob FROM tree_path LIMIT 1").fetchone()[0]
-            con.execute("INSERT INTO blob_row VALUES (?,?,?,?,?,?,?)", (blob, ti.CITATIONS, "", "parsed", 0, 0, ""))
+            con.execute("INSERT INTO blob_row VALUES (?,?,?,?,?,?,?,?)",
+                        (blob, ti.CITATIONS, "", "", "parsed", 0, 0, ""))
             con.execute("PRAGMA user_version = 0")
         con.close()
         run_verb(root, "rebuild", None, sets=sets)
@@ -574,6 +592,63 @@ def run_plant(root, top, plant, sets) -> int:
         con.close()
         say(f"stamped {stamp} after the build;")
         return 0 if print_equal(after, read_cold_dump()) and stamp == ti.INDEX_SCHEMA else 1
+    # PLAY-dOrderedCharter-51's two: each extractor version's rows kept apart, each worktree served its own
+    if plant == "two-versions":
+        other, edited = top / "wt2", "fixture_tags:extract_declared"
+        run_git(root, "worktree", "add", "-q", str(other), "-b", "two")
+        write_commit(other, {f"{FIXTURE_KIT}/fixture_tags.py": EDITED_EXTRACTOR}, "edit the extractor in two")
+        both = (root, other)
+        cold = {}
+        for where in both:  # each worktree's rows from nothing, the other's never built
+            remove_index(root)
+            run_verb(where, "rebuild", None, sets=sets)
+            cold[where] = read_dump(where)
+        remove_index(root)
+        for where in both:
+            run_verb(where, "rebuild", None, sets=sets)
+        second = [run_verb(where, "rebuild", None, sets=sets) for where in both]
+        same = [print_equal(read_dump(where), cold[where]) for where in both]
+        gone = ti.derive_context(other, other / FIXTURE_KIT / "namespaces.toml")
+        con = ti.load_index(root)
+        try:
+            held = con.execute("SELECT COUNT(DISTINCT version) FROM blob_parsed WHERE extractor=?",
+                               (edited,)).fetchone()[0]
+        finally:
+            con.close()
+        say(f"round 2 parsed {second[0]} and {second[1]} blobs; {held} versions of {edited} held side by side")
+        before = read_dump(root)
+        run_git(root, "worktree", "remove", "--force", str(other))
+        run_git(root, "worktree", "prune")
+        rc = run_gc(root, FIXTURE_KIT)
+        con = ti.load_index(root)
+        try:
+            left = sum(con.execute(f"SELECT COUNT(*) FROM {t} WHERE extractor=? AND version=?",
+                                   (edited, gone["versions"][edited])).fetchone()[0]
+                       for t in ("blob_row", "path_row", "blob_parsed"))
+            left += con.execute("SELECT COUNT(*) FROM tree_built WHERE versions=?", (gone["digest"],)).fetchone()[0]
+        finally:
+            con.close()
+        kept = read_dump(root) == before
+        say(f"two removed and pruned, --gc left {left} rows of its version;",
+            "the live dump unchanged" if kept else "the live dump CHANGED")
+        return 0 if all(same) and second == [0, 0] and held == 2 and rc == 0 and not left and kept else 1
+    if plant == "served-across":
+        other = top / "wt2"
+        run_git(root, "worktree", "add", "-q", str(other), "-b", "two")
+        run_verb(root, "rebuild", None, sets=sets)
+        write_files(other, {f"{FIXTURE_KIT}/fixture_tags.py": EDITED_EXTRACTOR})  # one tree, another version
+        parsed, served = [], []
+        for where in (other, root):  # one still serves the tag its version yields: the zero is not vacuous
+            con = ti.load_index(where)
+            try:
+                ctx = ti.derive_context(where, where / FIXTURE_KIT / "namespaces.toml")
+                parsed.append(ti.load_view(con, where, ctx)["parsed"])
+                served.append(len(ti.resolve_address(con, "layer.memory.recall")))
+            finally:
+                con.close()
+        say(f"two parsed {parsed[0]} blobs on the tree one built; served {served[0]} rows of one's version,",
+            f"and one serves {served[1]}")
+        return 0 if parsed[0] and not served[0] and served[1] else 1
     if plant == "rebuild":
         run_verb(root, "rebuild", None, sets=sets)
         first = read_dump(root)
@@ -655,6 +730,7 @@ def main(argv=None) -> int:
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--base")
     ap.add_argument("--rebuild", action="store_true")
+    ap.add_argument("--gc", action="store_true")
     ap.add_argument("--list-positional", action="store_true")
     ap.add_argument("--fixture", action="store_true")
     ap.add_argument("--plant", default="none")
@@ -677,12 +753,14 @@ def main(argv=None) -> int:
             for row in read_positional(root):
                 print(row)
             return 0
+        if a.gc:
+            return run_gc(root, derive_kit_rel(root))
         if a.rebuild:
             remove_index(root)
             run_kit_verb(root, "rebuild", None, sets={})
             return 0
         if not a.verb:
-            ap.error("a verb, --rebuild, --list-positional or --fixture")
+            ap.error("a verb, --rebuild, --gc, --list-positional or --fixture")
         return run_kit_verb(root, a.verb, a.address, sets={}, as_json=a.json, base=a.base)
     except PolicyRefused as exc:
         print(f"tags: refused · {exc.key} · {exc.line}", file=sys.stderr)

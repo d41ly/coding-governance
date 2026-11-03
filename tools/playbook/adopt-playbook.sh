@@ -228,7 +228,10 @@ echo "PASS — the layer check's plants"
 # reads is `--set`, so no row reads a policy file. The rows from `bad-ns` on are PLAY-dOrderedCharter-10's
 # nine plants, the shape check and the joins; `dead-selector` and `file-name` print their second half's
 # exit on a `rc=` line, read here as a line. Then four are PLAY-dOrderedCharter-44's: the index's
-# freshness keyed on blob, extractor and version, and its schema stamp. The rows after them are
+# freshness keyed on blob, extractor and version, and its schema stamp. Then three rows are
+# PLAY-dOrderedCharter-51's two plants: two worktrees whose extractor bytes differ keep their rows apart,
+# re-parse nothing on a second alternating round, and `--gc` collects the pruned one's version; a worktree
+# is never served another version's rows of a tree already built. The rows after them are
 # PLAY-dOrderedCharter-22's `purpose` arm: the namespace rows' `owner` and `purpose-source`, and the chain
 # registry joined to the fixture design's view; `pending-source` and `new-no-purpose` print their second
 # half's exit on a `rc=` line.
@@ -289,6 +292,9 @@ new-extractor|0|incremental rows equal a cold build's|old blobs: 0
 extractor-edit|0|the others ran 0 times, 4 skipped as fresh; 0 rows of the old version
 tagless|0|1 blob parsed after one file changed, 0 on a build with no change
 schema|0|tag-index — rebuilt: schema 0 to
+two-versions|0|round 2 parsed 0 and 0 blobs; 2 versions of fixture_tags:extract_declared held side by side|DIFFER
+two-versions|0|--gc left 0 rows of its version; the live dump unchanged
+served-across|0|served 0 rows of one's version, and one serves 1
 none $_tk|0|tags: purpose · no chain to read
 no-owner $_tk|2|namespace row 1 lacks owner
 ghost-owner $_tk|1|namespace 'doc' · owner 'dGhost' names no build of memory/project/chain.toml

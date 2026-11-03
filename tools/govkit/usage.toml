@@ -129,7 +129,7 @@ flags = ["--json", "--base="]
 id = "script:{prefix}/playbook/gov_tag.py"
 shape = "verb"
 entry = "{prefix}/playbook/gov_tag.py"
-flags = ["--rebuild", "--list-positional", "--fixture", "--plant=", "--set="]
+flags = ["--rebuild", "--gc", "--list-positional", "--fixture", "--plant=", "--set="]
 
 [[usage]]
 id = "script:{prefix}/run-gates/measure_legs.py"

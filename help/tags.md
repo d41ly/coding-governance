@@ -27,7 +27,9 @@ The resolver is `tools/playbook/gov_tag.py`, which stands in for `gov tag`. It r
 first use, never committed. A commit re-parses only the files it changed, and a worktree's
 uncommitted edits are served to that worktree alone. A newly registered or edited extractor re-reads
 the files it reads on the next build, and an index file of an older format is rebuilt once, printing
-`tag-index — rebuilt: schema <old> to <new>`. Deleting the file costs one rebuild.
+`tag-index — rebuilt: schema <old> to <new>`. Deleting the file costs one rebuild. Two worktrees whose
+extractor code differs keep their rows side by side in the one file, and each is served only the rows
+its own extractor code wrote, so switching between them re-parses nothing.
 
 ## How to use it
 
@@ -42,11 +44,14 @@ the files it reads on the next build, and an index file of an older format is re
 - **Check the tree:** `python tools/playbook/gov_tag.py check` runs the checks below; the `tags` leg
   of the merge bar runs the same command. `--base <rev>` names the revision new text is measured
   against; without it the merge bar's compare base is used. <!-- usage: script:tools/playbook/gov_tag.py#check 5c4c67e4 -->
-- **Rebuild, list, plant:** `python tools/playbook/gov_tag.py --rebuild` rebuilds the index from
-  nothing; `python tools/playbook/gov_tag.py --list-positional` prints one `<path>` TAB `<ref>` row
-  per positional reference, the rows `tools/playbook/positional-refs.txt` keeps; and
+- **Rebuild, collect, list, plant:** `python tools/playbook/gov_tag.py --rebuild` rebuilds the index
+  from nothing; `python tools/playbook/gov_tag.py --gc` deletes the rows of extractor code no live
+  worktree carries any more, printing `tag-index — collected: <n> rows of <m> versions`, and refuses
+  when a worktree's registry cannot be read; `python tools/playbook/gov_tag.py --list-positional`
+  prints one `<path>` TAB `<ref>` row per positional reference, the rows
+  `tools/playbook/positional-refs.txt` keeps; and
   `python tools/playbook/gov_tag.py --fixture --plant scope` runs one planted case in a scratch
-  repository. <!-- usage: script:tools/playbook/gov_tag.py b39584ac -->
+  repository. <!-- usage: script:tools/playbook/gov_tag.py 6cb6638a -->
 
 Every command takes `--json` for machine output, the index's only JSON.
 

@@ -1732,6 +1732,7 @@
       "{prefix}/memory-tree/tree_lib.py",
       "{prefix}/memory-tree/id_grammar.py",
       "{prefix}/memory-tree/coverage_join.py",
+      "{prefix}/memory-tree/design_lib.py",
       "{prefix}/lexicon/"
     ],
     "argv": [

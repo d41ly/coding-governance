@@ -9318,6 +9318,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_versions_digest",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "derive_view",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -15808,6 +15813,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "read_live_versions",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "read_liveness",
       "kind": "function",
       "file": "tools/unattended/resume-tick.sh"
@@ -17701,6 +17711,11 @@
       "id": "remove_dead_regions",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "remove_dead_versions",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "remove_descendants",
@@ -22151,6 +22166,11 @@
       "id": "run_gate_subprocess",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "run_gc",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
     },
     {
       "id": "run_gh33",
