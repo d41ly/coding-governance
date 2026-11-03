@@ -19,10 +19,15 @@
 | [2026-11-03-build-TOOL-dFairHearing-1-matched-a.md](../build/2026-11-03-build-TOOL-dFairHearing-1-matched-a.md) | research | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-matched-b.md](../build/2026-11-03-build-TOOL-dFairHearing-1-matched-b.md) | research | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-replay-2.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-2.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-a-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-a-return.md) | research | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-a.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-a.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-b-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-b-return.md) | research | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-b.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-b.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-23-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-23-return.md) | research | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-23.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-23.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-control-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-control-return.md) | research | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-control.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-control.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-void-runs.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-void-runs.md) | research | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-1-reuse-scout.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-1-reuse-scout.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-2-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-3-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-3-spec-writer.md) | journal | — |
@@ -38,9 +43,26 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md) | research | TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-11-02-prompt-TOOL-dFairHearing-1-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-1-build-brief.md) | research | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-1-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-1-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-10-skeptic.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-10-skeptic.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-11-skeptic.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-11-skeptic.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-1-2-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-2-fix-brief.md) | research | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-1-3-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-3-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-4-synthesizer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-4-synthesizer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-5-synthesizer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-5-synthesizer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-6-skeptic.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-6-skeptic.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-7-skeptic.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-7-skeptic.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-8-synthesizer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-8-synthesizer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-9-synthesizer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-9-synthesizer.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-1-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-fix-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-pass-b-build-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-pass-b-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-23-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-23-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-23-v2-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-23-v2-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-control-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-control-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-control-v2-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-control-v2-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-a-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-a-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-a-v2-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-a-v2-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-b-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-b-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-b-v2-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-b-v2-brief.md) | research | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md) | research | TOOL-dFairHearing-10 TOOL-dFairHearing-22 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-21 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 |
 | [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
