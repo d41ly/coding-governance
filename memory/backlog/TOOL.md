@@ -445,7 +445,7 @@ Cite ids, never line numbers.
 | [TOOL-dDerivedDocket-75](../builds/dDerivedDocket/BACKLOG.md) | OPEN | LOW | — | 2026-09-30 | NODE d RUNS AN ABSOLUTE core.hooksPath FROM A WRITER NOBODY KNOWS. The… |
 | [TOOL-dDerivedDocket-76](../builds/dDerivedDocket/BACKLOG.md) | OPEN | MED | — | 2026-09-30 | THE UNATTENDED KIT'S COMPENSATING CHECK IS UNPAID FOR THIS LANDING.… |
 | [TOOL-dEasedEffort-3](../builds/dEasedEffort/BACKLOG.md) | OPEN | BLOCKER | — | 2026-11-02 | inherited red: leg recall floor arms red at 529b98a4, older than the… |
-| [TOOL-dFairHearing-19](../builds/dFairHearing/BACKLOG.md) | DEFERRED | MED | TOOL-dFairHearing-30 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dFairHearing-19](../builds/dFairHearing/BACKLOG.md) | INPROGRESS | MED | TOOL-dFairHearing-30 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dFairHearing-41](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-03 | A LIVE SPEC OF ANOTHER BUILD CITES tools/hooks/agent-cap.js BY LINES… |
 | [TOOL-dFairHearing-42](../builds/dFairHearing/BACKLOG.md) | OPEN | MED | — | 2026-11-04 | REPLAY 1 MISSED ITS BAR IN BOTH RUNS, SO R-1 IS REOPENED WITH ITS… |
 | [TOOL-dFoldedVerdict-7](../builds/dFoldedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THREE CARRIERS WERE FOUND SITTING EXACTLY ON THEIR DECLARED CEILING IN… |

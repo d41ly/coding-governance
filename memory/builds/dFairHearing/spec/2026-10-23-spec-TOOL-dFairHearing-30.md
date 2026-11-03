@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-30 — unit 15's with-and-without replay run with one fresh clone per record and arm, so no arm reviews a tree holding the other's report
 
-**Status:** DEFERRED · rev-6 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
+**Status:** INPROGRESS · rev-6 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
