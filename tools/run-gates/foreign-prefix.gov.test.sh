@@ -258,6 +258,7 @@ WHOLE_RUN=(
   "roles render selftest|a --selftest mode of a shipped engine, so a probe site would be adopter-facing"
   "routed-commits selftest|a --selftest mode of a shipped engine, so a probe site would be adopter-facing"
   "tier2-review self-test|its arms run inside ONE node process, which no shell site can stop between arms"
+  "spec-audit opt-in pack self-test|it carries no FOREIGN_PREFIX_PROBE stop, so it runs whole at every prefix (TOOL-dFairHearing-23 S26)"
 )
 # THE GOV-LAYOUT DECLARATION, `row|reason` (S3, rev-6). An unshipped suite whose first arm grades
 # gov's own registry layout, which gov at the repo root is not. Not graded at the root, printed there.

@@ -309,6 +309,8 @@ mkdir -p "$E/${PFX}${HOOKS}" && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$E/${PFX}$
 # unit removes. No kit installs a workflow gate at a repo root, so the old fixture described a
 # layout that never existed, and it would have kept passing while real adopters stayed broken.
 mkdir -p "$E/${KIT_REL}" && cp "$GATE" "$E/${KIT_REL}/gate.sh"
+# TOOL-dFairHearing-23 S27: the gate exits 2 with no rule or marker predicate beside it, so every copy carries both.
+cp "$HERE/check-verifier-fanout.js" "$HERE/render_lenses.py" "$E/${KIT_REL}/"
 arm 'an empty population is not a pass' 'the population is empty, which is not a pass' \
   bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$E"
 
@@ -352,8 +354,63 @@ D="$TMP/nohook"; mkdir -p "$D"
 ( cd "$D" && git init -q . && git config user.email t@t.test && git config user.name t
   printf 'x\n' > README.md && git add -A && git commit -qm base --no-verify ) >/dev/null 2>&1
 mkdir -p "$D/${KIT_REL}" && cp "$GATE" "$D/${KIT_REL}/gate.sh"
+cp "$HERE/check-verifier-fanout.js" "$HERE/render_lenses.py" "$D/${KIT_REL}/"
 arm 'a missing predicate is a named failure' 'has no predicate to delegate to' \
   bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$D"
+
+# ---- TOOL-dFairHearing-23: the rule beside the gate, one counter and one marker predicate ----------------------
+# AC18: a gate copy with no check-verifier-fanout.js beside it exits 2 naming the file, never a clean line. RED
+# against the parent suite, which carries no such arm (the gate's exit 2 itself landed at TOOL-dFairHearing-16).
+NJ="$TMP/nojs/k"; mkdir -p "$NJ/workflows" "$NJ/hooks" && cp "$GATE" "$HERE/render_lenses.py" "$NJ/workflows/" \
+  && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$NJ/hooks/" && git -C "$NJ" init -q
+out=$(cd "$NJ" && bash workflows/check-verifier-fanout.sh "$TMP/bounded.js" 2>&1); rc=$?
+case "$rc:$out" in 2:*"no check-verifier-fanout.js beside this gate"*) printf 'arm ok    AC18: a gate copy with no .js beside it exits 2 naming the file\n' ;;
+  *) fails=$((fails+1)); printf 'arm FAIL  AC18: a gate copy with no .js did not refuse by name (rc=%s)\n%s\n' "$rc" "$out" ;; esac
+# AC25: five slot calls whose arguments carry commas inside parentheses, braces and a string count 5, through
+# `topLevelArgs`; with that counter staged to split on every comma, the same copy counts more. RED against the
+# parent, whose shell `measureSlots` counted, so the staged edit left it at 5.
+cat >"$TMP/calls.js" <<'EOF'
+export const meta = { name: 'slot-calls', description: 'five slot calls' }
+const L = [ // gov:lens-slots unit-spec
+  deriveSlotLens('unit-spec', { key: 'a', brief: 'b, c' }),
+  deriveSlotLens('unit-spec', { key: 'a', brief: 'b, c' }),
+  deriveSlotLens('unit-spec', { key: 'a', brief: 'b, c' }),
+  deriveSlotLens('unit-spec', { key: 'a', brief: 'b, c' }),
+  deriveSlotLens('unit-spec', { key: 'a', brief: 'b, c' }),
+]
+EOF
+out=$(bash "$GATE" "$TMP/calls.js" 2>&1); rc=$?
+case "$rc:$out" in 0:*"slots — 1 lens-slot literal(s), each holding 5"*) printf 'arm ok    AC25: five slot calls count 5\n' ;;
+  *) fails=$((fails+1)); printf 'arm FAIL  AC25: five slot calls did not count 5 (rc=%s)\n%s\n' "$rc" "$out" ;; esac
+SC="$TMP/split/k"; mkdir -p "$SC/workflows" "$SC/hooks" && cp "$GATE" "$HERE/render_lenses.py" "$SC/workflows/" \
+  && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$SC/hooks/" && git -C "$SC" init -q
+sed "s/else if (ch === ',' \&\& d === 0)/else if (ch === ',')/" "$HERE/check-verifier-fanout.js" > "$SC/workflows/check-verifier-fanout.js"
+if ! grep -q "else if (ch === ',') {" "$SC/workflows/check-verifier-fanout.js"; then
+  fails=$((fails+1)); printf 'arm FAIL  AC25: the staged topLevelArgs edit matched nothing, so the copy measures the shipped counter\n'
+else
+  out=$(cd "$SC" && bash workflows/check-verifier-fanout.sh "$TMP/calls.js" 2>&1); rc=$?
+  case "$rc:$out" in 1:*"SLOTS — "*"literal unit-spec holds 15 slot(s)"*) printf 'arm ok    AC25: a counter splitting on every comma names the literal as over its slots\n' ;;
+    *) fails=$((fails+1)); printf 'arm FAIL  AC25: the staged counter did not move the count (rc=%s)\n%s\n' "$rc" "$out" ;; esac
+fi
+# AC26: a comment naming the marker is no marker. `render_lenses.py --markers` prints the literal's line alone, and the
+# gate counts that literal 5. RED against the parent, whose renderer takes no --markers and whose gate walked the comment.
+cat >"$TMP/named.js" <<'EOF'
+export const meta = { name: 'named-marker', description: 'a comment naming the marker' }
+// the literal below carries gov:lens-slots unit-spec, and this comment [ is no marker
+const L = [ // gov:lens-slots unit-spec
+  { key: 'one' },
+  { key: 'two' },
+  { key: 'three' },
+  { key: 'four' },
+  { key: 'five' },
+]
+EOF
+out=$("$_rkd_py" "$HERE/render_lenses.py" --markers "$TMP/named.js" 2>&1 | tr -d '\r')
+[ "$out" = 3 ] && printf 'arm ok    AC26: --markers prints the marked line alone, never the comment naming it\n' \
+  || { fails=$((fails+1)); printf 'arm FAIL  AC26: --markers printed %s, not 3\n' "$out"; }
+out=$(bash "$GATE" "$TMP/named.js" 2>&1); rc=$?
+case "$rc:$out" in 0:*"slots — 1 lens-slot literal(s), each holding 5"*) printf 'arm ok    AC26: and the gate counts that one literal 5\n' ;;
+  *) fails=$((fails+1)); printf 'arm FAIL  AC26: the comment naming the marker moved the count (rc=%s)\n%s\n' "$rc" "$out" ;; esac
 
 
 # ---- TOOL-dRetiredFork-10: the gate resolves at a FOREIGN install prefix -------------------------
@@ -371,11 +428,20 @@ mkfix() { # $1 = fixture root · $2 = where the hook goes, relative to the root 
   local fix=$1 hookrel=$2
   mkdir -p "$fix/scripts/$WFK"
   cp "$HERE/check-verifier-fanout.sh" "$fix/scripts/$WFK/"
-  # a bounded harness, so the population is non-empty and the verdict is legitimately clean
+  cp "$HERE/check-verifier-fanout.js" "$HERE/render_lenses.py" "$fix/scripts/$WFK/"
+  # a bounded harness carrying one five-slot marked literal, so the population is non-empty, the slot
+  # count grades something whole-tree, and the verdict is legitimately clean (TOOL-dFairHearing-23 S23)
   cat >"$fix/scripts/$WFK/harness.js" <<'JS'
 export const meta = { name: 'fixture', description: 'a bounded harness', phases: [] }
 const LENSES = ['security', 'correctness', 'integration']
 const out = await boundedParallel(LENSES.map((l) => () => agent(`check ${l}`)), 5)
+const SLOTS = [ // gov:lens-slots fixture
+  'one',
+  'two',
+  'three',
+  'four',
+  'five',
+]
 JS
   if [ -n "$hookrel" ]; then
     mkdir -p "$fix/$(dirname "$hookrel")"
@@ -416,6 +482,13 @@ outA=$(cd "$FIX_A" && bash "scripts/$WFK/check-verifier-fanout.sh" 2>&1)
 outC=$(cd "$FIX_C" && bash "scripts/$WFK/check-verifier-fanout.sh" 2>&1)
 if [ "$outA" != "$outC" ]; then printf 'arm ok    the hook is what the fixtures are testing, not the tree shape\n'
 else fails=$((fails+1)); printf 'arm FAIL  identical verdicts with and without the predicate\n'; fi
+# TOOL-dFairHearing-23 AC14: the mkfix literal is what the whole-tree slot count grades, so cut it and the fixture reds
+# naming the missing marker. RED against the parent suite, whose mkfix harness carries no marked literal at all.
+FIX_D=$(mktemp -d); mkfix "$FIX_D" "scripts/$HKK/agent-cap.js"
+sed -i '/gov:lens-slots fixture/,/^]$/d' "$FIX_D/scripts/$WFK/harness.js"
+out=$(cd "$FIX_D" && bash "scripts/$WFK/check-verifier-fanout.sh" 2>&1); rc=$?
+case "$rc:$out" in 1:*"no lens-slot literal (a line marked gov:lens-slots) in any workflow script"*) printf 'arm ok    AC14: the mkfix fixture with its literal cut reds naming the missing marker\n' ;;
+  *) fails=$((fails+1)); printf 'arm FAIL  AC14: the cut mkfix fixture did not red on the missing marker (rc=%s)\n%s\n' "$rc" "$out" ;; esac
 
 # ---- TOOL-aRepatriatedFork-4: the harnesses live under .claude/workflows/ -----------------------
 # Both adopters keep their harnesses there, outside the kit prefix. The a7c78ad2 bytes read this

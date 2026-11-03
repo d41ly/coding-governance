@@ -978,9 +978,16 @@ build_merged_returns() {
     for (const [prefix, count] of Object.entries(shape.lenses))
       out[prefix] = { lens: "l", path: "/cd/find.json", findings: Array.from({ length: count }, () => finding) }
     out["verify:"] = { path: "/cd/verify.json", verdicts }
+    // TOOL-dFairHearing-23 S50 - each item of an array gains `grades`, every id it holds at its own severity, read
+    // after the arm edited the list, so the counting arms run the graded path; and `dispositions`, which the synthesis
+    // schema requires, one `new:merged-double` per id the skeptic double confirms, so the strict runner keeps it.
+    const items = process.argv[1] === "absent" ? undefined : JSON.parse(process.argv[1])
+    if (Array.isArray(items))
+      for (const it of items) if (it && typeof it === "object" && Array.isArray(it.ids)) it.grades = Object.fromEntries(it.ids.map((id) => [String(id), it.severity]))
+    const dispositions = shape.confirmed.filter((id) => id <= verdicts.length).map((id) => ({ id, disposition: "new:merged-double" }))
     // TOOL-dFairHearing-1 S9 - `twinFlags`, which the synthesis schema requires since `addressTwins` defaults to shown.
     out.synth = { path: "r/merged.md", summary: shape.summary, blockers: shape.typed[0], highs: shape.typed[1],
-      items: process.argv[1] === "absent" ? undefined : JSON.parse(process.argv[1]), twinFlags: [] }
+      items, twinFlags: [], dispositions }
     console.log(JSON.stringify(out))
   ' "$1" "${2:-48}" "${3:-}"
 }
@@ -2132,12 +2139,15 @@ build_layout() { # dir · kit dir · unattended dir, or '-' for none · checklis
   # it reds every check-mode run with a missing shipped copy.
   cp "$HERE/unattended-build.template.js" "$HERE/check-protocol-parity.test.sh" "$HERE/check_by_design_parity.py" \
      "$HERE/REVIEW-PROTOCOL.template.md" "$HERE/tier2-review.js" "$HERE/unattended-unit.js" "$d/$kd/"
+  # The parity render fills `{{LENS_SLOTS}}` from the lens catalogue, so a layout carries it and its renderer
+  # beside the parity script (TOOL-dFairHearing-23 S24); without them every render of the review harness refuses.
+  cp "$HERE/lenses.toml" "$HERE/render_lenses.py" "$d/$kd/"
   # THE RENDERER ASKS THE POLICY READER FOR FANOUT_CAP (TOOL-dGroundRules-10, which re-pointed it from
   # the agent-cap hook): `policy.py get runtime.agents-in-flight --rev HEAD`, the policy kit a
   # directory up where the inlined resolver's second probe finds it, and it refuses to render when
   # nothing answers. `requires = ["agent-cap", "policy"]`, so a real install has the reader, the hook
   # and the fan-out gate beside the parity script; the layout is committed so HEAD names a commit.
-  cp "$HERE/check-verifier-fanout.sh" "$d/$kd/"
+  cp "$HERE/check-verifier-fanout.sh" "$HERE/check-verifier-fanout.js" "$d/$kd/"
   mkdir -p "$d/$kd/../${POLICY_KIT}"; cp "$ROOT/${POLICY_KIT_DIR}/policy.py" "$ROOT/${POLICY_KIT_DIR}/catalogue.toml" "$d/$kd/../${POLICY_KIT}/"
   # The three pairs S7 made rendered: the renderer refuses a set with a template missing, and
   # `--tracked-only` would SKIP an absent live copy, so an install carries both halves of each.
@@ -2232,6 +2242,16 @@ has "DGR10 a reader answering a non-integer: --render refuses" "$o" "rc=2"
 has "DGR10 ...naming the answer" "$o" "answered 'abc' for runtime.agents-in-flight, not a positive integer"
 absent_harness=yes; [ -e "$PN/scripts/$WFK/unattended-build.js" ] && absent_harness=no
 same "DGR10 ...and writes no harness" "$absent_harness" "yes"
+
+# ---- TOOL-dFairHearing-23 AC15: a layout's copy set renders the review harness's lens slots, and refuses with no lens
+# ---- catalogue. RED against the parent suite, whose layout copies neither lenses.toml nor render_lenses.py.
+LC="$LAY/lenses"; build_layout "$LC" scripts/$WFK scripts/$UNK scripts/gotchas.py
+o=$( (cd "$LC/scripts/$WFK" && "$_rkd_py" render_lenses.py lenses.toml < tier2-review.template.js >/dev/null 2>&1; echo "rc=$?") )
+has "FH23 AC15 a layout's copy set renders the review harness template" "$o" "rc=0"
+rm -f "$LC/scripts/$WFK/lenses.toml"
+o=$( (cd "$LC/scripts/$WFK" && "$_rkd_py" render_lenses.py lenses.toml < tier2-review.template.js 2>&1; echo "rc=$?") )
+has "FH23 AC15 ...and without lenses.toml it refuses naming the catalogue" "$o" "rule 1: the lens catalogue lenses.toml could not be read"
+has "FH23 AC15 ...at exit 2" "$o" "rc=2"
 
 # ---- TOOL-dGroundRules-74: THE WRITER-SPLIT FALLBACK, from an adopter's side. A hook that predates
 # ---- `gov:fixed-writers` denies the split, and --render writes the verifier-bounded fallback with one

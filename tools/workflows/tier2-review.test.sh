@@ -255,6 +255,13 @@ function evalAddress(extra, ret) {
     ck(sord.map((f) => f.id).join(',') === '3,2,1', 'address: a spec finding with no address sorts after every addressed finding of its file: ' + sord.map((f) => f.id).join(','))
   }
 }
+// ---- TOOL-dFairHearing-23 AC39 — a repo-absolute path, its repo-relative spelling and a lower-case drive key as one file.
+// RED against the parent, whose key keeps the repo prefix, so the three keys differ.
+{
+  const rfn = evalAddress({ repo: 'C:/R' }, '[deriveAddressKey]')
+  const files = rfn ? ['C:/R/src/a.js', 'src/a.js', 'c:/R/src/a.js'].map((file) => rfn[0]({ file: file, line: 1, lens: 'l', id: 1 }).file) : []
+  ck(files.length === 3 && files.every((x) => x === 'src/a.js'), 'FH23 AC39 address: under repo C:/R the three spellings key as src/a.js: ' + JSON.stringify(files))
+}
 // A closed-set argument `field`: a proceeding arm reads the RESOLVED value back, a refusal must name `field`.
 function armClosedSet(field, name, extra, want) {
   let got = null
@@ -538,6 +545,21 @@ arm('walk: an item tag carrying a newline -> refused naming walk.items', buildWa
 arm('walk: two scenarios sharing an id -> refused naming walk.scenarios',
   buildWalk({ scenarios: [{ id: 'S1', name: 'a', walks: 'b' }, { id: 'S1', name: 'c', walks: 'd' }] }), WALK_NO + '.scenarios`')
 arm('walk: an empty items -> refused naming walk.items', buildWalk({ items: [] }), WALK_NO + '.items`')
+// TOOL-dFairHearing-23 AC40 - the grid's ceilings, each refused naming its field and its ceiling, each limit itself proceeding.
+// RED against the parent, which refuses none: every refusing arm proceeds there.
+{
+  const items = (n) => Array.from({ length: n }, (_, i) => ({ tag: 'i' + i, step: 's1' }))
+  const scenario = (over) => [Object.assign({ id: 'S1', name: 'n', walks: 'w' }, over)]
+  arm('FH23 AC40 walk: a run-1 walker slice of 201 cells -> refused naming walk and its 200-cell ceiling', buildWalk({ items: items(201) }),
+    WALK_NO + '` deals walker slot 1 of run 1 201 cells, above the 200-cell ceiling')
+  arm('FH23 AC40 walk: a walker slice of 200 cells -> proceeds', buildWalk({ items: items(200) }), null)
+  arm('FH23 AC40 walk: a scenario name of 121 characters -> refused naming walk.scenarios and its 120-character ceiling',
+    buildWalk({ scenarios: scenario({ name: 'n'.repeat(121) }) }), WALK_NO + '.scenarios` member 0 carries a name of 121 characters, above the 120-character ceiling')
+  arm('FH23 AC40 walk: a scenario name of 120 characters -> proceeds', buildWalk({ scenarios: scenario({ name: 'n'.repeat(120) }) }), null)
+  arm('FH23 AC40 walk: a walks of 601 characters -> refused naming walk.scenarios and its 600-character ceiling',
+    buildWalk({ scenarios: scenario({ walks: 'w'.repeat(601) }) }), WALK_NO + '.scenarios` member 0 carries a walks of 601 characters, above the 600-character ceiling')
+  arm('FH23 AC40 walk: a walks of 600 characters -> proceeds', buildWalk({ scenarios: scenario({ walks: 'w'.repeat(600) }) }), null)
+}
 let walkFns = null
 {
   let got = null
@@ -1318,8 +1340,9 @@ async function runWholeScriptArms() {
   // ==== TOOL-dFairHearing-15 — a diff review given no `checklist` ACQUIRES one (AC1-AC4) ===============
   // Every arm is RED against the parent render, which spawns no `resume:checklist` agent: AC1's items reach
   // no prompt, and every no-checklist run logs the absent WARNING and states `absent` in RUN INTEGRITY.
+  // TOOL-dFairHearing-23 S36 - the stub ends in the checker's `# by design —` head, as every whole stdout does.
   const ACQ = '# recurring-bug-class checklist for b..c (1 file(s))\n# 3 class(es) selected by an anchor + 0 universal\n\n' +
-    '- [ ] ACQONEX\n- [ ] ACQTWOX\n- [ ] ACQTHREEX\n'
+    '- [ ] ACQONEX\n- [ ] ACQTWOX\n- [ ] ACQTHREEX\n\n# by design — 0 invariant(s) this selection touches\n'
   const extractChecklistLine = (run) => {
     const sp = run.trace.find((t) => t.label === 'synth')
     return (/(^|\n)(Checklist: [^\n]*)/.exec(sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : '') || ['', '', ''])[2]
@@ -1429,6 +1452,18 @@ async function runWholeScriptArms() {
       'FH15 AC5 the acquired items reach the finders as C<n> in the checker\'s order: ' + acqItems.length + ' item(s)')
     ck(r.logs.indexOf('by-design: 1 invariant(s) from the checklist\'s by-design block') !== -1 && !fp.some((t) => /(^|\n)C\d+ bd-base/.test(t.prompt)),
       'FH15 AC5 the acquired by-design block reaches byDesign, and no lens sweeps it as a class')
+  }
+  // ---- TOOL-dFairHearing-23 AC27: the same real stdout cut inside its item list, or before its by-design head, is a
+  // checklistError and passes no checklist. RED against the parent render, which admits any return holding one `- ` line.
+  if (bdRan) {
+    const bdHead = BD_RANGE.indexOf('\n# by design')
+    const bdLast = BD_RANGE.lastIndexOf('\n- ', bdHead)
+    for (const [what, ret] of [['cut inside its item list', BD_RANGE.slice(0, bdLast + 1)], ['cut before its by-design head', BD_RANGE.slice(0, bdHead + 1)],
+      ['missing one item above its head', BD_RANGE.slice(0, bdLast + 1) + BD_RANGE.slice(bdHead + 1)]]) {
+      r = await runReview(DIFF, buildStubs({ 'resume:checklist': { checklist: ret } }))
+      ck(!r.threw && r.logs.some((l) => l.indexOf('WARNING: no checklist was acquired — checklistError') === 0) && r.logs.indexOf('checklist from --for-diff ' + B + '..' + H) === -1,
+        'FH23 AC27 the real stdout ' + what + ' is a checklistError WARNING and passes no checklist: ' + (r.threw || r.logs.filter((l) => l.indexOf('checklist') !== -1).join(' / ')))
+    }
   }
 
   // ==== TOOL-aSightedSkeptic-2 — the skeptic judges each finding's proposed fix as well as its claim ====
@@ -2574,6 +2609,16 @@ async function runGradesArms() {
       ck(r.result.blockers === 2 && scanWarn(r, 'no legal grade').some((l) => /ids 2$/.test(l)),
         'grades: ' + name + ' places id 2 at the item\'s BLOCKER and names it')
   }
+  // ---- TOOL-dFairHearing-23 AC21: an item with no `grades`, and one with `grades: null`, place each id at the item's
+  // severity, one WARNING naming the item. RED against the parent, whose `it.grades[String(id)]` throws a TypeError.
+  for (const [name, item] of [['no grades', { severity: 'BLOCKER', ids: [1, 2] }], ['grades null', { severity: 'BLOCKER', ids: [1, 2], grades: null }]]) {
+    r = await runItems([item])
+    if (checkNoThrow(r, 'FH23 AC21 ' + name)) {
+      const w = scanWarn(r, 'carries no grades object')
+      ck(r.result.blockers === 2 && w.length === 1 && w[0].indexOf('holding ids 1, 2 ') !== -1,
+        'FH23 AC21 an item with ' + name + ' places ids 1 and 2 at its BLOCKER, one WARNING naming it: ' + w.join(' / '))
+    }
+  }
   // ---- AC4: an item whose severity is not its highest grade is named, and the counts stay per id.
   r = await runItems([Object.assign({}, MIXED, { severity: 'MEDIUM' })])
   if (checkNoThrow(r, 'grades misranked'))
@@ -2875,7 +2920,7 @@ async function runTwinRunArms() {
 }
 
 // ==== TOOL-dFairHearing-8 — the class fix judge, and every confirmed finding's disposition (AC1-AC9) ======
-// RED against the parent render: it reads no `fixJudge`, `unclassed` or `legManifest`, so none refuses; its
+// RED against the parent render: it reads no `fixJudge`, `unclassed` or `gateManifest`, so none refuses; its
 // skeptics are never asked the class question; its probe reads no leg manifest; its synthesis is handed no
 // DISPOSITIONS block and its schema requires no `dispositions`; its appendix has nine columns; and its return
 // carries no `dispositions`, `dispositionFault` or `ownerItems`. WHAT IT DOES NOT CHECK: that a live skeptic
@@ -2940,20 +2985,20 @@ async function runDispositionArms() {
   ck(!!r.threw && r.threw.indexOf('tier2-review: `unclassed` must be one of refuse | reason | owner-rules') === 0 && r.trace.length === 0,
     'unclassed: maybe is refused before any spawn, naming the three values')
   ck(synthCall(ra).prompt.indexOf('\nunclassed: refuse - none is refused') !== -1, 'unclassed: absent, the synthesis prompt states refuse')
-  // ---- AC5: `legManifest` refused on the specs rule, rendered into the probe, and no legs refusing every gate:.
-  r = await runReview(Object.assign({}, DIFF, { legManifest: '../x.json' }), ALL_OK)
-  ck(!!r.threw && r.threw.indexOf('tier2-review: `legManifest` must be a repo-relative path') === 0 && r.trace.length === 0,
-    'legManifest: ../x.json is refused before any spawn')
+  // ---- AC5: `gateManifest` refused on the specs rule, rendered into the probe, and no legs refusing every gate:.
+  r = await runReview(Object.assign({}, DIFF, { gateManifest: '../x.json' }), ALL_OK)
+  ck(!!r.threw && r.threw.indexOf('tier2-review: `gateManifest` must be a repo-relative path') === 0 && r.trace.length === 0,
+    'gateManifest: ../x.json is refused before any spawn')
   ck(probeCall(ra).prompt.indexOf('gate-legs.json, the leg manifest') !== -1 && probeCall(ra).prompt.indexOf('{{TOOL_ROOT}}') === -1,
-    'legManifest: absent, the probe is told to read the rendered default gate-legs.json')
+    'gateManifest: absent, the probe is told to read the rendered default gate-legs.json')
   const r5 = await runReview(DIFF, buildStubs({ synth: buildDisposingSynth((ids) => ids.map((id) => ({ id: id, disposition: 'gate:memory hygiene' }))) }))
   if (checkNoThrow(r5, 'no legs'))
     ck(r5.logs.some((l) => l.indexOf('WARNING: no leg manifest was read from ') === 0) && synthCall(r5).prompt.indexOf('Leg names: no leg manifest was read') !== -1 &&
       r5.result.dispositions === null && r5.result.dispositionFault.indexOf('id 1 is "gate:memory hygiene", and no leg manifest was read') !== -1,
-      'legManifest: a probe returning no legs is logged and stated, and gate:memory hygiene is refused')
+      'gateManifest: a probe returning no legs is logged and stated, and gate:memory hygiene is refused')
   // ---- AC6: two slug-led items and one with no slug; one leg; the four forms; the schema requires the field.
   const CL = Object.assign({}, DIFF, { checklist: ['[ ] alpha-one (universal)', 'beta-two the second', 'Not slug-led'] })
-  const LEGS = { 'resume:probe': Object.assign(buildProbe(), { legs: ['memory hygiene'] }) }
+  const LEGS = { 'resume:probe': Object.assign(buildProbe(), { legs: ['memory hygiene'], legCount: 1 }) }
   const r6 = await runReview(CL, buildStubs(LEGS))
   if (checkNoThrow(r6, 'dispositions block')) {
     const s6 = synthCall(r6)
@@ -2987,6 +3032,34 @@ async function runDispositionArms() {
       JSON.stringify(x.result.ownerItems) === (u === 'owner-rules' ? '[1]' : '[]') && y.result.dispositions === null && y.result.dispositionFault.indexOf('id 1 ') === 0,
       'dispositions: under ' + u + ' none with a reason is ' + (u === 'refuse' ? 'refused' : 'accepted') + ', ownerItems ' + JSON.stringify(x.result && x.result.ownerItems) +
       ', and none with an empty reason is refused')
+  }
+  // ---- TOOL-dFairHearing-23 AC23: the reason cell is one line, a pipe written as `\|`: the prompt says so, and a raw `|`
+  // or a line break refuses the set, its note naming the appendix as needing a re-render. RED against the parent render,
+  // whose prompt states no such rule and whose check admits any non-empty reason.
+  {
+    const buildReason = (reason) => buildDisposingSynth((ids) => ids.map((id) => (id === 1 ? { id: id, disposition: 'none', reason: reason } : { id: id, disposition: 'new:fresh-class' })))
+    const raw = await runReview(Object.assign({}, DIFF, { unclassed: 'reason' }), buildStubs({ synth: buildReason('a | b') }))
+    const brk = await runReview(Object.assign({}, DIFF, { unclassed: 'reason' }), buildStubs({ synth: buildReason('a\nb') }))
+    const esc = await runReview(Object.assign({}, DIFF, { unclassed: 'reason' }), buildStubs({ synth: buildReason('a \\| b') }))
+    ck(!raw.threw && !brk.threw && !esc.threw && [raw, brk].every((x) => x.result.dispositions === null && x.result.note.indexOf('appendix needs a re-render') !== -1) &&
+      Array.isArray(esc.result.dispositions) && synthCall(raw).prompt.indexOf('so write it on one line, a pipe written as `\\|`') !== -1,
+      'FH23 AC23 a raw | and a line break refuse the set naming the appendix re-render, an escaped one is accepted, and the prompt says so: ' +
+      (raw.threw || raw.result.note))
+  }
+  // ---- TOOL-dFairHearing-23 AC22: the leg list is used whole or not at all. RED against the parent render, whose filter keeps a
+  // truncated list and an empty one as the manifest, so the short list admits the gate and the empty one names no missing manifest.
+  {
+    const GATED = buildSet({ 1: 'gate:memory hygiene', 2: 'new:fresh-class', 3: 'new:fresh-class', 4: 'new:fresh-class', 5: 'new:fresh-class' })
+    for (const [what, legs, legCount] of [['an empty list', [], 0], ['a list one short of legCount', ['memory hygiene'], 2],
+      ['a duplicate', ['memory hygiene', 'memory hygiene'], 2], ['a non-string', ['memory hygiene', 7], 2]]) {
+      const x = await runReview(CL, buildStubs({ 'resume:probe': Object.assign(buildProbe(), { legs: legs, legCount: legCount }), synth: buildDisposingSynth(GATED) }))
+      ck(!x.threw && x.logs.some((l) => l.indexOf('WARNING: no leg manifest was read from ') === 0) && x.result.dispositions === null &&
+        x.result.dispositionFault.indexOf('id 1 is "gate:memory hygiene", and no leg manifest was read') !== -1,
+        'FH23 AC22 ' + what + ' reads as no leg manifest and admits no gate: disposition: ' + (x.threw || x.result.dispositionFault))
+    }
+    const whole = await runReview(CL, buildStubs(Object.assign({ synth: buildDisposingSynth(GATED) }, LEGS)))
+    ck(!whole.threw && Array.isArray(whole.result.dispositions) && whole.result.dispositions[0].disposition === 'gate:memory hygiene',
+      'FH23 AC22 a whole list matching legCount admits the valid gate: ' + (whole.threw || whole.result.dispositionFault))
   }
   // ---- AC9: two confirmed and three refuted; the handed appendix has ten columns and two placeholders; the return the dispositions.
   const r9 = await runReview(Object.assign({}, DIFF, { unclassed: 'reason' }), buildStubs({
@@ -3760,9 +3833,9 @@ printf '%s\n' "$out"
 # (1), the key (1), the dead run-b lens (1) and two review_pin.py --twin arms (2). The six re-pinned type
 # arms add none. Counted by hand, not by a run: the pass runs no suite.
 # RAISED 498 -> 524 by TOOL-dFairHearing-8: 26 assertions, counted off the `fixJudge:`, `unclassed:`,
-# `legManifest:` and `dispositions:` arms — the fixJudge refusal and its three starts (2), the instance and
+# `gateManifest:` and `dispositions:` arms — the fixJudge refusal and its three starts (2), the instance and
 # class prompts and keys (2), the instance verdict under each judge (2), the unclassed refusal and its default
-# (2), the legManifest refusal, its rendered default and the no-legs run (3), the DISPOSITIONS block (1), the
+# (2), the gateManifest refusal, its rendered default and the no-legs run (3), the DISPOSITIONS block (1), the
 # accepted set and six planted faults (7), AC8's loop over three values (3), the handed and returned appendix
 # (2) and two review_pin.py --unclassed arms (2). The four re-pinned ten-column appendix arms add none.
 # Counted by hand, not by a run: the pass runs no suite.
@@ -3787,7 +3860,11 @@ printf '%s\n' "$out"
 # RAISED 598 -> 602 by TOOL-dFairHearing-20: 4 assertions, counted off the `walk red:` arms — AC2's complete walk (1),
 # AC1's nulled return (1), AC3's round line (1) and the one walkRed definition (1). Counted by hand and by a scratch
 # probe of the same calls, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=602
+# RAISED 602 -> 620 by TOOL-dFairHearing-23: 18 assertions, counted off the `FH23` arms — AC39's address key (1), AC40's
+# three refusals and three limits (6), AC21's two ungraded items (2), AC27's three cut returns (3), AC23's reason cell
+# (1) and AC22's four short lists and the whole one (5). The ACQ stub gaining its by-design head, LEGS its legCount
+# and the gateManifest rename add none. Counted by hand, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=620
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

@@ -2,6 +2,7 @@
 """render_lenses.py — fill each `{{LENS_SLOTS}}` token of a harness template from the lens catalogue.
 
   python <kit>/render_lenses.py <catalogue>   # stdin: a template, stdout: it with each token filled
+  python <kit>/render_lenses.py --markers <file>   # stdout: the line number of each lens-slots marker line
 
 A workflow script has no filesystem at run time, so the review harness cannot read `lenses.toml`
 itself: the install render is its one derivation, beside the four tokens the parity script fills.
@@ -16,6 +17,11 @@ literal set is DERIVED from the template's lens-slots markers and typed nowhere 
 Exit 0 = rendered · 2 = refused, one stderr line naming the row (its `key`, or its index when the key
 is the fault) and the rule. The rules are numbered as this kit's README, section "The lens
 catalogue", lists them.
+
+`--markers` (TOOL-dFairHearing-23) prints, one per line, the 1-based number of every line of `<file>`
+that `MARKER` matches, the one predicate finding a marked literal: the fan-out leg walks exactly those
+lines, so a comment that names `gov:lens-slots` is no marker there either. Exit 2 when the file cannot
+be read as UTF-8.
 
 WHAT IT DOES NOT CHECK: the slot count. A sixth default row renders a sixth slot, and the fan-out leg,
 `check-verifier-fanout.sh`, reds it: that leg reads what runs, and one answer to one question.
@@ -152,9 +158,24 @@ def render_lens_slots(text, rows):
     return "\n".join(out)
 
 
+def read_marker_lines(text):
+    """The 1-based number of each line `MARKER` matches, a trailing CR dropped (TOOL-dFairHearing-23 S35)."""
+    return [i + 1 for i, line in enumerate(text.split("\n")) if MARKER.search(line.rstrip("\r"))]
+
+
 def main(argv):
+    if len(argv) == 3 and argv[1] == "--markers":
+        try:
+            with open(argv[2], "rb") as fh:
+                text = fh.read().decode("utf-8")
+        except (OSError, UnicodeDecodeError) as e:
+            sys.stderr.write("render_lenses: REFUSED, --markers: %s could not be read as UTF-8: %s\n" % (argv[2], e))
+            return 2
+        sys.stdout.buffer.write("".join("%d\n" % n for n in read_marker_lines(text)).encode("utf-8"))
+        return 0
     if len(argv) != 2:
-        sys.stderr.write("usage: render_lenses.py <catalogue>   # stdin: a template, stdout: its render\n")
+        sys.stderr.write("usage: render_lenses.py <catalogue>   # stdin: a template, stdout: its render\n"
+                         "       render_lenses.py --markers <file>   # stdout: its lens-slots marker line numbers\n")
         return 2
     try:
         try:

@@ -337,71 +337,34 @@ done <<<"$SCAN"
 # would be a third copy of either.
 [ "$st" = 0 ] && echo "verifier-fanout: clean — $n workflow script(s) obey the hook's verify-stage rule"
 
-# ---- THE SLOT COUNT, NATIVE (TOOL-dFairHearing-13) ---------------------------------------------
-# Over the same population: every array literal whose opening line carries the lens-slots marker
-# holds exactly LENS_SLOTS top-level elements. `measureSlots` walks from that line's `[` to its
-# matching `]` string-aware (single, double and template quotes with `${}` nesting, line and block
-# comments, bracket depth), so punctuation inside a brief is no slot, and a trailing comma is no
-# element. It prints `<file>:<line> <literal> <n>` per marked literal. With explicit files a harness
-# carrying no marker is legal; in the whole-tree mode no marked literal anywhere is a failure,
-# because a count over nothing grades nothing. The slot verdict prints on a line of its own, after
-# the hook's clean line, which stays byte for byte.
-LENS_SLOTS=5   # the harness's slot count, its one home; counted per marked literal, never by name
-mapfile -t _scan <<<"${SCAN%$'\n'}"
-if ! slots=$(node -e '
-    const fs = require("fs")
-    // ponytail: no regex-literal state, as no lens literal carries a regex; add one when a brief does.
-    function measureSlots(src, at) {
-      const stack = []
-      let n = 0, has = false
-      for (let i = at; i < src.length; i++) {
-        const c = src[i], d = src[i + 1], top = stack[stack.length - 1]
-        if (top === "`") {
-          if (c === "\\") i++
-          else if (c === "`") stack.pop()
-          else if (c === "$" && d === "{") { stack.push("${"); i++ }
-          continue
-        }
-        if (c === "/" && d === "/") { const e = src.indexOf("\n", i); i = e < 0 ? src.length : e; continue }
-        if (c === "/" && d === "*") { const e = src.indexOf("*/", i + 2); i = e < 0 ? src.length : e + 1; continue }
-        if (/\s/.test(c)) continue
-        if (stack.length === 1 && c === ",") { if (has) n++; has = false; continue }
-        if (stack.length === 1 && c === "]") return has ? n + 1 : n
-        if (stack.length >= 1) has = true
-        if (c === "\"" || c === "\x27") {
-          for (i++; i < src.length && src[i] !== c; i++) if (src[i] === "\\") i++
-        } else if (c === "`" || "([{".includes(c)) stack.push(c)
-        else if (c === "}" && top === "${") stack.pop()
-        else if (")]}".includes(c)) stack.pop()
-      }
-      return "unterminated"
-    }
-    for (const f of process.argv.slice(1)) {
-      const src = fs.readFileSync(f, "utf8").replace(/\r\n/g, "\n")
-      let off = 0
-      src.split("\n").forEach((l, i) => {
-        const m = /gov:lens-slots\s+(\S+)/.exec(l)
-        const at = l.indexOf("[")
-        if (m) console.log(f + ":" + (i + 1) + " " + m[1] + " " + (at === -1 ? 0 : measureSlots(src, off + at)))
-        off += l.length + 1
-      })
-    }' "${_scan[@]}" 2>&1); then
-  echo "verifier-fanout: the slot count could not run — $slots"
-  exit 2
-fi
-m=0; bad_slots=0
-while read -r _loc _lit _cnt; do
-  [ -n "$_loc" ] || continue
-  m=$((m+1))
-  if [ "$_cnt" != "$LENS_SLOTS" ]; then
-    echo "verifier-fanout: SLOTS — $_loc literal $_lit holds $_cnt slot(s); a lens literal holds exactly $LENS_SLOTS"
-    bad_slots=1
-  fi
-done <<<"$slots"
-if [ "$m" = 0 ] && [ "$EXPLICIT" = 0 ]; then
+# ---- THE SLOT COUNT (TOOL-dFairHearing-13; one predicate and one counter since TOOL-dFairHearing-23) ----
+# Over the same population: every array literal opened on a marker line holds exactly the lens count.
+# The marker lines are `render_lenses.py --markers`, the renderer's own anchored regex, so a comment
+# that names gov:lens-slots is no marker here either. check-verifier-fanout.js `--slots` counts each
+# literal with `topLevelArgs`, rule 2's own counter, over the hook's literal-blanked view, so a comma in
+# a string, parentheses or braces is no slot and a trailing comma no element, and it holds the number,
+# its one home, and prints the verdict. With explicit files a harness carrying no marker is legal; in
+# the whole-tree mode no marked literal anywhere is a failure, because a count over nothing grades
+# nothing. The slot verdict prints on a line of its own, after the hook's clean line, which stays byte
+# for byte.
+RENDERER="$HERE/render_lenses.py"
+[ -f "$RENDERER" ] || { echo "verifier-fanout: no render_lenses.py beside this gate at $HERE — the marker predicate lives there, so a gate without it must say so, not pass"; exit 2; }
+[ -n "$_hk_py" ] || { echo "verifier-fanout: no usable python, so render_lenses.py --markers cannot name the marked literals — the slot count could not run"; exit 2; }
+locs=()
+while IFS= read -r f; do
+  [ -n "$f" ] || continue
+  _ml=$("$_hk_py" "$RENDERER" --markers "$f" 2>&1) || { echo "verifier-fanout: the slot count could not run — $_ml"; exit 2; }
+  for _l in $(printf '%s\n' "$_ml" | tr -d '\r'); do locs+=("$f:$_l"); done
+done <<<"$SCAN"
+if [ "${#locs[@]}" -gt 0 ]; then
+  slots=$(node "$FANJS" --hook "$HOOK" --slots "${locs[@]}" 2>&1); _sr=$?
+  case "$_sr" in
+    0) printf '%s\n' "$slots" ;;
+    1) printf '%s\n' "$slots"; st=1 ;;
+    *) echo "verifier-fanout: the slot count could not run — $slots"; exit 2 ;;
+  esac
+elif [ "$EXPLICIT" = 0 ]; then
   echo "verifier-fanout: no lens-slot literal (a line marked gov:lens-slots) in any workflow script — the slot count graded nothing, which is not a pass"
-  bad_slots=1
+  st=1
 fi
-[ "$bad_slots" = 0 ] && [ "$m" -gt 0 ] && echo "verifier-fanout: slots — $m lens-slot literal(s), each holding $LENS_SLOTS"
-[ "$bad_slots" = 0 ] || st=1
 exit "$st"

@@ -38,7 +38,9 @@ or a judged cell without `primary` and `covered`, is a refusal naming the arm an
 
 THE EXPERIMENT SHAPE. `check_experiment` reads one committed JSON manifest (`--experiment <src>`) and
 runs every rule of aScoutedSeam's method before the first figure line, a broken one exiting 2 by name:
-each case's `case_evidence` hook returns something; a `heldOut` file has exactly one commit in a
+each case's `case_evidence` hook returns something; a `review-replay` manifest's `candidates` is a list
+of `{case, report, matched}`, one review run of one subject record each, naming its `arm` unless one is
+declared; a `heldOut` file has exactly one commit in a
 history that is not shallow, working-tree bytes hashing to that commit's blob, and no id a tuning case carries; an arm with a `base` varies exactly one declared setting from it; every arm's
 parsed replies print against its `dispatched` count; a committed label key rotates; and the arms'
 `union` is read per set and pooled. What none of them checks: a variable nobody declared, that no
@@ -53,8 +55,9 @@ per run. Every run must find two thirds of the plants and, with two runs or more
 record's pin, records disagreeing on `runs`, a run missing or repeated, a record seeded another way, a plant
 whose `escaped` disagrees with the seed, and a confirmed row with no file and key.
 
-THE CONFORMANCE ARM. `scan_pairing_sites` names every comprehension, in a tracked `*.py` under the
-tool root this kit sits in (this file excepted), whose filter is `all()` over a second population with
+THE CONFORMANCE ARM. `scan_pairing_sites` names every comprehension, in a tracked `*.py` at and below
+this kit's own directory (this file and any path under `memory/` excepted, so a repository-root install
+never reaches a record folder's bench), whose filter is `all()` over a second population with
 an `in` test from the outer case to the inner variant, or an `is not None` test naming both. What it
 does not see: a JavaScript harness, and a pairing written as a `for` loop building a common list.
 
@@ -112,7 +115,7 @@ KIT_DIR = pathlib.Path(__file__).resolve().parent
 #: The two instances the factory exists for; `check_instances` reds when the table lacks one.
 INSTANCE_KEYS = ("review-replay", "scouted-seam")
 #: The arm count `run_selftest` must reach, as review_replay.py declares its own.
-ARMS_DECLARED = 16
+ARMS_DECLARED = 18
 
 
 class Refusal(Exception):
@@ -993,27 +996,76 @@ def measure_scouted_experiment(manifest, arms, repo="."):
     return head + figures
 
 
+#: A review-replay `candidates` entry's keys (TOOL-dFairHearing-23 S4); `arm` may be left out by a one-arm manifest.
+CANDIDATE_KEYS = {"case", "report", "matched", "arm"}
+
+
+def read_replay_cases(candidates, arms):
+    """`{<arm>: [entry, ...]}` from a review-replay `candidates` list, each entry one review run of one subject record.
+
+    Refused: not a list; an entry not an object, with a key outside CANDIDATE_KEYS, an empty `case` or
+    `report`, or a `matched` neither a source nor null; and an entry naming no declared arm, which an
+    entry may leave out only when the manifest declares one arm.
+    """
+    if not isinstance(candidates, list):
+        raise Refusal(f"candidates {candidates!r}: not a list of {{case, report, matched}}, one per review run")
+    names = [a["name"] for a in arms]
+    runs = {n: [] for n in names}
+    for i, c in enumerate(candidates):
+        if not isinstance(c, dict) or set(c) - CANDIDATE_KEYS:
+            raise Refusal(f"candidates[{i}]: not an object of {', '.join(sorted(CANDIDATE_KEYS))}"
+                          + (f"; unknown key(s) {', '.join(sorted(set(c) - CANDIDATE_KEYS))}" if isinstance(c, dict) else ""))
+        if not all(isinstance(c.get(k), str) and c[k] for k in ("case", "report")) or "matched" not in c \
+                or not (c["matched"] is None or (isinstance(c["matched"], str) and c["matched"])):
+            raise Refusal(f"candidates[{i}]: `case` and `report` are non-empty sources and `matched` a source or null, "
+                          f"not {json.dumps({k: c.get(k) for k in ('case', 'report', 'matched')})}")
+        arm = c.get("arm", names[0] if len(names) == 1 else None)
+        if arm not in runs:
+            raise Refusal(f"candidates[{i}] (case {c['case']}): arm {arm!r} is not a declared arm"
+                          + ("" if "arm" in c else "; with more than one arm declared each entry names its `arm`"))
+        runs[arm].append(c)
+    return runs
+
+
 def measure_replay_experiment(manifest, arms, repo="."):
-    """The review-replay experiment's lines: the known record's scorable items are its cases, each arm one candidate."""
-    candidates = manifest["candidates"]
-    if not isinstance(candidates, dict) or set(candidates) - {a["name"] for a in arms}:
-        raise Refusal(f"candidates {candidates!r}: not an object of <declared arm>: <src>")
+    """The review-replay experiment's lines (TOOL-dFairHearing-23 S4). A case is one review run of one subject
+    record; `dispatched` counts an arm's dispatched runs, and `parsed` the runs whose report holds an appendix
+    with at least one row `parse_candidates` reads. A parsed run with a `matched` list is scored against a
+    known set; against a review record, by `measure_replay`. An agent death is read from the report's
+    RUN INTEGRITY and skeptic counts, never from here."""
+    runs = read_replay_cases(manifest["candidates"], arms)
     known_text = read_raw_output(manifest["known"], repo)
-    mode = read_record_kind(known_text) or "diff-review"
-    known, err = parse_record_findings(known_text, mode)
-    if err:
-        raise Refusal(f"known {manifest['known']}: {err}")
-    check_case_evidence("review-replay", [{**it, "record": manifest["known"]} for it in known["items"] if it["path"]])
+    known_set = parse_known_set(known_text) if POPULATION.search(known_text) else None
+    if known_set is not None:
+        check_case_evidence("review-replay", known_set["rows"])
+    else:
+        mode = read_record_kind(known_text) or "diff-review"
+        known, err = parse_record_findings(known_text, mode)
+        if err:
+            raise Refusal(f"known {manifest['known']}: {err}")
+        check_case_evidence("review-replay", [{**it, "record": manifest["known"]} for it in known["items"] if it["path"]])
     head = check_one_variable(arms)
-    scores = {}
+    parsed, figures = {}, []
     for a in arms:
-        src = candidates.get(a["name"])
-        replay = measure_replay(known_text, read_raw_output(src, repo), 10)[0] if src else None
-        scores[a["name"]] = [replay["score"]] if replay else []
-    head += measure_parsed(arms, scores)
+        parsed[a["name"]] = []
+        for c in runs[a["name"]]:
+            text = read_raw_output(c["report"], repo)
+            cands, err = parse_candidates(text, read_record_kind(text) or "diff-review")
+            if err or not cands:
+                continue
+            parsed[a["name"]].append(c)
+            if known_set is not None and c["matched"] is not None:
+                score = measure_known_set(known_set, text, read_matched_list(read_raw_output(c["matched"], repo))[1])
+                figures.append(f"known-set {a['name']} {c['case']}: " + " · ".join(f"{n} {k}/{t}" for n, k, t in score["figures"]))
+            elif known_set is None:
+                replay, refusal = measure_replay(known_text, text, 10)
+                if refusal:
+                    raise Refusal(f"candidates case {c['case']}: {refusal[0]} {refusal[1]}")
+                s = replay["score"]
+                figures.append(f"recall {a['name']} {c['case']}: {len(s['matched'])} of {s['scorable']} scorable · "
+                               f"unscorable {len(s['unscorable'])} · candidate-only {len(s['candidate_only'])}")
+    head += measure_parsed(arms, parsed)
     head.append(check_judge_rotation(None))
-    figures = [f"recall {name}: {len(s[0]['matched'])} of {s[0]['scorable']} scorable · unscorable {len(s[0]['unscorable'])} "
-               f"· candidate-only {len(s[0]['candidate_only'])}" for name, s in scores.items() if s]
     return head + figures
 
 
@@ -1078,12 +1130,18 @@ ALL_CALL = re.compile(rb"\ball\s*\(")
 COMPREHENSIONS = (ast.ListComp, ast.SetComp, ast.GeneratorExp, ast.DictComp)
 
 
+#: The memory tree's root directory, whose record folders hold committed bench code, never a second scorer.
+MEMORY_ROOT = "memory"
+
+
 def scan_pairing_sites(root):
-    """`<path>:<line>` of each pairing comprehension in the tracked `*.py` under `root`, this file excepted.
+    """`<path>:<line>` of each pairing comprehension in the tracked `*.py` at and below `root`, this file excepted.
 
     A pairing comprehension filters on `all()` over a generator ranging over a second population whose
     element is `<outer case> in <inner variant>`, or an `is not None` test naming both. Outside a git
     checkout every `*.py` is the population. A file that does not parse is named too: it is unread.
+    A path under `MEMORY_ROOT/` is excluded by rule (TOOL-dFairHearing-23 S25): at a repository-root
+    install `root` is the repository, whose record folders keep benches the factory replaced.
     """
     root = pathlib.Path(root)
     try:
@@ -1099,7 +1157,7 @@ def scan_pairing_sites(root):
 
     sites = []
     for rel in sorted(files):
-        if pathlib.PurePosixPath(rel).name == pathlib.Path(__file__).name:
+        if pathlib.PurePosixPath(rel).name == pathlib.Path(__file__).name or rel.split("/")[0] == MEMORY_ROOT:
             continue
         data = (root / rel).read_bytes()
         if not ALL_CALL.search(data):
@@ -1231,7 +1289,7 @@ def run_selftest():
         return next((f"{w!r} not in {text!r}" for text, w in want if w not in text), None)
 
     def check_conformance():
-        live = scan_pairing_sites(KIT_DIR.parent)
+        live = scan_pairing_sites(KIT_DIR)
         if live:
             return f"a pairing outside the factory: {', '.join(live)}"
         with tempfile.TemporaryDirectory() as tmp:
@@ -1418,6 +1476,38 @@ def run_selftest():
                 or check_refused(lambda: parse_known_set(whole.replace("| b |", "| a |")), "tag a", "repeated")
                 or check_refused(lambda: measure_known_set(known, cand, [("2", "a")]), "pair 2 a", "[supervise]"))
 
+    def check_replay_manifest_arm():
+        """TOOL-dFairHearing-23 AC2: four review runs, each with a report and a matched list, parse 4 of 4; one
+        report's appendix cut parses 3 of 4; an unknown key still refuses by name."""
+        head = "**Serves:** research X-1\n\n**Population:** 2 · reviewed 2 · escaped 0 · high 1\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"
+        report = ("**Serves:** spec-audit X-1\n\nReview shape: raw 1, confirmed 1, refuted 0.\n\n" + APPENDIX_HEADING +
+                  "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n| 1 | l | x.md:[act] lifetime | confirmed |\n")
+        with tempfile.TemporaryDirectory() as tmp:
+            pathlib.Path(tmp, "known.md").write_text(head + "| a | x.md:[supervise] | high | no |\n| b | x.md:[act] | medium | no |\n", encoding="utf-8")
+            pathlib.Path(tmp, "m.md").write_text("**Adjudicator:** selftest\n\n| candidate | tag |\n|---|---|\n| 1 | b |\n", encoding="utf-8")
+            for r in range(4):
+                pathlib.Path(tmp, f"r{r}.md").write_text(report, encoding="utf-8")
+            manifest = {"instance": "review-replay", "known": str(pathlib.Path(tmp, "known.md")),
+                        "candidates": [{"case": f"run {r}", "report": str(pathlib.Path(tmp, f"r{r}.md")), "matched": str(pathlib.Path(tmp, "m.md"))}
+                                       for r in range(4)],
+                        "arms": [{"name": "a", "base": None, "settings": {}, "dispatched": 4}]}
+            lines = check_experiment(manifest)
+            if "parsed a: 4 of 4" not in lines or "known-set a run 0: reviewed 1/2 · escaped 0/0 · high 0/1" not in lines:
+                return f"four whole runs read {lines!r}"
+            pathlib.Path(tmp, "r3.md").write_text(report.split(APPENDIX_HEADING)[0], encoding="utf-8")
+            lines = check_experiment(manifest)
+            if "parsed a: 3 of 4" not in lines:
+                return f"a run whose appendix is cut read {lines!r}"
+            return (check_refused(lambda: check_experiment({**manifest, "cases": "x"}), "unknown key(s) cases")
+                    or check_refused(lambda: check_experiment({**manifest, "candidates": {"a": str(pathlib.Path(tmp, "r0.md"))}}), "not a list"))
+
+    def check_conformance_root_arm():
+        """TOOL-dFairHearing-23 AC16: at the repository root and at this kit, no pairing site is under memory/."""
+        if top is None:
+            return no_tree
+        named = [s for root in (top, KIT_DIR) for s in scan_pairing_sites(root) if s.startswith(MEMORY_ROOT + "/")]
+        return None if not named else f"a record folder's site was named: {', '.join(named)}"
+
     def check_tag_drive_arm():
         """TOOL-dFairHearing-18 AC7: the first of two tags, and a drive-lettered path folded as the section reader folds it."""
         want = [(r"C:\x.md:[a] then [b]", ("/x.md", "[a]")), ("x.md:[walk-table] plan.input", ("x.md", "[walk-table]"))]
@@ -1486,7 +1576,8 @@ def run_selftest():
             ("deterministic", check_deterministic), ("experiment-evidence", check_evidence_arm),
             ("experiment-freeze", check_freeze_arm), ("experiment-variable", check_variable_arm),
             ("experiment-parsed", check_parsed_arm), ("experiment-judge", check_judge_arm), ("experiment-union", check_union_arm),
-            ("known-set", check_known_set_arm), ("tag-drive", check_tag_drive_arm), ("design-recall", check_design_recall_arm)]
+            ("known-set", check_known_set_arm), ("tag-drive", check_tag_drive_arm), ("design-recall", check_design_recall_arm),
+            ("replay-manifest", check_replay_manifest_arm), ("conformance-root", check_conformance_root_arm)]
     passed = skipped = ran = 0
     for name, arm in arms:
         ran += 1

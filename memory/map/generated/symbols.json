@@ -3488,6 +3488,16 @@
       "file": "tools/hooks/format-guard.js"
     },
     {
+      "id": "checkChecklistWhole",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "checkChecklistWhole",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "checkCommand",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -4681,6 +4691,11 @@
       "id": "check_gate_refused",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "check_gate_token",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
     },
     {
       "id": "check_gate_unknown",
@@ -6331,6 +6346,11 @@
       "id": "check_under",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_ungated",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
     },
     {
       "id": "check_unmerged_live",
@@ -12023,6 +12043,11 @@
       "file": "tools/unattended/stop-guard.js"
     },
     {
+      "id": "measureLensSlots",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.js"
+    },
+    {
       "id": "measureRun",
       "kind": "function",
       "file": "tools/workflows/orient-counterfactual.js"
@@ -15993,6 +16018,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "read_marker_lines",
+      "kind": "function",
+      "file": "tools/workflows/render_lenses.py"
+    },
+    {
       "id": "read_matched_list",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
@@ -16616,6 +16646,11 @@
       "id": "read_remote_red",
       "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "read_replay_cases",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "read_repo_root",
@@ -18221,6 +18256,16 @@
       "id": "renderDeny",
       "kind": "function",
       "file": "tools/workflows/spec-audit-optin.js"
+    },
+    {
+      "id": "renderDriveFold",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderDriveFold",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "renderFanoutDeny",

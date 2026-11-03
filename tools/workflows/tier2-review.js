@@ -178,7 +178,7 @@ function readOutputTokens() {
 //                                         // the set, and it joins the review key under "class" only
 //   unclassed: "refuse" | "reason" | "owner-rules", // DEFAULTS to "refuse": the `review.unclassed` key, passed
 //                                         // as a pin argument, naming which `none` dispositions the check admits
-//   legManifest: "<repo-relative path>",  // DEFAULTS to "tools/gate-legs.json": the leg manifest the resume
+//   gateManifest: "<repo-relative path>",  // DEFAULTS to "tools/gate-legs.json": the leg manifest the resume
 //                                         // probe reads the `gate:` leg names from; refused on the `specs` rule
 //                                         // (TOOL-dFairHearing-8)
 //   optIn: { "<opt-in lens key>": "<default lens key>" }, // DEFAULTS to {}: the CALLER's swap. Each key is a
@@ -343,6 +343,10 @@ const WALK_SCENARIO_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$/
 const WALK_SEEDS = ['reverted-escapes', 'synthetic', 'none']
 const WALK_SLICING = ['scenario', 'step', 'diagonal'] // run 1, 2 and 3
 const WALK_VERDICTS = ['holds', 'finding', 'not-on-path']
+// TOOL-dFairHearing-23 S49 - the grid's ceilings, each refused by name before the first agent: the cells one walker
+// slice of this run holds, and the characters of a scenario's `name` and `walks` (spec section 8 F4, against the
+// audit's 812-cell walk, which dealt about 162 cells per walker and returned whole).
+const WALK_CEILINGS = { cells: 200, name: 120, walks: 600 }
 function checkWalk(w) {
   const buildRefusal = (field, rule, got) => new Error('tier2-review: `' + field + '` ' + rule + '. Got ' + JSON.stringify(got) + '.')
   if (!w || typeof w !== 'object' || Array.isArray(w))
@@ -362,6 +366,11 @@ function checkWalk(w) {
     throw buildRefusal('walk.scenarios', 'member ' + badScenario + ' must be {id, name, walks}, id matching ' + WALK_SCENARIO_ID.source + ' and name and walks non-empty strings', scenarios[badScenario])
   const twiceId = scenarios.findIndex((x, i) => scenarios.findIndex((y) => y.id === x.id) !== i)
   if (twiceId !== -1) throw buildRefusal('walk.scenarios', 'member ' + twiceId + ' repeats the id ' + scenarios[twiceId].id + ', and ids are unique', scenarios[twiceId])
+  for (const field of ['name', 'walks']) {
+    const long = scenarios.findIndex((x) => x[field].length > WALK_CEILINGS[field])
+    if (long !== -1)
+      throw buildRefusal('walk.scenarios', 'member ' + long + ' carries a ' + field + ' of ' + scenarios[long][field].length + ' characters, above the ' + WALK_CEILINGS[field] + '-character ceiling of ' + field, scenarios[long].id)
+  }
   const runs = w.runs === undefined ? 2 : w.runs
   if ([1, 2, 3].indexOf(runs) === -1) throw buildRefusal('walk.runs', 'must be review.design-audit.runs, 1, 2 or 3, or absent for 2', w.runs)
   if (!Number.isInteger(w.run) || w.run < 1 || w.run > runs)
@@ -370,6 +379,10 @@ function checkWalk(w) {
   if (WALK_SEEDS.indexOf(seed) === -1) throw buildRefusal('walk.seed', 'must be review.design-audit.seed, one of ' + WALK_SEEDS.join(' | ') + ', or absent for reverted-escapes', w.seed)
   if ((w.keySha !== undefined && (typeof w.keySha !== 'string' || !/^[0-9a-f]{64}$/.test(w.keySha))) || (w.keySha === undefined && seed !== 'none'))
     throw buildRefusal('walk.keySha', 'must be the key\'s SHA-256, 64 lower-case hex, and is required unless walk.seed is none', w.keySha)
+  const sliceCells = deriveWalkSlices(items, scenarios, w.run).map((s) => s.length)
+  const bigSlice = sliceCells.findIndex((n) => n > WALK_CEILINGS.cells)
+  if (bigSlice !== -1)
+    throw buildRefusal('walk', 'deals walker slot ' + (bigSlice + 1) + ' of run ' + w.run + ' ' + sliceCells[bigSlice] + ' cells, above the ' + WALK_CEILINGS.cells + '-cell ceiling of a walker slice', sliceCells)
   return { items: items.map((x) => ({ tag: x.tag, step: x.step })), scenarios: scenarios.map((x) => ({ id: x.id, name: x.name, walks: x.walks })),
     runs: runs, run: w.run, seed: seed, keySha: w.keySha === undefined ? null : w.keySha }
 }
@@ -619,8 +632,13 @@ function renderReviewedLine(subjects) {
 // S<n> and AC<n> upper-cased), else null. It never reads `ref`, so nothing is keyed on a ref string.
 const ADDRESS_TAG = /\[([a-z][a-z0-9-]*)\]/
 const ADDRESS_SECTION = /\bsection ?(\d+)\b|§ ?(\d+)\b|\b(S|AC)(\d+)\b/i
+// TOOL-dFairHearing-23 S48 - a leading `repo + '/'` is stripped once both fold to `/`, the drive letter compared
+// case-insensitively, so a repo-absolute path and its repo-relative spelling key as one file.
+const renderDriveFold = (p) => p.replace(/^[A-Za-z]:/, (d) => d.toLowerCase())
+const ADDRESS_ROOT = renderDriveFold(String(repo).replace(/\\/g, '/').replace(/\/+$/, '')) + '/'
 function deriveAddressKey(f) {
-  const file = String(f.file).trim().replace(/\\/g, '/').replace(/^\.\//, '')
+  const slashed = String(f.file).trim().replace(/\\/g, '/')
+  const file = (renderDriveFold(slashed).indexOf(ADDRESS_ROOT) === 0 ? slashed.slice(ADDRESS_ROOT.length) : slashed).replace(/^\.\//, '')
   let at = null
   if (!isSpec) at = Number.isInteger(f.line) ? f.line : null
   else {
@@ -849,7 +867,7 @@ const SPECS = a.specs === undefined ? [] : a.specs
 const specsRule = 'an array of repo-relative paths, each a non-empty string with no backslash, no leading / or ~, no drive letter, no .. segment and no control character'
 if (!Array.isArray(SPECS))
   throw new Error('tier2-review: `specs` must be ' + specsRule + '. Got ' + JSON.stringify(a.specs) + ', which is not an array.')
-// TOOL-dFairHearing-8 S4 - the rule as one predicate, since `legManifest` below is refused by it too.
+// TOOL-dFairHearing-8 S4 - the rule as one predicate, since `gateManifest` below is refused by it too.
 function checkRepoPath(s) {
   return typeof s === 'string' && !!s && s.indexOf('\\') === -1 && s[0] !== '/' && s[0] !== '~' && !/[\x00-\x1f]/.test(s) &&
     !/^[A-Za-z]:/.test(s) && s.split('/').indexOf('..') === -1
@@ -857,12 +875,12 @@ function checkRepoPath(s) {
 const specsBadIdx = SPECS.findIndex((s) => !checkRepoPath(s))
 if (specsBadIdx !== -1)
   throw new Error('tier2-review: `specs` must be ' + specsRule + '. Member ' + specsBadIdx + ' is ' + JSON.stringify(SPECS[specsBadIdx]) + '.')
-// TOOL-dFairHearing-8 S4 - `legManifest`, the leg manifest the resume probe reads the `gate:` leg names from. It
+// TOOL-dFairHearing-8 S4 - `gateManifest`, the leg manifest the resume probe reads the `gate:` leg names from. It
 // reaches the probe's prompt as a path an agent reads, so it is refused on the `specs` rule; the default is rendered.
-const legManifest = a.legManifest === undefined ? 'tools/gate-legs.json' : a.legManifest
-if (!checkRepoPath(legManifest))
-  throw new Error('tier2-review: `legManifest` must be a repo-relative path, a non-empty string with no backslash, no leading / or ~, ' +
-    'no drive letter, no .. segment and no control character. Got ' + JSON.stringify(a.legManifest) + '.')
+const gateManifest = a.gateManifest === undefined ? 'tools/gate-legs.json' : a.gateManifest
+if (!checkRepoPath(gateManifest))
+  throw new Error('tier2-review: `gateManifest` must be a repo-relative path, a non-empty string with no backslash, no leading / or ~, ' +
+    'no drive letter, no .. segment and no control character. Got ' + JSON.stringify(a.gateManifest) + '.')
 // S3 - on a spec audit `specs` is sibling context, NOT under audit, so one document cannot be both.
 const specsOverlap = isSpec ? SPECS.find((p) => subjects.some((x) => x && x.path === p)) : undefined
 if (specsOverlap !== undefined)
@@ -1461,6 +1479,21 @@ if (unreadNotes.length)
 // the spec kind never acquires, since `unattended-build`'s resolver already hands it a `--for-paths` one.
 // WHAT THIS DOES NOT CHECK: that the agent ran the command it was told to and returned stdout unaltered;
 // the by-design head-count refusal catches a truncated block, as the resolver's comment says of its own.
+// TOOL-dFairHearing-23 S36 - THE WHOLENESS CHECK, pure: '' when the `- ` items before the `# by design —` head number
+// n + u + k, `n` and `u` from the `# <n> class(es) selected by an anchor + <u> universal` line and `k` from the
+// `# invariants are read at <sha>; <k> that ...` line, 0 when it is absent; else why the return is cut.
+function checkChecklistWhole(text) {
+  const t = String(text).replace(/\r\n/g, '\n')
+  const head = /^# by design —/m.exec(t)
+  if (!head) return 'it carries no `# by design —` head'
+  const before = t.slice(0, head.index)
+  const sel = /^# (\d+) class\(es\) selected by an anchor \+ (\d+) universal/m.exec(before)
+  if (!sel) return 'it carries no `# <n> class(es) selected by an anchor + <u> universal` line'
+  const inv = /^# invariants are read at \S+; (\d+) that /m.exec(before)
+  const want = Number(sel[1]) + Number(sel[2]) + (inv ? Number(inv[1]) : 0)
+  const got = (before.match(/^- /gm) || []).length
+  return got === want ? '' : got + ' item(s) before the `# by design —` head, where its head lines state ' + want
+}
 phase('Resume')
 let acquiredChecklist = null
 let checklistWhy = null
@@ -1486,10 +1519,14 @@ if (!isSpec && a.checklist === undefined) {
   )
   // The resolver's `- ` item rule: a checklist reaches the parse only when it carries an item, and every
   // other outcome is a reason, announced below and never passed as an empty checklist.
-  if (res && typeof res.checklist === 'string' && /^- /m.test(res.checklist)) acquiredChecklist = res.checklist
+  // TOOL-dFairHearing-23 S36 - and only WHOLE: a return cut before its `# by design —` head, or whose items before
+  // it are not the n + u + k its head lines state, is a checklistError, so a tail-truncated return is never complete.
+  const cut = res && typeof res.checklist === 'string' && /^- /m.test(res.checklist) ? checkChecklistWhole(res.checklist) : ''
+  if (res && typeof res.checklist === 'string' && /^- /m.test(res.checklist) && !cut) acquiredChecklist = res.checklist
   else checklistWhy = !res ? 'the checklist agent died'
-    : typeof res.checklist === 'string' && res.checklist.trim() ? 'no bug class selected'
-      : (typeof res.checklistError === 'string' && res.checklistError) || 'the checklist agent returned neither `checklist` nor `checklistError`'
+    : cut ? 'checklistError: the returned checklist is cut — ' + cut
+      : typeof res.checklist === 'string' && res.checklist.trim() ? 'no bug class selected'
+        : (typeof res.checklistError === 'string' && res.checklistError) || 'the checklist agent returned neither `checklist` nor `checklistError`'
   log(acquiredChecklist !== null ? `checklist from --for-diff ${base}..${head}`
     : `WARNING: no checklist was acquired — ${checklistWhy}; no lens sweeps the project's recurring bug classes`)
 }
@@ -1602,7 +1639,7 @@ const REVIEW_SHAPE = 'lenses5-r4'
 // TOOL-dFairHearing-11 S8 - and `twin: true` ONLY on a twinned run, so it never reuses an untwinned run's lens
 // or verify files, and every untwinned key holds. The probe's type stays out: it writes no keyed file.
 // TOOL-dFairHearing-8 S2 - and `fixJudge` ONLY under `class`, so a class-judged verify file is never reused by an
-// `instance` run and every key a run without it derives holds. `unclassed` and `legManifest` reach the synthesis alone, and stay out.
+// `instance` run and every key a run without it derives holds. `unclassed` and `gateManifest` reach the synthesis alone, and stay out.
 const inputPrint = deriveFnv1a(renderCanonical(Object.assign({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: runNotes, specs: SPECS, checklist: checklist, intensity: intensity, ...(isSpec ? { probeRules: PROBE_RULES } : {}),
   ...(prevBlobCount ? { prevBlobs: subjects.map((x) => (x && typeof x === 'object' && x.prevBlob !== undefined ? x.prevBlob : null)) } : {}) }, workerType ? { workerType: workerType } : {},
   roledJudges ? { roles: { find: roles[finderKey] || null, verify: roles.skeptic || null } } : {}, preset !== 'unit-spec' ? { preset: preset } : {},
@@ -1648,10 +1685,10 @@ const probe = await agent(
     `a name field holding its file name. Do not repair, complete or re-judge anything: a file that ` +
     `does not parse, or lacks a field the schema requires, is left out and its name listed in skipped.\n` +
     // TOOL-dFairHearing-8 S4 - the leg manifest, read here because the harness has no filesystem (spec section 8 F4).
-    `5. Whatever steps 3 and 4 found, Read ${repo}/${legManifest}, the leg manifest. When it parses as JSON whose top level ` +
-    `is an array, return legs: the name field of every object in that array, in file order. When it is absent, does not ` +
-    `parse, or its top level is not an array, leave legs out.\n` +
-    `Return JSON {commonDir, ${isSpec ? 'blobs:[...], ' : 'base, head, '}finds:[...], verifies:[...], skipped:[...], legs:[...]}.`,
+    `5. Whatever steps 3 and 4 found, Read ${repo}/${gateManifest}, the leg manifest. When it parses as JSON whose top level ` +
+    `is an array, return legs: the name field of every object in that array, in file order, and legCount: the number of ` +
+    `elements of that array. When it is absent, does not parse, or its top level is not an array, leave both out.\n` +
+    `Return JSON {commonDir, ${isSpec ? 'blobs:[...], ' : 'base, head, '}finds:[...], verifies:[...], skipped:[...], legs:[...], legCount}.`,
   Object.assign({
     label: renderAgentLabel(reviewScope, 'resume:probe'),
     phase: 'Resume',
@@ -1665,8 +1702,10 @@ const probe = await agent(
         finds: { type: 'array', items: buildKeyedSchema(LENS_SCHEMA, []) },
         verifies: { type: 'array', items: buildKeyedSchema(isWalk ? WALK_VERDICT_SCHEMA : VERDICT_SCHEMA, ['batch', 'ids']) },
         skipped: { type: 'array', items: { type: 'string' } },
-        // TOOL-dFairHearing-8 S4 - optional: a probe that omits it reads as no leg manifest read.
-        legs: { type: 'array', items: { type: 'string' } },
+        // TOOL-dFairHearing-8 S4 - optional: a probe that omits it reads as no leg manifest read. TOOL-dFairHearing-23
+        // S31 - its members are untyped, so the harness's check below, not the schema, judges a non-string.
+        legs: { type: 'array' },
+        legCount: { type: 'integer' },
         // Optional (spec F2): a probe that omits it reads as every subject UNCHECKED, never as none moved.
         ...(isSpec ? { blobs: { type: 'array', items: { type: 'object', required: ['path', 'now'], properties: { path: { type: 'string' }, now: { type: 'string' } } } } } : {}),
       },
@@ -1689,9 +1728,13 @@ if (!isSpec && probeLive && FULL_SHA.test(String(probe.base)) && FULL_SHA.test(S
 if (!probeLive) log('WARNING: the resume probe died — nothing could be reused, so every lens is dispatched with the refs as given')
 // TOOL-dFairHearing-8 S4 - the leg names a `gate:` disposition may name, or null: a dead probe or one returning no
 // `legs` read no manifest, and then every `gate:` disposition is refused and the log and RUN INTEGRITY say so.
-const legs = probeLive && Array.isArray(probe.legs) ? probe.legs.filter((x) => typeof x === 'string' && x) : null
-log(legs ? `leg manifest: ${legs.length} leg name(s) read from ${legManifest}`
-  : `WARNING: no leg manifest was read from ${legManifest} — every gate: disposition is refused`)
+// TOOL-dFairHearing-23 S31 - and the list is used WHOLE or not at all: empty, a length other than the probe's `legCount`,
+// a non-string, an empty string or a duplicate reads as no leg manifest, so a truncated list never stands as one.
+const probeLegs = probeLive && Array.isArray(probe.legs) ? probe.legs : []
+const legs = probeLegs.length && probeLegs.length === probe.legCount &&
+  probeLegs.every((x, i) => typeof x === 'string' && x && probeLegs.indexOf(x) === i) ? probeLegs.slice() : null
+log(legs ? `leg manifest: ${legs.length} leg name(s) read from ${gateManifest}`
+  : `WARNING: no leg manifest was read from ${gateManifest} — every gate: disposition is refused`)
 // TOOL-aEvidencedLens-4 S4/S6 - the move check's judging half. A subject is MOVED when the probe read a
 // 40-hex hash that does not begin with the pinned blob, and UNCHECKED when no usable hash came back: a
 // dead probe, a missing `blobs` key or row, or an empty `now` never reads as "none moved".
@@ -2775,7 +2818,7 @@ const synth = await agent(
     (addressTwins === 'shown' ? `refuted findings shown: ${refuted.length}; same-address pairs shown: ${twinPairs.length}.\n` : '') +
     // TOOL-dFairHearing-8 S4-S6 - what the disposition check below is handed, on every run.
     `dispositions: unclassed ${unclassed}; ${classSlugs.length} class slug(s) handed; ` +
-    (legs ? `${legs.length} leg name(s) read from ${legManifest}.\n` : `no leg manifest was read from ${legManifest}, so every gate: disposition is refused.\n`) +
+    (legs ? `${legs.length} leg name(s) read from ${gateManifest}.\n` : `no leg manifest was read from ${gateManifest}, so every gate: disposition is refused.\n`) +
     `If lenses died, the finding set is INCOMPLETE and a zero count is not evidence of absence. ` +
     `Say so where you would otherwise call a zero positive evidence.\n\n` +
     // TOOL-dFairHearing-8 S6 - THE DISPOSITIONS, `review.report`'s grammar, the report step's to assign (spec section 8
@@ -2785,7 +2828,8 @@ const synth = await agent(
     `- class:<slug> - an instance of a recurring class this run was handed, <slug> being one of the class slugs below;\n` +
     `- gate:<leg> - a defect an existing gate leg should catch, <leg> being one of the leg names below, spelled exactly;\n` +
     `- new:<slug> - a recurring class no slug below names, <slug> matching ${CLASS_SLUG};\n` +
-    `- none - nothing above homes it, with a non-empty reason, and only as the unclassed value admits.\n` +
+    `- none - nothing above homes it, with a non-empty reason, and only as the unclassed value admits. The reason ` +
+    `becomes the appendix cell \`none — <reason>\`, so write it on one line, a pipe written as \`\\|\`.\n` +
     `unclassed: ${unclassed} - ` + (unclassed === 'refuse'
       ? 'none is refused: home every confirmed finding as class:, gate: or new:.'
       : unclassed === 'reason'
@@ -2796,7 +2840,7 @@ const synth = await agent(
       : `Class slugs: none handed, as no checklist item is slug-led, so every class: disposition is refused.\n`) +
     (legs
       ? `Leg names (${legs.length}), one per line:\n` + legs.map((x) => `  - ${renderPromptLine(x)}`).join('\n') + `\n`
-      : `Leg names: no leg manifest was read from ${legManifest}, so every gate: disposition is refused.\n`) +
+      : `Leg names: no leg manifest was read from ${gateManifest}, so every gate: disposition is refused.\n`) +
     `A set that leaves a confirmed id with no disposition, gives one twice, names an id that is not confirmed, or uses a ` +
     `form or a name outside these is refused whole.\n\n` +
     // The range line is what the unattended kit's `closing-review-recorded` joins on, so the value
@@ -2999,11 +3043,14 @@ if (synth) {
     let holdsConfirmed = false
     let first = null
     let top = 'LOW'
+    // TOOL-dFairHearing-23 S30 - `grades` is read only as a non-null, non-array object; an item without one places
+    // each of its ids at its severity, one WARNING naming it below. A fallback, never a refusal.
+    const graded = it.grades !== null && typeof it.grades === 'object' && !Array.isArray(it.grades)
     for (const id of Array.isArray(it.ids) ? it.ids : []) {
       if (!confirmedIds.has(id)) continue
       if (!holdsConfirmed) first = id
       holdsConfirmed = true
-      let grade = String(it.grades[String(id)]).toUpperCase()
+      let grade = graded ? String(it.grades[String(id)]).toUpperCase() : sev
       if (SEVERITIES.indexOf(grade.toLowerCase()) === -1) {
         grade = sev
         gradesDefaulted.push(id)
@@ -3013,6 +3060,8 @@ if (synth) {
       else severityById.set(id, grade)
     }
     if (holdsConfirmed) perItem[sev]++
+    if (holdsConfirmed && !graded)
+      log(`WARNING: the synthesis item holding ids ${it.ids.filter((id) => confirmedIds.has(id)).join(', ')} carries no grades object — its ids are placed at its severity ${sev}`)
     if (holdsConfirmed && top !== sev) itemsMisranked.push(first)
     if (addressOwed && holdsConfirmed && (sev === 'BLOCKER' || sev === 'HIGH')) {
       const held = it.ids.filter((id) => confirmedIds.has(id))
@@ -3076,11 +3125,14 @@ function checkDisposition(d) {
   const form = at === -1 ? s : s.slice(0, at)
   const name = at === -1 ? '' : s.slice(at + 1)
   const said = JSON.stringify(d.disposition)
+  // TOOL-dFairHearing-23 S32 - a reason carrying a raw `|` or a line break would break its appendix row, so the set is
+  // refused and the record's appendix needs a re-render with the reason on one line, each pipe as `\|`.
   if (s === 'none') return unclassed === 'refuse' ? 'is none, which unclassed refuse does not admit'
-    : typeof d.reason === 'string' && d.reason.trim() ? '' : 'is none with an empty reason'
+    : typeof d.reason !== 'string' || !d.reason.trim() ? 'is none with an empty reason'
+      : /(^|[^\\])\||[\r\n]/.test(d.reason) ? 'is none with a reason carrying a raw | or a line break, so the record\'s appendix needs a re-render' : ''
   if (form === 'class') return classSlugs.indexOf(name) !== -1 ? '' : `is ${said}, and ${JSON.stringify(name)} is no class slug this run handed`
   if (form === 'gate') return !legs ? `is ${said}, and no leg manifest was read, so no gate: disposition is legal`
-    : legs.indexOf(name) !== -1 ? '' : `is ${said}, and ${JSON.stringify(name)} is no leg of ${legManifest}`
+    : legs.indexOf(name) !== -1 ? '' : `is ${said}, and ${JSON.stringify(name)} is no leg of ${gateManifest}`
   if (form === 'new') return !NEW_SLUG.test(name) ? `is ${said}, and ${JSON.stringify(name)} is no slug matching ${CLASS_SLUG}`
     : classSlugs.indexOf(name) !== -1 ? `is ${said}, a handed class slug, so it is class:${name}` : ''
   return `is ${said}, outside the forms class:<slug> | gate:<leg> | new:<slug> | none`

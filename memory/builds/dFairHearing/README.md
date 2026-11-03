@@ -78,7 +78,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 38 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 38 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14
 ids TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-19 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-24 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28
 ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-41
@@ -107,7 +107,7 @@ ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHea
 | [TOOL-dFairHearing-17 — each review round's state, computed by the harness and carried in its record](spec/2026-10-23-spec-TOOL-dFairHearing-17.md) | 17 | 2 | CLOSED | rev-5 | 2026-11-03 |
 | [TOOL-dFairHearing-18 — the whole-design walk as a preset of the design audit, and its recall grade](spec/2026-10-23-spec-TOOL-dFairHearing-18.md) | 18 | 2 | CLOSED | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-20 — a gapped whole-design walk reds the harness's returned counts, not only its prose](spec/2026-10-23-spec-TOOL-dFairHearing-20.md) | 19 | 2 | CLOSED | rev-3 | 2026-11-03 |
-| [TOOL-dFairHearing-23 — the round-1 spec audit's 49 minors: one contract per shared name, criteria a correct build can pass, and the fixtures and records the moved code needs](spec/2026-10-23-spec-TOOL-dFairHearing-23.md) | 19 | 2 | INPROGRESS | rev-6 | 2026-11-03 |
+| [TOOL-dFairHearing-23 — the round-1 spec audit's 49 minors: one contract per shared name, criteria a correct build can pass, and the fixtures and records the moved code needs](spec/2026-10-23-spec-TOOL-dFairHearing-23.md) | 19 | 2 | CLOSED | rev-6 | 2026-11-03 |
 | [TOOL-dFairHearing-25 — the owed replays run after the replay contract is corrected, and their verdicts set the dark switches](spec/2026-10-23-spec-TOOL-dFairHearing-25.md) | 20 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-26 — every rule 0 and rule 5 arm of the hook's suite found at its new home and gone from the old one, counted by label whatever helper writes it](spec/2026-10-23-spec-TOOL-dFairHearing-26.md) | 20 | 2 | DEFERRED | rev-4 | 2026-11-03 |
 | [TOOL-dFairHearing-27 — the spec audit of units 20 to 23, its 31 minors: criteria a correct build can pass, refusals that name their cause, and the readers a move leaves behind](spec/2026-10-23-spec-TOOL-dFairHearing-27.md) | 21 | 2 | DEFERRED | rev-3 | 2026-11-03 |

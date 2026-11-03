@@ -162,8 +162,10 @@ acceptance criterion, so diagnostics that would change them live behind the flag
 
 Three of the agent-cap hook's rules are this kit's since the owner's NT-27, each seen red at its new
 home before the hook stopped carrying it. The hook keeps rules 6 and 7, which judge the call, and
-exports the readers these homes share with it: its views, `runBothViews`, `MAX_VERIFIERS`,
-`MAX_LENSES`, the writer bound, the args reader and the slug walk. Every `--only=` the hook was
+exports the readers these homes share with it: its views, `runBothViews`, `MAX_VERIFIERS`, the
+writer bound, the args reader and the slug walk. Rule 2's lens-literal bound is `LENS_SLOTS` in
+`check-verifier-fanout.js`, the same number the slot count holds every marked literal to, so it has
+one home (TOOL-dFairHearing-23). Every `--only=` the hook was
 given before now refuses, exit 2, naming the two script homes.
 
 | rule | home | runs from |
@@ -267,10 +269,15 @@ at run time, the first of `<tool root>memory-tree/gotchas.py` and `<tool root>go
 range the call pinned with a 120-second bound, and returns its stdout verbatim, which then takes
 the path a caller's string takes below. An acquired checklist logs `checklist from --for-diff
 <base>..<head>` and RUN INTEGRITY says so; no checker tracked, a non-zero exit, a timeout, stdout
-with no `- ` line (`no bug class selected`) or a dead agent logs a `WARNING:` naming the reason, and
+with no `- ` line (`no bug class selected`), a return that is not whole or a dead agent logs a `WARNING:`
+naming the reason, and
 RUN INTEGRITY's `Checklist:` line names it as `not acquired: <reason>`. A caller's `checklist`
 wins and no agent spawns; the spec kind never acquires, since `unattended-build.js` hands its audit
-a `--for-paths` one. A caller passes the same stdout, or its own curated list:
+a `--for-paths` one. A return is WHOLE (TOOL-dFairHearing-23) when it carries the checker's `# by
+design —` head and its `- ` items before that head number `n + u + k`, `n` and `u` from its `# <n>
+class(es) selected by an anchor + <u> universal` line and `k` from its `# invariants are read at <sha>;
+<k> that ...` line, 0 when absent; any other return is a `checklistError` naming the cut, so a
+tail-truncated stdout never passes as complete. A caller passes the same stdout, or its own curated list:
 
 ```js
 args: { repo, base, head, reviewDir,
@@ -421,10 +428,13 @@ Every confirmed finding is given one DISPOSITION from the report step's grammar:
 class this run was handed; `gate:<leg>`, a leg of the leg manifest; `new:<slug>`, a slug matching
 `[a-z][a-z0-9]*(-[a-z0-9]+)*` that is no handed slug; or `none`. The handed class slugs are the
 checklist items' slugs, read by the rule `classes` reads, so a `C<n>` label with no slug is no class.
-The leg names come from `legManifest`, a repo-relative path refused on the `specs` rule, defaulting to
-the kit root's `gate-legs.json` as rendered at install: the resume probe reads it and returns `legs`,
-the `name` of every object in its top-level array, and leaves `legs` out when the file is absent or is
-not such an array. With no `legs`, the log and RUN INTEGRITY say no leg manifest was read, and every
+The leg names come from `gateManifest`, the name drift-audit-state's harness gives the same input
+(TOOL-dFairHearing-23), a repo-relative path refused on the `specs` rule, defaulting to the kit root's
+`gate-legs.json` as rendered at install: the resume probe reads it and returns `legs`, the `name` of
+every object in its top-level array, beside `legCount`, the array's element count, and leaves both out
+when the file is absent or is not such an array. The list is used whole or not at all: an empty one, one
+whose length is not `legCount`, or one holding a non-string, an empty string or a duplicate reads as no
+`legs`. With no `legs`, the log and RUN INTEGRITY say no leg manifest was read, and every
 `gate:` disposition is refused. `unclassed` is the policy key `review.unclassed`, passed as a pin
 argument until a policy-file trigger lands: `'refuse'`, `'reason'` or `'owner-rules'`, and absent it is
 `'refuse'`; any other value refuses before the first agent. `none` is refused under `'refuse'`, and
@@ -433,7 +443,7 @@ admitted under the other two with a non-empty reason. The synthesis is handed th
 returns `dispositions`, one `{id, disposition, reason}` per confirmed id, which its schema requires.
 The harness accepts the set only when every confirmed id has exactly one legal disposition and no other
 id has one; otherwise it refuses the set whole, and `blockers` and `highs` keep their own derivation.
-Neither `unclassed` nor `legManifest` joins the review key.
+Neither `unclassed` nor `gateManifest` joins the review key.
 
 `preset` picks a spec audit's lens literal, `'unit-spec'`, `'design-audit'` or `'whole-design'` (below), and absent it is
 `'unit-spec'`, the five lenses above. Only the caller picks it, and the kind stays `spec-audit`, so
@@ -507,14 +517,27 @@ default is accepted and reported unread, since the swapped lens is the one that 
 losing test is recorded.
 
 `review_pin.py`, beside the harness, is the stand-in for `review.pin`: it prints the `preset`,
-`optIn`, `twin` and `unclassed` of one spec-audit call as one JSON line, and runs nothing.
+`optIn`, `twin` and `unclassed` of one spec-audit call as one JSON line, one line per run under
+`whole-design`, and runs nothing.
 
 ```
 python <kit>/review_pin.py --subject <path> [--subject <path> ...]
-                           [--opt-in none|'<json>'] [--design-record-preset unit-spec|design-audit]
+                           [--opt-in none|'<json>'] [--design-record-preset unit-spec|design-audit|whole-design]
+                           [--design-audit-runs 1|2|3] [--design-audit-seed reverted-escapes|synthetic|none]
                            [--twin never|design-records|design-and-landing|always]
                            [--unclassed refuse|reason|owner-rules]
+# defaults: runs 2, seed reverted-escapes
+# whole-design: one line per run   {"preset": "whole-design", "walk": {"runs": 3, "run": 1, "seed": "synthetic"}}
+# otherwise: one line, a key only for each flag given
 ```
+
+`--design-audit-runs` and `--design-audit-seed` are `review.design-audit.runs` and
+`review.design-audit.seed` (TOOL-dFairHearing-23), checked for shape only. When the printed preset is
+`whole-design` the module prints one line per run, run 1 to `runs`, each carrying its `walk` of `runs`,
+`run` and `seed`; the caller adds the design's items, scenarios and key hash before it invokes the
+harness. Under any other preset no line carries `walk`. A `--subject` carrying `\` exits 2 first,
+naming the backslash, as the harness's `specsRule` refuses one, so a backslashed spec path is never
+classed a design record.
 
 A subject is a spec subject when the harness's own `SPEC_SUBJECT_PATH`, read from the `tier2-review.js`
 beside the module, matches it; every other subject is a design record. A set holding any spec subject
@@ -604,7 +627,9 @@ Every return carries seven fields beside the counts:
   ninth joins the `classes` names with one space, so a class's hits can be counted across records. The
   tenth is the disposition: the synthesis is handed the table with `(synthesis)` in each confirmed row's
   cell and `-` in every other, and told to copy it verbatim but for those cells, each written with the
-  disposition it returns, a `none` as `none — <reason>`. The returned table carries the accepted
+  disposition it returns, a `none` as `none — <reason>`, the reason on one line and a pipe written as
+  `\|`; a reason carrying a raw `|` or a line break refuses the set, its note naming the record's
+  appendix as needing a re-render (TOOL-dFairHearing-23). The returned table carries the accepted
   dispositions so, and `-` in every cell when the set was refused. A
   cell is `-` when its value is absent or empty, a `|` is escaped, and line breaks fold to a space.
 - `lensYield` — per lens, `defects` and `unique` are `null` when no item list can be trusted (see below).
@@ -662,7 +687,11 @@ sharing a key and a literal (6); a key equal to a literal name (7); a literal no
 a marked literal no default row fills (9); an opt-in row with no literal outside its `default_in`
 (10); a marker not followed by the token, or a token with no marker (11). It does NOT count slots:
 `check-verifier-fanout.sh` holds every marked literal to exactly five, so a sixth default row
-renders and reds there.
+renders and reds there. The leg finds the literals through `render_lenses.py --markers <file>`, which
+prints the line number of each line the renderer's own anchored marker regex matches, so one predicate
+finds a marked literal and a comment naming `gov:lens-slots` is no marker; `check-verifier-fanout.js
+--slots` counts each with `topLevelArgs`, rule 2's counter, over the hook's literal-blanked view, and
+`LENS_SLOTS` there is the one home of the five (TOOL-dFairHearing-23).
 
 ## `workerType` — judges spawned as a named agent type, in all three harnesses
 
@@ -903,7 +932,7 @@ of how they were measured, and `check_experiment` makes that method a rule where
 show it and a recorded line where they cannot. The manifest, read through `read_raw_output`, names
 `instance`, `cases`, `results` and `arms`, each arm `{name, base, settings, dispatched}`, and may name
 `heldOut`, `judge {verdicts, key}` and `union {tuning, heldOut}`; the `review-replay` instance takes
-`known` and `candidates {<arm>: <src>}` in place of `cases` and `results`. An unknown key is refused,
+`known` and `candidates` in place of `cases` and `results`. An unknown key is refused,
 so a misspelt rule is never skipped. Every rule runs before the first figure line, and a broken one
 exits 2 naming the rule, the arm or case, and the value:
 
@@ -929,6 +958,28 @@ exits 2 naming the rule, the arm or case, and the value:
   was judged on is covered when any of them covered the primary. With `heldOut` declared it prints
   tuning, held-out and pooled, so the held-out cases join the score instead of standing beside it.
 
+**The `review-replay` manifest** (TOOL-dFairHearing-23), the terms `TOOL-dFairHearing-1`'s void rule and
+`TOOL-dFairHearing-15`'s `dispatched 4` and `paired 4 of 4` are written in:
+
+```json
+{
+  "instance": "review-replay",
+  "known": "<src>",
+  "candidates": [{"case": "<record>", "report": "<src>", "matched": "<src> or null"}],
+  "arms": [{"name": "<arm>", "base": null, "settings": {}, "dispatched": 4}]
+}
+```
+
+A CASE is one review run of one subject record, and each `candidates` entry is one case: its `report`
+and its `matched`, the adjudicated list `read_matched_list` reads, or `null`. An entry names its `arm`
+whenever the manifest declares more than one; a one-arm manifest may leave it out. `dispatched` counts
+an arm's dispatched runs, and `parsed <arm>: <n> of <dispatched>` counts the arm's runs whose report
+holds an appendix with at least one row `parse_candidates` reads, through `measure_parsed`. A parsed
+run with a `matched` list prints its known-set figures when `known` is a known set, and a parsed run
+against a review record its recall. An agent death is read from the report's `RUN INTEGRITY` lens and
+skeptic counts, never from the manifest or `parsed`. A `candidates` that is not such a list is refused
+by name.
+
 What the rules do not check: a variable nobody declared, that no prompt author read the held-out file,
 that one judge read each case, and that the evidence is right rather than present.
 
@@ -937,7 +988,8 @@ that the port reproduces the grader's figures over the committed cases and resul
 determinism across two hash seeds, the conformance arm, and one arm per experiment rule over a
 planted manifest, the union arm's proof reading the method's own experiment at `5f8ef021d`
 (`system tuning 21/23`, `system held-out 12/12`, `system pooled 33/35`). That arm, `scan_pairing_sites`, reds on a
-second scorer: a comprehension in a tracked `*.py` under the tool root, the factory excepted, whose
+second scorer: a comprehension in a tracked `*.py` at and below this kit's directory, the factory
+and any path under `memory/` excepted, so a repository-root install reaches no record folder, whose
 filter is `all()` over a second population testing the outer case against the inner variant. It
 reads Python only, and a pairing written as a `for` loop is not seen. In a tree without
 `memory/builds/aScoutedSeam/` the proof prints `SKIP`, and so does the conformance arm once its
@@ -971,6 +1023,39 @@ so it is listed and never counted as a false positive: there is no precision fig
 sharing a basename can match, because older records carry basename-only refs. And one replay is one
 sample of a stochastic fan — compare two harness versions by two scored runs side by side, never by
 one.
+
+### Replaying a review blind
+
+A blind replay reviews a past state of the tree in a clone that holds nothing after it, so no later
+record or object can reach a lens. The clone is made from a bundle of a transient ref, never by a
+`git clone` given `--branch`, which cannot name a `refs/replay/` ref and exits 128. `<name>` and the clone
+directory are fresh per replay, the directory under `%TEMP%`, never inside the worktree:
+
+```bash
+mkdir -p "$TEMP/<name>b"
+git update-ref refs/replay/<name> <commit>
+git bundle create "$TEMP/<name>b/h.bundle" refs/replay/<name>
+git update-ref -d refs/replay/<name>
+git init "$TEMP/<name>"
+git -C "$TEMP/<name>" fetch "$TEMP/<name>b/h.bundle" refs/replay/<name>:refs/heads/<name>
+git -C "$TEMP/<name>" checkout <name>
+git -C "$TEMP/<name>" rev-list --count <name>            # above 0, or the clone is empty
+```
+
+The `refs/replay/<name>` ref lives only until the bundle is written, so `git show-ref
+refs/replay/<name>` in the repository prints nothing afterwards, and the count line is the
+liveness check: a clone whose count is not above 0 replays nothing and is not scored.
+
+**A replayed spec audit passes the opt-in pack.** Its `<commit>` is a scratch commit on the original
+adding `memory/builds/dFairHearing/README.md` as it stands at `3708a705`, whose front matter is the
+owner-landed `spec-audit: 2026-10-21` with no `authorized-by`, and its `reviewDir` is
+`memory/builds/dFairHearing/reviews`, the folder that README opts in. A replay that spawns agents
+directly renders each prompt as a `gov:handoff` file, all rule 6 of the agent-cap hook admits; a
+harness replay runs through `tier2-review.js`, a declared harness.
+
+**The verdict of replay 1 flips `DESIGN_RECORD_PRESET` in `review_pin.py`**, the one value it edits, never
+a template default: the harness's own `preset` default stays `unit-spec`, so only a pin over design
+records alone moves to `design-audit`.
 
 ## `orient-counterfactual.js` — one stage-2 arm per call
 

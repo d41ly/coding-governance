@@ -772,7 +772,9 @@ backtick-quoted path-like tokens in its body, because an authored list is a seco
 body already says. Derivation over-selects rather than under-selects, and a record naming no path is
 REPORTED as unanchored rather than silently never firing.
 
-Hand a reviewer the classes their diff can hit:
+The review harness acquires the classes a diff can hit on its own: on the diff kind, `tier2-review.js`
+given no `checklist` runs the command below and hands its stdout to the lenses. A reader who wants the
+checklist runs it by hand:
 
 ```bash
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>

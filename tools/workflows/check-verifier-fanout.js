@@ -11,10 +11,18 @@
  * ONE SCANNER. The views this rule reads, and `runBothViews`, which unions the lexed and the shipped
  * views so no denial is lost, are agent-cap's, loaded from the hook `--hook` names: each view reads the
  * mode `runBothViews` switches, so a copy here would be a second scanner of one script, the drift
- * TOOL-aBatchedTribunal-1d ruled out. MAX_VERIFIERS, MAX_LENSES and the writer bound are the hook's
- * too. Everything below `loadHook` is the hook's rule 2, moved verbatim.
+ * TOOL-aBatchedTribunal-1d ruled out. MAX_VERIFIERS and the writer bound are the hook's too. Everything
+ * below `loadHook` is the hook's rule 2, moved verbatim, but for its array-literal bound, which reads
+ * LENS_SLOTS (TOOL-dFairHearing-23 S42).
+ *
+ * THE SLOT COUNT (TOOL-dFairHearing-13, here since TOOL-dFairHearing-23). `--slots` takes `<file>:<line>`
+ * locations, each a marker line `render_lenses.py --markers` printed, so the renderer's own anchored
+ * regex is the one predicate finding a marked literal. Each literal, from that line's `[` to its matching
+ * `]` in the hook's literal-blanked view, holds exactly LENS_SLOTS top-level elements, counted by
+ * `topLevelArgs`, the counter rule 2 uses, so a comma inside parentheses, braces or a string is no slot.
  *
  *   node <prefix>/workflows/check-verifier-fanout.js --hook <prefix>/hooks/agent-cap.js <file>...
+ *   node <prefix>/workflows/check-verifier-fanout.js --hook <prefix>/hooks/agent-cap.js --slots <file>:<line>...
  *
  * Exit 0 = clean · 1 = a finding, each file's printed on stderr as the hook printed it · 2 = refused:
  * no `--hook` or no file, an argument it does not take, agent-cap's exports not loadable, or a file it
@@ -24,16 +32,21 @@
 'use strict'
 
 // The hook's exports, bound by `loadHook` before any rule runs; the rule reads them by these names.
-let MAX_VERIFIERS, MAX_LENSES, renderCodeView, renderStrippedView, runBothViews, readWriterBound, resolveHarnessName
+let MAX_VERIFIERS, renderCodeView, renderStrippedView, renderBlankedLiterals, runBothViews, readWriterBound, resolveHarnessName
 
 function loadHook(hook) {
   const m = require(require('path').resolve(hook))
-  const need = ['MAX_VERIFIERS', 'MAX_LENSES', 'renderCodeView', 'renderStrippedView', 'runBothViews', 'readWriterBound', 'resolveHarnessName']
+  const need = ['MAX_VERIFIERS', 'renderCodeView', 'renderStrippedView', 'renderBlankedLiterals', 'runBothViews', 'readWriterBound', 'resolveHarnessName']
   const miss = need.filter((k) => m[k] === undefined)
   if (miss.length) throw new Error(`it exports no ${miss.join(', ')}`)
-  ;({ MAX_VERIFIERS, MAX_LENSES, renderCodeView, renderStrippedView, runBothViews, readWriterBound, resolveHarnessName } = m)
+  ;({ MAX_VERIFIERS, renderCodeView, renderStrippedView, renderBlankedLiterals, runBothViews, readWriterBound, resolveHarnessName } = m)
   return m
 }
+
+// THE LENS COUNT, its one home (TOOL-dFairHearing-23 S42): a marked lens literal holds exactly this many
+// slots, and rule 2's array-literal bound admits a literal of at most this many elements. It was two
+// numbers, the hook's lens bound and the fan-out gate's shell constant, which agreed only by hand.
+const LENS_SLOTS = 5
 
 // ---------------------------------------------------------------------------
 // RULE 2 — the VERIFIER ARITY rule (memory/guides/REVIEW-PROTOCOL.md).
@@ -56,7 +69,7 @@ function loadHook(hook) {
 //       identifier bound in this file to one — or marked `gov:fixed-writers`, the same shape with K at most
 //       the landed agent limit (MAX_VERIFIERS with no policy kit). The marker is the AUTHOR'S CLAIM; the
 //       shape check is what stops the claim being made falsely — `chunk(all, 1) // gov:fixed-verifiers` reds.
-//   (b) an identifier assigned from an ARRAY LITERAL with <= MAX_LENSES elements — the finder-lens
+//   (b) an identifier assigned from an ARRAY LITERAL with <= LENS_SLOTS elements — the finder-lens
 //       case, where the agent count is a constant visible in the source. The count drops a trailing
 //       comma; counting it as an element is what made this allowance read as 6.
 // Everything else is denied, including a for/while/forEach body containing `agent(`: a loop-built
@@ -176,7 +189,7 @@ function parseBranches(expr) {
 
 // TOOL-dTieredTribunal-13 S3 - the qualifying forms are a CLOSED list and each branch is judged on
 // its OWN text. Three forms and no fourth: a bounded split whose K resolves through `boundedK`; an
-// array LITERAL whose top-level element count is at or under MAX_LENSES, counted with the shared
+// array LITERAL whose top-level element count is at or under LENS_SLOTS, counted with the shared
 // splitter so a trailing comma is not an element; or a bare identifier already proven bounded,
 // alone or followed by a chain of operations that cannot grow it.
 function boundedBranch(br, name, consts, ok, bound) {
@@ -186,7 +199,7 @@ function boundedBranch(br, name, consts, ok, bound) {
   const c = /\bchunk\s*\(\s*[^,]+,\s*Math\.ceil\s*\(\s*[A-Za-z_$][\w$.]*\.length\s*\/\s*([^)]+)\)/.exec(t)
   const sp = /\bsplitInto\s*\(\s*[^,]+,\s*([^),]+)\)/.exec(t)
   if ((c && boundedK(c[1], consts, bound)) || (sp && boundedK(sp[1], consts, bound))) return true
-  if (t.startsWith('[') && t.endsWith(']')) return topLevelArgs(t.slice(1, -1)).length <= MAX_LENSES
+  if (t.startsWith('[') && t.endsWith(']')) return topLevelArgs(t.slice(1, -1)).length <= LENS_SLOTS
   const m = /^([A-Za-z_$][\w$]*)([\s\S]*)$/.exec(t)
   if (!m || m[1] === name || !ok.has(m[1])) return false
   const tail = m[2].trim()
@@ -412,11 +425,11 @@ function fanoutFindings(script, writer) {
     if (inner.includes('...')) return
     // ONE splitter, shared with the call-site walk below, because a TRAILING COMMA is not an element
     // any more than it is an argument. Counting `1 + every top-level comma` made a 5-element lens
-    // array measure 6 — which is the entire reason MAX_LENSES was 6. It never meant "six lenses are
+    // array measure 6 — which is the entire reason the hook's lens bound was 6. It never meant "six lenses are
     // allowed"; it meant "five lenses, plus the phantom the counter invented". Every shipped harness
     // is prettier-formatted, so every one of them was mis-measured, and the constant was raised to
     // fit the error rather than the error being found.
-    if (topLevelArgs(inner).length <= MAX_LENSES) ok.add(name)
+    if (topLevelArgs(inner).length <= LENS_SLOTS) ok.add(name)
   }
   lines.forEach(scan)
   lines.forEach(scan)
@@ -754,6 +767,27 @@ function topLevelArgs(text) {
   return out
 }
 
+// THE SLOT COUNT of one marked literal (TOOL-dFairHearing-23 S42): the top-level element count of the
+// literal opened by the last `[` of 1-based line `n` in the hook's literal-blanked view, where strings,
+// templates and comments are blank and the delimiters stay, so the walk to its matching `]` and
+// `topLevelArgs` see structure alone. 'unterminated' when no `[` opens there or none closes it.
+function measureLensSlots(script, n) {
+  const code = renderBlankedLiterals(script).code
+  const at = (code[n - 1] || '').lastIndexOf('[')
+  if (at === -1) return 'unterminated'
+  let depth = 0
+  let body = ''
+  for (let j = n - 1; j < code.length; j++) {
+    for (const ch of j === n - 1 ? code[j].slice(at) : code[j]) {
+      if ('([{'.includes(ch)) depth++
+      else if (')]}'.includes(ch) && --depth === 0) return topLevelArgs(body.slice(1)).length
+      body += ch
+    }
+    body += '\n'
+  }
+  return 'unterminated'
+}
+
 // Rule 2 over one script under both views, the writer bound read once and only for a marked script,
 // at this process's working directory.
 function scanFanout(script) {
@@ -772,7 +806,7 @@ function renderFanoutDeny(fan) {
     `  const MAX_VERIFIERS = ${MAX_VERIFIERS}\n` +
     `  const batches = chunk(items, Math.ceil(items.length / MAX_VERIFIERS)) // ${FIXED_MARK}\n` +
     `  await boundedParallel(batches.map((g) => () => agent(promptFor(g))), MAX_VERIFIERS)\n\n` +
-    `A fixed lens array (<= ${MAX_LENSES} elements) is allowed as-is — its agent count is a ` +
+    `A fixed lens array (<= ${LENS_SLOTS} elements) is allowed as-is — its agent count is a ` +
     `constant. Ready-made: ${resolveHarnessName()}.\n`
   )
 }
@@ -783,15 +817,39 @@ function renderFanoutDeny(fan) {
 function main(argv) {
   const refuse = (why) => { process.stderr.write(`check-verifier-fanout: ${why}\n`); return 2 }
   let hook = null
+  let slots = false
   const files = []
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--hook') hook = argv[++i] || null
-    else if (argv[i].startsWith('-')) return refuse(`${argv[i]} is no argument this check takes: it takes --hook <agent-cap.js> and the files to judge`)
+    else if (argv[i] === '--slots') slots = true
+    else if (argv[i].startsWith('-')) return refuse(`${argv[i]} is no argument this check takes: it takes --hook <agent-cap.js>, then the files to judge or --slots and their <file>:<line> marker locations`)
     else files.push(argv[i])
   }
   if (!hook) return refuse('names no --hook, so agent-cap\'s views, which this rule reads, cannot be loaded')
   if (!files.length) return refuse('names no file, and a check over nothing is not a pass')
   try { loadHook(hook) } catch (e) { return refuse(`cannot load agent-cap's exports from ${hook}: ${(e && e.message) || e}`) }
+  if (slots) {
+    // Each location is a marker line render_lenses.py --markers printed; the literal's name is the line's last word.
+    let bad = 0
+    for (const loc of files) {
+      const cut = loc.lastIndexOf(':')
+      const f = loc.slice(0, cut)
+      const n = Number(loc.slice(cut + 1))
+      let script
+      try { script = require('fs').readFileSync(f, 'utf8') } catch (e) {
+        return refuse(`${f} could not be read (${(e && e.code) || (e && e.message) || e}), and a literal this check cannot read is not one it may pass`)
+      }
+      const line = script.split(/\r?\n/)[n - 1]
+      if (cut <= 0 || !Number.isInteger(n) || n < 1 || line === undefined) return refuse(`--slots ${loc} names no line of a file, so it is no marker location`)
+      const count = measureLensSlots(script, n)
+      if (count !== LENS_SLOTS) {
+        process.stdout.write(`verifier-fanout: SLOTS — ${loc} literal ${line.trim().split(/\s+/).pop()} holds ${count} slot(s); a lens literal holds exactly ${LENS_SLOTS}\n`)
+        bad++
+      }
+    }
+    if (!bad) process.stdout.write(`verifier-fanout: slots — ${files.length} lens-slot literal(s), each holding ${LENS_SLOTS}\n`)
+    return bad ? 1 : 0
+  }
   let status = 0
   for (const f of files) {
     let script
