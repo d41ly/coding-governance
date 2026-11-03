@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-13 — the `lens` kind and namespace: gov's lenses tagged, a repository's lenses from its overlay, the fixed set with the five slots, and lens tags joined to the step gate
 
-**Status:** DEFERRED · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 15 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 15 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0470@dfafc75a whole
 **Carries:** node:tag-namespace.lens
@@ -11,11 +11,16 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-13-deviation-132.md](../build/2026-11-02-build-TOOL-dCalibratedLens-13-deviation-132.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md) | journal | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
 | [2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
 | [2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
 | [2026-11-03-build-TOOL-dCalibratedLens-13-deviation-133.md](../build/2026-11-03-build-TOOL-dCalibratedLens-13-deviation-133.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-13-deviation-134.md](../build/2026-11-03-build-TOOL-dCalibratedLens-13-deviation-134.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-48 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
@@ -41,8 +46,10 @@ catalogue and `render_lenses.py`), -23 S42 (`LENS_SLOTS` in `tools/workflows/che
 and -3 (the opt-in swap and `OPTIN_LENSES`);
 PLAY-dOrderedCharter-7 S4 and S7 (the kinds register and the record factory), -15 S7 (the change
 record), -19 S2 (the namespace registry and `tag_index.py`), -35 S1 to S10 (the overlay's rows and a
-kind's `schema` key) and -36 S1 to S7 (the fixed set and the exclusion refusals); TOOL-dDeclaredLoop-26
-§8 F5 (the playbook kit's `compose` verb on `overlay_rows.py`); TOOL-dWitnessedBar-11 (`leg_factory.py
+kind's `schema` key) and -36 S1 to S7 (the fixed set and the exclusion refusals); the owner's pick on TOOL-dDeclaredLoop-26
+§8 F5, which reads "OPEN for the owner", and under its option (a) the playbook kit's `compose` verb on
+`overlay_rows.py`, an ask on dOrderedCharter that "the build run would file" and no `BACKLOG.md` holds
+yet; TOOL-dWitnessedBar-11 (`leg_factory.py
 new`). The build run re-grounds on each and stops the unit when one is absent.
 
 - **S1** — (amended, id 8) The namespace. A `[[namespace]]` row in `tools/playbook/namespaces.toml` in
@@ -65,8 +72,8 @@ new`). The build run re-grounds on each and stops the unit when one is absent.
   to the overlay (PLAY-dOrderedCharter-15 S2). Observed by AC1.
 - **S3** — The composition. `read_lens_composition(root, rev)` in `tools/workflows/render_lenses.py` returns
   gov's rows and the overlay's `[[lens]]` rows composed by `compose_rows` (PLAY-dOrderedCharter-35),
-  which runs `check_rows` (PLAY-dOrderedCharter-36 S7), reached as the playbook kit's `compose` verb run
-  as a subprocess found through the inline `resolve_kit_dir`, as TOOL-dBoundRoles-20 S3 reaches it; with
+  which runs `check_rows` (PLAY-dOrderedCharter-36 S7), reached, under TOOL-dDeclaredLoop-26 §8 F5
+  (a), as the playbook kit's `compose` verb run as a subprocess found through the inline `resolve_kit_dir`, as TOOL-dBoundRoles-20 S3 reaches it; with
   the playbook kit absent it returns gov's rows and prints one note naming it. An overlay row's harness
   key is `adopter-<name>` (§8 F3), and the render fills `OPTIN_LENSES` (TOOL-dFairHearing-3 S6) from every
   composed `optin = true` row, the repository's included, so a repository lens can be swapped into a run.
@@ -130,7 +137,7 @@ new`). The build run re-grounds on each and stops the unit when one is absent.
 
 - **hands-off** `TOOL-dCalibratedLens-14` — `lens.<key>`, `derive_opt_in_tags` and the refusal of an exclusion of an opt-in key `review.opt-in` names, which a swap, an exclusion of a default and the slot an opt-in fills read
 - **hands-off** `TOOL-dCalibratedLens-1` — `kind.lens` and the `lens` namespace, under which the stage lenses' rows are tagged
-- **consumes-from** external — TOOL-dFairHearing-13, -23 S42 and -3, PLAY-dOrderedCharter-7 S4 and S7, -15 S7, -19 S2, -35, -36, TOOL-dDeclaredLoop-26 §8 F5's `compose` verb, TOOL-dWitnessedBar-11 and TOOL-dSafePassage-10 S1, each specced and unbuilt at base `8bec4cef` but the last, built
+- **consumes-from** external — TOOL-dFairHearing-13, -23 S42 and -3, PLAY-dOrderedCharter-7 S4 and S7, -15 S7, -19 S2, -35, -36, TOOL-dDeclaredLoop-26 §8 F5's `compose` verb (OPEN for the owner, and an unfiled ask on dOrderedCharter), TOOL-dWitnessedBar-11 and TOOL-dSafePassage-10 S1, each specced and unbuilt at base `8bec4cef` but the last, built
 
 ## 4. Design
 
@@ -370,6 +377,10 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC2 · the rendered fixt
   that unit made a precondition, a `lens.<key>` tag addressing every row of its key, and AC1 and AC7
   counting distinct keys, by the brief
   prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md (cross-check rows 115 and 116)
+- rev-4 · 2026-11-03 · §2 S3 §3 · re-grounded against dTotalRecall's and dDeclaredLoop's specs, the
+  `compose` precondition moved to the owner's pick on TOOL-dDeclaredLoop-26 §8 F5, OPEN for the owner,
+  its verb an unfiled ask on dOrderedCharter, and S3's route stated under option (a), by the brief
+  prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md (cross-check row 86)
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
-# TOOL-dCalibratedLens-42 — the `graded-by-a-row` case calls `derive_record_kind` in the form dTotalRecall's unit 53 gives it at its S21, and refuses any other form by name
+# TOOL-dCalibratedLens-42 — the `graded-by-a-row` case calls `derive_record_kind` with the parameters dTotalRecall's unit 53 gives it at its S21, and refuses any other form by name
 
-**Status:** DEFERRED · rev-1 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 5 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 5 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,8 +9,13 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md) | journal | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 |
 | [2026-11-03-build-TOOL-dCalibratedLens-42-deviation-421.md](../build/2026-11-03-build-TOOL-dCalibratedLens-42-deviation-421.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-42-deviation-422.md](../build/2026-11-03-build-TOOL-dCalibratedLens-42-deviation-422.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-42-deviation-423.md](../build/2026-11-03-build-TOOL-dCalibratedLens-42-deviation-423.md) | deviation | — |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-48 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-42-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-42-1-spec-writer.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-42-promoted-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-42-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
 
@@ -43,7 +48,11 @@ the two ancestor revisions is a named refusal rather than a misgrade. It repairs
   not call `read_bindings`, whose population is the build folders only (`record_paths`,
   `tools/memory-tree/tree_lib.py:421-425`), so no `memory/loop-review/` record reaches it. A planted
   record with no Serves line in that head prints `graded-by-a-row — FAIL · <path> · no written kind`.
-  Observed by AC1.
+  This departs from TOOL-dTotalRecall-53 S21's caller rule, "callers pass the kind
+  `tree_lib.read_bindings` … classified": the case keeps S21's parameters only, so it proves the row
+  lookup and not that the shipped `check_record_kinds` grades these records. That check grades them
+  once TOOL-dTotalRecall-108, filed 2026-11-03 in `memory/builds/dTotalRecall/BACKLOG.md`, is served,
+  a build-run precondition of unit 20. Observed by AC1.
 - **S3** — The signature check. Once per plant run, before the first call, the case reads
   `inspect.signature(derive_record_kind)` from the shipped `record_kinds.py`. It holds when the
   parameter names are `path`, `written_kind` and `rows`, in that order. Otherwise it prints
@@ -63,7 +72,8 @@ the two ancestor revisions is a named refusal rather than a misgrade. It repairs
 ### Edges
 
 - **consumes-from** `TOOL-dCalibratedLens-35` — the `graded-by-a-row` case and its record list, which S2 and S3 run ahead of; without the case there is no call to check
-- **consumes-from** external — TOOL-dTotalRecall-42 S5 and TOOL-dTotalRecall-53 S21 (`derive_record_kind` and its `written_kind` form), DEFERRED at base; a build-run precondition, re-grounded at the build run
+- **consumes-from** external — TOOL-dTotalRecall-42 S5 and TOOL-dTotalRecall-53 S21 (`derive_record_kind` and its `written_kind` parameters, not S21's `read_bindings` caller rule, S2), DEFERRED at base; a build-run precondition, re-grounded at the build run
+- **hands-off** external — TOOL-dTotalRecall-108: the record-kind check reading a Serves line outside the build folders, which makes the real check grade these records
 
 ## 4. Design
 
@@ -107,7 +117,8 @@ No identifier is minted. The `unread` line is the case's existing `unread` spell
   record with no written kind is a FAIL line.
 - observability — the `unread` line names the parameters the case met.
 - risks — a later ancestor revision renames a parameter: the case refuses by name, and the build run
-  re-grounds the call.
+  re-grounds the call. A pass proves the row lookup only; until TOOL-dTotalRecall-108 is served the
+  shipped check grades no `memory/loop-review/` record (S2).
 - testing — AC1 and AC2 by the pass.
 - migration — N/A.
 - user docs — N/A.
@@ -142,6 +153,10 @@ none
 
 - rev-1 · 2026-11-03 · initial draft, promoted from id 1 (HIGH, item H1) of the round-3 spec audit
   `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`; unit 35 amended at the disposal (its rev-2).
+- rev-2 · 2026-11-03 · H1 §2 S2 §3 §5 · re-grounded against dTotalRecall's and dDeclaredLoop's specs,
+  S2's departure from TOOL-dTotalRecall-53 S21's caller rule stated, the case proving the row lookup
+  only and TOOL-dTotalRecall-108 named as what makes the real check grade these records, by the brief
+  prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md (cross-check row 157)
 
 ## 10. Reuse audit
 

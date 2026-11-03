@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-1 — each stage review's lenses and effort: four stage literals in the lens catalogue, chosen by the breakpoint's stage, run at `review.<stage>.effort`
 
-**Status:** DEFERRED · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 16 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-5 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 16 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0458@5429e502 whole
 **Carries:** node:policy-key.review.<stage>.effort
@@ -10,12 +10,16 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md) | journal | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md) | research | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-returns.md) | research | TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-16 |
 | [2026-11-03-build-TOOL-dCalibratedLens-1-crosscheck-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-crosscheck-returns.md) | research | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 |
 | [2026-11-03-build-TOOL-dCalibratedLens-1-departures-spec.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-departures-spec.md) | journal | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-1-deviation-12.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-deviation-12.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-1-deviation-13.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-deviation-13.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-1-deviation-14.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-deviation-14.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-1-deviation-15.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-deviation-15.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-deviation-16.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-deviation-16.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
 | [2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md) | research | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-1-reuse-scout.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-1-reuse-scout.md) | journal | — |
@@ -27,6 +31,10 @@
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-1-spec-writer.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-2-spec-reviewer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-2-spec-reviewer.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-3-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-3-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-4-spec-reviewer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-4-spec-reviewer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-5-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-5-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-48 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md) | research | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md) | research | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
@@ -37,7 +45,7 @@
 ## 1. Goal
 
 Review exists at two stages only, and Plan, Test, Deploy and Maintain have none (`gap-review-01`,
-HIGH). dDeclaredLoop places a review breakpoint for each stage and dFairHearing gives the harness a
+HIGH). dDeclaredLoop places a review breakpoint for the five stages TOOL-dDeclaredLoop-19 reads and dFairHearing gives the harness a
 lens catalogue and presets, but no catalogue row is a lens of those four stages, and the effort a
 stage review runs at is read for the Design review alone (TOOL-dIndexedDesign-3 §8 F7 hands the rest
 here). This unit adds four five-slot literals to dFairHearing's catalogue, `plan`, `test`, `deploy`
@@ -59,9 +67,12 @@ and `maintain`, selects one by the stage of the breakpoint that fires, and runs 
   are appended after the catalogue's last row, in §4's table order. Every stage literal fills exactly
   five slots. Observed by AC1 and AC2.
 - **S3** — (amended, id 43) The stage reaches the preset. `tools/workflows/review_pin.py` (TOOL-dFairHearing-3 S8)
-  takes `--stage <stage>`: a stage that a `gov:lens-slots` marker of the rendered harness beside it
-  declares prints that literal as `preset`; `design` and `build`, which no marker names, leave the
-  subject mapping as it is; any other value exits 2 naming the stage and the marked literals. The
+  takes `--stage <stage>` and admits only a member of `REVIEW_STAGES`, which `review_pin.py` homes
+  (§8 F7): a member that a `gov:lens-slots` marker of the rendered harness beside it declares prints
+  that literal as `preset`; `design` and `build`, which no marker names, leave the subject mapping as
+  it is; a member whose marker is missing exits 2 naming the stage and the marked literals; any other
+  value, a marked literal outside the set such as `unit-spec` included, exits 2 naming the stage and
+  `REVIEW_STAGES`. The
   marker set is read by `read_lens_literals`, which runs `render_lenses.py --markers` over the
   rendered `tier2-review.js` beside it, the one marker predicate (TOOL-dFairHearing-23 S35), and takes
   the literal name from each `gov:lens-slots <literal>` line it numbers; a missing harness exits 2 as
@@ -73,7 +84,12 @@ and `maintain`, selects one by the stage of the breakpoint that fires, and runs 
   `REVIEW_STAGES`, each spelling its key first as a literal (TOOL-dIndexedDesign-3 S5), as in
   `read_policy_setting("review.plan.effort", root)`, so TOOL-dIndexedDesign-3 AC7's first grep still
   prints 1. Only the call's own stage is read, for the review stage keys of the call, where `stage`
-  is the new `review_stage` argument, and absent it is `design` for a workflow of `DESIGN_REVIEW_WORKFLOWS` and `build` for one of
+  is the new `review_stage` argument, checked against `REVIEW_STAGES` read from `review_pin.py`
+  through the inline `resolve_kit_dir("workflows", "review_pin.py", kit_dir)`, as `read_cap_answer`
+  reaches the policy kit (`tools/roles/roles_lib.py:136-158`), along the roles → review-harness
+  `requires_if` edge (`tools/roles/kit.toml:19`). Where review-harness is absent, a call passing
+  `--review-stage` raises a `RolesError` naming `review_pin.py` and the places looked, and a call
+  without it reads its default stage's key, no set read. With no `review_stage`, `stage` is `design` for a workflow of `DESIGN_REVIEW_WORKFLOWS` and `build` for one of
   `BUILD_REVIEW_WORKFLOWS = ("closing-review",)`. The review stage keys are the `stages` map of
   `spec-review` for every stage but `build`, and of `closing-review` for `build`
   (`tools/roles/workflows.toml:47`, `:67`). `python tools/roles/handoff.py stage-efforts <workflow>
@@ -84,8 +100,11 @@ and `maintain`, selects one by the stage of the breakpoint that fires, and runs 
   `tools/unattended/unattended.sh` takes `--stage <stage>`, passes it to `review_pin.py`, and adds
   `efforts` to the JSON line it prints, the output of `handoff.py stage-efforts <workflow>
   --review-stage <stage>` with `<workflow>` `closing-review` for `build` and `spec-review` otherwise.
-  TOOL-dDeclaredLoop-19 S6's firing site passes the step segment of the breakpoint's `position` tag
-  (`item.<step>.<name>`) as `--stage`. Observed by AC9.
+  No dDeclaredLoop unit calls `--trigger` at a placed breakpoint: TOOL-dDeclaredLoop-19 "lists and
+  holds", and its S9 `--plan` prints one `breakpoint:` line per placed breakpoint. The caller is the
+  main loop, which reads those lines and runs `--trigger` with `--stage` the step segment of the
+  `item.<step>.<name>` tag the line's `position` names, whatever relational form it takes (`before
+  item.plan.exit` gives `plan`); the verbs guide states that call (S7). Observed by AC9 and AC11.
 - **S6** — The catalogue row. The `review.<stage>.effort` row (`tools/policy/catalogue.toml:1241-1245`)
   gains `summary` and `usage`, its `allowed` and `default` unchanged, and `python tools/policy/policy.py
   lists --write` drains the name from `tools/policy/unsummarised-keys.txt` (`:179`). Observed by AC10.
@@ -96,16 +115,19 @@ and `maintain`, selects one by the stage of the breakpoint that fires, and runs 
   AC11.
 
 **Build-run precondition.** TOOL-dFairHearing-13, -2, -3, -16, -18 and -23, TOOL-dRankedPlan-6, TOOL-dIndexedDesign-3,
-TOOL-dBoundRoles-21, TOOL-dDeclaredLoop-19 and -20 are DEFERRED at `8bec4cef`. The build run builds
-this unit once each is CLOSED, and re-grounds every line this spec cites against its base.
+TOOL-dBoundRoles-21, TOOL-dDeclaredLoop-19 and -20 are DEFERRED at `8bec4cef`, as is
+TOOL-dTendedCadence-1, whose S1 declares the `item.maintain.*` rows a Maintain breakpoint is placed
+at. TOOL-dDeclaredLoop-109 is the ask §8 F4 relies on, filed 2026-11-03 in
+`memory/builds/dDeclaredLoop/BACKLOG.md`. The build run builds this unit once each unit is CLOSED,
+reads the ask's state, and re-grounds every line this spec cites against its base.
 
 ## 3. Non-goals (OUT)
 
 - Where a stage's breakpoint sits, when it fires and who disposes it: TOOL-dDeclaredLoop-19's
   `derive_breakpoints` and `review.<stage>`, read as built. A Maintain review runs where
-  `review.breakpoints` places one at an `item.maintain.*` boundary (TOOL-dDeclaredLoop-19 S4);
-  `review.maintain` itself is read by no row of `derive_breakpoints`, and §8 F4 files that as an ask
-  on dDeclaredLoop.
+  `review.breakpoints` (TOOL-dDeclaredLoop-19 S4) places one at a boundary of TOOL-dTendedCadence-1
+  S1's `item.maintain.*` rows; `review.maintain` itself is read by no row of `derive_breakpoints`,
+  the ask TOOL-dDeclaredLoop-109 in `memory/builds/dDeclaredLoop/BACKLOG.md` (§8 F4).
 - The Design review's lenses and the spec-audit presets: TOOL-dFairHearing-2 and its replay. The
   Build review keeps the diff literal; this unit reads its effort only.
 - The opt-in swap, the lens notes after a swap and the six opt-in rows: TOOL-dFairHearing-3 and -9.
@@ -124,8 +146,9 @@ this unit once each is CLOSED, and re-grounds every line this spec cites against
 - **consumes-from** external — TOOL-dFairHearing-13, -2 and -3: the catalogue, `render_lenses.py`, the `gov:lens-slots` marker, `PRESETS`, the design-audit rows and `review_pin.py`; without them there is no row to add and no preset to print
 - **consumes-from** external — TOOL-dRankedPlan-6 S1, `PLAN_RECORD_PRESET`, whose value this unit sets
 - **consumes-from** external — TOOL-dIndexedDesign-3 S4's step 1a and TOOL-dBoundRoles-21's `read_policy_setting`, the effort order this unit widens from one stage to six
-- **consumes-from** external — TOOL-dDeclaredLoop-19 and -20: `derive_breakpoints`, the firing site and `--trigger`
-- **hands-off** external — dDeclaredLoop reads `review.maintain` in `derive_breakpoints` (§8 F4's ask)
+- **consumes-from** external — TOOL-dDeclaredLoop-19 and -20: `derive_breakpoints`, `--plan`'s `breakpoint:` lines and `--trigger`
+- **consumes-from** external — TOOL-dTendedCadence-1 S1: the `item.maintain.*` rows, the Maintain boundary
+- **hands-off** external — dDeclaredLoop reads `review.maintain` in `derive_breakpoints` (§8 F4's ask, TOOL-dDeclaredLoop-109)
 - **consumes-from** external — TOOL-dFairHearing-16 S2's `tools/workflows/check-verifier-fanout.js`, rule 2's home, which AC3 runs; TOOL-dFairHearing-18 and -23 S15's `whole-design` literal and receiver branch; TOOL-dFairHearing-23 S35's `render_lenses.py --markers`
 - **hands-off** `TOOL-dCalibratedLens-24` — the rendered `tools/workflows/tier2-review.js` and its stage receiver, which that unit feeds to `check-verifier-fanout.js --hook` beside a looped copy (id 16)
 
@@ -133,8 +156,8 @@ this unit once each is CLOSED, and re-grounds every line this spec cites against
 
 **Waits on:** TOOL-dFairHearing-13, TOOL-dFairHearing-2, TOOL-dFairHearing-3, TOOL-dFairHearing-16,
 TOOL-dFairHearing-18, TOOL-dFairHearing-23, TOOL-dRankedPlan-6,
-TOOL-dIndexedDesign-3, TOOL-dBoundRoles-21, TOOL-dDeclaredLoop-19 and TOOL-dDeclaredLoop-20, each
-DEFERRED at base. This unit specs none of their primitives and names each where it reads one.
+TOOL-dIndexedDesign-3, TOOL-dBoundRoles-21, TOOL-dDeclaredLoop-19, TOOL-dDeclaredLoop-20 and
+TOOL-dTendedCadence-1, each DEFERRED at base. This unit specs none of their primitives and names each where it reads one.
 
 ### Evidence
 
@@ -202,11 +225,11 @@ whose `presets` are disjoint from `test` (rule 6, TOOL-dFairHearing-13 §8 F2).
 ### The stage path
 
 ```
-derive_breakpoints  -> {name, position = item.<step>.<x>, ...}           (TOOL-dDeclaredLoop-19)
-firing site         -> --trigger <slug> --subject <s> --cause <c> --stage <step>
+--plan <slug>       -> breakpoint: name · position · disposer · cause    (TOOL-dDeclaredLoop-19 S9)
+main loop           -> --trigger <slug> --subject <s> --cause <c> --stage <step of position's tag>
 --trigger           -> review_pin.py --subject <s> ... --stage <step>    -> {"preset": "<step>" | mapped}
                     -> handoff.py stage-efforts <spec-review|closing-review> --review-stage <step>
-                    -> prints {"preset", "optIn", "trigger", "blocks", "efforts"}
+                    -> prints {"preset", "optIn", "unclassed", "trigger", "blocks", "efforts"}
 caller              -> tier2-review.js with those arguments
 ```
 
@@ -227,7 +250,7 @@ caller              -> tier2-review.js with those arguments
 | 2 to 5 | `roles.effort.<r>` and the rest | TOOL-dBoundRoles-21 §4, unchanged |
 
 The key is read once per call. `REVIEW_STAGES = ("plan", "design", "build", "test", "deploy",
-"maintain")` is the closed set; `build` runs only under `closing-review`, every other stage only under
+"maintain")` in `review_pin.py` is the closed set (§8 F7); `build` runs only under `closing-review`, every other stage only under
 `spec-review` or `spec-write`, and a mismatch names both. An unset key leaves steps 2 to 5 to decide,
 which is the catalogue's derived default, "the role's declared effort".
 
@@ -239,7 +262,8 @@ which is the catalogue's derived default, "the role's declared effort".
 | `plan`, `test`, `deploy`, `maintain` | literal names, `PRESETS` members | none |
 | the fourteen keys of §4 "The rows" | lens keys | the catalogue's key pattern |
 | `read_lens_literals` | Python function, `review_pin.py` | `py.function`, `--suggest` OK |
-| `REVIEW_STAGES`, `BUILD_REVIEW_WORKFLOWS` | Python constants, `roles_lib.py` | `py.constant` is undeclared in `.lexicon.conf` |
+| `REVIEW_STAGES` | Python constant, `review_pin.py`, its one home (§8 F7) | `py.constant` is undeclared in `.lexicon.conf` |
+| `BUILD_REVIEW_WORKFLOWS` | Python constant, `roles_lib.py` | `py.constant` is undeclared in `.lexicon.conf` |
 | `--stage` | flag of `review_pin.py` and of `--trigger` | none |
 | `--review-stage` | flag of `handoff.py stage-efforts` | none |
 
@@ -302,10 +326,10 @@ proof.
 - `tools/workflows/lenses.toml`
 - `tools/workflows/tier2-review.template.js`
 - `tools/workflows/tier2-review.js` (its render)
-- `tools/workflows/review_pin.py`
+- `tools/workflows/review_pin.py` — `--stage`, `read_lens_literals` and `REVIEW_STAGES` (§8 F7)
 - `tools/workflows/tier2-review.test.sh`
 - `tools/workflows/README.md`
-- `tools/roles/roles_lib.py`
+- `tools/roles/roles_lib.py` — step 1a, reading `REVIEW_STAGES` from `review_pin.py`
 - `tools/roles/handoff.py`
 - `tools/roles/adopt-roles.test.sh`
 - `tools/roles/README.md`
@@ -335,7 +359,8 @@ proof.
 - perf / scale — no new agent: each stage review runs five finders, as every literal does. One more
   `handoff.py` start per `--trigger` call.
 - error / empty / loading states — an unknown stage exits 2 in `review_pin.py` and raises a
-  `RolesError` in `handoff.py`, each naming the closed set; a missing harness beside `review_pin.py`
+  `RolesError` in `handoff.py`, each naming the closed set; a `--review-stage` with no review-harness
+  kit raises one naming `review_pin.py`; a missing harness beside `review_pin.py`
   exits 2 naming it, as `read_spec_subject_path` does.
 - observability — the harness logs each stage's effort line (`tier2-review.template.js:356-360`) and
   its preset (TOOL-dFairHearing-2 S5), so a stage run names both.
@@ -361,8 +386,11 @@ proof.
   Red when: rule 2 denies the receiver's ternary over eight literals, so no review can spawn.
 - **AC4** — When `python review_pin.py --subject <a design record> --stage deploy`
   runs, it prints `{"preset": "deploy"}`; with `--stage build` it prints the subject mapping's line,
-  as without the flag; with `--stage nightly` it exits 2 naming `nightly` and the marked literals.
-  Red when: the stage is ignored, or an unmarked stage prints a preset.
+  as without the flag; with `--stage nightly` or `--stage unit-spec` it exits 2 naming the stage and
+  `REVIEW_STAGES`; and `grep -c '^REVIEW_STAGES = ' tools/workflows/review_pin.py
+  tools/roles/roles_lib.py` prints 1 and 0.
+  Red when: the stage is ignored, a marked literal outside `REVIEW_STAGES` prints a preset, or the
+  set has a second home.
 - **AC5** — When `review_pin.py --subject <a planted plan record>` runs with no `--stage`, it prints
   `{"preset": "plan"}`.
   Red when: `PLAN_RECORD_PRESET` still reads `unit-spec`.
@@ -380,8 +408,11 @@ proof.
 - **AC8** — When `handoff.py stage-efforts spec-review --review-stage nightly`, `handoff.py
   stage-efforts closing-review --review-stage plan`, and a fixture setting `review.plan.effort =
   "huge"` each run, each exits 1 and its stderr names, in turn, `REVIEW_STAGES`, both the stage and
-  `closing-review`, and `review.plan.effort` with the levels.
-  Red when: any of the three prints levels.
+  `closing-review`, and `review.plan.effort` with the levels; in a fixture install holding no
+  review-harness kit, `stage-efforts spec-review --review-stage plan` exits 1 naming `review_pin.py`,
+  and `stage-efforts spec-review` prints its levels.
+  Red when: any of the three prints levels, or an absent review-harness passes a stage unchecked or
+  stops a call that passes none.
 - **AC9** — When `bash tools/unattended/unattended.sh --trigger <fixture slug> --subject <a planted
   landing subject> --cause opt-in --stage deploy` runs in a fixture repository whose policy file sets
   `review.deploy.effort = "medium"`, its JSON line carries `"preset": "deploy"` and an `efforts`
@@ -395,7 +426,8 @@ proof.
 - **AC11** — (amended, id 43) When `grep -c 'review.<stage>.effort' help/policy.md`,
   `grep -c 'MAINTAIN_LENSES\|gov:lens-slots maintain' tools/workflows/README.md`,
   `grep -c '\-\-review-stage' tools/roles/README.md` and
-  `grep -c '\-\-stage' memory/guides/UNATTENDED-VERBS.md` run, each counts at least one.
+  `grep -c '\-\-stage' memory/guides/UNATTENDED-VERBS.md` run, each counts at least one, and `grep -c 'breakpoint:' memory/guides/UNATTENDED-VERBS.md` counts
+  at least one.
   Red when: a page still describes stage reviews without their lenses or their effort.
 
 ## 7. Gates
@@ -405,8 +437,8 @@ proof.
 The loop kit's legs are not on the line: `tools/loop/` holds no leg at base, and this unit writes no
 file there.
 
-New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC4 AC5 · the render over the shipped catalogue, `review_pin.py` with each stage and an unknown one, and a planted plan record, each red against the parents' tree with no stage literal · FLOOR_ASSERTIONS in that suite, raised by the arms added
-New arm: tools/roles/adopt-roles.test.sh · covers AC6 AC7 AC8 · fixture policy files setting a stage's key beside the design key, the build key, an unknown stage, a kind mismatch and an unknown level, red against step 1a reading the design key alone · none
+New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC4 AC5 · the render over the shipped catalogue, `review_pin.py` with each stage, an unknown one and `unit-spec`, and a planted plan record, each red against the parents' tree with no stage literal · FLOOR_ASSERTIONS in that suite, raised by the arms added
+New arm: tools/roles/adopt-roles.test.sh · covers AC6 AC7 AC8 · fixture policy files setting a stage's key beside the design key, the build key, an unknown stage, a kind mismatch, an unknown level and an install with no review-harness kit, red against step 1a reading the design key alone · none
 New arm: tools/unattended/unattended.test.sh · covers AC9 · a `--trigger` call with `--stage deploy` in a fixture setting the deploy key, red against the verb as TOOL-dDeclaredLoop-20 lands it, which takes no stage · none
 
 ## 8. Open questions
@@ -437,7 +469,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC9 · a `--trigger` call
   a breakpoint name outside I23's closed list. (b) changes dDeclaredLoop's `--plan` lines and name set,
   a public surface no clause of this build names, so it fails veto 2 outside the grant; (a) runs the
   Maintain lenses through dDeclaredLoop's breakpoints as the clause says. Recommendation (a).
-  RESOLVED (agent, 2026-11-02, delegated): (a), rung 3. The main loop files the ask in
+  RESOLVED (agent, 2026-11-03, delegated): (a), rung 3, the boundary TOOL-dTendedCadence-1 S1's
+  `item.maintain.*` rows. The ask is TOOL-dDeclaredLoop-109, filed 2026-11-03 in
   `memory/builds/dDeclaredLoop/BACKLOG.md`: "DERIVE_BREAKPOINTS READS NO REVIEW.MAINTAIN · v2:1656
   lists `review.maintain` under every preset and TOOL-dDeclaredLoop-19 S1 reads `review.<stage>` for
   plan, design, build, test and deploy only, so `review.maintain: owed` places nothing · accept
@@ -455,6 +488,15 @@ New arm: tools/unattended/unattended.test.sh · covers AC9 · a `--trigger` call
   change. RESOLVED (agent, 2026-11-02, delegated): lifted by `PLAY-dClosedLoop-3`, rung 3. grants:
   PLAY-dClosedLoop-3 the stage literals and rows in the review kit, the stage flag through the
   trigger and the pin, and the stage effort in the roles kit · widens: none · relaxes: none
+- **F7 — Where does `REVIEW_STAGES` live, so `--stage` admits only its members?** `review_pin.py`
+  ships in review-harness, which requires only `agent-cap` and `policy` (`tools/workflows/kit.toml:10`),
+  and roles already names review-harness under `requires_if` (`tools/roles/kit.toml:19`). (a)
+  `review_pin.py` imports it from `roles_lib.py`, review-harness's `requires` gaining `roles`, so the
+  two kits name each other. (b) `REVIEW_STAGES` moves to `review_pin.py` as its one home, reached by
+  `roles_lib.py` through the inline `resolve_kit_dir`, along the existing roles → review-harness edge.
+  (c) `review_pin.py` keeps its own copy of the stage set, with a parity arm against `REVIEW_STAGES`.
+  Recommendation (b): one home, no new kit edge. RESOLVED (owner, 2026-11-03): (b), "go with (b) for
+  row 9".
 
 ## 9. Revision log
 
@@ -474,6 +516,13 @@ New arm: tools/unattended/unattended.test.sh · covers AC9 · a `--trigger` call
   TOOL-dRankedPlan-6 AC1's arm flipped, by the brief
   prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md (cross-check rows 4, 6, 10, 13,
   16 and 17)
+- rev-5 · 2026-11-03 · §1 §2 S3 S4 S5 §3 §4 §5 AC4 AC8 AC11 §7 §8 F4 F7 · re-grounded against
+  dTotalRecall's and dDeclaredLoop's specs, `unclassed` in the `--trigger` key set, the main loop as
+  the `--trigger` caller reading `--plan`'s `breakpoint:` lines, the Maintain boundary as
+  TOOL-dTendedCadence-1 S1's rows with "the five stages" in §1, and F4 re-marked naming
+  TOOL-dDeclaredLoop-109; and the owner's pick on the first pass's row 9, F7 (b), `REVIEW_STAGES`
+  homed in `review_pin.py`; by the brief prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md
+  (cross-check rows 2, 3, 4 and 7)
 
 ## 10. Reuse audit
 
@@ -483,7 +532,8 @@ review preset lens set for a stage"` ranked among its candidates, its step 1a TO
 and widened here from one stage to six. The rows are TOOL-dFairHearing-13's catalogue, rendered by its
 `render_lenses.py`, with three of TOOL-dFairHearing-2's rows drawn rather than copied. The preset is
 TOOL-dFairHearing-3's `review_pin.py`, whose `PLAN_RECORD_PRESET` TOOL-dRankedPlan-6 S1 left for this
-unit to set. `python tools/codebase-map/reuse_lookup.py "resolve the reasoning effort level for a
+unit to set; `roles_lib.py` reaches its `REVIEW_STAGES` through the inline `resolve_kit_dir`, as
+`read_cap_answer` reaches the policy kit. `python tools/codebase-map/reuse_lookup.py "resolve the reasoning effort level for a
 review stage from policy"` returned name-stem neighbours only (`resolve`, `resolve_caps`,
 `load_policy`); none resolves a stage's level, so `resolve_stage_efforts` stands. Hits that disagreed
 with source: TOOL-dIndexedDesign-3 S4 cites the row at `catalogue.toml:1212-1215`, which sits at

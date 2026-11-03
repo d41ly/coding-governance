@@ -399,3 +399,26 @@ at effort medium, with their handoffs beside it. Their returns are
 - **dFairHearing holds a live run claim** (`refs/gov/runs/dFairHearing`, beat about 1300 s at the
   start of this pass). Its folder was read and never edited. A spec it revises after `66c5b8dbf` is
   outside this record.
+
+## Owner ruling, 2026-11-03
+
+The owner answered this pass's report with "go with (b) for row 9, rest with recommendations".
+
+- **Row 9:** option (b). `REVIEW_STAGES` is homed in `review_pin.py`, and `roles_lib.py` reaches it
+  along the roles → review-harness edge. Folded into TOOL-dCalibratedLens-1 rev-5 as §8 F7,
+  `RESOLVED (owner, 2026-11-03): (b)`. Record:
+  [`deviation-16`](2026-11-03-build-TOOL-dCalibratedLens-1-deviation-16.md).
+- **Row 96:** kept as the writer derived it. cl10 S5 seeds from the lower of fh25's two runs, and
+  nothing is edited.
+- **Row 83:** kept in this build. cl9 S1 widens `read_act_records` inside dCalibratedLens's build run,
+  and no ask is filed on dWellOiledMachine. This follows the owner's standing rule that no plan counts
+  on a foreign build for functionality it can fold in.
+- **The two unfiled asks:** filed as TOOL-dWellOiledMachine-128 (cl3 §8 F2) and
+  TOOL-dWellOiledMachine-129 (cl16 F1). The second pass found five more asks no BACKLOG held, and filed
+  those too.
+- **Deeper ancestors:** run as the second pass once `0d1c1dda4` landed. Record:
+  [`2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck`](2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md).
+- **The spec audit over the fold text:** run after both passes' folds, over every revised spec.
+- **A correction to the Re-ground section above:** "the largest is cl3 at 46753" was measured before
+  the index render. After the render cl3 reads 51098 bytes, because its generated records region grew.
+  No gate caps a spec's size, and 49152 was only the brief's acceptance line.

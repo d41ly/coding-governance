@@ -16,7 +16,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dCalibratedLens](builds/dCalibratedLens/README.md) | DEFERRED | d | 2026-10-21 | tooling | 55 | 2026-11-03 | active | 0 |
 | [dClosedLoop](builds/dClosedLoop/README.md) | INPROGRESS | d | 2026-10-14 | playbook+kickoff+tooling+deployer | 39 | 2026-10-26 | active | 0 |
 | [dConvergedCharter](builds/dConvergedCharter/README.md) | OPEN | d | 2026-10-21 | playbook | 24 | 2026-10-21 | active | 0 |
-| [dDeclaredLoop](builds/dDeclaredLoop/README.md) | DEFERRED | d | 2026-10-21 | tooling | 108 | 2026-11-02 | active | 0 |
+| [dDeclaredLoop](builds/dDeclaredLoop/README.md) | DEFERRED | d | 2026-10-21 | tooling | 111 | 2026-11-03 | active | 0 |
 | [dFairHearing](builds/dFairHearing/README.md) | DEFERRED | d | 2026-10-21 | tooling | 40 | 2026-11-02 | active | 0 |
 | [dFurnishedOrders](builds/dFurnishedOrders/README.md) | DEFERRED | d | 2026-10-21 | tooling | 61 | 2026-10-28 | active | 0 |
 | [dIndexedDesign](builds/dIndexedDesign/README.md) | DEFERRED | d | 2026-10-21 | tooling | 53 | 2026-10-28 | active | 0 |
@@ -30,8 +30,8 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dScopedBuild](builds/dScopedBuild/README.md) | DEFERRED | d | 2026-10-21 | tooling | 43 | 2026-11-03 | active | 0 |
 | [dShippedRelease](builds/dShippedRelease/README.md) | DEFERRED | d | 2026-10-21 | deployer | 145 | 2026-11-03 | active | 0 |
 | [dTendedCadence](builds/dTendedCadence/README.md) | DEFERRED | d | 2026-10-21 | tooling | 74 | 2026-11-03 | active | 0 |
-| [dTotalRecall](builds/dTotalRecall/README.md) | DEFERRED | d | 2026-10-21 | tooling | 106 | 2026-11-03 | active | 0 |
-| [dWellOiledMachine](builds/dWellOiledMachine/README.md) | DEFERRED | d | 2026-10-21 | tooling | 129 | 2026-11-03 | active | 0 |
+| [dTotalRecall](builds/dTotalRecall/README.md) | DEFERRED | d | 2026-10-21 | tooling | 108 | 2026-11-03 | active | 0 |
+| [dWellOiledMachine](builds/dWellOiledMachine/README.md) | DEFERRED | d | 2026-10-21 | tooling | 131 | 2026-11-03 | active | 0 |
 | [dWitnessedBar](builds/dWitnessedBar/README.md) | DEFERRED | d | 2026-10-21 | tooling | 98 | 2026-10-26 | active | 0 |
 | [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 2 | 2026-08-08 | dormant | 1 |
 | [aDeclaredBound](builds/aDeclaredBound/README.md) | OPEN | a | 2026-08-18 | tooling | 6 | 2026-08-18 | dormant | 0 |
