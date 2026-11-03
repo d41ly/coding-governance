@@ -225,7 +225,9 @@ echo "PASS — the layer check's plants"
 # THE TAG RESOLVER'S ARMS (PLAY-dOrderedCharter-19 S13, S14). Each row runs `gov_tag.py --fixture` over one
 # plant in its own scratch repository, `<plant and --set flags>|<exit>|<a line it must print>|<a line it
 # must not print>`, the last field optional; exit and lines are asserted together. Every policy key a plant
-# reads is `--set`, so no row reads a policy file.
+# reads is `--set`, so no row reads a policy file. The rows from `bad-ns` on are PLAY-dOrderedCharter-10's
+# nine plants, the shape check and the joins; `dead-selector` and `file-name` print their second half's
+# exit on a `rc=` line, read here as a line.
 _tk="--set tags.bare-refs=charter-only --set tags.retired-cites=refuse-new"
 _tf=0
 while IFS='|' read -r _tp _trc _twant _tnot; do
@@ -264,6 +266,21 @@ owned $_tk|1|kit expkit (layer.exp) mints layer.fixture-x in core namespace laye
 owned-core $_tk|0|tags: green · 0 red
 scope $_tk|0|tags: unarmed unit (1 not graded)|· unresolved ·
 scope-guide $_tk|1|memory/guides/ALPHA.md:13 · unresolved · \`doc.nope\` names no row
+bad-ns $_tk|1|· shape · step.build · namespace 'step' is not registered
+bad-seg $_tk|1|· shape · layer.Memory · segment 'Memory' is outside
+long-tag $_tk|1|· over 64 bytes (66)
+ns-word $_tk|1|· shape · practice.repo.x · first segment 'repo' is a namespace word
+none $_tk|0|tags: green · 0 red|namespace word
+escaped-word $_tk|1|namespace row 'a.b' is outside seg, so no tag is graded against it
+escaped-word $_tk|1|· shape · a.b.c · namespace 'a' is not registered
+unregistered-cite $_tk|1|\`layer.nowhere\` is cited and undeclared in layer
+dead-selector $_tk|1|\`reader.ghost\` is declared and selects no unit
+dead-selector $_tk|1|unused, a descriptor (not red): layer.memory layer.memory.lexicon
+dead-selector $_tk|1|without reader.ghost: rc=0
+empty-ns $_tk|0|tags: join kind · unarmed|\`kind.x\`
+file-name $_tk|0|1 file names not graded
+file-name $_tk|0|· unresolved · \`kit.toml\` names no row
+file-name $_tk|0|no tracked kit.toml: rc=1
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf tag-resolver arm(s) failed"; exit 1; fi
 echo "PASS — the tag resolver's plants"

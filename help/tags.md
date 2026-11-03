@@ -2,10 +2,25 @@
 
 **What it is.** A tag names one thing in the repository: `doc.build-method` is the build method
 guide, `doc.build-method#m5-recall-and-reuse` its `## M5` section. A tag is `<ns>.<seg>(.<seg>)*`,
-lower-case, at most 64 bytes, and its namespace is a row of `tools/playbook/namespaces.toml`. Two
-namespaces are registered today: `doc`, the charter, each guide under `memory/guides/`,
-`memory/HYGIENE.md` and `memory/TEMPLATE-SPEC.md`, with one section per `##` heading; and `unit`,
-which is empty until the instruction rows land, and prints as `unarmed` while it is.
+lower-case, at most 64 bytes, and its namespace is a row of `tools/playbook/namespaces.toml`. Ten
+namespaces are registered today, each read from the file that declares its members:
+
+| Namespace | Its members come from |
+|---|---|
+| `doc` | the charter, each guide under `memory/guides/`, `memory/HYGIENE.md` and `memory/TEMPLATE-SPEC.md`, one section per `##` heading |
+| `unit` | each `[[unit]]` row of a kit's `instructions.toml` |
+| `reader` | `tools/playbook/readers.toml`: `reader.every`, `reader.driver` and `reader.subagent` |
+| `practice` | `tools/playbook/practices.toml` |
+| `level` | `LEVELS` in `tools/playbook/instruction_units.py` |
+| `layer` | each `[[layer]]` row of `tools/playbook/layers.toml` |
+| `principle` | `tools/playbook/principles.toml` |
+| `kind` | `tools/playbook/kinds.toml` |
+| `kit` | the `id` of each `kit.toml` and `*.kit.toml` descriptor |
+| `repo` | the units of `.governance/instructions.toml` |
+
+A namespace whose file declares nothing yet prints as `unarmed`, and nothing in it is graded. A tag in
+a namespace no row registers, such as `step.build`, is red: `step`, `item` and `policy` join when
+dDeclaredLoop registers them, `role` with dBoundRoles and `record` with dTotalRecall.
 
 The resolver is `tools/playbook/gov_tag.py`, which stands in for `gov tag`. It reads a derived index,
 `<git-common-dir>/gov/index.db`: one SQLite file per machine that every worktree shares, built on
@@ -50,6 +65,21 @@ tag-shaped word that is not a citation, quote it another way, with doubled backt
 - **bare** — a bare name, a tag less its namespace, as `tags.bare-refs` says.
 - **owned** — a tag minted in a core layer's namespace by a kit whose layer is optional or an
   expansion.
+- **shape** — a defined tag, or a value a unit's `scope` selects, in an unregistered namespace, with a
+  segment outside `[a-z0-9][a-z0-9-]*`, longer than 64 bytes before any `#`, or whose first segment is
+  itself a namespace word, such as `practice.repo.x`.
+- **join** — a citation that is no member of its namespace, such as `` `layer.nowhere` ``; and, once
+  unit rows exist, a `reader` or `practice` member no unit selects. A describing namespace's unused
+  members are listed, never red.
+
+A backticked span that is the file name of a tracked file, such as `` `kit.toml` ``, is a file name,
+not a citation: it is counted as `<n> file names not graded` and never red. The same span with no such
+file tracked is red as unresolved.
+
+Where the lexicon kit is installed, `check` also hands every tag it grades to the lexicon's tag-name
+check and prints `slot point.instruction.name-check · searched-empty`, or `· filled` with its findings
+as reds. Without the lexicon it prints `· not-installed: the shape check stands alone`, and the shape
+check decides alone.
 
 Nothing it skips is silent. The summary line counts the citations graded, the unresolved, the
 retired cited, the bare references, the citations in build records not graded and the paths outside

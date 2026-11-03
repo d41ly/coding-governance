@@ -92,7 +92,9 @@ REGISTRY_FIELDS = ("ns", "owner", "layer", "source", "extractor", "role", "purpo
 
 
 def read_namespaces(path) -> list[dict]:
-    """The registry's `[[namespace]]` rows, each carrying every field of REGISTRY_FIELDS, or TagError."""
+    """The registry's `[[namespace]]` rows, each carrying every field of REGISTRY_FIELDS, or TagError. A row
+    whose `ns` is outside `seg` is returned: `derive_context` keeps it out of every pattern and the shape
+    check reds it by name (PLAY-dOrderedCharter-10 S3)."""
     path = pathlib.Path(path)
     try:
         rows = tomllib.loads(path.read_text(encoding="utf-8")).get("namespace") or []
@@ -103,8 +105,8 @@ def read_namespaces(path) -> list[dict]:
         missing = [f for f in REGISTRY_FIELDS if not isinstance(row.get(f), str) or not row.get(f)]
         if missing:
             raise TagError(f"{path.as_posix()}: namespace row {i} lacks {', '.join(missing)}")
-        if not SEG_RE.fullmatch(row["ns"]) or row["ns"] in seen:
-            raise TagError(f"{path.as_posix()}: namespace '{row['ns']}' is malformed or registered twice")
+        if row["ns"] in seen:
+            raise TagError(f"{path.as_posix()}: namespace '{row['ns']}' is registered twice")
         if row["role"] not in ("selects", "describes"):
             raise TagError(f"{path.as_posix()}: namespace '{row['ns']}' has role '{row['role']}', not selects or describes")
         if ":" not in row["extractor"]:
@@ -182,23 +184,140 @@ def extract_doc(ctx, path, text=None):
     return rows
 
 
-def extract_unit(ctx, path, text=None):
-    """The `unit` namespace: the `tag` of each `[[unit]]` row of every `instructions.toml`, a kit's and
-    `.governance/`'s. Empty until a build lands rows; a file that does not parse names nothing."""
-    if text is None:
-        return "" if pathlib.PurePosixPath(path).name == "instructions.toml" else None
+OVERLAY_UNITS = ".governance/instructions.toml"
+#: the extractors whose members are unit rows themselves, which a unit's `scope` never selects
+UNIT_EXTRACTORS = ("tag_index:extract_unit", "tag_index:extract_repo")
+
+
+def read_toml_tags(text, table):
+    """(value, line) for each `[[table]]` row's string `tag` in TOML `text`, unfiltered: the shape
+    check, never the extractor, refuses a malformed value. A file that does not parse names nothing."""
     try:
-        units = tomllib.loads(text).get("unit") or []
+        rows = tomllib.loads(text).get(table) or []
     except tomllib.TOMLDecodeError:
         return []
     lines = text.splitlines()
-    rows = []
+    out = []
+    for row in rows:
+        val = row.get("tag") if isinstance(row, dict) else None
+        if isinstance(val, str) and val:
+            n = next((i for i, ln in enumerate(lines, 1) if f'"{val}"' in ln), 1)
+            out.append((val, n))
+    return out
+
+
+def derive_tag_rows(text, table):
+    lines = text.splitlines()
+    return [(val, "tag", n, n, lines[n - 1] if lines else "") for val, n in read_toml_tags(text, table)]
+
+
+def derive_unit_rows(text):
+    """A `[[unit]]` file's rows: each unit's `tag`, and each value of its `scope` as a `selector` row."""
+    rows = derive_tag_rows(text, "unit")
+    try:
+        units = tomllib.loads(text).get("unit") or []
+    except tomllib.TOMLDecodeError:
+        return rows
+    lines = text.splitlines()
     for unit in units:
-        tag = unit.get("tag") if isinstance(unit, dict) else None
-        if isinstance(tag, str) and parse_tag(tag)[1] is None:
-            n = next((i for i, ln in enumerate(lines, 1) if f'"{tag}"' in ln), 1)
-            rows.append((tag, "tag", n, n, lines[n - 1] if lines else ""))
+        scope = unit.get("scope") if isinstance(unit, dict) else None
+        for val in scope if isinstance(scope, list) else ():
+            if isinstance(val, str) and val:
+                n = next((i for i, ln in enumerate(lines, 1) if f'"{val}"' in ln), 1)
+                rows.append((val, "selector", n, n, lines[n - 1] if lines else ""))
     return rows
+
+
+def extract_unit(ctx, path, text=None):
+    """The `unit` namespace: the `tag` of each `[[unit]]` row of every kit's `instructions.toml`, and each
+    `scope` value as a `selector` row; `.governance/`'s rows are the `repo` namespace's. Empty until a
+    build lands rows."""
+    if text is None:
+        return "" if pathlib.PurePosixPath(path).name == "instructions.toml" and path != OVERLAY_UNITS else None
+    return derive_unit_rows(text)
+
+
+def extract_repo(ctx, path, text=None):
+    """The `repo` namespace: the units of `.governance/instructions.toml`, the repository's own (S14)."""
+    if text is None:
+        return "" if path == OVERLAY_UNITS else None
+    return derive_unit_rows(text)
+
+
+def _read_kit_file(ctx, path, name):
+    return path == f"{ctx['kit']}/{name}"
+
+
+def extract_reader(ctx, path, text=None):
+    """The `reader` namespace: each `[[reader]]` row of `readers.toml` beside the registry."""
+    if text is None:
+        return "" if _read_kit_file(ctx, path, "readers.toml") else None
+    return derive_tag_rows(text, "reader")
+
+
+def extract_practice(ctx, path, text=None):
+    """The `practice` namespace: each `[[practice]]` row of `practices.toml` (PLAY-dOrderedCharter-1)."""
+    if text is None:
+        return "" if _read_kit_file(ctx, path, "practices.toml") else None
+    return derive_tag_rows(text, "practice")
+
+
+def extract_layer(ctx, path, text=None):
+    """The `layer` namespace: the `tag` of each `[[layer]]` row of `layers.toml`."""
+    if text is None:
+        return "" if _read_kit_file(ctx, path, "layers.toml") else None
+    return derive_tag_rows(text, "layer")
+
+
+def extract_principle(ctx, path, text=None):
+    """The `principle` namespace: each `[[principle]]` row of `principles.toml` (PLAY-dOrderedCharter-7)."""
+    if text is None:
+        return "" if _read_kit_file(ctx, path, "principles.toml") else None
+    return derive_tag_rows(text, "principle")
+
+
+def extract_kind(ctx, path, text=None):
+    """The `kind` namespace: each `[[kind]]` row of `kinds.toml` (PLAY-dOrderedCharter-7)."""
+    if text is None:
+        return "" if _read_kit_file(ctx, path, "kinds.toml") else None
+    return derive_tag_rows(text, "kind")
+
+
+def extract_level(ctx, path, text=None):
+    """The `level` namespace: `level.<name>` for each name of the `LEVELS` tuple in `instruction_units.py`
+    (PLAY-dOrderedCharter-13), at the tuple's line; a module that does not parse names nothing."""
+    if text is None:
+        return "" if _read_kit_file(ctx, path, "instruction_units.py") else None
+    import ast
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return []
+    lines = text.splitlines()
+    for node in tree.body:
+        if (isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "LEVELS" for t in node.targets)
+                and isinstance(node.value, (ast.Tuple, ast.List))):
+            n = node.lineno
+            return [(f"level.{e.value}", "tag", n, n, lines[n - 1]) for e in node.value.elts
+                    if isinstance(e, ast.Constant) and isinstance(e.value, str)]
+    return []
+
+
+def extract_kit(ctx, path, text=None):
+    """The `kit` namespace: `kit.<id>` for the top-level `id` of each tracked `kit.toml` or `*.kit.toml`
+    descriptor, at the `id` key's own line (§8 F5)."""
+    if text is None:
+        name = pathlib.PurePosixPath(path).name
+        return "" if name == "kit.toml" or name.endswith(".kit.toml") else None
+    try:
+        kid = tomllib.loads(text).get("id")
+    except tomllib.TOMLDecodeError:
+        return []
+    if not isinstance(kid, str) or not kid:
+        return []
+    lines = text.splitlines()
+    n = next((i for i, ln in enumerate(lines, 1) if re.match(r"\s*id\s*=", ln)), 1)
+    return [(f"kit.{kid}", "tag", n, n, lines[n - 1] if lines else "")]
 
 
 CODE_SPAN_RE = re.compile(r"(`+)(.+?)(?<!`)\1(?!`)")
@@ -296,11 +415,16 @@ def derive_context(root, registry) -> dict:
     extractors, and the worktree's own top-level path."""
     _tree_lib, id_grammar = load_memory_tree()
     conf = id_grammar.load_conf(pathlib.Path(root))
-    namespaces = read_namespaces(registry)
+    rows = read_namespaces(registry)
+    # validate before splice: a word outside `seg` reaches no LIKE pattern and no word set, only a red
+    namespaces = [r for r in rows if SEG_RE.fullmatch(r["ns"])]
     return {
         "root": pathlib.Path(root),
         "memory_root": (conf.get("MEMORY_ROOT") or "memory").strip("/"),
         "charter": conf.get("CHARTER") or "AGENTS.md",
+        "kit": pathlib.Path(os.path.relpath(pathlib.Path(registry).parent, root)).as_posix(),
+        "registry": pathlib.Path(os.path.relpath(registry, root)).as_posix(),
+        "malformed": [r["ns"] for r in rows if not SEG_RE.fullmatch(r["ns"])],
         "namespaces": namespaces,
         "extractors": load_extractors(namespaces, pathlib.Path(registry).parent),
         "worktree": read_git(root, "rev-parse", "--show-toplevel").strip(),
@@ -565,16 +689,28 @@ def _derive_span_ns(text):
     return head.split(".")[0] if "." in head else None
 
 
-def check_resolves(con, ctx, bare_mode, armed) -> tuple[list, dict]:
+def read_view_file_names(con) -> set:
+    """The base name of every path the view serves: a span equal to one, naming no row, is a file name."""
+    return {p.rsplit("/", 1)[-1] for (p,) in con.execute("SELECT path FROM view_path")}
+
+
+def read_defined(con) -> set:
+    return {t for (t,) in con.execute("SELECT DISTINCT p.tag FROM path_row p JOIN view_path v ON p.path=v.path "
+                                      "AND p.blob=v.blob WHERE p.kind IN ('doc','section','tag','retired')")}
+
+
+def check_resolves(con, ctx, bare_mode, armed, file_names=None) -> tuple[list, dict]:
     """S7 `resolves`: a graded citation into an armed namespace that resolves to no row is red; one into
     an unarmed namespace, or under `<MEMORY_ROOT>/builds/`, is counted and never graded. A retired tag
-    resolves here: whether citing it is red is the `retired` arm's question. Bare references
-    read as `bare_mode` says (`charter-only`, `unique`, `never`)."""
-    defined = {t for (t,) in con.execute("SELECT DISTINCT p.tag FROM path_row p JOIN view_path v ON p.path=v.path "
-                                         "AND p.blob=v.blob WHERE p.kind IN ('doc','section','tag','retired')")}
+    resolves here: whether citing it is red is the `retired` arm's question. A span naming no row that is
+    the base name of a served path is a file name, counted and never red (PLAY-dOrderedCharter-10 §8 F3).
+    Bare references read as `bare_mode` says (`charter-only`, `unique`, `never`)."""
+    defined = read_defined(con)
+    if file_names is None:
+        file_names = read_view_file_names(con)
     tails = {t.split(".", 1)[1] for t in defined if "#" not in t and "." in t}
     graded, records = read_population(con, ctx, namespaces=list(armed), words=tails)
-    counts = {"graded": 0, "unresolved": 0, "bare": 0, "records": 0, "unarmed": {}}
+    counts = {"graded": 0, "unresolved": 0, "bare": 0, "records": 0, "file_names": 0, "unarmed": {}}
     counts["records"] = sum(1 for r in records if _derive_span_ns(r[0]) in armed)
     reds, notes = [], []
     for text, path, line, *_ in graded:
@@ -582,6 +718,9 @@ def check_resolves(con, ctx, bare_mode, armed) -> tuple[list, dict]:
         if ns in armed:
             if not armed[ns]:
                 counts["unarmed"][ns] = counts["unarmed"].get(ns, 0) + 1
+                continue
+            if text not in defined and text in file_names:
+                counts["file_names"] += 1
                 continue
             counts["graded"] += 1
             if text not in defined:
@@ -675,6 +814,93 @@ def check_owned(con, ctx, layers_path) -> list:
         if hit and kinds.get(hit[1]) in ("optional", "expansion"):
             reds.append(f"tags: {path}:{line} · owned · kit {hit[0]} ({hit[1]}) mints {tag} in core namespace {ns}")
     return reds
+
+
+def check_tag_shape(con, ctx) -> tuple[list, list]:
+    """S3, the shape check, over every defining row and every unit row's selector value: each graded
+    before any `#<seg>`, against the registry's words, a word outside `seg` a red naming its row and
+    never a word. -> (reds, the tags graded)."""
+    words = {r["ns"] for r in ctx["namespaces"]}
+    reds = [f"tags: {ctx['registry']} · shape · namespace row '{ns}' is outside seg, so no tag is graded "
+            f"against it" for ns in ctx["malformed"]]
+    graded = []
+    for tag, path, line, *_ in read_rows(con, DEFINE_KINDS + ("selector",)):
+        head = tag.split("#")[0]
+        ns, _, rest = head.partition(".")
+        segs = rest.split(".") if rest else []
+        bad = next((s for s in segs if not SEG_RE.fullmatch(s)), None)
+        reason = None
+        if ns not in words:
+            reason = f"namespace '{ns}' is not registered"
+        elif not segs or bad is not None:
+            reason = f"segment '{bad or ''}' is outside {SEG}"
+        elif len(head.encode("utf-8")) > TAG_MAX_BYTES:
+            reason = f"over {TAG_MAX_BYTES} bytes ({len(head.encode('utf-8'))})"
+        elif segs[0] in words:
+            reason = f"first segment '{segs[0]}' is a namespace word"
+        if reason:
+            reds.append(f"tags: {path}:{line} · shape · {head} · {reason}")
+        graded.append(head)
+    return reds, graded
+
+
+def check_namespace_joins(con, ctx, file_names=None) -> tuple[list, list]:
+    """S4, each namespace joined both ways through `compute_coverage`: every graded citation into it is a
+    member (a retired one included, the `retired` arm's question), file names aside; and, for a `selects`
+    namespace whose members are not units, every member selects a unit. An empty population prints
+    `unarmed` and grades nothing; a descriptor's unused members are printed, never red. -> (reds, lines)."""
+    load_memory_tree()
+    from coverage_join import compute_coverage
+    if file_names is None:
+        file_names = read_view_file_names(con)
+    members, declared = {}, {}
+    for tag, path, line, kind, *_ in read_rows(con, DEFINE_KINDS + ("retired",)):
+        ns = tag.split("#")[0].split(".")[0]
+        members.setdefault(ns, set()).add(tag)
+        if kind != "retired" and "#" not in tag:
+            declared.setdefault(ns, {}).setdefault(tag, (path, line))
+    units = [r for r in read_rows(con, ("tag",)) if r[5] in UNIT_EXTRACTORS]
+    selected: dict = {}
+    for tag, path, line, *_ in read_rows(con, ("selector",)):
+        selected.setdefault(tag.split(".")[0], {}).setdefault(tag, (path, line))
+    graded, _records = read_population(con, ctx, namespaces=[r["ns"] for r in ctx["namespaces"]])
+    cited: dict = {}
+    for text, path, line, *_ in graded:
+        if text not in file_names:
+            cited.setdefault(_derive_span_ns(text), {}).setdefault(text, (path, line))
+    reds, lines, armed = [], [], []
+    for row in ctx["namespaces"]:
+        ns = row["ns"]
+        if not members.get(ns):
+            lines.append(f"tags: join {ns} · unarmed: its source declares nothing, so neither direction is graded")
+            continue
+        armed.append(ns)
+        cov = compute_coverage({ns: sorted(members[ns])}, {"cited": {ns: tuple(cited.get(ns, ()))}}, {ns: ()})
+        for key in cov.stale_claims.get(ns, []):
+            tag = key.split(": ", 1)[1]
+            path, line = cited[ns][tag]
+            reds.append(f"tags: {path}:{line} · join · `{tag}` is cited and undeclared in {ns}")
+        if row["extractor"] in UNIT_EXTRACTORS:
+            continue
+        sel = selected.get(ns, {})
+        if row["role"] == "selects":
+            if not units:
+                lines.append(f"tags: join {ns} · selects · unarmed: no unit row, so no member is graded as selecting")
+                continue
+            dec = declared.get(ns, {})
+            cov = compute_coverage({ns: sorted(dec)}, {"units": {ns: tuple(sel)}}, {ns: ()})
+            for tag in cov.unclaimed.get(ns, []):
+                reds.append(f"tags: {dec[tag][0]}:{dec[tag][1]} · join · `{tag}` is declared and selects no unit")
+            for key in cov.stale_claims.get(ns, []):
+                tag = key.split(": ", 1)[1]
+                reds.append(f"tags: {sel[tag][0]}:{sel[tag][1]} · join · a unit selects `{tag}`, which {ns} does not declare")
+        elif units:
+            unused = sorted(set(declared.get(ns, {})) - set(sel))
+            if unused:
+                lines.append(f"tags: join {ns} · {len(unused)} unused, a descriptor (not red): {' '.join(unused)}")
+    lines.insert(0, f"tags: joins · {len(armed)} armed ({' '.join(armed) or 'none'}), "
+                    f"{len(ctx['namespaces']) - len(armed)} unarmed, {len(units)} unit rows")
+    return reds, lines
 
 
 def read_index_rows(con) -> list[str]:

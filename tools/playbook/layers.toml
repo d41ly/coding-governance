@@ -9,8 +9,9 @@
 # The rows' definitions are the dClosedLoop architecture's `[layers]` table cells, and the points are the
 # eight `[core-points]` of its layer-expansions record, each spelled point.<layer>.<seg>, and the three
 # slot points PLAY-dOrderedCharter-17 declares: Test's leg-pack point, the LIVE column and the consult
-# point. A non-core row `uses` each point one of its kits attaches at through a core kit's slot. The `point`
-# words are a stand-in: a later build registers a `point` namespace and the shape check joins it then.
+# point, and PLAY-dOrderedCharter-10's name-check point, where the lexicon grades tag names. A non-core
+# row `uses` each point one of its kits attaches at through a core kit's slot. The `point` words are a
+# stand-in: a later build registers a `point` namespace and the shape check joins it then.
 # Add a row with: python check_layers.py --new <tag> --kind <kind> [--of <tag>] --definition <text>
 
 shared = ["lib"]
@@ -19,7 +20,7 @@ shared = ["lib"]
 tag = "layer.instruction"
 kind = "core"
 definition = "everything an agent is told, levelled 0 to 7 and tagged by scope"
-declares = []
+declares = ["point.instruction.name-check"]
 uses = []
 
 [[layer]]
@@ -72,7 +73,7 @@ kind = "optional"
 of = "layer.memory"
 definition = "the naming lexicon, the declared words agents consult before they name"
 declares = []
-uses = ["point.flow.leg-pack", "point.flow.version"]
+uses = ["point.flow.leg-pack", "point.flow.version", "point.instruction.name-check"]
 
 [[layer]]
 tag = "layer.flow.leg-packs"

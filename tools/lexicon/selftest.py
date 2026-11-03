@@ -6010,6 +6010,30 @@ else:
           f"{_cx.stdout[:120]!r} {_cx.stderr[:200]!r}")
 
 
+# ---- PLAY-dOrderedCharter-10 S7: `--tags` READS THE NAMESPACE WORDS FROM THE REGISTRY ---------------
+# A kit copy beside a FIXTURE registry whose words are not the live one's: `kit` is no word here, so
+# `layer.kit.x` passing and `practice.repo.x` refusing show the words came from the fixture, and the
+# malformed `a.b` row reaching no word shows it was validated before use.
+with build_tempdir() as _td:
+    _tr = Path(_td)
+    (_tr / ".git").mkdir()
+    shutil.copytree(KIT, _tr / PFX / KIT_NAME, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    (_tr / PFX / "playbook").mkdir(parents=True, exist_ok=True)
+    (_tr / PFX / "playbook" / "namespaces.toml").write_text(
+        "".join(f'[[namespace]]\nns = "{w}"\n\n' for w in ("practice", "repo", "layer", "a.b")),
+        encoding="utf-8", newline="\n")
+    _tg = subprocess.run([sys.executable, str(_tr / PFX / KIT_NAME / "lexicon.py"), "--tags"],
+                         input="practice.repo.x\nlayer.memory\nlayer.kit.x\nlayer.a.b\n",
+                         capture_output=True, text=True, encoding="utf-8")
+    _tgo = _tg.stdout + _tg.stderr
+check("--tags refuses `practice.repo.x` by the namespace-word rule, passes `layer.memory`, and reads "
+      "its words from the registry it resolves, a malformed row dropped",
+      _tg.returncode == 1
+      and "lexicon: tag practice.repo.x · first segment 'repo' is a namespace word" in _tgo
+      and "4 graded, 1 refused" in _tgo and "tag layer.memory" not in _tgo and "tag layer.a.b" not in _tgo
+      and f"{PFX}playbook/namespaces.toml" in _tgo, _tgo)
+
+
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")
     for f in FAILURES:

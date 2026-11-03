@@ -5143,6 +5143,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "check_namespace_joins",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "check_needs_target",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -6091,6 +6096,16 @@
       "id": "check_table_row",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "check_tag_name",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "check_tag_shape",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "check_target_local_config",
@@ -7873,6 +7888,11 @@
       "file": "tools/govkit/upgrade_walk.py"
     },
     {
+      "id": "derive_fixture_row",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
+    },
+    {
       "id": "derive_floor_breaches",
       "kind": "function",
       "file": "tools/codebase-map/replay-phrases.py"
@@ -9118,6 +9138,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "derive_tag_rows",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "derive_target_runner",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -9206,6 +9231,11 @@
       "id": "derive_unit_key",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "derive_unit_rows",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "derive_universal_plant",
@@ -9833,9 +9863,29 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "extract_kind",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
+      "id": "extract_kit",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "extract_label_unit",
       "kind": "function",
       "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "extract_layer",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
+      "id": "extract_level",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "extract_line_ref",
@@ -9878,6 +9928,16 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "extract_practice",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
+      "id": "extract_principle",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "extract_print_message",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -9893,6 +9953,11 @@
       "file": "tools/workflows/review_replay.py"
     },
     {
+      "id": "extract_reader",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "extract_reason",
       "kind": "function",
       "file": "tools/unattended/stop-guard.test.sh"
@@ -9901,6 +9966,11 @@
       "id": "extract_records",
       "kind": "function",
       "file": "tools/memory-tree/id_grammar.py"
+    },
+    {
+      "id": "extract_repo",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "extract_roster_ids",
@@ -14723,6 +14793,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "read_defined",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "read_defs_at_sha",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -16968,6 +17043,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_tag_words",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "read_target_bytes",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -17066,6 +17146,11 @@
       "id": "read_token",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_toml_tags",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "read_tool_errors",
@@ -17281,6 +17366,11 @@
       "id": "read_versions",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "read_view_file_names",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "read_view_grammar_lines",
@@ -19920,6 +20010,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
     },
     {
@@ -22478,6 +22573,11 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
+      "id": "run_name_check",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
+    },
+    {
       "id": "run_node",
       "kind": "function",
       "file": "tools/workflows/check_by_design_parity.py"
@@ -23038,6 +23138,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "run_suggest_tag",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "run_sweep",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
@@ -23051,6 +23156,11 @@
       "id": "run_switch_probe",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_tags",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "run_tail_retry",

@@ -16,6 +16,11 @@ version_from = { file = "render_playbook.py", pattern = "^KIT_PLAYBOOK_RENDER_VE
 # renderer without the template would have an engine and nothing to read.
 requires = ["playbook"]
 
+# PLAY-dOrderedCharter-10 S6: the tag check's one edge to a non-core kit, the lexicon, is a declared slot.
+optional = [
+  { part = "gov_tag.py", point = "point.instruction.name-check", fallback = "the shape check stands alone" },
+]
+
 [[files]]
 include = ["**"]
 role = "engine"

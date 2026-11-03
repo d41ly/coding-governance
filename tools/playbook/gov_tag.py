@@ -7,7 +7,8 @@
 
 `show` returns the tag's row, or its subtree as `tags.slice` says; `where` prints `path:line`; `refs`
 prints every citation of it, a build record's too; `check` runs the `retired`, `resolves` and `owned`
-arms over the citations outside `<MEMORY_ROOT>/builds/`. An address is a tag, `doc.<name>#<seg>`, or a
+arms over the citations outside `<MEMORY_ROOT>/builds/`, and the shape check, the joins and the
+name-check slot (PLAY-dOrderedCharter-10). An address is a tag, `doc.<name>#<seg>`, or a
 positional label `aliases.toml` maps. Every line opens `tags:`; `--json` is the index's only JSON.
 Exit 0 green, 1 red, 2 a refusal (an unreadable registry, a refused policy read, a locked index).
 
@@ -98,13 +99,40 @@ def run_kit_verb(root, verb, address, *, sets, as_json=False, base=None, kit_rel
         con.close()
 
 
+NAME_CHECK = "slot point.instruction.name-check"
+
+
+def run_name_check(root, tags) -> tuple[list, str]:
+    """S6, the name-check point: where the lexicon kit resolves, every shape-graded tag goes to its
+    `lexicon.py --tags` in one call, which reads the namespace words from the registry itself (§8 F2).
+    -> (reds, the slot line). No kit is the declared fallback; an answer it cannot give is red."""
+    from policy_value import resolve_kit_dir
+    try:
+        lex = resolve_kit_dir("lexicon", "lexicon.py", KIT_DIR) / "lexicon.py"
+    except LookupError:
+        return [], f"{NAME_CHECK} · not-installed: the shape check stands alone"
+    p = subprocess.run([sys.executable, str(lex), "--tags"], input="".join(f"{t}\n" for t in sorted(set(tags))),
+                       capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=str(root))
+    if p.returncode == 0:
+        return [], f"{NAME_CHECK} · searched-empty"
+    lines = [ln for ln in (p.stdout + p.stderr).splitlines() if ln.strip()]
+    if p.returncode == 1:
+        return [f"tags: name-check · {ln}" for ln in lines if ln.startswith("lexicon: tag ")], f"{NAME_CHECK} · filled"
+    return [f"tags: name-check · the lexicon could not answer (exit {p.returncode}): {ln}" for ln in lines[-3:]], \
+        f"{NAME_CHECK} · filled"
+
+
 def run_check(con, root, ctx, kit_rel, *, sets, base, as_json, state) -> int:
     counts = ti.derive_namespace_state(con, ctx)
     armed = counts  # ns -> defined-tag count; 0 is unarmed
     bare_mode = read_key("tags.bare-refs", root, sets, lambda: read_policy_value("tags.bare-refs", root)[0][0])
     retired_mode = read_key("tags.retired-cites", root, sets,
                             lambda: read_policy_value("tags.retired-cites", root)[0][0])
-    reds, c = ti.check_resolves(con, ctx, bare_mode, armed)
+    file_names = ti.read_view_file_names(con)
+    reds, shaped = ti.check_tag_shape(con, ctx)
+    j_reds, j_lines = ti.check_namespace_joins(con, ctx, file_names)
+    s_reds, c = ti.check_resolves(con, ctx, bare_mode, armed, file_names)
+    reds += j_reds + s_reds
     base_spans, base_why = None, ""
     if con.execute(ti.VIEW_ROWS + " WHERE p.kind='retired' LIMIT 1").fetchone():
         if base is None:
@@ -120,23 +148,26 @@ def run_check(con, root, ctx, kit_rel, *, sets, base, as_json, state) -> int:
             print(f"tags: retired: no base ({base_why}), so every citation reads as new")
     r_reds, warns, cited = ti.check_retired(con, ctx, retired_mode, base_spans, armed)
     o_reds = ti.check_owned(con, ctx, root / kit_rel / "layers.toml")
-    reds += r_reds + o_reds
+    n_reds, slot = run_name_check(root, shaped)
+    reds += r_reds + o_reds + n_reds
     tags = sum(counts.values())
     unread = con.execute("SELECT COUNT(*) FROM view_path WHERE path NOT LIKE '%.md'").fetchone()[0]
     summary = {
         "namespaces": len(counts), "tags": tags, "graded": c["graded"], "unresolved": c["unresolved"],
         "retired_cited": cited, "bare_refs": c["bare"], "records_not_graded": c["records"], "paths_not_markdown": unread,
+        "shape_graded": len(shaped), "file_names_not_graded": c["file_names"], "name_check": slot,
         "unarmed": {ns: c["unarmed"].get(ns, 0) for ns, n in counts.items() if not n},
         "reds": reds, "warns": warns, "blobs_parsed": state["parsed"],
     }
     if as_json:
         print(json.dumps(summary, indent=2, sort_keys=True))
         return 1 if reds else 0
-    for line in c["notes"] + warns + reds:
+    for line in c["notes"] + j_lines + warns + reds:
         print(line)
-    print(f"tags: {len(counts)} namespaces, {tags} tags, {c['graded']} citations graded, {c['unresolved']} unresolved, "
-          f"{cited} retired-cited, {c['bare']} bare refs; {c['records']} in build records not graded; "
-          f"{unread} paths outside Markdown not read; "
+    print(f"tags: {slot}")
+    print(f"tags: {len(counts)} namespaces, {tags} tags, {len(shaped)} shape-graded, {c['graded']} citations graded, "
+          f"{c['unresolved']} unresolved, {cited} retired-cited, {c['bare']} bare refs; {c['file_names']} file names "
+          f"not graded; {c['records']} in build records not graded; {unread} paths outside Markdown not read; "
           f"{state['parsed']} blob{'s' if state['parsed'] != 1 else ''} parsed")
     for ns in summary["unarmed"]:
         print(f"tags: unarmed {ns} ({summary['unarmed'][ns]} not graded)")
@@ -190,7 +221,7 @@ owner = "fixture"
 layer = "layer.instruction"
 source = "every *.tags file"
 extractor = "fixture_tags:extract_declared"
-role = "selects"
+role = "describes"
 purpose-source = "fixture"
 join-armed-by = "fixture"
 '''
@@ -231,7 +262,37 @@ kind = "expansion"
 GUIDE = "# Alpha\n\n## Intro\n\nthe intro text\n\n## M5 — Recall and reuse\n\nrecall first\n"
 FIXTURE_KIT = "tools/playbook"
 PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retired", "retired-old",
-          "retired-reminted", "bare", "bare-charter", "owned", "owned-core", "scope", "scope-guide")
+          "retired-reminted", "bare", "bare-charter", "owned", "owned-core", "scope", "scope-guide",
+          "bad-ns", "bad-seg", "long-tag", "ns-word", "unregistered-cite", "dead-selector", "empty-ns",
+          "escaped-word", "file-name")
+
+
+def derive_fixture_row(ns, extractor, role="describes", layer="layer.instruction") -> str:
+    """One fixture registry row (PLAY-dOrderedCharter-10's plants)."""
+    return (f'\n[[namespace]]\nns = "{ns}"\nowner = "fixture"\nlayer = "{layer}"\nsource = "fixture"\n'
+            f'extractor = "{extractor}"\nrole = "{role}"\npurpose-source = "fixture"\njoin-armed-by = "fixture"\n')
+
+
+#: PLAY-dOrderedCharter-10 S8: each plant's registry rows and the files it adds to the base fixture
+SHAPE_PLANTS = {
+    "bad-ns": (FIXTURE_UNIT_ROW, {"tools/corekit/instructions.toml": '[[unit]]\ntag = "step.build"\n'}),
+    "bad-seg": ("", {"tools/corekit/core.tags": "+layer.Memory\n"}),
+    "long-tag": ("", {"tools/corekit/core.tags": "+layer." + "a" * 60 + "\n"}),
+    "ns-word": (derive_fixture_row("repo", "fixture_tags:extract_declared"),
+                {"tools/corekit/core.tags": "+practice.repo.x\n"}),
+    "escaped-word": (derive_fixture_row("a.b", "fixture_tags:extract_declared"),
+                     {"tools/corekit/core.tags": "+a.b.c\n"}),
+    "unregistered-cite": ("", {"memory/guides/ALPHA.md": "+\nsee `layer.nowhere`\n"}),
+    "dead-selector": (FIXTURE_UNIT_ROW + derive_fixture_row("reader", "tag_index:extract_reader", "selects"), {
+        "tools/playbook/readers.toml": '[[reader]]\ntag = "reader.every"\n\n[[reader]]\ntag = "reader.ghost"\n',
+        "tools/corekit/instructions.toml": '[[unit]]\ntag = "unit.alpha"\nscope = ["reader.every"]\n',
+        "tools/corekit/core.tags": "+layer.memory.lexicon\n"}),
+    "empty-ns": (derive_fixture_row("kind", "tag_index:extract_kind"),
+                 {"tools/playbook/kinds.toml": "# declares nothing yet\n",
+                  "memory/guides/ALPHA.md": "+\nsee `kind.x`\n"}),
+    "file-name": (derive_fixture_row("kit", "tag_index:extract_kit", layer="layer.exp"),
+                  {"memory/guides/ALPHA.md": "+\nedit `kit.toml`\n"}),
+}
 
 
 def write_files(root: pathlib.Path, files: dict) -> None:
@@ -305,6 +366,11 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
             files["memory/guides/ALPHA.md"] += "\nand [doc.nope]\n"
     if plant == "two-paths":
         files["memory/guides/BETA.md"] = GUIDE
+    if plant in SHAPE_PLANTS:
+        rows, extra = SHAPE_PLANTS[plant]
+        files[f"{kit}/namespaces.toml"] += rows
+        for rel, text in extra.items():  # a leading `+` appends to the base file
+            files[rel] = files[rel] + text[1:] if text.startswith("+") else text
     write_commit(root, files, "base")
     return root
 
@@ -393,6 +459,18 @@ def run_plant(root, top, plant, sets) -> int:
         return run_verb(root, "check", None, sets=sets, base=base)
     if plant in ("retired-old", "retired-reminted"):
         return run_verb(root, "check", None, sets=sets, base=run_git(root, "rev-parse", "HEAD").strip())
+    if plant in ("dead-selector", "file-name"):  # the plant's exit, then its second half's on one line
+        rc = run_verb(root, "check", None, sets=sets)
+        if plant == "dead-selector":
+            write_commit(root, {"tools/playbook/readers.toml": '[[reader]]\ntag = "reader.every"\n'}, "no ghost")
+            half = "without reader.ghost"
+        else:
+            run_git(root, "mv", "tools/corekit/kit.toml", "tools/corekit/corekit.kit.toml")
+            run_git(root, "mv", "tools/expkit/kit.toml", "tools/expkit/expkit.kit.toml")
+            write_commit(root, {}, "no tracked kit.toml")
+            half = "no tracked kit.toml"
+        say(f"{half}: rc={run_verb(root, 'check', None, sets=sets)}")
+        return rc
     return run_verb(root, "check", None, sets=sets)
 
 

@@ -204,8 +204,28 @@ bytes; `tag_index.py` compiles it once as `TAG_RE` and `TAG_MAX_BYTES`, and `par
 string breaks. The namespace words are the rows of `namespaces.toml`, each with its `owner`, `layer`,
 `source`, `extractor` (`<module>:<function>`), `role`, `purpose-source` and `join-armed-by`, read by
 `read_namespaces`. This kit registers `doc` (the charter, the guides, `HYGIENE.md` and
-`TEMPLATE-SPEC.md`, a section per `##` heading) and `unit` (each `[[unit]]` row of an
-`instructions.toml`, empty and printed `unarmed` until rows land).
+`TEMPLATE-SPEC.md`, a section per `##` heading) and `unit` (each `[[unit]]` row of a kit's
+`instructions.toml`, its `scope` values as selector rows, empty and printed `unarmed` until rows land).
+
+PLAY-dOrderedCharter-10 registers eight more, each read from its declaring source by an `extract_<ns>`
+function in `tag_index.py` and printed `unarmed` while that source declares nothing: `reader`
+(`readers.toml`: `reader.every`, `reader.driver`, `reader.subagent`), `practice` (`practices.toml`),
+`level` (`LEVELS` in `instruction_units.py`), `layer` (`layers.toml`), `principle` (`principles.toml`),
+`kind` (`kinds.toml`), `kit` (the top-level `id` of every `kit.toml` and `*.kit.toml`, in
+`layer.distribution`) and `repo` (`.governance/instructions.toml`'s units). `check` adds the shape check
+(every defined tag and selector value in a registered namespace, every segment in shape, at most 64
+bytes before any `#`, no first segment that is a namespace word, a registry word outside the segment
+shape a red and never a word), the joins (every citation a member; every `reader` and `practice` member
+selecting a unit once unit rows exist) and the name-check slot, `point.instruction.name-check`, where the
+lexicon's `--tags` grades the same names. A cited span that is the base name of a tracked file is counted
+as a file name, never red. The later namespaces are not registered, so their tags red until the build
+that arms each adds its row:
+
+| Namespace | Armed by |
+|---|---|
+| `step`, `item`, `policy` | dDeclaredLoop |
+| `role` | dBoundRoles |
+| `record` | dTotalRecall |
 
 The index is `<git-common-dir>/gov/index.db`, one SQLite file per node shared by every worktree, never
 committed. Rows are keyed by blob, so a commit re-parses only the blobs it changed and one blob at two
