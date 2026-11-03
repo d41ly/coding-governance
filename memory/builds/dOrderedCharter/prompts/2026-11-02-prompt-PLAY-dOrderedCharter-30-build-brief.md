@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dOrderedCharter's build run; the spec run landed every spec and deferred every unit to it (README rule 1).
-- The build order is 18, 16, 17, 19, 10, 44, 22, 51, 24, 28, 26, 47, 48, 50, 25, 7, 53, 13, 42, 12, 9, 20, 15, 1, 45, 3, 41, 52, 6, 2, 11, 27, 21, 5, 4, 8, 14, 43, 30, 29, 23, 32, 33, 46, 35, 36, 34, 31, 37, 39, 40, 49, 54, 55 (each `order` group sorted by its specs' `consumes-from` edges). Every unit before yours in
+- The build order is 18, 16, 61, 62, 17, 19, 10, 44, 22, 51, 24, 28, 26, 47, 48, 50, 25, 7, 53, 13, 42, 12, 9, 20, 15, 1, 45, 3, 41, 52, 6, 2, 11, 27, 21, 5, 4, 8, 14, 43, 30, 29, 23, 32, 33, 46, 35, 36, 34, 31, 37, 39, 40, 49, 54, 55 (each `order` group sorted by its specs' `consumes-from` edges). Every unit before yours in
   that order is built and committed on this branch; read their code where your spec names it, never re-implement it.
   Your spec's §3 Edges name what you consume.
 - The spec audit is closed: the owner capped spec review at two rounds
