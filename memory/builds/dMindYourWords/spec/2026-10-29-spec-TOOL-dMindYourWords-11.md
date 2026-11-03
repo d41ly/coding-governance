@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-11 — the vocabulary changed only with the write path's record, which takes over from `ratified`
 
-**Status:** DEFERRED · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 5 · advances TOOL-dMindYourWords-18
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base ccd1292e · streams tooling · order 5 · advances TOOL-dMindYourWords-18
 
 **Carries:** cl-dClosedLoop-0272@51d03a52 whole
 **Carries:** node:record-kind.lexicon-declaration
@@ -15,8 +15,16 @@
 | [2026-10-29-build-TOOL-dMindYourWords-11-deviation-112.md](../build/2026-10-29-build-TOOL-dMindYourWords-11-deviation-112.md) | deviation | — |
 | [2026-10-29-build-TOOL-dMindYourWords-11-deviation-113.md](../build/2026-10-29-build-TOOL-dMindYourWords-11-deviation-113.md) | deviation | — |
 | [2026-10-29-build-TOOL-dMindYourWords-11-reuse-scout-c.md](../build/2026-10-29-build-TOOL-dMindYourWords-11-reuse-scout-c.md) | research | TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-16 |
+| [2026-11-03-build-TOOL-dMindYourWords-1-crosscheck-returns.md](../build/2026-11-03-build-TOOL-dMindYourWords-1-crosscheck-returns.md) | research | TOOL-dMindYourWords-1 |
+| [2026-11-03-build-TOOL-dMindYourWords-1-parents-crosscheck.md](../build/2026-11-03-build-TOOL-dMindYourWords-1-parents-crosscheck.md) | research | TOOL-dMindYourWords-1 |
+| [2026-11-03-build-TOOL-dMindYourWords-1-reground-returns.md](../build/2026-11-03-build-TOOL-dMindYourWords-1-reground-returns.md) | research | TOOL-dMindYourWords-1 |
+| [2026-11-03-build-TOOL-dMindYourWords-11-deviation-114.md](../build/2026-11-03-build-TOOL-dMindYourWords-11-deviation-114.md) | deviation | — |
 | [2026-10-29-prompt-TOOL-dMindYourWords-1-fix-brief.md](../prompts/2026-10-29-prompt-TOOL-dMindYourWords-1-fix-brief.md) | research | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-5 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-12 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 |
 | [2026-10-29-prompt-TOOL-dMindYourWords-1-spec-brief.md](../prompts/2026-10-29-prompt-TOOL-dMindYourWords-1-spec-brief.md) | research | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 |
+| [2026-11-03-prompt-TOOL-dMindYourWords-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dMindYourWords-1-parents-crosscheck.md) | research | TOOL-dMindYourWords-1 |
+| [2026-11-03-prompt-TOOL-dMindYourWords-1-parents-reground.md](../prompts/2026-11-03-prompt-TOOL-dMindYourWords-1-parents-reground.md) | research | TOOL-dMindYourWords-1 |
+| [2026-11-03-prompt-TOOL-dMindYourWords-11-1-spec-reviewer.md](../prompts/2026-11-03-prompt-TOOL-dMindYourWords-11-1-spec-reviewer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dMindYourWords-11-2-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dMindYourWords-11-2-spec-writer.md) | journal | — |
 | [2026-10-29-review-TOOL-dMindYourWords-1-spec-audit-round1.md](../reviews/2026-10-29-review-TOOL-dMindYourWords-1-spec-audit-round1.md) | spec-audit | TOOL-dMindYourWords-1 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-12 TOOL-dMindYourWords-5 TOOL-dMindYourWords-7 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-6 TOOL-dMindYourWords-8 TOOL-dMindYourWords-10 TOOL-dMindYourWords-9 TOOL-dMindYourWords-16 TOOL-dMindYourWords-13 TOOL-dMindYourWords-17 |
 
 <!-- /gen:spec-records -->
@@ -111,8 +119,9 @@ S7 (the factory `tools/memory-tree/build_records.py`, whose `new change` verb is
   `tools/memory-tree/record-kinds.toml`, written by `python record_kinds.py new lexicon-declaration
   --tag record.lexicon-declaration --writer hand --check "lexicon wiring"`, with `home` `.lexicon.conf`,
   `schema` form `rows` and `readers` the lexicon engine and `adopt-lexicon.sh --check`; the writer is
-  `hand` because the declaration is edited by hand and admitted by S3, until TOOL-dTotalRecall-2 registers
-  a door. `python record_kinds.py --write` re-renders the kinds region of
+  `hand` because the declaration is edited by hand and admitted by S3, and it keeps `writer = hand`
+  because it is a `rows` kind TOOL-dTotalRecall-2 S9 leaves at `hand` (tr2:80-84), with no door
+  planned. `python record_kinds.py --write` re-renders the kinds region of
   `tools/memory-tree/HYGIENE.template.md`, which `adopt-memory-tree.sh --render` carries into
   `memory/HYGIENE.md` (TOOL-dTotalRecall-1 S6). Gov's own first record,
   `memory/builds/dMindYourWords/build/<date>-build-TOOL-dMindYourWords-11-change-1.md`, tag `unit.lexicon.verbs`, `Action: add`, `Before: none`, written through the stand-in door, lands in
@@ -402,6 +411,7 @@ New arm: tools/drift-audit/selftest.py · covers AC6 · the fixture's planted LA
   and 6, and the spec brief's I11 and I16. The clause's named hole and readers differ from source:
   deviation record `2026-10-29-build-TOOL-dMindYourWords-11-deviation-111.md`.
 - rev-2 · 2026-10-29 · §3 · the Edges gain the mirror of each edge the round-1 spec audit's promoted units declare toward this unit (TOOL-dMindYourWords-23, TOOL-dMindYourWords-26, TOOL-dMindYourWords-28, TOOL-dMindYourWords-27, TOOL-dMindYourWords-29); no scope, design or criterion moved.
+- rev-3 · 2026-11-03 · §2 S10 · the `lexicon-declaration` row's writer stays `hand` as a `rows` kind TOOL-dTotalRecall-2 S9 leaves at `hand` (tr2:80-84) with no door planned, no longer awaiting a tr2 door; no scope, design or criterion moved, by the brief prompts/2026-11-03-prompt-TOOL-dMindYourWords-1-parents-reground.md
 
 ## 10. Reuse audit
 

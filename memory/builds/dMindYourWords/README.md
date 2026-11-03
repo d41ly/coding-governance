@@ -97,7 +97,7 @@ ids TOOL-dMindYourWords-50 TOOL-dMindYourWords-51 TOOL-dMindYourWords-52
 | [TOOL-dMindYourWords-38 — check 7c2 resolves `{prefix}` in a leg's argv before it looks for the file](spec/2026-10-29-spec-TOOL-dMindYourWords-38.md) | 4 | 2 | DEFERRED | rev-1 | 2026-10-29 |
 | [TOOL-dMindYourWords-39 — check 7c2 refuses a graded leg whose argv names no file it can read](spec/2026-10-29-spec-TOOL-dMindYourWords-39.md) | 4 | 2 | DEFERRED | rev-1 | 2026-10-29 |
 | [TOOL-dMindYourWords-51 — the audit of units 30 to 37: the minors on govkit's root-file class, batched — the registry's ledger tables join the population, read and validated once](spec/2026-10-29-spec-TOOL-dMindYourWords-51.md) | 4 | 2 | DEFERRED | rev-1 | 2026-10-29 |
-| [TOOL-dMindYourWords-11 — the vocabulary changed only with the write path's record, which takes over from `ratified`](spec/2026-10-29-spec-TOOL-dMindYourWords-11.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-29 |
+| [TOOL-dMindYourWords-11 — the vocabulary changed only with the write path's record, which takes over from `ratified`](spec/2026-10-29-spec-TOOL-dMindYourWords-11.md) | 5 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 | [TOOL-dMindYourWords-26 — a `widened:<record>` ledger row is admitted only when the branch adds its record](spec/2026-10-29-spec-TOOL-dMindYourWords-26.md) | 6 | 2 | DEFERRED | rev-2 | 2026-10-29 |
 | [TOOL-dMindYourWords-5 — a reasoned site suppression, recorded and counted, as the owner's fallback](spec/2026-10-29-spec-TOOL-dMindYourWords-5.md) | 6 | 2 | DEFERRED | rev-2 | 2026-10-29 |
 | [TOOL-dMindYourWords-28 — suppression provenance refused in a shallow history, and judged at a root commit](spec/2026-10-29-spec-TOOL-dMindYourWords-28.md) | 7 | 2 | DEFERRED | rev-2 | 2026-10-29 |
@@ -137,7 +137,7 @@ ids TOOL-dMindYourWords-50 TOOL-dMindYourWords-51 TOOL-dMindYourWords-52
 | [TOOL-dMindYourWords-52 — the audit of units 30 to 37: its 18 lexicon-side minors, batched — honest git reasons, every reader observed, the drain edit's shells and states, and the carriers a move left behind](spec/2026-10-29-spec-TOOL-dMindYourWords-52.md) | 22 | 2 | DEFERRED | rev-1 | 2026-10-29 |
 <!-- /gen:build-units -->
 
-Records: 87 bound to this build, across 4 record folder(s).
+Records: 95 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

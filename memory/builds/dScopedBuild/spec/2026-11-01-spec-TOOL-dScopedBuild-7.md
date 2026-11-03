@@ -17,7 +17,10 @@
 | [2026-11-01-build-TOOL-dScopedBuild-7-deviation-71.md](../build/2026-11-01-build-TOOL-dScopedBuild-7-deviation-71.md) | deviation | — |
 | [2026-11-01-build-TOOL-dScopedBuild-7-deviation-72.md](../build/2026-11-01-build-TOOL-dScopedBuild-7-deviation-72.md) | deviation | — |
 | [2026-11-01-build-TOOL-dScopedBuild-7-deviation-73.md](../build/2026-11-01-build-TOOL-dScopedBuild-7-deviation-73.md) | deviation | — |
+| [2026-11-03-build-TOOL-dScopedBuild-1-crosscheck-returns.md](../build/2026-11-03-build-TOOL-dScopedBuild-1-crosscheck-returns.md) | research | TOOL-dScopedBuild-1 |
+| [2026-11-03-build-TOOL-dScopedBuild-1-parents-crosscheck.md](../build/2026-11-03-build-TOOL-dScopedBuild-1-parents-crosscheck.md) | research | TOOL-dScopedBuild-1 |
 | [2026-11-01-prompt-TOOL-dScopedBuild-1-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-spec-brief.md) | research | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
+| [2026-11-03-prompt-TOOL-dScopedBuild-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dScopedBuild-1-parents-crosscheck.md) | research | TOOL-dScopedBuild-1 |
 | [2026-11-01-review-TOOL-dScopedBuild-1-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dScopedBuild-1-spec-audit-round1.md) | spec-audit | TOOL-dScopedBuild-1 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 |
 
 <!-- /gen:spec-records -->

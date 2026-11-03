@@ -150,7 +150,7 @@ ids TOOL-dTendedCadence-74
 | [TOOL-dTendedCadence-74 — the round-1 spec audit of units 49 to 59, its 26 minors batched: the hold's readers renamed, staleness and security claims that hold, criteria scoped to what they claim, and the population rules that can reach their fallback](spec/2026-11-01-spec-TOOL-dTendedCadence-74.md) | 24 | 2 | DEFERRED | rev-1 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 100 bound to this build, across 4 record folder(s).
+Records: 104 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

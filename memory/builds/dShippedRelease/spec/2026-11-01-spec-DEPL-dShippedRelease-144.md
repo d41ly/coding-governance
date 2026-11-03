@@ -12,6 +12,7 @@
 | [2026-11-01-build-DEPL-dShippedRelease-140-round5-disposal-return.md](../build/2026-11-01-build-DEPL-dShippedRelease-140-round5-disposal-return.md) | research | DEPL-dShippedRelease-140 DEPL-dShippedRelease-141 DEPL-dShippedRelease-142 DEPL-dShippedRelease-143 DEPL-dShippedRelease-145 |
 | [2026-11-01-build-DEPL-dShippedRelease-144-token-fix-brief.md](../build/2026-11-01-build-DEPL-dShippedRelease-144-token-fix-brief.md) | research | — |
 | [2026-11-01-build-DEPL-dShippedRelease-144-token-fix-return.md](../build/2026-11-01-build-DEPL-dShippedRelease-144-token-fix-return.md) | research | DEPL-dShippedRelease-140 |
+| [2026-11-03-prompt-DEPL-dShippedRelease-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-DEPL-dShippedRelease-1-parents-crosscheck.md) | research | DEPL-dShippedRelease-1 DEPL-dShippedRelease-4 DEPL-dShippedRelease-5 DEPL-dShippedRelease-6 DEPL-dShippedRelease-11 DEPL-dShippedRelease-12 DEPL-dShippedRelease-15 DEPL-dShippedRelease-30 DEPL-dShippedRelease-58 DEPL-dShippedRelease-68 DEPL-dShippedRelease-69 DEPL-dShippedRelease-78 DEPL-dShippedRelease-94 DEPL-dShippedRelease-95 DEPL-dShippedRelease-123 DEPL-dShippedRelease-125 DEPL-dShippedRelease-129 DEPL-dShippedRelease-138 |
 
 <!-- /gen:spec-records -->
 

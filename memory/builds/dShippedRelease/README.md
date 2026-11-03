@@ -132,7 +132,7 @@ ids DEPL-dShippedRelease-142 DEPL-dShippedRelease-143 DEPL-dShippedRelease-144 D
 | [DEPL-dShippedRelease-103 — An exit row is keyed by slug and tree, and an exited tree can queue again](spec/2026-10-30-spec-DEPL-dShippedRelease-103.md) | 8 | 2 | DEFERRED | rev-2 | 2026-11-01 |
 | [DEPL-dShippedRelease-2 — `deploy.distill` unarmed, recording that it measured nothing](spec/2026-10-30-spec-DEPL-dShippedRelease-2.md) | 8 | 2 | DEFERRED | rev-2 | 2026-10-30 |
 | [DEPL-dShippedRelease-13 — `deploy.core`: the core checks read on the landed tree, the per-SHA verdict and the patch a red files](spec/2026-10-30-spec-DEPL-dShippedRelease-13.md) | 9 | 2 | DEFERRED | rev-3 | 2026-11-01 |
-| [DEPL-dShippedRelease-4 — the deploy engine: `deploy.current` to `deploy.close`, `deploy.unlease` and the mailbox it closes](spec/2026-10-30-spec-DEPL-dShippedRelease-4.md) | 10 | 2 | DEFERRED | rev-4 | 2026-11-01 |
+| [DEPL-dShippedRelease-4 — the deploy engine: `deploy.current` to `deploy.close`, `deploy.unlease` and the mailbox it closes](spec/2026-10-30-spec-DEPL-dShippedRelease-4.md) | 10 | 2 | DEFERRED | rev-5 | 2026-11-03 |
 | [DEPL-dShippedRelease-53 — `deploy.record` copies the core verdict at its write, and `deploy.core` never writes to an absent ref](spec/2026-10-30-spec-DEPL-dShippedRelease-53.md) | 10 | 2 | DEFERRED | rev-3 | 2026-11-01 |
 | [DEPL-dShippedRelease-14 — the landing review, blocking the build's close and never the push](spec/2026-10-30-spec-DEPL-dShippedRelease-14.md) | 11 | 2 | DEFERRED | rev-6 | 2026-11-01 |
 | [DEPL-dShippedRelease-56 — a `running` core passes to `deploy.record`, so a landing record exists for the length of the bar](spec/2026-10-30-spec-DEPL-dShippedRelease-56.md) | 11 | 2 | DEFERRED | rev-3 | 2026-11-01 |
@@ -239,7 +239,7 @@ ids DEPL-dShippedRelease-142 DEPL-dShippedRelease-143 DEPL-dShippedRelease-144 D
 | [DEPL-dShippedRelease-144 — the round-5 spec audit's 32 MEDIUM and 11 LOW findings, batched](spec/2026-11-01-spec-DEPL-dShippedRelease-144.md) | 38 | 2 | DEFERRED | rev-1 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 52 bound to this build, across 4 record folder(s).
+Records: 61 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
