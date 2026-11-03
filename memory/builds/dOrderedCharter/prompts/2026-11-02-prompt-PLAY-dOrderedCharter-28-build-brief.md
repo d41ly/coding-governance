@@ -66,3 +66,14 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Your spec header's `advances PLAY-dOrderedCharter-38` stays `advances` when you flip it to `CLOSED`; you are not the last unit.
 - The unattended kit's own self-test suites are WAIVED for this build's landing (README, "Build-level rules"); a
   criterion they would observe is named as owed with PLAY-dClosedLoop-12, never run.
+
+## Your previous dispatch's work
+
+- Run wf_4f6a95e7-547's builder died mid-pass on an API network error (`ENOTFOUND`) before it committed. Its `--brief`
+  and `--dispatch` rows are in RUN.md (staged), and its uncommitted edits are still in the worktree: the spec's status
+  header, `tools/gate-legs.json`, `tools/govkit/registry.toml`, `subject-pins.tsv` and `usage.toml`,
+  `tools/playbook/edge_grammar.py`, `edges.toml`, `gov_tag.py`, `namespaces.toml` and
+  `tools/run-gates/ceiling-evidence.txt`. A copy of that diff is saved as
+  `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dorderedcharter-725f52/0394fa33-012c-408f-a840-e6e4cfaac23f/scratchpad/unit28-partial.patch`.
+- Read those edits against the spec before you trust any of them, finish the unit from them, and commit as one pass.
+  Re-run `--dispatch` only if your write set grows past the recorded row.
