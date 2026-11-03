@@ -108,6 +108,16 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "EdgeError",
+      "kind": "class",
+      "file": "tools/playbook/edge_grammar.py"
+    },
+    {
+      "id": "EdgeRefusal",
+      "kind": "class",
+      "file": "tools/playbook/edge_grammar.py"
+    },
+    {
       "id": "ExtendedLimit",
       "kind": "class",
       "file": "tools/run-gates/measure_legs.py"
@@ -1916,6 +1926,11 @@
       "id": "build_edges",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
+    },
+    {
+      "id": "build_edges_fixture",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
     },
     {
       "id": "build_entry",
@@ -4411,6 +4426,11 @@
       "id": "check_down_floor",
       "kind": "function",
       "file": "tools/lib/python_floor.py"
+    },
+    {
+      "id": "check_edges",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
     },
     {
       "id": "check_emitted",
@@ -8158,6 +8178,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "derive_inverse_edges",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
+    },
+    {
       "id": "derive_invocation",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -8511,6 +8536,11 @@
       "id": "derive_phase",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "derive_pin_hash",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
     },
     {
       "id": "derive_plant_needle",
@@ -11665,6 +11695,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/playbook/gov_tag.py"
     },
     {
@@ -12991,6 +13026,16 @@
       "id": "parse_dossier",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "parse_edge_lines",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
+    },
+    {
+      "id": "parse_edge_target",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
     },
     {
       "id": "parse_file",
@@ -14956,6 +15001,11 @@
       "id": "read_dump",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
+    },
+    {
+      "id": "read_edge_types",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
     },
     {
       "id": "read_engine_conf_reader",
@@ -22683,6 +22733,11 @@
       "file": "tools/govkit/shims.py"
     },
     {
+      "id": "run_parse",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
+    },
+    {
       "id": "run_pathless",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
@@ -22746,6 +22801,11 @@
       "id": "run_plant_arms",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "run_plant_rows",
+      "kind": "function",
+      "file": "tools/playbook/adopt-playbook.sh"
     },
     {
       "id": "run_pm",

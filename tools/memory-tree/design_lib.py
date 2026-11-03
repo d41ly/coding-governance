@@ -170,11 +170,17 @@ def run_git(root, *args, stdin=None, extra_env=None):
                           input=stdin, capture_output=True, env=env)
 
 
-def derive_clause_hash(text):
-    """The first eight hex digits of the SHA-256 of a clause's UTF-8 text, its trailing `cl-` id cut
-    off and each whitespace run folded to one space (`carries.py:85-87`)."""
-    body = re.sub(r"\s+", " ", CLAUSE_ID.sub("", text)).strip()
+def derive_pin_hash(text):
+    """THE ONE PIN NORMALISER (PLAY-dOrderedCharter-24 S7): the first eight hex digits of the SHA-256 of
+    the UTF-8 text with each whitespace run folded to one space and the ends stripped. Every pin calls it."""
+    body = re.sub(r"\s+", " ", text).strip()
     return hashlib.sha256(body.encode("utf-8")).hexdigest()[:8]
+
+
+def derive_clause_hash(text):
+    """A clause's pin: `derive_pin_hash` of its text with its trailing `cl-` id cut off
+    (`carries.py:85-87`)."""
+    return derive_pin_hash(CLAUSE_ID.sub("", text))
 
 
 def extract_clause_tokens(text):

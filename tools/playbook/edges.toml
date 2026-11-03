@@ -1,0 +1,127 @@
+# edges.toml — the edge-type registry (PLAY-dOrderedCharter-24 S1). Read by edge_grammar.read_edge_types.
+#
+# One [[edge]] row per type of ONE closed set: `type`; `inverse`, derived from this row and never declared
+# at a site; `from` and `to`, the namespace words of namespaces.toml a source and a target sit in, or the
+# class words `any` (every registered namespace and every native id) and `selects` (every namespace whose
+# row has role = "selects"); `pin`, `none`, `tag` or `clause`; `status`, `declared` or `derived`; and
+# `declared-at`, the site that owns the fact. A word not registered yet (`feature`, `item`, and the
+# native-id classes `spec`, `decision` and `build`) admits nothing until its build registers it. These are
+# P33's twelve declared types and the derived `cites`, from the memory plan's [edges];
+# PLAY-dOrderedCharter-28 adds its twelve and widens `decides` and `after`.
+
+[[edge]]
+type = "part-of"
+inverse = "has-part"
+from = ["any"]
+to = ["any"]
+pin = "none"
+status = "declared"
+declared-at = "annotations, dossier claims"
+
+[[edge]]
+type = "implements"
+inverse = "implemented-by"
+from = ["any"]
+to = ["feature", "spec"]
+pin = "none"
+status = "declared"
+declared-at = "gov:feature, the code record"
+
+[[edge]]
+type = "tests"
+inverse = "tested-by"
+from = ["any"]
+to = ["any"]
+pin = "none"
+status = "declared"
+declared-at = "the test's own declaration"
+
+[[edge]]
+type = "decides"
+inverse = "decided-by"
+from = ["decision"]
+to = ["any"]
+pin = "none"
+status = "declared"
+declared-at = "the decision row; Decided: trailers"
+
+[[edge]]
+type = "instructs"
+inverse = "instructed-by"
+from = ["unit"]
+to = ["selects"]
+pin = "none"
+status = "declared"
+declared-at = "the unit's select"
+
+[[edge]]
+type = "enforces"
+inverse = "enforced-by"
+from = ["any"]
+to = ["unit", "practice"]
+pin = "none"
+status = "declared"
+declared-at = "the leg's or hook's fields"
+
+[[edge]]
+type = "after"
+inverse = "before"
+from = ["build"]
+to = ["build"]
+pin = "none"
+status = "declared"
+declared-at = "the chain row"
+
+[[edge]]
+type = "supersedes"
+inverse = "superseded-by"
+from = ["any"]
+to = ["any"]
+pin = "tag"
+status = "declared"
+declared-at = "the new node"
+
+[[edge]]
+type = "amends"
+inverse = "amended-by"
+from = ["any"]
+to = ["any"]
+pin = "tag"
+status = "declared"
+declared-at = "the amending node"
+
+[[edge]]
+type = "patches"
+inverse = "patched-by"
+from = ["build"]
+to = ["build", "item"]
+pin = "none"
+status = "declared"
+declared-at = "the patch build's intake"
+
+[[edge]]
+type = "owner"
+inverse = "owns"
+from = ["any"]
+to = ["build", "layer"]
+pin = "none"
+status = "declared"
+declared-at = "the node's declaration"
+
+[[edge]]
+type = "layer"
+inverse = "in-layer"
+from = ["kit"]
+to = ["layer"]
+pin = "none"
+status = "declared"
+declared-at = "the descriptor"
+
+[[edge]]
+type = "cites"
+inverse = "cited-by"
+from = ["any"]
+to = ["any"]
+pin = "none"
+status = "derived"
+declared-at = "derived from the text"

@@ -88,3 +88,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-03T11:17:37Z brief · item PLAY-dOrderedCharter-51 · reason 7a3f27cddb67 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-51-build-brief.md
 
 2026-11-03T12:01:39Z rescope · item add PLAY-dOrderedCharter-63 · reason unit 24's dispatch was refused (run wf_7db2dca6-39a): check-spec-tokens.py's LIVE pattern matches a fenced **Status:** OPEN example inside DEFERRED TOOL-dIndexedDesign-12, so that spec is graded live and its §7 owes the playbook render selftest leg unit 51's guard added; the checker reads a spec's status from its header line, outside fences
+
+2026-11-03T13:12:44Z dispatch · item 6e0f4aad PLAY-dOrderedCharter-24 · reason tools/playbook/edges.toml tools/playbook/edge_grammar.py tools/memory-tree/design_lib.py tools/playbook/README.md tools/playbook/adopt-playbook.sh help/tags.md tools/govkit/usage.toml memory/map/generated/symbols.json memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-24.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-24-ledger.md memory/builds/dOrderedCharter/README.md
+
+2026-11-03T13:13:24Z brief · item PLAY-dOrderedCharter-24 · reason 4f744b3d9aa1 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-24-build-brief.md

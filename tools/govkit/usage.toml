@@ -132,6 +132,12 @@ entry = "{prefix}/playbook/gov_tag.py"
 flags = ["--rebuild", "--gc", "--list-positional", "--fixture", "--plant=", "--set="]
 
 [[usage]]
+id = "script:{prefix}/playbook/edge_grammar.py"
+shape = "verb"
+entry = "{prefix}/playbook/edge_grammar.py"
+flags = ["--list", "--parse=", "--fixture", "--plant="]
+
+[[usage]]
 id = "script:{prefix}/run-gates/measure_legs.py"
 shape = "verb"
 entry = "{prefix}/run-gates/measure_legs.py"

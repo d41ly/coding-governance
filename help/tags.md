@@ -133,6 +133,56 @@ prints `<n> registry rows joined to <n> view builds, <n> rows awaiting PM-5's re
 `DESIGN_*` keys are blank, as in a project that adopted the kit, `check` prints
 `tags: purpose · no chain to read` and grades only the namespace rows.
 
+## Edges: typed relations between tagged things
+
+An edge says how one thing relates to another, by type: `implements`, `tests`, `amends`. The types
+form one closed set, the rows of `tools/playbook/edges.toml`. Each type's inverse is derived from its
+row and never written: declaring `tests=kit.y` gives `` `kit.y` `` its `tested-by` edge.
+
+In a Markdown file an edge is one line at column 0, outside a code fence, one line per type:
+
+```text
+**Edges:** implements=feature.x
+**Edges:** tests=kit.y,kit.z
+```
+
+A target holds no space, comma or bracket. It is a tag (`` `kit.y` ``), a section (`` `doc.hygiene#rules` ``), a
+native id (`PLAY-dOrderedCharter-24`), an id's section (`PLAY-dOrderedCharter-24#goal`), or a tag or
+id pinned to a hash (`kit.y@1a2b3c4d`). The set, as `--list` prints it:
+
+| Type | Inverse | From | To | Pin |
+|---|---|---|---|---|
+| `part-of` | `has-part` | any | any | none |
+| `implements` | `implemented-by` | any | `feature`, `spec` | none |
+| `tests` | `tested-by` | any | any | none |
+| `decides` | `decided-by` | `decision` | any | none |
+| `instructs` | `instructed-by` | `unit` | `selects` | none |
+| `enforces` | `enforced-by` | any | `unit`, `practice` | none |
+| `after` | `before` | `build` | `build` | none |
+| `supersedes` | `superseded-by` | any | any | tag |
+| `amends` | `amended-by` | any | any | tag |
+| `patches` | `patched-by` | `build` | `build`, `item` | none |
+| `owner` | `owns` | any | `build`, `layer` | none |
+| `layer` | `in-layer` | `kit` | `layer` | none |
+| `cites` | `cited-by` | any | any | none, and derived from the text |
+
+`any` is every registered namespace and every native id. `selects` is every namespace whose row in
+`namespaces.toml` has `role = "selects"`, so a selector namespace a later build registers is an
+`instructs` target without a change to `edges.toml`. A word no row registers yet, such as `feature`
+or `item`, admits nothing until its build registers it.
+
+These lines are red: a malformed edge line, every one named in a single refusal; a type the set does
+not hold; a declared inverse or a declared `cites`; a target outside its type's `To`; and a pin on a
+type whose `Pin` is none. Nothing grades an edge's source against `From`, resolves a target to a
+row, or checks a pin's hash yet. No leg runs the edge check yet; it joins the `tags` leg later.
+
+- **List the set:** `python tools/playbook/edge_grammar.py --list` prints each type with its inverse,
+  `From`, `To` and `Pin`, then `edges: 13 types, 12 declared, 1 derived`.
+- **Check a file:** `python tools/playbook/edge_grammar.py --parse memory/guides/BUILD-METHOD.md`
+  prints each edge and each red, then the derived inverses or the red count. It exits 1 on a red.
+- **See it red:** `python tools/playbook/edge_grammar.py --fixture --plant outside-to` checks a planted
+  `layer=kit.x` and exits 1. <!-- usage: script:tools/playbook/edge_grammar.py bdab2d19 -->
+
 ## The three keys
 
 Each is set in `.governance/policy.toml` and read at the landed revision with `policy.py get`.

@@ -235,22 +235,27 @@ echo "PASS — the layer check's plants"
 # PLAY-dOrderedCharter-22's `purpose` arm: the namespace rows' `owner` and `purpose-source`, and the chain
 # registry joined to the fixture design's view; `pending-source` and `new-no-purpose` print their second
 # half's exit on a `rc=` line.
+# run_plant_rows <label> <script>: one `<plant and flags>|<exit>|<must print>|<must not print>` row per stdin
+# line, each run as `<script> --fixture --plant <plant and flags>`; every failed row adds one to `_tf`.
+run_plant_rows() {
+  while IFS='|' read -r _tp _trc _twant _tnot; do
+    [ -n "$_tp" ] || continue
+    # shellcheck disable=SC2086  # the plant field carries its own flags, word-split on purpose
+    _tout=$("$PY_BIN" "$2" --fixture --plant $_tp 2>&1); _tgot=$?
+    case "$_tgot:$_tout" in
+      "$_trc:"*"$_twant"*)
+        case "$_tout" in
+          *"${_tnot:-<none>}"*) _tf=$((_tf+1)); printf 'arm FAIL  %s plant %s — printed %s\n' "$1" "$_tp" "$_tnot" ;;
+          *) printf 'arm ok    %s plant %s\n' "$1" "$_tp" ;;
+        esac ;;
+      *) _tf=$((_tf+1)); printf 'arm FAIL  %s plant %s — wanted rc=%s + %s, got rc=%s\n' "$1" "$_tp" "$_trc" "$_twant" "$_tgot"
+         printf '%s\n' "$_tout" | sed 's/^/      /' ;;
+    esac
+  done
+}
 _tk="--set tags.bare-refs=charter-only --set tags.retired-cites=refuse-new"
 _tf=0
-while IFS='|' read -r _tp _trc _twant _tnot; do
-  [ -n "$_tp" ] || continue
-  # shellcheck disable=SC2086  # the plant field carries its own flags, word-split on purpose
-  _tout=$("$PY_BIN" "$HERE/gov_tag.py" --fixture --plant $_tp 2>&1); _tgot=$?
-  case "$_tgot:$_tout" in
-    "$_trc:"*"$_twant"*)
-      case "$_tout" in
-        *"${_tnot:-<none>}"*) _tf=$((_tf+1)); printf 'arm FAIL  tags plant %s — printed %s\n' "$_tp" "$_tnot" ;;
-        *) printf 'arm ok    tags plant %s\n' "$_tp" ;;
-      esac ;;
-    *) _tf=$((_tf+1)); printf 'arm FAIL  tags plant %s — wanted rc=%s + %s, got rc=%s\n' "$_tp" "$_trc" "$_twant" "$_tgot"
-       printf '%s\n' "$_tout" | sed 's/^/      /' ;;
-  esac
-done <<PLANTS
+run_plant_rows tags "$HERE/gov_tag.py" <<PLANTS
 none $_tk|0|tags: green · 0 red
 rebuild|0|dumps equal
 two-paths|0|incremental rows equal a cold build's
@@ -313,3 +318,36 @@ new-no-purpose $_tk|1|with a purpose: rc=0
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf tag-resolver arm(s) failed"; exit 1; fi
 echo "PASS — the tag resolver's plants"
+
+# THE EDGE GRAMMAR'S ARMS (PLAY-dOrderedCharter-24 §4). Each row runs `edge_grammar.py --fixture` over one
+# plant, the same row shape as the tag resolver's: the two-line block and a fenced line green, each
+# malformed plant naming both its bad lines in one refusal, the closed set's reds, and a selector a fixture
+# registry adds admitted with `edges.toml` unchanged.
+_tf=0
+run_plant_rows edges "$HERE/edge_grammar.py" <<'PLANTS'
+good-block|0|edges: site.md:6 · tests · kit.y, kit.z
+good-block|0|edges: inverse · feature.x implemented-by site.md:5
+good-block|0|edges: inverse · kit.z tested-by site.md:6
+good-block|0|edges: green · 2 edge(s)
+fenced-edge|0|edges: green · 0 edge(s)|site.md:4
+space-target|1|site.md:1: `**Edges:** tests=kit.y kit.z` holds the target 'kit.y kit.z', and a target holds no space; the grammar is
+space-target|1|site.md:3: `**Edges:** tests=kit.y, kit.z` holds the target ' kit.z'
+comma-in-pair|1|site.md:1: `**Edges:** tests,implements=kit.y` names the type 'tests,implements'
+comma-in-pair|1|site.md:3: `**Edges:** tests=kit.y,,kit.z` holds an empty target
+bracket-target|1|site.md:1: `**Edges:** tests=[kit.y]` holds the target '[kit.y]', and a target holds no bracket
+bracket-target|1|site.md:3: `**Edges:** tests=kit.y,kit.z]` holds the target 'kit.z]'
+two-types-one-line|1|site.md:1: `**Edges:** tests=kit.y tests=kit.z` carries a second `type=` pair
+two-types-one-line|1|site.md:3: `**Edges:** implements=kit.y · tests=kit.z` carries a second `type=` pair
+no-equals|1|site.md:1: `**Edges:** tests kit.y` holds no `type=` pair
+no-equals|1|site.md: 2 edge line(s) refused
+unregistered-type|1|edges: site.md:1 · frobs · is no type of edges.toml's closed set
+declared-inverse|1|edges: site.md:1 · implemented-by · is the inverse of implements
+declared-cites|1|edges: site.md:1 · cites · is derived
+outside-to|1|edges: site.md:1 · layer=kit.x · is outside layer's to [layer]
+pin-on-none|1|part-of=kit.x@1a2b3c4d · pins a target, and part-of's row says pin = "none"
+selector-registered|0|edges: green · 1 edge(s)
+selector-registered|0|edges: edges.toml unchanged
+selector-describes|1|edges: site.md:1 · instructs=feature.x · is outside instructs's to [selects]
+PLANTS
+if [ "$_tf" != 0 ]; then echo "FAIL — $_tf edge-grammar arm(s) failed"; exit 1; fi
+echo "PASS — the edge grammar's plants"

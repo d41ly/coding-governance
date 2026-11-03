@@ -265,3 +265,21 @@ line. A source the tree does not hold yet is printed `pending` and never graded.
 the design (`DESIGN_RECORD`, `DESIGN_BASELINE`, `DESIGN_VIEW`, `DESIGN_NODES`), the chain registry's
 slugs are joined both ways with the design view's builds, and a row with no `purpose` is legal only for a
 build the baseline already names; with those keys blank `check` prints that there is no chain to read.
+
+## Edges, their registry and their parser
+
+PLAY-dOrderedCharter-24. `edges.toml` is the edge-type registry: one `[[edge]]` row per type of one
+closed set, with `type`, `inverse`, `from`, `to`, `pin` (`none`, `tag` or `clause`), `status`
+(`declared` or `derived`) and `declared-at`, read by `edge_grammar.read_edge_types`. It holds P33's
+twelve declared types and the derived `cites`; an inverse is derived from its row by
+`derive_inverse_edges`, never declared. A row's `to` names namespace words, `any` (every registered
+namespace and every native id) or `selects` (every namespace whose `namespaces.toml` row has
+`role = "selects"`), so a later selector namespace needs no edit here; a word not registered yet admits
+nothing. At a Markdown site an edge is a column-0 line `**Edges:** type=target[,target]`, one per type;
+`parse_edge_lines` walks memory-tree's `tree_lib.unfenced_lines` and names every malformed line in one
+refusal, and `parse_edge_target` classifies a target as `tag`, `pinned-tag`, `section`, `id`, `id#tag`
+or `pinned-id`. `check_edges` reds an unregistered type, a declared inverse or `cites`, a target outside
+its row's `to` and a pin on a `pin = "none"` row. `edge_grammar.py --list`, `--parse <file>` and
+`--fixture --plant <case>` are its CLI, and the selftest runs every plant. A pin's hash is
+`design_lib.derive_pin_hash`, memory-tree's one normaliser, which `derive_clause_hash` calls. No leg runs
+the check yet, and nothing grades an edge's `from` or resolves a target: PLAY-dOrderedCharter-28's.
