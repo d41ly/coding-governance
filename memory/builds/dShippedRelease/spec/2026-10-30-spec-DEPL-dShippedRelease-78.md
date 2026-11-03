@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-78 — the round-1 spec audit's 77 minors, batched: the Readers of what unit 10 retires, the legs and rows each unit owes, honest failure states, and the observations that read the wrong thing
 
-**Status:** DEFERRED · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 32 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base f4597719 · streams deployer · order 32 · advances DEPL-dShippedRelease-32
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,11 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-30-build-DEPL-dShippedRelease-1-agent-ledger.md](../build/2026-10-30-build-DEPL-dShippedRelease-1-agent-ledger.md) | journal | DEPL-dShippedRelease-1 DEPL-dShippedRelease-2 DEPL-dShippedRelease-3 DEPL-dShippedRelease-4 DEPL-dShippedRelease-5 DEPL-dShippedRelease-6 DEPL-dShippedRelease-7 DEPL-dShippedRelease-8 DEPL-dShippedRelease-9 DEPL-dShippedRelease-10 DEPL-dShippedRelease-11 DEPL-dShippedRelease-12 DEPL-dShippedRelease-13 DEPL-dShippedRelease-14 DEPL-dShippedRelease-15 DEPL-dShippedRelease-16 DEPL-dShippedRelease-17 DEPL-dShippedRelease-18 DEPL-dShippedRelease-19 DEPL-dShippedRelease-20 DEPL-dShippedRelease-21 DEPL-dShippedRelease-22 DEPL-dShippedRelease-23 DEPL-dShippedRelease-24 DEPL-dShippedRelease-25 DEPL-dShippedRelease-26 DEPL-dShippedRelease-27 DEPL-dShippedRelease-28 DEPL-dShippedRelease-29 DEPL-dShippedRelease-30 DEPL-dShippedRelease-31 DEPL-dShippedRelease-49 DEPL-dShippedRelease-50 DEPL-dShippedRelease-51 DEPL-dShippedRelease-52 DEPL-dShippedRelease-53 DEPL-dShippedRelease-54 DEPL-dShippedRelease-55 DEPL-dShippedRelease-56 DEPL-dShippedRelease-57 DEPL-dShippedRelease-58 DEPL-dShippedRelease-59 DEPL-dShippedRelease-60 DEPL-dShippedRelease-61 DEPL-dShippedRelease-62 DEPL-dShippedRelease-63 DEPL-dShippedRelease-64 DEPL-dShippedRelease-65 DEPL-dShippedRelease-66 DEPL-dShippedRelease-67 DEPL-dShippedRelease-68 DEPL-dShippedRelease-69 DEPL-dShippedRelease-70 DEPL-dShippedRelease-71 DEPL-dShippedRelease-72 DEPL-dShippedRelease-73 DEPL-dShippedRelease-74 DEPL-dShippedRelease-75 DEPL-dShippedRelease-76 DEPL-dShippedRelease-77 DEPL-dShippedRelease-79 DEPL-dShippedRelease-80 DEPL-dShippedRelease-81 DEPL-dShippedRelease-82 DEPL-dShippedRelease-83 DEPL-dShippedRelease-84 DEPL-dShippedRelease-85 DEPL-dShippedRelease-86 DEPL-dShippedRelease-87 DEPL-dShippedRelease-88 DEPL-dShippedRelease-89 DEPL-dShippedRelease-90 DEPL-dShippedRelease-91 DEPL-dShippedRelease-92 DEPL-dShippedRelease-93 DEPL-dShippedRelease-94 DEPL-dShippedRelease-95 DEPL-dShippedRelease-96 DEPL-dShippedRelease-97 DEPL-dShippedRelease-98 DEPL-dShippedRelease-99 DEPL-dShippedRelease-100 DEPL-dShippedRelease-101 DEPL-dShippedRelease-102 DEPL-dShippedRelease-103 DEPL-dShippedRelease-104 DEPL-dShippedRelease-105 DEPL-dShippedRelease-106 DEPL-dShippedRelease-108 DEPL-dShippedRelease-109 DEPL-dShippedRelease-110 DEPL-dShippedRelease-111 DEPL-dShippedRelease-112 DEPL-dShippedRelease-113 DEPL-dShippedRelease-114 DEPL-dShippedRelease-115 DEPL-dShippedRelease-116 DEPL-dShippedRelease-117 DEPL-dShippedRelease-118 DEPL-dShippedRelease-119 DEPL-dShippedRelease-120 DEPL-dShippedRelease-121 DEPL-dShippedRelease-122 DEPL-dShippedRelease-123 DEPL-dShippedRelease-124 DEPL-dShippedRelease-125 DEPL-dShippedRelease-126 DEPL-dShippedRelease-127 DEPL-dShippedRelease-128 DEPL-dShippedRelease-129 DEPL-dShippedRelease-130 DEPL-dShippedRelease-131 DEPL-dShippedRelease-132 DEPL-dShippedRelease-133 DEPL-dShippedRelease-134 DEPL-dShippedRelease-135 DEPL-dShippedRelease-136 DEPL-dShippedRelease-137 DEPL-dShippedRelease-138 DEPL-dShippedRelease-140 DEPL-dShippedRelease-141 DEPL-dShippedRelease-142 DEPL-dShippedRelease-143 DEPL-dShippedRelease-144 DEPL-dShippedRelease-145 |
+| [2026-11-03-build-DEPL-dShippedRelease-78-deviation-781.md](../build/2026-11-03-build-DEPL-dShippedRelease-78-deviation-781.md) | deviation | — |
+| [2026-11-03-build-DEPL-dShippedRelease-78-lease-epoch-returns.md](../build/2026-11-03-build-DEPL-dShippedRelease-78-lease-epoch-returns.md) | research | — |
+| [2026-11-03-prompt-DEPL-dShippedRelease-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-DEPL-dShippedRelease-1-parents-crosscheck.md) | research | DEPL-dShippedRelease-1 DEPL-dShippedRelease-4 DEPL-dShippedRelease-5 DEPL-dShippedRelease-6 DEPL-dShippedRelease-11 DEPL-dShippedRelease-12 DEPL-dShippedRelease-15 DEPL-dShippedRelease-30 DEPL-dShippedRelease-58 DEPL-dShippedRelease-68 DEPL-dShippedRelease-69 DEPL-dShippedRelease-94 DEPL-dShippedRelease-95 DEPL-dShippedRelease-123 DEPL-dShippedRelease-125 DEPL-dShippedRelease-129 DEPL-dShippedRelease-138 DEPL-dShippedRelease-144 |
+| [2026-11-03-prompt-DEPL-dShippedRelease-78-1-spec-writer.md](../prompts/2026-11-03-prompt-DEPL-dShippedRelease-78-1-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-DEPL-dShippedRelease-78-lease-epoch-surface.md](../prompts/2026-11-03-prompt-DEPL-dShippedRelease-78-lease-epoch-surface.md) | research | — |
 | [2026-10-30-review-DEPL-dShippedRelease-49-spec-audit-round1.md](../reviews/2026-10-30-review-DEPL-dShippedRelease-49-spec-audit-round1.md) | spec-audit | DEPL-dShippedRelease-65 DEPL-dShippedRelease-66 DEPL-dShippedRelease-49 DEPL-dShippedRelease-50 DEPL-dShippedRelease-70 DEPL-dShippedRelease-71 DEPL-dShippedRelease-72 DEPL-dShippedRelease-53 DEPL-dShippedRelease-56 DEPL-dShippedRelease-58 DEPL-dShippedRelease-59 DEPL-dShippedRelease-68 DEPL-dShippedRelease-69 DEPL-dShippedRelease-51 DEPL-dShippedRelease-52 DEPL-dShippedRelease-60 DEPL-dShippedRelease-73 DEPL-dShippedRelease-55 DEPL-dShippedRelease-77 DEPL-dShippedRelease-61 DEPL-dShippedRelease-62 DEPL-dShippedRelease-63 DEPL-dShippedRelease-64 DEPL-dShippedRelease-76 DEPL-dShippedRelease-75 DEPL-dShippedRelease-67 DEPL-dShippedRelease-54 DEPL-dShippedRelease-57 DEPL-dShippedRelease-74 |
 
 <!-- /gen:spec-records -->
@@ -172,9 +177,12 @@ M46 89; M47 90; M48 93; M49 95; M50 97; M51 99; M52 100; M53 102; M54 103; M55 1
 - **S58** — id 93, M48, landing on unit 25. An empty local tag list consults the remote when one
   resolves and `GOVKIT_NO_REMOTE_PROBE` is unset; tags there refuse naming the fetch, and a dead
   remote prints that the list was unverified. Observed by AC48.
-- **S59** — id 95, M49, landing on unit 15. Exit 3 re-reads the lease epoch: still the holder
-  re-picks under a new id or raises an item, and any engine exit outside the table is unreachable.
-  Observed by AC49.
+- **S59** — id 95, M49, landing on unit 15. Exit 3 re-reads the epoch of unit 15 S6's run lease by
+  TOOL-dPlacedRequest-34 S22's read-only `unattended.sh --lease status run release <E>`, its sixth TAB
+  field: the same field of the same verb DEPL-dShippedRelease-138 S48's `read_lease_epoch` reads for
+  `build <slug>` alone, and S48 is not widened. `lease — none · <tail>` reads as not the holder. Still
+  the holder re-picks under a new id or raises an item, and any engine exit outside the table is
+  unreachable. Observed by AC49.
 - **S60** — id 97, M50, landing on units 16 and 29. The offer computes the composition report in
   gov's process over the target's tree as data, and the order carries it. Observed by AC50.
 - **S61** — id 99, M51, landing on unit 26. The row whose `uname` names this host is the running
@@ -542,6 +550,7 @@ New arm: tools/integrations/release_fixture.py · covers AC16 AC49 AC60 · the p
 - rev-1 · 2026-10-30 · initial draft, promoted from review the 77 minors, one scope item per raw id of the round-1 spec audit.
 - rev-2 · 2026-11-01 · §3 · the Edges gain the mirror of each edge the round-2 spec audit's promoted units declare toward this unit (units 106); no scope, design or criterion moved.
 - rev-3 · 2026-11-01 · §3 · the Edges gain the mirror of each edge the round-5 spec audit's promoted units declare toward this unit (units 144); no scope, design or criterion moved.
+- rev-4 · 2026-11-03 · §2 S59 · the exit-3 re-read names its surface, TOOL-dPlacedRequest-34 S22's `--lease status run release <E>` and its sixth TAB field, the field DEPL-dShippedRelease-138 S48 reads for the build lease; S48 is not widened and the exit-3 behaviour does not change.
 
 ## 10. Reuse audit
 

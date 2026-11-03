@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-2 — the one `record` write door, `gov_record.py new <kind>`, grown from the record factory: minting under a claim or lease, idempotent and content-addressed, rendering and refusing
 
-**Status:** DEFERRED · rev-7 · 2026-11-02 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-8 · 2026-11-03 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0213@bfd195a1 whole
 
@@ -17,6 +17,8 @@
 | [2026-10-26-build-TOOL-dTotalRecall-2-deviation-23.md](../build/2026-10-26-build-TOOL-dTotalRecall-2-deviation-23.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md) | research | TOOL-dTotalRecall-36 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
 | [2026-11-02-build-TOOL-dTotalRecall-2-deviation-24.md](../build/2026-11-02-build-TOOL-dTotalRecall-2-deviation-24.md) | deviation | — |
+| [2026-11-03-build-TOOL-dTotalRecall-2-deviation-25.md](../build/2026-11-03-build-TOOL-dTotalRecall-2-deviation-25.md) | deviation | — |
+| [2026-11-03-build-TOOL-dTotalRecall-2-owner-fork-returns.md](../build/2026-11-03-build-TOOL-dTotalRecall-2-owner-fork-returns.md) | research | TOOL-dTotalRecall-1 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
@@ -24,6 +26,8 @@
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md) | research | TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
 | [2026-11-02-prompt-TOOL-dTotalRecall-2-1-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dTotalRecall-2-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dTotalRecall-2-owner-fork.md](../prompts/2026-11-02-prompt-TOOL-dTotalRecall-2-owner-fork.md) | research | — |
+| [2026-11-03-prompt-TOOL-dTotalRecall-2-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dTotalRecall-2-1-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dTotalRecall-2-owner-fork.md](../prompts/2026-11-03-prompt-TOOL-dTotalRecall-2-owner-fork.md) | research | TOOL-dTotalRecall-1 |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
 
 <!-- /gen:spec-records -->
@@ -127,8 +131,8 @@ P30). Today three scaffolds write records (`gen_build_index.py --new-build` and 
   adapter the door reads `leases.offline` through
 - **consumes-from** external — PLAY-dOrderedCharter-7 S7/S8's `tools/memory-tree/build_records.py`,
   its renderer, `read_record` and `new` verb; TOOL-dPlacedRequest-1's build lease
-  `refs/gov/leases/<slug>/build`, read from the remote by `read_claims`, and the read-only holder verb over it that §8 F6's pick asks
-  dPlacedRequest for
+  `refs/gov/leases/<slug>/build`, read from the remote by `read_claims`, and its holder read through
+  TOOL-dPlacedRequest-34 S22's read-only `--lease status build <slug>`, §8 F6's pick
 - **hands-off** `TOOL-dTotalRecall-43` — `gov_record.py`, its writer refusal, its hand-row rewrite, its value refusal and its mint, which that unit changes for the round-1 audit's ids 5, 8, 9, 50 and 60
 - **hands-off** `TOOL-dTotalRecall-79` — `gov_record.py new deviation`, the door that unit writes its deviation records through (the round-1 audit of units 71 to 76, id 1)
 - **hands-off** `TOOL-dTotalRecall-80` — `gov_record.py new deviation`, the door that unit writes its deviation records through (the round-1 audit of units 71 to 76, id 16)
@@ -190,8 +194,9 @@ mints each placeholder it holds; a grammar holding none names a given id.
 | none (a given id, such as a spec's) | the caller's id, minted by its session | the build's lease or claim |
 
 The build's authority, in order: the lease `refs/gov/leases/<slug>/build` held by this session
-(TOOL-dPlacedRequest-1), its holder read through the read-only holder verb §8 F6 (a) asks dPlacedRequest for, which prints
-the lease's `fleet-tag`, `session`, `lease`-mode class and `epoch`; else the
+(TOOL-dPlacedRequest-1), its holder read through TOOL-dPlacedRequest-34 S22's read-only
+`--lease status build <slug>`, §8 F6's pick, which prints the lease's `fleet-tag`, `session`,
+`lease`-mode class and `epoch`, the class being the column §8 F6 asks for; else the
 slug claim `refs/gov/claims/<slug>` whose `claimant:` is this session's; a lease or claim held by
 another refuses, naming the holder. `unattended.sh --claims` cannot serve: it prints fields 1 to 5,
 no session among them (TOOL-dPlacedRequest-1:206-208, :396-397), while a lease is `mine` only when
@@ -345,16 +350,23 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC7 · its `--selftest` 
   `--claims`, which breaks that unit's AC10 and the shape TOOL-dDeclaredLoop-8 S7 extends; (c) the
   door parses the lease commit's `session:` key itself, a second parser of the record its S2 keeps in
   `read_claims`; (d) `--claims`' node column alone, so two sessions of one node both mint under one
-  lease. Recommendation: (a). RESOLVED (owner, 2026-11-02): (a) one read-only holder verb over
-  `read_claims`, widened by `epoch`. The field serves TOOL-dWellOiledMachine-6 §8 F4, resolved by the
-  owner on 2026-10-29 to a read-only `epoch` verb over `read_claims` that names this verb as its best
-  home. One ask, filed once by this build's run, which builds before dWellOiledMachine, serves this
-  unit's S2 and S9, TOOL-dWellOiledMachine-58 S4 (c) and S5, TOOL-dWellOiledMachine-41 S2's driver
+  lease. Recommendation: (a). RESOLVED (owner, 2026-11-03): (a), served by TOOL-dPlacedRequest-34
+  S22's `--lease status`, narrowing the owner's 2026-11-02 pick of (a) as one new read-only holder
+  verb over `read_claims` widened by `epoch`, whose `epoch` served TOOL-dWellOiledMachine-6 §8 F4,
+  resolved by the owner on 2026-10-29 to a read-only `epoch` verb over `read_claims` naming this
+  verb as its best home. The holder verb is S22's `--lease status build <slug>`, read-only, printing
+  one TAB line `<tail> <fleet tag> <session> <status> <verdict> <epoch>`, or `lease — none · <tail>`
+  (TOOL-dPlacedRequest-34:106-109, AC22 at :468-470): it carries `fleet-tag`, `session` and `epoch`,
+  and lacks the class. The ask narrows to one column, a seventh TAB field holding the `lease`-mode
+  class (`mine` or foreign, TOOL-dPlacedRequest-1:90-92), appended after `<epoch>`; the six-field
+  prefix stays, since `read_lease_epoch` (DEPL-dShippedRelease-138 S48) reads the sixth field. One
+  ask, filed once by this build's run, which builds before dWellOiledMachine, serves this unit's S6
+  and §4 "Minting", TOOL-dWellOiledMachine-58 S4 (c) and S5, TOOL-dWellOiledMachine-41 S2's driver
   check and TOOL-dWellOiledMachine-6 S6 and S7. The row the build run files in dPlacedRequest's
-  `BACKLOG.md`: "a read-only verb over `read_claims` printing a lease's `fleet-tag`, `session`,
-  `lease`-mode class (`mine` or foreign) and `epoch`, the five-field `--claims` shape kept". The
-  pass builds the lease rung of §4 "Minting" against that verb and parses no lease commit itself.
-  widens: the verb's `epoch` field · relaxes: none
+  `BACKLOG.md`: "a seventh TAB field on TOOL-dPlacedRequest-34 S22's `--lease status`, the lease's
+  `lease`-mode class (`mine` or foreign), the six-field prefix kept". The pass builds the lease rung
+  of §4 "Minting" against `--lease status` and parses no lease commit itself.
+  widens: the `--lease status` class column · relaxes: none
 
 ## 9. Revision log
 
@@ -375,6 +387,11 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC7 · its `--selftest` 
 - rev-7 · 2026-11-02 · §3 the external edge · §4 "Minting" · §8 F6 · F6 resolved by the owner to (a),
   per the brief `2026-11-02-prompt-TOOL-dTotalRecall-2-1-spec-writer`: the holder verb is the picked
   route, widened by `epoch` for TOOL-dWellOiledMachine-6 §8 F4, and the fork holds the ask's row.
+- rev-8 · 2026-11-03 · §3 the external edge · §4 "Minting" · §8 F6 · the owner re-picked F6 on
+  2026-11-03, per the brief `2026-11-03-prompt-TOOL-dTotalRecall-2-1-spec-writer`: the holder is read
+  through TOOL-dPlacedRequest-34 S22's `--lease status build <slug>`, the ask narrows to a seventh TAB
+  field holding the `lease`-mode class, the six-field prefix kept, and the ask serves S6 and §4
+  "Minting", not S2 and S9.
 
 ## 10. Reuse audit
 
