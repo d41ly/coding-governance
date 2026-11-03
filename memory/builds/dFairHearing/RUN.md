@@ -125,3 +125,9 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-03T09:32:02Z dispatch · item 3b956191 TOOL-dFairHearing-21 · reason tools/workflows/replay_scorer.py tools/workflows/README.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-21.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dFairHearing/README.md memory/map/generated/symbols.json
 
 2026-11-03T09:32:38Z brief · item TOOL-dFairHearing-21 · reason 24b4894ce36a memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-21-build-brief.md
+
+2026-11-03T09:57:17Z dispatch · item a882a5e6 TOOL-dFairHearing-15 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/README.md tools/workflows/tier2-review.test.sh coding-governance-agents.template.md AGENTS.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-15.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dFairHearing/README.md memory/map/generated/symbols.json
+
+2026-11-03T09:57:28Z brief · item TOOL-dFairHearing-15 · reason 9f818e0caae2 memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-15-build-brief.md
+
+2026-11-03T10:18:32Z dispatch · item a882a5e6 TOOL-dFairHearing-15 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/README.md tools/workflows/tier2-review.test.sh coding-governance-agents.template.md AGENTS.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-15.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dFairHearing/README.md memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md

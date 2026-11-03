@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-15 — the review's bug-class checklist, selected by the pinned range and handed by the harness itself
 
-**Status:** INPROGRESS · rev-6 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 16 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-6 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 16 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0082@8ac81dad whole
 

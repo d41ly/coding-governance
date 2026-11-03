@@ -153,7 +153,8 @@ function readOutputTokens() {
 //                                         // already a lens, one no row offers, a default the literal lacks, or one
 //                                         // default named twice; logged, in RUN INTEGRITY, and in the key when set
 //   checklist: "<preamble>\n- <item>\n  <continuation>" | ["<item>", ...], // the project's recurring
-//                                         // bug classes, each item swept by exactly one lens; absent -> a WARNING.
+//                                         // bug classes, each item swept by exactly one lens; absent on a diff review ->
+//                                         // the harness acquires it (`resume:checklist`), on a spec audit -> a WARNING.
 //                                         // The STRING form may carry the by-design block the checker prints
 //                                         // after its items (`# by design — <n> invariant(s) this selection
 //                                         // touches`, then `- ` lines): it is cut out before the items are
@@ -685,9 +686,10 @@ if (!checkRepoPath(legManifest))
 const specsOverlap = isSpec ? SPECS.find((p) => subjects.some((x) => x && x.path === p)) : undefined
 if (specsOverlap !== undefined)
   throw new Error('tier2-review: `specs` names ' + JSON.stringify(specsOverlap) + ', which is also a subject of this spec audit; a document cannot be both under audit and sibling context to it.')
-// TOOL-aSightedSkeptic-4 S1 - `checklist`, the project's recurring bug classes. The harness produces
-// none and names no checker (the caller here passes `gotchas.py --for-diff` stdout). Parsed before
-// the base-shape ladder and the first agent, so a bad value refuses in milliseconds. A non-blank
+// TOOL-aSightedSkeptic-4 S1 - `checklist`, the project's recurring bug classes. A caller's value wins;
+// on a diff review with none the harness acquires `gotchas.py --for-diff` stdout itself (TOOL-dFairHearing-15,
+// at the split below). Parsed after every other refusal and before the first agent a caller's value leaves
+// to spawn, so a bad value refuses in milliseconds. A non-blank
 // string with no `- ` item line REFUSES rather than becoming one item: one item lands on one lens,
 // which is the whole-checklist-on-one-agent defect this argument exists to remove (spec F2).
 function parseChecklist(v) {
@@ -748,27 +750,6 @@ function extractByDesign(v) {
       'as a whole one; pass the checker\'s stdout whole.')
   return { remainder: lines.slice(0, at).concat(lines.slice(end)).join('\n'), entries: entries }
 }
-const byDesignBlock = extractByDesign(a.checklist)
-const checklist = parseChecklist(byDesignBlock.remainder)
-const CHECKLIST_ITEMS = checklist.items
-// `byDesign` is the caller's KNOWN AND TRACKED issues THEN the block's INTENDED BEHAVIOUR, each under its
-// own label, so neither displaces the other: a caller's tracked list never erases the invariants, and a
-// block can never override what a caller said. `byDesignSources` is what the log and RUN INTEGRITY say.
-const BY_DESIGN_ENTRIES = byDesignBlock.entries || []
-const byDesignParts = []
-const byDesignSources = []
-if (a.byDesign) {
-  byDesignParts.push('Known and tracked — do not re-report:\n' + a.byDesign)
-  byDesignSources.push('the caller\'s byDesign')
-}
-if (BY_DESIGN_ENTRIES.length) {
-  byDesignParts.push('Intended behaviour — invariants this change touches:\n' + BY_DESIGN_ENTRIES.join('\n'))
-  byDesignSources.push(BY_DESIGN_ENTRIES.length + ' invariant(s) from the checklist\'s by-design block')
-}
-const byDesign = byDesignParts.length ? byDesignParts.join('\n') : 'none supplied'
-if (!byDesignSources.length)
-  byDesignSources.push('none supplied — no caller byDesign and ' + (byDesignBlock.entries ? 'a block of 0' : 'no block'))
-for (const s of byDesignSources) log('by-design: ' + s)
 const baseLooksPinned = isSpec || PINNED_SHA.test(String(base))
 if (!baseLooksPinned) {
   const why =
@@ -1184,6 +1165,71 @@ const unreadNotes = notedLenses.filter((k) => skippedLenses.indexOf(k) !== -1 ||
 const readNotes = notedLenses.filter((k) => unreadNotes.indexOf(k) === -1)
 if (unreadNotes.length)
   log(`WARNING: lens notes were supplied for skipped lens(es), unread: ${unreadNotes.join(', ')}`)
+// ---- TOOL-dFairHearing-15 S1-S3 — THE CHECKLIST AGENT, the first spawn of a diff review given no `checklist` ----
+// AFTER every refusal above, so a refused call still spawns nothing, and BEFORE the input print and the
+// resume probe, because the parsed checklist joins the review key and the probe's directory name carries
+// that key. The checker is found at run time over the nested and the flat spelling, never guessed; the
+// stdout takes the path a caller's string takes, `extractByDesign` then `parseChecklist` with their
+// refusals, so the checker's order is the C<n> order. A caller's `checklist` wins and nothing spawns;
+// the spec kind never acquires, since `unattended-build`'s resolver already hands it a `--for-paths` one.
+// WHAT THIS DOES NOT CHECK: that the agent ran the command it was told to and returned stdout unaltered;
+// the by-design head-count refusal catches a truncated block, as the resolver's comment says of its own.
+phase('Resume')
+let acquiredChecklist = null
+let checklistWhy = null
+if (!isSpec && a.checklist === undefined) {
+  const res = await agent(
+    `You are the CHECKLIST AGENT of a Tier-2 review. You run one command and report its output. You judge ` +
+      `nothing, review nothing and write nothing.\n\n` +
+      `1. Run \`git -C ${repo} ls-files --error-unmatch tools/memory-tree/gotchas.py\`; when it fails, run ` +
+      `\`git -C ${repo} ls-files --error-unmatch tools/gotchas.py\`. The checker is the first of the two that is ` +
+      `tracked; when neither is, return NO checklist and checklistError \`no checker tracked\`.\n` +
+      `2. In ${repo}, run \`python <checker> --for-diff ${base}..${head}\` with a 120-second timeout.\n` +
+      `3. Return its stdout VERBATIM as checklist. Return NO checklist and a checklistError naming why instead when ` +
+      `it exits non-zero (name the code), it times out, or its stdout carries no line starting \`- \` (write ` +
+      `\`no bug class selected\`).\n` +
+      `Return JSON {checklist} or {checklistError}.`,
+    Object.assign({
+      label: renderAgentLabel(reviewScope, 'resume:checklist'),
+      phase: 'Resume',
+      // The resolver's three optional fields, copied (`unattended-build`'s SUBJECTS_SCHEMA): none required, so
+      // an agent that cannot produce a checklist still validates and its reason is read below.
+      schema: { type: 'object', properties: { checklist: { type: 'string' }, checklistPaths: { type: 'array', items: { type: 'string' } }, checklistError: { type: 'string' } } },
+    }, probeOpts), // the probe's stage and type, as the resume probe takes them
+  )
+  // The resolver's `- ` item rule: a checklist reaches the parse only when it carries an item, and every
+  // other outcome is a reason, announced below and never passed as an empty checklist.
+  if (res && typeof res.checklist === 'string' && /^- /m.test(res.checklist)) acquiredChecklist = res.checklist
+  else checklistWhy = !res ? 'the checklist agent died'
+    : typeof res.checklist === 'string' && res.checklist.trim() ? 'no bug class selected'
+      : (typeof res.checklistError === 'string' && res.checklistError) || 'the checklist agent returned neither `checklist` nor `checklistError`'
+  log(acquiredChecklist !== null ? `checklist from --for-diff ${base}..${head}`
+    : `WARNING: no checklist was acquired — ${checklistWhy}; no lens sweeps the project's recurring bug classes`)
+}
+const byDesignBlock = extractByDesign(acquiredChecklist !== null ? acquiredChecklist : a.checklist)
+const checklist = parseChecklist(byDesignBlock.remainder)
+const CHECKLIST_ITEMS = checklist.items
+// `byDesign` is the caller's KNOWN AND TRACKED issues THEN the block's INTENDED BEHAVIOUR, each under its
+// own label, so neither displaces the other: a caller's tracked list never erases the invariants, and a
+// block can never override what a caller said. `byDesignSources` is what the log and RUN INTEGRITY say.
+const BY_DESIGN_ENTRIES = byDesignBlock.entries || []
+const byDesignParts = []
+const byDesignSources = []
+if (a.byDesign) {
+  byDesignParts.push('Known and tracked — do not re-report:\n' + a.byDesign)
+  byDesignSources.push('the caller\'s byDesign')
+}
+if (BY_DESIGN_ENTRIES.length) {
+  byDesignParts.push('Intended behaviour — invariants this change touches:\n' + BY_DESIGN_ENTRIES.join('\n'))
+  byDesignSources.push(BY_DESIGN_ENTRIES.length + ' invariant(s) from the checklist\'s by-design block')
+}
+const byDesign = byDesignParts.length ? byDesignParts.join('\n') : 'none supplied'
+if (!byDesignSources.length)
+  byDesignSources.push('none supplied — no caller byDesign and ' + (byDesignBlock.entries ? 'a block of 0' : 'no block'))
+for (const s of byDesignSources) log('by-design: ' + s)
+// What RUN INTEGRITY's `Checklist:` line says where nothing was swept, worded per cause.
+const checklistAbsence = checklistWhy !== null ? 'not acquired: ' + checklistWhy
+  : acquiredChecklist !== null ? 'acquired with no item' : a.checklist === undefined ? 'absent' : 'supplied with no item'
 // TOOL-aSightedSkeptic-4 S2-S6 - THE SPLIT. Item n goes to keys[(n - 1) % K], so every item is in
 // exactly one share and the split is a pure function of the items and the keys: a reused lens file
 // (S7) held the share this run would hand it. Round-robin, not contiguous `chunk`: a contiguous split
@@ -1218,9 +1264,10 @@ for (const k of runningLensKeys) {
 if (CHECKLIST_ITEMS.length)
   log(`checklist: ${CHECKLIST_ITEMS.length} item(s) over ${lensesRunning} lens(es), each swept by exactly one — ` +
     runningLensKeys.map((k) => k + ' ' + (checklistShares[k].length ? checklistShares[k].map((x) => 'C' + x.n).join(' ') : 'none')).join('; '))
-else if (a.checklist === undefined)
+// A reason the checklist agent gave was announced where it returned, so it is not announced twice.
+else if (checklistAbsence === 'absent')
   log('WARNING: no `checklist` was supplied — no lens sweeps the project\'s recurring bug classes; pass the caller\'s checklist output as `checklist`')
-else log('WARNING: `checklist` was supplied with no item — no lens sweeps the project\'s recurring bug classes')
+else if (checklistWhy === null) log(`WARNING: \`checklist\` was ${checklistAbsence} — no lens sweeps the project's recurring bug classes`)
 
 // ---- TOOL-dDerivedDocket-29 S2/S3 — THE RESUME PROBE, one agent, before the Find phase ----------
 // WHY ONE AGENT. The script has no filesystem, so something with one has to read the key directory.
@@ -1298,7 +1345,7 @@ function renderStageShape(at, counts, agents) {
   return renderShapeLine(Object.assign({ kind: kind, round: round, intensity: intensity, at: at, agents: agents,
     outTokens: tokensAtStart === null || now === null ? null : now - tokensAtStart }, counts))
 }
-phase('Resume')
+// `phase('Resume')` opened above the checklist agent (TOOL-dFairHearing-15 S1).
 const probe = await agent(
   `You are the RESUME PROBE of a Tier-2 review. You read files and report them. You judge nothing, ` +
     `review nothing and write nothing.\n\n` +
@@ -2263,9 +2310,11 @@ const synth = await agent(
         : `Intent: NEITHER \`specs\` nor \`context\` was supplied${isSpec ? '' : ', so the lenses had only the range\'s commit messages'} - the report must say so.\n`) +
     // TOOL-aSightedSkeptic-4 S4/S5 - which lens held which share, or that nothing was swept.
     (CHECKLIST_ITEMS.length
-      ? `Checklist: ${CHECKLIST_ITEMS.length} item(s), each assigned to exactly one of ${lensesRunning} lens(es): ` +
+      ? `Checklist: ${CHECKLIST_ITEMS.length} item(s)${acquiredChecklist !== null ? `, acquired by the harness from --for-diff ${base}..${head}` : ''}, ` +
+        `each assigned to exactly one of ${lensesRunning} lens(es): ` +
         runningLensKeys.map((k) => `${k} ${checklistShares[k].length}`).join(', ') + `.\n`
-      : `Checklist: NONE swept — ${a.checklist === undefined ? 'absent' : 'supplied with no item'}; a zero count is not ` +
+      // TOOL-dFairHearing-15 S3 - a checklist the agent did not hand over is named by its reason, never as absent.
+      : `Checklist: NONE swept — ${checklistAbsence}; a zero count is not ` +
         `evidence the project's recurring bug classes are absent.\n`) +
     // TOOL-aGraftedHelix-3 S8 - where the by-design list came from, in the words the log used.
     `By design: ${byDesignSources.join('; ')}.\n` +

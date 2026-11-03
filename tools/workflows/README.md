@@ -258,9 +258,18 @@ exists; the lens that reads it reports a missing one. A run given neither `specs
 `WARNING:`, and every report's RUN INTEGRITY block says where intent came from. `specs` joins the
 review key, like `lensNotes`.
 
-`checklist` carries the project's recurring bug classes. The harness produces none; this repository
-passes the stdout of the memory-tree kit's `gotchas.py --for-diff <range>`, from wherever that kit
-is installed:
+`checklist` carries the project's recurring bug classes. On the diff kind the harness ACQUIRES it
+when the caller passes none (TOOL-dFairHearing-15): its first agent, `resume:checklist` in the
+`Resume` phase, before the input print and the resume probe, finds the memory-tree kit's checker
+at run time, the first of `<tool root>memory-tree/gotchas.py` and `<tool root>gotchas.py` that
+`git ls-files --error-unmatch` calls tracked, runs `gotchas.py --for-diff <base>..<head>` over the
+range the call pinned with a 120-second bound, and returns its stdout verbatim, which then takes
+the path a caller's string takes below. An acquired checklist logs `checklist from --for-diff
+<base>..<head>` and RUN INTEGRITY says so; no checker tracked, a non-zero exit, a timeout, stdout
+with no `- ` line (`no bug class selected`) or a dead agent logs a `WARNING:` naming the reason, and
+RUN INTEGRITY's `Checklist:` line names it as `not acquired: <reason>`. A caller's `checklist`
+wins and no agent spawns; the spec kind never acquires, since `unattended-build.js` hands its audit
+a `--for-paths` one. A caller passes the same stdout, or its own curated list:
 
 ```js
 args: { repo, base, head, reviewDir,
@@ -274,7 +283,7 @@ refuses rather than becoming one item, and so does any value that is neither a s
 non-empty strings. The items are split ROUND-ROBIN over the lenses of the run's kind: item `n` goes to
 lens `(n - 1) % K` in lens order, so each class is swept by exactly one finder, labelled `C<n>`, and
 a finder begins a hit's claim with that label. A lens with no share is told so; skeptics get none. The
-split is logged, and RUN INTEGRITY states it. An absent or itemless checklist logs a `WARNING:` and
+split is logged, and RUN INTEGRITY states it. An absent (on the spec kind) or itemless checklist logs a `WARNING:` and
 RUN INTEGRITY says no class was swept; a string of `# ` header lines alone is itemless, not a refusal.
 The parsed checklist joins the review key.
 

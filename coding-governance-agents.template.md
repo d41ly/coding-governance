@@ -114,9 +114,6 @@ gate or protocol named in section 3 carries the detail.*
 <!-- kit:kickoff-manifest -->
 - `/session-kickoff` opens every unit: it orients, loads this repository's kickoff manifest and derives a closed scope.
 <!-- /kit:kickoff-manifest -->
-<!-- kit:memory-tree -->
-- `<prefix>/memory-tree/gotchas.py --for-diff <base>..<head>` lists the bug classes a diff can hit; run it before any review.
-<!-- /kit:memory-tree -->
 <!-- kit:codebase-map -->
 - Read a feature's codebase-map dossier first, and run `reuse_lookup.py "<behaviour>"` before building anything new.
 <!-- /kit:codebase-map -->

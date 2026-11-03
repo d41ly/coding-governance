@@ -530,7 +530,9 @@ async function runWholeScriptArms() {
       'a run where every agent returned exits complete, with no pending label and an integer blocker count')
     ck(typeof r.result.key === 'string' && r.result.key.indexOf('diff-review-r1-' + B.slice(0, 12) + '-' + H.slice(0, 12) + '-') === 0,
       'the diff-review key is kind, round and the RESOLVED base and head, then the input print: ' + r.result.key)
-    ck(r.trace[0] && r.trace[0].label === 'resume:probe', 'the resume probe is the first agent, before any lens')
+    // TOOL-dFairHearing-15 - DIFF passes no `checklist`, so the checklist agent spawns first and the probe second.
+    ck(r.trace[0] && r.trace[0].label === 'resume:checklist' && r.trace[1] && r.trace[1].label === 'resume:probe',
+      'the checklist agent, then the resume probe, are the first two agents, before any lens')
   }
   const K = r.result ? r.result.key : ''
 
@@ -672,7 +674,8 @@ async function runWholeScriptArms() {
     const judges = r.trace.filter((t) => /^(find|verify):/.test(t.label))
     const orch = r.trace.filter((t) => !/^(find|verify):/.test(t.label))
     ck(judges.length === 10 && judges.every((t) => t.agentType === 'Plan'), 'workerType: all five finders and five skeptic batches spawn as Plan')
-    ck(orch.length === 2 && orch[0].label === 'resume:probe' && orch[0].agentType === 'Plan' && orch[1].agentType === 'general-purpose',
+    ck(orch.length === 3 && orch[0].label === 'resume:checklist' && orch[0].agentType === 'Plan' && orch[1].label === 'resume:probe' &&
+      orch[1].agentType === 'Plan' && orch[2].agentType === 'general-purpose',
       'workerType: the probe takes Plan and the synthesis general-purpose, never the worker type: ' + orch.map((t) => t.label + '=' + t.agentType).join(' '))
     ck(judges.every((t) => t.prompt.indexOf('DURABILITY') === -1), 'workerType: no judge is told to write a lens or verify file')
     ck(judges.every((t) => t.prompt.indexOf('Set path to an empty string') !== -1), 'workerType: every judge is told to return path empty')
@@ -1134,7 +1137,8 @@ async function runWholeScriptArms() {
       'checklist: fewer items than lenses leaves an explicit empty share: ' + none.join(' '))
   }
   // ---- AC4: absent and empty are each announced in their own words; a real checklist warns nothing.
-  r = await runReview(DIFF, ALL_OK)
+  // On the SPEC kind since TOOL-dFairHearing-15: a diff review with none acquires one, armed below.
+  r = await runReview(SPEC, ALL_OK)
   if (checkNoThrow(r, 'checklist absent')) {
     const sp = r.trace.find((t) => t.label === 'synth')
     const fp = scanPrompts(r, 'find:')
@@ -1167,6 +1171,43 @@ async function runWholeScriptArms() {
     ck(scanSplit(r, SPEC_ORDER) && fp.every((t) => t.prompt.indexOf('against the spec set') !== -1),
       'spec-audit: the checklist splits over the spec lenses')
   }
+
+  // ==== TOOL-dFairHearing-15 — a diff review given no `checklist` ACQUIRES one (AC1-AC4) ===============
+  // Every arm is RED against the parent render, which spawns no `resume:checklist` agent: AC1's items reach
+  // no prompt, and every no-checklist run logs the absent WARNING and states `absent` in RUN INTEGRITY.
+  const ACQ = '# recurring-bug-class checklist for b..c (1 file(s))\n# 3 class(es) selected by an anchor + 0 universal\n\n' +
+    '- [ ] ACQONEX\n- [ ] ACQTWOX\n- [ ] ACQTHREEX\n'
+  const extractChecklistLine = (run) => {
+    const sp = run.trace.find((t) => t.label === 'synth')
+    return (/(^|\n)(Checklist: [^\n]*)/.exec(sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : '') || ['', '', ''])[2]
+  }
+  r = await runReview(DIFF, buildStubs({ 'resume:checklist': { checklist: ACQ } }))
+  if (checkNoThrow(r, 'FH15 checklist acquired')) {
+    const cp = r.trace[0] || { label: '', prompt: '' }
+    ck(cp.label === 'resume:checklist' && cp.prompt.indexOf('--for-diff ' + B + '..' + H) !== -1 &&
+      cp.prompt.indexOf('ls-files --error-unmatch tools/memory-tree/gotchas.py') !== -1 && cp.prompt.indexOf('ls-files --error-unmatch tools/gotchas.py') !== -1,
+      'FH15 AC1 the first agent is resume:checklist, naming --for-diff <base>..<head> and both checker spellings: ' + cp.label)
+    ck(['ACQONEX', 'ACQTWOX', 'ACQTHREEX'].every((x, i) => scanPrompts(r, 'find:').some((t) => new RegExp('(^|\\n)C' + (i + 1) + ' \\[ \\] ' + x).test(t.prompt))),
+      'FH15 AC1 the three acquired items reach the finder prompts as C1, C2 and C3')
+    ck(r.logs.indexOf('checklist from --for-diff ' + B + '..' + H) !== -1 &&
+      extractChecklistLine(r).indexOf('acquired by the harness from --for-diff ' + B + '..' + H) !== -1,
+      'FH15 S3 an acquired checklist is logged and stated in RUN INTEGRITY: ' + extractChecklistLine(r))
+  }
+  r = await runReview(Object.assign({}, DIFF, { checklist: ['CALLERONEX'] }), buildStubs({ 'resume:checklist': { checklist: ACQ } }))
+  ck(!r.threw && r.scanSpawned('resume:checklist').length === 0 && scanPrompts(r, 'find:').some((t) => t.prompt.indexOf('CALLERONEX') !== -1) &&
+    r.trace.length > 0 && r.trace.every((t) => t.prompt.indexOf('ACQONEX') === -1), 'FH15 AC2 a caller\'s checklist wins, and no checklist agent spawns')
+  for (const [what, ret, why] of [['a checklistError', { checklistError: 'no checker tracked' }, 'no checker tracked'],
+    ['stdout with no item line', { checklist: '# recurring-bug-class checklist for b..c (0 file(s))\n' }, 'no bug class selected'],
+    ['a dead agent', null, 'the checklist agent died']]) {
+    r = await runReview(DIFF, buildStubs({ 'resume:checklist': ret }))
+    const line = extractChecklistLine(r)
+    ck(!r.threw && r.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf(why) !== -1) && line.indexOf(why) !== -1 &&
+      line.indexOf('supplied with no item') === -1 && line.indexOf('— absent') === -1,
+      'FH15 AC3 ' + what + ' is warned and named in RUN INTEGRITY, never as absent or supplied: ' + (r.threw || line))
+  }
+  r = await runReview(SPEC, buildStubs({ 'resume:checklist': { checklist: ACQ } }))
+  ck(!r.threw && r.trace.length > 0 && r.scanSpawned('resume:checklist').length === 0 && r.trace.every((t) => t.prompt.indexOf('ACQONEX') === -1),
+    'FH15 AC4 a spec audit with no checklist spawns no checklist agent')
 
   // ==== TOOL-aGraftedHelix-3 — the checker's by-design block becomes `byDesign`, never an item =========
   // Every arm is RED against the parent render, which reads no block: the entry is swept as item C2,
@@ -1233,6 +1274,18 @@ async function runWholeScriptArms() {
       'by-design range: every lens reads bd-base as intended behaviour, and no prompt carries bd-new\'s ruling')
     ck(fp.filter((t) => t.prompt.indexOf('NEW/CHANGED invariant bd-new') !== -1).length === 1,
       'by-design range: exactly one lens sweeps the added invariant as a NEW/CHANGED item')
+  }
+  // ---- TOOL-dFairHearing-15 AC5: the same real stdout ACQUIRED by the checklist agent keeps the checker's
+  // item order as the C<n> labels and its by-design block reaches `byDesign`. RED against the parent render,
+  // which spawns no checklist agent, so no item reaches a prompt and no invariant is logged.
+  r = await runReview(DIFF, buildStubs({ 'resume:checklist': { checklist: BD_RANGE } }))
+  if (bdRan && checkNoThrow(r, 'FH15 acquired by-design range')) {
+    const fp = scanPrompts(r, 'find:')
+    const acqItems = BD_RANGE.split('\n# by design')[0].replace(/\r/g, '').split('\n').filter((l) => l.indexOf('- ') === 0).map((l) => l.slice(2).replace(/\s+$/, ''))
+    ck(acqItems.length > 0 && acqItems.every((x, i) => fp.filter((t) => t.prompt.indexOf('C' + (i + 1) + ' ' + x) !== -1).length === 1),
+      'FH15 AC5 the acquired items reach the finders as C<n> in the checker\'s order: ' + acqItems.length + ' item(s)')
+    ck(r.logs.indexOf('by-design: 1 invariant(s) from the checklist\'s by-design block') !== -1 && !fp.some((t) => /(^|\n)C\d+ bd-base/.test(t.prompt)),
+      'FH15 AC5 the acquired by-design block reaches byDesign, and no lens sweeps it as a class')
   }
 
   // ==== TOOL-aSightedSkeptic-2 — the skeptic judges each finding's proposed fix as well as its claim ====
@@ -3413,7 +3466,11 @@ printf '%s\n' "$out"
 # pin `addressTwins: 'hidden'` and `fixJudge: 'instance'`, the absent addressTwins arm resolves to shown,
 # the twins arm's second run is the hidden one, and the fixJudge absent arms delete the pin and agree with
 # class. Counted by hand, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=524
+# RAISED 524 -> 534 by TOOL-dFairHearing-15: 10 assertions, counted off the `FH15` arms — AC1's agent, items
+# and acquired line (3), AC2 (1), AC3's loop over three outcomes (3), AC4 (1) and AC5's order and block (2).
+# The re-pointed first-agent, orchestrator-type and absent-checklist arms add none. Counted by hand, not by
+# a run: the pass runs no suite.
+FLOOR_ASSERTIONS=534
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"
