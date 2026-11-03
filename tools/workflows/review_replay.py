@@ -4,6 +4,7 @@
 Stdlib only. Every population arrives as an argument; nothing here names a path outside this kit.
 
     python3 review_replay.py --known <record> --candidate <report> [--window N]
+    python3 review_replay.py --known-set <src> --candidate <src> [--matched <src>]
     python3 review_replay.py --corpus <dir> [<dir> ...] [--repo <clone>]
     python3 review_replay.py --selftest
 
@@ -45,6 +46,14 @@ subject pins — every `<path>@<hex>` after the binding line and before the firs
 `subjects none-stated`; no range is read or required. A candidate opening with the OTHER kind's
 binding is refused `kind-mismatch`, naming both; an unbound one is read in the known record's mode.
 Spec records are not listed by `--corpus`.
+
+KNOWN-SET MODE (TOOL-dFairHearing-1). `--known-set` names a known-set file in place of a past record:
+one `| tag | address | grade | escaped |` row per known defect, its counts held to its `**Population:**`
+line by `parse_known_set`. Every confirmed candidate row `extract_tag_ref` keys at a row's record and
+tag prints as an `address-match` line, for the adjudicator to confirm or refuse. With `--matched`, an
+adjudicated `| candidate | tag |` list under an `**Adjudicator:**` line, each pair is held to a
+confirmed candidate whose ref cites the row's `[tag]` somewhere, a pair failing it exits 2 by name,
+each tag counts once, and `reviewed k/n`, `escaped k/n` and `high k/n` print from those pairs alone.
 
 WHAT THE SCORE DOES NOT MEAN. Recall is against what ONE past review proved real, not against every
 defect in the range. A candidate-only finding may be a real defect the past review missed, so it is
@@ -109,6 +118,31 @@ def print_score(known_path, known, candidate_path, candidates, window, score, mo
         print("per-lens known: " + " · ".join(f"{lens} confirmed {t[0]} matched {t[1]}" for lens, t in sorted(known_lenses.items())))
     k, m = len(score["matched"]), score["scorable"]
     print(f"replay: recall {k}/{m} = {k / m:.2f}")
+
+
+def print_known_set_score(known_src, cand_src, matched_src, repo):
+    """Known-set mode: the address matches, then with a matched list the three counts; 2 on any refusal."""
+    try:
+        known = replay_scorer.parse_known_set(replay_scorer.read_raw_output(known_src, repo))
+        replay_scorer.check_case_evidence("review-replay", known["rows"])
+        who, pairs = replay_scorer.read_matched_list(replay_scorer.read_raw_output(matched_src, repo)) if matched_src else (None, None)
+        score = replay_scorer.measure_known_set(known, replay_scorer.read_raw_output(cand_src, repo), pairs)
+    except replay_scorer.Refusal as exc:
+        print(f"replay: REFUSED — {exc}", file=sys.stderr)
+        return 2
+    print(f"replay: known-set {known_src} · rows {len(known['rows'])} · reviewed {known['reviewed']} · "
+          f"escaped {known['escaped']} · high {known['high']}")
+    print(f"replay: candidate {cand_src} · address matches {len(score['address'])}")
+    for row, c in score["address"]:
+        print(f"address-match   {row['tag']} {row['path']}:{row['line']}  <-  {c['id']} {c['ref']}")
+    if pairs is None:
+        return 0
+    print(f"replay: matched {matched_src} · adjudicator {who} · pairs {len(pairs)} · tags {len(score['matched'])}")
+    for tag, ids in score["matched"].items():
+        print(f"MATCHED         {tag}  <-  {', '.join(ids)}")
+    for name, k, n in score["figures"]:
+        print(f"{name} {k}/{n}")
+    return 0
 
 
 def resolve_commits(shas, repo):
@@ -390,6 +424,8 @@ def main(argv):
     ap.add_argument("--known", metavar="RECORD")
     ap.add_argument("--candidate", metavar="REPORT")
     ap.add_argument("--corpus", nargs="+", metavar="DIR")
+    ap.add_argument("--known-set", metavar="SRC")
+    ap.add_argument("--matched", metavar="SRC")
     ap.add_argument("--window", type=int, default=10)
     ap.add_argument("--repo", default=".")
     args = ap.parse_args(argv)
@@ -412,8 +448,14 @@ def main(argv):
             return 2
         print_corpus(listed, refused, scanned)
         return 0
+    if args.known_set:
+        if not args.candidate or args.known:
+            ap.error("--known-set takes --candidate and optionally --matched, never --known")
+        return print_known_set_score(args.known_set, args.candidate, args.matched, args.repo)
+    if args.matched:
+        ap.error("--matched scores against a --known-set")
     if not (args.known and args.candidate):
-        ap.error("give --known and --candidate, or --corpus, or --selftest")
+        ap.error("give --known and --candidate, --known-set and --candidate, or --corpus, or --selftest")
     try:
         known_text = pathlib.Path(args.known).read_text(encoding="utf-8")
         cand_text = pathlib.Path(args.candidate).read_text(encoding="utf-8")

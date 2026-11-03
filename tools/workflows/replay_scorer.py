@@ -26,7 +26,11 @@ order of the variants, never a set's, so two runs over the same bytes print the 
 
 THE INSTANCES. `review-replay` is `review_replay.py`'s scoring core, moved here; that file keeps its
 CLI, its printer and its corpus listing as the instance's adapter. A spec ref there is read by
-`extract_tag_ref`: its first lower-case `[tag]`, else its section. `scouted-seam` is aScoutedSeam's
+`extract_tag_ref`: its first lower-case `[tag]`, else its section. Its known-set file, read by
+`parse_known_set`, is one `| tag | address | grade | escaped |` row per known defect under a
+`**Population:**` line its counts must reproduce; `read_matched_list` reads an adjudicator's
+`| candidate | tag |` pairs, and `measure_known_set` counts each tag once, refusing a pair whose
+candidate ref cites no `[tag]` of its row. `scouted-seam` is aScoutedSeam's
 grader (`check_hit`, `check_case` and the `grade`, `compare` and `judged` readings), ported from the
 grader blob a03896116e3c5cbf853affda241c22d8408cb945 at b0fe68f30; a result row without a `seams` list,
 or a judged cell without `primary` and `covered`, is a refusal naming the arm and the case.
@@ -79,6 +83,10 @@ SEVERITY = re.compile(r"\**(?:blocker|high|medium|low)\**", re.IGNORECASE)
 RAW_IDS = re.compile(r"\d+(?:\s*,\s*\d+)*")
 #: The `[tag]` a design-record audit addresses a finding by, read as tier2-review.js's deriveAddressKey reads it.
 TAG_REF = re.compile(r"\[[a-z][a-z0-9-]*\]")
+#: A known-set file's head (TOOL-dFairHearing-1 S1), and a matched list's (S3).
+POPULATION = re.compile(r"^\*\*Population:\*\* (\d+) · reviewed (\d+) · escaped (\d+) · high (\d+)\s*$", re.MULTILINE)
+ADJUDICATOR = re.compile(r"^\*\*Adjudicator:\*\* (\S.*?)\s*$", re.MULTILINE)
+KNOWN_GRADES = ("high", "medium", "ungraded")
 
 # ---- the scouted-seam instance's constant, ported from the grader blob.
 CODE_TOKEN = re.compile(r"-{0,2}[A-Za-z_][\w-]*")
@@ -88,7 +96,7 @@ KIT_DIR = pathlib.Path(__file__).resolve().parent
 #: The two instances the factory exists for; `check_instances` reds when the table lacks one.
 INSTANCE_KEYS = ("review-replay", "scouted-seam")
 #: The arm count `run_selftest` must reach, as review_replay.py declares its own.
-ARMS_DECLARED = 13
+ARMS_DECLARED = 14
 
 
 class Refusal(Exception):
@@ -403,6 +411,122 @@ def measure_replay(known_text, cand_text, window):
         window = 0
     return {"mode": mode, "known": known, "candidates": candidates, "window": window,
             "score": measure_recall(known["items"], candidates, window)}, None
+
+
+# ---- the review-replay instance's known set and adjudicated matches (TOOL-dFairHearing-1 S2, S3).
+
+def read_table(text, header):
+    """The cell lists of the rows of the first markdown table whose header row is `header`, else None.
+
+    Cells split as the appendix's are, `\\|` a literal bar; a separator row is skipped and the table
+    ends at its first non-table line.
+    """
+    rows, inside = [], False
+    for line in text.replace("\r\n", "\n").split("\n"):
+        s = line.strip()
+        cells = [c.strip().replace("\\|", "|") for c in CELL_SPLIT.split(s)[1:-1]] if s.startswith("|") else None
+        if not inside:
+            inside = cells == list(header)
+        elif cells is None:
+            break
+        elif not all(set(c) <= set("-: ") for c in cells):
+            rows.append(cells)
+    return rows if inside else None
+
+
+def parse_known_set(text):
+    """A known-set file: `{rows, reviewed, escaped, high}`, each row `{id, tag, address, path, line, record, grade, escaped}`.
+
+    Refused: no `**Population:**` line, no `| tag | address | grade | escaped |` table, a row count or
+    a partition count (escaped `no`, escaped `yes`, `high` among the reviewed) differing from that
+    line, a repeated tag, a grade or flag outside its set, and an address `extract_tag_ref` cannot read
+    as `<record path>:[<tag>]`. `path` and `line` are the address's record and tag and `record` the
+    record it names, so `derive_replay_evidence` reads a row as any review-replay case.
+    """
+    m = POPULATION.search(text)
+    if not m:
+        raise Refusal("known set: no `**Population:** <n> · reviewed <n> · escaped <n> · high <n>` line")
+    total, reviewed, escaped, high = map(int, m.groups())
+    table = read_table(text, ("tag", "address", "grade", "escaped"))
+    if table is None:
+        raise Refusal("known set: no `| tag | address | grade | escaped |` table")
+    rows, seen = [], set()
+    for cells in table:
+        if len(cells) != 4:
+            raise Refusal(f"known set: row {cells!r} has {len(cells)} cells, not 4")
+        tag, address, grade, flag = cells
+        if tag in seen:
+            raise Refusal(f"known set: tag {tag} is repeated")
+        seen.add(tag)
+        if grade not in KNOWN_GRADES or flag not in ("yes", "no"):
+            raise Refusal(f"known set: row {tag} reads grade {grade!r} and escaped {flag!r}; "
+                          f"a grade is one of {', '.join(KNOWN_GRADES)} and escaped is yes or no")
+        ref = extract_tag_ref(address)
+        if ref is None or not isinstance(ref[1], str):
+            raise Refusal(f"known set: row {tag}'s address {address!r} is not `<record path>:[<tag>]`")
+        rows.append({"id": tag, "tag": tag, "address": address, "path": ref[0], "line": ref[1], "record": ref[0],
+                     "grade": grade, "escaped": flag == "yes"})
+    counts = {"rows": (len(rows), total), "reviewed": (sum(not r["escaped"] for r in rows), reviewed),
+              "escaped": (sum(r["escaped"] for r in rows), escaped),
+              "high": (sum(r["grade"] == "high" and not r["escaped"] for r in rows), high)}
+    off = [f"{k} {got} against the population line's {want}" for k, (got, want) in counts.items() if got != want]
+    if off:
+        raise Refusal("known set: " + "; ".join(off))
+    return {"rows": rows, "reviewed": reviewed, "escaped": escaped, "high": high}
+
+
+def read_matched_list(text):
+    """An adjudicated matched list: `(adjudicator, [(candidate id, tag), ...])` in file order.
+
+    Refused: no `**Adjudicator:**` line, no `| candidate | tag |` table, and a row other than one
+    candidate id and one tag.
+    """
+    m = ADJUDICATOR.search(text)
+    if not m:
+        raise Refusal("matched list: no `**Adjudicator:** <who>` line")
+    table = read_table(text, ("candidate", "tag"))
+    if table is None:
+        raise Refusal("matched list: no `| candidate | tag |` table")
+    bad = next((c for c in table if len(c) != 2 or not all(c)), None)
+    if bad is not None:
+        raise Refusal(f"matched list: row {bad!r} is not one candidate id and one tag")
+    return m.group(1), [(c[0], c[1]) for c in table]
+
+
+def measure_known_set(known, cand_text, pairs=None):
+    """A known set against a candidate report: `{address}`, and with adjudicated `pairs` also `{matched, figures}`.
+
+    `address` is each `(row, candidate)` whose confirmed ref `extract_tag_ref` keys at the row's record
+    and tag: the adjudicator's candidates, never a score. A pair counts only when its candidate is a
+    confirmed appendix row whose ref cites the row's `[tag]` anywhere at the row's record, else the
+    pair is refused by name; a tag counts once however many pairs name it. `figures` is
+    `(name, k, n)` for reviewed, escaped and high-among-reviewed.
+    """
+    rows, err = parse_appendix_rows(cand_text)
+    if err:
+        raise Refusal(f"candidate: {err}")
+    keys = [(c, extract_tag_ref(c.get("ref"))) for c in rows]
+    address = [(r, c) for r in known["rows"] for c, k in keys
+               if k is not None and check_same_file(k[0], r["path"]) and k[1] == r["line"]]
+    if pairs is None:
+        return {"address": address}
+    by_tag, by_id = {r["tag"]: r for r in known["rows"]}, {c.get("id"): c for c in rows}
+    matched = {}
+    for cid, tag in pairs:
+        row, cand = by_tag.get(tag), by_id.get(cid)
+        if row is None:
+            raise Refusal(f"pair {cid} {tag}: {tag} is no row of the known set")
+        if cand is None:
+            raise Refusal(f"pair {cid} {tag}: {cid} is no confirmed appendix row of the candidate")
+        parts = derive_ref_parts(cand.get("ref"))
+        if not parts or not check_same_file(parts[0], row["path"]) or row["line"] not in TAG_REF.findall(parts[1]):
+            raise Refusal(f"pair {cid} {tag}: the candidate's ref {cand.get('ref')!r} cites no {row['line']} of {row['path']}")
+        matched.setdefault(tag, []).append(cid)
+    hit = [r for r in known["rows"] if r["tag"] in matched]
+    return {"address": address, "matched": matched, "figures": [
+        ("reviewed", sum(not r["escaped"] for r in hit), known["reviewed"]),
+        ("escaped", sum(r["escaped"] for r in hit), known["escaped"]),
+        ("high", sum(r["grade"] == "high" and not r["escaped"] for r in hit), known["high"])]}
 
 
 # ---- the scouted-seam instance: aScoutedSeam's grader, ported from blob a0389611 at b0fe68f30.
@@ -836,7 +960,8 @@ def check_experiment(manifest, repo="."):
 #: Each instance: its readers, its measures, its `case_evidence` hook, and its experiment manifest's
 #: keys, required then optional; any other key is refused, so a misspelt rule is never skipped.
 INSTANCES = {
-    "review-replay": {"readers": (read_raw_output, parse_record_findings, parse_candidates), "measure": measure_replay,
+    "review-replay": {"readers": (read_raw_output, parse_record_findings, parse_candidates, parse_known_set, read_matched_list),
+                      "measure": measure_replay,
                       "case_evidence": derive_replay_evidence, "experiment": measure_replay_experiment,
                       "manifest": ({"instance", "known", "candidates", "arms"}, set())},
     "scouted-seam": {"readers": (read_raw_output, read_scouted_population, read_seam_row, read_judge_cell),
@@ -1167,11 +1292,33 @@ def run_selftest():
         want = ["system tuning 21/23 ·", "system held-out 12/12 ·", "system pooled 33/35 ·"]
         return next((f"{w!r} not in {text!r}" for w in want if w not in text), None)
 
+    def check_known_set_arm():
+        """TOOL-dFairHearing-1 AC1, AC2: a known set whole, one row cut, one tag repeated, and a pair crossing sections."""
+        rows = ["| a | x.md:[supervise] | high | no |", "| b | x.md:[act] | medium | no |", "| c | x.md:[spawn] | ungraded | yes |"]
+        head = "**Serves:** research X-1\n\n**Population:** {n} · reviewed 2 · escaped 1 · high 1\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"
+        whole = head.format(n=3) + "\n".join(rows) + "\n"
+        known = parse_known_set(whole)
+        if [(r["tag"], r["line"], r["escaped"]) for r in known["rows"]] != [("a", "[supervise]", False), ("b", "[act]", False), ("c", "[spawn]", True)]:
+            return f"the whole set read as {known!r}"
+        if derive_replay_evidence(known["rows"][0]) != ["x.md:[supervise]", "x.md"]:
+            return f"a row's evidence reads {derive_replay_evidence(known['rows'][0])!r}"
+        cand = APPENDIX_HEADING.join(["Review shape: raw 2, confirmed 2, refuted 0.\n\n", "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n"
+                                      "| 1 | l | x.md:[act] lifetime, [supervise] relaunch | confirmed |\n| 2 | l | x.md:[act] | confirmed |\n"])
+        score = measure_known_set(known, cand, [("1", "a"), ("1", "b"), ("2", "b")])
+        if score["figures"] != [("reviewed", 2, 2), ("escaped", 0, 1), ("high", 1, 1)] or score["matched"] != {"a": ["1"], "b": ["1", "2"]}:
+            return f"a doubly matched tag or a later tag did not score once: {score!r}"
+        if [(r["tag"], c["id"]) for r, c in score["address"]] != [("b", "1"), ("b", "2")]:
+            return f"the address matches read {[(r['tag'], c['id']) for r, c in score['address']]!r}"
+        return (check_refused(lambda: parse_known_set(head.format(n=3) + "\n".join(rows[:2]) + "\n"), "rows 2", "3")
+                or check_refused(lambda: parse_known_set(whole.replace("| b |", "| a |")), "tag a", "repeated")
+                or check_refused(lambda: measure_known_set(known, cand, [("2", "a")]), "pair 2 a", "[supervise]"))
+
     arms = [("paired-refuses", check_paired_refuses), ("row-refuses", check_row_refuses), ("tag-section", check_tag_section),
             ("instances", check_instances_arm), ("scouted-proof", check_scouted_proof), ("conformance", check_conformance),
             ("deterministic", check_deterministic), ("experiment-evidence", check_evidence_arm),
             ("experiment-freeze", check_freeze_arm), ("experiment-variable", check_variable_arm),
-            ("experiment-parsed", check_parsed_arm), ("experiment-judge", check_judge_arm), ("experiment-union", check_union_arm)]
+            ("experiment-parsed", check_parsed_arm), ("experiment-judge", check_judge_arm), ("experiment-union", check_union_arm),
+            ("known-set", check_known_set_arm)]
     passed = skipped = ran = 0
     for name, arm in arms:
         ran += 1

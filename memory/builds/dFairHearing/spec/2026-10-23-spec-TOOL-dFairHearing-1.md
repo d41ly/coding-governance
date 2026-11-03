@@ -13,6 +13,16 @@
 | [2026-10-23-build-TOOL-dFairHearing-1-deviation-19.md](../build/2026-10-23-build-TOOL-dFairHearing-1-deviation-19.md) | deviation | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-1-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-1-builder-return.md) | journal | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-2-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-2-builder-return.md) | journal | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-calibration.md](../build/2026-11-03-build-TOOL-dFairHearing-1-calibration.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-deviation-12.md](../build/2026-11-03-build-TOOL-dFairHearing-1-deviation-12.md) | deviation | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-known-set.md](../build/2026-11-03-build-TOOL-dFairHearing-1-known-set.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-matched-a.md](../build/2026-11-03-build-TOOL-dFairHearing-1-matched-a.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-matched-b.md](../build/2026-11-03-build-TOOL-dFairHearing-1-matched-b.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-2.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-2.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-a.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-a.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-b.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-b.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-23.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-23.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-control.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-control.md) | research | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-1-reuse-scout.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-1-reuse-scout.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-2-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-3-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-3-spec-writer.md) | journal | — |

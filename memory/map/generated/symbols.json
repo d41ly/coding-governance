@@ -12068,6 +12068,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "measure_known_set",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "measure_legs_retried_after_timeout",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -13138,6 +13143,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "parse_known_set",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "parse_legacy_rows",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -13571,6 +13581,11 @@
       "id": "print_items",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
+    },
+    {
+      "id": "print_known_set_score",
+      "kind": "function",
+      "file": "tools/workflows/review_replay.py"
     },
     {
       "id": "print_landing_line",
@@ -15883,6 +15898,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "read_matched_list",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "read_may_of",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -17106,6 +17126,11 @@
       "id": "read_sweep_expectations",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_table",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "read_target_bytes",

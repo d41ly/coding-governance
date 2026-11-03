@@ -761,6 +761,18 @@ does a lens set or a prompt change find MORE of what a previous review proved re
   candidate opening with the other kind's `**Serves:**` binding is refused `kind-mismatch`, naming
   both kinds, in either direction; an unbound candidate is read in the known record's mode. Spec
   records are not listed by `--corpus`: name the known record directly.
+- `python3 {kit}/review_replay.py --known-set <src> --candidate <src> [--matched <src>]` — a candidate
+  scored against a known-set file (`TOOL-dFairHearing-1`) in place of a past record: one
+  `| tag | address | grade | escaped |` row per known defect, `address` being `<record path>:[<tag>]`,
+  `grade` `high`, `medium` or `ungraded` and `escaped` `yes` or `no`, under a
+  `**Population:** <n> · reviewed <n> · escaped <n> · high <n>` line. `parse_known_set` refuses a row
+  count or a partition count that line does not state, a repeated tag and an address `extract_tag_ref`
+  cannot read. Every confirmed candidate row `extract_tag_ref` keys at a row's record and tag prints as
+  an `address-match` line: candidates for the adjudicator, never a score. `--matched` names the
+  adjudicator's list, an `**Adjudicator:** <who>` line and a `| candidate | tag |` table of appendix
+  ids and known tags; a pair whose candidate is no confirmed row, or whose ref cites the row's `[tag]`
+  nowhere, exits 2 by name, each tag counts once, and `reviewed k/n`, `escaped k/n` and `high k/n`
+  print from those pairs alone. Every `<src>` reads as the factory's does.
 - `python3 {kit}/review_replay.py --corpus <dir> [<dir> ...] [--repo <clone>]` — which past records
   are replayable: each record whose first line is the `**Serves:** diff-review` binding, that passes
   the liveness check below and whose range resolves in this clone, with its round, range and scorable
