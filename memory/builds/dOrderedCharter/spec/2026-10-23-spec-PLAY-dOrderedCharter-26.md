@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-26 — file:line citations held in the positional population, new text citing a symbol or a pinned line
 
-**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 9 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-6 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 9 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0056@a91f3d50 whole
 
@@ -44,7 +44,9 @@ review producers that mandate a bare file:line today, so the ratchet does not re
 - **S1** — The three reference forms, one grammar in `tools/playbook/positional.py`:
   - a **file:line citation**, `<path>.<ext>:<n>[-<m>]` with `<ext>` in the closed set `CODE_EXTENSIONS`
     (`py`, `sh`, `js`, `mjs`, `cjs`, `ts`, `toml`, `json`), the path as written, a basename included;
-  - a **symbol citation**, `path#symbol`, `symbol` a name or a dotted `Class.member`;
+  - a **symbol citation**, `path#symbol`, `symbol` a name or a dotted `Class.member` and `path`'s
+    suffix in `SYMBOL_EXTENSIONS` (`py`, `sh`, `js`), written as the whole text of a single-backtick
+    span in Markdown (S4);
   - a **blob-pinned line**, `<path>@<oid>:<n>[-<m>]`, `<oid>` at least 8 hex characters naming a blob, or
     a commit whose `<oid>:<path>` is a blob.
   Observed by AC1, AC6 and AC7.
@@ -53,9 +55,14 @@ review producers that mandate a bare file:line today, so the ratchet does not re
   one row per distinct file:line pair in a tracked text file, `<citing path>\t<path>:<n>[-<m>]`, the
   reference as written, so a row's kind is its reference's shape and no kind column is needed. A row is
   keyed by path and reference, never by the citing line's number, and the list is never held as a count.
-  The list file is excluded from its own scan. `python tools/playbook/positional.py seed` writes the
-  file:line rows once, over the tree at the build pass, and refuses when the list already holds one.
-  Observed by AC1 and AC10.
+  The list file is excluded from its own scan. `python tools/playbook/positional.py seed` runs once,
+  over the tree at the build pass: it writes the file:line rows and joins every row
+  `gov_tag.py --list-positional` prints that the list lacks, so the list holds every positional
+  reference of both kinds the tree holds then. It refuses when the list already holds a file:line row.
+  The kinds that predicate reads are those of `read_positional` in `tools/playbook/gov_tag.py`, whose
+  pattern matches `Mn` and `check n` at `2ded0f42d` and no `§n`; a `§n` row joins when the predicate
+  prints one. At `2ded0f42d` it printed two rows the list lacked, both an `M5`: unit 19's ledger and
+  unit 26's divergence brief. Observed by AC1 and AC10.
 - **S3** — The `positional` check, which unit 19 hands to this unit: an arm of `gov_tag.py check`,
   implemented in `tools/playbook/positional.py`, comparing the tree with the list both ways over both
   reference kinds, the `§n`, `Mn` and `check n` population read through unit 19's `--list-positional`
@@ -70,19 +77,33 @@ review producers that mandate a bare file:line today, so the ratchet does not re
   `tools/playbook/policy_value.py`, the key literal first, the
   shape dGroundRules' reader-coverage arm counts: `root`'s committed policy at its landed revision,
   unset its catalogue default, `shrink-only` (v2:1351). A `PolicyRefused`, an exit 2 from `policy.py
-  get`, refuses the check with exit 2 naming the key. Under `--fixture`, unit 19's `--set` plants a value. Observed by
-  AC2, AC3, AC4 and AC5.
+  get`, refuses the check with exit 2 naming the key. Under `--fixture`, unit 19's `--set` plants a value.
+  `python tools/playbook/positional.py check` runs the same arm alone, the probe AC10 reads. Observed by
+  AC2, AC3, AC4, AC5 and AC10.
 - **S4** — Resolution of the two stable forms, by the same arm:
-  - a blob-pinned line resolves when its `<oid>` names one object and that blob holds line `<m>` (or `<n>`);
-    an unknown, ambiguous or non-blob `<oid>`, or a line past the blob's end, is red wherever it is
-    written, since a pin never moves;
-  - a symbol citation resolves when the file at the working tree defines `symbol`: Python by an `ast`
-    walk of module-level and class-level definitions, shell by `name()` or `function name`, JavaScript by
-    `function name`, `class name` or `const|let|var name =`; any other extension is unresolvable and names
-    the pinned form as its remedy. Unresolved is red in live text, every tracked path outside
-    `memory/builds/`, and printed without changing the exit under `memory/builds/`, whose records are
-    frozen and cannot be edited to clear it.
-  Observed by AC6 and AC7.
+  - a blob-pinned line, read by the same `git grep` over tracked text files as the file:line scan,
+    resolves when its `<oid>` names one object and that blob holds line `<m>` (or `<n>`). An unknown,
+    ambiguous or non-blob `<oid>`, or a line past the blob's end, is red outside `memory/builds/` and
+    printed without changing the exit under it (§8 F5);
+  - a symbol citation is the whole text of a span opened by one backtick, in a tracked Markdown file
+    outside code fences, that matches `symbol` with its path's suffix in `SYMBOL_EXTENSIONS`. It is read
+    by `scan_unfenced` and `CODE_SPAN_RE` in `tools/playbook/tag_index.py`, called and never copied: the
+    shape the tag resolver reads a citation in (`help/tags.md`, "A citation is the whole text of a
+    backticked span"). A doubled-backtick span is the escape. Nothing in a `.py`, `.sh`, `.js`, `.toml`
+    or `.json` file is read, so a usage id `script:<path>#<verb>`, a `purpose-source` value and a
+    `parser=` source are not symbol citations (§8 F4);
+  - a span of the `symbol` shape whose path's suffix is outside `SYMBOL_EXTENSIONS` is not a symbol
+    citation. The arm does not grade it and counts it on its summary line as passed over; unit 22's
+    purpose arm grades the `<path>#<field>` form at a `.toml` path;
+  - a symbol citation resolves when its path is tracked and the working-tree file defines the symbol:
+    Python by an `ast` walk of module-level and class-level `def`, `class` and assignment targets, the
+    module-level assignments being those `read_py_assigns` in `tools/playbook/tag_index.py` returns, so
+    a `.py` purpose-source and a `.py` symbol citation read one predicate; shell by `name()` or
+    `function name`; JavaScript by `function name`, `class name` or `const|let|var name =`. The finder
+    is one function, which unit 49 S45 calls for unit 36's `parser=` sources. Unresolved is red in a
+    tracked Markdown file outside `memory/builds/`, and printed without changing the exit under
+    `memory/builds/`, whose records are frozen and cannot be edited to clear it.
+  Observed by AC6, AC7 and AC10.
 - **S5** — The remedy verb. `python tools/playbook/positional.py pin <file> [--at <rev>]` rewrites each
   unlisted file:line citation in `<file>` to the blob-pinned line at `<rev>` (default `HEAD`), the `<oid>`
   written by `git rev-parse --short=8`, and refuses a citation whose path does not resolve at `<rev>` and a
@@ -118,6 +139,8 @@ review producers that mandate a bare file:line today, so the ratchet does not re
 - Symbol rows in the tag index and a symbol's span: dTotalRecall's code extractor (`memory.code-languages`,
   NP-10). S4's def finder is the stand-in until that extractor registers symbols.
 - Rewriting any existing record's citations: records stay as written and their pairs stay on the list.
+- govkit's usage-id grammar, the `help/` usage markers and the namespace registry's `purpose-source`
+  grammar: their owners' forms, which stay as they are and which S4 does not read.
 
 ### Edges
 
@@ -138,25 +161,30 @@ review producers that mandate a bare file:line today, so the ratchet does not re
 
 ```
 file-line  := <path>.<ext>:<n>[-<m>]        <ext> in CODE_EXTENSIONS
-symbol     := <path>#<name>[.<name>]
+symbol     := <path>#<name>[.<name>]       <path> suffix in SYMBOL_EXTENSIONS; a whole one-backtick span
 pinned     := <path>@<oid>:<n>[-<m>]       <oid> := [0-9a-f]{8,40}
 row        := <citing path> <TAB> <reference as written>        unit 19's grammar
 ```
 
 The file:line scan is `git grep -I -n -E` over the working tree's tracked files, the list file excluded,
-with the `file-line` pattern anchored so a path character, `@` or `#` cannot precede it. A pinned or
-symbol form never matches the `file-line` pattern, because the `@<oid>` or `#<name>` sits between the
-path and any `:<n>`. The `§n`, `Mn` and `check n` scan is unit 19's `--list-positional`, called and never
-copied, so the arm reads one predicate per reference kind.
+with the `file-line` pattern anchored so a path character, `@` or `#` cannot precede it; the pinned scan
+is the same grep with the `pinned` pattern. A pinned or symbol form never matches the `file-line`
+pattern, because the `@<oid>` or `#<name>` sits between the path and any `:<n>`. The symbol read is not
+a grep: it walks tracked Markdown through the tag resolver's span reader (S4). The `§n`, `Mn` and
+`check n` scan is unit 19's `--list-positional`, called and never copied, so the arm reads one predicate
+per reference kind.
 
 ### Inventory
 
-Minted: the module `tools/playbook/positional.py` with the verbs `seed`, `shrink` and `pin` and the arm
-function the `positional` check calls, the constant `CODE_EXTENSIONS`, the `positional-*` fixture cases,
-and the leg `tags positional selftest`. The figure of S2's seed is DERIVED by
+Minted: the module `tools/playbook/positional.py` with the verbs `seed`, `shrink`, `pin` and `check` and
+the arm function the `positional` check calls, the constants `CODE_EXTENSIONS` and `SYMBOL_EXTENSIONS`,
+the def finder S4 names, the `positional-*` fixture cases, and the leg `tags positional selftest`. The
+figure of S2's seed is DERIVED by
 `git grep -I -hoE '[A-Za-z0-9_./-]+\.(py|sh|js|mjs|ts|toml|json):[0-9]+' -- . ':!tools/playbook/positional-refs.txt'`,
-which counted 27,835 occurrences and 22,443 distinct pairs at `4e8f80cdf` (PINNED, 2026-10-23); the
-seed's own count replaces it at the build pass.
+which counted 27,835 occurrences and 22,443 distinct pairs at `4e8f80cdf` (PINNED, 2026-10-23), and
+44,360 occurrences at `2ded0f42d` (PINNED, 2026-11-03), where the same grep without `-h`, piped through
+`sort -u`, counted 35,569 citing-path and reference pairs; the seed's own count replaces both at the
+build pass.
 
 ### Migration
 
@@ -203,24 +231,30 @@ Live at landing, at order 9, after unit 19 (order 4) ships the list, `--list-pos
 
 - security: `pin` writes one named file inside the repository and refuses any other; no input reaches a
   shell, every git call takes an argv.
-- perf / scale: one `git grep` over the tree and one `git cat-file --batch` for every pinned oid; the list
-  grows by about 2.6 MB at seed and only shrinks after.
+- perf / scale: two `git grep` runs over the tree, one walk of tracked Markdown for symbol spans and one
+  `git cat-file --batch` for every pinned oid; the list grows by about 2.6 MB at seed and only shrinks
+  after.
 - error / empty / loading states: an absent list is red, never an empty population read as green; an empty
   file:line population after seed prints `unarmed`; an exit 2 from `policy.py get` exits 2 naming
   `tags.positional`.
 - observability: each red names the citing path, the reference and the remedy.
 - risks: a writer who cites `file:line` reds the bar; the message names `pin`. A frozen record's symbol
-  that goes stale is only printed (S4).
-- testing: S8's plants, both directions, and the real tree under unit 19's leg.
+  that goes stale, or its pin that never resolved, is only printed (S4). What the arm does not check: a
+  symbol citation written outside a one-backtick Markdown span, or at a suffix outside
+  `SYMBOL_EXTENSIONS`, is not graded; the summary line counts the other-suffix spans it passed over,
+  and nothing counts the unbackticked ones.
+- testing: S8's plants, both directions, and `positional.py check` over the real tree (AC10).
 - migration: the one-time seed (§4 Migration).
 - user docs: N/A — no `help/` page covers the tag checks until unit 37 renders them from rows.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When `python gov_tag.py --fixture --plant positional-seed` runs, the fixture's
-  list gains one `<citing path>\t<path>:<n>` row per distinct file:line pair in its tree beside its
-  `§n` rows, and a second `positional.py seed` exits 1 naming the existing rows.
-  Red when: the seed writes a count, keys a row by a line number, or runs twice.
+  list gains one `<citing path>\t<path>:<n>` row per distinct file:line pair in its tree, and the `Mn`
+  row its tree holds and its list lacks beside the rows it held, and a second `positional.py seed`
+  exits 1 naming the existing rows.
+  Red when: the seed writes a count, keys a row by a line number, leaves a row `--list-positional`
+  prints off the list, or runs twice.
 - **AC2** — When `python gov_tag.py --fixture --plant positional-new` runs, a file:line
   citation and an `M9` reference added after seed each red `check` under `shrink-only`, naming the path,
   the reference and the remedy, and the same fixture without the plants exits 0.
@@ -235,15 +269,19 @@ Live at landing, at order 9, after unit 19 (order 4) ships the list, `--list-pos
 - **AC5** — When `python tools/playbook/gov_tag.py --fixture --plant positional-new --set
   tags.positional=report` runs, both unlisted references are printed and `check` exits 0.
   Red when: `report` exits 1 or prints nothing.
-- **AC6** — When `python gov_tag.py --fixture --plant positional-symbol` runs, a
-  `path#symbol` naming a defined Python, shell and JavaScript symbol resolves, an undefined one reds
-  `check` in a file outside `memory/builds/`, and the same undefined one inside `memory/builds/` is
-  printed with exit 0.
-  Red when: an undefined symbol in live text passes, or a frozen record's reds the leg.
+- **AC6** — When `python gov_tag.py --fixture --plant positional-symbol` runs, a backticked
+  `path#symbol` naming a defined Python, shell and JavaScript symbol resolves; an undefined one reds
+  `check` in a Markdown file outside `memory/builds/`, and inside `memory/builds/` is printed with exit
+  0; and the same undefined name planted as a `script:` usage id in a Markdown comment, as a
+  `purpose-source` value in a `.toml` file, in a `.py` file, in doubled backticks and as a backticked
+  span at a `.toml` path leaves `check` at exit 0, the `.toml` span counted as passed over.
+  Red when: an undefined symbol in live Markdown passes, a frozen record's reds the arm, or a form S4
+  does not read reds.
 - **AC7** — When `python gov_tag.py --fixture --plant positional-pinned` runs, a pinned line
-  at a real blob and at a commit resolves, and an unknown `<oid>` and a line past the blob's end each red
-  `check`.
-  Red when: a pin resolves without its object or its line.
+  at a real blob and at a commit resolves, an unknown `<oid>` and a line past the blob's end each red
+  `check` outside `memory/builds/`, and the same unknown `<oid>` inside `memory/builds/` is printed
+  with exit 0.
+  Red when: a pin resolves without its object or its line, or a frozen record's pin reds the arm.
 - **AC8** — When `python gov_tag.py --fixture --plant positional-pin` runs, `positional.py
   pin` rewrites the unlisted citation to `<path>@<oid>:<n>` with `<oid>` the blob at `HEAD`, `check` then
   exits 0, and `pin` on a path outside the fixture repository exits 1 and writes nothing.
@@ -253,10 +291,15 @@ Live at landing, at order 9, after unit 19 (order 4) ships the list, `--list-pos
   tools/workflows/drift-audit-code.template.js tools/workflows/drift-audit-state.template.js` runs, each
   source prints the pinned form where it told a writer to cite `file:line`.
   Red when: a producer still asks for a bare file:line.
-- **AC10** — When `python gov_tag.py check` runs over the tree at the build pass, its
-  `positional` arm exits 0, and the list's file:line row count equals the count `positional.py seed`
-  printed.
-  figure: DERIVED at observation by the seed.
+- **AC10** — When `python tools/playbook/positional.py check` runs over the tree at the build pass,
+  after `positional.py seed`, it exits 0; the list's file:line row count equals the count
+  `positional.py seed` printed; and the list holds every row
+  `python tools/playbook/gov_tag.py --list-positional` prints.
+  figure: the seed's count is DERIVED at observation. The rest is PINNED at `2ded0f42d` (2026-11-03)
+  by the §8 F4 and F5 probes. S4's symbol predicate reads 6 citations, all under `memory/builds/`, all 6
+  printed unresolved and 0 red, and passes over 10 other-suffix spans, 1 of them live. The pinned scan
+  reads 30, all under `memory/builds/`, 0 red. `--list-positional` printed 2 rows the list lacked, which
+  the seed joins.
   Red when: the arm reds on the tree it was seeded from.
 - **AC11** — When `python -c "import tomllib; print([(r['owner'], bool(r.get('summary')), bool(r.get('usage'))) for r in tomllib.load(open( 'tools/policy/catalogue.toml' , 'rb'))['key'] if r['name'] == 'tags.positional'])"`
   runs after the pass, it prints one tuple, `dOrderedCharter` with both flags `True`;
@@ -296,7 +339,54 @@ New arm: tools/playbook/gov_tag.py · covers AC10 · the `positional` arm inside
   text and printed in records.
   RESOLVED (agent, 2026-10-23, delegated): rung 3: printed in records (S4). Red everywhere would red the
   bar on a code rename for a record nobody may edit, a red with no remedy; the pinned form is graded
-  everywhere because it cannot drift.
+  everywhere because it cannot drift. F5 narrows that last clause.
+- **F4** — How does the symbol scan tell a symbol citation from the tree's other `<path>#<name>` forms,
+  govkit's usage ids `script:<path>#<verb>` and unit 22's `purpose-source = "<path>#<field>"`, and what
+  is a citation whose path is outside py/sh/js graded as? Each option below was measured by a
+  read-only probe of its predicate over the tree at `2ded0f42d`; what makes an option lose is a live
+  red at that tree (AC10) or a read population of zero.
+  - (a) Exclusion by rule: S1's grammar over every tracked text file, minus a `script:` usage id and a
+    `purpose-source` value. It reads 119 (62 live, 57 in records). With rev-5's rule that another
+    suffix is red, all 62 live hits red: the `conf:` usage ids in `memory/project/docs-undocumented.txt`,
+    the `doc.<name>#<seg>` targets of `tools/playbook/aliases.toml`, and fixture strings in
+    `tools/govkit/docs_leg.py` and `tools/govkit/selftest.py`. With other suffixes not read it reads 18,
+    all in records, 0 red; but the exclusions are a closed list the corpus already outgrows. The §4 of
+    `memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-4.md` writes
+    `workflow-arg:unattended-unit.js#checklist` into `tools/unattended/kit.toml`, a `.js` usage id no
+    rule excludes. And the read covers code files: the fixture usage id in `tools/govkit/docs_leg.py`
+    names a path the tree does not track and is spared only by the `script:` rule, so S8's own
+    `positional-symbol` plant, an undefined symbol written into the fixture's Python source, would red
+    AC10. Veto 1.
+  - (b) A definition-shaped context: a hit counts when its path names a tracked py, sh or js file,
+    where a definition can exist. It reads 28 (23 live, 5 in records) and reds all 23 live: each
+    `<!-- usage: script:... -->` marker across seven `help/` pages, whose `#<verb>` names a CLI verb no
+    definition carries. Veto 1: it fails AC10, and clearing it edits the markers §3 keeps.
+  - (c) An opt-in marker the writer adds before the form. It reads 0 in the tree, and its only merit is
+    that zero, the vacuous-selector class M3's counter-rule refuses; unit 36 and the dBoundRoles and
+    dDeclaredLoop specs already write the bare form after `parser=`, so a marker would be a second form.
+  - (d) The tag resolver's citation shape: the whole text of a one-backtick span in tracked Markdown
+    outside fences, the path's suffix in py, sh or js (S4). It reads 6, all in records, all 6 printed
+    unresolved, 0 red, and passes over 10 other-suffix spans, 1 of them live. Its liveness is not the
+    zero live read: AC6's plant reds an undefined live symbol, and the 6 record reads show it reads the
+    tree.
+  For the other suffixes: graded red with the pinned form as remedy, rev-5's rule, reds 1 live span
+  under (d), the `<path>#<field>` example in `help/tags.md`'s purpose-source table, which is unit 22's
+  grammar and not a symbol (veto 1, AC10); not graded and counted on the summary line survives.
+  RESOLVED (agent, 2026-11-03, delegated): (d), rung 3, the most feature-rich survivor: it meets AC6
+  and AC10 and reuses the tag resolver's reader, `scan_unfenced` and `CODE_SPAN_RE` in
+  `tools/playbook/tag_index.py`. A path outside py, sh and js is not a symbol citation, not graded and
+  counted as passed over. Losers and the observation that rejected each: (a) the uncovered `.js` usage
+  id and the fixture text in code; (b) 23 live reds; (c) a zero read; other-suffix red, 1 live red.
+  widens: none · relaxes: S4's red for a `<path>#<name>` outside a one-backtick Markdown span or at a
+  suffix outside `SYMBOL_EXTENSIONS`, neither of which is read.
+- **F5** — Is an unresolved blob-pinned line in a frozen record red? rev-5 grades it everywhere (F3).
+  The pinned scan reads 30 at `2ded0f42d`, all under `memory/builds/` in 10 files, and none resolves:
+  illustrative oids that name no object, and basenames or non-paths under a real commit. Options: (a)
+  red everywhere; (b) red outside `memory/builds/`, printed under it, as S4 grades a symbol; (c) list
+  the 30 on the positional list.
+  RESOLVED (agent, 2026-11-03, delegated): (b), rung 3. (a) reds AC10 on 30 records nobody may edit,
+  a red with no remedy (veto 1); (c) puts a non-positional form on the positional list and keeps a
+  wrong pin forever. widens: none · relaxes: S4's red for an unresolved pin under `memory/builds/`.
 
 ## 9. Revision log
 
@@ -310,6 +400,11 @@ New arm: tools/playbook/gov_tag.py · covers AC10 · the `positional` arm inside
   commit. On the coordinator's follow-up the helper is `read_policy_value` in unit 19's
   `tools/playbook/policy_value.py`, the playbook kit's one policy helper.
 - rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-6 · 2026-11-03 · S1 S2 S3 S4 · AC1 AC6 AC7 AC10 · §3 · §4 · §5 · §8 · §10 · from
+  `2026-11-03-prompt-PLAY-dOrderedCharter-26-divergence-brief.md` items 1 to 3: a symbol citation is
+  the tag resolver's one-backtick Markdown span at a py, sh or js path (F4), an unresolved pin in a
+  record is printed (F5), the seed joins every row `--list-positional` prints, and AC10 reads
+  `positional.py check` with the counts it leaves red, 0.
 
 ## 10. Reuse audit
 
@@ -323,5 +418,10 @@ keyed list of file line citations so new text cannot add one"` ranked name-token
 the resolver; codebase-map's symbol corpus and lexicon's `_python_defs` (`tools/lexicon/lexicon.py:425`)
 are optional kits the core may not import (scout B, PLAY-dOrderedCharter-26 row), confirmed at source.
 The key is read through `read_policy_value` in unit 19's `tools/playbook/policy_value.py`, called and never copied.
+The symbol read extends the tag resolver's citation reader, `scan_unfenced` and `CODE_SPAN_RE` in
+`tools/playbook/tag_index.py`, the shape `help/tags.md` states for a citation, and its Python finder
+calls `read_py_assigns` from the same file, which unit 22's purpose arm reads a `.py` field with. The
+usage-id grammar in `tools/govkit/docs_leg.py` and unit 22's purpose-source reader were read to fix
+the forms S4 does not read, and neither is called (§8 F4).
 
 Recall terms used: `python tools/memory-recall/query.py "how are positional references and stale file line citations held so new text cannot add them" --terms "positional ratchet shrink-only keyed list citation file:line path#symbol blob pinned waiver highwater stale"`
