@@ -113,9 +113,12 @@ def parse_edge_lines(text, path) -> list[dict]:
         if line is None:
             bad.append(f"{path}:{n}: a fence opens here and never closes, so every line after it would go unread")
             continue
-        if not line.startswith(EDGE_HEAD):
+        if not line.lstrip().startswith(EDGE_HEAD):
             continue
         shown = line.rstrip()
+        if not line.startswith(EDGE_HEAD):   # an indented edge line is malformed, never passed over unread
+            bad.append(f"{path}:{n}: `{shown}` is indented, and an edge line sits at column 0; the grammar is {GRAMMAR}")
+            continue
         pair = shown[len(EDGE_HEAD):]
         kind, eq, rest = pair[1:].partition("=")
         why = None
