@@ -179,3 +179,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-03T21:20:44Z brief · item TOOL-dFairHearing-25 · reason 3a16df71a89b memory/builds/dFairHearing/prompts/2026-11-03-prompt-TOOL-dFairHearing-25-pass-b-build-brief.md
 
 2026-11-03T21:33:39Z dispatch · item 389a007c TOOL-dFairHearing-25 · reason tools/workflows/README.md memory/LIVE.md
+
+2026-11-03T22:29:32Z brief · item TOOL-dFairHearing-25 · reason fbc99c6ca4eb memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-25-build-brief.md
+
+2026-11-03T22:42:55Z dispatch · item 8ee00000 TOOL-dFairHearing-25 · reason memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-25.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-1.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-15.md memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-25-replay-verdicts.md memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-25-replay-1-manifest.json memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-25-replay-1-fhr1c-report.md memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-25-replay-1-fhr2b-report.md memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-25-matched-fhr1b.md memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-25-matched-fhr1c.md memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-25-matched-fhr2b.md memory/builds/dFairHearing/BACKLOG.md memory/builds/dFairHearing/README.md memory/backlog/TOOL.md memory/LIVE.md
