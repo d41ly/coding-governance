@@ -16,8 +16,8 @@ Run wf_069bf9f4-4b5, summarized from its return.
   - the positional seed re-run over the tree: 36786 `file:line` rows and 4 section rows;
   - the kickoff manifest re-stamped.
 - The policy mirror went into its own commit, `cf564295e`, as S9 requires.
-- Before the pass committed, HYGIENE check 9 refused one attempt, because the README and the spec's records region
-  were stale. Re-running the index generator fixed it.
+- Before the pass committed, the memory-hygiene index-freshness check refused one attempt, because the README and the
+  spec's records region were stale. Re-running the index generator fixed it.
 - Observed by probe, as the ledger records:
   - AC1 to AC8: through each `--fixture --plant` case, run directly.
   - AC9: the pinned form, found by `git grep` in each producer.
