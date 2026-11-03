@@ -67,13 +67,15 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - The unattended kit's own self-test suites are WAIVED for this build's landing (README, "Build-level rules"); a
   criterion they would observe is named as owed with PLAY-dClosedLoop-12, never run.
 
-## Owed by the unit before yours
+## Your previous dispatch's work
 
-- PLAY-dOrderedCharter-28's `resolve-family` plant reaches `tools/memory-tree/backlog.py` through `corpus_ids.py`, and
-  the `playbook render selftest` leg's guard in `tools/gate-legs.json` does not name it (class
-  held-suite-guard-misses-a-sibling-kit). Before you add `{prefix}/memory-tree/backlog.py` to that guard, list every
-  live spec outside this build whose §4 Files touched names `tools/memory-tree/backlog.py` and whose §7 leg line lacks
-  `playbook render selftest` (a widened guard reds such a spec in the spec-token check, and every later dispatch is then
-  refused, as unit 51's widening did to TOOL-dIndexedDesign-12). If the list is empty, add the guard row in your pass,
-  re-stamp the kickoff manifest in the same commit, declare both paths in `--dispatch`, and record it as a `report`
-  deviation naming unit 28's builder return. If it is not empty, leave the guard and name the specs in your return.
+- Run wf_8d835a4a-35d built rev-6 whole and probed it green; the pre-commit hook refused the pass commit on the
+  codebase-map gate (`UNCLAIMED ... {'gate-legs': ['tags positional selftest']}`). The spec now has this unit write that
+  leg's dossier claim. The built pass is saved as
+  `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dorderedcharter-725f52/0394fa33-012c-408f-a840-e6e4cfaac23f/scratchpad/PLAY-dOrderedCharter-26-build.patch`
+  (`git apply --index`). Start from it where it still applies at HEAD, against the spec at its latest rev; re-run
+  `--dispatch` (declaring the dossier and the `memory/map/generated/*` outputs `gen_map.py --write` rewrites) and
+  `--brief`, then add the dossier claim, regenerate the map and `.governance/policy.json` (its own commit, S9), and
+  commit.
+- Unit 28's guard item is withdrawn: widening the `playbook render selftest` guard to `backlog.py` would red ten live
+  specs outside this build. Leave the guard; the close records it.

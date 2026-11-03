@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-26 — file:line citations held in the positional population, new text citing a symbol or a pinned line
 
-**Status:** DEFERRED · rev-6 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 9 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-7 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 9 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0056@a91f3d50 whole
 
@@ -118,7 +118,12 @@ review producers that mandate a bare file:line today, so the ratchet does not re
   `drift-audit-state.template.js`. Observed by AC9.
 - **S7** — The legs. The arm runs inside unit 19's `tags (the resolver's checks)` leg, which already
   carries `"pack": "tags"` (S21); this unit adds one leg, `tags positional selftest`, with the same key,
-  running every plant of S8 in both directions. Observed by AC10.
+  running every plant of S8 in both directions. The same pass claims that leg in the `gate-legs` claim
+  of `memory/map/features/playbook.md`, beside unit 19's `tags` leg, and commits what
+  `python tools/codebase-map/gen_map.py --write` rewrites under `memory/map/generated/`. The map's
+  baseline is shrink-only, and the commit hook runs the codebase-map gate when a `.py` or `.js` path is
+  staged, so a pass that adds an unclaimed leg cannot commit. The leg's subject-pins and descriptor
+  rows are unit 50's (§3). Observed by AC10 and AC12.
 - **S8** — The plants, through unit 19's fixture: `python tools/playbook/gov_tag.py --fixture --plant
   <case> [--set tags.positional=<value>]`, each case `positional-*`, in the scratch repository that
   fixture builds. Observed by AC1 to AC8.
@@ -154,7 +159,7 @@ review producers that mandate a bare file:line today, so the ratchet does not re
 - **hands-off** `PLAY-dOrderedCharter-47` — S3's verdict for build records added before the check landed, made print-only by their adding commit's ancestry (finding 81)
 - **hands-off** `PLAY-dOrderedCharter-48` — S6's producers, made a query over the directive sources with a keyed keep list and a limb that reds a new producer (finding 82)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 5, 28 and 67, which that batch unit corrects after this unit lands, each by the item its report id names
-- **hands-off** `PLAY-dOrderedCharter-50` — the pin, descriptor and dossier rows of `tags positional selftest`, written at that unit's pass one order later (round-2 id 23)
+- **hands-off** `PLAY-dOrderedCharter-50` — the subject-pins and descriptor rows of `tags positional selftest`, written at that unit's pass one order later (round-2 id 23); the leg's dossier claim is S7's, written in this pass
 - **hands-off** `PLAY-dOrderedCharter-55` — AC10, which unit 49 S61 corrects, is observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2); and the positional plants of units 47, 48 and 53 run in `tags positional selftest` (round-2 id 28)
 
 ## 4. Design
@@ -204,6 +209,8 @@ Live at landing, at order 9, after unit 19 (order 4) ships the list, `--list-pos
 - `tools/playbook/gov_tag.py`
 - `tools/playbook/positional-refs.txt`
 - `tools/gate-legs.json`
+- `memory/map/features/playbook.md`, the leg's claim
+- `memory/map/generated/`, the files `python tools/codebase-map/gen_map.py --write` rewrites
 - `tools/workflows/REVIEW-PROTOCOL.template.md`
 - `memory/guides/REVIEW-PROTOCOL.md`
 - `tools/workflows/tier2-review.template.js`
@@ -310,10 +317,15 @@ Live at landing, at order 9, after unit 19 (order 4) ships the list, `--list-pos
   `git grep -n -F 'read_policy_value("tags.positional"' -- tools/playbook/positional.py` finds one line.
   Red when: the key keeps no summary or usage, stays on the list, gains a second row, or is read in a
   shape the reader-coverage arm does not count.
+- **AC12** — When `git grep -n -E '^gate-legs = \[.*"tags positional selftest"' -- memory/map/features/playbook.md`
+  runs after the pass, it prints one line, the dossier's `gate-legs` claim; and
+  `git grep -n -F "tags positional selftest" -- memory/map/generated/MAP.md` prints the leg's row,
+  `playbook` its claimant.
+  Red when: the leg lands unclaimed, or claimed with the generated map not rewritten.
 
 ## 7. Gates
 
-`playbook render selftest` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `check-wiring self-test` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
+`playbook render selftest` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `check-wiring self-test` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `codebase-map coverage + freshness`
 
 Unit 19's `tags (the resolver's checks)` leg, which lands at order 4, runs the `positional` arm over the
 tree. dGroundRules' policy legs, `policy check` and `policy fixtures`, run `arm_summaries`, the
@@ -407,6 +419,11 @@ New arm: tools/playbook/gov_tag.py · covers AC10 · the `positional` arm inside
   the tag resolver's one-backtick Markdown span at a py, sh or js path (F4), an unresolved pin in a
   record is printed (F5), the seed joins every row `--list-positional` prints, and AC10 reads
   `positional.py check` with the counts it leaves red, 0.
+- rev-7 · 2026-11-03 · S7 · AC12 · §3 · §4 · §7 · from
+  `2026-11-03-prompt-PLAY-dOrderedCharter-26-dossier-brief.md` item 1: S7 claims `tags positional
+  selftest` in the playbook dossier and commits the regenerated map in its own pass, since the commit
+  hook refused the pass whose claim waited for unit 50; the claim half of unit 50's S5 and AC4 moves
+  here as AC12, and the hands-off to unit 50 keeps the subject-pins and descriptor rows.
 
 ## 10. Reuse audit
 
