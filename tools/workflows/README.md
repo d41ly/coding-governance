@@ -454,7 +454,8 @@ architecture record, whose sections are not a unit spec's: `coherence`, `groundi
 the first agent. A preset off the default is logged before the first agent and joins the review key,
 so a design-audit run never reuses a unit-spec run's lens files; a run without it keeps its key. Every
 spec audit names its preset in RUN INTEGRITY and carries `preset` on every return, beside `intensity`.
-It ships dark: nothing in this kit passes `'design-audit'` yet.
+Which preset a design record gets when nobody names one is `DESIGN_RECORD_PRESET` in `review_pin.py`
+(below), the value's one source, so this page names it and never states its value.
 
 **The whole-design walk, `preset: 'whole-design'`** (TOOL-dFairHearing-18). Five walkers, `WHOLE_DESIGN_LENSES`,
 the `walk-1` to `walk-5` rows of `lenses.toml`, walk every item of a design through every scenario. The
@@ -542,7 +543,8 @@ classed a design record.
 A subject is a spec subject when the harness's own `SPEC_SUBJECT_PATH`, read from the `tier2-review.js`
 beside the module, matches it; every other subject is a design record. A set holding any spec subject
 prints `unit-spec`; a set of design records alone prints `--design-record-preset`, whose default,
-`DESIGN_RECORD_PRESET`, is `unit-spec` until the design-audit replay's verdict. `--opt-in` is the
+`DESIGN_RECORD_PRESET` in `review_pin.py`, is that value's one source, set by replay 1's verdict
+(the replay section below). `--opt-in` is the
 `review.opt-in` value: `none`, the default, or a JSON object keyed by literal name whose values are
 `optIn` maps, and the entry for the printed preset rides as `optIn`. It checks `--opt-in`'s shape only;
 membership is the harness's. It exits 2 naming `SPEC_SUBJECT_PATH`, `--opt-in` or `--subject` on a
@@ -1043,7 +1045,7 @@ idx=$(mktemp -p "${SCRATCH:?}")
 trap 'rm -f "$idx"; git update-ref -d refs/replay/<name> 2>/dev/null' EXIT   # the one trap
 # the placement step, only for a <commit> the source history lacks (TOOL-dFairHearing-25 S8):
 GIT_INDEX_FILE="$idx" git read-tree <base>
-GIT_INDEX_FILE="$idx" git update-index --add --cacheinfo 100644,<blob>,<path>
+GIT_INDEX_FILE="$idx" git update-index --add --cacheinfo 100644,<blob>,<path>   # once per placed file
 tree=$(GIT_INDEX_FILE="$idx" git write-tree)
 commit=$(git commit-tree "$tree" -p <base> -m placement)   # <commit> below is then "$commit"
 # the recipe
@@ -1064,17 +1066,27 @@ deletes the temporary index and the transient `refs/replay/<name>` however the s
 afterwards. `$SCRATCH` is the run's scratch directory. The last line is the liveness check: a clone
 whose `HEAD` is not `<commit>` replays the wrong tree and is not scored.
 
-**The placement step** makes a `<commit>` the source history lacks: `<base>` plus one file, `<blob>`
-at `<path>`. It writes that tree through the temporary `GIT_INDEX_FILE` and commits it by
-`git commit-tree`, so the working tree, the index and `HEAD` of the repository never move, no branch
-is made, and the commit is reachable only from the transient ref the recipe bundles. A replay of a
-commit the history holds leaves the four placement lines out.
+**The placement step** makes a `<commit>` the source history lacks: `<base>` plus the placed files,
+each a `<blob>` at a `<path>`, with the `update-index` line written once per placed file. It writes
+that tree through the temporary `GIT_INDEX_FILE` and commits it by `git commit-tree`, so the working
+tree, the index and `HEAD` of the repository never move, no branch is made, and the commit is
+reachable only from the transient ref the recipe bundles. A replay of a commit the history holds
+leaves the placement lines out.
 
-**A replayed spec audit passes the opt-in pack.** Its `<commit>` is the placement on `<base>`
-`6cfd21619`, adding `memory/builds/dFairHearing/README.md` as it stands at `3708a705` (`<blob>` is
+**A replayed spec audit passes the opt-in pack.** Replay 1's `<commit>` is the placement on `<base>`
+`6cfd21619` of two files, so its `update-index` line is written twice. The first is
+`memory/builds/dFairHearing/README.md` as it stands at `3708a705` (`<blob>` is
 `git rev-parse 3708a705:memory/builds/dFairHearing/README.md`), whose front matter is the
-owner-landed `spec-audit: 2026-10-21` with no `authorized-by`, and its `reviewDir` is
-`memory/builds/dFairHearing/reviews`, the folder that README opts in. A replay that spawns agents
+owner-landed `spec-audit: 2026-10-21` with no `authorized-by`. The second is the runtime record's
+blob `767187aa` (`git rev-parse 6cfd21619:memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md`)
+at the placed subject path
+`memory/builds/dFairHearing/replay/memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md`.
+The call's `reviewDir` is `memory/builds/dFairHearing/reviews`, the folder that README opts in, and
+its one subject is that placed subject path at `767187aa`, with id `PLAY-dClosedLoop-1` and no `rev`;
+the sibling `specs` and the checklist stay on their dClosedLoop paths. The pack admits only a subject
+under `reviewDir`'s build, so the record's own path is denied, and the placed path ends with the
+record's own, so `check_same_file` in `replay_scorer.py` still matches its refs to the known set
+(TOOL-dFairHearing-25 §4). A replay that spawns agents
 directly renders each prompt as a `gov:handoff` file, all rule 6 of the agent-cap hook admits; a
 harness replay runs through `tier2-review.js`, a declared harness.
 
