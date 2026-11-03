@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-3 — the Loop Review: a cadence step run as `review.loop.cadence` says, its lease keyed by the selected period, its walk and its record
 
-**Status:** DEFERRED · rev-6 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 2 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-7 · 2026-11-04 · node a · Tier-2 · base 8bec4cef · streams tooling · order 2 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0460@401ecbd8 whole
 **Carries:** node:record-kind.loop-review
@@ -26,6 +26,8 @@
 | [2026-11-03-build-TOOL-dCalibratedLens-3-deviation-34.md](../build/2026-11-03-build-TOOL-dCalibratedLens-3-deviation-34.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-3-deviation-35.md](../build/2026-11-03-build-TOOL-dCalibratedLens-3-deviation-35.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-3-deviation-36.md](../build/2026-11-03-build-TOOL-dCalibratedLens-3-deviation-36.md) | deviation | — |
+| [2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md](../build/2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-24 |
+| [2026-11-04-build-TOOL-dCalibratedLens-3-deviation-37.md](../build/2026-11-04-build-TOOL-dCalibratedLens-3-deviation-37.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-15 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
@@ -37,7 +39,10 @@
 | [2026-11-03-prompt-TOOL-dCalibratedLens-3-1-spec-reviewer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-3-1-spec-reviewer.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-3-2-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-3-2-spec-writer.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-3-3-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-3-3-spec-writer.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md](../prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-24 |
+| [2026-11-04-prompt-TOOL-dCalibratedLens-3-1-spec-writer.md](../prompts/2026-11-04-prompt-TOOL-dCalibratedLens-3-1-spec-writer.md) | journal | — |
 | [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
+| [2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md](../reviews/2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-46 |
 
 <!-- /gen:spec-records -->
 
@@ -126,8 +131,9 @@ re-grounds on each and stops the unit when one is absent.
   before a path is built. The walk commits nothing: it files one records-only intake, `intake.py file
   --origin cadence --filer item.loop.record`, its stable text the record's and the snapshot's content as
   JSON, so the patch build that takes it re-writes both with `python loop_review.py record --key <key>
-  --base <sha>`, the JSON on stdin, and lands them; the commit landing the first period's record also edits the
-row to carry no `unarmed` key (TOOL-dTotalRecall-42 S2). The JSON is never cut: the pre-render
+  --base <sha>`, the JSON on stdin, and lands them; the commit landing the first period's record and its
+  snapshot also edits both the `loop-review` row and unit 2's `value-ledger` row to carry no `unarmed`
+  key (TOOL-dTotalRecall-42 S2), which AC8 observes on both. The JSON is never cut: the pre-render
   (TOOL-dCalibratedLens-27 S1) builds it with every route `pending`, the longest route word, and over
   `INTAKE_CAP_BYTES` (65536, TOOL-dWellOiledMachine-4 S2) exits 1, `loop — refused: record text <n>
   bytes over INTAKE_CAP_BYTES`, filing nothing. A span `render_redacted` replaces lands as its
@@ -223,11 +229,17 @@ TOOL-dTendedCadence-2's `<event>.<sha12>` keys do).
 | `item.loop.file` | `command:loop.file` | `item.loop.price` | `filed` → `item.loop.record` | one intake per (ledger kind, id) |
 | `item.loop.record` | `command:loop.record` | `item.loop.file` | `recorded` → `transition` | the record |
 
-Each of the four rows also carries the keys TOOL-dDeclaredLoop-12 §4 requires of a non-role actor,
-`returns = "record-kind.loop-review"` and `allowance` `"none"`, but `"intake.py file --origin cadence"` on
-`file` and `record`; `inputs` is `["layer.runtime:GOV_CADENCE_KEY"]` on `lease`, and
+Each of the four rows also carries the keys TOOL-dDeclaredLoop-12 §4 requires of a non-role actor
+(TOOL-dDeclaredLoop-9 S1, S4), in the form unit 2 S9 uses: `returns = "record-kind.loop-review"`;
+`allowance = "none"` on `lease` and `gather` and `allowance = "records"` on `file` and `record`, each one
+word of `WRITES` (`tools/roles/check_roles.py:96`); and `witness = { class = "<class>", by = "<the
+table's Witness cell>" }`. The class is `history` on `lease` (a ref), `gather` and `record` (a tracked
+file), and `hook-record` on `file`: its intake is node-local and never committed
+(TOOL-dWellOiledMachine-4 S1), so it is no `history` fact, and it is written through that hook's one
+writer `write_intake` (TOOL-dWellOiledMachine-27 S1), the class TOOL-dDeclaredLoop-5's table gives a
+record a hook writes. `inputs` is `["layer.runtime:GOV_CADENCE_KEY"]` on `lease`, and
 `["layer.observability:<what it reads>"]` on the others: the `METRICS` sources, the proposals, the walk's
-readings.
+readings. `python loop_lib.py --check` passes the four rows (AC7).
 
 ### The record
 
@@ -339,8 +351,9 @@ names; the unit it names owns the finding and its proof.
   against TOOL-dTendedCadence-1 F1 and ask TOOL-dTendedCadence-25, and states the ask on
   dDeclaredLoop that admits `cadence.loop`, filed as TOOL-dDeclaredLoop-110.
 - **id 37 · §4 "The registry row", AC8 (M17, `TOOL-dCalibratedLens-30`)** — The row carries
-  `unarmed = "no record yet; its writer is loop_review.py record"` (TOOL-dTotalRecall-42 S2), dropped
-  by S8's first record, and AC8 also runs `python tools/memory-tree/record_kinds.py --check` after the
+  `unarmed = "no record yet; its writer is loop_review.py record"` (TOOL-dTotalRecall-42 S2). The
+  commit that lands S8's first record and its snapshot drops `unarmed` from both the `loop-review` and
+  the `value-ledger` rows, and AC8 observes both drops; AC8 also runs `python tools/memory-tree/record_kinds.py --check` after the
   pass: exit 0.
 - **id 38 · Files touched, §7 (M18, `TOOL-dCalibratedLens-30`)** — After the row edit the pass runs
   `python tools/memory-tree/record_kinds.py --write`, then `adopt-memory-tree.sh --render`;
@@ -481,14 +494,18 @@ findings below, and its disposal amended this text. Its ids restart at 1, so eac
 - **AC7** — When `python loop_review.py run --check` runs over the tree, it prints `loop — 5
   item(s) · ok`; `run --dry-run --key 2026-W45` in the fixture prints the items in the order lease,
   gather, price, file, record, each with its outcome; the plant `dangling-route`, a route naming no row,
-  exits 2 naming it.
-  Red when: the walk runs out of `needs` order, or a dangling route passes.
+  exits 2 naming it; `python loop_lib.py --check` over the tree exits 0, refusing none of the four rows.
+  Red when: the walk runs out of `needs` order, a dangling route passes, or a row's allowance is not a
+  word of `WRITES` or its witness carries no class.
+  permission: `loop_lib.py` is TOOL-dDeclaredLoop-12's, built with ask TOOL-dDeclaredLoop-110 before this unit's build run.
 - **AC8** — (amended, id 37) When `grep -n 'name = "loop-review"' record-kinds.toml` and `grep -n -A8
   'name = "review.loop.cadence"' tools/policy/catalogue.toml` run, the first prints the row and the second
   shows `summary` and `usage`; `grep -cxE 'review\.loop\.(cadence|window-days)'
-  tools/policy/unsummarised-keys.txt` prints `0`; in a scratch worktree committing one record, `record_kinds.py
-  --check` exits 1 naming `unarmed` while the row keeps the key, and 0 with it dropped in that commit.
-  Red when: either row lacks a field, a name stays undrained, or the key outlives the first record.
+  tools/policy/unsummarised-keys.txt` prints `0`; in a scratch worktree committing one record and one
+  snapshot, `record_kinds.py --check` exits 1 naming `unarmed` while either the `loop-review` or the
+  `value-ledger` row keeps the key, and 0 only once that commit drops it from both.
+  Red when: either row lacks a field, a name stays undrained, or the key outlives the first record on
+  either row.
 - **AC9** — When `grep -n 'every-n-landings' loop-review.md` runs, it prints the section's line
   naming the period key form and the `landings` field.
   Red when: the section is absent.
@@ -569,6 +586,12 @@ New arm: tools/loop/loop_review.py · covers AC1 AC3 AC4 AC5 AC6 AC7 AC10 · the
   TOOL-dWellOiledMachine-128 and TOOL-dDeclaredLoop-110, id 37's `unarmed` naming its writer and dropped
   by the first record's commit, and `loop-review` bound through `RECORD_KIND_TOKENS`, by the brief
   prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md (cross-check rows 24, 26, 30, 31)
+- rev-7 · 2026-11-04 · §4 S8 AC7 AC8 · the cross-check folds' spec audit disposed, the four item rows'
+  `allowance` held to `WRITES` and each given a classed `witness`, `loop_lib.py --check` observed by AC7,
+  and the first period's commit dropping `unarmed` from both the `loop-review` and `value-ledger` rows
+  with AC8 committing a snapshot beside the record, by the brief
+  prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md (review
+  2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit, items M1 M5)
 
 ## 10. Reuse audit
 

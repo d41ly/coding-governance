@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-5 — instruction effectiveness from returns and findings that cite unit tags, and the Loop Review's proposals under `review.loop.retire`, with the keep record
 
-**Status:** DEFERRED · rev-5 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 11 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-6 · 2026-11-04 · node a · Tier-2 · base 8bec4cef · streams tooling · order 11 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0462@cad135ef whole
 **Carries:** node:item.loop.propose
@@ -18,13 +18,17 @@
 | [2026-11-03-build-TOOL-dCalibratedLens-5-deviation-53.md](../build/2026-11-03-build-TOOL-dCalibratedLens-5-deviation-53.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-5-deviation-54.md](../build/2026-11-03-build-TOOL-dCalibratedLens-5-deviation-54.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-5-deviation-55.md](../build/2026-11-03-build-TOOL-dCalibratedLens-5-deviation-55.md) | deviation | — |
+| [2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md](../build/2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-24 |
+| [2026-11-04-build-TOOL-dCalibratedLens-5-deviation-56.md](../build/2026-11-04-build-TOOL-dCalibratedLens-5-deviation-56.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-48 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 |
+| [2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md](../prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-24 |
 | [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
+| [2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md](../reviews/2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-46 |
 
 <!-- /gen:spec-records -->
 
@@ -51,7 +55,11 @@ and `read_units`), -11 (`tools/playbook/load_sets.py` and its `derive` verb, and
 `render_agent_file` and `render_handoff`), -2 S4 (the override record), -15 (`instructions_edit.py`, the
 change record and its `new change` stand-in door); TOOL-dFairHearing-8 S8 (the appendix's tenth column,
 `disposition`); TOOL-dTotalRecall-1 (the registry `tools/memory-tree/record-kinds.toml`); ask
-TOOL-dDeclaredLoop-110 (dDeclaredLoop's `BACKLOG.md`), S9's step.
+TOOL-dDeclaredLoop-110 (dDeclaredLoop's `BACKLOG.md`), S9's step; and, for AC9's red, ask
+TOOL-dTotalRecall-108 (the dTotalRecall `BACKLOG.md` row filed 2026-11-03, THE RECORD-KIND CHECK READS NO
+SERVES LINE OUTSIDE THE BUILD FOLDERS) with TOOL-dCalibratedLens-20's `**Serves:**` line on the keep: a
+keep under `memory/loop-review/` gets a kind only through both, since TOOL-dTotalRecall-42 S5 grades by the
+kind TOOL-dTotalRecall-53 S21 has each caller take from `read_bindings`, which walks the build folders only.
 
 - **S1** — (amended, id 35) A return cites unit tags. `UNIT_SCHEMA` (`tools/workflows/unattended-unit.js:206`) and
   `SPEC_SCHEMA` (`tools/workflows/unattended-build.template.js:739`, rendered into
@@ -162,7 +170,8 @@ TOOL-dDeclaredLoop-110 (dDeclaredLoop's `BACKLOG.md`), S9's step.
 - **hands-off** `TOOL-dCalibratedLens-10` — the appendix's `units` column and the return's `units` field, whose confirmed findings its eval cases are added from, and `PROPOSERS`, which gains its entry
 - **hands-off** `TOOL-dCalibratedLens-8` — `PROPOSERS`, which gains the map-retirement entry
 - **hands-off** `TOOL-dCalibratedLens-14` — `PROPOSERS`, which gains the scenario entry, and the keep record and `read_keep_records`, which its decline writes and reads under its own rule, never this unit's lapse
-- **consumes-from** external — PLAY-dOrderedCharter-9, -11, -2 S4 and -15, TOOL-dFairHearing-8 S8 and TOOL-dTotalRecall-1, each DEFERRED at base and of an ancestor or parent build
+- **consumes-from** external — PLAY-dOrderedCharter-9, -11, -2 S4 and -15, TOOL-dFairHearing-8 S8 and TOOL-dTotalRecall-1, each DEFERRED at base and of an ancestor or parent build; and ask TOOL-dTotalRecall-108 in `memory/builds/dTotalRecall/BACKLOG.md`, without which the record-kind check grades no keep (AC9)
+- **consumes-from** `TOOL-dCalibratedLens-20` — the keep's `**Serves:** keep TOOL-dCalibratedLens-5` line, the kind AC9's grading reads
 - **hands-off** `TOOL-dCalibratedLens-25` — the `returned` fence and `print_agent_lines`' `units` field, whose position that unit's format-guard fixtures hold (id 35)
 - **hands-off** `TOOL-dCalibratedLens-30` — the `[[usage]]` rows of `propose` and `keep`, which the minors batch's `docs_leg.py --list` observation reads (id 39)
 - **consumes-from** `TOOL-dCalibratedLens-35` — the `three-homes` plant's `graded-by-a-row` case, which grades the keep this unit adds to the plant with its `keep` row (round-2 id 1)
@@ -468,7 +477,10 @@ As for round 1, of the round-3 spec audit
   and `python loop_review.py --fixture --plant three-homes` prints `graded-by-a-row — ok · 3 records`
   naming the keep's path (r3 id 5).
   Red when: the `keep` row's fields do not reach the field check.
-  fixture: `record_kinds.py` is TOOL-dTotalRecall-1's, absent at `8bec4cef`.
+  fixture: `record_kinds.py` is TOOL-dTotalRecall-1's, absent at `8bec4cef`; its grading of a keep under
+  `memory/loop-review/` is TOOL-dTotalRecall-42 S5 read with TOOL-dTotalRecall-53 S21 and ask
+  TOOL-dTotalRecall-108, over TOOL-dCalibratedLens-20's Serves line, each a build-run precondition: without
+  them the check exits 0 on the keep, and the build run waits for the ask rather than editing the case.
 - **AC10** — When `grep -n -A8 'name = "review.loop.retire"' tools/policy/catalogue.toml` runs it shows
   `summary` and `usage`, `grep -cx 'review.loop.retire' tools/policy/unsummarised-keys.txt` prints `0`, and
   `git grep -n '"review.loop.retire"' -- tools/loop` prints the one literal reader.
@@ -565,6 +577,11 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC2 · an appendix fixtu
 - rev-5 · 2026-11-03 · §2 §3 §4 S9 AC9 · re-grounded against dTotalRecall's and dDeclaredLoop's specs,
   S9's row form and TOOL-dDeclaredLoop-110, `unarmed`, `keep` untyped, the owner's `keep`, by the brief prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md
   (cross-check rows 38, 40, 41)
+- rev-6 · 2026-11-04 · §2 §3 AC9 · the cross-check folds' spec audit disposed, ask
+  TOOL-dTotalRecall-108 and unit 20's Serves line named as build-run preconditions of AC9's red and
+  added to the consumes-from lines, by the brief
+  prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md (review
+  2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit, items M6)
 
 ## 10. Reuse audit
 

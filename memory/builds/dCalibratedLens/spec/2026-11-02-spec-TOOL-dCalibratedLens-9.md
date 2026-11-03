@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-9 — probe cost priced in the value ledger, and compactions counted per item kind
 
-**Status:** DEFERRED · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-5 · 2026-11-04 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0466@f36d2aed whole
 
@@ -17,6 +17,8 @@
 | [2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
 | [2026-11-03-build-TOOL-dCalibratedLens-9-deviation-93.md](../build/2026-11-03-build-TOOL-dCalibratedLens-9-deviation-93.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-9-deviation-94.md](../build/2026-11-03-build-TOOL-dCalibratedLens-9-deviation-94.md) | deviation | — |
+| [2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md](../build/2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-24 |
+| [2026-11-04-build-TOOL-dCalibratedLens-9-deviation-95.md](../build/2026-11-04-build-TOOL-dCalibratedLens-9-deviation-95.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-48 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
@@ -25,7 +27,10 @@
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-9-1-spec-reviewer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-9-1-spec-reviewer.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-9-2-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-9-2-spec-writer.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md](../prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-24 |
+| [2026-11-04-prompt-TOOL-dCalibratedLens-9-1-spec-writer.md](../prompts/2026-11-04-prompt-TOOL-dCalibratedLens-9-1-spec-writer.md) | journal | — |
 | [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
+| [2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md](../reviews/2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-46 |
 
 <!-- /gen:spec-records -->
 
@@ -63,7 +68,7 @@ writer at a compaction (TOOL-dWellOiledMachine-12 S8); and the record door's `fi
   `Item`, `Wall`, `Tokens-In` and `Tokens-Out` through `gov_record.py show <key>`: the same `show`
   also yields the row's `Act`, a field its other callers ignore. `withheld` is kept as written and
   an absent field printed as `null`. The loop kit runs it as a
-  bounded subprocess (60 s) through the inline `resolve_kit_dir` block the module already carries
+  bounded subprocess (180 s, sized in §4 id 51) through the inline `resolve_kit_dir` block the module already carries
   (TOOL-dCalibratedLens-2 S1), since a kit imports no sibling kit. A failed run, a timeout or no
   runtime kit found is a refused read: the provider prints one `ledger — probe · acts unread · <why>`
   line and returns no rows, never a zero cost. Observed by AC1 and AC6.
@@ -195,9 +200,10 @@ findings below on this spec, and its disposal amended this text. Each bullet sup
 names; the unit it names owns the finding and its proof.
 
 - **id 50 · S4 (H10, `TOOL-dCalibratedLens-28`)** — The probe records are listed with one
-  `git ls-files` over S3's pathspec `<MEMORY_ROOT>/builds/*/build/*-probe-[0-9]*.md`, each read
-  through `gov_record.py show`, and each `probe-trigger` record the same way; never
-  `gov_record.py find`, which stops at 40 rows.
+  `gov_record.py find --kind probe --all`, the uncapped mode of §2 that TOOL-dWellOiledMachine-32
+  §8 F6 (b) picks over a `git ls-files` listing, each read through `gov_record.py show`, and each
+  `probe-trigger` record through `show` of the key its probe's `Trigger` names. Until `--all` lands,
+  a listing that meets `find`'s total line refuses as §2 states, so no row is written short.
 - **id 31 · S6 (M15, `TOOL-dCalibratedLens-30`)** — The runtime journal read is one helper,
   `read_runtime_journal(root)`, the bounded `runlog.py journal --producer runtime` subprocess
   returning the parsed lines; `read_journal_compactions` filters it, and TOOL-dCalibratedLens-16 S3
@@ -207,9 +213,12 @@ names; the unit it names owns the finding and its proof.
   widening adds, applied to `find`'s rows before any `show`), and reads the act records through
   `read_act_records` over the uncapped `find` mode of §2, the owner's pick at TOOL-dWellOiledMachine-32
   §8 F6 (b), whose option (c), a `git ls-files` listing, is "a second reader of the records beside
-  the index"; `estimate` (TOOL-dCalibratedLens-17) stays all-time. The 60 s bound
-  is sized for the population a window holds, and AC1 also times `acts --since` over 500 planted act
-  records under it.
+  the index"; `estimate` (TOOL-dCalibratedLens-17) stays all-time. The door gives no batch read:
+  `show` takes one key (TOOL-dTotalRecall-9 S5, `gov_record.py show <id>[#<tag>][@<blob>]`), and
+  `read_act_records` runs one `show` per row (TOOL-dWellOiledMachine-53 S4). The bound is therefore
+  sized on one `show` per act: a window of 500 acts at about 80 ms per bare Python start costs about
+  40 s before the door does any work, so S1's bound is 180 s, 360 ms per `show`. AC1 times `acts
+  --since` once over 500 planted act records under it, and the build records the figure.
 - **id 11 · S7, AC8 (L1, `TOOL-dCalibratedLens-30`)** — An absent runtime journal file reads
   `searched-none` (nothing written yet); a refused or timed-out read, or no runlog kit, reads
   `compactions: unread · <reason>`, and AC8's refused-read case expects `unread`.
@@ -240,8 +249,9 @@ names; the unit it names owns the finding and its proof.
 - security — no new write path: the provider reads committed records, one `git log` and two kit CLIs,
   and its output lands through `price` and `record`, units 2 and 3's. The `acts` verb prints fields the
   committed act records already carry.
-- perf / scale — one `git log`, one `ledgers.py acts`, one `find --kind probe` and one `show` per probe
-  and trigger record; `read_act_records` costs one `show` per act, its own spec's ceiling.
+- perf / scale — one `git log`, one `ledgers.py acts`, one `find --kind probe --all` and one `show` per
+  probe and trigger record; `read_act_records` costs one `show` per act, its own spec's ceiling, and
+  S1's 180 s bound is sized on that (§4 id 51).
 - error / empty / loading states — a refused read prints its reason and yields no row rather than a
   zero; an unrecorded act is counted and named; an absent journal renders `searched-none`.
 - observability — every `ledger — probe` line names the origin and the count it could not price.
@@ -258,10 +268,14 @@ names; the unit it names owns the finding and its proof.
 - **AC1** — (amended, id 51) When `python ledgers.py acts` runs from the runtime kit directory in a scratch repository
   holding two act records, one with `Tokens-In: withheld`, it prints two JSON objects whose `key`,
   `act`, `item`, `tokens-in` and `tokens-out` match the records, the withheld one as `"withheld"`.
-  Red when: a withheld field is printed as `0`, the record is dropped, or a record's `Act` prints as
-  `null` or not at all.
+  With `--since` set to the later record's date, it prints that record alone. Run once by the build
+  over 500 planted act records inside the window, `acts --since` finishes under S1's 180 s bound, and
+  the build record names the wall time measured.
+  Red when: a withheld field is printed as `0`, the record is dropped, a record's `Act` prints as
+  `null` or not at all, a record dated before `--since` prints, or the 500-record run takes 180 s or
+  more.
   fixture: a scratch repository under `%TEMP%`; the act record kind is TOOL-dWellOiledMachine-32's,
-  absent at `8bec4cef`.
+  absent at `8bec4cef`. The 500-record timing is the build's one observation, not an arm case.
 - **AC2** — When a probe calls `derive_act_tokens` from `loop_review.py` on `{"tokens-in": "120",
   "tokens-out": "30"}`, `{"tokens-in": "withheld", "tokens-out": "30"}` and `{"tokens-in": "-4",
   "tokens-out": "1"}`, it returns `150`, `None` and `None`.
@@ -365,6 +379,12 @@ New arm: tools/runtime/ledgers.py · covers AC1 · a `fixture --case acts-withhe
   record as output tokens only, no input-token field, and the example and fixture tags are
   dDeclaredLoop's `item.build.unit-pass` and `item.review.dispose`, by the brief
   prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md (cross-check rows 77, 79, 80)
+- rev-5 · 2026-11-04 · §4 §5 §6 S1 AC1 · the cross-check folds' spec audit disposed, id 51's bound
+  re-derived for one `show` per act since the door gives no batch read, S1's bound 180 s and AC1
+  gaining the `--since` case and the 500-record timing, and id 50 listing probe records through
+  `find --kind probe --all` and `show` in place of `git ls-files`, by the brief
+  prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md (review
+  2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit, items M4, L5)
 
 ## 10. Reuse audit
 

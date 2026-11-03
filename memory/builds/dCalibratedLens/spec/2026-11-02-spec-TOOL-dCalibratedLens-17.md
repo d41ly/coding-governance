@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-17 — the node beats and the pools' ledgers trended, and the reservation estimate per item kind re-derived from `trace.cost`
 
-**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 10 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-3 · 2026-11-04 · node a · Tier-2 · base 8bec4cef · streams tooling · order 10 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0474@b1852db0 whole
 
@@ -10,10 +10,13 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-17-deviation-172.md](../build/2026-11-02-build-TOOL-dCalibratedLens-17-deviation-172.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md) | journal | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md](../build/2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-24 |
+| [2026-11-04-build-TOOL-dCalibratedLens-17-deviation-173.md](../build/2026-11-04-build-TOOL-dCalibratedLens-17-deviation-173.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 |
+| [2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md](../prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-24 |
 | [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
@@ -132,8 +135,8 @@ source. Segments sort by tag, pool or kind.
 ```
 node-beats: a 2/6 load 0.25 hold 0 · b 0/4 load 0.90 hold 1 · beat.py members --json
 pool-ledgers: personal 6h limit-hold reserved 4.5h/2 · personal@b unknown none · ledgers.py pools, beat.py members --json
-reservation-estimates: item.build.unit 0.15h p90/10 · item.review.audit 1.5h ceiling/3 · trace.cost tokens+wall · ledgers.py estimate
-capacity-trend: free@a 3 2 2 falling · estimate@item.build.unit 1.5 0.15 falling · load@b 0.90 new · 2 record(s) in window · loop-review/
+reservation-estimates: item.build.unit-pass 0.15h p90/10 · item.review.audit 1.5h ceiling/3 · trace.cost tokens+wall · ledgers.py estimate
+capacity-trend: free@a 3 2 2 falling · estimate@item.build.unit-pass 1.5 0.15 falling · load@b 0.90 new · 2 record(s) in window · loop-review/
 ```
 
 | Line | Segment | Fields, from |
@@ -237,8 +240,8 @@ names; the unit it names owns the finding and its proof.
 ## 6. Acceptance criteria
 
 - **AC1** — When `python ledgers.py fixture --case estimate` plants ten act records of
-  `item.build.unit` whose `Wall` runs 1 to 10 minutes and `python ledgers.py estimate` runs over it, it
-  prints `{"kind": "item.build.unit", "hours": 0.15, "rows": 10, "basis": "p90"}`, and the fixture's
+  `item.build.unit-pass` whose `Wall` runs 1 to 10 minutes and `python ledgers.py estimate` runs over it, it
+  prints `{"kind": "item.build.unit-pass", "hours": 0.15, "rows": 10, "basis": "p90"}`, and the fixture's
   fan-one reservation still carries `hours` 0.15; with nine records it prints `"hours": 1.5`, `"rows": 9`,
   `"basis": "ceiling"`.
   Red when: the verb computes the p90 itself, staged as a copy with `P90_MIN_ROWS` 9, so at nine records
@@ -247,7 +250,7 @@ names; the unit it names owns the finding and its proof.
 - **AC2** — When the same case plants the ten records with `Wall: withheld`, as `trace.cost` `tokens`
   writes them, `ledgers.py estimate` prints `"rows": 0` and `"basis": "ceiling"` for the kind, and
   `python loop_review.py --fixture --plant capacity-tokens` prints a `reservation-estimates`
-  line carrying `item.build.unit 1.5h ceiling/0` and `trace.cost tokens`.
+  line carrying `item.build.unit-pass 1.5h ceiling/0` and `trace.cost tokens`.
   Red when: a withheld wall is counted as a row, or the line omits the `trace.cost` value.
 - **AC3** — When `python beat.py fixture --case members` plants one lease beating now and
   one past `leases.expiry-hours`, `beat.py members --json` prints one object, the live tag's, carrying
@@ -269,10 +272,10 @@ names; the unit it names owns the finding and its proof.
   `node-beats` and `reservation-estimates` carry their planted values.
   Red when: one refused read blanks the other two lines.
 - **AC7** — When the plant `capacity-trend` commits two `loop-review` records inside a 60-day window
-  carrying `free@a` values 3 and 2 and `estimate@item.build.unit` 1.5 and 1.5, a third outside it
+  carrying `free@a` values 3 and 2 and `estimate@item.build.unit-pass` 1.5 and 1.5, a third outside it
   carrying `free@a` 9, and a fourth only in the working tree carrying `free@a` 7, and the walk reads
   `free@a` 2 and the estimate 0.15, `capacity-trend` carries `free@a 3 2 2 falling` and
-  `estimate@item.build.unit 1.5 1.5 0.15 falling`, its source `2 record(s) in window`.
+  `estimate@item.build.unit-pass 1.5 1.5 0.15 falling`, its source `2 record(s) in window`.
   Red when: the out-of-window or the uncommitted record enters a series.
 - **AC8** — When the same plant's earlier records carry `load@b` and the walk's beats lack node `b`,
   while the walk carries `load@c` that no record holds, the line carries `load@b … gone` and
@@ -326,6 +329,11 @@ New arm: tools/runtime/selftest.py · covers AC1 AC3 · the `estimate`, `members
 - rev-2 · 2026-11-02 · §3 §4 §7 S4 S5 AC5 AC6 · amended at the disposal of the round-1 spec audit
   `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1 spec
   audit)": ids 11, 30 and 39 (`TOOL-dCalibratedLens-30`); §3 gains the hands-off to unit 30.
+- rev-3 · 2026-11-04 · §4 §6 AC1 AC2 AC7 · the cross-check folds' spec audit disposed, the example
+  lines' and the estimate case's item tag is spelled `item.build.unit-pass` as dDeclaredLoop declares
+  it, aligned with TOOL-dCalibratedLens-16, by the brief
+  prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md (review
+  2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit, items L2)
 
 ## 10. Reuse audit
 

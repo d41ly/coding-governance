@@ -351,3 +351,13 @@ TOOL-dTotalRecall-2. A handoff's text cannot be edited without its marker's `tas
 `handoff.py check`. So the brief's line now reads `- **tr2, TOOL-dTotalRecall-2:** rev-7`, and the five
 reader handoffs were re-rendered in place with `--out`. Each differs from what its reader was sent in
 that one line and its marker's `task-sha`. Each reader's transcript holds the text it received.
+
+## The spec audit over both passes' folds
+
+A Tier-2 spec audit at full intensity read the 24 specs both passes revised on 2026-11-04. Its record
+is
+[`2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit`](../reviews/2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md).
+
+- **Verdict:** CLEAN WITH FIXES. No blocker and no high, with 12 medium and 9 low items.
+- **Disposal:** all 21 items were folded as LOCAL into 15 specs, and unit 20 then gained the edges that pair M6's. That record's "Disposal" section
+  lists them.

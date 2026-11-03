@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-2 — the shared value ledger: its snapshot, its view, its row grammar and the `price` verb
 
-**Status:** DEFERRED · rev-6 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 1 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-7 · 2026-11-04 · node a · Tier-2 · base 8bec4cef · streams tooling · order 1 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0459@facc646b whole
 **Carries:** node:record-kind.value-ledger
@@ -23,6 +23,8 @@
 | [2026-11-03-build-TOOL-dCalibratedLens-2-deviation-24.md](../build/2026-11-03-build-TOOL-dCalibratedLens-2-deviation-24.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-2-deviation-25.md](../build/2026-11-03-build-TOOL-dCalibratedLens-2-deviation-25.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-2-deviation-26.md](../build/2026-11-03-build-TOOL-dCalibratedLens-2-deviation-26.md) | deviation | — |
+| [2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md](../build/2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-24 |
+| [2026-11-04-build-TOOL-dCalibratedLens-2-deviation-27.md](../build/2026-11-04-build-TOOL-dCalibratedLens-2-deviation-27.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-15 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
@@ -34,7 +36,9 @@
 | [2026-11-03-prompt-TOOL-dCalibratedLens-2-1-spec-reviewer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-2-1-spec-reviewer.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-2-2-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-2-2-spec-writer.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-2-3-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-2-3-spec-writer.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md](../prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-24 |
 | [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
+| [2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md](../reviews/2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-46 |
 
 <!-- /gen:spec-records -->
 
@@ -192,7 +196,7 @@ TOOL-dDeclaredLoop-110 in `memory/builds/dDeclaredLoop/BACKLOG.md` (AC8, id 26).
 | Column | Value | Source |
 |---|---|---|
 | `kind` | the provider's key: `leg` here | `PROVIDERS` |
-| `id` | the priced thing's name, `|` escaped as `\|` | the provider |
+| `id` | the priced thing's name, a pipe in it escaped as backslash-pipe | the provider |
 | `since` | ISO date it first existed | the provider |
 | `cost` | `<number><unit>/<runs>`, unit `s` or `tok`, or `-` | the provider |
 | `catches` | own events in the window, or `-` where the source names none for the kind | the catch source, or the provider |
@@ -316,8 +320,9 @@ names; the unit it names owns the finding and its proof.
   `unarmed = "no snapshot is tracked until loop_review.py record lands the first period"`
   (TOOL-dTotalRecall-42 S2), and AC7 also runs `python tools/memory-tree/record_kinds.py --check`
   after the pass: exit 0. The check reds the key once the home matches a file, so the commit that
-  lands the first snapshot, TOOL-dCalibratedLens-3 S8's patch build, drops `unarmed` from this row,
-  and that unit's AC observes the dropped key.
+  lands the first snapshot and its record, TOOL-dCalibratedLens-3 S8's patch build, drops `unarmed`
+  from both the `loop-review` and the `value-ledger` rows, and TOOL-dCalibratedLens-3 AC8 observes
+  both drops.
 - **id 38 · S6 (M18, `TOOL-dCalibratedLens-30`)** — After the row edit the pass runs
   `python tools/memory-tree/record_kinds.py --write`, which renders the `<!-- gen:record-kinds -->`
   region of `tools/memory-tree/HYGIENE.template.md`, then `adopt-memory-tree.sh --render` into
@@ -519,6 +524,11 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC7 · a fixtu
   moves to `loop.md`, `value-ledger` binds through `RECORD_KIND_TOKENS`, and unit 3 S8 drops
   `unarmed`, by the brief prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md
   (cross-check rows 11, 13, 14, 16, 20)
+- rev-7 · 2026-11-04 · §4 · the cross-check folds' spec audit disposed, id 37 naming
+  TOOL-dCalibratedLens-3 AC8 as the observer of the `unarmed` drop on both rows, and the `id` row's
+  escape rule said in words so its cell holds no bare pipe, by the brief
+  prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md (review
+  2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit, items M5 L4)
 
 ## 10. Reuse audit
 
