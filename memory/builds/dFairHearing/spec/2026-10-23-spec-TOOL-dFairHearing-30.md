@@ -18,6 +18,8 @@
 | [2026-11-03-prompt-TOOL-dFairHearing-25-fold-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-25-fold-fix-brief.md) | research | TOOL-dFairHearing-25 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-37 TOOL-dFairHearing-40 |
 | [2026-11-03-prompt-TOOL-dFairHearing-25-reorder-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-25-reorder-fix-brief.md) | research | TOOL-dFairHearing-25 TOOL-dFairHearing-35 |
 | [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
+| [2026-11-04-prompt-TOOL-dFairHearing-30-pass-a-build-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-30-pass-a-build-brief.md) | research | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-30-pass-b-build-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-30-pass-b-build-brief.md) | research | — |
 | [2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md) | spec-audit | TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-31 TOOL-dFairHearing-32 |
 
 <!-- /gen:spec-records -->
