@@ -11,13 +11,13 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | Build | Status | Node | Opened | Streams | Ids (n) | Last record | Activity | Landed-unclosed |
 |---|---|---|---|---|---|---|---|---|
 | [aOrientedCast](builds/aOrientedCast/README.md) | OPEN | a | 2026-10-11 | tooling+kickoff+playbook | 33 | 2026-10-16 | active | 0 |
-| [aScoutedSeam](builds/aScoutedSeam/README.md) | SPECCED | a | 2026-10-11 | tooling+kickoff+deployer | 5 | 2026-10-19 | active | 0 |
+| [aScoutedSeam](builds/aScoutedSeam/README.md) | SPECCED | a | 2026-10-11 | tooling+kickoff+deployer | 5 | 2026-10-19 | active | 1 |
 | [dBoundRoles](builds/dBoundRoles/README.md) | DEFERRED | d | 2026-10-21 | tooling | 75 | 2026-10-26 | active | 0 |
 | [dCalibratedLens](builds/dCalibratedLens/README.md) | OPEN | d | 2026-10-21 | tooling | 19 | 2026-11-02 | active | 0 |
 | [dClosedLoop](builds/dClosedLoop/README.md) | INPROGRESS | d | 2026-10-14 | playbook+kickoff+tooling+deployer | 39 | 2026-10-26 | active | 0 |
 | [dConvergedCharter](builds/dConvergedCharter/README.md) | OPEN | d | 2026-10-21 | playbook | 24 | 2026-10-21 | active | 0 |
 | [dDeclaredLoop](builds/dDeclaredLoop/README.md) | DEFERRED | d | 2026-10-21 | tooling | 108 | 2026-11-02 | active | 0 |
-| [dFairHearing](builds/dFairHearing/README.md) | INPROGRESS | d | 2026-10-21 | tooling | 41 | 2026-11-03 | active | 0 |
+| [dFairHearing](builds/dFairHearing/README.md) | DEFERRED | d | 2026-10-21 | tooling | 41 | 2026-11-03 | active | 0 |
 | [dFurnishedOrders](builds/dFurnishedOrders/README.md) | DEFERRED | d | 2026-10-21 | tooling | 61 | 2026-10-28 | active | 0 |
 | [dIndexedDesign](builds/dIndexedDesign/README.md) | DEFERRED | d | 2026-10-21 | tooling | 53 | 2026-10-28 | active | 0 |
 | [dKeptSession](builds/dKeptSession/README.md) | DEFERRED | d | 2026-10-21 | kickoff | 66 | 2026-10-26 | active | 0 |

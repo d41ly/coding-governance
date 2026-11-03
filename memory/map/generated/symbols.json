@@ -298,6 +298,11 @@
       "file": "tools/run-gates/regen.py"
     },
     {
+      "id": "Refusal",
+      "kind": "class",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "Refused",
       "kind": "class",
       "file": "tools/workflows/render_lenses.py"
@@ -4163,6 +4168,11 @@
       "file": "tools/push-main.sh"
     },
     {
+      "id": "check_case",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "check_catalogue",
       "kind": "function",
       "file": "tools/workflows/render_lenses.py"
@@ -4783,6 +4793,11 @@
       "file": "tools/unattended/stop-guard.test.sh"
     },
     {
+      "id": "check_hit",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "check_hold_code",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -4916,6 +4931,11 @@
       "id": "check_inplace_preconditions",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_instances",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "check_invariant",
@@ -5311,6 +5331,11 @@
       "id": "check_path_match",
       "kind": "function",
       "file": "tools/codebase-map/replay-phrases.py"
+    },
+    {
+      "id": "check_path_match",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "check_path_read_arm",
@@ -5780,7 +5805,7 @@
     {
       "id": "check_same_file",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "check_same_value",
@@ -8458,6 +8483,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_paired_cases",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "derive_parallel_step",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -8481,6 +8511,11 @@
       "id": "derive_path_key",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "derive_path_key",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "derive_peak",
@@ -8606,6 +8641,11 @@
       "id": "derive_redacted",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "derive_ref_parts",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "derive_refreshed_at",
@@ -9798,6 +9838,11 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "extract_code_tokens",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "extract_conf_keys",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
@@ -9870,7 +9915,7 @@
     {
       "id": "extract_line_ref",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "extract_microformat_shapes",
@@ -9920,7 +9965,7 @@
     {
       "id": "extract_range",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "extract_reason",
@@ -9960,7 +10005,7 @@
     {
       "id": "extract_section_ref",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "extract_segments",
@@ -9975,17 +10020,22 @@
     {
       "id": "extract_stated_count",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "extract_subject_pins",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "extract_supersessions",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "extract_tag_ref",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "extract_task_fields",
@@ -11750,6 +11800,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/workflows/review_pin.py"
     },
     {
@@ -12120,7 +12175,7 @@
     {
       "id": "measure_recall",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "measure_red_streak",
@@ -12135,7 +12190,7 @@
     {
       "id": "measure_replay",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "measure_round_count",
@@ -12166,6 +12221,21 @@
       "id": "measure_run",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "measure_scouted_compare",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "measure_scouted_grade",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "measure_scouted_judged",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "measure_scratch_bytes",
@@ -12845,7 +12915,7 @@
     {
       "id": "parse_appendix_rows",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "parse_args",
@@ -12865,7 +12935,7 @@
     {
       "id": "parse_candidates",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "parse_ceilings",
@@ -13085,7 +13155,7 @@
     {
       "id": "parse_record_findings",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "parse_record_markdown",
@@ -14156,6 +14226,11 @@
       "id": "read_arm_rows",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
+      "id": "read_arm_rows",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "read_ask_back",
@@ -15473,6 +15548,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "read_judge_cell",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "read_judged_kinds",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -16198,6 +16278,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "read_proof_tree",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "read_public_times",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -16206,6 +16291,11 @@
       "id": "read_pybin_alias",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "read_raw_output",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "read_receipt",
@@ -16255,7 +16345,7 @@
     {
       "id": "read_record_kind",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "read_recorded_phase",
@@ -16553,9 +16643,19 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
+      "id": "read_scouted_population",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "read_scratch_file",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "read_seam_row",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "read_serves_ids",
@@ -18711,6 +18811,11 @@
       "id": "render_policy_text",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "render_population",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "render_prof_line",
@@ -22920,6 +23025,11 @@
     {
       "id": "run_selftest",
       "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
       "file": "tools/workflows/review_replay.py"
     },
     {
@@ -23781,6 +23891,11 @@
       "id": "scan_owner_turns",
       "kind": "function",
       "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "scan_pairing_sites",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "scan_prefix_token",

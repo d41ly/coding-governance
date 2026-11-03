@@ -751,11 +751,12 @@ does a lens set or a prompt change find MORE of what a previous review proved re
   its confirmed count and how many a candidate matched.
   **Spec mode** is chosen when the known record's first non-blank line is the `**Serves:** spec-audit`
   binding. The known set is read from its appendix ONLY: with none it is refused `no-appendix`, never
-  scored as zero and never read through the legacy table. A spec ref is `<file>:<where>`, and the
-  section rule reads the first `§<n>` or `section <n>` in the address, else the first `S<n>`, `AC<n>`
-  or `F<n>` as §2, §6 or §8; an address naming none (`status header`) is UNSCORABLE. A match is the
-  same file and the same SECTION: the window is forced to 0, `--window` is ignored, and the
-  candidate line prints `address section`. The `replay: known` line carries `kind spec-audit` and the
+  scored as zero and never read through the legacy table. A spec ref is `<file>:<where>`, read by
+  `extract_tag_ref`: its key is the first lower-case `[tag]` anywhere in the address, as a
+  design-record audit addresses a finding, else the section rule: the first `§<n>` or `section <n>`,
+  else the first `S<n>`, `AC<n>` or `F<n>` as §2, §6 or §8; an address naming none (`status header`)
+  is UNSCORABLE. A match is the same file and the same key, compared by equality: the window is
+  forced to 0, `--window` is ignored, and the candidate line prints `address section`. The `replay: known` line carries `kind spec-audit` and the
   subject pins written after the binding line, or `subjects none-stated`; no range is required. A
   candidate opening with the other kind's `**Serves:**` binding is refused `kind-mismatch`, naming
   both kinds, in either direction; an unbound candidate is read in the known record's mode. Spec
@@ -766,8 +767,35 @@ does a lens set or a prompt change find MORE of what a previous review proved re
   count. The summary line puts every scanned record in exactly one bucket. Ranges resolve through
   ONE `git cat-file --batch-check` for the whole corpus.
 - `python3 {kit}/review_replay.py --selftest` — named arms over inline fixtures, no file
-  or git access; red when an arm fails or fewer arms ran than its `ARMS_DECLARED` states. It is the held leg
-  `review-replay selftest`.
+  or git access, then the factory's runner below; red when an arm of either fails or either ran fewer
+  arms than its own `ARMS_DECLARED` states. It is the held leg `review-replay selftest`.
+
+**The replay scorer factory, `replay_scorer.py`** (`TOOL-dFairHearing-12`). The scoring core above
+lives there as its `review-replay` instance, and this file is that instance's adapter: its CLI, its
+printer, its corpus listing and its arms. The second instance, `scouted-seam`, is aScoutedSeam's
+reuse grader (`check_hit`, `check_case` and the `grade`, `compare` and `judged` readings), ported from
+its grader blob at `b0fe68f30`. Both sit in one `INSTANCES` table, and `check_instances` reds when it
+lacks either. Every population arrives as a `<src>`: a working-tree path, a 40-hex blob or
+`<rev>:<path>`, read by one `git cat-file blob`, and an object git cannot read is refused, never an
+empty arm. `derive_paired_cases` is the one place variants are paired with cases: it refuses an
+answer outside the population, a variant that answered nothing and an empty pairing, and each figure
+line opens with `paired <n> of <N> · <variant> unanswered <ids>`, in the case file's and the
+arguments' order.
+
+- `python3 {kit}/replay_scorer.py --instance scouted-seam --cases <src> --results <src> --grade <arm>`,
+  `--compare <arm> <arm> [...]` or `--judged <arm|a+b> [...]`.
+- `python3 {kit}/replay_scorer.py --instance review-replay --known <src> --candidate <src> [--window N]`
+  — the same score `review_replay.py` prints, its inputs read as `<src>`.
+
+Its runner's arms: the pairing and row refusals, the `[tag]` reading, the instance check, a proof
+that the port reproduces the grader's figures over the committed cases and results at `b0fe68f30`,
+determinism across two hash seeds, and the conformance arm. That arm, `scan_pairing_sites`, reds on a
+second scorer: a comprehension in a tracked `*.py` under the tool root, the factory excepted, whose
+filter is `all()` over a second population testing the outer case against the inner variant. It
+reads Python only, and a pairing written as a `for` loop is not seen. In a tree without
+`memory/builds/aScoutedSeam/` the proof prints `SKIP`, and so does the conformance arm once its
+live-root and planted halves pass, its grader half unread; the count line names each skip, so an
+install outside this repo never reads a skip as a pass.
 
 **Liveness, the reason a score can be trusted at all.** Both inputs must reproduce their own stated
 confirmed count from what was extracted, or they are REFUSED with exit 2 naming both numbers — for a
