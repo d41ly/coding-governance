@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-49 — the round-1 spec audit's 73 minors: criteria that can pass, rows a new leg owes, one reader per fact, and seams in build order
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 39 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 39 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -145,10 +145,6 @@ L<n>'s AC<45+n>, and merged ids share one.
 - **S37** — id 43. Unit 16's `import` detector resolves a module through the importer's `sys.path`;
   failing that, a name also in a core home or beside the importer is no non-core edge
   (`tools/run-gates/measure_legs.py:1001-1006` imports process-monitor's `census`). Observed by AC28.
-- **S38** — id 44. `derive_baseline_additions` moves to `tools/lib/coverage_join.py` taking the baseline
-  text; `map_lib`'s wrapper supplies `map_root(root)/'baseline.toml'`
-  (`tools/codebase-map/map_lib.py:214-216`, `:1530`), so the core reads no optional kit's conf (unit
-  19 S9, F2). Observed by AC29.
 - **S39** — id 46. Unit 37's run arm spawns through govkit's `resolve_bash()`
   (`tools/govkit/govkit.py:1144`), never a bare `bash`. Observed by AC30.
 - **S40** — id 51. Unit 24's `tools/playbook/edges.toml` registers `consumes-from` and `hands-off` as
@@ -267,7 +263,7 @@ L<n>'s AC<45+n>, and merged ids share one.
 - **consumes-from** `PLAY-dOrderedCharter-15` — S15, S53
 - **consumes-from** `PLAY-dOrderedCharter-16` — S37, S67
 - **consumes-from** `PLAY-dOrderedCharter-18` — S16 to S20, S27 to S29, S47, S48, S69, S70
-- **consumes-from** `PLAY-dOrderedCharter-19` — S12, S38, S44, S50, S51
+- **consumes-from** `PLAY-dOrderedCharter-19` — S12, S44, S50, S51
 - **consumes-from** `PLAY-dOrderedCharter-20` — S13, S64
 - **consumes-from** `PLAY-dOrderedCharter-22` — S14, S43
 - **consumes-from** `PLAY-dOrderedCharter-23` — S59
@@ -470,9 +466,6 @@ Live at landing, last and alone (§3).
 - **AC28** — When unit 16's leg runs with a same-name plant (`census` in a core and a non-core home), it
   reports no edge for `measure_legs.py`'s import.
   Red when: a namesake becomes a non-core edge.
-- **AC29** — When `git -C tools/lib grep -n "map_root\|load_conf" -- coverage_join.py` runs, it prints
-  nothing, and unit 19's codebase-map arm stays green.
-  Red when: the core reads codebase-map's conf.
 - **AC30** — When the run arm runs with a PATH whose first `bash` is a planted stub, the stub is never
   called.
   Red when: a bare `bash` is spawned.
@@ -620,6 +613,7 @@ New arm: tools/run-gates/run-gates.test.sh · covers AC2 · the canary's key set
   report id.
 - rev-2 · 2026-10-24 · §3 · Edges mirror those units 50, 54 and 55 declare against this unit.
 - rev-3 · 2026-10-24 · §1 · §2 · §3 · §4 · §6 · §7 · §8 · re-grounded by `../build/2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md`, row 50, U1 and U7: S1 follows unit 37's policy page, S30 and S31 read `budgets.*` caps, and the census is a step of its own (F3); trimmed under its cap: §1's id map, the edge glosses, §2's subheadings and §4 Order go, each fact kept.
+- rev-4 · 2026-11-03 · §2 · §3 · §6 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-divergence-brief.md` Item 3: S38 and AC29 (id 44) go, folded into PLAY-dOrderedCharter-19's S9 and AC17 under BUILD-METHOD M4, since unit 19 moves `derive_baseline_additions` before this unit runs; the edge to unit 19 drops S38, every other item and its id kept.
 
 ## 10. Reuse audit
 
