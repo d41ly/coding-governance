@@ -131,14 +131,14 @@ function readOutputTokens() {
 //   batchBy: "id" | "address",           // DEFAULTS to "id": the order the findings are sliced into skeptic
 //                                         // batches in, "address" sorting them by deriveAddressKey so two
 //                                         // lenses citing one place meet one skeptic; refused outside the set
-//   addressTwins: "hidden" | "shown",    // DEFAULTS to "hidden": "shown" hands the synthesis every refuted
+//   addressTwins: "hidden" | "shown",    // DEFAULTS to "shown": it hands the synthesis every refuted
 //                                         // finding's claim and reason and each confirmed/refuted pair at one
 //                                         // address, and has it return `twinFlags`; refused outside the set
 //   twin: "never" | "design-records" | "design-and-landing" | "always", // DEFAULTS to "never": the
 //                                         // `review.twin` key, passed as a pin argument. A run it twins dispatches
 //                                         // a second finder run, run b, and the synthesis merges the two; refused
 //                                         // outside the set (TOOL-dFairHearing-11)
-//   fixJudge: "instance" | "class",      // DEFAULTS to "instance": "class" has the skeptic judge each fix by the
+//   fixJudge: "instance" | "class",      // DEFAULTS to "class": it has the skeptic judge each fix by the
 //                                         // defect's class and adds the fix verdict `instance`; refused outside
 //                                         // the set, and it joins the review key under "class" only
 //   unclassed: "refuse" | "reason" | "owner-rules", // DEFAULTS to "refuse": the `review.unclassed` key, passed
@@ -262,9 +262,9 @@ const batchBy = a.batchBy === undefined ? 'id' : a.batchBy
 if (typeof batchBy !== 'string' || ['id', 'address'].indexOf(batchBy) === -1)
   throw new Error('tier2-review: `batchBy` must be one of id | address. Got ' + JSON.stringify(a.batchBy) + '.')
 // TOOL-dFairHearing-7 S2 - `addressTwins`, in the shape of `batchBy`: a closed set refused outside it before
-// any agent, dark at `hidden` until the replay records a hit. It joins no review key: the synthesis it
-// changes writes no keyed file.
-const addressTwins = a.addressTwins === undefined ? 'hidden' : a.addressTwins
+// any agent, `shown` by default since TOOL-dFairHearing-1's replay 3 met its bar. It joins no review key:
+// the synthesis it changes writes no keyed file.
+const addressTwins = a.addressTwins === undefined ? 'shown' : a.addressTwins
 if (typeof addressTwins !== 'string' || ['hidden', 'shown'].indexOf(addressTwins) === -1)
   throw new Error('tier2-review: `addressTwins` must be one of hidden | shown. Got ' + JSON.stringify(a.addressTwins) + '.')
 // TOOL-dFairHearing-11 S4 - `twin`, the policy key `review.twin` passed as a pin argument until dDeclaredLoop's
@@ -275,9 +275,9 @@ const twin = a.twin === undefined ? 'never' : a.twin
 if (typeof twin !== 'string' || TWINS.indexOf(twin) === -1)
   throw new Error('tier2-review: `twin` must be one of ' + TWINS.join(' | ') + '. Got ' + JSON.stringify(a.twin) + '.')
 // TOOL-dFairHearing-8 S1 - `fixJudge`, in the shape of `intensity`: a closed set refused outside it before any agent,
-// dark at `instance` until the replay decides. `class` adds the fix verdict `instance` to FIX_VERDICTS below and joins
-// the review key; `instance` leaves every skeptic prompt and the key as they were.
-const fixJudge = a.fixJudge === undefined ? 'instance' : a.fixJudge
+// `class` by default since TOOL-dFairHearing-1's replay 4 met its bar. `class` adds the fix verdict `instance` to
+// FIX_VERDICTS below and joins the review key; `instance` leaves every skeptic prompt and the key as they were.
+const fixJudge = a.fixJudge === undefined ? 'class' : a.fixJudge
 if (typeof fixJudge !== 'string' || ['instance', 'class'].indexOf(fixJudge) === -1)
   throw new Error('tier2-review: `fixJudge` must be one of instance | class. Got ' + JSON.stringify(a.fixJudge) + '.')
 // S3 - `unclassed`, the policy key `review.unclassed` passed as a pin argument until dDeclaredLoop's `review.trigger`
@@ -1206,8 +1206,8 @@ const REVIEW_SHAPE = 'lenses5-r4'
 // per-preset caller passing the same notes derive one key, and every flat-form key holds.
 // TOOL-dFairHearing-11 S8 - and `twin: true` ONLY on a twinned run, so it never reuses an untwinned run's lens
 // or verify files, and every untwinned key holds. The probe's type stays out: it writes no keyed file.
-// TOOL-dFairHearing-8 S2 - and `fixJudge` ONLY under `class`, so a class-judged verify file is never reused by a dark
-// run and every key a run without it derives holds. `unclassed` and `legManifest` reach the synthesis alone, and stay out.
+// TOOL-dFairHearing-8 S2 - and `fixJudge` ONLY under `class`, so a class-judged verify file is never reused by an
+// `instance` run and every key a run without it derives holds. `unclassed` and `legManifest` reach the synthesis alone, and stay out.
 const inputPrint = deriveFnv1a(renderCanonical(Object.assign({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: runNotes, specs: SPECS, checklist: checklist, intensity: intensity, ...(isSpec ? { probeRules: PROBE_RULES } : {}),
   ...(prevBlobCount ? { prevBlobs: subjects.map((x) => (x && typeof x === 'object' && x.prevBlob !== undefined ? x.prevBlob : null)) } : {}) }, workerType ? { workerType: workerType } : {},
   roledJudges ? { roles: { find: roles[finderKey] || null, verify: roles.skeptic || null } } : {}, preset !== 'unit-spec' ? { preset: preset } : {},
@@ -1699,7 +1699,7 @@ const verdictResults = await boundedParallel(
         // TOOL-aSightedSkeptic-2 S2 - the fix is judged as a SECOND, separate question. It never moves
         // the claim's verdict (spec section 8 F1): a real defect with a bad fix is still a real defect.
         // TOOL-dFairHearing-8 S2 - under `fixJudge: 'class'` the second variant, judged by the defect's class; the
-        // first keeps today's bytes, so a dark run's verify prompt is unchanged.
+        // first keeps the pre-switch bytes, so an `instance` run's verify prompt is unchanged.
         (fixJudge === 'class'
           ? `\n\nTHE FIX, A SECOND AND SEPARATE QUESTION. For each finding also judge its proposed fix by the defect's CLASS, as \`fixVerdict\`: ` +
             `"sound" when applying it cures the defect's class, every instance of the pattern the claim names in the subject and the code ` +

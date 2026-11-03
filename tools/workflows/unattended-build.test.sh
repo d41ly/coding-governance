@@ -978,8 +978,9 @@ build_merged_returns() {
     for (const [prefix, count] of Object.entries(shape.lenses))
       out[prefix] = { lens: "l", path: "/cd/find.json", findings: Array.from({ length: count }, () => finding) }
     out["verify:"] = { path: "/cd/verify.json", verdicts }
+    // TOOL-dFairHearing-1 S9 - `twinFlags`, which the synthesis schema requires since `addressTwins` defaults to shown.
     out.synth = { path: "r/merged.md", summary: shape.summary, blockers: shape.typed[0], highs: shape.typed[1],
-      items: process.argv[1] === "absent" ? undefined : JSON.parse(process.argv[1]) }
+      items: process.argv[1] === "absent" ? undefined : JSON.parse(process.argv[1]), twinFlags: [] }
     console.log(JSON.stringify(out))
   ' "$1" "${2:-48}" "${3:-}"
 }
@@ -1038,7 +1039,7 @@ has    "MT a lowercase severity is the same word" "$au" '"blockers":3,"highs":6'
 # names `items`, and a synthesis double with no `items` key is refused the way the runtime refuses a
 # return missing a required key: the callee reads a dead synthesis, so neither count is invented.
 t2=$(run_merged_review "$(build_merged_returns "$MT_MERGED")")
-has    "MT the synthesis prompt asks for the item list" "$(printf '%s\n' "$t2" | grep '^prompt:synth:')" 'Return JSON {path, items, summary}'
+has    "MT the synthesis prompt asks for the item list" "$(printf '%s\n' "$t2" | grep '^prompt:synth:')" 'Return JSON {path, items, summary, twinFlags}'
 t2=$(run_merged_review "$(build_merged_returns absent)")
 au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
 has    "MT a synthesis return without items is refused by its schema" "$au" 'the synthesis agent died'

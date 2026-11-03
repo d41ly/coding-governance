@@ -293,7 +293,7 @@ armClosedSet('batchBy', 'batchBy: null is refused', { batchBy: null }, 'refused'
       'twins: a spec finding at `section 2 S5` pairs with one at `§2`, and `status header` pairs with nothing: ' + JSON.stringify(sgot))
   }
 }
-armClosedSet('addressTwins', 'addressTwins: absent resolves to hidden', {}, 'hidden')
+armClosedSet('addressTwins', 'addressTwins: absent resolves to shown', {}, 'shown')
 armClosedSet('addressTwins', 'addressTwins: hidden proceeds', { addressTwins: 'hidden' }, 'hidden')
 armClosedSet('addressTwins', 'addressTwins: shown proceeds', { addressTwins: 'shown' }, 'shown')
 armClosedSet('addressTwins', "addressTwins: 'on' is refused", { addressTwins: 'on' }, 'refused')
@@ -490,8 +490,11 @@ const B = 'b'.repeat(40)
 const H = 'c'.repeat(40)
 // TOOL-aMendedFleet-93 S4 - absent `workerType` reads as Plan, so the durable-spawn arms below pin `none`,
 // which spawns exactly as an absent value did before the default.
-const DIFF = { repo: '/tmp/r', base: B, head: H, round: 1, context: 'ctx', reviewDir: 'memory/reviews', workerType: 'none' }
-const SPEC = { repo: '/tmp/r', kind: 'spec-audit', round: 1, context: 'ctx', subjects: [{ path: 'memory/builds/dX/spec/s.md', blob: 'abc1234', id: 'TOOL-x-1', rev: 1 }], scratch: '/tmp/s', workerType: 'none' }
+// TOOL-dFairHearing-1 S9 - absent `addressTwins` reads as shown and absent `fixJudge` as class, so every arm
+// below pins `hidden` and `instance`, which run exactly as an absent value did before the two flips; the
+// arms that read the defaults themselves delete the pins.
+const DIFF = { repo: '/tmp/r', base: B, head: H, round: 1, context: 'ctx', reviewDir: 'memory/reviews', workerType: 'none', addressTwins: 'hidden', fixJudge: 'instance' }
+const SPEC = { repo: '/tmp/r', kind: 'spec-audit', round: 1, context: 'ctx', subjects: [{ path: 'memory/builds/dX/spec/s.md', blob: 'abc1234', id: 'TOOL-x-1', rev: 1 }], scratch: '/tmp/s', workerType: 'none', addressTwins: 'hidden', fixJudge: 'instance' }
 const buildProbe = (finds, verifies, base, head) => ({ commonDir: '/cd', base: base || B, head: head || H, finds: finds || [], verifies: verifies || [] })
 // One finding per lens, so five lenses make five ids and five batches of one: verify:batch-1 .. verify:batch-5.
 const buildLensReturn = (label) => {
@@ -2284,9 +2287,9 @@ async function runTwinArms() {
   const scanSynthCall = (run) => run.trace.find((t) => t.label === 'synth') || { prompt: '', schema: { required: [], properties: {} } }
   const FLAGS = [{ refuted: 2, confirmed: 1 }, { refuted: 2, confirmed: 1 }, { refuted: 1, confirmed: 2 }, { refuted: 9, confirmed: 1 }]
   const BY_DESIGN = { 2: { verdict: 'refuted', reason: 'by design' } }
-  // ---- AC3: the shown prompt carries both blocks and the schema requires twinFlags; the default carries neither.
+  // ---- AC3: the shown prompt carries both blocks and the schema requires twinFlags; the hidden one carries neither.
   const rs = await runTwins('shown', BY_DESIGN, FLAGS)
-  const rh = await runTwins(undefined, BY_DESIGN, FLAGS)
+  const rh = await runTwins('hidden', BY_DESIGN, FLAGS)
   if (checkNoThrow(rs, 'twins shown') && checkNoThrow(rh, 'twins hidden')) {
     const ss = scanSynthCall(rs)
     const sh = scanSynthCall(rh)
@@ -2299,7 +2302,7 @@ async function runTwinArms() {
     ck(sh.prompt.length > 0 && sh.prompt.indexOf('REFUTED findings') === -1 && sh.prompt.indexOf('SAME-ADDRESS PAIRS') === -1 &&
       sh.prompt.indexOf('twinFlags') === -1 && sh.schema.required.indexOf('twinFlags') === -1 && !('twinFlags' in sh.schema.properties) &&
       !('twinFlags' in rh.result) && !('twinPairs' in rh.result),
-      'twins: the default run hands neither block, a schema without twinFlags, and returns neither field')
+      'twins: the hidden run hands neither block, a schema without twinFlags, and returns neither field')
     // ---- AC4: one flag kept, its repeat dropped, the two naming a wrong verdict discarded and named.
     ck(JSON.stringify(rs.result.twinFlags) === JSON.stringify([{ refuted: 2, confirmed: 1, sameAddress: true }]) && rs.result.twinPairs === 1 &&
       rs.logs.some((l) => l.indexOf('WARNING: 2 twin flag(s)') === 0 && l.indexOf('discarded: 1/2, 9/1') !== -1),
@@ -2548,7 +2551,8 @@ async function runTwinRunArms() {
 // carries no `dispositions`, `dispositionFault` or `ownerItems`. WHAT IT DOES NOT CHECK: that a live skeptic
 // judges a fix by its class, or that a live synthesis writes the disposition cells it is told to; the return's
 // `appendix` is the source a caller compares the record against. AC2's byte-equality to the parent render is
-// the pass's probe, since this suite reads one render; here `instance` and an absent value agree.
+// the pass's probe, since this suite reads one render; here `class` and an absent value agree, the default
+// TOOL-dFairHearing-1 S9 flipped, so the absent arms run DIFF with its `fixJudge` pin deleted.
 async function runDispositionArms() {
   const skepticPrompts = (x) => x.trace.filter((t) => t.label.indexOf('verify:') === 0).map((t) => t.prompt)
   const synthCall = (x) => x.trace.find((t) => t.label === 'synth') || { prompt: '', schema: { required: [], properties: {} } }
@@ -2560,24 +2564,27 @@ async function runDispositionArms() {
   let r = await runReview(Object.assign({}, DIFF, { fixJudge: 'both' }), ALL_OK)
   ck(!!r.threw && r.threw.indexOf('tier2-review: `fixJudge` must be one of instance | class') === 0 && r.trace.length === 0,
     'fixJudge: both is refused before any spawn, naming the two values')
+  const UNJUDGED = Object.assign({}, DIFF)
+  delete UNJUDGED.fixJudge
   const started = []
   for (const v of [undefined, 'instance', 'class']) {
-    r = await runReview(v === undefined ? DIFF : Object.assign({}, DIFF, { fixJudge: v }), ALL_OK)
+    r = await runReview(v === undefined ? UNJUDGED : Object.assign({}, DIFF, { fixJudge: v }), ALL_OK)
     if (!r.threw && r.result && r.result.exit === 'complete') started.push(String(v))
   }
   ck(started.length === 3, 'fixJudge: absent, instance and class each start and complete: ' + started.join(' '))
-  // ---- AC2: `instance` keeps the absent run's skeptic prompts and key; `class` asks the class question and keys apart.
-  const ra = await runReview(DIFF, ALL_OK)
+  // ---- AC2: `class` keeps the absent run's skeptic prompts and key; `instance` asks the instance question and keys apart.
+  const ra = await runReview(UNJUDGED, ALL_OK)
   const ri = await runReview(Object.assign({}, DIFF, { fixJudge: 'instance' }), ALL_OK)
   const rc = await runReview(Object.assign({}, DIFF, { fixJudge: 'class' }), ALL_OK)
   if (checkNoThrow(ra, 'fixJudge absent') && checkNoThrow(ri, 'fixJudge instance') && checkNoThrow(rc, 'fixJudge class')) {
-    ck(skepticPrompts(ra).length === 5 && JSON.stringify(skepticPrompts(ri)) === JSON.stringify(skepticPrompts(ra)) && ri.result.key === ra.result.key &&
-      skepticPrompts(ra).every((p) => p.indexOf('"instance"') === -1 && p.indexOf('fixVerdict:"sound"|"unsound"|"none", fixNote') !== -1),
-      'fixJudge: instance hands the absent run\'s skeptic prompts, with no instance verdict, and derives its key')
-    ck(skepticPrompts(rc).length === 5 && skepticPrompts(rc).every((p) => p.indexOf('judge its proposed fix by the defect\'s CLASS') !== -1 &&
+    ck(skepticPrompts(ri).length === 5 && skepticPrompts(ri).every((p) => p.indexOf('"instance"') === -1 && p.indexOf('fixVerdict:"sound"|"unsound"|"none", fixNote') !== -1) &&
+      ri.result.key !== ra.result.key,
+      'fixJudge: instance asks every skeptic the instance question, with no instance verdict, and moves the key: ' + ri.result.key)
+    ck(skepticPrompts(ra).length === 5 && JSON.stringify(skepticPrompts(rc)) === JSON.stringify(skepticPrompts(ra)) && rc.result.key === ra.result.key &&
+      skepticPrompts(ra).every((p) => p.indexOf('judge its proposed fix by the defect\'s CLASS') !== -1 &&
       p.indexOf('"instance" when it cures the cited instance and leaves another of its class standing') !== -1 &&
-      p.indexOf('fixVerdict:"sound"|"unsound"|"none"|"instance", fixNote') !== -1) && rc.result.key !== ra.result.key,
-      'fixJudge: class asks every skeptic the class question with the instance verdict, and moves the key: ' + rc.result.key)
+      p.indexOf('fixVerdict:"sound"|"unsound"|"none"|"instance", fixNote') !== -1),
+      'fixJudge: class hands the absent run\'s skeptic prompts, the class question with the instance verdict, and derives its key')
   }
   // ---- AC3: an instance verdict with a note is the fix under `class`, and not judged under `instance`.
   const buildInstanceVerdicts = (label, prompt) => {
@@ -3402,6 +3409,10 @@ printf '%s\n' "$out"
 # accepted set and six planted faults (7), AC8's loop over three values (3), the handed and returned appendix
 # (2) and two review_pin.py --unclassed arms (2). The four re-pinned ten-column appendix arms add none.
 # Counted by hand, not by a run: the pass runs no suite.
+# HELD at 524 by TOOL-dFairHearing-1 S9, whose two default flips re-point arms and add none: DIFF and SPEC
+# pin `addressTwins: 'hidden'` and `fixJudge: 'instance'`, the absent addressTwins arm resolves to shown,
+# the twins arm's second run is the hidden one, and the fixJudge absent arms delete the pin and agree with
+# class. Counted by hand, not by a run: the pass runs no suite.
 FLOOR_ASSERTIONS=524
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then

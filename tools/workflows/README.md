@@ -359,7 +359,7 @@ kit passes `'address'` until the replay records a hit. On both orders a batch is
 `verify:batch-<n>` and its result file is `verify-batch-<n>.json`, carrying its member ids as `ids`,
 since the label no longer tells them; a verify file without `ids` is never reused.
 
-`addressTwins` is `'hidden'` or `'shown'`, and absent it is `'hidden'`. Under `'shown'` the synthesis
+`addressTwins` is `'hidden'` or `'shown'`, and absent it is `'shown'`. Under `'shown'` the synthesis
 is handed two more blocks after the UNVERIFIED findings: `REFUTED findings`, one line per refuted
 finding with its claim and the skeptic's reason, and `SAME-ADDRESS PAIRS`, each confirmed and refuted
 finding that `deriveTwinPairs` reads as one address through `deriveAddressKey` and `checkSameAddress`.
@@ -368,7 +368,10 @@ describes the same defect as a confirmed one and return each as `{refuted, confi
 which its schema then requires, and RUN INTEGRITY states how many refuted findings and pairs it was
 shown. A flag notes a twin and never overturns a verdict: no verdict, grade, item or count moves. Any
 other value refuses before the first agent. It joins no review key, since the synthesis writes no keyed
-file. It ships dark: nothing in this kit passes `'shown'` until the replay records a hit.
+file. Its default became `'shown'` when TOOL-dFairHearing-1's replay 3 met its bar
+(`memory/builds/dFairHearing/build/2026-11-03-build-TOOL-dFairHearing-1-verdicts.md`), so every run that
+passes no `addressTwins` hands the synthesis both blocks and requires `twinFlags` of it; a caller passes
+`'hidden'` for the synthesis prompt and schema of before.
 
 `twin` is the policy key `review.twin`, passed directly as a pin argument until a policy-file trigger
 lands: `'never'`, `'design-records'`, `'design-and-landing'` or `'always'`, and absent it is `'never'`;
@@ -390,7 +393,7 @@ item list, `agreed` holding a confirmed id of each run; it is `null` when the ta
 when no synthesis ran, and on every untwinned run. A twinned run's key print gains `twin: true`, so it
 never reuses an untwinned run's files; an untwinned run's key and synthesis prompt are unchanged.
 
-`fixJudge` is `'instance'` or `'class'`, and absent it is `'instance'`: how a skeptic judges a finding's
+`fixJudge` is `'instance'` or `'class'`, and absent it is `'class'`: how a skeptic judges a finding's
 proposed fix. Under `'instance'` it judges the fix against the instance the finding cites, and every
 skeptic prompt and the review key are as they were. Under `'class'` it asks whether the fix cures the
 defect's class, every instance of the pattern the claim names in the subject and the code or specs it
@@ -399,7 +402,10 @@ its class standing, `fixNote` holding the class-level fix. A fix judged `'instan
 way to that note in `confirmedFindings` and the synthesis's fix line, as an unsound one gives way to its
 correction, and RUN INTEGRITY counts the instance-only fixes. Under `'instance'` a skeptic answering
 `'instance'` reads as not judged. `'class'` joins the review key; any other value refuses before the
-first agent. It ships dark: nothing in this kit passes `'class'` until the replay decides.
+first agent. Its default became `'class'` when TOOL-dFairHearing-1's replay 4 met its bar (the same
+verdict record). Since `'class'` joins the review key, every run that passes no `fixJudge` derives a new
+key from then on, and no lens or verify file an earlier default run wrote is reused; a caller passes
+`'instance'` for the skeptic prompts and the key of before.
 
 Every confirmed finding is given one DISPOSITION from the report step's grammar: `class:<slug>`, a
 class this run was handed; `gate:<leg>`, a leg of the leg manifest; `new:<slug>`, a slug matching

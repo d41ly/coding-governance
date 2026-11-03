@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-1 — the owed replays: the design-audit preset run blind at blob 767187aa, and the verdicts that flip the dark switches
 
-**Status:** INPROGRESS · rev-6 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-6 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0068@d09495d0 whole
 
@@ -29,6 +29,7 @@
 | [2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-control-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-control-return.md) | research | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-control.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-control.md) | research | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-replay-void-runs.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-void-runs.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-verdicts.md](../build/2026-11-03-build-TOOL-dFairHearing-1-verdicts.md) | research | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-1-reuse-scout.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-1-reuse-scout.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-2-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-3-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-3-spec-writer.md) | journal | — |
