@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-21 — the held-out freeze check hashes the bytes it scores and refuses a shallow history
 
-**Status:** INPROGRESS · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-2 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -37,8 +37,8 @@ or a judged cell without `primary` and `covered`, is a refusal naming the arm an
 
 THE EXPERIMENT SHAPE. `check_experiment` reads one committed JSON manifest (`--experiment <src>`) and
 runs every rule of aScoutedSeam's method before the first figure line, a broken one exiting 2 by name:
-each case's `case_evidence` hook returns something; a `heldOut` file has exactly one commit and no id
-a tuning case carries; an arm with a `base` varies exactly one declared setting from it; every arm's
+each case's `case_evidence` hook returns something; a `heldOut` file has exactly one commit in a
+history that is not shallow, working-tree bytes hashing to that commit's blob, and no id a tuning case carries; an arm with a `base` varies exactly one declared setting from it; every arm's
 parsed replies print against its `dispatched` count; a committed label key rotates; and the arms'
 `union` is read per set and pooled. What none of them checks: a variable nobody declared, that no
 prompt author read the held-out file, that one judge read each case, and that evidence is right.
@@ -735,9 +735,11 @@ def check_case_evidence(instance, cases):
 def check_held_out_frozen(path, tuning_ids, repo="."):
     """`(line, cases)`: the freeze line and the held-out cases.
 
-    Refused: a path opening `-`, outside the repository or not a working-tree file; a history of other
-    than exactly one commit, read by ONE `git log --format=%H` with argv; and an id that is also a
-    tuning case's. "Never read to change a prompt" is printed as recorded: no committed output shows it.
+    Refused: a path opening `-`, outside the repository or not a working-tree file; a shallow history,
+    whose boundary commit lists every file; a history of other than exactly one commit, read by ONE
+    `git log --format=%H` with argv; working-tree bytes whose `git hash-object` (the checkout's filters
+    applied, so a CRLF checkout of an LF blob agrees) differ from the freeze's blob; and an id that is
+    also a tuning case's. "Never read to change a prompt" is printed as recorded: no committed output shows it.
     """
     if not path or not isinstance(path, str) or path.startswith("-"):
         raise Refusal(f"heldOut {path!r}: a path opening `-` or empty is refused")
@@ -754,12 +756,20 @@ def check_held_out_frozen(path, tuning_ids, repo="."):
         raise Refusal(f"heldOut {path}: outside the repository {root.as_posix()}") from None
     if not pathlib.Path(path).is_file():
         raise Refusal(f"heldOut {path}: not a working-tree file")
+    shallow = subprocess.run(["git", "-C", str(root), "rev-parse", "--is-shallow-repository"], capture_output=True, text=True, check=False)
+    if shallow.stdout.strip() != "false":
+        raise Refusal(f"heldOut {rel}: `git rev-parse --is-shallow-repository` printed {shallow.stdout.strip()!r}, not 'false': "
+                      "a shallow history cannot show a freeze, since its boundary commit lists every file")
     log = subprocess.run(["git", "-C", str(root), "log", "--format=%H", "--", rel], capture_output=True, text=True, check=False)
     shas = log.stdout.split()
     if log.returncode or not shas:
         raise Refusal(f"heldOut {rel}: no commit in its history, so it was never frozen")
     if len(shas) > 1:
         raise Refusal(f"heldOut {rel}: {len(shas)} commits, frozen at {shas[-1]} and changed after it at {', '.join(reversed(shas[:-1]))}")
+    work, blob = (subprocess.run(["git", "-C", str(root), *argv], capture_output=True, text=True, check=False).stdout.strip()
+                  for argv in (["hash-object", "--", rel], ["rev-parse", f"{shas[0]}:{rel}"]))
+    if not work or work != blob:
+        raise Refusal(f"heldOut {rel}: the working tree hashes to {work or 'nothing'}, not the freeze's blob {blob or 'nothing'} at {shas[0]}")
     cases = read_case_list(path, repo)
     tuning = set(tuning_ids)
     shared = [c["id"] for c in cases if c["id"] in tuning]
@@ -1217,6 +1227,19 @@ def run_selftest():
             first = check_experiment(manifest, tmp)[0]
             if not first.startswith(f"held-out: frozen at {freeze} · 1 case(s) · never read to change a prompt — recorded, not checked"):
                 return f"the first line reads {first!r}"
+            # TOOL-dFairHearing-21 AC1: one byte appended and left uncommitted moves the bytes scored off the freeze.
+            raw = held.read_bytes()
+            held.write_bytes(raw + b" ")
+            why = check_refused(lambda: check_experiment(manifest, tmp), "held.json", run_git("hash-object", "--", "held.json"),
+                                run_git("rev-parse", f"{freeze}:held.json"))
+            held.write_bytes(raw)
+            # TOOL-dFairHearing-21 AC2: a depth-1 clone's boundary commit is the only one its log lists.
+            shallow = pathlib.Path(tmp, "shallow")
+            run_git("clone", "-q", "--depth", "1", pathlib.Path(tmp).as_uri(), str(shallow))
+            why = why or check_refused(lambda: check_experiment({**manifest, "heldOut": str(shallow / "held.json")}, str(shallow)),
+                                       "held.json", "shallow")
+            if why:
+                return why
             shared = pathlib.Path(tmp, "shared.json")
             shared.write_text(json.dumps(EXPERIMENT_CASES + EXPERIMENT_HELD), encoding="utf-8")
             why = (check_refused(lambda: check_experiment({**manifest, "cases": str(shared)}, tmp), "heldOut", "h", "tuning")

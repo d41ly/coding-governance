@@ -821,7 +821,11 @@ exits 2 naming the rule, the arm or case, and the value:
   nothing for is refused by id, and an instance registered without the hook fails `check_instances`.
 - **freeze** — `check_held_out_frozen`: `heldOut` names a working-tree file inside the repository
   whose `git log` lists exactly one commit, printed first as `held-out: frozen at <sha>`, and shares
-  no id with the tuning cases. "Never read to change a prompt" is printed as recorded, not checked.
+  no id with the tuning cases. The freeze is the bytes scored: `git hash-object` of the working-tree
+  file, hashed through the checkout's filters so a CRLF checkout of an LF blob agrees, must equal the
+  freeze commit's blob, or it exits 2 naming both object ids (`TOOL-dFairHearing-21`). A shallow
+  history refuses before the history is read, since its boundary commit lists every file and so
+  cannot show a freeze. "Never read to change a prompt" is printed as recorded, not checked.
 - **one variable** — `check_one_variable`: an arm naming a `base` differs from its settings in exactly
   one key, compared as JSON values, and prints `arm <name>: varies <key> from <base>`.
 - **parsed first** — `measure_parsed`: `parsed <arm>: <n> of <dispatched>` for every arm, `n` the
