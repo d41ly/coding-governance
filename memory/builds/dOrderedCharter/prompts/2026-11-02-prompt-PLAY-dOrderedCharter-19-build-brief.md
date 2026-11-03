@@ -66,3 +66,12 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Your spec header's `advances PLAY-dOrderedCharter-38` stays `advances` when you flip it to `CLOSED`; you are not the last unit.
 - The unattended kit's own self-test suites are WAIVED for this build's landing (README, "Build-level rules"); a
   criterion they would observe is named as owed with PLAY-dClosedLoop-12, never run.
+
+## Your previous dispatch's work
+
+- Run wf_4f067f67-62a built this whole unit against rev-6, probed it, and rolled it back when `--dispatch` refused
+  AC17's suite run. Its change is saved as
+  `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dorderedcharter-725f52/0394fa33-012c-408f-a840-e6e4cfaac23f/scratchpad/unit19-build.patch`
+  (a `git diff HEAD --binary` of 38 files, RUN.md left out). Start from it where it still applies at HEAD, against the
+  spec at its latest rev; still owed then: the `.lexicon.conf` pin raise, the policy mirror commit, the kickoff
+  manifest re-stamp, `positional-refs.txt` regenerated, and the `gen_build_index.py --write` render.
