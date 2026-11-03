@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-37 — the round-4 spec audit's 19 minors on units 30 and 32: one replay procedure that isolates each arm, criteria over the scored attempt, and checks that can go red
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 24 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 24 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md) | research | TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 |
 | [2026-10-23-prompt-TOOL-dFairHearing-37-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-37-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFairHearing-37-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-37-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 | [2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md) | spec-audit | TOOL-dFairHearing-35 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 |
 
 <!-- /gen:spec-records -->
@@ -58,8 +59,8 @@ it.
   global option before the subcommand; the spelling in unit 32 S31 exits 129. AC19 gains a valid-path
   control. Observed by AC5.
 - **S6** — id 12 (M8, unit 30). The harness takes `repo` with every backslash folded to `/` at its one
-  read, `tools/workflows/tier2-review.template.js:180`, the fold `repoFold` (:491) already applies for
-  its comparison. Every `git -C ${repo}` command an agent runs then carries a path bash cannot strip.
+  read, `const repo` (`tools/workflows/tier2-review.template.js:215` at `9c1a2857a`), the fold `repoFold`
+  (:652) already applies for its comparison. Every `git -C ${repo}` command an agent runs then carries a path bash cannot strip.
   The README's per-arm step (S8) builds the clone path with `cygpath -m`. Observed by AC6.
 - **S7** — id 13 (M9, unit 32 S7, AC4). AC4's "neither reader changes" half reads the reader where unit
   12 S2 moved it: the body of `extract_section_ref` in `tools/workflows/replay_scorer.py`, sliced from
@@ -72,7 +73,7 @@ it.
   `git rev-parse HEAD` written to the run log at call time. Observed by AC8.
 - **S9** — id 23 (M12, unit 32 S22, AC13). AC13's absence check reads the two `.js` files on the
   blanked view and, in a second pass, on every `${…}` interpolation inside a template literal, which
-  `renderBlankedView`'s `tmpl` branch (`tools/hooks/agent-cap.js:1325-1328`) skips whole. A copy
+  `renderBlankedView`'s `tmpl` branch (`tools/hooks/agent-cap.js:551-554` at `9c1a2857a`) skips whole. A copy
   holding `` `x ${MAX_LENSES}` `` fails it. The residual: an identifier spelled at run time from
   pieces. Observed by AC9.
 - **S10** — id 25 (M13, unit 32). `resolveKitDir`, which unit 32 S25 adds to `tools/hooks/agent-cap.js`,
@@ -207,7 +208,7 @@ change: S3's `(derived)` marks and S11's attempt listing.
 ## 5. Production-readiness checklist
 
 - security — S6 folds a path separator at the harness's one `repo` read and admits nothing new; the
-  spec-kind `..` refusal after it (:486-489) still reads the folded value. No new write path.
+  spec-kind `..` refusal after it (:647-650 at `9c1a2857a`) still reads the folded value. No new write path.
 - perf / scale — one string replace per harness call; one `git ls-files` per held-out path.
 - error / empty / loading states — S12 makes a failed status a named refusal; S5 makes every held-out
   path resolve or exit 2 naming it.
@@ -249,7 +250,7 @@ change: S3's `(derived)` marks and S11's attempt listing.
 - **AC6** — When a scratch stub-agent run of `tools/workflows/tier2-review.js` is given `repo` as
   `C:\x\y`, every captured prompt's `git -C` command names `C:/x/y`, and no prompt holds a backslash
   inside that path.
-  Red when: `tools/workflows/tier2-review.template.js:180` still reads `a.repo` raw.
+  Red when: the `const repo` read in `tools/workflows/tier2-review.template.js` still takes `a.repo` raw.
 - **AC7** — When the body of `extract_section_ref`, sliced as S7 states, is taken from
   `git show <c32>:tools/workflows/replay_scorer.py` and from `git show <c32>~1:tools/workflows/replay_scorer.py`,
   where `<c32>` is unit 32's pass commit, the two slices are byte-identical and neither is empty.
@@ -302,7 +303,7 @@ change: S3's `(derived)` marks and S11's attempt listing.
 
 ## 7. Gates
 
-`tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `review-replay selftest` · `gotchas selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `workflow script syntax` · `codebase-map coverage + freshness` · `harness arms (fail branches armed or pinned)` · `testsuite counts (every bar self-test prints one)` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `review-replay selftest` · `gotchas selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `workflow script syntax` · `codebase-map coverage + freshness` · `harness arms (fail branches armed or pinned)` · `testsuite counts (every bar self-test prints one)` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/workflows/tier2-review.test.sh · covers AC6 · a stub run whose `repo` holds backslashes, staged against the harness at `TOOL-dFairHearing-32`'s commit, where `repo` is read raw · FLOOR_ASSERTIONS in that suite, raised by the arms added
 New arm: tools/workflows/replay_scorer.py (its runner, in the `review-replay selftest` leg) · covers AC5 · a held-out path naming one tracked file, staged against the factory at `TOOL-dFairHearing-32`'s commit · that runner's `ARMS_DECLARED`, raised by the arm added
@@ -325,12 +326,20 @@ New arm: tools/memory-tree/gotchas.py (its selftest) · covers AC14 · a gated s
   audit of specs 28 to 32 that land on units 30 and 32, as one of two batches.
 - rev-2 · 2026-10-23 · §3 · the round-5 spec audit's disposal: hands-off edges to TOOL-dFairHearing-38 and -39 (item H1, ids 1 and 11) and
   TOOL-dFairHearing-40 (twelve minors).
+- rev-3 · 2026-11-03 · §7 · the leg line adds `policy fixtures`, whose guard §4's
+  `tools/memory-tree/gotchas.py` trips (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 1).
+- rev-3 · 2026-11-03 · S9 · §10 · `renderBlankedView` and its `tmpl` branch re-cited from
+  the hook's lines 1303 and 1325-1328, past its 947 lines since unit 16, to :529 and :551-554
+  at `9c1a2857a` (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, items 2 and 4).
+- rev-3 · 2026-11-03 · S6 · §5 · AC6 · §10 · the harness's `repo` read, `repoFold` and the `..` refusal
+  re-cited at `9c1a2857a` (:180, :491 and :486-489 to :215, :652 and :647-650), and AC6's red case named
+  by the `const repo` read (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 2).
 
 ## 10. Reuse audit
 
 Every item extends a seam an earlier unit mints or the base tree carries: the README replay section
-(unit 23 S17, unit 27 S22, unit 32 S17), the harness's `repoFold` (`tools/workflows/tier2-review.template.js:491`),
-`renderBlankedView` (`tools/hooks/agent-cap.js:1303`), `resolve_kit_dir` and its behaviour arm
+(unit 23 S17, unit 27 S22, unit 32 S17), the harness's `repoFold` (`tools/workflows/tier2-review.template.js:652`),
+`renderBlankedView` (`tools/hooks/agent-cap.js:529`), both at `9c1a2857a`, `resolve_kit_dir` and its behaviour arm
 (`tools/lib/resolve_kit_dir.py`, `tools/lib/resolve-python.test.sh`), the syntax checker's
 explicit-file mode (`tools/workflows/check-workflow-syntax.js`) and unit 35's attempt checker.
 `python tools/codebase-map/reuse_lookup.py "normalise a repository path before pasting it into a git

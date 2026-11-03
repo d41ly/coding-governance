@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-32 — the round-3 spec audit's 32 minors: criteria that observe what their specs change, one source per procedure, and refusals that name their cause
 
-**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md) | research | TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 |
 | [2026-10-23-prompt-TOOL-dFairHearing-32-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-32-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFairHearing-32-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-32-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 | [2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md) | spec-audit | TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 |
 
 <!-- /gen:spec-records -->
@@ -37,8 +38,8 @@ Each item names its report id, its report item, the unit it lands on and the cri
 it. Where a report item merges ids, each id is its own item, and the later ids point at the first
 one's mechanism.
 
-- **S1** — id 2 (M1, unit 4, AC1). The resume probe's instruction at
-  `tools/workflows/tier2-review.template.js:1021` and its render names `find-<lens>.json or
+- **S1** — id 2 (M1, unit 4, AC1). The resume probe's instruction (its step 4,
+  `tools/workflows/tier2-review.template.js:1247` at `9c1a2857a`) and its render names `find-<lens>.json or
   verify-batch-<n>.json`, and no carrier under `tools/` or `memory/guides/` spells `verify-<a>-<b>`. A
   stub-run arm captures the `resume:probe` prompt and asserts that it names `verify-batch-<n>.json`.
   This supersedes unit 4 AC8's two absence patterns and adds a prompt half to its AC6.
@@ -122,21 +123,23 @@ one's mechanism.
   supersedes unit 25 S4's "pairs over the records both arms answered".
 - **S22** — id 3 (M2, unit 27, AC13). Unit 27 AC11's and AC9's absence checks read the two `.js` files,
   `tools/hooks/agent-cap.js` and `tools/workflows/check-verifier-fanout.js`, through `renderBlankedView`
-  (`tools/hooks/agent-cap.js:1303`), the view with string, template and comment contents blanked.
+  (`tools/hooks/agent-cap.js:529` at `9c1a2857a`, reached through the exported
+  `renderBlankedLiterals`), the view with string, template and comment contents blanked.
   `tools/check-playbook-parity.sh`, its suite and both REVIEW-PROTOCOL copies keep the whole-text grep,
   where `MAX_LENSES` sits in `sed` and `printf` strings or in prose S16 rewrites. AC9's shell half reads
   assignment lines only. This supersedes the whole-text `.js` halves of AC11 and AC9.
 - **S23** — id 8 (L2, unit 27, AC14). Unit 27 S28 is restated: the path limit holds for a clone
   without `core.longpaths`, which is the default for a fresh clone here, since this worktree's `true`
   sits only in its `config.worktree`. Fixtures go under `%TEMP%`. Spec 14 AC2's fixture line
-  (:189-190) joins S28's list. Unit 27 AC23, which no tree can turn red, is superseded by AC14.
+  (:198-199 of its rev-5) joins S28's list. Unit 27 AC23, which no tree can turn red, is superseded by AC14.
 - **S24** — id 16 (L2, unit 27, AC14). S23's defect from the grounding lens; S23 closes it.
 - **S25** — id 12 (M6, unit 27, AC15). `checkOptinPackPresent` ports `tools/lib/resolve_kit_dir.py` as
   its contract, rung for rung. A receipt row whose path is missing or escapes the tree is skipped, a
   `rendered` row joins, and the probes are `<here>/<home>/<anchor>` then `<here>/../<home>/<anchor>`.
   It denies only on the resolver's own refusal, naming the three places looked. One function,
   `resolveKitDir(home, anchor, here)`, between `// >>> resolveKitDir` and `// <<< resolveKitDir` in
-  `tools/hooks/agent-cap.js`, serves both `resolveHarnessName` (:112-116) and `checkOptinPackPresent`.
+  `tools/hooks/agent-cap.js`, serves both `resolveHarnessName` (:74-80 at `9c1a2857a`) and
+  `checkOptinPackPresent`.
   This supersedes unit 27 S20's deny on a missing-path row and AC15's third case.
 - **S26** — id 17 (M6, unit 27, AC16). The port is held to the canonical: a behaviour arm in
   `tools/lib/resolve-python.test.sh`, shaped as its `{prefix}` contract arm (2b), runs
@@ -149,14 +152,14 @@ one's mechanism.
   AC2 observe it.
 - **S29** — id 26 (M9, unit 27, AC17). `tools/check-playbook-parity.sh` resolves the owned side of the
   `lens-array bound` pair through `resolve_kit_dir "$_pp_py" workflows check-verifier-fanout.js
-  "$_self_dir"`, falling back to `<no workflows kit>` as `HK_DIR` does (:141-148). `fixture()` in
+  "$_self_dir"`, falling back to `<no workflows kit>` as `HK_DIR` does (:261-268 at `9c1a2857a`). `fixture()` in
   `tools/check-playbook-parity.test.sh` plants `${FX}workflows/check-verifier-fanout.js` holding `const
   LENS_SLOTS = 5`, declares it as an `[[entry]]` in the fixture registry and waives it in the fixture's
-  `playbook-kit-waivers.txt`, so the valid-fixture control stays green. The drift arm (:279-281)
-  re-points at that file.
+  `playbook-kit-waivers.txt`, so the valid-fixture control stays green. The drift arm, `AC2 MAX_LENSES
+  drifts from the hook README's stated bound` (:400-402 at `9c1a2857a`), re-points at that file.
 - **S30** — id 27 (L8, unit 27, AC18). Unit 27 §5 says the coupling is transitive. review-harness is
   already coupled to drift-audit (`tools/drift-audit/kit.toml:13`), and govkit closes a scoped update
-  over coupled kits the receipt claims (`tools/govkit/govkit.py:1050-1059`, `:9311`). So a scoped
+  over coupled kits the receipt claims (`tools/govkit/govkit.py:1120-1129`, `:9638`, at `9c1a2857a`). So a scoped
   agent-cap or review-harness update also moves drift-audit when the receipt claims it. This
   supersedes unit 27 AC7's two-kit fixture.
 - **S31** — id 35 (M13, unit 27, AC19). `check_held_out_frozen` runs `git ls-files --full-name
@@ -309,7 +312,8 @@ replay verdict records change, and only by the lines S14 derives from git.
 - **AC1** — When `git grep -n -e 'verify-<a>-<b>' -e 'verify-${' -e 'verify:ids' -e 'verify-<first id>' -- tools memory/guides`
   runs, it prints nothing. When a scratch stub-agent run of `tools/workflows/tier2-review.js` resumes,
   the prompt its stub captures for the `resume:probe` agent names `verify-batch-<n>.json`.
-  Red when: `tools/workflows/tier2-review.template.js:1021` still reads `verify-<a>-<b>.json`.
+  Red when: the `resume:probe` instruction in `tools/workflows/tier2-review.template.js` still reads
+  `verify-<a>-<b>.json`.
 - **AC2** — When a scratch node probe evaluates the prelude of `tools/workflows/tier2-review.js` as unit
   4 AC1 does, a spec-kind run keys the `where` values `§4`, `Section 3 Design`, `section4`, `§ 4` and
   `SECTION 12` to the `at` values `§4`, `§3`, `§4`, `§4` and `§12`.
@@ -410,7 +414,7 @@ replay verdict records change, and only by the lines S14 derives from git.
 
 ## 7. Gates
 
-`tier2-review self-test` · `verifier fan-out self-test` · `verifier fan-out` · `unattended-build self-test` · `review-join self-test` · `agent-cap self-test` · `scratch-guard self-test` · `hook destinations self-test` · `agent-cap restatement` · `playbook parity selftest` · `playbook parity` · `python resolver (behaviour + inline parity + idiom ban)` · `review-replay selftest` · `gotchas selftest` · `workflow script syntax` · `harness arms (fail branches armed or pinned)` · `testsuite counts (every bar self-test prints one)` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`tier2-review self-test` · `verifier fan-out self-test` · `verifier fan-out` · `unattended-build self-test` · `review-join self-test` · `agent-cap self-test` · `scratch-guard self-test` · `hook destinations self-test` · `agent-cap restatement` · `playbook parity selftest` · `playbook parity` · `python resolver (behaviour + inline parity + idiom ban)` · `review-replay selftest` · `gotchas selftest` · `workflow script syntax` · `harness arms (fail branches armed or pinned)` · `testsuite counts (every bar self-test prints one)` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC2 AC11 · the resume probe's old spelling, a space-required section class and spec 3's AC7 arm pinned to the literal under a flipped constant, staged against the harness at `TOOL-dFairHearing-30`'s commit · FLOOR_ASSERTIONS in that suite, raised by the arms added
 New arm: tools/workflows/replay_scorer.py (its runner, in the `review-replay selftest` leg) · covers AC5 AC6 AC7 AC19 · a blanked subject blob, each broken reference and a directory and a glob held-out path, staged against the factory at `TOOL-dFairHearing-30`'s commit · that runner's `ARMS_DECLARED`, raised by the arms added
@@ -439,14 +443,25 @@ New arm: tools/memory-tree/gotchas.py (its selftest) · covers AC20 · a gated s
 - rev-2 · 2026-10-23 · §3 · the round-4 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-37 (twelve minors).
 - rev-3 · 2026-10-23 · §3 · the round-5 spec audit's disposal: hands-off edges to TOOL-dFairHearing-38 (AC8 re-run, item H1) and TOOL-dFairHearing-40
   (the port's cure, id 28).
+- rev-4 · 2026-11-03 · §7 · the leg line adds `policy fixtures`, whose guard §4's
+  `tools/hooks/agent-cap.js` and `tools/memory-tree/gotchas.py` trip (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 1).
+  §4 keeps the hook: `renderBlankedView`, `resolveHarnessName` and unit 22's
+  `checkOptinPackPresent` stay there after unit 16.
+- rev-4 · 2026-11-03 · S22 · §10 · `renderBlankedView` re-cited from the hook's line 1303, past the
+  hook's 947 lines since unit 16, to :529 at `9c1a2857a` (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, items 2 and 4).
+- rev-4 · 2026-11-03 · S1 · S23 · S25 · S29 · S30 · AC1 · §10 · every other line re-cited at
+  `9c1a2857a`: the resume probe's step 4 (:1021 to :1247, AC1's red case by its text),
+  `resolveHarnessName` (:112-116 to :74-80), `HK_DIR` (:141-148 to :261-268), the drift arm (:279-281
+  to :400-402), govkit's coupling closure (:1050-1059 and :9311 to :1120-1129 and :9638), and spec 14
+  AC2's fixture line (:189-190 to :198-199) (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 2).
 
 ## 10. Reuse audit
 
 Every item extends a seam an earlier unit mints or the base tree carries, and none adds a module. The
 seams: `resolve_kit_dir`'s three rungs (`tools/lib/resolve_kit_dir.py:15-51`) and its behaviour-arm
-shape (`tools/lib/resolve-python.test.sh`, arm 2b); `renderBlankedView` (`tools/hooks/agent-cap.js:1303`);
-the parity gate's per-kit resolution (`tools/check-playbook-parity.sh:141-148`); govkit's coupling
-closure (`tools/govkit/govkit.py:1050-1059`, `:9311`); the runner floor (`tools/workflows/review_replay.py:84`,
+shape (`tools/lib/resolve-python.test.sh`, arm 2b); `renderBlankedView` (`tools/hooks/agent-cap.js:529`);
+the parity gate's per-kit resolution (`tools/check-playbook-parity.sh:261-268`); govkit's coupling
+closure (`tools/govkit/govkit.py:1120-1129`, `:9638`), each at `9c1a2857a`; the runner floor (`tools/workflows/review_replay.py:84`,
 `:604-606`); and the README recipe with unit 27 S22's trap. `python tools/codebase-map/reuse_lookup.py
 "resolve the merge base with the remote default branch or refuse"` ranked `resolve_kit_dir`, with 72
 installs, which is the port S25 holds to it. The recall query returned the audit's appendix, spec

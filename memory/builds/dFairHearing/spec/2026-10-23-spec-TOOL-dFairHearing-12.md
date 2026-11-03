@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-12 — the scorer factory: one replay scorer, with aScoutedSeam's grader as its second instance
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0079@d8e61ab6 whole
 
@@ -11,6 +11,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-11-02-prompt-TOOL-dFairHearing-12-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-12-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md) | research | TOOL-dFairHearing-10 TOOL-dFairHearing-22 TOOL-dFairHearing-14 TOOL-dFairHearing-1 TOOL-dFairHearing-21 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 |
 | [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
 <!-- /gen:spec-records -->
@@ -122,8 +123,9 @@ Measured 2026-10-23 at `3dca04036`, PINNED.
 - The S6 predicate, run over every tracked `*.py` (150 files) before writing this spec, named two
   sites, both in aScoutedSeam's `bench.py`, at :384 and :647, and none under `tools/` (98 files).
   A looser first cut, any `all()` filter over a second iterable, also named
-  `tools/drift-audit/drift_report.py:2040`, `tools/govkit/govkit.py:937`,
-  `tools/govkit/selftest.py:8196` and `tools/run-gates/measure_legs.py:3582`, none of which pairs a
+  `tools/drift-audit/drift_report.py:2040`, `tools/govkit/govkit.py:1007`,
+  `tools/govkit/selftest.py:10890` and `tools/run-gates/measure_legs.py:3582` (each at `9c1a2857`;
+  base's :937 and :8196 for govkit's two), none of which pairs a
   variant with a case; the membership-shape requirement is what drops them.
 
 ### The factory
@@ -158,7 +160,8 @@ whose refs carry no `[tag]` scores exactly as before, which is why AC3 replays o
 ### Why `review_replay.py` stays
 
 The clause's own token is `review_replay.py`, and units 1 and 18 and the kit README
-(`tools/workflows/README.md:477-534`) call it by that name. It becomes the `review-replay`
+(its `review_replay.py` section, `tools/workflows/README.md:732` at `9c1a2857`) call it by that
+name. It becomes the `review-replay`
 instance's thin adapter: argument parsing, `print_score`, `scan_corpus`, `resolve_commits`,
 `print_corpus` and its arms. The adapter imports the moved names, so its 25 arms keep their bodies.
 
@@ -211,7 +214,7 @@ The moved names keep their names; the ported `check_hit`, `check_case`, `derive_
 
 ### Rollout
 
-The kit README's `review_replay.py` section (`tools/workflows/README.md:477`) gains a paragraph
+The kit README's `review_replay.py` section (`tools/workflows/README.md:732` at `9c1a2857`) gains a paragraph
 naming the factory and its two instances. The kit's version line moves with `tier2-review`'s edits
 in the build run; this unit changes no rendered file.
 
@@ -341,6 +344,9 @@ lexicon leg grades the new function names.
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
+- rev-3 · 2026-11-03 · §4 · the looser cut's govkit sites and the kit README's `review_replay.py`
+  section re-cited at `9c1a2857`, where other builds moved their lines; the README by its heading
+  (2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief, item 2).
 
 ## 10. Reuse audit
 

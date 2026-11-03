@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-10 — the review records brought back in line with the code at their sources, each live copy re-rendered
 
-**Status:** INPROGRESS · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dFairHearing-19
+**Status:** INPROGRESS · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0077@58d0099e whole
 
@@ -9,9 +9,12 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dFairHearing-10-deviation-108.md](../build/2026-10-23-build-TOOL-dFairHearing-10-deviation-108.md) | deviation | — |
+| [2026-11-03-build-TOOL-dFairHearing-10-1-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-10-1-builder-return.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-9 TOOL-dFairHearing-11 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-16 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-11-02-prompt-TOOL-dFairHearing-10-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-10-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-10-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-10-1-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md) | research | TOOL-dFairHearing-22 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-1 TOOL-dFairHearing-21 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 |
 | [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
 <!-- /gen:spec-records -->
@@ -29,33 +32,34 @@ live copy.
 ## 2. Scope (IN)
 
 - **S1** — The protocol's lens list. The Tier-2 pattern's dimension list
-  (`tools/workflows/REVIEW-PROTOCOL.template.md:192`) names no lens. It points at the lens catalogue
-  TOOL-dFairHearing-13 lands, `tools/workflows/lenses.toml`, and its presets, so a lens added as a
-  catalogue row leaves the protocol true. Observed by AC1.
-- **S2** — The lens count. The default configuration (:199-201) and the lens allowance paragraph
-  (:222-227) say a run fills five lens slots on either kind, the count the verifier fan-out gate
+  (`tools/workflows/REVIEW-PROTOCOL.template.md:154` at `9c1a2857`) names no lens. It points at the
+  lens catalogue TOOL-dFairHearing-13 lands, `tools/workflows/lenses.toml`, and its presets, so a
+  lens added as a catalogue row leaves the protocol true. Observed by AC1.
+- **S2** — The lens count. The default configuration (:161-163) and the lens allowance paragraph
+  (:188-193) say a run fills five lens slots on either kind, the count the verifier fan-out gate
   holds as its slot count, and that an opt-in lens swaps a slot rather than adding one; neither cites
   `MAX_LENSES` in the hook unless the hook still holds it at dispatch. No sentence states the count as
   a bound word beside a digit and a lens noun. Observed by AC2.
-- **S3** — The skeptic default. "Default-refute" (:199) gives way to the default the harness applies
-  (`tools/workflows/tier2-review.template.js:1403-1405`): a finding a skeptic cannot establish is
-  refuted when its finder graded it medium or low, and answered uncertain when blocker or high.
-  Observed by AC3.
-- **S4** — Where each review rule is enforced. The protocol's enforcement section (:36-117) and its
-  predicate section (:118-157) name where TOOL-dFairHearing-16 left each rule: the verifier total and
+- **S3** — The skeptic default. "Default-refute" (:161) gives way to the default the harness applies
+  (`tools/workflows/tier2-review.template.js:1684-1686` at `9c1a2857`): a finding a skeptic cannot
+  establish is refuted when its finder graded it medium or low, and answered uncertain when blocker
+  or high. Observed by AC3.
+- **S4** — Where each review rule is enforced. The protocol's enforcement section (:36-81) and its
+  predicate section (:82-124) name where TOOL-dFairHearing-16 left each rule: the verifier total and
   the loop markers in the merge bar's harness check over committed harnesses, the ref-keyed join ban
   in `check-review-join.sh` alone, and the spec-audit opt-in in the review kit's pack on Workflow
   calls; and the "where enforcement does NOT reach" list says an inline script's verifier total is not
   checked at the tool call. Observed by AC4.
 - **S5** — Agent-cap's lens comment. The comment beside the lens allowance constant
-  (`tools/hooks/agent-cap.js:493-497` at base) says both kinds run five lenses, wherever the constant
-  lives at dispatch: in the hook, or in the verifier fan-out gate if TOOL-dFairHearing-13 or
-  TOOL-dFairHearing-16 moved it. Observed by AC5.
+  (`tools/hooks/agent-cap.js:400-404` at `9c1a2857`, :493-497 at base) says both kinds run five
+  lenses, wherever the constant lives at dispatch: in the hook, or in the verifier fan-out gate if
+  TOOL-dFairHearing-13 or TOOL-dFairHearing-16 moved it. At `9c1a2857`, after both landed, it is
+  still in the hook. Observed by AC5.
 - **S6** — The harness template's own prose. Every comment or `meta` string in
   `tools/workflows/tier2-review.template.js` that states the lens count, the skeptic default, or the
   agent-cap hook as the enforcer of a rule TOOL-dFairHearing-16 moved, states the code as it stands;
-  at base these are :769-773 and :838-842. `tools/workflows/tier2-review.js` is re-rendered. Observed
-  by AC6.
+  at `9c1a2857` these are :940-944, :971-972 and :993-999 (at base :769-773, :801-802 and
+  :838-842). `tools/workflows/tier2-review.js` is re-rendered. Observed by AC6.
 - **S7** — The synthesizer's input line. `tools/roles/agents/gov-synthesizer.agent.md` (:15-16, and the
   sentence at :18 that adds no finding a skeptic did not confirm) says what the harness hands it at
   dispatch: the confirmed findings, the unverified ones as outstanding, the refuted claims and
@@ -99,17 +103,19 @@ live copy.
 
 ### Evidence
 
-- `tools/workflows/REVIEW-PROTOCOL.template.md:192` lists security, correctness, data-integrity,
+- `tools/workflows/REVIEW-PROTOCOL.template.md:154` lists security, correctness, data-integrity,
   dead-code and integration-seams; the harness's diff lenses are security, correctness, seams,
-  verification and intent (`tools/workflows/tier2-review.template.js:774-800`) and its spec lenses
-  five others (:810-836).
-- :199 reads "3–6 primed finder lenses → batched default-refute skeptics", while the harness fills a
-  five-element literal (:842) and its skeptic default depends on the finder's grade (:1403-1405).
-- :222-227 says agent-cap holds the lens allowance as `MAX_LENSES`; the hook's comment at
-  `tools/hooks/agent-cap.js:495` says "tier2-review has four".
+  verification and intent, the `diff-review` rows of `tools/workflows/lenses.toml` that
+  `DIFF_LENSES` in `tools/workflows/tier2-review.template.js` renders since TOOL-dFairHearing-13, and
+  its spec lenses five others, the `unit-spec` rows `SPEC_LENSES` renders.
+- :161 reads "3–6 primed finder lenses → batched default-refute skeptics", while the harness fills a
+  five-slot literal (`LENSES`, :1000 at `9c1a2857`) and its skeptic default depends on the finder's
+  grade (:1684-1686).
+- :188-193 says agent-cap holds the lens allowance as `MAX_LENSES`; the hook's comment at
+  `tools/hooks/agent-cap.js:402` says "tier2-review has four".
 - `tools/roles/agents/gov-synthesizer.agent.md:15-16` says it is handed "the findings the skeptics
   confirmed", while the synthesis prompt carries the unverified findings too
-  (`tools/workflows/tier2-review.template.js:1736-1744`).
+  (`tools/workflows/tier2-review.template.js:2069-2077` at `9c1a2857`).
 - The review system record lists these edit sites (`memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-review-system.md`, section `[stale]`).
 - The restatement gate keys on a bound word beside a digit and a noun such as `lens`, `skeptic` or
   `agents` (`tools/check-agent-cap-restatement.sh:90-95`); its waiver rows key on the measured table's
@@ -203,7 +209,7 @@ records true unless it changes what they point at, the reason section 3 gives fo
 
 ## 7. Gates
 
-`review-protocol parity (kit vs dogfood)` · `agent-cap restatement` · `roles catalogue` · `roles render selftest` · `roles render wiring` · `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `agent-cap self-test` · `scratch-guard self-test` · `hook destinations self-test` · `check-wiring self-test` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene`
+`review-protocol parity (kit vs dogfood)` · `agent-cap restatement` · `policy fixtures` · `roles catalogue` · `roles render selftest` · `roles render wiring` · `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `agent-cap self-test` · `scratch-guard self-test` · `hook destinations self-test` · `check-wiring self-test` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene`
 
 No suite arm lands with this unit: every change is prose a render and the restatement gate already
 grade, and AC1 to AC9 observe it.
@@ -244,6 +250,16 @@ grade, and AC1 to AC9 observe it.
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
+- rev-3 · 2026-11-03 · §7 · the leg line adds `policy fixtures`, whose guard
+  `tools/hooks/agent-cap.js` in §4 trips, the refusal of
+  2026-11-03-build-TOOL-dFairHearing-10-1-builder-return
+  (2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief, items 1 and 4).
+- rev-3 · 2026-11-03 · S1 S2 S3 S4 · §4 · every line of the protocol template and the harness
+  template re-cited at `9c1a2857`, after TOOL-dFairHearing-13 and TOOL-dFairHearing-16 moved them;
+  the lens literals cited by symbol, since each is now a render of `lenses.toml` (same brief, item 2).
+- rev-3 · 2026-11-03 · S5 S6 · the hook's lens comment and the template's lens-count comments
+  re-cited at `9c1a2857` beside their base lines; S6's list adds the "three-to-six range" comment
+  above `LIGHT_LENSES`, a lens-count statement its rule already covers (same brief, item 2).
 
 ## 10. Reuse audit
 

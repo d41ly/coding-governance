@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-33 — the version check reads every declared kit version constant through govkit's own reader, so no carrier's form escapes a typed pattern
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-33-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-33-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md) | research | TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 |
 | [2026-11-02-prompt-TOOL-dFairHearing-33-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-33-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 | [2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md) | spec-audit | TOOL-dFairHearing-35 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 |
 
 <!-- /gen:spec-records -->
@@ -22,8 +23,8 @@ The round-4 spec audit's finding id 22 (item H1, HIGH, shared with id 31,
 `memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md`) is
 closed. `TOOL-dFairHearing-31` S3 matches version lines with one typed pattern,
 `KIT_[A-Z_]+_VERSION = |gov:kit [a-z-]+@`, over four directories. The build writes version constants
-that pattern cannot match: the shell form of `tools/check-wiring.sh:51`, `KIT_CHECK_WIRING_VERSION=1.34`
-with no spaces, and the marker kind of `coding-governance-agents.template.md`, `governance-template:
+that pattern cannot match: the shell form of `tools/check-wiring.sh:51`, `KIT_CHECK_WIRING_VERSION=1.35`
+at `9c1a2857a`, with no spaces, and the marker kind of `coding-governance-agents.template.md`, `governance-template:
 v4.4`. A hand bump there exits 0. This unit closes the constant half of item H1: it reads every kit's
 declared constant through the registry, each by its own declared pattern, at the base and at `HEAD`,
 and reports any value that moved. The marker half, the four-directory pathspec, is id 31's, in
@@ -34,7 +35,7 @@ and reports any value that moved. The marker half, the four-directory pathspec, 
 - **S1** — The population is declared, not typed. Every registry entry that
   `read_descriptors(root, load_registry(root), Report())` in `tools/govkit/govkit.py` returns and
   whose `version_from` names a file is read, and its value at each end is
-  `resolve_version_value_at(root, desc, <commit>)` (`tools/govkit/govkit.py:13314`), the one reading
+  `resolve_version_value_at(root, desc, <commit>)` (`tools/govkit/govkit.py:13722` at `9c1a2857a`), the one reading
   `derive_epoch_state` grades a kit's epoch by. Each constant is matched by its own entry's `pattern`, so the shell,
   Python, JavaScript, harness `version: ` and marker-kind forms are each read in the form they have.
   Observed by AC1 and AC2.
@@ -198,13 +199,18 @@ none
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 22 (item H1, HIGH, shared with id 31) of
   the round-4 spec audit of specs 28 to 32.
 - rev-2 · 2026-10-23 · §3 · the round-5 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-40 (nine minors).
+- rev-3 · 2026-11-03 · §1 · S1 · §10 · re-cited at `9c1a2857a`: `resolve_version_value_at` (:13314 to
+  :13722), `read_descriptors` (:13238 to :13622), and `tools/check-wiring.sh:51`'s value, now `1.35`
+  (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 2). AC1 stays on unit 31's base: §4's script over `git merge-base HEAD origin/main`
+  printed `constants 20` and exited 0 at `9c1a2857a`, the descriptor count AC1 derives, and AC2 still
+  prints its two pinned lines.
 
 ## 10. Reuse audit
 
-The seam extended is govkit's version reader: `read_descriptors` (`tools/govkit/govkit.py:13238`),
+The seam extended is govkit's version reader: `read_descriptors` (`tools/govkit/govkit.py:13622` at `9c1a2857a`),
 which `python tools/codebase-map/reuse_lookup.py "read every kit version constant at a commit and
 compare two commits"` ranked as a SEAM with fan-in 3, and `resolve_version_value_at`
-(`tools/govkit/govkit.py:13314`), which `derive_epoch_state` reads, so this probe and the epoch leg
+(`tools/govkit/govkit.py:13722`), which `derive_epoch_state` reads, so this probe and the epoch leg
 cannot disagree about a value. The recall query returned `TOOL-aMendedFleet-64`, the
 carrier writer that reads every `version_from`, `DEPL-dGaugedVintage-9`, which made the version
 readable at a commit, and the audit's H1 item.

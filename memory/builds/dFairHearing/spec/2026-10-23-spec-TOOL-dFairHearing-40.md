@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-40 — the round-5 spec audit's 35 minors: one build-wide version reading on one base, an attempt checker that refuses what it cannot place, and criteria a correct build can pass
 
-**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 26 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-2 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 26 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-38-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-38-promoted-fix-brief.md) | research | TOOL-dFairHearing-38 TOOL-dFairHearing-39 |
 | [2026-10-23-prompt-TOOL-dFairHearing-40-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-40-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFairHearing-40-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-40-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 |
 
 <!-- /gen:spec-records -->
 
@@ -44,7 +45,7 @@ it. Where a report item merges ids, the later id points at the first one's mecha
 - **S2** — id 26 (M1). S1's mechanism. Observed by AC1.
 - **S3** — id 3 (M2, units 33, 34 and 36). One base seam for the build-wide reading: S1's `<base>` is
   the sha unit 36's `base.py` prints, which takes `GATE_BASE` unchanged and otherwise calls
-  `resolve_compare_base` (`tools/codebase-map/map_lib.py:1502`). Units 33 and 34 at order 23 read unit
+  `resolve_compare_base` (`tools/codebase-map/map_lib.py:1507` at `9c1a2857a`). Units 33 and 34 at order 23 read unit
   31's probe, and the two bases agree only with `GATE_BASE` unset and `HEAD` ahead of the remote tip,
   so each of their ledgers names whether `GATE_BASE` was set when its AC1 ran. Observed by AC1 and AC2.
 - **S4** — id 20 (M2). S3's mechanism: the consumes-from edge of units 33 and 34 on unit 31 stays for
@@ -86,7 +87,7 @@ it. Where a report item merges ids, the later id points at the first one's mecha
   block runs over a clean fixture clone up to the harness call, the log holds exactly one
   `orchestrating <40 hex> clone ` line whose sha equals `ORCH`'s `HEAD`. Observed by AC7.
 - **S15** — id 18 (M9, unit 37 S9, AC9). Unit 37 AC9's absence probe reads both `.js` files through
-  `renderLexedView` (`tools/hooks/agent-cap.js:720`), which blanks strings, cuts `//` comments, blanks
+  `renderLexedView` (`tools/hooks/agent-cap.js:452` at `9c1a2857a`), which blanks strings, cuts `//` comments, blanks
   template text and copies each `${…}` body with its brace depth saved in `interpDepths`. It replaces
   the two-pass reader unit 37 S9 describes. Observed by AC8.
 - **S16** — id 25 (M10, unit 35 S3, S6). When unit 35's record states `ungated`, no prose carrier tells
@@ -103,7 +104,8 @@ it. Where a report item merges ids, the later id points at the first one's mecha
   the Red when clause of its AC12 is answered here. Where the port disagrees, this unit makes it test
   `.git` by existence and catch a `JSON.parse` failure, and owes the hook's legs. Observed by AC10.
 - **S18** — id 31 (M12, unit 33 §4, S3, AC3). `constants.py` catches `RuntimeError`, the base of
-  `govkit.Refusal` (`tools/govkit/govkit.py:115`), beside its other exceptions, so a registry that does
+  `govkit.Refusal` (bound at `tools/govkit/govkit.py:142` to the class at
+  `tools/govkit/upgrade_steps.py:305`, both at `9c1a2857a`), beside its other exceptions, so a registry that does
   not load exits 2 naming it. Observed by AC11.
 - **S19** — id 33 (M13, unit 33 S2, §5). A `new` outcome is a refusal, exit 2, unless the entry's
   descriptor is absent at the base. The registry is read at both ends, and an entry present at the base
@@ -129,7 +131,7 @@ it. Where a report item merges ids, the later id points at the first one's mecha
   when the two bases agree. Observed by AC2.
 - **S28** — id 17 (L8, unit 33 §4). Unit 33 §4's sentence naming `(none declared)` as a value the `(`
   test reads is corrected: the guard above it skips undeclared entries on the predicate
-  `resolve_entry_version_at` (`tools/govkit/govkit.py:703-705`) uses, so only `(unresolvable)` reaches
+  `resolve_entry_version_at` (`tools/govkit/govkit.py:773-775` at `9c1a2857a`) uses, so only `(unresolvable)` reaches
   the test. NOT OBSERVED by a criterion: it corrects a sentence and changes no behaviour; unit 33's
   ledger records it superseded here.
 - **S29** — id 23 (L9, unit 33 S2). The `absent` and `new` outcomes are asserted: the `7d98741e3` pair
@@ -145,12 +147,12 @@ it. Where a report item merges ids, the later id points at the first one's mecha
   regenerates after the passes, written by neither. Observed by AC18.
 - **S32** — id 34 (L12, unit 34 §3, §4). Unit 34 §3's attribution is corrected: a marker in an added or
   renamed file, and a marker present only at the head in a modified file, are graded by
-  `govkit selfcheck`'s check 5c (`tools/govkit/govkit.py:2222`) within its basis of claimed paths and
+  `govkit selfcheck`'s check 5c (`tools/govkit/govkit.py:1975` at `9c1a2857a`) within its basis of claimed paths and
   `marker_carriers`, never by `kit version markers`, whose script reads a fixed list of pairs. A file
   outside that basis is not graded by either, and the residual says so. NOT OBSERVED by a criterion: it
   corrects an attribution and changes no behaviour; unit 34's ledger records it superseded here.
 - **S33** — id 36 (L13, unit 37 S6). Every `git -C ${repo}` interpolation in
-  `tools/workflows/tier2-review.template.js`, the prompts and `diffCmd` (:1081) included, is quoted as
+  `tools/workflows/tier2-review.template.js`, the prompts and `diffCmd` (:1318 at `9c1a2857a`) included, is quoted as
   `git -C "${repo}"`, and after unit 37 S6's fold a `repo` holding a double quote, a `$` or a backtick
   is refused naming the character. A path holding a space then stays one argument. Observed by AC19.
 - **S34** — id 37 (L14, unit 37 S9). S15's mechanism: `renderLexedView` takes an interpolation only
@@ -300,8 +302,9 @@ section.
 
 The probe slices `checkLiteralOpen`, `resolveLiteralEnd` and `renderLexedView` out of
 `tools/hooks/agent-cap.js`, each from its `function <name>(` line to the next line opening `function `
-at column 0, and evaluates them together in a `vm` context; the file itself calls `main()` at load, so
-it is never required. A `ReferenceError` names a further function to slice and exits 2, never a pass.
+at column 0, and evaluates them together in a `vm` context; `renderLexedView` is not among the hook's
+exports (`module.exports`, `tools/hooks/agent-cap.js:910-913` at `9c1a2857a`), so the probe slices it
+rather than requiring the file. A `ReferenceError` names a further function to slice and exits 2, never a pass.
 The probe joins the view's `code` lines and searches `\bMAX_LENSES\b`. The same view is applied to
 `check-verifier-fanout.js`.
 
@@ -327,7 +330,7 @@ whose `JSON.parse` throws as absent, as :33 catches `ValueError`.
 `tools/workflows/tier2-review.js` is the template's render. `tools/hooks/agent-cap.js` changes only
 where AC10 finds the port disagreeing. The four prose carriers change only on an `ungated` record and
 only where AC9 finds the instruction. Two arms of `tools/workflows/tier2-review.test.sh` assert the
-unquoted `git -C /tmp/r` text (:766, :1659); their expected strings take the quoted form, the same
+unquoted `git -C /tmp/r` text (:967, :1912 at `9c1a2857a`); their expected strings take the quoted form, the same
 assertions. Under the build folder, only this unit's acceptance ledger is written.
 
 ### Alternatives rejected
@@ -477,7 +480,7 @@ repository goes under `%TEMP%/<short name>`.
 
 ## 7. Gates
 
-`agent-cap self-test` · `scratch-guard self-test` · `hook destinations self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `kit/dogfood doc parity` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `workflow script syntax` · `kit version markers` · `govkit selfcheck` · `review-replay selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `harness arms (fail branches armed or pinned)` · `testsuite counts (every bar self-test prints one)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`agent-cap self-test` · `scratch-guard self-test` · `hook destinations self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `kit/dogfood doc parity` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `workflow script syntax` · `kit version markers` · `govkit selfcheck` · `review-replay selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `harness arms (fail branches armed or pinned)` · `testsuite counts (every bar self-test prints one)` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/workflows/tier2-review.test.sh · covers AC19 · a stub run whose `repo` holds a space, and one holding `$`, staged against the harness at `TOOL-dFairHearing-37`'s commit, where the interpolation is bare · FLOOR_ASSERTIONS in that suite, raised by the arms added
 New arm: tools/lib/resolve-python.test.sh · covers AC10 · unit 37's rows 8 and 9 over the port at this unit's commit, staged with the port testing `isDirectory()` for `.git` · none
@@ -502,14 +505,25 @@ New arm: tools/lib/resolve-python.test.sh · covers AC10 · unit 37's rows 8 and
 
 - rev-1 · 2026-10-23 · initial draft, promoting the 19 MEDIUM and 16 LOW findings of the round-5 spec
   audit of specs 33 to 37 as one batch.
+- rev-2 · 2026-11-03 · §7 · the leg line adds `policy fixtures`, whose guard §4's
+  `tools/hooks/agent-cap.js` trips (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 1). §4 keeps the hook: unit 32's
+  `resolveKitDir`, which S17 cures, lands there after unit 16.
+- rev-2 · 2026-11-03 · S3 · S15 · S18 · S28 · S32 · S33 · §4 · §10 · re-cited at `9c1a2857a`:
+  `resolve_compare_base` (:1502 to :1507), `renderLexedView` (:720 to :452), `govkit.Refusal` (:115 to
+  its binding at :142 and its class in `upgrade_steps.py`), `resolve_entry_version_at`'s guard
+  (:703-705 to :773-775), check 5c (:2222 to :1975), `diffCmd` (:1081 to :1318) and the two
+  `git -C /tmp/r` arms (:766 and :1659 to :967 and :1912) (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 2).
+- rev-2 · 2026-11-03 · §4 · the absence probe's reason for slicing re-grounded: since unit 16 the hook
+  runs `main()` only as the entry point, and the probe slices because `renderLexedView` is not
+  exported; the slice and its `ReferenceError` refusal are unchanged (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 2).
 
 ## 10. Reuse audit
 
 Every item extends a seam an earlier unit mints or the base tree carries: units 33, 34 and 36's scratch
 probes corrected in place, govkit's readers (`read_descriptors`, `resolve_version_value_at`,
 `derive_registry_path` and `blob_at` in `tools/govkit/govkit.py`), `resolve_compare_base`
-(`tools/codebase-map/map_lib.py:1502`), unit 35's attempt checker, `renderLexedView`
-(`tools/hooks/agent-cap.js:720`), the README replay section and unit 23 S45's carrier wording.
+(`tools/codebase-map/map_lib.py:1507`), unit 35's attempt checker, `renderLexedView`
+(`tools/hooks/agent-cap.js:452`), both at `9c1a2857a`, the README replay section and unit 23 S45's carrier wording.
 `python tools/codebase-map/reuse_lookup.py "refuse a table row a parser recognises but cannot parse"`
 ranked the generic `rows`, `row` and `parse` stems and no row-refusing reader, so no existing seam fits
 the attempt-table refusal; it stays in the scratch checker. The recall query returned the audit's M3 and

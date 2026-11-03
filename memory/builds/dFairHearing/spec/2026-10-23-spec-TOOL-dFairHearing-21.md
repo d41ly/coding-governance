@@ -13,6 +13,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief.md) | research | TOOL-dFairHearing-20 TOOL-dFairHearing-22 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-21-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-21-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFairHearing-21-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-21-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md) | research | TOOL-dFairHearing-10 TOOL-dFairHearing-22 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-1 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 |
 | [2026-10-23-review-TOOL-dFairHearing-20-23-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-20-23-spec-audit.md) | spec-audit | TOOL-dFairHearing-22 TOOL-dFairHearing-20 TOOL-dFairHearing-23 |
 
 <!-- /gen:spec-records -->

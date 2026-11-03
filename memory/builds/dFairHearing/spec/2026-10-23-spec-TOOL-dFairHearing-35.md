@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-35 — unit 15's replay scored by one attempt rule fixed before the runs, so no figure rests on the attempt a runner prefers
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 22 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 22 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md) | research | TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 |
 | [2026-10-23-prompt-TOOL-dFairHearing-35-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-35-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFairHearing-35-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-35-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 | [2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md) | spec-audit | TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 |
 
 <!-- /gen:spec-records -->
@@ -204,7 +205,7 @@ the manifest and unit 30's verdict record change.
 
 ## 7. Gates
 
-`review-replay selftest` · `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `gotchas selftest` · `workflow script syntax` · `recall floor` · `recall floor arms` · `review-protocol parity (kit vs dogfood)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`review-replay selftest` · `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `gotchas selftest` · `workflow script syntax` · `recall floor` · `recall floor arms` · `review-protocol parity (kit vs dogfood)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/memory-tree/gotchas.py (its selftest, only on an `ungated` win) · covers AC4 · spec 15's planted class record naming a manifest leg, which the flag must omit, staged against `gotchas.py` at this unit's parent · none
 
@@ -222,6 +223,8 @@ New arm: tools/memory-tree/gotchas.py (its selftest, only on an `ungated` win) �
   audit of specs 28 to 32.
 - rev-2 · 2026-10-23 · §3 · the round-5 spec audit's disposal: hands-off edges to TOOL-dFairHearing-38 (the decision it reads, item H1) and
   TOOL-dFairHearing-40 (nine minors).
+- rev-3 · 2026-11-03 · §7 · the leg line adds `policy fixtures`, whose guard §4's
+  `tools/memory-tree/gotchas.py` trips (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 1).
 
 ## 10. Reuse audit
 

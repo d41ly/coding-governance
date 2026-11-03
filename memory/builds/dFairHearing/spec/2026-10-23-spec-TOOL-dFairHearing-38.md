@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-38 — a `selected` verdict observed by the parser `gotchas.py` has, so a correct build passes and a shipped flag reds
 
-**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 25 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-2 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 25 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-38-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-38-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-38-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-38-promoted-fix-brief.md) | research | TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 | [2026-11-02-prompt-TOOL-dFairHearing-38-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-38-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 
 <!-- /gen:spec-records -->
 
@@ -21,7 +22,7 @@ The round-5 spec audit's finding id 1 (item H1, HIGH, shared with id 11,
 `memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md`) is
 closed. `TOOL-dFairHearing-37` S4 and AC4 expect `gotchas.py --for-diff <range> --all-ungated` to exit 2
 with argparse's `unrecognized arguments` when unit 35's record states `selected`. `gotchas.py` has no
-argparse: `main`'s `--for-diff` branch (`tools/memory-tree/gotchas.py:1335-1339`) returns
+argparse: `main`'s `--for-diff` branch (`tools/memory-tree/gotchas.py:1366-1370` at `9c1a2857a`) returns
 `cmd_for_diff(root, conf, argv[2])` and never reads `argv[3:]`, so the call exits 0 and AC4 cannot pass
 on a correct build. This unit replaces that half of AC4 with an observation the parser can satisfy and
 a shipped flag cannot: the byte-identical comparison unit 32 AC8 already states, given a staged break,
@@ -98,7 +99,7 @@ sys.exit(1 if hits else 0)
 ```
 
 A missing anchor raises `StopIteration`, so the probe never passes on a branch it did not find. At
-`3708a705` the branch spans lines 1335 to 1339.
+`3708a705` the branch spans lines 1335 to 1339, and at `9c1a2857a` lines 1366 to 1370.
 
 ### Files touched (estimate)
 
@@ -157,6 +158,9 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 1 (item H1, HIGH, shared with id 11) of the
   round-5 spec audit of specs 33 to 37.
+- rev-2 · 2026-11-03 · §1 · §4 · the `--for-diff` branch re-cited at `9c1a2857a`, :1335-1339 having
+  moved to :1366-1370; §4's probe printed `branch 1366-1370 lines 5` and `all-ungated 0` there (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief,
+  item 2).
 
 ## 10. Reuse audit
 

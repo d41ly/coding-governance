@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-22 — agent-cap fails closed on a spec-audit call when the opt-in pack is not beside it
 
-**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief.md) | research | TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-22-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-22-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFairHearing-22-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-22-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md) | research | TOOL-dFairHearing-10 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-1 TOOL-dFairHearing-21 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 |
 | [2026-11-03-prompt-TOOL-dFairHearing-16-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-16-fix-brief.md) | research | TOOL-dFairHearing-16 TOOL-dFairHearing-26 TOOL-dFairHearing-28 TOOL-dFairHearing-29 |
 | [2026-10-23-review-TOOL-dFairHearing-20-23-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-20-23-spec-audit.md) | spec-audit | TOOL-dFairHearing-21 TOOL-dFairHearing-20 TOOL-dFairHearing-23 |
 
@@ -34,8 +35,8 @@ the spec-audit opt-in fails open.
 - **S1** — `checkOptinPackPresent(data)` in `tools/hooks/agent-cap.js`, called at the site rule 0's
   `checkSpecAuditDeclared` occupied in `main()`. For a `Workflow` call whose structured args, read by
   `extractWorkflowArgs`, carry `kind: 'spec-audit'` or a `specAudit` key, the trigger rule 0 used
-  (`tools/hooks/agent-cap.js:1491-1492` at `8b2b995f`, which `TOOL-dFairHearing-16` moves into the
-  pack), it denies, exit 2, unless the file
+  (`checkSpecAuditDeclared` in `tools/workflows/spec-audit-optin.js`, :123-124 at `9c1a2857`, where
+  `TOOL-dFairHearing-16` moved it out of the hook), it denies, exit 2, unless the file
   `<hook dir>/../workflows/spec-audit-optin.js` exists. Every other call, and every spec-audit call with
   the pack present, is admitted by this check; the pack decides the opt-in. Observed by AC1, AC2 and
   AC3.
@@ -54,7 +55,7 @@ the spec-audit opt-in fails open.
   `TOOL-dFairHearing-16` S4 puts it, so the rule never lives in two homes.
 - No read of `.claude/settings.json` from the hook. A pack present and unwired is a hand-copy state
   that `tools/check-wiring.sh` reports UNWIRED (`TOOL-dFairHearing-16` S6); govkit wires every fragment
-  it lands (`tools/govkit/govkit.py:6109-6125`), so on govkit's paths presence implies wiring.
+  it lands (`run_fragment_merges`, `tools/govkit/govkit.py:5894-5910` at `9c1a2857`), so on govkit's paths presence implies wiring.
 - No change to govkit, to either kit's `requires`, or to `update`'s scope narrowing.
 - No change to rules 6 and 7, the rules the hook keeps after `TOOL-dFairHearing-16`, or to any
   non-`Workflow` call.
@@ -68,7 +69,8 @@ the spec-audit opt-in fails open.
 
 ### Evidence
 
-Measured at `8b2b995f` on 2026-11-03, PINNED; rev-2 cited base `3708a705`'s lines.
+Measured at `9c1a2857` on 2026-11-03, PINNED, after `TOOL-dFairHearing-16` landed; rev-3 cited
+`8b2b995f`'s lines and rev-2 base `3708a705`'s.
 
 - `tools/hooks/kit.toml:9` makes the hooks kit require `settings-merge` and `kickoff-manifest` only;
   `tools/workflows/kit.toml:10` makes the review kit require `agent-cap` and `policy`, the reverse
@@ -77,10 +79,11 @@ Measured at `8b2b995f` on 2026-11-03, PINNED; rev-2 cited base `3708a705`'s line
   markers (`tools/govkit/govkit.py:9613-9645`).
 - The hook already probes the review kit beside its own directory, at
   `path.join(path.dirname(__dirname), 'workflows', ...)`, for the harness a deny message names
-  (`resolveHarnessName`, `tools/hooks/agent-cap.js:90-95`). S1 reuses that resolution.
+  (`resolveHarnessName`, `tools/hooks/agent-cap.js:74-79`). S1 reuses that resolution.
 - With `policy-mirror.js` beside the hooks kit, rule 7 refuses a payload `cwd` in no checkout
-  (`tools/hooks/agent-cap.js:1782-1785`); a copy of the hook with no policy kit beside it adds no rule
-  7, which is how the hook's suite arms its copy (`tools/hooks/agent-cap.test.sh:34-39`).
+  (`checkSettingsInForce`, `tools/hooks/agent-cap.js:779-782`); a copy of the hook with no policy kit
+  beside it adds no rule 7, which is how the hook's suite arms its copy
+  (`tools/hooks/agent-cap.test.sh:35-40`).
 - A `requires` edge from the hooks kit to the review kit closes a cycle with the review kit's own edge,
   and govkit's install order refuses a cycle (`tools/govkit/govkit.py`, `derive_install_order`'s
   docstring).
@@ -98,7 +101,7 @@ checkOptinPackPresent(data):
 It runs on every `Workflow` call that rules 6 and 7 admit. The hook carries no `--only=` selector
 after `TOOL-dFairHearing-16`, which refuses every such argument (its §8 F7), so no argument narrows
 it. A throw inside it denies, the hook's fail-closed rule for a rule that cannot finish, as rules 6
-and 7 catch theirs (`tools/hooks/agent-cap.js:1880-1882`, :1895-1897).
+and 7 catch theirs (`tools/hooks/agent-cap.js:874-876`, :889-891).
 
 ### What it does not check
 
@@ -195,13 +198,18 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC1 AC2 AC3 · a copy of the ho
 - rev-3 · 2026-11-03 · §6 · §7 · the criteria's copy of the hook has no policy kit beside it, so rule
   7, which refuses a cwd in no checkout, adds no rule, and the leg line adds `policy fixtures`, whose
   guard the hook's path trips (same brief, item 5).
+- rev-4 · 2026-11-03 · S1 · §3 · §4 · §10 · every line re-cited at `9c1a2857`, after
+  `TOOL-dFairHearing-16` landed: rule 0's trigger in the pack it moved to, where rev-3 cited the hook
+  past its end today; `resolveHarnessName`, rule 7's refusal, the suite's copy and both catches at
+  the hook's new lines; and govkit's fragment wiring by symbol, which rev-3 cited at base's line
+  (2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief, items 2 and 4).
 
 ## 10. Reuse audit
 
-The seam is the hook's own sibling-kit probe, `resolveHarnessName` (`tools/hooks/agent-cap.js:90-95`
-at `8b2b995f`), which already resolves the review kit beside the hook's directory; S1 resolves the
-pack the same way, and the trigger is rule 0's own two-condition test
-(`tools/hooks/agent-cap.js:1491-1492` at `8b2b995f`). `python tools/codebase-map/reuse_lookup.py
+The seam is the hook's own sibling-kit probe, `resolveHarnessName` (`tools/hooks/agent-cap.js:74-79`
+at `9c1a2857`), which already resolves the review kit beside the hook's directory; S1 resolves the
+pack the same way, and the trigger is rule 0's own two-condition test, now in the pack
+(`tools/workflows/spec-audit-optin.js:123-124` at `9c1a2857`). `python tools/codebase-map/reuse_lookup.py
 "hook resolves a sibling kit file beside its own directory and denies when absent"` ranked
 `resolve_kit_dir` and `kit_rel`, the Python and shell resolvers; neither runs inside the Node hook,
 so the JS probe the hook already carries is the seam. The recall query returned the audit's H3 item,

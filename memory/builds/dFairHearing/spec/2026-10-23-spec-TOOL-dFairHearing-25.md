@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-25 — the owed replays run after the replay contract is corrected, and their verdicts set the dark switches
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 20 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 20 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-25-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-25-promoted-fix-brief.md) | research | TOOL-dFairHearing-26 TOOL-dFairHearing-27 |
 | [2026-10-23-prompt-TOOL-dFairHearing-4-edge-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-4-edge-fix-brief.md) | research | TOOL-dFairHearing-4 TOOL-dFairHearing-18 TOOL-dFairHearing-27 |
 | [2026-11-02-prompt-TOOL-dFairHearing-25-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-25-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md) | research | TOOL-dFairHearing-10 TOOL-dFairHearing-22 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-1 TOOL-dFairHearing-21 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-23 TOOL-dFairHearing-26 |
 | [2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md) | spec-audit | TOOL-dFairHearing-4 TOOL-dFairHearing-14 TOOL-dFairHearing-26 TOOL-dFairHearing-27 |
 
 <!-- /gen:spec-records -->
@@ -210,7 +211,7 @@ verdict leaves. `tools/workflows/tier2-review.js` is the template's render.
 
 ## 7. Gates
 
-`review-replay selftest` · `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `gotchas selftest` · `recall floor` · `recall floor arms` · `review-protocol parity (kit vs dogfood)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`review-replay selftest` · `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `gotchas selftest` · `policy fixtures` · `recall floor` · `recall floor arms` · `review-protocol parity (kit vs dogfood)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 No new arm: this unit's outputs are the verdict record, the manifests and the switch state they set,
 each observed directly by §6.
@@ -232,6 +233,9 @@ each observed directly by §6.
   to 23.
 - rev-2 · 2026-10-23 · §3 · the round-3 spec audit's disposal: hands-off edges to TOOL-dFairHearing-30
   (unit 15's replay in per-arm clones, finding id 28) and TOOL-dFairHearing-32 (nine minors).
+- rev-3 · 2026-11-03 · §7 · the leg line adds `policy fixtures`, whose guard §4's
+  `tools/memory-tree/gotchas.py` trips (2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief,
+  item 1).
 
 ## 10. Reuse audit
 

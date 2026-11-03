@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-20 — a gapped whole-design walk reds the harness's returned counts, not only its prose
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 19 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 19 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief-2.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief-2.md) | research | TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief.md) | research | TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 |
 | [2026-11-02-prompt-TOOL-dFairHearing-20-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-20-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md) | research | TOOL-dFairHearing-10 TOOL-dFairHearing-22 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-1 TOOL-dFairHearing-21 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 |
 | [2026-10-23-review-TOOL-dFairHearing-20-23-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-20-23-spec-audit.md) | spec-audit | TOOL-dFairHearing-22 TOOL-dFairHearing-21 TOOL-dFairHearing-23 |
 
 <!-- /gen:spec-records -->
@@ -55,7 +56,7 @@ non-empty `walkGaps`.
   parity arm's five tokens are untouched.
 - No fabricated blocker count. A floor such as `blockers = walkGaps.length` would count gaps as
   findings nobody raised; `null` is the stated absence the build harness already refuses to round to
-  zero (`tools/workflows/unattended-build.template.js:1764-1775`).
+  zero (`tools/workflows/unattended-build.template.js:1860-1871` at `9c1a2857`).
 - No change to any preset other than `whole-design`, and no change to the diff kind.
 - No unattended-build wiring of the `whole-design` preset; none exists in this build.
 - No help page: `help/` holds no page on the review harness.
@@ -72,10 +73,10 @@ non-empty `walkGaps`.
 
 - The return's counts are nulled today on exactly one condition past the synthesis, the tally fault:
   `blockers` and `highs` stay `null` and the note reads `UNVERIFIED: ... so blockers and highs are
-  null` (`tools/workflows/tier2-review.template.js:1972-1979`, `:2057-2058`). S2 is a second condition
+  null` (`tools/workflows/tier2-review.template.js:2455-2464`, `:2648-2649` at `9c1a2857`). S2 is a second condition
   of that kind, in the same return.
 - The build harness reads a non-integer `blockers` as a DEGRADED run and throws rather than rounding it
-  to zero (`tools/workflows/unattended-build.template.js:1764-1775`), so `null` reaches every machine
+  to zero (`tools/workflows/unattended-build.template.js:1860-1871`), so `null` reaches every machine
   caller as not-clean.
 - `TOOL-dFairHearing-17` §4 "The count" computes `roundCount` from the confirmed blocker and high
   counts before the synthesis, and its rule returns `CONVERGED` when that count is 0; a no-finding walk
@@ -104,7 +105,7 @@ every lens death does, so `walkRed` is never computed over a partial set of walk
 | `note` | as today | `BLOCKED: the walk table has <n> gap(s); blockers, highs, roundCount and roundState are null` |
 
 The note's precedence is worst first, the order the return's own comment states
-(`tools/workflows/tier2-review.template.js:2046-2051`): a dead synthesis is `DEFERRED:`, then a gapped
+(the return's `note`, `tools/workflows/tier2-review.template.js:2638-2649` at `9c1a2857`): a dead synthesis is `DEFERRED:`, then a gapped
 walk is `BLOCKED:`, then a tally fault is `UNVERIFIED:`.
 
 ### Inventory
@@ -127,10 +128,10 @@ render its copy.
 
 - **A blocker floor of one per gap.** The report's fix offers it. It makes `blockers + highs` exceed
   `confirmed` on a no-finding walk, which the build harness refuses as an unreadable contract
-  (`tools/workflows/unattended-build.template.js:1786-1787`), and it counts gaps as findings.
+  (`tools/workflows/unattended-build.template.js:1882-1883` at `9c1a2857`), and it counts gaps as findings.
 - **A `BLOCKED` roundState token.** It adds a sixth token to `TOOL-dFairHearing-17`'s rule, which its
   parity arm holds equal to the driver's `review_state`, and the driver has no such token
-  (`tools/unattended/unattended.sh:12612-12619`).
+  (`review_state`, `tools/unattended/unattended.sh:12766-12773` at `9c1a2857`).
 
 ## 5. Production-readiness checklist
 
@@ -189,13 +190,16 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC2 AC3 · a whole-d
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 37 (item H1) of the round-1 spec audit.
 - rev-2 · 2026-10-23 · §3 · the disposal of the spec audit of units 20 to 23: a hands-off edge to TOOL-dFairHearing-27, naming the two findings it closes on this spec and the criterion it supersedes.
+- rev-3 · 2026-11-03 · §3 · §4 · §10 · every line of the harness template, the build harness and
+  the driver re-cited at `9c1a2857`, where other units moved them; the note and the driver's rule
+  also by symbol (2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief, item 2).
 
 ## 10. Reuse audit
 
 The seam is the harness's own tally-fault path: the return already nulls `blockers` and `highs` on a
-condition past the synthesis and names it in `note` (`tools/workflows/tier2-review.template.js:1972-1979`,
-`:2057-2058`), and the build harness already reads `null` as degraded
-(`tools/workflows/unattended-build.template.js:1764-1775`). `python tools/codebase-map/reuse_lookup.py
+condition past the synthesis and names it in `note` (`tools/workflows/tier2-review.template.js:2455-2464`,
+`:2648-2649` at `9c1a2857`), and the build harness already reads `null` as degraded
+(`tools/workflows/unattended-build.template.js:1860-1871`). `python tools/codebase-map/reuse_lookup.py
 "null the returned blocker and high counts when the review cannot be trusted"` ranked generic `count`
 stems and `review_state` in `tools/unattended/unattended.sh`, the driver's rule `TOOL-dFairHearing-17`
 mirrors; it did not surface the tally-fault return, which the source read found. The recall query

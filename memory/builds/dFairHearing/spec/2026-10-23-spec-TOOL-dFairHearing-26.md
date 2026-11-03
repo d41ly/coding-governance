@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-26 — every rule 0 and rule 5 arm of the hook's suite found at its new home and gone from the old one, counted by label whatever helper writes it
 
-**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 20 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 20 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-25-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-25-promoted-fix-brief.md) | research | TOOL-dFairHearing-25 TOOL-dFairHearing-27 |
 | [2026-10-23-prompt-TOOL-dFairHearing-26-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-26-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFairHearing-26-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-26-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md) | research | TOOL-dFairHearing-10 TOOL-dFairHearing-22 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-1 TOOL-dFairHearing-21 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-23 TOOL-dFairHearing-25 |
 | [2026-11-03-prompt-TOOL-dFairHearing-16-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-16-fix-brief.md) | research | TOOL-dFairHearing-16 TOOL-dFairHearing-22 TOOL-dFairHearing-28 TOOL-dFairHearing-29 |
 | [2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md) | spec-audit | TOOL-dFairHearing-4 TOOL-dFairHearing-14 TOOL-dFairHearing-25 TOOL-dFairHearing-27 |
 
@@ -161,11 +162,11 @@ Each changes only where the census finds an arm left behind or missing.
 
 ## 7. Gates
 
-`agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `unattended-build self-test` · `spec tokens (a spec's own names resolve)`
+`agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `unattended-build self-test` · `spec-audit opt-in pack self-test` · `spec tokens (a spec's own names resolve)`
 
-The leg `spec-audit opt-in pack self-test` runs the pack's suite once `TOOL-dFairHearing-16` adds it
-to `tools/gate-legs.json`. It is not on the line above because it is not in the manifest at this
-spec's base.
+The leg `spec-audit opt-in pack self-test` runs the pack's suite; `TOOL-dFairHearing-16` added it to
+`tools/gate-legs.json` (at `886c11fe`), after this spec's base, so it joins the line above. It carries
+no guard, so the guards join neither demands nor checks it.
 
 New arm: tools/workflows/check-review-join.test.sh · covers none · any rule-5 arm this unit moves, staged with the ref-keyed ban cut from the check · none
 New arm: tools/workflows/spec-audit-optin.test.sh · covers none · any rule-0 arm this unit moves, staged with rule 0 cut from the pack · none
@@ -199,6 +200,9 @@ base to move.
 - rev-3 · 2026-11-03 · §3 · the edge to TOOL-dFairHearing-28 names what that unit still holds, the
   pinned totals this AC1 reads and the unfoldable script, now that this spec's figures agree with
   it (same brief, item 5).
+- rev-4 · 2026-11-03 · §7 · the leg line names `spec-audit opt-in pack self-test`, which
+  `TOOL-dFairHearing-16` landed in the manifest; the sentence that kept it off the line for its
+  absence at base says so (2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief, item 1).
 
 ## 10. Reuse audit
 

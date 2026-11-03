@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-30 — unit 15's with-and-without replay run with one fresh clone per record and arm, so no arm reviews a tree holding the other's report
 
-**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md) | research | TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-31 TOOL-dFairHearing-32 |
 | [2026-10-23-prompt-TOOL-dFairHearing-30-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-30-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFairHearing-30-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-30-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 | [2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md) | spec-audit | TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-31 TOOL-dFairHearing-32 |
 
 <!-- /gen:spec-records -->
@@ -24,7 +25,8 @@ The round-3 spec audit's finding id 28 (item H2, HIGH,
 `memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md`) is
 closed. `TOOL-dFairHearing-25` runs unit 15's `selected` and `ungated` arms of each record in one
 clone, and the harness writes each report under `${repo}/${reviewDir}`
-(`tools/workflows/tier2-review.template.js:297`, `:1749`). The first arm's report therefore sits in
+(the `reviewDir` default and the report instruction, `tools/workflows/tier2-review.template.js:400`
+and `:2121` at `9c1a2857a`). The first arm's report therefore sits in
 the working tree the second arm reviews, and the recall comparison that decides spec 15 S6's product
 state can be contaminated. This unit takes that replay from unit 25 and runs each record and arm in
 its own freshly made clone, checked clean before its call, so no arm can read another arm's output.
@@ -178,7 +180,7 @@ states. The README's switch paragraph states the default the verdict leaves.
 
 ## 7. Gates
 
-`review-replay selftest` · `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `gotchas selftest` · `recall floor` · `recall floor arms` · `review-protocol parity (kit vs dogfood)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`review-replay selftest` · `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `gotchas selftest` · `recall floor` · `recall floor arms` · `review-protocol parity (kit vs dogfood)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/memory-tree/gotchas.py (its selftest, only on an `ungated` win) · covers AC4 · spec 15's planted class record naming a manifest leg, which the flag must omit, staged against `gotchas.py` at this unit's parent · none
 
@@ -199,6 +201,10 @@ New arm: tools/memory-tree/gotchas.py (its selftest, only on an `ungated` win) �
 - rev-2 · 2026-10-23 · §3 · the round-4 spec audit's disposal: hands-off edges to TOOL-dFairHearing-35 (the attempt rule,
   the scoring and the decision, finding id 32) and TOOL-dFairHearing-37 (seven minors).
 - rev-3 · 2026-10-23 · §3 · the round-5 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-40 (four minors that read the verdict record).
+- rev-4 · 2026-11-03 · §7 · the leg line adds `policy fixtures`, whose guard §4's
+  `tools/memory-tree/gotchas.py` trips (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 1).
+- rev-4 · 2026-11-03 · §1 · §10 · the harness's `reviewDir` default and report instruction re-cited at
+  `9c1a2857a`, :297 and :1749 having moved to :400 and :2121 (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 2).
 
 ## 10. Reuse audit
 
@@ -206,8 +212,8 @@ No new mechanism: the clone block is unit 25 §4's, the recipe is unit 23's in
 `tools/workflows/README.md`, and the scorer is unit 14's `check_experiment`. `python
 tools/codebase-map/reuse_lookup.py "give each comparative review run its own clean working tree"`
 ranked the generic `tree`, `run`, `run_arms` and `run_git` stems, none a per-run clone. The
-report-path seam was read at `tools/workflows/tier2-review.template.js:297` (the `reviewDir`
-default) and `:1749` (the report written under `${repo}/${reviewDir}`). The recall query returned
+report-path seam was read at `tools/workflows/tier2-review.template.js:400` (the `reviewDir`
+default) and `:2121` (the report written under `${repo}/${reviewDir}`), both at `9c1a2857a`. The recall query returned
 the audit's H2 item, spec 15's brief row for the replay and `TOOL-aEvidencedLens-10`, the replay
 scorer's origin, and no prior per-arm isolation rule. §8 F1 follows unit 25 §8 F1's hand-off form,
 read from that spec.

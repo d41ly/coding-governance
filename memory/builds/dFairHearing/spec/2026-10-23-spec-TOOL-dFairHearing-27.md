@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-27 — the spec audit of units 20 to 23, its 31 minors: criteria a correct build can pass, refusals that name their cause, and the readers a move leaves behind
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,8 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-27-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-27-2-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-4-edge-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-4-edge-fix-brief.md) | research | TOOL-dFairHearing-4 TOOL-dFairHearing-18 TOOL-dFairHearing-25 |
 | [2026-11-02-prompt-TOOL-dFairHearing-27-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-27-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-27-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-1-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 | [2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md) | spec-audit | TOOL-dFairHearing-4 TOOL-dFairHearing-14 TOOL-dFairHearing-25 TOOL-dFairHearing-26 |
 
 <!-- /gen:spec-records -->
@@ -71,12 +73,13 @@ one's mechanism.
 - **S12** — id 17 (M7, unit 22, AC7). `tools/hooks/kit.toml` gains `marker_carriers =
   ["{prefix}/workflows/spec-audit-optin.js"]`, and the pack carries a `gov:kit agent-cap@` marker at
   agent-cap's version of that commit. A scoped `govkit update --kits agent-cap` then moves a claimed
-  review kit with it (`tools/govkit/govkit.py:1034-1059`, `:9294-9312`). Unit 22's presence check
+  review kit with it (`derive_marker_coupling`, `tools/govkit/govkit.py:1104-1129`, and the scope
+  check, `:9621-9639`, at `9c1a2857a`). Unit 22's presence check
   stays, for hand copies and hooks-only adopters.
 - **S13** — id 18 (M8, unit 22, AC8). The deny message names its remedy by receipt state. When
   `.governance/install.json`'s `kits` claims `review-harness`, the remedy is `govkit update --kits
   review-harness`. Otherwise, or with no receipt, it is `govkit apply --kits review-harness`, because
-  `update` refuses a kit the receipt does not claim (`tools/govkit/govkit.py:9287-9293`). The
+  `update` refuses a kit the receipt does not claim (`tools/govkit/govkit.py:9614-9620` at `9c1a2857a`). The
   hand-copy remedy stays. This supersedes unit 22 S2's fixed first remedy and AC1's string.
 - **S14** — id 21 (M9, unit 23, AC9). `tools/workflows/check-verifier-fanout.sh` carries no
   `LENS_SLOTS` assignment, so the number keeps one home, `tools/workflows/check-verifier-fanout.js`
@@ -89,12 +92,15 @@ one's mechanism.
 - **S16** — id 24 (M11, unit 23, AC11). The readers of the old slot-count name follow it.
   `tools/check-playbook-parity.sh`'s `lens-array bound` pair reads `LENS_SLOTS` from
   `tools/workflows/check-verifier-fanout.js`, and its stated side is the README sentence on rule 2's
-  array-literal bound (`tools/hooks/README.md:180` at base), read wherever unit 16 S7 places it. The
-  plants in `tools/check-playbook-parity.test.sh` (:158, :279-281) follow. Both REVIEW-PROTOCOL copies
-  at :224 name `LENS_SLOTS` in `check-verifier-fanout.js`.
+  array-literal bound ("An array LITERAL of ≤5 elements", `tools/hooks/README.md:198` at `9c1a2857a`,
+  where unit 16 S7 left it), read wherever that sentence sits. The plants in
+  `tools/check-playbook-parity.test.sh` follow: the hook plant (:278 at `9c1a2857a`), the README plant
+  (:281-282) and the arm `AC2 MAX_LENSES drifts from the hook README's stated bound` (:400-402). Both
+  REVIEW-PROTOCOL copies, at the sentence holding the lens allowance as `MAX_LENSES` (:190 at
+  `9c1a2857a`), name `LENS_SLOTS` in `check-verifier-fanout.js`.
 - **S17** — id 26 (M12, unit 23, AC12). `tools/govkit/subject-pins.tsv` carries a row for
   `spec-audit opt-in pack self-test`, regenerated with `python tools/govkit/govkit.py selfcheck --write`
-  once the leg is live (`tools/govkit/govkit.py:3019-3020`).
+  once the leg is live (`tools/govkit/govkit.py:2764-2765` at `9c1a2857a`).
 - **S18** — id 28 (M13, unit 23, AC13). The `gateManifest` name (unit 23 S44) reaches
   `tools/workflows/README.md`'s argument list (unit 8 S9) and the throw that unit 8 AC5's arm expects
   in `tools/workflows/tier2-review.test.sh`.
@@ -102,14 +108,16 @@ one's mechanism.
   `tools/workflows/replay_scorer.py`'s runner by the number of arms added, as `review_replay.py:84`
   and `:604-606` hold it. This supersedes the floor field "none" on unit 21's `New arm:` line.
 - **S20** — id 33 (M15, unit 22, AC15). `checkOptinPackPresent` resolves the pack in
-  `resolve_kit_dir`'s order (`tools/check-kit-versions.sh:69-105`). First comes a
+  `resolve_kit_dir`'s order (`tools/check-kit-versions.sh:187-225` at `9c1a2857a`). First comes a
   `.governance/install.json` row whose `source` ends `workflows/spec-audit-optin.js` and whose `path`
   is a file inside the tree. Then comes `<hook dir>/../workflows/spec-audit-optin.js`. A receipt row
   whose `path` is missing denies, naming that path. No row and no probe hit denies as unit 22 S1
   does.
 - **S21** — id 34 (M16, unit 22, AC16). The `agent-cap self-test` guard in `tools/gate-legs.json` gains
-  `{prefix}/workflows/spec-audit-optin.js`. `memory/guides/SESSION-KICKOFF.md` is re-stamped after
-  that edit to its watched file, as unit 23 S28 re-stamps it.
+  `{prefix}/workflows/spec-audit-optin.js`. The commit that stages that edit to the kickoff manifest's
+  watched file re-stamps `last-audit:` in `memory/guides/SESSION-KICKOFF.md` in the same commit, by the
+  stamp rule `TOOL-dFairHearing-16` S9 follows for its leg: the pre-commit leg refuses a commit that
+  stages a watched file without one (`skills/session-kickoff/manifest-check.sh:1775-1790`).
 - **S22** — id 36 (M17, unit 23, AC17). The replay recipe in `tools/workflows/README.md` states its
   failure envelope. An existing `$TEMP/<name>` refuses. Every step's exit status is checked. The
   liveness check compares `git -C "$TEMP/<name>" rev-parse HEAD` with `git rev-parse <commit>`. An
@@ -129,8 +137,8 @@ one's mechanism.
 - **S27** — id 9 (L3, unit 23, AC22). Unit 23 AC20's base-sha half reads the three key-pinning arms'
   own lines, sliced by their labels, never a whole-file `grep -c`. Each of the three arms opens with a
   `// ---- ` header naming its unit and criterion (`TOOL-dFairHearing-2 AC4`, `TOOL-dFairHearing-3 AC5`,
-  `TOOL-dFairHearing-9 AC7`), the header form the suite's arms carry
-  (`tools/workflows/tier2-review.test.sh:481`).
+  `TOOL-dFairHearing-9 AC7`), the header form the suite's arms carry (the
+  `// ---- TOOL-dFairHearing-2 AC1 — ` header, `tools/workflows/tier2-review.test.sh:172` at `9c1a2857a`).
 - **S28** — id 16 (L4, units 21 and 23, AC23). The clone-path reason in unit 21 AC1 and unit 23 §6 is
   an UNVERIFIED platform claim: the audit measured clones succeeding under the scratchpad with
   `core.longpaths` true. Fixtures go under `%TEMP%` by the run mandate's own convention, and no
@@ -348,9 +356,11 @@ renders. The spec files of units 20 to 23 are not touched: every correction is s
   it exits 2. With the row naming a missing path, it exits 2 naming that path.
   Red when: the pack under a per-kit prefix is denied though the receipt names it.
 - **AC16** — When a python probe reads `tools/gate-legs.json`, the `agent-cap self-test` guard holds
-  the pack's prefixed path that S21 names. The `last-audit:` sha of `memory/guides/SESSION-KICKOFF.md`
-  is one after which `git log <sha>..HEAD -- tools/gate-legs.json` lists no commit.
-  Red when: a change to the pack alone skips the leg that holds the hook's literal.
+  the pack's prefixed path that S21 names. In `git diff <unit>~1 <unit> --
+  memory/guides/SESSION-KICKOFF.md`, where `<unit>` is the commit staging that guard edit, only the
+  `last-audit:` line changes, and its sha is `git rev-parse <unit>~1`.
+  Red when: a change to the pack alone skips the leg that holds the hook's literal, or the commit
+  staging the guard edit carries no re-stamp.
 - **AC17** — When the README's recipe runs twice with `<name>` `fhr`, first at `3708a705` and then at
   `HEAD`, the second run exits 2 before any fetch. After `rm -rf "$TEMP/fhr"` it ends with `git -C
   "$TEMP/fhr" rev-parse HEAD` equal to `git rev-parse HEAD`. `git show-ref refs/replay/fhr` prints
@@ -394,7 +404,7 @@ renders. The spec files of units 20 to 23 are not touched: every correction is s
 
 ## 7. Gates
 
-`playbook parity selftest` · `playbook parity` · `agent-cap self-test` · `scratch-guard self-test` · `hook destinations self-test` · `agent-cap restatement` · `verifier fan-out self-test` · `verifier fan-out` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-replay selftest` · `gotchas selftest` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `foreign-prefix parity (every self-test at three prefixes)` · `review-protocol parity (kit vs dogfood)` · `kickoff-manifest ratchet` · `kit version markers` · `workflow script syntax` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`playbook parity selftest` · `playbook parity` · `agent-cap self-test` · `scratch-guard self-test` · `hook destinations self-test` · `agent-cap restatement` · `verifier fan-out self-test` · `verifier fan-out` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-replay selftest` · `gotchas selftest` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `foreign-prefix parity (every self-test at three prefixes)` · `review-protocol parity (kit vs dogfood)` · `kickoff-manifest ratchet` · `kit version markers` · `workflow script syntax` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/workflows/check-verifier-fanout.test.sh · covers AC1 AC18 · a zero-row opt-in literal, a gate copy without the renderer and an unresolvable python, staged against the gate at `TOOL-dFairHearing-23`'s commit · none
 New arm: tools/workflows/replay_scorer.py (its runner, in the `review-replay selftest` leg) · covers AC4 AC5 AC25 · an item-only ref, a backslashed and an absolute held-out path, and a failed `git ls-files`, staged against the factory at `TOOL-dFairHearing-23`'s commit · that runner's `ARMS_DECLARED`, raised by the arms added
@@ -410,7 +420,7 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC19 AC20 · a run-2 ban
 - **F2 — What remedy does the deny name for an adopter whose receipt does not claim the review kit
   (S13)?** Options: (a) `govkit apply --kits review-harness`, the verb that installs a kit; (b) the
   kit's name alone, with a pointer to govkit's documentation; (c) `--add-kits`, which govkit's refusal
-  names but no verb parses (`tools/govkit/govkit.py:13719-13724`). (c) sends the adopter to a third
+  names but no verb parses (`tools/govkit/govkit.py:14116-14121` at `9c1a2857a`). (c) sends the adopter to a third
   refusal. (b) leaves the verb to a reader. (a) names a command that runs. RESOLVED (agent,
   2026-10-23, delegated): (a), rung 3. widens: none · relaxes: none
 - **F3 — Does `--markers` need its own python floor (S23)?** Options: (a) it shares the renderer's, and
@@ -425,13 +435,26 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC19 AC20 · a run-2 ban
   units 20 to 23 as one batch.
 - rev-2 · 2026-10-23 · §3 · the round-3 spec audit's disposal: hands-off edges to TOOL-dFairHearing-31
   (the version check's base, finding id 34) and TOOL-dFairHearing-32 (eleven minors).
+- rev-3 · 2026-11-03 · §7 · the leg line adds `policy fixtures`, whose guard §4's
+  `tools/hooks/agent-cap.js` and `tools/memory-tree/gotchas.py` trip (fix brief
+  2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 1). §4 keeps the hook:
+  `checkOptinPackPresent`, which S13 and S20 correct, stays there after unit 16 (unit 22 S1).
+- rev-3 · 2026-11-03 · S12 · S13 · S16 · S17 · S20 · S27 · §8 F2 · §10 · every line re-cited at
+  `9c1a2857a`, where other builds moved `govkit.py`, `check-kit-versions.sh`,
+  `check-playbook-parity.test.sh`, both REVIEW-PROTOCOL copies and `tier2-review.test.sh`; S16 names
+  the README sentence where unit 16 S7 left it, by its text (fix brief
+  2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 2).
+- rev-3 · 2026-11-03 · S21 · AC16 · the re-stamp rides the commit that stages the guard edit, the stamp
+  rule unit 16 S9 follows, since unit 23's rev-3 S28 schedules none. AC16's stamp half, which could
+  never pass because a bundled stamp names its commit's parent, reads that commit's diff as unit 16
+  AC13 does (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 4).
 
 ## 10. Reuse audit
 
 Every item extends a seam that an earlier unit mints or the base tree carries, and none adds a
-module. The seams: govkit's `marker_carriers` coupling (`tools/govkit/govkit.py:1034-1059`, used today
-by `tools/drift-audit/kit.toml:13`); `resolve_kit_dir`'s receipt-then-probe order
-(`tools/check-kit-versions.sh:69-105`); `extract_section_ref`'s item fallback
+module. The seams: govkit's `marker_carriers` coupling (`tools/govkit/govkit.py:1104-1129` at
+`9c1a2857a`, used today by `tools/drift-audit/kit.toml:13`); `resolve_kit_dir`'s receipt-then-probe order
+(`tools/check-kit-versions.sh:187-225` at `9c1a2857a`); `extract_section_ref`'s item fallback
 (`tools/workflows/review_replay.py:100-115`); `check_invariant`'s token loop
 (`tools/memory-tree/gotchas.py:432-440`); and the sibling suites' `FOREIGN_PREFIX_PROBE` stop.
 `python tools/codebase-map/reuse_lookup.py "resolve a sibling kit file through the install receipt"`

@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-23 — the round-1 spec audit's 49 minors: one contract per shared name, criteria a correct build can pass, and the fixtures and records the moved code needs
 
-**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 19 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 19 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -18,6 +18,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-23-3-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-23-3-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-23-readers-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-23-readers-fix-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFairHearing-23-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-23-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md) | research | TOOL-dFairHearing-10 TOOL-dFairHearing-22 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-1 TOOL-dFairHearing-21 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-25 TOOL-dFairHearing-26 |
 | [2026-10-23-review-TOOL-dFairHearing-20-23-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-20-23-spec-audit.md) | spec-audit | TOOL-dFairHearing-22 TOOL-dFairHearing-21 TOOL-dFairHearing-20 |
 
 <!-- /gen:spec-records -->
@@ -109,25 +110,26 @@ merges ids, each id is its own item and the later ones point at the first one's 
   pack: its `reviewDir` is `memory/builds/dFairHearing/reviews`, and the replay base commit adds
   `memory/builds/dFairHearing/README.md` as at base `3708a705`, the owner-landed key
   `spec-audit: 2026-10-21` with no `authorized-by`. Replays spawning agents directly render each prompt
-  as a `gov:handoff` file, all rule 6 of the hook admits (`tools/hooks/agent-cap.js:39-48`); a harness
+  as a `gov:handoff` file, all rule 6 of the hook admits (`tools/hooks/agent-cap.js:19-33` at `9c1a2857`); a harness
   replay runs through `tier2-review.js`, a declared harness.
 - **S23** — id 26 (M14, AC14). `tools/workflows/check-verifier-fanout.test.sh`'s `mkfix` harness gains a
   five-slot literal marked `gov:lens-slots`, and the "non-workflow .js" arm passes explicit files, so
   the whole-tree arms stay green under `TOOL-dFairHearing-13` S5's no-marker red.
 - **S24** — id 27 (M15, AC15). `build_layout` copies `lenses.toml` and `render_lenses.py` beside
-  `check-protocol-parity.test.sh` (`tools/workflows/unattended-build.test.sh:1995-1996`), so a
+  `check-protocol-parity.test.sh` (`tools/workflows/unattended-build.test.sh:2132-2133` at `9c1a2857`), so a
   layout's parity render finds the catalogue.
 - **S25** — id 28 (M16, AC16). `scan_pairing_sites(root)` walks the tracked `*.py` at and below the
   factory's own directory, never the tool root's tree, any path under the memory root excluded by rule,
   so at the foreign-prefix leg's repository-root prefix it reaches no record folder.
 - **S26** — id 29 (M17, AC17). The leg `spec-audit opt-in pack self-test` gains its meta-gate rows: an
-  `[[exempt_leg]]` worded as `verifier fan-out self-test`'s (`tools/govkit/registry.toml:642-644`), a
+  `[[exempt_leg]]` worded as `verifier fan-out self-test`'s (`tools/govkit/registry.toml:662-664` at `9c1a2857`), a
   row in `tools/run-gates/selftest-budgets.txt`, and a
   `WHOLE_RUN` row in `tools/run-gates/foreign-prefix.gov.test.sh`.
 - **S27** — id 30 (M18, AC18). Every fixture of `check-verifier-fanout.test.sh` that copies the gate
-  (`:199`, `:212`, `:231`) copies `check-verifier-fanout.js` and `render_lenses.py` beside it, and a new
+  (`:311`, `:354`, `:373` at `9c1a2857`) copies `check-verifier-fanout.js` and `render_lenses.py` beside it, and a new
   arm runs a gate copy with no `.js` beside it and expects exit 2 naming the file.
-- **S28** — id 33 (M19, AC19). Line 99 of `memory/guides/SESSION-KICKOFF.md` says the harness
+- **S28** — id 33 (M19, AC19). The `gotchas.py --for-diff` line of `memory/guides/SESSION-KICKOFF.md`
+  (:100 at `9c1a2857`, :99 at base) says the harness
   acquires the checklist on the diff kind. This unit schedules no `last-audit:` re-stamp. The
   pre-commit leg refuses a commit that stages a watched file without one
   (`skills/session-kickoff/manifest-check.sh:1775-1790`), so each commit staging
@@ -174,20 +176,21 @@ merges ids, each id is its own item and the later ones point at the first one's 
 - **S41** — id 18 (L4, AC32). The drive-letter observation of `extract_tag_ref` is written as a raw
   string, `r'C:\x.md:[a] then [b]'`.
 - **S42** — id 20 (L5, AC33). The slot count lives in `tools/workflows/check-verifier-fanout.js` beside
-  rule 2 and counts with agent-cap's exported `topLevelArgs` over its literal-blanked view; no
+  rule 2 and counts with `topLevelArgs`, which `TOOL-dFairHearing-16` moved from the hook into that
+  file (:737 at `9c1a2857`), over its literal-blanked view; no
   `measureSlots` lexer remains, and `LENS_SLOTS = 5` is the one home of the number, read by rule 2's
   array-literal bound in place of `MAX_LENSES`.
 - **S43** — id 22 (L6, AC34). `measure_design_recall` calls `measure_recall(items, candidates, 0)` per
   run, the plants as items and the confirmed rows as candidates, both through `extract_tag_ref`; only
   the union, the bar and the pin check stay new code.
 - **S44** — id 24 (L7, AC35). `TOOL-dFairHearing-8`'s argument is named `gateManifest`, the name
-  `tools/workflows/drift-audit-state.template.js:78` already gives the same input.
+  `tools/workflows/drift-audit-state.template.js:80` already gives the same input.
 - **S45** — id 36 (L8, AC36). The by-hand lookup instruction is reworded in
   `tools/memory-tree/HYGIENE.template.md:775-779`, its render `memory/HYGIENE.md`,
-  `memory/guides/MERGE-BAR.md:94-97` and `memory/guides/SESSION-KICKOFF.md:99`: each says the harness
+  `memory/guides/MERGE-BAR.md:94-97` and `memory/guides/SESSION-KICKOFF.md:100` (at `9c1a2857`): each says the harness
   acquires the checklist on the diff kind, the command kept for a reader who wants it.
 - **S46** — id 50 (L9, AC37). `review_pin.py` refuses, exit 2 by name, a `--subject` containing `\`, as
-  the harness's `specsRule` does (`tools/workflows/tier2-review.template.js:506`).
+  the harness's `specsRule` does (`tools/workflows/tier2-review.template.js:667` at `9c1a2857`).
 - **S47** — id 51 (L10, AC38). `TOOL-dFairHearing-9`'s per-preset note entry is refused, naming
   `lensNotes`, unless absent or a plain object, before the flat check.
 - **S48** — id 52 (L11, AC39). `deriveAddressKey` strips a leading `repo + '/'` after folding both to
@@ -284,8 +287,10 @@ exist: `$DREC` is the design record `memory/builds/dX/build/d.md`, and `$SPEC` t
 
 ### Kit versions (S12, S13)
 
-At this unit's commit the version carriers differ from `3708a705` by no `KIT_*_VERSION = ` line and
-no `gov:kit <kit>@` marker (AC6). The carriers are those
+At this unit's commit the version carriers differ from its parent by no `KIT_*_VERSION = ` line and
+no `gov:kit <kit>@` marker, and no commit of this build moved one (AC6). Other builds' landings since
+`3708a705` moved them through their own mints; those are not this build's moves, and S12 restores none
+of them. The carriers are those
 `tools/check-kit-versions.sh` grades: S13's, `tools/hooks/agent-cap.js`, `tools/roles/roles_lib.py`,
 and the `version:` line of `tools/workflows/tier2-review.template.js` with its render.
 
@@ -294,12 +299,14 @@ and the `version:` line of `tools/workflows/tier2-review.template.js` with its r
 ```
 markers = render_lenses.py --markers <harness>          # line numbers, the renderer's own anchored regex
 for each marker line: body = the literal from its "[" to the matching "]" in the blanked view
-                      slots = topLevelArgs(body).length  # agent-cap's export, depth over ( [ {
+                      slots = topLevelArgs(body).length  # the gate's own, depth over ( [ {
                       red unless slots === LENS_SLOTS     # LENS_SLOTS = 5, its one home
 ```
 
-The count moves from `check-verifier-fanout.sh` to `check-verifier-fanout.js` (S42); rule 2's bound
-read `MAX_LENSES` at `tools/hooks/agent-cap.js:497` and `:635`.
+The count moves from `check-verifier-fanout.sh` to `check-verifier-fanout.js` (S42); rule 2's bound,
+which `TOOL-dFairHearing-16` moved into that file, reads the hook's exported `MAX_LENSES`
+(`tools/hooks/agent-cap.js:404`, exported at :911) at `tools/workflows/check-verifier-fanout.js:189`
+and :419, each at `9c1a2857`.
 
 ### The ungated predicate (S21)
 
@@ -335,7 +342,7 @@ call names S22's `reviewDir` (§8 F3).
 | `legCount` | probe return field | none |
 | `matched` | manifest key | none |
 
-`gateManifest` (S44) is reused from `tools/workflows/drift-audit-state.template.js:78`, not minted.
+`gateManifest` (S44) is reused from `tools/workflows/drift-audit-state.template.js:80`, not minted.
 
 ### Files touched (estimate)
 
@@ -419,9 +426,15 @@ workflows kit's file under `tools/workflows/`; `$DREC` and `$SPEC` are §4's exa
   `--twin always` run, each prints one JSON line carrying its key; with the `--subject` alone the line
   is exactly `{"preset": "unit-spec"}`.
   Red when: a key prints with its flag absent.
-- **AC6** — When `git diff -U0 3708a705 -- tools/hooks tools/roles .claude/skills/build tools/workflows/tier2-review.template.js | grep -E '^[-+].*(KIT_[A-Z_]+_VERSION = |gov:kit [a-z-]+@)'`
-  runs at this unit's commit, it prints nothing.
-  Red when: a hand bump of any carrier survives on the branch.
+- **AC6** — When `git diff -U0 <unit>~1 <unit> -- tools/hooks tools/roles .claude/skills/build tools/workflows/tier2-review.template.js | grep -E '^[-+].*(KIT_[A-Z_]+_VERSION = |gov:kit [a-z-]+@)'`
+  runs, where `<unit>` is this unit's commit and `<unit>~1` its parent, the tree the build pass
+  starts from, it prints nothing; and the same `grep` over
+  `git log -p --no-merges --grep='^tool(dFairHearing)' 3708a705..<unit> -- <the same paths>` prints
+  nothing.
+  Red when: a hand bump of any carrier by a unit of this build is on the branch.
+  figure: the second half's population is DERIVED by `git log`; at `9c1a2857` it prints nothing over
+  the 13 `tool(dFairHearing)` commits landed so far, while other builds' landings moved review-harness `1.53` to `1.56`, roles
+  `1.8` to `1.12` and agent-cap `1.40` to `1.42`, which red base `3708a705`'s whole-tree diff.
 - **AC7** — When `python render_lenses.py` renders a scratch template holding a
   `= [ // gov:lens-optins` marker above a `{{LENS_SLOTS}}` token beside the shipped markers, it exits 0
   and fills the opt-in rows; a token with neither marker above it exits 2 naming the orphan.
@@ -480,9 +493,9 @@ workflows kit's file under `tools/workflows/`; `$DREC` and `$SPEC` are §4's exa
   `check-verifier-fanout.sh` with no `.js` beside it, run over a harness, exits 2 naming
   `check-verifier-fanout.js`.
   Red when: the missing `.js` prints clean.
-- **AC19** — When `sed -n 99p memory/guides/SESSION-KICKOFF.md` runs, it no longer says "run before a
-  review".
-  Red when: line 99 still tells a reader to run the checklist before a review.
+- **AC19** — When `grep -n "gotchas.py --for-diff" memory/guides/SESSION-KICKOFF.md` runs, the line
+  it prints no longer says "run before a review".
+  Red when: that line still tells a reader to run the checklist before a review.
 - **AC20** — When `grep -n "REVIEW_SHAPE" tier2-review.test.sh` runs, it prints the read the three
   key arms derive their expected key from; and `grep -c "3708a705" tier2-review.test.sh`
   prints no line inside those arms.
@@ -561,7 +574,7 @@ workflows kit's file under `tools/workflows/`; `$DREC` and `$SPEC` are §4's exa
 
 ## 7. Gates
 
-`agent-cap self-test` · `scratch-guard self-test` · `format-guard self-test` · `kit/dogfood doc parity` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `hook destinations self-test` · `govkit selftest` · `lexicon naming predicates` · `govkit refusal join` · `govkit acceptance matrix` · `verifier fan-out` · `review-replay selftest` · `gotchas selftest` · `review-protocol parity (kit vs dogfood)` · `kickoff-manifest ratchet` · `foreign-prefix parity (every self-test at three prefixes)` · `govkit selfcheck` · `every held leg is budgeted, every budget row resolves` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene` · `workflow script syntax` · `spec tokens (a spec's own names resolve)`
+`agent-cap self-test` · `scratch-guard self-test` · `format-guard self-test` · `policy fixtures` · `kit/dogfood doc parity` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `hook destinations self-test` · `govkit selftest` · `lexicon naming predicates` · `govkit refusal join` · `govkit acceptance matrix` · `verifier fan-out` · `review-replay selftest` · `gotchas selftest` · `review-protocol parity (kit vs dogfood)` · `kickoff-manifest ratchet` · `foreign-prefix parity (every self-test at three prefixes)` · `govkit selfcheck` · `every held leg is budgeted, every budget row resolves` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene` · `workflow script syntax` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/workflows/tier2-review.test.sh · covers AC8 AC11 AC20 AC21 AC22 AC23 AC27 AC28 AC38 AC39 AC40 · each covered AC's red case, staged against the harness at `TOOL-dFairHearing-18`'s commit · FLOOR_ASSERTIONS in that suite, raised by the arms added
 New arm: tools/workflows/replay_scorer.py (its runner, in the `review-replay selftest` leg) · covers AC1 AC2 AC16 AC24 AC32 AC34 · each covered AC's red case, staged against the factory at `TOOL-dFairHearing-18`'s commit · that runner's declared arm count, raised by the arms added
@@ -615,16 +628,32 @@ New arm: tools/memory-tree/gotchas.py (its selftest) · covers AC12 · a class g
   AC19 drops its stamp half, which could never pass: a bundled stamp names the bundling commit's
   parent, so `git log <sha>..HEAD` over the watched files always lists that commit (fix brief
   2026-11-03-prompt-TOOL-dFairHearing-16-2-fix-brief, item 3).
+- rev-4 · 2026-11-03 · §7 · the leg line adds `policy fixtures`, whose guard §4's
+  `tools/workflows/kit.toml`, `tools/memory-tree/gotchas.py`, `tools/govkit/registry.toml`, the hooks
+  and `tools/roles/roles_lib.py` trip (2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief,
+  item 1).
+- rev-4 · 2026-11-03 · S22 S24 S26 S27 S28 S42 S44 S45 S46 · §4 · §10 · every line re-cited at
+  `9c1a2857`: rule 6's header and `MAX_LENSES` at the hook's new lines, and `topLevelArgs` and rule
+  2's bound in `check-verifier-fanout.js`, where `TOOL-dFairHearing-16` moved them, in place of the
+  hook's `:1362-1380`, past its end today; the kickoff guide's checklist line by its command
+  (same brief, items 2 and 4).
+- rev-4 · 2026-11-03 · AC19 · the line is found by its command, `gotchas.py --for-diff`, not by
+  number: it sits at :100 at `9c1a2857`, so `sed -n 99p` read another line and passed unread (same
+  brief, item 2).
+- rev-4 · 2026-11-03 · AC6 · §4 · the diff is pinned to this unit's parent, and the build-wide half
+  reads only this build's own commits: base `3708a705`'s whole-tree diff is red today through other
+  builds' version mints, which no unit of this build made (same brief, item 3).
 
 ## 10. Reuse audit
 
 Every item extends a seam an earlier unit mints or the base tree carries, and none adds a module: the
 factory `tools/workflows/replay_scorer.py` and its `measure_recall`, `read_raw_output` and
 `extract_section_ref` (`tools/workflows/review_replay.py:100-115`); agent-cap's exported
-`topLevelArgs` (`tools/hooks/agent-cap.js:1362-1380`), already tracking `(`, `[` and `{`;
+`topLevelArgs`, moved from the hook by `TOOL-dFairHearing-16`
+(`tools/workflows/check-verifier-fanout.js:737` at `9c1a2857`), already tracking `(`, `[` and `{`;
 `check_invariant`'s token resolution (`tools/memory-tree/gotchas.py:432-440`); the harness's
-`specsRule` (`tools/workflows/tier2-review.template.js:506`); drift-audit-state's `gateManifest`
-(`tools/workflows/drift-audit-state.template.js:78`); and the sibling rows of
+`specsRule` (`tools/workflows/tier2-review.template.js:667`); drift-audit-state's `gateManifest`
+(`tools/workflows/drift-audit-state.template.js:80`); and the sibling rows of
 `tools/govkit/registry.toml` and `tools/run-gates/selftest-budgets.txt`.
 `tools/codebase-map/reuse_lookup.py` over "count the top level elements of an array literal string
 aware" and "decide whether a bug class record names a gate" ranked generic stems and
