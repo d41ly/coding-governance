@@ -786,15 +786,49 @@ arguments' order.
   `--compare <arm> <arm> [...]` or `--judged <arm|a+b> [...]`.
 - `python3 {kit}/replay_scorer.py --instance review-replay --known <src> --candidate <src> [--window N]`
   — the same score `review_replay.py` prints, its inputs read as `<src>`.
+- `python3 {kit}/replay_scorer.py --experiment <src> [--repo <clone>]` — an experiment declared once,
+  in a committed JSON manifest beside its raw outputs, scored under the method below.
+
+**The experiment shape, `--experiment`** (`TOOL-dFairHearing-14`). aScoutedSeam's figures held because
+of how they were measured, and `check_experiment` makes that method a rule where committed outputs
+show it and a recorded line where they cannot. The manifest, read through `read_raw_output`, names
+`instance`, `cases`, `results` and `arms`, each arm `{name, base, settings, dispatched}`, and may name
+`heldOut`, `judge {verdicts, key}` and `union {tuning, heldOut}`; the `review-replay` instance takes
+`known` and `candidates {<arm>: <src>}` in place of `cases` and `results`. An unknown key is refused,
+so a misspelt rule is never skipped. Every rule runs before the first figure line, and a broken one
+exits 2 naming the rule, the arm or case, and the value:
+
+- **evidence** — each instance's `case_evidence` hook: a `scouted-seam` case's `sha` and every
+  ground-truth item's `path` and `why`, a `review-replay` item's ref and its record. A case it returns
+  nothing for is refused by id, and an instance registered without the hook fails `check_instances`.
+- **freeze** — `check_held_out_frozen`: `heldOut` names a working-tree file inside the repository
+  whose `git log` lists exactly one commit, printed first as `held-out: frozen at <sha>`, and shares
+  no id with the tuning cases. "Never read to change a prompt" is printed as recorded, not checked.
+- **one variable** — `check_one_variable`: an arm naming a `base` differs from its settings in exactly
+  one key, compared as JSON values, and prints `arm <name>: varies <key> from <base>`.
+- **parsed first** — `measure_parsed`: `parsed <arm>: <n> of <dispatched>` for every arm, `n` the
+  cases holding a parsed row; an undeclared `dispatched`, or one below `n`, is refused. Figures pair
+  the parsed rows only, so an unparsed reply is counted, never scored.
+- **blind judge** — `check_judge_rotation`: a committed `judge.key`, `{<case>: {<label>: <arm>}}`,
+  gives each arm one label per case, and with two or more of each no arm holds one label throughout.
+  With no key it prints `labels rotated — recorded, not checked: no committed key`.
+- **union** — `measure_union`, aScoutedSeam's system reading: per set, a positive case any of its arms
+  was judged on is covered when any of them covered the primary. With `heldOut` declared it prints
+  tuning, held-out and pooled, so the held-out cases join the score instead of standing beside it.
+
+What the rules do not check: a variable nobody declared, that no prompt author read the held-out file,
+that one judge read each case, and that the evidence is right rather than present.
 
 Its runner's arms: the pairing and row refusals, the `[tag]` reading, the instance check, a proof
 that the port reproduces the grader's figures over the committed cases and results at `b0fe68f30`,
-determinism across two hash seeds, and the conformance arm. That arm, `scan_pairing_sites`, reds on a
+determinism across two hash seeds, the conformance arm, and one arm per experiment rule over a
+planted manifest, the union arm's proof reading the method's own experiment at `5f8ef021d`
+(`system tuning 21/23`, `system held-out 12/12`, `system pooled 33/35`). That arm, `scan_pairing_sites`, reds on a
 second scorer: a comprehension in a tracked `*.py` under the tool root, the factory excepted, whose
 filter is `all()` over a second population testing the outer case against the inner variant. It
 reads Python only, and a pairing written as a `for` loop is not seen. In a tree without
 `memory/builds/aScoutedSeam/` the proof prints `SKIP`, and so does the conformance arm once its
-live-root and planted halves pass, its grader half unread; the count line names each skip, so an
+live-root and planted halves pass, its grader half unread, and the union arm once its fixture half passes; the count line names each skip, so an
 install outside this repo never reads a skip as a pass.
 
 **Liveness, the reason a score can be trusted at all.** Both inputs must reproduce their own stated

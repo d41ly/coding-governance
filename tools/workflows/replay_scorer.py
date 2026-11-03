@@ -8,6 +8,7 @@ the self-test's proof, which reads aScoutedSeam's committed records where the tr
     python3 replay_scorer.py --instance scouted-seam --cases <src> --results <src> --compare <arm> <arm> [...]
     python3 replay_scorer.py --instance scouted-seam --cases <src> --results <src> --judged <arm|a+b> [...]
     python3 replay_scorer.py --instance review-replay --known <src> --candidate <src> [--window N]
+    python3 replay_scorer.py --experiment <src> [--repo <clone>]
     python3 replay_scorer.py --selftest
 
 A `<src>` resolves in one order: an existing working-tree path; else a 40-hex blob id; else
@@ -29,6 +30,14 @@ CLI, its printer and its corpus listing as the instance's adapter. A spec ref th
 grader (`check_hit`, `check_case` and the `grade`, `compare` and `judged` readings), ported from the
 grader blob a03896116e3c5cbf853affda241c22d8408cb945 at b0fe68f30; a result row without a `seams` list,
 or a judged cell without `primary` and `covered`, is a refusal naming the arm and the case.
+
+THE EXPERIMENT SHAPE. `check_experiment` reads one committed JSON manifest (`--experiment <src>`) and
+runs every rule of aScoutedSeam's method before the first figure line, a broken one exiting 2 by name:
+each case's `case_evidence` hook returns something; a `heldOut` file has exactly one commit and no id
+a tuning case carries; an arm with a `base` varies exactly one declared setting from it; every arm's
+parsed replies print against its `dispatched` count; a committed label key rotates; and the arms'
+`union` is read per set and pooled. What none of them checks: a variable nobody declared, that no
+prompt author read the held-out file, that one judge read each case, and that evidence is right.
 
 THE CONFORMANCE ARM. `scan_pairing_sites` names every comprehension, in a tracked `*.py` under the
 tool root this kit sits in (this file excepted), whose filter is `all()` over a second population with
@@ -79,7 +88,7 @@ KIT_DIR = pathlib.Path(__file__).resolve().parent
 #: The two instances the factory exists for; `check_instances` reds when the table lacks one.
 INSTANCE_KEYS = ("review-replay", "scouted-seam")
 #: The arm count `run_selftest` must reach, as review_replay.py declares its own.
-ARMS_DECLARED = 7
+ARMS_DECLARED = 13
 
 
 class Refusal(Exception):
@@ -445,17 +454,24 @@ def check_case(case, res, k=None):
             "n_must": sum(1 for s in seams if s.get("binding") == "MUST"), "false_must": len(false_must)}
 
 
+def read_case_list(src, repo="."):
+    """A cases file through `read_raw_output`: a non-empty JSON list of cases, each carrying an `id`."""
+    try:
+        cases = json.loads(read_raw_output(src, repo))
+    except ValueError as exc:
+        raise Refusal(f"source {src}: not JSON ({exc})") from None
+    if not isinstance(cases, list) or not cases or not all(isinstance(c, dict) and "id" in c for c in cases):
+        raise Refusal(f"source {src}: not a non-empty list of cases each carrying an `id`")
+    return cases
+
+
 def read_scouted_population(cases_src, results_src, repo="."):
     """`(corpus, results)` from the cases file and the results file, each through `read_raw_output`."""
-    docs = []
-    for src in (cases_src, results_src):
-        try:
-            docs.append(json.loads(read_raw_output(src, repo)))
-        except ValueError as exc:
-            raise Refusal(f"source {src}: not JSON ({exc})") from None
-    corpus, results = docs
-    if not isinstance(corpus, list) or not corpus or not all(isinstance(c, dict) and "id" in c for c in corpus):
-        raise Refusal(f"source {cases_src}: not a non-empty list of cases each carrying an `id`")
+    corpus = read_case_list(cases_src, repo)
+    try:
+        results = json.loads(read_raw_output(results_src, repo))
+    except ValueError as exc:
+        raise Refusal(f"source {results_src}: not JSON ({exc})") from None
     if not isinstance(results, dict):
         raise Refusal(f"source {results_src}: not an object of arms")
     return corpus, results
@@ -563,18 +579,281 @@ def measure_scouted_judged(corpus, results, arms):
     return lines
 
 
+# ---- the experiment shape (TOOL-dFairHearing-14): the method's rules, enforced where committed outputs show them.
+ARM_KEYS = {"name", "base", "settings", "dispatched"}
+#: The union's sets, as the manifest spells them and as the figure line prints them.
+UNION_SETS = {"tuning": "tuning", "heldOut": "held-out"}
+
+
+def derive_scouted_evidence(case):
+    """A scouted-seam case's objective evidence: its `sha`, then each ground-truth item's `path` and `why`; empty when any is missing."""
+    items = case.get("ground_truth") or []
+    if not case.get("sha") or not isinstance(items, list):
+        return []
+    if not all(isinstance(g, dict) and g.get("path") and g.get("why") for g in items):
+        return []
+    return [str(case["sha"])] + [f"{g['path']}: {g['why']}" for g in items]
+
+
+def derive_replay_evidence(case):
+    """A review-replay case's evidence: the known item's ref and the record it came from; empty when either is missing."""
+    return [f"{case['path']}:{case['line']}", case["record"]] if case.get("path") and case.get("record") else []
+
+
+def check_case_evidence(instance, cases):
+    """Refused naming the first case whose instance's `case_evidence` hook returns nothing."""
+    hook = INSTANCES[instance]["case_evidence"]
+    bare = next((c["id"] for c in cases if not hook(c)), None)
+    if bare is not None:
+        raise Refusal(f"case {bare}: `case_evidence` returns nothing for it under {instance}, so it carries no objective evidence to grade")
+
+
+def check_held_out_frozen(path, tuning_ids, repo="."):
+    """`(line, cases)`: the freeze line and the held-out cases.
+
+    Refused: a path opening `-`, outside the repository or not a working-tree file; a history of other
+    than exactly one commit, read by ONE `git log --format=%H` with argv; and an id that is also a
+    tuning case's. "Never read to change a prompt" is printed as recorded: no committed output shows it.
+    """
+    if not path or not isinstance(path, str) or path.startswith("-"):
+        raise Refusal(f"heldOut {path!r}: a path opening `-` or empty is refused")
+    try:
+        top = subprocess.run(["git", "-C", str(repo), "rev-parse", "--show-toplevel"], capture_output=True, text=True, check=False)
+    except OSError as exc:
+        raise Refusal(f"heldOut {path}: git could not run ({exc})") from None
+    if top.returncode:
+        raise Refusal(f"heldOut {path}: {repo} is not a git checkout, so no freeze can be read")
+    root = pathlib.Path(top.stdout.strip()).resolve()
+    try:
+        rel = pathlib.Path(path).resolve().relative_to(root).as_posix()
+    except ValueError:
+        raise Refusal(f"heldOut {path}: outside the repository {root.as_posix()}") from None
+    if not pathlib.Path(path).is_file():
+        raise Refusal(f"heldOut {path}: not a working-tree file")
+    log = subprocess.run(["git", "-C", str(root), "log", "--format=%H", "--", rel], capture_output=True, text=True, check=False)
+    shas = log.stdout.split()
+    if log.returncode or not shas:
+        raise Refusal(f"heldOut {rel}: no commit in its history, so it was never frozen")
+    if len(shas) > 1:
+        raise Refusal(f"heldOut {rel}: {len(shas)} commits, frozen at {shas[-1]} and changed after it at {', '.join(reversed(shas[:-1]))}")
+    cases = read_case_list(path, repo)
+    tuning = set(tuning_ids)
+    shared = [c["id"] for c in cases if c["id"] in tuning]
+    if shared:
+        raise Refusal(f"heldOut {rel}: case id(s) {', '.join(map(str, shared))} are tuning cases too")
+    return f"held-out: frozen at {shas[0]} · {len(cases)} case(s) · never read to change a prompt — recorded, not checked", cases
+
+
+def check_one_variable(arms):
+    """One line per arm: `base`, or the ONE settings key it varies from its base, compared as JSON values."""
+    by_name = {a["name"]: a for a in arms}
+    lines = []
+    for a in arms:
+        base = a.get("base")
+        if base is None:
+            lines.append(f"arm {a['name']}: base")
+            continue
+        if base not in by_name or base == a["name"]:
+            raise Refusal(f"arm {a['name']}: base {base!r} is not another declared arm")
+        mine, theirs = a["settings"], by_name[base]["settings"]
+        varied = [k for k in sorted(set(mine) | set(theirs)) if k not in mine or k not in theirs
+                  or json.dumps(mine[k], sort_keys=True) != json.dumps(theirs[k], sort_keys=True)]
+        if not varied:
+            raise Refusal(f"arm {a['name']}: its settings equal its base {base}'s, so it varies no variable")
+        if len(varied) > 1:
+            raise Refusal(f"arm {a['name']}: varies {', '.join(varied)} from {base}; one variable per arm")
+        lines.append(f"arm {a['name']}: varies {varied[0]} from {base}")
+    return lines
+
+
+def measure_parsed(arms, parsed):
+    """One `parsed <arm>: <n> of <dispatched>` line per arm; refused when `dispatched` is undeclared or below `n`."""
+    lines = []
+    for a in arms:
+        sent = a.get("dispatched")
+        if isinstance(sent, bool) or not isinstance(sent, int) or sent < 0:
+            raise Refusal(f"arm {a['name']}: `dispatched` is {sent!r}, not a count, so its parsed replies have nothing to be counted against")
+        n = len(parsed[a["name"]])
+        if n > sent:
+            raise Refusal(f"arm {a['name']}: {n} parsed against {sent} dispatched")
+        lines.append(f"parsed {a['name']}: {n} of {sent}")
+    return lines
+
+
+def check_judge_rotation(judge, repo="."):
+    """The judge line. A committed key `{<case>: {<label>: <arm>}}` gives each judged arm one label per case,
+    and with two or more arms over two or more cases no arm holds one label on every case. No key:
+    recorded, not checked."""
+    src = (judge or {}).get("key")
+    if src is None:
+        return "labels rotated — recorded, not checked: no committed key"
+    try:
+        key = json.loads(read_raw_output(src, repo))
+    except ValueError as exc:
+        raise Refusal(f"judge key {src}: not JSON ({exc})") from None
+    if not isinstance(key, dict) or not key or not all(
+            isinstance(v, dict) and v and all(isinstance(arm, str) for arm in v.values()) for v in key.values()):
+        raise Refusal(f"judge key {src}: not a non-empty object of {{<case>: {{<label>: <arm>}}}}")
+    arms = list(dict.fromkeys(arm for labels in key.values() for arm in labels.values()))
+    for case, labels in key.items():
+        held = list(labels.values())
+        unlabelled = [a for a in arms if a not in held]
+        doubled = [a for a in arms if held.count(a) > 1]
+        if unlabelled or doubled:
+            raise Refusal(f"judge key case {case}: arm(s) {', '.join(unlabelled + doubled)} hold "
+                          f"{'no label' if unlabelled else 'more than one label'}; each judged arm takes one")
+    if len(arms) < 2 or len(key) < 2:
+        return f"labels rotated — recorded, not checked: {len(arms)} arm(s) over {len(key)} case(s) leave nothing to rotate"
+    for arm in arms:
+        worn = {next(label for label, a in labels.items() if a == arm) for labels in key.values()}
+        if len(worn) == 1:
+            raise Refusal(f"judge key {src}: arm {arm} holds label {worn.pop()} on every one of {len(key)} case(s), so its label is not rotated")
+    return f"labels rotated — checked: {len(arms)} arm(s) over {len(key)} case(s) in {src}"
+
+
+def measure_union(sets, verdicts):
+    """aScoutedSeam's system reading per set, then pooled: a positive case one of the set's arms was judged on
+    is covered when any of them covered its primary; a case none was judged on is outside the population."""
+    lines, hit, total = [], 0, 0
+    for name, cases, arms in sets:
+        cells = {a: verdicts[a] for a in arms}
+        ids = [c["id"] for c in cases if c.get("ground_truth") and any(cells[a].get(c["id"]) for a in arms)]
+        covered = sum(1 for cid in ids if any(read_judge_cell(a, cid, cells[a][cid]).get("primary")
+                                              for a in arms if cells[a].get(cid)))
+        lines.append(f"system {name} {covered}/{len(ids)} · {' + '.join(arms)}")
+        hit, total = hit + covered, total + len(ids)
+    if len(sets) > 1:
+        lines.append(f"system pooled {hit}/{total} · {' + '.join(name for name, _, _ in sets)}")
+    return lines
+
+
+def measure_scouted_experiment(manifest, arms, repo="."):
+    """The scouted-seam experiment's lines: the four rule lines, then the paired figures and the union."""
+    corpus, results = read_scouted_population(manifest["cases"], manifest["results"], repo)
+    sets, head = [("tuning", corpus)], []
+    if "heldOut" in manifest:
+        line, held = check_held_out_frozen(manifest["heldOut"], [c["id"] for c in corpus], repo)
+        head.append(line)
+        sets.append(("held-out", held))
+    for _, cases in sets:
+        check_case_evidence("scouted-seam", cases)
+    head += check_one_variable(arms)
+    population = [c["id"] for _, cases in sets for c in cases]
+    parsed = {}
+    for a in arms:
+        rows = results.get(a["name"]) if a["name"] != "judge" else None
+        rows = rows if isinstance(rows, dict) else {}
+        parsed[a["name"]] = {cid: rows[cid] for cid in population
+                             if isinstance(rows.get(cid), dict) and isinstance(rows[cid].get("seams"), list)}
+    head += measure_parsed(arms, parsed)
+    judge = manifest.get("judge")
+    if judge is not None and (not isinstance(judge, dict) or set(judge) - {"verdicts", "key"} or not isinstance(judge.get("verdicts"), str)):
+        raise Refusal(f"judge {judge!r}: not an object naming `verdicts` and optionally `key`")
+    head.append(check_judge_rotation(judge, repo))
+    figures = []
+    # Figures pair the PARSED rows only, so an unparsed reply is counted above and never scored here.
+    for name, cases in sets:
+        ids = {c["id"] for c in cases}
+        answered = {a: {cid: row for cid, row in rows.items() if cid in ids} for a, rows in parsed.items()}
+        answered = {a: rows for a, rows in answered.items() if rows}
+        if answered:
+            figures.append(f"figures {name}")
+            figures += measure_scouted_compare(cases, answered, list(answered))
+    union = manifest.get("union")
+    if union is not None:
+        want = [k for k in UNION_SETS if k == "tuning" or "heldOut" in manifest]
+        if (not isinstance(union, dict) or sorted(union) != sorted(want)
+                or not all(isinstance(v, list) and v and all(isinstance(a, str) for a in v) for v in union.values())):
+            raise Refusal(f"union {union!r}: not an object naming a non-empty arm list for each of {', '.join(want)}")
+        if judge is None:
+            raise Refusal("union: declared with no `judge.verdicts` to read coverage from")
+        verdicts = results.get(judge["verdicts"])
+        if not isinstance(verdicts, dict):
+            raise Refusal(f"judge.verdicts {judge['verdicts']!r}: no such verdicts object in the results")
+        absent = [a for v in union.values() for a in v if not isinstance(verdicts.get(a), dict)]
+        if absent:
+            raise Refusal(f"union: no judged arm {', '.join(absent)} in {judge['verdicts']}")
+        figures += measure_union([(UNION_SETS[k], cases, union[k]) for k, (_, cases) in zip(want, sets)], verdicts)
+    return head + figures
+
+
+def measure_replay_experiment(manifest, arms, repo="."):
+    """The review-replay experiment's lines: the known record's scorable items are its cases, each arm one candidate."""
+    candidates = manifest["candidates"]
+    if not isinstance(candidates, dict) or set(candidates) - {a["name"] for a in arms}:
+        raise Refusal(f"candidates {candidates!r}: not an object of <declared arm>: <src>")
+    known_text = read_raw_output(manifest["known"], repo)
+    mode = read_record_kind(known_text) or "diff-review"
+    known, err = parse_record_findings(known_text, mode)
+    if err:
+        raise Refusal(f"known {manifest['known']}: {err}")
+    check_case_evidence("review-replay", [{**it, "record": manifest["known"]} for it in known["items"] if it["path"]])
+    head = check_one_variable(arms)
+    scores = {}
+    for a in arms:
+        src = candidates.get(a["name"])
+        replay = measure_replay(known_text, read_raw_output(src, repo), 10)[0] if src else None
+        scores[a["name"]] = [replay["score"]] if replay else []
+    head += measure_parsed(arms, scores)
+    head.append(check_judge_rotation(None))
+    figures = [f"recall {name}: {len(s[0]['matched'])} of {s[0]['scorable']} scorable · unscorable {len(s[0]['unscorable'])} "
+               f"· candidate-only {len(s[0]['candidate_only'])}" for name, s in scores.items() if s]
+    return head + figures
+
+
+def check_experiment(manifest, repo="."):
+    """An experiment's lines, every rule before the first figure; a broken rule is a Refusal naming the rule, the arm or case, and the value."""
+    why = check_instances()
+    if why:
+        raise Refusal(why)
+    if not isinstance(manifest, dict):
+        raise Refusal("manifest: not a JSON object")
+    instance = manifest.get("instance")
+    if instance not in INSTANCES:
+        raise Refusal(f"manifest instance {instance!r}: not one of {', '.join(INSTANCES)}")
+    required, optional = INSTANCES[instance]["manifest"]
+    unknown, missing = sorted(set(manifest) - required - optional), sorted(required - set(manifest))
+    if unknown or missing:
+        raise Refusal(f"manifest: {'unknown key(s) ' + ', '.join(unknown) if unknown else ''}"
+                      f"{'; ' if unknown and missing else ''}{'missing key(s) ' + ', '.join(missing) if missing else ''}")
+    arms = manifest["arms"]
+    if not isinstance(arms, list) or not arms:
+        raise Refusal("manifest arms: no arm declared")
+    seen = set()
+    for a in arms:
+        if not isinstance(a, dict) or not isinstance(a.get("name"), str) or not a["name"]:
+            raise Refusal(f"arm {a!r}: not an object with a `name`")
+        if set(a) - ARM_KEYS:
+            raise Refusal(f"arm {a['name']}: unknown key(s) {', '.join(sorted(set(a) - ARM_KEYS))}")
+        if not isinstance(a.get("settings"), dict):
+            raise Refusal(f"arm {a['name']}: no `settings` object, so the variable it varies is undeclared")
+        if a["name"] in seen:
+            raise Refusal(f"arm {a['name']}: declared twice")
+        seen.add(a["name"])
+    return INSTANCES[instance]["experiment"](manifest, arms, repo)
+
+
+#: Each instance: its readers, its measures, its `case_evidence` hook, and its experiment manifest's
+#: keys, required then optional; any other key is refused, so a misspelt rule is never skipped.
 INSTANCES = {
-    "review-replay": {"readers": (read_raw_output, parse_record_findings, parse_candidates), "measure": measure_replay},
+    "review-replay": {"readers": (read_raw_output, parse_record_findings, parse_candidates), "measure": measure_replay,
+                      "case_evidence": derive_replay_evidence, "experiment": measure_replay_experiment,
+                      "manifest": ({"instance", "known", "candidates", "arms"}, set())},
     "scouted-seam": {"readers": (read_raw_output, read_scouted_population, read_seam_row, read_judge_cell),
                      "measure": {"grade": measure_scouted_grade, "compare": measure_scouted_compare,
-                                 "judged": measure_scouted_judged}},
+                                 "judged": measure_scouted_judged},
+                     "case_evidence": derive_scouted_evidence, "experiment": measure_scouted_experiment,
+                     "manifest": ({"instance", "cases", "results", "arms"}, {"heldOut", "judge", "union"})},
 }
 
 
 def check_instances():
-    """None when the table holds every instance the factory exists for, else a refusal naming the missing."""
+    """None when the table holds every instance the factory exists for, each with its `case_evidence` hook, else a refusal naming the gap."""
     missing = [k for k in INSTANCE_KEYS if k not in INSTANCES]
-    return f"INSTANCES lacks {', '.join(missing)}: the factory needs both of {', '.join(INSTANCE_KEYS)}" if missing else None
+    if missing:
+        return f"INSTANCES lacks {', '.join(missing)}: the factory needs both of {', '.join(INSTANCE_KEYS)}"
+    hookless = [k for k, v in INSTANCES.items() if not callable(v.get("case_evidence"))]
+    return f"INSTANCES entry {', '.join(hookless)} declares no `case_evidence` hook, so its cases' evidence is unread" if hookless else None
 
 
 # ---- the conformance arm: no second scorer pairs variants with cases outside this factory.
@@ -648,6 +927,22 @@ FIXTURE_CASES = [{"id": "a", "point": "p", "ground_truth": [{"path": "x.py", "sy
                  {"id": "b", "point": "p", "ground_truth": []}, {"id": "c", "point": "p", "ground_truth": []}]
 FIXTURE_RESULTS = {v: {"a": {"seams": [{"path": "x.py", "symbol": "f", "binding": "MUST"}]}, "b": {"seams": []}}
                    for v in ("v1", "v2", "v3", "v4")}
+EXPERIMENT_CASES = [{"id": "a", "point": "p", "sha": "a" * 40, "ground_truth": [{"path": "x.py", "symbol": "f", "why": "the seam"}]},
+                    {"id": "b", "point": "p", "sha": "b" * 40, "ground_truth": [{"path": "y.py", "symbol": "g", "why": "the seam"}]},
+                    {"id": "c", "point": "p", "sha": "c" * 40, "ground_truth": []}]
+EXPERIMENT_HELD = [{"id": "h", "point": "p", "sha": "d" * 40, "ground_truth": [{"path": "w.py", "symbol": "k", "why": "the seam"}]}]
+EXPERIMENT_SEAMS = {cid: {"seams": [{"path": p, "symbol": s, "binding": "MUST"}]} for cid, p, s in
+                    (("a", "x.py", "f"), ("b", "y.py", "g"), ("c", "z.py", "h"), ("h", "w.py", "k"))}
+# m1b's reply on `c` did not parse; m1b@medium was judged on `b` alone, so the union reads `a` from m1b only.
+EXPERIMENT_RESULTS = {"m1b": {**EXPERIMENT_SEAMS, "c": {"error": "no reply"}}, "m1b@medium": EXPERIMENT_SEAMS,
+                      "judge2": {"m1b": {"a": {"primary": True, "covered": [0]}, "b": {"primary": False, "covered": []},
+                                         "h": {"primary": True, "covered": [0]}},
+                                 "m1b@medium": {"b": {"primary": True, "covered": [0]}}}}
+EXPERIMENT_KEY = {"a": {"ARM-A": "m1b", "ARM-B": "m1b@medium"}, "b": {"ARM-A": "m1b@medium", "ARM-B": "m1b"},
+                  "c": {"ARM-A": "m1b", "ARM-B": "m1b@medium"}}
+#: The method's own experiment: the cases and results at this commit, and the held-out file frozen at b6c828a92.
+UNION_PROOF_COMMIT = "5f8ef021d"
+HELD_OUT_FILE = "memory/builds/aScoutedSeam/build/2026-10-18-build-TOOL-aScoutedSeam-1-13-held-out-cases.json"
 
 
 def read_proof_tree():
@@ -750,9 +1045,133 @@ def run_selftest():
         heads = [line.split(" · ")[1] for line in outs[0].stdout.decode("utf-8").splitlines() if line.startswith("paired ")]
         return None if heads == [f"{v} unanswered c" for v in ("v3", "v1", "v4", "v2")] else f"variant lines out of argument order: {heads!r}"
 
+    # ---- the experiment shape's arms: a valid fixture manifest, then one planted break per rule.
+    def derive_fixture_manifest(tmp, **over):
+        """A valid two-arm experiment over fixture files written into `tmp`; `over` replaces top-level keys."""
+        cases, res = pathlib.Path(tmp, "cases.json"), pathlib.Path(tmp, "results.json")
+        cases.write_text(json.dumps(EXPERIMENT_CASES), encoding="utf-8")
+        res.write_text(json.dumps(EXPERIMENT_RESULTS), encoding="utf-8")
+        manifest = {"instance": "scouted-seam", "cases": str(cases), "results": str(res),
+                    "arms": [{"name": "m1b", "base": None, "settings": {"model": "m1b", "effort": "high"}, "dispatched": 3},
+                             {"name": "m1b@medium", "base": "m1b", "settings": {"model": "m1b", "effort": "medium"}, "dispatched": 4}],
+                    "judge": {"verdicts": "judge2", "key": None}, "union": {"tuning": ["m1b", "m1b@medium"]}}
+        return json.loads(json.dumps({**manifest, **over}))
+
+    def derive_frozen_repo(tmp):
+        """A fixture repository at `tmp` whose held-out file has ONE commit: its path, that commit, and a git runner."""
+        def run_git(*argv):
+            return subprocess.run(["git", "-C", tmp, "-c", "user.name=selftest", "-c", "user.email=selftest@invalid",
+                                   "-c", "commit.gpgsign=false", *argv], capture_output=True, text=True, check=True).stdout.strip()
+        run_git("init", "-q")
+        held = pathlib.Path(tmp, "held.json")
+        held.write_text(json.dumps(EXPERIMENT_HELD), encoding="utf-8")
+        run_git("add", "held.json")
+        run_git("commit", "-q", "--no-verify", "-m", "freeze the held-out set")
+        return held, run_git("rev-parse", "HEAD"), run_git
+
+    def check_evidence_arm():
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest = derive_fixture_manifest(tmp)
+            check_experiment(manifest)
+            bare = json.loads(json.dumps(EXPERIMENT_CASES))
+            bare[1]["sha"] = ""
+            pathlib.Path(tmp, "bare.json").write_text(json.dumps(bare), encoding="utf-8")
+            why = check_refused(lambda: check_experiment({**manifest, "cases": str(pathlib.Path(tmp, "bare.json"))}), "case b", "case_evidence")
+            if why:
+                return why
+            hook = INSTANCES["scouted-seam"].pop("case_evidence")
+            try:
+                return check_refused(lambda: check_experiment(manifest), "scouted-seam", "case_evidence")
+            finally:
+                INSTANCES["scouted-seam"]["case_evidence"] = hook
+
+    def check_freeze_arm():
+        with tempfile.TemporaryDirectory() as tmp:
+            held, freeze, run_git = derive_frozen_repo(tmp)
+            manifest = derive_fixture_manifest(tmp, heldOut=str(held), union={"tuning": ["m1b"], "heldOut": ["m1b"]})
+            first = check_experiment(manifest, tmp)[0]
+            if not first.startswith(f"held-out: frozen at {freeze} · 1 case(s) · never read to change a prompt — recorded, not checked"):
+                return f"the first line reads {first!r}"
+            shared = pathlib.Path(tmp, "shared.json")
+            shared.write_text(json.dumps(EXPERIMENT_CASES + EXPERIMENT_HELD), encoding="utf-8")
+            why = (check_refused(lambda: check_experiment({**manifest, "cases": str(shared)}, tmp), "heldOut", "h", "tuning")
+                   or check_refused(lambda: check_experiment({**manifest, "heldOut": "-held.json"}, tmp), "heldOut", "`-`")
+                   or check_refused(lambda: check_experiment({**manifest, "heldOut": str(pathlib.Path(tmp).parent / "held.json")}, tmp), "outside"))
+            if why:
+                return why
+            held.write_text(json.dumps(EXPERIMENT_HELD, indent=1), encoding="utf-8")
+            run_git("commit", "-q", "--no-verify", "-am", "tune after the freeze")
+            second = run_git("rev-parse", "HEAD")
+            return check_refused(lambda: check_experiment(manifest, tmp), "2 commits", f"frozen at {freeze}", second)
+
+    def check_variable_arm():
+        with tempfile.TemporaryDirectory() as tmp:
+            lines = check_experiment(derive_fixture_manifest(tmp))
+            if not {"arm m1b: base", "arm m1b@medium: varies effort from m1b"} <= set(lines):
+                return f"the arm lines read {[line for line in lines if line.startswith('arm ')]!r}"
+            two, none = derive_fixture_manifest(tmp), derive_fixture_manifest(tmp)
+            two["arms"][1]["settings"]["model"] = "m1c"
+            none["arms"][1]["settings"]["effort"] = "high"
+            return (check_refused(lambda: check_experiment(two), "arm m1b@medium", "effort, model")
+                    or check_refused(lambda: check_experiment(none), "arm m1b@medium", "varies no variable"))
+
+    def check_parsed_arm():
+        with tempfile.TemporaryDirectory() as tmp:
+            lines = check_experiment(derive_fixture_manifest(tmp))
+            counts = [i for i, line in enumerate(lines) if line.startswith("parsed ")]
+            figure = next((i for i, line in enumerate(lines) if line.startswith(("figures ", "system "))), None)
+            if [lines[i] for i in counts] != ["parsed m1b: 2 of 3", "parsed m1b@medium: 3 of 4"] or figure is None or max(counts) > figure:
+                return f"the parsed counts do not all precede the first figure: {lines!r}"
+            if "paired 2 of 3 · m1b unanswered c" not in "\n".join(lines):
+                return f"the unparsed reply was scored: {lines!r}"
+            undeclared, over = derive_fixture_manifest(tmp), derive_fixture_manifest(tmp)
+            del undeclared["arms"][1]["dispatched"]
+            over["arms"][0]["dispatched"] = 1
+            return (check_refused(lambda: check_experiment(undeclared), "arm m1b@medium", "dispatched")
+                    or check_refused(lambda: check_experiment(over), "arm m1b", "2 parsed against 1 dispatched"))
+
+    def check_judge_arm():
+        with tempfile.TemporaryDirectory() as tmp:
+            key = pathlib.Path(tmp, "key.json")
+            key.write_text(json.dumps(EXPERIMENT_KEY), encoding="utf-8")
+            manifest = derive_fixture_manifest(tmp, judge={"verdicts": "judge2", "key": str(key)})
+            lines = check_experiment(manifest)
+            if not any(line.startswith("labels rotated — checked: 2 arm(s) over 3 case(s)") for line in lines):
+                return f"a rotating key did not read checked: {lines!r}"
+            if "labels rotated — recorded, not checked: no committed key" not in check_experiment(derive_fixture_manifest(tmp)):
+                return "a null key did not print as recorded"
+            key.write_text(json.dumps({c: {"ARM-A": "m1b", "ARM-B": "m1b@medium"} for c in EXPERIMENT_KEY}), encoding="utf-8")
+            return check_refused(lambda: check_experiment(manifest), "arm m1b", "ARM-A", "every one of 3")
+
+    def check_union_arm():
+        with tempfile.TemporaryDirectory() as tmp:
+            held, _, _ = derive_frozen_repo(tmp)
+            manifest = derive_fixture_manifest(tmp, heldOut=str(held), union={"tuning": ["m1b", "m1b@medium"], "heldOut": ["m1b"]})
+            text = "\n".join(check_experiment(manifest, tmp))
+            want = ["system tuning 2/2 · m1b + m1b@medium", "system held-out 1/1 · m1b", "system pooled 3/3 · tuning + held-out"]
+            bad = next((f"{w!r} not in {text!r}" for w in want if w not in text), None)
+            if bad:
+                return bad
+            why = check_refused(lambda: check_experiment({**manifest, "union": {"tuning": ["m1b"]}}, tmp), "union", "heldOut")
+            if why:
+                return why
+        if top is None:
+            return no_tree
+        proof = {"instance": "scouted-seam", "cases": f"{UNION_PROOF_COMMIT}:{PROOF_DIR}3-cases.json",
+                 "results": f"{UNION_PROOF_COMMIT}:{PROOF_DIR}5-results.json", "heldOut": str(top / HELD_OUT_FILE),
+                 "arms": [{"name": a, "base": None, "settings": {"prompt": a}, "dispatched": n}
+                          for a, n in (("m1cA@medium", 30), ("t1r@medium", 35), ("m1c@medium", 12))],
+                 "judge": {"verdicts": "judge2", "key": None},
+                 "union": {"tuning": ["m1cA@medium", "t1r@medium"], "heldOut": ["m1c@medium", "t1r@medium"]}}
+        text = "\n".join(check_experiment(proof, top))
+        want = ["system tuning 21/23 ·", "system held-out 12/12 ·", "system pooled 33/35 ·"]
+        return next((f"{w!r} not in {text!r}" for w in want if w not in text), None)
+
     arms = [("paired-refuses", check_paired_refuses), ("row-refuses", check_row_refuses), ("tag-section", check_tag_section),
             ("instances", check_instances_arm), ("scouted-proof", check_scouted_proof), ("conformance", check_conformance),
-            ("deterministic", check_deterministic)]
+            ("deterministic", check_deterministic), ("experiment-evidence", check_evidence_arm),
+            ("experiment-freeze", check_freeze_arm), ("experiment-variable", check_variable_arm),
+            ("experiment-parsed", check_parsed_arm), ("experiment-judge", check_judge_arm), ("experiment-union", check_union_arm)]
     passed = skipped = ran = 0
     for name, arm in arms:
         ran += 1
@@ -785,10 +1204,24 @@ def main(argv):
     ap.add_argument("--known", metavar="SRC")
     ap.add_argument("--candidate", metavar="SRC")
     ap.add_argument("--window", type=int, default=10)
+    ap.add_argument("--experiment", metavar="SRC")
     ap.add_argument("--repo", default=".")
     args = ap.parse_args(argv)
     if args.selftest:
         return run_selftest()
+    if args.experiment:
+        # Every line is derived before the first prints, so a refusal leaves no figure on stdout.
+        try:
+            try:
+                manifest = json.loads(read_raw_output(args.experiment, args.repo))
+            except ValueError as exc:
+                raise Refusal(f"manifest {args.experiment}: not JSON ({exc})") from None
+            lines = check_experiment(manifest, args.repo)
+        except Refusal as exc:
+            print(f"replay_scorer: REFUSED — {exc}", file=sys.stderr)
+            return 2
+        print("\n".join(lines))
+        return 0
     instance = INSTANCES.get(args.instance)
     if instance is None:
         ap.error(f"--instance must name one of {', '.join(INSTANCES)}, not {args.instance!r}")

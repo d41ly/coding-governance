@@ -4173,6 +4173,11 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "check_case_evidence",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "check_catalogue",
       "kind": "function",
       "file": "tools/workflows/render_lenses.py"
@@ -4543,6 +4548,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_experiment",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "check_extract_covers",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -4773,6 +4783,11 @@
       "file": "tools/unattended/check-unattended.sh"
     },
     {
+      "id": "check_held_out_frozen",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "check_helpers_hoisted",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -4961,6 +4976,11 @@
       "id": "check_json_value",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "check_judge_rotation",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "check_keepalive_reaped",
@@ -5236,6 +5256,11 @@
       "id": "check_one_probe",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "check_one_variable",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "check_operand",
@@ -8703,6 +8728,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_replay_evidence",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "derive_repo_root",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
@@ -8816,6 +8846,11 @@
       "id": "derive_scope",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
+    },
+    {
+      "id": "derive_scouted_evidence",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "derive_scrub_set",
@@ -12118,6 +12153,11 @@
       "file": "tools/run-gates/held_halves.py"
     },
     {
+      "id": "measure_parsed",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "measure_pass",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -12193,6 +12233,11 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "measure_replay_experiment",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "measure_round_count",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -12224,6 +12269,11 @@
     },
     {
       "id": "measure_scouted_compare",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "measure_scouted_experiment",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
     },
@@ -12296,6 +12346,11 @@
       "id": "measure_typed_counts",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "measure_union",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "measure_view_delta",
@@ -14561,6 +14616,11 @@
       "id": "read_carries_specs",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "read_case_list",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "read_catalogue_row",
