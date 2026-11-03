@@ -27,3 +27,10 @@ round 2 · finding 24 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-25 
 round 2 · finding 19 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-29 · unit TOOL-dCalibratedLens-38 · rev 1
 round 2 · finding 27 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-21 · unit TOOL-dCalibratedLens-39 · rev 1
 round 2 · finding 31 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-27 · unit TOOL-dCalibratedLens-40 · rev 1
+round 3 · subject dCalibratedLens-spec-set-r3 · audited TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41
+round 3 · finding 1 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-35 · unit TOOL-dCalibratedLens-42 · rev 1
+round 3 · finding 11 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-41 · unit TOOL-dCalibratedLens-43 · rev 1
+round 3 · finding 12 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-31 · unit TOOL-dCalibratedLens-44 · rev 1
+round 3 · finding 27 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-31 · unit TOOL-dCalibratedLens-45 · rev 1
+round 3 · finding 22 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-41 · unit TOOL-dCalibratedLens-46 · rev 1
+round 3 · finding 23 · HIGH · new-mechanism · specs TOOL-dCalibratedLens-37 · unit TOOL-dCalibratedLens-47 · rev 1
