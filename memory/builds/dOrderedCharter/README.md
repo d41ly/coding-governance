@@ -124,7 +124,7 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 TOOL
 | [PLAY-dOrderedCharter-22 — the namespace row's purpose-source and owner fields, and the chain registry's purpose field](spec/2026-10-23-spec-PLAY-dOrderedCharter-22.md) | 6 | 2 | CLOSED | rev-3 | 2026-11-03 |
 | [PLAY-dOrderedCharter-51 — the shared tag index keeps each extractor version's rows apart, and each worktree reads only its own](spec/2026-10-24-spec-PLAY-dOrderedCharter-51.md) | 6 | 2 | CLOSED | rev-1 | 2026-11-03 |
 | [PLAY-dOrderedCharter-24 — the edge-type registry and the edge grammar: one closed set of typed edges, inverses derived, selectors open](spec/2026-10-23-spec-PLAY-dOrderedCharter-24.md) | 7 | 2 | CLOSED | rev-3 | 2026-11-03 |
-| [PLAY-dOrderedCharter-63 — the spec-token checker reads a spec's liveness from its status header, never from a fenced example](spec/2026-11-03-spec-PLAY-dOrderedCharter-63.md) | 7 | 2 | DEFERRED | rev-1 | 2026-11-03 |
+| [PLAY-dOrderedCharter-63 — the spec-token checker reads a spec's liveness from its status header, never from a fenced example](spec/2026-11-03-spec-PLAY-dOrderedCharter-63.md) | 7 | 2 | CLOSED | rev-1 | 2026-11-03 |
 | [PLAY-dOrderedCharter-28 — the shared edge grammar at every site the memory plan names: twelve new types, native-id classes and the two pinned forms](spec/2026-10-23-spec-PLAY-dOrderedCharter-28.md) | 8 | 2 | DEFERRED | rev-4 | 2026-11-03 |
 | [PLAY-dOrderedCharter-26 — file:line citations held in the positional population, new text citing a symbol or a pinned line](spec/2026-10-23-spec-PLAY-dOrderedCharter-26.md) | 9 | 2 | DEFERRED | rev-5 | 2026-11-03 |
 | [PLAY-dOrderedCharter-25 — gov tag bundle, a tag's members, regions and instructions in one call, and the two edge checks](spec/2026-10-23-spec-PLAY-dOrderedCharter-25.md) | 10 | 2 | DEFERRED | rev-6 | 2026-11-03 |
@@ -172,7 +172,7 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 TOOL
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 <!-- /gen:build-units -->
 
-Records: 281 bound to this build, across 4 record folder(s).
+Records: 282 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

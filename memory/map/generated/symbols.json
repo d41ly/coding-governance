@@ -5028,6 +5028,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "check_live_header",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "check_login",
       "kind": "function",
       "file": "tools/unattended/resume-tick.sh"

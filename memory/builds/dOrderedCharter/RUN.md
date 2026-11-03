@@ -92,3 +92,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-03T13:12:44Z dispatch · item 6e0f4aad PLAY-dOrderedCharter-24 · reason tools/playbook/edges.toml tools/playbook/edge_grammar.py tools/memory-tree/design_lib.py tools/playbook/README.md tools/playbook/adopt-playbook.sh help/tags.md tools/govkit/usage.toml memory/map/generated/symbols.json memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-24.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-24-ledger.md memory/builds/dOrderedCharter/README.md
 
 2026-11-03T13:13:24Z brief · item PLAY-dOrderedCharter-24 · reason 4f744b3d9aa1 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-24-build-brief.md
+
+2026-11-03T14:07:03Z dispatch · item 8f63a0e0 PLAY-dOrderedCharter-63 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh memory/map/generated/symbols.json memory/builds/dOrderedCharter/spec/2026-11-03-spec-PLAY-dOrderedCharter-63.md memory/builds/dOrderedCharter/build/2026-11-03-build-PLAY-dOrderedCharter-63-ledger.md memory/builds/dOrderedCharter/README.md
+
+2026-11-03T14:07:21Z brief · item PLAY-dOrderedCharter-63 · reason 06aabed1ee4d memory/builds/dOrderedCharter/prompts/2026-11-03-prompt-PLAY-dOrderedCharter-63-build-brief.md

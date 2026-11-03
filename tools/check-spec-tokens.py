@@ -153,7 +153,9 @@ key, read across their line wraps.
          every live key carrying punctuation also carries a space, and that clause is what keeps
          the refusal set disjoint from the key set. Every cleared object is listed by --list as
          NEAR, and the join's line prints on every run, because it has no key to branch on.
-         LIVE here is `LIVE` below, OPEN, SPECCED, INPROGRESS or BLOCKED, so a DEFERRED spec is
+         LIVE here is the status header's token, the first `**Status:**` line outside a fenced
+         block, read by `check_live_header`, so a fenced example line is never read; the token
+         is `LIVE` below, OPEN, SPECCED, INPROGRESS or BLOCKED, so a DEFERRED spec is
          counted terminal and not graded, where hygiene check 25 grades every spec that is not
          CLOSED or WONTDO. A hit's token is `claims <- <object>`, the guards join's composite
          spelling, so a `[path]` waiver row keyed on the same bare string neither swallows a
@@ -352,7 +354,8 @@ SOURCE_WHY = ("sources a shell file by bare name, which resolves against the wor
 NOT_A_LEG = re.compile(r"^(bash |sh |python3? |node |git )|/|^\.|^[A-Z][A-Z0-9_]+$")
 # Terminal specs are FROZEN records. This repo cites a landed decision verbatim and never rewrites
 # it, so grading a CLOSED spec would demand editing one to clear a hit. The population is the specs
-# a build can still change.
+# a build can still change. Liveness is the status header's token: the first `**Status:**` line
+# outside a fenced block, read by `check_live_header`, so a fenced example line is never read.
 LIVE = re.compile(r"^\*\*Status:\*\*\s*(OPEN|SPECCED|INPROGRESS|BLOCKED)", re.M)
 # Section 7 is a LIST in the house style — backticked leg names joined by the middle dot — but many
 # specs carry prose there too. Measured over the live corpus: treating every backticked token in
@@ -1188,6 +1191,16 @@ def render_unfenced(text):
     return "\n".join(lines)
 
 
+STATUS_HEAD = re.compile(r"^\*\*Status:\*\*.*$", re.M)
+
+
+def check_live_header(text):
+    """True when the spec's status header, its first `**Status:**` line outside a fenced block,
+    carries a LIVE token. A fenced example's status line is never read (PLAY-dOrderedCharter-63)."""
+    head = STATUS_HEAD.search(render_unfenced(text))
+    return bool(head) and bool(LIVE.match(head.group(0)))
+
+
 def scan_supersede(root, specs, cutoff):
     """The supersede join over `specs` (TOOL-dFoldedAudit-4). Returns `(hits, examined, carriers)`:
     `examined` counts the specs dated at or after `cutoff`, each instance of the phrase in one of them
@@ -1498,7 +1511,7 @@ def main(argv):
                       if re.match(r"memory/builds/[^/]+/spec/.*\.md$", f))
     specs, frozen = [], 0
     for f in allspecs:
-        if LIVE.search((root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")):
+        if check_live_header((root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")):
             specs.append(f)
         else:
             frozen += 1
