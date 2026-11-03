@@ -231,14 +231,22 @@ rule above ships at `<prefix>/workflows/tier2-review.js`.
 `TOOL-dFairHearing-22`. The hook carries no opt-in rule, only a presence check: whether a build
 declared `spec-audit:` is judged by the review kit's `spec-audit-optin.js` pack alone, the opt-in's
 one home. Last, after rules 6 and 7, a `Workflow` call whose structured `args` carry
-`kind: "spec-audit"` or a `specAudit` key, the pack's own trigger, is refused, exit 2, unless
-`<prefix>/workflows/spec-audit-optin.js` exists beside the hook's own directory; the refusal names
-that path and the two remedies, `govkit update --kits review-harness` or a hand copy wired with
-`<prefix>/settings-merge.py --fragment`. Why: the hooks kit cannot require the review kit, which
-requires it back, so `govkit update --kits agent-cap` lands the hook without the pack, and a hook
-landed without its pack must not admit an audit nobody judged. A throw refuses. **What it does not
-check**: that the pack is wired, which `<prefix>/check-wiring.sh` reports, or that it judges
-correctly, which the pack's own suite does.
+`kind: "spec-audit"` or a `specAudit` key, the pack's own trigger, is refused, exit 2, unless the
+pack is found in the sibling-kit resolver's order (`TOOL-dFairHearing-27`): first a row of the install
+receipt, `.governance/install.json` at the root the nearest `.git` names, whose `source` ends
+`workflows/spec-audit-optin.js` and whose `path` is a file inside the tree; then
+`<prefix>/workflows/spec-audit-optin.js` beside the hook's own directory. A receipt row whose `path` is
+no such file refuses naming that path, and no `..` path is followed; no row and no probe hit refuses
+naming the probed path. The refusal names two remedies. The first follows the receipt: `govkit update
+--kits review-harness` when its `kits` claims `review-harness`, and `govkit apply --kits
+review-harness` otherwise or with no receipt, because `update` refuses a kit the receipt does not
+claim. The second is a hand copy wired with `<prefix>/settings-merge.py --fragment`. Why: the hooks
+kit cannot require the review kit, which requires it back. The pack carries this kit's `gov:kit
+agent-cap@` marker, declared in `kit.toml`'s `marker_carriers`, so a scoped `govkit update --kits
+agent-cap` moves a claimed review kit with it; the check stays for a hand copy and a hooks-only
+adopter, since a hook landed without its pack must not admit an audit nobody judged. A throw
+refuses. **What it does not check**: that the pack is wired, which `<prefix>/check-wiring.sh`
+reports, or that it judges correctly, which the pack's own suite does.
 
 ## Rule 6 — every agent prompt is a rendered handoff
 

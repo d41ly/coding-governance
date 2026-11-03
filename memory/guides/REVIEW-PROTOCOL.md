@@ -41,7 +41,8 @@ while `tools/hooks/agent-cap.js` keeps the two rules that judge the call itself:
 - `tools/workflows/check-verifier-fanout.js` — the verify-stage total and the loop markers
   (`gov:fixed-verifiers`, `gov:fixed-writers`, `gov:sequential-agents`), the predicate below. The
   merge-bar leg `tools/workflows/check-verifier-fanout.sh` runs it over every committed harness,
-  reading `MAX_VERIFIERS`, `MAX_LENSES` and the writer bound through the hook's exports.
+  reading `MAX_VERIFIERS` and the writer bound through the hook's exports and `LENS_SLOTS` from its
+  own file.
 - `tools/workflows/check-review-join.js` — the ref-keyed verdict join ban, the integer key
   above. `tools/workflows/check-review-join.sh` alone runs it, per script.
 - `tools/workflows/spec-audit-optin.js` — the spec-audit opt-in, the review kit's pack: a
@@ -200,7 +201,7 @@ re-run it once, and hold on a second.
   different lenses buy; precision saturates. Every run fills the five lens slots above on either
   kind, and an opt-in lens from the catalogue swaps a slot rather than adding one. The array-literal
   allowance the fan-out leg reads beside the slot count is the same number as everything else here,
-  and `tools/hooks/agent-cap.js` holds it as `MAX_LENSES` — it
+  and `tools/workflows/check-verifier-fanout.js` holds it as `LENS_SLOTS` — it
   briefly read as 6, which was never a decision: the hook counted a trailing comma as an element, so
   every prettier-formatted 5-lens array measured 6 and the constant had been raised to fit the error.
   Ratified at 5 by the owner once the miscount was found.

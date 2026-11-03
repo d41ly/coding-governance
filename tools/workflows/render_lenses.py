@@ -20,8 +20,10 @@ catalogue", lists them.
 
 `--markers` (TOOL-dFairHearing-23) prints, one per line, the 1-based number of every line of `<file>`
 that `MARKER` matches, the one predicate finding a marked literal: the fan-out leg walks exactly those
-lines, so a comment that names `gov:lens-slots` is no marker there either. Exit 2 when the file cannot
-be read as UTF-8.
+lines, so a comment that names `gov:lens-slots` is no marker there either, and a `gov:lens-optins`
+line is never printed: an opt-in literal is outside the five-slot count (TOOL-dFairHearing-27 S1).
+Exit 2 when the file cannot be read as UTF-8, or below the renderer's own python floor, which
+`--markers` shares, so the fan-out leg reads either refusal as its predicate not having run.
 
 WHAT IT DOES NOT CHECK: the slot count. A sixth default row renders a sixth slot, and the fan-out leg,
 `check-verifier-fanout.sh`, reds it: that leg reads what runs, and one answer to one question.
@@ -42,11 +44,16 @@ class Refused(Exception):
     pass
 
 
-def load_catalogue(path):
-    """The catalogue's rows, or Refused naming the floor, the file or the parse (rule 1)."""
+def check_python_floor():
+    """Refused below the renderer's floor, which `--markers` shares (TOOL-dFairHearing-27 S23, F3 (a))."""
     if sys.version_info < (3, 11):
         raise Refused("rule 1: python %d.%d is below the 3.11 floor, which tomllib needs to read the "
                       "lens catalogue" % sys.version_info[:2])
+
+
+def load_catalogue(path):
+    """The catalogue's rows, or Refused naming the floor, the file or the parse (rule 1)."""
+    check_python_floor()
     import tomllib
     try:
         with open(path, "rb") as fh:
@@ -165,6 +172,11 @@ def read_marker_lines(text):
 
 def main(argv):
     if len(argv) == 3 and argv[1] == "--markers":
+        try:
+            check_python_floor()
+        except Refused as e:
+            sys.stderr.write("render_lenses: REFUSED, --markers: %s\n" % e)
+            return 2
         try:
             with open(argv[2], "rb") as fh:
                 text = fh.read().decode("utf-8")

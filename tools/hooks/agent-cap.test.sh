@@ -309,7 +309,28 @@ run_pack() { # name expected_exit hook payload-json [text stderr must carry ...]
 }
 SAD="$TMP/sad"; mkdir -p "$SAD/memory/builds/tSA/reviews"; printf -- '---\nslug: tSA\nspec-audit: 2026-10-23\n---\n' > "$SAD/memory/builds/tSA/README.md"
 SA_DATED="{\"tool_name\":\"Workflow\",\"tool_input\":{\"name\":\"tier2-review\",\"args\":{\"kind\":\"spec-audit\",\"repo\":\"$NODEDIR/sad\",\"reviewDir\":\"memory/builds/tSA/reviews\"}}}"
-run_pack "pack AC1: a dated spec-audit call with no pack beside the hook is refused, naming the pack and the update" 2 "$HOOK" "$SA_DATED" 'spec-audit-optin.js' 'govkit update --kits review-harness'
+# TOOL-dFairHearing-27 S13: this hook copy has no receipt above it, so the remedy is `apply`, which installs a kit;
+# `update` refuses one the receipt does not claim.
+run_pack "pack AC1: a dated spec-audit call with no pack beside the hook is refused, naming the pack and the apply" 2 "$HOOK" "$SA_DATED" 'spec-audit-optin.js' 'govkit apply --kits review-harness'
+# ---- TOOL-dFairHearing-27 AC8, AC15: the remedy by receipt state, and the pack found through the receipt ----------
+# A layout with a `.git` marker, the hook under `.claude/hooks/` and the pack under a per-kit prefix the probe
+# beside the hook never reaches. RED against the hook at TOOL-dFairHearing-22's commit, which read no receipt:
+# it named `update` for an unclaimed kit and denied the pack the receipt names.
+RCP="$TMP/rcpt/p"; mkdir -p "$RCP/.git" "$RCP/.claude/hooks" "$RCP/.governance" "$RCP/tools/workflows"
+cp "$KIT_HOOK" "$HERE/scratch-guard.js" "$RCP/.claude/hooks/"
+RCP_ROW='{"path":"tools/workflows/spec-audit-optin.js","kit":"review-harness","role":"engine","source":"tools/workflows/spec-audit-optin.js"}'
+printf '{"kits":["agent-cap"],"files":[]}' > "$RCP/.governance/install.json"
+run_pack "FH27 AC8: a receipt claiming agent-cap alone names the apply remedy" 2 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED" 'govkit apply --kits review-harness'
+grep -qF 'update --kits review-harness' "$TMP/err" && { echo "FAIL FH27 AC8: the unclaimed receipt's deny still names the update remedy"; fail=$((fail+1)); }
+printf '{"kits":["agent-cap","review-harness"],"files":[]}' > "$RCP/.governance/install.json"
+run_pack "FH27 AC8: a receipt claiming both names the update remedy" 2 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED" 'govkit update --kits review-harness'
+: > "$RCP/tools/workflows/spec-audit-optin.js"
+printf '{"kits":["agent-cap","review-harness"],"files":[%s]}' "$RCP_ROW" > "$RCP/.governance/install.json"
+run_pack "FH27 AC15: the pack under a per-kit prefix the receipt names is admitted" 0 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED"
+printf '{"kits":["agent-cap","review-harness"],"files":[%s]}' "${RCP_ROW//tools\/workflows\/spec-audit-optin.js\",\"kit/tools/gone/spec-audit-optin.js\",\"kit}" > "$RCP/.governance/install.json"
+run_pack "FH27 AC15: a receipt row naming a missing path is refused, naming it" 2 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED" 'tools/gone/spec-audit-optin.js'
+printf '{"kits":["agent-cap","review-harness"],"files":[]}' > "$RCP/.governance/install.json"
+run_pack "FH27 AC15: with the row left out, the probe beside the hook misses and the call is refused" 2 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED" 'spec-audit-optin.js'
 if [ -z "$PKWF" ]; then
   echo "FAIL pack AC2: no workflows kit holding spec-audit-optin.js beside this hooks kit, so the pack-present arm has no pack to copy"; fail=$((fail+1))
 else

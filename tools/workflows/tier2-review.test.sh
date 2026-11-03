@@ -553,6 +553,13 @@ arm('walk: an empty items -> refused naming walk.items', buildWalk({ items: [] }
   arm('FH23 AC40 walk: a run-1 walker slice of 201 cells -> refused naming walk and its 200-cell ceiling', buildWalk({ items: items(201) }),
     WALK_NO + '` deals walker slot 1 of run 1 201 cells, above the 200-cell ceiling')
   arm('FH23 AC40 walk: a walker slice of 200 cells -> proceeds', buildWalk({ items: items(200) }), null)
+  // TOOL-dFairHearing-27 AC19 - the cap is read on the slices `deriveWalkSlices` deals for the call's own `run`: 30 items
+  // of one step under 7 scenarios deal run 2's step slot 210 cells, refused before the first agent, where run 1's
+  // scenario deal stays under the ceiling. RED against a cap read on the run-1 deal alone, which admits both.
+  const SC7W = Array.from({ length: 7 }, (_, j) => ({ id: 'S' + (j + 1), name: 'n', walks: 'w' }))
+  arm('FH27 AC19 walk: a run-2 band of 210 cells -> refused naming the slice', buildWalk({ items: items(30), scenarios: SC7W, run: 2 }),
+    WALK_NO + '` deals walker slot 3 of run 2 210 cells, above the 200-cell ceiling')
+  arm('FH27 AC19 walk: the same grid under run 1 -> proceeds', buildWalk({ items: items(30), scenarios: SC7W, run: 1 }), null)
   arm('FH23 AC40 walk: a scenario name of 121 characters -> refused naming walk.scenarios and its 120-character ceiling',
     buildWalk({ scenarios: scenario({ name: 'n'.repeat(121) }) }), WALK_NO + '.scenarios` member 0 carries a name of 121 characters, above the 120-character ceiling')
   arm('FH23 AC40 walk: a scenario name of 120 characters -> proceeds', buildWalk({ scenarios: scenario({ name: 'n'.repeat(120) }) }), null)
@@ -2305,6 +2312,9 @@ async function runWalkArms() {
     ck(JSON.stringify(r.result.walkGaps) === '[]' && r.result.blockers === 0 && r.result.highs === 0 && r.result.roundCount === 0 &&
       r.result.roundState === 'CONVERGED' && !!csp && !/token is BLOCKED/.test(csp.prompt),
       'walk red: a complete no-finding walk returns blockers 0, highs 0, count 0 and CONVERGED, its prompt no BLOCKED sentence: ' + r.result.roundState)
+    // TOOL-dFairHearing-27 AC20: the absence half reads the gap sentence, never the static verdict list's `BLOCKED`.
+    ck(!!csp && !csp.prompt.split('\n').some((l) => /the walk table has [0-9]+ gap/.test(l)),
+      'FH27 AC20 walk red: the complete walk\'s synthesis prompt carries no `the walk table has <n> gap` line')
   }
   // ---- TOOL-dFairHearing-20 AC1/AC3: the same no-finding walk with one planted empty cell. Against the harness at
   // TOOL-dFairHearing-18's commit it returns roundState CONVERGED and blockers 0 beside the gap, and both arms red.
@@ -2316,6 +2326,8 @@ async function runWalkArms() {
       'walk red: a gapped no-finding walk nulls blockers, highs, roundCount and roundState, its note opening BLOCKED: ' + r.result.roundState + ' ' + r.result.blockers)
     ck(!!sp && /<<<ROUND\nreview-round [^\n]* count=- state=-\nROUND>>>/.test(sp.prompt),
       'walk red: the gapped walk\'s round line reads count=- and state=-')
+    ck(!!sp && sp.prompt.split('\n').filter((l) => /the walk table has [0-9]+ gap/.test(l)).length === 1,
+      'FH27 AC20 walk red: the gapped walk\'s synthesis prompt carries one `the walk table has <n> gap` line')
   }
   ck(src.split('\n').filter((l) => /\bconst walkRed\b/.test(l)).length === 1, 'walk red: the harness defines walkRed once')
   // ---- AC5: 40 clean cells of 42 over two skeptic batches, walkers 1 and 2 raising one finding each.
@@ -2384,7 +2396,7 @@ async function runPresetArms() {
       'preset: a run without it, or naming unit-spec, fans over SPEC_LENSES with the spec briefs: ' + ru.scanSpawned('find:').join(' '))
     ck(DL.length === 5 && DL.every((L) => !/\bsections? \d/.test(L.brief)),
       'preset: no design brief names a unit spec\'s numbered section')
-    // ---- AC4: the preset joins the key off its default only.
+    // ---- TOOL-dFairHearing-2 AC4: the preset joins the key off its default only.
     ck(rd.result.key !== ru.result.key, 'preset: a design-audit run and a default run over the same subjects derive different keys')
     ck(ru.result.key === rx.result.key && ru.result.key.indexOf('spec-audit-r1-') === 0,
       'preset: unit-spec, absent or named, derives one key, so a caller without the argument keeps its key: ' + ru.result.key)
@@ -2466,7 +2478,7 @@ async function runOptInArms() {
       ck(typeof r.threw === 'string' && r.threw.indexOf('tier2-review: `optIn`') === 0 && r.threw.indexOf(word) !== -1 && r.trace.length === 0,
         'optIn: AC3 ' + JSON.stringify(v) + ' refuses before any agent, naming "' + word + '": ' + r.threw)
     }
-    // ---- AC5: the key moves with a swap, and without one equals the live harness's key.
+    // ---- TOOL-dFairHearing-3 AC5: the key moves with a swap, and without one equals the live harness's key.
     const k0 = await runReview(SPEC, ALL_OK)
     const k1 = await runReview(SPEC, ALL_OK, top.src)
     ck(!!k0.result && !!k1.result && !!r2.result && k1.result.key === k0.result.key && r2.result.key !== k1.result.key,
@@ -3864,7 +3876,10 @@ printf '%s\n' "$out"
 # three refusals and three limits (6), AC21's two ungraded items (2), AC27's three cut returns (3), AC23's reason cell
 # (1) and AC22's four short lists and the whole one (5). The ACQ stub gaining its by-design head, LEGS its legCount
 # and the gateManifest rename add none. Counted by hand, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=620
+# RAISED 620 -> 624 by TOOL-dFairHearing-27: 4 assertions, counted off the `FH27` arms — AC19's run-2 refusal and its
+# run-1 control (2) and AC20's complete-walk absence and gapped-walk presence (2). The two re-labelled key-pinning
+# headers add none. Counted by hand, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=624
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

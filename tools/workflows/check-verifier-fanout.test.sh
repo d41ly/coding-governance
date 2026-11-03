@@ -366,6 +366,42 @@ NJ="$TMP/nojs/k"; mkdir -p "$NJ/workflows" "$NJ/hooks" && cp "$GATE" "$HERE/rend
 out=$(cd "$NJ" && bash workflows/check-verifier-fanout.sh "$TMP/bounded.js" 2>&1); rc=$?
 case "$rc:$out" in 2:*"no check-verifier-fanout.js beside this gate"*) printf 'arm ok    AC18: a gate copy with no .js beside it exits 2 naming the file\n' ;;
   *) fails=$((fails+1)); printf 'arm FAIL  AC18: a gate copy with no .js did not refuse by name (rc=%s)\n%s\n' "$rc" "$out" ;; esac
+# ---- TOOL-dFairHearing-27: the opt-in literal outside the count, and a predicate that did not run ----------------
+# AC1: a five-slot lens-slots literal beside a zero-row lens-optins literal. `--markers` prints the first line alone
+# and the gate exits 0. RED against a predicate that also matched the opt-in marker, whose zero rows red the count.
+cat >"$TMP/optin.js" <<'EOF'
+export const meta = { name: 'optin-literal', description: 'five slots and a zero-row opt-in literal' }
+const L = [ // gov:lens-slots unit-spec
+  { key: 'one' },
+  { key: 'two' },
+  { key: 'three' },
+  { key: 'four' },
+  { key: 'five' },
+]
+const O = [ // gov:lens-optins
+]
+EOF
+out=$("$_rkd_py" "$HERE/render_lenses.py" --markers "$TMP/optin.js" 2>&1 | tr -d '\r')
+[ "$out" = 2 ] && printf 'arm ok    FH27 AC1: --markers prints the lens-slots line alone, never the opt-in line\n' \
+  || { fails=$((fails+1)); printf 'arm FAIL  FH27 AC1: --markers printed %s, not 2\n' "$out"; }
+out=$(bash "$GATE" "$TMP/optin.js" 2>&1); rc=$?
+case "$rc:$out" in 0:*"slots — 1 lens-slot literal(s), each holding 5"*) printf 'arm ok    FH27 AC1: a zero-row opt-in literal leaves the gate at exit 0\n' ;;
+  *) fails=$((fails+1)); printf 'arm FAIL  FH27 AC1: the opt-in literal moved the slot count (rc=%s)\n%s\n' "$rc" "$out" ;; esac
+# AC18: a gate copy with no render_lenses.py beside it, and one whose python candidates all fail to run, each exit 2
+# naming the predicate. RED against the gate at TOOL-dFairHearing-23's commit, whose refusals named neither.
+NR="$TMP/norl/k"; mkdir -p "$NR/workflows" "$NR/hooks" && cp "$GATE" "$HERE/check-verifier-fanout.js" "$NR/workflows/" \
+  && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$NR/hooks/" && git -C "$NR" init -q
+out=$(cd "$NR" && bash workflows/check-verifier-fanout.sh "$TMP/optin.js" 2>&1); rc=$?
+case "$rc:$out" in 2:*"the marker predicate did not run (no render_lenses.py"*) printf 'arm ok    FH27 AC18: a gate copy with no renderer exits 2 naming the predicate\n' ;;
+  *) fails=$((fails+1)); printf 'arm FAIL  FH27 AC18: a gate copy with no renderer did not refuse by name (rc=%s)\n%s\n' "$rc" "$out" ;; esac
+# No python: stubs named for every launcher candidate, each exiting 9, ahead of PATH, so the probe RUNS each and
+# none answers. The hook is then found on the .claude/hooks/ rung alone, which the fixture carries.
+NP="$TMP/nopy"; mkdir -p "$NP/k/workflows" "$NP/.claude/hooks" "$NP/stub" && cp "$GATE" "$HERE/check-verifier-fanout.js" "$HERE/render_lenses.py" "$NP/k/workflows/" \
+  && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$NP/.claude/hooks/" && git -C "$NP" init -q
+for _n in python3 python py; do printf '#!/bin/sh\nexit 9\n' > "$NP/stub/$_n"; chmod +x "$NP/stub/$_n"; done
+out=$(cd "$NP" && PATH="$NP/stub:$PATH" GOV_PYTHON= bash k/workflows/check-verifier-fanout.sh "$TMP/optin.js" 2>&1); rc=$?
+case "$rc:$out" in 2:*"the marker predicate did not run (no usable python)"*) printf 'arm ok    FH27 AC18: an unresolvable python exits 2 naming the predicate\n' ;;
+  *) fails=$((fails+1)); printf 'arm FAIL  FH27 AC18: an unresolvable python did not refuse by name (rc=%s)\n%s\n' "$rc" "$out" ;; esac
 # AC25: five slot calls whose arguments carry commas inside parentheses, braces and a string count 5, through
 # `topLevelArgs`; with that counter staged to split on every comma, the same copy counts more. RED against the
 # parent, whose shell `measureSlots` counted, so the staged edit left it at 5.

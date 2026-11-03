@@ -392,17 +392,12 @@ function runBothViews(rule, script) {
   return lexed.concat(shipped.filter((f) => !seen.has(key(f))))
 }
 
-// THE VERIFY TOTAL, and the lens allowance beside it. Since TOOL-dFairHearing-16 no rule of this file
-// reads either: rule 2, the verify-stage total, is the review kit's `check-verifier-fanout.js`, which
-// reads both through this file's exports, and `check-playbook-parity.sh` reads both by source line.
-// They stay here, with the views, until dBoundRoles retires this hook and moves them.
+// THE VERIFY TOTAL. Since TOOL-dFairHearing-16 no rule of this file reads it: rule 2, the verify-stage
+// total, is the review kit's `check-verifier-fanout.js`, which reads it through this file's exports,
+// and `check-playbook-parity.sh` reads it by source line. It stays here, with the views, until
+// dBoundRoles retires this hook and moves it. The lens allowance that sat beside it left with its last
+// reader (TOOL-dFairHearing-27 S16): its one home is `LENS_SLOTS` in `check-verifier-fanout.js`.
 const MAX_VERIFIERS = 5
-// ONE NUMBER, ratified by the owner 2026-08-10 (spec F2). The lens allowance used to sit at 6 and
-// read as a deliberate find-stage affordance; it was not. It was the trailing-comma miscount above,
-// and no shipped harness has ever had six lenses — tier2-review runs five on both kinds, diff and
-// spec, and both drift-audit waves have five. With the count fixed, 5 is what the charter says and
-// what every harness already obeys.
-const MAX_LENSES = 5
 // TOOL-dGroundRules-10 F2 — a VERIFIER split's comparand is MAX_VERIFIERS, the verify total. TOOL-dGroundRules-18 — a WRITER
 // split's is the agent limit (receiver (a)), read through rule 7's `readPolicy` once, only for a script carrying the marker.
 const POLICY_HELPER = require('path').join(require('path').dirname(__dirname), 'policy', 'policy-mirror.js')
@@ -903,13 +898,13 @@ function main() {
 
 // TOOL-dFairHearing-16 S1 — THE SHARED READERS, exported to the homes that left with this file's
 // rules: rule 2's `check-verifier-fanout.js` and rule 5's `check-review-join.js` read the views,
-// `runBothViews`, the harness name and the two constants, rule 2 the writer bound too, and the review
+// `runBothViews`, the harness name and the verify total, rule 2 the writer bound too, and the review
 // kit's spec-audit opt-in pack the args reader and the slug walk, which rule 6 here also calls. ONE
 // copy each: a view reads the mode `runBothViews` switches, so the views and it stay one module.
 // `main()` runs only when this file is the entry point, the idiom scratch-guard.js uses, so requiring
 // it judges nothing. dBoundRoles retires this hook and moves these to their last home.
 module.exports = {
-  MAX_VERIFIERS, MAX_LENSES, readWriterBound, runBothViews, renderCodeView, renderStrippedView,
+  MAX_VERIFIERS, readWriterBound, runBothViews, renderCodeView, renderStrippedView,
   renderBlankedLiterals, resolveHarnessName, extractWorkflowArgs, extractBuildSlug,
 }
 if (require.main === module) main()
@@ -952,22 +947,48 @@ function readSettingsLayers(root) {
 // that names this kit alone lands the hook without it: the hooks kit cannot require the review kit,
 // which requires it back, a cycle govkit refuses. So a Workflow call carrying the opt-in's own
 // trigger, `kind: 'spec-audit'` or a `specAudit` key in its structured args, is refused unless the
-// pack sits in the workflows kit beside this hook's directory, probed as resolveHarnessName probes
-// the harness. WHAT IT DOES NOT CHECK: that the pack is wired, which check-wiring.sh reports, or that
-// it judges correctly, which its own suite does. A throw refuses. null = allow · string = deny.
+// pack is found in `resolve_kit_dir`'s order (TOOL-dFairHearing-27 S20): first the install receipt,
+// `.governance/install.json` at the root the nearest `.git` names, whose row `source` ends
+// `workflows/spec-audit-optin.js` with a `path` that is a file inside the tree; then the probe in the
+// workflows kit beside this hook's directory. A row whose `path` is no such file refuses naming it, and
+// no `..` path is followed. The receipt's `kits` picks the remedy (S13): `update` for a receipt claiming
+// review-harness, else `apply`, since govkit's `update` refuses a kit its receipt does not claim; an
+// absent or unreadable receipt is the hand-copy case, and the probe decides. WHAT IT DOES NOT CHECK:
+// that the pack is wired, which check-wiring.sh reports, or that it judges correctly, which its own
+// suite does. A throw refuses. null = allow · string = deny.
 function checkOptinPackPresent(data) {
   const path = require('path')
+  const fs = require('fs')
   try {
     const a = data.tool_name === 'Workflow' ? extractWorkflowArgs(data) : null
     if (!a || (String(a.kind) !== 'spec-audit' && a.specAudit === undefined)) return null
     const kits = path.dirname(__dirname)
-    const p = path.join(kits, 'workflows', 'spec-audit-optin.js')
-    if (require('fs').existsSync(p)) return null
+    let root = __dirname
+    for (let d = __dirname; ; d = path.dirname(d)) {
+      if (fs.existsSync(path.join(d, '.git'))) { root = d; break }
+      if (path.dirname(d) === d) break
+    }
+    let receipt = null
+    try { receipt = JSON.parse(fs.readFileSync(path.join(root, '.governance', 'install.json'), 'utf8')) } catch { receipt = null }
+    const rows = receipt && Array.isArray(receipt.files) ? receipt.files : []
+    const row = rows.find((r) => r && typeof r.path === 'string' && r.path && String(r.source || '').split('/').slice(-2).join('/') === 'workflows/spec-audit-optin.js')
+    let p = path.join(kits, 'workflows', 'spec-audit-optin.js')
+    let where = 'is not beside this hook'
+    if (row) {
+      p = path.resolve(root, row.path)
+      const rel = path.relative(root, p)
+      const inside = rel !== '' && !path.isAbsolute(rel) && !rel.split(path.sep).includes('..') && !row.path.split(/[\\/]/).includes('..')
+      let isFile = false
+      try { isFile = fs.statSync(p).isFile() } catch { isFile = false }
+      if (inside && isFile) return null
+      where = `is the path the install receipt names, and it is not a file inside this tree`
+    } else if (fs.existsSync(p)) return null
+    const claimed = !!receipt && Array.isArray(receipt.kits) && receipt.kits.includes('review-harness')
     const renderRel = (f) => path.relative(process.env.CLAUDE_PROJECT_DIR || process.cwd(), f).split(path.sep).join('/')
     return `BLOCKED by agent-cap: this Workflow call is a spec audit, and the spec-audit opt-in pack ` +
-      `${renderRel(p)} is not beside this hook. The opt-in moved to the review kit (TOOL-dFairHearing-16), ` +
+      `${row ? row.path : renderRel(p)} ${where}. The opt-in moved to the review kit (TOOL-dFairHearing-16), ` +
       `and a hook landed without its pack does not admit an audit nobody judged.\n` +
-      `Install the pack: govkit update --kits review-harness, or wire a hand copy with ` +
+      `Install the pack: govkit ${claimed ? 'update' : 'apply'} --kits review-harness, or wire a hand copy with ` +
       `python ${renderRel(path.join(kits, 'settings-merge.py'))} --fragment ${renderRel(path.join(kits, 'workflows', 'spec-audit-optin.fragment.json'))}.\n`
   } catch (e) {
     return `BLOCKED by agent-cap: the spec-audit pack check (TOOL-dFairHearing-22) threw (${(e && e.message) || e}), and a rule that cannot finish does not admit.\n`

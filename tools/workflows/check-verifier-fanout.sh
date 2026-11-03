@@ -340,20 +340,23 @@ done <<<"$SCAN"
 # ---- THE SLOT COUNT (TOOL-dFairHearing-13; one predicate and one counter since TOOL-dFairHearing-23) ----
 # Over the same population: every array literal opened on a marker line holds exactly the lens count.
 # The marker lines are `render_lenses.py --markers`, the renderer's own anchored regex, so a comment
-# that names gov:lens-slots is no marker here either. check-verifier-fanout.js `--slots` counts each
-# literal with `topLevelArgs`, rule 2's own counter, over the hook's literal-blanked view, so a comma in
+# that names gov:lens-slots is no marker here either, and a gov:lens-optins literal is outside the
+# count (TOOL-dFairHearing-27 S1). check-verifier-fanout.js `--slots` counts each literal with `topLevelArgs`, rule 2's own counter, over the hook's literal-blanked view, so a comma in
 # a string, parentheses or braces is no slot and a trailing comma no element, and it holds the number,
 # its one home, and prints the verdict. With explicit files a harness carrying no marker is legal; in
 # the whole-tree mode no marked literal anywhere is a failure, because a count over nothing grades
 # nothing. The slot verdict prints on a line of its own, after the hook's clean line, which stays byte
 # for byte.
 RENDERER="$HERE/render_lenses.py"
-[ -f "$RENDERER" ] || { echo "verifier-fanout: no render_lenses.py beside this gate at $HERE — the marker predicate lives there, so a gate without it must say so, not pass"; exit 2; }
-[ -n "$_hk_py" ] || { echo "verifier-fanout: no usable python, so render_lenses.py --markers cannot name the marked literals — the slot count could not run"; exit 2; }
+# A predicate that did not run is a named exit 2, never an empty marker list (TOOL-dFairHearing-27 S23):
+# no renderer beside the gate, no usable python, or `--markers` exiting non-zero, its python floor's
+# refusal included, since it shares the renderer's.
+[ -f "$RENDERER" ] || { echo "verifier-fanout: the marker predicate did not run (no render_lenses.py beside this gate at $HERE)"; exit 2; }
+[ -n "$_hk_py" ] || { echo "verifier-fanout: the marker predicate did not run (no usable python)"; exit 2; }
 locs=()
 while IFS= read -r f; do
   [ -n "$f" ] || continue
-  _ml=$("$_hk_py" "$RENDERER" --markers "$f" 2>&1) || { echo "verifier-fanout: the slot count could not run — $_ml"; exit 2; }
+  _ml=$("$_hk_py" "$RENDERER" --markers "$f" 2>&1) || { echo "verifier-fanout: the marker predicate did not run (render_lenses.py --markers $f exited $?: $_ml)"; exit 2; }
   for _l in $(printf '%s\n' "$_ml" | tr -d '\r'); do locs+=("$f:$_l"); done
 done <<<"$SCAN"
 if [ "${#locs[@]}" -gt 0 ]; then

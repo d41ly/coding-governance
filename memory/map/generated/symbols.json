@@ -5553,6 +5553,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_python_floor",
+      "kind": "function",
+      "file": "tools/workflows/render_lenses.py"
+    },
+    {
       "id": "check_quiet",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -10016,6 +10021,11 @@
       "id": "extract_files_touched",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "extract_gated_scope",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
     },
     {
       "id": "extract_gates",

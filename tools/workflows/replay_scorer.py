@@ -114,8 +114,9 @@ HEX40 = re.compile(r"[0-9a-fA-F]{40}")
 KIT_DIR = pathlib.Path(__file__).resolve().parent
 #: The two instances the factory exists for; `check_instances` reds when the table lacks one.
 INSTANCE_KEYS = ("review-replay", "scouted-seam")
-#: The arm count `run_selftest` must reach, as review_replay.py declares its own.
-ARMS_DECLARED = 18
+#: The arm count `run_selftest` must reach, as review_replay.py declares its own. Raised 18 -> 21 by
+#: TOOL-dFairHearing-27 S19: its three arms, tag-item, experiment-freeze-spelling and pairing-walk.
+ARMS_DECLARED = 21
 
 
 class Refusal(Exception):
@@ -820,7 +821,10 @@ def check_case_evidence(instance, cases):
 def check_held_out_frozen(path, tuning_ids, repo="."):
     """`(line, cases)`: the freeze line and the held-out cases.
 
-    Refused: a path opening `-`, outside the repository or not a working-tree file; a shallow history,
+    The path is normalised once, to its repo-relative POSIX form through `git ls-files --full-name`, before
+    any `<rev>:<path>` read, and any git call exiting non-zero refuses naming the call and its stderr, its
+    stdout never compared (TOOL-dFairHearing-27 S7).
+    Refused: a path opening `-`, outside the repository, not a working-tree file or not tracked; a shallow history,
     whose boundary commit lists every file; a history of other than exactly one commit, read by ONE
     `git log --format=%H` with argv; working-tree bytes whose `git hash-object` (the checkout's filters
     applied, so a CRLF checkout of an LF blob agrees) differ from the freeze's blob; and an id that is
@@ -841,18 +845,29 @@ def check_held_out_frozen(path, tuning_ids, repo="."):
         raise Refusal(f"heldOut {path}: outside the repository {root.as_posix()}") from None
     if not pathlib.Path(path).is_file():
         raise Refusal(f"heldOut {path}: not a working-tree file")
-    shallow = subprocess.run(["git", "-C", str(root), "rev-parse", "--is-shallow-repository"], capture_output=True, text=True, check=False)
-    if shallow.stdout.strip() != "false":
-        raise Refusal(f"heldOut {rel}: `git rev-parse --is-shallow-repository` printed {shallow.stdout.strip()!r}, not 'false': "
+
+    def read_git(*argv):
+        """One git call's stdout; a non-zero exit refuses naming the call and its stderr, its stdout never read."""
+        proc = subprocess.run(["git", "-C", str(root), *argv], capture_output=True, text=True, check=False)
+        if proc.returncode:
+            raise Refusal(f"heldOut {path}: `git {' '.join(argv)}` exited {proc.returncode}: {proc.stderr.strip() or 'no stderr'}")
+        return proc.stdout.strip()
+
+    # TOOL-dFairHearing-27 S7: the path is normalised ONCE, through git, before any `<rev>:<path>` read, so a
+    # backslashed or an absolute spelling reads the same blob as the repo-relative POSIX one.
+    rel = read_git("ls-files", "--full-name", "--", str(pathlib.Path(path).resolve()))
+    if not rel:
+        raise Refusal(f"heldOut {path}: not tracked, so no freeze can be read")
+    shallow = read_git("rev-parse", "--is-shallow-repository")
+    if shallow != "false":
+        raise Refusal(f"heldOut {rel}: `git rev-parse --is-shallow-repository` printed {shallow!r}, not 'false': "
                       "a shallow history cannot show a freeze, since its boundary commit lists every file")
-    log = subprocess.run(["git", "-C", str(root), "log", "--format=%H", "--", rel], capture_output=True, text=True, check=False)
-    shas = log.stdout.split()
-    if log.returncode or not shas:
+    shas = read_git("log", "--format=%H", "--", rel).split()
+    if not shas:
         raise Refusal(f"heldOut {rel}: no commit in its history, so it was never frozen")
     if len(shas) > 1:
         raise Refusal(f"heldOut {rel}: {len(shas)} commits, frozen at {shas[-1]} and changed after it at {', '.join(reversed(shas[:-1]))}")
-    work, blob = (subprocess.run(["git", "-C", str(root), *argv], capture_output=True, text=True, check=False).stdout.strip()
-                  for argv in (["hash-object", "--", rel], ["rev-parse", f"{shas[0]}:{rel}"]))
+    work, blob = read_git("hash-object", "--", rel), read_git("rev-parse", f"{shas[0]}:{rel}")
     if not work or work != blob:
         raise Refusal(f"heldOut {rel}: the working tree hashes to {work or 'nothing'}, not the freeze's blob {blob or 'nothing'} at {shas[0]}")
     cases = read_case_list(path, repo)
@@ -1138,19 +1153,23 @@ def scan_pairing_sites(root):
     """`<path>:<line>` of each pairing comprehension in the tracked `*.py` at and below `root`, this file excepted.
 
     A pairing comprehension filters on `all()` over a generator ranging over a second population whose
-    element is `<outer case> in <inner variant>`, or an `is not None` test naming both. Outside a git
-    checkout every `*.py` is the population. A file that does not parse is named too: it is unread.
-    A path under `MEMORY_ROOT/` is excluded by rule (TOOL-dFairHearing-23 S25): at a repository-root
-    install `root` is the repository, whose record folders keep benches the factory replaced.
+    element is `<outer case> in <inner variant>`, or an `is not None` test naming both. A file that does
+    not parse is named too: it is unread. A path under `MEMORY_ROOT/` is excluded by rule
+    (TOOL-dFairHearing-23 S25): at a repository-root install `root` is the repository, whose record
+    folders keep benches the factory replaced. Refused, never `[]`, when the `git ls-files` read fails or
+    lists no `*.py` (TOOL-dFairHearing-27 S30): a walk over nothing names no site and proves nothing.
     """
     root = pathlib.Path(root)
     try:
         proc = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", "*.py"], capture_output=True, check=False)
-        files = [f for f in proc.stdout.decode("utf-8").split("\0") if f] if proc.returncode == 0 else None
-    except OSError:
-        files = None
-    if files is None:
-        files = [p.relative_to(root).as_posix() for p in root.rglob("*.py")]
+    except OSError as exc:
+        raise Refusal(f"scan_pairing_sites {root.as_posix()}: `git ls-files` could not run ({exc})") from None
+    if proc.returncode:
+        raise Refusal(f"scan_pairing_sites {root.as_posix()}: `git ls-files` exited {proc.returncode}: "
+                      f"{proc.stderr.decode('utf-8', 'replace').strip() or 'no stderr'}")
+    files = [f for f in proc.stdout.decode("utf-8").split("\0") if f]
+    if not files:
+        raise Refusal(f"scan_pairing_sites {root.as_posix()}: `git ls-files` lists no *.py, so the walk graded nothing")
 
     def names(node):
         return {n.id for n in ast.walk(node) if isinstance(n, ast.Name)}
@@ -1288,24 +1307,44 @@ def run_selftest():
                 (judged, "judged common 30 (24 positive)\n"), (judged, "primary 17/24 · items 39/59 ·")]
         return next((f"{w!r} not in {text!r}" for text, w in want if w not in text), None)
 
+    def derive_git_tree(root, files):
+        """`files` ({relative path: text}) written under `root` and staged in a fresh repository there, the
+        tracked population `scan_pairing_sites` walks (TOOL-dFairHearing-27 S30)."""
+        for rel, text in files.items():
+            pathlib.Path(root, rel).parent.mkdir(parents=True, exist_ok=True)
+            pathlib.Path(root, rel).write_text(text, encoding="utf-8")
+        for argv in (["init", "-q"], ["add", "-A"]):
+            subprocess.run(["git", "-C", str(root), *argv], capture_output=True, check=True)
+        return pathlib.Path(root)
+
     def check_conformance():
         live = scan_pairing_sites(KIT_DIR)
         if live:
             return f"a pairing outside the factory: {', '.join(live)}"
         with tempfile.TemporaryDirectory() as tmp:
-            (pathlib.Path(tmp, "kit", "sub")).mkdir(parents=True)
-            pathlib.Path(tmp, "kit", "sub", "planted.py").write_text(PLANTED, encoding="utf-8")
-            pathlib.Path(tmp, "kit", "replay_scorer.py").write_text(PLANTED, encoding="utf-8")
-            pathlib.Path(tmp, "kit", "replay_scorer_twin.py").write_text(KIT_DIR.joinpath("replay_scorer.py").read_text(encoding="utf-8"), encoding="utf-8")
-            planted = scan_pairing_sites(pathlib.Path(tmp, "kit"))
+            kit = derive_git_tree(pathlib.Path(tmp, "kit"), {
+                "sub/planted.py": PLANTED, "replay_scorer.py": PLANTED,
+                "replay_scorer_twin.py": KIT_DIR.joinpath("replay_scorer.py").read_text(encoding="utf-8")})
+            planted = scan_pairing_sites(kit)
             if planted != ["sub/planted.py:2"]:
                 return f"the planted module, and only it, should be named: {planted!r}"
             if top is None:
                 return no_tree
-            pathlib.Path(tmp, "grader").mkdir()
-            pathlib.Path(tmp, "grader", "bench.py").write_text(read_raw_output(GRADER_BLOB, top), encoding="utf-8")
-            grader = scan_pairing_sites(pathlib.Path(tmp, "grader"))
+            grader = scan_pairing_sites(derive_git_tree(pathlib.Path(tmp, "grader"), {"bench.py": read_raw_output(GRADER_BLOB, top)}))
         return None if grader == ["bench.py:384", "bench.py:647"] else f"the grader blob read as {grader!r}"
+
+    def check_pairing_walk_arm():
+        """TOOL-dFairHearing-27 AC25: the pairing module under a copy's factory directory is named and under its
+        memory/ is not; a walk whose `git ls-files` fails, or that lists no `*.py`, refuses by name, never `[]`."""
+        with tempfile.TemporaryDirectory() as tmp:
+            copy = derive_git_tree(pathlib.Path(tmp, "copy"), {"tools/workflows/planted.py": PLANTED, f"{MEMORY_ROOT}/b/planted.py": PLANTED})
+            named = scan_pairing_sites(copy)
+            if named != ["tools/workflows/planted.py:2"]:
+                return f"the copy's pairing sites read {named!r}, not the factory module alone"
+            pathlib.Path(tmp, "bare").mkdir()
+            empty = derive_git_tree(pathlib.Path(tmp, "empty"), {"x.txt": "no python here\n"})
+            return (check_refused(lambda: scan_pairing_sites(pathlib.Path(tmp, "bare")), "scan_pairing_sites", "`git ls-files` exited")
+                    or check_refused(lambda: scan_pairing_sites(empty), "scan_pairing_sites", "lists no *.py"))
 
     def check_deterministic():
         with tempfile.TemporaryDirectory() as tmp:
@@ -1391,6 +1430,25 @@ def run_selftest():
             run_git("commit", "-q", "--no-verify", "-am", "tune after the freeze")
             second = run_git("rev-parse", "HEAD")
             return check_refused(lambda: check_experiment(manifest, tmp), "2 commits", f"frozen at {freeze}", second)
+
+    def check_freeze_spelling_arm():
+        """TOOL-dFairHearing-27 AC5: the held-out path spelled absolute with forward slashes and in the platform's
+        own separators (backslashes on Windows; the same spelling elsewhere) prints the one freeze line."""
+        with tempfile.TemporaryDirectory() as tmp:
+            held, freeze, _ = derive_frozen_repo(tmp)
+            for spelling in (held.resolve().as_posix(), str(held.resolve())):
+                manifest = derive_fixture_manifest(tmp, heldOut=spelling, union={"tuning": ["m1b"], "heldOut": ["m1b"]})
+                first = check_experiment(manifest, tmp)[0]
+                if not first.startswith(f"held-out: frozen at {freeze} · "):
+                    return f"the held-out path spelled {spelling!r} reads {first!r}"
+        return None
+
+    def check_tag_item_arm():
+        """TOOL-dFairHearing-27 AC4: a ref naming an S, AC or F item and no tag keys on the section the item maps to,
+        as `extract_section_ref` reads it; prose alone is None."""
+        want = [("x.md:AC3", ("x.md", 6)), ("x.md:S5 scope", ("x.md", 2)), ("x.md:F2", ("x.md", 8)), ("x.md:prose", None)]
+        return next((f"{ref!r} read as {extract_tag_ref(ref)!r}, not {w!r}" for ref, w in want
+                     if extract_tag_ref(ref) != w or extract_section_ref(ref) != w), None)
 
     def check_variable_arm():
         with tempfile.TemporaryDirectory() as tmp:
@@ -1577,7 +1635,9 @@ def run_selftest():
             ("experiment-freeze", check_freeze_arm), ("experiment-variable", check_variable_arm),
             ("experiment-parsed", check_parsed_arm), ("experiment-judge", check_judge_arm), ("experiment-union", check_union_arm),
             ("known-set", check_known_set_arm), ("tag-drive", check_tag_drive_arm), ("design-recall", check_design_recall_arm),
-            ("replay-manifest", check_replay_manifest_arm), ("conformance-root", check_conformance_root_arm)]
+            ("replay-manifest", check_replay_manifest_arm), ("conformance-root", check_conformance_root_arm),
+            ("tag-item", check_tag_item_arm), ("experiment-freeze-spelling", check_freeze_spelling_arm),
+            ("pairing-walk", check_pairing_walk_arm)]
     passed = skipped = ran = 0
     for name, arm in arms:
         ran += 1

@@ -257,6 +257,9 @@ GK_DIR=$(resolve_kit_dir "$_rkd_py" govkit registry.toml "$HERE") || exit 2
 GK="${GK_DIR##*/}"
 PB_DIR=$(resolve_kit_dir "$_rkd_py" playbook render_playbook.py "$HERE") || exit 2
 PB="${PB_DIR##*/}"
+# TOOL-dFairHearing-27 S16: the lens-array bound's owning side is LENS_SLOTS in the review kit's fan-out rule.
+WF_DIR=$(resolve_kit_dir "$_rkd_py" workflows check-verifier-fanout.js "$HERE") || exit 2
+WF="${WF_DIR##*/}"
 # FX is the prefix the NEXT fixture is built at: this suite's own by default, and empty for the
 # root-install arms, which every install owes whatever prefix this suite itself sits at.
 FX=$PFX
@@ -270,12 +273,14 @@ say_fail() { fails=$((fails+1)); printf 'arm FAIL  %s — %s\n' "$1" "$2"; }
 # fixture <dir> — a minimal but VALID tree the gate passes on, so each arm breaks exactly one thing.
 fixture() {
   local d=$1
-  mkdir -p "$d/${FX}${MT_KIT}" "$d/${FX}${HOOKS}" "$d/${FX}lib" "$d/${FX}${GK}" "$d/.claude"
+  mkdir -p "$d/${FX}${MT_KIT}" "$d/${FX}${HOOKS}" "$d/${FX}${WF}" "$d/${FX}lib" "$d/${FX}${GK}" "$d/.claude"
   git -C "$d" init -q 2>/dev/null
   git -C "$d" config user.email t@t; git -C "$d" config user.name t
   cp "$GATE_SRC" "$d/${FX}check-playbook-parity.sh"
   : > "$d/${FX}${MT_KIT}/engine.sh"
-  printf 'const CAP = 5\nconst MAX_VERIFIERS = 5\nconst MAX_LENSES = 5\n' > "$d/${FX}${HOOKS}/agent-cap.js"
+  printf 'const CAP = 5\nconst MAX_VERIFIERS = 5\n' > "$d/${FX}${HOOKS}/agent-cap.js"
+  # The lens-array bound's owner (TOOL-dFairHearing-27 S16). Undeclared in the fixture's registry, so no kit to S1.
+  printf 'const LENS_SLOTS = 5\n' > "$d/${FX}${WF}/check-verifier-fanout.js"
   # The hook README states two of the bounds, the lens-array bound and the resolved-K ceiling, the
   # latter in the rule-2 sentence its row reads (TOOL-dGroundRules-21 S35, TOOL-dGroundRules-25 S34).
   printf 'an array LITERAL of <=5 elements\n- Any marker `K` it cannot resolve to an integer <=5, the hook MAX_VERIFIERS\n' \
@@ -397,9 +402,9 @@ arm "S4 at a root install a kit file citing a charter section reds" red \
 FX=$PFX
 
 # --- AC2 · the unit's central proof: a stated value drifting from the source that owns it ----------
-arm "AC2 MAX_LENSES drifts from the hook README's stated bound" red \
+arm "AC2 LENS_SLOTS drifts from the hook README's stated bound" red \
   "a declared value pair disagrees with the source that owns it. Pair lens-array bound" \
-  sh -c 'printf "const MAX_VERIFIERS = 5\nconst MAX_LENSES = 6\n" > '"${PFX}${HOOKS}/agent-cap.js"''
+  sh -c 'printf "const LENS_SLOTS = 6\n" > '"${PFX}${WF}/check-verifier-fanout.js"''
 arm "AC4 the renderer's TEMPLATE_MAJOR drifts from the template marker" red \
   "a declared value pair disagrees with the source that owns it. Pair template major" \
   sh -c 'printf "TEMPLATE_MAJOR = 3\n" > '"${PFX}${PB}/render_playbook.py"''

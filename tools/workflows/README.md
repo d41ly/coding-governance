@@ -689,7 +689,11 @@ a marked literal no default row fills (9); an opt-in row with no literal outside
 `check-verifier-fanout.sh` holds every marked literal to exactly five, so a sixth default row
 renders and reds there. The leg finds the literals through `render_lenses.py --markers <file>`, which
 prints the line number of each line the renderer's own anchored marker regex matches, so one predicate
-finds a marked literal and a comment naming `gov:lens-slots` is no marker; `check-verifier-fanout.js
+finds a marked literal and a comment naming `gov:lens-slots` is no marker. A `gov:lens-optins` line is
+never printed, so an opt-in literal is outside the count; and a predicate that cannot run, with no
+renderer beside the gate, no usable python, or `--markers` exiting non-zero, its python floor shared
+with the renderer, exits the leg 2 with `the marker predicate did not run (<reason>)`, never an empty
+marker list (TOOL-dFairHearing-27); `check-verifier-fanout.js
 --slots` counts each with `topLevelArgs`, rule 2's counter, over the hook's literal-blanked view, and
 `LENS_SLOTS` there is the one home of the five (TOOL-dFairHearing-23).
 
@@ -1027,11 +1031,15 @@ one.
 ### Replaying a review blind
 
 A blind replay reviews a past state of the tree in a clone that holds nothing after it, so no later
-record or object can reach a lens. The clone is made from a bundle of a transient ref, never by a
-`git clone` given `--branch`, which cannot name a `refs/replay/` ref and exits 128. `<name>` and the clone
-directory are fresh per replay, the directory under `%TEMP%`, never inside the worktree:
+record or object can reach a lens. The clone is made from a bundle of a transient ref,
+never `git clone --branch`, which cannot name a `refs/replay/` ref and exits 128. `<name>` and the clone
+directory are fresh per replay, the directory under `%TEMP%`, never inside the worktree. Run the
+recipe as one script from the repository, so its failure envelope holds (TOOL-dFairHearing-27 S22):
 
 ```bash
+set -e
+test ! -e "$TEMP/<name>" || { echo "replay: $TEMP/<name> exists"; exit 2; }
+trap 'git update-ref -d refs/replay/<name> 2>/dev/null' EXIT
 mkdir -p "$TEMP/<name>b"
 git update-ref refs/replay/<name> <commit>
 git bundle create "$TEMP/<name>b/h.bundle" refs/replay/<name>
@@ -1039,12 +1047,14 @@ git update-ref -d refs/replay/<name>
 git init "$TEMP/<name>"
 git -C "$TEMP/<name>" fetch "$TEMP/<name>b/h.bundle" refs/replay/<name>:refs/heads/<name>
 git -C "$TEMP/<name>" checkout <name>
-git -C "$TEMP/<name>" rev-list --count <name>            # above 0, or the clone is empty
+test "$(git -C "$TEMP/<name>" rev-parse HEAD)" = "$(git rev-parse <commit>)"   # the liveness check
 ```
 
-The `refs/replay/<name>` ref lives only until the bundle is written, so `git show-ref
-refs/replay/<name>` in the repository prints nothing afterwards, and the count line is the
-liveness check: a clone whose count is not above 0 replays nothing and is not scored.
+An existing `$TEMP/<name>` refuses with exit 2 before any ref is written, so a stale clone is never
+read as this replay's; `set -e` checks every step's exit status; and the EXIT trap deletes the
+transient `refs/replay/<name>` however the script ends, a failed `git bundle create` included, so
+`git show-ref refs/replay/<name>` in the repository prints nothing afterwards. The last line is the
+liveness check: a clone whose `HEAD` is not `<commit>` replays the wrong tree and is not scored.
 
 **A replayed spec audit passes the opt-in pack.** Its `<commit>` is a scratch commit on the original
 adding `memory/builds/dFairHearing/README.md` as it stands at `3708a705`, whose front matter is the

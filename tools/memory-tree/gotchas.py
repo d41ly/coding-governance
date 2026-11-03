@@ -398,11 +398,12 @@ def scan_dead_anchors(recs: list, paths, m: str) -> list:
 
 
 def check_gate_token(t: str, tracked: set, legs):
-    """Does backticked token `t` name a gate? True for a tracked path, a directory over tracked paths, or a
-    leg name; None when it is neither path and `legs` is None, so a leg name cannot be checked; else False.
+    """Does backticked token `t` name a gate? One of three states: True, resolved, for a tracked path, a
+    directory over tracked paths, or a leg name; None, unresolved because `legs is None`, so a leg name
+    cannot be checked; False, unresolved.
 
-    `check_invariant`'s resolution, lifted unchanged (TOOL-dFairHearing-23 S21) so `check_ungated` reads
-    a class's gate through the same rule.
+    `check_invariant` keeps its note on the None state, and `check_ungated` counts it ungated and
+    announces it as a note (TOOL-dFairHearing-27 S9), so both read a class's gate through this one rule.
     """
     if t in tracked or any(x.startswith(t.rstrip("/") + "/") for x in tracked):
         return True
@@ -412,22 +413,41 @@ def check_gate_token(t: str, tracked: set, legs):
 
 
 GATED_LINE_RE = re.compile(r"gated (?:by|in|at)", re.I)
+# From a `gated by|in|at` match to the end of its sentence: a full stop followed by whitespace or the
+# paragraph's end, never a dot inside a backticked token (TOOL-dFairHearing-27 S11).
+GATED_SCOPE_RE = re.compile(r"(?:`[^`]*`|\.(?=\S)|[^.`])*")
+GATED_SECTION_RE = re.compile(r"^## Gated by[ \t]*\n(.*?)(?=^## |\Z)", re.M | re.S | re.I)
+
+
+def extract_gated_scope(body: str) -> list:
+    """The text a class record names its gates in: each `gated by`, `gated in` or `gated at` match,
+    wherever it falls, to the end of its sentence across wrapped lines, and each `## Gated by` body."""
+    scopes = []
+    for para in re.split(r"\n[ \t]*\n", body):
+        flat = " ".join(para.split("\n"))
+        scopes += [GATED_SCOPE_RE.match(flat, m.end()).group(0) for m in GATED_LINE_RE.finditer(flat)]
+    return scopes + GATED_SECTION_RE.findall(body)
 
 
 def check_ungated(text: str, tracked: set, legs) -> bool:
     """Is this class record UNGATED? True when its body says `no machine gate`, or when no backticked
-    token on its `gated by`, `gated in` or `gated at` lines passes `check_gate_token`.
+    token in its gated scope (`extract_gated_scope`) passes `check_gate_token`.
 
     The BODY only, cut as `declares()` cuts it, so the front matter never decides. A token that cannot
-    be checked (no leg manifest) does not pass, so it reads ungated rather than gated.
+    be checked (no leg manifest) does not pass, so it reads ungated rather than gated, and is announced
+    on stderr as `check_invariant` notes it.
     """
     m = FM_RE.match(text)
     body = text[m.end():] if m else text
     if re.search(r"no machine gate", body, re.I):
         return True
-    return not any(check_gate_token(t, tracked, legs) is True
-                   for line in body.split("\n") if GATED_LINE_RE.search(line)
-                   for t in GUARD_TOKEN_RE.findall(line))
+    states = [(t, check_gate_token(t, tracked, legs)) for s in extract_gated_scope(body) for t in GUARD_TOKEN_RE.findall(s)]
+    if any(ok is True for _, ok in states):
+        return False
+    for t in dict.fromkeys(t for t, ok in states if ok is None):
+        print(f"gotchas: gate `{t}` NOT resolved — LEG_MANIFEST is blank, so a token that is not a tracked "
+              f"path cannot be checked against a leg name, and the class reads ungated", file=sys.stderr)
+    return True
 
 
 def check_invariant(rec: dict, tracked: set, legs, defined, why_undefined: str) -> tuple:
@@ -484,7 +504,9 @@ def render(recs: list, m: str) -> str:
         "One authored record per class. The table below is GENERATED from each record's front matter",
         "and its DERIVED anchors — do not hand-edit between the markers.",
         "",
-        "Hand a reviewer the classes their diff can hit:",
+        # TOOL-dFairHearing-27 S29: the review harness acquires the checklist itself on the diff kind.
+        "The review harness acquires the classes a diff can hit on the diff kind, so a reviewer is",
+        "handed them without a lookup. For a reader who wants the checklist:",
         "",
         "```bash",
         # THIS install's path, derived, because INDEX.md is committed in the adopter's tree (S5).
@@ -960,6 +982,20 @@ def cmd_selftest() -> int:
             lambda: print("ungated", check_ungated(f"Gated by `{PFX}check-wiring.sh`.\n", gate_set, set()),
                           check_ungated("There is no machine gate.\n", gate_set, set()),
                           check_ungated("Gated by `no-such-gate.sh`.\n", gate_set, set())) or 0)
+        # TOOL-dFairHearing-27 S9, S11 — the scope runs across wrapped lines to its sentence's end, a `## Gated by`
+        # body is read, and a leg name under a blank manifest reads ungated with a note. RED against the
+        # line-by-line reader of TOOL-dFairHearing-23, which read the two wrapped forms and the body as ungated.
+        def read_scoped_ungated():
+            err = io.StringIO()
+            with contextlib.redirect_stderr(err):
+                got = [check_ungated(f"Gated in\n`{PFX}check-wiring.sh`'s arm.\n", gate_set, set()),
+                       check_ungated(f"The lock is gated by\n`{PFX}check-wiring.sh`.\n", gate_set, set()),
+                       check_ungated(f"Prose.\n\n## Gated by\n\n`{PFX}check-wiring.sh` runs it.\n", gate_set, set()),
+                       check_ungated("## Gated by\n\n`fixture leg`\n", gate_set, None)]
+            print("scoped", *got, "note" if "`fixture leg` NOT resolved" in err.getvalue() else "silent")
+            return 0
+        arm("check_ungated: a wrapped gated sentence and a `## Gated by` body are gated, a leg under a blank "
+            "manifest is ungated and announced", "scoped False False False True note", read_scoped_ungated)
         arm("--declares is the one predicate: 'no machine gate' declares", "[rc=0]",
             lambda: 0 if declares(_rec("x", "d", "There is no machine gate for this.\n")) else 1)
         arm("--declares reads the BODY, not the front matter", "[rc=0]",

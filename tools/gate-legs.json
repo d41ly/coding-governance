@@ -339,7 +339,8 @@
     ],
     "guard": [
       "{prefix}/hooks/",
-      "{prefix}/lib/"
+      "{prefix}/lib/",
+      "{prefix}/workflows/spec-audit-optin.js"
     ],
     "chunk": "selftests",
     "subject": "kit",

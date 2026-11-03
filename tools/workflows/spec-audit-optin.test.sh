@@ -283,6 +283,8 @@ printf -- '---\nslug: tSA\n---\n' > "$SAREADME"
 check_spec_audit "rule0: spec-audit, README without the key → deny naming id + key + README" 2 \
   "TOOL-aBlindedTrial-6;;spec-audit:;;builds/tSA/README.md" \
   "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\",\"subjects\":[{\"path\":\"memory/builds/tSA/spec/s.md\",\"blob\":\"abc1234\"}]}"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1, here since TOOL-dFairHearing-27 S4): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 # S5 — the rule sits ABOVE the script read, so a `name:`-only invocation is judged too.
 check "rule0: spec-audit by NAME only, README without the key → deny" 2 \
   "{\"tool_name\":\"Workflow\",\"tool_input\":{\"name\":\"tier2-review\",\"args\":{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}}}"
