@@ -326,7 +326,8 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "no-owner", "ghost-owner", "no-purpose-source", "bad-purpose-source", "member-no-field", "pending-source",
           "registry-ghost", "registry-missing", "registry-joined", "new-no-purpose", "two-versions",
           "served-across", "positional-seed", "positional-new", "positional-stale", "positional-listed",
-          "positional-symbol", "positional-pinned", "positional-pin", "positional-forked-before")
+          "positional-symbol", "positional-pinned", "positional-pin", "positional-forked-before",
+          "positional-producer-new", "positional-producer-stale")
 #: PLAY-dOrderedCharter-44's `extractor-edit`: the fixture extractor's module edited to stop yielding one tag
 EDITED_EXTRACTOR = FIXTURE_EXTRACTOR.replace("elif len(word) == 1:",
                                              'elif len(word) == 1 and word[0] != "layer.memory.recall":')
@@ -751,7 +752,8 @@ def derive_cite(n, oid=None) -> str:
 
 
 def run_positional_plant(root, top, plant, say, check) -> int:
-    """S8's seven plants and PLAY-dOrderedCharter-47's forked-before plant over the fixture's own list. `check` runs the fixture's whole `check`, whose
+    """S8's seven plants, PLAY-dOrderedCharter-47's forked-before plant and PLAY-dOrderedCharter-48's two producer
+    plants over the fixture's own lists. `check` runs the fixture's whole `check`, whose
     `positional` arm each plant moves; a plant of several steps returns 0 only when every step held."""
     import positional as pos
     kit, guide = FIXTURE_KIT, "memory/guides/ALPHA.md"
@@ -846,6 +848,20 @@ def run_positional_plant(root, top, plant, say, check) -> int:
         say(f"the pre-fork record: rc={rc1}; a record after the merge: rc={rc2}; "
             f"the pre-fork record moved under tools: rc={rc3}")
         return 0 if (rc1, rc2, rc3) == (0, 1, 1) else 1
+    if plant in ("positional-producer-new", "positional-producer-stale"):  # PLAY-dOrderedCharter-48 S5
+        role = "tools/roles/agents/gov-x.agent.md"
+        write_commit(root, {role: "# gov-x\n\n- cite it by file:line\n"}, "a role source")
+        if plant == "positional-producer-new":
+            rc = check()
+            write_files(root, {role: "# gov-x\n\n- cite it by `path#symbol`, never by file:line\n"})
+            say(f"re-pointed to a stable form: rc={check()}")
+            return rc
+        seeded = pos.run_producers(root, kit, seed=True)
+        rc1, again = check(), pos.run_producers(root, kit, seed=True)
+        write_files(root, {role: "# gov-x\n\n- cite it by `path#symbol`\n"})
+        rc2 = check()
+        say(f"kept: rc={rc1}; a second seed: rc={again}; the kept line re-pointed: rc={rc2}")
+        return 0 if (seeded, rc1, again, rc2) == (0, 0, 1, 1) else 1
     # positional-pin: the unlisted citation re-pinned, and a file outside the repository refused
     write_commit(root, {POS_CODE: POS_MOD, guide: GUIDE + f"\nsee {derive_cite(2)}\n"}, "a citation")
     blob = run_git(root, "rev-parse", "--short=8", f"HEAD:{POS_CODE}").strip()

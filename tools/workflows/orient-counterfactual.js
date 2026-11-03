@@ -108,7 +108,7 @@ function renderPrompt(i) {
     '; the reuse-lookup probe is ' + (arm.reuse ? 'IN — run it where the engine asks' : 'OUT — skip it and say so in the card') + '.\n\n' +
     'Rules: never mint a session slug; write NO file and run NO command that mutates the tree; every ' +
     'question the engine would put to a user becomes a line under `open` in the card instead of an ask. ' +
-    'Cite files by path and line, never ingest them into the card.\n\n' +
+    'Cite code by `path#symbol` or the blob-pinned line `<path>@<oid>:<n>`, never ingest a file into the card.\n\n' +
     'Return JSON {ready, card, startMs, endMs, refusedStep, recallRan, reuseRan}: `ready` is the READY ' +
     'line the engine derives (empty if you never reached it); `card` is the orientation card body you ' +
     'would append — task, the rows you read, the records recall found, the gotcha classes, the open ' +

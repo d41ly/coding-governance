@@ -1210,7 +1210,7 @@ const finderResults = await boundedParallel(
         checklistBlock[L.key] +
         `\n` +
         (isSpec
-          ? `Emit CONCRETE findings only — each needs file, where, severity (blocker|high|medium|low), with "where" being the section address, e.g. "section 2 S5", a one-line claim, the impact, a proposed fix, and evidence: the command you ran and what it printed, or read: <path>:<line> for a finding that rests on reading alone. A spec finding is often the ABSENCE of a line, so address it by section. Every finding is ABOUT the spec set; its evidence may come from anywhere in ${repo} at HEAD.` +
+          ? `Emit CONCRETE findings only — each needs file, where, severity (blocker|high|medium|low), with "where" being the section address, e.g. "section 2 S5", a one-line claim, the impact, a proposed fix, and evidence: the command you ran and what it printed, or read: <path>#<symbol>, or the blob-pinned line <path>@<sha8>:<line> at HEAD, for a finding that rests on reading alone. A spec finding is often the ABSENCE of a line, so address it by section. Every finding is ABOUT the spec set; its evidence may come from anywhere in ${repo} at HEAD.` +
             (roles[finderKey] ? '' : ` No speculation, no style nits.`) + ` If nothing real, return findings: [].\n`
           : `Emit CONCRETE findings only — each needs file, line, severity (blocker|high|medium|low), a one-line claim, the impact, and a proposed fix. ` +
             (roles[finderKey] ? `Nothing outside the diff.` : `No speculation, no style nits, nothing outside the diff.`) + ` If nothing real, return findings: [].\n`) +

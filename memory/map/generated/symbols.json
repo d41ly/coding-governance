@@ -5458,6 +5458,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "check_producers",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "check_projection",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -16523,6 +16528,16 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_producer_rows",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "read_producers",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "read_profile_legs",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -23091,6 +23106,11 @@
       "id": "run_proc",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_producers",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
     },
     {
       "id": "run_profile",

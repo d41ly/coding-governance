@@ -3,6 +3,7 @@
 
     python positional.py seed | shrink | check
     python positional.py pin <file> [--at <rev>]
+    python positional.py producers [--seed]
     python positional.py --selftest
 
 A file:line citation is `<path>.<ext>:<n>[-<m>]`, `<ext>` in CODE_EXTENSIONS. Every one the tree held at
@@ -23,6 +24,10 @@ A record deleted and re-added after `L` is graded from its original add, the old
 so a record first added before `L` stays grandfathered. `seed` writes the rows
 once and refuses a list already holding a file:line row; `shrink` drops the stale rows and never adds
 one; `pin` rewrites a file's unlisted file:line citations to the blob-pinned line at `--at` (HEAD).
+`producers` prints every hit of PRODUCER_RE over PRODUCER_PATHSPECS, the directive sources, a render's
+hits carried by its `.template.` source (PLAY-dOrderedCharter-48); `--seed` writes `positional-producers.txt`
+once, a `<path>\\t<line text>` row per hit naming no stable form. The arm's `producers` limb reds a hit
+neither kept nor naming a stable form, and a kept row no hit carries.
 Exit 0 green, 1 red, 2 a refusal (a refused policy read, an unreadable list, a git failure).
 """
 from __future__ import annotations
@@ -56,6 +61,13 @@ NAME = r"[A-Za-z_][A-Za-z0-9_]*"
 SYMBOL_RE = re.compile(rf"([{PATH_CHARS}]+)\.([A-Za-z0-9]+)#({NAME}(?:\.{NAME})?)")
 SH_DEF_RE = re.compile(r"^\s*(?:function\s+([A-Za-z_][\w-]*)|([A-Za-z_][\w-]*)\s*\(\s*\))", re.M)
 JS_DEF_RE = re.compile(r"\b(?:function\*?\s+|class\s+)([A-Za-z_$][\w$]*)|\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=")
+#: PLAY-dOrderedCharter-48: the directive sources a writer reads, and the spellings that tell it to cite a line
+PRODUCER_RE = r"file:line|path and line|<path>:<line>"
+PRODUCER_PATHSPECS = ("tools/roles/agents/", "tools/workflows/", "skills/", "coding-governance-agents.template.md",
+                      "tools/*/SKILL.template.md", "tools/*/*.template.md")
+PRODUCERS_NAME = "positional-producers.txt"
+#: a producer line naming a stable form, spelled as a placeholder or as a real pin, directs no line citation
+STABLE_FORM_RE = re.compile(r"#<?symbol>?|@<(?:oid|sha8?)>:|" + PINNED_RE.pattern)
 
 
 def read_positional_mode(root, sets=None) -> str:
@@ -91,10 +103,10 @@ def check_file_line_row(row: str) -> bool:
     return bool(FILE_LINE_RE.fullmatch(row.partition("\t")[2]))
 
 
-def read_git_grep(root, pattern, kit_rel) -> list[tuple[str, str]]:
-    """(path, line) for every line of a tracked text file in the working tree matching ERE `pattern`, the
-    positional list left out of its own scan."""
-    argv = ["git", "-C", str(root), "grep", "-I", "-n", "-z", "-E", pattern, "--", ".",
+def read_git_grep(root, pattern, kit_rel, paths=(".",), flags=(), numbered=False) -> list[tuple]:
+    """(path, line), or (path, n, line) when `numbered`, for every line of a tracked text file in the
+    working tree under `paths` matching ERE `pattern`, the positional list left out of its own scan."""
+    argv = ["git", "-C", str(root), "grep", "-I", "-n", "-z", *flags, "-E", pattern, "--", *paths,
             f":!{kit_rel}/{LIST_NAME}"]
     try:
         p = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8", errors="replace")
@@ -106,8 +118,72 @@ def read_git_grep(root, pattern, kit_rel) -> list[tuple[str, str]]:
     for rec in p.stdout.split("\n"):
         parts = rec.split("\0", 2)
         if len(parts) == 3:
-            hits.append((parts[0], parts[2]))
+            hits.append((parts[0], int(parts[1]), parts[2]) if numbered else (parts[0], parts[2]))
     return hits
+
+
+def read_producers(root, kit_rel) -> list[tuple[str, int, str]]:
+    """(path, n, trimmed line) for every hit of PRODUCER_RE over PRODUCER_PATHSPECS, case-insensitive; a
+    render's hits are dropped where its `<stem>.template.<ext>` source sits beside it, which carries them."""
+    hits = read_git_grep(root, PRODUCER_RE, kit_rel, PRODUCER_PATHSPECS, ("-i",), numbered=True)
+
+    def check_render(path):
+        head, dot, ext = path.rpartition(".")
+        return bool(dot) and ".template." not in path and (pathlib.Path(root) / f"{head}.template.{ext}").is_file()
+    return [(p, n, t.strip()) for p, n, t in hits if not check_render(p)]
+
+
+def read_producer_rows(path) -> list[str] | None:
+    """The kept producer list's `<path>\\t<line text>` rows, its `# ` reason lines left out; None if absent."""
+    rows = read_list(path)
+    return None if rows is None else [r for r in rows if not r.startswith("#")]
+
+
+def check_producers(root, kit_rel, mode) -> tuple[list, list, dict]:
+    """The `producers` limb: a hit neither kept nor naming a stable form is red, as is a kept row no hit
+    carries; under `refuse` a kept hit is red too. -> (findings, lines, counts)."""
+    say, rel = "tags: positional · producer", f"{kit_rel}/{PRODUCERS_NAME}"
+    rows = read_producer_rows(pathlib.Path(root) / rel)
+    kept = set(rows or ())
+    hits = read_producers(root, kit_rel)
+    carried = {f"{p}\t{t}" for p, _n, t in hits}
+    remedy = (f"re-point it to `path#symbol` or a blob-pinned line `<path>@<oid>:<n>`, or keep it with a "
+              f"`<path>\\t<line>` row under a `# ` reason in {rel}")
+    findings = [f"{say} · {p}:{n} · {t} · {remedy}" for p, n, t in hits
+                if f"{p}\t{t}" not in kept and not STABLE_FORM_RE.search(t)]
+    unlisted = len(findings)
+    findings += [f"{say} stale · {r.replace(chr(9), ' · ')} · no hit carries the row; drop it from {rel}"
+                 for r in sorted(kept - carried)]
+    if mode == "refuse":
+        findings += [f"{say} listed · {p}:{n} · {t} · tags.positional is refuse; {remedy}"
+                     for p, n, t in hits if f"{p}\t{t}" in kept]
+    lines = [f"{say}s · {len(hits)} hits, {len(kept)} kept rows, {unlisted} unlisted, "
+             f"{len(kept - carried)} stale{'' if rows is not None else f'; {rel} is absent, so nothing is kept'}"]
+    return findings, lines, {"producers": len(hits), "producers_kept": len(kept), "producers_unlisted": unlisted,
+                             "producers_stale": len(kept - carried)}
+
+
+def run_producers(root, kit_rel, seed=False) -> int:
+    """`positional.py producers`: every hit as `<path>:<n>\\t<line>`. `--seed` writes the kept list once, a
+    row per hit naming no stable form, and refuses a list already holding a row."""
+    hits = read_producers(root, kit_rel)
+    if not seed:
+        for p, n, t in hits:
+            print(f"{p}:{n}\t{t}")
+        return 0
+    path = pathlib.Path(root) / kit_rel / PRODUCERS_NAME
+    held = read_producer_rows(path) or []
+    if held:
+        print(f"positional: producers seed refused · {kit_rel}/{PRODUCERS_NAME} already holds {len(held)} rows; "
+              "the seed runs once, and the list only ever shortens after it")
+        return 1
+    rows = sorted({f"{p}\t{t}" for p, _n, t in hits if not STABLE_FORM_RE.search(t)})
+    head = ("# The producer hits kept: one `<path>\\t<the line's text, trimmed>` row each, keyed by text and never\n"
+            "# by line number, a `# ` reason line above each group (PLAY-dOrderedCharter-48).\n")
+    path.write_bytes((head + "".join(f"{r}\n" for r in rows)).encode("utf-8"))
+    print(f"positional: producers seeded {len(rows)} rows" if rows else
+          "positional: producers seeded a header and no row: the query found no hit naming no stable form")
+    return 0
 
 
 def read_file_line_rows(root, kit_rel) -> set[str]:
@@ -308,7 +384,9 @@ def check_positional(root, kit_rel, mode, memory_root) -> tuple[list, list, dict
     p_reds, p_printed, pins = check_pins(root, kit_rel, frozen)
     s_reds, s_printed, symbols, passed = check_symbols(root, frozen)
     findings += [f"{say}pin · {x}" for x in p_reds] + [f"{say}symbol · {x}" for x in s_reds]
-    lines = grandfathered + [f"{say}pin, frozen record, printed · {x}" for x in p_printed]
+    w_reds, w_lines, w_counts = check_producers(root, kit_rel, mode)  # PLAY-dOrderedCharter-48: the producers limb
+    findings += w_reds
+    lines = w_lines + grandfathered + [f"{say}pin, frozen record, printed · {x}" for x in p_printed]
     lines += [f"{say}symbol, frozen record, printed · {x}" for x in s_printed]
     held = sum(1 for r in rows if check_file_line_row(r))
     if not held:
@@ -316,7 +394,7 @@ def check_positional(root, kit_rel, mode, memory_root) -> tuple[list, list, dict
     counts = {"mode": mode, "file_line_rows": held, "section_rows": len(rows) - held,
               "unlisted": len(unlisted), "grandfathered": len(grandfathered), "stale": len(listed - tree), "pins": pins,
               "pins_red": len(p_reds), "pins_printed": len(p_printed), "symbols": symbols,
-              "symbols_red": len(s_reds), "symbols_printed": len(s_printed), "passed_over": passed}
+              "symbols_red": len(s_reds), "symbols_printed": len(s_printed), "passed_over": passed, **w_counts}
     lines.append(f"{say}{mode} · {held} file:line and {len(rows) - held} section rows listed, "
                  f"{counts['unlisted']} unlisted, {len(grandfathered)} grandfathered, "
                  f"{counts['stale']} stale; {pins} pins read, {len(p_reds)} red, "
@@ -450,6 +528,10 @@ positional-forked-before|0|positional — grandfathered: memory/builds/x/build/r
 positional-forked-before|0|tags: positional · unlisted · memory/builds/x/build/after.md · {x}:2
 positional-forked-before|0|tags: positional · unlisted · tools/notes.md · {x}:1
 positional-forked-before|0|the pre-fork record: rc=0; a record after the merge: rc=1; the pre-fork record moved under tools: rc=1
+positional-producer-new|1|tags: positional · producer · tools/roles/agents/gov-x.agent.md:3 · - cite it by file:line · re-point it
+positional-producer-new|1|re-pointed to a stable form: rc=0
+positional-producer-stale|0|tags: positional · producer stale · tools/roles/agents/gov-x.agent.md · - cite it by file:line · no hit
+positional-producer-stale|0|kept: rc=0; a second seed: rc=1; the kept line re-pointed: rc=1
 """
 
 
@@ -480,9 +562,10 @@ def run_selftest() -> int:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="positional.py", description="the positional population and its stable forms")
-    ap.add_argument("verb", nargs="?", choices=("seed", "shrink", "pin", "check"))
+    ap.add_argument("verb", nargs="?", choices=("seed", "shrink", "pin", "check", "producers"))
     ap.add_argument("file", nargs="?")
     ap.add_argument("--at", default="HEAD")
+    ap.add_argument("--seed", action="store_true", help="producers: write the kept list once")
     ap.add_argument("--selftest", action="store_true")
     a = ap.parse_args(argv)
     if a.selftest:
@@ -498,6 +581,8 @@ def main(argv=None) -> int:
             if not a.file:
                 ap.error("pin takes <file>")
             return run_pin(root, kit_rel, a.file, a.at)
+        if a.verb == "producers":
+            return run_producers(root, kit_rel, a.seed)
         return {"seed": run_seed, "shrink": run_shrink, "check": run_check}[a.verb](root, kit_rel)
     except PolicyRefused as exc:
         print(f"tags: refused · {exc.key} · {exc.line}", file=sys.stderr)

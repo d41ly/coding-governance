@@ -1,0 +1,17 @@
+# The producer hits kept: one `<path>\t<the line's text, trimmed>` row each, keyed by text and never
+# by line number, a `# ` reason line above each group (PLAY-dOrderedCharter-48).
+# narration of the old form: the line describes a `file:line` join, key or reader, and directs no citation
+tools/memory-tree/HYGIENE.template.md	`check-method-carriers.sh`. Keyed on PATH alone, never `<path>:<line>`. It is per-repo and the kit
+tools/workflows/README.md	candidate side prints how many of its confirmed rows carry no readable `file:line`, and is refused
+tools/workflows/README.md	first backticked `file:line`). Recall from the two record eras is therefore in different units.
+tools/workflows/check-review-join.sh	#   * COLLISION — two findings at one file:line (normal when two lenses read one function) collapse
+tools/workflows/check-review-join.sh	# that join on a `file:line` STRING the skeptic has to reproduce byte-for-byte has two failure modes,
+tools/workflows/check-review-join.test.sh	// The retired join was `verdicts[v.ref] = v`, which collided on a shared file:line.
+tools/workflows/review_replay.py	Each item is `{id, path, line}`, path and line None when the item is UNSCORABLE; in `spec-audit`
+tools/workflows/tier2-review.template.js	// (b) COLLISION — two findings at one file:line are entirely normal when two lenses read the same
+tools/workflows/tier2-review.template.js	// integer id, never by `ref` (two findings at one file:line would collapse into one row).
+# a read directive: the writer re-reads the line a finding already cites, and writes no citation
+tools/roles/agents/gov-skeptic.agent.md	- Re-run the finding's evidence yourself: the command it names, or the path and line it cites.
+tools/workflows/tier2-review.template.js	`Then re-run the finding's evidence under the PROBE POLICY above: run the command it names, or re-read the path and line it names, and say in \`reason\` what you observed.\n` +
+# a citation of a document line: a record's line, whose suffix CODE_EXTENSIONS does not hold
+tools/runlog/SKILL.template.md	`<path>:<line>`, a run-state line by its time and verb, a commit by its sha, or a journal line by

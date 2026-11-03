@@ -257,7 +257,14 @@ to its section; `positional-refs.txt` keeps the live positional references, one 
 each, as `--list-positional` prints them. An unlisted file:line citation in a `<MEMORY_ROOT>/builds/`
 record whose adding commit does not descend from the commit that added `positional.py` is printed
 `positional — grandfathered:` and never red, since it was written on a branch that never held the
-check (PLAY-dOrderedCharter-47). The `tags` leg runs `check`; the user page is `help/tags.md`.
+check (PLAY-dOrderedCharter-47). The sources that tell a writer what to cite are a query, not a list:
+`positional.py producers` prints every line of the directive sources (`PRODUCER_PATHSPECS`: the role and
+workflow sources, `skills/`, the charter template and the kits' `.template.` sources) spelling
+`file:line`, `path and line` or `<path>:<line>`, a render's lines carried by its `.template.` source.
+`positional-producers.txt` keeps the hits that direct no line citation, one `<path>` TAB `<line text>`
+row each under a `# ` reason, seeded once by `producers --seed`; the arm's `producers` limb reds a hit
+neither kept nor naming `path#symbol` or a blob-pinned line, and a kept row no hit carries
+(PLAY-dOrderedCharter-48). The `tags` leg runs `check`; the user page is `help/tags.md`.
 
 PLAY-dOrderedCharter-22 adds the `purpose` arm to `check`. Each registry row's `owner` names a build of
 the chain registry, `memory/project/chain.toml` (one `[[build]]` row per build, its `slug` and its
