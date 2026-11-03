@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-1 — the owed replays: the design-audit preset run blind at blob 767187aa, and the verdicts that flip the dark switches
 
-**Status:** INPROGRESS · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dFairHearing-19
+**Status:** INPROGRESS · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0068@d09495d0 whole
 
@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dFairHearing-1-departures-spec.md](../build/2026-10-23-build-TOOL-dFairHearing-1-departures-spec.md) | journal | — |
 | [2026-10-23-build-TOOL-dFairHearing-1-deviation-11.md](../build/2026-10-23-build-TOOL-dFairHearing-1-deviation-11.md) | deviation | — |
 | [2026-10-23-build-TOOL-dFairHearing-1-deviation-19.md](../build/2026-10-23-build-TOOL-dFairHearing-1-deviation-19.md) | deviation | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-1-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-1-builder-return.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-1-reuse-scout.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-1-reuse-scout.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-2-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-3-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-3-spec-writer.md) | journal | — |
@@ -25,6 +26,8 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md) | research | TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-11-02-prompt-TOOL-dFairHearing-1-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-1-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-1-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-fix-brief.md) | research | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md) | research | TOOL-dFairHearing-10 TOOL-dFairHearing-22 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-21 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 |
 | [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
@@ -50,7 +53,9 @@ the replay's raw outputs.
   `…-build-TOOL-dFairHearing-1-known-set.md`. It opens `**Serves:** research TOOL-dFairHearing-1`,
   states `**Population:** 65 · reviewed 59 · escaped 6 · high 8`, and holds one table row per known
   defect: `| tag | address | grade | escaped |`. `tag` is the defect's slug; `address` is
-  `<record path>:[<section tag>]`, the form `extract_tag_ref` reads; `grade` is `high`, `medium` or
+  `<record path>:[<section tag>]`, the form `extract_tag_ref` reads, its tag the first `[tag]` of the
+  row's source finding which at least one confirmed finding of every round that found the defect also
+  cites (§4 The known set, §8 F6); `grade` is `high`, `medium` or
   `ungraded`; `escaped` is `yes` or `no`. Observed by AC1.
 - **S2** — `parse_known_set(text)` in the factory's `review-replay` instance, and `review_replay.py
   --known-set <src> --candidate <src> [--matched <src>]`. The reader refuses a row count or a
@@ -121,10 +126,23 @@ the replay's raw outputs.
 The 59 reviewed rows are the `[map]` rows of
 `memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-runtime-reviews-compared.md:162-224`
 that carry a confirmed finding: every row but `prose-ceilings` and `slug-shape`, which only refuted
-findings name. A row's `address` is the first `[tag]` of the lowest-numbered confirmed finding
-`[map]` places on it, run A's ids before run B's, read from the two reports' appendices. Its grade is
-`high` for the eight defects `[numbers]` grades high (:90-98) and `medium` otherwise, since that
-instrument grades only those two (:74).
+findings name. A row's source finding is the lowest-numbered confirmed finding `[map]` places on it,
+run A's ids before run B's, read from the two reports' appendices. Its `address` is the source's
+record path and the first `[tag]` of the source's ref which at least one confirmed finding of every
+round that found the defect also cites (§8 F6). A defect one round found takes its source's first
+tag; the builder's probe found such a tag for every row both rounds found. The rule departs from the
+source's own first tag on two rows, both to `[supervise]`: `executor-map` (`[map]` :171), whose source
+A5 opens `[extend]`, which B10, run B's only finding on it, does not cite; and `inflight-count`
+(:175), whose source A8 opens `[invariants]`, which neither B12 nor B54 cites. Its grade is `high`
+for the eight defects `[numbers]` grades high (:90-98) and `medium` otherwise, since that instrument
+grades only those two (:74).
+
+`codex-events` (:186) takes `[policies]`, not `[harness]`: A22's and B13's refs spell the tag
+`[\harness]` (runtime-a report :539, runtime-b report :467), which `TAG_REF`
+(`tools/workflows/replay_scorer.py:81`) does not read, so A22's first readable tag is `[policies]`,
+which B13 also cites. No figure moves. The spelling is the reports' own and the reports are not
+edited (§3), so the build keeps `[policies]` and treats neither the row nor the reader as a defect to
+fix.
 
 The six escaped rows are the defects found after both rounds: the four the fold found (`[neither]`,
 :226-245) and the two the floor probe found
@@ -163,7 +181,11 @@ refusing each. The address check holds every pair to a cited `[tag]`, so an adju
 cross sections the finding never cited; a defect found only under a tag its finding does not cite is
 a miss. Matching by any cited tag, not only the first, is deliberate: the baseline's 46 and 45 were
 placed by reading, and a first-tag-only scorer would hold the preset to a harsher measure than the
-baseline it must match.
+baseline it must match. Under the address rule of The known set the scorer reproduces 46 and 45:
+every round that found a defect holds a confirmed finding citing its row's tag, so each `[map]`
+placement is a pair the address check admits, and neither moved row is graded high, so 6/8 and 8/8
+stand. Under the source's own first tag it would not: run B scores 43, with `executor-map` and
+`inflight-count` unmatched (`2026-11-03-build-TOOL-dFairHearing-1-1-builder-return`).
 
 ### The other three replays
 
@@ -319,6 +341,20 @@ The record writes under `memory/builds/` owe the two recall-floor legs by the gu
   `design-audit` for design records. (b) A harness default of `design-audit` for every spec audit,
   which unit specs then also get, against the clause's "for design records" (veto 1). Recommendation
   (a). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+- **F6 — Which tag does a known row's address take when the rounds that found its defect cite
+  different tags?** The builder's probe
+  (`2026-11-03-build-TOOL-dFairHearing-1-1-builder-return`) showed the rev-4 rule, the source
+  finding's first tag, caps run B's calibration at 43/59 for any correct build: `executor-map` takes
+  `[extend]` from A5, which B10 does not cite, and `inflight-count` takes `[invariants]` from A8,
+  which B12 and B54 do not cite. (a) The first `[tag]` of the source finding which at least one
+  confirmed finding of every round that found the defect also cites. (b) An address may hold more
+  than one tag. (c) AC3's run-B figure restated as 43/59, the two-row deficit a recorded departure.
+  (c) fails AC3 as written, so veto 1 discards it. (a) and (b) both meet AC3; (b) widens the row
+  grammar `TOOL-dFairHearing-18` reuses through its hands-off edge, and `extract_tag_ref`
+  (`tools/workflows/replay_scorer.py:200-210`) returns one key, so S2's address check and that unit's
+  seeded key would each owe a follow-up. (a) leaves none open: the probe moves only those two rows,
+  both to `[supervise]`, and leaves every row a qualifying tag. Recommendation (a). Rung 3. RESOLVED
+  (agent, 2026-11-03, delegated): (a). widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -328,6 +364,10 @@ The record writes under `memory/builds/` owe the two recall-floor legs by the gu
   `2026-10-23-build-TOOL-dFairHearing-1-deviation-11`; nothing else changed.
 - rev-3 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
 - rev-4 · 2026-10-23 · §3 · the disposal of the spec audit of units 20 to 23: a hands-off edge to TOOL-dFairHearing-25, which runs replay 1 after unit 23's corrections and supersedes AC4, AC5 and AC9's replay-1 half.
+- rev-5 · 2026-11-03 · §8 F6 · a new fork on the builder's DIVERGENCE, resolved (a) by M3, per the fix brief `2026-11-03-prompt-TOOL-dFairHearing-1-fix-brief`.
+- rev-5 · 2026-11-03 · S1 · §4 The known set · the address rule becomes F6's (a), moving `executor-map` and `inflight-count` to `[supervise]`, per `2026-11-03-prompt-TOOL-dFairHearing-1-fix-brief`.
+- rev-5 · 2026-11-03 · §4 Scoring · the claim that the scorer reproduces 46 and 45 now rests on F6's rule, naming the two rows and run B's 43 under the old one, per `2026-11-03-prompt-TOOL-dFairHearing-1-fix-brief`.
+- rev-5 · 2026-11-03 · §4 The known set · `codex-events` takes `[policies]` because `TAG_REF` does not read A22's and B13's `[\harness]`; no figure moves and it is not a defect to fix, per `2026-11-03-prompt-TOOL-dFairHearing-1-fix-brief`.
 
 ## 10. Reuse audit
 

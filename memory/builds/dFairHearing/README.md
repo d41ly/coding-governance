@@ -101,7 +101,7 @@ ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHea
 | [TOOL-dFairHearing-22 — agent-cap fails closed on a spec-audit call when the opt-in pack is not beside it](spec/2026-10-23-spec-TOOL-dFairHearing-22.md) | 12 | 2 | CLOSED | rev-4 | 2026-11-03 |
 | [TOOL-dFairHearing-12 — the scorer factory: one replay scorer, with aScoutedSeam's grader as its second instance](spec/2026-10-23-spec-TOOL-dFairHearing-12.md) | 13 | 2 | CLOSED | rev-3 | 2026-11-03 |
 | [TOOL-dFairHearing-14 — the experiment shape's method, enforced or recorded by the scorer factory](spec/2026-10-23-spec-TOOL-dFairHearing-14.md) | 14 | 2 | CLOSED | rev-5 | 2026-11-03 |
-| [TOOL-dFairHearing-1 — the owed replays: the design-audit preset run blind at blob 767187aa, and the verdicts that flip the dark switches](spec/2026-10-23-spec-TOOL-dFairHearing-1.md) | 15 | 2 | INPROGRESS | rev-4 | 2026-10-23 |
+| [TOOL-dFairHearing-1 — the owed replays: the design-audit preset run blind at blob 767187aa, and the verdicts that flip the dark switches](spec/2026-10-23-spec-TOOL-dFairHearing-1.md) | 15 | 2 | INPROGRESS | rev-5 | 2026-10-23 |
 | [TOOL-dFairHearing-21 — the held-out freeze check hashes the bytes it scores and refuses a shallow history](spec/2026-10-23-spec-TOOL-dFairHearing-21.md) | 15 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dFairHearing-15 — the review's bug-class checklist, selected by the pinned range and handed by the harness itself](spec/2026-10-23-spec-TOOL-dFairHearing-15.md) | 16 | 2 | DEFERRED | rev-6 | 2026-11-03 |
 | [TOOL-dFairHearing-17 — each review round's state, computed by the harness and carried in its record](spec/2026-10-23-spec-TOOL-dFairHearing-17.md) | 17 | 2 | DEFERRED | rev-5 | 2026-11-03 |
@@ -126,7 +126,7 @@ ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHea
 | [TOOL-dFairHearing-40 — the round-5 spec audit's 35 minors: one build-wide version reading on one base, an attempt checker that refuses what it cannot place, and criteria a correct build can pass](spec/2026-10-23-spec-TOOL-dFairHearing-40.md) | 26 | 2 | DEFERRED | rev-2 | 2026-11-03 |
 <!-- /gen:build-units -->
 
-Records: 161 bound to this build, across 4 record folder(s).
+Records: 164 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
