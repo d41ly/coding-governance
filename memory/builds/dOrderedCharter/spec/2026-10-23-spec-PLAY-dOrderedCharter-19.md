@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-19 — the tag grammar, its namespace registry, the derived SQLite tag index and its one resolver, and the join factory moved to the core
 
-**Status:** DEFERRED · rev-7 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 4 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-8 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 4 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0049@a87d159d whole
 **Carries:** node:system.tags
@@ -463,7 +463,7 @@ AC16's measurement, printing its zero graded citations rather than reading them 
 
 ## 7. Gates
 
-`memory hygiene` · `python resolver (behaviour + inline parity + idiom ban)` · `codebase-map coverage + freshness` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `recall floor` · `memory-recall kit selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `playbook render selftest` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `kit epoch (shipped bytes move, the version moves)`
+`memory hygiene` · `python resolver (behaviour + inline parity + idiom ban)` · `codebase-map coverage + freshness` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `recall floor` · `memory-recall kit selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `playbook render selftest` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `kit epoch (shipped bytes move, the version moves)` · `straggler-guard arms`
 
 dGroundRules' policy legs, `policy check` and `policy fixtures`, run `arm_summaries`, the mirror's
 parity and the reader-coverage arm over this unit's rows and calls; they are named here rather than
@@ -544,6 +544,7 @@ New arm: tools/codebase-map/selftest.py · covers AC10 AC17 · the selftest's co
   AC17, the core reading no codebase-map conf; `resolve_compare_base` rides as a `compare_base_py`
   copy; stale lines re-cited at HEAD.
 - rev-7 · 2026-11-03 · §4 Files touched · AC10 · AC17 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 1: AC17 observes the moved `derive_baseline_additions` by a probe of its four answers in a scratch repository, and AC10 the re-export by a `map_lib` probe, neither by a suite run, the codebase-map selftest staying on §7's `New arm:` line; Files touched adds `tools/govkit/usage.toml`, `.lexicon.conf` and `memory/project/docs-undocumented.txt`.
+- rev-8 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md`, the main loop's confirming sweep: rev-7's Files touched names `.lexicon.conf`, which trips the `straggler-guard arms` guard, so the §7 leg line names that leg.
 
 ## 10. Reuse audit
 
