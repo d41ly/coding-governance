@@ -7463,6 +7463,26 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "deriveRoundFields",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveRoundFields",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "deriveRoundState",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveRoundState",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "deriveSidecarPath",
       "kind": "function",
       "file": "tools/unattended/run-lease.js"
@@ -18296,6 +18316,16 @@
       "id": "renderRoster",
       "kind": "function",
       "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
+      "id": "renderRoundLine",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderRoundLine",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "renderRouteContext",

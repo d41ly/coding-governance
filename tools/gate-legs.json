@@ -741,7 +741,8 @@
     ],
     "guard": [
       "{prefix}/workflows/",
-      "{prefix}/memory-tree/gen_build_index.py"
+      "{prefix}/memory-tree/gen_build_index.py",
+      "{prefix}/unattended/unattended.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",

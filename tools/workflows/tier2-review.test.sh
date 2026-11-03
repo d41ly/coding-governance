@@ -446,6 +446,78 @@ ck(missing.length === 0, 'the args header documents all ' + fields.length + ' fi
 const subjectsKey = (hdr.match(/^\/\/\s+subjects:.*$/m) || [''])[0]
 ck(/\bid\b/.test(subjectsKey) && /\brev\b/.test(subjectsKey), 'pin: the args header documents a spec-audit subject\'s id and rev: ' + subjectsKey)
 
+// ---- TOOL-dFairHearing-17 AC1-AC4 — the round state's pure rule, its record line, and its two arguments.
+// The rule and the renderer are prelude functions, reached through the extracted body. Against the base
+// harness, which defines no deriveRoundState and reads neither argument, every arm below reds.
+const RS_SPEC = { kind: 'spec-audit', subjects: [{ path: 'memory/builds/dX/spec/a.md', blob: BLOB, id: 'TOOL-x-1', rev: 2 }] }
+let roundFns = null
+try {
+  roundFns = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn [deriveRoundState, renderRoundLine]')(
+    Object.assign({}, base, RS_SPEC, { round: 1 }), () => {}, null, null, null)
+} catch (e) { console.log('HARNESS-BROKEN round state: the prelude did not yield deriveRoundState -> ' + e.message) }
+const ROUND_ROWS = [
+  // AC1 - the planted flat and oscillating sequences stop; their strictly falling twins do not.
+  ['flat', [3], 3, 5, 'NON-CONVERGENT'], ['oscillating', [2, 1], 2, 5, 'NON-CONVERGENT'],
+  ['falling twin of flat', [3], 2, 5, 'CONVERGING'], ['falling twin of oscillating', [3, 2], 1, 5, 'CONVERGING'],
+  // AC2 - the bound at the caller's limit, the ceiling one run past it, and no limit reaching neither.
+  ['at the limit', [3, 2], 1, 3, 'BOUNDED'], ['one run past the limit', [4, 3, 2], 1, 3, 'CEILING'],
+  ['under the limit', [3], 2, 3, 'CONVERGING'], ['no limit', [3, 2], 1, null, 'CONVERGING'],
+  // AC3 - zero first, past the limit too; round 1's bound and its non-terminal twin.
+  ['clean round 1', [], 0, 3, 'CONVERGED'], ['clean after a fall', [2, 1], 0, 3, 'CONVERGED'], ['clean past the limit', [4, 3, 2], 0, 3, 'CONVERGED'],
+  ['round 1 at a limit of 1', [], 2, 1, 'BOUNDED'], ['round 1 under a limit of 3', [], 2, 3, 'CONVERGING'],
+]
+for (const [what, prior, count, limit, want] of ROUND_ROWS) {
+  const got = roundFns ? roundFns[0](prior, count, limit) : 'no function'
+  ck(got === want, 'round state: ' + what + ' deriveRoundState(' + JSON.stringify(prior) + ', ' + count + ', ' + limit + ') is ' + want + ': ' + got)
+}
+{
+  const line = roundFns ? roundFns[1]({ round: 1, roundLimit: null, priorCounts: [], roundCount: null, roundState: null }) : 'no function'
+  ck(line === 'review-round round=1 limit=- prior=- count=- state=-', 'round state: renderRoundLine writes every absent value as -, never 0: ' + line)
+}
+// AC4 - both arguments refused by name, before any agent; a round that disagrees with its prior sequence is refused naming both.
+for (const v of [0, 2.5, '3']) arm('round state: roundLimit ' + JSON.stringify(v) + ' -> refused naming roundLimit', Object.assign({}, RS_SPEC, { round: 1, roundLimit: v }), '`roundLimit`')
+for (const v of ['x', [1, -1], [1.5]]) arm('round state: priorCounts ' + JSON.stringify(v) + ' -> refused naming priorCounts', Object.assign({}, RS_SPEC, { priorCounts: v }), '`priorCounts`')
+arm('round state: round 3 with priorCounts [2] -> refused naming both', Object.assign({}, RS_SPEC, { round: 3, priorCounts: [2] }), '`round` 3 disagrees with `priorCounts`')
+arm('round state: round 3 with priorCounts [4, 2] and roundLimit 3 -> proceeds', Object.assign({}, RS_SPEC, { round: 3, priorCounts: [4, 2], roundLimit: 3 }), null)
+{
+  let inferred = null
+  try {
+    inferred = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn round')(
+      Object.assign({}, base, RS_SPEC, { priorCounts: [4, 2] }), () => {}, null, null, null)
+  } catch (e) { inferred = 'threw: ' + e.message }
+  ck(inferred === 3, 'round state: with no round, priorCounts [4, 2] makes the evaluated round 3: ' + inferred)
+}
+
+// ---- TOOL-dFairHearing-17 AC6 — THE PARITY ARM: deriveRoundState against the driver's review_state.
+// The shell block before this runner sliced `review_state()` and the `RUNAWAY_CEILING=` line out of the
+// unattended kit's driver and ran them over every row of the domain both can see: 0 to 3 prior counts,
+// each 0 to 3, a count of 0 to 3 and a limit of 1 to 4 with the round at or below it. Highs are 0 there,
+// so the driver's blocker count and the harness's count are one number. The domain stops at the limit on
+// purpose: past it the driver refuses the round outright where the harness reports CEILING, so the two
+// answer different questions there, and CEILING lies outside the domain on both sides. The arm asserts
+// the four tokens reachable inside it, and AC2's direct case above holds CEILING. A driver that could not
+// be read or sliced fails the arm by name; it never skips.
+{
+  let text = ''
+  try { text = fs.readFileSync(process.argv[6] || '', 'utf8') } catch (e) { text = 'PRODUCER-FAILED the driver rows could not be read: ' + e.message }
+  const failed = text.indexOf('PRODUCER-FAILED') === 0
+  const rows = failed ? [] : text.split('\n').filter((l) => l.trim() !== '').map((l) => l.replace(/\r$/, '').split('|'))
+  // The domain, enumerated here independently, so a producer that emitted fewer rows cannot pass.
+  let want = 0
+  for (let len = 0; len <= 3; len++) want += Math.pow(4, len) * 4 * (4 - len)
+  const bad = rows.filter((r) => {
+    const prior = r[0] === '' ? [] : r[0].split(' ').map(Number)
+    return !roundFns || r.length !== 4 || roundFns[0](prior, Number(r[1]), Number(r[2])) !== r[3]
+  })
+  ck(!failed && rows.length === want && bad.length === 0,
+    'round state: deriveRoundState equals the driver\'s review_state on every one of ' + want + ' rows (' +
+      (failed ? text.trim() : rows.length + ' read, ' + bad.length + ' disagree' + (bad.length ? ', first ' + bad[0].join('|') : '')) + ')')
+  const seen = new Set(rows.map((r) => r[3]))
+  const inDomain = ['CONVERGED', 'NON-CONVERGENT', 'BOUNDED', 'CONVERGING']
+  ck(!failed && inDomain.every((t) => seen.has(t)) && !seen.has('CEILING'),
+    'round state: the parity rows hold each of the four in-domain tokens and no CEILING: ' + [...seen].sort().join(' '))
+}
+
 // ==== TOOL-dDerivedDocket-29 — THE WHOLE SCRIPT, over stub agents ==================================
 // The runner evaluates the file as the Workflow runtime does. Each stub is looked up by exact label
 // first and then by the longest label prefix; a function stub is called with (label, prompt), and an
@@ -2041,6 +2113,37 @@ async function runLedgerArms() {
   await runTypedStageArms()
   await runTwinRunArms()
   await runDispositionArms()
+  await runRoundStateArms()
+}
+
+// ==== TOOL-dFairHearing-17 AC5 — the round state on the returns and in the synthesis prompt ====
+// Red against the base harness, whose returns carry no roundState and whose prompt carries no ROUND block.
+async function runRoundStateArms() {
+  // One finding confirmed at high, the rest refuted: the count is 1, round 3 sits at its limit of 3.
+  const confirmOne = (label, prompt) => {
+    const m = /ids ([0-9, ]+)\)/.exec(prompt)
+    const ids = m ? m[1].split(',').map((x) => parseInt(x, 10)) : []
+    return { path: '/cd/v.json', verdicts: ids.map((id) => ({ id: id, verdict: id === 1 ? 'confirmed' : 'refuted', reason: 'r' })) }
+  }
+  const RS = Object.assign({}, DIFF, { round: 3, priorCounts: [4, 2], roundLimit: 3 })
+  let r = await runReview(RS, buildStubs({ 'verify:': confirmOne }))
+  if (checkNoThrow(r, 'round state stub run')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    ck(r.result.exit === 'complete' && r.result.roundState === 'BOUNDED' && r.result.roundCount === 1,
+      'round state: a complete round 3 at limit 3 after [4, 2] with one high returns BOUNDED and count 1: ' + r.result.roundState + ' ' + r.result.roundCount)
+    ck(!!sp && sp.prompt.indexOf('<<<ROUND\nreview-round round=3 limit=3 prior=4,2 count=1 state=BOUNDED\nROUND>>>') !== -1,
+      'round state: the synthesis prompt carries the review-round line between the ROUND markers')
+  }
+  r = await runReview(RS, buildStubs({ 'verify:': confirmOne, 'find:seams': null }))
+  ck(!r.threw && r.result.exit === 'deferred-platform' && r.result.roundState === null && r.result.roundCount === null,
+    'round state: a run with a dead lens defers and reports no state: ' + (r.result && r.result.roundState))
+  r = await runReview(Object.assign({}, DIFF, { round: 2 }), ALL_OK)
+  ck(!r.threw && r.result.roundState === null && Number.isInteger(r.result.roundCount) &&
+    r.logs.some((l) => l.indexOf('WARNING') === 0 && l.indexOf('priorCounts') !== -1),
+    'round state: round 2 with no priorCounts returns a null state, an integer count, and a WARNING naming priorCounts')
+  r = await runReview(DIFF, buildStubs({ 'find:': buildEmptyLens }))
+  ck(!r.threw && r.result.exit === 'complete' && r.result.roundState === 'CONVERGED' && r.result.roundCount === 0,
+    'round state: a round whose lenses raise nothing returns CONVERGED and count 0: ' + (r.result && r.result.roundState))
 }
 
 // ==== TOOL-dFairHearing-2 — the design-audit preset: its lenses, its review key and its announcements ====
@@ -3308,7 +3411,34 @@ fi
 # The lens arms (TOOL-dFairHearing-13) run the renderer with the python resolved above, or with none,
 # which reds them by name rather than skipping them.
 case "$bd_why" in "no usable python"*) lens_py="" ;; *) lens_py=$bd_py ;; esac
-out=$(node "$TMP/run.js" "$ROOT/$FILE" "$BD_OUT" "$bd_mtd" "$lens_py"); rc=$?
+
+# ---- TOOL-dFairHearing-17 S5: the driver's `review_state()` and its `RUNAWAY_CEILING=` line, sliced out of the
+# unattended kit beside this one and run over the parity domain, one `<priors>|<count>|<limit>|<token>` row each.
+# The runner compares every row with deriveRoundState; a driver that cannot be read or sliced writes
+# PRODUCER-FAILED, which reds the arm by name rather than skipping it.
+RS_OUT="$TMP/review-state.out"; RS_DRIVER="$HERE/../unattended/unattended.sh"; rs_why=""; rs_src=""
+if [ ! -f "$RS_DRIVER" ]; then rs_why="the driver $RS_DRIVER is not a file"
+else
+  rs_src=$(tr -d '\r' < "$RS_DRIVER" | sed -n -e '/^RUNAWAY_CEILING=/p' -e '/^review_state() {/,/^}$/p')
+  case "$rs_src" in RUNAWAY_CEILING=*'review_state() {'*) ;; *) rs_why="could not slice RUNAWAY_CEILING= and review_state() out of $RS_DRIVER" ;; esac
+fi
+if [ -z "$rs_why" ]; then
+  ( eval "$rs_src" || exit 1
+    for l in 1 2 3 4; do for c in 0 1 2 3; do
+      printf '|%s|%s|%s\n' "$c" "$l" "$(review_state "" "$c" "$l")"
+      for p1 in 0 1 2 3; do
+        [ "$l" -ge 2 ] && printf '%s|%s|%s|%s\n' "$p1" "$c" "$l" "$(review_state "$p1" "$c" "$l")"
+        for p2 in 0 1 2 3; do
+          [ "$l" -ge 3 ] && printf '%s %s|%s|%s|%s\n' "$p1" "$p2" "$c" "$l" "$(review_state "$p1 $p2" "$c" "$l")"
+          for p3 in 0 1 2 3; do
+            [ "$l" -ge 4 ] && printf '%s %s %s|%s|%s|%s\n' "$p1" "$p2" "$p3" "$c" "$l" "$(review_state "$p1 $p2 $p3" "$c" "$l")"
+          done
+        done
+      done
+    done; done; exit 0 ) > "$RS_OUT" 2>&1 || rs_why="the sliced review_state() did not run: $(head -1 "$RS_OUT")"
+fi
+[ -z "$rs_why" ] || printf 'PRODUCER-FAILED %s\n' "$rs_why" > "$RS_OUT"
+out=$(node "$TMP/run.js" "$ROOT/$FILE" "$BD_OUT" "$bd_mtd" "$lens_py" "$RS_OUT"); rc=$?
 printf '%s\n' "$out"
 
 # The arms run inside a node process, so the count crosses a process boundary and this shell cannot
@@ -3470,7 +3600,11 @@ printf '%s\n' "$out"
 # and acquired line (3), AC2 (1), AC3's loop over three outcomes (3), AC4 (1) and AC5's order and block (2).
 # The re-pointed first-agent, orchestrator-type and absent-checklist arms add none. Counted by hand, not by
 # a run: the pass runs no suite.
-FLOOR_ASSERTIONS=534
+# RAISED 534 -> 564 by TOOL-dFairHearing-17: 30 assertions, counted off the `round state:` arms — AC1 to AC3's
+# thirteen rule rows (13), the absent-value line (1), AC4's six refusals, the disagreeing round, the proceeding
+# round and the inferred one (9), AC6's parity rows and token set (2) and AC5's stub runs (5). Counted by hand
+# and by a scratch probe of the same calls, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=564
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

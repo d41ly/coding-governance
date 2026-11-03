@@ -497,7 +497,30 @@ is dropped, a flag naming any other id is discarded and named in a `WARNING:` li
 synthesis returns `[]`. Under `'hidden'` neither key is present. The final return carries
 `dispositions`, the accepted `{id, disposition, reason}` list in confirmed-id order, `null` when the set
 was refused or no synthesis ran; `dispositionFault`, `''` or each failing id and why, which the `note`
-repeats; and `ownerItems`, the ids disposed `none` under `unclassed: 'owner-rules'`, else `[]`. Every return carries five fields beside the counts:
+repeats; and `ownerItems`, the ids disposed `none` under `unclassed: 'owner-rules'`, else `[]`.
+
+Each round's state is the harness's own (TOOL-dFairHearing-17). Two optional arguments, checked before
+any agent beside `round`, feed it, and neither joins the review key. `roundLimit` is an integer of 1 or
+more, absent meaning no limit, which a log line says, since then neither `BOUNDED` nor `CEILING` can be
+reached. `priorCounts` is an array of integers of 0 or more, each an earlier round's `roundCount` in round
+order. With no explicit `round`, a non-empty `priorCounts` makes the round `priorCounts.length + 1`; an
+explicit `round` that disagrees with it is refused naming both. The rule, `deriveRoundState`, is the
+driver's `review_state` order: a count of 0 reads `CONVERGED`; a count no smaller than the round before's
+reads `NON-CONVERGENT`; a round past `roundLimit` reads `CEILING`, one at it `BOUNDED`, and any other
+`CONVERGING`. The suite's parity arm holds it equal to `review_state` over every sequence both can see. The
+synthesis is handed one record line between `<<<ROUND` and `ROUND>>>` and told to copy it verbatim directly
+below the review-shape line:
+`review-round round=<n> limit=<n|-> prior=<c1,c2,…|-> count=<n|-> state=<STATE|->`, a `-` standing for
+an absent value, never a `0`. The harness reports the state and never stops, re-arms or refuses a round on it.
+
+Every return carries seven fields beside the counts:
+
+- `roundCount` and `roundState` — the round's confirmed blocker and high findings by binding grade,
+  `verifiedCounts.blocker + verifiedCounts.high`, known before the synthesis, and the rule over it. Both
+  are `null` on every `deferred-platform` exit; a complete exit with no confirmed finding carries `0`
+  and the rule over `0`. `roundState` is also `null`, beside an integer `roundCount`, on a round above 1
+  with no `priorCounts`, which a `WARNING:` line names. Pass `roundCount` on as the next round's
+  `priorCounts` entry.
 
 - `shape` — one record line, also logged, in this fixed grammar:
   `review-shape kind=<diff-review|spec-audit> round=<n> intensity=<full|light> at=<find|verify|synth> raw=<n|-> confirmed=<n|-> refuted=<n|-> merged=<n|-> unverified=<n|-> blocker=<n|-> high=<n|-> medium=<n|-> low=<n|-> agents=<n> out-tokens=<n|unknown>`.

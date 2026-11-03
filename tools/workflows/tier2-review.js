@@ -83,6 +83,25 @@ function renderShapeLine(fields) {
       .map((k) => `${k}=${fields[k] === null || fields[k] === undefined ? '-' : fields[k]}`).join(' ') +
     ` agents=${fields.agents} out-tokens=${fields.outTokens === null || fields.outTokens === undefined ? 'unknown' : fields.outTokens}`
 }
+// TOOL-dFairHearing-17 S1 - THE ROUND STATE, pure: this round's blocker-and-high count against the rounds
+// before it, in the driver's `review_state` test order — zero, then the non-decrease test against the round
+// before alone, then the ceiling one run past the caller's limit, then the bound at it. A null limit
+// reaches neither. The suite's parity arm holds it equal to `review_state` over the domain both see.
+function deriveRoundState(priorCounts, count, roundLimit) {
+  const round = priorCounts.length + 1
+  if (count === 0) return 'CONVERGED'
+  if (priorCounts.length && count >= priorCounts[priorCounts.length - 1]) return 'NON-CONVERGENT'
+  if (roundLimit !== null && round > roundLimit) return 'CEILING'
+  if (roundLimit !== null && round === roundLimit) return 'BOUNDED'
+  return 'CONVERGING'
+}
+// S4 - the record's `review-round` line, rendered before the synthesis and copied by it; `-` is an absent
+// value, never a 0, and an empty prior sequence is absent too.
+function renderRoundLine(fields) {
+  return `review-round round=${fields.round} ` +
+    ['roundLimit', 'priorCounts', 'roundCount', 'roundState'].map((k, i) => ['limit', 'prior', 'count', 'state'][i] + '=' +
+      (fields[k] === null || fields[k] === undefined || (Array.isArray(fields[k]) && !fields[k].length) ? '-' : String(fields[k]))).join(' ')
+}
 // The runtime's `budget.spent()` is the OUTPUT tokens spent this turn across the main loop and every
 // workflow, a shared pool, so only a delta isolates a run. Read through a `typeof` guard: the harness's
 // own suite and a `node` slice have no `budget`, and an absent counter is `null`, never a number.
@@ -115,8 +134,14 @@ function readOutputTokens() {
 //                                         // fold /c/ to c:/, so this kind also needs an ABSOLUTE `repo`;
 //                                         // an 8.3 name or a link aliasing `repo` is not seen; a diff
 //                                         // review never reads it
-//   round: <integer>,                     // inferred as 2 when priorFindings arrive without one
+//   round: <integer>,                     // inferred as priorCounts.length + 1 from a non-empty priorCounts,
+//                                         // else as 2 when priorFindings arrive without one; refused when it
+//                                         // disagrees with a given priorCounts
 //   priorFindings: [ ... ],               // a previous round's confirmed set
+//   roundLimit: <integer >= 1>,           // absent -> null, no limit: BOUNDED and CEILING unreachable. The round
+//                                         // at it reads BOUNDED, one past it CEILING (TOOL-dFairHearing-17)
+//   priorCounts: [<integer >= 0>, ...],   // each earlier round's `roundCount`, in round order; absent at a round
+//                                         // above 1 -> `roundState` null and a WARNING
 //   specs: ["<repo-relative path>", ...], // intent documents: a diff review's statement of intent, a spec audit's
 //                                         // sibling context; absent -> [], and with no context a WARNING
 //   lensNotes: { "<lens key>": "<note>" }, // project addendum per lens of THIS kind; absent -> {} and a WARNING;
@@ -397,7 +422,25 @@ function renderRerunTail(only, synthToo) {
 const priorFindings = Array.isArray(a.priorFindings) ? a.priorFindings : []
 // F1 resolved: accept an explicit integer AND infer 2 when prior findings arrive without one, so a
 // caller cannot silently get a round-1 brief while handing over a previous round's confirmed set.
-const round = Number.isInteger(a.round) && a.round > 0 ? a.round : priorFindings.length ? 2 : 1
+// TOOL-dFairHearing-17 S2 - `roundLimit` and `priorCounts`, checked here beside `round`, before any agent, so no
+// string reaches a prompt from them; neither joins the review key, as no lens or skeptic prompt reads either.
+const roundLimit = a.roundLimit === undefined ? null : a.roundLimit
+if (roundLimit !== null && !(Number.isInteger(roundLimit) && roundLimit >= 1))
+  throw new Error('tier2-review: `roundLimit` must be an integer of 1 or more, or absent for no limit. Got ' + JSON.stringify(a.roundLimit) + '.')
+const priorCounts = a.priorCounts === undefined ? null : a.priorCounts
+if (priorCounts !== null && !(Array.isArray(priorCounts) && priorCounts.every((c) => Number.isInteger(c) && c >= 0)))
+  throw new Error('tier2-review: `priorCounts` must be an array of integers of 0 or more, each an earlier round\'s roundCount in round order. Got ' + JSON.stringify(a.priorCounts) + '.')
+const explicitRound = Number.isInteger(a.round) && a.round > 0
+if (explicitRound && priorCounts !== null && a.round !== priorCounts.length + 1)
+  throw new Error('tier2-review: `round` ' + a.round + ' disagrees with `priorCounts` ' + JSON.stringify(priorCounts) + ', whose ' +
+    priorCounts.length + ' earlier round(s) make this round ' + (priorCounts.length + 1) + '.')
+const round = explicitRound ? a.round : priorCounts !== null && priorCounts.length ? priorCounts.length + 1 : priorFindings.length ? 2 : 1
+// S3 / F6 - the rule runs only where the prior sequence matches the round: round 1 with none reads as [],
+// and a later round with none, or with a sequence that cannot be its own, has no state rather than a guessed one.
+const roundStateKnown = priorCounts === null ? round === 1 : priorCounts.length + 1 === round
+function deriveRoundFields(count) {
+  return { roundCount: count, roundState: count !== null && roundStateKnown ? deriveRoundState(priorCounts || [], count, roundLimit) : null }
+}
 const reviewDir = a.reviewDir || 'reviews/'
 // TOOL-aOrientedCast-27 S3/S9 - every agent's label and the run's identity, `<slug> · <scope> · <stage>`.
 // The slug is the segment after a `builds/` segment of `reviewDir` when it is letters only, else none,
@@ -508,6 +551,11 @@ log(`role verify: ${verifyType} — ${roles.skeptic ? 'roles.skeptic' : workerTy
 log(`role synthesis: ${synthType} — ${roles.synthesis ? 'roles.synthesis' : 'no roles.synthesis, so PLATFORM_TYPE'}`)
 if (roles[otherFinderKey] !== undefined)
   log(`role find: roles.${otherFinderKey} is not read on a ${kind}`)
+// TOOL-dFairHearing-17 S2 - each degraded round-state input said once, before the first agent (spec section 8 F5, F6).
+if (roundLimit === null) log('round state: no roundLimit was passed, so this round can read neither BOUNDED nor CEILING')
+if (!roundStateKnown)
+  log(`WARNING: round ${round} with ${priorCounts === null ? 'no priorCounts' : 'priorCounts ' + JSON.stringify(priorCounts)}, ` +
+    'so roundState is null: pass each earlier round\'s roundCount as priorCounts to compute it')
 // TOOL-aOrientedCast-10 S7 - one line per stage on every run, naming its effort and where it came from.
 for (const k of ['probe', finderKey, 'skeptic', 'synthesis'])
   log(efforts[k] ? `effort ${k}: ${efforts[k]} — efforts.${k}` : `effort ${k}: the agent type's own, else the session's — no efforts.${k}`)
@@ -1705,7 +1753,7 @@ if (lensesDead === findersRunning) {
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: 0, lensesDead,
     lensesReused: reusedLens.size,
     note: `DEFERRED: no lens completed (${lensesDead}/${findersRunning} died) — nothing was reviewed; ${renderRerunTail(deadLensLabels.join(', '), false)}`,
-    round, priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses, twin: null,
+    round, ...deriveRoundFields(null), priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses, twin: null,
     // TOOL-aSightedSkeptic-8 S5 - nothing was judged on this path.
     ledger: [], confirmedFindings: [], appendix: '', lensYield,
   }
@@ -1728,7 +1776,7 @@ if (allFindings.length === 0) {
     shape: shapeLine,
     exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: deadLensLabels, durable,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: liveResults.length, lensesDead,
-    lensesReused: reusedLens.size, note, round, priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses, twin: null,
+    lensesReused: reusedLens.size, note, round, ...deriveRoundFields(deferred ? null : 0), priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses, twin: null,
     ledger: [], confirmedFindings: [], appendix: '', lensYield, // TOOL-aSightedSkeptic-8 S5 - no finding raised
   }
 }
@@ -2122,7 +2170,7 @@ if (confirmed.length + unverified.length === 0) {
     note: deferred
       ? `DEFERRED: every finding raised was refuted, but ${lensesDead}/${findersRunning} lenses died — ${renderRerunTail(pendingLabels.join(', '), false)}`
       : 'all findings adjudicated and refuted',
-    round, priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses, twin: null,
+    round, ...deriveRoundFields(deferred ? null : 0), priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses, twin: null,
     // TOOL-aSightedSkeptic-8 S5 - no report is written on this path (spec F3), so the return is the
     // only place this ledger and appendix exist; a caller may write them.
     ledger, confirmedFindings, appendix, lensYield,
@@ -2153,7 +2201,7 @@ if (pendingLabels.length) {
     lensesRun: liveResults.length, lensesDead, skepticsDead, lensesReused: reusedLens.size, batchesReused,
     report: null, summary: '', blockers: null, highs: null,
     note: `DEFERRED: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) did not return — ${renderRerunTail(pendingLabels.join(', '), false)}`,
-    round, priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses, twin: null,
+    round, ...deriveRoundFields(null), priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses, twin: null,
     ledger, confirmedFindings, appendix, lensYield, // TOOL-aSightedSkeptic-8 S5 - what was judged so far; `exit` says partial
   }
 }
@@ -2164,6 +2212,11 @@ if (pendingLabels.length) {
 // Its `out-tokens` therefore excludes the synthesis agent's own spend (spec section 3).
 const synthShape = renderStageShape('synth', verifiedCounts, findersRunning + batches.length + 1)
 log(synthShape)
+// TOOL-dFairHearing-17 S3/S4 - the count is the binding grades' blockers and highs, known before the synthesis
+// (spec section 8 F2), so the record line it copies and the final return carry one state.
+const synthRound = deriveRoundFields(verifiedCounts.blocker + verifiedCounts.high)
+const roundLine = renderRoundLine({ round: round, roundLimit: roundLimit, priorCounts: priorCounts, roundCount: synthRound.roundCount, roundState: synthRound.roundState })
+log(roundLine)
 // TOOL-aEvidencedLens-6 S6 - the per-lens counts that exist before the synthesis, for its verbatim block.
 const preSynthYield = deriveLensYield(ledger, null)
 phase('Synthesize')
@@ -2446,6 +2499,9 @@ const synth = await agent(
     // TOOL-aMendedFleet-18 S4 - the shape line rides the same copy instruction; the return's `shape` holds it.
     `\n\nREVIEW-SHAPE LINE - copy the review-shape line between the two marker lines below VERBATIM, alone on its own line, immediately above the appendix heading, and neither marker line copied.\n` +
     `<<<SHAPE\n${synthShape}\nSHAPE>>>` +
+    // TOOL-dFairHearing-17 S4 - the round line rides the same copy instruction; the return's `roundState` holds it.
+    `\n\nREVIEW-ROUND LINE - copy the review-round line between the two marker lines below VERBATIM, alone on its own line, ` +
+    `directly below the review-shape line, and neither marker line copied.\n<<<ROUND\n${roundLine}\nROUND>>>` +
     // TOOL-dFairHearing-11 S7 - the twin record line rides beside the shape line, copied the same way.
     (twinned
       ? `\n\nREVIEW-TWIN LINE - copy the review-twin line between the two marker lines below VERBATIM, alone on its own line, ` +
@@ -2779,6 +2835,8 @@ return {
               : 'complete') +
     (dispositionFault ? `; the DISPOSITIONS were refused (${dispositionFault}), so dispositions is null and blockers and highs stand` : ''),
   round,
+  // TOOL-dFairHearing-17 S3 - the state the record line carries, both null where the synthesis died.
+  ...(synth ? synthRound : deriveRoundFields(null)),
   priorFindings: priorFindings.length,
   // TOOL-aSightedSkeptic-7 S6 - on every exit path, so a light run is never read as a full one.
   intensity,

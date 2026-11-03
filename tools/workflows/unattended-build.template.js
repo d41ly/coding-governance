@@ -1769,8 +1769,11 @@ const auRaw = !specAudit ? null : await workflow(
 // `reportPath` I had invented, which is the fixture grading the fixture.
 //
 // WHO OWNS THE VERDICT VOCABULARY. `CONVERGING|CONVERGED|NON-CONVERGENT|CEILING|BOUNDED` is produced by
-// `unattended.sh`'s `review_state()` from the PRIOR round's counts — no JS can compute it, because
-// convergence is a property of the sequence and not of this round. The old prompt ran the driver's
+// `unattended.sh`'s `review_state()` from the PRIOR round's counts, because convergence is a property of
+// the sequence and not of this round. `tier2-review.js` now computes the same rule as its return's
+// `roundState` from the `priorCounts` a caller passes, held equal to `review_state()` by the parity arm in
+// `tier2-review.test.sh` (TOOL-dFairHearing-17); this harness passes none, so an unattended run's rounds are
+// still recorded through the driver, which owns the token here. The old prompt ran the driver's
 // `--review` and returned its token; that call was deleted with the agent and nothing replaced it,
 // so no round was recorded either and the DoD leg that reads the last round found none.
 //
