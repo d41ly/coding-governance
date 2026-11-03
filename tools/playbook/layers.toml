@@ -7,7 +7,9 @@
 # `shared` lists the tool directories that hold inline-copied primitives and no layer.
 #
 # The rows' definitions are the dClosedLoop architecture's `[layers]` table cells, and the points are the
-# eight `[core-points]` of its layer-expansions record, each spelled point.<layer>.<seg>. The `point`
+# eight `[core-points]` of its layer-expansions record, each spelled point.<layer>.<seg>, and the three
+# slot points PLAY-dOrderedCharter-17 declares: Test's leg-pack point, the LIVE column and the consult
+# point. A non-core row `uses` each point one of its kits attaches at through a core kit's slot. The `point`
 # words are a stand-in: a later build registers a `point` namespace and the shape check joins it then.
 # Add a row with: python check_layers.py --new <tag> --kind <kind> [--of <tag>] --definition <text>
 
@@ -24,7 +26,7 @@ uses = []
 tag = "layer.flow"
 kind = "core"
 definition = "a build's lifecycle: Plan, Design, Build, Test and Deploy as programs of items, review as breakpoints and testing as probes at any boundary, with the verdict engine and the lander"
-declares = ["point.flow.verdict-backend", "point.flow.release", "point.flow.version"]
+declares = ["point.flow.verdict-backend", "point.flow.release", "point.flow.version", "point.flow.leg-pack"]
 uses = []
 
 [[layer]]
@@ -38,7 +40,7 @@ uses = []
 tag = "layer.memory"
 kind = "core"
 definition = "the trail, what happened in a build, and the library, what generalizes beyond one"
-declares = ["point.memory.record-home"]
+declares = ["point.memory.record-home", "point.memory.live-column", "point.memory.consult"]
 uses = []
 
 [[layer]]
@@ -54,7 +56,7 @@ kind = "optional"
 of = "layer.memory"
 definition = "the codebase map's owner views and dossiers, which agents consult to decide"
 declares = []
-uses = []
+uses = ["point.memory.consult", "point.flow.version"]
 
 [[layer]]
 tag = "layer.memory.recall"
@@ -62,7 +64,7 @@ kind = "optional"
 of = "layer.memory"
 definition = "the record finder for why-questions"
 declares = []
-uses = []
+uses = ["point.memory.consult", "point.runtime.install-target", "point.flow.version"]
 
 [[layer]]
 tag = "layer.memory.lexicon"
@@ -70,7 +72,7 @@ kind = "optional"
 of = "layer.memory"
 definition = "the naming lexicon, the declared words agents consult before they name"
 declares = []
-uses = []
+uses = ["point.flow.leg-pack", "point.flow.version"]
 
 [[layer]]
 tag = "layer.flow.leg-packs"
@@ -78,14 +80,14 @@ kind = "optional"
 of = "layer.flow"
 definition = "verdict leg packs, legs that join the Test verdict where they are installed"
 declares = []
-uses = []
+uses = ["point.flow.version"]
 
 [[layer]]
 tag = "layer.observability"
 kind = "expansion"
 definition = "signals about the loop and the runtime, read and filed but never deciding a position, and the cadence programs that act on them: Maintain and the Loop Review"
 declares = []
-uses = ["point.runtime.cadence", "point.runtime.reading", "point.memory.record-home"]
+uses = ["point.runtime.cadence", "point.runtime.reading", "point.memory.record-home", "point.memory.live-column", "point.flow.version"]
 
 [[layer]]
 tag = "layer.integrations"

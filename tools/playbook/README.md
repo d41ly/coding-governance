@@ -156,7 +156,7 @@ typed in the register:
 
 ```toml
 layer = "layer.memory"
-optional = [{ part = "gen_build_index.py", point = "point.memory.record-home", fallback = "the column renders not-installed" }]
+optional = [{ part = "gen_build_index.py", point = "point.memory.live-column", fallback = "the Landed-unclosed column renders not-installed: drift-audit" }]
 ```
 
 `optional` is a core kit's declared slot: an edge from the file it names as `part` to a non-core kit
@@ -164,6 +164,14 @@ is allowed, its `point` declared by exactly one core row, its `fallback` what th
 component is absent. A `part` is relative to the kit's home; a flat entry, `home = "."` under
 `govkit/entries/`, spells a file under the tool root `{prefix}/<file>`, and a part spelling the tool
 root literally is a contract red that names the spelling to write.
+
+A slotted site prints its state on one line, one spelling for every site, after the site's own
+prefix (PLAY-dOrderedCharter-17): `slot <point> · <state>`, the state `filled` when the optional
+kit returned something, `searched-empty` when it ran and found nothing, or
+`not-installed: <fallback>` when it is absent, and never an empty result. The `not-installed` line
+takes the place of the site's free-worded skip; a site that printed nothing on success prints
+`filled` on stderr, so stdout contracts are unchanged, and every site keeps its exit code. A test
+suite's arm that needs an absent kit skips with the same line and counts its assertions.
 
 ```
 python check_layers.py                 # the gate: the contract, the edges and EX-1 over the tree

@@ -1415,11 +1415,13 @@ print_drift_delta() { # run-state file
     echo "drift-delta: skipped — no python launcher resolves, so the drift kit's reader cannot run"
     return 0
   fi
+  # PLAY-dOrderedCharter-17 S6: the drift kit is a declared slot, its state named on one line
   if ! d=$(resolve_kit_dir "$py" drift-audit drift_report.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
-    echo "drift-delta: skipped — no drift-audit kit holding drift_report.py resolves beside this kit"
+    echo "drift-delta: slot point.runtime.reading · not-installed: the close prints no drift delta — no drift-audit kit holding drift_report.py resolves beside this kit"
     return 0
   fi
   "$py" "$d/drift_report.py" --delta "$base" HEAD || true
+  echo "drift-delta: slot point.runtime.reading · filled" >&2
   return 0
 }
 # TOOL-dFoldedAudit-7 S2 - THE SPEC-AUDIT SWITCHES, the driver's ONE reader of the three policy keys.
@@ -14959,7 +14961,8 @@ write_run_record() { # slug -> 0 always; one line per miss
      || ! d=$(resolve_kit_dir "$py" runlog runlog.py "$KIT_DIR" 2>/dev/null) || [ ! -f "$d/runlog.py" ]; then
     # The resolver answers REPO-RELATIVE to the kit's own repository, so the file test is what holds
     # a driver run from another tree to the kit in the tree being closed, as the generator's is.
-    echo "unattended: run record not asked — no runlog kit holding runlog.py resolves beside this kit, so there is nothing to render from and no record is owed"
+    # PLAY-dOrderedCharter-17 S6: the runlog kit is a declared slot, its state named on one line
+    echo "unattended: slot point.runtime.reading · not-installed: no run record is owed — no runlog kit holding runlog.py resolves beside this kit, so there is nothing to render from"
     return 0
   fi
   run_bounded "$py" -B "$d/runlog.py" record "$slug" --write; rc=$?
@@ -14969,7 +14972,9 @@ write_run_record() { # slug -> 0 always; one line per miss
     return 0
   fi
   rec=$(printf '%s\n' "$RB_STDOUT" | sed -n 's/^runlog: record written \(.*\) ([0-9]* bytes.*/\1/p' | head -1)
-  [ -n "$rec" ] || return 0   # the renderer's own no-record line, printed above, is the answer
+  # the renderer's own no-record line, printed above, is the answer
+  [ -n "$rec" ] || { echo "unattended: slot point.runtime.reading · searched-empty" >&2; return 0; }
+  echo "unattended: slot point.runtime.reading · filled" >&2
   GIT add -- "$rec" >/dev/null 2>&1 \
     || { echo "unattended: run record written but git could not stage it, so no index was rendered: $rec"; return 0; }
   if ! gen=$(resolve_index_generator) || [ ! -f "$gen" ]; then

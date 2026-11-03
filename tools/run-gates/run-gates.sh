@@ -3123,9 +3123,15 @@ def check_hit(path, specs):
     return False
 
 # The two govkit questions, asked once each. Any refusal or nonzero exit is "cannot be reached".
-owners, epoch, why = None, {}, ""
+# The deployer is a declared slot (PLAY-dOrderedCharter-17 S7): one that does not resolve adds the
+# `slot point.flow.version · not-installed` line, and one that answered prints `filled` on stderr.
+owners, epoch, why, absent = None, {}, "", False
 try:
-    gk = str(resolve_kit_dir("govkit", "govkit.py", here) / "govkit.py")
+    try:
+        gk = str(resolve_kit_dir("govkit", "govkit.py", here) / "govkit.py")
+    except LookupError:
+        absent = True
+        raise
     rows = []
     for extra in ([], ["--epoch"]):
         p = subprocess.run([sys.executable, gk, "shipped", *extra], capture_output=True, text=True,
@@ -3193,8 +3199,12 @@ for sha, members in todo.items():
         hit = next((m for m in moved if check_hit(m, specs)), "")
         out.append("R\x1e%s\x1e%s moved since %s" % (i, hit, s8) if hit else "H\x1e%s\x1e%s" % (i, s8))
 
+if absent:
+    out.insert(0, "F\x1eslot point.flow.version · not-installed: the owner and epoch columns read unreachable")
+elif not why:
+    sys.stderr.buffer.write("run-gates: selftests changed: slot point.flow.version · filled\n".encode("utf-8"))
 if why:
-    out.insert(0, "F\x1egovkit is not reachable (%s), so every held leg selects by its guard plus its suite file" % why)
+    out.insert(int(absent), "F\x1egovkit is not reachable (%s), so every held leg selects by its guard plus its suite file" % why)
 elif fallback:
     out.insert(0, "F\x1eno kit ships the suite of %d held leg(s), so each selects by its guard plus its suite file: %s"
                % (len(fallback), ", ".join(fallback)))

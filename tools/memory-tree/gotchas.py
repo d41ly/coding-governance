@@ -1144,6 +1144,13 @@ def cmd_selftest() -> int:
                 "not installed beside this module\n[rc=0]", lambda: cmd_check(ti, ci))
         finally:
             globals()["load_defined_ids"] = real_load
+        # PLAY-dOrderedCharter-17 AC2: check 18's grammar is this kit's own, so a tree with no recall
+        # kit still resolves ids — an undefined decision reds by name, and nothing is announced absent.
+        tn, cn = build_tree("inv-norecall", {"n.md": build_invariant("n", decision="ARCH-tNone-9")})
+        arm("with no recall kit, check 18 reds an undefined decision by name", "names decision ARCH-tNone-9, "
+            "which no record in this corpus defines", lambda: cmd_check(tn, cn))
+        arm("...and announces no grammar kit absent", "[rc=0]",
+            lambda: 0 if load_defined_ids(tn)[1] is None else 1)
 
         # A leg name resolves through a fixture manifest, and the reds a SET manifest makes possible.
         tl, cl = build_tree("inv-leg", {"l.md": build_invariant("l", over={"Guarded by": "`fixture leg`"})}, legs)

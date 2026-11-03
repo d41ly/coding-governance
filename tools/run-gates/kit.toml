@@ -14,6 +14,10 @@ layer = "layer.flow"
 scope = "repo"
 version_from = { file = "run-gates.sh", pattern = "^KIT_RUN_GATES_VERSION=" }
 requires = []
+# PLAY-dOrderedCharter-17: the selection's govkit read is a declared slot with its fallback.
+optional = [
+  { part = "run-gates.sh", point = "point.flow.version", fallback = "the owner and epoch columns read unreachable" },
+]
 
 [[files]]
 include = "**"

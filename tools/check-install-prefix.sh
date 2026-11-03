@@ -325,12 +325,15 @@ fi
 if [ -z "$REGISTRY" ]; then
   # A SKIP ANNOUNCES ITSELF (charter [gate]), and exits 0 (TOOL-aRepatriatedFork-16 §8 F1, owner): a consumer's
   # bar stays green when it has nothing to police, and a printed skip cannot be misread as a graded run.
+  # PLAY-dOrderedCharter-17 S7: the deployer is a declared slot, so the skip names its state.
+  echo "install-prefix: slot point.flow.version · not-installed: the gate skips, said"
   echo "install-prefix: SKIPPED — this repo is not a kit SOURCE (no govkit engine and registry resolve"
   echo "install-prefix: from this gate's directory), so it ships nothing and its files under"
   echo "install-prefix: ${SELF_PREFIX:-the repo root} were NOT graded on this run. Said out loud rather"
   echo "install-prefix: than passed silently: a skip that looks like a pass is indistinguishable from coverage."
   exit 0
 fi
+echo "install-prefix: slot point.flow.version · filled" >&2
 
 # The kit names, derived. `git ls-files` so the answer is the same on every node and in every
 # checkout — a directory listing would also see untracked scratch dirs. The prefix is `SELF_PREFIX`:

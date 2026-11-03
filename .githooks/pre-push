@@ -1072,16 +1072,19 @@ if [ -z "$DECIDE" ] && [ -n "${main_local//0/}" ]; then   # --decide skips it: i
     if [ -z "$_ml_py" ]; then
       echo "pre-push: the merge-loss check did NOT run over refs/heads/$def — no usable python launcher resolved, so no merge in this push was graded."
     elif [ -z "$_ml_module" ]; then
-      echo "pre-push: the merge-loss check did NOT run over refs/heads/$def — the lexicon kit is installed neither under '$top' nor beside this hook, so no merge in this push was graded."
+      # PLAY-dOrderedCharter-17: the lexicon kit is a declared slot, its state named on one line
+      echo "pre-push: slot point.flow.leg-pack · not-installed: no merge in this push is graded — the lexicon kit is installed neither under '$top' nor beside this hook (refs/heads/$def)."
     else
       _ml_out=$(cd "$top" && "$_ml_py" "$_ml_module" --merge-losses "$main_remote..$main_local" 2>&1); _ml_rc=$?
       if [ "$_ml_rc" = 0 ]; then
         printf '%s\n' "$_ml_out" | sed 's/^/pre-push: /'
+        echo "pre-push: slot point.flow.leg-pack · searched-empty"
       elif [ "$_ml_rc" = 2 ]; then
         echo "pre-push: DEAD PROBE — the merge-loss check could not answer for refs/heads/$def, so this push is ALLOWED on a signal that did not measure:"
         printf '%s\n' "$_ml_out" | sed 's/^/  /'
       else
         why="pre-push: REFUSING — a merge in this push loses a definition one of its parents carried (TOOL-aMendedFleet-3)."
+        echo "pre-push: slot point.flow.leg-pack · filled" >&2
         echo "$why" >&2
         printf '%s\n' "$_ml_out" | sed 's/^/  /' >&2
         echo "  Deliberate override, as always: git push --no-verify" >&2

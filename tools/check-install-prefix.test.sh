@@ -40,7 +40,9 @@ cd "$ROOT" || exit 2
 GATE_REL="${PFX}${GATE##*/}"
 # The deployer the kit-source test resolves, found by its ENGINE file rather than by a typed name.
 GK_SRC=$(git ls-files -- "${PFX}*/govkit.py" | head -1)
-[ -n "$GK_SRC" ] || { echo "check-install-prefix.test: no govkit engine under ${PFX:-the repo root}"; exit 2; }
+# PLAY-dOrderedCharter-17 S10: the deployer is a declared slot. Every arm below builds its fixture from
+# its engine, so with none the registry arms skip, SAID, and the suite exits 0 having graded nothing.
+[ -n "$GK_SRC" ] || { echo "check-install-prefix.test: slot point.flow.version · not-installed: the registry arms skip — no govkit engine under ${PFX:-the repo root}, so this suite graded nothing"; exit 0; }
 GK=${GK_SRC%/*}; GK=${GK##*/}
 TL=tool   # gov's own prefix is "${TL}s", assembled so that this file does not spell it
 T=$(printf '\t')

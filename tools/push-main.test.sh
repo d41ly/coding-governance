@@ -908,13 +908,14 @@ if [ -n "$_mt_gk" ] && [ -n "$_ml_lex" ]; then
     echo u25 > src-u25.txt; git add src-u25.txt 2>/dev/null; git commit -q --no-verify -m "TOOL-tFix-25: unit"
     unset GATE_PUSH_BASE; bash "$HERE/push-main.sh" --prepare --slug tSkip 2>&1
   )
-  case "$out25" in *"no lexicon kit beside this lander"*) l25=1 ;; *) l25=0 ;; esac
-  case "$out25" in *"no govkit deployer beside this lander"*) g25=1 ;; *) g25=0 ;; esac
+  # PLAY-dOrderedCharter-17 AC4: each hidden kit is a slot whose line names its point and fallback.
+  case "$out25" in *"slot point.flow.leg-pack · not-installed: the pre-push hook grades the landing again — no lexicon kit beside this lander"*) l25=1 ;; *) l25=0 ;; esac
+  case "$out25" in *"slot point.flow.version · not-installed: the push bar's epoch legs grade the landing — no govkit deployer beside this lander"*) g25=1 ;; *) g25=0 ;; esac
   case "$out25" in *"DEAD PROBE"*|*"REFUSED"*) x25=1 ;; *) x25=0 ;; esac
   # TOOL-dSafePassage-8 AC6: the same prepare names the skipped gov-first walk once, with its reason.
   printf '%s\n' "$out25" >"$tmp/out25.txt"
   f25=0; while IFS= read -r ln25; do
-    [[ $ln25 == *'steps were NOT run on gov first — no govkit deployer beside this lander'* ]] && f25=$((f25 + 1))
+    [[ $ln25 == *'slot point.flow.version · not-installed: the gov-first walk is skipped'* ]] && f25=$((f25 + 1))
   done <"$tmp/out25.txt"
   [ "$l25$g25$x25$f25" = 1101 ] \
     && ok "25 a tree without the lexicon and govkit files skips both checks and the gov-first walk by name, with no DEAD PROBE or REFUSED" \
@@ -1357,7 +1358,7 @@ else
 fi
 
 # 35 — TOOL-dSafePassage-8 AC6: `run_gov_first` cut from the lander. No deployer beside it, with or
-#      without a python, is one `steps were NOT run on gov first` line and exit 0; a deployer beside it
+#      without a python, is one `slot point.flow.version · not-installed` line and exit 0; a deployer beside it
 #      with the resolver refusing is exit 1, because no later gate runs a step on gov. Staged red by
 #      making the no-python branch return 0 whatever is beside the lander.
 out35=$(
@@ -1375,7 +1376,7 @@ out35=$(
 )
 printf '%s\n' "$out35" >"$tmp/out35.txt"
 n35=0; while IFS= read -r ln35; do
-  [[ $ln35 == *'steps were NOT run on gov first — no govkit deployer beside this lander'* ]] && n35=$((n35 + 1))
+  [[ $ln35 == *'slot point.flow.version · not-installed: the gov-first walk is skipped'* ]] && n35=$((n35 + 1))
 done <"$tmp/out35.txt"
 case "$out35" in
   *"nopy-absent=["*"rc=0]"*"py-absent=["*"rc=0]"*"nopy-present=["*"no usable python launcher"*"rc=1]"*)
@@ -1547,19 +1548,19 @@ want38="== nopy
 merge-losses: push-main: the merge-loss check did NOT run — no usable python launcher; the pre-push hook grades the landing again.${nl38}rc=0
 regen: push-main: generated outputs were NOT regenerated — no usable python launcher; the push bar's preflight grades them.${nl38}rc=0
 minter: push-main: kit versions were NOT minted — no usable python launcher; the push bar's epoch legs grade the landing.${nl38}rc=0
-gov-first: push-main: steps were NOT run on gov first — no govkit deployer beside this lander, so this is not gov's tree.${nl38}rc=0
+gov-first: push-main: slot point.flow.version · not-installed: the gov-first walk is skipped as not gov's tree — no govkit deployer beside this lander.${nl38}rc=0
 mint-unit: rc=0
 == nokit
-merge-losses: push-main: the merge-loss check did NOT run — no lexicon kit beside this lander; the pre-push hook grades the landing again.${nl38}rc=0
+merge-losses: push-main: slot point.flow.leg-pack · not-installed: the pre-push hook grades the landing again — no lexicon kit beside this lander.${nl38}rc=0
 regen: push-main: generated outputs were NOT regenerated — no regen.py beside this lander; the push bar's preflight grades them.${nl38}rc=0
-minter: push-main: kit versions were NOT minted — no govkit deployer beside this lander; the push bar's epoch legs grade the landing.${nl38}rc=0
-gov-first: push-main: steps were NOT run on gov first — no govkit deployer beside this lander, so this is not gov's tree.${nl38}rc=0
+minter: push-main: slot point.flow.version · not-installed: the push bar's epoch legs grade the landing — no govkit deployer beside this lander, so kit versions were NOT minted.${nl38}rc=0
+gov-first: push-main: slot point.flow.version · not-installed: the gov-first walk is skipped as not gov's tree — no govkit deployer beside this lander.${nl38}rc=0
 mint-unit: rc=0
 == kit
-merge-losses: rc=0
+merge-losses: push-main: slot point.flow.leg-pack · searched-empty${nl38}rc=0
 regen: ran regen.py --write${nl38}rc=0
-minter: ran govkit.py mint --base A${nl38}rc=0
-gov-first: ran govkit.py update --target $top38 --write${nl38}rc=0
+minter: ran govkit.py mint --base A${nl38}push-main: slot point.flow.version · filled${nl38}rc=0
+gov-first: ran govkit.py update --target $top38 --write${nl38}push-main: slot point.flow.version · filled${nl38}rc=0
 mint-unit: ran routed_commits.py --newest-unit A..B${nl38}rc=0"
 n38=$(grep -c 'resolve_kit_dir "$py"' "$lander")
 s38=$(for f in run_post_merge check_merge_losses run_regen run_minter run_gov_first read_mint_unit; do

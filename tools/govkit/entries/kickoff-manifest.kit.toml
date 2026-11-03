@@ -11,6 +11,11 @@ layer = "layer.flow"
 home_root_relative = true
 version_from = { file = "manifest-check.sh", pattern = "^KIT_MANIFEST_VERSION=" }
 requires = []
+# PLAY-dOrderedCharter-17: the suite's edge to the recall kit is a declared slot with its fallback; the
+# part is the repo path itself, this entry's home being spelled from the repo root.
+optional = [
+  { part = "skills/session-kickoff/manifest-check.test.sh", point = "point.memory.consult", fallback = "the hidden-reader arm skips, said" },
+]
 
 [[files]]
 include = ["manifest-check.sh"]

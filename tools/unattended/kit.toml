@@ -11,6 +11,14 @@ version_from = { file = "unattended.sh", pattern = "^KIT_UNATTENDED_VERSION=" }
 # `kickoff-manifest` since TOOL-aRoutedQuill-7: past PROMPT_BRIEF_SKELETON_CUTOFF a prompt-mode preflight
 # reads the brief's sub-heads from that kit's checker, so an install without it refuses every such run.
 requires = ["memory-tree", "review-harness", "settings-merge", "kickoff-manifest"]
+# PLAY-dOrderedCharter-17: each edge to a non-core kit is a declared slot with its fallback.
+optional = [
+  { part = "unattended.sh", point = "point.runtime.reading", fallback = "the close prints no drift delta, said" },
+  { part = "unattended.sh", point = "point.runtime.reading", fallback = "no run record is owed, said" },
+  { part = "unattended.test.sh", point = "point.runtime.install-target", fallback = "the dispatch arms announce their skip" },
+  { part = "unattended.test.sh", point = "point.runtime.reading", fallback = "the run-record and drift-delta arms skip with the slot line, their assertions counted" },
+  { part = "unattended.test.sh", point = "point.memory.consult", fallback = "the conf-spelling arm's MAP_ROOT half skips, said, its assertions counted" },
+]
 
 [[files]]
 include = "**"

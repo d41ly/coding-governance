@@ -277,7 +277,9 @@ HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks agent-cap.js "$HERE") || exit 2
 HOOKS="${HOOKS_DIR##*/}"
 MT_KIT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree merge-rows.py "$HERE") || exit 2
 MT_KIT="${MT_KIT_DIR##*/}"
-MEMORY_RECALL_DIR=$(resolve_kit_dir "$_rkd_py" memory-recall query.py "$HERE") || exit 2
+# PLAY-dOrderedCharter-17 S10: the recall kit is a declared slot. Where it does not resolve, the recall
+# arms skip with the slot line below, where this suite used to exit 2.
+MEMORY_RECALL_DIR=$(resolve_kit_dir "$_rkd_py" memory-recall query.py "$HERE" 2>/dev/null) || MEMORY_RECALL_DIR=""
 MEMORY_RECALL="${MEMORY_RECALL_DIR##*/}"
 LIB_DIR=$(resolve_kit_dir "$_rkd_py" lib pyrun.sh "$HERE") || exit 2
 LIB="${LIB_DIR##*/}"
@@ -684,8 +686,9 @@ fi
 # that runs check-wiring.sh as its own SessionStart hook. The fragment is resolved the way the arm
 # itself resolves it, so this test works in both layouts (adopter: <root>/memory-recall/).
 FRAG=""; for c in "$ROOT_ABS/$MEMORY_RECALL_DIR/recall-opened.fragment.json"; do
-  [ -f "$c" ] && { FRAG="$c"; break; }
+  [ -n "$MEMORY_RECALL_DIR" ] && [ -f "$c" ] && { FRAG="$c"; break; }
 done
+[ -n "$MEMORY_RECALL_DIR" ] || echo "skip slot point.runtime.install-target · not-installed: the recall arms skip, no memory-recall kit resolving beside this one"
 if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   newrepo
   git config core.hooksPath .githooks        # isolate: hooks wired, so only the recall arm can be unwired

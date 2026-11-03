@@ -7,6 +7,10 @@ home = "."
 layer = "layer.runtime"
 version_from = { file = "settings-merge.py", pattern = "^KIT_SETTINGS_MERGE_VERSION = " }
 requires = []
+# PLAY-dOrderedCharter-17: the selftest's edge to the recall kit is a declared slot with its fallback.
+optional = [
+  { part = "{prefix}/settings-merge.py", point = "point.runtime.install-target", fallback = "arm 10 skips where recall is not adopted" },
+]
 
 [[files]]
 include = ["settings-merge.py"]

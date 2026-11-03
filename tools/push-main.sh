@@ -863,7 +863,10 @@ resolve_lander_kit() {  # kit home · file -> "<python>\t<kit dir>" · 0; else t
 # the branch moves, rather than after the bar at the push. Exit 1 of the mode returns 1 with its
 # lines; a DEAD PROBE, no python and no kit each print one line and return 0, because the pre-push
 # hook grades the same range again at the push and binds there. The kit is found from THIS script's
-# own directory, the tool root it was installed into, never from a typed prefix.
+# own directory, the tool root it was installed into, never from a typed prefix. The kit is a declared
+# slot (PLAY-dOrderedCharter-17): no kit prints `slot point.flow.leg-pack · not-installed: <fallback>`,
+# and a run prints `searched-empty` (no loss) or `filled` (a loss) on stderr. `run_minter` and
+# `run_gov_first` print the same grammar at `point.flow.version`.
 check_merge_losses() {  # R · T -> 1 when a merge in R..T loses a definition; 0 otherwise, any skip printed
   local py dir out rc got
   got=$(resolve_lander_kit lexicon lexicon.py); rc=$?
@@ -872,14 +875,14 @@ check_merge_losses() {  # R · T -> 1 when a merge in R..T loses a definition; 0
     return 0
   fi
   if [ "$rc" != 0 ]; then
-    echo "push-main: the merge-loss check did NOT run — no lexicon kit beside this lander; the pre-push hook grades the landing again." >&2
+    echo "push-main: slot point.flow.leg-pack · not-installed: the pre-push hook grades the landing again — no lexicon kit beside this lander." >&2
     return 0
   fi
   py=${got%%$'\t'*} dir=${got#*$'\t'}
   out=$("$py" "$top/$dir/lexicon.py" --merge-losses "$1..$2" 2>&1); rc=$?
   case "$rc" in
-    0) return 0 ;;
-    1) printf '%s\n' "$out" | sed 's/^/  /' >&2; return 1 ;;
+    0) echo "push-main: slot point.flow.leg-pack · searched-empty" >&2; return 0 ;;
+    1) echo "push-main: slot point.flow.leg-pack · filled" >&2; printf '%s\n' "$out" | sed 's/^/  /' >&2; return 1 ;;
   esac
   echo "push-main: DEAD PROBE — the merge-loss check could not answer, so this prepare continues; the pre-push hook binds the landing:" >&2
   printf '%s\n' "$out" | sed 's/^/  /' >&2
@@ -968,13 +971,14 @@ run_minter() {  # base · [head] -> 0 minted, clean or announced-skipped · 1 th
   fi
   # A missing deployer is a skip, never a refusal.
   if [ "$rc" != 0 ]; then
-    echo "push-main: kit versions were NOT minted — no govkit deployer beside this lander; the push bar's epoch legs grade the landing."
+    echo "push-main: slot point.flow.version · not-installed: the push bar's epoch legs grade the landing — no govkit deployer beside this lander, so kit versions were NOT minted."
     return 0
   fi
   py=${got%%$'\t'*} dir=${got#*$'\t'}
   out=$("$py" "$top/$dir/govkit.py" mint --base "$1" ${2:+--head "$2"} 2>&1); rc=$?
   if [ "$rc" -eq 0 ]; then
     printf '%s\n' "$out" | grep -v -e ' · clean$' -e ' · skip · ' || true
+    echo "push-main: slot point.flow.version · filled" >&2
     return 0
   fi
   echo "push-main: the version minter REFUSED (exit $rc):" >&2
@@ -998,17 +1002,18 @@ run_gov_first() {  # -> 0 walked or announced-skipped · 1 a step, the landing c
       echo "push-main: the upgrade steps could NOT be run on gov first — a govkit deployer is beside this lander and no usable python launcher runs it, and no later gate runs a step on gov." >&2
       return 1
     fi
-    echo "push-main: steps were NOT run on gov first — no govkit deployer beside this lander, so this is not gov's tree."
+    echo "push-main: slot point.flow.version · not-installed: the gov-first walk is skipped as not gov's tree — no govkit deployer beside this lander."
     return 0
   fi
   if [ "$rc" != 0 ]; then
-    echo "push-main: steps were NOT run on gov first — no govkit deployer beside this lander, so this is not gov's tree."
+    echo "push-main: slot point.flow.version · not-installed: the gov-first walk is skipped as not gov's tree — no govkit deployer beside this lander."
     return 0
   fi
   py=${got%%$'\t'*} dir=${got#*$'\t'}
   out=$("$py" "$top/$dir/govkit.py" update --target "$top" --write 2>&1); rc=$?
   if [ "$rc" -eq 0 ]; then
     printf '%s\n' "$out"
+    echo "push-main: slot point.flow.version · filled" >&2
     return 0
   fi
   echo "push-main: the upgrade steps REFUSED on gov first (exit $rc):" >&2

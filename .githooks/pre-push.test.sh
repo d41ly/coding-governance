@@ -1932,7 +1932,8 @@ superseded: fb -> fa"
   esac
   cd "$pfx_home" || exit 2
 else
-  bad "AMF3 the lexicon kit does not resolve beside this hook's kit root, so the merge-loss arms did not run"
+  # PLAY-dOrderedCharter-17 S10: the lexicon kit is a declared slot, so its absence is a said skip
+  echo "  skip — slot point.flow.leg-pack · not-installed: the merge-loss arms AMF3 AC6 and AC7 skip, the lexicon kit not resolving beside this hook's kit root"
 fi
 # ---- TOOL-dThriftyLanding-3: A DOC-ONLY PUSH, CLASSIFIED AGAINST THE DOC CLASS AT R ---------------
 # A scratch repo whose gate-env file at R declares `GATE_DOC_PATHS`, a stub bar that records the docs

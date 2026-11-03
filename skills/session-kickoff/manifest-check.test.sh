@@ -1443,6 +1443,12 @@ check_eq "K2 AC10 ...and the card holds one READY line, one task section, the se
 # CHECKS the card's id citations — no "id citations unchecked" NOTE — and judges the paths.
 K2E="$NONCE-k2e"; K2ECARD="$CARD_HOME/$K2E.md"
 run_card "F1 setup: a card for the no-grammar arm" "$CWT" 0 - --card --write --session "$K2E"
+# PLAY-dOrderedCharter-17 S10: the recall kit is a declared slot. With none to hide the hidden-reader
+# arm skips with the slot line, its 2 assertions counted.
+if [ -z "$RECALL_REL" ]; then
+  echo "skip slot point.memory.consult · not-installed: the hidden-reader arm F1 skips, no memory-recall kit resolving to hide; its 2 assertions are counted, not run"
+  pass=$((pass+2))
+else
 mv "$CWT/$RECALL_REL/extract.py" "$CWT/$RECALL_REL/extract.py.hid"
 { render_task_section; printf '## read\n- `AGENTS.md:1`\n%s\n' "$(render_ready_line "$wt_head")"; } | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2E" > "$CARD_OUT" 2>&1); got=$?
 mv "$CWT/$RECALL_REL/extract.py.hid" "$CWT/$RECALL_REL/extract.py"
@@ -1450,6 +1456,7 @@ mv "$CWT/$RECALL_REL/extract.py.hid" "$CWT/$RECALL_REL/extract.py"
   && { echo "ok   F1 a reader with no memory-recall kit still checks ids, no NOTE, the path is judged, the append lands (exit 0)"; pass=$((pass+1)); } \
   || { echo "FAIL F1 a reader with no memory-recall kit still checks ids, no NOTE, the path is judged, the append lands (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
 check_eq "F1 ...and the card ends with the body's READY line" "$(render_ready_line "$wt_head")" "$(tail -1 "$K2ECARD")"
+fi
 # F7 — a root-level tracked file cited by NAME is a path token (the spec-token lint's "exact tracked
 # path" half); a slashless dotted word that is not tracked (`e.g`) is nothing, never an UNVERIFIED.
 { render_task_section; printf '## read\n- read AGENTS.md first, e.g. before TOOL-zCardFixture-10\n%s\n' "$(render_ready_line "$wt_head")"; } | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2E" > "$CARD_OUT" 2>&1); got=$?

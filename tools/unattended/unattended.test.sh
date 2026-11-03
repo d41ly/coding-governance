@@ -1963,15 +1963,21 @@ hit "$out" "write the RECORD KEY, which is not always the item name: parked-surf
 # ---- is invisible here and reads exactly like having written no review at all.
 
 # ---- TOOL-aMendedFleet-63: --abort renders the run record itself, after its own END line, where
-# ---- the runlog kit resolves in the tree being aborted, and says `not asked` where it does not;
-# ---- neither moves the exit. One unit is dispatched first. Staged red by deleting the
+# ---- the runlog kit resolves in the tree being aborted, and prints its not-installed slot line where
+# ---- it does not; neither moves the exit. One unit is dispatched first. Staged red by deleting the
 # ---- post-dispatch `write_run_record` call: the present arm loses its indented renderer lines and
-# ---- the absent arm its `not asked` line.
+# ---- the absent arm its slot line.
 # The kit is reached through the resolver, REPO-RELATIVE, never a spelled sibling path, and laid
 # into the fixture at that same relative path, which is where the driver's file test looks.
-_rl_rel=$(resolve_kit_dir "$_rkd_py" runlog runlog.py "$HERE") || exit 2
+# PLAY-dOrderedCharter-17 S10: the runlog kit is a declared slot. Where it does not resolve the present
+# arm skips with the slot line, its 7 assertions COUNTED, and the absent arm still runs.
+_rl_kits="present absent"
+if ! _rl_rel=$(resolve_kit_dir "$_rkd_py" runlog runlog.py "$HERE" 2>/dev/null) || [ -z "$_rl_rel" ]; then
+  _rl_rel=""; _rl_kits=absent; n=$((n+7))
+  echo "  SKIP slot point.runtime.reading · not-installed: the run-record present arm skips, no runlog kit resolving beside this one; its 7 assertions are counted, not run"
+fi
 _rl_src="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_rl_rel"
-for _rk in present absent; do
+for _rk in $_rl_kits; do
   bcopen
   # A READY spec, because bcopen's is THIN and `--dispatch` refuses a THIN unit (check 49).
   printf '# ARCH-tRun-1 — the unit\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-1 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n' > memory/builds/tRun/spec/one.md
@@ -1988,11 +1994,11 @@ for _rk in present absent; do
     hit "$(git diff --cached --name-only)" "memory/builds/tRun/build/"
     # This fixture holds no memory-tree generator, so the index half is the named miss.
     hit "$out" "unattended: run record staged, but no memory-tree generator resolves here"
-    miss "$out" "run record not asked"
+    miss "$out" "not-installed: no run record is owed"
   else
-    hit "$out" "unattended: run record not asked — no runlog kit holding runlog.py resolves beside this kit"
+    hit "$out" "unattended: slot point.runtime.reading · not-installed: no run record is owed — no runlog kit holding runlog.py resolves beside this kit"
   fi
-  rm -rf "$_rl_rel"
+  [ -z "$_rl_rel" ] || rm -rf "$_rl_rel"
 done
 
 bcrestore   # HOISTED: restore main to the shared BASE for the arms below.
@@ -8442,16 +8448,27 @@ hit "$out" "dispatch declared"
 # ---- and blank are compared as the consumer sees them: an absent `MAP_ROOT` is the kit default, and
 # ---- `BACKLOG_MODE` matters only as equal to `builds` or not.
 _rcv_root=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)
-_rcv_cm="$_rcv_root/$(resolve_kit_dir "$_rkd_py" codebase-map map_lib.py "$HERE")"
+# PLAY-dOrderedCharter-17 S10: the codebase map is a declared slot. Where it does not resolve the
+# MAP_ROOT half skips with the slot line, each of its 13 assertions COUNTED, and the rest still runs.
+if _rcv_cm=$(resolve_kit_dir "$_rkd_py" codebase-map map_lib.py "$HERE" 2>/dev/null) && [ -n "$_rcv_cm" ]; then
+  _rcv_cm="$_rcv_root/$_rcv_cm"
+else
+  _rcv_cm=""
+  echo "  SKIP slot point.memory.consult · not-installed: the conf-spelling arm's MAP_ROOT half skips, no codebase-map kit resolving beside this one; its 13 assertions are counted, not run"
+fi
 _rcv_mt="$_rcv_root/$MT_KIT_DIR"
 _rcv_d=$(mktemp -d)
 _rcv_n=0
 for _rcv_f in 'K=v' 'K="v"' "K='v'" 'export K=v' 'K=v # c' 'K="v" # c' 'K=' 'K=""' '  K=v' 'K=v\r' '# K=v' 'K= v' 'K=v\nK=w'; do
   # MAP_ROOT against map_lib.load_conf, the absent case resolving to the kit default on both sides
-  printf "${_rcv_f//K/MAP_ROOT}\n" | sed 's/\bv\b/docs\/map/; s/\bw\b/docs\/other/' > "$_rcv_d/.codebase-map.conf"
-  _rcv_sh=$(read_conf_value "$_rcv_d/.codebase-map.conf" MAP_ROOT) || _rcv_sh=memory/map
-  _rcv_py=$("$_rkd_py" -c "import sys, pathlib; sys.path.insert(0, sys.argv[1]); import map_lib; print(map_lib.load_conf(pathlib.Path(sys.argv[2]))['MAP_ROOT'])" "$_rcv_cm" "$_rcv_d" 2>&1 | tr -d '\r')
-  same "read_conf_value reads MAP_ROOT as map_lib does: $_rcv_f" "$_rcv_sh" "$_rcv_py"
+  if [ -n "$_rcv_cm" ]; then
+    printf "${_rcv_f//K/MAP_ROOT}\n" | sed 's/\bv\b/docs\/map/; s/\bw\b/docs\/other/' > "$_rcv_d/.codebase-map.conf"
+    _rcv_sh=$(read_conf_value "$_rcv_d/.codebase-map.conf" MAP_ROOT) || _rcv_sh=memory/map
+    _rcv_py=$("$_rkd_py" -c "import sys, pathlib; sys.path.insert(0, sys.argv[1]); import map_lib; print(map_lib.load_conf(pathlib.Path(sys.argv[2]))['MAP_ROOT'])" "$_rcv_cm" "$_rcv_d" 2>&1 | tr -d '\r')
+    same "read_conf_value reads MAP_ROOT as map_lib does: $_rcv_f" "$_rcv_sh" "$_rcv_py"
+  else
+    n=$((n+1))
+  fi
   # BACKLOG_MODE against tree_lib.parse_conf, compared as the `when` test reads it: equal to builds or not
   printf "${_rcv_f//K/BACKLOG_MODE}\n" | sed 's/\bv\b/builds/; s/\bw\b/shards/' > "$_rcv_d/.memory-tree.conf"
   _rcv_sh=$(read_conf_value "$_rcv_d/.memory-tree.conf" BACKLOG_MODE) || _rcv_sh=""
@@ -13442,7 +13459,7 @@ _da_home=drift-audit
 _da_rel=$(resolve_kit_dir "$_rkd_py" "$_da_home" drift_report.py "$HERE" 2>/dev/null) || _da_rel=""
 if [ -z "$_da_rel" ]; then
   n=$((n+2))   # COUNTED EITHER WAY, so the floor grades this suite and not which kits sit beside it
-  echo "  SKIP the drift-delta close arm: no drift-audit kit resolves beside this one, so nothing prints the delta; its 2 assertions are counted, not run"
+  echo "  SKIP slot point.runtime.reading · not-installed: the drift-delta close arm skips, no drift-audit kit resolving beside this one, so nothing prints the delta; its 2 assertions are counted, not run"
 else
   build_hold_fixture
   mkdir -p dk/u "dk/$_da_home"
