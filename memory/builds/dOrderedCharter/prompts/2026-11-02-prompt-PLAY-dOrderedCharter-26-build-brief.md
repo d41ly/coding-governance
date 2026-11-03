@@ -66,3 +66,14 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Your spec header's `advances PLAY-dOrderedCharter-38` stays `advances` when you flip it to `CLOSED`; you are not the last unit.
 - The unattended kit's own self-test suites are WAIVED for this build's landing (README, "Build-level rules"); a
   criterion they would observe is named as owed with PLAY-dClosedLoop-12, never run.
+
+## Owed by the unit before yours
+
+- PLAY-dOrderedCharter-28's `resolve-family` plant reaches `tools/memory-tree/backlog.py` through `corpus_ids.py`, and
+  the `playbook render selftest` leg's guard in `tools/gate-legs.json` does not name it (class
+  held-suite-guard-misses-a-sibling-kit). Before you add `{prefix}/memory-tree/backlog.py` to that guard, list every
+  live spec outside this build whose §4 Files touched names `tools/memory-tree/backlog.py` and whose §7 leg line lacks
+  `playbook render selftest` (a widened guard reds such a spec in the spec-token check, and every later dispatch is then
+  refused, as unit 51's widening did to TOOL-dIndexedDesign-12). If the list is empty, add the guard row in your pass,
+  re-stamp the kickoff manifest in the same commit, declare both paths in `--dispatch`, and record it as a `report`
+  deviation naming unit 28's builder return. If it is not empty, leave the guard and name the specs in your return.
