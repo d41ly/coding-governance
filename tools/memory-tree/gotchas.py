@@ -402,8 +402,9 @@ def check_gate_token(t: str, tracked: set, legs):
     directory over tracked paths, or a leg name; None, unresolved because `legs is None`, so a leg name
     cannot be checked; False, unresolved.
 
-    `check_invariant` keeps its note on the None state, and `check_ungated` counts it ungated and
-    announces it as a note (TOOL-dFairHearing-27 S9), so both read a class's gate through this one rule.
+    `check_invariant` keeps its note on the None state. `check_ungated` reads that state as not gated
+    and notes it on stderr (TOOL-dFairHearing-27 S9), so both read a class's gate through this one
+    rule, and no live path calls `check_ungated`; its docstring names its callers.
     """
     if t in tracked or any(x.startswith(t.rstrip("/") + "/") for x in tracked):
         return True
@@ -437,6 +438,10 @@ def check_ungated(text: str, tracked: set, legs) -> bool:
     The BODY only, cut as `declares()` cuts it, so the front matter never decides. A token that cannot
     be checked (no leg manifest) does not pass, so it reads ungated rather than gated, and is announced
     on stderr as `check_invariant` notes it.
+
+    No live path calls this. Its callers are this file's selftest arms and the replay instrument
+    `2026-11-04-build-TOOL-dFairHearing-30-ungated.py`, a committed build record. `gotchas.py` has no
+    `--all-ungated` flag, and the unit that adds one wires this in (TOOL-dFairHearing-23 S21).
     """
     m = FM_RE.match(text)
     body = text[m.end():] if m else text
