@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-37 — the round-4 spec audit's 19 minors on units 30 and 32: one replay procedure that isolates each arm, criteria over the scored attempt, and checks that can go red
 
-**Status:** INPROGRESS · rev-6 · 2026-11-04 · node d · Tier-2 · base 3708a705 · streams tooling · order 26 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-6 · 2026-11-04 · node d · Tier-2 · base 3708a705 · streams tooling · order 26 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dFairHearing-37-deviation-371.md](../build/2026-10-23-build-TOOL-dFairHearing-37-deviation-371.md) | deviation | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
+| [2026-11-04-build-TOOL-dFairHearing-37-1-acceptance-ledger.md](../build/2026-11-04-build-TOOL-dFairHearing-37-1-acceptance-ledger.md) | journal | — |
 | [2026-11-04-build-TOOL-dFairHearing-37-1-builder-return.md](../build/2026-11-04-build-TOOL-dFairHearing-37-1-builder-return.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md) | research | TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 |
 | [2026-10-23-prompt-TOOL-dFairHearing-37-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-37-1-spec-writer.md) | journal | — |

@@ -248,7 +248,9 @@ if (!cfg || typeof cfg !== 'object' || Array.isArray(cfg) || !cfg.repo) {
 const a = cfg
 const base = a.base
 const head = a.head || 'HEAD'
-const repo = a.repo || '.'
+// TOOL-dFairHearing-37 S6 - every backslash folded to `/` at this one read, as `repoFold` folds it below:
+// bash strips a backslash from an unquoted `git -C C:\x\y`, and git takes forward slashes on Windows.
+const repo = String(a.repo || '.').replace(/\\/g, '/')
 // TOOL-dTieredTribunal-11 S1 - the SUBJECT DESCRIPTOR. One field carries the review kind, and six
 // things below become per-kind: the acquire sentence, the lens catalogue, the context default, the
 // anchor predicate, the finding schema's address field, and the record's kind token.

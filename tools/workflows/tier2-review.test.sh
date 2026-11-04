@@ -716,6 +716,17 @@ async function runWholeScriptArms() {
   }
   const K = r.result ? r.result.key : ''
 
+  // ---- TOOL-dFairHearing-37 AC6: a `repo` of `C:\x\y` reaches every prompt's `git -C` as `C:/x/y`, the
+  // fold at the harness's one `repo` read. RED against that read taking `a.repo` raw, as at unit 32's commit.
+  {
+    const rw = await runReview(Object.assign({}, DIFF, { repo: 'C:\\x\\y' }), ALL_OK)
+    const ps = rw.trace.map((t) => t.prompt)
+    const named = ps.join('\n').match(/git -C [^\s`]+/g) || []
+    ck(!rw.threw && named.length > 0 && named.every((g) => g === 'git -C C:/x/y') && ps.every((p) => p.indexOf('C:\\x') === -1),
+      'FH37 AC6 a repo of C:\\x\\y reaches every prompt as git -C C:/x/y: ' + named.length + ' git -C command(s), ' +
+      JSON.stringify(named.filter((g) => g !== 'git -C C:/x/y').slice(0, 3)))
+  }
+
   // ---- TOOL-aOrientedCast-27 AC8: every whole label is `<slug> · <kind> round <n> · <stage>`, the slug
   // read from a `builds/<slug>/` reviewDir and absent outside one; every check carries its count, so an
   // empty trace cannot pass. Against renderAgentLabel staged to return the stage alone, each reds.
@@ -3890,7 +3901,9 @@ printf '%s\n' "$out"
 # RAISED 624 -> 626 by TOOL-dFairHearing-32: 2 assertions, the `FH32` arms — AC1's resume:probe prompt (1) and AC2's
 # five section forms (1). AC11's arm reads DESIGN_RECORD_PRESET already and adds none. Counted by hand, not by a
 # run: the pass runs no suite.
-FLOOR_ASSERTIONS=626
+# RAISED 626 -> 627 by TOOL-dFairHearing-37: 1 assertion, the `FH37` arm — AC6's backslashed repo (1). Counted by
+# hand and by a scratch probe of the same call, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=627
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

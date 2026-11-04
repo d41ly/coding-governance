@@ -1007,6 +1007,15 @@ def cmd_selftest() -> int:
             return 0
         arm("check_ungated: a gated sentence closing on `.**` keeps the next sentence out of its scope",
             f"bold {PFX}check-wiring.sh True\n[rc=0]", read_bold_scope)
+        # TOOL-dFairHearing-37 S15 — a mixed run of closers, `.*)`, ends the sentence as `.**` does. RED against
+        # GATED_SCOPE_RE's closer class narrowed to one character, which carries the scope past `.*)`.
+        def read_mixed_closer_scope():
+            text = f"(gated by `{PFX}check-wiring.sh`.*) Next sentence names `{PFX}y`.\n"
+            print("mixed", *[t for s in extract_gated_scope(text) for t in GUARD_TOKEN_RE.findall(s)],
+                  check_ungated(text, {f"{PFX}y"}, set()))
+            return 0
+        arm("check_ungated: a gated sentence closing on `.*)` keeps the next sentence out of its scope",
+            f"mixed {PFX}check-wiring.sh True\n[rc=0]", read_mixed_closer_scope)
         arm("--declares is the one predicate: 'no machine gate' declares", "[rc=0]",
             lambda: 0 if declares(_rec("x", "d", "There is no machine gate for this.\n")) else 1)
         arm("--declares reads the BODY, not the front matter", "[rc=0]",

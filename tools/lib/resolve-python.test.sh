@@ -699,11 +699,14 @@ print(";".join(c.replace(root, "F").replace(os.sep, "/").replace(".EXE", ".exe")
 # `refused`. The rows: a receipt row inside the tree; a row naming a missing path, the kit beside
 # `here`'s parent; a `..` row naming a real file, no probe hit; a `rendered` row; the inner probe; the
 # outer probe; nothing anywhere. Names are neutral, home `h` and anchor `a.js`. RED against a port that
-# denies on row 2's missing path. A host with no node prints no list and reds, never skips. WHAT THIS
+# denies on row 2's missing path. TOOL-dFairHearing-37 S13 adds rows 8 and 9, each answering the outer
+# probe: row 8's `.git` is a FILE, a worktree's, and the receipt beside `$JR/.git` names `r8/k/a.js`, so a
+# port testing `isDirectory()` walks past the worktree to it and answers `k`; row 9's receipt is not JSON,
+# so a port letting `JSON.parse` throw answers `refused`. A host with no node prints no list and reds, never skips. WHAT THIS
 # DOES NOT CHECK: the refusal's wording, or the port's two call sites, which agent-cap.test.sh's pack arms read.
 HOOKS_DIR=$(resolve_kit_dir "$REALPY" hooks agent-cap.js "$HERE") || exit 2
 JR="$TMP/jr"
-add_resolver_layout() { # <row> <receipt rows or empty> <file>... — one layout of the seven
+add_resolver_layout() { # <row> <receipt rows or empty> <file>... — one layout of the nine
   local d="$JR/r$1" j=$2 f; shift 2
   mkdir -p "$d/.git" "$d/p" "$d/q"
   [ -z "$j" ] || { mkdir -p "$d/.governance"; printf '{"files": [%s]}\n' "$j" > "$d/.governance/install.json"; }
@@ -716,11 +719,17 @@ add_resolver_layout 4 '{"role": "rendered", "source": "t/h/a.template.js", "path
 add_resolver_layout 5 '' p/h/a.js
 add_resolver_layout 6 '' h/a.js
 add_resolver_layout 7 ''
+add_resolver_layout 8 '' h/a.js k/a.js
+rmdir "$JR/r8/.git"; printf 'gitdir: elsewhere\n' > "$JR/r8/.git"
+mkdir -p "$JR/.git" "$JR/.governance"
+printf '{"files": [{"source": "t/h/a.js", "path": "r8/k/a.js"}]}\n' > "$JR/.governance/install.json"
+add_resolver_layout 9 '' h/a.js
+mkdir -p "$JR/r9/.governance"; printf '{not json\n' > "$JR/r9/.governance/install.json"
 jr_py=$("$REALPY" -B -c '
 import pathlib, sys
 sys.path.insert(0, sys.argv[1])
 from resolve_kit_dir import resolve_kit_dir
-for r in range(1, 8):
+for r in range(1, 10):
     root = pathlib.Path(sys.argv[2], "r%d" % r).absolute()
     try:
         print(pathlib.Path(resolve_kit_dir("h", "a.js", root / "p")).relative_to(root).as_posix())
@@ -731,12 +740,12 @@ const fs = require("fs"), path = require("path")
 const m = /^\/\/ >>> resolveKitDir\n([\s\S]*?)^\/\/ <<< resolveKitDir$/m.exec(fs.readFileSync(process.argv[1], "utf8").replace(/\r/g, ""))
 if (!m) { console.log("no marked resolveKitDir block in " + process.argv[1]); process.exit(0) }
 const resolveKitDir = new Function("require", m[1] + "\nreturn resolveKitDir")(require)
-for (let r = 1; r <= 7; r++) {
+for (let r = 1; r <= 9; r++) {
   const root = path.join(process.argv[2], "r" + r)
   try { console.log(path.relative(root, resolveKitDir("h", "a.js", path.join(root, "p"))).split(path.sep).join("/")) } catch (e) { console.log("refused") }
 }' "$ROOT/$HOOKS_DIR/agent-cap.js" "$JR" 2>&1 | tr -d '\r')
-[ "$jr_py" = "$(printf '%s\n' k h refused k p/h h refused)" ] \
-  || bad "the canonical resolve_kit_dir disagrees with TOOL-dFairHearing-32's seven layouts: ${jr_py//$'\n'/ }"; ok
+[ "$jr_py" = "$(printf '%s\n' k h refused k p/h h refused h h)" ] \
+  || bad "the canonical resolve_kit_dir disagrees with the nine layouts of TOOL-dFairHearing-32 and -37: ${jr_py//$'\n'/ }"; ok
 [ "$jr_js" = "$jr_py" ] \
   || bad "agent-cap.js's resolveKitDir disagrees with the canonical row for row: port ${jr_js//$'\n'/ } · canonical ${jr_py//$'\n'/ }"; ok
 

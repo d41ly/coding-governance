@@ -116,8 +116,9 @@ KIT_DIR = pathlib.Path(__file__).resolve().parent
 INSTANCE_KEYS = ("review-replay", "scouted-seam")
 #: The arm count `run_selftest` must reach, as review_replay.py declares its own. Raised 18 -> 21 by
 #: TOOL-dFairHearing-27 S19: its three arms, tag-item, experiment-freeze-spelling and pairing-walk. Raised 21 -> 24
-#: by TOOL-dFairHearing-32 S9: replay-subject, experiment-references and held-out-pathspec.
-ARMS_DECLARED = 24
+#: by TOOL-dFairHearing-32 S9: replay-subject, experiment-references and held-out-pathspec. Raised 24 -> 25 by
+#: TOOL-dFairHearing-37 S5: held-out-tracked.
+ARMS_DECLARED = 25
 
 
 class Refusal(Exception):
@@ -1656,6 +1657,16 @@ def run_selftest():
                     or check_refused(lambda: check_experiment(derive_fixture_manifest(tmp, heldOut=star, union=union), tmp),
                                      star, "0 line(s)"))
 
+    def check_held_out_tracked_arm():
+        """TOOL-dFairHearing-37 AC5: the valid-path control `held-out-pathspec` lacks: `heldOut` naming one tracked
+        file reaches the freeze comparison. RED against `--literal-pathspecs` spelled after `ls-files`, which git
+        refuses with exit 129, so every path refuses."""
+        with tempfile.TemporaryDirectory() as tmp:
+            held, freeze, _ = derive_frozen_repo(tmp)
+            manifest = derive_fixture_manifest(tmp, heldOut=str(held), union={"tuning": ["m1b"], "heldOut": ["m1b"]})
+            first = check_experiment(manifest, tmp)[0]
+            return None if first.startswith(f"held-out: frozen at {freeze} · ") else f"one tracked file reads {first!r}"
+
     def check_conformance_root_arm():
         """TOOL-dFairHearing-23 AC16: at the repository root and at this kit, no pairing site is under memory/."""
         if top is None:
@@ -1735,7 +1746,8 @@ def run_selftest():
             ("replay-manifest", check_replay_manifest_arm), ("conformance-root", check_conformance_root_arm),
             ("tag-item", check_tag_item_arm), ("experiment-freeze-spelling", check_freeze_spelling_arm),
             ("pairing-walk", check_pairing_walk_arm), ("replay-subject", check_replay_subject_arm),
-            ("experiment-references", check_references_arm), ("held-out-pathspec", check_held_out_pathspec_arm)]
+            ("experiment-references", check_references_arm), ("held-out-pathspec", check_held_out_pathspec_arm),
+            ("held-out-tracked", check_held_out_tracked_arm)]
     passed = skipped = ran = 0
     for name, arm in arms:
         ran += 1
