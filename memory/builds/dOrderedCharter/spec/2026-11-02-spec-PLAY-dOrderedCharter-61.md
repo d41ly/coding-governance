@@ -74,6 +74,7 @@ population that is real.
 
 - **consumes-from** `PLAY-dOrderedCharter-16` — `tools/playbook/check_layers.py`, its fixture and plant table, and `tools/memory-tree/import_walk.py`; without them there is no check to repair
 - **hands-off** `PLAY-dOrderedCharter-17` — the 40 edges the repaired check reports, each made an `optional` row with a named fallback, the test suites and whole-tree resolvers included by §8 F1
+- **hands-off** `PLAY-dOrderedCharter-62` — the repaired `tools/playbook/check_layers.py`, its fixture and `adopt-playbook.sh`'s plant table, which that unit's plants read an edge through
 
 ## 4. Design
 
@@ -245,6 +246,7 @@ New arm: tools/playbook/check_layers.py · covers AC1 AC2 · the layer leg over 
 ## 9. Revision log
 
 - rev-1 · 2026-11-02 · initial draft, by `2026-11-02-prompt-PLAY-dOrderedCharter-61-spec-brief`.
+- 2026-11-04 · section 3 Edges · from `2026-11-04-prompt-PLAY-dOrderedCharter-15-edge-mirror-brief.md`: the hands-off mirror of the consumes-from edge unit 62 declares against this unit; a mirror-only edit, so the status line keeps its rev.
 
 ## 10. Reuse audit
 

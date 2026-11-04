@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them
 
-**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-6 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0033@756303be whole
 
@@ -50,7 +50,13 @@ every load-bearing document to a registry row (foundations R2, v2:949-957 P13, l
   `doc.<file stem, lower-cased>` (`PLAY-dOrderedCharter-19` S3); the class rows for Skills, path rules
   and agent files carry tags that namespace does not derive, so its extractor `extract_doc`
   (`tools/playbook/tag_index.py`) gains this registry's rows in its population, one declaring source
-  for both. Observed by AC1.
+  for both. Each row whose tag that namespace does not derive, the class rows and the deploy Skill's,
+  also carries `h1`, one line naming what its files are: the `doc` namespace's `purpose-source` is
+  `#h1` (`tools/playbook/namespaces.toml@c7269a97:20`), and the purpose arm reads a `.toml` member's
+  field off its own row (`tools/playbook/tag_index.py#check_namespace_purpose`, through
+  `tools/playbook/tag_index.py#read_toml_field`), so a class tag with no `h1` reds on the first tags run.
+  A charter or guide row carries none, its file's own `# ` line being its purpose. The `doc` row's
+  `source` text (`tools/playbook/namespaces.toml@c7269a97:17`) gains this registry's rows. Observed by AC1.
 - **S2** — The seeded rows (§4 Inventory): the charter at level 0, every guide under
   `{memory_root}/guides/`, `TEMPLATE-SPEC.md` and `HYGIENE.md` at level 3, every Skill and path rule
   at level 4, and the role agent files at level 5. Observed by AC1.
@@ -65,30 +71,54 @@ every load-bearing document to a registry row (foundations R2, v2:949-957 P13, l
   by AC3.
 - **S5** — Emission by every other source. A document whose renderer is not Python (the memory-tree
   and unattended kits' guide templates, the review harness's protocol template, each Skill template,
-  the authored `SKILL.md`, `MERGE-BAR.md`, `SESSION-KICKOFF.md` and `.claude/rules/product.md`) carries
+  the authored `skills/session-kickoff/SKILL.md` and `skills/deploy-governance/SKILL.md`, `MERGE-BAR.md`,
+  `SESSION-KICKOFF.md` and `.claude/rules/product.md`) carries
   its envelope's two lines in its source, after any front matter or `gov:kit` marker and at the end, so
   every render holds them. The gate compares each with the registry's rendering, so the source is
-  checked against the one declaration both ways. Observed by AC4.
+  checked against the one declaration both ways. Every Skill in S6's population has its source named:
+  `.claude/skills/cleanup/SKILL.md` renders from `tools/branch-reconcile/SKILL.template.md`
+  (`tools/branch-reconcile/adopt-branch-reconcile.sh`'s `--scaffold`), and `.claude/skills/build/SKILL.md`
+  from `tools/roles/SKILL.template.md` (`tools/roles/adopt-roles.sh`'s `OUT` and `TEMPLATE`). Observed by
+  AC4.
 - **S6** — The gate, `python tools/playbook/instruction_units.py envelopes --check`, a new leg
-  `instruction envelopes` in `tools/gate-legs.json`. Its arms, each naming the path: a registered
+  `instruction envelopes` in `tools/gate-legs.json`, its argv
+  `["python", "{prefix}/playbook/instruction_units.py", "envelopes", "--check"]`. Its arms, each naming the path: a registered
   document with no envelope, or one whose doc, level or direction differs from its row; an opener with
   no closer, a closer with no opener, or a closer naming another doc; a second document at level 0; a
   load-bearing document with no row. The load-bearing population is derived, never typed: every path
   the charter's Protocols lines name, every `*.md` under `{memory_root}/guides/`, every
   `.claude/agents/*.md`, `.claude/rules/*.md`, `.claude/skills/*/SKILL.md` and `skills/*/SKILL.md`. The
   gate asserts that population is non-empty and prints its count. Observed by AC5 and AC6.
-- **S7** — Size. A document's cap is its `budgets.*` key in `.governance/policy.toml`, where
-  dSafePassage's step moved every row of the former limits file (TOOL-dSafePassage-1 S7, S8), named as
-  the census `tools/policy/caps.toml` names it and read with `budgets.py resolve <cap>`
-  (TOOL-dGroundRules-9 S1, S2). A document an envelope takes past its cap is raised by the build run in
-  the minimal guard's one admitted shape (TOOL-dGroundRules-6 S3): exactly one `budgets` leaf grown per
-  commit, a `RAISED <old> -> <new>` comment directly above it, argued under the four raise conditions
-  the step carries above `[budgets]`, and a `memory/DECISIONS.md` row added. So each crossing
-  document's envelope lands in the commit that raises its cap, one commit per raise. At base,
-  `memory/guides/UNATTENDED-PROTOCOL.md` (66859 of 66860) and `skills/session-kickoff/SKILL.md` (18310
-  of 18432) are the two caps an envelope crosses, each a census row. A registered document with no
-  census row has no cap declared and is measured by none; this unit adds no census row, a new cap being
-  the owner's (TOOL-dGroundRules-9 §3). Observed by AC7.
+- **S7** — Size. A document's cap is its row in `tools/template-size-limits.txt`. dSafePassage's limits
+  step is TOOL-dSafePassage-61, still DEFERRED, so `.governance/policy.toml`'s `[budgets]` holds only
+  `enforce` and `pinned`, the census `tools/policy/caps.toml` names each cap's home `limits:<path>`, and
+  a key held in both homes refuses (that file's RESOLUTION paragraph). A cap is read with
+  `python tools/policy/budgets.py resolve <cap>` (TOOL-dGroundRules-9 S1, S2). A document an envelope
+  takes past its row is raised by the build run on that file's raise conditions, its WHEN A RUN MAY
+  RAISE A ROW paragraph: this unit's change takes the subject past the row, measured CR-stripped; the
+  row's comment block reserves no next movement to the owner and the new value keeps any rule the block
+  states; `RAISED <old> -> <new>` is argued above the row with the date, this unit, the measured figure
+  and why; and this unit's row is in `memory/DECISIONS.md`. Each crossing document's envelope lands in
+  the commit that raises its row. At `c7269a97`, CR-stripped, an envelope crosses four rows:
+  `.claude/skills/unattended/SKILL.md` (10369 of 10369) and `memory/guides/UNATTENDED-PROTOCOL.md`
+  (67183 of 67183), whose blocks' rule is no headroom, so each new value is its render's measured
+  figure; `skills/session-kickoff/SKILL.md` (18310 of 18432), raised only if its envelope, 84 bytes
+  plus its direction, passes the 122 free; and `memory/guides/BUILD-METHOD.md` (30659 of 30720), whose
+  block reserves the row to the owner once its remainder is spent ("Spent, it is the owner's again")
+  and ties it to the figure the document spells ("Change both or neither"), so the second condition
+  fails and no run raises it: its envelope, 80 bytes plus its direction against 61 free, waits on the
+  fork record's F5. A registered document with no row is measured by none; this unit adds no row, a
+  new row being the owner's (the same paragraph). Observed by AC7.
+
+- **S8** — The leg's own rows, written in its pass. The claiming row is an `[[exempt_leg]]` row in
+  `tools/govkit/registry.toml` naming the leg, with a `why` (the fork record's F6);
+  `python tools/govkit/govkit.py selfcheck --write` adds its `tools/govkit/subject-pins.tsv` row; the
+  `gate-legs` claim of `memory/map/features/playbook.md` gains the leg; `python
+  tools/codebase-map/gen_map.py --write` rewrites `memory/map/generated/`; and the kickoff manifest's
+  `last-audit` in `memory/guides/SESSION-KICKOFF.md` is re-stamped, as a `tools/gate-legs.json` edit owes
+  (unit 26's pass, `fe22fcf80`). The `envelopes` verb's planted defects are rows of
+  `tools/playbook/adopt-playbook.sh`'s `run_plant_rows`, each `instruction_units.py --fixture --plant
+  <case>`, so the `playbook render selftest` leg runs them. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -116,8 +146,8 @@ every load-bearing document to a registry row (foundations R2, v2:949-957 P13, l
 - **hands-off** `PLAY-dOrderedCharter-29` — the document registry the render-parity arm reads
 - **consumes-from** `PLAY-dOrderedCharter-20` — `INSTRUCTION_PATHSPECS`, the instruction-file population S6's load-bearing population reads in place of its own path list
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 5, 22, 38, 57, 65 and 67, which that batch unit corrects after this unit lands, each by the item its report id names
-- **consumes-from** external — dSafePassage, landed before the build run: the step that moved every row of the former limits file under `budgets.*` in `.governance/policy.toml`, the four raise conditions above `[budgets]` (TOOL-dSafePassage-1 S7, S8)
-- **consumes-from** external — dGroundRules, landed before the build run: the cap census and `budgets.py resolve` (TOOL-dGroundRules-9 S1, S2), and the minimal guard's one admitted raise (TOOL-dGroundRules-6 S3)
+- **consumes-from** external — `tools/template-size-limits.txt`, the caps' home while dSafePassage's limits step (TOOL-dSafePassage-61) is DEFERRED: its rows and its raise conditions, which S7 raises on
+- **consumes-from** external — dGroundRules, landed before the build run: the cap census and `budgets.py resolve` (TOOL-dGroundRules-9 S1, S2)
 - **consumes-from** `PLAY-dOrderedCharter-50` — the owed-rows probe: this pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its commit and writes every row it names in that commit (round-2 id 23), the rows of its envelope leg and the size rows its envelopes cross among them
 
 ## 4. Design
@@ -145,6 +175,7 @@ path = ".claude/agents/*.md"
 level = 5
 direction = "This role's static instructions; yields to levels 0 to 4"
 source = "{prefix}/roles/agents/"
+h1 = "The role agent files, one per rendered role"
 ```
 
 The charter's direction is the owner's form (layer-instruction:376, v2:1094). An envelope line is
@@ -156,8 +187,8 @@ and the closer `[/<path>]`; both are whole lines.
 Minted: `tools/playbook/documents.toml`; its `[[document]]` row; `read_document_registry`;
 `tools/lib/envelope.py` with `render_envelope` and `read_envelopes`; the inline block name
 `render_envelope`; the `PARITY_ROWS` row `render_envelope`; the CLI verb `envelopes`; the leg
-`instruction envelopes`; the class-row tags `doc.skills`, `doc.kickoff-skill`, `doc.rules` and
-`doc.agents`. The charter's and the guides' rows reuse the tags `PLAY-dOrderedCharter-19` derives
+`instruction envelopes`; the row field `h1`; the plant names of AC5 and AC6; the tags `doc.skills`,
+`doc.kickoff-skill`, `doc.deploy-skill`, `doc.rules` and `doc.agents`. The charter's and the guides' rows reuse the tags `PLAY-dOrderedCharter-19` derives
 (`doc.charter`, `doc.build-method`, `doc.hygiene`, `doc.template-spec`, `doc.annotation-style`,
 `doc.review-protocol`, `doc.merge-bar`, `doc.session-kickoff`, `doc.unattended-protocol`,
 `doc.unattended-asks`, `doc.unattended-stops`, `doc.unattended-verbs`, `doc.playbook-template`).
@@ -183,7 +214,13 @@ naming `P13`.
 - `tools/roles/roles_lib.py`
 - `tools/roles/render_agents.py`
 - `tools/gate-legs.json`
-- `.governance/policy.toml` (S7's two raises, one commit each)
+- `tools/template-size-limits.txt` (S7's raises, one commit each)
+- `tools/playbook/namespaces.toml` (the `doc` row's `source` text)
+- `tools/playbook/adopt-playbook.sh` (the plant rows)
+- `tools/govkit/registry.toml` (the `[[exempt_leg]]` row)
+- `tools/govkit/subject-pins.tsv` (regenerated)
+- `memory/map/features/playbook.md` (the dossier claim)
+- `memory/map/generated/*` (regenerated)
 - `memory/DECISIONS.md`
 - `coding-governance-agents.template.md`
 - `tools/memory-tree/BUILD-METHOD.template.md`
@@ -197,14 +234,16 @@ naming `P13`.
 - `tools/unattended/PLAYBOOK-TEMPLATE.template.md`
 - `tools/unattended/SKILL.template.md`
 - `tools/workflows/REVIEW-PROTOCOL.template.md`
-- `tools/roles/SKILL.template.md`
+- `tools/roles/SKILL.template.md` (renders `.claude/skills/build/SKILL.md`)
+- `tools/branch-reconcile/SKILL.template.md` (renders `.claude/skills/cleanup/SKILL.md`)
 - `tools/drift-audit/SKILL.template.md`
 - `tools/lexicon/SKILL.template.md`
 - `tools/memory-recall/SKILL.template.md`
 - `tools/runlog/SKILL.template.md`
 - `skills/session-kickoff/SKILL.md`
+- `skills/deploy-governance/SKILL.md`
 - `memory/guides/MERGE-BAR.md`
-- `memory/guides/SESSION-KICKOFF.md`
+- `memory/guides/SESSION-KICKOFF.md` (its envelope and the `last-audit` re-stamp)
 - `.claude/rules/product.md`
 - the renders of the sources above, re-rendered and never edited: `AGENTS.md`, `memory/guides/*.md`,
   `memory/TEMPLATE-SPEC.md`, `memory/HYGIENE.md`, `.claude/agents/*.md`, `.claude/skills/*/SKILL.md`
@@ -224,7 +263,8 @@ naming `P13`.
 - error / empty / loading states: an absent registry or an empty load-bearing population refuses with
   exit 2, never reads green.
 - observability: the gate prints the population count and one line per offender.
-- risks: two documents sit at their caps (S7); a raise is a decision row, not a silent edit.
+- risks: four documents sit at or near their rows (S7), one the owner's (F5); a raise is a decision row,
+  not a silent edit.
 - testing: §6 and the `New arm:` lines of §7.
 - migration: §4 Migration.
 - user docs: `help/charter.md`, created by `PLAY-dOrderedCharter-1`, gains a paragraph on levels and
@@ -234,8 +274,8 @@ naming `P13`.
 
 - **AC1** — When `python instruction_units.py envelopes --list` runs, it prints every
   seeded row with its resolved path, its level and the count of files its path matches, each count at
-  least 1.
-  Red when: a row's path matches no file.
+  least 1, and each row whose tag the `doc` namespace does not derive with its `h1`.
+  Red when: a row's path matches no file, or such a row has no `h1`.
 - **AC2** — When `diff` compares the `render_envelope` block of `envelope.py` with the
   block in `tools/playbook/render_playbook.py` and in `tools/roles/roles_lib.py`, CR stripped, both are
   empty.
@@ -244,7 +284,7 @@ naming `P13`.
   its front matter are read after a re-render, they are `[AGENTS.md · Level 0 · …]` and the same
   opener naming `.claude/agents/gov-builder.md` at `Level 5`, and each file ends its body with its closer.
   Red when: either renderer drops the envelope.
-- **AC4** — When `envelopes --check` runs over gov's tree after the build, it exits 0 and prints a
+- **AC4** — When `envelopes --check --root .` runs over gov's tree after the build, it exits 0 and prints a
   population count equal to the number of files S6 derives.
   Red when: a source's envelope lines differ from its row.
   figure: the count is DERIVED by the gate on each run.
@@ -255,18 +295,28 @@ naming `P13`.
 - **AC6** — When the same fixture gains an unregistered guide, `NEW.md` in its guides folder, the gate exits 1
   naming it; with its row added and its envelope written, it exits 0.
   Red when: an unregistered load-bearing document passes.
-- **AC7** — When `git show HEAD:.governance/policy.toml` is read after the envelopes' commits, the keys
-  `"memory/guides/UNATTENDED-PROTOCOL.md"` and `"skills/session-kickoff/SKILL.md"` under `[budgets]`
-  each hold a value at least the CR-stripped bytes of its document, each raised key under a
-  `RAISED <old> -> <new>` comment naming this unit directly above it.
-  Red when: an envelope lands with its document over its cap.
+- **AC7** — When `git show HEAD:tools/template-size-limits.txt` is read after the envelopes' commits,
+  each row S7 raised holds at least its document's CR-stripped bytes, equal where its block's rule is no
+  headroom, under a `RAISED <old> -> <new>` line naming this unit; `python tools/policy/budgets.py
+  resolve <path>` prints that value for each; and the `memory/guides/BUILD-METHOD.md` row reads 30720
+  unless the owner moved it (F5).
+  Red when: an envelope lands with its document over its row, or a row moves without its argued line.
+
+- **AC8** — When `git grep -n -F 'name = "instruction envelopes"' -- tools/govkit/registry.toml` runs
+  after the pass, it prints one line under an `[[exempt_leg]]` header; `git grep -n -F "instruction
+  envelopes" -- tools/govkit/subject-pins.tsv memory/map/generated/MAP.md` prints the pins row and the
+  map's row, `playbook` its claimant; `git grep -n -F '"instruction envelopes"' --
+  memory/map/features/playbook.md` prints the dossier's `gate-legs = [` line; and `git show HEAD --
+  memory/guides/SESSION-KICKOFF.md` at the pass commit shows its `last-audit` line rewritten.
+  Red when: the leg lands without its claiming row, its pins row, its dossier claim, the rewritten map
+  or the re-stamp.
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `roles render wiring` · `roles render selftest` · `template size <=48KiB` · `charter size` · `build-method size` · `unattended protocol size` · `govkit acceptance matrix` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `check-wiring self-test` · `lexicon naming predicates` · `manifest-check self-test` · `scratch-guard self-test` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `codebase-map kit selftest` · `drift-audit selftest` · `lexicon selftest` · `pre-push run-log line` · `run-gates run-log line` · `runlog selftest` · `kit/dogfood doc parity` · `policy fixtures`
+`playbook render selftest` · `playbook render wiring` · `roles render wiring` · `roles render selftest` · `template size <=48KiB` · `charter size` · `build-method size` · `unattended protocol size` · `govkit acceptance matrix` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `check-wiring self-test` · `lexicon naming predicates` · `manifest-check self-test` · `scratch-guard self-test` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `codebase-map kit selftest` · `drift-audit selftest` · `lexicon selftest` · `pre-push run-log line` · `run-gates run-log line` · `runlog selftest` · `kit/dogfood doc parity` · `policy fixtures` · `unattended skill size` · `kickoff engine size <=18KiB` · `govkit selftest` · `govkit refusal join` · `branch-reconcile selftest` · `tags (the resolver's checks)`
 
 New arm: tools/lib/resolve-python.test.sh · covers AC2 · the parity table's `render_envelope` row, its failing case a copy with one byte changed · none
-New arm: tools/playbook/instruction_units.py · covers AC5 AC6 · the `envelopes` verb's selftest plants each defect of AC5 and the unregistered guide of AC6 in a scratch tree · none
+New arm: tools/playbook/adopt-playbook.sh · covers AC5 AC6 · `run_plant_rows` rows over `instruction_units.py --fixture --plant <case>`, one per defect of AC5 and the unregistered guide of AC6 in a scratch tree, under the `playbook render selftest` leg · none
 
 ## 8. Open questions
 
@@ -286,11 +336,35 @@ New arm: tools/playbook/instruction_units.py · covers AC5 AC6 · the `envelopes
   RESOLVED (agent, 2026-10-23, delegated): (a), rung 5 (ER:388), the clause names every registered
   document and the file's own terms admit a run's raise of a measured-file row; (c) fails the gate's
   load-bearing arm and (b) edits two governance carriers for bytes. widens: none · relaxes: none
+  Re-read at `c7269a97` (rev-6): four rows cross; (a) holds for three, and the fourth,
+  `memory/guides/BUILD-METHOD.md`, whose block reserves its row to the owner, is F5.
 - **F4 — One spelling for a document's tag.** `PLAY-dOrderedCharter-19` derives `doc.<stem>` for the
   charter and the guides and nothing for Skills, rules or agent files. Options: (a) reuse its tags and
   add the class rows to its extractor's population; (b) a tag scheme of this registry's own. RESOLVED
   (agent, 2026-10-23, delegated): (a), rung 3; (b) spells one document's tag twice, the M2 interface
   disagreement this build's brief forbids. widens: none · relaxes: none
+- **F5 — BUILD-METHOD's envelope against its row. OPEN, the owner's.** The render measures 30659 of
+  30720, CR-stripped, and the envelope S16 fixes takes 80 bytes plus its direction, 152 with section 4's
+  example, so it crosses. Options: (a) the owner raises the row, and the document's `**Budget:` figure
+  with it, by at least the envelope's bytes less the 61 free, in the envelope's commit; (b) trim
+  BUILD-METHOD's prose by that much, such as the raise history its budget paragraph carries; (c) leave BUILD-METHOD out of the registry; (d) exempt it from the
+  envelope arm; (e) a shorter envelope for it. No delegated option survives: (a) is the owner's, the
+  row's block reserving its next movement ("Spent, it is the owner's again"), so the raise terms'
+  second condition fails and the build method's fork rule keeps its own budget out of any delegation;
+  (b) changes a governance carrier beyond the clause's two lines, its budget prose included (veto 2);
+  (c) fails S6's load-bearing arm and AC6's class (veto 1); (d) is a named exemption read as coverage,
+  and fails S6's first arm (veto 1); (e) is not S16's shape, and with an empty direction its two lines
+  still take 80 against 61 free (veto 1). Recommendation: (a), the row's own block naming the owner as
+  its next mover and the envelope being the clause's content. Until the owner rules, S2's BUILD-METHOD
+  envelope does not land and this unit does not build.
+- **F6 — Which row claims the `instruction envelopes` leg?** Options: (a) an `[[exempt_leg]]` row in
+  `tools/govkit/registry.toml`; (b) a `[[gate_leg]]` row in `tools/playbook/kit.toml`, as
+  `playbook render wiring` carries. RESOLVED (agent, 2026-11-04, delegated): (a), rung 3. (b) lost on
+  its observation: the seeded rows name gov's own documents, `MERGE-BAR.md`, `SESSION-KICKOFF.md` and
+  the role agent files among them, and AC1 requires each row to match a file, so an adopter carrying
+  the leg reds on a document it never received; and the registry records beside `run-gates.gov.test.sh`
+  that a descriptor row naming a leg the target cannot carry reds the deployer. widens: none · relaxes:
+  none
 
 ## 9. Revision log
 
@@ -303,13 +377,15 @@ New arm: tools/playbook/instruction_units.py · covers AC5 AC6 · the `envelopes
   a crossing is raised in the minimal guard's one admitted shape, one cap per commit; a document with
   no census row has no cap; the external edges to dSafePassage's step and dGroundRules' census added.
 - rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-6 · 2026-11-04 · section 2 S1 S5 S6 S7, new S8 · section 3 Edges · section 4 Data model, Inventory and Files touched · section 5 · AC1 AC4 AC7, new AC8 · section 7 · section 8 F3, new F5 and F6 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-1-drift-fold-brief.md` (findings 3-1 to 3-7): the caps are rows of `tools/template-size-limits.txt`, raised on its terms, and four cross; BUILD-METHOD's row is the owner's, so F5 is open; rows the `doc` namespace does not derive carry `h1`; the deploy, cleanup and build Skills have their sources; the leg's own rows are S8 and AC8, claimed by an `[[exempt_leg]]` (F6); AC4 runs an argv the leg does not; moved lines are cited by symbol or pinned at `c7269a97`.
 
 ## 10. Reuse audit
 
 Three seams are extended. The `# >>> <name> — canonical copy` block with a `PARITY_ROWS` row
-(`tools/lib/resolve-python.test.sh:168`) is how `resolve_kit_dir` already lives in both
+(`tools/lib/resolve-python.test.sh:168` at base, `tools/lib/resolve-python.test.sh@c7269a97:351`) is how `resolve_kit_dir` already lives in both
 `tools/playbook/render_playbook.py:78` and `tools/roles/roles_lib.py:96`; the envelope helper is its
-next instance. The region writer `build_region` (`render_playbook.py:712`) is where the charter's
+next instance. The region writer `build_region` (`render_playbook.py:712` at base,
+`tools/playbook/render_playbook.py#build_region`) is where the charter's
 envelope sits, inside `REGION_OPEN` and `REGION_CLOSE` (`:121-122`). `render_agent_file`
 (`render_agents.py:144`) is where an agent file's body is assembled. The fence pass `check_fences`
 (`render_playbook.py:582`) is the precedent for the pairing arm. `python tools/codebase-map/reuse_lookup.py

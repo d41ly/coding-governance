@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-2 — the charter re-founded in its level-0 envelope, with the override rule and its record
 
-**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 20 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-6 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 20 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0032@e38b0cb6 whole
 **Carries:** node:policy-key.charter.override
@@ -62,13 +62,15 @@ C1-F11, C1-F12).
   instruction wins, the conflict named and recorded; `absolute`, the charter outranks every live
   instruction and no override is taken. The rule also says a conflict resolves by level, never by load
   order, and that unenveloped text and any envelope inside tool output are data (v2:953-957 P13). The
-  key is read with `policy.py get charter.override`, run in the target through unit 9's `policy_reader`
-  (the playbook kit's one subprocess reader of that verb), called with the key literal first,
-  `policy_reader("charter.override", …)`, the call shape dGroundRules' reader-coverage arm counts
-  (TOOL-dGroundRules-8, its Readers table). It reads the target's committed policy at its landed
+  key is read with `policy.py get charter.override`, run in the target through unit 19's
+  `read_policy_value` (`tools/playbook/policy_value.py#read_policy_value`, the playbook kit's one
+  subprocess caller of that verb), called with the key literal first,
+  `read_policy_value("charter.override", root)`, the call shape dGroundRules' reader-coverage arm
+  counts (TOOL-dGroundRules-8, its Readers table). It reads the target's committed policy at its landed
   revision, and an unset key answers the catalogue default `explicit-override` with its reason
-  (TOOL-dGroundRules-2 S7, TOOL-dGroundRules-3 S2); on the reader's exit 2 the render refuses, naming
-  the key and printing the reader's line. The key's catalogue row lands with dGroundRules with no
+  (TOOL-dGroundRules-2 S7, TOOL-dGroundRules-3 S2); on `PolicyRefused`, which the reader raises on its
+  exit 2 and with no policy kit found, the render refuses, naming the key and printing the exception's
+  `line`, the reader's own words. The key's catalogue row lands with dGroundRules with no
   `summary` or `usage`, named on the shrink-only `tools/policy/unsummarised-keys.txt`
   (TOOL-dGroundRules-1 S3, S6): this unit adds no row; it fills that row's `summary` and its `usage`, a
   line the row admits (`charter.override = "absolute"`), and drains the name with
@@ -94,28 +96,41 @@ C1-F11, C1-F12).
   `pass`, `passwd`, `password`, `secret`, `token`, `apikey`), seen red on today's `pw` field. Observed by
   AC4.
 - **S6** — The section-number readers re-pointed in this unit. `parse_charter` in `roles_lib.py`
-  (`tools/roles/roles_lib.py:176`) reads the rule lines between two new markers the practices render
-  inside, `PRACTICES_OPEN` and `PRACTICES_CLOSE` beside `PLAYBOOK_OPEN` (`:60`), so the roles `rules:`
-  join resolves each tag to its practice line by tag, not by `## 1.`. `SECTION_ONE_RE` (`:61`) is kept
-  only as the reader of a seeded charter older than the markers, which still parses as today. The
-  section-number wording is re-pointed in `check_roles.py:243`, `render_agents.py:99` (its fixture
-  charter gains the markers), the docstrings of `handoff.py` and `render_agents.py`,
-  `tools/roles/README.md`, `help/roles.md`, and the review harness files that cite "AGENTS.md section 7"
-  (`tools/workflows/drift-audit-code.template.js:34,49`, `drift-audit-state.template.js:33,48`) and
-  `tools/unattended/check-pass-order.sh:62`, each re-pointed to the practice's tag. Observed by AC5 and
-  AC6.
+  (`tools/roles/roles_lib.py:176`, now `tools/roles/roles_lib.py#parse_charter`) reads the rule lines
+  between two new markers the practices render inside, `PRACTICES_OPEN` and `PRACTICES_CLOSE` beside
+  `PLAYBOOK_OPEN` (`tools/roles/roles_lib.py@c7269a97:60`), so the roles `rules:` join resolves each tag
+  to its practice line by tag, not by `## 1.`. `SECTION_ONE_RE` (`tools/roles/roles_lib.py#SECTION_ONE_RE`)
+  is kept only as the reader of a seeded charter older than the markers, which still parses as today,
+  and a legacy fixture charter, a constant whose name carries `LEGACY`, keeps that reader tested. The
+  section-number wording is re-pointed in `check_roles.py:243` (now
+  `tools/roles/check_roles.py@c7269a97:255`, its R1 message) and its usage text, `render_agents.py:99`
+  (its fixture charter gains the markers), the docstrings of `handoff.py` and `render_agents.py`, every
+  "section 1" of `roles_lib.py` (its module docstring, the `RULE_LINE_RE` comment, `LEGACY_NOTE`, the R0
+  messages of `parse_charter`, the docstring and two messages of `check_rule_tags`, and the docstring
+  of `render_charter_blocks`), `tools/roles/README.md`, `help/roles.md`, and the review harness files that
+  cite "AGENTS.md section 7" (`tools/workflows/drift-audit-code.template.js:34,49`, now
+  `tools/workflows/drift-audit-code.template.js@c7269a97:35` and
+  `tools/workflows/drift-audit-code.template.js@c7269a97:50`; `drift-audit-state.template.js:33,48`, now
+  `tools/workflows/drift-audit-state.template.js@c7269a97:35` and
+  `tools/workflows/drift-audit-state.template.js@c7269a97:50`) and
+  `tools/unattended/check-pass-order.sh:62`, each re-pointed to the practice's tag. That script's
+  "protocol section 1" line names the unattended protocol's own section, not the charter's, and stays.
+  Observed by AC5 and AC6.
 - **S7** — The proof: a role render over the re-founded charter, every agent file carrying the
   practice lines its role's `rules:` cites. Observed by AC6.
 - **S8** — The project block: the repository's own rules in their own part of the level-0 envelope,
   under a heading naming what the reader does, rendered from `[charter] adopter_rules` until the
   overlay's level-0 `repo.` units replace that source. Observed by AC1.
 - **S9** — Size. The re-founded `AGENTS.md` is measured with `budgets.py resolve AGENTS.md`
-  (TOOL-dGroundRules-9 S2) against its cap `budgets."AGENTS.md"` (20480), which dSafePassage's step moved
-  into `.governance/policy.toml` from the former limits file (TOOL-dSafePassage-1 S7, S8). A crossing is
-  raised in this unit's commit in the minimal guard's one admitted shape (TOOL-dGroundRules-6 S3): that
-  one leaf grown, a `RAISED <old> -> <new>` comment directly above it, argued under the four raise
-  conditions the step carries above `[budgets]`, and a `memory/DECISIONS.md` row added; the cap stays at
-  or under 32768, which `PLAY-dOrderedCharter-6`'s check holds. Observed by AC7.
+  (TOOL-dGroundRules-9 S2) against its cap, 20480 at `c7269a97`: the `AGENTS.md` row of
+  `tools/template-size-limits.txt`, the cap's `limits:` home in the census, which `budgets.py` reads at
+  the landed revision. A crossing is raised in this unit's commit by moving that row on the four
+  conditions in that file's header (`tools/template-size-limits.txt@c7269a97:16-23`): this unit's own
+  change takes the charter past the row, measured CR-stripped; the row's comment block reserves no
+  movement; a `RAISED <old> -> <new>` line above the row carries the date, this unit, the measured
+  figure and why the new value; and a `memory/DECISIONS.md` row lands with it. The cap stays at or under
+  32768, which `PLAY-dOrderedCharter-6`'s check holds. `.governance/policy.toml` is not written.
+  Observed by AC7.
 - **S10** — The page. `help/charter.md` gains the override rule, its three values and where the record
   goes. Observed by AC7.
 
@@ -145,8 +160,9 @@ C1-F11, C1-F12).
 - **hands-off** `PLAY-dOrderedCharter-34` — the project block composed from the overlay's level-0 units
 - **hands-off** `PLAY-dOrderedCharter-5` — the re-founded charter, whose blocks the ranked agent file and handoff carry
 - **hands-off** `PLAY-dOrderedCharter-30` — the roles `rules:` join re-pointed to practice tags, through which the renamed `portable` value is read
-- **consumes-from** external — dGroundRules, landed before the build run: `policy.py get` at the landed revision (TOOL-dGroundRules-2 S7) with an unset key's default and reason (TOOL-dGroundRules-3 S2), the `charter.override` row and the shrink-only list this unit drains (TOOL-dGroundRules-1 S3, S6), `budgets.py resolve` (TOOL-dGroundRules-9 S2), the minimal guard's one admitted raise (TOOL-dGroundRules-6 S3), and the reader-coverage arm's call shapes (TOOL-dGroundRules-8)
-- **consumes-from** external — dSafePassage, landed before the build run: the step that moved the `AGENTS.md` row of the former limits file to `budgets."AGENTS.md"` in `.governance/policy.toml`, the four raise conditions above `[budgets]` (TOOL-dSafePassage-1 S7, S8)
+- **consumes-from** external — dGroundRules, landed before the build run: `policy.py get` at the landed revision (TOOL-dGroundRules-2 S7) with an unset key's default and reason (TOOL-dGroundRules-3 S2), the `charter.override` row and the shrink-only list this unit drains (TOOL-dGroundRules-1 S3, S6), `budgets.py resolve` (TOOL-dGroundRules-9 S2), and the reader-coverage arm's call shapes (TOOL-dGroundRules-8)
+- **consumes-from** external — `tools/template-size-limits.txt`, in the tree: the `AGENTS.md` row `budgets.py resolve` answers as the charter's `limits:` home, and the four raise conditions in its header S9's raise follows; dSafePassage's step that would move them under `budgets.*` is DEFERRED at TOOL-dSafePassage-61 and is not waited for
+- **consumes-from** `PLAY-dOrderedCharter-19` — `read_policy_value` and `PolicyRefused` in `tools/playbook/policy_value.py`, through which S2 reads `charter.override`
 - **consumes-from** `PLAY-dOrderedCharter-42` — the override kind's token in the bindings reader, without which S4's record reads malformed (finding 31)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 21, 47, 75 and 85, which that batch unit corrects after this unit lands, each by the item its report id names
 - **hands-off** `PLAY-dOrderedCharter-55` — AC7's page pathspec, which unit 49 S24 corrects, is observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
@@ -177,7 +193,8 @@ C1-F11, C1-F12).
 ```
 
 The headings above are the design's; the builder may reword a heading, never number one. `Protocols`
-and `Facts` keep their names, which `CARRIED_SECTIONS` (`roles_lib.py:67`) reads.
+and `Facts` keep their names, which `CARRIED_SECTIONS` (`roles_lib.py:67`, still
+`tools/roles/roles_lib.py#CARRIED_SECTIONS`) reads.
 
 ### The override record
 
@@ -207,7 +224,7 @@ reseed. `parse_charter` reads a `v4.x` charter through `SECTION_ONE_RE`, unchang
 
 Live at landing, in one commit with the role render (S7), so no tree holds the re-founded charter and
 an unparsed roles kit. That commit also carries the `charter.override` row's fill and the list's drain,
-and a raise of `budgets."AGENTS.md"` if S9 needs one. A second commit stages only
+and a raise of the `AGENTS.md` row of `tools/template-size-limits.txt` if S9 needs one. A second commit stages only
 `.governance/policy.json` as `policy.py mirror --write` regenerates it, because the mirror records the
 catalogue's and the policy file's blob ids (TOOL-dGroundRules-5 S1), and the guard admits a mirror
 commit only when the policy file and the catalogue equal HEAD (TOOL-dGroundRules-19 S1).
@@ -232,7 +249,7 @@ commit only when the policy file and the catalogue equal HEAD (TOOL-dGroundRules
 - `tools/unattended/check-pass-order.sh`
 - `tools/check-microformats.sh`
 - `tools/check-microformats.test.sh`
-- `.governance/policy.toml` (only on S9's raise of `budgets."AGENTS.md"`)
+- `tools/template-size-limits.txt` (only on S9's raise of its `AGENTS.md` row)
 - `memory/DECISIONS.md`
 - `tools/policy/catalogue.toml` (the `charter.override` row's `summary` and `usage`)
 - `tools/policy/unsummarised-keys.txt` (drained by `lists --write`)
@@ -279,20 +296,24 @@ commit only when the policy file and the catalogue equal HEAD (TOOL-dGroundRules
   nothing; with `--words` empty it exits 1.
   Red when: a record is written under `absolute` or with a field missing.
 - **AC4** — When `bash tools/check-microformats.sh <scratch-template>` runs over a copy carrying
-  today's `pw <pw-or-where-it-lives>` field, it exits 1 naming `pw`; over the shipped template it exits 0.
-  Red when: the `pw` field passes.
-- **AC5** — When `git grep -n "section 1 \|section 7\|## 1\." -- tools/roles tools/workflows/drift-audit-code.template.js tools/workflows/drift-audit-state.template.js tools/unattended/check-pass-order.sh help/roles.md`
-  runs, the only hits are `SECTION_ONE_RE`'s legacy definition, its legacy fixture and its comment.
-  Red when: a reader still names a charter section by number.
+  today's `pw <pw-or-where-it-lives>` field, it exits 1 naming `pw`; and over the shipped template,
+  `grep -n "creds in" coding-governance-agents.template.md` names the `up —` definition while
+  `grep -n "pw <pw" coding-governance-agents.template.md` prints nothing.
+  Red when: the `pw` field passes, or the shipped definition still asks for a credential.
+- **AC5** — When `git grep -n -E "section [17]([^0-9]|$)|## 1\." -- tools/roles tools/workflows/drift-audit-code.template.js tools/workflows/drift-audit-state.template.js tools/unattended/check-pass-order.sh help/roles.md`
+  runs, 28 hits at `c7269a97`, the only hits left are the "protocol section 1" line of
+  `tools/unattended/check-pass-order.sh` and the `## 1.` heading of the legacy fixture charter, on a
+  line whose constant name carries `LEGACY`.
+  Red when: any other hit, a reader still naming a charter section by number.
 - **AC6** — When `python tools/roles/render_agents.py --check` runs after the commit, it exits 0, and
   `grep -c "^- \[verify\] " .claude/agents/gov-builder.md` prints 1; `python tools/roles/check_roles.py`
   over a scratch charter whose practices markers are removed and whose `## 1.` heading is gone exits 2
   naming R0.
   Red when: the role render fails on the re-founded charter, or a charter with neither shape parses.
-- **AC7** — When `git show HEAD:.governance/policy.toml` is read after the commit, its `"AGENTS.md"` key
-  under `[budgets]` holds a value at least the CR-stripped bytes of `AGENTS.md`, and a raised key
-  carries a `RAISED <old> -> <new>` comment naming this unit directly above it; and
-  `grep -n "charter.override" charter.md` names the key.
+- **AC7** — When `python tools/policy/budgets.py resolve AGENTS.md` runs after the commit, the value it
+  prints is at least the CR-stripped bytes of `AGENTS.md`; when that value moved,
+  `git show HEAD:tools/template-size-limits.txt` carries a `RAISED <old> -> <new>` line naming this unit
+  in the comment block above the `AGENTS.md` row; and `grep -n "charter.override" charter.md` names the key.
   Red when: the charter lands over its cap, or the page omits the rule.
   figure: the charter's size is DERIVED by `wc -c` at the landing commit.
 - **AC8** — When `python "tools/policy/policy.py" lists --check` runs after the first commit, it exits 0;
@@ -332,9 +353,11 @@ New arm: tools/playbook/render_playbook.py · covers AC2 · the selftest renders
   Probe: `git grep -n "section [0-9]" -- tools/workflows/*.template.js`, read for a prompt string naming
   the charter. Liveness: the probe finds `drift-audit-code.template.js:34`, so it can produce a hit.
   RESOLVED (agent, 2026-10-23, delegated): the hits are code comments in the drift-audit templates
-  (`:34`, `:49`; state `:33`, `:48`) and `unattended-build.template.js:992`, which names the spec
-  format's section 10, not the charter; S6 re-points the four charter comments. widens: none · relaxes:
-  none
+  (two in each, `tools/workflows/drift-audit-code.template.js@c7269a97:35` and its line 50, the state
+  template's the same two lines) and `unattended-build.template.js:992`, now
+  `tools/workflows/unattended-build.template.js@c7269a97:1066`, which with that file's other hits names
+  the spec format's sections 7, 9 and 10, not the charter; S6 re-points the four charter comments.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -348,20 +371,34 @@ New arm: tools/playbook/render_playbook.py · covers AC2 · the selftest renders
   `budgets.py resolve` and a crossing raised on `budgets."AGENTS.md"` in the minimal guard's one
   admitted shape, the former limits file being gone.
 - rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-6 · 2026-11-04 · S2 S6 S9 · section 3 Edges · section 4 design text, Rollout, Files touched · AC4
+  AC5 AC7 · the fork record's F4 · section 10 · from
+  `2026-11-04-prompt-PLAY-dOrderedCharter-52-drift-fold-brief.md` findings 2-1 to 2-5 and the
+  cross-cutting finding: S2 reads `charter.override` through unit 19's `read_policy_value`, refusing on
+  `PolicyRefused`, and the Edges gain unit 19; anchors re-read at `c7269a97` and written as symbols or
+  pinned lines beside each listed citation; S6 lists every section-number hit AC5's widened grep finds;
+  AC4's shipped-template half is a direct grep, not the leg; S9, AC7 and the Files touched re-ground
+  on `tools/template-size-limits.txt`, still tracked, the dSafePassage edge replaced by one naming it.
 
 ## 10. Reuse audit
 
-The seams extended: `parse_charter` (`tools/roles/roles_lib.py:176-224`) through `SECTION_ONE_RE`
-(`:61`), `check_rule_tags` (`:257`) and `render_charter_blocks` (`:284`), the one reader of the charter
-for every role render; `render()` (`tools/playbook/render_playbook.py:979`) for the template; the
-`[charter] adopter_rules` placeholder (`tools/govkit/entries/playbook.kit.toml:274-277`) for the project
-block; `tools/check-microformats.sh` for the credential field; and S12's factory for the override
-record, the deviation record's reader (`tools/memory-tree/deviation_join.py:141-164`, `:212`) being its
-first instance. `python tools/codebase-map/reuse_lookup.py "parse the charter rule tags a role cites"`
+The seams extended: `parse_charter` (`tools/roles/roles_lib.py:176-224`, now
+`tools/roles/roles_lib.py#parse_charter`) through `SECTION_ONE_RE`
+(`tools/roles/roles_lib.py#SECTION_ONE_RE`), `check_rule_tags` (`tools/roles/roles_lib.py#check_rule_tags`)
+and `render_charter_blocks` (`tools/roles/roles_lib.py#render_charter_blocks`), the one reader of the
+charter for every role render; `render()` (`tools/playbook/render_playbook.py:979`, now
+`tools/playbook/render_playbook.py#render`) for the template; the `[charter] adopter_rules` placeholder
+(`tools/govkit/entries/playbook.kit.toml:274-277`, now
+`tools/govkit/entries/playbook.kit.toml@c7269a97:275-278`) for the project block;
+`tools/check-microformats.sh` for the credential field; `read_policy_value`
+(`tools/playbook/policy_value.py#read_policy_value`) for `charter.override`; and S12's factory for the
+override record, the deviation record's reader (`tools/memory-tree/deviation_join.py:141-164`, now
+`tools/memory-tree/deviation_join.py@c7269a97:146-169` from `SAY` to `RUN_FILE`, and
+`tools/memory-tree/deviation_join.py#read_record`) being its first instance. `python tools/codebase-map/reuse_lookup.py "parse the charter rule tags a role cites"`
 ranked `parse_charter`, `RolesError`, `resolve_charter_path` and `check_rule_tags` from
 `tools/roles/roles_lib.py`, which agree with the source, and `parse` (`tools/memory-recall/query.py`,
 fan-in 102), a name-token match that is no seam for this. Scout A's row cites
-`tools/workflows/drift-audit-code.js:34,49`; the edit is to its `.template.js` source, which carries the
-same lines.
+`tools/workflows/drift-audit-code.js:34,49`, now `tools/workflows/drift-audit-code.js@c7269a97:35` and
+its line 50; the edit is to its `.template.js` source, which carries the same lines.
 
 Recall terms used: `python tools/memory-recall/query.py "how are role agents handed charter rule lines and how is the handoff ordered" --terms "handoff role rules charter blocks render_charter_blocks omitClaudeMd subagent prompt marker"`

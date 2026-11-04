@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-41 — the `cross-os` block stays live, so every v4 template renders after the practice catalogue lands
 
-**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -25,11 +25,11 @@ The round-1 spec audit (`memory/builds/dOrderedCharter/reviews/2026-10-23-review
 confirmed **finding 30 at HIGH**, its item **H3**. `PLAY-dOrderedCharter-1` S6 marks the `cross-os`
 `[[block]]` row `legacy` and moves the template marker only to v4.5. `render()` refuses any template
 at or above `TEMPLATE_MAJOR` (4) whose `when` fence names a legacy block
-(`tools/playbook/render_playbook.py:1004-1012`), and gov's template still carries
+(`tools/playbook/render_playbook.py:1004-1012` at base, `tools/playbook/render_playbook.py@c7269a97:1049-1057` at `c7269a97`), and gov's template still carries
 `<!-- when:cross-os -->` at line 198, around the Toolchain section, as every seeded v4.x adopter
 template carries the section-1 fence. Gov's re-render (unit 1 AC4) and every adopter's render would
 refuse. Unit 1's Migration line is also wrong: the reseed note fires only when the major is behind
-(`:1026-1029`), never for v4.4 against v4.5. This unit keeps `cross-os` a live block, keeps S6's
+(`tools/playbook/render_playbook.py@c7269a97:1071-1074`), never for v4.4 against v4.5. This unit keeps `cross-os` a live block, keeps S6's
 mapping of `drop_blocks` onto the practice set, states the major-only rule, and arms a render probe
 over gov's template and a seeded previous-minor template. It repairs unit 1 and is built right after
 it.
@@ -37,12 +37,14 @@ it.
 ## 2. Scope (IN)
 
 - **S1** — The row stays live. The `cross-os` `[[block]]` row in
-  `tools/govkit/entries/playbook.kit.toml:285-287` carries no `legacy` key at this unit's close. This
+  `tools/govkit/entries/playbook.kit.toml:285-287` (at `c7269a97`
+  `tools/govkit/entries/playbook.kit.toml@c7269a97:286-288`) carries no `legacy` key at this unit's close. This
   supersedes unit 1 S6's "the `cross-os` `[[block]]` row ... gains `legacy`". Where unit 1 landed the
   key, this unit takes it off the row.
   **Readers:** by name: `tools/govkit/entries/playbook.kit.toml`, the row, and
   `tools/playbook/render_playbook.py`, which reads the `legacy` key of every block row · by value:
-  `render()`'s legacy set and its refusal (`tools/playbook/render_playbook.py:1008-1012`), which this
+  `render()`'s legacy set and its refusal (`tools/playbook/render_playbook.py:1008-1012` at base,
+  `tools/playbook/render_playbook.py@c7269a97:1053-1057`), which this
   item keeps `cross-os` out of. Observed by AC1 and AC2.
 - **S2** — The mapping, without the legacy path. A `drop_blocks` member `cross-os` still cuts the
   fenced text the template carries (the Toolchain section at `coding-governance-agents.template.md:198-200`,
@@ -88,11 +90,18 @@ fences at lines 42-44 and 198-200. The block row is at `tools/govkit/entries/pla
 with no `legacy` key today. Gov's `.governance/deploy.toml` sets no `drop_blocks`, and says why in its
 comment.
 
+Re-read at `c7269a97`, the same rules sit about 45 lines lower, each pinned: `current` at
+`tools/playbook/render_playbook.py@c7269a97:1049`; the legacy set at `tools/playbook/render_playbook.py@c7269a97:1053`; the refusal at `tools/playbook/render_playbook.py@c7269a97:1054-1057`; `retired` at `tools/playbook/render_playbook.py@c7269a97:1060`, its
+note at `tools/playbook/render_playbook.py@c7269a97:1070`; the reseed note at `tools/playbook/render_playbook.py@c7269a97:1071-1074`; the `drop_names` loop and drop set at
+`tools/playbook/render_playbook.py@c7269a97:1062-1068`; the undeclared-member refusal at `tools/playbook/render_playbook.py@c7269a97:1034-1037`; all inside
+`tools/playbook/render_playbook.py#render`. The block row is at
+`tools/govkit/entries/playbook.kit.toml@c7269a97:286-288`, and `TEMPLATE_MAJOR` stays at `:343`.
+
 ### Flow
 
 `render()` keeps its order. Unit 1's catalogue step resolves the active set; S2's step, beside it,
 removes `practice.cross-os` when `drop_blocks` names `cross-os` and appends the note. The existing
-`drop_names` loop and drop set (`:1017-1023`) drop the fence as they always did, because `cross-os` is declared and
+`drop_names` loop and drop set (`tools/playbook/render_playbook.py@c7269a97:1062-1068`) drop the fence as they always did, because `cross-os` is declared and
 not legacy.
 
 ### Inventory
@@ -124,7 +133,7 @@ sequenced rather than run together (M6), and before unit 2 at order 20, which mo
 - security: no new surface.
 - perf / scale: none; one set difference per render.
 - error / empty / loading states: unchanged; a `drop_blocks` member naming an undeclared block is
-  still refused (`:988-992`).
+  still refused (`tools/playbook/render_playbook.py@c7269a97:1034-1037`).
 - observability: S2's note names both the dropped block and the practice.
 - risks: an adopter reading unit 1's earlier `retired` wording is told to keep the member, which still
   drops the Toolchain section.
@@ -135,9 +144,11 @@ sequenced rather than run together (M6), and before unit 2 at order 20, which mo
 ## 6. Acceptance criteria
 
 - **AC1** — When `python -c "import sys, tomllib; print([b for b in tomllib.load(open(sys.argv[1],'rb'))['block'] if b['name']=='cross-os'])" tools/govkit/entries/playbook.kit.toml`
-  runs at the unit's commit, the one row printed has no `legacy` key.
+  runs at the unit's commit, the one row printed has no `legacy` key. It reads green at base too: its
+  failing case is the staged `legacy` mark section 7's arm names.
   Red when: the row carries `legacy`.
 - **AC2** — When `python tools/playbook/render_playbook.py --target . --check` runs on gov, it exits 0.
+  It reads green at base too: its failing case is the same staged `legacy` mark.
   Red when: the render refuses naming `when:cross-os`, as it does with the row marked legacy.
 - **AC3** — When the render runs against a scratch target with `drop_blocks = ["cross-os"]` and gov's
   template, the output carries no Toolchain section and no `[cross-os]` line, and prints the
@@ -146,8 +157,11 @@ sequenced rather than run together (M6), and before unit 2 at order 20, which mo
 - **AC4** — When `git grep -n -e "minor behind" -- tools/playbook/render_playbook.py help/`
   runs, `render_playbook.py` and the page `charter.md` each state the major-only rule.
   Red when: either still says a minor-older template gets the reseed note.
-- **AC5** — When `python tools/playbook/render_playbook.py --selftest` runs, the S4 arm renders gov's
-  template and the seeded v4.4 copy with and without the member and reports four exits of 0.
+- **AC5** — When `python tools/playbook/render_playbook.py --target <scratch>` runs over four scratch
+  targets, gov's template and a seeded v4.4 copy (its literal section-1 lines and both `cross-os`
+  fences), each with and without `drop_blocks = ["cross-os"]` in its `.governance/deploy.toml`, each of
+  the four renders exits 0. The builder never runs the selftest, which scratch-guard refuses a role
+  agent; S4's arm is section 7's `New arm:`, which the main loop observes red and then green at the close.
   Red when: a block row's state change makes either template refuse.
 
 ## 7. Gates
@@ -173,11 +187,13 @@ New arm: tools/playbook/render_playbook.py · covers AC5 · the selftest renders
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's finding 30 (HIGH, item H3).
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 - rev-3 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-4 · 2026-11-04 · section 1 · section 2 S1 · section 4 Evidence and Flow · section 5 · AC1 AC2 AC5 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-1-drift-fold-brief.md` (findings 41-1 to 41-3): `render()`'s lines, about 45 lower at `c7269a97`, are pinned there beside each base citation; AC5 renders four scratch targets directly, since scratch-guard refuses a builder the selftest, which stays owed at the close; AC1 and AC2 name their failing case, the staged `legacy` mark.
 
 ## 10. Reuse audit
 
-The seam is `render()`'s block handling in `tools/playbook/render_playbook.py:979-1051`, the legacy set
-and refusal at `:1008-1012` and the `drop_names` loop and drop set at `:1017-1023`, which this unit leaves as it is
+The seam is `render()`'s block handling in `tools/playbook/render_playbook.py:979-1051` at base
+(`tools/playbook/render_playbook.py#render`), the legacy set and refusal at `tools/playbook/render_playbook.py@c7269a97:1053-1057` and the
+`drop_names` loop and drop set at `tools/playbook/render_playbook.py@c7269a97:1062-1068`, which this unit leaves as it is
 and keeps `cross-os` outside of. The recall query returned `TOOL-dRedressedBar-20` §4, which describes
 the same three rules at an earlier line set (`:1000-1001`, `:1006-1009`, `:1023-1026`) and agrees with
 source on their meaning. `python tools/codebase-map/reuse_lookup.py "render a template whose when

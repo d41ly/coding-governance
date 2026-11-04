@@ -94,6 +94,7 @@ later build registers; and the pin hash factored into one shared function (night
 - **hands-off** `PLAY-dOrderedCharter-35` — the edge grammar and S7's shared pin normaliser
 - **hands-off** `PLAY-dOrderedCharter-15` — S7's shared normaliser for a change record's before and after texts
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 51 and 52, which that batch unit corrects after this unit lands, each by the item its report id names
+- **hands-off** `PLAY-dOrderedCharter-7` — `tools/playbook/edges.toml`, whose `enforces` row's `to` that unit's S2 widens with `principle`
 
 ## 4. Design
 
@@ -251,6 +252,7 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC2 AC3 AC4 AC5 AC6 · the p
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
 - rev-3 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- 2026-11-04 · section 3 Edges · from `2026-11-04-prompt-PLAY-dOrderedCharter-15-edge-mirror-brief.md`: the hands-off mirror of the consumes-from edge unit 7 declares against this unit; a mirror-only edit, so the status line keeps its rev.
 
 ## 10. Reuse audit
 

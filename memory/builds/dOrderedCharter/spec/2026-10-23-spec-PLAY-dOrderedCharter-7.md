@@ -178,7 +178,6 @@ build owns.
 - **consumes-from** external — dGroundRules, landed before this build run: `policy.py get` at the landed revision (TOOL-dGroundRules-2 S1, S7, `cl-dClosedLoop-0008`) with an unset key's catalogue default (TOOL-dGroundRules-3 S2), the `core.bypass` and `core.exceptions` rows and the shrink-only list S12 drains (TOOL-dGroundRules-1 S3, S6), and the mirror's `mirror --write` (TOOL-dGroundRules-5 S2, TOOL-dGroundRules-19 S1); the minimal guard's proof is `[ -t 2 ]` inline in `.githooks/pre-commit`, which no Python calls (TOOL-dGroundRules-6 S4, F3), so this edge takes no proof from it
 - **hands-off** `PLAY-dOrderedCharter-9` — `read_policy_value`, over which that unit's `policy_reader` renders a `policy:<key>` unit
 - **hands-off** `PLAY-dOrderedCharter-14` — `read_policy_value`, which that unit reads `memory.load-budget` through
-- **hands-off** `PLAY-dOrderedCharter-27` — `read_policy_value`, which that unit reads `memory.code-budget` through
 - **hands-off** external — dShippedRelease runs the core legs on the landed tree and acts on a bypassed red as `core.bypass` says; dTotalRecall's record door adopts the exception door
 - **hands-off** `PLAY-dOrderedCharter-42` — the three typed record kinds admitted by the bindings reader and joined to their file names, and the factory's kind list made the reader's (finding 31)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 4, 5, 40, 61, 66, 67 and 85, which that batch unit corrects after this unit lands, each by the item its report id names
@@ -406,6 +405,7 @@ New arm: tools/memory-tree/deviation_join.py · covers AC7 · its existing suite
   `compute_coverage` is imported from memory-tree's `coverage_join.py`; `edges.toml`'s `enforces` `to`
   gains `principle` in this pass; the five legs write their claim, pin and claiming rows; the
   `deviation_join.py` lines and the leg count are re-read at `8aafb0314`; §4 Rollout names units 24 and 50.
+- 2026-11-04 · section 3 Edges · from `2026-11-04-prompt-PLAY-dOrderedCharter-15-edge-mirror-brief.md`: the hands-off to unit 27 is dropped, since that unit reads `read_policy_value` from PLAY-dOrderedCharter-19 and its consumes-from edge names 19, not this unit; an edge-only edit, so the status line keeps its rev.
 
 ## 10. Reuse audit
 

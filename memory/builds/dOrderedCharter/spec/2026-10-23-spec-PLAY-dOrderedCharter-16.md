@@ -124,6 +124,7 @@ name a core memory-tree module imported from the recall kit (P28, v2 `[layers]`;
 - **hands-off** `PLAY-dOrderedCharter-15` — the layer register's declared points, which the write command's arms read
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 43 and 63, which that batch unit corrects after this unit lands, each by the item its report id names
 - **hands-off** `PLAY-dOrderedCharter-55` — `import_walk.derive_import_closure`, over which the tag index's extractor version is hashed (round-2 id 19)
+- **hands-off** `PLAY-dOrderedCharter-61` — `tools/playbook/check_layers.py`, its fixture and plant table, and `tools/memory-tree/import_walk.py`, which that unit repairs
 
 ## 4. Design
 
@@ -359,6 +360,7 @@ New arm: tools/memory-tree/check-verdict-epoch.test.sh · covers AC1 · a case a
   the policy kit is `layer.instruction` core (F4) and joins Files touched, `policy fixtures` joins §7
   for its guard, and the walk's and govkit check 7's lines are re-read at HEAD after
   PLAY-dOrderedCharter-18.
+- 2026-11-04 · section 3 Edges · from `2026-11-04-prompt-PLAY-dOrderedCharter-15-edge-mirror-brief.md`: the hands-off mirror of the consumes-from edge unit 61 declares against this unit; a mirror-only edit, so the status line keeps its rev.
 
 ## 10. Reuse audit
 

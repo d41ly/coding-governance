@@ -222,6 +222,9 @@ point 3, the owner's NT-15; C1-F3, DA-M9, FM10).
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 11, 55, 77 and 78, which that batch unit corrects after this unit lands, each by the item its report id names; finding 44 is folded into S9 and AC17
 - **hands-off** `PLAY-dOrderedCharter-51` — `tree_built` keyed on the tree and its extractor-versions digest, and every read filtered to the reading worktree's own versions (round-2 id 30)
 - **hands-off** `PLAY-dOrderedCharter-55` — the index's order-5 independence, its in-place schema rebuild and the dirty rows' canonical worktree key (round-2 ids 4, 31, 41)
+- **hands-off** `PLAY-dOrderedCharter-2` — `read_policy_value` and `PolicyRefused` in `tools/playbook/policy_value.py`, through which that unit's S2 reads `charter.override`
+- **hands-off** `PLAY-dOrderedCharter-11` — `read_policy_value` and `PolicyRefused` in `tools/playbook/policy_value.py`, through which that unit's S2 reads `instructions.checks`, and `read_namespaces` in `tools/playbook/tag_index.py`, through which its S1 reads the `role` and `feature` rows
+- **hands-off** `PLAY-dOrderedCharter-27` — `read_policy_value` in `tools/playbook/policy_value.py` and its refusal `PolicyRefused`, which that unit's S2 reads `memory.code-budget` through
 
 ## 4. Design
 
@@ -548,6 +551,7 @@ New arm: tools/codebase-map/selftest.py · covers AC10 AC17 · the selftest's co
   copy; stale lines re-cited at HEAD.
 - rev-7 · 2026-11-03 · §4 Files touched · AC10 · AC17 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 1: AC17 observes the moved `derive_baseline_additions` by a probe of its four answers in a scratch repository, and AC10 the re-export by a `map_lib` probe, neither by a suite run, the codebase-map selftest staying on §7's `New arm:` line; Files touched adds `tools/govkit/usage.toml`, `.lexicon.conf` and `memory/project/docs-undocumented.txt`.
 - rev-8 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md`, the main loop's confirming sweep: rev-7's Files touched names `.lexicon.conf`, which trips the `straggler-guard arms` guard, so the §7 leg line names that leg.
+- 2026-11-04 · section 3 Edges · from `2026-11-04-prompt-PLAY-dOrderedCharter-15-edge-mirror-brief.md`: the hands-off mirrors of the consumes-from edges units 2, 11 and 27 declare against this unit; a mirror-only edit, so the status line keeps its rev.
 
 ## 10. Reuse audit
 

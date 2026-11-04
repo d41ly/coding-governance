@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-21 — each practice's reach per step rendered as step-scoped units handed in work orders
 
-**Status:** DEFERRED · rev-2 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 23 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 23 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0051@44bf9720 whole
 
@@ -38,14 +38,27 @@ holds the charter to one line per practice.
 - **S1** — The step a work order serves. Each workflow row of `tools/roles/workflows.toml` gains a
   `step` field naming the flow step its work belongs to, a reach key of the practice catalogue, or
   `none` for a workflow that serves no step. `check_roles.py` admits the key in `WORKFLOW_KEYS`
-  (`tools/roles/check_roles.py:92`) and refuses a row without it. A role's step is its `workflow:`
-  value's row's `step`. The seeded values are §4's table. Observed by AC1.
+  (`tools/roles/check_roles.py:92`, today `tools/roles/check_roles.py#WORKFLOW_KEYS`), and that is the
+  whole refusal of a row without it: the missing-key loop in `tools/roles/check_roles.py#check_roles`
+  already refuses a row lacking any `WORKFLOW_KEYS` member. A role's step is its `workflow:` value's
+  row's `step`. The seeded values are the table in section 4. `WORKFLOW_KEYS` also lays out the
+  workflows table `tools/roles/check_roles.py#render_catalogue_region` writes into
+  `tools/roles/README.md`'s `gen:roles-catalogue` region, one column per key, and the stale-region check
+  reds a region that differs from a fresh render, so the builder re-renders it with
+  `check_roles.py --write` in the same commit. Observed by AC1.
 - **S2** — The reach units. `derive_load_set` (`PLAY-dOrderedCharter-11`) adds, for a reader whose
   step is not `none`, one unit per active practice (`charter.practices`, resolved by
   `resolve_active_practices` of `PLAY-dOrderedCharter-1`) whose catalogue row has a
   `reach.<step>` value: tag `practice.<name>.<step>`, scope `step.<step>` and the practice's own tag,
   level 0, the practice's, type `directive`, text the reach value. They are derived at render from the
-  catalogue and never written as rows. Observed by AC2.
+  catalogue and never written as rows. The reader's role part, its `role.<name>` selector, is reported
+  `unarmed` while no `role` namespace is registered, as unit 11 reports an unregistered `feature.*`
+  part; the reach units do not ride that part, since they are keyed on the role's step, read from its
+  workflow row, so they load all the same. Their `step.<step>` scope names a namespace
+  `tools/playbook/namespaces.toml` does not register: `derive_load_set` validates no scope of a derived
+  unit, and the tag resolver, whose shape check reds `step.build` as an unregistered namespace (the
+  `bad-ns` plant row, `tools/playbook/adopt-playbook.sh@c7269a97:281`), reads only written rows, so the
+  scope is printed and never graded. Observed by AC2.
 - **S3** — Handed in the work order. `render_handoff` (`tools/roles/handoff.py:312`) renders the reach
   units as one `### Practices at <step>` block after the charter blocks, one `- [<name>] <reach>` line
   each in catalogue order, and none for a step of `none`. Observed by AC3.
@@ -148,14 +161,18 @@ Live at landing; every builder handoff gains the block.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python tools/roles/check_roles.py` runs over a scratch kit whose `build` row lacks
-  `step`, it exits non-zero naming the row and the field; over the shipped kit it exits 0.
-  Red when: a workflow without `step` passes.
-- **AC2** — When `python load_sets.py derive --reader role.gov-builder` runs, it lists a
-  unit `practice.yagni.build` and one per other active practice with a `build` reach, and none with a
-  `design` reach only; for `role.gov-session` (workflow `handoff`, step `none`) it lists none.
-  Red when: a reach unit of another step loads, or a step of `none` loads one.
-- **AC3** — When `python tools/roles/handoff.py render --role builder --build <fixture> --stdout`
+- **AC1** — When `python <scratch>/tools/roles/check_roles.py --root <scratch>` runs, the checker reading
+  the kit beside it, over a scratch copy of gov's tree whose roles kit's `build` row lacks `step`, it
+  exits non-zero naming the row and the field; over an unedited scratch copy of the shipped kit, its
+  README re-rendered by `--write`, it exits 0.
+  Red when: a workflow without `step` passes, or the catalogue region lacks the `step` column.
+- **AC2** — When `python load_sets.py derive --reader role.gov-builder` runs, it prints the role part
+  `unarmed` and lists a unit `practice.yagni.build` and one per other active practice with a `build`
+  reach, and none with a `design` reach only; for `role.gov-session` (workflow `handoff`, step `none`)
+  it lists none.
+  Red when: a reach unit of another step loads, a step of `none` loads one, or the unarmed role part
+  drops the reach units.
+- **AC3** — When `python tools/roles/handoff.py render --role gov-builder --build <fixture> --unit <id> --stdout`
   runs, the output holds `### Practices at build` with `- [yagni] delete rather than disable`; with
   `charter.practices` passed as a stand-in set without `practice.yagni`, the line is absent.
   Red when: the block is missing, or an inactive practice's reach is handed.
@@ -188,13 +205,17 @@ New arm: tools/playbook/instruction_units.py · covers AC4 · the `practices` ve
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-3 · 2026-11-04 · section 2 S1, S2 · AC1 to AC3 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-27-1-spec-writer.md`, the drift sweep's findings 21-1 to 21-4 read at `c7269a97`: the moved citations carry their stable forms; the missing-key loop is the whole refusal and the README's catalogue region is re-rendered with the key; AC3 renders as `gov-builder` with `--unit`; the role part reads `unarmed` and the `step.<step>` scope is never graded; AC1 runs over a scratch copy, not the `roles catalogue` leg's argv.
 
 ## 10. Reuse audit
 
 The seams extended: `render_charter_blocks` as called from `render_handoff`
-(`tools/roles/handoff.py:397-407`, `tools/roles/roles_lib.py:284`), where practice lines reach a
-handoff today and where the block joins; `tools/roles/workflows.toml` and `WORKFLOW_KEYS`
-(`tools/roles/check_roles.py:92`, checked at `:258-260`), the declared workflow rows the step joins;
+(`tools/roles/handoff.py:397-407`, `tools/roles/roles_lib.py:284`, today
+`tools/roles/roles_lib.py#render_charter_blocks`), where practice lines reach a handoff today and
+where the block joins; `tools/roles/workflows.toml` and `WORKFLOW_KEYS` (`tools/roles/check_roles.py:92`,
+today `tools/roles/check_roles.py#WORKFLOW_KEYS`, checked in `tools/roles/check_roles.py#check_roles`
+and rendered by `tools/roles/check_roles.py#render_catalogue_region`), the declared workflow rows the
+step joins;
 and `PLAY-dOrderedCharter-11`'s `derive_load_set`. `python tools/codebase-map/reuse_lookup.py
 "assemble a role handoff from the charter rules and the task"` ranked `RolesError`, `parse_charter`,
 `resolve_charter_path`, `render_charter_blocks`, `render_role` and `check_rule_tags` from

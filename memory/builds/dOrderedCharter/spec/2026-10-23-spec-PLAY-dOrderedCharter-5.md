@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-5 — ranked envelopes in every subagent handoff, the charter carried once
 
-**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 24 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 24 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0035@0d7d32c8 whole
 
@@ -148,7 +148,7 @@ charter blocks from an agent file that also lacks them.
   envelope in the body of the fixture's builder agent file is level 0, holding the cited rule lines,
   and its last closer is the agent file's own level-5 closer.
   Red when: the charter blocks follow the role text or sit outside an envelope.
-- **AC2** — When `python tools/roles/handoff.py render --role builder --build <fixture> --stdout` runs,
+- **AC2** — When `python tools/roles/handoff.py render --role gov-builder --build <fixture> --unit <id> --stdout` runs,
   the envelopes it prints carry levels 0, 5 and 6 in that order, each opened and closed once.
   Red when: a block is unenveloped or out of level order.
 - **AC3** — When the same render runs with `--part task`, `grep -c "^### Charter rules"` over its output
@@ -184,13 +184,15 @@ New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 AC4 · the selftest'
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 - rev-4 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-5 · 2026-11-04 · AC2 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-27-1-spec-writer.md`, the drift sweep's findings 5-1 and 5-2 read at `c7269a97`: `render_charter_blocks` carries its stable form beside its moved line; AC2, and AC3 with it, render as `gov-builder` with `--unit`, since the catalogue holds no role `builder`.
 
 ## 10. Reuse audit
 
 The seams extended: `render_handoff` (`tools/roles/handoff.py:312-423`), whose charter blocks
 (`:397-407`) and Role and Task sections (`:415-422`) this unit reorders and wraps; `render_agent_file`
 (`tools/roles/render_agents.py:144-155`), which renders the same charter blocks through
-`render_charter_blocks` (`tools/roles/roles_lib.py:284`); `check_handoff` (`handoff.py:426`), the one
+`render_charter_blocks` (`tools/roles/roles_lib.py:284`, today
+`tools/roles/roles_lib.py#render_charter_blocks`); `check_handoff` (`handoff.py:426`), the one
 verifier of a prompt file; and `PLAY-dOrderedCharter-3`'s inline `render_envelope` copy in
 `roles_lib.py`. `python tools/codebase-map/reuse_lookup.py "assemble a role handoff from the charter
 rules and the task"` ranked `parse_charter`, `render_charter_blocks`, `render_role` and `load_roles`

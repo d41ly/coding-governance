@@ -196,6 +196,7 @@ extending `charter.practices` into a pack catalogue, apart from the policy prese
 - **hands-off** `PLAY-dOrderedCharter-46` — S2's re-render pointed at the overlay the write verb has just written, through the candidate read (finding 80)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 5, 14, 67 and 85, which that batch unit corrects after this unit lands, each by the item its report id names
 - **consumes-from** `PLAY-dOrderedCharter-50` — the owed-rows probe: this pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its commit and writes every row it names in that commit (round-2 id 23)
+- **hands-off** `PLAY-dOrderedCharter-52` — the `instructions_edit.py fixture --plant` entry that unit's S6 three cases join
 
 ## 4. Design
 
@@ -426,6 +427,7 @@ New arm: tools/gate-legs.json · covers AC6 · the `instruction edits (manifest 
 - rev-7 · 2026-11-03 · S9 · from `2026-11-03-prompt-PLAY-dOrderedCharter-9-readers-brief.md`: S9's
   `**Readers:**` clause escapes the by-name half, the item retiring no name, and names the retired rows'
   value readers.
+- 2026-11-04 · section 3 Edges · from `2026-11-04-prompt-PLAY-dOrderedCharter-15-edge-mirror-brief.md`: the hands-off mirror of the consumes-from edge unit 52 declares against this unit; a mirror-only edit, so the status line keeps its rev.
 
 ## 10. Reuse audit
 

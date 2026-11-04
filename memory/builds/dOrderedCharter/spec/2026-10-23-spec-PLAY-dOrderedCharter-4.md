@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-4 — the instruction map re-injected on compact and resume through the existing replay fragment
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 25 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 25 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0034@06f1afc5 whole
 
@@ -130,7 +130,8 @@ card's tail, never the level-0 map.
 
 `derive_map_block` follows `derive_overlaps_line` (`:555-589`) rung for rung:
 
-1. `resolve_kit_file playbook instruction_units.py` (`:854-866`) empty → `map — skipped: no playbook
+1. `resolve_kit_file playbook instruction_units.py`
+   (`skills/session-kickoff/manifest-check.sh#resolve_kit_file`) empty → `map — skipped: no playbook
    instruction map resolves in this tree`.
 2. `resolve_python` empty → `map — skipped: no Python resolves on this node`.
 3. No working `timeout -k` → the same `skipped:` form the overlaps cell prints.
@@ -169,8 +170,8 @@ read-only output and the fallback is today's replay plus one line.
 ### Alternatives rejected
 
 - **A third SessionStart fragment printing the map.** Refused by the clause and by `check_card`
-  (`tools/check-wiring.sh:1044-1046`), which iterates exactly the two card fragments, so a third
-  entry would be wiring no arm grades.
+  (`tools/check-wiring.sh:1044-1046`, today `tools/check-wiring.sh#check_card`), which iterates exactly
+  the two card fragments, so a third entry would be wiring no arm grades.
 - **Storing the map in the card at write time.** The card is per session and written at startup; a
   map stored there goes stale when a registry row changes mid-session, and the replay's job is to
   print what holds now.
@@ -232,7 +233,7 @@ read-only output and the fallback is today's replay plus one line.
 
 ## 7. Gates
 
-`govkit acceptance matrix` · `lexicon naming predicates` · `manifest-check self-test` · `playbook render selftest` · `scratch-guard self-test` · `check-wiring self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit acceptance matrix` · `lexicon naming predicates` · `manifest-check self-test` · `playbook render selftest` · `scratch-guard self-test` · `check-wiring self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: skills/session-kickoff/manifest-check.test.sh · covers AC4 AC5 AC6 · the replay's map-first order, its three skipped forms and the writer's absence of a map, its failing case staged by printing the map after the card · none
 New arm: tools/playbook/render_playbook.py · covers AC1 AC2 · `--selftest` arms rendering the `map` verb over a two-row registry and an over-cap one, staged by dropping the preset line from the verb's output · none
@@ -261,17 +262,21 @@ New arm: tools/playbook/render_playbook.py · covers AC1 AC2 · `--selftest` arm
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §2 S2 · §3 Non-goals · §4 The verb, The preset line · AC1 · §8 F3's evidence · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 31: the preset line stops restating the resolution order, which dGroundRules' reader extends with a last-valid source and a derived-default refusal, and points at `policy.py get <key> --explain`; F3 keeps its resolution.
+- rev-4 · 2026-11-04 · §4 The replay, Alternatives rejected · §7 · §10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-27-1-spec-writer.md`, the drift sweep's findings 4-1 and 4-2 read at `c7269a97`: the leg line names `policy fixtures`, whose guard `skills/session-kickoff/manifest-check.sh` trips; `resolve_kit_file` and `check_card` carry their stable forms beside their moved lines, and the reuse audit stops saying the scout's `check_card` line holds.
+- 2026-11-04 · section 9 · from `2026-11-04-prompt-PLAY-dOrderedCharter-1-hygiene-fix-brief.md` item 1, by the main loop's ruling on its fork: the rev-4 entry names section 4, section 7 and section 10 in the section-sign form, the only form the template-conformance check accepts until a repair unit widens it to a section named in words; a records fix, so the status line keeps its rev.
 
 ## 10. Reuse audit
 
 The seams extended: the replay `print_replay` (`skills/session-kickoff/manifest-check.sh:721-725`)
 and its existing fragment `orientation-replay.fragment.json` (matcher `resume|compact`); the bounded
-optional-sibling probe `derive_overlaps_line` (`:555-589`) with `resolve_kit_file` (`:854-866`),
+optional-sibling probe `derive_overlaps_line` (`:555-589`) with `resolve_kit_file`
+(`skills/session-kickoff/manifest-check.sh#resolve_kit_file`),
 whose rungs `derive_map_block` follows and whose resolver it calls rather than spelling a sibling
 path; PLAY-dOrderedCharter-2's `render_instruction_map` and PLAY-dOrderedCharter-3's
 `render_envelope` and `read_document_registry`, consumed, never retyped. The scout row
 (`2026-10-23-build-PLAY-dOrderedCharter-1-reuse-scout-a.md`, unit -4) was verified against source:
-`print_replay` sits at `:721` and `check_card` at `tools/check-wiring.sh:1044`, as it states.
+`print_replay` sits at `:721`, as it states; its `check_card` at `tools/check-wiring.sh:1044` has since
+moved, and this spec cites it as `tools/check-wiring.sh#check_card`.
 `reuse_lookup.py "re-inject the instruction map on compact and resume through the session start replay hook"`
 ranked `map_root`, `load_map_tree` and `render_map_md` (`tools/codebase-map/map_lib.py`), the
 codebase map's dossier renderers, which render no instruction ladder, and `extract_session` and

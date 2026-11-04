@@ -122,3 +122,5 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-03T23:35:50Z brief · item PLAY-dOrderedCharter-50 · reason ed3a9839799f memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-50-build-brief.md
 
 2026-11-04T00:09:43Z dispatch · item c7269a97 PLAY-dOrderedCharter-50 · reason tools/run-gates/owed_rows.py tools/run-gates/run-gates.test.sh tools/run-gates/kit.toml tools/govkit/subject-pins.tsv tools/govkit/selftest.py tools/playbook/kit.toml memory/map/features/run-gates.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/CARDS.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-50-ledger.md memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-50.md memory/builds/dOrderedCharter/README.md
+
+2026-11-04T01:01:27Z rescope · item add PLAY-dOrderedCharter-64 · reason the template-conformance check's revision-scope arm accepts only the section-sign form, which unit 26's positional check grades and unit 53's per-line rule will red; one arm must accept a section named in words, a class repair before unit 53 (sweep fold 2)

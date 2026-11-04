@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-6 — the drive section composed from each adopted kit's drive table, and the charter held inside 32 KiB
 
-**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 19 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-6 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 19 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0036@3667f2f3 whole
 
@@ -53,11 +53,12 @@ F1-6, F1-7; v2:961-965 P15).
   by AC1 and AC3.
 - **S3** — The composition. The template gains a `## Drive — how to start and advance the loop` section
   holding one `{{DRIVE}}` line in a one-line region, and `render()`
-  (`tools/playbook/render_playbook.py:979`) expands it, before it collects placeholders, into one
+  (`tools/playbook/render_playbook.py:979`, now `tools/playbook/render_playbook.py#render`) expands it, before it collects placeholders, into one
   `- ` line per row of the selected kits, `start` rows first, then by the workflow's `stage` integer,
   then kit and row order. A kit the target did not select contributes nothing. The renderer finds each
   selected kit's descriptor through the registry's `descriptor` path: in gov, under the tool root, as
-  `resolve_declaration_paths` (`render_playbook.py:743`) finds its own; in an adopter, a dir kit's own
+  `resolve_declaration_paths` (`render_playbook.py:743`, now
+  `tools/playbook/render_playbook.py#resolve_declaration_paths`) finds its own; in an adopter, a dir kit's own
   installed `kit.toml`, and a flat entry's descriptor shipped beside the engine by a `root_relative`
   `[[files]]` rule in `tools/playbook/kit.toml`, the rule that already ships `playbook.kit.toml`.
   Observed by AC2.
@@ -65,11 +66,18 @@ F1-6, F1-7; v2:961-965 P15).
   `stage` names a workflow or `start`, its `role` a rendered role or `main`, and its four fields are
   non-empty; every role of `tools/roles/workflows.toml`'s `roles` lists has a row; every line between
   the drive region's markers in the rendered charter is a selected kit's row; every selected kit's row
-  is a line there. Each failure names the kit and the row. Observed by AC3 and AC4.
+  is a line there. Each failure names the kit and the row. Its plants are cases of unit 9's
+  `instruction_units.py fixture --plant` entry, `drive-bad-role`, `drive-no-row`, `drive-empty-command`,
+  `drive-hand-line` and `drive-lost-line`, each a row of `adopt-playbook.sh`'s selftest through
+  `run_plant_rows` (`tools/playbook/adopt-playbook.sh#run_plant_rows`), which gains an optional third
+  argument naming the script's plant entry, `--fixture` when absent, so the tag and edge rows run
+  unchanged (the fork record's F6). Observed by AC3 and AC4.
 - **S5** — The role line in the handoff. `render_handoff` (`tools/roles/handoff.py:312`) adds the
   role's drive lines under a `### Drive` heading at the end of the `## Role` section, from the same
   rows, so a subagent holds its role's line as the main session does. Observed by AC5.
-- **S6** — The charter inside 32 KiB. `tools/check-template-size.sh` gains a check: when its subject
+- **S6** — The charter inside 32 KiB. `tools/check-template-size.sh` gains a check, numbered 8 after
+  the retired-positional refusal's 7, beside its budget read
+  (`tools/check-template-size.sh@c7269a97:310-327`): when its subject
   is the rendered charter, `AGENTS.md`, a cap `budgets.py resolve AGENTS.md` answers above the smallest
   harness's limit is refused under either `budgets.enforce` value, a correctness check as the script's
   checks 3, 5 and 6 stay (TOOL-dGroundRules-9 S6). The limit is `CODEX_MAX`, read with
@@ -78,17 +86,23 @@ F1-6, F1-7; v2:961-965 P15).
   it; the check never types the value and never parses the census itself, and the verb's exit 2 refuses
   the check, exit 2. The charter is measured at this unit against its two caps
   through `budgets.py resolve AGENTS.md coding-governance-agents.template.md` (TOOL-dGroundRules-9 S2),
-  `budgets."AGENTS.md"` (20480) and the template's (49152), the `AGENTS.md` and template rows
-  `tools/template-size-limits.txt` held until dSafePassage's step moved them under `budgets.*` in
-  `.governance/policy.toml` (TOOL-dSafePassage-1 S7, S8), and both caps are
+  20480 for `AGENTS.md` and 49152 for the template at `c7269a97`: the `AGENTS.md` and template rows of
+  `tools/template-size-limits.txt`, each cap's `limits:` home in the census, read at the landed
+  revision, a `budgets."<key>"` value in `.governance/policy.toml` taking a row's place. Both caps are
   held. Observed by AC6.
-- **S7** — The raise rule, as the clause states it. `help/charter.md`, S8's page, gains one sentence:
-  once a cap is under `budgets.*`, a run's raise goes through the one write shape dGroundRules' minimal
-  guard admits until dDeclaredLoop's guard lands, argued in that write's change record as
-  `cl-dClosedLoop-0012` defines it, and the four conditions dSafePassage's step carries above
-  `[budgets]` stand; the sentence links `help/policy.md`'s section on who may change the policy file
-  (TOOL-dGroundRules-6 S6) for the shape, and the policy file stays as the step writes it (§8 F4).
-  Observed by AC7.
+  **Readers:** by name: READER NOT IN TREE — this item retires no name; "retired" names the size script's
+  existing retired-positional refusal, which keeps its number and its refusal while the new check
+  takes the next one · by value: NO VALUE READERS — no value is retired; the two caps and the
+  harness limit are read, never moved, and the census row that homes the limit is unit 31's to re-point.
+- **S7** — The raise rule, as the clause states it. `help/charter.md`, the page unit 1 creates and S8
+  extends, gains one sentence: a run's raise of a charter cap is owed under the four conditions in the
+  header of `tools/template-size-limits.txt`, its paragraph on when a run may raise a row
+  (`tools/template-size-limits.txt@c7269a97:16-23`), argued in place above the row as
+  `RAISED <old> -> <new>` with a `memory/DECISIONS.md` row in the same commit, the change record `cl-dClosedLoop-0012`
+  names for this build; once a row is under `budgets.*`, the raise goes through the one write shape
+  the minimal guard admits, as `help/policy.md`'s section on who may change the policy file states
+  (TOOL-dGroundRules-6 S6). The sentence links that header and that section and restates neither,
+  and this unit writes neither file (the fork record's F4). Observed by AC7.
 - **S8** — The page. `help/charter.md` gains a section on the drive section: where a kit declares its
   rows and how an adopter reads its own. Observed by AC7.
 - **S9** — One reader of a cap's home. The policy kit's `budgets.py` gains a verb,
@@ -100,8 +114,11 @@ F1-6, F1-7; v2:961-965 P15).
   `KEY = n` spellings alike); `-` for any other form. A cap with no census row, or a `constant:` home
   whose file holds no such line or no integer after its `=`, refuses, exit 2, as
   `policy: refused · <path>:<line> · <why>`. Its case `budgets-home` joins `CASES` in
-  `tools/policy/check_policy.py`, `help/size-caps.md` gains the verb's line, and the kit's version
-  marker moves. Units 11 and 34 read `CODEX_MAX` through it (§8 F5). Observed by AC8.
+  `tools/policy/check_policy.py`, `help/size-caps.md` gains the verb's line, and the kit's two version
+  markers move together, `KIT_POLICY_VERSION` in `tools/policy/policy.py` and the first line of
+  `tools/policy/README.md`, `<!-- gov:kit policy@<v> -->`, both `1.3` at `c7269a97`, which the `kit
+  version markers` leg reads equal. Units 11 and 34 read `CODEX_MAX` through it (the fork record's F5).
+  Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -127,7 +144,8 @@ F1-6, F1-7; v2:961-965 P15).
 - **hands-off** `PLAY-dOrderedCharter-37` — the drive table's `[[drive]]` rows its reference page renders
 - **hands-off** `PLAY-dOrderedCharter-11` — the `budgets.py home` verb its harness-limit read calls
 - **consumes-from** external — dGroundRules, landed before the build run: `budgets.py`, its `resolve` verb, its `derive_home_line` and the cap census whose `codex-instructions` row S9's verb prints (TOOL-dGroundRules-9 S1, S2), `CASES` in `check_policy.py` and the kit's version marker (TOOL-dGroundRules-1 S7), and the minimal guard, its one admitted raise and its help section, which the raise route names (TOOL-dGroundRules-6 S3, S6)
-- **consumes-from** external — dSafePassage, landed before the build run: the step that moved every row of the former limits file under `budgets.*` in `.governance/policy.toml`, the four raise conditions above `[budgets]` (TOOL-dSafePassage-1 S7, S8)
+- **consumes-from** `PLAY-dOrderedCharter-1` — `help/charter.md`, the page S7 and S8 extend, which that unit creates at order 17
+- **consumes-from** external — `tools/template-size-limits.txt`, in the tree: the `AGENTS.md` and template rows `budgets.py resolve` answers as each cap's `limits:` home, and the four raise conditions in its header that S7's sentence links; dSafePassage's step that would move them under `budgets.*` is DEFERRED at TOOL-dSafePassage-61 and is not waited for
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, finding 21, which that batch unit corrects after this unit lands, each by the item its report id names
 - **hands-off** `PLAY-dOrderedCharter-55` — AC7's page pathspec, which unit 49 S24 corrects, is observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
 
@@ -156,9 +174,10 @@ one line each, under the one-line cap.
 
 Minted: the `[[drive]]` row and its four fields; the stage value `start`; the role value `main`;
 the template section `## Drive — how to start and advance the loop`; the placeholder `DRIVE`; the CLI verb
-`drive`; the handoff heading `### Drive`; the size check's new number in `check-template-size.sh`; the
+`drive`; the handoff heading `### Drive`; the size check's new number in `check-template-size.sh`, 8; the
 `root_relative` `[[files]]` rules in `tools/playbook/kit.toml`; the `budgets.py` verb `home`, the
-function `read_cap_home` and the case `budgets-home`. `python tools/lexicon/lexicon.py --suggest
+function `read_cap_home` and the case `budgets-home`; the plants `drive-bad-role`, `drive-no-row`,
+`drive-empty-command`, `drive-hand-line` and `drive-lost-line`; `run_plant_rows`' third argument. `python tools/lexicon/lexicon.py --suggest
 read_cap_home --as py.function` answered OK on 2026-10-25; the lexicon declares no CLI-verb cell, so
 `home` is graded by no cell, and it names what the verb prints, as `resolve` and `check` do.
 
@@ -169,9 +188,9 @@ template's vintage as it does today. A kit without rows contributes nothing.
 
 ### Rollout
 
-Live at landing. Gov's `AGENTS.md` grows by the drive section; it is measured in the build against
-`budgets."AGENTS.md"` (20480), and a cap the section would cross is raised only in the minimal guard's
-one admitted shape (TOOL-dGroundRules-6 S3), under the four conditions above `[budgets]`.
+Live at landing. Gov's `AGENTS.md` grows by the drive section; it is measured in the build with
+`budgets.py resolve AGENTS.md`, 20480 at `c7269a97`, and a cap the section would cross is raised only
+in its row of `tools/template-size-limits.txt`, on the four conditions that file's header states.
 
 ### Files touched (estimate)
 
@@ -187,6 +206,7 @@ one admitted shape (TOOL-dGroundRules-6 S3), under the four conditions above `[b
 - `tools/playbook/kit.toml`
 - `tools/playbook/render_playbook.py`
 - `tools/playbook/instruction_units.py`
+- `tools/playbook/adopt-playbook.sh` (the drive plants' rows and `run_plant_rows`' third argument)
 - `tools/govkit/entries/playbook.kit.toml`
 - `tools/roles/handoff.py`
 - `tools/check-template-size.sh`
@@ -197,6 +217,7 @@ one admitted shape (TOOL-dGroundRules-6 S3), under the four conditions above `[b
 - `tools/policy/budgets.py` (the `home` verb and `read_cap_home`)
 - `tools/policy/check_policy.py` (the `budgets-home` case)
 - `tools/policy/policy.py` (the kit's version marker)
+- `tools/policy/README.md` (the kit's second version marker)
 - `help/size-caps.md` (the verb's line)
 
 ### Alternatives rejected
@@ -239,10 +260,12 @@ one admitted shape (TOOL-dGroundRules-6 S3), under the four conditions above `[b
 - **AC5** — When `python tools/roles/handoff.py render --role builder --build <fixture> --stdout` renders a fixture handoff, its
   `## Role` section ends with a `### Drive` block holding the `gov-builder` rows' lines.
   Red when: the handoff carries no drive line.
-- **AC6** — When `bash tools/check-template-size.sh AGENTS.md` runs in a scratch repository holding the
-  policy kit, whose committed `.governance/policy.toml` sets `"AGENTS.md" = 40960` under `[budgets]`, it
-  exits non-zero naming `CODEX_MAX` under `budgets.enforce = "warn"`; at 20480 it exits 0, and the
-  measured bytes it prints are at most 20480.
+- **AC6** — When the scratch copy of the script runs as `bash <scratch>/tools/check-template-size.sh
+  <scratch>/AGENTS.md`, never the `charter size` leg's argv, in a scratch repository holding the policy
+  kit, whose committed `.governance/policy.toml` sets `"AGENTS.md" = 40960` under `[budgets]` and whose
+  limits file carries no `AGENTS.md` row (a cap held in both homes refuses,
+  `tools/policy/budgets.py#resolve_caps`), it exits non-zero naming `CODEX_MAX` under
+  `budgets.enforce = "warn"`; at 20480 it exits 0, and the measured bytes it prints are at most 20480.
   Red when: a cap above 32768 passes.
 - **AC7** — When `grep -n "cl-dClosedLoop-0012" charter.md` and `grep -n "Drive" charter.md` run, each
   names the new text.
@@ -261,7 +284,7 @@ one admitted shape (TOOL-dGroundRules-6 S3), under the four conditions above `[b
 
 New arm: tools/policy/check_policy.py --fixture · covers AC8 · the `budgets-home` case plants a `constant:` home with its assignment line and one without · none
 New arm: tools/check-template-size.test.sh · covers AC6 · a scratch repository whose committed policy file sets the charter's cap above the harness limit · none
-New arm: tools/playbook/instruction_units.py · covers AC3 AC4 · the `drive` verb's selftest plants each defect of AC3 and the two charter edits of AC4 in a scratch tree · none
+New arm: tools/playbook/adopt-playbook.sh · covers AC3 AC4 · the `playbook render selftest` leg's `run_plant_rows` rows, each running `instruction_units.py fixture --plant drive-<case>` over one defect of AC3 or one charter edit of AC4 in a scratch tree, each failing case staged by its plant · none
 
 ## 8. Open questions
 
@@ -282,17 +305,21 @@ New arm: tools/playbook/instruction_units.py · covers AC3 AC4 · the `drive` ve
   RESOLVED (agent, 2026-10-23, delegated): (a), rung 3; (c) holds today's value and not the limit,
   so a later raise to 40960 would pass, and (b) is `PLAY-dOrderedCharter-34`'s composition refusal.
   widens: none · relaxes: none
-- **F4 — Where S7's sentence goes, the file it was written for being gone.** dSafePassage's step
-  deletes the former limits file in its own commit and carries its header, the four raise conditions,
-  above `[budgets]` in `.governance/policy.toml` (TOOL-dSafePassage-1 S7, S8), a path the minimal guard
-  refuses to an agent's commit unless the change is one cap raised (TOOL-dGroundRules-6 S1, S3).
-  Options: (a) the sentence on `help/charter.md`, S8's page, linking `help/policy.md`'s section on who
-  may change the policy file (TOOL-dGroundRules-6 S6), the policy file left as the step writes it; (b)
-  the sentence above `[budgets]`, written by the owner at a terminal; (c) the sentence on
-  `help/size-caps.md` (TOOL-dGroundRules-9 S8). (b) hangs an agent's unit on an owner turn the build
-  cannot schedule, and (c) edits a page another build owns. RESOLVED (agent, 2026-10-24, delegated):
-  (a), rung 1, the parents' landed specs rule out the file and the agent's write; (a) is the page this
-  unit already edits, and the link keeps the shape stated once. widens: none · relaxes: none
+- **F4 — Where S7's sentence goes.** First resolved, on 2026-10-24, on the premise that dSafePassage's
+  step had deleted the limits file and carried its header above `[budgets]` in `.governance/policy.toml`
+  (TOOL-dSafePassage-1 S7, S8). At `c7269a97` the step has not landed: `tools/template-size-limits.txt`
+  is tracked, its `AGENTS.md` row 20480 and its four raise conditions in its header; `[budgets]` holds
+  only `enforce` and `pinned`; the census reads `home = "limits:AGENTS.md"`; and TOOL-dSafePassage-1's
+  fork record moved the step to TOOL-dSafePassage-61, DEFERRED. Options: (a) the sentence on
+  `help/charter.md`, linking the limits file's header and `help/policy.md`'s section on who may change
+  the policy file, neither file written; (b) the sentence in the limits file's header; (c) the sentence
+  on `help/size-caps.md` (TOOL-dGroundRules-9 S8); (d) hold S6 and S7 until TOOL-dSafePassage-61 lands.
+  (b) edits the paragraph that names itself the one statement of these terms, which the build method
+  and the gate's own message point at rather than restate, a governance carrier; (c) edits a page
+  another build owns; (d) waits on a foreign DEFERRED unit this run never lands. RESOLVED (agent,
+  2026-11-04, delegated): (a), rung 1, the tree at `c7269a97` and the main loop's sweep decision in
+  `2026-11-04-prompt-PLAY-dOrderedCharter-52-drift-fold-brief.md`; it is the page this unit already
+  edits, and the links keep each term stated once. widens: none · relaxes: none
 - **F5 — Which unit adds `budgets.py home`.** The owner-forks brief of 2026-10-25 (item 6, the parent
   audit's P1) gives the verb to unit 11, so that S6's check and units 11 and 34 share one reader of the
   `codex-instructions` home. Options: (a) this unit, the verb's first caller at order 19; (b) unit 11,
@@ -301,6 +328,16 @@ New arm: tools/playbook/instruction_units.py · covers AC3 AC4 · the `drive` ve
   its own parse until then, two readers of one row, the defect P1 removes. RESOLVED (agent,
   2026-10-25, delegated): (a), rung 1, the build's order and the edge arm; the one reader the brief
   asks for is kept, and unit 11 calls it. widens: none · relaxes: none
+- **F6 — Which leg runs the drive plants.** At `c7269a97` `adopt-playbook.sh` runs no
+  `instruction_units.py` case, and `run_plant_rows` calls each script as `<script> --fixture --plant
+  <case>`, while unit 9 S6 spells the module's entry `fixture --plant <case>`. Options: (a) rows through
+  `run_plant_rows`, given an optional third argument naming the plant entry, `--fixture` when absent;
+  (b) a second spelling, `--fixture`, on `instruction_units.py` beside unit 9's verb; (c) a copy of the
+  loop for this module; (d) a new leg, with its dossier claim, its `subject-pins.tsv` row and its
+  claiming registry row. (b) is two spellings of one entry, (c) a second copy of the seam the reuse
+  rule forbids, and (d) adds a leg and three rows for five plants the `playbook render selftest` leg
+  already reaches, its guard covering `tools/playbook/`. RESOLVED (agent, 2026-11-04, delegated): (a),
+  rung 3, the seam the tag and edge arms already ride, extended additively. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -318,19 +355,34 @@ New arm: tools/playbook/instruction_units.py · covers AC3 AC4 · the `drive` ve
   `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md`, the parent audit's P1: this unit adds
   `budgets.py home <cap>`, the one reader of a cap's home, and S6 calls it rather than parse the
   census; F5 records why the verb lands here, at order 19, not with unit 11.
+- rev-6 · 2026-11-04 · S3 S4 S6 S7 S9 · section 3 Edges · section 4 Inventory, Rollout, Files touched ·
+  AC6 · section 7 · the fork record's F4 and F6 · section 10 · from
+  `2026-11-04-prompt-PLAY-dOrderedCharter-52-drift-fold-brief.md` findings 6-1 to 6-7 and the
+  cross-cutting finding: anchors re-read at `c7269a97` and written as symbols or pinned lines beside
+  each listed citation; the caps re-grounded on `tools/template-size-limits.txt`, still tracked, and
+  S7's sentence linking its header, F4 re-resolved and the dSafePassage edge replaced by one naming
+  that file; the new check is number 8; both policy version markers move; the Edges gain unit 1, whose
+  page S7 extends; the drive plants ride `run_plant_rows` (F6); AC6 runs the scratch copy, not the leg.
+- 2026-11-04 · section 2 S6 · from `2026-11-04-prompt-PLAY-dOrderedCharter-1-hygiene-fix-brief.md` item 2:
+  S6 gains its Readers clause, which says it retires nothing; a records fix, so the status line keeps its rev.
 
 ## 10. Reuse audit
 
-The seams extended: `render()` (`tools/playbook/render_playbook.py:979`) composes the section;
-`resolve_declaration_paths` (`:743`) is how the engine already finds a descriptor in gov and beside
+The seams extended: `render()` (`tools/playbook/render_playbook.py:979`, now
+`tools/playbook/render_playbook.py#render`) composes the section;
+`resolve_declaration_paths` (`tools/playbook/render_playbook.py#resolve_declaration_paths`) is how the engine already finds a descriptor in gov and beside
 itself in an adopter, and the `root_relative` `[[files]]` rules of `tools/playbook/kit.toml` are how
 its declarations already travel; `tools/roles/workflows.toml` already orders the loop's workflows by
 `stage`; `render_handoff` (`tools/roles/handoff.py:312`) assembles the role section the drive lines
 join; `budgets.py resolve` is the one reader of the caps (TOOL-dGroundRules-9 S2, S5), and
-`check-template-size.sh` (`tools/check-template-size.sh:79-100`) the enforcer the hold joins.
+`check-template-size.sh` (`tools/check-template-size.sh:79-100`, now its key derivation) the enforcer
+the hold joins, beside its budget read (`tools/check-template-size.sh@c7269a97:310-327`) and its breach
+check (`tools/check-template-size.sh@c7269a97:375-385`); `run_plant_rows`
+(`tools/playbook/adopt-playbook.sh#run_plant_rows`) is the plant loop the drive rows ride.
 `python tools/codebase-map/reuse_lookup.py "compose a charter section from each kit descriptor"`
 ranked `kit_rel`, `resolve_kit_dir` (fan-in 12, installs 72), `read_descriptors`
-(`tools/govkit/govkit.py:13238`, `tools/run-gates/regen.py`) and `render_charter_blocks`;
+(`tools/govkit/govkit.py:13238`, now `tools/govkit/govkit.py#read_descriptors`;
+`tools/run-gates/regen.py`) and `render_charter_blocks`;
 `read_descriptors` reads every registry descriptor but lives in the deployer, which an adopter's
 renderer does not have, so the engine keeps its own read, as the map's hit and the source disagree on
 reachability. A grep of `tools/govkit/govkit.py` finds no closed set of descriptor keys, so a
