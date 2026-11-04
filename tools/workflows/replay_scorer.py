@@ -92,6 +92,8 @@ BACKTICKED = re.compile(r"`([^`]+)`")
 LINE_REF = re.compile(r"([^\s:]*[./][^\s:]*):(\d+)")
 RANGE = re.compile(r"\b([0-9a-fA-F]{7,40})\.\.\.?([0-9a-fA-F]{7,40})\b")
 STATED = re.compile(r"\bconfirmed\W{0,6}(\d+)", re.IGNORECASE)
+#: The count as the harness states it: the `review-shape` line the synthesis copies above the appendix.
+SHAPE_STATED = re.compile(r"^\W*review-shape\b.*?\bconfirmed=(\d+)", re.IGNORECASE | re.MULTILINE)
 ITEM_ID = re.compile(r"[A-Za-z]{0,3}\d+(?:-\d+)?")
 SEVERITY = re.compile(r"\**(?:blocker|high|medium|low)\**", re.IGNORECASE)
 RAW_IDS = re.compile(r"\d+(?:\s*,\s*\d+)*")
@@ -117,8 +119,8 @@ INSTANCE_KEYS = ("review-replay", "scouted-seam")
 #: The arm count `run_selftest` must reach, as review_replay.py declares its own. Raised 18 -> 21 by
 #: TOOL-dFairHearing-27 S19: its three arms, tag-item, experiment-freeze-spelling and pairing-walk. Raised 21 -> 24
 #: by TOOL-dFairHearing-32 S9: replay-subject, experiment-references and held-out-pathspec. Raised 24 -> 25 by
-#: TOOL-dFairHearing-37 S5: held-out-tracked.
-ARMS_DECLARED = 25
+#: TOOL-dFairHearing-37 S5: held-out-tracked. Raised 25 -> 26 by TOOL-dFairHearing-46 S5: stated-shape.
+ARMS_DECLARED = 26
 
 
 class Refusal(Exception):
@@ -268,8 +270,9 @@ def extract_range(text):
 
 
 def extract_stated_count(text):
-    """The first number after the word `confirmed`, read from the prose before any appendix."""
-    m = STATED.search(text.split(APPENDIX_HEADING, 1)[0])
+    """The `review-shape` line's count, else the first number after the word `confirmed`, from before any appendix."""
+    head = text.split(APPENDIX_HEADING, 1)[0]
+    m = SHAPE_STATED.search(head) or STATED.search(head)
     return int(m.group(1)) if m else None
 
 
@@ -648,7 +651,7 @@ def check_case(case, res, k=None):
     """One case's verdict: items hit, the primary's rank and binding, SOLVED, and decoy MUSTs.
 
     A decoy matches on its path AND its symbol, because one file can hold the right seam and the
-    wrong one: `resolveEntryImage` and `imageField` share a file in inCMS.
+    wrong one: `resolveEntryImage` and `imageField` share a file in adopter ic (grader blob a0389611).
     """
     seams = (res or {}).get("seams") or []
     rows = []
@@ -845,7 +848,7 @@ def check_held_out_frozen(path, tuning_ids, repo="."):
     if not path or not isinstance(path, str) or path.startswith("-"):
         raise Refusal(f"heldOut {path!r}: a path opening `-` or empty is refused")
     try:
-        top = subprocess.run(["git", "-C", str(repo), "rev-parse", "--show-toplevel"], capture_output=True, text=True, check=False)
+        top = subprocess.run(["git", "-C", str(repo), "rev-parse", "--show-toplevel"], capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
     except OSError as exc:
         raise Refusal(f"heldOut {path}: git could not run ({exc})") from None
     if top.returncode:
@@ -858,7 +861,7 @@ def check_held_out_frozen(path, tuning_ids, repo="."):
 
     def read_git(*argv):
         """One git call's stdout; a non-zero exit refuses naming the call and its stderr, its stdout never read."""
-        proc = subprocess.run(["git", "-C", str(root), *argv], capture_output=True, text=True, check=False)
+        proc = subprocess.run(["git", "-C", str(root), *argv], capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
         if proc.returncode:
             raise Refusal(f"heldOut {path}: `git {' '.join(argv)}` exited {proc.returncode}: {proc.stderr.strip() or 'no stderr'}")
         return proc.stdout.strip()
@@ -1211,7 +1214,7 @@ def scan_pairing_sites(root):
     if not files:
         raise Refusal(f"scan_pairing_sites {root.as_posix()}: `git ls-files` lists no *.py, so the walk graded nothing")
 
-    def names(node):
+    def extract_names(node):
         return {n.id for n in ast.walk(node) if isinstance(n, ast.Name)}
 
     sites = []
@@ -1229,7 +1232,7 @@ def scan_pairing_sites(root):
         for node in ast.walk(tree):
             if not isinstance(node, COMPREHENSIONS):
                 continue
-            outer = set().union(*(names(g.target) for g in node.generators))
+            outer = set().union(*(extract_names(g.target) for g in node.generators))
             outer_iters = {ast.dump(g.iter) for g in node.generators}
             for cond in (c for g in node.generators for c in g.ifs):
                 for call in ast.walk(cond):
@@ -1239,11 +1242,11 @@ def scan_pairing_sites(root):
                     gen = call.args[0]
                     if any(ast.dump(g.iter) in outer_iters for g in gen.generators):
                         continue
-                    inner = set().union(*(names(g.target) for g in gen.generators))
+                    inner = set().union(*(extract_names(g.target) for g in gen.generators))
                     test = gen.elt
                     if not (isinstance(test, ast.Compare) and len(test.ops) == 1):
                         continue
-                    left, right = names(test.left), names(test.comparators[0])
+                    left, right = extract_names(test.left), extract_names(test.comparators[0])
                     member = isinstance(test.ops[0], ast.In) and left & outer and right & inner
                     present = (isinstance(test.ops[0], ast.IsNot) and isinstance(test.comparators[0], ast.Constant)
                                and test.comparators[0].value is None and left & outer and left & inner)
@@ -1254,7 +1257,7 @@ def scan_pairing_sites(root):
 
 # ---- self-test. The proof reads aScoutedSeam's committed blobs; the rest are inline fixtures.
 PROOF_COMMIT = "b0fe68f30"
-PROOF_DIR = "memory/builds/aScoutedSeam/build/2026-10-11-build-TOOL-aScoutedSeam-1-"
+PROOF_DIR = "memory/builds/aScoutedSeam/build"
 GRADER_BLOB = "a03896116e3c5cbf853affda241c22d8408cb945"
 PLANTED = 'def pair(cases, arms):\n    return [c for c in cases if all(c["id"] in rows for rows in arms.values())]\n'
 FIXTURE_CASES = [{"id": "a", "point": "p", "ground_truth": [{"path": "x.py", "symbol": "f"}]},
@@ -1276,13 +1279,13 @@ EXPERIMENT_KEY = {"a": {"ARM-A": "m1b", "ARM-B": "m1b@medium"}, "b": {"ARM-A": "
                   "c": {"ARM-A": "m1b", "ARM-B": "m1b@medium"}}
 #: The method's own experiment: the cases and results at this commit, and the held-out file frozen at b6c828a92.
 UNION_PROOF_COMMIT = "5f8ef021d"
-HELD_OUT_FILE = "memory/builds/aScoutedSeam/build/2026-10-18-build-TOOL-aScoutedSeam-1-13-held-out-cases.json"
+HELD_OUT_FILE = "-1-13-held-out-cases.json"  # the record's name ending under PROOF_DIR
 
 
 def read_proof_tree():
     """The checkout holding aScoutedSeam's records, or None: the proof's population exists only there."""
     try:
-        proc = subprocess.run(["git", "-C", str(KIT_DIR), "rev-parse", "--show-toplevel"], capture_output=True, text=True, check=False)
+        proc = subprocess.run(["git", "-C", str(KIT_DIR), "rev-parse", "--show-toplevel"], capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
     except OSError:
         return None
     top = pathlib.Path(proc.stdout.strip()) if proc.returncode == 0 else None
@@ -1299,6 +1302,13 @@ def run_selftest():
         except Refusal as exc:
             return None if all(n in str(exc) for n in needles) else f"refused without naming {needles}: {exc}"
         return f"not refused; wanted a refusal naming {needles}"
+
+    def derive_proof_path(ending):
+        """The one record under `PROOF_DIR` whose name ends `ending`, repo-relative; refused unless exactly one does."""
+        found = sorted(pathlib.Path(top, PROOF_DIR).glob("*" + ending))
+        if len(found) != 1:
+            raise Refusal(f"proof: {len(found)} record(s) under {PROOF_DIR} end {ending}, not one")
+        return found[0].relative_to(top).as_posix()
 
     def check_paired_refuses():
         return (check_refused(lambda: derive_paired_cases(["a", "b"], {"x": ["a"], "y": ["b"]}), "empty pairing", "x", "y")
@@ -1336,7 +1346,8 @@ def run_selftest():
     def check_scouted_proof():
         if top is None:
             return no_tree
-        corpus, results = read_scouted_population(f"{PROOF_COMMIT}:{PROOF_DIR}3-cases.json", f"{PROOF_COMMIT}:{PROOF_DIR}5-results.json", top)
+        corpus, results = read_scouted_population(f"{PROOF_COMMIT}:{derive_proof_path('-1-3-cases.json')}",
+                                                  f"{PROOF_COMMIT}:{derive_proof_path('-1-5-results.json')}", top)
         grade = measure_scouted_grade(corpus, results, "m1b")[-1]
         compare = "\n".join(measure_scouted_compare(corpus, results, ["m1b", "m1b@medium"]))
         judged = "\n".join(measure_scouted_judged(corpus, results, ["m1cA@medium"]))
@@ -1377,9 +1388,10 @@ def run_selftest():
         """TOOL-dFairHearing-27 AC25: the pairing module under a copy's factory directory is named and under its
         memory/ is not; a walk whose `git ls-files` fails, or that lists no `*.py`, refuses by name, never `[]`."""
         with tempfile.TemporaryDirectory() as tmp:
-            copy = derive_git_tree(pathlib.Path(tmp, "copy"), {"tools/workflows/planted.py": PLANTED, f"{MEMORY_ROOT}/b/planted.py": PLANTED})
+            factory = f"{KIT_DIR.name}/planted.py"
+            copy = derive_git_tree(pathlib.Path(tmp, "copy"), {factory: PLANTED, f"{MEMORY_ROOT}/b/planted.py": PLANTED})
             named = scan_pairing_sites(copy)
-            if named != ["tools/workflows/planted.py:2"]:
+            if named != [f"{factory}:2"]:
                 return f"the copy's pairing sites read {named!r}, not the factory module alone"
             pathlib.Path(tmp, "bare").mkdir()
             empty = derive_git_tree(pathlib.Path(tmp, "empty"), {"x.txt": "no python here\n"})
@@ -1415,7 +1427,7 @@ def run_selftest():
         """A fixture repository at `tmp` whose held-out file has ONE commit: its path, that commit, and a git runner."""
         def run_git(*argv):
             return subprocess.run(["git", "-C", tmp, "-c", "user.name=selftest", "-c", "user.email=selftest@invalid",
-                                   "-c", "commit.gpgsign=false", *argv], capture_output=True, text=True, check=True).stdout.strip()
+                                   "-c", "commit.gpgsign=false", *argv], capture_output=True, text=True, encoding="utf-8", errors="replace", check=True).stdout.strip()
         run_git("init", "-q")
         held = pathlib.Path(tmp, "held.json")
         held.write_text(json.dumps(EXPERIMENT_HELD), encoding="utf-8")
@@ -1543,8 +1555,8 @@ def run_selftest():
                 return why
         if top is None:
             return no_tree
-        proof = {"instance": "scouted-seam", "cases": f"{UNION_PROOF_COMMIT}:{PROOF_DIR}3-cases.json",
-                 "results": f"{UNION_PROOF_COMMIT}:{PROOF_DIR}5-results.json", "heldOut": str(top / HELD_OUT_FILE),
+        proof = {"instance": "scouted-seam", "cases": f"{UNION_PROOF_COMMIT}:{derive_proof_path('-1-3-cases.json')}",
+                 "results": f"{UNION_PROOF_COMMIT}:{derive_proof_path('-1-5-results.json')}", "heldOut": str(top / derive_proof_path(HELD_OUT_FILE)),
                  "arms": [{"name": a, "base": None, "settings": {"prompt": a}, "dispatched": n}
                           for a, n in (("m1cA@medium", 30), ("t1r@medium", 35), ("m1c@medium", 12))],
                  "judge": {"verdicts": "judge2", "key": None},
@@ -1737,6 +1749,22 @@ def run_selftest():
             rc, out, _ = run_entry(["--design-recall", "--key", str(pathlib.Path(tmp, "absent.md")), "--seed", "none"] + recs)
             return None if rc == 0 and "not graded" in out else f"--seed none read {rc}: {out!r}"
 
+    def check_stated_shape_arm():
+        """TOOL-dFairHearing-46 AC5: the count is the `review-shape` line's, so prose reading `3 confirmed, 0 blocker`
+        above it reads 3 and never 0; a line disagreeing with the rows still refuses; with no line, `STATED` still reads."""
+        prose = "By raw confirmed finding the tally is the same: 3 confirmed, 0 blocker, 0 high, 1 medium, 2 low.\n\n"
+        line = "review-shape kind=diff-review round=1 intensity=full at=synth raw=3 confirmed={n} refuted=0\n\n"
+        table = (APPENDIX_HEADING + "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n"
+                 + "".join(f"| {i} | l | a.py:{i} | confirmed |\n" for i in (1, 2, 3)))
+        rows, err = parse_appendix_rows(prose + line.format(n=3) + table)
+        if err or len(rows) != 3:
+            return f"a report whose prose leads read {err or rows!r}"
+        _, err = parse_appendix_rows(prose + line.format(n=2) + table)
+        if not (err or "").endswith("stated confirmed count of 2"):
+            return f"a shape line disagreeing with its rows read {err!r}"
+        want = [("confirmed 2\n", 2), ("Review shape: raw 1, confirmed 1, refuted 0.\n", 1), ("no count here\n", None)]
+        return next((f"{t!r} read {extract_stated_count(t)!r}, not {w!r}" for t, w in want if extract_stated_count(t) != w), None)
+
     arms = [("paired-refuses", check_paired_refuses), ("row-refuses", check_row_refuses), ("tag-section", check_tag_section),
             ("instances", check_instances_arm), ("scouted-proof", check_scouted_proof), ("conformance", check_conformance),
             ("deterministic", check_deterministic), ("experiment-evidence", check_evidence_arm),
@@ -1747,7 +1775,7 @@ def run_selftest():
             ("tag-item", check_tag_item_arm), ("experiment-freeze-spelling", check_freeze_spelling_arm),
             ("pairing-walk", check_pairing_walk_arm), ("replay-subject", check_replay_subject_arm),
             ("experiment-references", check_references_arm), ("held-out-pathspec", check_held_out_pathspec_arm),
-            ("held-out-tracked", check_held_out_tracked_arm)]
+            ("held-out-tracked", check_held_out_tracked_arm), ("stated-shape", check_stated_shape_arm)]
     passed = skipped = ran = 0
     for name, arm in arms:
         ran += 1
