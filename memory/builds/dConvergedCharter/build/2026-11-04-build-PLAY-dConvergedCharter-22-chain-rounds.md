@@ -82,3 +82,54 @@ round 1 · finding 1 · HIGH · local · specs PLAY-dConvergedCharter-9 PLAY-dCo
 round 1 · finding 2 · HIGH · local · specs PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-17 · unit PLAY-dConvergedCharter-17 · rev 2
 round 1 · sibling · unit PLAY-dConvergedCharter-11 · rev 3
 round 1 · sibling · unit PLAY-dConvergedCharter-9 · rev 3
+round 2 · subject dConvergedCharter-spec-set-r2 · audited PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-39
+round 2 · finding 1 · HIGH · local · specs PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-11 · unit PLAY-dConvergedCharter-12 · rev 3
+round 2 · finding 2 · HIGH · local · specs PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-11 · unit PLAY-dConvergedCharter-20 · rev 3
+round 2 · finding 2 · HIGH · local · specs PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-11 · unit PLAY-dConvergedCharter-11 · rev 4
+round 2 · finding 16 · HIGH · local · specs PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-11 · unit PLAY-dConvergedCharter-20 · rev 3
+round 2 · finding 16 · HIGH · local · specs PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-11 · unit PLAY-dConvergedCharter-11 · rev 4
+round 2 · finding 3 · HIGH · local · specs PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-7 · unit PLAY-dConvergedCharter-12 · rev 3
+round 2 · finding 3 · HIGH · local · specs PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-7 · unit PLAY-dConvergedCharter-7 · rev 4
+round 2 · finding 14 · HIGH · local · specs PLAY-dConvergedCharter-11 · unit PLAY-dConvergedCharter-11 · rev 4
+round 2 · finding 15 · HIGH · local · specs PLAY-dConvergedCharter-11 · unit PLAY-dConvergedCharter-11 · rev 4
+round 2 · finding 17 · HIGH · local · specs PLAY-dConvergedCharter-38 · unit PLAY-dConvergedCharter-38 · rev 2
+round 2 · finding 18 · HIGH · local · specs PLAY-dConvergedCharter-9 · unit PLAY-dConvergedCharter-9 · rev 4
+round 2 · finding 38 · HIGH · local · specs PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-17 · unit PLAY-dConvergedCharter-9 · rev 4
+round 2 · finding 38 · HIGH · local · specs PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-17 · unit PLAY-dConvergedCharter-17 · rev 3
+round 2 · finding 4 · MEDIUM · local · specs PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-17 · unit PLAY-dConvergedCharter-38 · rev 2
+round 2 · finding 4 · MEDIUM · local · specs PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-17 · unit PLAY-dConvergedCharter-17 · rev 3
+round 2 · finding 5 · MEDIUM · local · specs PLAY-dConvergedCharter-9 · unit PLAY-dConvergedCharter-9 · rev 4
+round 2 · finding 19 · MEDIUM · local · specs PLAY-dConvergedCharter-9 · unit PLAY-dConvergedCharter-9 · rev 4
+round 2 · finding 6 · MEDIUM · local · specs PLAY-dConvergedCharter-12 · unit PLAY-dConvergedCharter-12 · rev 3
+round 2 · finding 32 · MEDIUM · local · specs PLAY-dConvergedCharter-12 · unit PLAY-dConvergedCharter-12 · rev 3
+round 2 · finding 7 · MEDIUM · local · specs PLAY-dConvergedCharter-39 · unit PLAY-dConvergedCharter-39 · rev 2
+round 2 · finding 34 · MEDIUM · local · specs PLAY-dConvergedCharter-39 · unit PLAY-dConvergedCharter-39 · rev 2
+round 2 · finding 9 · MEDIUM · local · specs PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-22 · unit PLAY-dConvergedCharter-11 · rev 4
+round 2 · finding 9 · MEDIUM · local · specs PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-22 · unit PLAY-dConvergedCharter-22 · rev 3
+round 2 · finding 10 · MEDIUM · local · specs PLAY-dConvergedCharter-23 · unit PLAY-dConvergedCharter-23 · rev 3
+round 2 · finding 11 · MEDIUM · local · specs PLAY-dConvergedCharter-13 · unit PLAY-dConvergedCharter-13 · rev 4
+round 2 · finding 20 · MEDIUM · local · specs PLAY-dConvergedCharter-11 · unit PLAY-dConvergedCharter-11 · rev 4
+round 2 · finding 22 · MEDIUM · local · specs PLAY-dConvergedCharter-22 · unit PLAY-dConvergedCharter-22 · rev 3
+round 2 · finding 24 · MEDIUM · local · specs PLAY-dConvergedCharter-38 · unit PLAY-dConvergedCharter-38 · rev 2
+round 2 · finding 39 · MEDIUM · local · specs PLAY-dConvergedCharter-38 · unit PLAY-dConvergedCharter-38 · rev 2
+round 2 · finding 25 · MEDIUM · local · specs PLAY-dConvergedCharter-11 · unit PLAY-dConvergedCharter-11 · rev 4
+round 2 · finding 26 · MEDIUM · local · specs PLAY-dConvergedCharter-22 · unit PLAY-dConvergedCharter-22 · rev 3
+round 2 · finding 27 · MEDIUM · new-mechanism · specs PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-13 · unit PLAY-dConvergedCharter-40 · rev 1
+round 2 · finding 28 · MEDIUM · local · specs PLAY-dConvergedCharter-11 · unit PLAY-dConvergedCharter-11 · rev 4
+round 2 · finding 29 · MEDIUM · local · specs PLAY-dConvergedCharter-11 · unit PLAY-dConvergedCharter-11 · rev 4
+round 2 · finding 30 · MEDIUM · local · specs PLAY-dConvergedCharter-12 · unit PLAY-dConvergedCharter-12 · rev 3
+round 2 · finding 33 · MEDIUM · local · specs PLAY-dConvergedCharter-7 · unit PLAY-dConvergedCharter-7 · rev 4
+round 2 · finding 36 · MEDIUM · local · specs PLAY-dConvergedCharter-20 · unit PLAY-dConvergedCharter-20 · rev 3
+round 2 · finding 37 · MEDIUM · local · specs PLAY-dConvergedCharter-22 · unit PLAY-dConvergedCharter-22 · rev 3
+round 2 · finding 40 · MEDIUM · local · specs PLAY-dConvergedCharter-38 · unit PLAY-dConvergedCharter-38 · rev 2
+round 2 · finding 41 · MEDIUM · local · specs PLAY-dConvergedCharter-23 · unit PLAY-dConvergedCharter-23 · rev 3
+round 2 · finding 42 · MEDIUM · local · specs PLAY-dConvergedCharter-13 · unit PLAY-dConvergedCharter-13 · rev 4
+round 2 · finding 43 · MEDIUM · local · specs PLAY-dConvergedCharter-22 · unit PLAY-dConvergedCharter-22 · rev 3
+round 2 · finding 12 · LOW · local · specs PLAY-dConvergedCharter-38 · unit PLAY-dConvergedCharter-38 · rev 2
+round 2 · finding 13 · LOW · local · specs PLAY-dConvergedCharter-7 · unit PLAY-dConvergedCharter-7 · rev 4
+round 2 · finding 23 · LOW · local · specs PLAY-dConvergedCharter-12 · unit PLAY-dConvergedCharter-12 · rev 3
+round 2 · finding 35 · LOW · local · specs PLAY-dConvergedCharter-17 · unit PLAY-dConvergedCharter-17 · rev 3
+round 2 · finding 1 · HIGH · local · specs PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-11 · unit PLAY-dConvergedCharter-11 · rev 4
+round 2 · sibling · unit PLAY-dConvergedCharter-7 · rev 4
+round 2 · sibling · unit PLAY-dConvergedCharter-13 · rev 4
+round 2 · sibling · unit PLAY-dConvergedCharter-20 · rev 3
