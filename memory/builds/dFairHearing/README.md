@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-19 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-24 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-41 TOOL-dFairHearing-42 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48
+ids: TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-19 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-24 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-41 TOOL-dFairHearing-42 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-49
 spec-audit: 2026-10-21
 parents: dSafePassage
 may: PLAY-dClosedLoop-3
@@ -78,11 +78,11 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 43 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 44 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14
 ids TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-19 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-24 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28
 ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-41 TOOL-dFairHearing-42
-ids TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48
+ids TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-49
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -130,13 +130,14 @@ ids TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHea
 | [TOOL-dFairHearing-46 — the bar's own reds in the replay scorer, and its stated-count reader](spec/2026-11-04-spec-TOOL-dFairHearing-46.md) | 29 | 1 | CLOSED | rev-2 | 2026-11-04 |
 | [TOOL-dFairHearing-45 — the bar's own reds in the kits: renders the ban can read, a fragment that ships, one anchor, no-fork forms, eight renames, and the honest brief record](spec/2026-11-04-spec-TOOL-dFairHearing-45.md) | 30 | 2 | CLOSED | rev-5 | 2026-11-04 |
 | [TOOL-dFairHearing-47 — the last of the bar's own reds: two loops fed from a file, one exempt row, one guard, one cite, and the manifest's stamps](spec/2026-11-04-spec-TOOL-dFairHearing-47.md) | 31 | 1 | CLOSED | rev-1 | 2026-11-04 |
+| [TOOL-dFairHearing-48 — the nine items of the diff review of units 43 to 47](spec/2026-11-05-spec-TOOL-dFairHearing-48.md) | 32 | 2 | INPROGRESS | rev-1 | 2026-11-05 |
 <!-- /gen:build-units -->
 
-Records: 332 bound to this build, across 4 record folder(s).
+Records: 335 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47.
+Ids no `spec-audit` record has ever named: TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48.
 
 Ids whose spec moved past its audited revision: TOOL-dFairHearing-1@rev-2 TOOL-dFairHearing-10@rev-1 TOOL-dFairHearing-11@rev-1 TOOL-dFairHearing-12@rev-1 TOOL-dFairHearing-13@rev-1 TOOL-dFairHearing-14@rev-3 TOOL-dFairHearing-15@rev-1 TOOL-dFairHearing-16@rev-1 TOOL-dFairHearing-17@rev-2
 TOOL-dFairHearing-18@rev-1 TOOL-dFairHearing-2@rev-1 TOOL-dFairHearing-20@rev-1 TOOL-dFairHearing-21@rev-1 TOOL-dFairHearing-22@rev-1 TOOL-dFairHearing-23@rev-1 TOOL-dFairHearing-25@rev-1 TOOL-dFairHearing-26@rev-1 TOOL-dFairHearing-27@rev-1 TOOL-dFairHearing-28@rev-1 TOOL-dFairHearing-29@rev-1
@@ -146,7 +147,7 @@ TOOL-dFairHearing-6@rev-1 TOOL-dFairHearing-8@rev-1 TOOL-dFairHearing-9@rev-1.
 
 <!-- gen:build-coverage -->
 
-Coverage of dFairHearing's 18 clause(s) and 10 owned node(s), over 43 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dFairHearing's 18 clause(s) and 10 owned node(s), over 44 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 18
 - carried in parts: 0 (none)
@@ -161,7 +162,7 @@ Coverage of dFairHearing's 18 clause(s) and 10 owned node(s), over 43 spec(s) at
   `spec/2026-10-23-spec-TOOL-dFairHearing-32.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dFairHearing-33.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dFairHearing-34.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dFairHearing-35.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-23-spec-TOOL-dFairHearing-36.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dFairHearing-37.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dFairHearing-38.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dFairHearing-39.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-23-spec-TOOL-dFairHearing-40.md` (PLAY-dClosedLoop-2), `spec/2026-11-04-spec-TOOL-dFairHearing-43.md` (PLAY-dClosedLoop-2), `spec/2026-11-04-spec-TOOL-dFairHearing-44.md` (PLAY-dClosedLoop-2), `spec/2026-11-04-spec-TOOL-dFairHearing-45.md` (PLAY-dClosedLoop-2),
-  `spec/2026-11-04-spec-TOOL-dFairHearing-46.md` (PLAY-dClosedLoop-2), `spec/2026-11-04-spec-TOOL-dFairHearing-47.md` (PLAY-dClosedLoop-2)
+  `spec/2026-11-04-spec-TOOL-dFairHearing-46.md` (PLAY-dClosedLoop-2), `spec/2026-11-04-spec-TOOL-dFairHearing-47.md` (PLAY-dClosedLoop-2), `spec/2026-11-05-spec-TOOL-dFairHearing-48.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0071, cl-dClosedLoop-0072, cl-dClosedLoop-0073, cl-dClosedLoop-0074, cl-dClosedLoop-0076, cl-dClosedLoop-0080, cl-dClosedLoop-0081, cl-dClosedLoop-0082, cl-dClosedLoop-0084
 <!-- /gen:build-coverage -->
 
@@ -200,6 +201,7 @@ Coverage of dFairHearing's 18 clause(s) and 10 owned node(s), over 43 spec(s) at
 | 29 | `TOOL-dFairHearing-43`, `TOOL-dFairHearing-44`, `TOOL-dFairHearing-46` | no |
 | 30 | `TOOL-dFairHearing-45` | no |
 | 31 | `TOOL-dFairHearing-47` | no |
+| 32 | `TOOL-dFairHearing-48` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

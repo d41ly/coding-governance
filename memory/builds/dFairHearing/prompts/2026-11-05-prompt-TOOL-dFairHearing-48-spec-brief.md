@@ -19,15 +19,14 @@ Write the spec for `TOOL-dFairHearing-48` at `memory/builds/dFairHearing/spec/20
 3. Left-shift each finding: name the existing arm or gate that can red on its class, or add one. One `New arm:` line per gate added, each naming a break that reds on today's code. Item 9's labels land in those arms' messages and row descriptions.
 4. Write the unit's departure record the way unit 46's was written.
 5. Header: Tier-2, `order 32`, no ask clause, status `OPEN`.
-
-### Traps this close has already hit
-- `--dispatch` refuses a generated file declared beside its generator, including an open sibling's. List the write set, and split the unit if a pair appears.
-- Staging `tools/gate-legs.json` requires the kickoff manifest's `last-audit` re-stamp and its delta line in the same commit: put `memory/guides/SESSION-KICKOFF.md` in Files touched and a scope item.
-- A rename or a new definition may move `memory/map/generated/symbols.json`; say which.
-- A criterion must not rest on a command that fails on the base for a reason outside this unit: run it first.
-- A test floor counted by hand is not a run: say the floors move, and let the close confirm them.
-- Acceptance section sweep: split every backticked span on whitespace; each word holding a `/` must be a tracked path exactly or lead with `$`, `<`, a quote or `~`. A single `{` lead is not skipped. Check `tools/check-spec-tokens.py`'s `BAR` pattern at lines 419 to 424. Put any `python -c` probe in the Design section instead.
-- Every change-log line names a section, a scope id or an acceptance id. New text cites no check, section or method rule by a bare number.
+6. Clear the traps this close has already hit:
+   - `--dispatch` refuses a generated file declared beside its generator, including an open sibling's. List the write set, and split the unit if a pair appears.
+   - Staging `tools/gate-legs.json` requires the kickoff manifest's `last-audit` re-stamp and its delta line in the same commit: put `memory/guides/SESSION-KICKOFF.md` in Files touched and a scope item.
+   - A rename or a new definition may move `memory/map/generated/symbols.json`; say which.
+   - A criterion must not rest on a command that fails on the base for a reason outside this unit: run it first.
+   - A test floor counted by hand is not a run: say the floors move, and let the close confirm them.
+   - Acceptance section sweep: split every backticked span on whitespace; each word holding a `/` must be a tracked path exactly or lead with `$`, `<`, a quote or `~`. A single `{` lead is not skipped. Check `tools/check-spec-tokens.py`'s `BAR` pattern at lines 419 to 424. Put any `python -c` probe in the Design section instead.
+   - Every change-log line names a section, a scope id or an acceptance id. New text cites no check, section or method rule by a bare number.
 
 ### Acceptance
 A spec conforming to `memory/TEMPLATE-SPEC.md`, one criterion per item, each red on today's tree and green on a correct build, with item 1's fork resolved and its limits stated.
