@@ -13,3 +13,4 @@
 - SEV · TOOL-dFairHearing-41 · LOW · one waiver row holds one [cite] hit on another build's live spec; no verdict moves
 - KEEP · TOOL-dFairHearing-41 · filed by TOOL-dFairHearing-16's build pass; the cure is a revision of another build's spec, outside this build's writes (README, Build-level rules)
 - SEV · TOOL-dFairHearing-42 · MED · design records keep the unit-spec preset, which the replay measured below the baseline's bar; no switch moves until the owner rules
+- KEEP · TOOL-dFairHearing-42 · filed by TOOL-dFairHearing-25's verdict pass; the ruling on R-1 is the owner's, outside every unit's writes, and the close surfaces it as a parked decision

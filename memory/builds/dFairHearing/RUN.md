@@ -225,3 +225,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-04T06:24:10Z dispatch · item 2e4e82b2 TOOL-dFairHearing-39 · reason memory/gotchas/criterion-asserts-what-its-own-command-cannot-show.md memory/gotchas/INDEX.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-39.md memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-39-1-acceptance-ledger.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dFairHearing/README.md
 
 2026-11-04T06:24:14Z brief · item TOOL-dFairHearing-39 · reason b542cd067b3b memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-39-build-brief.md
+
+2026-11-04T07:38:34Z dispatch · item ed286502 TOOL-dFairHearing-40 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-40-1-acceptance-ledger.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-40.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dFairHearing/README.md
+
+2026-11-04T07:38:51Z brief · item TOOL-dFairHearing-40 · reason 65d3574a33d9 memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-40-build-brief.md
