@@ -131,7 +131,7 @@ ids TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHea
 | [TOOL-dFairHearing-45 — the bar's own reds in the kits: renders the ban can read, a fragment that ships, one anchor, no-fork forms, eight renames, and the honest brief record](spec/2026-11-04-spec-TOOL-dFairHearing-45.md) | 30 | 2 | OPEN | rev-3 | 2026-11-04 |
 <!-- /gen:build-units -->
 
-Records: 310 bound to this build, across 4 record folder(s).
+Records: 311 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
