@@ -492,6 +492,13 @@ write_rev_spec 93 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.'
 #      the specs that already do the right thing, because this house style wraps at ~100 columns.
 write_rev_spec 94 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · folded the review
   corrections, which moved §4 and the acceptance criteria beneath it.'
+# 95 — post-cutoff, a section named in WORDS (PLAY-dOrderedCharter-64) -> silent
+write_rev_spec 95 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · section 7 · folded the review corrections.'
+# 96 — the words form capitalised, its digit on the wrapped continuation line -> silent
+write_rev_spec 96 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · folded the review corrections, which moved Section
+  10 and nothing else.'
+# 97 — the plural with no digit names no section -> RED
+write_rev_spec 97 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · folded the review corrections across several sections.'
 
 # ---- TOOL-aJoinedCanon-3: the §2 scope-JOIN arms. SCOPE_JOIN_CUTOFF is declared at 2026-08-20 in
 # ---- the conf above, between the fixture eras. The shipped cutoff sits ahead of every dated spec on
@@ -1450,6 +1457,10 @@ miss 'tFixture-91.md (revision entries naming no'   # the entry gained a §4 tok
 miss 'tFixture-92.md (revision entries naming no'   # PRE-cutoff, grandfathered
 miss 'tFixture-93.md (revision entries naming no'   # rev-1 only, exempt
 miss 'tFixture-94.md (revision entries naming no'   # the token is on a wrapped continuation line
+# ---- PLAY-dOrderedCharter-64: a section named in words.
+miss 'tFixture-95.md (revision entries naming no'   # section 7, lower case
+miss 'tFixture-96.md (revision entries naming no'   # Section, its digit on the wrap
+hit  'tFixture-97.md (revision entries naming no section, scope id or acceptance id'   # sections, no digit
 
 # ---- TOOL-aJoinedCanon-3: §2 scope-join. AC1-AC5.
 hit  'tFixture-110.md (scope items naming neither an acceptance criterion nor NOT OBSERVED'
@@ -4508,7 +4519,9 @@ fi
 # skipped aloud with that block's others. Counted by reading; OWED: observed at the close.
 # RAISED 668 -> 670 by TOOL-dGroundRules-25 S35: its two no-launcher assertions, exit 2 and the line,
 # each top-level and never skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=670
+# RAISED 670 -> 673 by PLAY-dOrderedCharter-64: its three words-form rev-scope assertions, fixtures
+# 95, 96 and 97, each top-level and never skipped. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=673
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

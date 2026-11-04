@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-64 — the rev-scope arm accepts a section named in words
 
-**Status:** DEFERRED · rev-1 · 2026-11-04 · node d · Tier-2 · base 1ff6df71 · streams playbook · order 11 · advances PLAY-dOrderedCharter-38
+**Status:** CLOSED · rev-1 · 2026-11-04 · node d · Tier-2 · base 1ff6df71 · streams playbook · order 11 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -108,7 +108,7 @@ _SPEC10_SHIPPED="$SPEC10_CUTOFF"   # captured BEFORE the source, so the fallback
 SPEC10_EVIDENCE_CUTOFF=""   # date; a Tier-2 spec dated >= this must RECORD its reuse audit (check 12); blank = never required
 # The SIXTH cutoff, same semantics as the three RULE cutoffs and preset here for the same adopter
 # argument the paragraph above states (TOOL-aJoinedCanon-1).
-REV_SCOPE_CUTOFF=""     # date; specs dated >= this must give every rev-2+ §9 entry a §n/Sn/ACn scope token (check 12); blank = never required
+REV_SCOPE_CUTOFF=""     # date; specs dated >= this: every rev-2+ revision-log entry must name a section, scope id or acceptance id (the template-conformance check); blank = never required
 # The SEVENTH cutoff, same semantics and preset for the same adopter argument (TOOL-aJoinedCanon-3).
 SCOPE_JOIN_CUTOFF=""    # date; specs dated >= this must have every §2 scope item name an AC label or NOT OBSERVED (check 12); blank = never required
 # The EIGHTH cutoff, same semantics and preset for the same adopter argument (TOOL-aJoinedCanon-4).
@@ -2429,6 +2429,8 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     # ---- The section-sign half is index()+substr() rather than a regex because the byte is multibyte
     # ---- and length() returns 2 on a byte-oriented awk and 1 on gawk in a UTF-8 locale; substr counts
     # ---- in whatever unit length just returned, so the pair is consistent in either interpreter.
+    # ---- The words half lowers the entry and needs the word section, whitespace, then a digit, so a
+    # ---- capitalised word and a wrap between the two count and the plural alone does not.
     # ---- (No apostrophe below this line: the whole awk program is one single-quoted shell string.)
     if (revscopecut != "" && fdate != "" && fdate >= revscopecut) {
       rs_in9 = 0; rs_ne = 0
@@ -2449,7 +2451,7 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       for (i = 1; i <= rs_ne; i++) {
         if (rs_num[i] < 2) continue
         rs_E = rs_txt[i]; rs_p = index(rs_E, "§")
-        rs_has = (rs_p > 0 && substr(rs_E, rs_p + length("§"), 1) ~ /[0-9]/) || (rs_E ~ /(^|[^A-Za-z0-9])(S|AC)[0-9]/)
+        rs_has = (rs_p > 0 && substr(rs_E, rs_p + length("§"), 1) ~ /[0-9]/) || (rs_E ~ /(^|[^A-Za-z0-9])(S|AC)[0-9]/) || (tolower(rs_E) ~ /(^|[^a-z0-9])section[[:space:]]+[0-9]/)
         if (!rs_has) { rs_nb++; rs_bad = (rs_nb == 1) ? "rev-" rs_num[i] : rs_bad ", rev-" rs_num[i] }
       }
       if (rs_nb > 0)

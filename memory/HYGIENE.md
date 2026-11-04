@@ -323,11 +323,11 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
     Every §2 scope item must name the acceptance criterion that observes it, or carry `NOT OBSERVED`
     and a reason, once the filename date reaches `SCOPE_JOIN_CUTOFF`, on either tier — and only for a
     spec carrying BOTH headings, matched by heading TEXT rather than by ordinal. SHAPE only.
-    Every §9 revision entry numbered rev-2 or higher must name what it MOVED — a `§<n>`, `S<n>` or
-    `AC<n>` token — once the filename date reaches `REV_SCOPE_CUTOFF`, on either tier. Graded per
-    ENTRY with continuation lines folded in, because this corpus wraps §9 and puts the detail in the
-    wrap; rev-1 is exempt, and the engine announces a zero population rather than passing silently
-    while the cutoff sits ahead of the corpus.
+    Every revision-log entry numbered rev-2 or higher must name what it MOVED — a `§<n>`,
+    `section <n>`, `S<n>` or `AC<n>` token — once the filename date reaches `REV_SCOPE_CUTOFF`, on
+    either tier. Graded per ENTRY with continuation lines folded in, because this corpus wraps the
+    revision log and puts the detail in the wrap; rev-1 is exempt, and the engine announces a zero
+    population rather than passing silently while the cutoff sits ahead of the corpus.
     §8 is graded PER F-ITEM once the filename date reaches `FORK_ITEM_CUTOFF`, which supersedes the
     section-wide reading there: at a terminal status, on either tier, each F-item's span carries its
     own mark, quoted marks not counting; a Tier-2 §8 of any other shape reds at ANY status and under

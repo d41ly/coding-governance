@@ -331,11 +331,14 @@ follows it, so a scope token may sit on a wrapped continuation and still counts.
 - rev-<N> · <YYYY-MM-DD> · <scope> · <what moved>
 ```
 
-`<scope>` is one or more `§<n>`, `S<n>` or `AC<n>` tokens, separated by spaces, commas or the `·`
-this corpus already writes its status fields with. The separator is house style rather than grammar:
-the gate reads PRESENCE. The field sits AFTER the date and never before it — `drift_report.py`
-anchors its revision-log signal on the rev number followed by the date, so a scope field inserted
-ahead of the date drops the entry out of that population.
+`<scope>` is one or more `§<n>`, `section <n>`, `S<n>` or `AC<n>` tokens, separated by spaces, commas
+or the `·` this corpus already writes its status fields with. The separator is house style rather
+than grammar: the gate reads PRESENCE. The field sits AFTER the date and never before it —
+`drift_report.py` anchors its revision-log signal on the rev number followed by the date, so a scope
+field inserted ahead of the date drops the entry out of that population.
+
+The words form `section <n>` matches in any case, `<n>` a digit run, and may wrap between the word
+and the number; the word alone, or `sections`, names nothing.
 
 **rev-1 is exempt.** A first draft moved the whole document, so a scope list on it names everything
 and says nothing. Every entry numbered rev-2 or higher is graded.
