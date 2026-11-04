@@ -2,7 +2,8 @@
 # meta-check or the kinds contract would red today: <principle|practice|leg|kind> TAB <name> TAB <the build that
 # arms it>. A principle's arming build is the chain build carrying the first clause of its design [enforcement]
 # row; a leg's is dWitnessedBar, which owns the gate-leg kind; a kind's is its register owner. Seeded once at
-# the build pass from the tree, it only shrinks after: `python <prefix>/playbook/core.py meta-check` reds a row
+# the build pass from the tree, its `practice` rows when the catalogue landed (PLAY-dOrderedCharter-1), it only
+# shrinks after: `python <prefix>/playbook/core.py meta-check` reds a row
 # whose item is enforced now, and an item with no row.
 principle	principle.p1	dDeclaredLoop
 principle	principle.p2	dDeclaredLoop
@@ -41,6 +42,45 @@ principle	principle.p39	dGroundRules
 principle	principle.p40	dPlacedRequest
 principle	principle.p41	dTrueNorth
 principle	principle.p42	dGroundRules
+practice	practice.yagni	dWitnessedBar
+practice	practice.reuse	dWitnessedBar
+practice	practice.consistency	dWitnessedBar
+practice	practice.core	dWitnessedBar
+practice	practice.contract	dWitnessedBar
+practice	practice.derive	dWitnessedBar
+practice	practice.one-fact	dWitnessedBar
+practice	practice.spec	dWitnessedBar
+practice	practice.verify	dWitnessedBar
+practice	practice.gate	dWitnessedBar
+practice	practice.class	dWitnessedBar
+practice	practice.left-shift	dWitnessedBar
+practice	practice.bar	dWitnessedBar
+practice	practice.cost	dWitnessedBar
+practice	practice.small	dWitnessedBar
+practice	practice.isolate	dWitnessedBar
+practice	practice.land	dWitnessedBar
+practice	practice.post-merge	dWitnessedBar
+practice	practice.reconcile	dWitnessedBar
+practice	practice.migrations	dWitnessedBar
+practice	practice.ids	dWitnessedBar
+practice	practice.memory	dWitnessedBar
+practice	practice.records	dWitnessedBar
+practice	practice.docs	dWitnessedBar
+practice	practice.security	dWitnessedBar
+practice	practice.risk	dWitnessedBar
+practice	practice.bound	dWitnessedBar
+practice	practice.bytes	dWitnessedBar
+practice	practice.cross-os	dWitnessedBar
+practice	practice.tokens	dWitnessedBar
+practice	practice.tools	dWitnessedBar
+practice	practice.roles	dWitnessedBar
+practice	practice.voice	dWitnessedBar
+practice	practice.signal	dWitnessedBar
+practice	practice.formats	dWitnessedBar
+practice	practice.default	dWitnessedBar
+practice	practice.solid	dWitnessedBar
+practice	practice.dry	dWitnessedBar
+practice	practice.tdd	dWitnessedBar
 leg	kickoff-manifest ratchet	dWitnessedBar
 leg	template size <=48KiB	dWitnessedBar
 leg	charter size	dWitnessedBar

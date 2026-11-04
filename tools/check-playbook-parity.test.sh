@@ -298,12 +298,14 @@ fixture() {
   # fixture control -- which is exactly what that arm is for. Three pairs were added when the
   # playbook moved under this gate's protection and out of check-agent-cap-restatement.sh's
   # population; the control failed, correctly, until the fixture carried their sentences.
-  # v4.0 (TOOL-aDistilledCharter-3) retired four pairs; the verify-agent total is the playbook's one.
-  printf '<!-- governance-template: v4.0 -->\ntemplate {{ALPHA}} {{MEMORY_ROOT}}\nat most 5 verify agents TOTAL (batch grows)\n' \
+  # v4.0 (TOOL-aDistilledCharter-3) retired four pairs; the verify-agent total is the playbook's one,
+  # stated by the practice catalogue beside the renderer (PLAY-dOrderedCharter-1).
+  printf '<!-- governance-template: v4.0 -->\ntemplate {{ALPHA}} {{MEMORY_ROOT}}\n' \
     > "$d/coding-governance-agents.template.md"
   # TOOL-aDistilledCharter-8: the renderer's TEMPLATE_MAJOR pairs with the template marker's major.
   mkdir -p "$d/${FX}${PB}"
   printf 'TEMPLATE_MAJOR = 4\n' > "$d/${FX}${PB}/render_playbook.py"
+  printf 'at most 5 verify agents TOTAL (batch grows)\n' > "$d/${FX}${PB}/practices.toml"
   # A root install has no root head to name a kit by, so its runbook names it the way gov's does,
   # through the `<prefix>/` token (VERIFYING repair: a bare `memory-tree/` documents nothing).
   # The bare `§2` is S4's NEAR-MISS: a section sign with no charter word, counted and never failed.
@@ -403,7 +405,7 @@ arm "AC2 MAX_LENSES drifts from the hook README's stated bound" red \
 arm "AC4 the renderer's TEMPLATE_MAJOR drifts from the template marker" red \
   "a declared value pair disagrees with the source that owns it. Pair template major" \
   sh -c 'printf "TEMPLATE_MAJOR = 3\n" > '"${PFX}${PB}/render_playbook.py"''
-arm "AC2 MAX_VERIFIERS drifts from the template's stated total" red \
+arm "AC2 MAX_VERIFIERS drifts from the catalogue's stated total" red \
   "a declared value pair disagrees with the source that owns it. Pair verify-agent total" \
   sh -c 'printf "const MAX_VERIFIERS = 6\n" > '"${PFX}${HOOKS}/agent-cap.js"''
 
@@ -412,7 +414,7 @@ arm "AC2 MAX_VERIFIERS drifts from the template's stated total" red \
 # --- AC4 · an extraction that matches nothing must never compare empty to empty ----------------------
 arm "AC4 an unresolvable pair reds rather than passing" red \
   "an extraction matched NOTHING, so the pair was never compared" \
-  sh -c 'sed -i "s/at most 5 verify agents TOTAL (batch grows)//" coding-governance-agents.template.md'
+  sh -c 'sed -i "s/at most 5 verify agents TOTAL (batch grows)//" '"${PFX}${PB}/practices.toml"''
 
 # --- S4 · a charter section cited by number (TOOL-aDistilledCharter-3) -------------------------------
 S4_RED="a live file cites a charter section by number, and v4.0 has no numbered sections; cite the handle or the owning guide: "

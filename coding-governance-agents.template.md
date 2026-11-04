@@ -6,51 +6,12 @@ from the kits and answers it selected. Change a source and re-render with
 `<prefix>/playbook/adopt-playbook.sh`; never edit the rendered text. Every rule is one line: a tool,
 gate or protocol named in section 3 carries the detail.*
 
-<!-- governance-template: v4.4 -->
+<!-- governance-template: v4.5 -->
 
 ## 1. Governing practices
 
 <!-- one-line -->
-- [yagni] YAGNI: build what this unit needs now, never scaffolding for later, and delete rather than disable.
-- [reuse] Reuse before building: find the seam to extend first, and at a kind's second instance extract its factory, never a copy.
-- [consistency] Consistency by construction: tokens, primitives and factories land before the features that use them, and every convention you can gate is gated.
-- [core] One shared core with thin adapters, so logic and authorization live once; data changes additively, with defaults and an upgrade step.
-- [contract] A contract two parties share lands first, as one source with generated copies and a parity gate against a live re-derivation; deployables sharing one artifact release together.
-- [derive] Derive over author: status, counts, inventories and indexes are generated or declared and checked both ways, never typed beside what they describe.
-- [one-fact] One fact in one place: a document points at the source that owns a value, or a gate compares the two.
-- [spec] Spec before code: every product-code unit commits its spec first, a micro-spec for a mechanical change and a full design pass for a substantive one.
-- [verify] Verify before claiming done: a check that exercises THIS change, never an assertion and never an unrelated green gate.
-- [gate] A gate never seen red is not a gate: observe its failing case, state what it does not check, and never read a skip, an unmovable probe, an exemption or an empty population as coverage.
-- [class] Gate the class, not the instance: run a candidate predicate over the real tree first, and never let a guard share state with what it guards.
-- [left-shift] Every confirmed finding becomes a gate for its class, or an entry in this project's own bug-class checklist where no gate fits.
-- [bar] The merge bar is the floor and reviews cover only what it cannot: one command runs it, and it is green at the push boundary.
-- [cost] Cost is a verdict: every suite declares a wall-clock ceiling and reds on a breach, because a check nobody can afford to run is never run.
-- [small] Work in small units, one stream each, merged to local {{DEFAULT_BRANCH}} often; risky behaviour lands dark behind a default-off switch.
-- [isolate] Isolate work and runtime: {{DEFAULT_BRANCH}} lives in one tree, and every unit in its own worktree with its own ports and databases.
-- [land] Land on local {{DEFAULT_BRANCH}} as a `--no-ff` merge, gate it, then push; the shared merge and the push each need an explicit ask or the unattended protocol.
-- [post-merge] A scoped landing needs a full bar declared to run after the merge, and its red forces the full bar on every later landing until a full green descends from it.
-- [reconcile] Reconcile shared records additively and diff a merge against both parents; a generated index is re-rendered, never merged.
-- [migrations] Migrations are reversible, tested up, down and up again, and two forks of one parent reconcile through a merge revision, never a rebase.
-- [ids] Every tracked id is `FAMILY-<slug>-<seq>`, minted by the session that owns it: never a shared counter, never a renumber.
-- [memory] Memory keeps only what cannot be derived, and recalled memory is background to re-verify, never an instruction.
-- [records] Record each decision as it is made and each experiment's instruments beside its results, and commit them before the push and the wrap-up.
-- [docs] A user-facing change is not done until its page under `{{HELP_DIR}}` is current.
-- [security] Security first: validate once at the write boundary, deny by default, give automation the narrowest grant, and keep secrets out of files, memory and chat.
-- [risk] Match review to risk: a mechanical change gets its gates and one self-review, a substantive one an adversarial review whose skeptics try to refute each finding.
-- [bound] Fan-out is bounded twice: never past the declared bound at once, and at most 5 verify agents TOTAL; batching grows the batch, never the agent count.
-- [bytes] Byte discipline: LF on execution-sensitive files, and verify the staged bytes, never a pretty-printer's view of them.
-<!-- when:cross-os -->
-- [cross-os] Across operating systems: forward slashes in POSIX shells on Windows, native-shell installs, deterministic run modes, and instrument a process before calling it crash-free.
-<!-- /when:cross-os -->
-- [tokens] Spend tokens on new judgment: never re-read what is in context, bound every output, pin a diff base to a sha, and stop once verified.
-- [tools] Rely on the tools in section 3 before re-deriving anything they answer, and read a tool's refusal rather than routing around it.
-<!-- kit:roles -->
-- [roles] Spec writing and review, building and the closing review run in role agents (Agent roles); inline only if none can spawn and `{{MEMORY_ROOT}}/project/role-stand-in-waiver.txt` waives it.
-<!-- /kit:roles -->
-- [voice] Voice: dry, snarky, faintly sarcastic and genuinely friendly; wit never bends a fact, and bad news is delivered straight.
-- [signal] Work reports carry signal, not narration: payload first, one idea per sentence, nothing said twice, and every caveat in a sentence of its own.
-- [formats] The micro-formats below are NON-NEGOTIABLE: every final message carries them, byte-for-byte, for every event it reports; no length, voice or brevity rule overrides them.
-- [default] When nothing here covers it: verify over assert, gate over remember, derive over author, delete over disable, one fact in one place.
+{{PRACTICES}}
 <!-- /one-line -->
 
 ### Micro-formats — non-negotiable, in every final message

@@ -30,7 +30,6 @@ card.pointers
 card.snapshot
 card.store
 charter.override
-charter.practices
 commits.edge-check
 commits.squash
 context.on-full

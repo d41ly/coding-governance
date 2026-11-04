@@ -3477,7 +3477,7 @@ def main() -> int:
         test_spine_flat_layout, test_spine_nested_layout, test_durable_derives_families, test_chunk_arm_rolls_up,
         test_empty_spine_is_loud,
         test_zero_records_is_loud, test_empty_corpus_names_memory_root,
-        test_conf_digest_both_directions, test_digest_covers_kit_version, test_writes_nothing_in_worktree,
+        test_conf_digest_both_directions, test_digest_covers_grammar_epoch, test_writes_nothing_in_worktree,
         test_alias_rebuild, test_dead_alias_is_loud, test_eviction, test_printed_invocations_resolve,
         test_budget_lru, test_budget_protections, test_build_marker_lifecycle,
         test_budget_build_in_flight, test_budget_marker_ttl,

@@ -104,7 +104,6 @@ policy:card.pointers	undocumented when the docs leg landed
 policy:card.snapshot	undocumented when the docs leg landed
 policy:card.store	undocumented when the docs leg landed
 policy:charter.override	undocumented when the docs leg landed
-policy:charter.practices	undocumented when the docs leg landed
 policy:commits.edge-check	undocumented when the docs leg landed
 policy:commits.squash	undocumented when the docs leg landed
 policy:context.on-full	undocumented when the docs leg landed

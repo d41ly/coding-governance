@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-1 — the practice catalogue and `charter.practices`
 
-**Status:** DEFERRED · rev-8 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 17 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
+**Status:** CLOSED · rev-8 · 2026-11-05 · node d · Tier-2 · base ce13efbe · streams playbook · order 17 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
 
 **Carries:** cl-dClosedLoop-0031@419dfa75 whole
 **Carries:** node:policy-key.charter.practices
@@ -24,6 +24,8 @@
 | [2026-10-25-build-PLAY-dOrderedCharter-1-deviation-14.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-deviation-14.md) | deviation | — |
 | [2026-10-25-build-PLAY-dOrderedCharter-1-parents-audit.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-parents-audit.md) | research | — |
 | [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-11-02-build-PLAY-dOrderedCharter-1-ledger.md](../build/2026-11-02-build-PLAY-dOrderedCharter-1-ledger.md) | journal | — |
+| [2026-11-04-build-PLAY-dOrderedCharter-1-deviation-15.md](../build/2026-11-04-build-PLAY-dOrderedCharter-1-deviation-15.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-1-reuse-scout.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-1-reuse-scout.md) | journal | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-2-reuse-scout.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-2-reuse-scout.md) | journal | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-3-reuse-scout.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-3-reuse-scout.md) | journal | — |

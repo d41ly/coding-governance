@@ -65,7 +65,7 @@ JS_DEF_RE = re.compile(r"\b(?:function\*?\s+|class\s+)([A-Za-z_$][\w$]*)|\b(?:co
 #: PLAY-dOrderedCharter-48: the directive sources a writer reads, and the spellings that tell it to cite a line
 PRODUCER_RE = r"file:line|path and line|<path>:<line>"
 PRODUCER_PATHSPECS = ("tools/roles/agents/", "tools/workflows/", "skills/", "coding-governance-agents.template.md",
-                      "tools/*/SKILL.template.md", "tools/*/*.template.md")
+                      "tools/playbook/practices.toml", "tools/*/SKILL.template.md", "tools/*/*.template.md")
 PRODUCERS_NAME = "positional-producers.txt"
 #: a producer line naming a stable form, spelled as a placeholder or as a real pin, directs no line citation
 STABLE_FORM_RE = re.compile(r"#<?symbol>?|@<(?:oid|sha8?)>:|" + PINNED_RE.pattern)

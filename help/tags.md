@@ -77,7 +77,7 @@ tag-shaped word that is not a citation, quote it another way, with doubled backt
   expansion.
 - **shape** — a defined tag, or a value a unit's `scope` selects, in an unregistered namespace, with a
   segment outside `[a-z0-9][a-z0-9-]*`, longer than 64 bytes before any `#`, or whose first segment is
-  itself a namespace word, such as `practice.repo.x`.
+  itself a namespace word, such as `` `practice.repo.x` ``.
 - **join** — a citation that is no member of its namespace, such as `` `layer.nowhere` ``; and, once
   unit rows exist, a `reader` or `practice` member no unit selects. A describing namespace's unused
   members are listed, never red.

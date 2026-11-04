@@ -945,6 +945,26 @@ RELATION_BANDS = (0.10, 0.125, 0.15, 0.175, 0.20)
 NAME_EDGE = (r"(?<![\w-])(?:", r")(?![\w-])")
 
 
+def read_relation_gate(conf):
+    """-> `(mode, floor)` from NEAR_MATCH_GATE, or None when it is blank, which is NOT ARMED.
+
+    Blank is the kit's shipped value and is announced on every run rather than passed over: a floor
+    measured on one corpus is not a floor for another, so arming is the adopter's measured act
+    (`--measure-relations` is the instrument). A malformed value is a named refusal, never a
+    traceback and never a guess at what was meant.
+    """
+    raw = conf.get(RELATION_KEY, "").strip()
+    if not raw:
+        return None
+    mm = re.fullmatch(r"(red|warn):([0-9]*\.?[0-9]+)", raw)
+    floor = float(mm.group(2)) if mm else 0.0
+    if not mm or not 0 < floor <= 1:
+        raise Problem(f"row-grammar: {RELATION_KEY}='{raw}' is not `red:<floor>` or `warn:<floor>` "
+                      f"with the floor a decimal in (0, 1]; blank it to leave check {RELATION_CHECK} "
+                      f"unarmed")
+    return mm.group(1), floor
+
+
 def load_index_builder():
     """-> this kit's `id_grammar` module, check 27's index builder, or a refusal naming it and the key.
 

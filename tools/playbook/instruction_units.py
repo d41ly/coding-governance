@@ -3,7 +3,8 @@
 (PLAY-dOrderedCharter-13); the statement grammar and the render provenance lock (PLAY-dOrderedCharter-12);
 the instruction-unit registry, its one reader and documents rendered from units (PLAY-dOrderedCharter-9);
 the unit schema, one fact in one unit, status from the change record, and the instruction-file population
-the renderer-of-record table and the legacy list grade (PLAY-dOrderedCharter-20).
+the renderer-of-record table and the legacy list grade (PLAY-dOrderedCharter-20); the practice catalogue's
+reader and its active set (PLAY-dOrderedCharter-1).
 
     python instruction_units.py ladder-terms             # the leg: no source names a ladder place by priority or rank
     python instruction_units.py grammar [--doc <path>]   # the leg: unit rows, unit-rendered documents, the lock
@@ -12,6 +13,9 @@ the renderer-of-record table and the legacy list grade (PLAY-dOrderedCharter-20)
     python instruction_units.py schema                   # every row's fields
     python instruction_units.py one-fact                 # no fact and no term held by two active units
     python instruction_units.py fixture [--plant <case>]  # the plants, each in a throwaway tree
+    python instruction_units.py practices --list         # the shipped catalogue's tags, in render order
+    python instruction_units.py practices --check [<path>]  # a catalogue, the shipped one by default
+    python instruction_units.py practices --active [<tags>]  # the active set of a comma-joined value; none, the default
 
 `LEVELS` is the one place an envelope, a unit row, a card or a map reads a level from: a tuple whose index is
 the level, so `len(LEVELS)` is the ladder's height and `LEVELS[n]` a level's name. `PLATFORM` names the
@@ -51,6 +55,10 @@ the records naming the tag, and `read_change_records` is every tree read's one s
 
 THE POPULATION. `INSTRUCTION_PATHSPECS` is the instruction files, closed. `check_renderers` holds them against
 `renderers.toml` both ways and `check_legacy` against `instructions-legacy.txt`; the render gate calls both.
+
+THE PRACTICES. `read_practice_catalogue` reads `practices.toml`: its `foundation` tags and its `[[practice]]`
+rows, each a tag, a line and a reach table, a row it refuses naming the row. `resolve_active_practices` turns
+the value of `charter.practices` into the active rows, in catalogue order.
 
 Exit 0 green, 1 red, 2 a usage refusal.
 """
@@ -98,6 +106,7 @@ PLATFORM = "platform"
 
 LADDER_SOURCES = (
     "coding-governance-agents.template.md",
+    "tools/playbook/practices.toml",
     ":(glob)tools/*.template.md",
     ":(glob)tools/*/*.template.md",
     ":(glob)tools/roles/agents/*.agent.md",
@@ -433,6 +442,73 @@ def render_unit(unit, policy_reader) -> str:
 def render_units(units, policy_reader) -> str:
     """S4: the units' rendered lines joined, one line per unit."""
     return "\n".join(render_unit(u, policy_reader) for u in units)
+
+
+def read_practice_catalogue(path) -> dict:
+    """S3: the catalogue at `path`, as TOML reads it: `foundation`, its default tags, and `practice`, its rows
+    in render order. Raises one UnitRowError naming each row refused: a tag outside `practice.<seg>`, a tag
+    twice, an empty `line`, no reach, a reach key outside the `seg` shape, a `foundation` entry naming no row.
+    A line's length is the render's to grade."""
+    import tag_index
+    try:
+        table = tomllib.loads(pathlib.Path(path).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:     # ValueError: a TOML or a UTF-8 fault
+        raise UnitRowError(f"{path}: the practice catalogue is unreadable: {exc}") from None
+    rows, foundation = table.get("practice"), table.get("foundation", [])
+    if not rows or not isinstance(rows, list):
+        raise UnitRowError(f"{path}: the practice catalogue holds no [[practice]] row")
+    faults, seen = [], set()
+    for i, row in enumerate(rows, 1):
+        tag = str(row.get("tag"))
+        where = f"{path}: practice row {i} ({tag})"
+        name = tag.partition("practice.")[2]
+        if not tag.startswith("practice.") or not tag_index.SEG_RE.fullmatch(name):
+            faults.append(f"{where} · its tag is outside practice.<name>, a name of [a-z0-9][a-z0-9-]*")
+        if tag in seen:
+            faults.append(f"{where} · its tag is held by an earlier row")
+        seen.add(tag)
+        if not str(row.get("line") or "").strip():
+            faults.append(f"{where} · its `line` is empty")
+        reach = row.get("reach")
+        if not reach or not isinstance(reach, dict):
+            faults.append(f"{where} · it carries no reach.<step> key")
+            continue
+        faults += [f"{where} · reach key `{step}` is outside [a-z0-9][a-z0-9-]*" for step in reach
+                   if not tag_index.SEG_RE.fullmatch(step)]
+    faults += [f"{path}: `foundation` names {tag}, which no row holds" for tag in foundation if tag not in seen]
+    if faults:
+        raise UnitRowError("\n".join(faults))
+    return {"foundation": foundation, "practice": rows}
+
+
+def resolve_active_practices(catalogue, value) -> list:
+    """S4: the active rows in catalogue order, `value` the set `charter.practices` holds or None for the
+    `foundation` set. An empty set and a tag in no row raise UnitRowError naming it."""
+    rows = catalogue["practice"]
+    if value is None:
+        value = catalogue["foundation"]
+    elif not value:
+        raise UnitRowError("charter.practices is the empty set: name a practice, or leave the key unset")
+    unknown = sorted(set(value) - {r["tag"] for r in rows})
+    if unknown:
+        raise UnitRowError(f"charter.practices names {', '.join(unknown)}, which no practice row holds")
+    return [r for r in rows if r["tag"] in value]
+
+
+def run_practices(args) -> tuple[list, int]:
+    """The `practices` verbs: `--list`, `--check [<path>]` and `--active [<tags>]`, a comma-joined value, an
+    empty one the empty set."""
+    shipped = KIT_DIR / "practices.toml"
+    if args == ["--list"]:
+        return [r["tag"] for r in read_practice_catalogue(shipped)["practice"]], 0
+    if args[:1] == ["--check"] and len(args) <= 2:
+        path = args[1] if len(args) == 2 else shipped
+        rows = read_practice_catalogue(path)["practice"]
+        return [f"{SAY}: practices · {path} · {len(rows)} row(s) · green"], 0
+    if args[:1] == ["--active"] and len(args) <= 2:
+        value = [t for t in args[1].split(",") if t] if len(args) == 2 else None
+        return [r["tag"] for r in resolve_active_practices(read_practice_catalogue(shipped), value)], 0
+    return [__doc__.split("\n\n")[1]], 2
 
 
 def run_ladder_terms(root=".") -> tuple[list, int]:
@@ -1633,6 +1709,8 @@ def main(argv) -> int:
             lines, rc = run_grammar(root, argv[2] if len(argv) == 3 else None)
         elif argv == ["lock", "--check"]:
             lines, rc = check_lock(root)
+        elif argv[:1] == ["practices"]:
+            lines, rc = run_practices(argv[1:])
         elif argv[:1] == ["fixture"] and (len(argv) == 1 or (len(argv) == 3 and argv[1] == "--plant")):
             plant = argv[2] if len(argv) == 3 else None
             if plant is not None and plant not in PLANTS:

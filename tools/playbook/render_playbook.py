@@ -73,6 +73,13 @@ until the charter's stated values render from sourced fact units. `--check-rende
 render gate: every scope, then `renderers.toml` (each instruction file has exactly one renderer of record),
 the status arm, and the legacy list under the policy key `instructions.legacy`. A template's
 `<!-- units: <selector> -->` line expands to the selected units' lines, one per unit.
+
+THE PRACTICE LINES (PLAY-dOrderedCharter-1). A template's `{{PRACTICES}}` line expands to `- [<name>] <line>`
+per active row of `practices.toml` beside this engine, before the placeholder set is collected, so a token
+inside a line resolves as it would in the template. The active set is the policy key `charter.practices`,
+the `foundation` set where that key is a derived default or no policy kit answers, less each row whose `kit`
+is not selected and each `drop_blocks` member naming a row. A template with no such line reads neither the
+catalogue nor the key.
 """
 from __future__ import annotations
 
@@ -178,6 +185,9 @@ GEMINI_SETTINGS = '.gemini/settings.json'
 GEMINI_CONFIGURED_RE = re.compile(rf'"fileName"[^\S\n]*:[^\S\n]*(\[[^\S\n]*)?"{re.escape(CANON)}"')
 IMPORT_LINE_RE = re.compile(rf'^@\.*/?([^/\n]*/)*{re.escape(CANON)}[^\S\n]*$', re.M)
 PARITY_GATE = 'check-playbook-parity.sh'
+PRACTICES_LINE_RE = re.compile(r'^[ \t]*\{\{PRACTICES\}\}[ \t]*$', re.M)
+# The policy kit's DERIVED_WHY, spelled again because a kit imports no sibling; the selftest runs the real reader.
+POLICY_DERIVED_LINE = 'a derived default no reader computes yet'
 
 
 class Refusal(Exception):
@@ -1138,6 +1148,46 @@ def render_unit_slots(text: str, target: Path, notes: list, slots: list | None =
     return UNIT_SLOT_RE.sub(render_slot, text)
 
 
+def render_practice_lines(catalogue: dict, target: Path, kits: set, cut: list, notes: list) -> list[str]:
+    """`- [<name>] <line>` per active row: S4's set, less each `cut` member's row and each row whose `kit` is
+    not selected. A derived default, or no policy kit, takes the `foundation` set and notes it; any other
+    refused read, a set value that cannot resolve and an empty result refuse."""
+    iu = load_units_module()
+    from policy_value import PolicyRefused, read_policy_value
+    value = None
+    try:
+        lines, _explain = read_policy_value("charter.practices", target)
+    except PolicyRefused as exc:
+        if POLICY_DERIVED_LINE in exc.line:
+            notes.append('charter.practices — the foundation set: a derived default the policy reader '
+                         'leaves to the practice catalogue')
+        elif exc.line.startswith('no policy kit found'):
+            notes.append('charter.practices — the foundation set: no policy kit in this install, so no '
+                         'set can be read')
+        else:
+            raise Refusal(f'charter.practices: {exc.line}') from None
+    else:
+        try:
+            from instructions_edit import resolve_practices  # loads the memory-tree kit, so only a set value does
+        except (LookupError, ImportError) as exc:
+            raise Refusal(f'charter.practices holds a set, and resolving it needs the memory-tree kit, '
+                          f'which this install lacks: {exc}') from None
+        try:
+            value = resolve_practices(lines)
+        except ValueError as exc:     # its UnitRowError and the git read's LevelError
+            raise Refusal(f'charter.practices: {exc}') from None
+    try:
+        rows = iu.resolve_active_practices(catalogue, value)
+    except iu.UnitRowError as exc:
+        raise Refusal(str(exc)) from None
+    gone = {f'practice.{d}' for d in cut}
+    kept = [r for r in rows if r['tag'] not in gone and ('kit' not in r or r['kit'] in kits)]
+    if not kept:
+        raise Refusal('charter.practices leaves no practice to render, once the rows whose kit is not '
+                      'selected and the drop_blocks members are cut')
+    return [f"- [{r['tag'].split('.', 1)[1]}] {r['line']}" for r in kept]
+
+
 def render(engine_dir: Path, gov_root: Path, target: Path,
            charter_path: Path | None = None, slots: list | None = None) -> tuple[str, list[str]]:
     desc, blocks, entries = load_declarations(*resolve_declaration_paths(engine_dir, gov_root))
@@ -1176,18 +1226,33 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
     # template under a deploy.toml written for v3.x. With the fence present it drops as it always did.
     retired = [d for d in drop_names if d in legacy and ('when', d) not in present]
     drop_names = [d for d in drop_names if d not in retired]
+    # PLAY-dOrderedCharter-1 S6: a member naming a catalogue row leaves the active set, fence or none.
+    catalogue, cut = None, []
+    if PRACTICES_LINE_RE.search(text):
+        iu = load_units_module()
+        try:
+            catalogue = iu.read_practice_catalogue(engine_dir / 'practices.toml')
+        except iu.UnitRowError as e:
+            raise Refusal(str(e)) from None
+        tags = {r['tag'] for r in catalogue['practice']}
+        cut = [d for d in drop_names if f'practice.{d}' in tags]
     for d in drop_names:
-        if ('when', d) not in present:
+        if ('when', d) not in present and d not in cut:
             raise Refusal(f'drop_blocks names `{d}` but no when fence in the template carries it')
 
     drop = {('kit', name) for ns, name in present if ns == 'kit' and name not in kits}
-    drop |= {('when', d) for d in drop_names}
+    drop |= {('when', d) for d in drop_names if ('when', d) in present}
     text = remove_fenced(text, drop)
     # PLAY-dOrderedCharter-12 S5: render provenance never loads. The template keeps its marker, which this
     # render and its parity readers read from the source; the lock's charter row carries it (main).
     text = TEMPLATE_MARKER_LINE_RE.sub('', text)
 
     notes = [f'retired   drop_blocks {d} — {legacy[d]}; remove it from deploy.toml' for d in retired]
+    notes += [f'retired   drop_blocks {d} — practice.{d} leaves the active set; charter.practices names the '
+              f'set directly' for d in cut]
+    if catalogue:
+        text = PRACTICES_LINE_RE.sub(
+            lambda _m: '\n'.join(render_practice_lines(catalogue, target, kits, cut, notes)), text, count=1)
     if marker and not current:
         notes.append(f'legacy    template v{marker.group(1)}.{marker.group(2)} at '
                      f'{template.as_posix()} — this engine ships v{TEMPLATE_MAJOR}.x; reseed the '
@@ -1306,6 +1371,103 @@ def check_scope_arms(check_arm) -> None:
             gate.write_text(f'exit {code}\n', encoding='utf-8')
             rc, said = run_main('--check-render', '--scope', 'claims', '--target', tgt)
             check_arm(rc == code, f'the claims scope carries the gate\'s exit {code}', said)
+
+
+PRACTICE_ROW = '\n[[practice]]\ntag = "practice.{0}"\n{1}line = "{2}"\n[practice.reach]\nbuild = "x"\n'
+PRACTICE_TABLE = ('foundation = ["practice.one", "practice.cross-os", "practice.roles"]\n'
+                  + PRACTICE_ROW.format('one', '', 'Rule one for {{ANSWER}}.')
+                  + PRACTICE_ROW.format('cross-os', '', 'Rule two.')
+                  + PRACTICE_ROW.format('roles', 'kit = "roles"\n', 'Rule three.'))
+PRACTICE_TEMPLATE = (f'<!-- governance-template: v{TEMPLATE_MAJOR}.5 -->\n\n{ONE_LINE_OPEN}\n{{{{PRACTICES}}}}\n'
+                     f'{ONE_LINE_CLOSE}\n')
+CROSS_OS_FENCE = '<!-- when:cross-os -->\nthe toolchain section\n<!-- /when:cross-os -->\n'
+PRACTICE_REFUSALS = (('a tag outside its shape', 'practice.One', 'tag = "practice.one"', 'tag = "practice.One"'),
+                     ('a tag twice', 'held by an earlier row', 'tag = "practice.roles"', 'tag = "practice.one"'),
+                     ('an empty line', 'its `line` is empty', 'line = "Rule two."', 'line = ""'),
+                     ('no reach', 'no reach.<step> key',
+                      '[practice.reach]\nbuild = "x"\n\n[[practice]]\ntag = "practice.cross-os"',
+                      '\n[[practice]]\ntag = "practice.cross-os"'),
+                     ('a reach key outside its shape', 'reach key `Plan`', 'build = "x"', 'Plan = "x"'),
+                     ('a foundation entry naming no row', 'names practice.none', '"practice.roles"]',
+                      '"practice.none"]'))
+
+
+def check_practice_arms(check_arm) -> None:
+    """PLAY-dOrderedCharter-1: `render` over a target committed on `main`: each refused catalogue, the `kit`
+    field, a `drop_blocks` member with and without its fence, and, where a policy kit answers, the three policy
+    cases; where none does, those print `unarmed` and the no-policy-kit note is what is asserted."""
+    import tempfile
+
+    def render_target(table=PRACTICE_TABLE, kits='["roles"]', tail='', tpl=PRACTICE_TEMPLATE, policy=None,
+                      branch='main') -> tuple[str, list, str | None]:
+        """-> (body, notes, refusal or None) of one committed fixture target."""
+        with tempfile.TemporaryDirectory() as td:
+            eng, tgt = Path(td) / 'engine', Path(td) / 'target'
+            eng.mkdir()
+            (tgt / '.governance').mkdir(parents=True)
+            (eng / 'practices.toml').write_text(table, encoding='utf-8')
+            (eng / 'playbook.kit.toml').write_text(
+                '[[placeholder]]\nkey = "ANSWER"\nclass = "defaulted"\ndefault = "x"\n\n'
+                '[[block]]\nname = "cross-os"\n', encoding='utf-8')
+            (eng / 'registry.toml').write_text('[[entry]]\nid = "roles"\n\n[[entry]]\nid = "lexicon"\n',
+                                               encoding='utf-8')
+            (tgt / 'TPL.md').write_text(tpl, encoding='utf-8')
+            (tgt / '.governance' / 'deploy.toml').write_text(
+                f'kits = {kits}\n{tail}\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
+            if policy is not None:
+                (tgt / '.governance' / 'policy.toml').write_text(policy, encoding='utf-8')
+            read_git(tgt, 'init', '-q', '-b', branch)
+            read_git(tgt, 'add', '-A')
+            read_git(tgt, '-c', 'user.name=fx', '-c', 'user.email=fx@example.invalid', 'commit', '-qm', 'fixture')
+            try:
+                return (*render(eng, Path(td), tgt), None)
+            except Refusal as e:
+                return '', [], str(e)
+
+    for name, want, old, new in PRACTICE_REFUSALS:
+        _b, _n, got = render_target(PRACTICE_TABLE.replace(old, new, 1))
+        check_arm(got is not None and want in got, f'a catalogue with {name} refuses the render',
+                  f'refused with {got!r}')
+    body, notes, got = render_target()
+    check_arm(got is None and '- [one] Rule one for x.' in body and '- [roles] Rule three.' in body,
+              'the render expands the rows and resolves a token inside a line', f'refused {got!r}: {body!r}')
+    body, _n, got = render_target(kits='["lexicon"]')
+    check_arm(got is None and '[roles]' not in body and '- [one]' in body,
+              'a row whose kit is not selected stays out', f'refused {got!r}: {body!r}')
+    note = 'retired   drop_blocks cross-os — practice.cross-os leaves'
+    for name, tpl in (('with its fence', PRACTICE_TEMPLATE + CROSS_OS_FENCE), ('with no fence', PRACTICE_TEMPLATE)):
+        body, notes, got = render_target(tail='drop_blocks = ["cross-os"]', tpl=tpl)
+        check_arm(got is None and '[cross-os]' not in body and 'the toolchain section' not in body
+                  and any(n.startswith(note) for n in notes), f'a drop_blocks member {name} leaves the set',
+                  f'refused {got!r}: {body!r} {notes!r}')
+    older = f'<!-- governance-template: v{TEMPLATE_MAJOR}.4 -->\n\n- [one] Kept.\n{CROSS_OS_FENCE}'
+    body, notes, got = render_target(tail='drop_blocks = ["cross-os"]', tpl=older)
+    check_arm(got is None and '- [one] Kept.' in body and 'the toolchain section' not in body
+              and not any(n.startswith(note) for n in notes), 'a template with no practices line renders as before',
+              f'refused {got!r}: {notes!r}')
+    was = os.environ.pop('GOV_DEFAULT_BRANCH', None)
+    try:
+        _b, notes, got = render_target()
+        said = [n for n in notes if n.startswith('charter.practices — the foundation set')]
+        try:
+            resolve_kit_dir('policy', 'policy.py', Path(__file__).resolve().parent)
+        except LookupError as exc:
+            print(f'  unarmed: the unset key, a committed empty set and a repository on master need a policy '
+                  f'kit, and {exc}')
+            check_arm(got is None and len(said) == 1 and 'no policy kit' in said[0],
+                      'with no policy kit the render takes the foundation set and says so', f'{got!r} {notes!r}')
+            return
+        check_arm(got is None and len(said) == 1 and 'a derived default' in said[0],
+                  'an unset key takes the foundation set and says so', f'{got!r} {notes!r}')
+        _b, _n, got = render_target(policy='charter.practices = []\n')
+        check_arm(got is not None and 'charter.practices' in got and 'this set is never empty' in got,
+                  'a committed empty set refuses naming the key and the reader', f'refused with {got!r}')
+        _b, _n, got = render_target(branch='master')
+        check_arm(got is not None and 'charter.practices' in got and 'names no commit' in got,
+                  'a repository on master with no remote refuses naming the key', f'refused with {got!r}')
+    finally:
+        if was is not None:
+            os.environ['GOV_DEFAULT_BRANCH'] = was
 
 
 def run_selftest() -> int:
@@ -1953,6 +2115,7 @@ def run_selftest() -> int:
               'an absent roles kit prints the resolver\'s reason and refuses',
               f'refused {got!r}, stderr {said!r}')
     check_scope_arms(check_arm)
+    check_practice_arms(check_arm)
 
     if failed:
         print(f'render_playbook.selftest FAILED — {failed} of {passed + failed} arm(s)')

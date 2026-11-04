@@ -23,6 +23,8 @@ name = "charter.practices"
 allowed = { type = "set", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "catalogue or repo-declared practices" }
 empty = "never"
 default = { derived = "the governance foundation set" }
+summary = "Which practices the rendered charter carries: practice tags or pack names, and unset, the catalogue's foundation set."
+usage = 'charter.practices = ["practice.yagni", "practice.reuse"]'
 owner = "dOrderedCharter"
 
 [[key]]

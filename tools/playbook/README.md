@@ -52,7 +52,21 @@ It never guesses. Every refusal names what the operator must supply:
 - a `[charter]` entry that fails its grading (below);
 - a `kit:` fence naming something that is not a registry entry;
 - a `when:` fence naming a block the descriptor does not declare;
-- a `drop_blocks` member that matches no fence.
+- a `drop_blocks` member that matches no fence and, where the template carries `{{PRACTICES}}`, names no
+  catalogue row;
+- a template carrying `{{PRACTICES}}` with a catalogue that does not read, or an active set the policy
+  reader refuses, that cannot resolve, or that leaves no practice to render.
+
+## The practice catalogue
+
+`practices.toml` holds one `[[practice]]` row per practice: its tag, its one-line rule, what it changes at
+each step, and the kit a line needs, where it needs one. A template's `{{PRACTICES}}` line expands to one
+`- [<name>] <line>` per active row, before placeholders are collected, so a token inside a line resolves
+as it would in the template, and a template with no such line reads neither the catalogue nor the key.
+`instruction_units.py practices` lists, checks and resolves it. The active set is the policy key
+`charter.practices`, and the render takes the `foundation` set where that key is a derived default or no
+policy kit answers, printing which. A `drop_blocks` member naming a row leaves the active set, noted
+`retired`, and still cuts the fenced text the template carries. `help/charter.md` is the adopter's page.
 
 ## Where a value comes from
 

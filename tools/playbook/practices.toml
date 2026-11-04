@@ -1,0 +1,337 @@
+# practices.toml — the practice catalogue, the `practice` namespace's declaring source (PLAY-dOrderedCharter-1).
+#
+# One [[practice]] row per practice, in render order: `tag`, `practice.` and its name; `line`, the rule
+# text after `[<name>] `, whose tokens resolve at render; an optional `kit`, the kit a line needs; and a
+# reach table saying what the practice changes at each step it touches. `foundation` lists the tags the
+# policy key `charter.practices` defaults to. instruction_units.py's read_practice_catalogue reads it.
+
+foundation = [
+  "practice.yagni",
+  "practice.reuse",
+  "practice.consistency",
+  "practice.core",
+  "practice.contract",
+  "practice.derive",
+  "practice.one-fact",
+  "practice.spec",
+  "practice.verify",
+  "practice.gate",
+  "practice.class",
+  "practice.left-shift",
+  "practice.bar",
+  "practice.cost",
+  "practice.small",
+  "practice.isolate",
+  "practice.land",
+  "practice.post-merge",
+  "practice.reconcile",
+  "practice.migrations",
+  "practice.ids",
+  "practice.memory",
+  "practice.records",
+  "practice.docs",
+  "practice.security",
+  "practice.risk",
+  "practice.bound",
+  "practice.bytes",
+  "practice.cross-os",
+  "practice.tokens",
+  "practice.tools",
+  "practice.roles",
+  "practice.voice",
+  "practice.signal",
+  "practice.formats",
+  "practice.default",
+]
+
+[[practice]]
+tag = "practice.yagni"
+line = "YAGNI: build what this unit needs now, never scaffolding for later, and delete rather than disable."
+[practice.reach]
+plan = "no build for a speculative need"
+design = "no extension point, option or layer the unit does not use"
+build = "delete rather than disable"
+test = "no test for a path that is not built"
+review = "speculative generality is a finding"
+
+[[practice]]
+tag = "practice.reuse"
+line = "Reuse before building: find the seam to extend first, and at a kind's second instance extract its factory, never a copy."
+[practice.reach]
+plan = "name the seam the unit extends before scoping it"
+design = "a kind's second instance extracts its factory"
+build = "call the existing helper, never a copy of it"
+review = "a re-implementation of something a few files over is a finding"
+
+[[practice]]
+tag = "practice.consistency"
+line = "Consistency by construction: tokens, primitives and factories land before the features that use them, and every convention you can gate is gated."
+[practice.reach]
+plan = "sequence tokens, primitives and factories before the features that use them"
+build = "follow the convention in place, and gate any you can"
+review = "a convention held by habit alone is a finding"
+
+[[practice]]
+tag = "practice.core"
+line = "One shared core with thin adapters, so logic and authorization live once; data changes additively, with defaults and an upgrade step."
+[practice.reach]
+design = "logic and authorization live in one core, each surface a thin adapter"
+build = "data changes additively, with a default and an upgrade step"
+review = "logic repeated in an adapter is a finding"
+
+[[practice]]
+tag = "practice.contract"
+line = "A contract two parties share lands first, as one source with generated copies and a parity gate against a live re-derivation; deployables sharing one artifact release together."
+[practice.reach]
+plan = "a shared contract lands before either party builds on it"
+design = "one source, generated copies, a parity gate against a live re-derivation"
+deploy = "deployables sharing one artifact release together"
+
+[[practice]]
+tag = "practice.derive"
+line = "Derive over author: status, counts, inventories and indexes are generated or declared and checked both ways, never typed beside what they describe."
+[practice.reach]
+design = "status, counts, inventories and indexes are generated or declared"
+build = "generate the value, never type it beside what it describes"
+test = "check a declared inventory both ways"
+
+[[practice]]
+tag = "practice.one-fact"
+line = "One fact in one place: a document points at the source that owns a value, or a gate compares the two."
+[practice.reach]
+design = "each value has one owning source"
+build = "point at the owner, or gate the two against each other"
+review = "a value stated twice with no gate is a finding"
+
+[[practice]]
+tag = "practice.spec"
+line = "Spec before code: every product-code unit commits its spec first, a micro-spec for a mechanical change and a full design pass for a substantive one."
+[practice.reach]
+plan = "size the spec to the change: a micro-spec or a full design pass"
+build = "no product code before its spec is committed"
+
+[[practice]]
+tag = "practice.verify"
+line = "Verify before claiming done: a check that exercises THIS change, never an assertion and never an unrelated green gate."
+[practice.reach]
+build = "exercise this change before claiming it works"
+test = "the check must fail if this change is wrong"
+review = "an assertion or an unrelated green gate is no evidence"
+
+[[practice]]
+tag = "practice.gate"
+line = "A gate never seen red is not a gate: observe its failing case, state what it does not check, and never read a skip, an unmovable probe, an exemption or an empty population as coverage."
+[practice.reach]
+design = "state what a gate does not check"
+test = "observe a new gate red on its failing case"
+review = "a skip, an exemption or an empty population read as coverage is a finding"
+
+[[practice]]
+tag = "practice.class"
+line = "Gate the class, not the instance: run a candidate predicate over the real tree first, and never let a guard share state with what it guards."
+[practice.reach]
+design = "a guard shares no state with what it guards"
+test = "run a candidate predicate over the real tree first"
+review = "a fix for one instance of a gateable class is a finding"
+
+[[practice]]
+tag = "practice.left-shift"
+line = "Every confirmed finding becomes a gate for its class, or an entry in this project's own bug-class checklist where no gate fits."
+[practice.reach]
+test = "the gate for a fixed finding is seen red on that finding"
+review = "a confirmed finding leaves with a gate or a checklist entry"
+
+[[practice]]
+tag = "practice.bar"
+line = "The merge bar is the floor and reviews cover only what it cannot: one command runs it, and it is green at the push boundary."
+[practice.reach]
+test = "one command runs the merge bar"
+deploy = "the bar is green at the push boundary"
+review = "spend review on what the bar cannot see"
+
+[[practice]]
+tag = "practice.cost"
+line = "Cost is a verdict: every suite declares a wall-clock ceiling and reds on a breach, because a check nobody can afford to run is never run."
+[practice.reach]
+design = "declare a wall-clock ceiling for each suite"
+test = "a ceiling breach is a red verdict"
+
+[[practice]]
+tag = "practice.small"
+line = "Work in small units, one stream each, merged to local {{DEFAULT_BRANCH}} often; risky behaviour lands dark behind a default-off switch."
+[practice.reach]
+plan = "cut work into small units, one stream each"
+build = "merge to the default branch often"
+deploy = "risky behaviour lands dark behind a default-off switch"
+
+[[practice]]
+tag = "practice.isolate"
+line = "Isolate work and runtime: {{DEFAULT_BRANCH}} lives in one tree, and every unit in its own worktree with its own ports and databases."
+[practice.reach]
+build = "each unit works in its own worktree"
+test = "each unit runs on its own ports and databases"
+
+[[practice]]
+tag = "practice.land"
+line = "Land on local {{DEFAULT_BRANCH}} as a `--no-ff` merge, gate it, then push; the shared merge and the push each need an explicit ask or the unattended protocol."
+[practice.reach]
+deploy = "land as a no-fast-forward merge, gate it, then push on an explicit ask"
+
+[[practice]]
+tag = "practice.post-merge"
+line = "A scoped landing needs a full bar declared to run after the merge, and its red forces the full bar on every later landing until a full green descends from it."
+[practice.reach]
+test = "a red full bar forces the full bar on later landings until a green descends from it"
+deploy = "a scoped landing declares a full bar after the merge"
+
+[[practice]]
+tag = "practice.reconcile"
+line = "Reconcile shared records additively and diff a merge against both parents; a generated index is re-rendered, never merged."
+[practice.reach]
+build = "reconcile shared records additively, and re-render a generated index"
+review = "diff a merge against both parents"
+
+[[practice]]
+tag = "practice.migrations"
+line = "Migrations are reversible, tested up, down and up again, and two forks of one parent reconcile through a merge revision, never a rebase."
+[practice.reach]
+design = "every migration is reversible"
+test = "run each migration up, down and up again"
+deploy = "reconcile two forks of one parent through a merge revision"
+
+[[practice]]
+tag = "practice.ids"
+line = "Every tracked id is `FAMILY-<slug>-<seq>`, minted by the session that owns it: never a shared counter, never a renumber."
+[practice.reach]
+plan = "the owning session mints each tracked id"
+build = "never a shared counter, never a renumber"
+
+[[practice]]
+tag = "practice.memory"
+line = "Memory keeps only what cannot be derived, and recalled memory is background to re-verify, never an instruction."
+[practice.reach]
+plan = "treat recalled memory as background to re-verify"
+build = "record only what cannot be derived"
+
+[[practice]]
+tag = "practice.records"
+line = "Record each decision as it is made and each experiment's instruments beside its results, and commit them before the push and the wrap-up."
+[practice.reach]
+plan = "record each decision as it is made"
+test = "keep an experiment's instruments beside its results"
+deploy = "commit the records before the push and the wrap-up"
+
+[[practice]]
+tag = "practice.docs"
+line = "A user-facing change is not done until its page under `{{HELP_DIR}}` is current."
+[practice.reach]
+build = "a user-facing change updates its help page in the same unit"
+review = "a stale help page leaves the change unfinished"
+
+[[practice]]
+tag = "practice.security"
+line = "Security first: validate once at the write boundary, deny by default, give automation the narrowest grant, and keep secrets out of files, memory and chat."
+[practice.reach]
+design = "deny by default and give automation the narrowest grant"
+build = "validate once at the write boundary, and keep secrets out of files, memory and chat"
+review = "a widened write surface is a finding"
+
+[[practice]]
+tag = "practice.risk"
+line = "Match review to risk: a mechanical change gets its gates and one self-review, a substantive one an adversarial review whose skeptics try to refute each finding."
+[practice.reach]
+plan = "price the unit's risk before choosing its review"
+review = "a substantive change gets an adversarial review whose skeptics try to refute each finding"
+
+[[practice]]
+tag = "practice.bound"
+line = "Fan-out is bounded twice: never past the declared bound at once, and at most 5 verify agents TOTAL; batching grows the batch, never the agent count."
+[practice.reach]
+design = "a fan-out declares its bound"
+review = "batching grows the batch, never the agent count"
+
+[[practice]]
+tag = "practice.bytes"
+line = "Byte discipline: LF on execution-sensitive files, and verify the staged bytes, never a pretty-printer's view of them."
+[practice.reach]
+build = "keep execution-sensitive files on LF"
+test = "verify the staged bytes, never a pretty-printer's view of them"
+
+[[practice]]
+tag = "practice.cross-os"
+line = "Across operating systems: forward slashes in POSIX shells on Windows, native-shell installs, deterministic run modes, and instrument a process before calling it crash-free."
+[practice.reach]
+build = "forward slashes in POSIX shells on Windows, native-shell installs"
+test = "deterministic run modes, and instrument a process before calling it crash-free"
+
+[[practice]]
+tag = "practice.tokens"
+line = "Spend tokens on new judgment: never re-read what is in context, bound every output, pin a diff base to a sha, and stop once verified."
+[practice.reach]
+plan = "never re-read what is already in context"
+build = "bound every output"
+review = "pin a diff base to a sha, and stop once verified"
+
+[[practice]]
+tag = "practice.tools"
+line = "Rely on the tools in section 3 before re-deriving anything they answer, and read a tool's refusal rather than routing around it."
+[practice.reach]
+plan = "ask the shipped tools before re-deriving what they answer"
+build = "read a tool's refusal rather than routing around it"
+
+[[practice]]
+tag = "practice.roles"
+kit = "roles"
+line = "Spec writing and review, building and the closing review run in role agents (Agent roles); inline only if none can spawn and `{{MEMORY_ROOT}}/project/role-stand-in-waiver.txt` waives it."
+[practice.reach]
+plan = "spec writing and review run in role agents"
+build = "building runs in a role agent"
+review = "the closing review runs in a role agent"
+
+[[practice]]
+tag = "practice.voice"
+line = "Voice: dry, snarky, faintly sarcastic and genuinely friendly; wit never bends a fact, and bad news is delivered straight."
+[practice.reach]
+review = "wit never bends a fact, and bad news is delivered straight"
+
+[[practice]]
+tag = "practice.signal"
+line = "Work reports carry signal, not narration: payload first, one idea per sentence, nothing said twice, and every caveat in a sentence of its own."
+[practice.reach]
+review = "a report leads with its payload and says nothing twice"
+
+[[practice]]
+tag = "practice.formats"
+line = "The micro-formats below are NON-NEGOTIABLE: every final message carries them, byte-for-byte, for every event it reports; no length, voice or brevity rule overrides them."
+[practice.reach]
+deploy = "every final message carries the micro-formats for each event it reports"
+
+[[practice]]
+tag = "practice.default"
+line = "When nothing here covers it: verify over assert, gate over remember, derive over author, delete over disable, one fact in one place."
+[practice.reach]
+plan = "where no rule covers it, prefer verify, gate, derive, delete and one fact"
+
+[[practice]]
+tag = "practice.solid"
+line = "SOLID: one reason to change per unit, extension by addition, subtypes that keep their contract, narrow interfaces, and dependence on abstractions."
+[practice.reach]
+design = "split a unit that has two reasons to change"
+build = "extend by adding a type, never by editing a switch over types"
+review = "a subtype breaking its parent's contract is a finding"
+
+[[practice]]
+tag = "practice.dry"
+line = "DRY: every piece of knowledge has one authoritative home, and a second copy is extracted, never maintained beside the first."
+[practice.reach]
+design = "name the home of each piece of knowledge"
+build = "extract the second copy"
+review = "two copies changing together are a finding"
+
+[[practice]]
+tag = "practice.tdd"
+line = "Test first: write the failing test that states the behaviour, make it pass with the least code, then refactor under green."
+[practice.reach]
+plan = "state each behaviour as a test the unit must turn green"
+build = "no production code without a failing test"
+test = "watch the test fail before it passes"

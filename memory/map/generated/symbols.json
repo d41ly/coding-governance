@@ -5798,6 +5798,11 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
+      "id": "check_practice_arms",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "check_preflip",
       "kind": "function",
       "file": ".githooks/straggler-guard.sh"
@@ -17273,6 +17278,11 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
+      "id": "read_practice_catalogue",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "read_practice_tags",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -17481,6 +17491,11 @@
       "id": "read_registry_tags",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "read_relation_gate",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "read_release_pin",
@@ -19958,6 +19973,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "render_practice_lines",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "render_prof_line",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -20566,6 +20586,11 @@
       "id": "resolveToplevel",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "resolve_active_practices",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "resolve_address",
@@ -24151,6 +24176,11 @@
       "id": "run_practices",
       "kind": "function",
       "file": "tools/playbook/core.py"
+    },
+    {
+      "id": "run_practices",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "run_prefix_commit",
