@@ -184,7 +184,7 @@ def read_register(root, value, today=None):
     return out, admitted
 
 
-def apply_exceptions(root, reds, lines):
+def check_exceptions(root, reds, lines):
     """Read `core.exceptions`, print each excused red as `excepted` and every register red. -> rc."""
     try:
         value = read_value(root, "core.exceptions")
@@ -330,7 +330,7 @@ def run_meta_check(root=None):
             reds.append((CORE, item, f"pending {ns} row {item} is stale: it is enforced now, so delete the row "
                                      f"(armed by {pending[ns][item]})"))
     lines.append(f"{SAY}: pending · " + " · ".join(f"{k} {len(pending[k])}" for k in PENDING_KEYS))
-    rc = apply_exceptions(root, reds, lines)
+    rc = check_exceptions(root, reds, lines)
     lines.append(f"{SAY}: meta-check · {'red' if rc else 'green'} · {len(ids)} principles, {len(legs)} legs, "
                  f"{len(kinds)} kinds · core.bypass {bypass}")
     return lines, rc
@@ -400,7 +400,7 @@ def run_kinds(root=None):
     for tag in sorted(set(pending["kind"]) - seen):
         reds.append((CORE, tag, f"{tag} is no kind the register holds: a kind outside kinds.toml cannot appear"))
     lines.append(f"{SAY}: kinds · {len(kinds)} registered, {len(pending['kind'])} pending")
-    rc = apply_exceptions(root, reds, lines)
+    rc = check_exceptions(root, reds, lines)
     lines.append(f"{SAY}: kinds · {'red' if rc else 'green'}")
     return lines, rc
 
@@ -466,7 +466,7 @@ def run_skills(root=None):
             reds.append((CORE, rel, f"{rel}/SKILL.md description is {len(desc)} characters, over "
                                     f"{SKILL_DESCRIPTION_MAX}"))
     lines = [f"{SAY}: skills · {len(dirs)} Skills under {home.relative_to(root).as_posix()}/"]
-    rc = apply_exceptions(root, reds, lines)
+    rc = check_exceptions(root, reds, lines)
     lines.append(f"{SAY}: skills conformance · {'red' if rc else 'green'}")
     return lines, rc
 
@@ -496,7 +496,7 @@ def run_practices(root=None):
             reds.append((CORE, str(tag), f"{tag}: its line is {len(line.encode('utf-8'))} bytes, over "
                                          f"{PRACTICE_LINE_MAX}"))
     lines = [f"{SAY}: practices · {len(rows)} rows in {rel}"]
-    rc = apply_exceptions(root, reds, lines)
+    rc = check_exceptions(root, reds, lines)
     lines.append(f"{SAY}: practices conformance · {'red' if rc else 'green'}")
     return lines, rc
 
@@ -612,7 +612,7 @@ def write_fixture(top, policy="# no key set\n"):
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_bytes(text.encode("utf-8"))
     run_fixture_git(top, "init", "-q", "-b", "main")
-    commit_fixture(top, "fixture base")
+    write_fixture_commit(top, "fixture base")
 
 
 def run_fixture_git(top, *args):
@@ -623,40 +623,40 @@ def run_fixture_git(top, *args):
                            *args], capture_output=True, text=True, env=env, stdin=subprocess.DEVNULL)
 
 
-def commit_fixture(top, msg):
+def write_fixture_commit(top, msg):
     run_fixture_git(top, "add", "-A")
     run_fixture_git(top, "commit", "-q", "--no-verify", "--allow-empty", "-m", msg)
 
 
 class Case:
-    """One plant's run: each `expect` runs a gate over the fixture and records what it observed."""
+    """One plant's run: each `check_gate` runs a gate over the fixture and records what it observed."""
 
     def __init__(self, top, out):
         self.top, self.out, self.failed = top, out, 0
 
-    def edit(self, rel, fn):
+    def write_file(self, rel, fn):
         p = self.top / rel
         old = p.read_text(encoding="utf-8") if p.exists() else None
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_bytes(fn(old).encode("utf-8"))
         return old
 
-    def put(self, rel, old):
+    def set_file(self, rel, old):
         p = self.top / rel
         if old is None:
             p.unlink(missing_ok=True)
         else:
             p.write_bytes(old.encode("utf-8"))
 
-    def legs(self, fn):
-        return self.edit("tools/gate-legs.json", lambda t: json.dumps(fn(json.loads(t)), indent=1) + "\n")
+    def write_legs(self, fn):
+        return self.write_file("tools/gate-legs.json", lambda t: json.dumps(fn(json.loads(t)), indent=1) + "\n")
 
-    def policy(self, text):
-        self.edit(".governance/policy.toml", lambda _t: text)
-        commit_fixture(self.top, "policy")
+    def write_policy(self, text):
+        self.write_file(".governance/policy.toml", lambda _t: text)
+        write_fixture_commit(self.top, "policy")
 
-    def expect(self, label, gate, want_rc, *needles, absent=()):
-        commit_fixture(self.top, label)
+    def check_gate(self, label, gate, want_rc, *needles, absent=()):
+        write_fixture_commit(self.top, label)
         lines, rc = gate(self.top)
         text = "\n".join(lines)
         missing = [n for n in needles if n not in text]
@@ -674,87 +674,87 @@ def run_new_in(argv):
     return lambda top: run_new(argv, top)
 
 
-def plant_registry(c):
-    c.expect("registry: the control, the ids equal the design's heads both ways", run_meta_check, 0, "16 rows against 16")
-    old = c.edit("tools/playbook/principles.toml",
+def arm_registry(c):
+    c.check_gate("registry: the control, the ids equal the design's heads both ways", run_meta_check, 0, "16 rows against 16")
+    old = c.write_file("tools/playbook/principles.toml",
                  lambda t: t + '[[principle]]\ntag = "principle.p43"\nid = "P43"\nline = "Extra."\nclauses = []\n')
-    c.legs(lambda legs: [dict(g, enforces=g["enforces"] + ["principle.p43"]) if g["name"] == "fx meta" else g
+    c.write_legs(lambda legs: [dict(g, enforces=g["enforces"] + ["principle.p43"]) if g["name"] == "fx meta" else g
                          for g in legs])
-    c.expect("registry: a planted extra P43 row", run_meta_check, 1, "registry row P43")
-    c.put("tools/playbook/principles.toml", old)
-    c.legs(lambda legs: [dict(g, enforces=FX_TAGS) if g["name"] == "fx meta" else g for g in legs])
-    c.edit("tools/playbook/principles.toml", lambda t: re.sub(
+    c.check_gate("registry: a planted extra P43 row", run_meta_check, 1, "registry row P43")
+    c.set_file("tools/playbook/principles.toml", old)
+    c.write_legs(lambda legs: [dict(g, enforces=FX_TAGS) if g["name"] == "fx meta" else g for g in legs])
+    c.write_file("tools/playbook/principles.toml", lambda t: re.sub(
         r'\[\[principle\]\]\ntag = "principle\.p7"\n.*?clauses = \[\]\n\n', "", t, flags=re.S))
-    c.legs(lambda legs: [dict(g, enforces=[t for t in g["enforces"] if t != "principle.p7"]) for g in legs])
-    c.expect("registry: a planted missing P7 row", run_meta_check, 1, "P7 heads")
-    c.put("tools/playbook/principles.toml", old)
+    c.write_legs(lambda legs: [dict(g, enforces=[t for t in g["enforces"] if t != "principle.p7"]) for g in legs])
+    c.check_gate("registry: a planted missing P7 row", run_meta_check, 1, "P7 heads")
+    c.set_file("tools/playbook/principles.toml", old)
 
 
-def plant_unenforced(c):
-    def drop(tag):
+def arm_unenforced(c):
+    def derive_without(tag):
         return lambda legs: [dict(g, enforces=[t for t in g["enforces"] if t != tag]) for g in legs]
-    restore = c.legs(drop("principle.p5"))
-    c.expect("unenforced: principle.p5 named by no leg, no kind and no pending row", run_meta_check, 1,
+    restore = c.write_legs(derive_without("principle.p5"))
+    c.check_gate("unenforced: principle.p5 named by no leg, no kind and no pending row", run_meta_check, 1,
              "principle.p5: no leg's enforces")
-    c.put("tools/gate-legs.json", restore)
-    c.expect("unenforced: its enforcing leg restored", run_meta_check, 0, "meta-check · green")
-    c.legs(lambda legs: [dict(g, enforces=g["enforces"] + ["principle.p99"]) if g["name"] == "fx meta" else g
+    c.set_file("tools/gate-legs.json", restore)
+    c.check_gate("unenforced: its enforcing leg restored", run_meta_check, 0, "meta-check · green")
+    c.write_legs(lambda legs: [dict(g, enforces=g["enforces"] + ["principle.p99"]) if g["name"] == "fx meta" else g
                          for g in legs])
-    c.expect("unenforced: an enforces naming principle.p99", run_meta_check, 1, "principle.p99: a leg enforces tag")
-    c.put("tools/gate-legs.json", restore)
-    c.expect("unenforced: principle.p99 taken out", run_meta_check, 0, "meta-check · green")
+    c.check_gate("unenforced: an enforces naming principle.p99", run_meta_check, 1, "principle.p99: a leg enforces tag")
+    c.set_file("tools/gate-legs.json", restore)
+    c.check_gate("unenforced: principle.p99 taken out", run_meta_check, 0, "meta-check · green")
 
 
-def plant_pending(c):
-    restore = c.legs(lambda legs: legs + [{"name": "fx bare", "argv": ["python", "x.py"]}])
-    c.expect("pending: a leg with no enforces and no pending row", run_meta_check, 1, "leg 'fx bare' carries no enforces")
-    old = c.edit("tools/playbook/core-pending.txt", lambda t: t + "leg\tfx bare\tdFx\n")
-    c.expect("pending: the leg's pending row excuses it, and the counts print", run_meta_check, 0,
+def arm_pending(c):
+    restore = c.write_legs(lambda legs: legs + [{"name": "fx bare", "argv": ["python", "x.py"]}])
+    c.check_gate("pending: a leg with no enforces and no pending row", run_meta_check, 1, "leg 'fx bare' carries no enforces")
+    old = c.write_file("tools/playbook/core-pending.txt", lambda t: t + "leg\tfx bare\tdFx\n")
+    c.check_gate("pending: the leg's pending row excuses it, and the counts print", run_meta_check, 0,
              "pending · principle 0 · practice 0 · leg 1 · kind 1")
-    c.put("tools/gate-legs.json", restore)
-    c.edit("tools/playbook/core-pending.txt", lambda _t: old + "principle\tprinciple.p3\tdFx\n")
-    c.expect("pending: a pending row for an enforced principle", run_meta_check, 1,
+    c.set_file("tools/gate-legs.json", restore)
+    c.write_file("tools/playbook/core-pending.txt", lambda _t: old + "principle\tprinciple.p3\tdFx\n")
+    c.check_gate("pending: a pending row for an enforced principle", run_meta_check, 1,
              "pending principle row principle.p3 is stale", "pending · principle 1")
-    c.put("tools/playbook/core-pending.txt", old)
+    c.set_file("tools/playbook/core-pending.txt", old)
 
 
-def plant_kinds(c):
-    c.expect("kinds: the control", run_kinds, 0, "kinds · green")
-    old = c.edit("tools/playbook/kinds.toml", lambda t: t.replace('gate = "fx skills"', 'gate = "fx nowhere"'))
-    c.expect("kinds: a kind row whose gate names no leg", run_kinds, 1, "kind.skill: its gate 'fx nowhere' names no leg")
-    c.put("tools/playbook/kinds.toml", old)
-    restore = c.legs(lambda legs: [dict(g, enforces=["principle.p16"]) if g["name"] == "fx skills" else g
+def arm_kinds(c):
+    c.check_gate("kinds: the control", run_kinds, 0, "kinds · green")
+    old = c.write_file("tools/playbook/kinds.toml", lambda t: t.replace('gate = "fx skills"', 'gate = "fx nowhere"'))
+    c.check_gate("kinds: a kind row whose gate names no leg", run_kinds, 1, "kind.skill: its gate 'fx nowhere' names no leg")
+    c.set_file("tools/playbook/kinds.toml", old)
+    restore = c.write_legs(lambda legs: [dict(g, enforces=["principle.p16"]) if g["name"] == "fx skills" else g
                                    for g in legs])
-    c.expect("kinds: a gate leg whose enforces lacks a tag of the kind's binds", run_kinds, 1,
+    c.check_gate("kinds: a gate leg whose enforces lacks a tag of the kind's binds", run_kinds, 1,
              "does not enforce principle.p15")
-    c.put("tools/gate-legs.json", restore)
-    oldp = c.edit("tools/playbook/core-pending.txt", lambda t: t + "kind\tkind.widget\tdFx\n")
-    c.expect("kinds: a kind.widget tag no register row holds", run_kinds, 1, "kind.widget is no kind the register holds")
-    c.put("tools/playbook/core-pending.txt", oldp)
+    c.set_file("tools/gate-legs.json", restore)
+    oldp = c.write_file("tools/playbook/core-pending.txt", lambda t: t + "kind\tkind.widget\tdFx\n")
+    c.check_gate("kinds: a kind.widget tag no register row holds", run_kinds, 1, "kind.widget is no kind the register holds")
+    c.set_file("tools/playbook/core-pending.txt", oldp)
 
 
-def plant_skill(c):
-    c.expect("skill: new skill demo --description x", run_new_in(["skill", "demo", "--description", "x"]), 0,
+def arm_skill(c):
+    c.check_gate("skill: new skill demo --description x", run_new_in(["skill", "demo", "--description", "x"]), 0,
              "wrote skills/demo/SKILL.md")
-    c.expect("skill: the factory's Skill passes its gate", run_skills, 0, "skills conformance · green")
-    c.edit("skills/empty/SKILL.md", lambda _t: "---\nname: empty\ndescription:\n---\n")
-    c.expect("skill: a planted Skill with an empty description", run_skills, 1, "skills/empty/SKILL.md has an empty")
-    c.put("skills/empty/SKILL.md", None)
-    c.edit("skills/wrong/SKILL.md", lambda _t: "---\nname: other\ndescription: x\n---\n")
-    c.expect("skill: a planted Skill whose name differs from its directory", run_skills, 1, "names 'other'")
+    c.check_gate("skill: the factory's Skill passes its gate", run_skills, 0, "skills conformance · green")
+    c.write_file("skills/empty/SKILL.md", lambda _t: "---\nname: empty\ndescription:\n---\n")
+    c.check_gate("skill: a planted Skill with an empty description", run_skills, 1, "skills/empty/SKILL.md has an empty")
+    c.set_file("skills/empty/SKILL.md", None)
+    c.write_file("skills/wrong/SKILL.md", lambda _t: "---\nname: other\ndescription: x\n---\n")
+    c.check_gate("skill: a planted Skill whose name differs from its directory", run_skills, 1, "names 'other'")
 
 
-def plant_practice(c):
-    c.expect("practice: no catalogue reads unarmed", run_practices, 0, "unarmed")
-    c.expect("practice: new practice demo --line x", run_new_in(["practice", "demo", "--line", "x"]), 0,
+def arm_practice(c):
+    c.check_gate("practice: no catalogue reads unarmed", run_practices, 0, "unarmed")
+    c.check_gate("practice: new practice demo --line x", run_new_in(["practice", "demo", "--line", "x"]), 0,
              "appended practice.demo")
-    c.expect("practice: the factory's row passes its gate", run_practices, 0, "practices conformance · green")
+    c.check_gate("practice: the factory's row passes its gate", run_practices, 0, "practices conformance · green")
     rel = "tools/playbook/practices.toml"
-    old = c.edit(rel, lambda t: t + '\n[[practice]]\ntag = "practice.two"\nline = """a\nb"""\n')
-    c.expect("practice: a two-line line", run_practices, 1, "practice.two: its line is not one line")
-    c.put(rel, old)
-    c.edit(rel, lambda t: t + '\n[[practice]]\ntag = "practice.demo"\nline = "again"\n')
-    c.expect("practice: a repeated tag", run_practices, 1, "practice.demo is catalogued twice")
+    old = c.write_file(rel, lambda t: t + '\n[[practice]]\ntag = "practice.two"\nline = """a\nb"""\n')
+    c.check_gate("practice: a two-line line", run_practices, 1, "practice.two: its line is not one line")
+    c.set_file(rel, old)
+    c.write_file(rel, lambda t: t + '\n[[practice]]\ntag = "practice.demo"\nline = "again"\n')
+    c.check_gate("practice: a repeated tag", run_practices, 1, "practice.demo is catalogued twice")
 
 
 def run_door(c, *args):
@@ -766,9 +766,9 @@ def run_door(c, *args):
     return p.returncode
 
 
-def plant_exception(c):
-    c.legs(lambda legs: legs + [{"name": "fx bare", "argv": ["python", "x.py"]}])
-    c.expect("exception: the red before any record", run_meta_check, 1, "red · leg 'fx bare'")
+def arm_exception(c):
+    c.write_legs(lambda legs: legs + [{"name": "fx bare", "argv": ["python", "x.py"]}])
+    c.check_gate("exception: the red before any record", run_meta_check, 1, "red · leg 'fx bare'")
     run_door(c, "--principle", "principle.p16", "--excuses", "fx bare", "--reason", "the fixture's own")
     day = datetime.date.today().isoformat()
     rel = f"memory/builds/dFx/build/{day}-build-PLAY-dFx-1-exception-1.md"
@@ -777,57 +777,57 @@ def plant_exception(c):
     c.failed += bool(fields) or not text
     c.out.append(f"{SAY}: fixture · exception: the door wrote {rel} · "
                  + ("every field" if text and not fields else f"FAILED, missing {fields or 'the file'}"))
-    c.expect("exception: the excused red prints excepted, naming the record", run_meta_check, 0,
+    c.check_gate("exception: the excused red prints excepted, naming the record", run_meta_check, 0,
              f"excepted · leg 'fx bare' carries no enforces", f"by {day}-build-PLAY-dFx-1-exception-1")
-    c.edit(f"memory/builds/dFx/build/{day}-build-PLAY-dFx-1-exception-2.md", lambda _t: (
+    c.write_file(f"memory/builds/dFx/build/{day}-build-PLAY-dFx-1-exception-2.md", lambda _t: (
         "# x\n\n**Serves:** exception PLAY-dFx-1\n\n- **Principle:** principle.p16\n- **Excuses:** fx other\n"
         "- **Caused-by:** PLAY-dFx-1\n"))
-    c.expect("exception: a record missing Reason is red", run_meta_check, 1, "exception-2.md · malformed: Reason is missing")
+    c.check_gate("exception: a record missing Reason is red", run_meta_check, 1, "exception-2.md · malformed: Reason is missing")
 
 
-def plant_exceptions_values(c):
-    c.legs(lambda legs: legs + [{"name": "fx bare", "argv": ["python", "x.py"]}])
+def arm_exceptions_values(c):
+    c.write_legs(lambda legs: legs + [{"name": "fx bare", "argv": ["python", "x.py"]}])
     b = "memory/builds/dFx/build/2026-01-01-build-PLAY-dFx-1-exception-"
     rec = ("# x\n\n**Serves:** exception PLAY-dFx-1\n\n- **Principle:** principle.p16\n- **Excuses:** fx bare\n"
            "- **Reason:** the fixture's own\n{}- **Caused-by:** PLAY-dFx-1\n")
-    c.policy('core.exceptions = "owner-only-expiring"\n')
-    c.edit(b + "1.md", lambda _t: rec.format(""))
-    c.expect("exceptions-values: owner-only-expiring reds a record with no Expires", run_meta_check, 1,
+    c.write_policy('core.exceptions = "owner-only-expiring"\n')
+    c.write_file(b + "1.md", lambda _t: rec.format(""))
+    c.check_gate("exceptions-values: owner-only-expiring reds a record with no Expires", run_meta_check, 1,
              "exception-1.md · carries no **Expires:**")
-    c.edit(b + "1.md", lambda _t: rec.format("- **Expires:** 2000-01-01\n"))
-    c.expect("exceptions-values: owner-only-expiring reds an expired record", run_meta_check, 1, "expired on 2000-01-01")
-    c.edit(b + "1.md", lambda _t: rec.format("- **Expires:** 2999-12-31\n"))
-    c.expect("exceptions-values: a record written without the owner proof is not admitted", run_meta_check, 1,
+    c.write_file(b + "1.md", lambda _t: rec.format("- **Expires:** 2000-01-01\n"))
+    c.check_gate("exceptions-values: owner-only-expiring reds an expired record", run_meta_check, 1, "expired on 2000-01-01")
+    c.write_file(b + "1.md", lambda _t: rec.format("- **Expires:** 2999-12-31\n"))
+    c.check_gate("exceptions-values: a record written without the owner proof is not admitted", run_meta_check, 1,
              "red · leg 'fx bare'", absent=("excepted",))
-    c.expect("exceptions-values: the register names it not admitted", run_exceptions, 0, "not admitted")
-    c.policy('core.exceptions = "none"\n')
-    c.expect("exceptions-values: none reds every record and excuses nothing", run_meta_check, 1,
+    c.check_gate("exceptions-values: the register names it not admitted", run_exceptions, 0, "not admitted")
+    c.write_policy('core.exceptions = "none"\n')
+    c.check_gate("exceptions-values: none reds every record and excuses nothing", run_meta_check, 1,
              "exception-1.md · core.exceptions is none", "red · leg 'fx bare'", absent=("excepted",))
-    c.policy('core.exceptions = "any-session-recorded"\n')
-    c.expect("exceptions-values: any-session-recorded admits it", run_meta_check, 0, "excepted · leg 'fx bare'")
+    c.write_policy('core.exceptions = "any-session-recorded"\n')
+    c.check_gate("exceptions-values: any-session-recorded admits it", run_meta_check, 0, "excepted · leg 'fx bare'")
 
 
-def plant_bypass_never(c):
-    c.legs(lambda legs: [dict(g, guard=["tools/playbook/"]) if g["name"] == "fx meta" else g for g in legs])
-    c.policy('core.bypass = "never"\n')
-    c.expect("bypass-never: a core leg carrying a guard under never", run_meta_check, 1,
+def arm_bypass_never(c):
+    c.write_legs(lambda legs: [dict(g, guard=["tools/playbook/"]) if g["name"] == "fx meta" else g for g in legs])
+    c.write_policy('core.bypass = "never"\n')
+    c.check_gate("bypass-never: a core leg carrying a guard under never", run_meta_check, 1,
              "leg 'fx meta' enforces", "core.bypass is never")
-    c.policy('core.bypass = "with-hooks-report"\n')
-    c.expect("bypass-never: the same leg under with-hooks-report", run_meta_check, 0, "core.bypass with-hooks-report")
+    c.write_policy('core.bypass = "with-hooks-report"\n')
+    c.check_gate("bypass-never: the same leg under with-hooks-report", run_meta_check, 0, "core.bypass with-hooks-report")
     bad = pathlib.Path(tempfile.mkdtemp(prefix="core-fx-"))
     try:
         write_fixture(bad, policy='core.bypass = "sometimes"\n')
         inner = Case(bad, c.out)
-        inner.expect("bypass-never: the only committed policy sets core.bypass sometimes", run_meta_check, 1,
+        inner.check_gate("bypass-never: the only committed policy sets core.bypass sometimes", run_meta_check, 1,
                      "refused · core.bypass")
         c.failed += inner.failed
     finally:
         shutil.rmtree(bad, ignore_errors=True)
 
 
-PLANTS = {"registry": plant_registry, "unenforced": plant_unenforced, "pending": plant_pending,
-          "kinds": plant_kinds, "skill": plant_skill, "practice": plant_practice, "exception": plant_exception,
-          "exceptions-values": plant_exceptions_values, "bypass-never": plant_bypass_never}
+PLANTS = {"registry": arm_registry, "unenforced": arm_unenforced, "pending": arm_pending,
+          "kinds": arm_kinds, "skill": arm_skill, "practice": arm_practice, "exception": arm_exception,
+          "exceptions-values": arm_exceptions_values, "bypass-never": arm_bypass_never}
 
 
 def run_fixture(plant=None):

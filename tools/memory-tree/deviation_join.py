@@ -143,7 +143,7 @@ from design_lib import (  # noqa: E402  the one parser of the design, and its cl
 from tree_lib import (  # noqa: E402
     GIT_ENV_LEAKS, HDR_RE, parse_conf, parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at)
 from build_records import (  # noqa: E402  the typed record factory: FIELD, the grammar of deviations.py:123
-    derive_stem, read_record as read_typed_record, read_records as read_typed_records)
+    FIELD, derive_stem, read_record as read_typed_record, read_records as read_typed_records)
 
 SAY = "deviation"
 POLICIES = ("report", "refuse")
