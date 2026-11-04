@@ -1068,6 +1068,31 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "arm_merge_edit",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "arm_merge_multiline",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "arm_merge_parse",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "arm_merge_policy",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "arm_merge_same_add",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "arm_minor",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -6593,6 +6618,11 @@
       "file": "tools/playbook/positional.py"
     },
     {
+      "id": "check_table_case",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.test.sh"
+    },
+    {
       "id": "check_table_row",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -6846,6 +6876,11 @@
       "id": "check_when",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
+    },
+    {
+      "id": "check_whole_conflict",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "check_window_invariant",
@@ -8483,9 +8518,34 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "derive_fx_long",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.test.sh"
+    },
+    {
+      "id": "derive_fx_long",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "derive_fx_policy",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.test.sh"
+    },
+    {
+      "id": "derive_fx_policy",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "derive_fx_row",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "derive_fx_unit",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.test.sh"
     },
     {
       "id": "derive_gate_backstop",
@@ -9831,6 +9891,11 @@
       "id": "derive_table",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "derive_table_fault",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.test.sh"
     },
     {
       "id": "derive_tag_reds",
@@ -23958,6 +24023,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_merge_pair",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "run_merged_build",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
@@ -24171,6 +24241,11 @@
       "id": "run_post_merge",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "run_practice_read",
+      "kind": "function",
+      "file": "tools/playbook/core.py"
     },
     {
       "id": "run_practices",
@@ -29791,6 +29866,11 @@
       "id": "write_manifest",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "write_merge_driver",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "write_message",

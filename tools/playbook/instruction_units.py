@@ -455,7 +455,7 @@ def read_practice_catalogue(path) -> dict:
     except (OSError, ValueError) as exc:     # ValueError: a TOML or a UTF-8 fault
         raise UnitRowError(f"{path}: the practice catalogue is unreadable: {exc}") from None
     rows, foundation = table.get("practice"), table.get("foundation", [])
-    if not rows or not isinstance(rows, list):
+    if not rows or not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):
         raise UnitRowError(f"{path}: the practice catalogue holds no [[practice]] row")
     faults, seen = [], set()
     for i, row in enumerate(rows, 1):
@@ -1240,7 +1240,7 @@ def write_kits(c, alpha, beta=None):
 
 
 def run_commit(top, msg):
-    run_git(top, "-c", "user.name=f", "-c", "user.email=f@f", "commit", "-q", "-m", msg)
+    run_git(top, "-c", "user.name=f", "-c", "user.email=f@f", "-c", "commit.gpgsign=false", "commit", "-q", "-m", msg)
 
 
 def arm_row(c):

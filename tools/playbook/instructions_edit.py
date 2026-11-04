@@ -11,7 +11,7 @@
     python instructions_edit.py fixture [--plant <case>]
 
 THE MANIFESTS. `read_manifests` lists each kit's `instructions.toml` and the overlay, the one list a write
-reads. Across nodes they are row stores: `merge-rows.py` merges them by each `[[unit]]` table's `tag`.
+reads. Across nodes they are row stores: `merge-rows.py` merges them per entry, by each table's `tag` or `key`.
 
 A WRITE, in `run_write`'s order. `instructions.edit` and `instructions.proof` are read at load, for every
 verb: a refused read exits 2, and so does a value selecting a component no core row of the layer register
@@ -68,6 +68,8 @@ OWNER_VALUE = "owner-command-agents-propose"
 FLOW_VALUE = "flow-only"
 FOR_ALL_VALUE = "command-for-all"
 TTY_PROOF = "tty-cli"
+FX_MANIFEST = "tools/alpha/instructions.toml"
+FX_HEADER_LINES = 'before\n[[unit]]\ntag = "unit.fake"\nafter'
 SIGNED_PROOFS = ("signed", "both")
 GUARD_POINT = "point.instruction.guard"
 FLOW_POINT = "point.instruction.flow"
@@ -539,6 +541,15 @@ def derive_fx_row(tag, text="MUST hold.", kind="directive", level=3) -> str:
     return render_row({"tag": tag, "level": level, "type": kind, "trigger": "always", "text": text})
 
 
+def derive_fx_long(tag, text) -> str:
+    """A row whose `text` is a multi-line string, a shape the row writer never emits and an author may."""
+    return f'[[unit]]\ntag = "{tag}"\nlevel = 3\ntext = """\n{text}\n"""\n'
+
+
+def derive_fx_policy(key, default="a") -> str:
+    return f'[[policy]]\nkey = "{key}"\ndefault = "{default}"\n'
+
+
 def write_policy(root, **values):
     import gov_tag
     body = "".join(f'{k.replace("_", ".")} = "{v}"\n' for k, v in values.items())
@@ -585,35 +596,102 @@ def read_porcelain(root) -> str:
     return iu.run_git(root, "status", "--porcelain")
 
 
-def arm_merge(c):
+def write_merge_driver(c):
+    """The fixture repository's `main`: the real driver wired to both manifest routes."""
     mt = resolve_kit_dir("memory-tree", "merge-rows.py", KIT_DIR)
     iu.run_git(c.top, "config", "merge.rows.driver",
                f'"{pathlib.Path(sys.executable).as_posix()}" "{(mt / "merge-rows.py").as_posix()}" %O %A %B %P')
-    rel = "tools/alpha/instructions.toml"
     c.write_file(".gitattributes", f"**/{iu.MANIFEST} merge=rows\n{iu.OVERLAY} merge=rows\n")
-    base = derive_fx_row("unit.base")
-    c.write_file(rel, base)
     iu.run_git(c.top, "checkout", "-q", "-b", "main")
+    iu.run_commit(c.top, "the wiring")
+
+
+def run_merge_pair(c, name, base, ours, theirs, rel=FX_MANIFEST) -> tuple:
+    """`rel` at `base`, one branch to each side, theirs merged into ours: `(exit, git's and the driver's words, the file)`."""
+    iu.run_git(c.top, "checkout", "-q", "-b", f"{name}-base", "main")
+    c.write_file(rel, base)
     iu.run_commit(c.top, "the base")
+    for side, text in (("ours", ours), ("theirs", theirs)):
+        iu.run_git(c.top, "checkout", "-q", "-b", f"{name}-{side}", f"{name}-base")
+        c.write_file(rel, text)
+        iu.run_commit(c.top, side)
+    iu.run_git(c.top, "checkout", "-q", f"{name}-ours")
+    done = subprocess.run(["git", "-C", str(c.top), "-c", "user.name=f", "-c", "user.email=f@f", "-c",
+                           "commit.gpgsign=false", "merge", "-q", "--no-edit", f"{name}-theirs"], capture_output=True,
+                          text=True, encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL)
+    return done.returncode, done.stdout + done.stderr, (c.top / rel).read_text(encoding="utf-8")
 
-    def run_pair(name, ours, theirs):
-        for side, row in (("ours", ours), ("theirs", theirs)):
-            iu.run_git(c.top, "checkout", "-q", "-b", f"{name}-{side}", "main")
-            c.write_file(rel, base + "\n" + row)
-            iu.run_commit(c.top, side)
-        iu.run_git(c.top, "checkout", "-q", f"{name}-ours")
-        done = subprocess.run(["git", "-C", str(c.top), "-c", "user.name=f", "-c", "user.email=f@f", "merge", "-q",
-                               "--no-edit", f"{name}-theirs"], capture_output=True, text=True, encoding="utf-8",
-                              errors="replace", stdin=subprocess.DEVNULL)
-        return done.returncode, done.stdout + done.stderr, (c.top / rel).read_text(encoding="utf-8")
 
-    rc, said, merged = run_pair("two", derive_fx_row("unit.ours"), derive_fx_row("unit.theirs"))
-    tags = [u.tag for u in iu.parse_unit_rows(merged, rel)[0]]
+def check_whole_conflict(c, label, rc, said, merged, ours, theirs, named):
+    """A whole-file conflict: exit 1, both sides entire between the markers, and a closing label holding `named`."""
+    close = merged.rstrip("\n").rsplit("\n", 1)[-1]
+    c.check(label, rc == 1 and merged.startswith(f"<<<<<<< ours\n{ours}=======\n{theirs}>>>>>>> theirs")
+            and named in close, f"{rc} {close!r} {said}")
+
+
+def arm_merge(c):
+    write_merge_driver(c)
+    base = derive_fx_row("unit.base")
+    rc, said, merged = run_merge_pair(c, "two", base, base + "\n" + derive_fx_row("unit.ours"),
+                                      base + "\n" + derive_fx_row("unit.theirs"))
+    tags = [u.tag for u in iu.parse_unit_rows(merged, FX_MANIFEST)[0]]
     c.check("two branches' adds merge with both tags once", rc == 0 and sorted(tags) == ["unit.base", "unit.ours",
             "unit.theirs"], f"{rc} {tags} {said}")
-    rc, said, merged = run_pair("same", derive_fx_row("unit.both", "MUST one."), derive_fx_row("unit.both", "MUST two."))
+    c.check("the table class ran and the row plane did not", "merge-rows: tables " in said and "merge-rows: rows " not in said,
+            said)
+    rc, said, merged = run_merge_pair(c, "same", base, base + "\n" + derive_fx_row("unit.both", "MUST one."),
+                                      base + "\n" + derive_fx_row("unit.both", "MUST two."))
     c.check("one tag added with different bytes is a conflict the driver names",
             rc == 1 and "unit.both" in said and "<<<<<<<" in merged, f"{rc} {said}")
+
+
+def arm_merge_edit(c, name):
+    """The three both-sides rows over one tag: each a whole-file conflict naming it, nothing kept from one side alone."""
+    write_merge_driver(c)
+    held, one, two, other = (derive_fx_row("unit.base"), derive_fx_row("unit.base", "MUST one."),
+                             derive_fx_row("unit.base", "MUST two."), derive_fx_row("unit.other"))
+    base, ours, theirs = {"merge-both-edit": (held, one, two), "merge-delete-edit": (held + other, other, two + other),
+                          "merge-edit-delete": (held + other, one + other, other)}[name]
+    check_whole_conflict(c, f"{name} is a whole-file conflict naming the tag", *run_merge_pair(c, "edit", base, ours, theirs),
+                         ours, theirs, "unit.unit.base")
+
+
+def arm_merge_multiline(c):
+    write_merge_driver(c)
+    one, two, kept = derive_fx_row("unit.one"), derive_fx_row("unit.two"), derive_fx_long("unit.kept", FX_HEADER_LINES)
+    edit_one, edit_two = derive_fx_row("unit.one", "MUST move."), derive_fx_row("unit.two", "MUST move.")
+    added = derive_fx_long("unit.added", "plain\nlines")
+    rc, said, merged = run_merge_pair(c, "long", one + kept + two, edit_one + kept + two + added, one + kept + edit_two)
+    c.check("edits around a string holding a header line merge clean", rc == 0, f"{rc} {said}")
+    c.check("the output parses with no tag cut from the string", [u["tag"] for u in tomllib.loads(merged)["unit"]]
+            == ["unit.one", "unit.kept", "unit.two", "unit.added"], merged)
+    c.check("that unit's chunk is byte-identical to its side's", kept in merged and added in merged, merged)
+
+
+def arm_merge_same_add(c):
+    write_merge_driver(c)
+    base, row = derive_fx_row("unit.base"), derive_fx_row("unit.both")
+    rc, said, merged = run_merge_pair(c, "same", base, base + row, base + row)
+    c.check("one tag added with the same bytes lands once", rc == 0 and merged == base + row, f"{rc} {said} {merged}")
+
+
+def arm_merge_policy(c):
+    write_merge_driver(c)
+    one, two, three, four, five = (derive_fx_policy(f"adopter.{n}") for n in ("one", "two", "three", "four", "five"))
+    rc, said, merged = run_merge_pair(c, "adds", one, one + two + three, one + four + five, iu.OVERLAY)
+    c.check("two policy rows added on each side merge keyed by `key`", rc == 0 and merged == one + two + three + four + five,
+            f"{rc} {said} {merged}")
+    ours, theirs = derive_fx_policy("adopter.one", "b"), derive_fx_policy("adopter.one", "c")
+    check_whole_conflict(c, "both sides editing one row's default names policy.<key>",
+                         *run_merge_pair(c, "edits", one, ours, theirs, iu.OVERLAY), ours, theirs, "policy.adopter.one")
+
+
+def arm_merge_parse(c):
+    write_merge_driver(c)
+    base = derive_fx_row("unit.base")
+    ours, theirs = base + '  [[unit]]\ntag = "unit.hidden"\n', base + derive_fx_row("unit.theirs")
+    check_whole_conflict(c, "a side whose cut does not reproduce its parse fails closed with both sides",
+                         *run_merge_pair(c, "cut", base, ours, theirs), ours, theirs, "merge-rows failed")
 
 
 def arm_propose(c):
@@ -849,7 +927,11 @@ def arm_retired_rows(c):
             any("written by instructions.edit" in r for r in reds), str(reds))
 
 
-PLANTS = {"merge": arm_merge, "propose": arm_propose, "owner-propose": arm_owner_propose, "rerender": arm_rerender,
+PLANTS = {"merge": arm_merge, "merge-multiline": arm_merge_multiline, "merge-same-add": arm_merge_same_add,
+          "merge-policy": arm_merge_policy, "merge-parse": arm_merge_parse,
+          **{name: functools.partial(arm_merge_edit, name=name)
+             for name in ("merge-both-edit", "merge-delete-edit", "merge-edit-delete")},
+          "propose": arm_propose, "owner-propose": arm_owner_propose, "rerender": arm_rerender,
           "command-for-all": arm_command_for_all, "flow-only": arm_flow_only, "proof-values": arm_proof_values,
           "guard": arm_guard, "checks": arm_checks, "record": arm_record, "packs": arm_packs,
           "retired-rows": arm_retired_rows}

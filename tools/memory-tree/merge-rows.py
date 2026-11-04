@@ -20,11 +20,13 @@ line, because in that grammar every row about one ask — the ask, its SEV row, 
 it — leads with that ask's id, and first-id keying therefore conflicts on a pair a filer and a
 triager produce on ordinary work. The audit line names which census ran.
 
-A FOURTH CLASS, THE INSTRUCTION MANIFESTS, IS NOT ROWS OF LINES (PLAY-dOrderedCharter-15). A `%P` named
+A FOURTH CLASS, THE INSTRUCTION MANIFESTS, IS NOT ROWS OF LINES (PLAY-dOrderedCharter-15, -45). A `%P` named
 `instructions.toml` goes to `resolve_tables` before anything below runs, since a `[[unit]]` table spans lines and
-no line of it is a row: each side is cut into tables keyed by `tag` and merged per key against the base. A key
-both sides moved apart is a `TableConflict`, a whole-file conflict naming each key, and the written bytes are
-re-cut before they are returned, so no tag is lost and none is duplicated.
+no line of it is a row: each side is cut into a preamble and one chunk per array-of-tables entry, keyed by the
+array's name with the entry's `tag`, or its `key` where it has no `tag`, and merged per key against the base. A
+key both sides moved apart is a `TableConflict`, a whole-file conflict naming each key. A side whose cut does not
+reproduce `tomllib`'s read of it fails closed, and the written bytes are re-cut before they are returned, so they
+parse, hold each key once and hold each chunk as one side wrote it.
 
 A GENERATED VIEW IS NEVER MERGED WITH AN AUTHORED SHARD. After the switch-over
 `memory/backlog/<FAMILY>.md` is RENDERED from the per-build files, and a branch forked before it
@@ -59,6 +61,10 @@ non-row content this corpus produced (a heading, a placeholder, a repeated lead-
 sub-heading in two sections) and its ONE observed corruption is a row line duplicated at rc 0 —
 which is exactly the population keying owns. Partitioning by the grammar would hand git the row
 lines it duplicates and rebuild the defect on the other side of the split.
+
+A THIRD PLANE, THE TABLE CLASS, SITS BESIDE THE TWO AND NEVER MEETS THEM. No line of a manifest reaches the
+predicate, the skeleton or `git merge-file`: its unit of merge is a whole entry, because a line merge interleaves
+two edits of one `text` value and still reads as no tag lost.
 
 THE SKELETON is how the two planes recombine in ORDER rather than by guess. Each of `%O %A %B` is
 projected to a line list of the same length in which every ROW line becomes a single token line and
@@ -372,7 +378,7 @@ class StructureDrift(RuntimeError):
 # time, no parser state, because state is where all three rounds of defects lived.
 _ROW_RE = re.compile(r"^\s*[-*]\s")
 _MANIFEST_NAME = "instructions.toml"
-_TABLE_HEADER = "[[unit]]"
+_TABLE_HEADER = "[["
 # Deliberately INDEPENDENT of the driver's own anchor grammar, and not imported from it. The keyed
 # path already guarantees uniqueness for what `key()` keys; this exists for the population it does
 # NOT key. Keying the postcondition on the same regex as the merge would make it self-consistent and
@@ -1198,52 +1204,78 @@ def structure_identity(merged: list[str], skel: list[str]) -> None:
 # --------------------------------------------------------------------------------------------
 
 def check_manifest(path: str | None) -> bool:
-    """Whether `%P` names an instruction manifest, a row store of `[[unit]]` tables."""
+    """Whether `%P` names an instruction manifest, a store of array-of-tables entries."""
     return path is not None and path.replace("\\", "/").rsplit("/", 1)[-1] == _MANIFEST_NAME
 
 
 def read_tables(lines: list[str]) -> tuple[str, dict]:
-    """`(preamble, {tag: table text})` of one side: a table runs from its `[[unit]]` header to the next. A cut
-    that leaves a table no TOML, or one with no `tag`, raises, and the driver fails closed."""
+    """`(preamble, {entry key: chunk})` of one side, an entry key being the array's name with the entry's `tag`, or
+    its `key` where it has none. A chunk runs from its header to the next. A column-0 `[[` whose prefix does not
+    parse sits inside a value, a multi-line string's line say, since a cut there leaves that value open, so it cuts
+    nothing. A chunk that is not one entry, an entry with neither field, a key twice, or a cut that does not rebuild
+    `tomllib`'s read of the whole side raises, and the driver fails closed."""
     import tomllib  # noqa: PLC0415 — deferred, as the driver's other imports are; see `anchors()`
-    heads = [i for i, ln in enumerate(lines) if ln.startswith(_TABLE_HEADER)]
-    tables = {}
-    for start, end in zip(heads, heads[1:] + [len(lines)]):
-        text = "".join(lines[start:end])
-        tag = tomllib.loads(text)["unit"][0]["tag"]
-        if tag in tables:
-            raise DuplicatedContent(f"the tag {tag} heads two tables of one side")
-        tables[tag] = text
-    return "".join(lines[:heads[0]] if heads else lines), tables
+    whole = tomllib.loads("".join(lines))
+    pieces, start = [], 0
+    for cut in [*(i for i, ln in enumerate(lines) if ln.startswith(_TABLE_HEADER)), len(lines)]:
+        text = "".join(lines[start:cut])
+        try:
+            pieces.append((text, tomllib.loads(text)))
+        except tomllib.TOMLDecodeError:
+            continue
+        start = cut
+    (preamble, head), *chunks = pieces
+    tables, rows = {}, {}
+    for text, parsed in chunks:
+        name, entries = next(iter(parsed.items()))
+        if len(parsed) != 1 or not isinstance(entries, list) or len(entries) != 1:
+            raise StructureDrift(f"the chunk {text[:40]!r} is not one array-of-tables entry")
+        ident = entries[0].get("tag", entries[0].get("key"))
+        if ident is None:
+            raise StructureDrift(f"a [[{name}]] entry carries neither a tag nor a key")
+        entry = f"{name}.{ident}"
+        if entry in tables:
+            raise DuplicatedContent(f"{entry} heads two entries of one side")
+        tables[entry] = text
+        rows.setdefault(name, []).append(entries[0])
+    if {**head, **rows} != whole:
+        raise StructureDrift("the cut does not reproduce tomllib's read of the whole side")
+    return preamble, tables
 
 
 def resolve_table(base: str | None, ours: str | None, theirs: str | None) -> tuple[str | None, bool]:
     """One key's three-way, None an absent side, line endings folded: `(its text, whether it conflicts)`."""
     o, a, b = (t if t is None else t.replace("\r\n", "\n") for t in (base, ours, theirs))
+    if a == b == o:
+        return base, False
     if a == b or b == o:
         return ours, False
     return (theirs, False) if a == o else (None, True)
 
 
 def resolve_tables(o_lines, a_lines, b_lines) -> list[str]:
-    """The manifests' merge: ours' tables in ours' order, then theirs' additions in theirs'."""
+    """The manifests' merge: ours' entries in ours' order, then theirs' additions in theirs'. Returned only once the
+    written text parses, holds the merged keys each once, and holds each chunk byte for byte as one side wrote it."""
     (o_pre, O), (a_pre, A), (b_pre, B) = read_tables(o_lines), read_tables(a_lines), read_tables(b_lines)
     preamble, clash = resolve_table(o_pre, a_pre, b_pre)
     conflicts, kept = ["the preamble"] * clash, {}
-    for tag in [*A, *(t for t in B if t not in A)]:
-        text, clash = resolve_table(O.get(tag), A.get(tag), B.get(tag))
+    for entry in [*A, *(k for k in B if k not in A)]:
+        text, clash = resolve_table(O.get(entry), A.get(entry), B.get(entry))
         if clash:
-            conflicts.append(tag)
+            conflicts.append(entry)
         elif text is not None:
-            kept[tag] = text
+            kept[entry] = text
     if conflicts:
         raise TableConflict(", ".join(conflicts))
     term = _dominant(a_lines, b_lines, o_lines)
     parts = [preamble or "", *kept.values()]
     merged = _lines("".join(p if not p or p.endswith(("\n", "\r")) else p + term for p in parts))
-    written = read_tables(merged)[1]    # a duplicate raises here
+    written = read_tables(merged)[1]    # text that does not parse, or a key twice, raises here
     if list(written) != list(kept):
         raise RowLoss(f"the written tables {list(written)} are not the merged {list(kept)}")
+    for entry, text in written.items():
+        if text not in (O.get(entry), A.get(entry), B.get(entry)):
+            raise StructureDrift(f"the written chunk of {entry} is byte-identical to no side's")
     print(f"merge-rows: tables O/A/B {len(O)}/{len(A)}/{len(B)} -> {len(written)} written, clean", file=sys.stderr)
     return merged
 

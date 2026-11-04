@@ -532,7 +532,8 @@ def write_practice(root, rel, name, line):
         raise ValueError(f"practice.{name} is catalogued already")
     text = path.read_text(encoding="utf-8") if path.is_file() else (
         "# practices.toml — the practice catalogue, the `practice` namespace's declaring source.\n")
-    text = text.rstrip("\n") + f'\n\n[[practice]]\ntag = "practice.{name}"\nline = {json.dumps(line, ensure_ascii=False)}\n'
+    quoted = json.dumps(line, ensure_ascii=False)
+    text = text.rstrip("\n") + f'\n\n[[practice]]\ntag = "practice.{name}"\nline = {quoted}\n[practice.reach]\nbuild = {quoted}\n'
     path.write_bytes(text.encode("utf-8"))
     return rel
 
@@ -699,6 +700,16 @@ def run_new_in(argv):
     return lambda top: run_new(argv, top)
 
 
+def run_practice_read(top):
+    """The render's reader over the fixture's catalogue, a row it refuses an exit 1."""
+    import instruction_units as iu
+    try:
+        iu.read_practice_catalogue(pathlib.Path(top, "tools/playbook/practices.toml"))
+    except iu.UnitRowError as exc:
+        return [str(exc)], 1
+    return [f"{SAY}: the render's reader takes the catalogue"], 0
+
+
 def arm_registry(c):
     c.check_gate("registry: the control, the ids equal the design's heads both ways", run_meta_check, 0, "16 rows against 16")
     old = c.write_file("tools/playbook/principles.toml",
@@ -774,6 +785,7 @@ def arm_practice(c):
     c.check_gate("practice: new charter-practice demo --line x", run_new_in(["charter-practice", "demo", "--line", "x"]), 0,
              "appended practice.demo")
     c.check_gate("practice: the factory's row passes its gate", run_practices, 0, "practices conformance · green")
+    c.check_gate("practice: the render's reader takes the factory's row", run_practice_read, 0, "takes the catalogue")
     rel = "tools/playbook/practices.toml"
     old = c.write_file(rel, lambda t: t + '\n[[practice]]\ntag = "practice.two"\nline = """a\nb"""\n')
     c.check_gate("practice: a two-line line", run_practices, 1, "practice.two: its line is not one line")

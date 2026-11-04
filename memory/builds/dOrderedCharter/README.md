@@ -142,7 +142,7 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY
 | [PLAY-dOrderedCharter-20 — the unit schema, the one renderer of record and its templates, the render gate with its legacy list, and one fact in one unit](spec/2026-10-23-spec-PLAY-dOrderedCharter-20.md) | 15 | 2 | CLOSED | rev-9 | 2026-11-04 |
 | [PLAY-dOrderedCharter-15 — the instruction manifest and its guarded write command, each change recorded, and the pack catalogue](spec/2026-10-23-spec-PLAY-dOrderedCharter-15.md) | 16 | 2 | CLOSED | rev-10 | 2026-11-04 |
 | [PLAY-dOrderedCharter-1 — the practice catalogue and `charter.practices`](spec/2026-10-23-spec-PLAY-dOrderedCharter-1.md) | 17 | 2 | CLOSED | rev-8 | 2026-11-05 |
-| [PLAY-dOrderedCharter-45 — the merge driver's TOML-table class states its whole conflict envelope and proves its output parses](spec/2026-10-24-spec-PLAY-dOrderedCharter-45.md) | 17 | 2 | DEFERRED | rev-3 | 2026-11-04 |
+| [PLAY-dOrderedCharter-45 — the merge driver's TOML-table class states its whole conflict envelope and proves its output parses](spec/2026-10-24-spec-PLAY-dOrderedCharter-45.md) | 17 | 2 | CLOSED | rev-3 | 2026-11-05 |
 | [PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them](spec/2026-10-23-spec-PLAY-dOrderedCharter-3.md) | 18 | 2 | DEFERRED | rev-9 | 2026-11-04 |
 | [PLAY-dOrderedCharter-41 — the `cross-os` block stays live, so every v4 template renders after the practice catalogue lands](spec/2026-10-24-spec-PLAY-dOrderedCharter-41.md) | 18 | 2 | DEFERRED | rev-5 | 2026-11-04 |
 | [PLAY-dOrderedCharter-52 — the TOML-table merge envelope is total: every base, ours and theirs state has a row, and an unlisted one is a conflict](spec/2026-10-24-spec-PLAY-dOrderedCharter-52.md) | 18 | 2 | DEFERRED | rev-2 | 2026-11-04 |
@@ -174,7 +174,7 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-4 | 2026-11-04 |
 <!-- /gen:build-units -->
 
-Records: 384 bound to this build, across 4 record folder(s).
+Records: 386 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -1388,6 +1388,8 @@ PRACTICE_REFUSALS = (('a tag outside its shape', 'practice.One', 'tag = "practic
                       '[practice.reach]\nbuild = "x"\n\n[[practice]]\ntag = "practice.cross-os"',
                       '\n[[practice]]\ntag = "practice.cross-os"'),
                      ('a reach key outside its shape', 'reach key `Plan`', 'build = "x"', 'Plan = "x"'),
+                     ('an array of non-tables', 'holds no [[practice]] row',
+                      PRACTICE_TABLE[PRACTICE_TABLE.index('\n[[practice]]'):], 'practice = ["x"]\n'),
                      ('a foundation entry naming no row', 'names practice.none', '"practice.roles"]',
                       '"practice.none"]'))
 
@@ -1418,7 +1420,8 @@ def check_practice_arms(check_arm) -> None:
                 (tgt / '.governance' / 'policy.toml').write_text(policy, encoding='utf-8')
             read_git(tgt, 'init', '-q', '-b', branch)
             read_git(tgt, 'add', '-A')
-            read_git(tgt, '-c', 'user.name=fx', '-c', 'user.email=fx@example.invalid', 'commit', '-qm', 'fixture')
+            read_git(tgt, '-c', 'user.name=fx', '-c', 'user.email=fx@example.invalid', '-c', 'commit.gpgsign=false',
+                     'commit', '-qm', 'fixture')
             try:
                 return (*render(eng, Path(td), tgt), None)
             except Refusal as e:

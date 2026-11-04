@@ -2193,6 +2193,67 @@ mkcheckrepo "$Q" shards ""
   git add -A; git commit -q -m 'a memory root nothing is filed under' )
 check_says "an empty governed population refuses" "$Q" 1 "no tracked path under nowhere/"
 
+# --- 54. THE MANIFESTS MERGE PER ENTRY, AND A LINE MERGE FAILS THE SAME ASSERTIONS (PLAY-dOrderedCharter-45)
+# The table class over the inputs of the seven merge plants of `instructions_edit.py fixture`, spelled
+# here so this suite needs no other kit. EVERY case replays the same three files through
+# `git merge-file`, the line merge this class replaces, under the same assertions: a case the control
+# also passes proves nothing about the class, so `red` demands the control FAIL, and only the identical
+# add, the one case a line merge gets right, says `held`. What this does not check: the `.gitattributes`
+# route to the driver, which those plants cover through a real `git merge`.
+MANIFEST=tools/alpha/instructions.toml
+OVERLAY=.governance/instructions.toml
+derive_fx_unit() { printf '[[unit]]\ntag = "unit.%s"\nlevel = 3\ntext = "%s"\n' "$1" "${2:-MUST hold.}"; }
+derive_fx_long() { printf '[[unit]]\ntag = "unit.%s"\nlevel = 3\ntext = """\n%b\n"""\n' "$1" "$2"; }
+derive_fx_policy() { printf '[[policy]]\nkey = "adopter.%s"\ndefault = "%s"\n' "$1" "${2:-a}"; }
+derive_table_fault() {  # $1 got rc · $2 want rc · $3 what the close names, empty on a clean want -> the first broken expectation
+  [ "$1" = "$2" ] || { echo "rc=$1, expected $2"; return; }
+  if [ "$2" = 0 ]; then
+    cmp -s "$TMP/a" "$TMP/twant" || { echo "the written bytes are not the wanted merge"; return; }
+    "$PY" -c 'import sys, tomllib; tomllib.load(open(sys.argv[1], "rb"))' "$TMP/a" 2>/dev/null || echo "the output does not parse"
+    return
+  fi
+  { printf '<<<<<<< ours\n'; cat "$TMP/ta"; printf '=======\n'; cat "$TMP/tb"; } > "$TMP/twhole"
+  sed '$d' "$TMP/a" | cmp -s - "$TMP/twhole" || { echo "%A is not the whole-file body of both sides"; return; }
+  tail -1 "$TMP/a" | grep -F '>>>>>>> theirs' | grep -qF "$3" || echo "the closing label names no $3"
+}
+check_table_case() {  # $1 label · $2 %P · $3 want rc · $4 what the close names · $5 the line merge's verdict: red | held
+  local rc broken
+  cp "$TMP/ta" "$TMP/a"
+  $DRV "$TMP/to" "$TMP/a" "$TMP/tb" "$2" >/dev/null 2>"$TMP/terr" && rc=0 || rc=$?
+  broken=$(derive_table_fault "$rc" "$3" "$4")
+  [ -z "$broken" ] || bad "table class, $1: $broken — stderr [$(head -1 "$TMP/terr" | cut -c1-160)]"
+  grep -q '^merge-rows: rows ' "$TMP/terr" && bad "table class, $1: a manifest's lines reached the row plane"
+  cp "$TMP/ta" "$TMP/a"
+  git merge-file -q -L ours -L base -L theirs "$TMP/a" "$TMP/to" "$TMP/tb" 2>/dev/null && rc=0 || rc=$?
+  broken=$(derive_table_fault "$rc" "$3" "$4")
+  if [ "$5" = red ]; then
+    [ -n "$broken" ] || bad "table class, $1: a line merge passes this case too, so it proves nothing about the class"
+  else
+    [ -z "$broken" ] || bad "table class, $1: the line merge this case holds for broke: $broken"
+  fi
+}
+derive_fx_unit a > "$TMP/to"; derive_fx_unit a 'MUST one.' > "$TMP/ta"; derive_fx_unit a 'MUST two.' > "$TMP/tb"
+check_table_case "both sides edit one tag" "$MANIFEST" 1 unit.unit.a red
+{ derive_fx_unit a; derive_fx_unit b; } > "$TMP/to"; derive_fx_unit b > "$TMP/ta"; { derive_fx_unit a 'MUST two.'; derive_fx_unit b; } > "$TMP/tb"
+check_table_case "ours deletes a tag theirs edits" "$MANIFEST" 1 unit.unit.a red
+{ derive_fx_unit a; derive_fx_unit b; } > "$TMP/to"; { derive_fx_unit a 'MUST one.'; derive_fx_unit b; } > "$TMP/ta"; derive_fx_unit b > "$TMP/tb"
+check_table_case "ours edits a tag theirs deletes" "$MANIFEST" 1 unit.unit.a red
+INNER='before\n[[unit]]\ntag = "unit.fake"\nafter'
+{ derive_fx_unit a; derive_fx_long m "$INNER"; derive_fx_unit b; } > "$TMP/to"
+{ derive_fx_unit a 'MUST one.'; derive_fx_long m "$INNER"; derive_fx_unit b; derive_fx_long c 'plain\nlines'; } > "$TMP/ta"
+{ derive_fx_unit a; derive_fx_long m "$INNER"; derive_fx_unit b 'MUST two.'; } > "$TMP/tb"
+{ derive_fx_unit a 'MUST one.'; derive_fx_long m "$INNER"; derive_fx_unit b 'MUST two.'; derive_fx_long c 'plain\nlines'; } > "$TMP/twant"
+check_table_case "a string holding a header line" "$MANIFEST" 0 "" red
+derive_fx_unit a > "$TMP/to"; { derive_fx_unit a; derive_fx_unit x; } > "$TMP/ta"; cp "$TMP/ta" "$TMP/tb"; cp "$TMP/ta" "$TMP/twant"
+check_table_case "one tag added with the same bytes" "$MANIFEST" 0 "" held
+derive_fx_policy one > "$TMP/to"; { derive_fx_policy one; derive_fx_policy two; derive_fx_policy three; } > "$TMP/ta"; { derive_fx_policy one; derive_fx_policy four; derive_fx_policy five; } > "$TMP/tb"
+{ derive_fx_policy one; derive_fx_policy two; derive_fx_policy three; derive_fx_policy four; derive_fx_policy five; } > "$TMP/twant"
+check_table_case "policy rows added on each side" "$OVERLAY" 0 "" red
+derive_fx_policy one > "$TMP/to"; derive_fx_policy one b > "$TMP/ta"; derive_fx_policy one c > "$TMP/tb"
+check_table_case "both sides edit one policy row" "$OVERLAY" 1 policy.adopter.one red
+derive_fx_unit a > "$TMP/to"; { derive_fx_unit a; printf '  [[unit]]\ntag = "unit.hidden"\n'; } > "$TMP/ta"; { derive_fx_unit a; derive_fx_unit x; } > "$TMP/tb"
+check_table_case "a side whose cut does not reproduce its parse" "$MANIFEST" 1 "merge-rows failed" red
+
 # The count is DERIVED from the file, not typed: a hand-maintained tally reads as a claim about
 # coverage and goes stale the first time a group is added without touching it. The floor is a
 # RATCHET — raised with the groups, never left behind, or a deleted group passes as a green run.
@@ -2203,7 +2264,7 @@ check_says "an empty governed population refuses" "$Q" 1 "no tracked path under 
 # driver, and the count of cases the arithmetic bar binds on.
 ngroups=$(grep -c '^# --- ' "$SELF")
 nruns=$(grep -c '^run "' "$SELF")
-[ "$ngroups" -ge 55 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 55 — a group was deleted"
+[ "$ngroups" -ge 56 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 56 — a group was deleted"
 [ "$nruns" -ge 42 ] || bad "only $nruns 'run' case(s) remain, expected at least 42 — a group was emptied while its banner stayed, which the banner count cannot see"
 [ "$NEVER_WORSE_BOUND" -ge "$NEVER_WORSE_FLOOR" ]   || bad "the arithmetic never-worse comparison bound on $NEVER_WORSE_BOUND case(s) against a grow-only floor of $NEVER_WORSE_FLOOR — a control flipped from rc 0 to rc 1 and silently left the bar"
 [ "$st" = 0 ] && echo "PASS — merge-rows: $ngroups groups / $nruns run cases held, $NEVER_WORSE_BOUND under the arithmetic never-worse bar, $ncons conservative (cap $CONSERVATIVE_CAP)"
