@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-40 — the round-5 spec audit's 35 minors: one build-wide version reading on one base, an attempt checker that refuses what it cannot place, and criteria a correct build can pass
 
-**Status:** INPROGRESS · rev-5 · 2026-11-04 · node d · Tier-2 · base 3708a705 · streams tooling · order 28 · advances TOOL-dFairHearing-19
+**Status:** INPROGRESS · rev-6 · 2026-11-04 · node d · Tier-2 · base 3708a705 · streams tooling · order 28 · closes TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -17,6 +17,7 @@
 | [2026-11-03-prompt-TOOL-dFairHearing-25-fold-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-25-fold-fix-brief.md) | research | TOOL-dFairHearing-25 TOOL-dFairHearing-30 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-37 |
 | [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 |
 | [2026-11-04-prompt-TOOL-dFairHearing-40-1-spec-writer.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-40-1-spec-writer.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-40-2-spec-writer.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-40-2-spec-writer.md) | journal | — |
 | [2026-11-04-prompt-TOOL-dFairHearing-40-closes-fix-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-40-closes-fix-brief.md) | research | — |
 | [2026-11-04-prompt-TOOL-dFairHearing-40-fix-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-40-fix-brief.md) | research | — |
 
@@ -658,6 +659,11 @@ already stages the `isDirectory()` and `JSON.parse` breaks it names.
   kept clones named once (fix brief 2026-11-04-prompt-TOOL-dFairHearing-40-fix-brief, item 4).
 - rev-5 · 2026-11-04 · §3 · the consumes-from rows on units 30, 32, 36 and 37 name what this unit now
   reads (fix brief 2026-11-04-prompt-TOOL-dFairHearing-40-fix-brief, items 1 to 3).
+- rev-6 · 2026-11-04 · header · §9 · `advances TOOL-dFairHearing-19` becomes `closes TOOL-dFairHearing-19`:
+  this unit is the build's last in order, which the build's BACKLOG.md DEFERRED row, the README's rule 1
+  and the ask's accept clause name as the header that closes the ask; with `advances`, the CLOSED flip
+  drops the ask to OPEN (fix brief
+  2026-11-04-prompt-TOOL-dFairHearing-40-closes-fix-brief, items 1 to 3).
 
 ## 10. Reuse audit
 

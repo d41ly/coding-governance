@@ -123,10 +123,10 @@ ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHea
 | [TOOL-dFairHearing-37 — the round-4 spec audit's 19 minors on units 30 and 32: one replay procedure that isolates each arm, criteria over the scored attempt, and checks that can go red](spec/2026-10-23-spec-TOOL-dFairHearing-37.md) | 26 | 2 | CLOSED | rev-6 | 2026-11-04 |
 | [TOOL-dFairHearing-38 — a `selected` verdict observed by the parser `gotchas.py` has, so a correct build passes and a shipped flag reds](spec/2026-10-23-spec-TOOL-dFairHearing-38.md) | 27 | 2 | CLOSED | rev-3 | 2026-11-04 |
 | [TOOL-dFairHearing-39 — a criterion quoting an error text its tool never emits, carried into the bug-class catalogue a spec commit selects](spec/2026-10-23-spec-TOOL-dFairHearing-39.md) | 27 | 2 | CLOSED | rev-3 | 2026-11-04 |
-| [TOOL-dFairHearing-40 — the round-5 spec audit's 35 minors: one build-wide version reading on one base, an attempt checker that refuses what it cannot place, and criteria a correct build can pass](spec/2026-10-23-spec-TOOL-dFairHearing-40.md) | 28 | 2 | INPROGRESS | rev-5 | 2026-11-04 |
+| [TOOL-dFairHearing-40 — the round-5 spec audit's 35 minors: one build-wide version reading on one base, an attempt checker that refuses what it cannot place, and criteria a correct build can pass](spec/2026-10-23-spec-TOOL-dFairHearing-40.md) | 28 | 2 | INPROGRESS | rev-6 | 2026-11-04 |
 <!-- /gen:build-units -->
 
-Records: 273 bound to this build, across 4 record folder(s).
+Records: 274 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
