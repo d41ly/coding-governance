@@ -78,7 +78,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 38 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 38 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14
 ids TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-19 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-24 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28
 ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-41 TOOL-dFairHearing-42
@@ -122,11 +122,11 @@ ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHea
 | [TOOL-dFairHearing-36 — the round-4 spec audit's 13 minors on units 28, 29 and 31: probes that read every node's bytes alike, misses seen red, and the bar's own base](spec/2026-10-23-spec-TOOL-dFairHearing-36.md) | 26 | 2 | CLOSED | rev-5 | 2026-11-04 |
 | [TOOL-dFairHearing-37 — the round-4 spec audit's 19 minors on units 30 and 32: one replay procedure that isolates each arm, criteria over the scored attempt, and checks that can go red](spec/2026-10-23-spec-TOOL-dFairHearing-37.md) | 26 | 2 | CLOSED | rev-6 | 2026-11-04 |
 | [TOOL-dFairHearing-38 — a `selected` verdict observed by the parser `gotchas.py` has, so a correct build passes and a shipped flag reds](spec/2026-10-23-spec-TOOL-dFairHearing-38.md) | 27 | 2 | CLOSED | rev-3 | 2026-11-04 |
-| [TOOL-dFairHearing-39 — a criterion quoting an error text its tool never emits, carried into the bug-class catalogue a spec commit selects](spec/2026-10-23-spec-TOOL-dFairHearing-39.md) | 27 | 2 | DEFERRED | rev-2 | 2026-11-03 |
+| [TOOL-dFairHearing-39 — a criterion quoting an error text its tool never emits, carried into the bug-class catalogue a spec commit selects](spec/2026-10-23-spec-TOOL-dFairHearing-39.md) | 27 | 2 | INPROGRESS | rev-2 | 2026-11-03 |
 | [TOOL-dFairHearing-40 — the round-5 spec audit's 35 minors: one build-wide version reading on one base, an attempt checker that refuses what it cannot place, and criteria a correct build can pass](spec/2026-10-23-spec-TOOL-dFairHearing-40.md) | 28 | 2 | DEFERRED | rev-4 | 2026-11-03 |
 <!-- /gen:build-units -->
 
-Records: 264 bound to this build, across 4 record folder(s).
+Records: 266 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

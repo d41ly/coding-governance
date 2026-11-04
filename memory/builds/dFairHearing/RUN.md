@@ -217,3 +217,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-04T04:59:17Z dispatch · item 3ad4a669 TOOL-dFairHearing-37 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh tools/workflows/replay_scorer.py tools/memory-tree/gotchas.py tools/lib/resolve-python.test.sh memory/map/generated/symbols.json memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-37-1-acceptance-ledger.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-37.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dFairHearing/README.md
 
 2026-11-04T04:59:20Z brief · item TOOL-dFairHearing-37 · reason b23f8a61e0a4 memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-37-build-brief.md
+
+2026-11-04T05:14:25Z brief · item TOOL-dFairHearing-38 · reason cb6bf2cc7b23 memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-38-build-brief.md
+
+2026-11-04T05:29:01Z dispatch · item ff578b9d TOOL-dFairHearing-38 · reason memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-38-1-acceptance-ledger.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-38.md memory/builds/dFairHearing/README.md memory/LIVE.md memory/backlog/TOOL.md

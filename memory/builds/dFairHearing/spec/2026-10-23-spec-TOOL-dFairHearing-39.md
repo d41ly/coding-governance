@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-39 — a criterion quoting an error text its tool never emits, carried into the bug-class catalogue a spec commit selects
 
-**Status:** DEFERRED · rev-2 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 27 · advances TOOL-dFairHearing-19
+**Status:** INPROGRESS · rev-2 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 27 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-39-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-39-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFairHearing-39-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-39-build-brief.md) | research | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-40 |
+| [2026-11-04-prompt-TOOL-dFairHearing-39-fix-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-39-fix-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
