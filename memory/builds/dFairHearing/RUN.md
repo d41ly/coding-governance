@@ -9,7 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: 2c50ab3117f23f2b8d5336fd922418bbd6610736 · park · 5 touching
+refreshed-at: 0d1c1dda4b5656df0a6341dba492ae1f75e8bd61 · park · 25 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: bc4bb6e1751a3f0229c22ac3cb56090603ff0d5c
 phase: BUILDING
@@ -235,3 +235,5 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-04T09:02:16Z review · item dFairHearing · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 8 · disposition promote
 
 2026-11-04T09:02:19Z rescope · item add TOOL-dFairHearing-43 · reason the closing diff review's exit promotes its 8 confirmed minors (5 medium, 3 low) into one unit, memory/builds/dFairHearing/reviews/2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md
+
+2026-11-04T11:35:27Z decision · item unit 43's builder (run wf_8508c2cd-8b0) killed PID 453281, another session's packet.py --write dOrderedCharter, outside this run's ledger; that session's dOrderedCharter packet render may need re-running · reason a process not in the ledger is never killed; the run cannot repair another session's work, so the owner checks the dOrderedCharter worktree and re-runs its packet render if it is partial
