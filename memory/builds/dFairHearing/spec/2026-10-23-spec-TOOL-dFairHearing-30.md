@@ -14,8 +14,8 @@
 | [2026-11-04-build-TOOL-dFairHearing-30-1-builder-return.md](../build/2026-11-04-build-TOOL-dFairHearing-30-1-builder-return.md) | journal | — |
 | [2026-11-04-build-TOOL-dFairHearing-30-3-builder-return.md](../build/2026-11-04-build-TOOL-dFairHearing-30-3-builder-return.md) | journal | — |
 | [2026-11-04-build-TOOL-dFairHearing-30-4-builder-return.md](../build/2026-11-04-build-TOOL-dFairHearing-30-4-builder-return.md) | journal | — |
-| [2026-11-04-build-TOOL-dFairHearing-30-replay-manifest.json](../build/2026-11-04-build-TOOL-dFairHearing-30-replay-manifest.json) | research | TOOL-dFairHearing-15 |
-| [2026-11-04-build-TOOL-dFairHearing-30-replay-verdict.md](../build/2026-11-04-build-TOOL-dFairHearing-30-replay-verdict.md) | research | TOOL-dFairHearing-15 |
+| [2026-11-04-build-TOOL-dFairHearing-30-replay-manifest.json](../build/2026-11-04-build-TOOL-dFairHearing-30-replay-manifest.json) | research | TOOL-dFairHearing-15 TOOL-dFairHearing-35 |
+| [2026-11-04-build-TOOL-dFairHearing-30-replay-verdict.md](../build/2026-11-04-build-TOOL-dFairHearing-30-replay-verdict.md) | research | TOOL-dFairHearing-15 TOOL-dFairHearing-35 |
 | [2026-11-04-build-TOOL-dFairHearing-30-ungated.py](../build/2026-11-04-build-TOOL-dFairHearing-30-ungated.py) | research | TOOL-dFairHearing-15 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-departures-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-departures-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-3 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-32 |
 | [2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md) | research | TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-31 TOOL-dFairHearing-32 |

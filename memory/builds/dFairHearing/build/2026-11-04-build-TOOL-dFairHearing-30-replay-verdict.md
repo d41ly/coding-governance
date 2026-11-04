@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-30 — unit 15's replay in nine clones: every record and arm has a completed attempt that is not void, after f2s1's unparsed report was re-run as f2s2
 
-**Serves:** research TOOL-dFairHearing-30 TOOL-dFairHearing-15
+**Serves:** research TOOL-dFairHearing-30 TOOL-dFairHearing-15 TOOL-dFairHearing-35
 
 This is spec S5's record, written by pass (b), the unit's last pass. It holds the runs of unit 15's
 replay (spec 15 S5, its §4 corpus, arms `selected` and `ungated`): each attempt's clone, `HEAD`, status,
@@ -289,3 +289,117 @@ clones: the manifest names them by absolute path, and this record pins each by b
    put first, so the record binds. Its helper `tracked` is renamed `check_tracked`, at its definition
    and its one call, because the repository's naming lexicon admits no `tracked` verb. Behaviour is
    unchanged. Dropping the first line and reversing the rename gives back blob `954b6417`.
+
+## Scoring
+
+Written by `TOOL-dFairHearing-35` (its S5). The attempt rule is that spec's S1, the checker its §4,
+and the decision rule spec 15 §4 "The decision", which unit 30 S4 reads.
+
+**The attempts table** is the `## Attempts (S9)` table above, unchanged. The checker, §4's
+`attempts.py` written under the pass's scratch directory, read it at this commit:
+`python attempts.py memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-30-replay-verdict.md`
+exited 0 and printed:
+
+```text
+scored 1 selected 1 f1s1
+scored 1 ungated 1 f1u1
+scored 2 selected 2 f2s2
+scored 2 ungated 1 f2u1
+scored 3 selected 1 f3s1
+scored 3 ungated 1 f3u1
+scored 4 selected 1 f4s1
+scored 4 ungated 1 f4u1
+```
+
+No pair is `void after cap` and no attempt is `unscored`. f2s1 is record 2 `selected`'s first
+eligible attempt and is void, so its second, f2s2, is scored.
+
+The same checker over nine scratch tables, each opening with the header row, record 4 `selected`
+varied (spec 35 AC2):
+
+| record 4 `selected` attempts | exit | output |
+|---|---|---|
+| refused, completed void, completed, completed | 0 | `scored 4 selected 3 f4s3`, `unscored 4 selected 4` |
+| the same, attempt 3 void too | 3 | `void after cap 4 selected`, `unscored 4 selected 4` |
+| attempt 2 listed twice | 1 | `attempts: attempt 2 of record 4 selected is listed twice` |
+| failed, completed | 0 | `scored 4 selected 2 f4s2` |
+| failed, failed, completed | 3 | `void after cap 4 selected`, `unscored 4 selected 3` |
+| one row reading `Completed` | 1 | `attempts: line 10 opens an attempt row and does not parse` |
+| one row whose last cell is empty | 1 | `attempts: line 10 has an empty last cell` |
+| one row reading `Selected` | 1 | `attempts: line 10 opens an attempt row and does not parse` |
+| one completed row, then a second table holding an attempt-shaped row | 0 | `scored 4 selected 1 f4s1` |
+
+**The manifest** is
+`memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-30-replay-manifest.json`. Each
+of its eight `candidates` entries names the report of the clone its `scored` line names, so record
+2 `selected` names f2s2's. Over it, `python tools/workflows/replay_scorer.py --experiment` exited 0
+and printed, before any figure, the lines quoted under "The manifest" above:
+
+```text
+arm ungated: varies checklist from selected
+parsed selected: 4 of 4
+parsed ungated: 4 of 4
+```
+
+Its `recall` lines that follow score every case against the manifest's one `known`, record 1, so
+this section reads none of them (departure 4).
+
+**Each record's recall** is its own scored report against its own record, spec 15 S5's
+`python tools/workflows/review_replay.py --known <record> --candidate <report>`, each exiting 0:
+
+| # | `selected` (clone, recall) | `ungated` (clone, recall) |
+|---|---|---|
+| 1 | f1s1 · `recall 6/22 = 0.27` | f1u1 · `recall 10/22 = 0.45` |
+| 2 | f2s2 · `recall 2/10 = 0.20` | f2u1 · `recall 0/10 = 0.00` |
+| 3 | f3s1 · `recall 6/10 = 0.60` | f3u1 · `recall 2/10 = 0.20` |
+| 4 | f4s1 · `recall 12/17 = 0.71` | f4u1 · `recall 13/17 = 0.76` |
+
+Every known item is scorable: each run prints `unscorable 0` for the known record, `scorable` 22,
+10, 10 and 17.
+
+**The pairing** is the factory's: `derive_paired_cases` and `render_population` in
+`tools/workflows/replay_scorer.py`, over the four cases and each arm's answered cases, print:
+
+```text
+paired 4 of 4 · selected unanswered none
+paired 4 of 4 · ungated unanswered none
+```
+
+**The pooled figures**, matched known items over scorable known items summed over the four paired
+records:
+
+- `selected`: 26/59 = 0.441
+- `ungated`: 25/59 = 0.424
+
+**The decision: `selected` holds.** Its pooled recall, 26/59, is at or above `ungated`'s, 25/59, so
+review keeps the range's selection and spec 15 S6 does not land. `tools/memory-tree/gotchas.py`, the
+harness template and its render are unchanged by this unit, and `tools/workflows/README.md`'s
+`checklist` paragraph already states the default this leaves: the harness acquires
+`gotchas.py --for-diff <base>..<head>` with no flag.
+
+**The class set the `ungated` arm carried**, per record: the `selected` arm's items for the range as
+the clone's own checker printed them, then the classes the committed instrument appended as
+ungated. Each is the `checklist` of unit 30's `f<r>u1-args.json` in the session scratchpad,
+re-derived by
+`python 2026-11-04-build-TOOL-dFairHearing-30-ungated.py <this repository> <clone> <base>..<head>`
+over the clone, which stays on disk:
+
+| # | clone | items | of them selected | appended ungated | checklist sha256 (12) |
+|---|---|---|---|---|---|
+| 1 | f1u1 | 130 | 92 | 38 | `668cc4180bb4` |
+| 2 | f2u1 | 111 | 91 | 20 | `bffdbeb67415` |
+| 3 | f3u1 | 78 | 25 | 53 | `6f166104d7ff` |
+| 4 | f4u1 | 99 | 24 | 75 | `0f260b686f44` |
+
+The four sets differ because each clone's catalogue is the one at its range head; 72 classes ride
+all four and 144 ride at least one.
+
+**Superseded here.** Unit 30's S4, the figure and decision half of its S5 and AC3, AC4's `ungated`
+half, spec 15 S6's product files and spec 15's `New arm:` line for the selftest of `gotchas.py` are
+answered by `TOOL-dFairHearing-35`'s S3 to S5 and AC3 to AC4 (`TOOL-dFairHearing-23` §8 F7's form).
+That `New arm:` line applies only on an `ungated` win, so with `selected` holding it is owed no
+observation.
+
+**The evidence kept.** Every report the manifest names and every transcript file this record
+quotes exists on disk at this commit (`test -e` over each, 8 reports and 24 transcript files). This
+pass removed none of them, nor f2s1's report.
