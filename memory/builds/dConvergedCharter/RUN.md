@@ -9,11 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: PLAY-dConvergedCharter-24=DEFERRED PLAY-dConvergedCharter-25=DEFERRED PLAY-dConvergedCharter-26=DEFERRED PLAY-dConvergedCharter-27=DEFERRED PLAY-dConvergedCharter-28=DEFERRED PLAY-dConvergedCharter-29=DEFERRED PLAY-dConvergedCharter-30=DEFERRED PLAY-dConvergedCharter-31=DEFERRED PLAY-dConvergedCharter-32=DEFERRED PLAY-dConvergedCharter-33=DEFERRED PLAY-dConvergedCharter-34=DEFERRED PLAY-dConvergedCharter-35=DEFERRED PLAY-dConvergedCharter-36=DEFERRED PLAY-dConvergedCharter-37=DEFERRED
+units-at-landing: PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18
+gates-run: unattended-17938053573705645701-600 fb0dd91f
 parked-surfaced: yes, 26 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: b2ba51d4f0ec8c886f97d429de1a406131074ca4
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -94,3 +97,7 @@ base: 0d1c1dda4b5656df0a6341dba492ae1f75e8bd61
 2026-11-04T13:16:45Z rescope · item defer PLAY-dConvergedCharter-39 · reason spec run (README rule 1): specced here, the spec audit's chain stopped at round 2 on its own verdict (STOP, own-work), carried forward DEFERRED against PLAY-dConvergedCharter-24 for the build run to build
 
 2026-11-04T13:16:46Z rescope · item defer PLAY-dConvergedCharter-40 · reason spec run (README rule 1): specced here, the spec audit's chain stopped at round 2 on its own verdict (STOP, own-work), carried forward DEFERRED against PLAY-dConvergedCharter-24 for the build run to build
+
+2026-11-04T15:35:53Z override · item specs-audited · reason the spec-audit chain stopped on its own verdict at round 2 (STOP, own-work), and --chain-verdict names PLAY-dConvergedCharter-40, the round-2 promotion, to close under this override; the build run builds it from its spec as written
+
+2026-11-04T15:35:53Z override · item closing-review-recorded · reason a spec run writes no code, so its diff is specs and records only; the two-round spec-audit chain recorded in the chain record is the review of this spec-only diff, the disposition every chain spec run's close takes (PLAY-dClosedLoop-37)
