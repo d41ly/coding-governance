@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-35 — unit 15's replay scored by one attempt rule fixed before the runs, so no figure rests on the attempt a runner prefers
 
-**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 24 · advances TOOL-dFairHearing-19
+**Status:** INPROGRESS · rev-5 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 24 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
