@@ -1893,6 +1893,18 @@
     "enforces": ["principle.p16"]
   },
   {
+    "name": "instruction ladder (level is the one term)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/instruction_units.py",
+      "ladder-terms"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p13", "principle.p11"]
+  },
+  {
     "name": "tags (the resolver's checks)",
     "argv": [
       "python",

@@ -60,6 +60,7 @@ hook destinations (every declared hook path ships)	repo	product
 hook destinations self-test	kit	selftests
 install-prefix (shipped surface)	repo	product
 install-prefix self-test	kit	selftests
+instruction ladder (level is the one term)	repo	product
 kickoff engine size <=18KiB	repo	product
 kickoff-manifest ratchet	repo	records
 kit epoch (shipped bytes move, the version moves)	repo	declarations
