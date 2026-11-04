@@ -251,6 +251,16 @@ const head = a.head || 'HEAD'
 // TOOL-dFairHearing-37 S6 - every backslash folded to `/` at this one read, as `repoFold` folds it below:
 // bash strips a backslash from an unquoted `git -C C:\x\y`, and git takes forward slashes on Windows.
 const repo = String(a.repo || '.').replace(/\\/g, '/')
+// TOOL-dFairHearing-40 S33 - every `git -C` below quotes `repo` as `git -C "${repo}"`, so a path holding a
+// space stays one argument. The three characters a double-quoted bash string cannot hold literally are
+// refused here, naming the character, never escaped: a typo'd path fails before any agent spawns.
+const repoUnsafe = ['"', '$', '`'].find((c) => repo.indexOf(c) !== -1)
+if (repoUnsafe) {
+  throw new Error(
+    'tier2-review: `repo` holds ' + JSON.stringify(repoUnsafe) + ', which a double-quoted shell argument ' +
+      'cannot carry literally. Got ' + JSON.stringify(repo) + '. Refusing rather than escaping it.',
+  )
+}
 // TOOL-dTieredTribunal-11 S1 - the SUBJECT DESCRIPTOR. One field carries the review kind, and six
 // things below become per-kind: the acquire sentence, the lens catalogue, the context default, the
 // anchor predicate, the finding schema's address field, and the record's kind token.
@@ -1412,8 +1422,8 @@ if (!isSpec && a.checklist === undefined) {
   const res = await agent(
     `You are the CHECKLIST AGENT of a Tier-2 review. You run one command and report its output. You judge ` +
       `nothing, review nothing and write nothing.\n\n` +
-      `1. Run \`git -C ${repo} ls-files --error-unmatch {{TOOL_ROOT}}memory-tree/gotchas.py\`; when it fails, run ` +
-      `\`git -C ${repo} ls-files --error-unmatch {{TOOL_ROOT}}gotchas.py\`. The checker is the first of the two that is ` +
+      `1. Run \`git -C "${repo}" ls-files --error-unmatch {{TOOL_ROOT}}memory-tree/gotchas.py\`; when it fails, run ` +
+      `\`git -C "${repo}" ls-files --error-unmatch {{TOOL_ROOT}}gotchas.py\`. The checker is the first of the two that is ` +
       `tracked; when neither is, return NO checklist and checklistError \`no checker tracked\`.\n` +
       `2. In ${repo}, run \`python <checker> --for-diff ${base}..${head}\` with a 120-second timeout.\n` +
       `3. Return its stdout VERBATIM as checklist. Return NO checklist and a checklistError naming why instead when ` +
@@ -1577,14 +1587,14 @@ function renderStageShape(at, counts, agents) {
 const probe = await agent(
   `You are the RESUME PROBE of a Tier-2 review. You read files and report them. You judge nothing, ` +
     `review nothing and write nothing.\n\n` +
-    `1. Run \`git -C ${repo} rev-parse --git-common-dir\`. Turn the answer into an ABSOLUTE path with ` +
+    `1. Run \`git -C "${repo}" rev-parse --git-common-dir\`. Turn the answer into an ABSOLUTE path with ` +
     `forward slashes (a relative answer is relative to ${repo}) and return it as commonDir.\n` +
     (isSpec
       // TOOL-aEvidencedLens-4 S4 - the move check's read half. The probe reports; the HARNESS compares.
-      ? `2. For EACH path below, run \`git -C ${repo} hash-object <path>\` and return blobs: one {path, now} per path, ` +
+      ? `2. For EACH path below, run \`git -C "${repo}" hash-object <path>\` and return blobs: one {path, now} per path, ` +
         `now being the hash it prints, or an empty string when the command fails. Compare nothing:\n` +
         subjects.map((x) => `  - ${x && typeof x === 'object' ? x.path : String(x)}`).join('\n') + `\n`
-      : `2. Run \`git -C ${repo} rev-parse --verify ${base}^{commit}\` and \`git -C ${repo} rev-parse --verify ${head}^{commit}\` ` +
+      : `2. Run \`git -C "${repo}" rev-parse --verify ${base}^{commit}\` and \`git -C "${repo}" rev-parse --verify ${head}^{commit}\` ` +
         `and return the two FULL shas as base and head. Return an empty string for one that does not resolve.\n`) +
     `3. The review directory is <commonDir>/review-lenses/` +
     (isSpec
@@ -1667,8 +1677,8 @@ const keyDir = probeLive
   : `<common-dir>/review-lenses/${reviewKey}`
 const keyDirHow = probeLive
   ? ''
-  : ` <common-dir> is the absolute, forward-slash form of what \`git -C ${repo} rev-parse --git-common-dir\` prints.`
-const diffCmd = `git -C ${repo} diff ${baseSha}...${headSha}`
+  : ` <common-dir> is the absolute, forward-slash form of what \`git -C "${repo}" rev-parse --git-common-dir\` prints.`
+const diffCmd = `git -C "${repo}" diff ${baseSha}...${headSha}`
 const presentFinds = probeLive && Array.isArray(probe.finds) ? probe.finds : []
 const presentVerifies = probeLive && Array.isArray(probe.verifies) ? probe.verifies : []
 log(`review key ${reviewKey} — ${presentFinds.length} lens file(s) and ${presentVerifies.length} verify file(s) present`)
@@ -1724,14 +1734,14 @@ function renderIntent() {
         `Read the ones your lens or your finding touches; the intent lens reads every one WHOLE before it reads the diff. ` +
         `A listed document that does not exist in ${repo} is itself a finding against its path.\n`
       : '') +
-    `Read the range's commit messages, \`git -C ${repo} log --format=%B ${baseSha}..${headSha}\`, and any spec or design document the diff touches or those messages name.` +
+    `Read the range's commit messages, \`git -C "${repo}" log --format=%B ${baseSha}..${headSha}\`, and any spec or design document the diff touches or those messages name.` +
     (SPECS.length ? '' : ' No spec was supplied, so these are the statement of intent.')
 }
 
 function renderBrief(role) {
   const skeptic = role === 'skeptic'
   const lines = [
-    `REPO: ${repo} — run every git command as \`git -C ${repo} …\`; every path below is relative to it.`,
+    `REPO: ${repo} — run every git command as \`git -C "${repo}" …\`; every path below is relative to it.`,
     isSpec
       ? `SUBJECT: the spec set, each file at its pinned blob:\n` + subjects.map((x) => {
         const mv = movedSubjects.find((m) => m.path === x.path)
@@ -1752,12 +1762,12 @@ function renderBrief(role) {
               ? 'no prevBlob was supplied - review this file whole'
               : String(x.prevBlob).indexOf(String(x.blob)) === 0 || String(x.blob).indexOf(String(x.prevBlob)) === 0
                 ? 'unchanged since the previous round'
-                : `git -C ${repo} diff ${x.prevBlob} ${x.blob}`)).join('\n'))
+                : `git -C "${repo}" diff ${x.prevBlob} ${x.blob}`)).join('\n'))
         : ' - this is a FOLD review. The diff above is what the previous round\'s fixes introduced, not the whole build.')
       : ''}`,
   ]
   if (skeptic && !isSpec)
-    lines.push(`SCOPE: a finding is in scope only if this diff introduced its defect or made it reachable. A defect present unchanged at the base is PRE-EXISTING: refute it. Check with \`git -C ${repo} show ${baseSha}:<path>\`.`)
+    lines.push(`SCOPE: a finding is in scope only if this diff introduced its defect or made it reachable. A defect present unchanged at the base is PRE-EXISTING: refute it. Check with \`git -C "${repo}" show ${baseSha}:<path>\`.`)
   lines.push(skeptic ? `BY DESIGN (refute any finding one of these covers): ${byDesign}` : `BY DESIGN (do NOT re-report these): ${byDesign}`)
   lines.push(priorFindings.length
     ? (skeptic
@@ -1810,9 +1820,9 @@ function buildLensCall(L, run) {
         // TOOL-aOrientedCast-5 S5 - under a role, the identity and posture sentences are the role's block.
         ? (roles[finderKey] ? '' : `You are the ${L.key} reviewer of a SPEC SET. `) +
           `For EACH subject listed under SUBJECT above: first run ` +
-          `\`git -C ${repo} hash-object <path>\` and compare the result to the pinned blob. A mismatch ` +
+          `\`git -C "${repo}" hash-object <path>\` and compare the result to the pinned blob. A mismatch ` +
           `means the spec MOVED since this review was commissioned: review the file as it now stands, and read ` +
-          `the moved text with \`git -C ${repo} diff <blob> -- <path>\` as unreviewed fold text. Report a defect IN ` +
+          `the moved text with \`git -C "${repo}" diff <blob> -- <path>\` as unreviewed fold text. Report a defect IN ` +
           `that text as a finding graded by the SEVERITY RUBRIC below; the move itself is not a finding. ` +
           `Then Read the file WHOLE.\n\n`
         : (roles[finderKey] ? '' : `You are the ${L.key} reviewer. `) + `Review ONLY the diff named under SUBJECT above (run \`${diffCmd}\`, then Read/Grep the touched files + their immediate callers).\n\n`) +

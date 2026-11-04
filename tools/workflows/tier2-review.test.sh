@@ -722,9 +722,27 @@ async function runWholeScriptArms() {
     const rw = await runReview(Object.assign({}, DIFF, { repo: 'C:\\x\\y' }), ALL_OK)
     const ps = rw.trace.map((t) => t.prompt)
     const named = ps.join('\n').match(/git -C [^\s`]+/g) || []
-    ck(!rw.threw && named.length > 0 && named.every((g) => g === 'git -C C:/x/y') && ps.every((p) => p.indexOf('C:\\x') === -1),
-      'FH37 AC6 a repo of C:\\x\\y reaches every prompt as git -C C:/x/y: ' + named.length + ' git -C command(s), ' +
-      JSON.stringify(named.filter((g) => g !== 'git -C C:/x/y').slice(0, 3)))
+    ck(!rw.threw && named.length > 0 && named.every((g) => g === 'git -C "C:/x/y"') && ps.every((p) => p.indexOf('C:\\x') === -1),
+      'FH37 AC6 a repo of C:\\x\\y reaches every prompt as git -C "C:/x/y": ' + named.length + ' git -C command(s), ' +
+      JSON.stringify(named.filter((g) => g !== 'git -C "C:/x/y"').slice(0, 3)))
+  }
+
+  // ---- TOOL-dFairHearing-40 AC19: every `git -C` quotes `repo`, so a `repo` of `C:/x y/z` reaches each
+  // prompt as one argument, and a `repo` holding `$`, `"` or a backtick is refused naming it before any
+  // agent spawns. RED against the harness at unit 37's commit `6d768c563`, where all 13 interpolations
+  // are bare and no character of `repo` is refused.
+  {
+    const rs = await runReview(Object.assign({}, DIFF, { repo: 'C:/x y/z' }), ALL_OK)
+    const named = rs.trace.map((t) => t.prompt).join('\n').match(/git -C (?:"[^"]*"|[^\s`]+)/g) || []
+    ck(!rs.threw && named.length > 0 && named.every((g) => g === 'git -C "C:/x y/z"'),
+      'FH40 AC19 a repo of C:/x y/z reaches every prompt as git -C "C:/x y/z": ' + named.length + ' git -C command(s), ' +
+      JSON.stringify(named.filter((g) => g !== 'git -C "C:/x y/z"').slice(0, 3)))
+    const unrefused = []
+    for (const c of ['$', '"', '`']) {
+      const rr = await runReview(Object.assign({}, DIFF, { repo: '/tmp/a' + c + 'b' }), ALL_OK)
+      if (!rr.threw || rr.threw.indexOf(JSON.stringify(c)) === -1 || rr.trace.length !== 0) unrefused.push(c + ' ' + (rr.threw || 'did not throw'))
+    }
+    ck(unrefused.length === 0, 'FH40 AC19 a repo holding $, " or a backtick is refused naming it before any agent spawns: ' + JSON.stringify(unrefused))
   }
 
   // ---- TOOL-aOrientedCast-27 AC8: every whole label is `<slug> · <kind> round <n> · <stage>`, the slug
@@ -1161,7 +1179,7 @@ async function runWholeScriptArms() {
   r = await runReview(Object.assign({}, DIFF, { context: 'CTX-MARK', byDesign: 'BD-MARK' }), ALL_OK)
   if (checkNoThrow(r, 'briefed skeptic')) {
     const bv = scanPrompts(r, 'verify:')
-    ck(bv.length === 5 && bv.every((t) => t.prompt.indexOf('REPO: /tmp/r') !== -1 && t.prompt.indexOf('git -C /tmp/r diff ' + B + '...' + H) !== -1 &&
+    ck(bv.length === 5 && bv.every((t) => t.prompt.indexOf('REPO: /tmp/r') !== -1 && t.prompt.indexOf('git -C "/tmp/r" diff ' + B + '...' + H) !== -1 &&
       t.prompt.indexOf('CTX-MARK') !== -1 && t.prompt.indexOf('BD-MARK') !== -1),
       'a skeptic prompt carries the repo, the range, the context and the by-design list')
   }
@@ -2169,7 +2187,7 @@ async function runLedgerArms() {
     const fv = scanPrompts(r, 'find:').concat(scanPrompts(r, 'verify:'))
     const extractFoldLine = (p, path) => p.split('\n').find((l) => l.indexOf('  - ' + path + ': ') === 0) || ''
     ck(fv.length === 10 && fv.every((t) => t.prompt.indexOf('FOLD DIFF') !== -1 && t.prompt.indexOf('first-round') === -1 &&
-      extractFoldLine(t.prompt, 'memory/builds/dX/spec/one.md') === '  - memory/builds/dX/spec/one.md: git -C /tmp/r diff ' + P40 + ' ' + D40 &&
+      extractFoldLine(t.prompt, 'memory/builds/dX/spec/one.md') === '  - memory/builds/dX/spec/one.md: git -C "/tmp/r" diff ' + P40 + ' ' + D40 &&
       extractFoldLine(t.prompt, 'memory/builds/dX/spec/two.md') === '  - memory/builds/dX/spec/two.md: unchanged since the previous round' &&
       extractFoldLine(t.prompt, 'memory/builds/dX/spec/three.md') === '  - memory/builds/dX/spec/three.md: no prevBlob was supplied - review this file whole'),
       'fold: a round-2 spec run carries each subject\'s FOLD DIFF line in every find: and verify: prompt')
@@ -3903,7 +3921,10 @@ printf '%s\n' "$out"
 # run: the pass runs no suite.
 # RAISED 626 -> 627 by TOOL-dFairHearing-37: 1 assertion, the `FH37` arm — AC6's backslashed repo (1). Counted by
 # hand and by a scratch probe of the same call, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=627
+# RAISED 627 -> 629 by TOOL-dFairHearing-40: 2 assertions, the `FH40` arms — AC19's spaced repo (1) and its three
+# refused characters (1). The three quoted expectations it rewrites add none. Counted by hand and by a scratch
+# probe of the same calls, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=629
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"
