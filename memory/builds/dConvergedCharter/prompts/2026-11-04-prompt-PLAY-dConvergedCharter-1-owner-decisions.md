@@ -32,3 +32,11 @@ named readers: the four `read_policy_key` copies with their callers, `held_halve
 and govkit's conf-key gap checks, with the house-file arm. Clause `cl-dClosedLoop-0485` is carried in two parts. Done
 as an attended records change with a spec-writer pass, the two halves spec-audited because the README declares the
 audit, and landed on the owner's ask.
+
+## After round 3 of the spec-audit chain
+
+Round 3's disposal took PLAY-dConvergedCharter-11 from 48,596 to 75,698 bytes; PLAY-dConvergedCharter-12 reads
+49,217. Asked: "What now?" Answered: **Accept the size.** The ceiling stays warn-only for these units and no further
+split is made.
+
+`--chain-verdict` read CONTINUE for round 4 over ten units. Asked whether to run it. Answered: **Run round 4.**
