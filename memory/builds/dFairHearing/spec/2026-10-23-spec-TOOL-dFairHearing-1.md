@@ -70,6 +70,22 @@
 | [2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-b-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-b-brief.md) | research | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-b-v2-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-b-v2-brief.md) | research | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md) | research | TOOL-dFairHearing-10 TOOL-dFairHearing-22 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-21 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 |
+| [2026-11-04-prompt-TOOL-dFairHearing-19-1-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-19-1-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-19-10-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-19-10-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-19-2-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-19-2-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-19-3-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-19-3-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-19-4-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-19-4-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-19-5-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-19-5-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-19-6-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-19-6-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-19-7-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-19-7-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-19-8-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-19-8-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-19-9-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-19-9-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-19-ledgers-batch1-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-19-ledgers-batch1-brief.md) | research | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-19-ledgers-batch2-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-19-ledgers-batch2-brief.md) | research | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-19-ledgers-batch3-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-19-ledgers-batch3-brief.md) | research | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-19-ledgers-batch4-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-19-ledgers-batch4-brief.md) | research | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-19-ledgers-batch5-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-19-ledgers-batch5-brief.md) | research | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-19-ledgers-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-19-ledgers-brief.md) | research | — |
 | [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md](../reviews/2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md) | diff-review | TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 
