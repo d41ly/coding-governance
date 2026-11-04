@@ -9,7 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: 0d1c1dda4b5656df0a6341dba492ae1f75e8bd61 · park · 25 touching
+refreshed-at: 923954b6150a57861b3fb64c412fa5f1cb1c6752 · park · 31 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: bc4bb6e1751a3f0229c22ac3cb56090603ff0d5c
 phase: BUILDING
@@ -265,3 +265,5 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-04T18:40:28Z dispatch · item ddc1b734 TOOL-dFairHearing-45 · reason tools/check-install-prefix.sh tools/check-install-prefix.test.sh tools/check-hook-destinations.sh tools/check-hook-destinations.test.sh tools/check-wiring.test.sh tools/gate-legs.json tools/hooks/README.md tools/hooks/agent-cap.test.sh tools/lib/resolve-python.test.sh tools/policy/check_policy.py tools/workflows/README.md tools/workflows/check-review-join.js tools/workflows/check-review-join.sh tools/workflows/check-verifier-fanout.js tools/workflows/check-verifier-fanout.sh tools/workflows/check-verifier-fanout.test.sh tools/workflows/lenses.toml tools/workflows/spec-audit-optin.fragment.json tools/workflows/spec-audit-optin.test.sh tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh .lexicon.conf help/spec-audit.md memory/project/brief-recorded-waiver.txt memory/project/spawn-idiom-sites.txt memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-45-1-acceptance-ledger.md memory/builds/dFairHearing/spec/2026-11-04-spec-TOOL-dFairHearing-45.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dFairHearing/README.md memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md
 
 2026-11-04T19:20:11Z rescope · item add TOOL-dFairHearing-47 · reason the close's second lint read after unit 45: two here-string loops, a guard pathspec govkit will not classify, a guard unit 45's arm outgrew, a moved cite, and the kickoff manifest's last-body-change
+
+2026-11-04T20:40:02Z decision · item units 43 to 47 have no spec audit and no diff review: the closing diff review stops at bc4bb6e17, and the planned specs-audited override cites the owner's 2026-10-23 stop, which covers round 5's promotions, not these units · reason options: accept that record for them, or audit them; the override's reach is the owner's to rule, so the run does not assume it

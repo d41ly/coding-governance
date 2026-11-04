@@ -2,7 +2,7 @@
 
 # gov-researcher handoff — TOOL-dFairHearing-19
 
-<!-- gov:handoff role=gov-researcher build=dFairHearing unit=TOOL-dFairHearing-19 path=memory/builds/dFairHearing/prompts/2026-11-04-prompt-TOOL-dFairHearing-19-7-researcher.md role-sha=51b61c49e522 task-sha=928aa2a18d7f -->
+<!-- gov:handoff role=gov-researcher build=dFairHearing unit=TOOL-dFairHearing-19 path=memory/builds/dFairHearing/prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-8-researcher.md role-sha=51b61c49e522 task-sha=0a2ff45a0d07 -->
 
 ## Role
 
@@ -39,11 +39,11 @@ This handoff is for build `dFairHearing`, unit `TOOL-dFairHearing-19`.
 
 ### input:question
 
-Which record on disk evidences each acceptance criterion of this batch's CLOSED units? Read the full brief at memory/builds/dFairHearing/prompts/2026-11-04-prompt-TOOL-dFairHearing-19-ledgers-batch2-brief.md first: its Items state the ledger rules, the two line forms and the UNEVIDENCED list your return carries. Answer by drafting the ledgers it names.
+Which record on disk evidences each acceptance criterion of this batch's CLOSED units? Read the full brief at memory/builds/dFairHearing/prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-batch3-brief.md first: its Items state the ledger rules, the two line forms and the UNEVIDENCED list your return carries. Answer by drafting the ledgers it names.
 
 ### brief:goal
 
-Draft the acceptance ledger for each CLOSED unit of build dFairHearing in your batch, from the records already on disk, so the main loop can review and commit them at the close. The memory-hygiene gate's ledger-coverage check reds on every criterion of units 1 to 18, 20 to 23 and 25 to 36, because none of those units has a ledger. Your batch: TOOL-dFairHearing-8, TOOL-dFairHearing-9, TOOL-dFairHearing-10, TOOL-dFairHearing-11, TOOL-dFairHearing-12, TOOL-dFairHearing-13, TOOL-dFairHearing-14. Write nothing under the repository. Write each draft to `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dfairhearing-fe4e9c/db957487-b5c0-4a88-ab27-88dd90bc468f/scratchpad/ledgers/`. Run no gate, suite or bar, and commit nothing.
+Draft the acceptance ledger for each CLOSED unit of build dFairHearing in your batch, from the records already on disk, so the main loop can review and commit them at the close. The memory-hygiene gate's ledger-coverage check reds on every criterion of units 1 to 18, 20 to 23 and 25 to 36, because none of those units has a ledger. Your batch: TOOL-dFairHearing-15, TOOL-dFairHearing-16, TOOL-dFairHearing-17, TOOL-dFairHearing-18, TOOL-dFairHearing-20, TOOL-dFairHearing-21, TOOL-dFairHearing-22. Write nothing under the repository. Write each draft to `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dfairhearing-fe4e9c/db957487-b5c0-4a88-ab27-88dd90bc468f/scratchpad/ledgers/`. Run no gate, suite or bar, and commit nothing.
 
 ### brief:non-goals
 

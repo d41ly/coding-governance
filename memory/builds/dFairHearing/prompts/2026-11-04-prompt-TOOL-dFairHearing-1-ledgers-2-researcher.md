@@ -2,7 +2,7 @@
 
 # gov-researcher handoff — TOOL-dFairHearing-19
 
-<!-- gov:handoff role=gov-researcher build=dFairHearing unit=TOOL-dFairHearing-19 path=memory/builds/dFairHearing/prompts/2026-11-04-prompt-TOOL-dFairHearing-19-1-researcher.md role-sha=51b61c49e522 task-sha=fb055a0e6bf1 -->
+<!-- gov:handoff role=gov-researcher build=dFairHearing unit=TOOL-dFairHearing-19 path=memory/builds/dFairHearing/prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-2-researcher.md role-sha=51b61c49e522 task-sha=436535f9f9cd -->
 
 ## Role
 
@@ -43,7 +43,7 @@ Which record on disk evidences each acceptance criterion of this batch's CLOSED 
 
 ### brief:goal
 
-Draft the acceptance ledger for each CLOSED unit of build dFairHearing in your batch, from the records already on disk, so the main loop can review and commit them at the close. The memory-hygiene gate's ledger-coverage check reds on every criterion of units 1 to 18, 20 to 23 and 25 to 36, because none of those units has a ledger. Your batch: TOOL-dFairHearing-1, TOOL-dFairHearing-2, TOOL-dFairHearing-3, TOOL-dFairHearing-4, TOOL-dFairHearing-5, TOOL-dFairHearing-6, TOOL-dFairHearing-7. Write nothing under the repository. Write each draft to `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dfairhearing-fe4e9c/db957487-b5c0-4a88-ab27-88dd90bc468f/scratchpad/ledgers/`. Run no gate, suite or bar, and commit nothing.
+Draft the acceptance ledger for each CLOSED unit of build dFairHearing in your batch, from the records already on disk, so the main loop can review and commit them at the close. The memory-hygiene gate's ledger-coverage check reds on every criterion of units 1 to 18, 20 to 23 and 25 to 36, because none of those units has a ledger. Your batch: TOOL-dFairHearing-8, TOOL-dFairHearing-9, TOOL-dFairHearing-10, TOOL-dFairHearing-11, TOOL-dFairHearing-12, TOOL-dFairHearing-13, TOOL-dFairHearing-14. Write nothing under the repository. Write each draft to `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dfairhearing-fe4e9c/db957487-b5c0-4a88-ab27-88dd90bc468f/scratchpad/ledgers/`. Run no gate, suite or bar, and commit nothing.
 
 ### brief:non-goals
 

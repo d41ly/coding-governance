@@ -2,7 +2,7 @@
 
 # gov-researcher handoff — TOOL-dFairHearing-19
 
-<!-- gov:handoff role=gov-researcher build=dFairHearing unit=TOOL-dFairHearing-19 path=memory/builds/dFairHearing/prompts/2026-11-04-prompt-TOOL-dFairHearing-19-6-researcher.md role-sha=51b61c49e522 task-sha=ab69e6c17925 -->
+<!-- gov:handoff role=gov-researcher build=dFairHearing unit=TOOL-dFairHearing-19 path=memory/builds/dFairHearing/prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-6-researcher.md role-sha=51b61c49e522 task-sha=ab69e6c17925 -->
 
 ## Role
 
@@ -39,7 +39,7 @@ This handoff is for build `dFairHearing`, unit `TOOL-dFairHearing-19`.
 
 ### input:question
 
-Which record on disk evidences each acceptance criterion of this batch's CLOSED units? Read the full brief at memory/builds/dFairHearing/prompts/2026-11-04-prompt-TOOL-dFairHearing-19-ledgers-batch1-brief.md first: its Items state the ledger rules, the two line forms and the UNEVIDENCED list your return carries. Answer by drafting the ledgers it names.
+Which record on disk evidences each acceptance criterion of this batch's CLOSED units? Read the full brief at memory/builds/dFairHearing/prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-batch1-brief.md first: its Items state the ledger rules, the two line forms and the UNEVIDENCED list your return carries. Answer by drafting the ledgers it names.
 
 ### brief:goal
 
