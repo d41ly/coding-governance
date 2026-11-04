@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-20 — the conf fold and the unattended kit's retirement shipped as upgrade steps, every shim closed when its window does, and the adopter exit check widened
 
-**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 7 · advances PLAY-dConvergedCharter-24
+**Status:** OPEN · rev-3 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 7 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0494@4e004b72 whole
 
@@ -11,9 +11,10 @@
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md](../build/2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md) | research | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 |
 | [2026-11-03-build-PLAY-dConvergedCharter-20-deviation-201.md](../build/2026-11-03-build-PLAY-dConvergedCharter-20-deviation-201.md) | deviation | — |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
+| [2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-39 |
 
 <!-- /gen:spec-records -->
 
@@ -46,7 +47,13 @@ and the owner-item mailbox (TOOL-dWellOiledMachine-48 S1, S4). `read_releases`
   names a conf as a source. For each key of the map the home assigns, the up compares that value with
   `policy.py get <key> --rev HEAD`, the policy file's value or the catalogue default, and moves it only
   where the two differ; a value equal to what `get` already returns moves nothing, so no default is
-  restated. It writes through `render_policy_text` (`tools/govkit/upgrade_steps.py:1365`)
+  restated. A row whose catalogue `default` is `{ derived = … }` (unit 11 S1 and §8 F2, every folded
+  key not read through `get`) holds no catalogue value, and `get` refuses it, exit 2, wherever the
+  policy file does not set it (`DerivedDefault`, `tools/policy/policy.py:686-697`). The up knows such a
+  row from the `default` shape `derive_home_folds` reads with its `legacy` field, never from the
+  refusal's text: for it, `get`'s exit 2 reads as "no value", and the assigned home value always moves;
+  where the policy file already sets the key, `get` answers with that value and the compare above
+  holds. A refusal of any other row stops the up writing nothing, exit 2, naming the key. It writes through `render_policy_text` (`tools/govkit/upgrade_steps.py:1365`)
   behind one before-image, refuses writing nothing where the conf or the policy file differs from its
   blob at HEAD, as `fanout_cap.py`'s up does (`tools/govkit/steps/fanout_cap.py:168-171`), and takes the
   conf out last, the file itself where only blanks and comments remain. The witness exits 0 when no key
@@ -71,11 +78,19 @@ and the owner-item mailbox (TOOL-dWellOiledMachine-48 S1, S4). `read_releases`
   every push-main adopter to declare `GATE_DOC_PATHS` and `GATE_POST_MERGE` in its own committed copy
   (`WIRE-INTO-PROJECT.md:921-936`), and unit 11 re-points those reads to the policy file. Its map is the
   gate file's `owner-policy` keys alone, the only ones with a catalogue row, so its `mechanic` lines and
-  its shell code stay and the file is never removed. Observed by AC3 and AC7.
+  its shell code stay and the file is never removed. `process-monitor/conf-to-policy` deletes the
+  adopter's `.process-monitor.conf`, every non-comment line of which is a folded `PROCMON_` key; its
+  readers that test the file's PRESENCE, `tools/run-gates/run-gates.sh:1542-1543` (the tree-kill
+  delegation flag `PROCMON_CONF`) and `tools/process-monitor/adopt-process-monitor.sh:219-234` (its
+  absent-conf refusal), read through unit 11 S4's presence shape, "adopted when `policy.py legacy
+  .process-monitor.conf` prints a key, or the file exists", in the adopter's installed copies that the
+  same `update` ships, so the step lands only with that re-point and the deleted file disables nothing.
+  Observed by AC3, AC7 and AC8.
   **Readers:** by name: the keys' readers in each kit, re-pointed by unit 11 before this unit's steps
   land, and `tools/policy/legacy-homes.txt`, drained by `policy.py lists --write` · by value: each kit's
   conf-key gap check `read_conf_key_gaps` (`tools/govkit/govkit.py:4943`), which reads `*_keys` and
-  unit 11 re-points.
+  unit 11 re-points; and the presence tests of `tools/run-gates/run-gates.sh:1543` and
+  `tools/process-monitor/adopt-process-monitor.sh:227-229`, re-pointed by unit 11 S4's fifth shape.
 - **S3** — The unattended kit's retirement as a step. `unattended/run-conf-retired`, an `[[upgrade]]`
   row in `tools/govkit/steps.toml`, the file for a surface no live entry owns, since unit 12's
   `[[retired]]` row takes the entry out of the registry. Its up runs S1 over `.unattended.conf` and then,
@@ -85,8 +100,13 @@ and the owner-item mailbox (TOOL-dWellOiledMachine-48 S1, S4). `read_releases`
   keys a reader outside the kit still reads keep their rows there (unit 12 S2) and move. Two sets drop:
   the six extension keys, which unit 11 S1 gives no row and which leave with the conf
   (PLAY-dConvergedCharter-22 S5), and each folded key whose row unit 12 removed because only the kit read
-  it, which nothing reads once the kit is withdrawn, so dropping it loses no value. `surfaces` names
-  each dropped key as `conf-key:.unattended.conf#<KEY>`. The kit's installed files leave through
+  it, which nothing reads once the kit is withdrawn, so dropping it loses no value. The retrofit keys the
+  moved `pass-order history` and `brief-recorded` checkers read, `PASS_ORDER_CUTOFF`,
+  `BRIEF_RECORDED_CUTOFF`, `PASS_ORDER_PREANCHOR_CAP` and `PASS_ORDER_WAIVER`, neither move nor drop:
+  where the target's conf assigns one, the up appends that line to the target's `.memory-tree.conf`
+  before the conf is deleted, the home unit 12 S3 gives them in gov, under the same before-image, so an
+  adopter's checkers keep their cutoffs. `surfaces` names each dropped or carried key as
+  `conf-key:.unattended.conf#<KEY>`. The kit's installed files leave through
   `update`'s carried-claim path, never the step's: the `[[retired]]` row's successor `runtime` (unit 12
   §8 F4) carries the claimed kit's rows (`tools/govkit/govkit.py:9547-9565`, `resolve_claim` at
   `tools/govkit/upgrade_steps.py:1002`), and a carried row whose source gov no longer ships reads
@@ -138,8 +158,8 @@ and the owner-item mailbox (TOOL-dWellOiledMachine-48 S1, S4). `read_releases`
 
 ### Edges
 
-- **consumes-from** `PLAY-dConvergedCharter-11` — `render_folded_lines`, the `legacy` verb S1 reads a home's assignments through, and `legacy-homes.txt` with the catalogue's `legacy` field it drains into, the key map S1 derives and S2's homes; without it no key is folded and the steps move nothing
-- **consumes-from** `PLAY-dConvergedCharter-12` — `tools/unattended/` leaving gov under its `[[retired]]` row, which S3's step follows at the adopter, and the `unattended.*` catalogue rows that unit leaves standing for keys read outside the kit, the map S3 moves; without it the step would strip a conf a live kit reads
+- **consumes-from** `PLAY-dConvergedCharter-11` — `render_folded_lines`, the `legacy` verb S1 reads a home's assignments through, and `legacy-homes.txt` with the catalogue's `legacy` field it drains into, the key map S1 derives and S2's homes, the derived-default refusal of `get` S1 reads as no catalogue value, and S4's presence shape that keeps `process-monitor/conf-to-policy` from disabling an adopter's monitor; without it no key is folded and the steps move nothing
+- **consumes-from** `PLAY-dConvergedCharter-12` — `tools/unattended/` leaving gov under its `[[retired]]` row, which S3's step follows at the adopter, the `unattended.*` catalogue rows that unit leaves standing for keys read outside the kit, the map S3 moves, and `.memory-tree.conf` as the moved checkers' cutoff home, where S3 carries an adopter's cutoffs; without it the step would strip a conf a live kit reads
 - **consumes-from** `PLAY-dConvergedCharter-17` — `shims.toml`, the `roles/build-skill` row S4 holds to its window and reds, naming the roles kit as the one that closes it, once a release lets the window close
 - **consumes-from** `PLAY-dConvergedCharter-5` — `steps-pending`, read through `derive_migration_state`, the state S5 grades
 - **hands-off** `PLAY-dConvergedCharter-21` — `fanout_cap.py`'s shared step `conf_to_policy.py` with S1's home mode, which unit 21's house-seed step calls with a reader of its own
@@ -251,11 +271,15 @@ until a release is cut.
 ## 6. Acceptance criteria
 
 - **AC1** — When `python conf_to_policy.py up <target> --home .memory-tree.conf` runs over a scratch
-  target whose conf assigns one folded key a non-default value and another its default, and whose
-  policy file sets neither, the policy file gains the first key and not the second, the conf loses both
-  lines, and `down` restores both files byte-identical.
-  Red when: a default is restated, a folded key is left assigned with the witness reading applied, or
-  the up strips a line whose value it never wrote, the case of a detector that never sees the home.
+  target whose fixture catalogue gives one folded key a literal default and another a `{ derived = … }`
+  default, whose conf assigns the literal-default key its default, a second literal-default key a
+  non-default value and the derived-default key any value, and whose policy file sets none of them, the
+  policy file gains the second and the third keys and not the first, the conf loses all three lines,
+  and `down` restores both files byte-identical.
+  Red when: a literal default is restated, a derived-default key's refusal is read as "equal" and its
+  value lost, or as a failure that aborts the step, a folded key is left assigned with the witness
+  reading applied, or the up strips a line whose value it never wrote, the case of a detector that
+  never sees the home.
 - **AC2** — When `python fanout_cap.py up` runs over dSafePassage-1 S6's scratch target before and after
   S1, the files it writes are byte-identical.
   Red when: the home mode moves the frozen step's behaviour.
@@ -265,12 +289,14 @@ until a release is cut.
   Red when: a home holding a folded key has no step, so its adopters keep reading the old home.
 - **AC4** — When `run-conf-retired`'s up runs over a scratch target holding `.unattended.conf` with one
   folded key whose catalogue row stands, one folded key whose row the fixture's catalogue lacks, and one
-  extension key, the policy file gains the first alone, the file is gone, and `down` restores it
-  byte-identical; and after `govkit update` over a scratch adopter whose receipt claims the unattended
+  extension key, and a `PASS_ORDER_CUTOFF` line, the policy file gains the first alone, the target's
+  `.memory-tree.conf` gains the `PASS_ORDER_CUTOFF` line, the file is gone, and `down` restores every
+  file byte-identical; and after `govkit update` over a scratch adopter whose receipt claims the unattended
   kit, every `tools/unattended/` path the receipt names reads `withdrawn`, and is gone under
   `--write-withdrawals`.
-  Red when: an extension key or a row-less key is moved into the policy file, the file survives with the
-  witness green, or the kit's installed files survive the update with no order.
+  Red when: an extension key or a row-less key is moved into the policy file, a cutoff the moved
+  checkers read is dropped, the file survives with the witness green, or the kit's installed files
+  survive the update with no order.
 - **AC5** — When `python shims.py --fixture --plant window-open --window 2 --releases 2` runs, the
   open row's line reads `is open past its window` and the plant exits 0; with `--releases 1` no line
   names the row.
@@ -286,12 +312,19 @@ until a release is cut.
   its `GOV_KITROOT` line and every non-assignment line, and `down` restores both files byte-identical.
   Red when: an adopter's owner-policy gate key is left unread after unit 11's re-point, or a mechanic
   line leaves the gate file.
+- **AC8** — When `process-monitor/conf-to-policy`'s up runs over a scratch adopter holding the
+  process-monitor and run-gates kits at this build's tip and a committed `.process-monitor.conf`, the
+  file is gone, `bash <prefix>/process-monitor/adopt-process-monitor.sh --check` there exits 0, and the
+  adopter's bar prints its process-monitor delegation line.
+  Red when: the adopter's bar stops delegating tree kills with no line, or the kit's check refuses the
+  folded conf as absent.
+  fixture: the scratch adopter is built under `%TEMP%` with a short name.
 
 ## 7. Gates
 
-`govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `upgrade-walk` · `step-rows-frozen` · `step-gate` · `docs` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `lexicon selftest` · `recall floor arms` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit selfcheck` · `govkit selftest` · `process-monitor adopter selftest` · `govkit refusal join` · `govkit acceptance matrix` · `upgrade-walk` · `step-rows-frozen` · `step-gate` · `docs` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `lexicon selftest` · `recall floor arms` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/govkit/selftest.py · covers AC1 AC4 AC7 · scratch targets for the home mode, the gate-file step and the run-conf step, failing case a default restated or a home read through `get` · none
+New arm: tools/govkit/selftest.py · covers AC1 AC4 AC7 AC8 · scratch targets for the home mode, the gate-file step, the run-conf step and the process-monitor step, failing cases a literal default restated, a derived-default value dropped, a home read through `get`, a cutoff dropped, and the monitor's presence test left on the deleted file · none
 New arm: tools/govkit/selftest.py · covers AC5 · the window plant with an open row past its window · none
 New arm: tools/govkit/selftest.py · covers AC6 · a planted register and mailbox, failing case a pending row with no owner item · none
 
@@ -321,6 +354,13 @@ New arm: tools/govkit/selftest.py · covers AC6 · a planted register and mailbo
   run-conf rows), 4 (closing a shim row is the row's kit's release-bound act, named by S4) and 11 (the
   hands-off edge to PLAY-dConvergedCharter-14 describes `check_adopters_converged` at a release); the
   consumes-from edge to PLAY-dConvergedCharter-12 names the catalogue rows S3 moves.
+- rev-3 · 2026-11-04 · S1 S2 S3 §3 AC1 AC4 AC8 §7 · folded
+  `2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1` findings 2 and 16 (a derived-default row's
+  `get` refusal reads as no catalogue value, known from the row's `default` shape, and its assigned value
+  always moves; AC1 plants a literal-default and a derived-default key), 36 (the process-monitor step's
+  presence-testing readers named, landing with unit 11 S4's presence shape, AC8 and the adopter suite's
+  leg) and 1 (S3 carries the moved checkers' cutoffs into the target's `.memory-tree.conf`, AC4), with
+  the consumes-from edges to PLAY-dConvergedCharter-11 and -12 naming what each now supplies.
 
 ## 10. Reuse audit
 

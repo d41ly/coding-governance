@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-23 — the release asks' join: one key hash and one ask text for Maintain's and `release.route`'s `release-verify-failed` filings
 
-**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 9 · advances PLAY-dConvergedCharter-24
+**Status:** OPEN · rev-3 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 9 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0502@fbfa8f4f whole
 
@@ -10,9 +10,10 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 |
 | [2026-11-03-build-PLAY-dConvergedCharter-5-reuse-scout-d.md](../build/2026-11-03-build-PLAY-dConvergedCharter-5-reuse-scout-d.md) | research | PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 |
 | [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
+| [2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-39 |
 
 <!-- /gen:spec-records -->
 
@@ -80,6 +81,12 @@ a cadence intake as an `ask`), and the four asks §8 F4 states. None of these fi
 - The drift history's `key_hash` column (`tools/drift-audit/drift_report.py:3762-3777`). It hashes the sorted,
   LF-joined offender keys of a record with no kind, a different payload, so it is not a copy of
   `derive_key_hash` and keeps its bytes (§4 "Evidence").
+- The release ref's hash, `derive_release_ref` in `tools/integrations/release.py`: `env-` and the first
+  12 hex of the SHA-256 of an environment name (DEPL-dShippedRelease-15,
+  `memory/builds/dShippedRelease/spec/2026-10-30-spec-DEPL-dShippedRelease-15.md:250-252`), written by
+  `release.py record`. Its payload is an
+  environment name, not a `kind`/`key` filing pair, so it keeps its bytes and every committed
+  `refs/gov/release/…env-<hex>` ref keeps its name.
 - The intake's content key (TOOL-dPlacedRequest-19 S1), Entry's placement (TOOL-dWellOiledMachine-27 S4) and
   the `seen` clause's writer (TOOL-dTendedCadence-15 S2). This unit makes two texts equal and calls them.
 - The stand-ins each parent builds against while the other is unlanded: both parents land before this build
@@ -195,18 +202,27 @@ Minted, each asked of `lexicon.py --suggest <name> --as py.function` at base and
   `# >>> render_breach_text` blocks, each block is byte-equal to its canonical with CRs dropped, and
   `git grep -n -E 'sha256' -- tools/drift-audit/maintain_file.py tools/loop/loop_review.py
   tools/integrations/release.py` prints only lines inside a `# >>> derive_key_hash` … `# <<<` span of
-  its file, each hit graded against the span's line range, so `hashlib.sha256(`, `from hashlib import
-  sha256` and `hashlib.new("sha256")` are all seen; over a scratch copy with a planted
-  `hashlib.sha256(` line outside its block, the same grep prints that line outside every span.
-  Red when: a copy is edited by one byte, or a consumer computes the hash outside the block, including a
-  pathspec that matches no tracked file and so finds nothing.
+  its file or inside a function of the declared allowlist, each hit graded against the span's line
+  range, so `hashlib.sha256(`, `from hashlib import sha256` and `hashlib.new("sha256")` are all seen.
+  The allowlist is one row, `(tools/integrations/release.py, derive_release_ref, "env- ref of an
+  environment name, DEPL-dShippedRelease-15; not a filing key")` (§3), and each hit it admits is
+  printed with its reason, never skipped silently. Over a scratch copy with a planted `hashlib.sha256(`
+  line outside every block and allowlisted function, the same grep prints that line.
+  Red when: a copy is edited by one byte, a consumer computes the filing hash outside the block, an
+  allowlisted hit is admitted without its printed reason, or a pathspec matches no tracked file and so
+  finds nothing.
 - **AC6** — When `grep -n "maintain key" release.md maintain.md` runs under `help/`, each page names the marker,
   and `release.md` says Maintain's later filing adds a `seen` row.
   Red when: either page still describes two asks for one failure.
 
 ## 7. Gates
 
-`drift-audit selftest` · `python resolver (behaviour + inline parity + idiom ban)`
+`drift-audit selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+
+The `verify-join` arm's file, `tools/integrations/release_fixture.py`, and `release.py` are run by the
+parent legs `integrations release` and `integrations adapters` (DEPL-dShippedRelease-15), and
+`loop_review.py` by `loop-review selftest` (TOOL-dCalibratedLens-2 S11); none is in the manifest at base,
+and each runs this unit's edits once its parent lands, before this build run.
 
 New arm: tools/lib/resolve-python.test.sh · covers AC5 · two `PARITY_ROWS` rows, `derive_key_hash` and `render_breach_text`, each staged red by a one-byte edit to one inline copy · none
 
@@ -260,6 +276,11 @@ New arm: tools/drift-audit/selftest.py · covers AC2 · `write_breach_ask` rende
 - rev-2 · 2026-11-04 · AC5 · folded `2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1` finding
   50: AC5's grep spells the three full paths and every `sha256` form, grades each hit against its
   file's block span, and stages its red with a planted hash outside a block.
+- rev-3 · 2026-11-04 · §3 AC5 §7 · folded `2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1`
+  findings 41 (`derive_release_ref`'s SHA-256 of an environment name keeps its bytes, a §3 non-goal, and
+  AC5's grep admits it through a declared, printed allowlist row) and 10 (§7 names `memory hygiene` and
+  `spec tokens`, and the parent legs `integrations release`, `integrations adapters` and `loop-review
+  selftest` that run the `verify-join` arm, `release.py` and `loop_review.py`).
 
 ## 10. Reuse audit
 

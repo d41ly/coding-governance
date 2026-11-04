@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-7 — protocols and templates as tag-sliced views, the guides retired, their rationale in units' `help` and the `help/why/` tree under `help.explanation`
 
-**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 17 · advances PLAY-dConvergedCharter-24
+**Status:** OPEN · rev-4 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 17 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0481@a6574329 whole
 **Carries:** node:policy-key.help.explanation
@@ -11,10 +11,11 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-03-build-PLAY-dConvergedCharter-6-reuse-scout-b.md](../build/2026-11-03-build-PLAY-dConvergedCharter-6-reuse-scout-b.md) | research | PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-15 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
+| [2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-39 |
 
 <!-- /gen:spec-records -->
 
@@ -58,11 +59,13 @@ cannot be retired, which the arm of S6 proves on a planted retirement (the owner
   (PLAY-dOrderedCharter-11 S1). So `rationale-apart` (PLAY-dOrderedCharter-29 S6) stays green with the
   tree rendered. A page carries no `<!-- usage: … -->` anchor, so the docs leg walks it
   (`tools/govkit/docs_leg.py:413`) for links only. Observed by AC5.
-- **S5** — The `explains` edge type. One `[[edge]]` row in `tools/playbook/edges.toml`
-  (PLAY-dOrderedCharter-24 S1): `type = "explains"`, `inverse = "explained-by"`, `from = ["unit"]`,
-  `to = ["doc"]`, `pin = "none"`, `status = "declared"`. A unit row writes it in its `edges` list as
-  `explains=doc.<name>#<seg>`, the section address of PLAY-dOrderedCharter-19 S3. The closed set and the
-  target-resolves check are dOrderedCharter's, so §8 F2 files the ask they owe. Observed by AC6.
+- **S5** — The `explains` edge type, read and never written here. Its one `[[edge]]` row in
+  `tools/playbook/edges.toml` (`type = "explains"`, `inverse = "explained-by"`, `from = ["unit"]`, `to =
+  ["doc"]`, `pin = "none"`) is written by PLAY-dConvergedCharter-12 S7 at order 4, the row's first
+  reader, before this unit's pass; this unit's units write it in their `edges` list as
+  `explains=doc.<name>#<seg>`, the section address of PLAY-dOrderedCharter-19 S3, and add no second row.
+  The closed set and the target-resolves check are dOrderedCharter's, so §8 F2 files the ask they owe.
+  Observed by AC6.
 - **S6** — The no-lost-rationale arm, `check_rationale_kept(root)`, run by
   `--check-render --scope explanation` under either value. Its population is
   `derive_retired_sections(root)`: every `<memory_root>/guides/*.md` that a first-parent commit of
@@ -85,10 +88,14 @@ cannot be retired, which the arm of S6 proves on a planted retirement (the owner
   this unit adds beside unit 13's feature route: one move per `##` section of a guide this unit takes
   out, its destination the `help` field of a unit in the kit manifest §4 "The guides" names and its
   edge `explains=doc.<name>#<seg>` in place of the feature route's `promoted-from=`. A section whose
-  directive text is already a unit (unit 1) gains the `help` and the edge on that unit. Each row is
-  written by `apply`'s own write route (unit 13 S4, its §8 F2): the pass's kit edit, its change record
-  through `python tools/memory-tree/build_records.py new change`, and the whole plan refused, writing
-  nothing, unless `instructions_edit.py check` passes over the would-be tree. No row goes through
+  directive text is already a unit (unit 1) gains the `help` and the edge on that unit through
+  `apply`'s amend route, PLAY-dConvergedCharter-40 S1: an entry whose `target` names a tag the kit
+  manifest already holds rewrites that row in place, never appending a second row for the tag. Each row,
+  new or amended, is written by `apply`'s own write route (unit 13 S4, its §8 F2, and unit 40 S2 for an
+  amended row): the pass's kit edit, its change record through `python
+  tools/memory-tree/build_records.py new change` (`Action add` for a new row, `Action edit` for an
+  amended one), and the whole plan refused, writing nothing, unless `instructions_edit.py check` passes
+  over the would-be tree. No row goes through
   `instructions.edit`'s door, which under its default `owner-command-agents-propose`
   (`tools/policy/catalogue.toml:647-649`) prints a proposal for an agent and writes nothing, so the
   guides would leave with their rationale unwritten. Observed by AC8, AC9 and AC12.
@@ -108,17 +115,24 @@ cannot be retired, which the arm of S6 proves on a planted retirement (the owner
   **Readers:** by name: `coding-governance-agents.template.md` (rendered to `AGENTS.md`), the nine role
   sources under `tools/roles/agents/` (rendered to `.claude/agents/*.md`), `tools/roles/SKILL.template.md`,
   `skills/session-kickoff/SKILL.md`, `README.md`, `WIRE-INTO-PROJECT.md`, `help/spec-audit.md`,
-  `.governance/deploy.toml:68`, `.memory-tree.conf:531`, `tools/memory-tree/kit.toml`,
+  `.governance/deploy.toml:68`, `.memory-tree.conf:531`, `tools/memory-tree/kit.toml` (its
+  `kit/dogfood doc parity` leg row, `:247`, whose guard drops the two removed guide paths, as its
+  manifest row in `tools/gate-legs.json:437` does),
   `tools/memory-tree/adopt-memory-tree.sh`, `tools/memory-tree/README.md`,
   `tools/memory-tree/HYGIENE.template.md`, `tools/memory-tree/check-memory-hygiene.test.sh`,
   `tools/memory-tree/check-method-carriers.test.sh`, `tools/workflows/kit.toml`,
   `tools/workflows/README.md`, `tools/workflows/unattended-build.template.js`,
   `tools/hooks/agent-cap.js:431`, `tools/drift-audit/drift_signals.py:44`, `tools/lib/render-doc.sh`,
   `tools/govkit/selftest.py:9758`, `tools/run-gates/run-gates.gov.test.sh`, `tools/check-template-size.test.sh`,
-  and for the manifest `.governance/install.json`, `skills/session-kickoff/manifest-check.sh`,
-  `tools/drift-audit/drift_signals.py:35`, `tools/policy/check_policy.py:3175` and
-  `tools/govkit/fixtures/release-0/deploy.toml`;
-  the rows of `tools/gate-legs.json` are rendered from the kits' `[[gate_leg]]` rows, the edit ·
+  and for the manifest `.governance/install.json`, `tools/drift-audit/drift_signals.py:35`,
+  `tools/policy/check_policy.py:3175` and `tools/govkit/fixtures/release-0/deploy.toml`, and
+  READER NOT IN TREE: `tools/kickoff-manifest/manifest-check.sh`, the manifest's checker, which unit 16 S1 moves
+  there by `git mv` from `skills/session-kickoff/` at order 5, after base;
+  gov's manifest `tools/gate-legs.json`, which is hand-kept and edited in the same commit as the
+  descriptor row it spells (no generator writes it, `tools/govkit/govkit.py:2560-2564`): the
+  `build-method size` leg, which measures `memory/guides/BUILD-METHOD.md` (`check-template-size.sh:339` fails when the
+  file is absent), leaves it together with its `[[exempt_leg]]` row in `tools/govkit/registry.toml`
+  (`:359-361`), so govkit selfcheck's check 7h reads no stale exemption ·
   by value: `tools/template-size-limits.txt:129` and `tools/template-size-highwater.txt`, which cap
   `BUILD-METHOD.md`'s bytes; `tools/policy/caps.toml:63-67`, the same cap's policy row;
   `memory/project/method-carriers.txt`, which `tools/memory-tree/check-method-carriers.sh` compares with
@@ -165,7 +179,8 @@ cannot be retired, which the arm of S6 proves on a planted retirement (the owner
 
 ### Edges
 
-- **consumes-from** `PLAY-dConvergedCharter-12` — `explains=`, the edges from units' `help` to the four UNATTENDED guides' sections, which S6 grades with this unit's own
+- **consumes-from** `PLAY-dConvergedCharter-12` — `explains=`, the edges from units' `help` to the four UNATTENDED guides' sections, which S6 grades with this unit's own, and the `explains` `[[edge]]` row of `edges.toml` that unit's S7 writes, without which no edge of S7 here parses
+- **consumes-from** `PLAY-dConvergedCharter-40` — `guide_move.py apply`'s amend route, through which S7 gives a section whose directive text is already a unit its `help` and edge on that row; without it the builder appends a duplicate tag or hand-edits outside the guarded route
 - **consumes-from** `PLAY-dConvergedCharter-6` — `record_kinds.py`, every record kind registered, so `record_kinds.py --template spec` renders S10's skeleton and the `record` namespace of S9 is whole
 - **consumes-from** `PLAY-dConvergedCharter-19` — `extract_section`, the heading-to-section rule S6 cuts a retired guide by, so an address S6 derives equals the address a unit's edge spells
 - **consumes-from** `PLAY-dConvergedCharter-13` — `guide_move.py`, the guide caller of the factory `prose_move.py` and its write route, to which S7 adds the `--rationale` route it moves each section's rationale through; without it the rationale would land through `dossier_move.py`'s proposal and record route, or a third mover
@@ -228,8 +243,8 @@ Explains: doc.build-method#m5-recall-and-reuse
 ### Inventory
 
 Minted: `render_explanation`, `check_rationale_kept`, `derive_retired_sections`, the scope
-`explanation`, the slot `<!-- record-template: <kind> -->`, the edge type `explains` with its inverse
-`explained-by`, and the plant cases `explanation-rendered`, `explanation-registry-only`,
+`explanation`, the slot `<!-- record-template: <kind> -->` (the edge type `explains` is
+PLAY-dConvergedCharter-12's, S5), and the plant cases `explanation-rendered`, `explanation-registry-only`,
 `rationale-unmapped`, `rationale-mapped` and `rationale-moved-out` on PLAY-dOrderedCharter-20 S10's
 fixture verb; the route `--rationale` of `guide_move.py plan` and its plant `rationale-route` on
 `guide_move.py --fixture`. Each function
@@ -247,8 +262,9 @@ the last commit of the unit, after S6 reads green over a scratch commit that rem
 - `tools/playbook/guide_move.py` (the `--rationale` route and its plant)
 - `tools/runtime/kit.toml` (the `PLAYBOOK-TEMPLATE.md` render's `[[files]]` and `[[lf_pin]]` rows)
 - `tools/playbook/renderers.toml`
-- `tools/playbook/edges.toml`
 - `tools/playbook/instructions-legacy.txt`
+- `tools/gate-legs.json` (the `build-method size` row, and `kit/dogfood doc parity`'s guard),
+  `tools/govkit/registry.toml` (its `[[exempt_leg]]` row)
 - `tools/memory-tree/instructions.toml`
 - `tools/workflows/instructions.toml`
 - `tools/run-gates/instructions.toml`
@@ -258,7 +274,7 @@ the last commit of the unit, after S6 reads green over a scratch commit that rem
 - `memory/guides/ANNOTATION-STYLE.md`, `memory/guides/BUILD-METHOD.md`, `memory/guides/MERGE-BAR.md`,
   `memory/guides/REVIEW-PROTOCOL.md`, `memory/guides/PLAYBOOK-TEMPLATE.md` (removed)
 - `memory/guides/SESSION-KICKOFF.md` moved to `memory/project/SESSION-KICKOFF.md`; its readers
-  `.governance/install.json`, `skills/session-kickoff/manifest-check.sh`,
+  `.governance/install.json`, `tools/kickoff-manifest/manifest-check.sh`,
   `tools/govkit/fixtures/release-0/deploy.toml`
 - `tools/memory-tree/ANNOTATION-STYLE.template.md`, `tools/memory-tree/BUILD-METHOD.template.md`,
   `tools/workflows/REVIEW-PROTOCOL.template.md` (removed)
@@ -277,8 +293,8 @@ the last commit of the unit, after S6 reads green over a scratch commit that rem
 - **A rendered view file per retired guide**, at a new path such as `memory/protocols/<name>.md`. Rejected
   by R-E's own test: "an agent reads its slice and never a whole guide" (layer-instruction `:508-509`).
   A file per guide is a whole guide again, and unit 14's exit check reds a surviving guide path.
-- **The no-lost-rationale arm keyed by the compare base.** Rejected by a measurement: units 12 and 16
-  remove six guides before this unit lands, and after the build lands the compare base no longer holds
+- **The no-lost-rationale arm keyed by the compare base.** Rejected by a measurement: unit 12 removes
+  four guides before this unit lands, and after the build lands the compare base no longer holds
   any of them, so the arm would grade nothing from then on. History read once per run grades every
   removal for good, and `git log --diff-filter=D` over `memory/guides/` costs one call.
 - **`explains=<guide path>#<seg>`, the path spelling of the brief's I21.** Rejected because
@@ -326,9 +342,10 @@ the last commit of the unit, after S6 reads green over a scratch commit that rem
 - **AC5** — When `grep -c why documents.toml` runs after the unit lands it prints 0, and the
   `rationale-apart` arm passes on the tree with the explanation pages rendered.
   Red when: a `help` text appears in a registered document, or the tree is a registered document.
-- **AC6** — When `python edge_grammar.py --list` runs, it prints `explains` with inverse
-  `explained-by`, from `unit` to `doc`, and a unit row declaring `explained-by=` is red.
-  Red when: the type is missing, or its inverse may be declared.
+- **AC6** — When `git grep -c 'type = "explains"' -- edges.toml` runs in `tools/playbook/` at this
+  unit's pass base and at its tip, each prints 1, and `git diff <base> HEAD -- edges.toml` there
+  prints nothing.
+  Red when: this unit writes a second `explains` row, or reads a type that is missing at its pass.
 - **AC7** — When `python instruction_units.py fixture --plant rationale-unmapped` commits the removal of a
   planted guide holding sections `## Why` and `## How`, with a unit explaining only `## How`,
   `render_playbook.py --check-render --scope explanation` exits 1 naming the guide, `## Why` and its
@@ -358,15 +375,24 @@ the last commit of the unit, after S6 reads green over a scratch commit that rem
   --rationale` writes one entry per `##` section of the planted guide, `apply` appends one unit
   row per entry carrying its `help` and its `explains=doc.<name>#<seg>` edge with one change record each,
   and the same apply over a tree whose `instructions_edit.py check` fails leaves the manifest and the
-  guide byte-identical.
-  Red when: a section moves with no edge, a row is written past a failing check, or a row goes through
-  `instructions.edit`'s door and is read as written.
+  guide byte-identical; with a planted unit already holding the directive text of one section, that
+  entry amends the existing row's `help` and `edges` under an `Action edit` record and the manifest
+  holds the tag once.
+  Red when: a section moves with no edge, a row is written past a failing check, a row goes through
+  `instructions.edit`'s door and is read as written, or an existing unit's tag gains a second row.
+- **AC13** — When `grep -cE 'memory/guides/(ANNOTATION-STYLE|BUILD-METHOD|MERGE-BAR|REVIEW-PROTOCOL|PLAYBOOK-TEMPLATE)\.md'
+  tools/gate-legs.json tools/memory-tree/kit.toml` and `grep -c 'build-method size'
+  tools/govkit/registry.toml` run on the tip, each prints 0, and `python tools/govkit/govkit.py
+  selfcheck` prints no stale-exemption line.
+  Red when: a manifest leg, a guard or an `[[exempt_leg]]` row still names a removed guide.
 ## 7. Gates
 
-`policy fixtures` · `playbook render selftest` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `manifest-check self-test` · `lexicon naming predicates` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `transition-audit arms` · `straggler-guard arms` · `agent-cap self-test` · `scratch-guard self-test` · `hook destinations self-test` · `drift-audit selftest` · `policy check` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`policy fixtures` · `playbook render selftest` · `govkit selftest` · `govkit selfcheck` · `review-protocol parity (kit vs dogfood)` · `govkit refusal join` · `govkit acceptance matrix` · `manifest-check self-test` · `lexicon naming predicates` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `transition-audit arms` · `straggler-guard arms` · `agent-cap self-test` · `scratch-guard self-test` · `hook destinations self-test` · `drift-audit selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `policy check` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 The parents' legs `instruction render (one renderer of record)` and `writing practice (records and
-units)` run this unit's arm and AC5 once they land; neither is in the manifest at base.
+units)` run this unit's arm and AC5 once they land; neither is in the manifest at base. The
+`build-method size` leg leaves the manifest with its `[[exempt_leg]]` row in this unit (S8), observed by
+AC13.
 
 New arm: tools/playbook/render_playbook.py · covers AC2 AC3 AC4 AC7 AC8 · the five plant cases of the Inventory, its failing cases a committed guide removal with one unmapped section and a move out of the guides path walked with a pathspec · none
 New arm: tools/playbook/guide_move.py · covers AC12 · the `rationale-route` plant, staged red with `apply` writing past a failing `instructions_edit.py check` · none
@@ -379,7 +405,8 @@ New arm: tools/playbook/guide_move.py · covers AC12 · the `rationale-route` pl
   (layer-instruction `:508-509`), and the fates record retires the guides (fates `:210`). widens: none · relaxes: none
 - **F2 — How do the closed edge set and the retirement rule admit `explains`?** Options: (a) this unit
   adds the `edges.toml` row and asks dOrderedCharter to name it; (b) the arm reads a side map with no edge.
-  (b) is a second inventory beside the unit rows. RESOLVED (agent, 2026-11-03, delegated): (a), rung 3.
+  (b) is a second inventory beside the unit rows. RESOLVED (agent, 2026-11-03, delegated): (a), rung 3. The row's writer is PLAY-dConvergedCharter-12
+  S7 since this spec's rev-3, the row's first reader at order 4; this unit still files the ask.
   The ask, target build dOrderedCharter: PLAY-dOrderedCharter-24 S1's closed set names `explains`
   (`unit` to `doc`, inverse `explained-by`, `pin = "none"`), and PLAY-dOrderedCharter-25 S6 and -29 S8
   read a `doc.<name>#<seg>` address that `derive_retired_sections` returns as resolved and retired with
@@ -414,6 +441,18 @@ New arm: tools/playbook/guide_move.py · covers AC12 · the `rationale-route` pl
   27 (S6 walks without a pathspec, the `rationale-moved-out` plant), 31 (the guides' bytes restated as
   317,842) and 3 (the `PLAYBOOK-TEMPLATE.md` render's rows sit in the runtime descriptor, where unit 12
   moved them, and leave with the render).
+- rev-3 · 2026-11-04 · S5 S8 §3 §4 §8 AC6 AC13 §7 · folded
+  `2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1` findings 3 (the `explains` `[[edge]]` row
+  moves to PLAY-dConvergedCharter-12 S7, its first reader; S5 reads it, AC6 observes that no second row is
+  written, `edges.toml` leaves Files touched, the consumes-from edge names the row, F2 notes the writer),
+  13 (`tools/kickoff-manifest/manifest-check.sh` spelled where unit 16 moves it, and "four guides (unit
+  12)") and 33 (the `build-method size` leg leaves with its `[[exempt_leg]]` row, the parity guard drops
+  the removed guides, the manifest named hand-kept, AC13 and §7's `govkit selfcheck` and
+  `review-protocol parity (kit vs dogfood)`).
+- rev-4 · 2026-11-04 · S7 §3 §10 AC12 · sibling edit by the repair unit PLAY-dConvergedCharter-40 for
+  `2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1` finding 27: a section whose directive text
+  is already a unit gains its `help` and edge through `apply`'s amend route under an `Action edit`
+  record, AC12's planted existing unit, and the consumes-from edge to that unit.
 
 ## 10. Reuse audit
 
@@ -421,8 +460,8 @@ The seams extended are `render_playbook.py`'s scopes (PLAY-dOrderedCharter-20 S5
 (S10), `read_units` and the `help` field (PLAY-dOrderedCharter-9 S1-S2), the edge registry
 (PLAY-dOrderedCharter-24 S1), the tag slice (PLAY-dOrderedCharter-25 S1), the prose mover (I16): the
 factory `tools/lib/prose_move.py` through its guide caller `tools/playbook/guide_move.py plan|apply`
-(unit 13 S1, S3, S4), never the dossier caller `dossier_move.py`, whose route sends sections to
-proposals and records,
+(unit 13 S1, S3, S4) with its amend route for an existing unit (PLAY-dConvergedCharter-40), never the
+dossier caller `dossier_move.py`, whose route sends sections to proposals and records,
 `extract_section` (I12), `record_kinds.py --template` (TOOL-dTotalRecall-1 S5) and the catalogue's
 `lists --write` drain (`tools/policy/policy.py`). `python tools/codebase-map/reuse_lookup.py "render each
 unit's rationale into a help tree no agent loads"` ranked name-stem hits only (`tree`, `load`,

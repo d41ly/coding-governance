@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-12 — the unattended kit, its four guides and `/unattended` retired once the driver carries every run, every reader by path and by value re-pointed or retired with it
 
-**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 4 · advances PLAY-dConvergedCharter-24
+**Status:** OPEN · rev-3 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 4 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0486@36def3b5 whole
 
@@ -10,17 +10,18 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md](../build/2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md) | research | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
+| [2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-39 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
 The unattended kit is a second driver beside the supervisor, its README and the product rule still call
-it a "four-verb driver" while it declares 30 verbs (gap-tool-08), and night pass point 1 sends its parts
+it a "four-verb driver" while it declares 32 verbs (gap-tool-08), and night pass point 1 sends its parts
 to the loop kit and the runtime kit, `/unattended` a thin client of `run` until this build retires it
 (NP-4). This unit removes `tools/unattended/`, its four guides and `/unattended` from gov's tree once
 dWellOiledMachine's driver carries every run: each reader by path and by value inventoried over the
@@ -37,7 +38,16 @@ before this unit's pass begins:
 | P1 | TOOL-dWellOiledMachine-25 and -28: `run` drives every build and `/unattended` is its client | `git grep -l 'unattended/' -- tools/runtime tools/loop` lists no file but WOM-28's `driver.sh`, and `driver.sh` resolves no verb into `unattended.sh` |
 | P2 | the driver verbs this build's own run uses have homes outside the kit: dispatch, phase and witness, `--close`, the run record (TOOL-dDeclaredLoop-7, TOOL-dWellOiledMachine-2, -3, -25) | `run.py --help` names each |
 | P3 | PLAY-dConvergedCharter-11 has landed: the kit's `read_policy_key` copy is gone and its conf keys read through `policy.py legacy .unattended.conf` | `check_policy.py --readers read_policy_key --kind value` exits 0 |
-| P4 | the unit row with its `help` field, `instructions_edit.py check` and the change record's door (PLAY-dOrderedCharter-9 S1, -15 S6, S7), and the `explains` edge type I21 names (PLAY-dOrderedCharter-24's `edges.toml`, the ask unit 7 files) | `instructions_edit.py check` passes a planted unit row carrying an `explains=` edge |
+| P4 | the unit row with its `help` field, `instructions_edit.py check` and the change record's door (PLAY-dOrderedCharter-9 S1, -15 S6, S7), and the edge registry `tools/playbook/edges.toml` with its closed set and grammar (PLAY-dOrderedCharter-24 S1), into which S7 writes the `explains` row | `python tools/playbook/edge_grammar.py --list` exits 0 and `instructions_edit.py check` passes a planted unit row carrying an edge type the registry already holds |
+
+- **S7** — The `explains` edge type, the first write of this unit's pass, before S1 writes any edge of
+  it. One `[[edge]]` row in `tools/playbook/edges.toml` (PLAY-dOrderedCharter-24 S1): `type =
+  "explains"`, `inverse = "explained-by"`, `from = ["unit"]`, `to = ["doc"]`, `pin = "none"`, `status =
+  "declared"`. A unit row writes it in its `edges` list as `explains=doc.<name>#<seg>`, the section
+  address of PLAY-dOrderedCharter-19 S3. This unit is the row's one writer, at order 4, because S1 is
+  its first reader; PLAY-dConvergedCharter-7, at order 17, reads it and writes no row. The closed set
+  and the target-resolves check are dOrderedCharter's, and the ask that set names `explains` is the one
+  PLAY-dConvergedCharter-7 §8 F2 files. Observed by AC9.
 
 - **S1** — The guides' rationale kept before they go (the owner's FQ-6). Each `##` section of
   `memory/guides/UNATTENDED-PROTOCOL.md`, `-VERBS.md`, `-STOPS.md` and `-ASKS.md` whose rule survives in
@@ -116,14 +126,41 @@ before this unit's pass begins:
   `tools/unattended/PLAYBOOK-TEMPLATE.template.md` moves with it by `git mv`, its `[[files]]` row and
   its `[[lf_pin]]` row to the runtime descriptor, and `memory/guides/PLAYBOOK-TEMPLATE.md` keeps
   rendering from there until PLAY-dConvergedCharter-7 takes the render out; `routed-commits selftest` and
-  `policy fixtures` keep their rows and re-point what they read. `tools/gate-legs.json` is re-rendered
-  from the descriptors, never edited. Observed by AC4 and AC8.
+  `policy fixtures` keep their rows and re-point what they read. Gov's manifest `tools/gate-legs.json`
+  is hand-kept, no generator writes it (`tools/govkit/govkit.py:2560-2564`, `:3267`): each leg row is
+  edited by hand in the same commit as the descriptor row it spells, and an exempt leg taken out of the
+  manifest takes its `[[exempt_leg]]` row in `tools/govkit/registry.toml` out in that commit, so check
+  7h never reads the descriptor and the manifest apart. `unattended skill wiring` is not this unit's to take out:
+  DEPL-dShippedRelease-10 S10, a parent built before this build, folds it into `kit wiring (every
+  descriptor's check)`; the legs table is re-derived at the pass from the manifest the parents leave,
+  and a kit leg already gone there is not counted again.
+  The two moved checkers stop needing the kit and its conf. `plan_state`, the classifier
+  `check-pass-order.sh` slices out of the driver (`tools/unattended/check-pass-order.sh:139-142`, its
+  driver guard at `:76`), is re-homed into the runtime library with `GEN_REGION_AWK`, and the moved
+  `check-pass-order.sh` slices it from there; the moved `check-brief-recorded.sh` sources that library in
+  place of `lib-unattended.sh` (`tools/unattended/check-brief-recorded.sh:126-131`), its driver guard
+  (`:142`) testing the library instead. Each checker's guard on `.unattended.conf`
+  (`check-pass-order.sh:75`, `check-brief-recorded.sh:141`) leaves: the folded keys it reads,
+  `MEMORY_ROOT`, `GENERATED_INDEXES` and `SHARED_RECORDS`, come from `policy.py legacy .unattended.conf`,
+  the catalogue rows a reader outside the kit still reads (S2), captured and exit-tested; the retrofit
+  keys `PASS_ORDER_CUTOFF` (`.unattended.conf:461`), `BRIEF_RECORDED_CUTOFF` (`:514`),
+  `PASS_ORDER_PREANCHOR_CAP` and `PASS_ORDER_WAIVER` move, where gov assigns them, into
+  `.memory-tree.conf` beside its other `_CUTOFF` keys, a home that survives the kit, and each checker
+  reads them from there as text, the way it already reads `FORK_ITEM_CUTOFF`
+  (`check-pass-order.sh:151-154`). Observed by AC4 and AC8.
 - **S4** — The lists and the size rows. `memory/project/fork-ceilings.txt:15-16` (the `unattended-status`
   and `check-unattended` entrypoints) and `memory/project/method-carriers.txt`'s rows for the kit's files
   and its Skill (`:5,10-11,15-16,23`) leave; the rows `tools/template-size-limits.txt:131-162`,
   `tools/template-size-highwater.txt:1` and `tools/policy/caps.toml:83-87` leave with the guides and the
   Skill they cap; `memory/project/method-carriers.txt`'s two `unattended-build` rows stay, the harness
-  being `tools/workflows/`'s. Observed by AC5.
+  being `tools/workflows/`'s. Every other `memory/project/*.txt` registry row naming a file of the kit
+  is drained the same way, its population `git grep -l 'unattended/' -- memory/project` at the pass and
+  never a typed list: at base `spawn-idiom-sites.txt` (68 rows), `substitution-fed-loops.txt` (27),
+  `temp-name-sites.txt` (3), `unarmed-branches.txt` (42), `refusal-retirements.txt` (5) and
+  `spec-token-waivers.txt` (1, `routed-commits selftest <- tools/unattended/`). A row naming a file the
+  kit takes out of the tree leaves; a row naming a file S3 moves is re-pointed to its `tools/runtime/` path, as the
+  registry's own scan re-derives it (`sh_hygiene.py:125` fails a row the scan no longer finds), and a
+  waiver row whose guard hit is gone leaves rather than hiding nothing. Observed by AC5.
 - **S5** — The pointers. The charter template's `kit:unattended` fences (`coding-governance-agents.template.md:142-144`
   and `:181-183`) leave, the protocol line re-pointed to the document TOOL-dWellOiledMachine-25 names for
   a run with no owner turn (`help/runtime.md`, its S8) in the runtime kit's fence, and `AGENTS.md`
@@ -152,10 +189,10 @@ before this unit's pass begins:
 
 - **consumes-from** `PLAY-dConvergedCharter-22` — `settings_census.py`, whose `leaves-with` rows name the run conf's extension keys this unit takes out with `.unattended.conf`
 - **consumes-from** `PLAY-dConvergedCharter-11` — `derive_readers`, the inventory by path and by value whose `--readers` CLI lists every reader and reds a survivor on the scratch clone
-- **hands-off** `PLAY-dConvergedCharter-20` — `tools/unattended/`, removed from gov's tree, which the upgrade step removes from an adopter's, the `unattended.*` catalogue rows a reader outside the kit still reads, which its step moves, and the tick forwarder's `unattended/resume-tick` row, which that unit's S4 holds to its window
+- **hands-off** `PLAY-dConvergedCharter-20` — `tools/unattended/`, removed from gov's tree, which the upgrade step removes from an adopter's, the `unattended.*` catalogue rows a reader outside the kit still reads, which its step moves, the tick forwarder's `unattended/resume-tick` row, which that unit's S4 holds to its window, and `.memory-tree.conf` as the moved checkers' cutoff home (S3), into which its step carries an adopter's cutoffs
 - **hands-off** `PLAY-dConvergedCharter-2` — `tools/unattended/`, gone, so `DIRECTIVES_CORE`'s M-number keys no longer hold a positional reference
 - **hands-off** `PLAY-dConvergedCharter-19` — `tools/unattended/`, gone with its guides and its line-ending pin rows, so the tag and class-pin migration never reaches them
-- **hands-off** `PLAY-dConvergedCharter-7` — `explains=`, the edges from units' `help` to the four guides' sections, which its no-lost-rationale arm grades
+- **hands-off** `PLAY-dConvergedCharter-7` — `explains=`, the edges from units' `help` to the four guides' sections, which its no-lost-rationale arm grades, and the `explains` `[[edge]]` row of `edges.toml` S7 writes, which that unit reads and writes no second time
 - **consumes-from** external — TOOL-dWellOiledMachine-25, -28, TOOL-dDeclaredLoop-7, PLAY-dOrderedCharter-9, -15, -24, each specced and unbuilt at base `0d1c1dda`
 
 ## 4. Design
@@ -178,8 +215,9 @@ Read at `d8a12f046`; no product file differs from base `0d1c1dda`.
   `unattended-build self-test` names only the harness (`tools/gate-legs.json`).
 - The four guides render from the kit's templates (`tools/unattended/kit.toml:71,81`); the charter's
   `kit:unattended` fences render to `AGENTS.md:130` and `:160`.
-- `README.md:57` and `.claude/rules/product.md:30` say "four-verb driver"; the driver declares 30
-  verbs (`tools/unattended/unattended.sh:111,114`, gap-tool-08).
+- `README.md:57` and `.claude/rules/product.md:30` say "four-verb driver"; the driver declares 32
+  verbs, `VERBS_SLUG` 26 and `VERBS_INLINE` 6 (`tools/unattended/unattended.sh:113`, `:116`,
+  gap-tool-08).
 - TOOL-dWellOiledMachine-28 S4 leaves `tools/unattended/resume-tick.sh` as a forwarder of one command
   for registered node ticks, deleted when `install.deprecation-window` closes over its step U2, and hands
   "the kit's remaining files and the forwarder's last reader" here (its §3).
@@ -189,11 +227,11 @@ Read at `d8a12f046`; no product file differs from base `0d1c1dda`.
 | Leg | Subject | Fate |
 |---|---|---|
 | `unattended kit gate` | `.unattended.conf` | leaves with the kit |
-| `unattended skill wiring` | the `/unattended` Skill | leaves |
+| `unattended skill wiring` | the `/unattended` Skill | already retired by DEPL-dShippedRelease-10 S10 into `kit wiring (every descriptor's check)`; not counted here |
 | `unattended protocol size` | the rendered protocol guide | leaves, its `[[exempt_leg]]` row too |
 | `unattended skill size` | the rendered Skill | leaves, its `[[exempt_leg]]` row too |
-| `pass-order history` | every build's commits (BUILD-METHOD M6) | `check-pass-order.sh` moves to `tools/runtime/` |
-| `brief-recorded` | every unit's brief | `check-brief-recorded.sh` moves |
+| `pass-order history` | every build's commits (BUILD-METHOD M6) | `check-pass-order.sh` moves to `tools/runtime/`, `plan_state` from the runtime library, its cutoffs from `.memory-tree.conf` (S3) |
+| `brief-recorded` | every unit's brief | `check-brief-recorded.sh` moves, sourcing the runtime library, its cutoff from `.memory-tree.conf` (S3) |
 | `playbook validity gate` | every tracked playbook | `check-playbook.sh` moves, its template `PLAYBOOK-TEMPLATE.template.md` with it |
 | `routed-commits selftest` | `routed_commits.py` | re-points its `lib-unattended.sh` source to the moved library's home |
 | `policy fixtures` | the policy fixtures | re-points its read of the kit's `kit.toml` |
@@ -212,8 +250,9 @@ tree this commit leaves.
 
 ### Inventory
 
-Minted: the `[[retired]]` row `unattended`; the shim id `unattended/resume-tick`. No function is
-minted: the inventory is PLAY-dConvergedCharter-11's `derive_readers`.
+Minted: the `[[retired]]` row `unattended`; the shim id `unattended/resume-tick`; the edge type
+`explains` with its inverse `explained-by` (S7). No function is minted: the inventory is
+PLAY-dConvergedCharter-11's `derive_readers`, and `plan_state` moves with its name.
 
 ### Rollout
 
@@ -225,7 +264,8 @@ carried to the runtime kit by the `successor` of the `[[retired]]` row.
 - `tools/unattended/` (removed but `resume-tick.sh`, re-rendered as the shim)
 - `tools/runtime/check-pass-order.sh`, `tools/runtime/check-brief-recorded.sh`,
   `tools/runtime/check-playbook.sh`, `tools/runtime/PLAYBOOK-TEMPLATE.template.md` and their suites
-  (moved), `tools/runtime/kit.toml`, the runtime library that takes `GEN_REGION_AWK`
+  (moved), `tools/runtime/kit.toml`, the runtime library that takes `GEN_REGION_AWK` and `plan_state`
+- `tools/playbook/edges.toml` (the `explains` row, S7)
 - `tools/lib/resolve-python.test.sh`, `tools/memory-tree/deviation_join.py`,
   `tools/check-spec-tokens.test.sh`, `tools/run-gates/run-selftests.test.sh`,
   `tools/drift-audit/selftest.py`, `tools/runlog/selftest.py`, `tools/memory-tree/marker-contract.test.sh`,
@@ -244,7 +284,10 @@ carried to the runtime kit by the `successor` of the `[[retired]]` row.
 - `tools/gate-legs.json` (rendered from the descriptors), `tools/template-size-limits.txt`,
   `tools/template-size-highwater.txt`, `tools/policy/caps.toml`, `tools/policy/catalogue.toml`,
   `tools/policy/check_policy.py`, `tools/policy/README.md`, `.governance/policy.toml`
-- `memory/project/fork-ceilings.txt`, `memory/project/method-carriers.txt`
+- `memory/project/fork-ceilings.txt`, `memory/project/method-carriers.txt`,
+  `memory/project/spawn-idiom-sites.txt`, `memory/project/substitution-fed-loops.txt`,
+  `memory/project/temp-name-sites.txt`, `memory/project/unarmed-branches.txt`,
+  `memory/project/refusal-retirements.txt`, `memory/project/spec-token-waivers.txt`
 - `coding-governance-agents.template.md` (rendered to `AGENTS.md` by `tools/playbook/`),
   `tools/memory-tree/BUILD-METHOD.template.md` (rendered to `memory/guides/BUILD-METHOD.md`),
   `tools/roles/SKILL.template.md`, `skills/session-kickoff/manifest-check.sh`
@@ -310,14 +353,20 @@ Each scratch clone is built under `%TEMP%` with a short name from the tip of thi
   `unattended/resume-tick` row is graded green and every vanished member is named in the `[[retired]]`
   row's `surfaces`.
   Red when: a vanished member has no row, or the tick forwarder is missing while its row is open.
-- **AC4** — When `python -c "import json,sys; print(len(json.load(open(sys.argv[1]))))" tools/gate-legs.json`
-  runs on the tip it prints the base's 148 less the four legs §4 marks as leaving, and each moved leg's
-  `argv` names `{prefix}/runtime/`.
-  Red when: a leg whose subject survives is lost, or a leg still names a path under `tools/unattended/`.
-  figure: DERIVED from the base count, re-read at observation.
+- **AC4** — When `git show <rev>:tools/gate-legs.json | python -c "import json,sys; L=json.load(sys.stdin);
+  K={'unattended kit gate','unattended skill wiring','unattended protocol size','unattended skill size'};
+  print(len(L), sum(1 for l in L if l['name'] in K))"` runs at the pass's base and at the tip, the tip's
+  first figure is the base's first less the base's second, the tip's second is 0, each moved leg's
+  `argv` names `{prefix}/runtime/`, and `grep -c 'unattended protocol size\|unattended skill size'
+  tools/govkit/registry.toml` prints 0.
+  Red when: a leg whose subject survives is lost, a leg still names a path under `tools/unattended/`, or
+  an exempt leg leaves with its `[[exempt_leg]]` row kept.
+  figure: DERIVED from the manifest the parents leave at the pass's base, re-read at observation.
 - **AC5** — When `grep -c unattended fork-ceilings.txt` and `grep -cE '^(tools/unattended|\.claude/skills/unattended)' method-carriers.txt`
-  run on the tip, each prints 0, and `grep -c unattended template-size-limits.txt` prints 0.
-  Red when: a row names a removed file.
+  run on the tip, each prints 0, `grep -c unattended template-size-limits.txt` prints 0, and `git grep
+  -c 'unattended/' -- memory/project` prints no file.
+  Red when: a row names a removed file, or a registry row the shell-hygiene or harness-arms legs read
+  still names the kit's path.
 - **AC6** — When `grep -n 'four-verb' README.md product.md` runs on the tip it prints nothing, and
   `grep -c 'UNATTENDED-PROTOCOL' AGENTS.md coding-governance-agents.template.md` prints 0 for each.
   Red when: a pointer still names the kit as a driver or the protocol guide.
@@ -329,19 +378,29 @@ Each scratch clone is built under `%TEMP%` with a short name from the tip of thi
   dConvergedCharter` run on a scratch clone of the tip where `tools/unattended/` is absent, the first
   exits 0 reading its template beside it and the second measures, printing no `Unmeasured` line; and
   `bash tools/check-dead-paths.sh` there exits 0 with no hit under `memory/map/features/` or
-  `memory/gotchas/`.
-  Red when: a moved checker loses its template, the deviation join loses its strip, or a live carrier
-  still names a removed file of the kit.
+  `memory/gotchas/`. On the same clone, which holds no `tools/unattended/` and no `.unattended.conf`,
+  `bash check-pass-order.sh` and `bash check-brief-recorded.sh`, run in `tools/runtime/`, each exit 0,
+  and neither prints `ORDER term is OFF` or `BRIEF term is OFF`.
+  Red when: a moved checker loses its template, its classifier, its library or its cutoff, the
+  deviation join loses its strip, or a live carrier still names a removed file of the kit.
   fixture: the clone is built under `%TEMP%` with a short name.
+- **AC9** — When `python edge_grammar.py --list` runs in `tools/playbook/` at the unit's tip, it prints
+  `explains` with inverse `explained-by`, from `unit` to `doc`, and a planted unit row declaring
+  `explained-by=` is red; `git grep -c 'type = "explains"' -- edges.toml` there prints 1.
+  Red when: the type is missing when S1 writes its first edge, its inverse may be declared, or a second
+  row spells it.
 
 ## 7. Gates
 
-`spawn budget (forks per hot entrypoint)` · `pass-order history` · `brief-recorded` · `playbook validity gate` · `playbook render selftest` · `routed-commits selftest` · `policy fixtures` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `kit/dogfood doc parity` · `manifest-check self-test` · `scratch-guard self-test` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `run-gates canary` · `run-gates gov canary` · `run-selftests self-test` · `measure-legs selftest` · `transition-audit arms` · `straggler-guard arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates` · `python resolver (behaviour + inline parity + idiom ban)` · `spec-tokens self-test` · `drift-audit selftest` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `marker contracts` · `run-gates turnstile` · `govkit selfcheck` · `dead-path carriers (deleted files still named)` · `codebase-map coverage + freshness`
+`spawn budget (forks per hot entrypoint)` · `shell hygiene (a loop fed by a command substitution)` · `shell hygiene (a fork spent on builtin work)` · `shell hygiene (a fixed-name temp renamed into place)` · `harness arms (fail branches armed or pinned)` · `pass-order history` · `brief-recorded` · `playbook validity gate` · `playbook render selftest` · `routed-commits selftest` · `policy fixtures` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `kit/dogfood doc parity` · `manifest-check self-test` · `scratch-guard self-test` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `run-gates canary` · `run-gates gov canary` · `run-selftests self-test` · `measure-legs selftest` · `transition-audit arms` · `straggler-guard arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates` · `python resolver (behaviour + inline parity + idiom ban)` · `spec-tokens self-test` · `drift-audit selftest` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `marker contracts` · `run-gates turnstile` · `govkit selfcheck` · `dead-path carriers (deleted files still named)` · `codebase-map coverage + freshness`
 
 The legs this unit removes are named in §4 "The legs"; the kit's suites are waived for this build's
 landing (README rule 8) and leave with it. The arm below is declared for the main loop's close.
 
 New arm: tools/policy/check_policy.py · covers AC2 · the `--readers` run over a scratch clone staged with one surviving path reader and one surviving value reader · none
+
+The `explains` row's grammar arm is PLAY-dOrderedCharter-24's edge-grammar check, which AC9 reads; it is
+not in the manifest at base.
 
 ## 8. Open questions
 
@@ -387,6 +446,16 @@ New arm: tools/policy/check_policy.py · covers AC2 · the `--readers` run over 
   memory root, the regenerated map and the dead-path and codebase-map legs), 6 (the extension keys
   leave with the conf, a row read outside the kit stays for unit 20's step) and 4 (the tick
   forwarder's row is held by PLAY-dConvergedCharter-20 S4 and closed by its kit, release-bound).
+- rev-3 · 2026-11-04 · P4 S3 S4 S7 §1 §3 §4 AC4 AC5 AC8 AC9 §7 · folded
+  `2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1` findings 1 (`plan_state` re-homed in the
+  runtime library, `brief-recorded` sourcing it, the moved checkers' cutoffs homed in `.memory-tree.conf`,
+  AC8 observing both on the kitless clone), 3 (the `explains` `[[edge]]` row moves here from
+  PLAY-dConvergedCharter-7 as S7, P4 needing only the registry, AC9 taking unit 7's AC6, the hands-off
+  edge to unit 7 naming the row), 6 and 32 (the manifest is hand-kept, an exempt leg leaves with its
+  `[[exempt_leg]]` row, `unattended skill wiring` retired by DEPL-dShippedRelease-10 S10, AC4 derived from
+  the pass's base), 23 (32 verbs at `unattended.sh:113`, `:116`) and 30 (every `memory/project/*.txt`
+  registry row naming the kit drained or re-pointed, AC5, and the shell-hygiene and harness-arms legs);
+  the hands-off edge to PLAY-dConvergedCharter-20 names the cutoff home its step carries at an adopter.
 
 ## 10. Reuse audit
 

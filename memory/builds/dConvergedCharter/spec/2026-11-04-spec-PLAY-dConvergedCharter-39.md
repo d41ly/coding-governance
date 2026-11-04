@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-39 — the five renamed `gov-` Skills claimed in the codebase-map dossiers, the drift-audit kit given the dossier it lacks, and the baseline shrunk to match
 
-**Status:** OPEN · rev-1 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 19 · advances PLAY-dConvergedCharter-24
+**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 19 · advances PLAY-dConvergedCharter-24
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-40 |
+| [2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
 
 <!-- /gen:spec-records -->
 
@@ -41,9 +42,15 @@ forwarders at the old paths.
   (PLAY-dConvergedCharter-20 S4), and not in this build. Observed by AC1.
 - **S2** — id 44, the new dossier. `memory/map/features/drift-audit.md`, in the dossier shape
   `memory/map/README.md` states, claims the drift-audit kit's items the baseline carries unclaimed at
-  base: `kits = ["drift-audit"]`, `gate-legs = ["drift-audit records", "drift-audit selftest",
-  "drift-audit wiring"]` and `rendered-skills = ["drift-audit", "gov-drift"]`, with its title, status,
-  streams and paths read from `tools/drift-audit/kit.toml` and its README at the pass. Observed by AC2.
+  base: `kits = ["drift-audit"]`, `gate-legs` and `rendered-skills = ["drift-audit", "gov-drift"]`, with
+  its title, status, streams and paths read from `tools/drift-audit/kit.toml` and its README at the
+  pass. The `gate-legs` claims are DERIVED at the pass from the manifest `tools/gate-legs.json` and the
+  baseline the parents leave, never typed from the base: each `drift-audit …` leg the manifest still
+  holds and the baseline carries unclaimed. At base those are `drift-audit records`, `drift-audit
+  selftest` and `drift-audit wiring`, but DEPL-dShippedRelease-10 S10, a parent built before this build,
+  folds `drift-audit wiring` into `kit wiring (every descriptor's check)`, so it is not claimed here;
+  and `kit wiring (every descriptor's check)` is claimed only by the dossier that owns the run-gates kit,
+  never by this one. Observed by AC2 and AC3.
 - **S3** — id 44, the baseline shrinks. Each key S2 claims moves from `memory/map/baseline.toml`
   (`:21-23`, `:36`, `:49` at base) into the new dossier's claims and stays in the inventory: its
   baseline line is taken out by hand, as the file's own grammar asks of a claimed item (`:1-5`), and no
@@ -75,7 +82,10 @@ Read at `e6909dcaa`; no product file differs from base `0d1c1dda`.
   `["lexicon"]`, `memory-recall.md:22` `["memory-recall"]`, `runlog.md:21` `["runlog"]`; no file under
   `memory/map/features/` names the drift-audit kit as its feature.
 - `memory/map/baseline.toml` carries the drift-audit kit's `gate-legs` (`:21-23`), its `kits` entry
-  (`:36`) and its `rendered-skills` entry (`:49`), and only shrinks (`:1-5`).
+  (`:36`) and its `rendered-skills` entry (`:49`), and only shrinks (`:1-5`). Of the three legs,
+  `drift-audit wiring` leaves the manifest with DEPL-dShippedRelease-10 S10
+  (`memory/builds/dShippedRelease/spec/2026-10-30-spec-DEPL-dShippedRelease-10.md:116-119`) before this
+  unit's pass, so a claim of it would read STALE.
 
 ### Inventory
 
@@ -120,13 +130,17 @@ commits is not run; the close runs it once.
   runs at the unit's tip, it prints one `rendered-skills` line in each of the four dossiers, each line
   also holding its old name.
   Red when: a renamed Skill's new key is unclaimed, or its forwarder's old key loses its claim.
-- **AC2** — When `grep -n "gov-drift" drift-audit.md` runs in `memory/map/features/` and `grep -c
-  "drift-audit" memory/map/baseline.toml` runs at the tip, the first prints the claim and the second prints 0.
-  Red when: `gov-drift` has no dossier, or a key S2 claims still sits in the baseline.
+- **AC2** — When `grep -n "gov-drift" drift-audit.md` runs in `memory/map/features/`, and each key the
+  new dossier claims is grepped in `memory/map/baseline.toml` at the tip, the first prints the claim and
+  no claimed key is found in the baseline; `grep -c 'drift-audit wiring' drift-audit.md` prints 0.
+  Red when: `gov-drift` has no dossier, a key S2 claims still sits in the baseline, or a leg the parents
+  retired is claimed.
 - **AC3** — When `python tools/codebase-map/gen_map.py --write` runs at the tip, `git diff --exit-code --
-  memory/map/generated/` exits 0, and `memory/map/generated/inventories.json` lists the five `gov-` keys
-  under `rendered-skills`.
-  Red when: the generated map is stale against the dossiers, or an entry is missing from the inventory.
+  memory/map/generated/` exits 0, `memory/map/generated/inventories.json` lists the five `gov-` keys
+  under `rendered-skills`, and it lists under `gate-legs` every key the new dossier claims there.
+  Red when: the generated map is stale against the dossiers, an entry is missing from the inventory, or
+  the new dossier claims a `gate-legs` key the inventory does not hold, which the coverage leg reads
+  STALE.
 
 ## 7. Gates
 
@@ -141,6 +155,12 @@ none
 - rev-1 · 2026-11-04 · initial draft, promoted by the disposal of
   `2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1` for finding 44 (MEDIUM, item M25), repairing
   PLAY-dConvergedCharter-9; that unit's §3 rewritten as this unit's sibling edit (its rev-3).
+- rev-2 · 2026-11-04 · S2 §4 AC2 AC3 · folded
+  `2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1` findings 7 and 34: the new dossier's
+  `gate-legs` claims are derived at the pass from the manifest and baseline the parents leave, `drift-audit
+  wiring` dropped as retired by DEPL-dShippedRelease-10 S10, `kit wiring (every descriptor's check)` left
+  to the run-gates dossier, and AC2 and AC3 checking every claimed leg against the baseline and the
+  inventory.
 
 ## 10. Reuse audit
 

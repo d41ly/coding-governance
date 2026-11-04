@@ -36,3 +36,7 @@ base: 0d1c1dda4b5656df0a6341dba492ae1f75e8bd61
 2026-11-04T10:30:44Z rescope · item add PLAY-dConvergedCharter-39 · reason closes 2026-11-04 spec-audit round1 finding 44 (MEDIUM): the renamed gov- Skills claimed in the codebase-map dossiers, a drift-audit dossier added
 
 2026-11-04T11:25:10Z review · item dConvergedCharter-spec-set-r1 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 11 · minors 44 · folded 53 · promoted 2 · disposition promote
+
+2026-11-04T12:20:47Z rescope · item add PLAY-dConvergedCharter-40 · reason closes 2026-11-04 spec-audit PLAY-dConvergedCharter-22 round1 finding 27 (MEDIUM): guide_move.py apply amends an existing unit's help and edge under an edit change record
+
+2026-11-04T12:57:03Z review · item dConvergedCharter-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 9 · minors 31 · folded 39 · promoted 1 · disposition promote
