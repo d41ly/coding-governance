@@ -58,7 +58,7 @@ from = ["unit"]
 to = ["selects"]
 pin = "none"
 status = "declared"
-declared-at = "the unit's select"
+declared-at = "the unit's scope"
 
 [[edge]]
 type = "enforces"

@@ -201,7 +201,7 @@ resolves.
 **Where edges are read.** Beyond the `**Edges:**` line: a record's `**Serves:**` line as `serves` and
 its `**Caused-by:**` and `**Made-by:**` lines; a spec's `**Carries:**` line as `carries-clause`; a
 work order's `gov:handoff` marker's `unit=` and `build=` as `serves`; an instruction unit's `edges`,
-`select`, `required-by` and `enforced-by`; a code note's `refs=` segment; and a commit's trailers,
+`scope`, `required-by` and `enforced-by`; a code note's `refs=` segment; and a commit's trailers,
 `Pass:`, `Gov-Unit:` and `Gov-Item:` as `serves`, `Gov-Act:` as `made-by`, `Gov-Session:` as
 `runs-in` and `Decided:` as `decides`. The trailer keys are the `[[trailer]]` rows of `edges.toml`.
 

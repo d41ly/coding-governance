@@ -233,7 +233,7 @@ LAND = ("# Land\n\n## Members\n\n" + EDGE.format("part-of", TAG) + "\n## Cites\n
 NOTE = "# gov:note fixture refs=" + TAG + "\n"
 #: AC1's sources: a part-of in a guide section and one in a whole record, a unit selecting the tag, a cite
 MANIFEST = {"memory/guides/LAND.md": LAND, "memory/notes/whole.md": EDGE.format("part-of", TAG),
-            "tools/corekit/instructions.toml": f'[[unit]]\ntag = "unit.alpha"\nselect = ["{TAG}"]\n'}
+            "tools/corekit/instructions.toml": f'[[unit]]\ntag = "unit.alpha"\nscope = ["{TAG}"]\n'}
 
 
 def derive_fold_files(alpha, beta, notes) -> dict:

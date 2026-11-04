@@ -26,7 +26,7 @@ whose `pin` is `tag` (`amends`, `supersedes`), a pinned id only on one whose `pi
 
 THE SITES, one adapter each: a record's header (`**Serves:**` through `tree_lib.read_bindings`,
 `**Caused-by:**`, `**Made-by:**`), a record's section (`**Edges:**`), an instruction unit's row (`edges`,
-`select`, `required-by`, `enforced-by`), code (a `gov:note` line's `refs=` segment), a commit's trailers
+`scope`, `required-by`, `enforced-by`, read through the registry's `parse_unit_rows`), code (a `gov:note` line's `refs=` segment), a commit's trailers
 (the `[[trailer]]` table), a work order's `gov:handoff` marker (`unit=` and `build=`) and a spec's
 `**Carries:**` line (through `design_lib.parse_binding_lines`, its one parser).
 
@@ -82,7 +82,7 @@ FORMS = (
 PIN_OF = {"pinned-tag": "tag", "pinned-id": "clause"}
 HEADER_RE = re.compile(r"^\*\*(Caused-by|Made-by):\*\*[ \t]+(\S.*?)[ \t]*$")
 NOTE_RE = re.compile(r"^[ \t]*(?:#+|//|--|;|/?\*+|<!--)[ \t]*gov:note[ \t].*?[ \t]refs=(.*?)[ \t]*(?:-->|\*/)?[ \t]*$")
-UNIT_FIELDS = (("select", "instructs", False), ("required-by", "instructs", True), ("enforced-by", "enforces", True))
+UNIT_FIELDS = (("scope", "instructs", False), ("required-by", "instructs", True), ("enforced-by", "enforces", True))
 
 
 class EdgeError(RuntimeError):
@@ -306,29 +306,27 @@ def read_carries_edges(text, path) -> list[dict]:
 
 
 def read_unit_edges(text, path) -> list[dict]:
-    """An instruction unit file's `[[unit]]` rows: each row's `edges` list in the edge grammar, its `select`
-    as `instructs` targets, its `required-by` as the sources that instruct it and its `enforced-by` as the
-    sources that enforce it. A malformed entry is an EdgeRefusal naming it."""
-    try:
-        units = tomllib.loads(text).get("unit") or []
-    except tomllib.TOMLDecodeError as exc:
-        raise EdgeRefusal(f"edges: {path}: the unit file is no TOML: {exc}") from None
-    lines = text.splitlines()
-    edges, bad = [], []
+    """An instruction unit file's `[[unit]]` rows, read through the registry's `parse_unit_rows`: each row's
+    `edges` list in the edge grammar, its `scope` as `instructs` targets, its `required-by` as the sources
+    that instruct it and a list `enforced-by` as the sources that enforce it, the string `none — <why>`
+    none. A row the reader cannot read and a malformed entry are each an EdgeRefusal line naming it."""
+    from instruction_units import parse_unit_rows
+    units, faults = parse_unit_rows(text, path)
+    edges, bad = [], [str(f) for f in faults]
     for u in units:
-        tag = u.get("tag", "")
-        n = next((i for i, ln in enumerate(lines, 1) if f'"{tag}"' in ln), 1)
-        at = {"path": path, "line": n, "site": "unit"}
-        for entry in u.get("edges") or []:
-            kind, _, rest = str(entry).partition("=")
+        tag = u.tag or ""
+        at = {"path": path, "line": u.line, "site": "unit"}
+        for entry in u.edges:
+            kind, _, rest = entry.partition("=")
             why = None if TYPE_RE.fullmatch(kind) and rest else "holds no `type=` pair"
             why = why or next(filter(None, map(derive_target_fault, rest.split(","))), None)
             if why:
-                bad.append(f"{path}:{n}: unit {tag} edges entry '{entry}' {why}")
+                bad.append(f"{path}:{u.line}: unit {tag} edges entry '{entry}' {why}")
             else:
                 edges.append({**at, "type": kind, "targets": rest.split(","), "source": tag})
         for field, kind, inbound in UNIT_FIELDS:
-            for v in u.get(field) or []:
+            vals = getattr(u, field.replace("-", "_"))
+            for v in vals if isinstance(vals, tuple) else ():
                 edges.append({**at, "type": kind, "targets": [tag] if inbound else [v],
                               "source": v if inbound else tag})
     if bad:
@@ -451,16 +449,12 @@ def read_text_history(root, path, extract, digest) -> dict:
 
 
 def derive_unit_texts(text):
-    """`(tag, text)` of each `[[unit]]` table of a unit file: its header line to the next table's. Stands in
-    for the unit registry's reader until PLAY-dOrderedCharter-9 lands its rows."""
-    for chunk in re.split(r"(?m)^(?=\[)", text):
-        if chunk.startswith("[[unit]]"):
-            try:
-                tag = (tomllib.loads(chunk).get("unit") or [{}])[0].get("tag")
-            except tomllib.TOMLDecodeError:
-                continue
-            if tag:
-                yield tag, chunk
+    """`(tag, body)` of each readable `[[unit]]` row of a unit file, through the registry's
+    `parse_unit_rows`: its header line to the next table's."""
+    from instruction_units import parse_unit_rows
+    for u in parse_unit_rows(text, "")[0]:
+        if u.tag:
+            yield u.tag, u.body
 
 
 def derive_view_texts(text):
@@ -559,8 +553,9 @@ def run_resolve(edges, rc, lenient=("serves",)) -> tuple[list, dict]:
 
 def read_tree_edges(root, base) -> tuple[list, list]:
     """Every edge of the tree at `root`: `(edges, refusals)`, the refusals one line per malformed line.
-    Markdown under MEMORY_ROOT is read for headers, sections, carries and markers; every `instructions.toml`
-    for units; every non-Markdown file naming a note for its refs; and the trailers of `base..HEAD`."""
+    Markdown under MEMORY_ROOT is read for headers, sections, carries and markers; every unit manifest
+    `derive_manifest_kind` names for units; every non-Markdown file naming a note for its refs; and the trailers of `base..HEAD`."""
+    from instruction_units import derive_kit_prefix, derive_manifest_kind
     tree_lib, _ = ti.load_memory_tree()
     import design_lib
     conf = design_lib.read_design_conf(root)
@@ -571,10 +566,12 @@ def read_tree_edges(root, base) -> tuple[list, list]:
     grep = subprocess.run(["git", "-C", str(root), "grep", "-l", "-I", "-F", "gov:note", "--", ".", ":!*.md"],
                           capture_output=True, text=True, encoding="utf-8", errors="replace")
     notes = set(grep.stdout.splitlines()) if grep.returncode == 0 else set()
+    prefix = derive_kit_prefix()
     edges, bad = [], []
     for rel in tracked:
         md = rel.endswith(".md") and rel.startswith(m + "/")
-        if not (md or rel.endswith("instructions.toml") or rel in notes):
+        unit = derive_manifest_kind(rel, prefix) is not None
+        if not (md or unit or rel in notes):
             continue
         try:
             text = (root / rel).read_bytes().decode("utf-8").replace("\r\n", "\n")
@@ -589,7 +586,7 @@ def read_tree_edges(root, base) -> tuple[list, list]:
                     edges += read_carries_edges(text, rel)
                 if "gov:handoff" in text:
                     edges += read_handoff_edges(text, rel)
-            elif rel.endswith("instructions.toml"):
+            elif unit:
                 edges += read_unit_edges(text, rel)
             else:
                 edges += read_note_refs(text, rel)

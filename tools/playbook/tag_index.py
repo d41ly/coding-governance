@@ -143,12 +143,13 @@ CITATIONS = "tag_index:extract_citations"
 
 
 def resolve_extractor_module(mod_name, registry_dir) -> pathlib.Path:
-    """The file defining `<module>`: `<module>.py` beside the registry, or this file for a `tag_index` the
-    registry's directory does not hold (a fixture's). `--gc` reads another worktree's map, so its
-    `tag_index` is that worktree's own copy."""
+    """The file defining `<module>`: `<module>.py` beside the registry, or the one of this file's own kit
+    directory, `tag_index` and `instruction_units` among them, for a module the registry's directory does
+    not hold (a fixture's). `--gc` reads another worktree's map, so its modules are that worktree's copies."""
     own = pathlib.Path(registry_dir) / f"{mod_name}.py"
-    if mod_name == "tag_index" and not own.is_file():
-        return pathlib.Path(os.path.abspath(__file__))
+    kit = pathlib.Path(os.path.abspath(__file__)).parent / f"{mod_name}.py"
+    if not own.is_file() and kit.is_file():
+        return kit
     return own
 
 
@@ -245,9 +246,8 @@ def extract_doc(ctx, path, text=None):
     return rows
 
 
-OVERLAY_UNITS = ".governance/instructions.toml"
 #: the extractors whose members are unit rows themselves, which a unit's `scope` never selects
-UNIT_EXTRACTORS = ("tag_index:extract_unit", "tag_index:extract_repo")
+UNIT_EXTRACTORS = ("instruction_units:extract_unit", "instruction_units:extract_repo")
 
 
 def read_toml_tags(text, table):
@@ -270,39 +270,6 @@ def read_toml_tags(text, table):
 def derive_tag_rows(text, table):
     lines = text.splitlines()
     return [(val, "tag", n, n, lines[n - 1] if lines else "") for val, n in read_toml_tags(text, table)]
-
-
-def derive_unit_rows(text):
-    """A `[[unit]]` file's rows: each unit's `tag`, and each value of its `scope` as a `selector` row."""
-    rows = derive_tag_rows(text, "unit")
-    try:
-        units = tomllib.loads(text).get("unit") or []
-    except tomllib.TOMLDecodeError:
-        return rows
-    lines = text.splitlines()
-    for unit in units:
-        scope = unit.get("scope") if isinstance(unit, dict) else None
-        for val in scope if isinstance(scope, list) else ():
-            if isinstance(val, str) and val:
-                n = next((i for i, ln in enumerate(lines, 1) if f'"{val}"' in ln), 1)
-                rows.append((val, "selector", n, n, lines[n - 1] if lines else ""))
-    return rows
-
-
-def extract_unit(ctx, path, text=None):
-    """The `unit` namespace: the `tag` of each `[[unit]]` row of every kit's `instructions.toml`, and each
-    `scope` value as a `selector` row; `.governance/`'s rows are the `repo` namespace's. Empty until a
-    build lands rows."""
-    if text is None:
-        return "" if pathlib.PurePosixPath(path).name == "instructions.toml" and path != OVERLAY_UNITS else None
-    return derive_unit_rows(text)
-
-
-def extract_repo(ctx, path, text=None):
-    """The `repo` namespace: the units of `.governance/instructions.toml`, the repository's own (S14)."""
-    if text is None:
-        return "" if path == OVERLAY_UNITS else None
-    return derive_unit_rows(text)
 
 
 def _read_kit_file(ctx, path, name):

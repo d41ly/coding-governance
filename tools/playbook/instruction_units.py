@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """instruction_units.py — the instruction ladder, levels 0 to 7, and the one term for a place on it
-(PLAY-dOrderedCharter-13); the statement grammar and the render provenance lock (PLAY-dOrderedCharter-12).
+(PLAY-dOrderedCharter-13); the statement grammar and the render provenance lock (PLAY-dOrderedCharter-12);
+the instruction-unit registry, its one reader and documents rendered from units (PLAY-dOrderedCharter-9).
 
     python instruction_units.py ladder-terms             # the leg: no source names a ladder place by priority or rank
     python instruction_units.py grammar [--doc <path>]   # the leg: unit rows, unit-rendered documents, the lock
@@ -17,10 +18,18 @@ LADDER-TERMS reds each line of a tracked instruction source, the closed pathspec
 names an instruction's place as a priority or a rank with a number, naming the path, the line and the remedy;
 a pathspec list matching no tracked file is red, never green.
 
+THE REGISTRY. Each kit's `instructions.toml` holds one `[[unit]]` table per unit. `parse_unit_rows` is
+the one reader of a manifest's text, a working-tree file or a blob at any revision: a `Unit` per readable
+row and a `UnitRowError` per row it cannot read. `derive_manifest_kind` names the population, `kit` for
+`<prefix>/<dir>/instructions.toml` and `overlay` for `.governance/instructions.toml`; `read_units` reads
+every kit manifest, `origin` the kit's descriptor `id`; `extract_unit` and `extract_repo` are the tag
+index's extractors of the `unit` and `repo` namespaces. `derive_unit_selection` picks a document's units
+by selector, and `render_unit` gives the line each loads as, a derived unit's from its source.
+
 THE STATEMENT GRAMMAR. Every loaded unit is one of `STATEMENT_TYPES`; `check_statement` grades a unit row
 against its type and `check_document` a rendered document for the four shapes that load without giving
-direction. GRAMMAR grades every unit row through unit 9's reader, `unarmed` until it lands, every lock row
-whose `units` is non-empty through `check_document`, and the lock; `--doc` grades one document on demand.
+direction. GRAMMAR grades every unit row `read_units` returns, `unarmed` while the tree holds none, every
+lock row whose `units` is non-empty through `check_document`, and the lock; `--doc` grades one document.
 
 THE LOCK, `.governance/instructions.lock`, carries render provenance instead of the loaded text: one
 `[[target]]` row per rendered target, `path`, `blob` (the git blob id of the rendered bytes), `units`
@@ -33,15 +42,18 @@ Exit 0 green, 1 red, 2 a usage refusal.
 """
 from __future__ import annotations
 
+import functools
 import os
 import json
 import pathlib
 import re
+import shlex
 import shutil
 import subprocess
 import sys
 import tempfile
 import tomllib
+from dataclasses import dataclass
 
 sys.dont_write_bytecode = True
 
@@ -107,6 +119,15 @@ LOCK_SHAPES = {
     "template": re.compile(r"[^\s@]+@v[0-9]+\.[0-9]+"),
 }
 
+MANIFEST = "instructions.toml"
+OVERLAY = ".governance/instructions.toml"
+UNIT_HEADER = "[[unit]]"
+EVERY = "reader.every"
+ENFORCED_NONE = "none — "
+#: S1's string fields and list fields, in their row spelling; `level`, `enforced-by` and `class` read apart
+UNIT_STRINGS = ("tag", "type", "trigger", "budget", "text", "source", "owner", "usage", "help")
+UNIT_LISTS = ("scope", "required-by", "edges")
+
 
 class LockError(ValueError):
     """A lock that cannot be read."""
@@ -132,6 +153,212 @@ def run_git(root, *args) -> str:
     if done.returncode:
         raise LevelError(f"git {' '.join(args[:2])} failed: {done.stderr.decode('utf-8', 'replace').strip()}")
     return done.stdout.decode("utf-8", "replace")
+
+
+class UnitRowError(ValueError):
+    """A unit row the reader cannot read, naming its manifest and its row; `read_units` raises one naming
+    every fault of the tree, and a refused render raises one naming the unit and its source."""
+
+
+@dataclass(frozen=True)
+class Unit:
+    """One `[[unit]]` row as S1 reads it: `origin` the kit's descriptor `id`, never a row field; `line` its
+    header's line and `body` its text from that header to the next table header."""
+    tag: str | None
+    level: int | None
+    type: str | None
+    scope: tuple
+    trigger: str | None
+    budget: str | None
+    text: str | None
+    source: str | None
+    origin: str | None
+    owner: str | None
+    usage: str | None
+    help: str | None
+    required_by: tuple
+    enforced_by: tuple | str
+    klass: str
+    edges: tuple
+    path: str
+    index: int
+    line: int
+    body: str
+
+
+@functools.lru_cache(maxsize=None)
+def derive_kit_prefix() -> str:
+    """The parent of this module's own kit directory inside its repository: `tools` in gov, empty at the top."""
+    here = pathlib.PurePosixPath(run_git(KIT_DIR, "rev-parse", "--show-prefix").strip().rstrip("/"))
+    return here.parent.as_posix().strip(".")
+
+
+def derive_manifest_kind(path, prefix) -> str | None:
+    """S2's one population predicate: `kit` for `<prefix>/<dir>/instructions.toml`, `overlay` for
+    `.governance/instructions.toml`, else None."""
+    if path == OVERLAY:
+        return "overlay"
+    head, parts = [s for s in str(prefix).split("/") if s not in ("", ".")], str(path).split("/")
+    return "kit" if parts[-1] == MANIFEST and len(parts) == len(head) + 2 and parts[:len(head)] == head else None
+
+
+def parse_unit_rows(text, path, origin=None) -> tuple[list, list]:
+    """S2's text entry, the one parser of a manifest: `(units, faults)` of one manifest's text, a `Unit` per
+    readable `[[unit]]` table in row order and a `UnitRowError` per row it cannot read, naming the file and
+    the row's index or tag. Field rules beyond a field's TOML type are the schema check's."""
+    heads, n, faults = [], 1, []
+    for chunk in re.split(r"(?m)^(?=\[)", text):
+        if chunk.startswith(UNIT_HEADER):
+            heads.append((n, chunk))
+        n += chunk.count("\n")
+
+    def add_fault(i, tag, why):
+        name = f" ({tag})" if isinstance(tag, str) and tag else ""
+        at = f" at line {heads[i - 1][0]}" if 0 < i <= len(heads) else ""
+        faults.append(UnitRowError(f"{path}: unit row {i}{name}{at} · {why}"))
+
+    try:
+        rows = tomllib.loads(text).get("unit")
+    except tomllib.TOMLDecodeError as exc:
+        for i in range(1, max(len(heads), 1) + 1):
+            add_fault(i, None, f"the manifest is no TOML: {exc}")
+        return [], faults
+    rows = [] if rows is None else rows
+    if not isinstance(rows, list):
+        add_fault(1, None, "`unit` is no array of [[unit]] tables")
+        return [], faults
+    units = []
+    for i, row in enumerate(rows, 1):
+        if not isinstance(row, dict):
+            add_fault(i, None, "the row is no table")
+            continue
+        tag = row.get("tag")
+        if len(rows) != len(heads):
+            add_fault(i, tag, "the row sits under no [[unit]] header")
+            continue
+        bad, vals = [], {}
+        for key in UNIT_STRINGS:
+            vals[key] = row.get(key)
+            if vals[key] is not None and not isinstance(vals[key], str):
+                bad.append(f"`{key}` is no string")
+        for key in UNIT_LISTS:
+            v = row.get(key, [])
+            vals[key] = tuple(v) if isinstance(v, list) else ()
+            if not isinstance(v, list) or not all(isinstance(x, str) for x in v):
+                bad.append(f"`{key}` is no list of strings")
+        level = row.get("level")
+        if level is not None:
+            try:
+                level = parse_level(level)
+            except LevelError as exc:
+                bad.append(f"`level` · {exc}")
+        enforced = row.get("enforced-by", [])
+        if isinstance(enforced, list) and all(isinstance(x, str) for x in enforced):
+            enforced = tuple(enforced)
+        elif not (isinstance(enforced, str) and enforced.startswith(ENFORCED_NONE)
+                  and enforced[len(ENFORCED_NONE):].strip()):
+            bad.append("`enforced-by` is no list of descriptions and no `none — <why>`")
+        klass = row.get("class", "fixed")
+        if not isinstance(klass, str):
+            bad.append("`class` is no string")
+        if bad:
+            add_fault(i, tag, "; ".join(bad))
+            continue
+        line, body = heads[i - 1]
+        units.append(Unit(tag=vals["tag"], level=level, type=vals["type"], scope=vals["scope"],
+                          trigger=vals["trigger"], budget=vals["budget"], text=vals["text"],
+                          source=vals["source"], origin=origin, owner=vals["owner"], usage=vals["usage"],
+                          help=vals["help"], required_by=vals["required-by"], enforced_by=enforced,
+                          klass=klass, edges=vals["edges"], path=path, index=i, line=line, body=body))
+    return units, faults
+
+
+def read_units(root) -> list:
+    """S2's tree entry: the Units of every `kit` manifest git tracks under `root`, in path then row order,
+    each `origin` its kit's descriptor `id`. Raises one UnitRowError naming every fault."""
+    root, prefix = pathlib.Path(root), derive_kit_prefix()
+    paths = sorted(p for p in run_git(root, "ls-files", "-z", "--", f"*{MANIFEST}").split("\0")
+                   if p and derive_manifest_kind(p, prefix) == "kit")
+    units, faults = [], []
+    for rel in paths:
+        try:
+            kit = tomllib.loads((root / rel).parent.joinpath("kit.toml").read_text(encoding="utf-8")).get("id")
+        except (OSError, tomllib.TOMLDecodeError):
+            kit = None
+        try:
+            text = (root / rel).read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as exc:
+            faults.append(UnitRowError(f"{rel}: the manifest is unreadable: {exc}"))
+            continue
+        got, bad = parse_unit_rows(text, rel, kit if isinstance(kit, str) else None)
+        units += got
+        faults += bad
+    if faults:
+        raise UnitRowError("\n".join(str(f) for f in faults))
+    return units
+
+
+def extract_unit(ctx, path, text=None):
+    """The `unit` namespace: each readable row's `tag` of every kit manifest, and each `scope` value as a
+    `selector` row; the overlay's rows are the `repo` namespace's. `text` is a blob at any revision, read
+    through `parse_unit_rows`; a row's fault is the schema and edge checks' to red, never the index's."""
+    if text is None:
+        return "" if derive_manifest_kind(path, derive_kit_prefix()) == "kit" else None
+    lines, rows = text.splitlines(), []
+    for u in parse_unit_rows(text, path)[0]:
+        span = lines[u.line - 1:u.line - 1 + u.body.count("\n") + 1]
+        for val, kind in [(u.tag, "tag")] * bool(u.tag) + [(v, "selector") for v in u.scope if v]:
+            n = u.line + next((i for i, ln in enumerate(span) if f'"{val}"' in ln), 0)
+            rows.append((val, kind, n, n, lines[n - 1] if lines else ""))
+    return rows
+
+
+def extract_repo(ctx, path, text=None):
+    """The `repo` namespace: the units of `.governance/instructions.toml`, the repository's own (S14)."""
+    if text is None:
+        return "" if derive_manifest_kind(path, derive_kit_prefix()) == "overlay" else None
+    return extract_unit(ctx, path, text)
+
+
+def derive_unit_selection(units, selector) -> list:
+    """S4: the units a document holds, those whose `scope` holds `selector` or `reader.every`, ordered by
+    level, then manifest path, then row order."""
+    wanted = {selector, EVERY}
+    return sorted((u for u in units if wanted & set(u.scope)),
+                  key=lambda u: (len(LEVELS) if u.level is None else u.level, u.path, u.index))
+
+
+def render_unit(unit, policy_reader) -> str:
+    """S4: the line a unit loads as: its `text` when typed; a `policy:<key>` source's value lines through
+    `policy_reader(key)`, one member per line; a `cmd:<command>` source's output, never typed text. A
+    refused read refuses the render, a UnitRowError naming the unit, the key and the reader's line."""
+    from policy_value import PolicyRefused
+    if unit.type not in (POLICY_VALUE, FACT):
+        return unit.text or ""
+    kind, _, arg = (unit.source or "").partition(":")
+    where = f"{unit.path}: unit {unit.tag}"
+    if kind == "policy":
+        try:
+            return "\n".join(policy_reader(arg)[0])
+        except PolicyRefused as exc:
+            raise UnitRowError(f"{where} · the render is refused: policy {exc.key}: {exc.line}") from None
+    if kind == "cmd":
+        try:
+            done = subprocess.run(shlex.split(arg), capture_output=True, text=True, encoding="utf-8",
+                                  errors="replace", stdin=subprocess.DEVNULL)
+        except (OSError, ValueError) as exc:
+            raise UnitRowError(f"{where} · the render is refused: `{arg}` did not run: {exc}") from None
+        if done.returncode:
+            raise UnitRowError(f"{where} · the render is refused: `{arg}` exited {done.returncode}")
+        return done.stdout.rstrip("\n")
+    # ponytail: no probe registry exists, so a `probe:<name>` source refuses; its runner lands with the registry
+    raise UnitRowError(f"{where} · the render is refused: source {unit.source!r} names no policy key and "
+                       f"no command")
+
+
+def render_units(units, policy_reader) -> str:
+    """S4: the units' rendered lines joined, one line per unit."""
+    return "\n".join(render_unit(u, policy_reader) for u in units)
 
 
 def run_ladder_terms(root=".") -> tuple[list, int]:
@@ -302,7 +529,7 @@ def derive_unit_pin(text) -> str:
 
 def read_lock(root=".") -> list[dict]:
     """S4's one reader: the lock's `[[target]]` rows, `[]` for an absent lock. Raises LockError on a lock
-    that does not parse."""
+    that does not parse and on a `target` entry that is no table, naming the entry."""
     path = pathlib.Path(root) / LOCK
     if not path.is_file():
         return []
@@ -310,7 +537,12 @@ def read_lock(root=".") -> list[dict]:
         rows = tomllib.loads(path.read_text(encoding="utf-8")).get("target") or []
     except tomllib.TOMLDecodeError as exc:
         raise LockError(f"{LOCK} does not parse: {exc}") from None
-    return [r for r in rows if isinstance(r, dict)]
+    if not isinstance(rows, list):
+        raise LockError(f"{LOCK}: `target` is {rows!r}, no array of [[target]] tables")
+    for i, r in enumerate(rows, 1):
+        if not isinstance(r, dict):
+            raise LockError(f"{LOCK}: target entry {i}, {r!r}, is no table")
+    return rows
 
 
 def write_lock_row(root, path, renderer, template, units=()) -> dict:
@@ -367,20 +599,33 @@ def check_lock(root=".") -> tuple[list, int]:
 
 
 def run_grammar(root=".", doc=None) -> tuple[list, int]:
-    """S7: `--doc` grades one document through S3; bare, the unit rows through unit 9's reader, the lock's
-    rows whose `units` is non-empty through S3, and the lock through S6."""
+    """S7: `--doc` grades one document through S3; bare, every unit row `read_units` returns through
+    `check_statement`, `unarmed` with none, the lock's rows whose `units` is non-empty through S3, and
+    the lock through S6."""
     root = pathlib.Path(root)
     if doc is not None:
         found = check_document((root / doc).read_text(encoding="utf-8"))
         return found + [f"{SAY}: grammar · {doc} · {len(found)} red"], 1 if found else 0
-    lines = [f"{SAY}: grammar · units · unarmed: no unit reader (PLAY-dOrderedCharter-9)"]
+    try:
+        units, reds = read_units(root), []
+    except UnitRowError as exc:
+        units, reds = [], [f"{SAY}: red · {ln}" for ln in str(exc).splitlines()]
+    for u in units:
+        reds += check_statement({"tag": u.tag, "type": u.type, "text": u.text, "source": u.source,
+                                 "trigger": u.trigger, "enforced-by": u.enforced_by},
+                                lambda tag: load_resolver(root)(tag))
+    if not units and not reds:
+        lines = [f"{SAY}: grammar · units · unarmed: the tree holds no unit row (PLAY-dOrderedCharter-40 "
+                 f"writes the first)"]
+    else:
+        lines = [f"{SAY}: grammar · units · {len(units)} row(s) · {len(reds)} red"] + reds
     found = []
     graded = [r for r in read_lock(root) if r.get("units")]
     for r in graded:
         found += check_document((root / r["path"]).read_text(encoding="utf-8"), r["units"])
     lines += found + [f"{SAY}: grammar · {len(graded)} unit-rendered document(s) · {len(found)} red"]
     lock_lines, rc = check_lock(root)
-    return lines + lock_lines, 1 if found or rc else 0
+    return lines + lock_lines, 1 if reds or found or rc else 0
 
 
 class Case:
@@ -561,13 +806,225 @@ def arm_lock(c):
     lines, rc = check_lock(c.top)
     c.check("a rendered charter carrying a version marker reds",
             rc == 1 and any("carries a version marker" in ln for ln in lines), " | ".join(lines))
+    c.write_file(LOCK, 'target = ["AGENTS.md"]\n')
+    try:
+        said = f"it read {read_lock(c.top)}"
+    except LockError as exc:
+        said = str(exc)
+    c.check("a target entry that is no table refuses naming the entry", "target entry 1, 'AGENTS.md'" in said, said)
     lock.unlink()
     lines, rc = check_lock(c.top)
     c.check("an absent lock reds", rc == 1 and "holds no row" in lines[0], " | ".join(lines))
 
 
+#: S6's manifests: every S1 field on one row, the second declaring no class and a forged `origin`
+FULL_ROW = '''[[unit]]
+tag = "unit.full"
+level = 3
+type = "directive"
+scope = ["reader.every"]
+trigger = "always"
+budget = "line"
+text = "MUST probe the map, then recall."
+source = "policy:tags.slice"
+owner = "dFixture"
+usage = "fixture usage"
+help = "the fixture's rationale"
+required-by = ["step.build"]
+enforced-by = ["spec tokens"]
+class = "open"
+edges = ["part-of=layer.instruction"]
+
+[[unit]]
+tag = "unit.bare"
+origin = "forged"
+'''
+EDGED = '[[unit]]\ntag = "{}"\nscope = ["reader.every"]\nedges = ["part-of=layer.instruction"]\n'
+FX_KITS = {"tools/alpha/kit.toml": 'id = "alpha-kit"\n', "tools/beta/kit.toml": 'id = "beta-kit"\n'}
+UNREADABLE = {
+    "tools/alpha/instructions.toml": '[[unit]]\ntag = "unit.broken"\nlevel = = 3\n',
+    "tools/beta/instructions.toml": '[[unit]]\ntag = "unit.nine"\nlevel = "nine"\n\n'
+                                    '[[unit]]\ntag = "unit.flat"\nscope = "reader.every"\n',
+}
+NO_PAIR = '[[unit]]\ntag = "unit.pairless"\nedges = ["part-of"]\n'
+NONE_WHY = ('[[unit]]\ntag = "unit.hooked"\nenforced-by = "none — a hook outside this tree"\n\n'
+            '[[unit]]\ntag = "unit.gated"\nenforced-by = ["the guide size leg"]\n')
+RENDER_ROWS = {
+    "tools/alpha/instructions.toml": '[[unit]]\ntag = "unit.land"\nlevel = 3\ntype = "directive"\n'
+    'scope = ["reader.driver"]\ntrigger = "always"\ntext = "MUST land through the lander."\n\n'
+    '[[unit]]\ntag = "unit.slice"\nlevel = 2\ntype = "policy-value"\nscope = ["reader.every"]\n'
+    'source = "policy:tags.slice"\ntext = "typed, never rendered"\n',
+    "tools/beta/instructions.toml": '[[unit]]\ntag = "unit.branch"\nlevel = 1\ntype = "fact"\n'
+    'scope = ["reader.driver"]\nsource = "cmd:git rev-parse --abbrev-ref HEAD"\n\n'
+    '[[unit]]\ntag = "unit.other"\nlevel = 0\ntype = "directive"\nscope = ["reader.subagent"]\n'
+    'trigger = "always"\ntext = "MUST stay out of the driver\'s document."\n',
+}
+UNKNOWN = ('[[unit]]\ntag = "unit.unknown"\nlevel = 2\ntype = "policy-value"\nscope = ["reader.driver"]\n'
+           'source = "policy:zz.unknown"\n')
+
+
+def write_kits(c, alpha, beta=None):
+    for rel, text in FX_KITS.items():
+        c.write_file(rel, text)
+    c.write_file("tools/alpha/instructions.toml", alpha)
+    if beta is not None:
+        c.write_file("tools/beta/instructions.toml", beta)
+
+
+def run_commit(top, msg):
+    run_git(top, "-c", "user.name=f", "-c", "user.email=f@f", "commit", "-q", "-m", msg)
+
+
+def arm_row(c):
+    write_kits(c, FULL_ROW)
+    units = read_units(c.top)
+    full, bare = (units + [None, None])[:2]
+    for key, val in tomllib.loads(FULL_ROW)["unit"][0].items():
+        got = getattr(full, {"class": "klass"}.get(key, key.replace("-", "_")), None)
+        c.check(f"`{key}` reads back", got == (tuple(val) if isinstance(val, list) else val), repr(got))
+    c.check("origin is the kit's id, never the row's",
+            (getattr(full, "origin", None), getattr(bare, "origin", None)) == ("alpha-kit", "alpha-kit"), str(units))
+    c.check("a row declaring no class reads fixed", getattr(bare, "klass", None) == "fixed", str(bare))
+
+
+def arm_two_kits(c):
+    from edge_grammar import read_tree_edges
+    c.write_file(".memory-tree.conf", "MEMORY_ROOT=memory\n")
+    write_kits(c, EDGED.format("unit.a1") + "\n" + EDGED.format("unit.a2"), EDGED.format("unit.b1"))
+    for rel in (OVERLAY, "tools/alpha/sub/instructions.toml", "docs/instructions.toml"):
+        c.write_file(rel, EDGED.format("repo.x" if rel == OVERLAY else "unit.decoy"))
+    kits = {"tools/alpha/instructions.toml", "tools/beta/instructions.toml"}
+    tags = [u.tag for u in read_units(c.top)]
+    c.check("read_units reads both kits in path then row order", tags == ["unit.a1", "unit.a2", "unit.b1"], str(tags))
+    tracked = [p for p in run_git(c.top, "ls-files", "-z").split("\0") if p]
+    claimed = {p for p in tracked if extract_unit({}, p) is not None}
+    c.check("extract_unit claims the two kit manifests alone", claimed == kits, str(sorted(claimed)))
+    repo = {p for p in tracked if extract_repo({}, p) is not None}
+    c.check("extract_repo claims the overlay alone", repo == {OVERLAY}, str(sorted(repo)))
+    edges, bad = read_tree_edges(c.top, None)
+    sites = {e["path"] for e in edges if e["site"] == "unit"}
+    c.check("read_tree_edges reads the two kits and the overlay alone", sites == kits | {OVERLAY} and not bad,
+            f"{sorted(sites)} {bad}")
+
+
+def arm_unreadable(c):
+    from edge_grammar import EdgeRefusal, read_unit_edges
+    write_kits(c, *UNREADABLE.values())
+    for rel, text in UNREADABLE.items():
+        faults = parse_unit_rows(text, rel)[1]
+        c.check(f"each fault of {rel} names the file and the row",
+                bool(faults) and all(f"{rel}: unit row " in str(f) for f in faults), str(faults))
+    try:
+        said = f"it read {read_units(c.top)}"
+    except UnitRowError as exc:
+        said = str(exc)
+    for want in ("tools/alpha/instructions.toml: unit row 1 at line 1 · the manifest is no TOML",
+                 "unit row 1 (unit.nine) at line 1 · `level`", "unit row 2 (unit.flat) at line 5 · `scope`"):
+        c.check(f"read_units raises one UnitRowError naming `{want}`", want in said, said)
+    units = parse_unit_rows(NO_PAIR, "tools/x/instructions.toml")[0]
+    c.check("an edges entry with no `=` reads back as its string",
+            [u.edges for u in units] == [("part-of",)], str(units))
+    try:
+        said = f"it read {read_unit_edges(NO_PAIR, 'tools/x/instructions.toml')}"
+    except EdgeRefusal as exc:
+        said = str(exc)
+    c.check("read_unit_edges refuses it naming the file, the row's line and the entry",
+            "tools/x/instructions.toml:1: unit unit.pairless edges entry 'part-of'" in said, said)
+    enforces = [e["source"] for e in read_unit_edges(NONE_WHY, "tools/x/instructions.toml") if e["type"] == "enforces"]
+    c.check("a `none — <why>` enforced-by yields no enforces edge, a list one",
+            enforces == ["the guide size leg"], str(enforces))
+
+
+def arm_arms(c):
+    import gov_tag
+    import tag_index as ti
+    from edge_grammar import read_tree_edges
+    root = gov_tag.build_tags_fixture(c.top, "none")
+    reg = root / gov_tag.FIXTURE_KIT / "namespaces.toml"
+    gov_tag.write_commit(root, {f"{gov_tag.FIXTURE_KIT}/namespaces.toml": reg.read_text(encoding="utf-8")
+                                + gov_tag.FIXTURE_UNIT_ROW}, "the unit namespace")
+    for files in ({}, {"tools/corekit/instructions.toml": NONE_WHY}):
+        if files:
+            gov_tag.write_commit(root, files, "unit rows")
+        grammar = run_grammar(root)[0][0]
+        ctx = ti.derive_context(root, reg)
+        con = ti.load_index(root)
+        try:
+            ti.load_view(con, root, ctx)
+            joins = "\n".join(ti.check_namespace_joins(con, ctx)[1])
+            members = sorted(r[0] for r in ti.read_rows(con, ("tag",)) if r[5] in ti.UNIT_EXTRACTORS)
+        finally:
+            con.close()
+        edges = [e for e in read_tree_edges(root, None)[0] if e["site"] == "unit"]
+        c.out.append(f"{SAY}:   {grammar} · unit members {members} · {len(edges)} unit edge(s)")
+        if files:
+            c.check("the grammar half grades the fixture's rows", "units · 2 row(s)" in grammar, grammar)
+            c.check("the unit namespace holds the fixture's rows", members == ["unit.gated", "unit.hooked"]
+                    and "join unit · unarmed" not in joins, f"{members} {joins}")
+            c.check("the unit edge site reads the fixture's rows", len(edges) == 1, str(edges))
+        else:
+            c.check("the grammar half prints unarmed with no row", "units · unarmed" in grammar, grammar)
+            c.check("the unit namespace prints unarmed with no row", "join unit · unarmed" in joins, joins)
+            c.check("the unit edge site reads no edge with no row", not edges, str(edges))
+
+
+def arm_render(c):
+    from policy_value import read_policy_value, resolve_kit_dir
+    write_kits(c, *RENDER_ROWS.values())
+    run_git(c.top, "checkout", "-q", "-b", "main")
+    run_commit(c.top, "the fixture's rows")
+
+    def read_fixture_policy(key):
+        return read_policy_value(key, c.top)
+
+    chosen = derive_unit_selection(read_units(c.top), "reader.driver")
+    c.check("the selector holds its own units and reader.every's, in level order",
+            [u.tag for u in chosen] == ["unit.branch", "unit.slice", "unit.land"], str([u.tag for u in chosen]))
+    said = render_units(chosen, read_fixture_policy).split("\n")
+    policy = resolve_kit_dir("policy", "policy.py", KIT_DIR) / "policy.py"
+    value = subprocess.run([sys.executable, str(policy), "get", "tags.slice"], cwd=c.top, capture_output=True,
+                           text=True, encoding="utf-8", stdin=subprocess.DEVNULL).stdout.rstrip("\n")
+    branch = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True,
+                            stdin=subprocess.DEVNULL).stdout.strip()
+    c.out.append(f"{SAY}:   rendered · {' | '.join(said)}")
+    c.check("one line per unit: the command's output, the key's value as policy.py prints it, the typed text",
+            said == [branch, value, "MUST land through the lander."], f"{said} vs {[branch, value]}")
+    try:
+        said = "it rendered " + render_units(chosen + parse_unit_rows(UNKNOWN, "tools/beta/instructions.toml")[0],
+                                             read_fixture_policy)
+    except UnitRowError as exc:
+        said = str(exc)
+    c.check("a refused policy read refuses the render naming the key", "policy zz.unknown" in said, said)
+
+
+def arm_extractor(c):
+    import tag_index as ti
+    rel = "tools/alpha/instructions.toml"
+    write_kits(c, EDGED.format("unit.blob"))
+    run_commit(c.top, "base")
+    (c.top / rel).unlink()
+    rows = [r[:2] for r in extract_unit({}, rel, run_git(c.top, "show", f"HEAD:{rel}"))]
+    c.check("extract_unit reads the base blob's tag and selector rows, absent from the working tree",
+            rows == [("unit.blob", "tag"), (EVERY, "selector")], str(rows))
+    kit = c.top / "tools" / "playbook"
+    kit.mkdir(parents=True)
+    for name in ("namespaces.toml", "instruction_units.py"):
+        shutil.copyfile(KIT_DIR / name, kit / name)
+    names = ("instruction_units:extract_unit", "instruction_units:extract_repo")
+    before = ti.derive_extractor_versions(ti.read_namespaces(kit / "namespaces.toml"), kit)
+    c.check("the registry names both unit extractors in instruction_units", all(n in before for n in names),
+            str(sorted(before)))
+    src = (kit / "instruction_units.py").read_text(encoding="utf-8")
+    (kit / "instruction_units.py").write_text(src.replace("def parse_unit_rows(", "def parse_unit_rows( ", 1),
+                                              encoding="utf-8", newline="")
+    after = ti.derive_extractor_versions(ti.read_namespaces(kit / "namespaces.toml"), kit)
+    c.check("a byte in the copy's parse_unit_rows changes both versions",
+            all(before.get(n) != after.get(n) for n in names), f"{before} {after}")
+
+
 PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority, "statements": arm_statements,
-          "document": arm_document, "lock": arm_lock}
+          "document": arm_document, "lock": arm_lock, "row": arm_row, "two-kits": arm_two_kits,
+          "unreadable": arm_unreadable, "arms": arm_arms, "render": arm_render, "extractor": arm_extractor}
 
 
 def run_fixture(plant=None) -> tuple[list, int]:
@@ -604,7 +1061,7 @@ def main(argv) -> int:
                 lines, rc = run_fixture(plant)
         else:
             lines, rc = [__doc__.split("\n\n")[1]], 2
-    except (LevelError, LockError, OSError, RuntimeError) as exc:  # RuntimeError: the tag index's TagError
+    except (LevelError, LockError, UnitRowError, OSError, RuntimeError) as exc:  # RuntimeError: the tag index's TagError
         lines, rc = [f"{SAY}: red · {exc}"], 1
     for line in lines:
         sys.stdout.buffer.write((line + "\n").encode("utf-8"))

@@ -166,3 +166,9 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-04T09:18:45Z brief · item PLAY-dOrderedCharter-12 · reason 86295d77fc91 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-12-build-brief.md
 
 2026-11-04T09:43:54Z dispatch · item 9cc88e71 PLAY-dOrderedCharter-12 · reason .lexicon.conf
+
+2026-11-04T10:49:29Z dispatch · item 4773fbef PLAY-dOrderedCharter-9 · reason tools/playbook/instruction_units.py tools/playbook/tag_index.py tools/playbook/edge_grammar.py tools/playbook/gov_tag.py tools/playbook/namespaces.toml tools/playbook/edges.toml tools/playbook/tag_bundle.py help/tags.md memory/map/features/session-kickoff.md memory/map/features/playbook.md memory/map/generated/symbols.json memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/builds/dOrderedCharter/README.md memory/LIVE.md memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-9.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-9-ledger.md memory/builds/dOrderedCharter/build/2026-11-04-build-PLAY-dOrderedCharter-9-deviation-94.md
+
+2026-11-04T10:49:41Z brief · item PLAY-dOrderedCharter-9 · reason 192198ec568c memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-9-build-brief.md
+
+2026-11-04T11:19:38Z dispatch · item 4773fbef PLAY-dOrderedCharter-9 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

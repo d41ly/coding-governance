@@ -438,6 +438,16 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "Unit",
+      "kind": "class",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "UnitRowError",
+      "kind": "class",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "Unmeasured",
       "kind": "class",
       "file": "tools/memory-tree/deviation_join.py"
@@ -893,6 +903,11 @@
       "file": "tools/workflows/check-verifier-fanout.test.sh"
     },
     {
+      "id": "arm_arms",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_bypass_never",
       "kind": "function",
       "file": "tools/playbook/core.py"
@@ -951,6 +966,11 @@
       "id": "arm_exceptions_values",
       "kind": "function",
       "file": "tools/playbook/core.py"
+    },
+    {
+      "id": "arm_extractor",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "arm_foreign",
@@ -1083,9 +1103,19 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_render",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_rotated",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_row",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "arm_row_edit",
@@ -1138,6 +1168,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "arm_two_kits",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_unenforced",
       "kind": "function",
       "file": "tools/playbook/core.py"
@@ -1146,6 +1181,11 @@
       "id": "arm_unread",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_unreadable",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "arm_wall",
@@ -8498,6 +8538,11 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "derive_kit_prefix",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "derive_kit_rel",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
@@ -8641,6 +8686,11 @@
       "id": "derive_lowered_limit",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "derive_manifest_kind",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "derive_manifest_plant",
@@ -9588,9 +9638,9 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
-      "id": "derive_unit_rows",
+      "id": "derive_unit_selection",
       "kind": "function",
-      "file": "tools/playbook/tag_index.py"
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "derive_unit_texts",
@@ -10340,7 +10390,7 @@
     {
       "id": "extract_repo",
       "kind": "function",
-      "file": "tools/playbook/tag_index.py"
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "extract_roster_ids",
@@ -10410,7 +10460,7 @@
     {
       "id": "extract_unit",
       "kind": "function",
-      "file": "tools/playbook/tag_index.py"
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "extract_unit_ids",
@@ -13626,6 +13676,11 @@
       "id": "parse_tsx_defs",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "parse_unit_rows",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "parse_unranked_pins",
@@ -17985,6 +18040,11 @@
     {
       "id": "read_units",
       "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "read_units",
+      "kind": "function",
       "file": "tools/runlog/model.py"
     },
     {
@@ -19841,6 +19901,16 @@
       "id": "render_unfenced",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "render_unit",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "render_units",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "render_view",
@@ -22606,6 +22676,11 @@
       "id": "run_commit",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "run_commit",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "run_commit_on",
@@ -28986,6 +29061,11 @@
       "id": "write_kits",
       "kind": "function",
       "file": ".githooks/straggler-guard.test.sh"
+    },
+    {
+      "id": "write_kits",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "write_landed_observation",
