@@ -211,3 +211,5 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-04T02:53:25Z dispatch · item 5c9bb5bd TOOL-dFairHearing-32 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh tools/workflows/replay_scorer.py tools/hooks/agent-cap.js tools/hooks/agent-cap.test.sh tools/hooks/README.md tools/lib/resolve-python.test.sh tools/check-playbook-parity.test.sh tools/memory-tree/gotchas.py memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-32.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dFairHearing/README.md memory/map/generated/symbols.json tools/workflows/README.md
 
 2026-11-04T03:05:10Z brief · item TOOL-dFairHearing-36 · reason 0d84cbc52cc3 memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-36-build-brief.md
+
+2026-11-04T03:49:06Z dispatch · item 631666c3 TOOL-dFairHearing-36 · reason memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-36.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dFairHearing/README.md
