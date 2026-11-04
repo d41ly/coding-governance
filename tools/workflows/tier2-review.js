@@ -696,11 +696,11 @@ function deriveTwinPairs(confirmed, refuted) {
 // S2 - a sorted COPY: file, then `at` (lines by value, tokens by code unit, null after every address of
 // its file), then lens, then id. The argument keeps id order for the ledger, the appendix and the yield.
 function deriveAddressOrder(findings) {
-  const cmp = (p, q) => (p === q ? 0 : p < q ? -1 : 1)
-  const cmpAt = (p, q) => (p === q ? 0 : p === null ? 1 : q === null ? -1 : typeof p === 'number' && typeof q === 'number' ? p - q : cmp(String(p), String(q)))
+  const deriveOrder = (p, q) => (p === q ? 0 : p < q ? -1 : 1)
+  const deriveAtOrder = (p, q) => (p === q ? 0 : p === null ? 1 : q === null ? -1 : typeof p === 'number' && typeof q === 'number' ? p - q : deriveOrder(String(p), String(q)))
   return findings
     .map((f) => [deriveAddressKey(f), f])
-    .sort((u, v) => cmp(u[0].file, v[0].file) || cmpAt(u[0].at, v[0].at) || cmp(String(u[0].lens), String(v[0].lens)) || u[0].id - v[0].id)
+    .sort((u, v) => deriveOrder(u[0].file, v[0].file) || deriveAtOrder(u[0].at, v[0].at) || deriveOrder(String(u[0].lens), String(v[0].lens)) || u[0].id - v[0].id)
     .map((pair) => pair[1])
 }
 // TOOL-dFairHearing-5 S1 - THE DUPLICATE REASON FORM, read once: the id a refutation opening

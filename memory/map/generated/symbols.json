@@ -7128,26 +7128,6 @@
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
-      "id": "cmp",
-      "kind": "function",
-      "file": "tools/workflows/tier2-review.js"
-    },
-    {
-      "id": "cmp",
-      "kind": "function",
-      "file": "tools/workflows/tier2-review.template.js"
-    },
-    {
-      "id": "cmpAt",
-      "kind": "function",
-      "file": "tools/workflows/tier2-review.js"
-    },
-    {
-      "id": "cmpAt",
-      "kind": "function",
-      "file": "tools/workflows/tier2-review.template.js"
-    },
-    {
       "id": "cnot",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -7433,6 +7413,16 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "deriveAtOrder",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveAtOrder",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "deriveBindingSeverity",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -7511,6 +7501,16 @@
       "id": "deriveLiveness",
       "kind": "function",
       "file": "tools/workflows/drift-audit-state.template.js"
+    },
+    {
+      "id": "deriveOrder",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveOrder",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "deriveReadRev",
@@ -13038,11 +13038,6 @@
       "file": "tools/memory-recall/recall-opened.test.sh"
     },
     {
-      "id": "openersOf",
-      "kind": "function",
-      "file": "tools/workflows/check-verifier-fanout.js"
-    },
-    {
       "id": "order_verb_of",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -13561,6 +13556,16 @@
       "id": "printLensYield",
       "kind": "function",
       "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "printRefusal",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.js"
+    },
+    {
+      "id": "printRefusal",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "print_abort_notice",
@@ -17786,16 +17791,6 @@
       "id": "refusal",
       "kind": "function",
       "file": "tools/memory-recall/recall_conf.py"
-    },
-    {
-      "id": "refuse",
-      "kind": "function",
-      "file": "tools/workflows/check-review-join.js"
-    },
-    {
-      "id": "refuse",
-      "kind": "function",
-      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "refuse_if_terminal",
@@ -23841,6 +23836,11 @@
       "id": "scanMessageLines",
       "kind": "function",
       "file": "tools/hooks/format-guard.js"
+    },
+    {
+      "id": "scanOpeners",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "scanSegments",

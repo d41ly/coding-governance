@@ -1416,7 +1416,7 @@ async function runWholeScriptArms() {
   if (checkNoThrow(r, 'FH15 checklist acquired')) {
     const cp = r.trace[0] || { label: '', prompt: '' }
     ck(cp.label === 'resume:checklist' && cp.prompt.indexOf('--for-diff ' + B + '..' + H) !== -1 &&
-      cp.prompt.indexOf('ls-files --error-unmatch tools/memory-tree/gotchas.py') !== -1 && cp.prompt.indexOf('ls-files --error-unmatch tools/gotchas.py') !== -1,
+      /ls-files --error-unmatch \S*memory-tree\/gotchas\.py/.test(cp.prompt) && /ls-files --error-unmatch [^\s\/]*\/?gotchas\.py/.test(cp.prompt),
       'FH15 AC1 the first agent is resume:checklist, naming --for-diff <base>..<head> and both checker spellings: ' + cp.label)
     ck(['ACQONEX', 'ACQTWOX', 'ACQTHREEX'].every((x, i) => scanPrompts(r, 'find:').some((t) => new RegExp('(^|\\n)C' + (i + 1) + ' \\[ \\] ' + x).test(t.prompt))),
       'FH15 AC1 the three acquired items reach the finder prompts as C1, C2 and C3')
@@ -3764,8 +3764,10 @@ case "$bd_why" in "no usable python"*) lens_py="" ;; *) lens_py=$bd_py ;; esac
 # unattended kit beside this one and run over the parity domain, one `<priors>|<count>|<limit>|<token>` row each.
 # The runner compares every row with deriveRoundState; a driver that cannot be read or sliced writes
 # PRODUCER-FAILED, which reds the arm by name rather than skipping it.
-RS_OUT="$TMP/review-state.out"; RS_DRIVER="$HERE/../unattended/unattended.sh"; rs_why=""; rs_src=""
-if [ ! -f "$RS_DRIVER" ]; then rs_why="the driver $RS_DRIVER is not a file"
+RS_OUT="$TMP/review-state.out"; rs_why=""; rs_src=""
+# A refusal leaves RS_DRIVER empty, so the arm below reds naming no driver rather than slicing one.
+RS_DRIVER=$(resolve_kit_dir "$bd_py" unattended unattended.sh "$HERE" 2>/dev/null) && RS_DRIVER="$ROOT/$RS_DRIVER/unattended.sh" || RS_DRIVER=""
+if [ ! -f "$RS_DRIVER" ]; then rs_why="the driver '$RS_DRIVER' is not a file: the unattended kit did not resolve to one"
 else
   rs_src=$(tr -d '\r' < "$RS_DRIVER" | sed -n -e '/^RUNAWAY_CEILING=/p' -e '/^review_state() {/,/^}$/p')
   case "$rs_src" in RUNAWAY_CEILING=*'review_state() {'*) ;; *) rs_why="could not slice RUNAWAY_CEILING= and review_state() out of $RS_DRIVER" ;; esac

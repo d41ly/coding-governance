@@ -37,8 +37,9 @@
 # directory as its engine, and `{here}` names that directory at every prefix — including a kit
 # directory an adopter RENAMED, which `{kit}/<name>/` cannot follow (inCMS homes memory-recall at
 # `scripts/recall/`; TOOL-aRepatriatedFork-2 S4). That fragment is compared at its in-tree
-# resolution, as a `{kit}` one is. A directory that is the home of NO descriptor ships from nowhere,
-# and the gate refuses naming it.
+# resolution, as a `{kit}` one is, and also at that kit's canonical `{kit}`, which spells the
+# destinations of a kit whose id differs from its directory. A directory that is the home of NO
+# descriptor ships from nowhere, and the gate refuses naming it.
 set -u
 _self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || _self_dir=""   # before the cd: $0 may be relative
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "hook-dest: not a git repo"; exit 2; }
@@ -241,6 +242,8 @@ for eid, (d, _p) in govkit.read_descriptors(root, reg, govkit.Report()).items():
 print("\n".join(sorted(x[2:] if x.startswith("./") else x for x in out)))
 PYEOF
 ) || { echo "hook-dest: could not resolve the descriptors — refusing"; exit 2; }
+# Python's text stdout ends a line CRLF on Windows, and the `case` compare below reads that CR.
+DESTS=${DESTS//$'\r'/}
 
 [ -n "$DESTS" ] || { echo "hook-dest: REFUSING — the descriptors resolved NO destinations at all"; exit 1; }
 
@@ -260,12 +263,16 @@ for eid, (d, _p) in govkit.read_descriptors(root, reg, govkit.Report()).items():
     # repair: skipping the empty home left every root-level {here} fragment homeless).
     if isinstance(d.get("home"), str):
         homes.add(("F " if d.get("kind") == "flat" else "D ") + (d["home"].rstrip("/") or "."))
+        if d.get("kind") != "flat":
+            homes.add("K %s\t%s" % (d["home"].rstrip("/") or ".", govkit.canonical_ctx(eid)["kit"]))
 print("\n".join(sorted(homes)))
 PYEOF
 ) || { echo "hook-dest: could not read the flat-kit homes — refusing"; exit 2; }
+FLAT=${FLAT//$'\r'/}
 PFX=$(printf '%s\n' "$FLAT" | head -1)
 FLAT_HOMES=$(printf '%s\n' "$FLAT" | tail -n +2 | sed -n 's/^F //p')
 DIR_HOMES=$(printf '%s\n' "$FLAT" | tail -n +2 | sed -n 's/^D //p')
+DIR_KITS=$(printf '%s\n' "$FLAT" | tail -n +2 | sed -n 's/^K //p')
 [ -n "$PFX" ] || { echo "hook-dest: REFUSING — the deployer names no canonical prefix"; exit 1; }
 # A ZERO here is a broken selector, not a tree with no flat kits: this repo's own kickoff engine is
 # one, and the arm below would otherwise refuse every `{here}` fragment for a reason that is false.
@@ -308,9 +315,18 @@ for f in $FRAGS; do
       dir=$(dirname "$f")
       if ! printf '%s\n' "$FLAT_HOMES" | grep -qxF -- "$dir"; then
         if printf '%s\n' "$DIR_HOMES" | grep -qxF -- "$dir"; then
-          # A directory kit ships its tree unchanged: the in-tree resolution IS the shipped path.
+          # A directory kit ships its tree unchanged: the in-tree resolution IS the shipped path, or
+          # the same path at the kit's canonical `{kit}`, where an id that differs from its home
+          # spells the destinations. NOT CHECKED: an adopter's per-kit `kit` override.
+          _landed=""
+          while IFS=$'\t' read -r _h _k; do
+            [ "$_h" = "$dir" ] || continue
+            case $'\n'"$DESTS"$'\n' in *$'\n'"$_k/${resolved#"$dir"/}"$'\n'*) _landed="$_k/${resolved#"$dir"/}" ;; esac
+          done <<<"$DIR_KITS"
           if printf '%s\n' "$DESTS" | grep -qxF -- "$resolved"; then
             echo "hook-dest: ok   $f -> $resolved (beside its directory kit's engine)"
+          elif [ -n "$_landed" ]; then
+            echo "hook-dest: ok   $f -> $resolved in the tree, ships as $_landed"
           else
             echo "hook-dest: FAIL $f declares hook_path '$hp' -> '$resolved', which NO kit.toml rule ships"
             echo "           from the directory kit homed at '$dir'."

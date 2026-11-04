@@ -10,7 +10,8 @@
 set -u
 # A suite run from inside a session inherits the session's directory; no arm here wants it.
 unset CLAUDE_PROJECT_DIR
-HERE="$(cd "$(dirname "$0")" && pwd)"
+case $0 in */*) HERE=${0%/*} ;; *) HERE=. ;; esac
+HERE="$(cd "$HERE" && pwd)"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 pass=0; fail=0
 # The one resolver, not the retired `command -v python3 || python` idiom this repo banned — which the
@@ -266,7 +267,7 @@ print(json.dumps({"tool_name":"Workflow","tool_input":{"scriptPath":g,"args":arg
       # WITH a trailing newline (TOOL-aBlindedTrial-7): `read` returns non-zero on the final
       # unterminated line, so `printf '%s'` left every arm's LAST needle unchecked and a
       # single-needle arm checking nothing - observed when a needle absent from the deny passed.
-      printf '%s\n' "$needles" | sed 's/;;/\n/g' > "$TMP/needles"
+      printf '%s\n' "${needles//;;/$'\n'}" > "$TMP/needles"
       while IFS= read -r n; do
         [ -n "$n" ] && ! grep -qF -- "$n" "$TMP/err" && miss="$miss [$n]"
       done < "$TMP/needles"
@@ -365,7 +366,7 @@ check_spec_audit "rule0: reviewDir climbing through .. into a declared build →
 # F5 — an MSYS-form `repo` (`/c/...`) is a spelling this node's corpus carries and the harness's own
 # `git -C` accepts; `path.resolve` on win32 made it `C:\c\...` and denied a DECLARED build with ENOENT.
 # Derived from $SAJ, so on a host where `pwd -W` is not a thing the arm feeds the unchanged POSIX path.
-SAM=$(printf '%s' "$SAJ" | sed 's|^\([A-Za-z]\):/|/\L\1/|')
+[[ $SAJ =~ ^([A-Za-z]):/(.*)$ ]] && SAM="/${BASH_REMATCH[1],,}/${BASH_REMATCH[2]}" || SAM=$SAJ
 check_spec_audit "rule0: declared build, repo in MSYS /<drive>/ form → allow" 0 "" \
   "{\"kind\":\"spec-audit\",\"repo\":\"$SAM\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
 # R1 (round 2) — containment must hold on the ROOT axis, not only the slug axis. A SECOND checkout
@@ -375,7 +376,7 @@ check_spec_audit "rule0: declared build, repo in MSYS /<drive>/ form → allow" 
 # so every other spelling is denied by the same `subjects` sentence. The repo-relative allow above
 # is the control.
 SAREPO2="$TMP/sarepo2"; mkdir -p "$SAREPO2/memory/builds/tSA/spec"; printf -- '---\nslug: tSA\n---\n' > "$SAREPO2/memory/builds/tSA/README.md"
-SAJ2="$NODEDIR/sarepo2"; SAM2=$(printf '%s' "$SAJ2" | sed 's|^\([A-Za-z]\):/|/\L\1/|')
+SAJ2="$NODEDIR/sarepo2"; [[ $SAJ2 =~ ^([A-Za-z]):/(.*)$ ]] && SAM2="/${BASH_REMATCH[1],,}/${BASH_REMATCH[2]}" || SAM2=$SAJ2
 check_spec_audit "rule0: declared reviewDir, an ABSOLUTE subject into a same-slug second checkout → deny naming subjects" 2 '`subjects`;;sarepo2/memory/builds/tSA/spec/s.md' \
   "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\",\"subjects\":[{\"path\":\"$SAJ2/memory/builds/tSA/spec/s.md\",\"blob\":\"abc1234\"}]}"
 check_spec_audit "rule0: ...the same subject in MSYS /<drive>/ form → deny naming subjects" 2 '`subjects`' \

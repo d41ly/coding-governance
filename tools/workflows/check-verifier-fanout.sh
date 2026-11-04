@@ -357,7 +357,7 @@ locs=()
 while IFS= read -r f; do
   [ -n "$f" ] || continue
   _ml=$("$_hk_py" "$RENDERER" --markers "$f" 2>&1) || { echo "verifier-fanout: the marker predicate did not run (render_lenses.py --markers $f exited $?: $_ml)"; exit 2; }
-  for _l in $(printf '%s\n' "$_ml" | tr -d '\r'); do locs+=("$f:$_l"); done
+  for _l in ${_ml//$'\r'/}; do locs+=("$f:$_l"); done
 done <<<"$SCAN"
 if [ "${#locs[@]}" -gt 0 ]; then
   slots=$(node "$FANJS" --hook "$HOOK" --slots "${locs[@]}" 2>&1); _sr=$?

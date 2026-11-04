@@ -231,7 +231,7 @@ key is a literal name, `diff-review`, `unit-spec` or `design-audit`, each mappin
 ```js
 args: { kind: 'spec-audit', subjects, scratch,
         lensNotes: { 'unit-spec': { reuse: 'the kits under tools/ are the seams' },
-                     'design-audit': { 'alternatives-and-cost': 'price a new kit against tools/lib/' } } }
+                     'design-audit': { 'alternatives-and-cost': 'price a new kit against the shared library' } } }
 ```
 
 The run reads only its own literal's entry, absent meaning `{}` and announced as no notes; only that
@@ -266,7 +266,7 @@ review key, like `lensNotes`.
 `checklist` carries the project's recurring bug classes. On the diff kind the harness ACQUIRES it
 when the caller passes none (TOOL-dFairHearing-15): its first agent, `resume:checklist` in the
 `Resume` phase, before the input print and the resume probe, finds the memory-tree kit's checker
-at run time, the first of `<tool root>memory-tree/gotchas.py` and `<tool root>gotchas.py` that
+at run time, the first of `<tool-root>/memory-tree/gotchas.py` and `<tool-root>/gotchas.py` that
 `git ls-files --error-unmatch` calls tracked, runs `gotchas.py --for-diff <base>..<head>` over the
 range the call pinned with a 120-second bound, and returns its stdout verbatim, which then takes
 the path a caller's string takes below. An acquired checklist logs `checklist from --for-diff
@@ -1089,11 +1089,11 @@ leaves the placement lines out.
 `memory/builds/dFairHearing/README.md` as it stands at `3708a705` (`<blob>` is
 `git rev-parse 3708a705:memory/builds/dFairHearing/README.md`), whose front matter is the
 owner-landed `spec-audit: 2026-10-21` with no `authorized-by`. The second is the runtime record's
-blob `767187aa` (`git rev-parse 6cfd21619:memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md`)
-at the placed subject path
-`memory/builds/dFairHearing/replay/memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md`.
+blob `767187aa` (`git rev-parse 6cfd21619:<record>`, `<record>` being the path
+`TOOL-dFairHearing-25`'s design names) at the placed subject path
+`memory/builds/dFairHearing/replay/<record>`.
 The call's `reviewDir` is `memory/builds/dFairHearing/reviews`, the folder that README opts in, and
-its one subject is that placed subject path at `767187aa`, with id `PLAY-dClosedLoop-1` and no `rev`;
+its one subject is that placed subject path at `767187aa`, with the record's own spec id and no `rev`;
 the sibling `specs` and the checklist stay on their dClosedLoop paths. The pack admits only a subject
 under `reviewDir`'s build, so the record's own path is denied, and the placed path ends with the
 record's own, so `check_same_file` in `replay_scorer.py` still matches its refs to the known set

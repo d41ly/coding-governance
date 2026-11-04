@@ -3,5 +3,5 @@
   "event": "PreToolUse",
   "matcher": "Workflow",
   "marker": "spec-audit-optin.js",
-  "hook_path": "{kit}/workflows/spec-audit-optin.js"
+  "hook_path": "{here}/spec-audit-optin.js"
 }

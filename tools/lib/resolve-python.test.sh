@@ -710,10 +710,10 @@ HOOKS_DIR=$(resolve_kit_dir "$REALPY" hooks agent-cap.js "$HERE") || exit 2
 WORKFLOWS_DIR=$(resolve_kit_dir "$REALPY" workflows spec-audit-optin.js "$HERE") || exit 2
 JR="$TMP/jr"
 add_resolver_layout() { # <row> <receipt rows or empty> <file>... — one layout of the nine
-  local d="$JR/r$1" j=$2 f; shift 2
+  local d="$JR/r$1" j=$2 f _p; shift 2
   mkdir -p "$d/.git" "$d/p" "$d/q"
   [ -z "$j" ] || { mkdir -p "$d/.governance"; printf '{"files": [%s]}\n' "$j" > "$d/.governance/install.json"; }
-  for f in "$@"; do mkdir -p "$(dirname "$d/$f")"; printf 'x\n' > "$d/$f"; done
+  for f in "$@"; do _p="$d/$f"; mkdir -p "${_p%/*}"; printf 'x\n' > "$_p"; done
 }
 add_resolver_layout 1 '{"source": "t/h/a.js", "path": "k/a.js"}' k/a.js
 add_resolver_layout 2 '{"source": "t/h/a.js", "path": "gone/a.js"}' h/a.js
@@ -968,9 +968,10 @@ scan_sibling_path() {  # file paths on stdin -> "file:line:text" per hard-coded 
 }
 sib_pop=$(cd "$ROOT" && git ls-files -- "${PFX}*.js")
 sib_hits=$(cd "$ROOT" && printf '%s\n' "$sib_pop" | scan_sibling_path)
-[ -z "$sib_hits" ] || { echo "FAIL a JS file finds a sibling kit at a hard-coded path:"; printf '%s\n' "$sib_hits" | sed 's/^/    /'; st=1; }
+[ -z "$sib_hits" ] || { echo "FAIL a JS file finds a sibling kit at a hard-coded path:"; printf '    %s\n' "${sib_hits//$'\n'/$'\n'    }"; st=1; }
 ok
-[ "$(printf '%s\n' "$sib_pop" | grep -c .)" -gt 10 ] || bad "the sibling-kit path ban scanned a collapsed population"; ok
+mapfile -t _sib_rows <<<"$sib_pop"
+[ "${#_sib_rows[@]}" -gt 10 ] || bad "the sibling-kit path ban scanned a collapsed population"; ok
 plant="$TMP/sib.js"
 printf "const p = path.join(path.dirname(__dirname), 'kit', 'a.js')\n" > "$plant"
 [ "$(printf '%s\n' "$plant" | scan_sibling_path | wc -l)" = 1 ] || bad "the sibling-kit path ban does not fire on a planted line"; ok

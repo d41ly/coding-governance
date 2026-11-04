@@ -1785,11 +1785,13 @@ d = json.load(open(sys.argv[1], encoding="utf-8"))
 d["hooks"]["PreToolUse"] = [g for g in d["hooks"]["PreToolUse"] if not any("spec-audit-optin.js" in h.get("command", "") for h in g["hooks"])]
 json.dump(d, open(sys.argv[2], "w", encoding="utf-8"), indent=2)' "$ROOT_ABS/.claude/settings.json" "$_sao/settings.json" 2>/dev/null
 out=$(cd "$ROOT_ABS" && GOV_SETTINGS_JSON="$_sao/settings.json" bash "$SCRIPT" --check 2>/dev/null)
-ck "FH16 AC9 the pack's group removed from a settings copy -> UNWIRED naming spec-audit-optin.js" \
-   "$(printf '%s' "$out" | grep -q '^UNWIRED  spec-audit — .*spec-audit-optin\.js' && echo 1 || echo 0)"
+_re=$'(^|\n)UNWIRED  spec-audit — [^\n]*spec-audit-optin\\.js'
+_hit=0; [[ $out =~ $_re ]] && _hit=1
+ck "FH16 AC9 the pack's group removed from a settings copy -> UNWIRED naming spec-audit-optin.js" "$_hit"
 out=$(cd "$ROOT_ABS" && bash "$SCRIPT" --check 2>/dev/null)
-ck "FH16 AC9 LIVENESS ...and over the tree's own settings the pack reads ok" \
-   "$(printf '%s' "$out" | grep -q '^ok       spec-audit — PreToolUse entry' && echo 1 || echo 0)"
+_re=$'(^|\n)ok       spec-audit — PreToolUse entry'
+_hit=0; [[ $out =~ $_re ]] && _hit=1
+ck "FH16 AC9 LIVENESS ...and over the tree's own settings the pack reads ok" "$_hit"
 rm -rf "$_sao"
 
 # ---- TOOL-aRepatriatedFork-19: the install RECEIPT is the first rung -----------------------------

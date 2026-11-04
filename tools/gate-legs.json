@@ -94,7 +94,8 @@
     "guard": [
       "{prefix}/check-playbook-parity.sh",
       "{prefix}/check-playbook-parity.test.sh",
-      "{prefix}/playbook-kit-waivers.txt"
+      "{prefix}/playbook-kit-waivers.txt",
+      "{prefix}/workflows/check-verifier-fanout.js"
     ],
     "argv": [
       "bash",
@@ -1897,7 +1898,8 @@
       "{prefix}/workflows/kit.toml",
       "AGENTS.md",
       "memory/builds/dClosedLoop/build/",
-      "help/policy.md"
+      "help/policy.md",
+      ".governance/install.json"
     ],
     "chunk": "selftests",
     "subject": "kit",

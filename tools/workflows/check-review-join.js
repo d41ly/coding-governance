@@ -130,22 +130,22 @@ function renderJoinDeny(joins) {
 // throw anywhere is a refusal too, since node's own exit 1 on an uncaught throw would read as a join.
 // ponytail: this argv loop is check-verifier-fanout.js's twin; dBoundRoles' move of the shared readers is where one runner would live.
 function main(argv) {
-  const refuse = (why) => { process.stderr.write(`check-review-join: ${why}\n`); return 2 }
+  const printRefusal = (why) => { process.stderr.write(`check-review-join: ${why}\n`); return 2 }
   let hook = null
   const files = []
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--hook') hook = argv[++i] || null
-    else if (argv[i].startsWith('-')) return refuse(`${argv[i]} is no argument this check takes: it takes --hook <agent-cap.js> and the files to judge`)
+    else if (argv[i].startsWith('-')) return printRefusal(`${argv[i]} is no argument this check takes: it takes --hook <agent-cap.js> and the files to judge`)
     else files.push(argv[i])
   }
-  if (!hook) return refuse('names no --hook, so agent-cap\'s views, which this rule reads, cannot be loaded')
-  if (!files.length) return refuse('names no file, and a check over nothing is not a pass')
-  try { loadHook(hook) } catch (e) { return refuse(`cannot load agent-cap's exports from ${hook}: ${(e && e.message) || e}`) }
+  if (!hook) return printRefusal('names no --hook, so agent-cap\'s views, which this rule reads, cannot be loaded')
+  if (!files.length) return printRefusal('names no file, and a check over nothing is not a pass')
+  try { loadHook(hook) } catch (e) { return printRefusal(`cannot load agent-cap's exports from ${hook}: ${(e && e.message) || e}`) }
   let status = 0
   for (const f of files) {
     let script
     try { script = require('fs').readFileSync(f, 'utf8') } catch (e) {
-      return refuse(`${f} could not be read (${(e && e.code) || (e && e.message) || e}), and a script this check cannot read is not one it may pass`)
+      return printRefusal(`${f} could not be read (${(e && e.code) || (e && e.message) || e}), and a script this check cannot read is not one it may pass`)
     }
     const joins = scanJoin(script)
     if (joins.length) { process.stderr.write(renderJoinDeny(joins)); status = 1 }

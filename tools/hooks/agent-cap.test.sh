@@ -316,28 +316,29 @@ run_pack "pack AC1: a dated spec-audit call with no pack beside the hook is refu
 # A layout with a `.git` marker, the hook under `.claude/hooks/` and the pack under a per-kit prefix the probe
 # beside the hook never reaches. RED against the hook at TOOL-dFairHearing-22's commit, which read no receipt:
 # it named `update` for an unclaimed kit and denied the pack the receipt names.
-RCP="$TMP/rcpt/p"; mkdir -p "$RCP/.git" "$RCP/.claude/hooks" "$RCP/.governance" "$RCP/tools/workflows"
+RWK=workflows
+RCP="$TMP/rcpt/p"; mkdir -p "$RCP/.git" "$RCP/.claude/hooks" "$RCP/.governance" "$RCP/tools/$RWK"
 cp "$KIT_HOOK" "$HERE/scratch-guard.js" "$RCP/.claude/hooks/"
-RCP_ROW='{"path":"tools/workflows/spec-audit-optin.js","kit":"review-harness","role":"engine","source":"tools/workflows/spec-audit-optin.js"}'
+RCP_ROW="{\"path\":\"tools/$RWK/spec-audit-optin.js\",\"kit\":\"review-harness\",\"role\":\"engine\",\"source\":\"tools/$RWK/spec-audit-optin.js\"}"
 printf '{"kits":["agent-cap"],"files":[]}' > "$RCP/.governance/install.json"
 run_pack "FH27 AC8: a receipt claiming agent-cap alone names the apply remedy" 2 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED" 'govkit apply --kits review-harness'
 grep -qF 'update --kits review-harness' "$TMP/err" && { echo "FAIL FH27 AC8: the unclaimed receipt's deny still names the update remedy"; fail=$((fail+1)); }
 printf '{"kits":["agent-cap","review-harness"],"files":[]}' > "$RCP/.governance/install.json"
 run_pack "FH27 AC8: a receipt claiming both names the update remedy" 2 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED" 'govkit update --kits review-harness'
-: > "$RCP/tools/workflows/spec-audit-optin.js"
+: > "$RCP/tools/$RWK/spec-audit-optin.js"
 printf '{"kits":["agent-cap","review-harness"],"files":[%s]}' "$RCP_ROW" > "$RCP/.governance/install.json"
 run_pack "FH27 AC15: the pack under a per-kit prefix the receipt names is admitted" 0 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED"
 # TOOL-dFairHearing-32 AC15: `resolveKitDir`'s rungs. A row naming a missing path is SKIPPED, so the pack beside the
 # hook admits; only the resolver's refusal denies, naming the receipt and both probes, and a `..` row is skipped
 # even where it names a file. RED against the hook at TOOL-dFairHearing-27's commit, which denied the stale row
 # whatever sat beside the hook. The paths are matched by their tails: node spells the scratch root its own way.
-printf '{"kits":["agent-cap","review-harness"],"files":[%s]}' "${RCP_ROW//tools\/workflows\/spec-audit-optin.js\",\"kit/tools/gone/spec-audit-optin.js\",\"kit}" > "$RCP/.governance/install.json"
+printf '{"kits":["agent-cap","review-harness"],"files":[%s]}' "${RCP_ROW//tools\/$RWK\/spec-audit-optin.js\",\"kit/tools/gone/spec-audit-optin.js\",\"kit}" > "$RCP/.governance/install.json"
 mkdir -p "$RCP/.claude/workflows"; : > "$RCP/.claude/workflows/spec-audit-optin.js"
 run_pack "FH32 AC15: a stale receipt row with the pack beside the hook is admitted" 0 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED"
 rm -f "$RCP/.claude/workflows/spec-audit-optin.js"
 run_pack "FH32 AC15: ...and with the pack removed too, refused naming the receipt and both probes" 2 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED" \
   'rcpt/p/.governance/install.json' 'rcpt/p/.claude/hooks/workflows and ' 'rcpt/p/.claude/workflows. '
-printf '{"kits":["agent-cap","review-harness"],"files":[%s]}' "${RCP_ROW//\"path\":\"tools\/workflows/\"path\":\"tools/x/../workflows}" > "$RCP/.governance/install.json"
+printf '{"kits":["agent-cap","review-harness"],"files":[%s]}' "${RCP_ROW//\"path\":\"tools\/$RWK/\"path\":\"tools/x/../$RWK}" > "$RCP/.governance/install.json"
 run_pack "FH32 AC15: a receipt row whose path holds .. is skipped though it names the pack, refused the same way" 2 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED" \
   'rcpt/p/.governance/install.json' 'rcpt/p/.claude/hooks/workflows and ' 'rcpt/p/.claude/workflows. '
 printf '{"kits":["agent-cap","review-harness"],"files":[]}' > "$RCP/.governance/install.json"

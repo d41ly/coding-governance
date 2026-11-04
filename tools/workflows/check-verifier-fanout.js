@@ -592,7 +592,7 @@ function fanoutFindings(script, writer) {
     // or 60 lines, so a pathological file cannot make this quadratic. A fixed 2-line window was the
     // first cut and was also a measured hole: a `.map((f) => () =>` whose agent() sits ten
     // prompt-lines below escaped it entirely, which is the commonest shape in these harnesses.
-    const openersOf = (text) => {
+    const scanOpeners = (text) => {
       const out = []
       let pending = 0
       for (let k = text.length - 1; k >= 0; k--) {
@@ -610,14 +610,14 @@ function fanoutFindings(script, writer) {
     // cancel the very openers being looked for, and the one-line fan-out — the exact shape that
     // motivated this rule — reads as enclosed by nothing. Measured, twice.
     let win = l.slice(0, l.search(/\bagent\s*\(/))
-    for (let k = i - 1; k >= 0 && k > i - 60 && openersOf(win).length < 2; k--) win = code[k] + '\n' + win
+    for (let k = i - 1; k >= 0 && k > i - 60 && scanOpeners(win).length < 2; k--) win = code[k] + '\n' + win
 
     // FAIL CLOSED. The first cut classified only three tidy spellings and fell through to ALLOW for
     // everything else, which meant a receiver it did not recognise was a receiver it blessed — five
     // independent bypasses, each one agent per finding, each reported clean. An iteration construct
     // this rule cannot PROVE bounded is denied; the burden is on the fan-out, not on the gate.
     let hit = null
-    for (const pos of openersOf(win)) {
+    for (const pos of scanOpeners(win)) {
       const before = win.slice(0, pos)
       const m = ITER_CALL.exec(before)
       if (m) {
@@ -815,19 +815,19 @@ function renderFanoutDeny(fan) {
 // predicate or read its file has measured nothing. A throw anywhere is a refusal too, since node's own
 // exit 1 on an uncaught throw would read as a finding.
 function main(argv) {
-  const refuse = (why) => { process.stderr.write(`check-verifier-fanout: ${why}\n`); return 2 }
+  const printRefusal = (why) => { process.stderr.write(`check-verifier-fanout: ${why}\n`); return 2 }
   let hook = null
   let slots = false
   const files = []
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--hook') hook = argv[++i] || null
     else if (argv[i] === '--slots') slots = true
-    else if (argv[i].startsWith('-')) return refuse(`${argv[i]} is no argument this check takes: it takes --hook <agent-cap.js>, then the files to judge or --slots and their <file>:<line> marker locations`)
+    else if (argv[i].startsWith('-')) return printRefusal(`${argv[i]} is no argument this check takes: it takes --hook <agent-cap.js>, then the files to judge or --slots and their <file>:<line> marker locations`)
     else files.push(argv[i])
   }
-  if (!hook) return refuse('names no --hook, so agent-cap\'s views, which this rule reads, cannot be loaded')
-  if (!files.length) return refuse('names no file, and a check over nothing is not a pass')
-  try { loadHook(hook) } catch (e) { return refuse(`cannot load agent-cap's exports from ${hook}: ${(e && e.message) || e}`) }
+  if (!hook) return printRefusal('names no --hook, so agent-cap\'s views, which this rule reads, cannot be loaded')
+  if (!files.length) return printRefusal('names no file, and a check over nothing is not a pass')
+  try { loadHook(hook) } catch (e) { return printRefusal(`cannot load agent-cap's exports from ${hook}: ${(e && e.message) || e}`) }
   if (slots) {
     // Each location is a marker line render_lenses.py --markers printed; the literal's name is the line's last word.
     let bad = 0
@@ -837,10 +837,10 @@ function main(argv) {
       const n = Number(loc.slice(cut + 1))
       let script
       try { script = require('fs').readFileSync(f, 'utf8') } catch (e) {
-        return refuse(`${f} could not be read (${(e && e.code) || (e && e.message) || e}), and a literal this check cannot read is not one it may pass`)
+        return printRefusal(`${f} could not be read (${(e && e.code) || (e && e.message) || e}), and a literal this check cannot read is not one it may pass`)
       }
       const line = script.split(/\r?\n/)[n - 1]
-      if (cut <= 0 || !Number.isInteger(n) || n < 1 || line === undefined) return refuse(`--slots ${loc} names no line of a file, so it is no marker location`)
+      if (cut <= 0 || !Number.isInteger(n) || n < 1 || line === undefined) return printRefusal(`--slots ${loc} names no line of a file, so it is no marker location`)
       const count = measureLensSlots(script, n)
       if (count !== LENS_SLOTS) {
         process.stdout.write(`verifier-fanout: SLOTS — ${loc} literal ${line.trim().split(/\s+/).pop()} holds ${count} slot(s); a lens literal holds exactly ${LENS_SLOTS}\n`)
@@ -854,7 +854,7 @@ function main(argv) {
   for (const f of files) {
     let script
     try { script = require('fs').readFileSync(f, 'utf8') } catch (e) {
-      return refuse(`${f} could not be read (${(e && e.code) || (e && e.message) || e}), and a script this check cannot read is not one it may pass`)
+      return printRefusal(`${f} could not be read (${(e && e.code) || (e && e.message) || e}), and a script this check cannot read is not one it may pass`)
     }
     const fan = scanFanout(script)
     if (fan.length) { process.stderr.write(renderFanoutDeny(fan)); status = 1 }

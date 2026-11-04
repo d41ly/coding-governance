@@ -361,9 +361,11 @@ arm 'a missing predicate is a named failure' 'has no predicate to delegate to' \
 # ---- TOOL-dFairHearing-23: the rule beside the gate, one counter and one marker predicate ----------------------
 # AC18: a gate copy with no check-verifier-fanout.js beside it exits 2 naming the file, never a clean line. RED
 # against the parent suite, which carries no such arm (the gate's exit 2 itself landed at TOOL-dFairHearing-16).
+# WFK names these fixtures' own kit directory; the layouts further down derive it from the install.
+WFK=workflows
 NJ="$TMP/nojs/k"; mkdir -p "$NJ/workflows" "$NJ/hooks" && cp "$GATE" "$HERE/render_lenses.py" "$NJ/workflows/" \
   && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$NJ/hooks/" && git -C "$NJ" init -q
-out=$(cd "$NJ" && bash workflows/check-verifier-fanout.sh "$TMP/bounded.js" 2>&1); rc=$?
+out=$(cd "$NJ" && bash "$WFK/check-verifier-fanout.sh" "$TMP/bounded.js" 2>&1); rc=$?
 case "$rc:$out" in 2:*"no check-verifier-fanout.js beside this gate"*) printf 'arm ok    AC18: a gate copy with no .js beside it exits 2 naming the file\n' ;;
   *) fails=$((fails+1)); printf 'arm FAIL  AC18: a gate copy with no .js did not refuse by name (rc=%s)\n%s\n' "$rc" "$out" ;; esac
 # ---- TOOL-dFairHearing-27: the opt-in literal outside the count, and a predicate that did not run ----------------
@@ -391,7 +393,7 @@ case "$rc:$out" in 0:*"slots — 1 lens-slot literal(s), each holding 5"*) print
 # naming the predicate. RED against the gate at TOOL-dFairHearing-23's commit, whose refusals named neither.
 NR="$TMP/norl/k"; mkdir -p "$NR/workflows" "$NR/hooks" && cp "$GATE" "$HERE/check-verifier-fanout.js" "$NR/workflows/" \
   && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$NR/hooks/" && git -C "$NR" init -q
-out=$(cd "$NR" && bash workflows/check-verifier-fanout.sh "$TMP/optin.js" 2>&1); rc=$?
+out=$(cd "$NR" && bash "$WFK/check-verifier-fanout.sh" "$TMP/optin.js" 2>&1); rc=$?
 case "$rc:$out" in 2:*"the marker predicate did not run (no render_lenses.py"*) printf 'arm ok    FH27 AC18: a gate copy with no renderer exits 2 naming the predicate\n' ;;
   *) fails=$((fails+1)); printf 'arm FAIL  FH27 AC18: a gate copy with no renderer did not refuse by name (rc=%s)\n%s\n' "$rc" "$out" ;; esac
 # No python: stubs named for every launcher candidate, each exiting 9, ahead of PATH, so the probe RUNS each and
@@ -399,7 +401,7 @@ case "$rc:$out" in 2:*"the marker predicate did not run (no render_lenses.py"*) 
 NP="$TMP/nopy"; mkdir -p "$NP/k/workflows" "$NP/.claude/hooks" "$NP/stub" && cp "$GATE" "$HERE/check-verifier-fanout.js" "$HERE/render_lenses.py" "$NP/k/workflows/" \
   && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$NP/.claude/hooks/" && git -C "$NP" init -q
 for _n in python3 python py; do printf '#!/bin/sh\nexit 9\n' > "$NP/stub/$_n"; chmod +x "$NP/stub/$_n"; done
-out=$(cd "$NP" && PATH="$NP/stub:$PATH" GOV_PYTHON= bash k/workflows/check-verifier-fanout.sh "$TMP/optin.js" 2>&1); rc=$?
+out=$(cd "$NP" && PATH="$NP/stub:$PATH" GOV_PYTHON= bash "k/$WFK/check-verifier-fanout.sh" "$TMP/optin.js" 2>&1); rc=$?
 case "$rc:$out" in 2:*"the marker predicate did not run (no usable python)"*) printf 'arm ok    FH27 AC18: an unresolvable python exits 2 naming the predicate\n' ;;
   *) fails=$((fails+1)); printf 'arm FAIL  FH27 AC18: an unresolvable python did not refuse by name (rc=%s)\n%s\n' "$rc" "$out" ;; esac
 # AC25: five slot calls whose arguments carry commas inside parentheses, braces and a string count 5, through
@@ -420,11 +422,11 @@ case "$rc:$out" in 0:*"slots — 1 lens-slot literal(s), each holding 5"*) print
   *) fails=$((fails+1)); printf 'arm FAIL  AC25: five slot calls did not count 5 (rc=%s)\n%s\n' "$rc" "$out" ;; esac
 SC="$TMP/split/k"; mkdir -p "$SC/workflows" "$SC/hooks" && cp "$GATE" "$HERE/render_lenses.py" "$SC/workflows/" \
   && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$SC/hooks/" && git -C "$SC" init -q
-sed "s/else if (ch === ',' \&\& d === 0)/else if (ch === ',')/" "$HERE/check-verifier-fanout.js" > "$SC/workflows/check-verifier-fanout.js"
-if ! grep -q "else if (ch === ',') {" "$SC/workflows/check-verifier-fanout.js"; then
+sed "s/else if (ch === ',' \&\& d === 0)/else if (ch === ',')/" "$HERE/check-verifier-fanout.js" > "$SC/$WFK/check-verifier-fanout.js"
+if ! grep -q "else if (ch === ',') {" "$SC/$WFK/check-verifier-fanout.js"; then
   fails=$((fails+1)); printf 'arm FAIL  AC25: the staged topLevelArgs edit matched nothing, so the copy measures the shipped counter\n'
 else
-  out=$(cd "$SC" && bash workflows/check-verifier-fanout.sh "$TMP/calls.js" 2>&1); rc=$?
+  out=$(cd "$SC" && bash "$WFK/check-verifier-fanout.sh" "$TMP/calls.js" 2>&1); rc=$?
   case "$rc:$out" in 1:*"SLOTS — "*"literal unit-spec holds 15 slot(s)"*) printf 'arm ok    AC25: a counter splitting on every comma names the literal as over its slots\n' ;;
     *) fails=$((fails+1)); printf 'arm FAIL  AC25: the staged counter did not move the count (rc=%s)\n%s\n' "$rc" "$out" ;; esac
 fi
@@ -1562,7 +1564,7 @@ nest_n=0
 for f in "$TMP"/nest/*.js; do
   [ -f "$f" ] || continue
   nest_n=$((nest_n+1))
-  n=$(basename "$f" .js)
+  n=${f##*/}; n=${n%.js}
   payload=$("$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","tool_input":{"script":open(sys.argv[1],encoding="utf-8").read()}}))' "$f")
   printf '%s' "$payload" | (cd "$TMP" && run_fan) >/dev/null 2>"$TMP/err"; rc=$?
   if [ "$rc" = 2 ] && grep -qF 'spawns one agent per item' "$TMP/err"; then

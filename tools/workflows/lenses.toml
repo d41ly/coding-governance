@@ -1,4 +1,4 @@
-# tools/workflows/lenses.toml — one row per lens; a row's place in the file is its slot order.
+# lenses.toml — one row per lens; a row's place in the file is its slot order.
 #
 # The review harness's lens literals are RENDERED from these rows by render_lenses.py, at install and
 # in the parity leg, because a workflow script has no filesystem and cannot read this file. A row

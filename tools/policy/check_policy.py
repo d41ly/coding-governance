@@ -3028,7 +3028,7 @@ def run_limit_case(name):
             render = (wf / "unattended-build.template.js").read_text(encoding="utf-8").replace("{{FANOUT_CAP}}", "6")
             finds = lambda *needles: lambda rc, o, e: rc == 1 and all(n in e for n in needles)  # noqa: E731
 
-            def judge(repo, hook, script, what, want, checker="check-verifier-fanout.js"):
+            def check_case(repo, hook, script, what, want, checker="check-verifier-fanout.js"):
                 case = Path(repo, "fanout-case.js")
                 case.write_text(script, encoding="utf-8", newline="\n")
                 return check_run(name, what, ["node", str(wf / checker), "--hook", str(hook), str(case)],
@@ -3040,13 +3040,13 @@ def run_limit_case(name):
                     (6, VERIFIER_SPLIT, "a verifier split at 6 under a landed limit of 6",
                      finds("gov:fixed-verifiers", "above the bound 5: MAX_VERIFIERS")))):
                 repo, kit, hook = build_limit_repo(t / f"r{i}", LIMIT_POLICY.format(n=n))
-                checks.append(judge(repo, hook, script, what, want))
+                checks.append(check_case(repo, hook, script, what, want))
             (kit / "policy-mirror.js").unlink()
-            checks.append(judge(repo, hook, render, "the render at 6, policy-mirror.js removed",
-                                finds("gov:fixed-writers", "above the bound 5: MAX_VERIFIERS, as no policy kit")))
+            checks.append(check_case(repo, hook, render, "the render at 6, policy-mirror.js removed",
+                                     finds("gov:fixed-writers", "above the bound 5: MAX_VERIFIERS, as no policy kit")))
             # TOOL-dFairHearing-43 S10: rule 5, run over the same hook copy, so the claim above is an executed check.
-            checks.append(judge(repo, hook, "m.set(f.ref, v)\n", "check-review-join.js over a ref-keyed join",
-                                finds("a ref-keyed verdict join"), "check-review-join.js"))
+            checks.append(check_case(repo, hook, "m.set(f.ref, v)\n", "check-review-join.js over a ref-keyed join",
+                                     finds("a ref-keyed verdict join"), "check-review-join.js"))
         elif name == "limit-settings-elsewhere":
             # TOOL-dGroundRules-21 S34: GOV_SETTINGS_JSON names the settings in force, for the render and rule 7.
             repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))

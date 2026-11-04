@@ -372,7 +372,7 @@ for f in "${SCAN[@]}"; do
   fi
   if [ "$rc" = 2 ]; then
     echo "review-join: the predicate exited 2 on $f, so that is its own refusal and not a join"
-    printf '%s\n' "$out" | sed 's/^/    /'
+    printf '    %s\n' "${out//$'\n'/$'\n'    }"
     exit 2
   fi
   if [ "$rc" = 1 ]; then

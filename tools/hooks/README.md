@@ -236,7 +236,7 @@ one home. Last, after rules 6 and 7, a `Workflow` call whose structured `args` c
 `kind: "spec-audit"` or a `specAudit` key, the pack's own trigger, is refused, exit 2, unless the
 pack is found by `resolveKitDir`, the hook's port of the sibling-kit resolver `resolve_kit_dir`, rung
 for rung (`TOOL-dFairHearing-32`): first a row of the install receipt, `.governance/install.json` at
-the root the nearest `.git` names, whose `source` ends `workflows/spec-audit-optin.js` (or a
+the root the nearest `.git` names, whose `source` ends `<prefix>/workflows/spec-audit-optin.js` (or a
 `rendered` row from that home naming the file) and whose `path` is a file inside the tree; then the
 probes `<hook dir>/workflows/` and `<hook dir>/../workflows/`. A receipt row whose `path` is missing,
 escapes the tree or holds `..` is skipped, never followed and never a deny, so a stale row with the
