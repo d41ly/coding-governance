@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-2 — the charter re-founded in its level-0 envelope, with the override rule and its record
 
-**Status:** DEFERRED · rev-6 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 20 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-7 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 20 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0032@e38b0cb6 whole
 **Carries:** node:policy-key.charter.override
@@ -312,7 +312,7 @@ commit only when the policy file and the catalogue equal HEAD (TOOL-dGroundRules
   Red when: the role render fails on the re-founded charter, or a charter with neither shape parses.
 - **AC7** — When `python tools/policy/budgets.py resolve AGENTS.md` runs after the commit, the value it
   prints is at least the CR-stripped bytes of `AGENTS.md`; when that value moved,
-  `git show HEAD:tools/template-size-limits.txt` carries a `RAISED <old> -> <new>` line naming this unit
+  `git grep -n -e . HEAD -- tools/template-size-limits.txt` carries a `RAISED <old> -> <new>` line naming this unit
   in the comment block above the `AGENTS.md` row; and `grep -n "charter.override" charter.md` names the key.
   Red when: the charter lands over its cap, or the page omits the rule.
   figure: the charter's size is DERIVED by `wc -c` at the landing commit.
@@ -379,6 +379,7 @@ New arm: tools/playbook/render_playbook.py · covers AC2 · the selftest renders
   pinned lines beside each listed citation; S6 lists every section-number hit AC5's widened grep finds;
   AC4's shipped-template half is a direct grep, not the leg; S9, AC7 and the Files touched re-ground
   on `tools/template-size-limits.txt`, still tracked, the dSafePassage edge replaced by one naming it.
+- rev-7 · 2026-11-04 · AC7 · from `2026-11-04-prompt-PLAY-dOrderedCharter-20-3-sweep-fix-brief.md` item 3: AC7 reads the limits file at HEAD with the plain path as its own token.
 
 ## 10. Reuse audit
 

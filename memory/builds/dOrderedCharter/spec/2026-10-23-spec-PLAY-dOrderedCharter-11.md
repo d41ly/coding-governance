@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-11 — load sets derived per reader and item, budgeted, and refused when a required unit is missing
 
-**Status:** DEFERRED · rev-7 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 21 · closes PLAY-dOrderedCharter-57 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-8 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 21 · closes PLAY-dOrderedCharter-57 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0041@29cae3c8 whole
 **Carries:** node:policy-key.instructions.checks
@@ -261,7 +261,7 @@ commit only when the policy file and the catalogue equal HEAD (TOOL-dGroundRules
   fixture registry holding a unit scoped `feature.roles`, in a scratch tree whose
   `tools/playbook/namespaces.toml` holds no `feature` row, the unit is not selected and the report
   carries `unarmed — feature.*`; with a `feature` row whose `role` is `selects` planted, carrying every
-  field of `REGISTRY_FIELDS` (`tools/playbook/tag_index.py#REGISTRY_FIELDS`: `ns`, `owner`, `layer`,
+  field of `REGISTRY_FIELDS` (in `tools/playbook/tag_index.py`: `ns`, `owner`, `layer`,
   `source`, `extractor`, `role`, `purpose-source` and `join-armed-by`) so `read_namespaces` raises no
   `TagError`, it is selected.
   Red when: an unregistered feature selector reads as an empty set, so "no feature units" passes green.
@@ -343,6 +343,7 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC5 · a fixtur
   (F5), AC1 and AC2 plant one; AC7's planted row carries every registry field; the selftest rides
   `run_plant_rows`; anchors written as symbols beside each listed citation; S3, the Edges and the
   reuse audit re-ground on `tools/template-size-limits.txt`, still tracked.
+- rev-8 · 2026-11-04 · AC7 · from `2026-11-04-prompt-PLAY-dOrderedCharter-20-3-sweep-fix-brief.md` item 3: AC7 names `REGISTRY_FIELDS` beside the plain path.
 
 ## 10. Reuse audit
 

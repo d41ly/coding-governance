@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them
 
-**Status:** DEFERRED · rev-6 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-7 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0033@756303be whole
 
@@ -116,9 +116,9 @@ every load-bearing document to a registry row (foundations R2, v2:949-957 P13, l
   `gate-legs` claim of `memory/map/features/playbook.md` gains the leg; `python
   tools/codebase-map/gen_map.py --write` rewrites `memory/map/generated/`; and the kickoff manifest's
   `last-audit` in `memory/guides/SESSION-KICKOFF.md` is re-stamped, as a `tools/gate-legs.json` edit owes
-  (unit 26's pass, `fe22fcf80`). The `envelopes` verb's planted defects are rows of
-  `tools/playbook/adopt-playbook.sh`'s `run_plant_rows`, each `instruction_units.py --fixture --plant
-  <case>`, so the `playbook render selftest` leg runs them. Observed by AC8.
+  (unit 26's pass, `fe22fcf80`). The `envelopes` verb's planted defects are cases joining
+  `tools/playbook/instruction_units.py#PLANTS`, each `instruction_units.py fixture --plant <case>`, so the
+  `instruction units selftest` leg runs them through its bare `fixture` verb (unit 20's F12). Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -144,7 +144,7 @@ every load-bearing document to a registry row (foundations R2, v2:949-957 P13, l
 - **hands-off** `PLAY-dOrderedCharter-4` — the registry's rows read as the instruction map's levels
 - **hands-off** `PLAY-dOrderedCharter-8` — the card's own row at level 1
 - **hands-off** `PLAY-dOrderedCharter-29` — the document registry the render-parity arm reads
-- **consumes-from** `PLAY-dOrderedCharter-20` — `INSTRUCTION_PATHSPECS`, the instruction-file population S6's load-bearing population reads in place of its own path list
+- **consumes-from** `PLAY-dOrderedCharter-20` — `INSTRUCTION_PATHSPECS`, the instruction-file population S6's load-bearing population reads in place of its own path list, and the `instruction units selftest` leg its cases ride by joining `PLANTS` (unit 20's F12)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 5, 22, 38, 57, 65 and 67, which that batch unit corrects after this unit lands, each by the item its report id names
 - **consumes-from** external — `tools/template-size-limits.txt`, the caps' home while dSafePassage's limits step (TOOL-dSafePassage-61) is DEFERRED: its rows and its raise conditions, which S7 raises on
 - **consumes-from** external — dGroundRules, landed before the build run: the cap census and `budgets.py resolve` (TOOL-dGroundRules-9 S1, S2)
@@ -216,7 +216,6 @@ naming `P13`.
 - `tools/gate-legs.json`
 - `tools/template-size-limits.txt` (S7's raises, one commit each)
 - `tools/playbook/namespaces.toml` (the `doc` row's `source` text)
-- `tools/playbook/adopt-playbook.sh` (the plant rows)
 - `tools/govkit/registry.toml` (the `[[exempt_leg]]` row)
 - `tools/govkit/subject-pins.tsv` (regenerated)
 - `memory/map/features/playbook.md` (the dossier claim)
@@ -295,7 +294,7 @@ naming `P13`.
 - **AC6** — When the same fixture gains an unregistered guide, `NEW.md` in its guides folder, the gate exits 1
   naming it; with its row added and its envelope written, it exits 0.
   Red when: an unregistered load-bearing document passes.
-- **AC7** — When `git show HEAD:tools/template-size-limits.txt` is read after the envelopes' commits,
+- **AC7** — When `git grep -n -e . HEAD -- tools/template-size-limits.txt` is read after the envelopes' commits,
   each row S7 raised holds at least its document's CR-stripped bytes, equal where its block's rule is no
   headroom, under a `RAISED <old> -> <new>` line naming this unit; `python tools/policy/budgets.py
   resolve <path>` prints that value for each; and the `memory/guides/BUILD-METHOD.md` row reads 30720
@@ -313,10 +312,10 @@ naming `P13`.
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `roles render wiring` · `roles render selftest` · `template size <=48KiB` · `charter size` · `build-method size` · `unattended protocol size` · `govkit acceptance matrix` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `check-wiring self-test` · `lexicon naming predicates` · `manifest-check self-test` · `scratch-guard self-test` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `codebase-map kit selftest` · `drift-audit selftest` · `lexicon selftest` · `pre-push run-log line` · `run-gates run-log line` · `runlog selftest` · `kit/dogfood doc parity` · `policy fixtures` · `unattended skill size` · `kickoff engine size <=18KiB` · `govkit selftest` · `govkit refusal join` · `branch-reconcile selftest` · `tags (the resolver's checks)`
+`playbook render selftest` · `playbook render wiring` · `roles render wiring` · `roles render selftest` · `template size <=48KiB` · `charter size` · `build-method size` · `unattended protocol size` · `govkit acceptance matrix` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `check-wiring self-test` · `lexicon naming predicates` · `manifest-check self-test` · `scratch-guard self-test` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `codebase-map kit selftest` · `drift-audit selftest` · `lexicon selftest` · `pre-push run-log line` · `run-gates run-log line` · `runlog selftest` · `kit/dogfood doc parity` · `policy fixtures` · `unattended skill size` · `kickoff engine size <=18KiB` · `govkit selftest` · `govkit refusal join` · `branch-reconcile selftest` · `tags (the resolver's checks)` · `instruction units selftest`
 
 New arm: tools/lib/resolve-python.test.sh · covers AC2 · the parity table's `render_envelope` row, its failing case a copy with one byte changed · none
-New arm: tools/playbook/adopt-playbook.sh · covers AC5 AC6 · `run_plant_rows` rows over `instruction_units.py --fixture --plant <case>`, one per defect of AC5 and the unregistered guide of AC6 in a scratch tree, under the `playbook render selftest` leg · none
+New arm: tools/playbook/instruction_units.py · covers AC5 AC6 · `PLANTS` cases run by `instruction_units.py fixture --plant <case>`, one per defect of AC5 and the unregistered guide of AC6 in a scratch tree, under the `instruction units selftest` leg · none
 
 ## 8. Open questions
 
@@ -378,6 +377,7 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC5 AC6 · `run_plant_rows` 
   no census row has no cap; the external edges to dSafePassage's step and dGroundRules' census added.
 - rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 - rev-6 · 2026-11-04 · section 2 S1 S5 S6 S7, new S8 · section 3 Edges · section 4 Data model, Inventory and Files touched · section 5 · AC1 AC4 AC7, new AC8 · section 7 · section 8 F3, new F5 and F6 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-1-drift-fold-brief.md` (findings 3-1 to 3-7): the caps are rows of `tools/template-size-limits.txt`, raised on its terms, and four cross; BUILD-METHOD's row is the owner's, so F5 is open; rows the `doc` namespace does not derive carry `h1`; the deploy, cleanup and build Skills have their sources; the leg's own rows are S8 and AC8, claimed by an `[[exempt_leg]]` (F6); AC4 runs an argv the leg does not; moved lines are cited by symbol or pinned at `c7269a97`.
+- rev-7 · 2026-11-04 · S8 · section 3 Edges · section 4 Files touched · AC7 · section 7 · from `2026-11-04-prompt-PLAY-dOrderedCharter-20-3-sweep-fix-brief.md` items 2 and 3: the plants join `PLANTS` and ride unit 20's `instruction units selftest` leg, spelled `fixture --plant`, `adopt-playbook.sh` leaves the write set, and AC7 reads the limits file at HEAD with the plain path as its own token.
 
 ## 10. Reuse audit
 

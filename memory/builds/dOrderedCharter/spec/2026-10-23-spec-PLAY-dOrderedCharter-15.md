@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-15 — the instruction manifest and its guarded write command, each change recorded, and the pack catalogue
 
-**Status:** DEFERRED · rev-8 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 16 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
+**Status:** DEFERRED · rev-9 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 16 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
 
 **Carries:** cl-dClosedLoop-0045@f345dc78 whole
 
@@ -261,7 +261,7 @@ when the policy file and the catalogue equal HEAD (TOOL-dGroundRules-5 S1, TOOL-
 - `tools/govkit/registry.toml`, the `[[exempt_leg]]` row
 - `tools/govkit/subject-pins.tsv`, by `govkit.py selfcheck --write`
 - `memory/map/features/playbook.md`, the leg's claim
-- `memory/map/generated/`, the files `python tools/codebase-map/gen_map.py --write` rewrites
+- `memory/map/generated/`, the map's generated outputs
 - `tools/policy/catalogue.toml`, the two existing rows filled
 - `tools/policy/unsummarised-keys.txt`, drained by `lists --write`
 - `.governance/policy.json`, the second commit
@@ -430,6 +430,7 @@ New arm: tools/gate-legs.json · covers AC6 · the `instruction edits (manifest 
   value readers.
 - 2026-11-04 · section 3 Edges · from `2026-11-04-prompt-PLAY-dOrderedCharter-15-edge-mirror-brief.md`: the hands-off mirror of the consumes-from edge unit 52 declares against this unit; a mirror-only edit, so the status line keeps its rev.
 - rev-8 · 2026-11-04 · S7 · section 3 · from `2026-11-04-prompt-PLAY-dOrderedCharter-20-divergence-brief.md`: S7 and the consumes-from line for unit 20 take the body of `read_change_records`, which this unit replaces when it lands the `change` kind.
+- rev-9 · 2026-11-04 · section 4 Files touched · from `2026-11-04-prompt-PLAY-dOrderedCharter-20-3-sweep-fix-brief.md` item 1: the line names the map's generated outputs and not the generator, which the pass runs and never writes, so the three legs guarding the map kit stay untripped; no S or AC id moved.
 
 ## 10. Reuse audit
 

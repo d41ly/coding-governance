@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-6 — the drive section composed from each adopted kit's drive table, and the charter held inside 32 KiB
 
-**Status:** DEFERRED · rev-6 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 19 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-7 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 19 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0036@3667f2f3 whole
 
@@ -68,10 +68,8 @@ F1-6, F1-7; v2:961-965 P15).
   the drive region's markers in the rendered charter is a selected kit's row; every selected kit's row
   is a line there. Each failure names the kit and the row. Its plants are cases of unit 9's
   `instruction_units.py fixture --plant` entry, `drive-bad-role`, `drive-no-row`, `drive-empty-command`,
-  `drive-hand-line` and `drive-lost-line`, each a row of `adopt-playbook.sh`'s selftest through
-  `run_plant_rows` (`tools/playbook/adopt-playbook.sh#run_plant_rows`), which gains an optional third
-  argument naming the script's plant entry, `--fixture` when absent, so the tag and edge rows run
-  unchanged (the fork record's F6). Observed by AC3 and AC4.
+  `drive-hand-line` and `drive-lost-line`, each joining `tools/playbook/instruction_units.py#PLANTS`, so
+  the `instruction units selftest` leg runs it through its bare `fixture` verb (the fork record's F6). Observed by AC3 and AC4.
 - **S5** — The role line in the handoff. `render_handoff` (`tools/roles/handoff.py:312`) adds the
   role's drive lines under a `### Drive` heading at the end of the `## Role` section, from the same
   rows, so a subagent holds its role's line as the main session does. Observed by AC5.
@@ -134,7 +132,7 @@ F1-6, F1-7; v2:961-965 P15).
 
 ### Edges
 
-- **consumes-from** `PLAY-dOrderedCharter-20` — the renderer of record the drive expansion lives in
+- **consumes-from** `PLAY-dOrderedCharter-20` — the renderer of record the drive expansion lives in, and the `instruction units selftest` leg its cases ride by joining `PLANTS` (unit 20's F12)
 - **consumes-from** `PLAY-dOrderedCharter-9` — the reader module the `drive` verb joins
 - **hands-off** `PLAY-dOrderedCharter-23` — the drive row saying a build runs unattended by default
 - **hands-off** `PLAY-dOrderedCharter-2` — where the drive section sits in the re-founded charter
@@ -177,7 +175,7 @@ the template section `## Drive — how to start and advance the loop`; the place
 `drive`; the handoff heading `### Drive`; the size check's new number in `check-template-size.sh`, 8; the
 `root_relative` `[[files]]` rules in `tools/playbook/kit.toml`; the `budgets.py` verb `home`, the
 function `read_cap_home` and the case `budgets-home`; the plants `drive-bad-role`, `drive-no-row`,
-`drive-empty-command`, `drive-hand-line` and `drive-lost-line`; `run_plant_rows`' third argument. `python tools/lexicon/lexicon.py --suggest
+`drive-empty-command`, `drive-hand-line` and `drive-lost-line`. `python tools/lexicon/lexicon.py --suggest
 read_cap_home --as py.function` answered OK on 2026-10-25; the lexicon declares no CLI-verb cell, so
 `home` is graded by no cell, and it names what the verb prints, as `resolve` and `check` do.
 
@@ -206,7 +204,6 @@ in its row of `tools/template-size-limits.txt`, on the four conditions that file
 - `tools/playbook/kit.toml`
 - `tools/playbook/render_playbook.py`
 - `tools/playbook/instruction_units.py`
-- `tools/playbook/adopt-playbook.sh` (the drive plants' rows and `run_plant_rows`' third argument)
 - `tools/govkit/entries/playbook.kit.toml`
 - `tools/roles/handoff.py`
 - `tools/check-template-size.sh`
@@ -263,8 +260,8 @@ in its row of `tools/template-size-limits.txt`, on the four conditions that file
 - **AC6** — When the scratch copy of the script runs as `bash <scratch>/tools/check-template-size.sh
   <scratch>/AGENTS.md`, never the `charter size` leg's argv, in a scratch repository holding the policy
   kit, whose committed `.governance/policy.toml` sets `"AGENTS.md" = 40960` under `[budgets]` and whose
-  limits file carries no `AGENTS.md` row (a cap held in both homes refuses,
-  `tools/policy/budgets.py#resolve_caps`), it exits non-zero naming `CODEX_MAX` under
+  limits file carries no `AGENTS.md` row (a cap held in both homes refuses, in
+  `resolve_caps` of `tools/policy/budgets.py`), it exits non-zero naming `CODEX_MAX` under
   `budgets.enforce = "warn"`; at 20480 it exits 0, and the measured bytes it prints are at most 20480.
   Red when: a cap above 32768 passes.
 - **AC7** — When `grep -n "cl-dClosedLoop-0012" charter.md` and `grep -n "Drive" charter.md` run, each
@@ -280,11 +277,11 @@ in its row of `tools/template-size-limits.txt`, on the four conditions that file
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `playbook parity` · `policy check` · `policy fixtures` · `kit version markers` · `charter size` · `template size <=48KiB` · `template size gate selftest` · `roles render wiring` · `roles render selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test`
+`playbook render selftest` · `playbook render wiring` · `playbook parity` · `policy check` · `policy fixtures` · `kit version markers` · `charter size` · `template size <=48KiB` · `template size gate selftest` · `roles render wiring` · `roles render selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `instruction units selftest`
 
 New arm: tools/policy/check_policy.py --fixture · covers AC8 · the `budgets-home` case plants a `constant:` home with its assignment line and one without · none
 New arm: tools/check-template-size.test.sh · covers AC6 · a scratch repository whose committed policy file sets the charter's cap above the harness limit · none
-New arm: tools/playbook/adopt-playbook.sh · covers AC3 AC4 · the `playbook render selftest` leg's `run_plant_rows` rows, each running `instruction_units.py fixture --plant drive-<case>` over one defect of AC3 or one charter edit of AC4 in a scratch tree, each failing case staged by its plant · none
+New arm: tools/playbook/instruction_units.py · covers AC3 AC4 · the `drive-bad-role`, `drive-no-row`, `drive-empty-command`, `drive-hand-line` and `drive-lost-line` `PLANTS` cases, over one defect of AC3 or one charter edit of AC4 in a scratch tree, under the `instruction units selftest` leg, each failing case staged by its plant · none
 
 ## 8. Open questions
 
@@ -328,16 +325,21 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC3 AC4 · the `playbook ren
   its own parse until then, two readers of one row, the defect P1 removes. RESOLVED (agent,
   2026-10-25, delegated): (a), rung 1, the build's order and the edge arm; the one reader the brief
   asks for is kept, and unit 11 calls it. widens: none · relaxes: none
-- **F6 — Which leg runs the drive plants.** At `c7269a97` `adopt-playbook.sh` runs no
-  `instruction_units.py` case, and `run_plant_rows` calls each script as `<script> --fixture --plant
-  <case>`, while unit 9 S6 spells the module's entry `fixture --plant <case>`. Options: (a) rows through
-  `run_plant_rows`, given an optional third argument naming the plant entry, `--fixture` when absent;
-  (b) a second spelling, `--fixture`, on `instruction_units.py` beside unit 9's verb; (c) a copy of the
-  loop for this module; (d) a new leg, with its dossier claim, its `subject-pins.tsv` row and its
-  claiming registry row. (b) is two spellings of one entry, (c) a second copy of the seam the reuse
-  rule forbids, and (d) adds a leg and three rows for five plants the `playbook render selftest` leg
-  already reaches, its guard covering `tools/playbook/`. RESOLVED (agent, 2026-11-04, delegated): (a),
-  rung 3, the seam the tag and edge arms already ride, extended additively. widens: none · relaxes: none
+- **F6 — Which leg runs the drive plants.** `run_plant_rows` calls each script as `<script> --fixture --plant <case>`,
+  while `tools/playbook/instruction_units.py#main` takes the verb `fixture --plant <case>` and refuses
+  that flag. First resolved, on 2026-11-04, as (a); unit 20's F12 has since added the
+  `instruction units selftest` leg. Options: (a) rows through `run_plant_rows`, given an optional third
+  argument naming the plant entry, `--fixture` when absent; (b) a second spelling, `--fixture`, on
+  `instruction_units.py` beside unit 9's verb; (c) a copy of the loop for this module; (d) a new leg, with
+  its dossier claim, its `subject-pins.tsv` row and its claiming registry row; (e) the cases join
+  `PLANTS`, and unit 20's leg runs them. (b) is two spellings of one entry, (c) a second copy of the seam
+  the reuse rule forbids, and (d) a second leg for what unit 20's already runs. (a) is the loser, on two
+  observations: that leg's argv in `tools/gate-legs.json` is the bare `fixture` verb and
+  `tools/playbook/instruction_units.py#run_fixture` walks every `PLANTS` entry, so a typed row repeats a
+  case the leg runs; and `playbook render selftest` ships in `tools/playbook/kit.toml`, where a target
+  holding no roles kit has no `tools/roles/workflows.toml` for the drive cases to read. RESOLVED (agent,
+  2026-11-04, delegated): (e); a new case cannot miss the leg, and `run_plant_rows` stays as it is. The
+  cost: an adopter runs none of these plants. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -365,6 +367,7 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC3 AC4 · the `playbook ren
   page S7 extends; the drive plants ride `run_plant_rows` (F6); AC6 runs the scratch copy, not the leg.
 - 2026-11-04 · section 2 S6 · from `2026-11-04-prompt-PLAY-dOrderedCharter-1-hygiene-fix-brief.md` item 2:
   S6 gains its Readers clause, which says it retires nothing; a records fix, so the status line keeps its rev.
+- rev-7 · 2026-11-04 · S4 · section 3 Edges · section 4 Inventory, Files touched · AC6 · section 7 · the fork record's F6 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-20-3-sweep-fix-brief.md` items 2 and 3: the drive cases join `PLANTS` and ride unit 20's `instruction units selftest` leg, `run_plant_rows` keeps two arguments and `adopt-playbook.sh` leaves the write set, F6 re-resolved to (e); AC6 names `resolve_caps` beside the plain path.
 
 ## 10. Reuse audit
 
@@ -377,8 +380,8 @@ its declarations already travel; `tools/roles/workflows.toml` already orders the
 join; `budgets.py resolve` is the one reader of the caps (TOOL-dGroundRules-9 S2, S5), and
 `check-template-size.sh` (`tools/check-template-size.sh:79-100`, now its key derivation) the enforcer
 the hold joins, beside its budget read (`tools/check-template-size.sh@c7269a97:310-327`) and its breach
-check (`tools/check-template-size.sh@c7269a97:375-385`); `run_plant_rows`
-(`tools/playbook/adopt-playbook.sh#run_plant_rows`) is the plant loop the drive rows ride.
+check (`tools/check-template-size.sh@c7269a97:375-385`); `PLANTS`
+(`tools/playbook/instruction_units.py#PLANTS`) is the table the drive cases join, which unit 20's `instruction units selftest` leg walks.
 `python tools/codebase-map/reuse_lookup.py "compose a charter section from each kit descriptor"`
 ranked `kit_rel`, `resolve_kit_dir` (fan-in 12, installs 72), `read_descriptors`
 (`tools/govkit/govkit.py:13238`, now `tools/govkit/govkit.py#read_descriptors`;

@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-31 — this build's own upgrade steps: the agent-instructions wiring to the one renderer, adopter rules into the overlay, the seeded template's succession row, the census's change records and the `map_lib` deprecation
 
-**Status:** DEFERRED · rev-6 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 36 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
+**Status:** DEFERRED · rev-7 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 36 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
 
 **Carries:** cl-dClosedLoop-0061@bf1a53b5 whole
 
@@ -373,7 +373,7 @@ edited. Both counts are DERIVED by the query at the pass.
 - **AC13** — When `python -c "import tomllib; print([(r['enforcer'], r['home']) for r in tomllib.load(open( 'tools/policy/caps.toml' , 'rb'))['cap'] if r['name'] == 'codex-instructions'])"`
   runs after the pass, it prints the module `CODEX_MAX` moved into and `constant:<that module>:CODEX_MAX`,
   and `python "tools/policy/check_policy.py"` reports `arm_cap_census` green.
-  Red when: the row still names `agent-instructions/adopt-agent-instructions.sh`, which the pass deletes.
+  Red when: the row still names `tools/agent-instructions/adopt-agent-instructions.sh`, through its `{prefix}` spelling, which the pass deletes.
 - **AC14** — When `git grep -n -A1 -e 'class = "charter-key"' -e 'class = "module-export"' -- tools/govkit/usage.toml`
   runs after the pass, it prints both rows, each followed by `usage = "none"`.
   Red when: a class registered in `tools/govkit/surface-classes.toml` has no `[[class]]` row in
@@ -472,6 +472,7 @@ New arm: tools/govkit/surface-classes.toml · covers AC4 AC7 · the step gate's 
   TOOL-dSafePassage-9's retired-seed verdicts, with a consumes-from edge on that revision; no ask is
   filed, since dSafePassage's units 6 and 9 are revised in the same commit.
 - rev-6 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-7 · 2026-11-04 · AC13 · from `2026-11-04-prompt-PLAY-dOrderedCharter-20-3-sweep-fix-brief.md` item 4: AC13 names the adopter by its full tracked path.
 
 ## 10. Reuse audit
 

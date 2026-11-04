@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-20 — the unit schema, the one renderer of record and its templates, the render gate with its legacy list, and one fact in one unit
 
-**Status:** DEFERRED · rev-8 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 15 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-9 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 15 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0050@13d9192b whole
 
@@ -31,6 +31,8 @@
 | [2026-11-04-prompt-PLAY-dOrderedCharter-20-1-spec-writer.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-20-1-spec-writer.md) | journal | — |
 | [2026-11-04-prompt-PLAY-dOrderedCharter-20-2-divergence-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-20-2-divergence-brief.md) | research | — |
 | [2026-11-04-prompt-PLAY-dOrderedCharter-20-2-spec-writer.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-20-2-spec-writer.md) | journal | — |
+| [2026-11-04-prompt-PLAY-dOrderedCharter-20-3-spec-writer.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-20-3-spec-writer.md) | journal | — |
+| [2026-11-04-prompt-PLAY-dOrderedCharter-20-3-sweep-fix-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-20-3-sweep-fix-brief.md) | research | — |
 | [2026-11-04-prompt-PLAY-dOrderedCharter-20-divergence-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-20-divergence-brief.md) | research | — |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
@@ -299,7 +301,7 @@ the catalogue equal HEAD (TOOL-dGroundRules-19 S1). The second commit carries `P
 - `tools/govkit/registry.toml`, the three `[[exempt_leg]]` rows
 - `tools/govkit/subject-pins.tsv`, by `govkit.py selfcheck --write`
 - `memory/map/features/playbook.md`, the legs' claim
-- `memory/map/generated/`, the files `python tools/codebase-map/gen_map.py --write` rewrites
+- `memory/map/generated/`, the map's generated outputs
 - `tools/policy/catalogue.toml`, the existing row filled
 - `tools/policy/unsummarised-keys.txt`, drained by `lists --write`
 - `.governance/policy.json`, the second commit
@@ -406,11 +408,11 @@ Not touched, under F10's (e): `tools/roles/render_agents.py`, `tools/roles/adopt
   Red when: a leg lands unpinned, unclaimed, missing from the dossier, or claimed with the map not
   regenerated.
 - **AC12** — When `python tools/roles/render_agents.py --check` runs, it exits 0;
-  `python -c "import tomllib; print([t['renderer'] for t in tomllib.load(open('tools/playbook/renderers.toml', 'rb'))['target'] if '.claude/agents/*.md' in t['paths']])"`
+  `python -c "import tomllib; print([t['renderer'] for t in tomllib.load(open( 'tools/playbook/renderers.toml' , 'rb'))['target'] if '.claude/agents/*.md' in t['paths']])"`
   prints `['kit-adopter']`; and `python tools/playbook/render_playbook.py --render-scope agents` exits 2
   naming the scope and writes nothing.
   Red when: an agent file gains a second renderer of record, or the kept render stops holding it.
-- **AC13** — When `python -c "import tomllib; d = lambda k: tomllib.load(open(f'tools/{k}/kit.toml', 'rb')); print(d('agent-instructions')['requires'], {g['generator'] for g in d('roles')['generated']})"`
+- **AC13** — When `python -c "import tomllib; d = lambda k: tomllib.load(open( 'tools/%s/kit.toml' % k , 'rb')); print(d('agent-instructions')['requires'], {g['generator'] for g in d('roles')['generated']})"`
   runs, it prints `['playbook-render']` and `{'render_agents.py'}`; `git grep -n -F 'No hard deps' --
   tools/agent-instructions/adopt-agent-instructions.sh` prints nothing; `python tools/govkit/govkit.py
   selfcheck` names no finding on `agent-instructions`; and `python instruction_units.py fixture --plant
@@ -537,9 +539,8 @@ New arm: tools/playbook/render_playbook.py · covers AC5 · the render selftest 
   RESOLVED (agent, 2026-11-04, delegated): (b). (c) reds a target holding no roles kit. (a) ships there
   too, so three rows need a presence test, a skip read as a pass, and its typed rows leave the twelve
   cases already in `PLANTS` on no leg (PINNED, 2026-11-04; 24 seconds). Under (b) a new case cannot miss
-  the leg. The cost: an adopter runs none of these plants. This unit takes no third argument; F6 refused a
-  new leg for five plants, this one exists, and F6 stands until unit 6 folds the edge. widens: none ·
-  relaxes: none
+  the leg. The cost: an adopter runs none of these plants. This unit takes no third argument, and unit 6's
+  F6 folds onto this leg. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -547,7 +548,7 @@ New arm: tools/playbook/render_playbook.py · covers AC5 · the render selftest 
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-43, PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50, PLAY-dOrderedCharter-55.
 - rev-4 · 2026-10-24 · §2 S8 · §3 Edges · §4 Rollout, Files touched · §5 · AC8, AC10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` U3 and U4: `instructions.legacy` is read with `policy.py get` through PLAY-dOrderedCharter-7's `read_policy_value`, a refused read reds the gate, and the landed row is filled and drained, never added.
-- rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2.
 - rev-6 · 2026-11-03 · S2 S4 S8 S10 · §3 Edges · §4 · AC5 AC9 AC10 AC11 (new) · §7 · §8 F5
   (new) · §10 · from `2026-11-03-prompt-PLAY-dOrderedCharter-9-drift-fold-brief.md` items 20-1 to
   20-7.
@@ -562,6 +563,9 @@ New arm: tools/playbook/render_playbook.py · covers AC5 · the render selftest 
 - rev-8 · 2026-11-04 · S7 S12 S13 (new) · section 3 · section 4 · section 5 · AC7 AC11 AC14 (new) · section 7 ·
   section 8 F11 F12 (new) · section 9, older tails trimmed for bytes · section 10 · from
   `2026-11-04-prompt-PLAY-dOrderedCharter-20-2-divergence-brief.md` items 1 to 4.
+- rev-9 · 2026-11-04 · AC12 AC13 · section 9 · the fix for unit 20's third hand-back: no `python -c` word is
+  path-shaped.
+- 2026-11-04 · section 4 Files touched · section 8 F12 · `2026-11-04-prompt-PLAY-dOrderedCharter-20-3-sweep-fix-brief.md` items 1 and 2.
 
 ## 10. Reuse audit
 

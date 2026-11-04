@@ -77,3 +77,31 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Build that expected string from a placeholder, as unit 47's `SELFTEST_ROWS` do with `{x}`, so the source holds no
   `path:line` text. Declare `tools/playbook/instruction_units.py` in your `--dispatch` if your spec does not, and confirm
   the module's plants stay green.
+
+## Your previous dispatch's work
+
+- Run wf_e0f47b3e-0d5 built most of rev-8, then died on an API 403 before committing. Its edits are still in this tree,
+  uncommitted: 26 tracked paths and three new ones, and the spec is at INPROGRESS. They are also saved as
+  `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dorderedcharter-725f52/0394fa33-012c-408f-a840-e6e4cfaac23f/scratchpad/unit20-partial.patch`.
+- Start from the tree as it stands: read the diff against rev-8, finish what is missing, and verify every AC yourself.
+  Nothing it did is verified until you observe it.
+- Its `--dispatch` and `--brief` rows are in `RUN.md`. Re-run `--dispatch` if your write set differs, and re-run
+  `--brief`, because this section changed the brief. Commit this brief with your pass, and declare it.
+
+## The dispatch after that
+
+- Run wf_9f744eb1-b46 found the rev-8 work complete: all 20 fixture plants green, and the agent-instructions adopter
+  matching in 15 of 16 scenarios, the 16th recorded in its deviation draft. It stopped on two spec tokens, now fixed at
+  rev-9. The tree still holds that work, and the spec is back at `DEFERRED`: set `INPROGRESS` only after `--dispatch`
+  returns.
+- Its drafts are in the scratchpad: `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dorderedcharter-725f52/0394fa33-012c-408f-a840-e6e4cfaac23f/scratchpad/ledger.md`, `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dorderedcharter-725f52/0394fa33-012c-408f-a840-e6e4cfaac23f/scratchpad/deviation.md` and `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dorderedcharter-725f52/0394fa33-012c-408f-a840-e6e4cfaac23f/scratchpad/commit-msg.txt`. Re-check them against
+  rev-9 before you use them.
+- Owed in the pass commit:
+  - `.lexicon.conf`'s `VERB_OFFENDER_PIN` goes from 1216 to 1209, because the pin is an equality and the absorbed shell
+    writers drained seven. Confirm the count first.
+  - Re-stamp the kickoff manifest, because `tools/gate-legs.json` is on its watch list, and count the delta line.
+  - Run `gen_build_index --write` and make the CLOSED flip.
+  - Commit `.governance/policy.json` alone, with `Pass: none`.
+- In `--dispatch`, declare `.lexicon.conf`, `memory/map/generated/CARDS.md`, `inventories.json`, the ledger, the deviation
+  and this brief, but never `RUN.md`.
+- Do not call a gate's predicate directly after its leg is refused. Name what is owed and leave it for the close.

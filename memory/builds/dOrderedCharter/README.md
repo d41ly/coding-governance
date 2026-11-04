@@ -139,16 +139,16 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY
 | [PLAY-dOrderedCharter-42 — the bindings reader admits every kind the record factory mints, joined to its file name both ways](spec/2026-10-24-spec-PLAY-dOrderedCharter-42.md) | 12 | 2 | CLOSED | rev-5 | 2026-11-04 |
 | [PLAY-dOrderedCharter-12 — the statement grammar, its check, and render provenance in a sidecar lock](spec/2026-10-23-spec-PLAY-dOrderedCharter-12.md) | 13 | 2 | CLOSED | rev-5 | 2026-11-04 |
 | [PLAY-dOrderedCharter-9 — the instruction-unit registry: one row per unit in each kit's manifest, its one reader, and documents rendered from units](spec/2026-10-23-spec-PLAY-dOrderedCharter-9.md) | 14 | 2 | CLOSED | rev-5 | 2026-11-04 |
-| [PLAY-dOrderedCharter-20 — the unit schema, the one renderer of record and its templates, the render gate with its legacy list, and one fact in one unit](spec/2026-10-23-spec-PLAY-dOrderedCharter-20.md) | 15 | 2 | DEFERRED | rev-8 | 2026-11-04 |
-| [PLAY-dOrderedCharter-15 — the instruction manifest and its guarded write command, each change recorded, and the pack catalogue](spec/2026-10-23-spec-PLAY-dOrderedCharter-15.md) | 16 | 2 | DEFERRED | rev-8 | 2026-11-04 |
+| [PLAY-dOrderedCharter-20 — the unit schema, the one renderer of record and its templates, the render gate with its legacy list, and one fact in one unit](spec/2026-10-23-spec-PLAY-dOrderedCharter-20.md) | 15 | 2 | DEFERRED | rev-9 | 2026-11-04 |
+| [PLAY-dOrderedCharter-15 — the instruction manifest and its guarded write command, each change recorded, and the pack catalogue](spec/2026-10-23-spec-PLAY-dOrderedCharter-15.md) | 16 | 2 | DEFERRED | rev-9 | 2026-11-04 |
 | [PLAY-dOrderedCharter-1 — the practice catalogue and `charter.practices`](spec/2026-10-23-spec-PLAY-dOrderedCharter-1.md) | 17 | 2 | DEFERRED | rev-7 | 2026-11-04 |
 | [PLAY-dOrderedCharter-45 — the merge driver's TOML-table class states its whole conflict envelope and proves its output parses](spec/2026-10-24-spec-PLAY-dOrderedCharter-45.md) | 17 | 2 | DEFERRED | rev-3 | 2026-11-04 |
-| [PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them](spec/2026-10-23-spec-PLAY-dOrderedCharter-3.md) | 18 | 2 | DEFERRED | rev-6 | 2026-11-04 |
+| [PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them](spec/2026-10-23-spec-PLAY-dOrderedCharter-3.md) | 18 | 2 | DEFERRED | rev-7 | 2026-11-04 |
 | [PLAY-dOrderedCharter-41 — the `cross-os` block stays live, so every v4 template renders after the practice catalogue lands](spec/2026-10-24-spec-PLAY-dOrderedCharter-41.md) | 18 | 2 | DEFERRED | rev-4 | 2026-11-04 |
 | [PLAY-dOrderedCharter-52 — the TOML-table merge envelope is total: every base, ours and theirs state has a row, and an unlisted one is a conflict](spec/2026-10-24-spec-PLAY-dOrderedCharter-52.md) | 18 | 2 | DEFERRED | rev-2 | 2026-11-04 |
-| [PLAY-dOrderedCharter-6 — the drive section composed from each adopted kit's drive table, and the charter held inside 32 KiB](spec/2026-10-23-spec-PLAY-dOrderedCharter-6.md) | 19 | 2 | DEFERRED | rev-6 | 2026-11-04 |
-| [PLAY-dOrderedCharter-2 — the charter re-founded in its level-0 envelope, with the override rule and its record](spec/2026-10-23-spec-PLAY-dOrderedCharter-2.md) | 20 | 2 | DEFERRED | rev-6 | 2026-11-04 |
-| [PLAY-dOrderedCharter-11 — load sets derived per reader and item, budgeted, and refused when a required unit is missing](spec/2026-10-23-spec-PLAY-dOrderedCharter-11.md) | 21 | 2 | DEFERRED | rev-7 | 2026-11-04 |
+| [PLAY-dOrderedCharter-6 — the drive section composed from each adopted kit's drive table, and the charter held inside 32 KiB](spec/2026-10-23-spec-PLAY-dOrderedCharter-6.md) | 19 | 2 | DEFERRED | rev-7 | 2026-11-04 |
+| [PLAY-dOrderedCharter-2 — the charter re-founded in its level-0 envelope, with the override rule and its record](spec/2026-10-23-spec-PLAY-dOrderedCharter-2.md) | 20 | 2 | DEFERRED | rev-7 | 2026-11-04 |
+| [PLAY-dOrderedCharter-11 — load sets derived per reader and item, budgeted, and refused when a required unit is missing](spec/2026-10-23-spec-PLAY-dOrderedCharter-11.md) | 21 | 2 | DEFERRED | rev-8 | 2026-11-04 |
 | [PLAY-dOrderedCharter-27 — each role's load set budgeting the `code` slot](spec/2026-10-23-spec-PLAY-dOrderedCharter-27.md) | 22 | 2 | DEFERRED | rev-5 | 2026-11-04 |
 | [PLAY-dOrderedCharter-21 — each practice's reach per step rendered as step-scoped units handed in work orders](spec/2026-10-23-spec-PLAY-dOrderedCharter-21.md) | 23 | 2 | DEFERRED | rev-3 | 2026-11-04 |
 | [PLAY-dOrderedCharter-5 — ranked envelopes in every subagent handoff, the charter carried once](spec/2026-10-23-spec-PLAY-dOrderedCharter-5.md) | 24 | 2 | DEFERRED | rev-5 | 2026-11-04 |
@@ -159,13 +159,13 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY
 | [PLAY-dOrderedCharter-30 — the portable practice: a role per language, one rule set, each rule paired with its named leg, absorbing `[cross-os]` and `[bytes]`](spec/2026-10-23-spec-PLAY-dOrderedCharter-30.md) | 28 | 2 | DEFERRED | rev-5 | 2026-11-03 |
 | [PLAY-dOrderedCharter-29 — the one writing practice's checks over records as well as units](spec/2026-10-23-spec-PLAY-dOrderedCharter-29.md) | 29 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 | [PLAY-dOrderedCharter-23 — a build run unattended by default from its request, said in the drive section, and the `[land]` rule read through the request's mandate](spec/2026-10-23-spec-PLAY-dOrderedCharter-23.md) | 30 | 2 | DEFERRED | rev-3 | 2026-11-03 |
-| [PLAY-dOrderedCharter-32 — the repository's instruction overlay: `.governance/instructions.toml`, its `repo.` units, pinned edges into gov's units, derived classes and the repository's own policy keys](spec/2026-10-23-spec-PLAY-dOrderedCharter-32.md) | 31 | 2 | DEFERRED | rev-5 | 2026-11-03 |
+| [PLAY-dOrderedCharter-32 — the repository's instruction overlay: `.governance/instructions.toml`, its `repo.` units, pinned edges into gov's units, derived classes and the repository's own policy keys](spec/2026-10-23-spec-PLAY-dOrderedCharter-32.md) | 31 | 2 | DEFERRED | rev-6 | 2026-11-04 |
 | [PLAY-dOrderedCharter-33 — pins and drift: each gov change record marked `editorial` or `semantic`, a stale pin acting as `instructions.stale` says, successors re-pointing or orphaning an edge](spec/2026-10-23-spec-PLAY-dOrderedCharter-33.md) | 32 | 2 | DEFERRED | rev-5 | 2026-11-03 |
 | [PLAY-dOrderedCharter-46 — the overlay's landed revision defined, its unborn-HEAD outcome stated, and a write door rendering the rows it just wrote](spec/2026-10-24-spec-PLAY-dOrderedCharter-46.md) | 32 | 2 | DEFERRED | rev-5 | 2026-11-03 |
 | [PLAY-dOrderedCharter-35 — the overlay's row mechanism for every registered kind: adopter-segment tags, field patches, whole-row replacements, exclusions, row pins and stale rows](spec/2026-10-23-spec-PLAY-dOrderedCharter-35.md) | 33 | 2 | DEFERRED | rev-6 | 2026-11-03 |
 | [PLAY-dOrderedCharter-36 — the row checks over every registered kind: the fixed set, the exclusion refusals and the widening classifier](spec/2026-10-23-spec-PLAY-dOrderedCharter-36.md) | 34 | 2 | DEFERRED | rev-6 | 2026-11-03 |
 | [PLAY-dOrderedCharter-34 — composition and its report: the project block and marked parts from the overlay, budgets and harness limits at render, one composition for every harness, the delta report, and the practice census](spec/2026-10-23-spec-PLAY-dOrderedCharter-34.md) | 35 | 2 | DEFERRED | rev-6 | 2026-11-03 |
-| [PLAY-dOrderedCharter-31 — this build's own upgrade steps: the agent-instructions wiring to the one renderer, adopter rules into the overlay, the seeded template's succession row, the census's change records and the `map_lib` deprecation](spec/2026-10-23-spec-PLAY-dOrderedCharter-31.md) | 36 | 2 | DEFERRED | rev-6 | 2026-11-03 |
+| [PLAY-dOrderedCharter-31 — this build's own upgrade steps: the agent-instructions wiring to the one renderer, adopter rules into the overlay, the seeded template's succession row, the census's change records and the `map_lib` deprecation](spec/2026-10-23-spec-PLAY-dOrderedCharter-31.md) | 36 | 2 | DEFERRED | rev-7 | 2026-11-04 |
 | [PLAY-dOrderedCharter-37 — the help pages: reference pages rendered from each registry's rows, concept, task and tutorial pages beside them, every shown command run, each page linked to its unit by tag](spec/2026-10-23-spec-PLAY-dOrderedCharter-37.md) | 37 | 2 | DEFERRED | rev-5 | 2026-11-03 |
 | [PLAY-dOrderedCharter-39 — the card import survives the agent-instructions kit's retirement, with the wiring leg kept by name](spec/2026-10-24-spec-PLAY-dOrderedCharter-39.md) | 37 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 | [PLAY-dOrderedCharter-40 — gov's first instruction unit rows, one per reference page, and the pages' registry tags declared](spec/2026-10-24-spec-PLAY-dOrderedCharter-40.md) | 38 | 2 | DEFERRED | rev-2 | 2026-10-24 |
@@ -174,7 +174,7 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-4 | 2026-11-04 |
 <!-- /gen:build-units -->
 
-Records: 362 bound to this build, across 4 record folder(s).
+Records: 364 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
