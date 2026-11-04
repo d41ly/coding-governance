@@ -56,6 +56,9 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - A shipped kit file may not name an adopter, and a hook file may not spell `tools/<kit>/` as a literal.
 - A new shell or Python function stales `memory/map/generated/symbols.json`; regenerate it in your pass.
 - A new gotcha class needs a claim in a codebase-map dossier's gotcha-classes in the same commit.
+- Unit 26's positional check reds new tracked text that cites a section by its sign, a hygiene check by its number,
+  a method rule by its code, or a `path:line`, your acceptance ledger and builder notes included: name them in
+  words and cite code as `path#symbol`. Your pass must leave `python tools/playbook/gov_tag.py check` green.
 
 ## dOrderedCharter's own rules
 
