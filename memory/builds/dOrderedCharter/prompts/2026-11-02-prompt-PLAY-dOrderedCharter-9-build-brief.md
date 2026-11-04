@@ -66,3 +66,12 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Your spec header's `advances PLAY-dOrderedCharter-38` stays `advances` when you flip it to `CLOSED`; you are not the last unit.
 - The unattended kit's own self-test suites are WAIVED for this build's landing (README, "Build-level rules"); a
   criterion they would observe is named as owed with PLAY-dClosedLoop-12, never run.
+
+## Owed by the unit before yours
+
+- Unit 12's `read_lock` in `tools/playbook/instruction_units.py` silently drops a `target` entry that is not a table, so
+  a malformed lock row reads as no row instead of refusing by name. Make it refuse, naming the entry, and add the case
+  to the module's `lock` plant. Your pass already writes this file.
+- `memory/map/features/session-kickoff.md` still calls Step 2's fallback the "`governance-template:` marker fallback";
+  unit 12 replaced the marker with the lock. Re-word that claim and regenerate the map in your pass, declaring both in
+  your `--dispatch`.
