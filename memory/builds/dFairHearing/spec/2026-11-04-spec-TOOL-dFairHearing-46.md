@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-46 — the bar's own reds in the replay scorer, and its stated-count reader
 
-**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-1 · base f4120c83 · streams tooling · order 29
+**Status:** INPROGRESS · rev-2 · 2026-11-04 · node d · Tier-1 · base f4120c83 · streams tooling · order 29
 
 **Derived:** PLAY-dClosedLoop-2
 
