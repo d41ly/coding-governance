@@ -128,7 +128,7 @@ ids TOOL-dFairHearing-43
 | [TOOL-dFairHearing-43 — the closing diff review's eight minors: caller refs refused before any agent, one cell encoding, every pin key routed, one sibling-kit resolver, and arms over every preset](spec/2026-11-04-spec-TOOL-dFairHearing-43.md) | 29 | 2 | INPROGRESS | rev-2 | 2026-11-04 |
 <!-- /gen:build-units -->
 
-Records: 293 bound to this build, across 4 record folder(s).
+Records: 298 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
