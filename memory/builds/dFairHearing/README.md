@@ -128,7 +128,7 @@ ids TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHea
 | [TOOL-dFairHearing-43 — seven of the closing diff review's eight minors: caller refs refused before any agent, one cell encoding, every pin key routed, one sibling-kit resolver, and arms over every preset](spec/2026-11-04-spec-TOOL-dFairHearing-43.md) | 29 | 2 | CLOSED | rev-4 | 2026-11-04 |
 | [TOOL-dFairHearing-44 — the closing diff review's second batch unit: two docstrings say who calls the ungated reader](spec/2026-11-04-spec-TOOL-dFairHearing-44.md) | 29 | 1 | CLOSED | rev-1 | 2026-11-04 |
 | [TOOL-dFairHearing-46 — the bar's own reds in the replay scorer, and its stated-count reader](spec/2026-11-04-spec-TOOL-dFairHearing-46.md) | 29 | 1 | CLOSED | rev-2 | 2026-11-04 |
-| [TOOL-dFairHearing-45 — the bar's own reds in the kits: renders the ban can read, a fragment that ships, one anchor, no-fork forms, eight renames, and the honest brief record](spec/2026-11-04-spec-TOOL-dFairHearing-45.md) | 30 | 2 | INPROGRESS | rev-4 | 2026-11-04 |
+| [TOOL-dFairHearing-45 — the bar's own reds in the kits: renders the ban can read, a fragment that ships, one anchor, no-fork forms, eight renames, and the honest brief record](spec/2026-11-04-spec-TOOL-dFairHearing-45.md) | 30 | 2 | INPROGRESS | rev-5 | 2026-11-04 |
 <!-- /gen:build-units -->
 
 Records: 321 bound to this build, across 4 record folder(s).

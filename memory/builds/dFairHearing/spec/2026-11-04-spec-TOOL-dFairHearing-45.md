@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-45 — the bar's own reds in the kits: renders the ban can read, a fragment that ships, one anchor, no-fork forms, eight renames, and the honest brief record
 
-**Status:** INPROGRESS · rev-4 · 2026-11-04 · node d · Tier-2 · base f4120c83 · streams tooling · order 30 · ratified 2026-11-04
+**Status:** INPROGRESS · rev-5 · 2026-11-04 · node d · Tier-2 · base f4120c83 · streams tooling · order 30 · ratified 2026-11-04
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -66,6 +66,10 @@ finds each site by the text quoted here and not by its number.
 - **S11** — policy fixtures guard. The `policy fixtures` row of `tools/gate-legs.json` adds
   `.governance/install.json` to its guard, the file the fixture's own `resolve_kit_dir` reads.
   Observed by AC11.
+- **S12** — the kickoff manifest. S8 and S11 stage `tools/gate-legs.json`, a watched path, so this
+  unit's commit bundles the `last-audit` re-stamp of `memory/guides/SESSION-KICKOFF.md`, its sha
+  `HEAD` and its datetime advanced, with a `manifest-audit: delta` line in the commit message naming
+  the two guard entries. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -84,7 +88,8 @@ finds each site by the text quoted here and not by its number.
 - Not the hooks kit's `marker_carriers` row, which names `{prefix}/workflows/spec-audit-optin.js`
   (`tools/hooks/kit.toml:13`) while a default install lands the pack at `{kit}`. It is outside every
   leg this unit repairs.
-- Not the kickoff-manifest re-stamp, which the main loop does last.
+- Not the close's final kickoff-manifest re-stamp, which the main loop does last. S12 is this
+  commit's own.
 
 ### Edges
 
@@ -97,11 +102,11 @@ finds each site by the text quoted here and not by its number.
 These are the reds of one lint run, each a small repair, and the brief adopts them as one unit. Unit
 43 writes eight of the same files at order 29, so sequencing them here avoids a write conflict.
 The dispatch rule pairs each generated index with its generator, and the brief-recorded leg prints
-that surface whole. The write set below holds none of its generators,
+that surface whole. The write set below declares none of its generators,
 `tools/codebase-map/gen_map.py`, `tools/memory-tree/gen_build_index.py`,
 `tools/memory-tree/backlog.py`, `tools/memory-tree/gotchas.py`, `tools/memory-tree/asbuilt_view.py`,
-`tools/policy/policy.py` and `tools/roles/render_agents.py`, and none of its indexes, so the set
-needs no split.
+`tools/policy/policy.py` and `tools/roles/render_agents.py`. It holds one of its indexes,
+`memory/map/generated/symbols.json`, which alone pairs nothing, so the set needs no split.
 
 ### What the leg outputs could not show
 
@@ -120,7 +125,10 @@ the brief:
 
 The kit name in a suite goes into a variable, the idiom the gate's header leaves unchecked on
 purpose: `RWK=workflows` in `tools/hooks/agent-cap.test.sh` and `WFK=workflows` in
-`tools/workflows/check-verifier-fanout.test.sh`.
+`tools/workflows/check-verifier-fanout.test.sh`. That suite already binds `WFK` from the install, at
+:462, after these sites. The new binding goes before the first of them, at :364, because those
+fixtures make their own literal `workflows` directory, and the later binding stays for the layouts
+below it.
 
 | Site | Spelling | Form |
 |---|---|---|
@@ -196,7 +204,9 @@ done <<<"$DIR_KITS"
 ```
 
 The lookup uses `case` and not `printf | grep -q`, which would add a `var-pipe` site to that file's
-registered count. What the compare does not check: an adopter's per-kit `kit` override, which the
+registered count. It reads whole lines, and Python's text stdout ends a line CRLF on Windows, so both
+captures strip the CR first, `DESTS=${DESTS//$'\r'/}` and `FLAT=${FLAT//$'\r'/}`. Without that the
+lookup finds nothing there, as the first pass's probe showed. What the compare does not check: an adopter's per-kit `kit` override, which the
 canonical context cannot know.
 
 ### The docs anchor (S4)
@@ -223,6 +233,8 @@ The section spells no command, so the leg's command test has nothing new to read
 | `tools/workflows/check-verifier-fanout.sh:360` | `var-pipe` | 2 of 1 | `for _l in ${_ml//$'\r'/}; do` |
 | `tools/workflows/check-verifier-fanout.test.sh:1565` | `path-subst` | 6 of 5 | `n=${f##*/}; n=${n%.js}` |
 | `tools/lib/resolve-python.test.sh:713` | `path-subst` | 5 of 4 | `_p="$d/$f"; mkdir -p "${_p%/*}"`, `_p` joining the `local` line |
+| `tools/lib/resolve-python.test.sh`, unit 43's `sib_hits` `FAIL` line | `var-pipe` | added by unit 43 | `printf '    %s\n' "${sib_hits//$'\n'/$'\n'    }"` |
+| `tools/lib/resolve-python.test.sh`, unit 43's `sib_pop` population test | `var-pipe` | added by unit 43 | `mapfile -t _sib_rows <<<"$sib_pop"`, then `[ "${#_sib_rows[@]}" -gt 10 ]` |
 | `tools/check-wiring.test.sh`, the two `FH16 AC9` `ck` lines | `var-pipe` | 164 of 162 | `[[ $out =~ $_re ]]`, `_re` an `$'…'` pattern opening `(^|\n)`, the first with `[^\n]*` for its `.*` |
 | `tools/workflows/spec-audit-optin.test.sh:13` | `path-subst` | 1, no row | `case $0 in */*) HERE=${0%/*} ;; *) HERE=. ;; esac`, then `HERE="$(cd "$HERE" && pwd)"` |
 | `tools/workflows/spec-audit-optin.test.sh:269` | `var-pipe` | 3, no row | `printf '%s\n' "${needles//;;/$'\n'}" > "$TMP/needles"` |
@@ -230,13 +242,16 @@ The section spells no command, so the leg's command test has nothing new to read
 
 Each new site is converted and each inherited site stays, so a count returns to its row and no row
 moves up. The grep in AC5 lists the spellings. Unit 43 adds arms to two of these suites, so a builder
-counts each class again after it and converts any site unit 43 added the same way.
+counts each class again after it and converts any site unit 43 added the same way. The first pass
+found the two rows above that way, and `tools/lib/resolve-python.test.sh` keeps its `var-pipe` row of
+8.
 
 ### Lexicon (S6)
 
-Eight of the nine new keys are here, and unit 46 renames the ninth (F1). Each name is local to its
-function, so
-`memory/map/generated/symbols.json` does not move.
+Eight of the nine new keys are here, and unit 46 renames the ninth (F1).
+`memory/map/generated/symbols.json` moves with seven of them: it lists JS definitions local to a
+function too, so its `refuse` rows, its `openersOf` row and its `cmp` and `cmpAt` rows, template and
+render, all change. `python tools/codebase-map/gen_map.py --write` rewrites it. `judge` has no row.
 
 | Key | Name | Cell | Verb |
 |---|---|---|---|
@@ -356,7 +371,8 @@ than carrying it.
 
 - `check_case`, in cell `py.function`.
 - `printRefusal`, `scanOpeners`, `deriveOrder` and `deriveAtOrder`, in cell `js.function`.
-- `RWK`, `WFK`, `DIR_KITS` and the `K` row of the homes block, shell locals that no cell grades.
+- `RWK`, `_sib_rows`, `DIR_KITS` and the `K` row of the homes block, and `WFK`'s earlier binding,
+  shell locals that no cell grades.
 - The suite arm labels `FH45 AC2` and `FH45 AC3`.
 - The deviation record stem `2026-11-04-build-TOOL-dFairHearing-45-deviation-451`.
 
@@ -388,11 +404,14 @@ than carrying it.
 - `help/spec-audit.md`
 - `memory/project/brief-recorded-waiver.txt`
 - `memory/project/spawn-idiom-sites.txt`
+- `memory/guides/SESSION-KICKOFF.md`
+- `memory/map/generated/symbols.json`
 - `memory/builds/dFairHearing/build/`
 
 The render changes only through the review kit's parity gate in its render mode, `kit.toml`'s
-`[[regenerate]]` argv, never by hand. Under the build folder, only this unit's acceptance ledger is
-written.
+`[[regenerate]]` argv, never by hand. `memory/map/generated/symbols.json` changes only through
+`gen_map.py --write`, and `memory/guides/SESSION-KICKOFF.md` only in its `last-audit` line. Under the
+build folder, only this unit's acceptance ledger is written.
 
 ### Alternatives rejected
 
@@ -461,7 +480,7 @@ brief's list was cut there. A `permission:` line marks every criterion the hook 
   `python tools/govkit/docs_leg.py` runs, it exits 0.
   Red when: the hook is anchored on no page or at a stale fingerprint, or is listed as undocumented.
   permission: the hook refuses the leg to a pass; the main loop observes it.
-- **AC5** — When `git grep -nE 'basename "\$f" \.js|dirname "\$d/\$f"|_ml" \| tr|needles" \| sed|SAJ2?" \| sed' -- tools/workflows/check-verifier-fanout.test.sh tools/lib/resolve-python.test.sh tools/workflows/check-verifier-fanout.sh tools/workflows/spec-audit-optin.test.sh`
+- **AC5** — When `git grep -nE 'basename "\$f" \.js|dirname "\$d/\$f"|_ml" \| tr|needles" \| sed|SAJ2?" \| sed|sib_hits" \| sed|sib_pop" \| grep -c' -- tools/workflows/check-verifier-fanout.test.sh tools/lib/resolve-python.test.sh tools/workflows/check-verifier-fanout.sh tools/workflows/spec-audit-optin.test.sh`
   runs, it prints nothing, and `grep -c "^tools/hooks/agent-cap.test.sh" memory/project/spawn-idiom-sites.txt`
   prints 1. When `python tools/gate-lint/sh_hygiene.py --spawn-idioms memory/project/spawn-idiom-sites.txt . ":!*.test.sh" ":!memory/"`
   runs, it exits 0 and prints a line opening `sh-hygiene: OK`.
@@ -500,10 +519,15 @@ brief's list was cut there. A `permission:` line marks every criterion the hook 
   0, and no line it prints carries `guard-trace · WRONG`.
   Red when: a tracked file a fixture case reads trips no guard of the leg, as at `f4120c83`, where the
   second command prints that `WRONG` naming `.governance/install.json` and exits 1.
+- **AC12** — When `git show --name-only --format=%B HEAD` runs at this unit's build commit, it lists
+  `memory/guides/SESSION-KICKOFF.md` beside `tools/gate-legs.json` and prints a line opening
+  `manifest-audit: delta`.
+  Red when: a commit stages `tools/gate-legs.json` with the manifest's stamp unchanged, which the
+  pre-commit hook refuses, naming that path under `staged changes touch watched files`.
 
 ## 7. Gates
 
-`install-prefix (shipped surface)` · `install-prefix self-test` · `hook destinations (every declared hook path ships)` · `hook destinations self-test` · `docs` · `shell hygiene (a fork spent on builtin work)` · `shell-hygiene selftest` · `lexicon naming predicates` · `lexicon wiring` · `drift-audit records` · `playbook parity selftest` · `brief-recorded` · `check-wiring self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `spec-audit opt-in pack self-test` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `policy fixtures` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `straggler-guard arms` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`kickoff-manifest ratchet` · `install-prefix (shipped surface)` · `install-prefix self-test` · `hook destinations (every declared hook path ships)` · `hook destinations self-test` · `docs` · `shell hygiene (a fork spent on builtin work)` · `shell-hygiene selftest` · `lexicon naming predicates` · `lexicon wiring` · `drift-audit records` · `playbook parity selftest` · `brief-recorded` · `check-wiring self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `spec-audit opt-in pack self-test` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `policy fixtures` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `straggler-guard arms` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/check-install-prefix.test.sh · covers AC2 · a fixture template holding two block-token lines and a render filling them with different line counts, staged against `f4120c83`, whose rule prints `0 render(s) left out`, beside one literal edit outside the blocks, which must put the render back · none
 
@@ -548,6 +572,10 @@ branch, and the lander mints `review-harness`, `agent-cap`, `policy` and `run-ga
   prefix token, which that check skips; the observation is unchanged.
 - rev-4 · 2026-11-04 · S11 · AC11 · the `policy fixtures` guard gains `.governance/install.json`, the
   red unit 43's third pass found, with its design note.
+- rev-5 · 2026-11-04 · S1 · S3 · S5 · S6 · S12 · AC5 · AC12 · the first build pass's divergence folded:
+  S12 bundles the manifest re-stamp and the non-goal narrows to the close's; S6's map sentence is
+  corrected and two paths join the estimate; S3 strips CR, S5 carries unit 43's two `var-pipe` sites,
+  and S1 states where `WFK` binds.
 
 ## 10. Reuse audit
 
