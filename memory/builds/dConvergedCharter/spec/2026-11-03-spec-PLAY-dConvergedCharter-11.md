@@ -649,8 +649,8 @@ New arm: tools/push-main.test.sh · covers none · the `pm9` parity arm deleted 
   file and are read through `legacy --key`, so all four copies are deleted; (b) the mechanics folded
   too; (c) post-merge's copy kept, its keys being mechanic. v2:1130 folds "`.githooks/gate-env.sh`'s
   owner-policy keys" only, which removes (b); (c) fails the clause's "four copies … each re-pointed".
-  Rung 1, v2 and the clause answer it. RESOLVED (agent, 2026-11-03, delegated): (a). widens: none ·
-  relaxes: none
+  Rung 1, v2 and the clause answer it. RESOLVED (agent, 2026-11-03, delegated): (a).
+  widens: none · relaxes: none
 - **F4 — The folded names.** (a) `<namespace>.<key>`, the namespace from the home and the home's own
   prefix dropped where every key of the home carries it (`PROCMON_`, and `GATE_` on the gate file's
   keys that carry it), lower-kebab; (b) the full key kebabed with no prefix dropped. (b) prints

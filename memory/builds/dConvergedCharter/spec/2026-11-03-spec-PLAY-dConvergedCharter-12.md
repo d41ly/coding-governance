@@ -413,19 +413,19 @@ not in the manifest at base.
 - **F2 — What happens to a leg whose checker lives in the kit?** (a) Sorted by subject: a leg whose
   subject leaves with the kit leaves, one whose subject survives moves with its checker; (b) every such
   leg removed. (b) removes `pass-order history`, the refusal M6 names, a governance-carrier change this
-  build's clauses do not name (veto 2). Rung 3. RESOLVED (agent, 2026-11-03, delegated): (a). widens:
-  none · relaxes: none
+  build's clauses do not name (veto 2). Rung 3. RESOLVED (agent, 2026-11-03, delegated): (a).
+  widens: none · relaxes: none
 - **F3 — The node tick's forwarder.** (a) It becomes a `command` shim row, the directory's one file
   until its window closes; (b) removed with the directory; (c) kept as the hand-written file it is. (b)
   breaks every registered `gov-resume-tick` task before its window, which TOOL-dWellOiledMachine-28 F4
   ruled against; (c) leaves a forwarder no row declares, against `shims.toml`'s "never written by hand".
-  Rung 1, the parent's ruling answers it. RESOLVED (agent, 2026-11-03, delegated): (a). widens: none ·
-  relaxes: none
+  Rung 1, the parent's ruling answers it. RESOLVED (agent, 2026-11-03, delegated): (a).
+  widens: none · relaxes: none
 - **F4 — The `[[retired]]` row's successor.** (a) `runtime`, so an adopter claiming the kit is carried
   to the kit that took its parts (`upgrade_steps.read_retired`: "a claimed kit with a successor is
   carried to it"); (b) `none`, its rows read `withdrawn`. Night pass point 1 sends the kit's parts to
-  the runtime and loop kits. Rung 1. RESOLVED (agent, 2026-11-03, delegated): (a). widens: none ·
-  relaxes: none
+  the runtime and loop kits. Rung 1. RESOLVED (agent, 2026-11-03, delegated): (a).
+  widens: none · relaxes: none
 - **F5 — An ask on dClosedLoop.** PLAY-dClosedLoop-11 to -17 ask for an owner run of
   `tools/unattended/run-unattended-gates.sh --selftests` at or after each chain build's landing, and this
   unit removes those suites. Ask, target dClosedLoop: "the unattended suite asks PLAY-dClosedLoop-11 to

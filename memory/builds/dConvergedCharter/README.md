@@ -123,7 +123,7 @@ ids PLAY-dConvergedCharter-34 PLAY-dConvergedCharter-35 PLAY-dConvergedCharter-3
 | [PLAY-dConvergedCharter-18 — the owner's cycle walked by key from a planted build's intake, red on a hop resolved by search or prose](spec/2026-11-03-spec-PLAY-dConvergedCharter-18.md) | 23 | 2 | DEFERRED | rev-1 | 2026-11-03 |
 <!-- /gen:build-units -->
 
-Records: 26 bound to this build, across 4 record folder(s).
+Records: 29 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

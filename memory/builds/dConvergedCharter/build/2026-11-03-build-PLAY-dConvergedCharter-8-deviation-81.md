@@ -13,5 +13,5 @@
 - **Approver:** spec writer, the gov-spec-writer stage of the harness's spec run for dConvergedCharter, citing ER:328, under the chain's `author-recorded` value (`PLAY-dClosedLoop-4`); carried for the owner's walk unless it rules otherwise
 - **Follow-through:** amends cl-dClosedLoop-0482@c8b56d3a
 - **Caused-by:** PLAY-dConvergedCharter-8
-- **Bound:** the clause's "each retired with its last document" for the leg `review-protocol parity (kit vs dogfood)`
+- **Bound:** the clause's "each retired with its last document" for `review-protocol parity (kit vs dogfood)`
 - **Tier:** strongest, a bound the carried clause states in its text
