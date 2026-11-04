@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-11 — every kit conf key the retrofit does not convert folded into the policy file, its readers inventoried by value and re-pointed
 
-**Status:** OPEN · rev-4 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 2 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-4 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 2 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0485@43490b62 whole
 

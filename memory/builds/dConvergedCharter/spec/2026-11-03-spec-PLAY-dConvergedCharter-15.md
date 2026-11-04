@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-15 — the hand-written `help/` pages, the kit READMEs, root `README.md` and the runbook migrated: a generated reference half, a how-to half under the docs leg, render parity on both
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 20 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 20 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0489@74c9a546 whole
 

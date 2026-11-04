@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-9 — Skills as level-4 thin entries from their commands' drive rows, renamed `gov-<name>` by upgrade step, the old names forwarded, the prefix and stale-path arms
 
-**Status:** OPEN · rev-4 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 18 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-4 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 18 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0483@5b53c82b whole
 

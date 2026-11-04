@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-2 — every remaining positional reference in live text migrated to tags, frozen records resolved through redirect rows
 
-**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 13 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 13 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0476@46c25c62 whole
 

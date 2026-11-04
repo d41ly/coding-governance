@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-18 — the owner's cycle walked by key from a planted build's intake, red on a hop resolved by search or prose
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 23 · closes PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 23 · closes PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0492@a532274c whole
 

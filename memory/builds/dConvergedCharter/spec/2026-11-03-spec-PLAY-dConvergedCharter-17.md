@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-17 — the `/build` Skill retired once the supervisor drives attended builds, its client held by a `skill` shim for the deprecation window
 
-**Status:** OPEN · rev-3 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 4 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-3 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 4 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0491@3aafd2a1 whole
 

@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-4 — superseded parts retired through ratified proposals: one supersession proposer, its route and the ratification check
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 21 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 21 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0478@5ccb9b38 whole
 

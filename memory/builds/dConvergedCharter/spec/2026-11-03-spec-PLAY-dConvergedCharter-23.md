@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-23 — the release asks' join: one key hash and one ask text for Maintain's and `release.route`'s `release-verify-failed` filings
 
-**Status:** OPEN · rev-3 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 9 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-3 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 9 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0502@fbfa8f4f whole
 

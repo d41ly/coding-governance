@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-40 — `guide_move.py apply`'s amend route: an entry whose target tag a kit manifest already holds gains its `help` and edge on that row under an `edit` change record, never a second row
 
-**Status:** OPEN · rev-1 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 15 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-1 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 15 · advances PLAY-dConvergedCharter-24
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -33,3 +33,17 @@
 - SEV · PLAY-dConvergedCharter-35 · LOW · two parents keep two names for the kit wiring legs, and the build run must pick one
 - SEV · PLAY-dConvergedCharter-36 · LOW · the census's rulings sit in an unarmed kind, so no check reads them
 - SEV · PLAY-dConvergedCharter-37 · LOW · seven asks wait on suites the kit's retirement deletes
+- DEFERRED · PLAY-dConvergedCharter-24 · until PLAY-dConvergedCharter-18 · the spec run carries every unit forward DEFERRED against this ask, each spec header advancing it; the build run builds them, and its last unit in build order carries `closes` for it
+- DEFERRED · PLAY-dConvergedCharter-25 · until PLAY-dConvergedCharter-23 · PLAY-dConvergedCharter-23's build run joins the two filings, so DEPL-dShippedRelease-15 S10 must file the shared text by then
+- DEFERRED · PLAY-dConvergedCharter-26 · until PLAY-dConvergedCharter-23 · PLAY-dConvergedCharter-23's joined fixture needs the release-verify reading's producer registered by then
+- DEFERRED · PLAY-dConvergedCharter-27 · until PLAY-dConvergedCharter-23 · PLAY-dConvergedCharter-23's build run moves the key hash to one inline block, which TOOL-dTendedCadence-15 S2 must hash through by then
+- DEFERRED · PLAY-dConvergedCharter-28 · until PLAY-dConvergedCharter-23 · PLAY-dConvergedCharter-23's build run makes the loop review's key hash the inline block, held by its parity row
+- DEFERRED · PLAY-dConvergedCharter-29 · until PLAY-dConvergedCharter-3 · PLAY-dConvergedCharter-3's first evidence merge ships its alias through the kind-alias step, which must take its pair from argv by then
+- DEFERRED · PLAY-dConvergedCharter-30 · until PLAY-dConvergedCharter-19 · PLAY-dConvergedCharter-19's build run authors the guides' section tags, which the doc extractor must honour by then
+- DEFERRED · PLAY-dConvergedCharter-31 · until PLAY-dConvergedCharter-2 · PLAY-dConvergedCharter-2's build run drains the positional list, which must leave finding labels and check numbers out by then
+- DEFERRED · PLAY-dConvergedCharter-32 · until PLAY-dConvergedCharter-10 · PLAY-dConvergedCharter-10's build run renders Skill entries from drive rows, whose derived units need a lock row by then
+- DEFERRED · PLAY-dConvergedCharter-33 · until PLAY-dConvergedCharter-7 · PLAY-dConvergedCharter-7's no-lost-rationale arm reads the `explains` edge type, which the edge set must name by then
+- DEFERRED · PLAY-dConvergedCharter-34 · until PLAY-dConvergedCharter-8 · PLAY-dConvergedCharter-8's build run keeps each retired renderer's leg name on its target row, which must take a `leg` key by then
+- DEFERRED · PLAY-dConvergedCharter-35 · until PLAY-dConvergedCharter-8 · PLAY-dConvergedCharter-8's build run retires the two wiring legs under one name, which both parents must spell alike by then
+- DEFERRED · PLAY-dConvergedCharter-36 · until PLAY-dConvergedCharter-22 · PLAY-dConvergedCharter-22's census records its first owner ruling, which the ruling kind must read armed by then
+- DEFERRED · PLAY-dConvergedCharter-37 · until PLAY-dConvergedCharter-12 · PLAY-dConvergedCharter-12's build run removes the unattended kit's suites, so the seven suite asks must be answered or closed by then

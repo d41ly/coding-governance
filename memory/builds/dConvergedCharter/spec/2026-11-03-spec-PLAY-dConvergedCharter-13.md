@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-13 — feature-specific guide prose migrated into feature-scoped units through one prose mover
 
-**Status:** OPEN · rev-4 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 14 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-4 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 14 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0487@ff29708d whole
 

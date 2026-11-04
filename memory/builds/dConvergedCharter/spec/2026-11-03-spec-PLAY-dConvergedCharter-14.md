@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-14 — every part at its fate: the fates table as rows with path globs, and its join run as convergence's exit check
 
-**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 22 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 22 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0488@7cf98c51 whole
 

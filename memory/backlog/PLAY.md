@@ -38,20 +38,20 @@ Cite ids, never line numbers.
 | [PLAY-dClosedLoop-36](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE SURFACED-DECISIONS ATTESTATION IS A TYPED COUNT. --attest… |
 | [PLAY-dClosedLoop-37](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | A SPEC RUN'S CLOSE OWES TWO STEPS THE CLOSE SECTION DOES NOT STATE. A… |
 | [PLAY-dClosedLoop-38](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE PACKET OWNS NO TRANSPORT POINT. cl-dClosedLoop-0333 names a lease… |
-| [PLAY-dConvergedCharter-24](../builds/dConvergedCharter/BACKLOG.md) | SPECCED | MED | PLAY-dConvergedCharter-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
-| [PLAY-dConvergedCharter-25](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-04 | THE RELEASE ROUTE FILES ITS OWN ASK TEXT. DEPL-dShippedRelease-15 S10… |
-| [PLAY-dConvergedCharter-26](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-04 | THE RELEASE-VERIFY READING HAS NO PRODUCER. TOOL-dTendedCadence-2 hands… |
-| [PLAY-dConvergedCharter-27](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-04 | MAINTAIN'S BREACH ASK HASHES AND RENDERS INLINE. TOOL-dTendedCadence-15… |
-| [PLAY-dConvergedCharter-28](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-04 | THE LOOP REVIEW'S KEY HASH IS A THIRD COPY. TOOL-dCalibratedLens-5 S8… |
-| [PLAY-dConvergedCharter-29](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-04 | THE KIND-ALIAS STEP HARDCODES ONE PAIR. TOOL-dTotalRecall-20 S1's… |
-| [PLAY-dConvergedCharter-30](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-04 | THE DOC EXTRACTOR FOLDS AN AUTHORED HEADING TAG.… |
-| [PLAY-dConvergedCharter-31](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-04 | THE POSITIONAL LIST READS A FINDING LABEL AS A REFERENCE.… |
-| [PLAY-dConvergedCharter-32](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-04 | A DERIVED SKILL UNIT HAS NO LOCK ROW. PLAY-dConvergedCharter-10 renders… |
-| [PLAY-dConvergedCharter-33](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-04 | THE EDGE SET HAS NO EXPLAINS TYPE. PLAY-dConvergedCharter-7 keys its… |
-| [PLAY-dConvergedCharter-34](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-04 | A RENDER TARGET CANNOT NAME ITS LEG. PLAY-dConvergedCharter-8 retires… |
-| [PLAY-dConvergedCharter-35](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-04 | TWO PARENTS NAME THE WIRING LEGS DIFFERENTLY. PLAY-dOrderedCharter-20… |
-| [PLAY-dConvergedCharter-36](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-04 | THE RULING KIND STAYS UNARMED IN GOV. TOOL-dLinkedLibrary-8 gives the… |
-| [PLAY-dConvergedCharter-37](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-04 | THE UNATTENDED SUITE ASKS OUTLIVE THE SUITES. PLAY-dClosedLoop-11 to… |
+| [PLAY-dConvergedCharter-24](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | MED | PLAY-dConvergedCharter-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [PLAY-dConvergedCharter-25](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-23 | 2026-11-04 | THE RELEASE ROUTE FILES ITS OWN ASK TEXT. DEPL-dShippedRelease-15 S10… |
+| [PLAY-dConvergedCharter-26](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-23 | 2026-11-04 | THE RELEASE-VERIFY READING HAS NO PRODUCER. TOOL-dTendedCadence-2 hands… |
+| [PLAY-dConvergedCharter-27](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-23 | 2026-11-04 | MAINTAIN'S BREACH ASK HASHES AND RENDERS INLINE. TOOL-dTendedCadence-15… |
+| [PLAY-dConvergedCharter-28](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-23 | 2026-11-04 | THE LOOP REVIEW'S KEY HASH IS A THIRD COPY. TOOL-dCalibratedLens-5 S8… |
+| [PLAY-dConvergedCharter-29](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-3 | 2026-11-04 | THE KIND-ALIAS STEP HARDCODES ONE PAIR. TOOL-dTotalRecall-20 S1's… |
+| [PLAY-dConvergedCharter-30](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-19 | 2026-11-04 | THE DOC EXTRACTOR FOLDS AN AUTHORED HEADING TAG.… |
+| [PLAY-dConvergedCharter-31](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-2 | 2026-11-04 | THE POSITIONAL LIST READS A FINDING LABEL AS A REFERENCE.… |
+| [PLAY-dConvergedCharter-32](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-10 | 2026-11-04 | A DERIVED SKILL UNIT HAS NO LOCK ROW. PLAY-dConvergedCharter-10 renders… |
+| [PLAY-dConvergedCharter-33](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-7 | 2026-11-04 | THE EDGE SET HAS NO EXPLAINS TYPE. PLAY-dConvergedCharter-7 keys its… |
+| [PLAY-dConvergedCharter-34](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-8 | 2026-11-04 | A RENDER TARGET CANNOT NAME ITS LEG. PLAY-dConvergedCharter-8 retires… |
+| [PLAY-dConvergedCharter-35](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-8 | 2026-11-04 | TWO PARENTS NAME THE WIRING LEGS DIFFERENTLY. PLAY-dOrderedCharter-20… |
+| [PLAY-dConvergedCharter-36](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-22 | 2026-11-04 | THE RULING KIND STAYS UNARMED IN GOV. TOOL-dLinkedLibrary-8 gives the… |
+| [PLAY-dConvergedCharter-37](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-12 | 2026-11-04 | THE UNATTENDED SUITE ASKS OUTLIVE THE SUITES. PLAY-dClosedLoop-11 to… |
 | [PLAY-dOrderedCharter-38](../builds/dOrderedCharter/BACKLOG.md) | DEFERRED | MED | PLAY-dOrderedCharter-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [PLAY-dOrderedCharter-56](../builds/dOrderedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE SLOTS NAME dBoundRoles AS THEIR RENDERER. PLAY-dOrderedCharter-17's… |
 | [PLAY-dOrderedCharter-57](../builds/dOrderedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE LOAD SET TAKES NO FEATURE SELECTION. TOOL-dFurnishedOrders-18… |

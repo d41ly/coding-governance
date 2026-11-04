@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-19 — the guides' positional citations migrated to tags, legacy anchors kept as aliases, and the per-directory line-ending pins retired into class pins
 
-**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 12 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 12 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0493@67838f7a whole
 

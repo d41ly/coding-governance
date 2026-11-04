@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-8 — the remaining renderers absorbed, each retired with its last document, and the arm that refuses one retired early
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 19 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 19 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0482@c53ca182 whole
 

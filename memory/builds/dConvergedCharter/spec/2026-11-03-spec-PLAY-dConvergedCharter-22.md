@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-22 — the census of gov's own flow and role settings, each row ruled by the owner and the gov-only ones moved
 
-**Status:** OPEN · rev-3 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 1 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-3 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 1 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0496@a94b54b6 whole
 

@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-38 — the memory root's live carriers declared once in the dead-path gate and read by the reader inventory, so a retirement's inventory names a dossier or gotcha still citing the retired path
 
-**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 3 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 3 · advances PLAY-dConvergedCharter-24
 
 **Derived:** PLAY-dClosedLoop-2
 

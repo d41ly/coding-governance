@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-1 — protocol text derived to facts only: each protocol document's load-bearing statements written as typed units, its rationale left for the explanation tree
 
-**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 15 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 15 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0475@2b542935 whole
 

@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-7 — protocols and templates as tag-sliced views, the guides retired, their rationale in units' `help` and the `help/why/` tree under `help.explanation`
 
-**Status:** OPEN · rev-4 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 17 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-4 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 17 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0481@a6574329 whole
 **Carries:** node:policy-key.help.explanation

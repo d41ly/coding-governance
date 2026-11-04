@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-5 — adopters migrated onto the ranked charter and the loop by the walk that exists, each read migrated or put to the owner
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 6 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 6 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0479@8dc7a199 whole
 

@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-10 — the protocols and skills scopes of the one renderer: protocol slices and Skill entries rendered from units
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 16 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 16 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0484@7e1eaeeb whole
 

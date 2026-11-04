@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-39 — the five renamed `gov-` Skills claimed in the codebase-map dossiers, the drift-audit kit given the dossier it lacks, and the baseline shrunk to match
 
-**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 19 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 19 · advances PLAY-dConvergedCharter-24
 
 **Derived:** PLAY-dClosedLoop-2
 
