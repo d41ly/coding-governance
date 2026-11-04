@@ -38,7 +38,10 @@ its own extractor code wrote, so switching between them re-parses nothing.
   `tools/playbook/aliases.toml`: `python tools/playbook/gov_tag.py where "BUILD-METHOD M5"` prints the
   line of `## M5`. <!-- usage: script:tools/playbook/gov_tag.py#where 9a2511d8 -->
 - **Read it:** `python tools/playbook/gov_tag.py show doc.build-method#m5-recall-and-reuse` prints the
-  section's lines. <!-- usage: script:tools/playbook/gov_tag.py#show 09500daf -->
+  section's lines. <!-- usage: script:tools/playbook/gov_tag.py#show 09500daf --> A tag a change record
+  retired has no definition, so `show` prints its `retired` row instead and exits 0: kind `retired`, then
+  `**Successor:** <value>`, one tag for a rename, the list for a split and `none` for a removal. `where`
+  and every resolver still find nothing for it, so a retired tag never resolves as live.
 - **See who cites it:** `python tools/playbook/gov_tag.py refs doc.build-method` prints `path:line`
   for every citation, a build record's included. <!-- usage: script:tools/playbook/gov_tag.py#refs c503761e -->
 - **Check the tree:** `python tools/playbook/gov_tag.py check` runs the checks below; the `tags` leg

@@ -28,7 +28,8 @@ the one reader of a manifest's text, a working-tree file or a blob at any revisi
 row and a `UnitRowError` per row it cannot read. `derive_manifest_kind` names the population, `kit` for
 `<prefix>/<dir>/instructions.toml` and `overlay` for `.governance/instructions.toml`; `read_units` reads
 every kit manifest, `origin` the kit's descriptor `id`; `extract_unit` and `extract_repo` are the tag
-index's extractors of the `unit` and `repo` namespaces. `derive_unit_selection` picks a document's units
+index's extractors of the `unit` and `repo` namespaces, `extract_unit` also reading each change record, the
+file `CHANGE_RECORD_RE` names, for the `retired` row of a tag it ended. `derive_unit_selection` picks a document's units
 by selector, and `render_unit` gives the line each loads as, a derived unit's from its source.
 
 THE STATEMENT GRAMMAR. Every loaded unit is one of `STATEMENT_TYPES`; `check_statement` grades a unit row
@@ -149,6 +150,9 @@ TYPED_TYPES = (DIRECTIVE, CONSTRAINT, DEFINITION, POINTER)
 #: A change record's `Action` values that end a tag; every other leaves it active.
 ENDING_ACTIONS = ("remove", "rename", "split")
 ACTIVE = "active"
+#: A change record's name under `<memory_root>/builds/*/build/`, and its one field shape, the factory's bullet.
+CHANGE_RECORD_RE = re.compile(r"(?:^|/)builds/[^/]+/build/\d{4}-\d{2}-\d{2}-build-[A-Za-z]+-[A-Za-z0-9]+-\d+-change-\d+\.md$")
+CHANGE_FIELD_RE = re.compile(r"^- \*\*([A-Z][a-z-]+(?: [a-z]+)?):\*\* (.+)$")
 
 INSTRUCTION_PATHSPECS = (
     "{charter}",
@@ -342,12 +346,38 @@ def read_units(root) -> list:
     return units
 
 
+def read_change_fields(text) -> dict:
+    """A change record's `- **<Field>:** <value>` bullets, a field given twice its first: the playbook side's read
+    of the fields `build_records.py read` prints."""
+    fields = {}
+    for line in text.splitlines():
+        m = CHANGE_FIELD_RE.match(line)
+        if m:
+            fields.setdefault(m.group(1), m.group(2).strip())
+    return fields
+
+
+def derive_retired_rows(text) -> list:
+    """The `retired` row of a change record whose `Action` ends a tag: the record's `Unit`, at its `Unit` line, its
+    text the `Successor` line with its bullet cut, where `show` reads the redirect back. A malformed record's
+    fault is the status read's to red."""
+    fields = read_change_fields(text)
+    if fields.get("Action") not in ENDING_ACTIONS or not fields.get("Unit"):
+        return []
+    n = next(i for i, ln in enumerate(text.splitlines(), 1) if ln.startswith("- **Unit:**"))
+    return [(fields["Unit"], "retired", n, n, f"**Successor:** {fields.get('Successor', 'none')}")]
+
+
 def extract_unit(ctx, path, text=None):
     """The `unit` namespace: each readable row's `tag` of every kit manifest, and each `scope` value as a
     `selector` row; the overlay's rows are the `repo` namespace's. `text` is a blob at any revision, read
-    through `parse_unit_rows`; a row's fault is the schema and edge checks' to red, never the index's."""
+    through `parse_unit_rows`; a row's fault is the schema and edge checks' to red, never the index's. A
+    change record under the memory root gives its `retired` row, `derive_retired_rows`."""
+    record = str(path).startswith(ctx.get("memory_root", "memory") + "/") and CHANGE_RECORD_RE.search(path)
     if text is None:
-        return "" if derive_manifest_kind(path, derive_kit_prefix()) == "kit" else None
+        return "" if record or derive_manifest_kind(path, derive_kit_prefix()) == "kit" else None
+    if record:
+        return derive_retired_rows(text)
     lines, rows = text.splitlines(), []
     for u in parse_unit_rows(text, path)[0]:
         span = lines[u.line - 1:u.line - 1 + u.body.count("\n") + 1]
@@ -576,22 +606,16 @@ def derive_unit_pin(text) -> str:
     return design_lib.derive_pin_hash(text)
 
 
-def derive_status_note() -> str | None:
-    """The line a tree read prints while the `change` kind is pending: its status arm grades nothing yet."""
+def read_change_records(root) -> list:
+    """Every tree read's change records, `build_records.read_changes`' mappings, the ones `derive_status`
+    reads, oldest first. Raises one UnitRowError naming each malformed record."""
     load_memory_tree_path()
     import build_records
-    pending = build_records.KINDS["change"].get("pending")
-    return f"status: unarmed · the change kind is pending on {pending}" if pending else None
-
-
-def read_change_records(root) -> list:
-    """Every tree read's change records. While `build_records.KINDS` holds `change` as pending no record can
-    exist, so this returns none and each unit reads active. With the kind landed and this body unchanged it
-    raises, so `unarmed` cannot outlive the pending row: unit 15 replaces the body with the kind's reader."""
-    if derive_status_note():
-        return []
-    raise UnitRowError(f"{root}: the change kind has landed and read_change_records holds no reader of it: "
-                       f"PLAY-dOrderedCharter-15 gives it one")
+    records = build_records.read_changes(root)
+    bad = [f"{r['path']}: {key} {why}" for r in records for key, why in r["malformed"]]
+    if bad:
+        raise UnitRowError("\n".join(bad))
+    return records
 
 
 def derive_status(tag, records) -> str:
@@ -620,9 +644,9 @@ def check_tag_entry(value) -> str | None:
     return None if word in read_namespace_words() else f"opens with `{word}`, which no namespace registers"
 
 
-def check_unit_row(unit, row) -> list[str]:
+def check_unit_row(unit, row, ns="unit") -> list[str]:
     """S1: one row's fields, `row` the table as TOML reads it; each red names the manifest, the tag and the
-    field. A row with no `budget` is held to `line`, the smaller."""
+    field. A row with no `budget` is held to `line`, the smaller; `ns` is its manifest's namespace."""
     found = []
 
     def add_red(field, why, remedy):
@@ -636,8 +660,8 @@ def check_unit_row(unit, row) -> list[str]:
                                                   "from the kit" if key in ("status", "origin") else "delete it")
     if unit.tag is not None:
         import tag_index
-        if not unit.tag.startswith("unit.") or not tag_index.TAG_RE.fullmatch(unit.tag):
-            add_red("tag", f"{unit.tag!r} is no tag of the `unit` namespace", "spell it unit.<name>")
+        if not unit.tag.startswith(f"{ns}.") or not tag_index.TAG_RE.fullmatch(unit.tag):
+            add_red("tag", f"{unit.tag!r} is no tag of the `{ns}` namespace", f"spell it {ns}.<name>")
     if unit.type is not None and unit.type not in STATEMENT_TYPES:
         add_red("type", f"{unit.type!r} is no statement type", f"type it one of {', '.join(STATEMENT_TYPES)}")
     if unit.budget is not None and unit.budget not in BUDGET_BYTES:
@@ -697,12 +721,11 @@ def check_one_fact(units, records) -> list[str]:
 def run_one_fact(root=".") -> tuple[list, int]:
     """S2 over the tree: every row `read_units` reads, statuses from `read_change_records`."""
     root = pathlib.Path(root)
-    units, records, note = read_units(root), read_change_records(root), derive_status_note()
-    head = [f"{SAY}: {note}"] if note else []
+    units, records = read_units(root), read_change_records(root)
     if not units:
-        return head + [f"{SAY}: one-fact · unarmed: the tree holds no unit row"], 0
+        return [f"{SAY}: one-fact · unarmed: the tree holds no unit row"], 0
     reds = check_one_fact(units, records)
-    return head + reds + [f"{SAY}: one-fact · {len(units)} row(s) · {len(reds)} red"], 1 if reds else 0
+    return reds + [f"{SAY}: one-fact · {len(units)} row(s) · {len(reds)} red"], 1 if reds else 0
 
 
 def derive_kit_file(root, name) -> pathlib.Path:
@@ -1405,7 +1428,6 @@ def arm_one_fact(c):
 
 
 def arm_status(c):
-    import instruction_units as tree   # the module instance the renderer imports, not this script's
     load_memory_tree_path()
     import build_records
     for records, want in (([], ACTIVE), ([{"Unit": "unit.a", "Action": "edit", "Successor": ""}], ACTIVE),
@@ -1425,30 +1447,28 @@ def arm_status(c):
     c.check("the slot renders while its units are active", rc == 0, said)
     run_git(c.top, "add", "--", "AGENTS.md", LOCK)
     run_commit(c.top, "the rendered charter")
-    c.check("read_change_records over the tree returns no record", read_change_records(c.top) == [])
+    c.check("read_change_records over a tree with no record returns none", read_change_records(c.top) == [])
     rc, said = run_render(c.top, "--check-render")
-    c.check("the gate prints the unarmed status line naming the kind's unit", rc == 0
-            and "status: unarmed · the change kind is pending on PLAY-dOrderedCharter-15" in said, said)
-    held = tree.read_change_records
-    tree.read_change_records = lambda root: [{"Unit": "unit.sub", "Action": "remove", "Successor": "none"}]
+    c.check("the gate is green and prints no status line", rc == 0
+            and not any(ln.startswith("render-playbook: status") for ln in said.splitlines()), said)
+    (c.top / "memory/builds/fx").mkdir(parents=True)
+    rel = build_records.write_change(c.top, "fx", "ARCH-fx-1", "unit.sub", "remove", "semantic",
+                                     f"unit.sub@{derive_unit_pin('MUST answer the subagent.')}", "none",
+                                     build_records.DOOR_PROOF, "none")
+    run_git(c.top, "add", "--", rel)
+    run_commit(c.top, "a committed record")
+    c.check("the committed record reads back", [r["Unit"] for r in read_change_records(c.top)] == ["unit.sub"])
+    rc, said = run_render(c.top)
+    c.check("a committed record retires its unit at render", rc == 1 and "retired:none" in said, said)
+    text = (c.top / rel).read_text(encoding="utf-8")
+    c.write_file(rel, text.replace("- **Mark:** semantic\n", ""))
     try:
-        rc, said = run_render(c.top)
-    finally:
-        tree.read_change_records = held
-    c.check("a retired unit a template selects reds the render", rc == 1 and "retired:none" in said, said)
-    landed = build_records.KINDS["change"]
-    build_records.KINDS["change"] = {"fields": ("Unit",)}
-    try:
-        rc, said = run_render(c.top, "--check-render")
-        try:
-            read_change_records(c.top)
-            raised = "it read"
-        except UnitRowError as exc:
-            raised = str(exc)
-    finally:
-        build_records.KINDS["change"] = landed
-    c.check("with the kind landed the read raises", "holds no reader" in raised, raised)
-    c.check("with the kind landed the render reds", rc == 1 and "holds no reader" in said, said)
+        raised = f"it read {read_change_records(c.top)}"
+    except UnitRowError as exc:
+        raised = str(exc)
+    c.check("a malformed record raises naming it", rel in raised and "Mark is missing" in raised, raised)
+    rc, said = run_render(c.top, "--check-render")
+    c.check("a malformed record reds the gate", rc == 1 and rel in said, said)
 
 
 def arm_renderers(c):

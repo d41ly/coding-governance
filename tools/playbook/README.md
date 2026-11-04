@@ -22,8 +22,8 @@ stated values render from sourced fact units. Every write records the target's r
 
 `--check-render` with no scope is the render gate, the `instruction render (one renderer of record)` leg, gov's
 own: every scope; `renderers.toml`, where an instruction file claimed by two rows or none is red, the closed
-population being `INSTRUCTION_PATHSPECS` in `instruction_units.py`; the status arm, printing `status: unarmed`
-until the `change` record kind lands; and `instructions-legacy.txt`, one path per instruction file not yet
+population being `INSTRUCTION_PATHSPECS` in `instruction_units.py`; the status arm, where a malformed `change`
+record is red; and `instructions-legacy.txt`, one path per instruction file not yet
 rendered from units, under the policy key `instructions.legacy`. A template's `<!-- units: <selector> -->` line
 expands to the lines of the units that selector selects, each unit active, and to nothing of its own.
 

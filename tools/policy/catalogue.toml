@@ -651,12 +651,16 @@ owner = "dOrderedCharter"
 name = "instructions.edit"
 allowed = ["owner-command-agents-propose", "flow-only", "command-for-all"]
 default = "owner-command-agents-propose"
+summary = "Who writes an instruction unit: the owner through the write command with agents only proposing, any caller of it, or only the flow's item."
+usage = 'instructions.edit = "command-for-all"'
 owner = "dOrderedCharter"
 
 [[key]]
 name = "instructions.proof"
 allowed = ["tty-cli", "signed", "both"]
 default = "tty-cli"
+summary = "What shows the write command's caller is the owner: standard error being a terminal, with the signed proof and both refused until that component lands."
+usage = 'instructions.proof = "tty-cli"'
 owner = "dOrderedCharter"
 
 [[key]]

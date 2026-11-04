@@ -6,7 +6,8 @@
     python gov_tag.py --rebuild | --gc | --list-positional
     python gov_tag.py --fixture --plant <case> [--set <key>=<value>]
 
-`show` returns the tag's row, or its subtree as `tags.slice` says; `where` prints `path:line`; `refs`
+`show` returns the tag's row, or its subtree as `tags.slice` says, or for a tag only a `retired` row holds that
+row, its redirect; `where` prints `path:line`; `refs`
 prints every citation of it, a build record's too; `check` runs the `retired`, `resolves` and `owned`
 arms over the citations outside `<MEMORY_ROOT>/builds/`, and the shape check, the joins and the
 name-check slot (PLAY-dOrderedCharter-10), and the `purpose` arm, the namespace rows' `owner` and
@@ -70,6 +71,16 @@ def read_refs(con, tag) -> list[dict]:
     return [{"path": p, "line": n} for _t, p, n, *_ in ti.read_rows(con, ("span",), tag=tag)]
 
 
+def read_retired_rows(con, tag) -> list[dict]:
+    """`tag`'s `retired` rows, `show`'s fallback where no definition holds it. A retired row is a name and no
+    prefix, so `tags.slice` does not reach it, and no other read serves it: nothing resolves it as live."""
+    out = []
+    for t, path, line, kind, blob, ex in ti.read_rows(con, ("retired",), tag=tag):
+        end, text = ti.read_text_of(con, blob, ex, kind, line)
+        out.append({"tag": t, "path": path, "line": line, "end_line": end, "kind": kind, "text": text})
+    return out
+
+
 def run_bundle_verb(con, root, kit_rel, address, aliases, *, sets, opts, as_json) -> int:
     """`bundle` (PLAY-dOrderedCharter-25 S1-S4): the node `show` resolves, then tag_bundle's manifest."""
     import tag_bundle
@@ -106,7 +117,8 @@ def run_kit_verb(root, verb, address, *, sets, as_json=False, base=None, kit_rel
             return 2
         if verb == "show":
             slice_ = read_key("tags.slice", root, sets, lambda: read_policy_value("tags.slice", root)[0][0])
-            rows = ti.resolve_address(con, address, slice_, aliases)
+            rows = (ti.resolve_address(con, address, slice_, aliases)
+                    or read_retired_rows(con, aliases.get(address, address)))
             if as_json:
                 print(json.dumps(rows, indent=2, sort_keys=True))
             for r in rows if not as_json else ():

@@ -82,6 +82,10 @@ memory/backlog/*.md merge=rows
 # pre-switch branch's shard edits from line-merging into a view — without the attribute the driver
 # is never asked, and git's own text merge completes the merge with nothing refusing it.
 memory/builds/*/BACKLOG.md merge=rows
+# The instruction manifests, row stores across nodes (PLAY-dOrderedCharter-15): the driver keys each
+# `[[unit]]` table by its `tag`, so two nodes adding a unit merge with both tags once.
+**/instructions.toml merge=rows
+.governance/instructions.toml merge=rows
 
 # Wholly GENERATED views: a merge takes this side, and check 9 (gen_build_index.py --check) or
 # check 17 (gotchas.py --check) then reds the stale result until `--write` re-renders it.

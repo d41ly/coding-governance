@@ -1,0 +1,11 @@
+# packs.toml — the instruction pack catalogue (PLAY-dOrderedCharter-15), read by instructions_edit.py's read_packs.
+#
+# One [[pack]] row per pack: `name`; `kind`, one of methodology, governance or language; `practices`, practice
+# tags of practices.toml or the one selector "all"; `description`. `charter.practices` may name a pack, and
+# resolve_practices turns the value into practice tags. A pack is no policy preset: no preset row sets that key.
+
+[[pack]]
+name = "foundation"
+kind = "governance"
+practices = "all"
+description = "The governance foundation set, every catalogue practice until the census narrows it."

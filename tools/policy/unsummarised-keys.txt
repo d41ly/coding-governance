@@ -73,9 +73,7 @@ install.from
 install.guards
 install.steps
 instructions.checks
-instructions.edit
 instructions.exclude
-instructions.proof
 instructions.slices
 instructions.stale
 instructions.task-charter

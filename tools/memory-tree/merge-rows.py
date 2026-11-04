@@ -20,6 +20,12 @@ line, because in that grammar every row about one ask — the ask, its SEV row, 
 it — leads with that ask's id, and first-id keying therefore conflicts on a pair a filer and a
 triager produce on ordinary work. The audit line names which census ran.
 
+A FOURTH CLASS, THE INSTRUCTION MANIFESTS, IS NOT ROWS OF LINES (PLAY-dOrderedCharter-15). A `%P` named
+`instructions.toml` goes to `resolve_tables` before anything below runs, since a `[[unit]]` table spans lines and
+no line of it is a row: each side is cut into tables keyed by `tag` and merged per key against the base. A key
+both sides moved apart is a `TableConflict`, a whole-file conflict naming each key, and the written bytes are
+re-cut before they are returned, so no tag is lost and none is duplicated.
+
 A GENERATED VIEW IS NEVER MERGED WITH AN AUTHORED SHARD. After the switch-over
 `memory/backlog/<FAMILY>.md` is RENDERED from the per-build files, and a branch forked before it
 still edits that path as an authored shard. Line-merging those two is silent damage in both
@@ -327,6 +333,10 @@ class ViewShardRefused(RuntimeError):
         self.recipe = recipe
 
 
+class TableConflict(RuntimeError):
+    """Both sides moved one manifest key apart; the message names each key."""
+
+
 class DuplicatedContent(RuntimeError):
     """A duplicate postcondition refused the result. Raised, never printed-and-continued."""
 
@@ -361,6 +371,8 @@ class StructureDrift(RuntimeError):
 # here instead of guessed there. It is also the ONLY partition predicate — stateless, one line at a
 # time, no parser state, because state is where all three rounds of defects lived.
 _ROW_RE = re.compile(r"^\s*[-*]\s")
+_MANIFEST_NAME = "instructions.toml"
+_TABLE_HEADER = "[[unit]]"
 # Deliberately INDEPENDENT of the driver's own anchor grammar, and not imported from it. The keyed
 # path already guarantees uniqueness for what `key()` keys; this exists for the population it does
 # NOT key. Keying the postcondition on the same regex as the merge would make it self-consistent and
@@ -1185,12 +1197,65 @@ def structure_identity(merged: list[str], skel: list[str]) -> None:
 
 # --------------------------------------------------------------------------------------------
 
+def check_manifest(path: str | None) -> bool:
+    """Whether `%P` names an instruction manifest, a row store of `[[unit]]` tables."""
+    return path is not None and path.replace("\\", "/").rsplit("/", 1)[-1] == _MANIFEST_NAME
+
+
+def read_tables(lines: list[str]) -> tuple[str, dict]:
+    """`(preamble, {tag: table text})` of one side: a table runs from its `[[unit]]` header to the next. A cut
+    that leaves a table no TOML, or one with no `tag`, raises, and the driver fails closed."""
+    import tomllib  # noqa: PLC0415 — deferred, as the driver's other imports are; see `anchors()`
+    heads = [i for i, ln in enumerate(lines) if ln.startswith(_TABLE_HEADER)]
+    tables = {}
+    for start, end in zip(heads, heads[1:] + [len(lines)]):
+        text = "".join(lines[start:end])
+        tag = tomllib.loads(text)["unit"][0]["tag"]
+        if tag in tables:
+            raise DuplicatedContent(f"the tag {tag} heads two tables of one side")
+        tables[tag] = text
+    return "".join(lines[:heads[0]] if heads else lines), tables
+
+
+def resolve_table(base: str | None, ours: str | None, theirs: str | None) -> tuple[str | None, bool]:
+    """One key's three-way, None an absent side, line endings folded: `(its text, whether it conflicts)`."""
+    o, a, b = (t if t is None else t.replace("\r\n", "\n") for t in (base, ours, theirs))
+    if a == b or b == o:
+        return ours, False
+    return (theirs, False) if a == o else (None, True)
+
+
+def resolve_tables(o_lines, a_lines, b_lines) -> list[str]:
+    """The manifests' merge: ours' tables in ours' order, then theirs' additions in theirs'."""
+    (o_pre, O), (a_pre, A), (b_pre, B) = read_tables(o_lines), read_tables(a_lines), read_tables(b_lines)
+    preamble, clash = resolve_table(o_pre, a_pre, b_pre)
+    conflicts, kept = ["the preamble"] * clash, {}
+    for tag in [*A, *(t for t in B if t not in A)]:
+        text, clash = resolve_table(O.get(tag), A.get(tag), B.get(tag))
+        if clash:
+            conflicts.append(tag)
+        elif text is not None:
+            kept[tag] = text
+    if conflicts:
+        raise TableConflict(", ".join(conflicts))
+    term = _dominant(a_lines, b_lines, o_lines)
+    parts = [preamble or "", *kept.values()]
+    merged = _lines("".join(p if not p or p.endswith(("\n", "\r")) else p + term for p in parts))
+    written = read_tables(merged)[1]    # a duplicate raises here
+    if list(written) != list(kept):
+        raise RowLoss(f"the written tables {list(written)} are not the merged {list(kept)}")
+    print(f"merge-rows: tables O/A/B {len(O)}/{len(A)}/{len(B)} -> {len(written)} written, clean", file=sys.stderr)
+    return merged
+
+
 def merge(o_lines, a_lines, b_lines, *, path=None) -> tuple[list[str], bool]:
     # `path` IS KEYWORD-ONLY, and that is the gotcha class
     # `row-driver-emits-a-plausible-file-with-rows-missing.md` closed structurally rather than by
     # care: a fourth POSITIONAL beside three interchangeable line lists is a transposition waiting
     # to happen, and a transposed argument here yields a well-formed file with rows missing.
     #
+    if check_manifest(path):
+        return resolve_tables(o_lines, a_lines, b_lines), False
     # THE VIEW/SHARD REFUSAL COMES FIRST — before the skeleton, the key merge and every
     # postcondition. There is nothing to reconcile on this pair: one side is a generated table and
     # the other is authored rows that belong in a build's own file, and any merge of them is damage
@@ -1507,6 +1572,10 @@ def main(argv: list[str]) -> int:
         print(f"merge-rows: REFUSED — {exc}", file=sys.stderr)
         for line in exc.recipe:
             print(line, file=sys.stderr)
+        return rc
+    except TableConflict as exc:
+        rc = write_conflict_body(a, b, f"theirs (table conflict: {exc})")
+        print(f"merge-rows: CONFLICT — each side changed {exc} apart", file=sys.stderr)
         return rc
     except Exception as exc:  # noqa: BLE001 — deliberately total; see above
         print(f"merge-rows: FAILED ({exc.__class__.__name__}: {exc}) — writing a conflict rather "

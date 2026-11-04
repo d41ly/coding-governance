@@ -334,6 +334,18 @@ def read_unit_edges(text, path) -> list[dict]:
     return edges
 
 
+def read_change_edges(text, path) -> list[dict]:
+    """A change record's `Promoted-from` field as a `promoted-from` edge at `instructions.edit`, the site its
+    row names as its one writer."""
+    from instruction_units import read_change_fields
+    fields = read_change_fields(text)
+    if "Promoted-from" not in fields:
+        return []
+    n = next(i for i, ln in enumerate(text.splitlines(), 1) if ln.startswith("- **Promoted-from:**"))
+    return check_site_targets([{"path": path, "line": n, "type": "promoted-from", "site": "instructions.edit",
+                                "targets": [fields["Promoted-from"]], "source": fields.get("Unit", "")}], path)
+
+
 def read_note_refs(text, path) -> list[dict]:
     """Each code note's `refs=` segment, its targets in the edge-target form, as the derived `cites`
     edges a note's references are. A malformed segment is an EdgeRefusal naming its line."""
@@ -553,9 +565,10 @@ def run_resolve(edges, rc, lenient=("serves",)) -> tuple[list, dict]:
 
 def read_tree_edges(root, base) -> tuple[list, list]:
     """Every edge of the tree at `root`: `(edges, refusals)`, the refusals one line per malformed line.
-    Markdown under MEMORY_ROOT is read for headers, sections, carries and markers; every unit manifest
+    Markdown under MEMORY_ROOT is read for headers, sections, carries, markers and a change record's field;
+    every unit manifest
     `derive_manifest_kind` names for units; every non-Markdown file naming a note for its refs; and the trailers of `base..HEAD`."""
-    from instruction_units import derive_kit_prefix, derive_manifest_kind
+    from instruction_units import CHANGE_RECORD_RE, derive_kit_prefix, derive_manifest_kind
     tree_lib, _ = ti.load_memory_tree()
     import design_lib
     conf = design_lib.read_design_conf(root)
@@ -586,6 +599,8 @@ def read_tree_edges(root, base) -> tuple[list, list]:
                     edges += read_carries_edges(text, rel)
                 if "gov:handoff" in text:
                     edges += read_handoff_edges(text, rel)
+                if CHANGE_RECORD_RE.search(rel):
+                    edges += read_change_edges(text, rel)
             elif unit:
                 edges += read_unit_edges(text, rel)
             else:

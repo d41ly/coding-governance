@@ -17,6 +17,15 @@ THE EXCEPTION KIND and its stand-in door (S8): `build_records.py new exception -
 `**Serves:** exception <unit id>`, for the session's own commit. It is the door the memory plan lists until
 dTotalRecall's record door adopts it. The core gates read the register (`core.py exceptions`).
 
+THE CHANGE KIND and its stand-in door (PLAY-dOrderedCharter-15 S7, S14): `write_change` is the one writer of a
+record of an instruction unit's change, `read_changes` the register, by date, build and `<n>`, since a unit's
+status is its last record. Its two callers are `instructions_edit.py` and `build_records.py new change --build
+<slug> --unit <id> --tag <unit tag> --action <verb> --mark <mark> --before <pin> --after <pin> [--successor
+<tag[,tag]>] [--promoted-from <source>]`, the door a build's builder records a kit manifest change through
+while that command refuses every write. A pin is `none` or `<tag>@<hash8>`. `--tag` fills `Unit`, `--unit` names
+the file and fills `Caused-by`, and `Proof` reads `DOOR_PROOF`, no flag, so no caller of the door claims a proof.
+Two builds' same-day records of one tag order by slug, the read's known ceiling.
+
 `build_records.py read <path>` prints one record's fields and every refusal: exit 0 well-formed, 1 malformed,
 2 an unreadable path or a pending kind.
 
@@ -25,8 +34,8 @@ bindings reader admits and joins to their file names, and an import whose table 
 raises naming each kind. A kind whose fields a later unit owns holds a declared-pending entry,
 `{"pending": "<unit id>"}`. `build_records.py --fixture --plant typed-kinds` writes one record of every typed
 kind into a scratch git repository, through `new <kind>` where the kind has a door and `write_record`
-otherwise, and asserts `tree_lib.read_bindings` reads each `bound` and `gen_build_index.py --print-bindings`
-prints no `A` row: exit 0 PASS, 1 FAIL naming each failure.
+otherwise, asserts `tree_lib.read_bindings` reads each `bound` and `gen_build_index.py --print-bindings`
+prints no `A` row, and asserts no door takes another door's flags: exit 0 PASS, 1 FAIL naming each failure.
 """
 from __future__ import annotations
 
@@ -49,6 +58,13 @@ ID = r"[A-Za-z]+-[A-Za-z0-9]+-\d+"
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 SLUG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9-]*$")
 PRINCIPLE = re.compile(r"^principle\.p[1-9]\d*$")
+TAG = r"[a-z0-9][a-z0-9-]*(?:\.[a-z0-9][a-z0-9-]*)+"
+PIN = re.compile(TAG + r"@[0-9a-f]{8}")
+CHANGE_ACTIONS = ("add", "edit", "remove", "rename", "split")   # the one list `instructions_edit.WRITE_VERBS` reads
+ENDING_ACTIONS = ("remove", "rename", "split")                   # those that end a tag and so name a `Successor`
+CHANGE_MARKS = ("editorial", "semantic")
+PROOF = re.compile(r"tty-cli|none — \S.*")
+DOOR_PROOF = "none — stand-in door"
 
 # kind -> its required fields and its closed sets, `(field, allowed values)` in refusal order
 KINDS = {
@@ -65,12 +81,15 @@ KINDS = {
         "closed": (),
     },
     "override": {"pending": "PLAY-dOrderedCharter-2"},
-    "change": {"pending": "PLAY-dOrderedCharter-15"},
+    "change": {
+        "required": ("Unit", "Action", "Before", "After", "Mark", "Proof", "Caused-by"),
+        "closed": (("Mark", CHANGE_MARKS), ("Action", CHANGE_ACTIONS)),
+    },
 }
 if set(KINDS) != set(TYPED_RECORD_KINDS):
     raise ImportError("build_records: the kind table and tree_lib.TYPED_RECORD_KINDS differ on "
                       + ", ".join(sorted(set(KINDS) ^ set(TYPED_RECORD_KINDS))))
-DOORS = ("exception",)          # the kinds `new <kind>` writes; every other kind is `write_record`'s alone
+DOORS = ("exception", "change")  # the kinds `new <kind>` writes; every other kind is `write_record`'s alone
 PLANTS = ("typed-kinds",)
 
 
@@ -182,6 +201,70 @@ def write_exception(root, build, unit, principle, excuses, reason, expires=None,
     return write_record(root, build, unit, "exception", f"{principle} excused for {excuses}", fields, today)
 
 
+# -------------------------------------------------------------------------------- the change kind
+def check_change_fields(fields):
+    """The change kind's own field rules: `Unit` a tag, the pin shapes, `Proof`, and `Successor` on an ending
+    action alone: one tag on a rename, `none` on a removal, a list on a split, whose `After` holds one pin per
+    successor in that order."""
+    bad = []
+    action, heir = fields.get("Action"), fields.get("Successor")
+    if "Unit" in fields and not re.fullmatch(TAG, fields["Unit"]):
+        bad.append(("Unit", f"{fields['Unit']} is no tag"))
+    for key in ("Before", "After"):
+        pins = fields.get(key, "none").split(",") if key == "After" and action == "split" else [fields.get(key, "none")]
+        bad += [(key, f"{p} is neither none nor <tag>@<hash8>") for p in pins if p != "none" and not PIN.fullmatch(p)]
+    if "Proof" in fields and not PROOF.fullmatch(fields["Proof"]):
+        bad.append(("Proof", f"{fields['Proof']} is neither tty-cli nor none — <value>"))
+    if action not in ENDING_ACTIONS:
+        if heir is not None:
+            bad.append(("Successor", f"is given on {action}, which ends no tag"))
+        return bad
+    if heir is None:
+        return bad + [("Successor", f"is missing on {action}")]
+    heirs = heir.split(",")
+    if action == "remove" and heir != "none":
+        bad.append(("Successor", f"{heir} on a removal, which is none"))
+    if action != "remove" and not all(re.fullmatch(TAG, h) for h in heirs):
+        bad.append(("Successor", f"{heir} is no tag or comma list of tags"))
+    if action == "rename" and len(heirs) != 1:
+        bad.append(("Successor", f"{heir} on a rename, which is one tag"))
+    if action == "split" and [p.split("@")[0] for p in fields.get("After", "").split(",")] != heirs:
+        bad.append(("After", f"{fields.get('After')} is not one pin per successor of {heir}, in its order"))
+    return bad
+
+
+def read_change(path, text):
+    """One change record: its fields under their own names, the mapping `derive_status` reads, and `id`, `path`,
+    `date`, `build`, `n` and `malformed`."""
+    fields, bad, name = read_record(path, text, "change", check_fields=check_change_fields)
+    stem = pathlib.PurePosixPath(path).stem
+    return {**fields, "id": stem, "path": path, "date": stem[:10], "build": name.group("build") if name else None,
+            "n": int(name.group("n")) if name else None, "malformed": bad}
+
+
+def read_changes(root, conf=None):
+    """The change register: every tracked change record of `root`, by date, build and `<n>` as a number."""
+    records = read_records(root, read_design_conf(root) if conf is None else conf, "change", read_change)
+    return sorted(records, key=lambda r: (r["date"], r["build"] or "", r["n"] or 0))
+
+
+def write_change(root, build, unit, tag, action, mark, before, after, proof, successor=None, promoted_from=None,
+                 today=None):
+    """The one writer of a change record, under `root`'s own memory tree. -> its repo-relative path. Every value
+    is validated here, the write boundary; a refusal is ValueError."""
+    fields = [("Unit", tag), ("Action", action), ("Before", before), ("After", after), ("Mark", mark)]
+    fields += [("Successor", successor)] * (successor is not None)
+    fields += [("Proof", proof)] + [("Promoted-from", promoted_from)] * (promoted_from is not None)
+    fields.append(("Caused-by", unit))
+    spec, held = KINDS["change"], dict(fields)
+    bad = [f"{k} is one non-empty line" for k, v in fields if not v or not v.strip() or "\n" in v or "\r" in v]
+    bad += [f"{k} {held[k]} is outside {' · '.join(allowed)}" for k, allowed in spec["closed"] if held[k] not in allowed]
+    bad += [f"{k} {why}" for k, why in check_change_fields(held)]
+    if bad:
+        raise ValueError("; ".join(bad))
+    return write_record(root, build, unit, "change", f"{action} {tag}", fields, today)
+
+
 def write_record(root, build, unit, kind, title, fields, today=None):
     """The record writer every door shares: the next `kind` record of `build` under `root`'s own memory tree,
     headed `# <unit> <kind> <n> — <title>`, then `**Serves:** <kind> <unit>` and each `(key, value)` of
@@ -212,12 +295,33 @@ def write_record(root, build, unit, kind, title, fields, today=None):
 
 
 # -------------------------------------------------------------------------------- the fixture
+# each door's flags over the fixture, and a flag only it takes, which every other door refuses
+DOOR_ARGV = {
+    "exception": (["--principle", "principle.p1", "--excuses", "the fixture", "--reason", "the typed-kinds round trip"],
+                  ["--principle", "principle.p1"]),
+    "change": (["--tag", "unit.fixture", "--action", "add", "--mark", "semantic", "--before", "none",
+                "--after", "unit.fixture@0123abcd"], ["--tag", "unit.fixture"]),
+}
+
+
+def run_door(root, kind, unit, flags):
+    """`new <kind>` over the fixture's build: `(exit, what it printed)`, argparse's refusal an exit too."""
+    import contextlib
+    import io
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
+        try:
+            rc = main(["new", kind, "--root", str(root), "--build", "tKinds", "--unit", unit, *flags])
+        except SystemExit as exc:
+            rc = exc.code
+    return rc, buf.getvalue()
+
+
 def run_fixture(plant):
     """`--fixture --plant typed-kinds` (PLAY-dOrderedCharter-42 S4): one record of every kind of
     `TYPED_RECORD_KINDS`, read at run time, in a build folder of a scratch git repository under the host
-    temp directory, each read back `bound` as its kind and `--print-bindings` printing no `A` row."""
-    import contextlib
-    import io
+    temp directory, each read back `bound` as its kind and `--print-bindings` printing no `A` row, and each
+    door refusing the flag only another door takes."""
     import subprocess
     import tempfile
     from deviation_join import remove_tree, set_env_aside   # noqa: E402  the kit's fixture helpers
@@ -238,16 +342,16 @@ def run_fixture(plant):
                          "base 0123abcd\n")
             for kind in TYPED_RECORD_KINDS:
                 if kind in DOORS:
-                    buf = io.StringIO()
-                    with contextlib.redirect_stdout(buf):
-                        rc = main(["new", kind, "--root", str(root), "--build", "tKinds", "--unit", unit,
-                                   "--principle", "principle.p1", "--excuses", "the fixture",
-                                   "--reason", "the typed-kinds round trip"])
-                    got = re.search(r"wrote (\S+)", buf.getvalue())
+                    rc, said = run_door(root, kind, unit, DOOR_ARGV[kind][0])
+                    got = re.search(r"wrote (\S+)", said)
                     if rc != 0 or not got:
                         bad.append(f"{kind}: new {kind} exited {rc}")
                         continue
                     written[kind] = got.group(1)
+                    for other in (d for d in DOORS if d != kind):
+                        rc, said = run_door(root, kind, unit, DOOR_ARGV[kind][0] + DOOR_ARGV[other][1])
+                        if rc != 2:
+                            bad.append(f"{kind}: new {kind} took {other}'s {DOOR_ARGV[other][1][0]}, exiting {rc}")
                 else:
                     written[kind] = write_record(root, "tKinds", unit, kind, "the typed-kinds round trip",
                                                  [("Caused-by", unit)])
@@ -289,14 +393,21 @@ def main(argv):
     ap.add_argument("--plant", choices=PLANTS)
     sub = ap.add_subparsers(dest="verb")
     new = sub.add_parser("new", help="write the next record of a kind through its door")
-    new.add_argument("kind", choices=DOORS)
-    new.add_argument("--build", required=True)
-    new.add_argument("--unit", required=True)
-    new.add_argument("--principle", required=True)
-    new.add_argument("--excuses", required=True)
-    new.add_argument("--reason", required=True)
-    new.add_argument("--expires")
-    new.add_argument("--root", default=".")
+    doors = new.add_subparsers(dest="kind", required=True)
+    for door in DOORS:
+        one = doors.add_parser(door, allow_abbrev=False)
+        one.add_argument("--build", required=True)
+        one.add_argument("--unit", required=True)
+        one.add_argument("--root", default=".")
+    doors.choices["exception"].add_argument("--principle", required=True)
+    doors.choices["exception"].add_argument("--excuses", required=True)
+    doors.choices["exception"].add_argument("--reason", required=True)
+    doors.choices["exception"].add_argument("--expires")
+    change = doors.choices["change"]
+    for flag in ("--tag", "--action", "--mark", "--before", "--after"):
+        change.add_argument(flag, required=True)
+    change.add_argument("--successor")
+    change.add_argument("--promoted-from")
     read = sub.add_parser("read", help="read one record and name every refusal")
     read.add_argument("path")
     args = ap.parse_args(argv)
@@ -311,8 +422,12 @@ def main(argv):
     if args.verb == "new":
         root = pathlib.Path(args.root).absolute()
         try:
-            rel = write_exception(root, args.build, args.unit, args.principle, args.excuses, args.reason,
-                                  args.expires)
+            if args.kind == "change":
+                rel = write_change(root, args.build, args.unit, args.tag, args.action, args.mark, args.before,
+                                   args.after, DOOR_PROOF, args.successor, args.promoted_from)
+            else:
+                rel = write_exception(root, args.build, args.unit, args.principle, args.excuses, args.reason,
+                                      args.expires)
         except (ValueError, OSError) as exc:
             print(f"build-records: refused · {exc}", file=sys.stderr)
             return 2
@@ -334,6 +449,8 @@ def main(argv):
     if kind == "deviation":
         import deviation_join  # noqa: E402  the deviation kind's own rules live with its join
         bad = deviation_join.read_record(rel, text)["malformed"]
+    elif kind == "change":
+        bad = read_change(rel, text)["malformed"]
     else:
         bad = read_exception(rel, text)["malformed"]
     for ln in text.replace("\r\n", "\n").split("\n"):

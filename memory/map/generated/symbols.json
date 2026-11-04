@@ -33,6 +33,11 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
+      "id": "Candidate",
+      "kind": "class",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "Case",
       "kind": "class",
       "file": "tools/playbook/core.py"
@@ -345,6 +350,11 @@
     {
       "id": "Refused",
       "kind": "class",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "Refused",
+      "kind": "class",
       "file": "tools/run-gates/owed_rows.py"
     },
     {
@@ -423,9 +433,19 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "TableConflict",
+      "kind": "class",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
       "id": "TagError",
       "kind": "class",
       "file": "tools/playbook/tag_index.py"
+    },
+    {
+      "id": "Terminal",
+      "kind": "class",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "ThreadEntry",
@@ -768,6 +788,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "add_write_flags",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "adopt",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -923,9 +948,19 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "arm_checks",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "arm_claim_fixture",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "arm_command_for_all",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "arm_content",
@@ -968,6 +1003,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "arm_flow_only",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "arm_foreign",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -981,6 +1021,11 @@
       "id": "arm_growth_denies",
       "kind": "function",
       "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
+      "id": "arm_guard",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "arm_keeps",
@@ -1016,6 +1061,11 @@
       "id": "arm_lock",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_merge",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "arm_minor",
@@ -1058,6 +1108,16 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "arm_owner_propose",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "arm_packs",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "arm_parse",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -1093,9 +1153,24 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_proof_values",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "arm_propose",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "arm_reader_coverage",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "arm_record",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "arm_records",
@@ -1121,6 +1196,16 @@
       "id": "arm_renderers",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_rerender",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "arm_retired_rows",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "arm_rotated",
@@ -2688,6 +2773,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "build_parser",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "build_partition",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
@@ -3361,6 +3451,11 @@
       "id": "build_traced_runner",
       "kind": "function",
       "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
+      "id": "build_tree",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "build_tree_git_env",
@@ -4393,6 +4488,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "check_change_fields",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
       "id": "check_child_forwarding",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
@@ -4466,6 +4566,11 @@
       "id": "check_conf_reader_parity",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_conflicts",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "check_conformance",
@@ -4913,6 +5018,11 @@
       "file": "tools/memory-tree/design_lib.py"
     },
     {
+      "id": "check_guard_witness",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "check_guarded",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -5308,6 +5418,11 @@
       "file": "tools/check-spec-tokens.test.sh"
     },
     {
+      "id": "check_manifest",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
       "id": "check_marker_line",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -5541,6 +5656,11 @@
       "id": "check_packing",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "check_packs",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "check_page_command",
@@ -5871,6 +5991,11 @@
       "id": "check_ref",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_references",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "check_refusal_sites",
@@ -6483,6 +6608,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "check_tags",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "check_target_local_config",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -6536,6 +6666,11 @@
       "id": "check_tracked_population",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "check_tree",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "check_tree_claim",
@@ -7783,6 +7918,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "derive_absent_flags",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "derive_action",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -7936,6 +8076,11 @@
       "id": "derive_calibrated_width",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "derive_candidate",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "derive_candidates",
@@ -8331,6 +8476,11 @@
       "id": "derive_foreign",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "derive_fx_row",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "derive_gate_backstop",
@@ -9163,6 +9313,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "derive_retired_rows",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "derive_rev_prefix",
       "kind": "function",
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
@@ -9213,6 +9368,11 @@
       "file": "tools/memory-tree/adopt-memory-tree.sh"
     },
     {
+      "id": "derive_row",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "derive_row_identity",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -9226,6 +9386,11 @@
       "id": "derive_row_lines",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "derive_row_pin",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "derive_row_re",
@@ -9608,11 +9773,6 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
-      "id": "derive_status_note",
-      "kind": "function",
-      "file": "tools/playbook/instruction_units.py"
-    },
-    {
       "id": "derive_statuses",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -9781,6 +9941,11 @@
       "id": "derive_unit_selection",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "derive_unit_targets",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "derive_unit_texts",
@@ -12226,6 +12391,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "main",
@@ -15193,9 +15363,34 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_change",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
+      "id": "read_change_at",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "read_change_edges",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
+    },
+    {
+      "id": "read_change_fields",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "read_change_records",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "read_changes",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "read_charter_shapes",
@@ -15433,6 +15628,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "read_declared_points",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "read_default_tree",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -15526,6 +15726,11 @@
       "id": "read_dirt",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "read_dirty",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "read_dirty_paths",
@@ -16528,6 +16733,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_load",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "read_local_env_vars",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -16556,6 +16766,16 @@
       "id": "read_manifest",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "read_manifest_tags",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "read_manifests",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "read_margin",
@@ -16781,6 +17001,11 @@
       "id": "read_owned_nodes",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "id": "read_packs",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "read_page_anchors",
@@ -17023,6 +17248,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "read_porcelain",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "read_positional",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
@@ -17041,6 +17271,11 @@
       "id": "read_pp_key",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "read_practice_tags",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "read_preflight_probes",
@@ -17306,6 +17541,11 @@
       "id": "read_retired_ids",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "id": "read_retired_rows",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
     },
     {
       "id": "read_rev",
@@ -17898,6 +18138,11 @@
       "file": "tools/playbook/positional.py"
     },
     {
+      "id": "read_tables",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
       "id": "read_tag_rows",
       "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
@@ -17906,6 +18151,11 @@
       "id": "read_tag_words",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "read_target",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "read_target_bytes",
@@ -17961,6 +18211,11 @@
       "id": "read_text",
       "kind": "function",
       "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
+      "id": "read_text",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "read_text_history",
@@ -18116,6 +18371,11 @@
       "id": "read_tree_paths",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_tree_rows",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "read_tree_text",
@@ -19703,6 +19963,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "render_proposal",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "render_prose_report",
       "kind": "function",
       "file": "tools/runlog/prose.py"
@@ -19811,6 +20076,11 @@
       "id": "render_roles_index",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "render_row",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "render_row_order",
@@ -21368,6 +21638,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "resolve_practices",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "resolve_prefix_sh",
       "kind": "function",
       "file": "tools/check-dead-paths.sh"
@@ -22023,6 +22298,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "resolve_root",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "resolve_row_docs",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -22131,6 +22411,16 @@
       "id": "resolve_step_argv",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "resolve_table",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "resolve_tables",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
     },
     {
       "id": "resolve_template_path",
@@ -22810,6 +23100,11 @@
     {
       "id": "run_check",
       "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "run_check",
+      "kind": "function",
       "file": "tools/playbook/positional.py"
     },
     {
@@ -22846,6 +23141,11 @@
       "id": "run_cli",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "run_cli",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "run_cli",
@@ -22960,6 +23260,11 @@
     {
       "id": "run_door",
       "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
+      "id": "run_door",
+      "kind": "function",
       "file": "tools/playbook/core.py"
     },
     {
@@ -23066,6 +23371,11 @@
       "id": "run_fixture",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "run_fixture",
@@ -23573,6 +23883,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "run_list",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "run_live",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -23883,6 +24198,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "run_propose",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "run_provision_git",
       "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
@@ -23971,6 +24291,11 @@
       "id": "run_render",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "run_render",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "run_render_helper",
@@ -24203,6 +24528,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_show",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "run_shrink",
       "kind": "function",
       "file": "tools/playbook/positional.py"
@@ -24353,6 +24683,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_tag_check",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "run_tags",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -24443,6 +24778,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "run_verb",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "run_vr_push",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -24491,6 +24831,11 @@
       "id": "run_write",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
+      "id": "run_write",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "run_writer",
@@ -28808,6 +29153,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "write_candidate",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "write_card",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -28866,6 +29216,11 @@
       "id": "write_chain_spec",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_change",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "write_charter_lock",
@@ -29508,9 +29863,19 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "write_points",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "write_policy",
       "kind": "function",
       "file": "tools/govkit/shims.py"
+    },
+    {
+      "id": "write_policy",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "write_policy",

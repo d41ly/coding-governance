@@ -53,6 +53,8 @@
       "hook destinations self-test",
       "install-prefix (shipped surface)",
       "install-prefix self-test",
+      "instruction edits (manifest checks)",
+      "instruction edits selftest",
       "instruction grammar (statement types, provenance lock)",
       "instruction ladder (level is the one term)",
       "instruction render (one renderer of record)",

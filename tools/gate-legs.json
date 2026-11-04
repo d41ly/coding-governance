@@ -1957,6 +1957,30 @@
     "enforces": ["principle.p16"]
   },
   {
+    "name": "instruction edits (manifest checks)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/instructions_edit.py",
+      "check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 180,
+    "enforces": ["principle.p11", "principle.p13"]
+  },
+  {
+    "name": "instruction edits selftest",
+    "argv": [
+      "python",
+      "{prefix}/playbook/instructions_edit.py",
+      "fixture"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "enforces": ["principle.p16"]
+  },
+  {
     "name": "tags (the resolver's checks)",
     "argv": [
       "python",

@@ -2130,9 +2130,6 @@ def run_check_render(engine_dir: Path, gov_root: Path, target: Path, charter_pat
         iu.read_change_records(target)
     except iu.UnitRowError as e:
         reds.append(f'render-playbook: red · status · {e}')
-    note = iu.derive_status_note()
-    if note:
-        print(f'render-playbook: {note}')
     try:
         reds += iu.check_legacy(target, read_policy_value("instructions.legacy", target)[0][0])
     except PolicyRefused as e:
