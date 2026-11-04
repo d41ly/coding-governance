@@ -132,7 +132,7 @@ ids TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHea
 | [TOOL-dFairHearing-47 — the last of the bar's own reds: two loops fed from a file, one exempt row, one guard, one cite, and the manifest's stamps](spec/2026-11-04-spec-TOOL-dFairHearing-47.md) | 31 | 1 | CLOSED | rev-1 | 2026-11-04 |
 <!-- /gen:build-units -->
 
-Records: 329 bound to this build, across 4 record folder(s).
+Records: 330 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
