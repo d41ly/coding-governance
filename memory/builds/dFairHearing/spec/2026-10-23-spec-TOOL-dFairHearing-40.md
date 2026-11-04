@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-40 — the round-5 spec audit's 35 minors: one build-wide version reading on one base, an attempt checker that refuses what it cannot place, and criteria a correct build can pass
 
-**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 28 · advances TOOL-dFairHearing-19
+**Status:** INPROGRESS · rev-4 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 28 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
