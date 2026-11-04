@@ -474,9 +474,9 @@ def run_skills(root=None):
 def run_practices(root=None):
     root, kit_rel, prefix = derive_layout(root)
     try:
-        row = read_kind_row(root, kit_rel, "practice")
+        row = read_kind_row(root, kit_rel, "charter-practice")
         if row is None:
-            return [f"{SAY}: red · kinds.toml holds no kind.practice row, so no practice is graded"], 1
+            return [f"{SAY}: red · kinds.toml holds no kind.charter-practice row, so no practice is graded"], 1
         rel = row.get("population", "").replace("{prefix}", prefix)
         rows = read_toml_rows(pathlib.Path(root, rel), "practice")
     except CoreRefused as exc:
@@ -559,10 +559,10 @@ def run_new(argv, root=None):
                 raise ValueError("new skill <name> --description <text>")
             home = row.get("population", "").replace("{prefix}", prefix).split("/*")[0]
             return [f"{SAY}: new · wrote {write_skill(root, home, name, flags['--description'])}"], 0
-        if own and own.group("kind") == "practice":
+        if own and own.group("kind") == "charter-practice":
             flags = dict(zip(rest[::2], rest[1::2]))
             if set(flags) != {"--line"} or len(rest) != 2:
-                raise ValueError("new practice <name> --line <text>")
+                raise ValueError("new charter-practice <name> --line <text>")
             rel = row.get("population", "").replace("{prefix}", prefix)
             return [f"{SAY}: new · appended practice.{name} to {write_practice(root, rel, name, flags['--line'])}"], 0
     except ValueError as exc:
@@ -594,12 +594,12 @@ def write_fixture(top, policy="# no key set\n"):
             '[[kind]]\ntag = "kind.skill"\nowner = "dFx"\nbinds = ["principle.p15", "principle.p16"]\n'
             'population = "skills/*/SKILL.md"\nfactory = "python {prefix}/playbook/core.py new skill"\n'
             'gate = "fx skills"\n\n'
-            '[[kind]]\ntag = "kind.practice"\nowner = "dFx"\nbinds = ["principle.p16"]\n'
+            '[[kind]]\ntag = "kind.charter-practice"\nowner = "dFx"\nbinds = ["principle.p16"]\n'
             'population = "{prefix}/playbook/practices.toml"\n'
-            'factory = "python {prefix}/playbook/core.py new practice"\ngate = "fx practices"\n\n'
-            '[[kind]]\ntag = "kind.layer"\nowner = "dFx"\nbinds = ["principle.p16"]\npopulation = ""\n'
+            'factory = "python {prefix}/playbook/core.py new charter-practice"\ngate = "fx practices"\n\n'
+            '[[kind]]\ntag = "kind.product-layer"\nowner = "dFx"\nbinds = ["principle.p16"]\npopulation = ""\n'
             'factory = ""\ngate = ""\n'),
-        "tools/playbook/core-pending.txt": "# fixture pending list\nkind\tkind.layer\tdFx\n",
+        "tools/playbook/core-pending.txt": "# fixture pending list\nkind\tkind.product-layer\tdFx\n",
         "tools/gate-legs.json": json.dumps([
             {"name": "fx meta", "argv": ["python", "x.py"], "enforces": FX_TAGS},
             {"name": "fx skills", "argv": ["python", "x.py"], "enforces": ["principle.p15", "principle.p16"]},
@@ -746,7 +746,7 @@ def arm_skill(c):
 
 def arm_practice(c):
     c.check_gate("practice: no catalogue reads unarmed", run_practices, 0, "unarmed")
-    c.check_gate("practice: new practice demo --line x", run_new_in(["practice", "demo", "--line", "x"]), 0,
+    c.check_gate("practice: new charter-practice demo --line x", run_new_in(["charter-practice", "demo", "--line", "x"]), 0,
              "appended practice.demo")
     c.check_gate("practice: the factory's row passes its gate", run_practices, 0, "practices conformance · green")
     rel = "tools/playbook/practices.toml"

@@ -140,3 +140,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-04T04:52:15Z brief · item PLAY-dOrderedCharter-64 · reason 9d7da2401920 memory/builds/dOrderedCharter/prompts/2026-11-04-prompt-PLAY-dOrderedCharter-64-build-brief.md
 
 2026-11-04T05:05:15Z rescope · item add PLAY-dOrderedCharter-65 · reason unit 7's kinds register mints kind.kit, kind.layer and kind.practice, whose first segment is a namespace word; the tags leg reds six times (mid-build lint after unit 7); a repair renames them before unit 53
+
+2026-11-04T05:50:08Z dispatch · item f4acbd4a PLAY-dOrderedCharter-65 · reason tools/playbook/kinds.toml tools/playbook/core-pending.txt tools/playbook/core.py memory/builds/dOrderedCharter/spec/2026-11-04-spec-PLAY-dOrderedCharter-65.md memory/builds/dOrderedCharter/build/2026-11-04-build-PLAY-dOrderedCharter-65-ledger.md memory/LIVE.md memory/builds/dOrderedCharter/README.md
+
+2026-11-04T05:50:16Z brief · item PLAY-dOrderedCharter-65 · reason d0c4cbe4d526 memory/builds/dOrderedCharter/prompts/2026-11-04-prompt-PLAY-dOrderedCharter-65-build-brief.md

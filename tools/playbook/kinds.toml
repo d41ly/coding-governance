@@ -5,10 +5,12 @@
 # `population`, a tracked-path glob (`{prefix}` the tool root); `factory`, the command `core.py new <kind>` runs;
 # `gate`, the leg of <prefix>/gate-legs.json whose `enforces` holds every tag of `binds`. A kind whose factory or
 # gate has not landed carries "" there and is a `kind` row of core-pending.txt naming its owner.
-# `python <prefix>/playbook/core.py kinds` grades the contract.
+# `python <prefix>/playbook/core.py kinds` grades the contract. A kind's name is never a namespace word: where a
+# kind's members form a namespace, its name puts a qualifier before that word, naming where the population lives,
+# and the `<kind>` that `core.py new` takes is that name.
 
 [[kind]]
-tag = "kind.kit"
+tag = "kind.tool-kit"
 owner = "dShippedRelease"
 binds = ["principle.p16"]
 population = "{prefix}/*/kit.toml"
@@ -88,11 +90,11 @@ factory = "python {prefix}/playbook/core.py new skill"
 gate = "core skills conformance"
 
 [[kind]]
-tag = "kind.practice"
+tag = "kind.charter-practice"
 owner = "dOrderedCharter"
 binds = ["principle.p14", "principle.p16"]
 population = "{prefix}/playbook/practices.toml"
-factory = "python {prefix}/playbook/core.py new practice"
+factory = "python {prefix}/playbook/core.py new charter-practice"
 gate = "core practices conformance"
 
 [[kind]]
@@ -112,7 +114,7 @@ factory = ""
 gate = ""
 
 [[kind]]
-tag = "kind.layer"
+tag = "kind.product-layer"
 owner = "dOrderedCharter"
 binds = ["principle.p16", "principle.p28"]
 population = "{prefix}/playbook/layers.toml"

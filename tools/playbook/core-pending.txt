@@ -194,7 +194,7 @@ leg	kit-placeholders self-test	dWitnessedBar
 leg	selftest harness self-test	dWitnessedBar
 leg	extract-arms self-test	dWitnessedBar
 leg	run-selftests self-test	dWitnessedBar
-kind	kind.kit	dShippedRelease
+kind	kind.tool-kit	dShippedRelease
 kind	kind.command	dDeclaredLoop
 kind	kind.instruction-unit	dOrderedCharter
 kind	kind.policy-key	dDeclaredLoop
