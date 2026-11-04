@@ -139,8 +139,8 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY
 | [PLAY-dOrderedCharter-42 — the bindings reader admits every kind the record factory mints, joined to its file name both ways](spec/2026-10-24-spec-PLAY-dOrderedCharter-42.md) | 12 | 2 | CLOSED | rev-5 | 2026-11-04 |
 | [PLAY-dOrderedCharter-12 — the statement grammar, its check, and render provenance in a sidecar lock](spec/2026-10-23-spec-PLAY-dOrderedCharter-12.md) | 13 | 2 | CLOSED | rev-5 | 2026-11-04 |
 | [PLAY-dOrderedCharter-9 — the instruction-unit registry: one row per unit in each kit's manifest, its one reader, and documents rendered from units](spec/2026-10-23-spec-PLAY-dOrderedCharter-9.md) | 14 | 2 | CLOSED | rev-5 | 2026-11-04 |
-| [PLAY-dOrderedCharter-20 — the unit schema, the one renderer of record and its templates, the render gate with its legacy list, and one fact in one unit](spec/2026-10-23-spec-PLAY-dOrderedCharter-20.md) | 15 | 2 | DEFERRED | rev-6 | 2026-11-03 |
-| [PLAY-dOrderedCharter-15 — the instruction manifest and its guarded write command, each change recorded, and the pack catalogue](spec/2026-10-23-spec-PLAY-dOrderedCharter-15.md) | 16 | 2 | DEFERRED | rev-7 | 2026-11-03 |
+| [PLAY-dOrderedCharter-20 — the unit schema, the one renderer of record and its templates, the render gate with its legacy list, and one fact in one unit](spec/2026-10-23-spec-PLAY-dOrderedCharter-20.md) | 15 | 2 | DEFERRED | rev-7 | 2026-11-04 |
+| [PLAY-dOrderedCharter-15 — the instruction manifest and its guarded write command, each change recorded, and the pack catalogue](spec/2026-10-23-spec-PLAY-dOrderedCharter-15.md) | 16 | 2 | DEFERRED | rev-8 | 2026-11-04 |
 | [PLAY-dOrderedCharter-1 — the practice catalogue and `charter.practices`](spec/2026-10-23-spec-PLAY-dOrderedCharter-1.md) | 17 | 2 | DEFERRED | rev-7 | 2026-11-04 |
 | [PLAY-dOrderedCharter-45 — the merge driver's TOML-table class states its whole conflict envelope and proves its output parses](spec/2026-10-24-spec-PLAY-dOrderedCharter-45.md) | 17 | 2 | DEFERRED | rev-3 | 2026-11-04 |
 | [PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them](spec/2026-10-23-spec-PLAY-dOrderedCharter-3.md) | 18 | 2 | DEFERRED | rev-6 | 2026-11-04 |
@@ -174,7 +174,7 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-4 | 2026-11-04 |
 <!-- /gen:build-units -->
 
-Records: 358 bound to this build, across 4 record folder(s).
+Records: 360 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

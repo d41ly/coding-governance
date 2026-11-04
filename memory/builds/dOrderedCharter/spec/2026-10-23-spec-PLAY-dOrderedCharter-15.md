@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-15 — the instruction manifest and its guarded write command, each change recorded, and the pack catalogue
 
-**Status:** DEFERRED · rev-7 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 16 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
+**Status:** DEFERRED · rev-8 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 16 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
 
 **Carries:** cl-dClosedLoop-0045@f345dc78 whole
 
@@ -115,7 +115,8 @@ extending `charter.practices` into a pack catalogue, apart from the policy prese
   `promoted-from`'s row names that site as its one writer (`tools/playbook/edges.toml:237-244`), and the
   writer arm reds the type at any other site (`edge_grammar.py:415-417`), while no adapter assigns this
   site today (`:254-386`; `read_header_edges` reads `Caused-by` and `Made-by` alone, `HEADER_RE` `:83`).
-  Unit 20 derives each unit's `status` from these; unit 33 grades `Mark`. The factory's `new change` verb is the stand-in door
+  Unit 20 derives each unit's `status` from these, and this unit takes the body of unit 20's
+  `read_change_records`, which it replaces when it lands the `change` kind; unit 33 grades `Mark`. The factory's `new change` verb is the stand-in door
   a build's builder records a kit manifest change through while the command refuses writes. Observed by
   AC9.
 - **S8** — The pack catalogue, `tools/playbook/packs.toml`: one `[[pack]]` row per instruction pack, with
@@ -175,7 +176,7 @@ extending `charter.practices` into a pack catalogue, apart from the policy prese
 ### Edges
 
 - **consumes-from** `PLAY-dOrderedCharter-9` — `read_units`, the rows every verb reads, and `extract_unit` beside its reader, whose claim S9 extends to change records
-- **consumes-from** `PLAY-dOrderedCharter-20` — the schema and one-fact checks, the renderer a write re-renders through, and `derive_status`
+- **consumes-from** `PLAY-dOrderedCharter-20` — the schema and one-fact checks, the renderer a write re-renders through, `derive_status`, and the body of `read_change_records`, which it replaces when it lands the `change` kind
 - **consumes-from** `PLAY-dOrderedCharter-12` — the grammar check S6 runs
 - **consumes-from** `PLAY-dOrderedCharter-7` — the record factory and its stand-in door, which S7's kind joins, and `principle` in `tools/playbook/edges.toml`'s `enforces` row's `to`, which S10's `enforces` values need
 - **consumes-from** `PLAY-dOrderedCharter-16` — the layer register whose declared points S3, S4 and S5 read
@@ -428,6 +429,7 @@ New arm: tools/gate-legs.json · covers AC6 · the `instruction edits (manifest 
   `**Readers:**` clause escapes the by-name half, the item retiring no name, and names the retired rows'
   value readers.
 - 2026-11-04 · section 3 Edges · from `2026-11-04-prompt-PLAY-dOrderedCharter-15-edge-mirror-brief.md`: the hands-off mirror of the consumes-from edge unit 52 declares against this unit; a mirror-only edit, so the status line keeps its rev.
+- rev-8 · 2026-11-04 · S7 · section 3 · from `2026-11-04-prompt-PLAY-dOrderedCharter-20-divergence-brief.md`: S7 and the consumes-from line for unit 20 take the body of `read_change_records`, which this unit replaces when it lands the `change` kind.
 
 ## 10. Reuse audit
 

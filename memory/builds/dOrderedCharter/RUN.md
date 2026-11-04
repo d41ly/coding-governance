@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 0d1c1dda4b5656df0a6341dba492ae1f75e8bd61 · park · 23 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: bad313dc506a25dbb3b48cf75774c34913e4fbbf
 phase: BUILDING
@@ -172,3 +173,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-04T10:49:41Z brief · item PLAY-dOrderedCharter-9 · reason 192198ec568c memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-9-build-brief.md
 
 2026-11-04T11:19:38Z dispatch · item 4773fbef PLAY-dOrderedCharter-9 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-04T12:04:50Z decision · item Should the default kit set gain playbook-render, so the roles kit can require it and its agents scope can leave render_agents.py? · reason Options: (a) widen the default set, which changes what every install lands; (e) keep the agents scope on render_agents.py, the run's interim ruling. Refused because widening the default set is the owner's.
+
+2026-11-04T12:04:54Z decision · item May BUILD-METHOD's size cap be raised so the guide can carry its instruction envelope? · reason Spec 3's open fork. The render is 30659 of 30720 bytes and the envelope needs at least 80. The cap's own row reserves any raise to the owner, and every option that leaves the cap alone hits a veto. Unit 3 cannot register BUILD-METHOD without this.

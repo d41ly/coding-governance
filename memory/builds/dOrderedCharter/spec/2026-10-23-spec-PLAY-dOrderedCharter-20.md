@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-20 — the unit schema, the one renderer of record and its templates, the render gate with its legacy list, and one fact in one unit
 
-**Status:** DEFERRED · rev-6 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 15 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-7 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 15 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0050@13d9192b whole
 
@@ -28,6 +28,8 @@
 | [2026-11-02-prompt-PLAY-dOrderedCharter-20-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-20-build-brief.md) | journal | — |
 | [2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md) | research | PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-11-03-prompt-PLAY-dOrderedCharter-9-drift-sweep-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-9-drift-sweep-brief.md) | research | PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-50 |
+| [2026-11-04-prompt-PLAY-dOrderedCharter-20-1-spec-writer.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-20-1-spec-writer.md) | journal | — |
+| [2026-11-04-prompt-PLAY-dOrderedCharter-20-divergence-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-20-divergence-brief.md) | research | — |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -41,9 +43,9 @@ fact in one place is policed per instance, never as a class (gap-found-23). The 
 templates of slots, and arms a render gate at this build with a shrink-only list of today's hand-written
 documents (IW-1). This unit builds that system over the rows unit 9 reads: the schema check, the one-fact
 check, each unit's status derived from its change record, the renderer-of-record table and its check, the
-one renderer absorbing the playbook, roles and agent-instructions renders and playbook parity, the charter
+one renderer absorbing the playbook and agent-instructions renders and playbook parity, the charter
 and work-order templates' slot mechanism, the render gate under `instructions.legacy`, and the
-instruction-unit kind's factory.
+instruction-unit kind's factory. The roles render stays on `render_agents.py` in this unit (F10).
 
 ## 2. Scope (IN)
 
@@ -61,36 +63,46 @@ instruction-unit kind's factory.
   reaches `design_lib`, and a derived unit's type and `source`; and two active `definition` units defining one term, the text before ` — `, are red
   whatever their meanings. Observed by AC2.
 - **S3** — Status derived from the change record (S13). `derive_status(tag, records)` returns one of
-  S13's three status values from the change records naming the tag, read through unit 7's record factory
-  as the kind unit 15 registers; no row carries `status`, and S1 refuses one that does. A unit whose
-  derived status is not `active` and that a template selects is red at render. Observed by AC3.
+  S13's three status values from the records naming the tag, each a mapping of unit 15's fields `Unit`,
+  `Action` and `Successor`; no row carries `status`, and S1 refuses one that does. A unit whose
+  derived status is not `active` and that a template selects is red at render. Every tree read, S2's
+  active, the render arm and S8, takes its records from `read_change_records(root)` in
+  `instruction_units.py`, which reaches `tools/memory-tree/build_records.py#KINDS` as
+  `tools/playbook/instruction_units.py#derive_unit_pin` reaches `design_lib`. While that table holds
+  `change` as pending it returns no record, so every unit reads `active`, and the caller prints
+  `status: unarmed · the change kind is pending on <unit>`. With the kind landed and this body
+  unchanged it raises, which reds the caller; unit 15 gives it its reader (F7). Observed by AC3.
 - **S4** — The renderer-of-record table, `tools/playbook/renderers.toml`: one `[[target]]` row per
   instruction-file population, `paths` (globs) and `renderer`, the instruction files being the closed
   pathspec list `INSTRUCTION_PATHSPECS` in `instruction_units.py`: the charter `.memory-tree.conf`'s
   `CHARTER` names, `CLAUDE.md`, `.claude/agents/*.md`, `.claude/rules/*.md`, `.claude/skills/*/SKILL.md`,
   `skills/*/SKILL.md`, `{memory_root}/guides/*.md`, `{memory_root}/TEMPLATE-SPEC.md` and
   `{memory_root}/HYGIENE.md`. A file two rows claim, or none, is red, so each instruction file has exactly
-  one renderer of record. Every population has its row (§4 Data model): the three `playbook:*` scopes;
-  `kit-adopter` for a file a kit's adopter renders from that kit's template and holds by its own
-  `--check`; and `hand` for a file no renderer writes, today `.claude/rules/product.md` (`git grep -l
+  one renderer of record. Every population has its row (§4 Data model): the two `playbook:*` scopes;
+  `kit-adopter` for a file a kit's adopter renders from that kit's template or role files and holds
+  by its own `--check`; and `hand` for a file no renderer writes, today `.claude/rules/product.md` (`git grep -l
   "rules/product.md" -- tools/` prints nothing), `skills/deploy-governance/SKILL.md`,
   `skills/session-kickoff/SKILL.md`, `{memory_root}/guides/MERGE-BAR.md` and
   `{memory_root}/guides/SESSION-KICKOFF.md`. Where one glob holds files of two renderers, the
   `kit-adopter` row names its files by path (§8 F5). Observed by AC4.
-- **S5** — The one renderer. `tools/playbook/render_playbook.py` is the renderer of record (S11) for three
-  scopes: `charter` (today's `render()`), `agents` (each `.claude/agents/*.md`, rendered by the roles kit's
-  `render_agent_file` as the scope's slot renderer, reached through `resolve_kit_dir`), and `entry-files`
-  (`CLAUDE.md` and each other harness alias, the pointer or copy `adopt-agent-instructions.sh` writes
-  today, its logic moved into the renderer). `python tools/playbook/render_playbook.py --render-scope
-  <scope>` writes a scope and `--check-render --scope <scope>` compares its bytes; every write records the
-  target's lock row (unit 12). `adopt-roles.sh` and `adopt-agent-instructions.sh` call these for their
-  render and their `--check`, so no second renderer writes an absorbed file. Observed by AC5.
+- **S5** — The one renderer. `tools/playbook/render_playbook.py` is the renderer of record (the systems
+  record's S11) for two scopes: `charter` (today's `render()`) and `entry-files` (`CLAUDE.md` and each
+  other harness alias, the pointer or copy `adopt-agent-instructions.sh` writes today, its logic moved
+  into the renderer). `python tools/playbook/render_playbook.py --render-scope <scope>` writes a scope
+  and `--check-render --scope <scope>` compares its bytes; every write records the target's lock row
+  (unit 12). `adopt-agent-instructions.sh` calls these for its render and its `--check`, so no second
+  renderer writes an absorbed file. `--target` defaults to the repository root; the adopter passes its
+  own, finds the renderer through the inline `resolve_kit_dir`, and exits 2 naming `playbook-render`
+  where that finds none. The `entry-files` scope takes the adopter's `--aliases`, `--mode` and `--force`,
+  and with none the aliases `renderers.toml` assigns it. Observed by AC5 and AC13.
 - **S6** — The absorbed legs keep their names, the join key every leg-keyed file reads, and run the one
-  gate scoped to the targets they covered: `playbook render wiring` the `charter` scope, `roles render
-  wiring` the `agents` scope, `agent-instructions wiring` the `entry-files` scope, and `playbook parity`
-  the `claims` scope, whose arms are `check-playbook-parity.sh`'s S1, S2 and S4, run by the gate until the
-  charter's stated values render from sourced fact units. The two render selftests fold into
-  `render_playbook.py`'s selftest. Observed by AC6.
+  gate scoped to the targets they covered: `playbook render wiring` the `charter` scope,
+  `agent-instructions wiring` the `entry-files` scope, and `playbook parity` the `claims` scope, whose
+  arms are `check-playbook-parity.sh`'s S1, S2 and S4, run by the gate until the charter's stated values
+  render from sourced fact units. `playbook render selftest` keeps its argv and gains the scope arms in
+  `render_playbook.py`'s selftest. `roles render wiring` and `roles render selftest` are not absorbed and
+  keep their argvs, `bash {prefix}/roles/adopt-roles.sh --check` and `python
+  {prefix}/roles/render_agents.py --selftest` (S11, F8). Observed by AC6.
 - **S7** — The templates. A template holds slot lines and no prose: `<!-- units: <selector> -->` on its own
   line expands, at render, to `render_units(derive_unit_selection(units, selector))` (unit 9). `render()` expands
   slots in the charter template; the work-order template `tools/playbook/templates/work-order.template.md`
@@ -112,13 +124,19 @@ instruction-unit kind's factory.
   row's `summary` and its `usage`, a line the row admits (`instructions.legacy = "refuse"`), and drains the
   name in the same commit with `python <prefix>/policy/policy.py lists --write`. Observed by AC8 and AC10.
 - **S9** — The instruction-unit kind's factory and gate (deviation 71):
-  `python tools/playbook/core.py new unit <name> --kit <kit> --type <t> --level <n> --text <line>` composes a
-  row S1 passes and prints it with the unit-15 command that writes it, never writing a manifest itself;
-  the kind's gate is S1's leg, and the kind's row in `tools/playbook/kinds.toml` names both, leaving
-  `tools/playbook/core-pending.txt`. Observed by AC9.
+  `python tools/playbook/core.py new instruction-unit <name> --kit <kit> --type <t> --level <n> --text <line>`
+  composes a row S1 passes and prints it with the unit-15 command that writes it, never writing a
+  manifest itself; the kind's gate is S1's leg, and the kind's row in `tools/playbook/kinds.toml` names
+  both, leaving `tools/playbook/core-pending.txt`. The row's factory is `python
+  {prefix}/playbook/core.py new instruction-unit`, which `tools/playbook/core.py#run_new` serves in
+  process through `OWN_FACTORY`, as it serves `skill`. No alias spells `unit`: a kind's name is never a
+  namespace word (unit 65). The stale pending row `principle.p11` leaves that file in the same commit,
+  since `instruction ladder (level is the one term)` and `instruction grammar (statement types,
+  provenance lock)` enforce it now. Observed by AC9.
 - **S10** — The legs and plants. Legs `instruction units (schema, one fact)` and `instruction render (one
   renderer of record)` in `tools/gate-legs.json`, each carrying `"enforces": ["principle.p11",
-  "principle.p13"]`, `"subject": "repo"`, and `"chunk"` `declarations` and `wiring` in that order; `python
+  "principle.p13"]`, the schema leg also `principle.p16` (F6), `"subject": "repo"`, and `"chunk"`
+  `declarations` and `wiring` in that order; `python
   tools/playbook/instruction_units.py fixture --plant <case>` stages every case in a throwaway tree in the
   system temp directory. The legs' rows land in this pass, as unit 26 writes its leg's. Each leg gets:
   - an `[[exempt_leg]]` row in `tools/govkit/registry.toml` after the `edges` row (`:715`), in the shape
@@ -134,11 +152,21 @@ instruction-unit kind's factory.
 
   `python tools/run-gates/owed_rows.py --base HEAD` (unit 50) then prints none owed. Observed by AC1 to
   AC9 and AC11.
+- **S11** — The agent render stays where it is (F10). `.claude/agents/*.md` and `.claude/roles.json` stay
+  on `tools/roles/render_agents.py`, which keeps `--write`, `--check` and `--selftest`, and
+  `adopt-roles.sh` calls it as it does today, with no lock row for those files. `renderers.toml` gives
+  the agent files `kit-adopter`, `roles render wiring` holds them, and `render_playbook.py` has no
+  `agents` scope. Observed by AC12.
+- **S12** — The kit descriptors. `tools/agent-instructions/kit.toml` sets `requires =
+  ["playbook-render"]` (F9), and the header of `adopt-agent-instructions.sh` names python and that kit in
+  place of its no-hard-deps claim. `tools/roles/kit.toml` does not change: its `requires` and its two
+  `[[generated]]` rows stand, since `adopt-roles.sh` reaches no renderer in this unit (F10). Observed by
+  AC13.
 
 ## 3. Non-goals (OUT)
 
-- The write command, `instructions.edit`, its manifest and its change record kind: unit 15
-  (`cl-dClosedLoop-0045`), which S3 and S9 call.
+- The write command, `instructions.edit`, its manifest, its change record kind and the reader
+  `read_change_records` gains: unit 15 (`cl-dClosedLoop-0045`), which S3 and S9 call.
 - The charter's re-founded content: unit 2. Envelopes: unit 3. Load sets and budgets: unit 11. Step-scoped
   practice units in work orders: unit 21. The `code` slot: unit 27.
 - Migrating the guides, the Skills and `.claude/rules/` onto units: each chain build migrates its own
@@ -146,6 +174,8 @@ instruction-unit kind's factory.
   `tools/lib/render-doc.sh`'s copies, kit/dogfood doc parity, review-protocol parity, each kit's skill wiring
   `--check` and govkit's placeholder render.
 - The adopter upgrade step that moves agent-instructions' wiring: unit 31.
+- The agent files' move onto the one renderer. `render_agents.py` keeps `--write` and `--check` for them,
+  and `adopt-roles.sh` keeps calling it, until the owner rules on the default set (F10).
 - The role static block template and the single carry: dBoundRoles; hook-message and harness-prompt
   templates: dWellOiledMachine.
 
@@ -157,7 +187,8 @@ instruction-unit kind's factory.
 - **consumes-from** external — dGroundRules, landed before this build run: `policy.py get` at the landed revision (TOOL-dGroundRules-2 S1, S7, `cl-dClosedLoop-0008`) with an unset key's catalogue default (TOOL-dGroundRules-3 S2), the `instructions.legacy` row and the shrink-only list S8 drains (TOOL-dGroundRules-1 S3, S6), and the mirror's `mirror --write` (TOOL-dGroundRules-5 S2, TOOL-dGroundRules-19 S1)
 - **consumes-from** `PLAY-dOrderedCharter-24` — its S7 normaliser, `design_lib.derive_pin_hash`, the one-fact key's hash
 - **consumes-from** `PLAY-dOrderedCharter-19` — the tag grammar and namespace registry S1 grades `tag`, `scope` and `required-by` against, and `read_policy_value` in `tools/playbook/policy_value.py`, which S8 reads `instructions.legacy` through
-- **hands-off** `PLAY-dOrderedCharter-15` — the write command S9 prints, and the change records S3 derives status from
+- **hands-off** `PLAY-dOrderedCharter-15` — the write command S9 prints, the change records S3 derives status from, and the body of `read_change_records`, which it replaces when it lands the `change` kind (F7)
+- **hands-off** external — the `agents` scope, the agent files' move onto the one renderer, parked for the owner's ruling on widening the default set; until then `render_agents.py` keeps `--write` and `--check` for those files (F10)
 - **hands-off** `PLAY-dOrderedCharter-2` — the charter's units, rendered through S7's slots
 - **hands-off** `PLAY-dOrderedCharter-3` — `INSTRUCTION_PATHSPECS`, the instruction-file population its load-bearing population reads
 - **hands-off** `PLAY-dOrderedCharter-21` — the work-order template's slots, which step-scoped units join
@@ -183,15 +214,12 @@ paths = ["{charter}"]
 renderer = "playbook:charter"
 
 [[target]]
-paths = [".claude/agents/*.md"]
-renderer = "playbook:agents"
-
-[[target]]
 paths = ["CLAUDE.md"]
 renderer = "playbook:entry-files"
 
-[[target]]   # each from its kit's template, by that kit's adopter and its inline render-doc copy
-paths = [".claude/skills/*/SKILL.md", "{memory_root}/TEMPLATE-SPEC.md", "{memory_root}/HYGIENE.md",
+[[target]]   # each from its kit's template or role files, by that kit's adopter
+paths = [".claude/agents/*.md", ".claude/skills/*/SKILL.md",
+         "{memory_root}/TEMPLATE-SPEC.md", "{memory_root}/HYGIENE.md",
          "{memory_root}/guides/ANNOTATION-STYLE.md", "{memory_root}/guides/BUILD-METHOD.md",
          "{memory_root}/guides/PLAYBOOK-TEMPLATE.md", "{memory_root}/guides/REVIEW-PROTOCOL.md",
          "{memory_root}/guides/UNATTENDED-ASKS.md", "{memory_root}/guides/UNATTENDED-PROTOCOL.md",
@@ -207,7 +235,8 @@ renderer = "hand"
 The `kit-adopter` paths are the renders at HEAD: `tools/memory-tree/adopt-memory-tree.sh:566-569`
 pairs four templates with `HYGIENE.md`, `TEMPLATE-SPEC.md` and two guides,
 the unattended kit's five guide templates and `tools/workflows/REVIEW-PROTOCOL.template.md` give six
-more guides, and each of the seven `.claude/skills/*/SKILL.md` is named by its kit's adopter. The build pass
+more guides, and each of the seven `.claude/skills/*/SKILL.md` is named by its kit's adopter. The agent
+files are `adopt-roles.sh`'s, through `render_agents.py` (S11). The build pass
 re-derives the list and the table holds it both ways.
 
 The work-order template, `tools/playbook/templates/work-order.template.md`, holds two second-level
@@ -222,11 +251,12 @@ headings, `Role` and `Task`, and four slot lines, each `<!-- slot: <name> -->` o
 
 ### Inventory
 
-Minted: the verbs `schema` and `one-fact`, `derive_status`, `INSTRUCTION_PATHSPECS`, the files
+Minted: the verbs `schema` and `one-fact`, `derive_status`, `read_change_records`,
+`INSTRUCTION_PATHSPECS`, the files
 `tools/playbook/renderers.toml`, `tools/playbook/instructions-legacy.txt` and
 `tools/playbook/templates/work-order.template.md`, the renderer flags `--render-scope`, `--check-render`
-and `--scope` with the scopes `charter`, `agents`, `entry-files` and `claims`, the slot line grammar, the
-factory verb `new unit`, and the legs `instruction units (schema, one fact)` and `instruction render (one
+and `--scope` with the scopes `charter`, `entry-files` and `claims`, the slot line grammar, the
+factory verb `new instruction-unit`, and the legs `instruction units (schema, one fact)` and `instruction render (one
 renderer of record)`. The legacy list's seed is DERIVED at the build pass from `INSTRUCTION_PATHSPECS`; at
 `4e8f80cdf` it would hold 33 files (PINNED, 2026-10-23: `AGENTS.md`, `CLAUDE.md`, nine agent files, one
 rule, seven installed Skills, two authored Skills, ten guides, `TEMPLATE-SPEC.md` and `HYGIENE.md`).
@@ -239,7 +269,8 @@ the renderer, the script calling it. Rendered bytes do not change: the scopes re
 ### Rollout
 
 Live at landing, at order 15, after unit 9 (order 14); units 15 (order 16), 2 (order 20) and 3 (order 18)
-build on it. S8's row fill lands as two commits: the fill with the list drain, then
+build on it. S3's status arm prints `unarmed` from landing until unit 15 gives `read_change_records` its
+reader. S8's row fill lands as two commits: the fill with the list drain, then
 `.governance/policy.json` alone as `policy.py mirror --write` regenerates it, since a catalogue edit stales
 the mirror (TOOL-dGroundRules-5 S1, S2) and the guard admits a mirror commit only when the policy file and
 the catalogue equal HEAD (TOOL-dGroundRules-19 S1).
@@ -255,9 +286,8 @@ the catalogue equal HEAD (TOOL-dGroundRules-19 S1).
 - `tools/playbook/instructions-legacy.txt`
 - `tools/playbook/templates/work-order.template.md`
 - `tools/roles/handoff.py`
-- `tools/roles/render_agents.py`
-- `tools/roles/adopt-roles.sh`
 - `tools/agent-instructions/adopt-agent-instructions.sh`
+- `tools/agent-instructions/kit.toml`, `requires`
 - `tools/gate-legs.json`
 - `tools/govkit/registry.toml`, the two `[[exempt_leg]]` rows
 - `tools/govkit/subject-pins.tsv`, by `govkit.py selfcheck --write`
@@ -266,6 +296,9 @@ the catalogue equal HEAD (TOOL-dGroundRules-19 S1).
 - `tools/policy/catalogue.toml`, the existing row filled
 - `tools/policy/unsummarised-keys.txt`, drained by `lists --write`
 - `.governance/policy.json`, the second commit
+
+Not touched, under F10's (e): `tools/roles/render_agents.py` keeps `--write` and `--check` for the agent
+files, and `tools/roles/adopt-roles.sh`, its fixture and `tools/roles/kit.toml` stand as they are.
 
 ### Alternatives rejected
 
@@ -284,11 +317,15 @@ the catalogue equal HEAD (TOOL-dGroundRules-19 S1).
 - perf / scale: one render per scope; the checks read the rows once.
 - error / empty / loading states: an instruction file with no renderer row is red; a refused
   `instructions.legacy` read is red naming the key; an empty unit population prints `unarmed`, never
-  green.
+  green, and so does the status arm while the `change` kind is pending.
 - observability: each red names the path or tag, the arm and the remedy.
-- risks: the roles kit's render now reaches the playbook kit, a core-to-core edge unit 16's check admits;
-  an adopter whose roles kit updates before its playbook kit renders with the old renderer until unit 31's
-  step runs.
+- risks: `adopt-agent-instructions.sh` now reaches the playbook kit, an edge inside `layer.instruction`.
+  Under AC5 that adopter keeps no fallback, so no target wires its aliases with an old renderer. Where
+  `render_playbook.py` is absent it exits 2 naming `playbook-render`; where the renderer predates
+  `--render-scope`, `tools/playbook/render_playbook.py#main`'s parser exits 2. Either way nothing is
+  written. `requires` orders `playbook-render` first and makes `apply` refuse its absence (F9); a receipt
+  that already holds the kit without it is unit 31's step. The roles adopter does not move, so a default
+  install renders as it does today (F10).
 - testing: S10's plants both ways, and the byte-identity of every scope and the handoff.
 - migration: §4 Migration.
 - user docs: `help/roles.md` names the leg that holds the agent files (its line 141), unchanged in name.
@@ -305,24 +342,30 @@ the catalogue equal HEAD (TOOL-dGroundRules-19 S1).
   Red when: one fact held twice passes.
 - **AC3** — When `python instruction_units.py fixture --plant status` runs, `derive_status`
   returns `active` with no record, `retired:unit.b` for a rename, `retired:unit.b,unit.c` for a split and
-  `retired:none` for a retirement, a row typing `status` reds `schema`, and a retired unit a template
-  selects reds the render.
-  Red when: a status is read from the row, or a retired unit renders.
+  `retired:none` for a retirement over records the case passes in, a row typing `status` reds `schema`,
+  and a retired unit a template selects reds the render. `read_change_records` over the tree returns no
+  record and the render prints the `status: unarmed` line naming `PLAY-dOrderedCharter-15`; with the
+  case's `KINDS` row for `change` landed, it raises and the render reds.
+  Red when: a status is read from the row, a retired unit renders, or the read stays unarmed once the
+  kind lands.
 - **AC4** — When `python instruction_units.py fixture --plant renderers` plants a guide no
   `renderers.toml` row claims and an agent file two rows claim, `--check-render` exits 1 naming each.
   Red when: an instruction file has no renderer of record, or two.
-- **AC5** — When `python tools/playbook/render_playbook.py --check-render --scope agents` and `--scope
-  entry-files` run over the tree, each exits 0 with the bytes `adopt-roles.sh` and
-  `adopt-agent-instructions.sh` wrote before this unit;
-  `git grep -n -e '--render-scope' -e '--check-render' -- tools/roles/adopt-roles.sh tools/agent-instructions/adopt-agent-instructions.sh`
-  prints a line in each script; and `git grep -n -F 'render_agents.py' -- tools/roles/adopt-roles.sh`
-  and `git grep -n -F '_wire_pointer_or_copy' -- tools/agent-instructions/adopt-agent-instructions.sh`
-  print nothing, where today they print `:20`, `:323` and `:137`, `:139`, `:142`.
-  Red when: an absorbed file is written by a second renderer, or its bytes move.
-- **AC6** — When `python -c "import json, sys; print({l['name']: l['argv'] for l in json.load(open(sys.argv[1], encoding='utf-8')) if l['name'] in ('playbook render wiring', 'roles render wiring', 'agent-instructions wiring', 'playbook parity')})" tools/gate-legs.json`
-  runs, each of the four names is present and each argv runs `--check-render` with its scope, directly or
-  through its kit's `--check`.
-  Red when: a name is gone, or a leg still runs its own renderer.
+- **AC5** — When `python tools/playbook/render_playbook.py --check-render --scope entry-files` runs over
+  the tree, it exits 0 with the bytes `adopt-agent-instructions.sh` wrote before this unit;
+  `git grep -n -e '--render-scope' -e '--check-render' -- tools/agent-instructions/adopt-agent-instructions.sh`
+  prints a line; `git grep -n -F 'render_agents.py' -- tools/roles/adopt-roles.sh` still prints `:20` and
+  `:323` among its lines; and `git grep -n -F '_wire_pointer_or_copy' -- tools/agent-instructions/adopt-agent-instructions.sh`
+  prints nothing, where today it prints `:137`, `:139`, `:142`.
+  Red when: an absorbed file is written by a second renderer, its bytes move, or the roles adopter leaves
+  `render_agents.py` before the owner's ruling.
+- **AC6** — When `python -c "import json, sys; print({l['name']: l['argv'] for l in json.load(open(sys.argv[1], encoding='utf-8')) if l['name'] in ('playbook render wiring', 'roles render wiring', 'agent-instructions wiring', 'playbook parity', 'roles render selftest')})" tools/gate-legs.json`
+  runs, each of the five names is present; `playbook render wiring`, `agent-instructions wiring` and
+  `playbook parity` each run `--check-render` with their scope, directly or through their kit's `--check`;
+  and `roles render wiring` and `roles render selftest` print today's argvs, `adopt-roles.sh --check` and
+  `render_agents.py --selftest`.
+  Red when: a name is gone, an absorbed leg still runs its own renderer, or a roles leg moves before the
+  owner's ruling.
 - **AC7** — When `python instruction_units.py fixture --plant work-order` runs, `handoff.py
   render --stdout` over the case's fixture build prints bytes equal to the expected output the case pins
   from the render before the template, and
@@ -337,10 +380,13 @@ the catalogue equal HEAD (TOOL-dGroundRules-19 S1).
   `instructions.legacy`.
   Red when: an unlisted hand-written document passes, the list grows unseen, or a refused read grades
   under a default.
-- **AC9** — When `python tools/playbook/core.py new unit demo --kit playbook-render --type directive --level 3
-  --text "MUST demo."` runs, it prints one row `schema` passes and the unit-15 command that writes it, the
-  manifest is unchanged, and `core.py kinds` reads the instruction-unit kind with its factory and gate.
-  Red when: the factory writes a manifest, or its row fails the schema.
+- **AC9** — When `python tools/playbook/core.py new instruction-unit demo --kit playbook-render --type directive
+  --level 3 --text "MUST demo."` runs, it prints one row `schema` passes and the unit-15 command that writes
+  it, the manifest is unchanged, and `core.py kinds` reads the instruction-unit kind with its factory and
+  gate and exits 0. `git grep -n -F 'principle.p11' -- tools/playbook/core-pending.txt` prints nothing, and
+  `python tools/playbook/core.py meta-check` prints no stale row naming that principle.
+  Red when: the factory writes a manifest, its row fails the schema, its gate leg lacks a tag the kind
+  binds, or the stale pending row stays.
 - **AC10** — When `python -c "import tomllib; print([(r['owner'], bool(r.get('summary')), bool(r.get('usage'))) for r in tomllib.load(open( 'tools/policy/catalogue.toml' , 'rb'))['key'] if r['name'] == 'instructions.legacy'])"`
   runs after the pass, it prints one row, `dOrderedCharter`, `True`, `True`; `git grep -n -x -F
   "instructions.legacy" -- "tools/policy/unsummarised-keys.txt"` finds no line; `python
@@ -354,12 +400,25 @@ the catalogue equal HEAD (TOOL-dGroundRules-19 S1).
   line of an `[[exempt_leg]]` row.
   Red when: a leg lands unpinned, unclaimed, missing from the dossier, or claimed with the map not
   regenerated.
+- **AC12** — When `python tools/roles/render_agents.py --check` runs, it exits 0;
+  `python -c "import tomllib; print([t['renderer'] for t in tomllib.load(open('tools/playbook/renderers.toml', 'rb'))['target'] if '.claude/agents/*.md' in t['paths']])"`
+  prints `['kit-adopter']`; and `python tools/playbook/render_playbook.py --render-scope agents` exits 2
+  naming the scope and writes nothing.
+  Red when: an agent file gains a second renderer of record, or the kept render stops holding it.
+- **AC13** — When `python -c "import tomllib; d = lambda k: tomllib.load(open(f'tools/{k}/kit.toml', 'rb')); print(d('agent-instructions')['requires'], {g['generator'] for g in d('roles')['generated']})"`
+  runs, it prints `['playbook-render']` and `{'render_agents.py'}`; `git grep -n -F 'No hard deps' --
+  tools/agent-instructions/adopt-agent-instructions.sh` prints nothing; `python tools/govkit/govkit.py
+  selfcheck` names no finding on `agent-instructions`; and `python instruction_units.py fixture --plant
+  no-renderer` runs that adopter in a tree holding no playbook kit, where it exits 2 naming
+  `playbook-render` and writes no target.
+  Red when: the agent-instructions adopter rests on a kit its descriptor does not name, a generated row
+  names a generator no file backs, or an adopter with no renderer writes a target.
 
 ## 7. Gates
 
-`playbook render selftest` · `govkit acceptance matrix` · `agent-instructions self-test` · `playbook render wiring` · `roles render wiring` · `roles render selftest` · `agent-instructions wiring` · `playbook parity` · `roles catalogue` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `govkit selftest` · `govkit refusal join` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness`
+`playbook render selftest` · `govkit acceptance matrix` · `agent-instructions self-test` · `playbook render wiring` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `core meta-check` · `core kinds` · `core selftest` · `govkit selfcheck` · `docs` · `agent-instructions wiring` · `playbook parity` · `roles catalogue` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `govkit selftest` · `govkit refusal join` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness`
 
-New arm: tools/playbook/instruction_units.py · covers AC1 AC2 AC3 AC4 AC7 AC8 · the `schema`, `one-fact`, `status`, `renderers`, `work-order` and `legacy` fixture cases, each failing case staged by its plant · none
+New arm: tools/playbook/instruction_units.py · covers AC1 AC2 AC3 AC4 AC7 AC8 AC13 · the `schema`, `one-fact`, `status`, `renderers`, `work-order`, `legacy` and `no-renderer` fixture cases, each failing case staged by its plant · none
 
 New arm: tools/playbook/render_playbook.py · covers AC5 · the render selftest re-renders each scope over a fixture target and compares bytes, its failing case a scope writing one byte differently · none
 
@@ -392,6 +451,62 @@ New arm: tools/playbook/render_playbook.py · covers AC5 · the render selftest 
   lost to `[gate]`: an exemption is a population nobody grades, so a new instruction file would pass
   unclaimed. Under (a) a new guide reds until a row names it, which is the check. widens: none ·
   relaxes: none
+- **F6** — `kind.instruction-unit` binds `principle.p13` and `principle.p16`, S10 gave its gate leg p11
+  and p13, and `tools/playbook/core.py#check_kind_row` reds a gate leg lacking a bound tag. Options: (a)
+  the schema leg adds `principle.p16`; (b) the kind's `binds` loses it.
+  RESOLVED (agent, 2026-11-04, delegated): (a). All 17 rows of `tools/playbook/kinds.toml` bind p16
+  (PINNED, 2026-11-04), so (b) would make this kind the one exception and amend a register this unit
+  does not own. Under (a) the leg joins `core skills conformance` and `core practices conformance`, each
+  a kind's gate carrying p16, and it earns the tag: a row S1 refuses reaches no manifest by any route.
+  widens: none · relaxes: none
+- **F7** — S3 reads change records as the kind unit 15 registers, unit 15 builds after this unit, and
+  `tools/memory-tree/build_records.py#KINDS` holds the kind as pending. What do the tree reads take
+  until then? Options: (a) no records, every unit active with an `unarmed` line, unit 15 wiring the
+  reader; (b) this unit registers the kind; (c) this unit builds after unit 15.
+  RESOLVED (agent, 2026-11-04, delegated): (a). (b) lost to section 3, which gives the kind to unit 15,
+  whose S7 owns its fields and its action set. (c) lost to a cycle: unit 15 consumes S1, S2 and the
+  renderer from this unit. (a) loses nothing, since no change record can exist before unit 15 lands the
+  kind, so `active` is the true status and not a default. The raising branch keeps `unarmed` from
+  outliving the pending row, so the empty population is never read as coverage. widens: none ·
+  relaxes: none
+- **F8** — Does `roles render selftest` keep its `render_agents.py --selftest` argv or move to
+  `render_playbook.py`? Options: (a) it keeps it, and `render_playbook.py`'s selftest gains only the
+  scope arms; (b) its arms and argv move.
+  RESOLVED (agent, 2026-11-04, delegated): (a). (b) lost to `playbook render selftest`, a leg of subject
+  `kit` that ships to a target holding no roles kit, where the moved arms could not run; making
+  `playbook-render` require `roles` would be a cycle if the owner later takes F10's (a), which
+  `tools/govkit/govkit.py#derive_install_order` refuses. The arms drive `run_mode` over a roles catalogue,
+  so they stay beside it, and under F10's (e) `run_mode` does not move either. widens: none · relaxes:
+  none
+- **F9** — The agent-instructions adopter will call `render_playbook.py`, and its kit declares `requires
+  = []`. Options: (a) `requires = ["playbook-render"]`; (b) a `requires_if` row, the adopter keeping its
+  shell writes where the renderer is absent; (c) no edge, the adopter refusing at run time alone.
+  RESOLVED (agent, 2026-11-04, delegated): (a). (b) fails AC5, which greps those writes gone. (c) lets
+  `apply` land a kit its adopter cannot run, the state
+  `tools/govkit/govkit.py#derive_unsatisfied_requires` exists to refuse. The kit is outside the default
+  set, so the edge refuses no default install, and unit 31 names `playbook-render` its successor. The
+  cost is stated: a target taking this kit alone now selects `playbook-render` and `playbook` too.
+  widens: none · relaxes: none
+- **F10** — `roles` is in the default set of `tools/govkit/registry.toml` and `playbook-render` is not, so
+  moving the agent render onto `render_playbook.py` would leave a default install with no renderer for
+  its agent types or for `.claude/roles.json`, the index the hooks kit's write gate arms on. What does
+  this unit do? Options: (a) the `requires` of `tools/roles/kit.toml` gains `playbook-render` and the
+  default set gains that entry; (b) it gains `playbook-render` alone; (c) a `requires_if` row, the adopter
+  writing no agent type where the renderer is absent; (d) `adopt-roles.sh` falls back to `render_agents.py`
+  there; (e) a later unit takes the `agents` scope, and the agent files take the `kit-adopter` row until
+  it lands.
+  RESOLVED (agent, 2026-11-04, delegated): (e), the main loop's ruling, which re-scopes S5, S6, AC5 and
+  AC6 and keeps `render_agents.py --write` and `--check` for the agent files. (a) is the owner's and
+  stays parked: widening the default set changes what every install lands
+  (`tools/govkit/govkit.py#derive_default_gained`), and this run does not widen it. Whether a default
+  `apply` would complete under (a) is UNVERIFIED: the default-install shape in `tools/govkit/matrix.py`
+  declares five answers, and the render refuses on an absent `asked` key. (b) fails `govkit acceptance
+  matrix`: `tools/govkit/govkit.py#derive_unsatisfied_requires` makes `apply` refuse, and that shape
+  asserts `apply` completes. (c) unarms the role-aware write gate on default installs, widening a write
+  surface this tier did not price. (d) keeps two writers behind one scope. The cost of (e) is stated:
+  `cl-dClosedLoop-0050` names `roles render wiring` among the legs absorbed, so that half stays undone
+  under this spec's `whole` carry until the owner rules. widens: none · relaxes: the roles half of the
+  clause, until the owner rules
 
 ## 9. Revision log
 
@@ -407,15 +522,29 @@ New arm: tools/playbook/render_playbook.py · covers AC5 · the render selftest 
   the removed writes; the kit id is `playbook-render`; the reader is unit 19's `read_policy_value`
   refusing by `PolicyRefused` and the normaliser `design_lib.derive_pin_hash`; AC10's untracked note
   goes; and §10's line is re-read.
+- rev-7 · 2026-11-04 · S3 S5 S6 S9 S10 S11 (new) S12 (new) · section 3 · section 4 · section 5 · AC3 AC6 AC9
+  AC12 (new) AC13 (new) · section 7 · section 8 F6 to F10 (new) · section 10 · from
+  `2026-11-04-prompt-PLAY-dOrderedCharter-20-divergence-brief.md` items 1 to 7: the factory is `core.py new
+  instruction-unit`; the schema leg enforces p16; the tree reads are unarmed until unit 15 wires
+  `read_change_records`; agent-instructions requires `playbook-render`, the roles `requires` stays open at
+  F10, and the section 5 risk is rewritten; `render_agents.py` loses its writer, the fixture, generators
+  and usage row follow, and `roles render selftest` keeps its argv; the stale `principle.p11` row goes.
+- rev-7 · 2026-11-04 · S4 S5 S6 S11 S12 · section 1 · section 3 · section 4 · section 5 · AC5 AC6 AC12 AC13 ·
+  section 8 F8 F10 · section 10 · the main loop's ruling on F10, option (e), over the entry above: the
+  `agents` scope stays on `render_agents.py`, which keeps `--write` and `--check`, the agent files take
+  `kit-adopter`, and the roles adopter, its fixture, its generators, its usage row and `help/roles.md` stand;
+  the owner's option (a) is parked; F9 stands.
 
 ## 10. Reuse audit
 
 The seams extended are `render()` in `tools/playbook/render_playbook.py` (line 1024), the renderer of record
-S11 names; `render_agent_file` (`tools/roles/render_agents.py:144`) and `run_mode` (line 269), which become
-the `agents` scope's slot renderer; `render_handoff` (`tools/roles/handoff.py:312`), whose
+the systems record's S11 names; `render_handoff` (`tools/roles/handoff.py:312`), whose
 section order becomes the work-order template; and `_wire_pointer_or_copy` in
 `tools/agent-instructions/adopt-agent-instructions.sh`, whose pointer and copy writes move into the
-renderer. The legacy list follows the shrink-only list idiom of `tools/dead-path-waivers.txt`. `python
+renderer. `render_agent_file` (`tools/roles/render_agents.py:144`) and `run_mode` (line 269) stay the roles
+render, which this unit leaves in place (F10). The legacy list follows the shrink-only list idiom of `tools/dead-path-waivers.txt`. S9 extends
+`tools/playbook/core.py#run_new` through `OWN_FACTORY`, and S3's reader reads
+`tools/memory-tree/build_records.py#KINDS`. `python
 tools/codebase-map/reuse_lookup.py "refuse an instruction file whose bytes differ from its render or that no
 renderer produces"` ranked `render` (ten sites, `render_playbook.py` among them) and name-token matches,
 which confirms the four renderers scout A listed and finds no renderer-of-record table, so none fits that.
