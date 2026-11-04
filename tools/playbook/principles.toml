@@ -1,0 +1,259 @@
+# principles.toml — the principle registry (PLAY-dOrderedCharter-7 S1), the `principle` namespace's declaring
+# source. One [[principle]] row per v2 principle, P1 to P42: `tag` (principle.p<n>), `id` (P<n>), `line` (its
+# bold title) and `clauses` (its v2 [enforcement] row). Written once from the design record
+# memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md, sections [principles]
+# and [enforcement]. Principles are fixed: no policy key reads or writes a row, and a principle changes only by
+# an owner-ratified amendment. `python <prefix>/playbook/core.py meta-check` joins each row both ways to the
+# legs whose `enforces` and the kinds whose `binds` name it.
+
+[[principle]]
+tag = "principle.p1"
+id = "P1"
+line = "One loop, declared once."
+clauses = ["cl-dClosedLoop-0086", "cl-dClosedLoop-0089", "cl-dClosedLoop-0097"]
+
+[[principle]]
+tag = "principle.p2"
+id = "P2"
+line = "Witnessed hand-offs."
+clauses = ["cl-dClosedLoop-0090", "cl-dClosedLoop-0102"]
+
+[[principle]]
+tag = "principle.p3"
+id = "P3"
+line = "Local-first verdict."
+clauses = ["cl-dClosedLoop-0342", "cl-dClosedLoop-0344"]
+
+[[principle]]
+tag = "principle.p4"
+id = "P4"
+line = "One flow, attended or not."
+clauses = ["cl-dClosedLoop-0053", "cl-dClosedLoop-0155", "cl-dClosedLoop-0207", "cl-dClosedLoop-0304"]
+
+[[principle]]
+tag = "principle.p5"
+id = "P5"
+line = "Concurrency by lease, inside the flow."
+clauses = ["cl-dClosedLoop-0120", "cl-dClosedLoop-0143", "cl-dClosedLoop-0145"]
+
+[[principle]]
+tag = "principle.p6"
+id = "P6"
+line = "Maintain closes the loop, as an expansion."
+clauses = ["cl-dClosedLoop-0442", "cl-dClosedLoop-0444", "cl-dClosedLoop-0449"]
+
+[[principle]]
+tag = "principle.p7"
+id = "P7"
+line = "Review at breakpoints."
+clauses = ["cl-dClosedLoop-0104", "cl-dClosedLoop-0105", "cl-dClosedLoop-0107", "cl-dClosedLoop-0460"]
+
+[[principle]]
+tag = "principle.p8"
+id = "P8"
+line = "Every adopter is an adopter, gov included."
+clauses = ["cl-dClosedLoop-0062", "cl-dClosedLoop-0064", "cl-dClosedLoop-0428"]
+
+[[principle]]
+tag = "principle.p9"
+id = "P9"
+line = "Measured weight."
+clauses = ["cl-dClosedLoop-0015", "cl-dClosedLoop-0367", "cl-dClosedLoop-0459", "cl-dClosedLoop-0461", "cl-dClosedLoop-0473", "cl-dClosedLoop-0474"]
+
+[[principle]]
+tag = "principle.p10"
+id = "P10"
+line = "Flexible and configurable."
+clauses = ["cl-dClosedLoop-0007", "cl-dClosedLoop-0008", "cl-dClosedLoop-0012"]
+
+[[principle]]
+tag = "principle.p11"
+id = "P11"
+line = "Everything loaded gives direction."
+clauses = ["cl-dClosedLoop-0039", "cl-dClosedLoop-0042", "cl-dClosedLoop-0096", "cl-dClosedLoop-0476"]
+
+[[principle]]
+tag = "principle.p12"
+id = "P12"
+line = "Specs are structured contracts."
+clauses = ["cl-dClosedLoop-0389", "cl-dClosedLoop-0391", "cl-dClosedLoop-0394"]
+
+[[principle]]
+tag = "principle.p13"
+id = "P13"
+line = "Levelled, tagged instructions."
+clauses = ["cl-dClosedLoop-0033", "cl-dClosedLoop-0039", "cl-dClosedLoop-0040", "cl-dClosedLoop-0043"]
+
+[[principle]]
+tag = "principle.p14"
+id = "P14"
+line = "Practices with reach."
+clauses = ["cl-dClosedLoop-0031", "cl-dClosedLoop-0051"]
+
+[[principle]]
+tag = "principle.p15"
+id = "P15"
+line = "The charter starts the loop; the tools continue it."
+clauses = ["cl-dClosedLoop-0032", "cl-dClosedLoop-0036", "cl-dClosedLoop-0280"]
+
+[[principle]]
+tag = "principle.p16"
+id = "P16"
+line = "The core cannot be built around."
+clauses = ["cl-dClosedLoop-0037", "cl-dClosedLoop-0091", "cl-dClosedLoop-0212", "cl-dClosedLoop-0349", "cl-dClosedLoop-0480"]
+
+[[principle]]
+tag = "principle.p17"
+id = "P17"
+line = "Features carry the design between units."
+clauses = ["cl-dClosedLoop-0390"]
+
+[[principle]]
+tag = "principle.p18"
+id = "P18"
+line = "Decision principles outrank practices in unattended forks."
+clauses = ["cl-dClosedLoop-0176", "cl-dClosedLoop-0390"]
+
+[[principle]]
+tag = "principle.p19"
+id = "P19"
+line = "Built work is never rewritten in place."
+clauses = ["cl-dClosedLoop-0400"]
+
+[[principle]]
+tag = "principle.p20"
+id = "P20"
+line = "The flow is the layer above the build."
+clauses = ["cl-dClosedLoop-0097", "cl-dClosedLoop-0098", "cl-dClosedLoop-0110"]
+
+[[principle]]
+tag = "principle.p21"
+id = "P21"
+line = "Builds coordinate before they wait."
+clauses = ["cl-dClosedLoop-0145", "cl-dClosedLoop-0421", "cl-dClosedLoop-0422"]
+
+[[principle]]
+tag = "principle.p22"
+id = "P22"
+line = "Position is derived, never remembered."
+clauses = ["cl-dClosedLoop-0092", "cl-dClosedLoop-0121", "cl-dClosedLoop-0123"]
+
+[[principle]]
+tag = "principle.p23"
+id = "P23"
+line = "Claims are trusted by key and source."
+clauses = ["cl-dClosedLoop-0093"]
+
+[[principle]]
+tag = "principle.p24"
+id = "P24"
+line = "The checklist is a program."
+clauses = ["cl-dClosedLoop-0094", "cl-dClosedLoop-0097", "cl-dClosedLoop-0099"]
+
+[[principle]]
+tag = "principle.p25"
+id = "P25"
+line = "Role functions live only in role agents."
+clauses = ["cl-dClosedLoop-0167", "cl-dClosedLoop-0175", "cl-dClosedLoop-0303"]
+
+[[principle]]
+tag = "principle.p26"
+id = "P26"
+line = "Every exchange between roles is a typed record."
+clauses = ["cl-dClosedLoop-0169", "cl-dClosedLoop-0170", "cl-dClosedLoop-0182", "cl-dClosedLoop-0286"]
+
+[[principle]]
+tag = "principle.p27"
+id = "P27"
+line = "Load is precise."
+clauses = ["cl-dClosedLoop-0041", "cl-dClosedLoop-0057"]
+
+[[principle]]
+tag = "principle.p28"
+id = "P28"
+line = "Layers are capabilities, and the core never depends on an expansion."
+clauses = ["cl-dClosedLoop-0046", "cl-dClosedLoop-0047"]
+
+[[principle]]
+tag = "principle.p29"
+id = "P29"
+line = "A role acts on what it is handed, and verifies only what its job is to verify."
+clauses = ["cl-dClosedLoop-0178", "cl-dClosedLoop-0192", "cl-dClosedLoop-0196", "cl-dClosedLoop-0197", "cl-dClosedLoop-0198", "cl-dClosedLoop-0205"]
+
+[[principle]]
+tag = "principle.p30"
+id = "P30"
+line = "Memory is declared once and written through one door."
+clauses = ["cl-dClosedLoop-0212", "cl-dClosedLoop-0213", "cl-dClosedLoop-0229"]
+
+[[principle]]
+tag = "principle.p31"
+id = "P31"
+line = "Testing happens wherever the work needs it."
+clauses = ["cl-dClosedLoop-0125", "cl-dClosedLoop-0408"]
+
+[[principle]]
+tag = "principle.p32"
+id = "P32"
+line = "Every role sees the code its item touches."
+clauses = ["cl-dClosedLoop-0126", "cl-dClosedLoop-0208", "cl-dClosedLoop-0219"]
+
+[[principle]]
+tag = "principle.p33"
+id = "P33"
+line = "One relational syntax."
+clauses = ["cl-dClosedLoop-0054", "cl-dClosedLoop-0055", "cl-dClosedLoop-0058", "cl-dClosedLoop-0313", "cl-dClosedLoop-0437"]
+
+[[principle]]
+tag = "principle.p34"
+id = "P34"
+line = "Instruction and memory share one writing practice."
+clauses = ["cl-dClosedLoop-0058", "cl-dClosedLoop-0059", "cl-dClosedLoop-0230", "cl-dClosedLoop-0493"]
+
+[[principle]]
+tag = "principle.p35"
+id = "P35"
+line = "Every record names its cause."
+clauses = ["cl-dClosedLoop-0004", "cl-dClosedLoop-0230", "cl-dClosedLoop-0310", "cl-dClosedLoop-0312", "cl-dClosedLoop-0363", "cl-dClosedLoop-0456", "cl-dClosedLoop-0469"]
+
+[[principle]]
+tag = "principle.p36"
+id = "P36"
+line = "No harness is the runtime."
+clauses = ["cl-dClosedLoop-0292", "cl-dClosedLoop-0310", "cl-dClosedLoop-0313", "cl-dClosedLoop-0314", "cl-dClosedLoop-0315", "cl-dClosedLoop-0437"]
+
+[[principle]]
+tag = "principle.p37"
+id = "P37"
+line = "One portable practice, a role per language."
+clauses = ["cl-dClosedLoop-0028", "cl-dClosedLoop-0060", "cl-dClosedLoop-0259", "cl-dClosedLoop-0314", "cl-dClosedLoop-0315", "cl-dClosedLoop-0362", "cl-dClosedLoop-0436", "cl-dClosedLoop-0493"]
+
+[[principle]]
+tag = "principle.p38"
+id = "P38"
+line = "Supersession walks declared steps."
+clauses = ["cl-dClosedLoop-0016", "cl-dClosedLoop-0018", "cl-dClosedLoop-0019", "cl-dClosedLoop-0022", "cl-dClosedLoop-0023", "cl-dClosedLoop-0025", "cl-dClosedLoop-0026", "cl-dClosedLoop-0027", "cl-dClosedLoop-0061", "cl-dClosedLoop-0106", "cl-dClosedLoop-0183", "cl-dClosedLoop-0184", "cl-dClosedLoop-0231", "cl-dClosedLoop-0240", "cl-dClosedLoop-0262", "cl-dClosedLoop-0306", "cl-dClosedLoop-0435", "cl-dClosedLoop-0494", "cl-dClosedLoop-0495"]
+
+[[principle]]
+tag = "principle.p39"
+id = "P39"
+line = "Every loop ends and every wait expires."
+clauses = ["cl-dClosedLoop-0017", "cl-dClosedLoop-0084", "cl-dClosedLoop-0115", "cl-dClosedLoop-0116", "cl-dClosedLoop-0117", "cl-dClosedLoop-0118", "cl-dClosedLoop-0132", "cl-dClosedLoop-0162", "cl-dClosedLoop-0163", "cl-dClosedLoop-0191", "cl-dClosedLoop-0324", "cl-dClosedLoop-0325", "cl-dClosedLoop-0326", "cl-dClosedLoop-0327", "cl-dClosedLoop-0328", "cl-dClosedLoop-0329", "cl-dClosedLoop-0336", "cl-dClosedLoop-0368", "cl-dClosedLoop-0440", "cl-dClosedLoop-0473"]
+
+[[principle]]
+tag = "principle.p40"
+id = "P40"
+line = "A unit claims its own work; anything above it only offers."
+clauses = ["cl-dClosedLoop-0133", "cl-dClosedLoop-0134", "cl-dClosedLoop-0135", "cl-dClosedLoop-0136", "cl-dClosedLoop-0137", "cl-dClosedLoop-0138", "cl-dClosedLoop-0164", "cl-dClosedLoop-0165", "cl-dClosedLoop-0293", "cl-dClosedLoop-0330", "cl-dClosedLoop-0331", "cl-dClosedLoop-0332", "cl-dClosedLoop-0333", "cl-dClosedLoop-0334", "cl-dClosedLoop-0335", "cl-dClosedLoop-0336", "cl-dClosedLoop-0337", "cl-dClosedLoop-0338", "cl-dClosedLoop-0415", "cl-dClosedLoop-0441", "cl-dClosedLoop-0474"]
+
+[[principle]]
+tag = "principle.p41"
+id = "P41"
+line = "The design is carried whole."
+clauses = ["cl-dClosedLoop-0001", "cl-dClosedLoop-0002", "cl-dClosedLoop-0003", "cl-dClosedLoop-0004", "cl-dClosedLoop-0005", "cl-dClosedLoop-0006", "cl-dClosedLoop-0119", "cl-dClosedLoop-0398", "cl-dClosedLoop-0412"]
+
+[[principle]]
+tag = "principle.p42"
+id = "P42"
+line = "Every user-facing surface is documented from the fact that defines it."
+clauses = ["cl-dClosedLoop-0007", "cl-dClosedLoop-0030", "cl-dClosedLoop-0067", "cl-dClosedLoop-0237", "cl-dClosedLoop-0489"]

@@ -29,12 +29,16 @@ owner = "dOrderedCharter"
 name = "core.bypass"
 allowed = ["with-hooks-report", "with-hooks-block", "never"]
 default = "with-hooks-report"
+summary = "Whether a permitted bypass skips the core checks with every other leg, its core red reported or blocking after, or never: under never the meta-check reds a core leg that carries a leg guard."
+usage = 'core.bypass = "never"'
 owner = "dOrderedCharter"
 
 [[key]]
 name = "core.exceptions"
 allowed = ["any-session-recorded", "owner-only-expiring", "none"]
 default = "any-session-recorded"
+summary = "Which exception records excuse a core red: any well-formed record a session wrote, only an owner-written one whose expiry is still ahead, or none, every record then red."
+usage = 'core.exceptions = "owner-only-expiring"'
 owner = "dOrderedCharter"
 
 [[key]]

@@ -1827,7 +1827,70 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 120
+    "ceiling": 120,
+    "enforces": ["principle.p28", "principle.p16"]
+  },
+  {
+    "name": "core meta-check",
+    "argv": [
+      "python",
+      "{prefix}/playbook/core.py",
+      "meta-check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p16"]
+  },
+  {
+    "name": "core kinds",
+    "argv": [
+      "python",
+      "{prefix}/playbook/core.py",
+      "kinds"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p16"]
+  },
+  {
+    "name": "core skills conformance",
+    "argv": [
+      "python",
+      "{prefix}/playbook/core.py",
+      "kinds",
+      "skill"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p16"]
+  },
+  {
+    "name": "core practices conformance",
+    "argv": [
+      "python",
+      "{prefix}/playbook/core.py",
+      "kinds",
+      "practice"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p14", "principle.p16"]
+  },
+  {
+    "name": "core selftest",
+    "argv": [
+      "python",
+      "{prefix}/playbook/core.py",
+      "fixture"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "enforces": ["principle.p16"]
   },
   {
     "name": "tags (the resolver's checks)",

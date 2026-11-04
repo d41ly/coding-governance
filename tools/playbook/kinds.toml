@@ -1,0 +1,144 @@
+# kinds.toml — the kinds register (PLAY-dOrderedCharter-7 S4), the `kind` namespace's declaring source: the closed
+# set of extension kinds of the foundations record's C3, so a `kind.*` tag this file lacks fails the tag resolver.
+# One [[kind]] row per kind: `tag` (kind.<name>); `owner`, the chain build that lands its factory, as the
+# foundations record's "Settled design for the core" assigns it; `binds`, the principle tags that bind it;
+# `population`, a tracked-path glob (`{prefix}` the tool root); `factory`, the command `core.py new <kind>` runs;
+# `gate`, the leg of <prefix>/gate-legs.json whose `enforces` holds every tag of `binds`. A kind whose factory or
+# gate has not landed carries "" there and is a `kind` row of core-pending.txt naming its owner.
+# `python <prefix>/playbook/core.py kinds` grades the contract.
+
+[[kind]]
+tag = "kind.kit"
+owner = "dShippedRelease"
+binds = ["principle.p16"]
+population = "{prefix}/*/kit.toml"
+factory = ""
+gate = ""
+
+[[kind]]
+tag = "kind.command"
+owner = "dDeclaredLoop"
+binds = ["principle.p16"]
+population = ""
+factory = ""
+gate = ""
+
+[[kind]]
+tag = "kind.instruction-unit"
+owner = "dOrderedCharter"
+binds = ["principle.p13", "principle.p16"]
+population = "{prefix}/*/instructions.toml"
+factory = ""
+gate = ""
+
+[[kind]]
+tag = "kind.policy-key"
+owner = "dDeclaredLoop"
+binds = ["principle.p16"]
+population = "{prefix}/policy/catalogue.toml"
+factory = ""
+gate = ""
+
+[[kind]]
+tag = "kind.preset"
+owner = "dDeclaredLoop"
+binds = ["principle.p16"]
+population = ""
+factory = ""
+gate = ""
+
+[[kind]]
+tag = "kind.gate-leg"
+owner = "dWitnessedBar"
+binds = ["principle.p16"]
+population = "{prefix}/gate-legs.json"
+factory = ""
+gate = ""
+
+[[kind]]
+tag = "kind.role"
+owner = "dDeclaredLoop"
+binds = ["principle.p16"]
+population = ""
+factory = ""
+gate = ""
+
+[[kind]]
+tag = "kind.workflow"
+owner = "dDeclaredLoop"
+binds = ["principle.p16"]
+population = "{prefix}/workflows/*.js"
+factory = ""
+gate = ""
+
+[[kind]]
+tag = "kind.hook"
+owner = "dDeclaredLoop"
+binds = ["principle.p16"]
+population = "{prefix}/hooks/*.js"
+factory = ""
+gate = ""
+
+[[kind]]
+tag = "kind.skill"
+owner = "dOrderedCharter"
+binds = ["principle.p16"]
+population = "skills/*/SKILL.md"
+factory = "python {prefix}/playbook/core.py new skill"
+gate = "core skills conformance"
+
+[[kind]]
+tag = "kind.practice"
+owner = "dOrderedCharter"
+binds = ["principle.p14", "principle.p16"]
+population = "{prefix}/playbook/practices.toml"
+factory = "python {prefix}/playbook/core.py new practice"
+gate = "core practices conformance"
+
+[[kind]]
+tag = "kind.record-kind"
+owner = "dConvergedCharter"
+binds = ["principle.p16"]
+population = ""
+factory = ""
+gate = ""
+
+[[kind]]
+tag = "kind.stage"
+owner = "dDeclaredLoop"
+binds = ["principle.p16"]
+population = ""
+factory = ""
+gate = ""
+
+[[kind]]
+tag = "kind.layer"
+owner = "dOrderedCharter"
+binds = ["principle.p16", "principle.p28"]
+population = "{prefix}/playbook/layers.toml"
+factory = "python {prefix}/playbook/check_layers.py --new"
+gate = "layer dependencies (the core never depends on an expansion)"
+
+[[kind]]
+tag = "kind.item"
+owner = "dDeclaredLoop"
+binds = ["principle.p16"]
+population = ""
+factory = ""
+gate = ""
+
+[[kind]]
+tag = "kind.lens"
+owner = "dCalibratedLens"
+binds = ["principle.p16"]
+population = ""
+factory = ""
+gate = ""
+
+[[kind]]
+tag = "kind.scenario"
+owner = "dDeclaredLoop"
+binds = ["principle.p16"]
+population = ""
+factory = ""
+gate = ""

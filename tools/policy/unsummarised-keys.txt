@@ -35,8 +35,6 @@ commits.edge-check
 commits.squash
 context.on-full
 context.threshold
-core.bypass
-core.exceptions
 currency.max-behind
 currency.on-behind
 decisions.major

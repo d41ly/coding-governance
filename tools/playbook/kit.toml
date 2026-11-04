@@ -95,3 +95,11 @@ argv = ["python", "{prefix}/playbook/positional.py", "--selftest"]
 name = "tags bundle selftest"
 subject = "kit"
 argv = ["python", "{prefix}/playbook/tag_bundle.py", "--selftest"]
+
+# THE CORE PLANTS (PLAY-dOrderedCharter-7 S11): every `fixture --plant` case writes its own registries, legs,
+# records and committed policy into a scratch repository, so an adopter carries the leg as it carries the
+# resolver's plants above. The four core gates over gov's own registries are [[exempt_leg]] rows instead.
+[[gate_leg]]
+name = "core selftest"
+subject = "kit"
+argv = ["python", "{prefix}/playbook/core.py", "fixture"]

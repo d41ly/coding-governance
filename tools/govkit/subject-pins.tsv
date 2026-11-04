@@ -30,6 +30,11 @@ codebase-map adopter e2e	kit	e2e
 codebase-map coverage + freshness	repo	declarations
 codebase-map gate coverage	repo	declarations
 codebase-map kit selftest	kit	selftests
+core kinds	repo	declarations
+core meta-check	repo	declarations
+core practices conformance	repo	declarations
+core selftest	kit	selftests
+core skills conformance	repo	declarations
 corpus-ids selftest	kit	selftests
 dead-path carriers (deleted files still named)	repo	declarations
 dead-path carriers self-test	kit	selftests

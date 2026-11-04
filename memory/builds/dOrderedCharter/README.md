@@ -133,7 +133,7 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY
 | [PLAY-dOrderedCharter-50 — the rows a new leg, key or retirement owes are written by the pass that creates them, through one owed-rows probe](spec/2026-10-24-spec-PLAY-dOrderedCharter-50.md) | 10 | 2 | CLOSED | rev-5 | 2026-11-04 |
 | [PLAY-dOrderedCharter-53 — a file:line citation is grandfathered by the commit that wrote its line, never by the age of its file](spec/2026-10-24-spec-PLAY-dOrderedCharter-53.md) | 11 | 2 | DEFERRED | rev-2 | 2026-11-03 |
 | [PLAY-dOrderedCharter-64 — the rev-scope arm accepts a section named in words](spec/2026-11-04-spec-PLAY-dOrderedCharter-64.md) | 11 | 2 | DEFERRED | rev-1 | 2026-11-04 |
-| [PLAY-dOrderedCharter-7 — the core: principle registry, meta-check, kinds register, exception register and the core policies](spec/2026-10-23-spec-PLAY-dOrderedCharter-7.md) | 11 | 2 | DEFERRED | rev-7 | 2026-11-03 |
+| [PLAY-dOrderedCharter-7 — the core: principle registry, meta-check, kinds register, exception register and the core policies](spec/2026-10-23-spec-PLAY-dOrderedCharter-7.md) | 11 | 2 | CLOSED | rev-7 | 2026-11-04 |
 | [PLAY-dOrderedCharter-13 — the ladder renumbered: levels 0 to 7, the charter at level 0, the platform above it](spec/2026-10-23-spec-PLAY-dOrderedCharter-13.md) | 12 | 2 | DEFERRED | rev-5 | 2026-11-03 |
 | [PLAY-dOrderedCharter-42 — the bindings reader admits every kind the record factory mints, joined to its file name both ways](spec/2026-10-24-spec-PLAY-dOrderedCharter-42.md) | 12 | 2 | DEFERRED | rev-5 | 2026-11-03 |
 | [PLAY-dOrderedCharter-12 — the statement grammar, its check, and render provenance in a sidecar lock](spec/2026-10-23-spec-PLAY-dOrderedCharter-12.md) | 13 | 2 | DEFERRED | rev-5 | 2026-11-03 |
@@ -173,7 +173,7 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-4 | 2026-11-04 |
 <!-- /gen:build-units -->
 
-Records: 336 bound to this build, across 4 record folder(s).
+Records: 337 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
