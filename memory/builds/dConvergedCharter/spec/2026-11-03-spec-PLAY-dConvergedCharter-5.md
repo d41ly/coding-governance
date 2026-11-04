@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-5 — adopters migrated onto the ranked charter and the loop by the walk that exists, each read migrated or put to the owner
 
-**Status:** DEFERRED · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 6 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 6 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0479@8dc7a199 whole
 
@@ -84,7 +84,7 @@ dDeclaredLoop's loop kit.
 
 ### Edges
 
-- **hands-off** `PLAY-dConvergedCharter-20` — `steps-pending`, read through `derive_migration_state`'s states, which the widened exit check grades for every registered adopter
+- **hands-off** `PLAY-dConvergedCharter-20` — `steps-pending`, read through `derive_migration_state`'s states, which the widened exit check grades for every registered adopter, and S2's `migration` verb with its one row walk, which that unit's exit check extends with `--grade` rather than walking the register a second time
 - **consumes-from** external — DEPL-dShippedRelease-31 (`read_adopter_rows`, `registered`), -7 (`adopter_reading.py read`, `steps-pending`, `derive_adopter_route`), -16 (`kits.offer`), -25 (schema 5) and -3 (`read_release_tags`), and TOOL-dWellOiledMachine-48 (`raise_owner_item`), each specced and unbuilt at base `0d1c1dda`
 - **consumes-from** external — the migration content: PLAY-dOrderedCharter-31 S4, TOOL-dBoundRoles-19, TOOL-dTotalRecall-20 and dDeclaredLoop's loop kit, each a parent's own `[[upgrade]]` rows
 
@@ -218,6 +218,10 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 · `adopter_reading.
 
 - rev-1 · 2026-11-03 · initial draft, from the packet's Items 5, `gap-spine-04`, scout D's row for 0479
   and its disagreement 2, and the spec brief's I7.
+- rev-2 · 2026-11-04 · §3 · the hands-off edge to PLAY-dConvergedCharter-20 names S2's `migration` walk,
+  which that unit's S5 extends with `--grade`, mirroring the consumes-from edge PLAY-dConvergedCharter-20
+  rev-5 wrote when it folded `2026-11-04-review-PLAY-dConvergedCharter-11-spec-audit-round1` finding 24;
+  this unit's S2 and its exit codes are unchanged.
 
 ## 10. Reuse audit
 
