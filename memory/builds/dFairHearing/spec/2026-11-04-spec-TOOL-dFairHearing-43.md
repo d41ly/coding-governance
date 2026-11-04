@@ -1,6 +1,6 @@
-# TOOL-dFairHearing-43 — the closing diff review's eight minors: caller refs refused before any agent, one cell encoding, every pin key routed, one sibling-kit resolver, and arms over every preset
+# TOOL-dFairHearing-43 — seven of the closing diff review's eight minors: caller refs refused before any agent, one cell encoding, every pin key routed, one sibling-kit resolver, and arms over every preset
 
-**Status:** INPROGRESS · rev-2 · 2026-11-04 · node d · Tier-2 · base 23e1a54d · streams tooling · order 29
+**Status:** INPROGRESS · rev-3 · 2026-11-04 · node d · Tier-2 · base 23e1a54d · streams tooling · order 29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,11 +8,12 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
+| [2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 |
 | [2026-11-04-build-TOOL-dFairHearing-43-1-builder-return.md](../build/2026-11-04-build-TOOL-dFairHearing-43-1-builder-return.md) | journal | — |
 | [2026-11-04-build-TOOL-dFairHearing-43-2-builder-return.md](../build/2026-11-04-build-TOOL-dFairHearing-43-2-builder-return.md) | journal | — |
 | [2026-11-04-build-TOOL-dFairHearing-43-deviation-431.md](../build/2026-11-04-build-TOOL-dFairHearing-43-deviation-431.md) | deviation | — |
 | [2026-11-04-prompt-TOOL-dFairHearing-43-1-spec-writer.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-43-1-spec-writer.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-43-2-spec-writer.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-43-2-spec-writer.md) | journal | — |
 | [2026-11-04-prompt-TOOL-dFairHearing-43-build-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-43-build-brief.md) | research | — |
 | [2026-11-04-prompt-TOOL-dFairHearing-43-spec-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-43-spec-brief.md) | research | — |
 | [2026-11-04-prompt-TOOL-dFairHearing-43-split-fix-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-43-split-fix-brief.md) | research | — |
@@ -21,19 +22,21 @@
 
 ## 1. Goal
 
-One batch unit closes the eight confirmed findings of the build's closing diff review,
+This batch unit closes seven of the eight confirmed findings of the build's closing diff review,
 `memory/builds/dFairHearing/reviews/2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md`, round 1,
-CLEAN WITH FIXES and CONVERGED: MEDIUM ids 1, 2, 3, 4 and 7 (items 1 to 5) and LOW ids 5, 6 and 8
-(items 6 to 8). The build method's severity rule promotes every confirmed finding at a diff exit and
-batches every MEDIUM and LOW into one unit naming them all. Each item carries the fix the skeptic
-judged sound, re-grounded at `23e1a54d`, and the gate or catalogue record that keeps its class from
-returning. The four findings disposed `new:<class>` (ids 1, 5, 6 and 8) each gain a class record in
+CLEAN WITH FIXES and CONVERGED: MEDIUM ids 1, 2, 3, 4 and 7 (items 1 to 5) and LOW ids 6 and 8 (items
+7 and 8). LOW id 5 (item 6) is split: this unit writes its class record, and its docstrings are the
+second batch unit, `TOOL-dFairHearing-44`. The build method's severity rule promotes every confirmed
+finding at a diff exit and batches every MEDIUM and LOW into one unit naming them all, or two across
+disjoint write sets. Each item carries the fix the skeptic judged sound, re-grounded at `23e1a54d`,
+and the gate or catalogue record that keeps its class from returning. The four findings disposed `new:<class>` (ids 1, 5, 6 and 8) each gain a class record in
 the bug-class catalogue.
 
 ## 2. Scope (IN)
 
 Each item names its report id, its report item and the criterion that observes it, in the order of
-the record's `## Items`.
+the record's `## Items`. The ids S8 and AC8 are unused: id 5's docstrings moved to
+`TOOL-dFairHearing-44`, and the later ids keep their numbers.
 
 - **S1** — id 1 (item 1, MEDIUM). On the diff kind, before any agent and at every round, `base` and
   `head` must each match `REF_SHAPE`, `/^[0-9A-Za-z._\/~^][0-9A-Za-z._\/~^-]*$/`; any other value
@@ -43,12 +46,17 @@ the record's `## Items`.
   `rev-parse --verify` commands (:1597) only receive a value inside the shape. The round-1 WARNING on a
   `base` that is not a pinned sha (:968-976) is unchanged. The render `tools/workflows/tier2-review.js`
   is regenerated. Observed by AC1.
-- **S2** — id 2 (item 2, MEDIUM). `renderCell` (:2445) owns the appendix cell's encoding. The `none`
-  branch of `checkDisposition` (:3049-3053) keeps two tests, the `unclassed` admission and the
-  non-empty reason, and its comment says the cell is encoded by `renderCell`. The DISPOSITIONS prompt
-  (:2752-2753) tells the synthesis the harness encodes the cell, so the reason is plain text, and it no
-  longer asks for a pipe written as `\|`. The workflows README's appendix sentence
-  (`tools/workflows/README.md:631-635`) says the same. Its reader in the review harness suite, the
+- **S2** — id 2 (item 2, MEDIUM). `renderCell` (:2445) owns the encoding of the appendix the harness
+  returns. The `none` branch of `checkDisposition` (:3049-3053) keeps two tests, the `unclassed`
+  admission and the non-empty reason, and its comment says the returned cell is encoded by
+  `renderCell`. The DISPOSITIONS prompt (:2752-2753) tells the synthesis the harness encodes that cell,
+  so the returned reason is plain text, and it no longer asks for a pipe written as `\|`. The appendix
+  the synthesis writes into the record is outside `renderCell`, so the appendix-copy instruction
+  (:2875-2876) takes that rule: after its `none — <reason>` clause it adds a sentence opening
+  `In that cell, which you write and the harness does not encode,` that asks for the reason on one
+  line and each `|` written as `\|`. The workflows README's appendix sentence
+  (`tools/workflows/README.md:631-635`) says the same of both copies, and that a raw `|` or a line
+  break in a returned reason refuses nothing. Its reader in the review harness suite, the
   `FH23 AC23` arm (`tools/workflows/tier2-review.test.sh:3085-3097`), becomes the round-trip arm the
   Gates section declares. Observed by AC2.
 - **S3** — id 3 (item 3, MEDIUM). The audit's review call
@@ -68,7 +76,12 @@ the record's `## Items`.
   refusal reaches the existing load-failure deny (:249-261), whose remedy names the resolver's message,
   the three places it looked, in place of "Install the hooks kit beside the review kit". The two
   README sentences on where the pack finds the hooks kit say so (`tools/workflows/README.md:196-200`,
-  `tools/hooks/README.md:184-185`). Observed by AC4 and AC5.
+  `tools/hooks/README.md:184-185`), and so do the pack's header comment (:16-20) and the comment above
+  the suite's arms (`tools/workflows/spec-audit-optin.test.sh:550-554`). The suite's arm at
+  `tools/workflows/spec-audit-optin.test.sh:566`, which expects `could not be loaded` with no hooks kit,
+  changes with that text: its needle becomes `looked in`, words of the resolver's message. The arm
+  above it (:565) still finds `agent-cap.js` in that message, and the `scratch-guard.js` arm (:573)
+  still reaches the load failure at :33. Observed by AC4 and AC5.
 - **S5** — id 4, the copy's parity. The python resolver suite's JS-port behaviour section
   (`tools/lib/resolve-python.test.sh:693-750`) runs its nine layouts over each marked block, the
   hook's and the pack's, and requires the two blocks byte-identical. Observed by AC5.
@@ -87,13 +100,6 @@ the record's `## Items`.
   `repo` `C:/x y/z`. Every `git -C` match in each run equals `git -C "C:/x y/z"`, and the spec runs carry
   the probe's hash-object command and the acquire sentence's hash-object and diff commands
   (:1594, :1823, :1825). The `FH40 AC19` arm's label then claims what its runs show. Observed by AC7.
-- **S8** — id 5 (item 6, LOW). The docstrings of `check_gate_token` (`tools/memory-tree/gotchas.py:405-406`)
-  and `check_ungated` (:434-440) state who calls `check_ungated`: its selftest arms, and unit 30's
-  committed instrument `memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-30-ungated.py`,
-  which calls it (its line 34). No `--all-ungated` flag exists, and the unit that adds one wires it.
-  The sentence saying the function "counts it ungated and announces it as a note", as if a live path
-  called it, is reworded. The finding's other option, taking the function out until that unit, would
-  break the instrument unit 40 AC17 runs, so the function stays. No behaviour changes. Observed by AC8.
 - **S9** — id 6 (item 7, LOW). The comment at `tools/workflows/kit.toml:78` names the argument
   `gateManifest`, the key the harness reads (`tools/workflows/tier2-review.template.js:896`), in place
   of `legManifest`, which nothing under `tools/` reads. Observed by AC9.
@@ -108,7 +114,8 @@ the record's `## Items`.
   its Symptom, its Where it bit naming this review by file stem and its id, its fix, and its gate
   sentence, and `memory/gotchas/INDEX.md` regenerated with `python tools/memory-tree/gotchas.py --write`.
   Each record's backticked path tokens are exactly its anchor column below, so the selection is the
-  one the table states. Observed by AC11.
+  one the table states. Id 5's fix names unit TOOL-dFairHearing-44, unbackticked. The records and the
+  regeneration run `tools/memory-tree/gotchas.py` and leave that file unedited. Observed by AC11.
 
   | Record | Id | Anchors | Gate sentence |
   |---|---|---|---|
@@ -119,7 +126,9 @@ the record's `## Items`.
 
 ## 3. Non-goals (OUT)
 
-- No re-review: the diff exit is CONVERGED, and its minors are disposed here, not folded.
+- No re-review: the diff exit is CONVERGED, and its minors are disposed here and in
+  `TOOL-dFairHearing-44`, not folded.
+- No edit to `tools/memory-tree/gotchas.py`: id 5's docstrings are `TOOL-dFairHearing-44`'s scope.
 - No change to any class record the review disposed `class:` (ids 2, 3, 4 and 7). Each class's
   left-shift is the arm its item adds: the round trip for `pipe-in-a-code-span-splits-a-table-cell`,
   the pin-key arm for `policy-value-with-no-route`, the parity and the ban for
@@ -127,8 +136,8 @@ the record's `## Items`.
   `criterion-asserts-what-its-own-command-cannot-show`.
 - No refusal of every key `unattended-build.js` does not know: S3 routes the keys a pin prints and the
   one the skeptic named.
-- No new grammar for an already-escaped `\|` in a `none` reason. Once the prompt stops asking for it,
-  a reason carries a pipe as written.
+- No new grammar for an already-escaped `\|` in a returned `none` reason. Once the DISPOSITIONS prompt
+  stops asking for it, a returned reason carries a pipe as written.
 - Not the lexicon offender count, the replay scorer's stated-count reader or the playbook-parity leg
   guard: those are separate adopted units.
 - No help page: `help/` covers none of the review harness, the build harness, the opt-in pack, the
@@ -140,11 +149,18 @@ none
 
 ## 4. Design
 
-### Why one unit
+### Why two units
 
 The four new records share one generated file, `memory/gotchas/INDEX.md`, and ids 1, 2 and 7 share
-the review harness template, its render and its suite. No split leaves two disjoint write sets, which
-is the only case the severity rule admits two batch units.
+the review harness template, its render and its suite, so those stay in this unit. Id 5's docstrings
+write only `tools/memory-tree/gotchas.py`, which is the generator of that index
+(`tools/memory-tree/kit.toml:504-507`), and `--dispatch` refuses an index beside its generator on the
+paths alone (`tools/unattended/unattended.sh:14599-14620`). So they are `TOOL-dFairHearing-44`, whose
+write set is disjoint from this one, which is the case the severity rule admits two batch units.
+
+Disjoint paths do not make the two passes concurrent. That refusal reads every open sibling pass's
+paths as well as its own (`tools/unattended/unattended.sh:14567`, :14606), so this pass and unit 44's
+cannot be open together, and each is declared only after the other has committed.
 
 ### The ref shape (S1)
 
@@ -167,12 +183,20 @@ leading-`-` rule keeps the value from reading as a git option. The probe-resolve
 
 ### One cell encoding (S2)
 
-`renderCell` folds every line break to a space and escapes every `|` as `\|`, and the replay scorer's
+The harness's returned appendix and the record's appendix have different writers. For the returned
+one, `renderCell` folds every line break to a space and escapes every `|` as `\|`, and the replay scorer's
 reader splits on an unescaped `|` and unescapes `\|` (`tools/workflows/replay_scorer.py:90`, :291). A
 raw `a | b` therefore reads back as `a | b`, and a raw line break as one space. The check refused
 exactly those spellings, and admitted the `\|` spelling the prompt asked for, which `renderCell`
 escapes a second time and the reader returns as `a \| b`. With the check's pipe arm gone from the
 `none` branch and the prompt reworded, the writer's encoding and the reader's decoding are one pair.
+
+The record's appendix is the synthesis agent's own text, copied from the block the APPENDIX paragraph
+hands it (:2872-2878), and the scorer reads that text from the record's file
+(`tools/workflows/replay_scorer.py:323`). `renderCell` never sees the `(synthesis)` cell the agent
+fills, so a raw `|` there would split the row. The escape therefore moves to the paragraph that tells
+the agent to write that cell. What this does not check: nothing verifies the agent's copy, as nothing
+verifies the rest of it today (:2864-2865).
 
 ### Every pin key routed (S3)
 
@@ -234,7 +258,8 @@ neither moves the fold, and neither answers anything the ask asks.
 
 - `REF_SHAPE`, a constant in `tools/workflows/tier2-review.template.js` and its render.
 - The suite arm labels `FH43 AC1`, `FH43 AC2`, `FH43 AC3`, `FH43 AC4`, `FH43 AC5`, `FH43 AC6`,
-  `FH43 AC7` and `FH43 AC10`, one prefix per arm the Gates section declares.
+  `FH43 AC7` and `FH43 AC10`, one prefix per arm the Gates section declares, apart from the arm at
+  `tools/workflows/spec-audit-optin.test.sh:566`, which keeps its label and changes its needle.
 - The four class slugs of S11's table, each the stem of its record and its front-matter `name`.
 - The deviation record stem `2026-11-04-build-TOOL-dFairHearing-43-deviation-431`, written beside this
   spec.
@@ -254,14 +279,14 @@ neither moves the fold, and neither answers anything the ask asks.
 - `tools/hooks/agent-cap.js`
 - `tools/hooks/README.md`
 - `tools/lib/resolve-python.test.sh`
-- `tools/memory-tree/gotchas.py`
 - `tools/policy/check_policy.py`
 - `memory/gotchas/`
 - `memory/builds/dFairHearing/build/`
 
 The two renders change only through the review kit's parity gate in its render mode, `kit.toml`'s
 `[[regenerate]]` argv, never by hand. `memory/gotchas/INDEX.md` changes only through
-`gotchas.py --write`. Under the build folder, only this unit's acceptance ledger is written.
+`gotchas.py --write`, which this unit runs and does not edit, so no path above is the generator of
+another. Under the build folder, only this unit's acceptance ledger is written.
 
 ### Alternatives rejected
 
@@ -290,7 +315,9 @@ The two renders change only through the review kit's parity gate in its render m
 - observability — the pack's deny and the harness's refusal each name their cause on stderr or in the
   thrown message.
 - risks — S6 changes the hook on a tree whose receipt homes the policy kit elsewhere: the writer bound
-  and the settings-in-force rule then read the landed limit there, where today they fall back.
+  and the settings-in-force rule then read the landed limit there, where today they fall back. S2
+  gives up the refusal that caught a raw `|`, so a synthesis ignoring the appendix sentence writes a
+  split row into its record.
 - testing — the arms the Gates section declares, each observed RED then GREEN at the close, and the
   scratch probes of the acceptance criteria.
 - migration — an adopter's caller passing a `base` or `head` outside the shape is refused; no adopter
@@ -316,9 +343,10 @@ prompt and the arguments of every `workflow` call. Scratch layouts go under `$TE
   `parse_appendix_rows` in `tools/workflows/replay_scorer.py`, handed `confirmed <n>` and a newline
   before the returned appendix, `<n>` the run's confirmed count, reads id 1's disposition as
   `none — a | b`. With the reason holding a line break between `a` and `b`, it reads `none — a b`. The
-  synthesis prompt carries no `a pipe written as`.
-  Red when: the check refuses a reason `renderCell` encodes, or the prompt asks for a spelling the
-  renderer escapes twice.
+  synthesis prompt carries no `a pipe written as`, and its paragraph opening
+  `APPENDIX - the report's LAST section` carries `which you write and the harness does not encode`.
+  Red when: the check refuses a reason `renderCell` encodes, the prompt asks for a spelling the
+  renderer escapes twice, or the agent writing the record's cell is not told to escape it.
 - **AC3** — When a stub run of `tools/workflows/unattended-build.js` takes the suite's minimal units
   arguments with `twin` `always`, `unclassed` `reason`, `fixJudge` `instance` and a `walk` object, the
   audit's `workflow` call carries each unchanged, and a run passing none carries none of the four. For
@@ -330,7 +358,7 @@ prompt and the arguments of every `workflow` call. Scratch layouts go under `$TE
   receipt homes the hooks kit's `agent-cap.js` and `scratch-guard.js` in a directory not named `hooks`,
   over the dated-opt-in payload and README the pack's own suite admits, it exits 0 with an empty
   stderr. With the receipt rows naming files that do not exist and no hooks kit beside the copy, it
-  exits 2 naming `agent-cap.js` and the three places looked.
+  exits 2 naming `agent-cap.js`, `looked in` and the three places looked.
   Red when: the pack finds its readers by a rule other than agent-cap's, so a receipt-homed install is
   denied.
   fixture: the layout under `$TEMP/fh43k`, a `.git` directory, `.governance/install.json`, the copied
@@ -357,12 +385,6 @@ prompt and the arguments of every `workflow` call. Scratch layouts go under `$TE
   names that bare command. `grep -c "FH43 AC7" tools/workflows/tier2-review.test.sh` prints a number
   above 0.
   Red when: the suite asserts the quoting of the diff kind alone, so a bare spec-only site stays green.
-- **AC8** — When `grep -c "all-ungated" tools/memory-tree/gotchas.py` runs, it prints a number above 0,
-  `grep -c "TOOL-dFairHearing-30-ungated" tools/memory-tree/gotchas.py` prints a number above 0, and
-  `grep -c "counts it ungated and announces it as a note" tools/memory-tree/gotchas.py` prints 0;
-  `python tools/memory-tree/gotchas.py --selftest` exits 0.
-  Red when: a docstring describes `check_ungated` as called by a live path, or omits the instrument
-  that imports it.
 - **AC9** — When `git grep -n legManifest -- tools` runs, it prints nothing, and
   `grep -c "gateManifest" tools/workflows/kit.toml` prints a number above 0.
   Red when: the descriptor names an argument key the harness never reads.
@@ -387,7 +409,7 @@ prompt and the arguments of every `workflow` call. Scratch layouts go under `$TE
 
 New arm: tools/workflows/tier2-review.test.sh · covers AC1 · stub runs whose `head` is `HEAD;echo PWNED` and whose `base` holds `$(`, a backtick or a leading `-`, staged against the harness at `23e1a54d`, where the `head` run spawns the checklist agent with the value in its command · FLOOR_ASSERTIONS in that suite, 629 at `23e1a54d`, raised by the arms added
 
-New arm: tools/workflows/tier2-review.test.sh · covers AC2 · the `FH23 AC23` arm moved to the round trip, a `none` reason holding a raw `|` and one holding a line break each accepted and read back through `parse_appendix_rows`, staged against `23e1a54d`, which refuses both sets · the same floor
+New arm: tools/workflows/tier2-review.test.sh · covers AC2 · the `FH23 AC23` arm moved to the round trip, a `none` reason holding a raw `|` and one holding a line break each accepted and read back through `parse_appendix_rows`, and the appendix paragraph's escape sentence found in the prompt, staged against `23e1a54d`, which refuses both sets and states no such sentence · the same floor
 
 New arm: tools/workflows/tier2-review.test.sh · covers AC7 · the spaced `repo` over `unit-spec`, its round-2 fold, `design-audit` and `whole-design`, staged by stripping the quotes from the probe's hash-object command (:1594) alone, then from the acquire sentence's (:1823) alone · the same floor
 
@@ -395,15 +417,16 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC3 · every key the
 
 New arm: tools/workflows/spec-audit-optin.test.sh · covers AC4 · a receipt homing the hooks kit outside a sibling `hooks/`, staged against `23e1a54d`, where the pack denies the dated opt-in naming `could not be loaded` · FLOOR_ASSERTIONS in that suite, 123 at `23e1a54d`, raised by the arms added
 
+New arm: tools/workflows/spec-audit-optin.test.sh · covers AC4 · the no-hooks-kit `specAudit` arm at :566 moved from `could not be loaded` to `looked in`, staged against `23e1a54d`, whose deny carries no `looked in` · none, a moved arm adds no assertion
+
 New arm: tools/lib/resolve-python.test.sh · covers AC5 · the JS-port section over the pack's block and the two blocks compared, staged against `23e1a54d`, where the pack carries no marked block · none
 
 New arm: tools/lib/resolve-python.test.sh · covers AC6 · the sibling-kit path ban with its population and its two plants, staged against `23e1a54d`, where it names the hook's :403 and the pack's :24 · none
 
 New arm: tools/policy/check_policy.py · covers AC10 · the ref-keyed join row of `limit-hook-writer-split`, staged against a fixture copy of `check-review-join.js` whose ban matches nothing and exits 0 · none
 
-AC6's agent-cap half and AC8, AC9 and AC11 take no arm: the ban stops the hard-coded path from
-returning, the docstrings and the comment change no behaviour, and the catalogue's own check and
-selftest grade the records.
+AC6's agent-cap half, AC9 and AC11 take no arm: the ban stops the hard-coded path from returning, the
+comment changes no behaviour, and the catalogue's own check and selftest grade the records.
 
 ## 8. Open questions
 
@@ -425,6 +448,22 @@ selftest grade the records.
 - rev-2 · 2026-11-04 · AC3 · the pin command's `--subject` names a tracked design record, unit 25's
   replay verdicts, in place of an untracked fixture path the spec token check refused; the printed
   keys are unchanged, measured at `01a9b0e02`.
+- rev-3 · 2026-11-04 · S8 · AC8 · both moved to `TOOL-dFairHearing-44`, with
+  `tools/memory-tree/gotchas.py` out of §4's Files touched, so no path pairs an index with its
+  generator; later ids keep their numbers; brief `2026-11-04-prompt-TOOL-dFairHearing-43-2-spec-writer`.
+- rev-3 · 2026-11-04 · §1 · §3 · the title, the Goal and the Non-goals say seven findings close here
+  and id 5 is split; brief `2026-11-04-prompt-TOOL-dFairHearing-43-2-spec-writer`.
+- rev-3 · 2026-11-04 · §4 · "Why one unit" is now "Why two units": the false claim that no split is
+  disjoint corrected, and the two passes stated as never open together; brief `2026-11-04-prompt-TOOL-dFairHearing-43-2-spec-writer`.
+- rev-3 · 2026-11-04 · S11 · id 5's class record and the `gotchas.py --write` regeneration stay here,
+  its fix naming unit 44; brief `2026-11-04-prompt-TOOL-dFairHearing-43-2-spec-writer`.
+- rev-3 · 2026-11-04 · S2 · AC2 · §4 · §5 · §7 · the appendix-copy instruction near
+  `tools/workflows/tier2-review.template.js:2876` takes the escape of the record's own cell, because
+  `renderCell` encodes only the returned table; brief `2026-11-04-prompt-TOOL-dFairHearing-43-2-spec-writer`.
+- rev-3 · 2026-11-04 · S4 · AC4 · §4 · §7 · the arm at `tools/workflows/spec-audit-optin.test.sh:566`
+  named among the text S4 changes, its needle `looked in`, with its `New arm:` line and the Inventory's
+  label sentence; brief `2026-11-04-prompt-TOOL-dFairHearing-43-2-spec-writer`.
+- rev-3 · 2026-11-04 · §7 · the no-arm sentence loses AC8 and the docstrings; brief `2026-11-04-prompt-TOOL-dFairHearing-43-2-spec-writer`.
 
 ## 10. Reuse audit
 
