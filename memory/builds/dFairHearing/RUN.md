@@ -271,3 +271,5 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-04T21:32:27Z dispatch · item 1dc7a793 TOOL-dFairHearing-47 · reason tools/check-hook-destinations.sh tools/workflows/unattended-build.test.sh tools/govkit/registry.toml tools/gate-legs.json memory/project/unarmed-branches.txt memory/guides/SESSION-KICKOFF.md memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-47-1-acceptance-ledger.md memory/builds/dFairHearing/spec/2026-11-04-spec-TOOL-dFairHearing-47.md memory/builds/dFairHearing/README.md memory/LIVE.md memory/backlog/TOOL.md
 
 2026-11-04T21:37:55Z brief · item TOOL-dFairHearing-47 · reason 9b699352ba4e memory/builds/dFairHearing/prompts/2026-11-04-prompt-TOOL-dFairHearing-47-build-brief.md
+
+2026-11-04T22:07:08Z rescope · item add TOOL-dFairHearing-48 · reason the owner-ordered diff review of units 43 to 47 confirmed 15 minors in 9 items, memory/builds/dFairHearing/reviews/2026-11-05-review-TOOL-dFairHearing-43-47-diff-review.md, promoted to one unit

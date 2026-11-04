@@ -16,6 +16,7 @@
 | [2026-11-04-prompt-TOOL-dFairHearing-45-1-spec-writer.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-45-1-spec-writer.md) | journal | — |
 | [2026-11-04-prompt-TOOL-dFairHearing-45-build-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-45-build-brief.md) | research | — |
 | [2026-11-04-prompt-TOOL-dFairHearing-45-spec-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-45-spec-brief.md) | research | — |
+| [2026-11-05-review-TOOL-dFairHearing-43-47-diff-review.md](../reviews/2026-11-05-review-TOOL-dFairHearing-43-47-diff-review.md) | diff-review | TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-46 TOOL-dFairHearing-47 |
 
 <!-- /gen:spec-records -->
 
