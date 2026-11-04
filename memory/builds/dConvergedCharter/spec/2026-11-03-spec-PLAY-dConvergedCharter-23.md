@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-23 — the release asks' join: one key hash and one ask text for Maintain's and `release.route`'s `release-verify-failed` filings
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 9 · advances PLAY-dConvergedCharter-24
+**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 9 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0502@fbfa8f4f whole
 
@@ -10,8 +10,9 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 |
 | [2026-11-03-build-PLAY-dConvergedCharter-5-reuse-scout-d.md](../build/2026-11-03-build-PLAY-dConvergedCharter-5-reuse-scout-d.md) | research | PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 |
+| [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
 
 <!-- /gen:spec-records -->
 
@@ -192,8 +193,13 @@ Minted, each asked of `lexicon.py --suggest <name> --as py.function` at base and
 - **AC5** — When the parity table's extractor, the `awk` program of its `blk` function, runs over
   `maintain_file.py`, `loop_review.py` and `release.py` for the `# >>> derive_key_hash` and
   `# >>> render_breach_text` blocks, each block is byte-equal to its canonical with CRs dropped, and
-  `git grep -n "hashlib.sha256" -- maintain_file.py loop_review.py release.py` finds no hash outside a block.
-  Red when: a copy is edited by one byte, or a consumer computes the hash outside the block.
+  `git grep -n -E 'sha256' -- tools/drift-audit/maintain_file.py tools/loop/loop_review.py
+  tools/integrations/release.py` prints only lines inside a `# >>> derive_key_hash` … `# <<<` span of
+  its file, each hit graded against the span's line range, so `hashlib.sha256(`, `from hashlib import
+  sha256` and `hashlib.new("sha256")` are all seen; over a scratch copy with a planted
+  `hashlib.sha256(` line outside its block, the same grep prints that line outside every span.
+  Red when: a copy is edited by one byte, or a consumer computes the hash outside the block, including a
+  pathspec that matches no tracked file and so finds nothing.
 - **AC6** — When `grep -n "maintain key" release.md maintain.md` runs under `help/`, each page names the marker,
   and `release.md` says Maintain's later filing adds a `seen` row.
   Red when: either page still describes two asks for one failure.
@@ -251,6 +257,9 @@ New arm: tools/drift-audit/selftest.py · covers AC2 · `write_breach_ask` rende
 
 - rev-1 · 2026-11-03 · initial draft, from the spec brief's unit row, scout D's row and disagreements 5, 6
   and 8, and the parent specs read at base.
+- rev-2 · 2026-11-04 · AC5 · folded `2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1` finding
+  50: AC5's grep spells the three full paths and every `sha256` form, grades each hit against its
+  file's block span, and stages its red with a planted hash outside a block.
 
 ## 10. Reuse audit
 

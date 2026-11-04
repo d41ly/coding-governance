@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-9 — Skills as level-4 thin entries from their commands' drive rows, renamed `gov-<name>` by upgrade step, the old names forwarded, the prefix and stale-path arms
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 18 · advances PLAY-dConvergedCharter-24
+**Status:** OPEN · rev-3 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 18 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0483@5b53c82b whole
 
@@ -10,8 +10,9 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-03-build-PLAY-dConvergedCharter-6-reuse-scout-b.md](../build/2026-11-03-build-PLAY-dConvergedCharter-6-reuse-scout-b.md) | research | PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-15 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
+| [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
 
 <!-- /gen:spec-records -->
 
@@ -46,9 +47,14 @@ without the prefix (SK-2).
   (each `[[files]]` row's `include`), and the five adopt scripts that render them,
   `tools/lexicon/adopt-lexicon.sh:246`, `tools/drift-audit/adopt-drift-audit.sh:66`,
   `tools/branch-reconcile/adopt-branch-reconcile.sh:45`, `tools/memory-recall/adopt-memory-recall.sh:238`
-  and `tools/runlog/adopt-runlog.sh:66`; `tools/drift-audit/README.md:104` · by value: NO VALUE READERS, no
-  file counts or compares a template's bytes outside the adopt scripts' own `--check`, which the by-name
-  half lists.
+  and `tools/runlog/adopt-runlog.sh:66`; `tools/drift-audit/README.md:104`; gov's receipt
+  `.governance/install.json`, whose rows at `:164`, `:566`, `:770` and `:812` name a `SKILL.template.md`
+  as path and source; and the template pin lines of `.gitattributes` (`:282`, `:286`), where unit 19's
+  class pins have not already taken them · by value: the same receipt rows, whose recorded hashes
+  `update`'s verdict compares with each template's bytes, rewritten by the update that withdraws the
+  template; and the adopt scripts' own `--check`. The list is the printed output of `python
+  check_policy.py --readers <template path> --kind path` for each of the five templates at the pass,
+  never typed; the lines above are its reading at base.
 - **S3** — Installed with the command. Each entry's `[[files]]` row (`role = "rendered"`, `to` the
   gov- path) and its `[[regenerate]]` argv, `render_playbook.py --render-scope skills`, sit in the
   descriptor that ships the command. For `/gov-lexicon`, `/gov-drift` and `/gov-cleanup` that is the same
@@ -61,16 +67,25 @@ without the prefix (SK-2).
   (the precedent `agent-cap/fanout-cap-to-agents-in-flight`, `tools/hooks/kit.toml:138-145`), ids
   `memory-recall/skill-to-gov-recall`, `runlog/skill-to-gov-runlog`, `lexicon/skill-to-gov-lexicon`,
   `drift-audit/skill-to-gov-drift` and `branch-reconcile/skill-to-gov-cleanup`, each with `surfaces =
-  ["path:.claude/skills/<old>/SKILL.md"]`. The UP withdraws the old render where its bytes equal the old
-  kit's render, as `adopt-branch-reconcile.sh --scaffold` withdrew `/branch-reconcile` at kit 1.4
-  (`tools/branch-reconcile/README.md:169-172`), and names and keeps a file that is not. The DOWN restores
-  it byte-identical. The WITNESS exits 0 when the old path holds no kit render. Observed by AC4.
+  ["path:.claude/skills/<old>/SKILL.md"]`. The UP clears the old path, since S5's forwarder re-occupies
+  it, and decides what the file is the way `update` decides, never by a byte compare of its own: it
+  classifies the old Skill's `[[files]]` row against the target's receipt through `VERDICT_GRID`
+  (`tools/govkit/govkit.py:8283-8292`), CRs stripped before any compare, and withdraws the file on `withdrawn`,
+  keeping and naming the file on the `("differs", "absent")` cell, a file the target edited. Where the receipt holds no row for the file, an
+  install the adopt script scaffolded, it recognises a kit render by the precedent's own test: the front
+  matter's `name: <old>` and the command's name in the body, read through `tr -d '\r'`, as
+  `adopt-branch-reconcile.sh:104-115` recognised `/branch-reconcile` at kit 1.4
+  (`tools/branch-reconcile/README.md:169-172`), so a CRLF copy, an older template's render and a render
+  with other answers are each withdrawn; anything else is named and kept. The DOWN restores it
+  byte-identical. The WITNESS exits 0 when the old path holds no kit render by the same test.
+  Observed by AC4.
 - **S5** — The old names forwarded. Five `[[shim]]` rows in `tools/govkit/shims.toml`, `kind = "skill"`
   (I3, unit 17), `from = ".claude/skills/<old>/SKILL.md"`, `to = ".claude/skills/gov-<new>/SKILL.md"`,
   `closed = false`. Each stays open until `install.deprecation-window` releases are cut, which
   `check_shim_windows` holds while `read_releases` is the stand-in returning none
-  (`tools/govkit/shims.py:302-305`). Removing a row once its window closes is unit 20's exit check, not
-  this unit's. Observed by AC5.
+  (`tools/govkit/shims.py:302-305`). Closing a row once its window allows it is the act of the kit the
+  row's id names, release-bound, which PLAY-dConvergedCharter-20 S4 reds when left undone; no unit of
+  this build closes one. Observed by AC5.
 - **S6** — The readers re-pointed, by path and by value, re-derived at the first pass by `derive_readers`
   (I1). Pinned at `d8a12f046` they are: each kit's `to`, `probe` and `pattern` rows (§4 "The five"); the
   `.gitattributes` Skill lines `:119`, `:125`, `:132`, `:281` and `:285`, those unit 19's class pins leave
@@ -82,7 +97,12 @@ without the prefix (SK-2).
 - **S7** — The stale-path arm. `core skills conformance` (PLAY-dOrderedCharter-7 S6) gains
   `check_skill_paths(root)`: every descriptor `to`, `probe` (`must_exist` and `must_not_exist`) and
   `[[lf_pin]]` `pattern` under `.claude/skills/` must name the directory of a `skill` value some
-  `[[drive]]` row declares, or the `from` of an open `skill` shim row. Descriptors are read through
+  `[[drive]]` row declares, or the `from` of an open `skill` shim row, or the installed path an open
+  `skill` shim holds through its kit's install row: a command-`to` row whose `from` template is the
+  source of a descriptor `[[files]]` row whose `to` is that path. So unit 17's held `/build` client,
+  `from = "{prefix}/roles/SKILL.template.md"`, admits the roles kit's `to`, `probe` and `pattern` rows
+  naming `.claude/skills/build/SKILL.md` (`tools/roles/kit.toml:57`, `:90`, `:145`) while its row is
+  open, and reds them once it closes. Descriptors are read through
   `read_kit_rows(root)` (DEPL-dShippedRelease-10 S6), so the core reaches them with no govkit. Each red
   names the descriptor, the key and the path. Observed by AC6.
 - **S8** — The prefix arm. The `kind.skill` row's population widens from `skills/*/SKILL.md` to also
@@ -99,7 +119,12 @@ without the prefix (SK-2).
 - The per-kit Skill wiring `--check` arms and legs that remain once the entries render: unit 8's,
   each with its last document.
 - `/build`, `/unattended` and `/session-kickoff`: units 17, 12 and 16 retire them; none is renamed.
-- Closing a shim when its window ends, and the exit check over pending steps: unit 20's.
+- Closing a shim when its window ends: the act of the kit the row's id names, release-bound
+  (PLAY-dConvergedCharter-20 S4); the exit check over pending steps: unit 20's.
+- `tools/roles/SKILL.template.md`: unit 17's held `/build` client, which stays until its shim row
+  closes; this unit removes only the five renamed kits' templates.
+- The codebase-map claims of the five renamed Skills, the dossier the drift-audit kit lacks and the
+  regenerated map: PLAY-dConvergedCharter-39, which follows this unit.
 - The commands themselves: `gov why`, `gov trace` (TOOL-dWellOiledMachine-34) and `record find`
   (TOOL-dTotalRecall-9).
 - The line-ending class pins: unit 19's. This unit re-points only the per-Skill lines it leaves.
@@ -110,6 +135,7 @@ without the prefix (SK-2).
 - **consumes-from** `PLAY-dConvergedCharter-17` — `KINDS`, holding `skill`, so S5's five forwarder rows validate in `shims.toml`
 - **consumes-from** `PLAY-dConvergedCharter-19` — `.gitattributes`, its class pins, so S6 re-points only the per-Skill lines the class leaves standing
 - **consumes-from** `PLAY-dConvergedCharter-10` — `renderers.toml`, the `skills` scope's `[[target]]` row and the `skill` key of `[[drive]]` that S2 renders and S8 reads
+- **hands-off** `PLAY-dConvergedCharter-39` — `.claude/skills/gov-<name>/SKILL.md`, the five entries S2 renders, whose `rendered-skills` keys that unit claims in the dossiers and whose old keys it releases
 - **consumes-from** external — PLAY-dOrderedCharter-6 and -7, TOOL-dDeclaredLoop-18, TOOL-dWellOiledMachine-34, TOOL-dTotalRecall-9 and DEPL-dShippedRelease-10 S6, each DEFERRED at base and built before this unit's build pass
 
 ## 4. Design
@@ -148,9 +174,9 @@ A kit's command named here is the one its Skill runs today; the build pass reads
 ### Inventory
 
 Minted: the step program `tools/govkit/steps/skill_rename.py` with its fixture verb `--fixture --plant
-<case>` (cases `rename`, `edited`, `absent`); the five step ids of S4; `check_skill_paths` and
+<case>` (cases `rename`, `edited`, `absent`, `crlf`, `older-render`, `no-receipt`); the five step ids of S4; `check_skill_paths` and
 `check_skill_prefix`, each asked of `python tools/lexicon/lexicon.py --suggest <name> --as py.function` at
-`d8a12f046`: OK; the plant cases `skill-stale-probe` and `skill-no-prefix` on `core.py fixture --plant`.
+`d8a12f046`: OK; the plant cases `skill-stale-probe`, `skill-held-client` and `skill-no-prefix` on `core.py fixture --plant`.
 
 ### Migration
 
@@ -186,6 +212,11 @@ DOWN restores the old render and the forwarder is not written.
   an adopter that never re-runs the scaffold keeps the old name with no forwarder.
 - **One step program per rename.** Rejected by the reuse rule's second-instance clause: five renames
   share one UP, DOWN and WITNESS that differ only in two names, so one program takes them as arguments.
+- **The UP's own byte compare against the old kit's render.** It re-derives `VERDICT_GRID`'s
+  `withdrawn` and `retired-edited` cells and misses a CRLF copy, an older render and a render with
+  other answers. Spec 20 §4 rejects a step deciding withdrawal for files `update` owns; this case
+  differs because the path does not stay empty: S5's forwarder must be written there, so the UP clears
+  it, deciding through `update`'s own classification.
 - **The prefix arm keyed on the directory name alone.** Rejected because a repository's own Skill may
   carry any name, and the clause refuses only a gov-rendered one: the arm needs the drive row or the
   `skills` target to tell the two apart.
@@ -193,7 +224,8 @@ DOWN restores the old render and the forwarder is not written.
 ## 5. Production-readiness checklist
 
 - security — the step writes only under `.claude/skills/<old>/` in its target, and withdraws a file
-  only when its bytes equal the kit's render; any other file is named and kept.
+  only when `VERDICT_GRID` reads it `withdrawn`, or, with no receipt row, when the precedent's test
+  recognises it as a kit render; any other file is named and kept.
 - perf / scale — five rows, one descriptor read per arm.
 - error / empty / loading states — an adopter with no old Skill is a witness-true no-op; a hand-edited
   old Skill is kept and named, and the step still records applied.
@@ -212,8 +244,9 @@ DOWN restores the old render and the forwarder is not written.
   each `description` opening `Use when` and naming its command, the `gov-recall` entry's naming both
   `gov why` and `record find`, and the `gov-runlog` entry's naming `gov trace`.
   Red when: an entry carries a procedure, or a description is typed rather than rendered from its rows.
-- **AC2** — When `git ls-files -- tools | grep -c SKILL.template.md` runs after the unit lands, it prints
-  0, the five kits' templates gone and `/build`'s and `/unattended`'s with units 17 and 12, and
+- **AC2** — When `git ls-files -- tools/lexicon tools/drift-audit tools/branch-reconcile tools/memory-recall
+  tools/runlog | grep -c SKILL.template.md` runs after the unit lands, it prints 0, the five renamed
+  kits' templates gone while `tools/roles/SKILL.template.md` stays as unit 17's held client, and
   `grep -c -E "skills/(cleanup|drift-audit|lexicon|memory-recall|runlog)/" instructions-legacy.txt`
   prints 0.
   Red when: a renamed Skill still has a hand-written template or a legacy row.
@@ -222,15 +255,22 @@ DOWN restores the old render and the forwarder is not written.
   Red when: the adopter renders the entry itself beside the one renderer.
 - **AC4** — When `python skill_rename.py --fixture --plant rename` runs, the UP withdraws the old
   render and the WITNESS exits 0, the DOWN restores it byte-identical, and the `edited` plant keeps a
-  hand-edited old Skill and names it.
-  Red when: an edited Skill is withdrawn, or the DOWN differs by a byte.
+  hand-edited old Skill and names it; the `crlf` plant, a CRLF copy of the render, and the
+  `older-render` plant, a render of an older template, are each withdrawn, and the `no-receipt` plant,
+  a scaffolded render with no receipt row, is withdrawn by the precedent's recognition test.
+  Red when: an edited Skill is withdrawn, a CRLF copy or an older render is kept as hand-edited, or the
+  DOWN differs by a byte.
 - **AC5** — When `python tools/govkit/shims.py --check` runs after the unit lands, the five `skill` rows
   are open and each forwarder at an old path matches its render.
   Red when: a row is closed while `read_releases` returns none, or a forwarder is missing.
 - **AC6** — When `python core.py fixture --plant skill-stale-probe` plants `probe = { must_exist =
   ".claude/skills/lexicon/SKILL.md" }` in a descriptor with no open shim from that path, `core skills
-  conformance` exits 1 naming the descriptor, `probe` and the path; with the shim row open it exits 0.
-  Red when: the stale probe passes, or a forwarded path reds.
+  conformance` exits 1 naming the descriptor, `probe` and the path; with the shim row open it exits 0;
+  and the `skill-held-client` plant, a held `/build` row with a command `to` and its kit's `to`, `probe`
+  and `pattern` rows naming `.claude/skills/build/SKILL.md`, exits 0 while the row is open and 1 once
+  it is closed.
+  Red when: the stale probe passes, a forwarded path reds, or a held client's install rows red while
+  its row is open.
 - **AC7** — When `git grep -n -E "\.claude/skills/(cleanup|drift-audit|lexicon|memory-recall|runlog)/"
   -- . ':!memory'` runs after the unit lands, every hit is `tools/govkit/shims.toml` or a forwarder.
   Red when: a `to`, `probe` or `pattern` row, an adopt script or a self-test names an old path.
@@ -247,8 +287,8 @@ DOWN restores the old render and the forwarder is not written.
 The parent legs `core skills conformance` and `instruction render (one renderer of record)` run S7, S8
 and AC1 once they land; neither is in the manifest at base.
 
-New arm: tools/playbook/core.py · covers AC6 AC8 · the plants `skill-stale-probe` and `skill-no-prefix`, the failing cases a stale `probe` with no open shim and a drive row's `skill` without `gov-` · none
-New arm: tools/govkit/steps/skill_rename.py · covers AC4 · the plants `rename`, `edited` and `absent`, the failing case an edited old Skill withdrawn · none
+New arm: tools/playbook/core.py · covers AC6 AC8 · the plants `skill-stale-probe`, `skill-held-client` and `skill-no-prefix`, the failing cases a stale `probe` with no open shim, a held client's rows red while open, and a drive row's `skill` without `gov-` · none
+New arm: tools/govkit/steps/skill_rename.py · covers AC4 · the plants `rename`, `edited`, `absent`, `crlf`, `older-render` and `no-receipt`, the failing cases an edited old Skill withdrawn and a CRLF copy kept · none
 
 ## 8. Open questions
 
@@ -271,6 +311,15 @@ New arm: tools/govkit/steps/skill_rename.py · covers AC4 · the plants `rename`
 
 - rev-1 · 2026-11-03 · initial draft, from the packet's Item 9, layer-instruction R-F (`:514-525`), the
   fates row `:203`, scout B row 9 and findings 7 and 8, and the spec brief's I3, I14, I19 and I20.
+- rev-2 · 2026-11-04 · S2 S4 S5 S7 §3 §4 §5 AC2 AC4 AC6 §7 §10 · folded
+  `2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1` findings 1 (AC2 counts the five renamed kits,
+  the held `/build` client staying), 2 (S7 admits a held client's install rows), 15 (the receipt rows
+  and template pin lines in S2's readers, the list printed by `derive_readers`), 55 and 36 (the UP
+  decides through `VERDICT_GRID` and the precedent's CR-stripped recognition test, with the CRLF and
+  older-render plants) and 4 (closing a shim row is the row's kit's release-bound act).
+- rev-3 · 2026-11-04 · §3 · sibling edit by the repair unit PLAY-dConvergedCharter-39 for
+  `2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1` finding 44: the codebase-map claims of the
+  renamed Skills move to that unit, with the hands-off edge to it.
 
 ## 10. Reuse audit
 
@@ -280,7 +329,10 @@ descriptor `[[upgrade]]` row and its step-program shape (`tools/hooks/kit.toml:1
 `tools/govkit/steps/fanout_cap.py`), and `core skills conformance` (PLAY-dOrderedCharter-7 S6).
 `python tools/codebase-map/reuse_lookup.py "render a Skill entry from a command row and rename it with a
 forwarder"` ranked name-stem hits only (`rows`, `row`, `render`, `extract_row`, `resolve_entry`); none
-renames a rendered file across an upgrade, so `skill_rename.py` is new, on the step-program seam. Scout B
+renames a rendered file across an upgrade, so `skill_rename.py` is new, on the step-program seam, and
+decides what the old file is through `VERDICT_GRID` (`tools/govkit/govkit.py:8283-8292`), `update`'s own
+classifier, with the precedent's recognition test (`adopt-branch-reconcile.sh:104-115`) where no receipt
+row exists. Scout B
 row 9 holds against source at `d8a12f046`; its finding 8 (no `skill` kind) is unit 17's, and the
 `.sh`/`.js`/`.py` rule at `shims.py:95-97` is a second constraint that unit owes for a `SKILL.md` row.
 

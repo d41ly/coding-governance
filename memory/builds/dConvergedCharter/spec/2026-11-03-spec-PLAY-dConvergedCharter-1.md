@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-1 — protocol text derived to facts only: each protocol document's load-bearing statements written as typed units, its rationale left for the explanation tree
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 15 · advances PLAY-dConvergedCharter-24
+**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 15 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0475@2b542935 whole
 
@@ -10,13 +10,15 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-reuse-scout-a.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-reuse-scout-a.md) | research | PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-19 |
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-1-reuse-scout.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-1-reuse-scout.md) | journal | — |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-2-reuse-scout.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-2-reuse-scout.md) | journal | — |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-3-reuse-scout.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-3-reuse-scout.md) | journal | — |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-4-reuse-scout.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-4-reuse-scout.md) | journal | — |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-5-spec-writer.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-5-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
+| [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
 
 <!-- /gen:spec-records -->
 
@@ -41,8 +43,12 @@ its `source` field, the envelopes), -9 (`[[unit]]` rows), -12 (`STATEMENT_TYPES`
 
 - **S1** — The population, `derive_migrated_documents(root)` in `tools/playbook/guide_move.py`: every
   level-3 row of `documents.toml` whose path `instructions-legacy.txt` lists (shared interface I17),
-  each edited at its `source`. DERIVED at the pass; once units 12 and 16 have taken theirs out, it is the six
-  documents of §4 Evidence. A document is migrated once an active unit's `promoted-from` edge names one
+  each edited at its `source`, less two files named by path: `memory/guides/SESSION-KICKOFF.md`, the kickoff
+  manifest, whose lines are the ratchet's input and not statements to type, and
+  `memory/guides/PLAYBOOK-TEMPLATE.md`, whose source is the template `check-playbook.sh` validates every playbook
+  against (`tools/unattended/check-playbook.sh:25`, moved with it to the runtime kit by unit 12). PLAY-dConvergedCharter-7
+  moves the first and takes the second out at order 17 (its §4 "The guides"). DERIVED at the pass; once unit 12
+  has taken the four unattended guides out, it is the six documents of §4 Evidence. A document is migrated once an active unit's `promoted-from` edge names one
   of its sections. Observed by AC4.
 - **S2** — The residue route, `python tools/playbook/guide_move.py plan --residue --out <file>`, a
   second route of unit 13's mover over the same factory (shared interface I16, `derive_moves`): one
@@ -87,8 +93,9 @@ its `source` field, the envelopes), -9 (`[[unit]]` rows), -12 (`STATEMENT_TYPES`
   slot lines: unit 7.
 - The `protocols` scope that renders a document from its units: unit 10.
 - The runbook `WIRE-INTO-PROJECT.md`: DEPL-dShippedRelease-9 derives it and unit 15 migrates it.
-- The unattended guides and `SESSION-KICKOFF.md`: units 12 and 16 remove them first, so they are not
-  in S1's population.
+- The four unattended guides: unit 12 removes them first, so they are not in S1's population.
+- `SESSION-KICKOFF.md` and `PLAYBOOK-TEMPLATE.md`: unit 7 moves the first and removes the second, after this
+  unit; S1 excludes both by path, a manifest and a checker's template being no protocol document.
 
 ### Edges
 
@@ -105,9 +112,11 @@ its `source` field, the envelopes), -9 (`[[unit]]` rows), -12 (`STATEMENT_TYPES`
   67,106 and `memory/TEMPLATE-SPEC.md` 39,749. The sources: `tools/memory-tree/ANNOTATION-STYLE.template.md`,
   `BUILD-METHOD.template.md`, `HYGIENE.template.md` and `SPEC-TEMPLATE.template.md`;
   `tools/workflows/REVIEW-PROTOCOL.template.md`; `MERGE-BAR.md` is hand-written, its own source.
-- The other six guides at base leave first: the four unattended guides and `PLAYBOOK-TEMPLATE.md` with
-  the kit (unit 12, rendered by `tools/unattended/adopt-unattended.sh:761-775`), `SESSION-KICKOFF.md`
-  with the Skill (unit 16).
+- Of the other six guides at base, the four unattended guides leave first, with the kit (unit 12,
+  rendered by `tools/unattended/adopt-unattended.sh:761-775`). `PLAYBOOK-TEMPLATE.md` stays until unit 7
+  removes its render at order 17, its template moved by unit 12 beside `check-playbook.sh`, and
+  `SESSION-KICKOFF.md` stays until unit 7 moves it to `memory/project/` (unit 7 §8 F5); unit 16 moves the
+  kickoff engine's files and neither of these. S1 excludes both by path.
 - None of the parents' files exists at base: `git ls-files` prints no `documents.toml`,
   `instruction_units.py`, `instructions_edit.py` or `instructions-legacy.txt` at `d8a12f046`.
 
@@ -195,8 +204,10 @@ the units load where their `scope` selects them once unit 7's slices and the loa
   `the marker below`; with both removed it exits 0.
   Red when: a non-fact statement planted in a migrated document passes the check.
 - **AC4** — When `python instructions_edit.py check` runs at this unit's pass tip, it exits 0, and
-  `derive_migrated_documents` names each of the six documents of §4 Evidence.
-  Red when: a migrated source keeps a modal line, or a document of the population is left unmigrated.
+  `derive_migrated_documents` names each of the six documents of §4 Evidence and neither
+  `SESSION-KICKOFF.md` nor `PLAYBOOK-TEMPLATE.md`.
+  Red when: a migrated source keeps a modal line, a document of the population is left unmigrated, or a
+  file S1 excludes by path is migrated.
   figure: DERIVED at the pass.
 - **AC5** — When `python instruction_units.py envelopes --check` runs at the pass tip, it exits 0 over
   the six sources.
@@ -232,6 +243,10 @@ New arm: tools/playbook/guide_move.py · covers AC1 AC2 AC3 · the four `residue
 ## 9. Revision log
 
 - rev-1 · 2026-11-03 · initial draft, the spec run's carrier of `cl-dClosedLoop-0475`.
+- rev-2 · 2026-11-04 · S1 §3 §4 AC4 · folded `2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1`
+  finding 12: one owner per guide, as unit 7's table states, `PLAYBOOK-TEMPLATE.md` removed and
+  `SESSION-KICKOFF.md` moved by unit 7 after this unit, S1 excluding both by path with the reason, and
+  unit 16 no longer said to remove either.
 
 ## 10. Reuse audit
 

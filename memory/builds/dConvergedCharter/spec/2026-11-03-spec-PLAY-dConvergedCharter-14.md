@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-14 — every part at its fate: the fates table as rows with path globs, and its join run as convergence's exit check
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 22 · advances PLAY-dConvergedCharter-24
+**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 22 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0488@7cf98c51 whole
 
@@ -10,9 +10,10 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-03-build-PLAY-dConvergedCharter-5-reuse-scout-d.md](../build/2026-11-03-build-PLAY-dConvergedCharter-5-reuse-scout-d.md) | research | PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-23 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
-| [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 |
+| [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
+| [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-18 |
 
 <!-- /gen:spec-records -->
 
@@ -94,17 +95,23 @@ heading fold). The rest is live at base: `tracked` (`tools/govkit/govkit.py:344`
   for PLAY-dConvergedCharter-4's proposer, its metrics line `parts: <n> parts · <s> superseded · fates_join.py`.
   Where govkit is absent, an adopter's tree, the entry adds no reading and the proposer announces itself unarmed.
   Observed by AC8.
-- **S7** — The exit check and the leg. `python fates_join.py check` runs S4; `python fates_join.py check --exit`
-  runs it and, in the same run and verdict, PLAY-dConvergedCharter-20's adopter exit arm
-  `check_adopters_converged` (`tools/govkit/adopter_reading.py`), which reads `derive_pending_steps` per registered
-  adopter, so the two read beside each other and never as two populations.
+- **S7** — The exit check and the leg. `python fates_join.py check` runs S4; `python fates_join.py check --exit
+  [--release <tag>]` runs it and, in the same run and verdict, PLAY-dConvergedCharter-20's adopter exit arm
+  `check_adopters_converged(root, release)` (`tools/govkit/adopter_reading.py`, unit 20 S5), which grades every
+  row of the adopter register, registered or not, through `derive_migration_state` (unit 5 S1) at `release`, so
+  the two read beside each other and never as two populations. `release` is the converged release unit 5 S5
+  names, the first `gov/v*` tag whose commit contains this build's landing merge, taken from `--release` when
+  given and otherwise derived by that same rule. Where no such tag exists, or the register is empty, the arm
+  exits 2 and `check --exit` prints `fates — exit check not graded: <the arm's reason>` and exits 2: a
+  not-graded adopter half is never read as green, whatever the join's own verdict. Observed by AC11.
   The leg `fates join`, argv `python {prefix}/govkit/fates_join.py check`, is gov's own as `step-gate` is at base: a
   row in `tools/gate-legs.json`, `chunk` `declarations`, `subject` `repo`, with its `reads`, and an `[[exempt_leg]]`
   row in `tools/govkit/registry.toml` saying why no adopter carries it; where TOOL-dWitnessedBar-28 has moved gov's
   own legs elsewhere by the build run, it is declared there. Observed by AC9.
 - **S8** — The plants, `python fates_join.py --fixture --plant <name>`, each a scratch git repository under
   `%TEMP%` with a short name holding a three-row table: `unlisted`, `surviving-guide`, `stays-vanished`,
-  `declined-unamended`, `declined-amended`, `kept-unratified`, `retired-unratified` and `overlap`; each is red as
+  `declined-unamended`, `declined-amended`, `kept-unratified`, `retired-unratified`, `overlap` and
+  `exit-ungraded`; each is red as
   planted and green with its fix, and `--fixture` with no plant runs them all. Observed by AC2 to AC7.
   **Readers:** by name: none, since this item mints plants and withdraws no name · by value: NO VALUE READERS,
   nothing this item names is taken out of the tree.
@@ -125,7 +132,7 @@ heading fold). The rest is live at base: `tracked` (`tools/govkit/govkit.py:344`
 
 - **consumes-from** `PLAY-dConvergedCharter-4` — the `keep` record of a declined part keyed `(part, id)`, which S5 reads; `check_ratified_retirements`, which S4 runs as its fourth arm; and the parts reading `readings["parts"]` that unit's proposer reads, which S6 supplies
 - **consumes-from** `PLAY-dConvergedCharter-23` — `derive_key_hash`, the factory S5 keys a declined part's `keep` record through
-- **consumes-from** `PLAY-dConvergedCharter-20` — `derive_pending_steps`, read through `check_adopters_converged`, that unit's adopter exit arm, which `check --exit` runs beside the join
+- **consumes-from** `PLAY-dConvergedCharter-20` — `check_adopters_converged(root, release)`, that unit's adopter exit arm, which `check --exit` runs beside the join at unit 5 S5's converged release, each register row graded through `derive_migration_state`, its exit 2 read as not graded
 - **consumes-from** `PLAY-dConvergedCharter-15` — `fates.toml`, the four `[[part]]` rows of that unit's S1 (`help/` pages, kit READMEs, root `README.md`, the agent runbook), which S1 materializes with the record's `[table]`
 - **consumes-from** external — TOOL-dCalibratedLens-3 and -5 (`METRICS`, `read_keep_records`) and TOOL-dTotalRecall-10 (`derive_anchor`), each DEFERRED at base and of a parent or ancestor build
 
@@ -287,6 +294,11 @@ check: whether a fate is right, whether a part with no path reached its fate, an
   Red when: the leg lacks its manifest row or its exemption row.
 - **AC10** — When `grep -n "keep:" fates.md` and `grep -n "fates.md" README.md` run in `help/`, each prints a line.
   Red when: the page or its index row is missing.
+- **AC11** — When `python fates_join.py --fixture --plant exit-ungraded` runs `check --exit` over a fixture whose
+  join is green, whose register holds one row and which carries no `gov/v*` tag, it prints `fates — exit check not
+  graded` with the adopter arm's reason and exits 2; with `--release <tag>` naming a planted tag and the row
+  `migrated`, it exits 0.
+  Red when: the exit check reads green while its adopter half was not graded.
 
 ## 7. Gates
 
@@ -295,7 +307,7 @@ check: whether a fate is right, whether a part with no path reached its fate, an
 The close runs `python tools/govkit/fates_join.py check --exit` once, after the last unit is terminal, as
 convergence's exit check; its verdict is the build's, not a criterion of this unit.
 
-New arm: tools/govkit/fates_join.py · covers AC2 AC3 AC4 AC5 AC6 AC7 · the `--fixture` plants `unlisted`, `surviving-guide`, `stays-vanished`, `declined-unamended`, `declined-amended`, `kept-unratified`, `retired-unratified` and `overlap`, staged red by a join with each arm removed in turn, and the new leg `fates join` itself run red over a scratch clone of this tree holding one unlisted file · none
+New arm: tools/govkit/fates_join.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC11 · the `--fixture` plants `unlisted`, `surviving-guide`, `stays-vanished`, `declined-unamended`, `declined-amended`, `kept-unratified`, `retired-unratified`, `overlap` and `exit-ungraded`, staged red by a join with each arm removed in turn and by `check --exit` folding the adopter arm's exit 2 into a green, and the new leg `fates join` itself run red over a scratch clone of this tree holding one unlisted file · none
 
 ## 8. Open questions
 
@@ -325,6 +337,11 @@ New arm: tools/govkit/fates_join.py · covers AC2 AC3 AC4 AC5 AC6 AC7 · the `--
   brief's unit 14 row and I9, I22, I23 and I24, scout D's row for unit 14 and its disagreements 3 and 4, the fates
   record's `[kits]`, `[table]` and `[check]`, the night pass's `[p8-fates]` and the shape audit's
   `declined-retirement` finding.
+- rev-2 · 2026-11-04 · S7 S8 §3 AC11 §7 · folded `2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1`
+  finding 11: the adopter arm is described as unit 20 S5 defines it, `check_adopters_converged(root, release)`
+  over every register row through `derive_migration_state`, `check --exit` takes the release from
+  `--release` or unit 5 S5's rule, and the arm's exit 2 makes the exit check not graded, the
+  `exit-ungraded` plant observing it; the consumes-from edge to PLAY-dConvergedCharter-20 says so.
 
 ## 10. Reuse audit
 

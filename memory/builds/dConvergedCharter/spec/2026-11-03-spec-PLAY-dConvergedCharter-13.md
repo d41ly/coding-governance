@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-13 — feature-specific guide prose migrated into feature-scoped units through one prose mover
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 14 · advances PLAY-dConvergedCharter-24
+**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 14 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0487@ff29708d whole
 
@@ -10,8 +10,9 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-reuse-scout-a.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-reuse-scout-a.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-19 |
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
+| [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
 
 <!-- /gen:spec-records -->
 
@@ -61,12 +62,18 @@ Build-run preconditions, each landed before this unit's pass: TOOL-dLinkedLibrar
   `text` is blank, composes each row with `core.py new unit` (PLAY-dOrderedCharter-20 S9) and completes
   it with `scope = ["feature.<name>"]`, `help` the paragraph verbatim and the edge
   `promoted-from=doc.<name>#<seg>`, writes it by S4's route, and moves the paragraph out through
-  `write_moves`. Observed by AC1 and AC2.
+  `write_moves`. The route is chosen by a flag, no flag being this feature route, so a second route is
+  one more route function over the same factory and write route: PLAY-dConvergedCharter-1 adds
+  `--residue` and PLAY-dConvergedCharter-7 `--rationale`. Observed by AC1 and AC2.
 - **S4** — The write route (§8 F2). `apply` appends each row to the kit's `instructions.toml` as the
   pass's own kit edit, writes its change record through `python tools/memory-tree/build_records.py new
   change` (`Action add`, `Promoted-from` the section tag, PLAY-dOrderedCharter-15 S7), and refuses the
-  whole plan, writing nothing, when `instructions_edit.py check` fails over the would-be tree.
-  Observed by AC1.
+  whole plan, writing nothing, when `instructions_edit.py check` fails over the would-be tree. It is
+  the one route an agent pass writes kit rows by under `instructions.edit`'s default
+  `owner-command-agents-propose` (`tools/policy/catalogue.toml:647-649`), whose door prints a proposal
+  for an agent and writes nothing: PLAY-dConvergedCharter-7 writes its rationale rows through this
+  `apply`, and PLAY-dConvergedCharter-12, which builds before this unit, writes its own by the same
+  route, citing §8 F2 as the ruling. Observed by AC1.
 - **S5** — The residue arm, `check_feature_prose(units, guides)` in `guide_move.py`: a guide source
   paragraph whose text, whitespace squeezed, equals the `help` of an active unit scoped `feature.*` is
   red, `FEATURE PROSE LEFT <path> <tag>`. It runs as one more check of `instructions_edit.py check`
@@ -93,7 +100,7 @@ Build-run preconditions, each landed before this unit's pass: TOOL-dLinkedLibrar
 
 - **consumes-from** `PLAY-dConvergedCharter-19` — `extract_section`'s rule honoured for guide headings, through which S1 reads a guide's sections; without it a retagged guide heading folds to a third spelling
 - **hands-off** `PLAY-dConvergedCharter-1` — `dossier_move.py`'s plan and apply as the factory `prose_move.py`, which unit 1 calls for the residue
-- **hands-off** `PLAY-dConvergedCharter-7` — `dossier_move.py`'s plan and apply as one factory, which unit 7 calls to move rationale
+- **hands-off** `PLAY-dConvergedCharter-7` — `guide_move.py`, the guide caller of the factory `prose_move.py` with S4's write route, to which unit 7 adds `--rationale` to move each retired guide section's rationale into a unit's `help` with an `explains=` edge
 - **consumes-from** external — TOOL-dLinkedLibrary-19 and -20, TOOL-dTotalRecall-9, PLAY-dOrderedCharter-3, -9, -15 and -20, each DEFERRED at base and landed before this build run
 
 ## 4. Design
@@ -253,6 +260,10 @@ New arm: tools/lib/resolve-python.test.sh · covers AC4 · the `prose_move` pari
 ## 9. Revision log
 
 - rev-1 · 2026-11-03 · initial draft, the spec run's carrier of `cl-dClosedLoop-0487`.
+- rev-2 · 2026-11-04 · S3 S4 §3 · folded `2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1` findings
+  34 (the hands-off edge to PLAY-dConvergedCharter-7 names `guide_move.py` and the rationale route unit 7
+  adds, not `dossier_move.py`; S3 names the route argument) and 33 (S4's write route, ruled in §8 F2, is
+  the one units 7 and 12 write their rationale rows by).
 
 ## 10. Reuse audit
 

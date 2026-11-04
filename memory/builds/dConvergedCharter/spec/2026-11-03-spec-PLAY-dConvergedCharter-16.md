@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-16 — the `/session-kickoff` Skill retired: its kit homed under the tool root, a `[[retired]]` row, a forwarding stub and the dangling-link report
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 5 · advances PLAY-dConvergedCharter-24
+**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 5 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0490@0c938e1f whole
 
@@ -11,9 +11,10 @@
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md](../build/2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md) | research | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 |
 | [2026-11-03-build-PLAY-dConvergedCharter-16-deviation-161.md](../build/2026-11-03-build-PLAY-dConvergedCharter-16-deviation-161.md) | deviation | — |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
-| [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 |
+| [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
+| [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
 
 <!-- /gen:spec-records -->
 
@@ -52,7 +53,17 @@ of the Skill leave with unit 12, which builds before this unit.
   `**Readers:**` below is its reading at base. A frozen record under `memory/builds/`, `memory/ledger/`
   or `memory/archive/` is never edited, and the fixture receipts under `tools/govkit/fixtures/` keep
   the source paths of the install they model. `.governance/install.json` is re-written by `update`,
-  never by hand. Observed by AC3.
+  never by hand. The memory root's live carriers, which the dead-path and codebase-map legs grade and
+  `derive_readers`' walk outside the memory root does not reach at base, are re-pointed in the same
+  commit, listed by `bash tools/check-dead-paths.sh --list` on a scratch clone after the move:
+  `memory/map/features/session-kickoff.md`, whose `harness-hooks` claim at `:14`, `SessionStart
+  skills/session-kickoff/manifest-check.sh`, names the key `map_extractors.py` builds from
+  `.claude/settings.json` (`tools/codebase-map/map_extractors.py:141-171`), so S3's settings re-point moves
+  the key and the claim moves with it, and its `paths` globs; `memory/map/features/build-method.md:85`,
+  `playbook.md:60` and `testsuite-counts.md:97`; and the five gotcha pages that spell the engine's path,
+  `shipped-checker-edit-is-an-adopter-contract-change.md` among them, PINNED at `0d1c1dda` by `git grep -l
+  -E 'session-kickoff/manifest-check|skills/session-kickoff' 0d1c1dda -- memory/gotchas | wc -l`.
+  `memory/map/generated/` is regenerated by `gen_map.py` in that commit. Observed by AC3 and AC8.
   **Readers:** by name: `.claude/settings.json:38`, `.claude/settings.json:47`, `.githooks/pre-commit:238`,
   `.gitattributes:146-151`, `tools/gate-legs.json:6`, `tools/gate-legs.json:155`, `tools/gate-legs.json:309-312`,
   `tools/gate-legs.json:357`, `tools/gate-legs.json:1517`, `tools/gate-legs.json:1840`,
@@ -247,6 +258,9 @@ preconditions have, in the commit that replaces `SKILL.md` with the stub.
   `tools/memory-tree/check-memory-hygiene.test.sh`, `tools/memory-tree/kit-dogfood-parity.test.sh`,
   `tools/workflows/check-protocol-parity.test.sh`, `tools/memory-recall/SKILL.template.md`,
   `tools/memory-recall/README.md`, `tools/memory-recall/selftest.py`: S3, S4
+- `memory/map/features/session-kickoff.md`, `memory/map/features/build-method.md`,
+  `memory/map/features/playbook.md`, `memory/map/features/testsuite-counts.md`, the five gotcha pages S3
+  names, and `memory/map/generated/` (regenerated): S3
 - `memory/guides/SESSION-KICKOFF.md`, `memory/project/method-carriers.txt`, `memory/project/spawn-idiom-sites.txt`,
   `memory/project/unarmed-branches.txt`, `memory/project/temp-name-sites.txt`, `memory/project/fork-ceilings.txt`,
   `memory/project/spec-token-waivers.txt`: S3
@@ -313,10 +327,16 @@ preconditions have, in the commit that replaces `SKILL.md` with the stub.
   target present it prints no such line.
   Red when: the planted node's dangling link reads as a skip.
   fixture: a symlink, or under MINGW a junction laid by `cmd //c mklink /J`.
+- **AC8** — When `python tools/codebase-map/gen_map.py --check` and `bash tools/check-dead-paths.sh` run on a
+  scratch clone of the commit that moves the files, the first reports no STALE claim and no UNCLAIMED
+  `harness-hooks` key, `memory/map/features/session-kickoff.md` claiming the re-pointed SessionStart entry,
+  and the second exits 0 with no hit under `memory/map/features/` or `memory/gotchas/`.
+  Red when: a dossier still claims the old hook key, or a live carrier still names the moved path.
+  fixture: the clone is built under `%TEMP%` with a short name.
 
 ## 7. Gates
 
-`kickoff-manifest ratchet` · `kickoff engine size <=18KiB` · `manifest-check self-test` · `scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `hook destinations self-test` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `playbook parity selftest` · `playbook render selftest` · `kit/dogfood doc parity` · `codebase-map kit selftest` · `lexicon selftest` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit runbook parity` · `step-gate` · `docs` · `playbook render wiring` · `roles render wiring` · `policy fixtures` · `transition-audit arms` · `straggler-guard arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`kickoff-manifest ratchet` · `kickoff engine size <=18KiB` · `manifest-check self-test` · `scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `hook destinations self-test` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `playbook parity selftest` · `playbook render selftest` · `kit/dogfood doc parity` · `codebase-map kit selftest` · `lexicon selftest` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit runbook parity` · `step-gate` · `docs` · `playbook render wiring` · `roles render wiring` · `policy fixtures` · `transition-audit arms` · `straggler-guard arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `codebase-map coverage + freshness` · `dead-path carriers (deleted files still named)`
 
 New arm: tools/check-wiring.test.sh · covers AC7 · a scratch HOME whose session-kickoff link targets a removed directory · none
 New arm: tools/govkit/selftest.py · covers AC5 AC6 · the skill row closed with no release cut, its failing case the stub deleted under a held window · none
@@ -345,6 +365,10 @@ New arm: tools/govkit/selftest.py · covers AC5 AC6 · the skill row closed with
 
 - rev-1 · 2026-11-03 · initial draft, from the packet's Items 16, `gap-orient-21`, v2:579 and :605, scout
   C's row for 0490 and its findings 2 and 8, and the spec brief's I1, I2, I3.
+- rev-2 · 2026-11-04 · S3 §4 AC8 §7 · folded `2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1`
+  finding 43: the live carriers under the memory root, the `session-kickoff` dossier's `harness-hooks`
+  claim first, the gotcha pages and the regenerated map are S3's readers and Files touched, AC8
+  observes them, and §7 names `codebase-map coverage + freshness` and the dead-path leg.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-17 — the `/build` Skill retired once the supervisor drives attended builds, its client held by a `skill` shim for the deprecation window
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 3 · advances PLAY-dConvergedCharter-24
+**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 3 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0491@3aafd2a1 whole
 
@@ -10,9 +10,12 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md](../build/2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md) | research | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
-| [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 |
+| [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
+| [2026-11-04-prompt-PLAY-dConvergedCharter-17-1-spec-writer.md](../prompts/2026-11-04-prompt-PLAY-dConvergedCharter-17-1-spec-writer.md) | journal | — |
+| [2026-11-04-prompt-PLAY-dConvergedCharter-17-fold-brief.md](../prompts/2026-11-04-prompt-PLAY-dConvergedCharter-17-fold-brief.md) | research | — |
+| [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
 
 <!-- /gen:spec-records -->
 
@@ -73,16 +76,25 @@ supervisor does not drive attended builds and this unit does not build.
   `tools/roles/adopt-roles.sh` (`:249`), `tools/roles/adopt-roles.test.sh`, `tools/roles/kit.toml`'s
   install row (`:55-57`), probe (`:88-92`) and `[[lf_pin]]` (`:145-147`), `.gitattributes:143`, the
   render checks of `tools/govkit/selftest.py:2872,2889` and `tools/check-wiring.sh:1844`.
-  Observed by AC4, AC5.
+  `tools/roles/SKILL.template.md` is this unit's held `/build` client until the `roles/build-skill` row
+  closes, and for that reason PLAY-dConvergedCharter-9 AC2 counts only the five renamed kits' templates
+  and excludes it. While the row is open the roles kit's `to`, `probe` and `pattern` rows naming
+  `.claude/skills/build/SKILL.md` (`tools/roles/kit.toml:57`, `:90`, `:145`) stay, and
+  PLAY-dConvergedCharter-9 S7 admits them as a held client's install rows, so `core skills conformance`
+  stays green over gov's tree with both units built.
+  Observed by AC3, AC4, AC5.
 - **S5** — `help/shims.md` gains the `skill` kind: the two `to` forms, what a held client is, and that
-  closing the row is a release-bound act. Observed by AC6.
+  closing the row is a release-bound act of the kit the row's id names (PLAY-dConvergedCharter-20 S4).
+  Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
 - `/build` as a client of `run`, and `run` itself: TOOL-dWellOiledMachine-25.
-- Closing the row and removing the held set when the window closes: PLAY-dConvergedCharter-20, which
-  removes every shim whose window has closed. `shims.read_releases` reads no release at base
-  (`shims.py:302-305`), so no window can close inside this build.
+- Closing the row and removing the held set when the window closes: the roles kit's act, the kit the
+  row's id `roles/build-skill` names, release-bound, in the first release after `check_shim_windows`
+  allows it; PLAY-dConvergedCharter-20 S4 reds the row past that point naming the roles kit, and no
+  unit of this build closes it. `shims.read_releases` reads no release at base (`shims.py:302-305`), so
+  no window can close inside this build.
 - Shipping the retirement to adopters as an upgrade step: PLAY-dConvergedCharter-20.
 - `/session-kickoff` and `/unattended`: PLAY-dConvergedCharter-16 and -12.
 - Renaming Skills to `gov-<name>`: PLAY-dConvergedCharter-9, which uses the `skill` kind's Skill form.
@@ -92,7 +104,7 @@ supervisor does not drive attended builds and this unit does not build.
 - **consumes-from** `PLAY-dConvergedCharter-11` — `derive_readers`, the inventory by value whose `--readers` CLI lists and reds the readers of `/build`
 - **hands-off** `PLAY-dConvergedCharter-16` — `KINDS`, the `skill` kind whose row holds or forwards a retired Skill for the window
 - **hands-off** `PLAY-dConvergedCharter-9` — `KINDS`, the `skill` kind whose Skill form renders a forwarder at a renamed Skill's old source
-- **hands-off** `PLAY-dConvergedCharter-20` — `shims.toml`, the `roles/build-skill` row, closed and its held set removed when its window closes
+- **hands-off** `PLAY-dConvergedCharter-20` — `shims.toml`, the `roles/build-skill` row, which that unit's S4 holds to its window and reds, naming the roles kit as the one that closes it, once a release lets the window close
 - **consumes-from** external — TOOL-dWellOiledMachine-25, the supervisor driving attended builds and `/build` its client
 
 ## 4. Design
@@ -191,8 +203,12 @@ added.
   Red when: a held client is overwritten by a render, or a renamed Skill gets no forwarder.
 - **AC3** — When `python shims.py --check` runs over gov's tree it grades the `roles/build-skill` row
   green, and with `skill-closed`, the row closed with its window not yet allowed by the plant's
-  release count, `check_shim_windows` holds it naming `install.deprecation-window`.
-  Red when: the row closes before the window, or a `skill` row is refused as an unknown kind.
+  release count, `check_shim_windows` holds it naming `install.deprecation-window`. Over the same tree
+  `git ls-files -- tools/roles/SKILL.template.md` prints the held client and `git grep -c
+  '\.claude/skills/build/SKILL.md' -- tools/roles/kit.toml` prints `tools/roles/kit.toml:3`, its `to`,
+  `probe` and `pattern` rows, all kept while the row is open.
+  Red when: the row closes before the window, a `skill` row is refused as an unknown kind, or the held
+  client or one of its install rows is gone while the row is open.
 - **AC4** — When `python check_policy.py --readers /build --kind value --except <path>…` runs on a
   scratch clone of the tip with the row closed and the held set of S4 removed, each `--except` naming
   `registry.toml`, `shims.toml` or `usage.toml`, it exits 0; the same run with a planted line naming
@@ -202,9 +218,11 @@ added.
 - **AC5** — When `grep -n 'run.py' AGENTS.md coding-governance-agents.template.md` runs after the render,
   each names the attended-build line, and `grep -c '/build' SKILL.md` over the kickoff card prints 0.
   Red when: the charter or the kickoff card still sends an attended build to `/build`.
-- **AC6** — When `grep -nE 'skill|held' shims.md` runs over the help page, the `skill` kind and the held
-  client are named.
-  Red when: the page omits the kind.
+- **AC6** — When ``grep -n '`skill`' shims.md`` and `grep -n 'held client' shims.md` run over the help
+  page after S5, each prints at least one line, and the same two greps over the page at base print
+  nothing.
+  Red when: the page omits the kind or the held client, so a grep that matched the page's existing
+  `held` lines (`help/shims.md:16`, `:44`, `:48`) would read green before S5 is written.
 
 ## 7. Gates
 
@@ -235,6 +253,12 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 · the `skill` plants ru
 ## 9. Revision log
 
 - rev-1 · 2026-11-03 · initial draft.
+- rev-2 · 2026-11-04 · S4 S5 §3 AC3 AC6 · folded `2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1`
+  findings 17 (AC6 greps the new kind and the held client and is red at base), 4 (closing the row is
+  the roles kit's release-bound act, the non-goal and the hands-off edge to PLAY-dConvergedCharter-20
+  saying so), 1 (the held `/build` client stays until the row closes, which is why
+  PLAY-dConvergedCharter-9 AC2 excludes it) and 2 (the roles kit's `to`, `probe` and `pattern` rows stay
+  while the row is open, admitted by PLAY-dConvergedCharter-9 S7 as a held client's install rows).
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-22 — the census of gov's own flow and role settings, each row ruled by the owner and the gov-only ones moved
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 1 · advances PLAY-dConvergedCharter-24
+**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 1 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0496@a94b54b6 whole
 
@@ -10,8 +10,9 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 |
 | [2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md](../build/2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md) | research | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 |
+| [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
 
 <!-- /gen:spec-records -->
 
@@ -46,7 +47,9 @@ move nothing (§4 "Absent parents").
   manifest's leg names, the descriptor claims and the `[[exempt_leg]]` rows. Check 7h calls it in place
   of its inline reading, its findings and its note unchanged, and the census calls it too. A manifest
   leg no descriptor claims is a census row; one no `[[exempt_leg]]` row covers either reads
-  `undeclared`, and `--check` exits 1 naming it. Observed by AC2, AC3.
+  `undeclared · govkit selfcheck 7h reds it`, and `--check` exits 0 on it: check 7h
+  (`tools/govkit/govkit.py:2686-2690`) already fails that leg, so the census reports the row and never
+  reds the same fact a second time with a second remedy. Observed by AC2, AC3.
 - **S3** — The ruling join. `read_census_rulings(root)` reads every `ruling` record whose `Subject` is a
   census key, through the record factory's reader, and the census reads each row `unruled`, `accepted`
   or `declined`. A ruling is the owner's, written through the door on the owner path; for each unruled
@@ -57,7 +60,8 @@ move nothing (§4 "Absent parents").
 - **S4** — The moves, `--apply <key>`, for an `accepted` row only, through the door its population
   names in §4 "The populations": a leg as a `[[gate-leg]]` row tagged `leg.adopter.<slug>` in gov's
   `.governance/instructions.toml` through `instructions_edit.py add --manifest overlay`, its
-  `[[exempt_leg]]` row then taken out of `tools/govkit/registry.toml` in the same act; an effort as a
+  `[[exempt_leg]]` row then taken out of `tools/govkit/registry.toml` only once the overlay is read to
+  hold the row; an effort as a
   `roles.effort.<slot>` or `roles.effort.<workflow>.<stage>` value in gov's `.governance/policy.toml`
   through `policy_edit.py set`; a grant as a `[[role]]` patch `amends=role.<slot>@<hash8>` adding the
   leg to `gates`, through `instructions_edit.py add`; a run conf or gate environment value is moved by
@@ -65,6 +69,18 @@ move nothing (§4 "Absent parents").
   prints `moved by the fold` and writes nothing. An `unruled` or `declined` key, or an absent door,
   exits 2 naming why and writes nothing. An `accepted` row whose door is installed and whose move is not
   done reads `owed`, and `--check` exits 1 naming it. Observed by AC5, AC6.
+  After every door call `--apply` re-reads the destination, the overlay through `read_overlay_rows`,
+  the policy file through `policy.py get`, and reads the move done only where the destination holds
+  the row. A door that printed a proposal and wrote nothing, which is what `instructions_edit.py` does
+  for an agent caller under `instructions.edit`'s default `owner-command-agents-propose`
+  (`tools/policy/catalogue.toml:647-649`), leaves the row `accepted · held: the door proposed`, exit 0
+  naming the proposal, and nothing else is written: the `[[exempt_leg]]` row stays. The two writes of
+  a leg's move are ordered and reversible: before the door runs, `--apply` takes before-images of
+  `.governance/instructions.toml` and `tools/govkit/registry.toml` through TOOL-dSafePassage-1's
+  helpers, writes the overlay row through the door, confirms it, then removes the exempt row; on any
+  failure after the first write it restores both before-images byte for byte and exits 2 naming the
+  step that failed, so no leg is left both overlay-claimed and exempt, nor neither. Observed by AC9 and
+  AC10.
   **Readers:** by name: `tools/govkit/registry.toml`, which holds the `[[exempt_leg]]` row a moved leg
   leaves. by value: `tools/govkit/govkit.py` (check 7h, through `derive_leg_claims`, which reads the
   moved leg as claimed by gov's overlay row once TOOL-dWitnessedBar-28's composition lands) and
@@ -144,10 +160,11 @@ workflows `roles_lib.load_roles` and `load_workflows` return, as `check_roles.py
 | `unruled` | no ruling names the key | 0 |
 | `declined · kept` | a `decline` ruling: read as a drop, the row stays where it is | 0 |
 | `accepted · held: <door> not installed` | an `accept` ruling and the population's door absent | 0 |
+| `accepted · held: the door proposed` | an `accept` ruling, and the door printed a proposal and wrote nothing | 0 |
 | `accepted · moved` | an `accept` ruling and the destination holds the row: an overlay row with the tag, a policy value, a role patch, or for a value the folded key in gov's policy file | 0 |
 | `owed` | an `accept` ruling, the door installed, the destination not holding the row | 1 |
 | `leaves-with PLAY-dConvergedCharter-12` | a run conf extension key (S5) | 0 |
-| `undeclared` | a leg no descriptor claims and no `[[exempt_leg]]` row covers | 1 |
+| `undeclared · govkit selfcheck 7h reds it` | a leg no descriptor claims and no `[[exempt_leg]]` row covers | 0, check 7h owns the red |
 
 A mechanic gate environment key is no item: the summary line counts them as
 `<m> mechanic keys stay`, since v2 folds only the owner-policy keys (§8 F3).
@@ -197,11 +214,14 @@ moves until a ruling and its door exist.
 ## 5. Production-readiness checklist
 
 - security — read-only except `--apply`, which writes only an owner-accepted row and only through the
-  door that guards its destination, refusing an unruled or declined key; the census writes no ruling.
+  door that guards its destination, refusing an unruled or declined key; the census writes no ruling,
+  and never removes an exempt row the door's write did not replace.
 - perf / scale — one pass over the manifest, the registry, the descriptors, the house file and two
   homes; about 150 rows at base.
 - error / empty / loading states — an absent home, kind or door is one named line (§4 "Absent
-  parents"); a manifest that does not parse exits 2 naming it.
+  parents"); a manifest that does not parse exits 2 naming it. A door that proposes reads `held`; a
+  failed write after the first restores both files from their before-images and exits 2 naming the
+  step (S4).
 - observability — the summary line, and one row per member with its state.
 - risks — a ruling naming a leg that later leaves the manifest prints `stale ruling`; the owner rules
   again or not at all.
@@ -223,10 +243,12 @@ each other case plants one change.
   the summary line's counts sum to the rows printed.
   Red when: a population is read from a typed list, or a `mechanic` key prints as a row.
   figure: DERIVED, every count re-read at observation.
-- **AC2** — When `settings_census.py --check --root <dir>` runs over the `undeclared-leg` fixture,
-  whose manifest gains a leg no descriptor claims and no exempt row covers, it exits 1 naming
-  `gate-legs.json#<that leg> · undeclared`; over `baseline` it exits 0.
-  Red when: the leg population is the exempt set, so the planted leg prints nothing.
+- **AC2** — When `settings_census.py --report --root <dir>` runs over the `undeclared-leg` fixture,
+  whose manifest gains a leg no descriptor claims and no exempt row covers, it prints
+  `gate-legs.json#<that leg> · undeclared · govkit selfcheck 7h reds it`, and `--check` there exits 0;
+  over `baseline` the row is absent.
+  Red when: the leg population is the exempt set, so the planted leg prints nothing, or the census reds
+  the fact check 7h already reds.
 - **AC3** — When `grep -c 'derive_leg_claims' govkit.py` runs it prints at least 2, the definition and
   check 7h's call, and selfcheck's `legs: <n> in the manifest · <c> claimed · <e> exempt` note over the
   `baseline` fixture names the same three counts the census derives there.
@@ -239,7 +261,7 @@ each other case plants one change.
   fixture: the ruling records are planted in the factory's `fields` form; the join runs once
   TOOL-dLinkedLibrary-8 lands, and before it the case prints `rulings: not installed`.
 - **AC5** — When `--apply gate-legs.json#<leg>` runs over the `door-stub` fixture, which plants an
-  `accept` ruling and a stub of the overlay door that records its argv, the stub records one `add
+  `accept` ruling and a stub of the overlay door that records its argv and writes the row, the stub records one `add
   --manifest overlay` call carrying a `leg.adopter.<slug>` row and the registry loses that leg's
   `[[exempt_leg]]` row; `--apply` on the `unruled` and `declined` keys exits 2 and the stub records
   nothing.
@@ -254,12 +276,20 @@ each other case plants one change.
 - **AC8** — When `grep -nE 'settings_census|unruled|leg.adopter' policy.md` runs over the help page,
   each term is named under the section S6 adds.
   Red when: the page omits one.
-
+- **AC9** — When `--apply gate-legs.json#<leg>` runs over the `door-proposes` fixture, an `accept` ruling
+  and a stub door that prints a proposal and writes nothing, the row reads `accepted · held: the door
+  proposed`, the exit is 0, and both `.governance/instructions.toml` and `tools/govkit/registry.toml` are
+  byte-identical, the `[[exempt_leg]]` row still present.
+  Red when: the exempt row leaves while the overlay row was only proposed.
+- **AC10** — When `--apply gate-legs.json#<leg>` runs over the `registry-fails` fixture, whose stub door
+  writes the overlay row and whose registry is made unwritable, it exits 2 naming the registry step,
+  and both files are byte-identical to their state before the run.
+  Red when: a half-applied move is left, a leg overlay-claimed and still exempt.
 ## 7. Gates
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates`
 
-New arm: tools/govkit/selftest.py · covers AC2 AC4 AC5 AC6 AC7 · each fixture case run with `derive_leg_claims` returning the exempt set, the ruling join returning none, and `--apply` skipping its state check · none
+New arm: tools/govkit/selftest.py · covers AC2 AC4 AC5 AC6 AC7 AC9 AC10 · each fixture case run with `derive_leg_claims` returning the exempt set, the ruling join returning none, `--apply` skipping its state check, removing the exempt row with no re-read, or skipping its restore · none
 
 ## 8. Open questions
 
@@ -293,6 +323,10 @@ New arm: tools/govkit/selftest.py · covers AC2 AC4 AC5 AC6 AC7 · each fixture 
 ## 9. Revision log
 
 - rev-1 · 2026-11-03 · initial draft.
+- rev-2 · 2026-11-04 · S2 S4 §4 §5 AC2 AC5 AC9 AC10 §7 · folded
+  `2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1` findings 33 (`--apply` removes the exempt row
+  only once the overlay holds its replacement, a proposing door reading `held`), 53 (the two writes'
+  before-images, order and restore) and 39 (`undeclared` is reported and left to check 7h's red).
 
 ## 10. Reuse audit
 

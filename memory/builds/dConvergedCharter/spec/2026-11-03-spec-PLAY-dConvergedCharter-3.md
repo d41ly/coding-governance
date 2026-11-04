@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-3 — records merged by evidence: two kinds the registry and the commit history call one become one, the other name an alias shipped as an upgrade step
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 11 · advances PLAY-dConvergedCharter-24
+**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 11 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0477@47475290 whole
 
@@ -10,9 +10,10 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-reuse-scout-a.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-reuse-scout-a.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-19 |
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
-| [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 |
+| [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
+| [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
 
 <!-- /gen:spec-records -->
 
@@ -37,33 +38,44 @@ PLAY-dConvergedCharter-11 (`derive_readers`).
   unordered pair of rows that is one kind by evidence: equal `writer`, equal `lifecycle`, equal `readers` as a
   set, equal `schema.form`, and a commit share of at least `MERGE_SHARE_FLOOR = 0.9` over at least
   `MERGE_COMMIT_FLOOR = 20` commits touching the less-written kind, in the window of 30 days ending at the
-  commit measured. Every condition is necessary; §8 F1 states why the share alone is not. Observed by AC1
-  and AC2.
-- **S2** — The measurement. `measure_commit_share(root, rows, since)` walks `git log --no-merges --no-renames
-  --name-only --since=<since>` over the memory root once, the walk TOOL-dTotalRecall-24 S3's appender takes,
+  commit measured. The window is anchored on that commit and never on the wall clock:
+  `derive_window_since(root, at)` returns the committer date of `at` less 30 days, `at` being the commit
+  graded (HEAD, or a branch's merge-base with its base where the leg grades a branch), and every caller
+  passes `since` and `at` explicitly, so the verdict at a fixed commit is the same on every run date.
+  Every condition is necessary; §8 F1 states why the share alone is not. Observed by AC1, AC2 and AC7.
+- **S2** — The measurement. `measure_commit_share(root, rows, since, at)` walks `git log <at> --no-merges
+  --no-renames --name-only --since=<since>` over the memory root once, the walk TOOL-dTotalRecall-24 S3's appender takes,
   and gives each commit the set of kinds whose `home` admits a path it touches, through the home predicate
   PLAY-dConvergedCharter-6 S1 calls. The share of a pair is the commits touching both over the commits touching
   the less-written one. `python record_kinds.py --merge-evidence` prints one line per pair whose four columns
   agree, `merge-evidence: <a> <b> · share <s> over <n> · one|apart`, and a count line. Observed by AC3.
-- **S3** — The arm. `check_merge_evidence(root)`, called by `check_record_kinds` on the leg `record-kinds`,
-  reds each pair `derive_merge_pairs` returns while both rows stand:
-  `record-kinds: <a> and <b> are one kind by evidence, both rows standing`. Observed by AC1.
+- **S3** — The arm. `check_merge_evidence(root, at)`, called by `check_record_kinds` on the leg
+  `record-kinds` with `at` the commit it grades and `since` from `derive_window_since`, reds each pair
+  `derive_merge_pairs` returns while both rows stand:
+  `record-kinds: <a> and <b> are one kind by evidence, both rows standing`. The leg carries no path
+  guard (TOOL-dTotalRecall-1's row), so no guarded or cached run keeps a verdict a later memory-root
+  commit moved; were a guard ever added, it would have to admit every memory-root commit. Observed by
+  AC1 and AC7.
 - **S4** — A merge. For each pair S1 returns at the build run's tip, the kind with fewer tracked records
   (the earlier registry row on a tie) becomes the other's alias: `KIND_ALIASES` (TOOL-dTotalRecall-18 S7) gains
   `"<loser>": "<winner>"`, every writer of the loser's token writes the winner's, every reader comparing the
   value compares `canonical_kind(...)`, records already written keep their bytes, and the loser's row leaves
   `tools/memory-tree/record-kinds.toml`. Each merge's own readers are listed in its pass's commit from
-  `derive_readers(repo, <loser>, "value")` (PLAY-dConvergedCharter-11 S1). Observed by AC4.
+  `derive_readers(repo, <loser>, "value")` (PLAY-dConvergedCharter-11 S6, I1). Observed by AC4.
   **Readers:** by name: the names of record kinds are spelled by `RECORD_KIND_TOKENS` in
   `tools/memory-tree/tree_lib.py`, by `tools/memory-tree/gen_build_index.py`, by the Serves-kind ledger arm of
   `tools/memory-tree/check-memory-hygiene.sh` and by `memory/HYGIENE.md`'s closed kind list · by value:
   `read_bindings`' kind classification (`tools/memory-tree/tree_lib.py:471`) and the acceptance-ledger set of
   check 23 in `check-memory-hygiene.sh`, each re-pointed through `canonical_kind`.
-- **S5** — The alias step. The program of TOOL-dTotalRecall-20 S1 takes its pair from two optional argv words,
-  `<old> <new>`, defaulting to `journal log`, so the landed row's frozen argv keeps its behaviour; each merge
-  adds an `[[upgrade]]` row `memory-tree/serves-<loser>-read-as-<winner>` to `tools/memory-tree/kit.toml`,
-  `surfaces = ["serves-kind:<loser>"]`, `resume = "atomic"`, its `up`, `down` and `witness` the same program
-  with the pair. Observed by AC5.
+- **S5** — The alias step. The landed program of TOOL-dTotalRecall-20 S1,
+  `tools/govkit/steps/memory_journal_alias.py`, is never edited: `check_frozen`
+  (`tools/govkit/upgrade_steps.py:1038-1041`) reds any byte change to a landed step's program, argv kept
+  or not. The pair-taking program ships as a new file, `tools/govkit/steps/record_kind_alias.py
+  up|down|witness <target> <old> <new>`, both words required, its body the journal program's with the
+  pair as arguments; each merge adds an `[[upgrade]]` row `memory-tree/serves-<loser>-read-as-<winner>` to
+  `tools/memory-tree/kit.toml`, `surfaces = ["serves-kind:<loser>"]`, `resume = "atomic"`, its `up`,
+  `down` and `witness` the new program with the pair. The journal row and its program keep their bytes.
+  Observed by AC5.
 - **S6** — The docs. `tools/memory-tree/README.md`'s registry section names the rule, its two floors, the
   `--merge-evidence` table and the alias step. Observed by AC6.
 
@@ -120,8 +132,9 @@ one through gov's `read_bindings`, as the journal step does.
 ### Inventory
 
 Minted, each asked of `lexicon.py --suggest <name> --as py.function` at base and answered OK:
-`derive_merge_pairs`, `measure_commit_share`, `check_merge_evidence`. The constants `MERGE_SHARE_FLOOR` and
-`MERGE_COMMIT_FLOOR`, the flag `--merge-evidence` of `record_kinds.py`, and the step id grammar
+`derive_merge_pairs`, `measure_commit_share`, `check_merge_evidence`, `derive_window_since`. The step program
+`record_kind_alias.py`. The constants `MERGE_SHARE_FLOOR` and
+`MERGE_COMMIT_FLOOR`, the flags `--merge-evidence` and `--at <sha>` of `record_kinds.py`, and the step id grammar
 `memory-tree/serves-<loser>-read-as-<winner>`.
 
 ### Files touched (estimate)
@@ -129,7 +142,8 @@ Minted, each asked of `lexicon.py --suggest <name> --as py.function` at base and
 - `tools/memory-tree/record_kinds.py`: S1, S2, S3
 - `tools/memory-tree/record-kinds.toml`, `tools/memory-tree/tree_lib.py`: S4, per merge
 - each writer of a merged kind's token: S4, per merge, named in its pass from `derive_readers`
-- `tools/govkit/steps/memory_journal_alias.py`: S5
+- `tools/govkit/steps/record_kind_alias.py` (new): S5; `tools/govkit/steps/memory_journal_alias.py` is
+  not touched
 - `tools/memory-tree/kit.toml`: S5, per merge
 - `tools/memory-tree/README.md`: S6
 
@@ -173,21 +187,27 @@ Minted, each asked of `lexicon.py --suggest <name> --as py.function` at base and
   winner, a planted record of the loser's kind written before the merge keeps its bytes, and
   `read_bindings` classifies it as the winner.
   Red when: the merge rewrites the old record, or the loser's row still stands.
-- **AC5** — When `python memory_journal_alias.py witness <target>` runs with no pair and again with
-  `<old> <new>` on a fixture target holding records of `<old>`, the first reads `journal` as `log` exactly as
-  before and the second reads `<old>` as `<new>`.
-  Red when: the frozen journal row's behaviour moves, or the pair is ignored.
+- **AC5** — When `python record_kind_alias.py witness <target> <old> <new>` runs on a fixture target holding
+  records of `<old>`, it reads `<old>` as `<new>`; `git diff --quiet <base> -- memory_journal_alias.py`
+  run in `tools/govkit/steps/` exits 0 at the unit's tip, and `python upgrade_steps.py` over the tree reports
+  no frozen program moved.
+  Red when: the landed journal program changes by a byte, or the pair is ignored.
 - **AC6** — When `grep -n "merge-evidence" README.md` runs in `tools/memory-tree/`, the registry section names
   the rule's two floors and the flag.
   Red when: the README is silent on the rule.
-
+- **AC7** — When `python record_kinds.py --merge-evidence --at <tip>` runs over AC1's fixture rebuilt with
+  every commit's author and committer date set in 2020, it prints the planted pair `one` over its 25
+  commits, as it does over the fixture dated today.
+  Red when: the window is read from the wall clock, so a history older than 30 days before the run reads
+  `no commit since` and a fixed commit's verdict moves with the run date.
 ## 7. Gates
 
-`memory hygiene` · `memory-hygiene self-test` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `policy fixtures`
+`memory hygiene` · `memory-hygiene self-test` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `policy fixtures` · `step-rows-frozen` · `upgrade-walk`
 
 New arm: tools/memory-tree/record_kinds.py · covers AC1 AC2 AC4 · the `--selftest` merge plants, its failing case the planted pair left unmerged with the arm cut · none
 
-New arm: tools/govkit/selftest.py · covers AC5 · the alias step with and without a pair, its failing case a pair ignored · none
+New arm: tools/govkit/selftest.py · covers AC5 · the new alias program with a pair beside the untouched journal program, its failing case a pair ignored · none
+New arm: tools/memory-tree/record_kinds.py · covers AC7 · the `--selftest` window plant over a 2020-dated fixture history, its failing case `since` read from the wall clock · none
 
 ## 8. Open questions
 
@@ -216,6 +236,11 @@ New arm: tools/govkit/selftest.py · covers AC5 · the alias step with and witho
 
 - rev-1 · 2026-11-03 · initial draft, from the spec brief's unit row, scout A's row 3 and the co-commit probe
   of §8 F1.
+- rev-2 · 2026-11-04 · S1 S2 S3 S4 S5 §4 AC5 AC7 §7 · folded
+  `2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1` findings 14 (the pair-taking alias program is a
+  new file and the landed program keeps its bytes, `step-rows-frozen` and `upgrade-walk` named), 54 (the
+  window anchored on the graded commit's date, `derive_window_since`, and the leg unguarded) and 18
+  (`derive_readers` cited at PLAY-dConvergedCharter-11 S6).
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-2 — every remaining positional reference in live text migrated to tags, frozen records resolved through redirect rows
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 13 · advances PLAY-dConvergedCharter-24
+**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 13 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0476@46c25c62 whole
 
@@ -10,9 +10,10 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-reuse-scout-a.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-reuse-scout-a.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-19 |
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
-| [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 |
+| [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
+| [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
 
 <!-- /gen:spec-records -->
 
@@ -37,12 +38,15 @@ with `seed`, `shrink`, `pin` and the `positional` arm under `tags.positional`), 
 registry and its `lifecycle` column), TOOL-dIndexedDesign-9 (`SPEC_SECTION_TAGS`,
 `SPEC_TAGS_CUTOFF`), and this build's units 6, 12 and 19 (§3 Edges).
 
-- **S1** — The partition. `derive_positional_class(path, homes)` in `tools/playbook/positional.py`
-  classes a citing path `frozen` when it matches the `home` of a `record-kinds.toml` row whose
-  `lifecycle` is `frozen`, `append-only` or `generated`, and `live` otherwise. The rows are read
-  through a new print mode, `python tools/memory-tree/record_kinds.py --homes`, one
-  `<kind>\t<lifecycle>\t<home>` line per row through `read_record_kinds`, run as a subprocess through
-  the inlined `resolve_kit_dir`, since a kit imports no sibling kit. A rendered instruction file whose
+- **S1** — The partition. `derive_positional_class(paths)` in `tools/playbook/positional.py`
+  classes a citing path `frozen` when the `record-kinds.toml` row that admits it carries a `lifecycle`
+  of `frozen`, `append-only` or `generated`, and `live` otherwise. It matches no `home` glob itself: the
+  classification is a new classifier mode of the registry, `python tools/memory-tree/record_kinds.py
+  --lifecycle <path>...`, which prints one `<path>\t<lifecycle>` line per path, `none` for a path no
+  row admits, through the one home-match predicate PLAY-dConvergedCharter-6 S1 calls
+  (`derive_record_kind`, TOOL-dTotalRecall-42), so the registry's glob dialect is read in one place
+  (TOOL-dCalibratedLens-33). `positional.py` runs it once per run as a subprocess over every citing
+  path, through the inlined `resolve_kit_dir`, since a kit imports no sibling kit. A rendered instruction file whose
   `documents.toml` row names a `source` other than itself is classed by that source and migrated
   there. Observed by AC1 and AC4.
 - **S2** — The migration verb, `python tools/playbook/positional.py migrate [--apply]`. Without
@@ -111,7 +115,7 @@ registry and its `lifecycle` column), TOOL-dIndexedDesign-9 (`SPEC_SECTION_TAGS`
 
 - **consumes-from** `PLAY-dConvergedCharter-12` — `tools/unattended/` removed with its four guides and `DIRECTIVES_CORE`; without it the migration rewrites code that leaves
 - **consumes-from** `PLAY-dConvergedCharter-19` — `aliases.toml` rows for the guides' legacy anchors, the targets S2's `alias` class writes
-- **consumes-from** `PLAY-dConvergedCharter-6` — `record_kinds.py` with every record home registered; without it an unregistered record home is classed live and rewritten
+- **consumes-from** `PLAY-dConvergedCharter-6` — `record_kinds.py` with every record home registered, and the one home-match predicate S1's `--lifecycle` mode classes a path through; without it an unregistered record home is classed live and rewritten, or a second glob dialect classes it
 - **consumes-from** external — PLAY-dOrderedCharter-19 and -26, TOOL-dWitnessedBar-18, TOOL-dTotalRecall-1 and -18, TOOL-dIndexedDesign-9, each DEFERRED at base and landed before this build run
 
 ## 4. Design
@@ -148,7 +152,7 @@ row (path, ref) from positional.py list
 |---|---|---|
 | `derive_positional_class`, `write_rewrites` | functions, `positional.py` | `py.function`, both `OK` by `--suggest` |
 | `migrate` with `--apply` | verb of `positional.py` | none |
-| `--homes` | print mode of `record_kinds.py` | none |
+| `--lifecycle <path>...` | classifier mode of `record_kinds.py` | none |
 | `LIVE ROW` | the arm's red prefix | none |
 | the five `positional-*` cases of S8 | fixture plants | none |
 
@@ -170,7 +174,7 @@ kit, and the live-row arm reds only rows the adopter's list holds, which `positi
 - `tools/playbook/gov_tag.py`: S5, S8
 - `tools/playbook/aliases.toml`: S4
 - `tools/playbook/positional-refs.txt`: S7
-- `tools/memory-tree/record_kinds.py`: S1's `--homes`
+- `tools/memory-tree/record_kinds.py`: S1's `--lifecycle`
 - `tools/memory-tree/check-memory-hygiene.sh` and `tools/memory-tree/check-memory-hygiene.test.sh`: S6
 - `tools/memory-tree/SPEC-TEMPLATE.template.md`, rendered to `memory/TEMPLATE-SPEC.md`: S6
 - `tools/memory-tree/HYGIENE.template.md`, rendered to `memory/HYGIENE.md`: S6
@@ -199,7 +203,7 @@ kit, and the live-row arm reds only rows the adopter's list holds, which `positi
 - perf / scale — one `gov_tag.py where` per distinct reference, cached per run; the frozen partition
   is one subprocess per run.
 - error / empty / loading states — an empty list prints `positional: no live row` and exits 0; a
-  failed `--homes` read refuses the arm, exit 2, naming the module, never classing a path live by
+  failed `--lifecycle` read refuses the arm, exit 2, naming the module, never classing a path live by
   default.
 - observability — every class line names the path and the reference.
 - risks — S5 narrows a predicate another build owns; §8 F2 records the ask that keeps its spec in
@@ -224,10 +228,13 @@ kit, and the live-row arm reds only rows the adopter's list holds, which `positi
   citing path `derive_positional_class` classes `live`, and the `positional` arm exits 0 over the tree.
   Red when: a live row is left on the list.
   figure: DERIVED at the pass by `positional.py list`.
-- **AC4** — When `python record_kinds.py --homes` runs over the registry, it prints one
-  `<kind>\t<lifecycle>\t<home>` line per registry row, and `derive_positional_class` classes a path
-  under a `frozen` home `frozen` and one under a `current-state` home `live`.
-  Red when: a frozen home's path is classed live, or the mode prints no row over a non-empty registry.
+- **AC4** — When `python record_kinds.py --lifecycle <a> <b> <c>` runs over a fixture registry holding
+  a `frozen` row whose home is `memory/archive/**` and a `current-state` row, it prints `<a>\tfrozen` for
+  a path two directories under `memory/archive/`, `<b>\tcurrent-state` for the other row's path, and
+  `<c>\tnone` for a path no row admits, and `derive_positional_class` classes them `frozen`, `live` and
+  `live`; `grep -nE 'fnmatch|glob' positional.py` prints nothing.
+  Red when: a frozen home's path is classed live, a `**` home is read by a second dialect, or
+  `positional.py` matches a home glob itself.
 - **AC5** — When `bash tools/memory-tree/check-memory-hygiene.sh --only 12` runs over a fixture tree
   whose spec, dated at or after `REV_SCOPE_CUTOFF`, has a rev-2 entry naming only `section.design`, it
   passes; with `SPEC_TAGS_CUTOFF` set on or before the spec's date, an entry naming only `§4` is red
@@ -256,14 +263,14 @@ plants once PLAY-dOrderedCharter-19 and -26 land them; neither is in the manifes
 
 New arm: tools/playbook/gov_tag.py · covers AC1 AC2 AC6 AC7 · the five `positional-*` plants of S8 in `tags positional selftest`, the live-row failing case a listed live reference · none
 New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC5 · a fixture spec past `SPEC_TAGS_CUTOFF` whose rev-2 entry names only `§4` · none
-New arm: tools/memory-tree/record_kinds.py · covers AC4 · its `--selftest` printing `--homes` over a two-row fixture registry, its failing case a `frozen` row classed live · none
+New arm: tools/memory-tree/record_kinds.py · covers AC4 · its `--selftest` running `--lifecycle` over a two-row fixture registry with a `**` home, its failing case a `frozen` row's deep path classed live · none
 
 ## 8. Open questions
 
 - **F1 — Which citing paths are frozen?** Options: (a) PLAY-dOrderedCharter-26 S4's partition alone,
   `memory/builds/`, which rewrites `memory/DECISIONS.md` and the frozen templates under
-  `memory/archive/`; (b) the record-kind registry's `lifecycle`, read through a `--homes` print mode
-  this unit adds to `record_kinds.py`; (c) a list of frozen roots typed in `positional.py`.
+  `memory/archive/`; (b) the record-kind registry's `lifecycle`, read through a `--lifecycle` classifier
+  mode this unit adds to `record_kinds.py`; (c) a list of frozen roots typed in `positional.py`.
   RESOLVED (agent, 2026-11-03, delegated): (b), rung 3, the most feature-rich survivor: (a) rewrites records P19 freezes (veto 1 against v2:899's principle), (c) types beside the registry that owns the fact, and (b) reads the one column TOOL-dTotalRecall-18 S1 gives every kind, the print mode a read verb over landed code. widens: none · relaxes: none
 - **F2 — A hit the predicate prints that is no citation (gap-tool-08's overload): a review-finding
   `M4`, the hygiene engine's own `check 12`.** Options: (a) rewrite every hit, the engine's own numbering
@@ -286,6 +293,11 @@ New arm: tools/memory-tree/record_kinds.py · covers AC4 · its `--selftest` pri
 ## 9. Revision log
 
 - rev-1 · 2026-11-03 · initial draft, the spec run's carrier of `cl-dClosedLoop-0476`.
+- rev-2 · 2026-11-04 · S1 §3 §4 §5 AC4 §7 §8 · folded `2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1`
+  finding 38: the `--homes` print mode is replaced by the classifier mode `record_kinds.py --lifecycle
+  <path>...` through PLAY-dConvergedCharter-6's one home-match predicate, `derive_positional_class`
+  matches no glob, and AC4 plants a `**` home; F1's pick is unchanged and its option text names the mode;
+  the consumes-from edge to PLAY-dConvergedCharter-6 names the predicate.
 
 ## 10. Reuse audit
 

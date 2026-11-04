@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-19 — the guides' positional citations migrated to tags, legacy anchors kept as aliases, and the per-directory line-ending pins retired into class pins
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 12 · advances PLAY-dConvergedCharter-24
+**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 12 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0493@67838f7a whole
 
@@ -12,9 +12,10 @@
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-03-build-PLAY-dConvergedCharter-19-deviation-191.md](../build/2026-11-03-build-PLAY-dConvergedCharter-19-deviation-191.md) | deviation | — |
 | [2026-11-03-build-PLAY-dConvergedCharter-19-deviation-192.md](../build/2026-11-03-build-PLAY-dConvergedCharter-19-deviation-192.md) | deviation | — |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
-| [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-21 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 |
+| [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-21 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
+| [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
 
 <!-- /gen:spec-records -->
 
@@ -36,7 +37,10 @@ S2-S5 (the `positional` arm under `tags.positional` and its remedy verb), PLAY-d
 section with no `[[alias]]` row is red), TOOL-dTotalRecall-9 (`extract_section`'s authored-heading rule),
 TOOL-dTotalRecall-10 S1 (`derive_anchor`), TOOL-dWitnessedBar-24 S2 (`tools/gate-lint/eol_class.py` and the class
 lines `*.py`, `*.js`, `*.json`, `*.toml` beside `*.sh`), ask A1 of §8 F5, and this build's PLAY-dConvergedCharter-12,
-which retires the four `UNATTENDED-*` guides, `PLAYBOOK-TEMPLATE.md` and the unattended kit's pin rows first.
+which retires the four `UNATTENDED-*` guides and the unattended kit's pin rows first. `PLAYBOOK-TEMPLATE.md`
+stays until PLAY-dConvergedCharter-7 removes it after this unit, so it is in this unit's population; it carries
+no positional label or citation at base (`grep -cE '§[0-9]|\bM[0-9]+\b'` prints 0), so S1 and S3 change none of
+its bytes, and `SESSION-KICKOFF.md` is in the population too (§4 Files touched).
 
 - **S1** — The authored section tags. Each `##` heading of a guide under `memory/guides/` that carries a
   positional label (`M<n> —`, `§<n>`) takes the form `## [section.<seg>] <Title>`, the label cut from the title
@@ -70,18 +74,28 @@ which retires the four `UNATTENDED-*` guides, `PLAYBOOK-TEMPLATE.md` and the una
 - **S6** — The class pins in the kits' rows. A kit's `[[lf_pin]]` row whose pattern a class covers, one file
   or one directory of `*.md`, `*.txt`, `*.toml`, `*.sh`, `*.js` or `*.json`, leaves its `kit.toml`, and the kit
   declares the class row `pattern = "*.<ext>"` instead, which `lf_pins` dedupes across kits
-  (`tools/govkit/govkit.py:5671-5692`). The rows whose pattern no class covers stay instances: the root confs
-  (`.codebase-map.conf`, `.memory-tree.conf`, `.process-monitor.conf`), `.memory-tree.conf.example`, the two
-  hooks of `push-main.kit.toml` and the `{user_skills}` row outside the tree. Observed by AC6.
+  (`tools/govkit/govkit.py:5671-5692`). A pattern's placeholders are resolved before its extension is taken:
+  `{kit}`, `{prefix}` and `{memory_root}` to gov's own values, as `lf_pins` resolves them. The rows whose
+  pattern no kit class covers stay instances: the root confs `.codebase-map.conf`
+  (`tools/codebase-map/kit.toml:141`) and `.memory-tree.conf` (`tools/memory-tree/kit.toml:366`),
+  `{kit}/.memory-tree.conf.example` (`:369`), the two hooks of `push-main.kit.toml`, the `{user_skills}` row
+  outside the tree, and the `{playbook_path}` row (`tools/govkit/entries/playbook.kit.toml:65`), whose value
+  is an adopter's answer with no fixed extension, so no class can cover it. `.process-monitor.conf`'s row
+  leaves with the file in PLAY-dConvergedCharter-11 S2, before this unit. Observed by AC6 and AC7.
   **Readers:** by name: `lf_pins` and the plan's attribute rows in `tools/govkit/govkit.py` (`:3833`, `:5685`),
   `tools/govkit/selftest.py` and `WIRE-INTO-PROJECT.md`'s pin section (`:1418`) · by value: `lf_pin_block`'s
   block bytes, which `update` recomputes (`govkit.py:10231-10276`), and the selftest assertion that the block
   holds `.claude/skills/memory-recall/SKILL.md text eol=lf` (`tools/govkit/selftest.py:7558`), re-pointed to
   `*.md text eol=lf`.
 - **S7** — The covered-pin arm. `check_covered_pins(root)` in `tools/gate-lint/eol_class.py`, run by the class
-  leg, reads every `eol=lf` line of `.gitattributes` and every `[[lf_pin]]` pattern of the kits' descriptors,
-  and reds each one that is not a class line while a class line covers its extension:
-  `eol-class: <pattern> pinned per path, covered by *.<ext>`. Observed by AC7.
+  leg, grades two populations against two class sets and never crosses them. Each `eol=lf` line of gov's
+  `.gitattributes` that is not a class line reds while one of gov's own class lines covers its extension,
+  those of S5 among them. Each kit `[[lf_pin]]` pattern, its `{kit}`, `{prefix}` and `{memory_root}`
+  placeholders resolved first, reds while one of the class rows the kits declare covers its extension,
+  `*.md`, `*.txt`, `*.toml`, `*.sh`, `*.js` and `*.json` (S6), never gov's gov-only class lines such as
+  `*.conf` and `*.example`, which reach no adopter's block. A pattern holding a placeholder that resolves
+  to an adopter's answer or outside the tree, `{playbook_path}` and `{user_skills}`, is an instance and is
+  not graded. A red reads `eol-class: <pattern> pinned per path, covered by *.<ext>`. Observed by AC7.
 - **S8** — The adopter's step. An `[[upgrade]]` row `govkit/lf-pins-to-class` in `tools/govkit/steps.toml`,
   `surfaces` one `attributes:<pattern>` per withdrawn pattern, `resume = "atomic"`, its program
   `tools/govkit/steps/lf_class_pins.py` with `up`, `down` and `witness`: `up` rewrites the target's block through
@@ -114,7 +128,8 @@ which retires the four `UNATTENDED-*` guides, `PLAYBOOK-TEMPLATE.md` and the una
 
 ### Evidence
 
-- `.gitattributes` holds 79 `eol=lf` lines at base, one of them a comment (`:72`): 78 pins. By the last
+- `.gitattributes` holds 78 `eol=lf` lines at base, one of them a comment (`:72`): 77 pins, PINNED at
+  `0d1c1dda` by `git show 0d1c1dda:.gitattributes | grep -c 'eol=lf'`. By the last
   segment's extension they are 22 `md`, 10 `txt`, 10 `toml`, 5 `py`, 5 `conf`, 4 `sh`, 4 `json`, 3 `tsv`, 3 `js`,
   2 `example`, 1 `yml`, 2 whole directories (`memory/map/generated/*`, `tools/runlog/fixtures/*`) and 5 with no
   extension, the four hooks and `*.fragment.json`'s class (PINNED at base).
@@ -218,11 +233,16 @@ heading, BUILD-METHOD's twelve among them.
   figure: 15 is PINNED from §4 "The pins after".
 - **AC6** — When `python govkit.py plan` runs over a fixture target selecting every kit, its attribute rows name
   only class patterns and the uncovered instances S6 lists.
-  Red when: a per-directory or single-file pattern a class covers reaches the block.
+  Red when: a per-directory or single-file pattern a kit class covers reaches the block, or a kept instance of
+  S6 is dropped.
 - **AC7** — When a fixture adds `tools/x/*.py text eol=lf` to a copy of `.gitattributes`, `python
   eol_class.py` exits 1 printing `pinned per path, covered by *.py`; the same with a planted
-  `[[lf_pin]] pattern = "{kit}/*.sh"` row in a copy of a descriptor.
-  Red when: the planted per-directory pin passes, the clause's second seen-red case.
+  `[[lf_pin]] pattern = "{kit}/*.sh"` row in a copy of a descriptor. Over gov's own descriptors after S6 it
+  exits 0, and a planted kit row `pattern = ".codebase-map.conf"` and one `pattern = "{playbook_path}"` each
+  pass, while gov's `.gitattributes` with a planted `.codebase-map.conf text eol=lf` line reds, covered by
+  `*.conf`.
+  Red when: the planted per-directory pin passes, the clause's second seen-red case, or a kit instance S6
+  keeps reds against a gov-only class line.
 - **AC8** — When `python lf_class_pins.py up <target>` runs on a fixture adopter holding the pre-step block, the
   block equals `lf_pin_block` of the class rows, `witness` exits 0, and `down` restores the block and every
   renormalized file byte-identical.
@@ -236,7 +256,7 @@ heading, BUILD-METHOD's twelve among them.
 
 `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor` · `recall floor arms` · `policy fixtures` · `kit/dogfood doc parity` · `playbook render selftest` · `shell-hygiene selftest` · `build-method size` · `agent-cap self-test` · `hook destinations self-test` · `review-join self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `branch-reconcile selftest` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `drift-audit selftest` · `lexicon selftest` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line`
 
-New arm: tools/gate-lint/eol_class.py · covers AC7 · `check_covered_pins` over a planted per-directory line and a planted per-directory `[[lf_pin]]` row, staged red with the arm reading only class lines · none
+New arm: tools/gate-lint/eol_class.py · covers AC7 · `check_covered_pins` over a planted per-directory line, a planted per-directory `[[lf_pin]]` row, a root-conf row and a placeholder row, staged red with the arm reading only class lines or grading kit rows against gov's class lines · none
 
 New arm: tools/govkit/selftest.py · covers AC6 AC8 · the step `govkit/lf-pins-to-class` up, witness and down on a fixture adopter, staged red by an `up` that writes the pre-step block · none
 
@@ -247,7 +267,7 @@ New arm: tools/govkit/selftest.py · covers AC6 AC8 · the step `govkit/lf-pins-
   address; (c) the label kept. (c) fails the clause's "survive reordering" reading of CV2; (b) re-addresses the
   section on every title edit; (a) pins the address and needs the extractor change ask A1 states. Rung 3. RESOLVED (agent, 2026-11-03, delegated): (a), ask A1 a build-run precondition. widens: none · relaxes: none
 - **F2 — Which classes pin gov's own file?** Research-compatibility's P-eol names the execution class (`*.py`,
-  `*.js`, `*.json`, `*.toml`, extensionless hooks); 43 of gov's 78 pins are `md`, `txt`, `tsv`, `yml`, `conf` or
+  `*.js`, `*.json`, `*.toml`, extensionless hooks); 43 of gov's 77 pins are `md`, `txt`, `tsv`, `yml`, `conf` or
   `example`. (a) Those six extensions also become gov-only class lines; (b) they stay per-directory. (b)
   fails the clause's "per-directory pins retired"; (a) changes no blob (§4 "Evidence") and reaches no adopter, the
   `[[gov_only_pin]]` rows being kept out of every block (`govkit.py:5677-5680`). Rung 3. RESOLVED (agent, 2026-11-03, delegated): (a). widens: none · relaxes: none
@@ -271,6 +291,12 @@ New arm: tools/govkit/selftest.py · covers AC6 AC8 · the step `govkit/lf-pins-
 
 - rev-1 · 2026-11-03 · initial draft, from the spec brief's unit row, scout A's row 19 and disagreements 1, 2
   and 5, and the census of §4.
+- rev-2 · 2026-11-04 · §2 S6 S7 §4 AC6 AC7 §7 §10 · folded
+  `2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1` findings 13, 26 and 51 (S7 grades gov's lines
+  against gov's class lines and kit rows against the kit class rows only, placeholders resolved first,
+  `{playbook_path}` kept as an instance, `.process-monitor.conf` dropped from S6, AC7's root-conf and
+  placeholder plants), 12 (`PLAYBOOK-TEMPLATE.md` stays in this unit's population, unit 7 removing it
+  after) and 29 (78 lines and 77 pins, scout A's figure no longer corrected).
 
 ## 10. Reuse audit
 
@@ -281,7 +307,7 @@ second inventory), PLAY-dOrderedCharter-26 S5's remedy verb, govkit's `lf_pins` 
 covered-pin arm. `python tools/codebase-map/reuse_lookup.py "pin line endings by file class instead of per
 directory"` ranked name stems only (`check_line` in `tools/runlog/runlog_lib.py`, `unfenced_lines` in
 `tools/memory-tree/tree_lib.py`), none a pin reader, so no existing callable fits beyond the govkit functions
-read by hand. Where a record and source disagreed: scout A counts 78 `eol=lf` lines and source holds 79, one a
+read by hand. Where a record and source disagreed: scout A's 78 `eol=lf` lines agree with source, one of them a
 comment; scout A's row omits that BUILD-METHOD sits 61 bytes under its owner-reserved row, which §8 F4 settles;
 and the `[[lf_pin]]` rows number 35 in 16 descriptors, which scout A's row leaves uncounted.
 

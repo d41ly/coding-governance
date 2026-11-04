@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-21 — `tools/roles/house/policy.toml` retired as a seed: a repository's unruled efforts folded into `roles.effort.*` by an upgrade step, and the house-file fallback gone
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 8 · advances PLAY-dConvergedCharter-24
+**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 8 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0495@53f4c9b2 whole
 
@@ -10,9 +10,10 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md](../build/2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md) | research | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-22 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
-| [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 |
+| [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
+| [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
 
 <!-- /gen:spec-records -->
 
@@ -45,7 +46,14 @@ home mode; and `derive_readers` (unit 11's I1).
   `[effort.stages.<w>] <s>` to `roles.effort.<w>.<s>` and its `default` to `roles.effort.default`, through
   `render_policy_text` behind one before-image; (4) the house file is deleted last. A value equal to
   the role's declared level, or a `default` of `medium`, is no proposal, so it goes with the file:
-  gov's levels live in the role definitions every release updates. Observed by AC1, AC2 and AC3.
+  gov's levels live in the role definitions every release updates. An unruled effort below the floor,
+  a level under `medium` (DEPL-dShippedRelease-28 S5, TOOL-dBoundRoles-23 S5), is never written by the
+  step, since `policy-file.guard` admits it only under the owner's authorization: it stops the up as an
+  unruled grant does (S2), writing nothing, exit 1, naming the key and `core.py adopt declarations
+  --rule <key> accept|decline`, so the level reaches the policy file only through the owner's ruling and
+  `check_effort_floor` never reds a value the step wrote. `house_seed.py` spells `house/policy.toml`
+  literally, as `HOUSE_MIGRATORS` requires (unit 11 S8), so the inventory still lists it.
+  Observed by AC1, AC2, AC3 and AC7.
   **Readers:** by name: `tools/roles/kit.toml:39`, `tools/roles/roles_lib.py:398-411`,
   `tools/roles/check_roles.py:367`, `tools/roles/handoff.py:480`, `tools/roles/render_agents.py:140`,
   `tools/policy/policy.py:1119` (`HOUSE_ANCHOR`), `tools/policy/legacy-homes.txt` · by value: the
@@ -75,13 +83,21 @@ home mode; and `derive_readers` (unit 11's I1).
   home leaves `derive_legacy_homes` (`HOUSE_ANCHOR`, `tools/policy/policy.py:1119`), and its two rows
   leave `tools/policy/legacy-homes.txt` by `policy.py lists --write` only. `check_gate_names`, lifted
   by TOOL-dBoundRoles-21 S6, stays for the role field. The census's effort and grant population in
-  `settings_census.py` (unit 22), read through `load_policy`, leaves with the file. Observed by AC5 and
-  AC6.
+  `tools/govkit/settings_census.py` (unit 22), read through `load_policy`, leaves with the file: the
+  census prints one line `efforts and grants: house file retired (PLAY-dConvergedCharter-21) — the
+  roles.effort.* keys and each role's gates field hold them` in place of the population, never an empty
+  one, and no longer imports `load_policy`. The policy kit's README stops describing the house file as a
+  legacy home. Observed by AC5, AC6 and AC8.
   **Readers:** by name: `tools/roles/roles_lib.py:398-480`, `tools/roles/check_roles.py:42`,
   `tools/roles/check_roles.py:367`, `tools/roles/handoff.py:34`, `tools/roles/handoff.py:480`,
   `tools/roles/render_agents.py:8`, `tools/roles/render_agents.py:140`, `tools/roles/render_agents.py:330`,
   `tools/roles/render_agents.py:460`, `tools/roles/render_agents.py:499-507`, `tools/policy/policy.py:1119`,
-  `tools/policy/policy.py:1218`, `tools/roles/README.md:175` · by value: R12's refusal lines, which the
+  `tools/policy/policy.py:1218`, `tools/roles/README.md:175`, `tools/policy/README.md` (`:149-157`,
+  where it still names the house file a legacy home, `:385` and `:522-527`), the comment at
+  `tools/govkit/selftest.py:9581`; READER NOT IN TREE: `tools/govkit/settings_census.py`, which unit 22
+  creates at order 1, after base, and whose effort and grant population reads the house file through
+  `load_policy` · by value: R12's
+  refusal lines, which the
   roles fixtures at `tools/roles/render_agents.py:460-507` compare; the two `legacy-homes.txt` rows
   `<tool-root>/roles/house/policy.toml [effort]` and `[gates]`, which `lists --check` compares.
 - **S5** — The docs: `help/roles.md` says a role's effort is the `roles.effort.*` keys, then the
@@ -130,6 +146,7 @@ Read at `d8a12f04`; no product file differs from base `0d1c1dda`.
 | `default` other than `medium` | dropped, already set | dropped | `roles.effort.default` |
 | a level equal to the declared one, `default = "medium"` | no proposal | no proposal | dropped |
 | a `[gates]` row the role's field lacks | dropped, in the overlay | dropped | the up stops, S2 |
+| a level below `medium`, the floor | dropped, already set under the owner's authorization | dropped | the up stops, S1, as for a grant |
 
 ### Inventory
 
@@ -156,7 +173,8 @@ forever.
 - `tools/roles/kit.toml`, `tools/roles/house/policy.toml` (deleted): S1, S3
 - `tools/roles/roles_lib.py`, `tools/roles/check_roles.py`, `tools/roles/handoff.py`,
   `tools/roles/render_agents.py`, `tools/roles/README.md`: S4
-- `tools/policy/policy.py`, `tools/policy/legacy-homes.txt`: S4
+- `tools/policy/policy.py`, `tools/policy/legacy-homes.txt`, `tools/policy/README.md`: S4
+- `tools/govkit/settings_census.py`: S4, the house population retired
 - `tools/govkit/usage.toml`, `tools/govkit/selftest.py`: the step's `[[usage]]` rows and §6's plants
 - `help/roles.md`, `help/policy.md`: S5
 
@@ -172,7 +190,8 @@ forever.
 
 ## 5. Production-readiness checklist
 
-- security — no grant is written without the owner's ruling (S2); efforts are levels from a closed
+- security — no grant and no below-floor effort is written without the owner's ruling (S1, S2), the
+  floor being the one `policy-file.guard` holds for an automated write; efforts are levels from a closed
   set, each written through the one policy writer under `run_step_isolated`.
 - perf / scale — one proposal scan and one ruling read per step.
 - error / empty / loading states — no house file: the up exits 0 writing nothing; a malformed one
@@ -204,17 +223,32 @@ forever.
   with no key set, it returns the role's declared level; and `python house_seed.py down <target>` after
   AC1 restores both files byte-identical.
   Red when: a reader still reads the house file, or the down leaves a written key.
-- **AC6** — When `derive_readers` runs from `check_policy.py` with needle `tools/roles/house/policy.toml` and kind
-  `path` over the unit's tip, it returns no reader outside frozen records, and `git grep -n load_policy`
-  over `tools/` prints nothing; unit 11's `arm_house_readers` reads armed and names no reader; and
-  `python tools/policy/policy.py lists --check` exits 0 with the two house rows gone.
-  Red when: a reader of the retired seed survives, or the shrink-only list keeps a row no home yields.
+- **AC6** — When `python check_policy.py --readers tools/roles/house/policy.toml --kind path
+  --except tools/govkit/steps/house_seed.py --except tools/playbook/adopt_declarations.py --except
+  tools/govkit/selftest.py` runs over the unit's tip with `house_seed.py` present, it exits 0, the three
+  exempt paths being unit 11's `HOUSE_MIGRATORS` and the self-test holding their plants, each still
+  spelling the path; `git grep -n load_policy -- tools` prints nothing; unit 11's `arm_house_readers`
+  reads armed and names no reader; a scratch copy with `tools/roles/house/policy.toml` read in
+  `tools/roles/check_roles.py` makes both the CLI and the arm red naming that file; and `python
+  tools/policy/policy.py lists --check` exits 0 with the two house rows gone.
+  Red when: a reader of the retired seed survives, a migrator the step needs reds, or the shrink-only
+  list keeps a row no home yields.
+- **AC7** — When `python house_seed.py up <target>` runs over a scratch target whose house file sets
+  `gov-skeptic = "low"`, below the floor, with no ruling, it exits 1 naming `effort.roles.gov-skeptic` and
+  the `--rule` command, and the house file and the policy file are byte-identical; with an `accept`
+  ruling for that key it completes and writes no line for it.
+  Red when: a below-floor effort reaches the policy file with no owner act.
+- **AC8** — When `python settings_census.py --report` runs over the unit's tip, it prints the `house file
+  retired` line in place of effort and grant rows, and `grep -c load_policy tools/govkit/settings_census.py`
+  prints 0.
+  Red when: the census reads an absent house file as an empty population, or still calls the deleted
+  fallback.
 
 ## 7. Gates
 
 `roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `policy check` · `policy fixtures` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `upgrade-walk` · `step-gate` · `docs` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 · scratch targets under `house_seed.py`'s plants, failing case a declined effort written · none
+New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC7 AC8 · scratch targets under `house_seed.py`'s plants and the census over a seedless tree, failing cases a declined or below-floor effort written and an empty census population · none
 New arm: tools/roles/render_agents.py · covers AC5 · its fixture with a planted house file and no key, failing case the house level read · none
 
 ## 8. Open questions
@@ -239,6 +273,11 @@ New arm: tools/roles/render_agents.py · covers AC5 · its fixture with a plante
 
 - rev-1 · 2026-11-03 · initial draft, from the packet's Items 21, `gap-roles-26`, v2:1131-1132, scout C's
   row for 0495, and the spec brief's I6 and I8.
+- rev-2 · 2026-11-04 · S1 S4 §4 §5 AC6 AC7 AC8 §7 · folded
+  `2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1` findings 10 (`settings_census.py` in S4's
+  readers and Files touched, its retired-population line), 42 and 49 (AC6 passes unit 11's
+  `HOUSE_MIGRATORS` as `--except` paths, the policy README and the selftest comment re-worded, a planted
+  non-exempt reader reds) and 48 (a below-floor effort stops the up like an unruled grant).
 
 ## 10. Reuse audit
 

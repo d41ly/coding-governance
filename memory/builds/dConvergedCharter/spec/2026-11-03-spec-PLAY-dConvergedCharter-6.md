@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-6 — every record kind on dTotalRecall's registry: the residue sweep of the memory tree's homes, and the kinds no spec registers
 
-**Status:** OPEN · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 10 · advances PLAY-dConvergedCharter-24
+**Status:** OPEN · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 10 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0480@7f73d023 whole
 
@@ -10,9 +10,10 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-03-build-PLAY-dConvergedCharter-6-reuse-scout-b.md](../build/2026-11-03-build-PLAY-dConvergedCharter-6-reuse-scout-b.md) | research | PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-15 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
-| [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 |
+| [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
+| [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
 
 <!-- /gen:spec-records -->
 
@@ -40,8 +41,13 @@ conformance contract), PLAY-dOrderedCharter-42 (`TYPED_RECORD_KINDS`) and PLAY-d
   root `.memory-tree.conf` declares, as `tracked()` lists a tree (`tools/govkit/govkit.py:344`). It subtracts each
   path a row's tracked `home` glob admits, through the home-match predicate `check_pockets` and
   `derive_record_kind` already apply, never a second glob dialect, and each path a `documents.toml` row
-  registers, so a document is never also a record. Every path left prints
-  `record-kinds: unregistered home <path>` and the gate exits 1. Observed by AC1, AC2 and AC4.
+  registers, so a document is never also a record, and each file under `<memory root>/project/` that
+  `PROJECT_REGISTRY_EXTRA` names, admitted as a `registry` record from the same key hygiene check 3 widens
+  its allowlist by (`tools/memory-tree/check-memory-hygiene.sh:934-975`), read through the one reader that
+  check reads it by, so an extra registry is declared once and both arms agree on it. Every path left
+  prints `record-kinds: unregistered home <path>` and the gate exits 1. The two arms grade different
+  questions over one tree (§4 "The two arms"): check 3 owns which root files and directories may exist,
+  and S1 owns which kind each tracked file under them is. Observed by AC1, AC2, AC4 and AC6.
 - **S2** — The count line. The arm prints `record-kinds: homes <n> tracked · <m> admitted · <d> documents ·
   <u> unregistered` on every run, and a population of zero tracked files is red, `record-kinds: no tracked
   file under <root>`, so an empty population never reads as coverage. Observed by AC2 and AC5.
@@ -51,11 +57,13 @@ conformance contract), PLAY-dOrderedCharter-42 (`TYPED_RECORD_KINDS`) and PLAY-d
   `run-state`, a build's run-state file and its rotated copies; and `memory-index`, the memory tree's own
   `README.md`. Observed by AC3.
 - **S4** — The homes another kind owns. A residue path whose record belongs to a kind another unit registers
-  (§4 "The census") takes that row's `home` cell by one added glob, written through TOOL-dTotalRecall-18's verb,
-  never a second row for the kind. Observed by AC2.
+  (§4 "The census") takes that row's `home` cell by an added glob per shape, written through
+  TOOL-dTotalRecall-18's verb, never a second row for the kind: the `spec` row gains
+  `memory/builds/*/spec/units/*.md`, and the `instrument` row gains the seven data globs of
+  `memory/builds/*/build/`, an instrument's measured output beside its script. Observed by AC2.
 - **S5** — The docs. `tools/memory-tree/README.md`'s registry section (TOOL-dTotalRecall-1 S12) gains the
-  residue arm, its count line and the rule that a new record home owes a row or a glob before its first
-  record lands. Observed by AC6.
+  residue arm, its count line, the split between it and hygiene check 3, and the rule that a new record
+  home owes a row or a glob before its first record lands. Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -72,7 +80,7 @@ conformance contract), PLAY-dOrderedCharter-42 (`TYPED_RECORD_KINDS`) and PLAY-d
 ### Edges
 
 - **hands-off** `PLAY-dConvergedCharter-3` — `record_kinds.py`, the registry whose every home is now a row, over which unit 3 measures and merges kinds
-- **hands-off** `PLAY-dConvergedCharter-2` — `record_kinds.py`, the registry whose every home is now a row, whose `home` and `lifecycle` unit 2 reads to class a citing path; this unit adds no `--homes` print mode, and unit 2's S1 adds it to `record_kinds.py`
+- **hands-off** `PLAY-dConvergedCharter-2` — `record_kinds.py`, the registry whose every home is now a row, and the one home-match predicate S1 calls, through which unit 2's `--lifecycle` classifier mode classes a citing path; this unit adds no print mode, and unit 2's S1 adds that one to `record_kinds.py` and matches no glob itself
 - **hands-off** `PLAY-dConvergedCharter-7` — `record_kinds.py`, whose `--template` renders every kind's schema, one of unit 7's view sources
 - **consumes-from** external — TOOL-dTotalRecall-1, -2, -18 and -42, PLAY-dOrderedCharter-3, -7 and -42, each specced and DEFERRED at base, landed in ancestors before the build run
 
@@ -98,9 +106,12 @@ the specs of every build register (a `git grep` of `record_kinds.py new` and of 
 
 | Home at base | Files | Its kind and owner |
 |---|---|---|
-| `memory/builds/*/build/*.md`, `spec/*.md`, `reviews/*.md`, `prompts/*.md` | 9774 | the Serves kinds and `spec` (TOOL-dTotalRecall-1 S2), each typed kind, `instrument` for a script beside its record (-18 S5), and `research-return`'s `memory/builds/*/*/*.md` |
+| `memory/builds/*/build/*.md`, `spec/*.md`, `reviews/*.md`, `prompts/*.md` | 9606 | the Serves kinds and `spec` (TOOL-dTotalRecall-1 S2), each typed kind, and `research-return`'s `memory/builds/*/*/*.md` |
+| `memory/builds/*/build/*.py`, `*.sh`, `*.js` | 100 | `instrument`, a script beside its record (-18 S5) |
+| `memory/builds/*/spec/units/*.md` | 21 | `spec`: S4 adds the depth-five glob to its row |
+| `memory/builds/*/build/*.tsv`, `*.json`, `*.log`, `*.out`, `*.txt`, `*.svg`, `*.html` | 38 | `instrument`, an instrument's measured output beside its script and record: S4 adds the seven data globs to its row |
 | `memory/builds/*/README.md`, `BACKLOG.md` | 347 | `build-readme` and `backlog-row` (dTotalRecall) |
-| `memory/builds/*/RUN.md` | 113 | none: S3's `run-state` |
+| `memory/builds/*/RUN.md` | 112 | none: S3's `run-state` |
 | `memory/builds/*/RUN.LANDED.*.md`, `RUN.ABORTED.*.md` | 11 | none: S3's `run-state` |
 | `memory/gotchas/*.md` | 152 | `gotcha` |
 | `memory/DECISIONS.md` | 1 | `decision` |
@@ -113,7 +124,10 @@ the specs of every build register (a `git grep` of `record_kinds.py new` and of 
 | `memory/guides/*.md`, `memory/HYGIENE.md`, `memory/TEMPLATE-SPEC.md` | 12 | documents, PLAY-dOrderedCharter-3 S2's seeded rows |
 | `memory/README.md` | 1 | none: S3's `memory-index` |
 
-Counts are PINNED at base `0d1c1dda` and re-derived by S2's count line at every run. Scout B's residue list
+Counts are PINNED at base `0d1c1dda` by grouping `git ls-tree -r --name-only 0d1c1dda memory` by the
+shapes above, every path matched by exactly one row, and the rows sum to that listing's count, 10,491, the
+CHECKED total: a table whose sum differs from its listing is a census with a home no row owns. S2's
+count line re-derives both at every run. Scout B's residue list
 (`prompt`, `RUN.md`, `memory/project/*.txt`, the ledger) disagrees with source in three of four places: the
 prompt records carry `journal` or `research` Serves lines and sit under `research-return`'s home, and the lists
 and the ledger are TOOL-dTotalRecall-18 S5's `registry` and `view`.
@@ -125,7 +139,17 @@ and the ledger are TOOL-dTotalRecall-18 S5's `registry` and `view`.
 | `run-state` | `memory/builds/*/RUN.md`, `memory/builds/*/RUN.*.md` | `current-state` | `header` | the run driver's verb that writes it at the build run's base (TOOL-dWellOiledMachine-25), re-grounded on landed code | the run-state read keys the roles name, or `readers-none` with the reason |
 | `memory-index` | `memory/README.md` | `current-state` | `header` | `hand` | `readers-none`: no work order hands it |
 
-Both rows take `layer.memory` and `check = "record-kinds"`. A rotated copy (`RUN.LANDED.<sha>.md`) is the same
+Both rows take `layer.memory` and `check = "record-kinds"`.
+
+### The two arms
+
+| Question | Arm | Its source |
+|---|---|---|
+| may this root file or directory, or this `project/` registry, exist? | hygiene check 3, `check-memory-hygiene.sh:882-975` | its closed set, widened by `PROJECT_REGISTRY_EXTRA` |
+| which record kind is this tracked file? | S1, `check_record_homes` | the registry's `home` cells, the documents rows, and the same `PROJECT_REGISTRY_EXTRA` read for `registry` |
+
+A new home is declared once: a registry row's `home` for S1, and only where it is a new root directory
+also check 3's set, which is a structure question S1 does not ask. A rotated copy (`RUN.LANDED.<sha>.md`) is the same
 kind frozen by its rename, so it carries no row of its own.
 
 ### The arm
@@ -187,7 +211,7 @@ the count line `record-kinds: homes`.
 - **AC2** — When `python record_kinds.py --check` runs over the build run's tip, it prints the count line with
   `0 unregistered` and a tracked count above 10,000.
   Red when: any census home of §4 is left without an admitting glob.
-  figure: DERIVED at observation; the floor 10,000 is PINNED from the base census of 10,500.
+  figure: DERIVED at observation; the floor 10,000 is PINNED from the base census of 10,491.
 - **AC3** — When `python record_kinds.py new run-state --tag record.run-state --writer hand --check
   record-kinds` runs on a fixture registry already holding the row, it exits 2 refusing the duplicate; and on the
   tip, `grep -c 'name = "run-state"\|name = "memory-index"' record-kinds.toml` prints 2.
@@ -198,12 +222,19 @@ the count line `record-kinds: homes`.
 - **AC5** — When `python record_kinds.py --check` runs with the memory root pointed at an empty tracked
   directory, it exits 1 printing `record-kinds: no tracked file under`.
   Red when: an empty population passes.
+- **AC6** — When the fixture plants `extra.tsv` under its `memory/project/` and names it in `PROJECT_REGISTRY_EXTRA`,
+  `python record_kinds.py --check` admits it as `registry` and `bash check-memory-hygiene.sh --only 3`
+  passes it; with the key blank, both name it.
+  Red when: the two arms disagree on one planted registry, so a home is declared twice or graded once.
+- **AC7** — When `grep -n "unregistered home" README.md` and `grep -n "check 3" README.md` run in
+  `tools/memory-tree/`, the registry section names the residue arm, its count line and the split.
+  Red when: the README omits the arm or the split.
 
 ## 7. Gates
 
 `memory hygiene` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms`
 
-New arm: tools/memory-tree/record_kinds.py · covers AC1 AC3 AC4 AC5 · the `--selftest` plants of the residue arm, its failing case the planted unregistered home passing with the subtraction widened to `memory/**` · none
+New arm: tools/memory-tree/record_kinds.py · covers AC1 AC3 AC4 AC5 AC6 · the `--selftest` plants of the residue arm and the extra-registry plant, its failing cases the planted unregistered home passing with the subtraction widened to `memory/**` and the extra registry read from a list of the arm's own · none
 
 ## 8. Open questions
 
@@ -220,12 +251,21 @@ New arm: tools/memory-tree/record_kinds.py · covers AC1 AC3 AC4 AC5 · the `--s
 ## 9. Revision log
 
 - rev-1 · 2026-11-03 · initial draft, from the spec brief's unit row, scout B's row and the census of §4.
+- rev-2 · 2026-11-04 · S1 S4 S5 §3 §4 AC2 AC6 AC7 §7 §10 · folded
+  `2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1` findings 25 (the census re-run by full shape at
+  `0d1c1dda`, the `spec/units` glob and the build data globs added by S4, the total checked against the
+  listing), 37 (hygiene check 3 named, the two arms' split stated, `PROJECT_REGISTRY_EXTRA` read once for
+  both, AC6) and 38 (the hands-off edge to PLAY-dConvergedCharter-2 names the predicate its classifier
+  mode prints through). S5's criterion moves from AC6 to AC7.
 
 ## 10. Reuse audit
 
 The seams extended: TOOL-dTotalRecall-1's `check_record_kinds` and factory `record_kinds.py new`, and
 TOOL-dTotalRecall-18 S6's `check_pockets`, the common-directory residue sweep whose home predicate S1 calls over
-the tracked tree, with `tracked()` (`tools/govkit/govkit.py:344`) as the listing.
+the tracked tree, with `tracked()` (`tools/govkit/govkit.py:344`) as the listing. Hygiene check 3
+(`tools/memory-tree/check-memory-hygiene.sh:882-975`) already reds a path outside its closed root set,
+widened by `PROJECT_REGISTRY_EXTRA`; S1 does not restate that allowlist and reads the same key, so the two
+arms answer two questions over one declaration (§4 "The two arms").
 `python tools/codebase-map/reuse_lookup.py "find tracked files under the memory tree that no declared home glob
 matches"` ranked `tracked` and name stems (`tree`, `resolve_memory_root`); none at base joins a path to a kind,
 so no existing callable fits beyond the specced `check_pockets`. Where a record and source disagreed: the brief
