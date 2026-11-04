@@ -550,18 +550,20 @@ has "FH43 AC3 the review call receives twin unchanged" "$w" '"twin":"always"'
 has "FH43 AC3 ...and unclassed unchanged" "$w" '"unclassed":"reason"'
 has "FH43 AC3 ...and fixJudge unchanged" "$w" '"fixJudge":"instance"'
 has "FH43 AC3 ...and walk unchanged" "$w" "\"walk\":$FH43_WALK"
-pin_rows=$("$_rkd_py" -B "$HERE/review_pin.py" --subject memory/builds/tB/build/d.md --design-record-preset whole-design \
+pin_file=$(mktemp) || exit 2
+"$_rkd_py" -B "$HERE/review_pin.py" --subject memory/builds/tB/build/d.md --design-record-preset whole-design \
     --twin always --unclassed reason --opt-in '{"whole-design": {"topology": "blast-radius"}}' | "$_rkd_py" -c '
 import json, sys
 for line in sys.stdin:
     for k, v in json.loads(line).items():
-        print(k + "\t" + json.dumps(v, separators=(",", ":")))' | tr -d '\r' | sort -u)
-has "FH43 AC3 the pin prints a walk, so the population below is real" "$pin_rows" 'walk'
+        print(k + "\t" + json.dumps(v, separators=(",", ":")))' | tr -d '\r' | sort -u >"$pin_file"
+has "FH43 AC3 the pin prints a walk, so the population below is real" "$(<"$pin_file")" 'walk'
 while IFS=$'\t' read -r k v; do
   [ -n "$k" ] || continue
   w=$(run_wf "${UNITS%\}}"",\"$k\":$v}" "$(returns CONVERGED 0)" | grep '^wargs:')
   has "FH43 AC3 the pin's $k reaches the review call with its value" "$w" "\"$k\":$v"
-done <<< "$pin_rows"
+done <"$pin_file"
+rm -f "$pin_file"
 
 # S3 — CONVERGING paired with 0 blockers is REFUSED BY NAME. A loop with nothing left to
 # converge on has converged, so the pairing is this repo's signature for a record no verb

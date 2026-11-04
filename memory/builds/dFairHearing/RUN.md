@@ -267,3 +267,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-04T19:20:11Z rescope · item add TOOL-dFairHearing-47 · reason the close's second lint read after unit 45: two here-string loops, a guard pathspec govkit will not classify, a guard unit 45's arm outgrew, a moved cite, and the kickoff manifest's last-body-change
 
 2026-11-04T20:40:02Z decision · item units 43 to 47 have no spec audit and no diff review: the closing diff review stops at bc4bb6e17, and the planned specs-audited override cites the owner's 2026-10-23 stop, which covers round 5's promotions, not these units · reason options: accept that record for them, or audit them; the override's reach is the owner's to rule, so the run does not assume it
+
+2026-11-04T21:32:27Z dispatch · item 1dc7a793 TOOL-dFairHearing-47 · reason tools/check-hook-destinations.sh tools/workflows/unattended-build.test.sh tools/govkit/registry.toml tools/gate-legs.json memory/project/unarmed-branches.txt memory/guides/SESSION-KICKOFF.md memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-47-1-acceptance-ledger.md memory/builds/dFairHearing/spec/2026-11-04-spec-TOOL-dFairHearing-47.md memory/builds/dFairHearing/README.md memory/LIVE.md memory/backlog/TOOL.md
+
+2026-11-04T21:37:55Z brief · item TOOL-dFairHearing-47 · reason 9b699352ba4e memory/builds/dFairHearing/prompts/2026-11-04-prompt-TOOL-dFairHearing-47-build-brief.md

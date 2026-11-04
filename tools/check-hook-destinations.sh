@@ -272,7 +272,9 @@ FLAT=${FLAT//$'\r'/}
 PFX=$(printf '%s\n' "$FLAT" | head -1)
 FLAT_HOMES=$(printf '%s\n' "$FLAT" | tail -n +2 | sed -n 's/^F //p')
 DIR_HOMES=$(printf '%s\n' "$FLAT" | tail -n +2 | sed -n 's/^D //p')
-DIR_KITS=$(printf '%s\n' "$FLAT" | tail -n +2 | sed -n 's/^K //p')
+KITS_FILE=$(mktemp) || { echo "hook-dest: could not make a scratch file — refusing"; exit 2; }
+trap 'rm -f "$KITS_FILE"' EXIT
+printf '%s\n' "$FLAT" | tail -n +2 | sed -n 's/^K //p' >"$KITS_FILE"
 [ -n "$PFX" ] || { echo "hook-dest: REFUSING — the deployer names no canonical prefix"; exit 1; }
 # A ZERO here is a broken selector, not a tree with no flat kits: this repo's own kickoff engine is
 # one, and the arm below would otherwise refuse every `{here}` fragment for a reason that is false.
@@ -322,7 +324,7 @@ for f in $FRAGS; do
           while IFS=$'\t' read -r _h _k; do
             [ "$_h" = "$dir" ] || continue
             case $'\n'"$DESTS"$'\n' in *$'\n'"$_k/${resolved#"$dir"/}"$'\n'*) _landed="$_k/${resolved#"$dir"/}" ;; esac
-          done <<<"$DIR_KITS"
+          done <"$KITS_FILE"
           if printf '%s\n' "$DESTS" | grep -qxF -- "$resolved"; then
             echo "hook-dest: ok   $f -> $resolved (beside its directory kit's engine)"
           elif [ -n "$_landed" ]; then

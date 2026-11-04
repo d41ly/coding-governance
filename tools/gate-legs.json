@@ -1337,7 +1337,10 @@
     "guard": [
       "{prefix}/check-hook-destinations.sh",
       "{prefix}/hooks/",
-      "{prefix}/memory-recall/"
+      "{prefix}/memory-recall/",
+      "{prefix}/workflows/kit.toml",
+      "{prefix}/workflows/spec-audit-optin.fragment.json",
+      "{prefix}/workflows/spec-audit-optin.js"
     ],
     "chunk": "selftests",
     "subject": "kit",
