@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-37 — the round-4 spec audit's 19 minors on units 30 and 32: one replay procedure that isolates each arm, criteria over the scored attempt, and checks that can go red
 
-**Status:** INPROGRESS · rev-5 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 26 · advances TOOL-dFairHearing-19
+**Status:** INPROGRESS · rev-6 · 2026-11-04 · node d · Tier-2 · base 3708a705 · streams tooling · order 26 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,11 +10,14 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dFairHearing-37-deviation-371.md](../build/2026-10-23-build-TOOL-dFairHearing-37-deviation-371.md) | deviation | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
+| [2026-11-04-build-TOOL-dFairHearing-37-1-builder-return.md](../build/2026-11-04-build-TOOL-dFairHearing-37-1-builder-return.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md) | research | TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 |
 | [2026-10-23-prompt-TOOL-dFairHearing-37-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-37-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFairHearing-37-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-37-build-brief.md) | research | — |
 | [2026-11-03-prompt-TOOL-dFairHearing-25-fold-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-25-fold-fix-brief.md) | research | TOOL-dFairHearing-25 TOOL-dFairHearing-30 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-40 |
 | [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
+| [2026-11-04-prompt-TOOL-dFairHearing-37-1-spec-writer.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-37-1-spec-writer.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-37-fix-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-37-fix-brief.md) | research | — |
 | [2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md) | spec-audit | TOOL-dFairHearing-35 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 |
 
 <!-- /gen:spec-records -->
@@ -59,11 +62,15 @@ it.
   S21's contract reds; unit 30 AC4 holds no count since the fold. When unit 35's record states
   `selected`, `gotchas.py --for-diff <range> --all-ungated` exits 2 with argparse's `unrecognized
   arguments`, so no flag shipped. This also answers unit 32 S13 and AC8, whose byte-identical
-  comparison presumes the flag ships. Observed by AC4.
+  comparison presumes the flag ships. The argparse sentence does not hold on the built tree:
+  `gotchas.py` reads its arguments by hand and exits 0 on an unknown flag (probe at `8d58d785c`), the
+  repair `TOOL-dFairHearing-38` S2 and S3 own (§3). Observed by AC4.
 - **S5** — id 10 (M6, unit 32 S31, AC19). `check_held_out_frozen` in
-  `tools/workflows/replay_scorer.py` runs `git --literal-pathspecs ls-files --full-name -- <path>`, the
-  global option before the subcommand; the spelling in unit 32 S31 exits 129. AC19 gains a valid-path
-  control. Observed by AC5.
+  `tools/workflows/replay_scorer.py` already runs `git --literal-pathspecs ls-files --full-name -- <path>`,
+  the global option before the subcommand (:870 at `fb755fa80`, as `read_git("--literal-pathspecs",
+  "ls-files", …)`): unit 32 built it so, its `Decided:` line departing from its S31 spelling after the
+  verb, which git refuses with exit 129. This unit changes no scorer code; it adds the valid-path control
+  unit 32 AC19 lacked, a runner arm over one tracked file. Observed by AC5.
 - **S6** — id 12 (M8, unit 30). Unit 30's runs pass a forward-slash clone path, built with `cygpath -m`
   by its S7 before they run, so this item hardens the harness for every other caller and corrects no
   run. The harness takes `repo` with every backslash folded to `/` at its one read, `const repo`
@@ -109,7 +116,9 @@ it.
   Observed by AC13.
 - **S15** — id 6 (L1, unit 32 S32, AC20). `check_ungated`'s sentence end is a full stop, optionally
   followed by a run of closing `*`, `_`, `)` or backtick characters, then whitespace or the paragraph's
-  end. Observed by AC14.
+  end. Unit 32 already built the run: `GATED_SCOPE_RE` (`tools/memory-tree/gotchas.py:419` at
+  `fb755fa80`) holds `` \.(?![*_)`]*(?:\s|\Z)) ``, and its selftest pins `.**` (:1000-1009). This unit
+  changes no `check_ungated` code; it adds the selftest arm for a mixed run, `.*)`. Observed by AC14.
 - **S16** — id 8 (L3, unit 32 AC14, AC10). AC14 is recorded evidence for unit 32 S23 under S14's
   computed precondition, and AC10, now its in-repository `git for-each-ref refs/replay/` read alone, is
   a precondition, each so labelled in unit 32's ledger. NOT OBSERVED by a criterion here: it labels two
@@ -202,7 +211,8 @@ written; S3 and S11 read the replay records.
 - security — S6 folds a path separator at the harness's one `repo` read and admits nothing new; the
   spec-kind `..` refusal after it (:647-650 at `9c1a2857a`) still reads the folded value. No new write path.
 - perf / scale — one string replace per harness call; one `git ls-files` per held-out path.
-- error / empty / loading states — S5 makes every held-out path resolve or exit 2 naming it.
+- error / empty / loading states — S5's control observes that a valid held-out path resolves, beside
+  unit 32's refusals that exit 2 naming the path.
 - observability — AC3 reports whether each record's orchestrating commit was written at call time.
 - risks — none beyond the reads: this unit writes no replay record.
 - testing — scratch probes and fixtures per criterion; the §7 arms observed RED then GREEN at the close.
@@ -217,27 +227,40 @@ written; S3 and S11 read the replay records.
 
 - **AC1** — When `git show --name-only --format= <c30>` runs, where `<c30>` is the commit
   `git log --diff-filter=A --format=%H -1 -- <unit 30's record>` prints, every path it lists sits under
-  `memory/builds/dFairHearing/` or is `tools/workflows/README.md`. `git merge-base --is-ancestor <unit
-  27's pass commit> <c35>` exits 0, where `<c35>` is the commit that adds unit 35's manifest.
+  `memory/` or is `tools/workflows/README.md`: piped through
+  `grep -v '^memory/' | grep -vx 'tools/workflows/README.md'`, it prints nothing. The `memory/` paths
+  are records and the renders the build-index hook forces into every pass commit (`memory/LIVE.md`,
+  `memory/backlog/TOOL.md`), never product. `git merge-base --is-ancestor <c27> <c>` exits 0 for `<c>` as `<c30>` and as `<c35>`, where
+  `<c27>` is unit 27's pass commit, the one
+  `git log --format=%H -1 --grep='^tool(dFairHearing): TOOL-dFairHearing-27 '` prints, and `<c35>` is
+  unit 35's scoring commit, the one `git log --format=%H -G'^## Scoring$' -- <unit 30's record>` prints
+  (unit 35 adds no manifest; it writes the `## Scoring` section into unit 30's record).
   Red when: unit 30's commit writes a product file other than the README's replay section, or the
-  scoring ran before unit 27's rewrite.
-- **AC2** — When unit 35's `attempts.py` runs over unit 30's record, each `unscored` attempt it names
-  is listed `unscored` in the record, and unit 32's acceptance ledger answers AC12 with no red on an
-  attempt unit 35's rule never read.
-  Red when: unit 32's ledger reds AC12 on an attempt unit 35's rule never read.
+  runs or the scoring ran before unit 27's rewrite.
+- **AC2** — When unit 35's `attempts.py` (its §4, written under `$SCRATCH`) runs over unit 30's record,
+  each `unscored` attempt it names is listed `unscored` in the record; where it names none, as the
+  record's `## Scoring` section states, the ledger records this half `n/a: no unscored attempt`, never as
+  coverage. Unit 32's builder return
+  (`memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-32-1-builder-return.md`) records
+  its AC12 with no red on an attempt unit 35's rule never read, and so does unit 32's acceptance ledger
+  where one exists at this unit's commit (unit 32 owed it to the close).
+  Red when: unit 32's record of AC12 reds an attempt unit 35's rule never read.
 - **AC3** — When `grep -n "orchestrating commit" <unit 30's record>` and the same over unit 25's record
   run, each prints a line and neither line ends `(derived)`. A scratch run of unit 32's AC9 probe over
   each record compares the recorded value.
   Red when: a value git derived after the fact is graded as evidence, or a record lacks the call-time
   value.
-- **AC4** — When unit 35's record states `selected`, `python tools/memory-tree/gotchas.py --for-diff
-  HEAD~1..HEAD --all-ungated` exits 2 and prints `unrecognized arguments`. When it states `ungated`,
-  unit 35's AC4 answers this criterion.
-  Red when: a `selected` verdict ships the flag.
+- **AC4** — When `grep -n "^\*\*The decision:" <unit 30's record>` runs, it prints one line. Where that
+  line names `selected`, as it does at `8d58d785c`, this unit's ledger records AC4's `selected` half
+  `superseded by TOOL-dFairHearing-38` (its AC1 and AC2, §3) and grades no exit of `gotchas.py` here.
+  Where it names `ungated`, unit 35's AC4 answers this criterion.
+  Red when: the ledger grades the `selected` half on `gotchas.py`'s exit, which is 0 for any unknown
+  flag, or the decision line is missing.
 - **AC5** — When `--experiment` runs with `heldOut` naming one tracked file, it exits 0 or reaches the
   freeze comparison. With `heldOut` naming a directory, and again a path holding `*`, each exits 2
   naming the path and its line count. Run in the workflows kit,
-  `grep -c "git --literal-pathspecs ls-files" replay_scorer.py` prints 1.
+  `grep -c '"--literal-pathspecs", "ls-files"' replay_scorer.py` prints 1, the argv form `read_git`
+  takes.
   Red when: the valid path exits 2, which is the spelling that exits 129 refusing every path.
 - **AC6** — When a scratch stub-agent run of `tools/workflows/tier2-review.js` is given `repo` as
   `C:\x\y`, every captured prompt's `git -C` command names `C:/x/y`, and no prompt holds a backslash
@@ -286,9 +309,9 @@ written; S3 and S11 read the replay records.
 `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `review-replay selftest` · `gotchas selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `workflow script syntax` · `codebase-map coverage + freshness` · `harness arms (fail branches armed or pinned)` · `testsuite counts (every bar self-test prints one)` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/workflows/tier2-review.test.sh · covers AC6 · a stub run whose `repo` holds backslashes, staged against the harness at `TOOL-dFairHearing-32`'s commit, where `repo` is read raw · FLOOR_ASSERTIONS in that suite, raised by the arms added
-New arm: tools/workflows/replay_scorer.py (its runner, in the `review-replay selftest` leg) · covers AC5 · a held-out path naming one tracked file, staged against the factory at `TOOL-dFairHearing-32`'s commit · that runner's `ARMS_DECLARED`, raised by the arm added
+New arm: tools/workflows/replay_scorer.py (its runner, in the `review-replay selftest` leg) · covers AC5 · a held-out path naming one tracked file, staged against `check_held_out_frozen` with its `read_git` call spelled as unit 32 S31 did, `--literal-pathspecs` after `ls-files`, which git refuses with exit 129 so the valid path refuses · that runner's `ARMS_DECLARED`, raised by the arm added
 New arm: tools/lib/resolve-python.test.sh · covers AC12 · a JS port testing `isDirectory()` for `.git`, and one letting `JSON.parse` throw · none
-New arm: tools/memory-tree/gotchas.py (its selftest) · covers AC14 · a gated sentence closing on `.*)`, staged against `TOOL-dFairHearing-32`'s `check_ungated` · none
+New arm: tools/memory-tree/gotchas.py (its selftest) · covers AC14 · a gated sentence closing on `.*)`, staged with `GATED_SCOPE_RE`'s closer class narrowed to one character, `` [*_)`]? `` in place of `` [*_)`]* ``, which carries the scope past `.*)` into the next sentence · none
 
 ## 8. Open questions
 
@@ -328,6 +351,31 @@ New arm: tools/memory-tree/gotchas.py (its selftest) · covers AC14 · a gated s
   hardens the harness for other callers, unit 30's path being forward-slashed by its S7; S1 and AC1
   admit unit 30's README step. §3 takes a consumes-from edge on unit 25, whose record AC3 reads, and
   its first non-goal reads today's M4 (owner, 2026-11-01).
+- rev-6 · 2026-11-04 · AC1 · the first half's predicate admits every `memory/` path, the generated
+  renders the build-index hook forces into unit 30's commit `db0f99c71` (`memory/LIVE.md`,
+  `memory/backlog/TOOL.md`) among them, and still reds on a product file (fix brief
+  2026-11-04-prompt-TOOL-dFairHearing-37-fix-brief, item 1).
+- rev-6 · 2026-11-04 · AC1 · the second half's `<c35>` is unit 35's scoring commit, derived by
+  `-G'^## Scoring$'` over unit 30's record, since unit 35 adds no manifest; `<c27>` is derived too, and
+  the ancestry is read against `<c30>` as well (fix brief 2026-11-04-prompt-TOOL-dFairHearing-37-fix-brief,
+  item 2).
+- rev-6 · 2026-11-04 · S5 · §5 · §7 · the AC5 arm's staged break is S31's spelling after the verb,
+  which exits 129 on today's code, in place of unit 32's commit, which already spells the option before
+  the verb; S5 and §5 state that code as built (fix brief 2026-11-04-prompt-TOOL-dFairHearing-37-fix-brief,
+  item 3).
+- rev-6 · 2026-11-04 · S15 · §7 · the AC14 arm's staged break is the closer class narrowed to one
+  character, in place of unit 32's `check_ungated`, which already reads a run; S15 states that code as
+  built (fix brief 2026-11-04-prompt-TOOL-dFairHearing-37-fix-brief, item 3).
+- rev-6 · 2026-11-04 · AC5 · the count greps the argv form `"--literal-pathspecs", "ls-files"`, which
+  prints 1 at `8d58d785c`, where the string form printed 0 (fix brief
+  2026-11-04-prompt-TOOL-dFairHearing-37-fix-brief, item 4).
+- rev-6 · 2026-11-04 · S4 · AC4 · `gotchas.py` exits 0 on an unknown flag at `8d58d785c`, so AC4's
+  `selected` half is recorded superseded by `TOOL-dFairHearing-38` (§3) and graded on no exit here, and
+  S4 names its argparse sentence as not holding (fix brief 2026-11-04-prompt-TOOL-dFairHearing-37-fix-brief,
+  item 4).
+- rev-6 · 2026-11-04 · AC2 · `attempts.py` is unit 35 §4's scratch checker; the empty `unscored`
+  population is recorded `n/a`, and unit 32's AC12 is read from its builder return, its acceptance ledger
+  being owed to the close (fix brief 2026-11-04-prompt-TOOL-dFairHearing-37-fix-brief, item 4).
 
 ## 10. Reuse audit
 
