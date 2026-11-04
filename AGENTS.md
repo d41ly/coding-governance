@@ -7,8 +7,6 @@ from the kits and answers it selected. Change a source and re-render with
 `<prefix>/playbook/adopt-playbook.sh`; never edit the rendered text. Every rule is one line: a tool,
 gate or protocol named in section 3 carries the detail.*
 
-<!-- governance-template: v4.4 -->
-
 ## 1. Governing practices
 
 <!-- one-line -->

@@ -342,6 +342,8 @@ NODE_KEYS = ('primary_tree', 'worktree_root', 'variances')
 # render notes that a newer one is available to reseed.
 TEMPLATE_MAJOR = 4
 TEMPLATE_MARKER_RE = re.compile(r'<!--\s*governance-template:\s*v([0-9]+)\.([0-9]+)\s*-->')
+# The marker's whole line and one blank line after it, which a render drops (PLAY-dOrderedCharter-12 S5).
+TEMPLATE_MARKER_LINE_RE = re.compile(rf'^[ \t]*{TEMPLATE_MARKER_RE.pattern}[ \t]*\n(?:[ \t]*\n)?', re.M)
 
 
 def read_fleet(path: Path) -> list[dict]:
@@ -754,6 +756,25 @@ def write_region(charter_path: Path, body: str) -> None:
     charter_path.write_text(build_region(cur, body), encoding='utf-8', newline='\n')
 
 
+def write_charter_lock(gov_root: Path, target: Path, charter_path: Path) -> None:
+    """PLAY-dOrderedCharter-12 S5: the charter's row of the target's `.governance/instructions.lock`,
+    written after every write-mode render: `blob` hashes the bytes `write_region` just wrote, `renderer`
+    is this kit at KIT_PLAYBOOK_RENDER_VERSION and `template` the template's path and its version marker,
+    the provenance the rendered text no longer carries. `instruction_units.write_lock_row` writes it."""
+    engine = str(Path(__file__).resolve().parent)
+    if engine not in sys.path:
+        sys.path.insert(0, engine)
+    import instruction_units
+    import render_playbook   # the module's own constant: as a script, `main` runs above the line defining it
+    template = resolve_template_path(gov_root, target, read_deploy(target)[2]).resolve()
+    marker = TEMPLATE_MARKER_RE.search(read_input(template, 'the charter template'))
+    base = target if template.is_relative_to(target) else gov_root.resolve()
+    instruction_units.write_lock_row(
+        target, Path(os.path.relpath(charter_path, target)).as_posix(),
+        f'playbook-render@{render_playbook.KIT_PLAYBOOK_RENDER_VERSION}',
+        f'{template.relative_to(base).as_posix()}@v{marker.group(1)}.{marker.group(2)}' if marker else '')
+
+
 def build_region(charter: str | None, body: str) -> str:
     """Write `body` between the region markers. THREE states, and this reader serves all of them.
 
@@ -1066,6 +1087,9 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
     drop = {('kit', name) for ns, name in present if ns == 'kit' and name not in kits}
     drop |= {('when', d) for d in drop_names}
     text = remove_fenced(text, drop)
+    # PLAY-dOrderedCharter-12 S5: render provenance never loads. The template keeps its marker, which this
+    # render and its parity readers read from the source; the lock's charter row carries it (main).
+    text = TEMPLATE_MARKER_LINE_RE.sub('', text)
 
     notes = [f'retired   drop_blocks {d} — {legacy[d]}; remove it from deploy.toml' for d in retired]
     if marker and not current:
@@ -1577,6 +1601,25 @@ def run_selftest() -> int:
             print(f'  arm FAIL a template that is its own charter is refused — rc {rc}, '
                   f'{err.getvalue()!r}, file now {left!r}')
 
+    # PLAY-dOrderedCharter-12 S5 — the render writes its provenance to the lock, never into the charter:
+    # the rendered charter carries no version marker and the lock's charter row carries it.
+    import instruction_units
+    with tempfile.TemporaryDirectory() as td:
+        tgt = Path(td)
+        (tgt / '.governance').mkdir()
+        (tgt / '.governance' / 'deploy.toml').write_text(
+            'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
+        (tgt / 'TPL.md').write_text(f'<!-- governance-template: v{TEMPLATE_MAJOR}.4 -->\n\nplain\n',
+                                    encoding='utf-8')
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            rc = main(['--target', str(tgt)])
+        left = (tgt / 'AGENTS.md').read_text(encoding='utf-8') if rc == 0 else ''
+        rows = instruction_units.read_lock(tgt) if rc == 0 else []
+    check_arm(rc == 0 and 'plain' in left and not TEMPLATE_MARKER_RE.search(left)
+              and [r.get('template') for r in rows] == [f'TPL.md@v{TEMPLATE_MAJOR}.4'],
+              'the rendered charter carries no version marker and the lock row carries it',
+              f'rc {rc}, charter {left!r}, lock rows {rows!r}')
+
     # TOOL-aRepatriatedFork-42 — `--answers` states what `render` would use, and grades `kits` alike.
     with tempfile.TemporaryDirectory() as td:
         eng, tgt = _write_fixture(Path(td), ok_kits, ok_var)
@@ -1875,9 +1918,16 @@ def main(argv: list[str]) -> int:
               f'{", ".join(sorted(set(survived)))}', file=sys.stderr)
         return 1
     write_region(charter_path, body)
+    try:
+        write_charter_lock(gov_root, target, charter_path)
+    except (Refusal, ValueError) as e:   # ValueError: the lock module's LevelError and LockError
+        print(f'render-playbook: REFUSED — the charter is written but its lock row is not: {e}',
+              file=sys.stderr)
+        return 1
     for n in notes:
         print(f'  {n}')
-    print(f'render-playbook — wrote the gov:playbook region into {charter_path.as_posix()}')
+    print(f'render-playbook — wrote the gov:playbook region into {charter_path.as_posix()}, its '
+          f'provenance into .governance/instructions.lock')
     return 0
 
 

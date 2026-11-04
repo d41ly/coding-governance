@@ -1,0 +1,9 @@
+# instructions.lock — render provenance, one row per rendered target. Written by the renderer
+# through instruction_units.write_lock_row; never by hand.
+
+[[target]]
+path = "AGENTS.md"
+blob = "8ade85049cd21699dddcfe3c78102cc18d009eb8"
+units = []
+renderer = "playbook-render@1.33"
+template = "coding-governance-agents.template.md@v4.4"

@@ -226,9 +226,9 @@ def run_fixture(plant):
     root = pathlib.Path(tempfile.mkdtemp(prefix="br-"))
     try:
         with set_env_aside(GIT_ENV_LEAKS):
-            def git(*args):
+            def run_git(*args):
                 return subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, check=True).stdout
-            git("init", "-q", "--template=")
+            run_git("init", "-q", "--template=")
             with open(root / ".memory-tree.conf", "w", encoding="utf-8", newline="\n") as fh:
                 fh.write('MEMORY_ROOT=memory\nFAMILIES="arch:ARCH"\n')
             spec = root / "memory/builds/tKinds/spec/2026-01-01-spec-ARCH-tKinds-1.md"
@@ -251,8 +251,8 @@ def run_fixture(plant):
                 else:
                     written[kind] = write_record(root, "tKinds", unit, kind, "the typed-kinds round trip",
                                                  [("Caused-by", unit)])
-            git("add", "-A")
-            tracked = [p for p in git("ls-files").split("\n") if p]
+            run_git("add", "-A")
+            tracked = [p for p in run_git("ls-files").split("\n") if p]
             binds = read_bindings(str(root), tracked, read_design_conf(root))
             for kind, rel in written.items():
                 rec = binds.get(rel) or {"state": "absent", "kind": None, "why": "not read"}

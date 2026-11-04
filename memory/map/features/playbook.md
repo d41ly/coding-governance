@@ -8,7 +8,7 @@ streams = ["playbook", "tooling"]
 decisions = ["TOOL-aSiftedPlaybook-1"]
 
 [claims]
-gate-legs = ["template size gate selftest", "playbook parity", "playbook parity selftest", "playbook render wiring", "playbook render selftest", "charter size", "micro-format definitions", "micro-format gate selftest", "line length", "line-length gate selftest", "layer dependencies (the core never depends on an expansion)", "tags (the resolver's checks)", "tags positional selftest", "tags bundle selftest", "edges (every declared edge parses, is registered and resolves)", "core meta-check", "core kinds", "core skills conformance", "core practices conformance", "core selftest", "instruction ladder (level is the one term)"]
+gate-legs = ["template size gate selftest", "playbook parity", "playbook parity selftest", "playbook render wiring", "playbook render selftest", "charter size", "micro-format definitions", "micro-format gate selftest", "line length", "line-length gate selftest", "layer dependencies (the core never depends on an expansion)", "tags (the resolver's checks)", "tags positional selftest", "tags bundle selftest", "edges (every declared edge parses, is registered and resolves)", "core meta-check", "core kinds", "core skills conformance", "core practices conformance", "core selftest", "instruction ladder (level is the one term)", "instruction grammar (statement types, provenance lock)"]
 kits = ["playbook"]
 git-hooks = []
 harness-hooks = []

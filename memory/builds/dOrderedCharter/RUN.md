@@ -160,3 +160,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-04T08:09:09Z brief · item PLAY-dOrderedCharter-42 · reason 9ab0ced973a3 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-42-build-brief.md
 
 2026-11-04T08:26:49Z dispatch · item 17a4ab1a PLAY-dOrderedCharter-42 · reason memory/backlog/PLAY.md
+
+2026-11-04T09:18:22Z dispatch · item a294f103 PLAY-dOrderedCharter-12 · reason tools/playbook/instruction_units.py tools/playbook/render_playbook.py .governance/instructions.lock AGENTS.md skills/session-kickoff/SKILL.md WIRE-INTO-PROJECT.md tools/gate-legs.json tools/govkit/registry.toml tools/govkit/subject-pins.tsv memory/map/features/playbook.md memory/map/generated/MAP.md memory/map/generated/symbols.json memory/map/generated/CARDS.md memory/map/generated/inventories.json tools/memory-tree/build_records.py memory/guides/SESSION-KICKOFF.md memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-12.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-12-ledger.md memory/builds/dOrderedCharter/README.md memory/LIVE.md
+
+2026-11-04T09:18:45Z brief · item PLAY-dOrderedCharter-12 · reason 86295d77fc91 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-12-build-brief.md

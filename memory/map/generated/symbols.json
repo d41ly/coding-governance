@@ -208,6 +208,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "LockError",
+      "kind": "class",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "MapError",
       "kind": "class",
       "file": "tools/codebase-map/map_lib.py"
@@ -928,6 +933,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "arm_document",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_evil_merge",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -981,6 +991,11 @@
       "id": "arm_legacy_homes",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "arm_lock",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "arm_minor",
@@ -1101,6 +1116,11 @@
       "id": "arm_stash",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_statements",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "arm_submodule",
@@ -4533,6 +4553,11 @@
       "file": "tools/govkit/docs_leg.py"
     },
     {
+      "id": "check_document",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "check_down_floor",
       "kind": "function",
       "file": "tools/lib/python_floor.py"
@@ -5168,6 +5193,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "check_lock",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "check_login",
       "kind": "function",
       "file": "tools/unattended/resume-tick.sh"
@@ -5521,6 +5551,11 @@
       "id": "check_point",
       "kind": "function",
       "file": "tools/playbook/check_layers.py"
+    },
+    {
+      "id": "check_pointer_target",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "check_positional",
@@ -6216,6 +6251,11 @@
       "id": "check_stash",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_statement",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "check_status_one_line",
@@ -9543,6 +9583,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "derive_unit_pin",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "derive_unit_rows",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
@@ -11506,6 +11551,11 @@
       "id": "load_registry",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "load_resolver",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "load_roles",
@@ -16281,6 +16331,11 @@
       "id": "read_local_env_vars",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "read_lock",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "read_lock_holder",
@@ -22988,6 +23043,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_grammar",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "run_grep",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
@@ -28518,6 +28578,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "write_charter_lock",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "write_claim",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -29016,6 +29081,11 @@
       "id": "write_load_fixture",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "write_lock_row",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "write_lookup",

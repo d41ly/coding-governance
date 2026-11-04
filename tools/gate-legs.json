@@ -1905,6 +1905,18 @@
     "enforces": ["principle.p13", "principle.p11"]
   },
   {
+    "name": "instruction grammar (statement types, provenance lock)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/instruction_units.py",
+      "grammar"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p11"]
+  },
+  {
     "name": "tags (the resolver's checks)",
     "argv": [
       "python",

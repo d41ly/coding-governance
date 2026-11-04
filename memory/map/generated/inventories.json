@@ -53,6 +53,7 @@
       "hook destinations self-test",
       "install-prefix (shipped surface)",
       "install-prefix self-test",
+      "instruction grammar (statement types, provenance lock)",
       "instruction ladder (level is the one term)",
       "kickoff engine size <=18KiB",
       "kickoff-manifest ratchet",

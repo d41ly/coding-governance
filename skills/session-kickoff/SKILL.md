@@ -84,9 +84,8 @@ Then, in order, after those:
    refuses it by design. Step 2b therefore SKIPS the audit for it, and the READY card says
    `manifest: machine-global (<path>) — unaudited`. A stale one is then visible every kickoff instead
    of silently authoritative.
-2. Else an instantiated governance doc: grep the repo for the `governance-template:` marker (e.g.
-   `docs/PARALLEL.md`) — skipping files whose name contains `.template` or whose body still holds
-   `{{`-shaped placeholders: a template is not an instantiated governance doc. **This fallback is
+2. Else an instantiated governance doc: the `path` of the `.governance/instructions.lock` row whose
+   `template` is set (e.g. `docs/PARALLEL.md`); a template is never one. **This fallback is
    ENGINE-ONLY** — `manifest-check.sh` does not implement it, which is why it is not in `--locations`.
 
 The manifest is **authoritative for everything project-specific**: branch/layout conventions,

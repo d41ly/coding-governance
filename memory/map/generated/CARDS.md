@@ -179,10 +179,10 @@ The governance playbook — the shipped template + companions, and the gates ove
 
 - status `shipped` · streams `playbook`, `tooling` · dossier `memory/map/features/playbook.md`
 - decisions 1: `TOOL-aSiftedPlaybook-1`
-- gate-legs 21: `template size gate selftest`, `playbook parity`, `playbook parity selftest`, `playbook render wiring`, `playbook render selftest`, `charter size`, `micro-format definitions`, `micro-format gate selftest`, `line length`, `line-length gate selftest`, `layer dependencies (the core never depends on an expansion)`, `tags (the resolver's checks)`, `tags positional selftest`, `tags bundle selftest`, `edges (every declared edge parses, is registered and resolves)`, `core meta-check`, `core kinds`, `core skills conformance`, `core practices conformance`, `core selftest`, `instruction ladder (level is the one term)`
+- gate-legs 22: `template size gate selftest`, `playbook parity`, `playbook parity selftest`, `playbook render wiring`, `playbook render selftest`, `charter size`, `micro-format definitions`, `micro-format gate selftest`, `line length`, `line-length gate selftest`, `layer dependencies (the core never depends on an expansion)`, `tags (the resolver's checks)`, `tags positional selftest`, `tags bundle selftest`, `edges (every declared edge parses, is registered and resolves)`, `core meta-check`, `core kinds`, `core skills conformance`, `core practices conformance`, `core selftest`, `instruction ladder (level is the one term)`
 - kits 1: `playbook`
 - globs 8: `tools/check-template-size.sh`
-- cut 7 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 8 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## playbook-mode
 
