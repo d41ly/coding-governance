@@ -14,21 +14,62 @@
  * a tree that unwired it. Blocks via exit 2 + stderr; exits 0 on any other tool and any admitted call.
  *
  * ITS READERS ARE THE HOOKS KIT'S, one copy each: `extractWorkflowArgs` and `extractBuildSlug` from
- * agent-cap.js's exports, `readFrontMatterKey` and `readConfKey` from scratch-guard.js, both probed in
- * the hooks kit beside this review kit. A call it cannot load them for is judged without them: one
+ * agent-cap.js's exports, `readFrontMatterKey` and `readConfKey` from scratch-guard.js, both read from
+ * the directory `resolveKitDir` finds the hooks kit in, as agent-cap finds this pack: the install
+ * receipt's row, then the two sibling probes. A call it cannot load them for is judged without them: one
  * whose `args` may be a spec audit is DENIED by name, naming the reader, and every other call is
  * admitted, since a missing reader must not turn the one call this rule refuses into an admission.
  */
 'use strict'
 
-const HOOKS_DIR = require('path').join(require('path').dirname(__dirname), 'hooks')
 // Bound by `loadReaders` before the rule runs; the rule reads them by these names.
 let extractWorkflowArgs, extractBuildSlug, readFrontMatterKey, readConfKey
 
+// TOOL-dFairHearing-43 S4 - agent-cap.js's resolver, carried inline because the pack needs it to find
+// agent-cap.js. `resolve_kit_dir.py` in gov's lib dir is its canonical, and the resolve-python suite
+// holds this block byte-identical to the hook's.
+// >>> resolveKitDir
+function resolveKitDir(home, anchor, here) {
+  const path = require('path')
+  const fs = require('fs')
+  const checkFile = (f) => { try { return fs.statSync(f).isFile() } catch { return false } }
+  here = path.resolve(here)
+  let root = here
+  for (let d = here; ; d = path.dirname(d)) {
+    if (fs.existsSync(path.join(d, '.git'))) { root = d; break }
+    if (path.dirname(d) === d) break
+  }
+  const receipt = path.join(root, '.governance', 'install.json')
+  let rows = []
+  try {
+    const data = JSON.parse(fs.readFileSync(receipt, 'utf8'))
+    rows = data && typeof data === 'object' && Array.isArray(data.files) ? data.files : []
+  } catch { rows = [] }
+  for (const row of rows) {
+    if (!row || typeof row !== 'object' || Array.isArray(row) || !row.path) continue
+    const src = String(row.source || '').split('/')
+    const n = src.length
+    const made = row.role === 'rendered' && String(row.path).split('/').pop() === anchor
+    if (!(n >= 2 && src[n - 2] === home && (src[n - 1] === anchor || made))) continue
+    const hit = path.resolve(root, String(row.path))
+    const rel = path.relative(root, hit)
+    const inside = rel !== '' && !path.isAbsolute(rel) && rel.split(path.sep)[0] !== '..'
+    if (checkFile(hit) && inside && !String(row.path).split(/[\\/]/).includes('..')) return path.dirname(hit)
+  }
+  const probes = [path.join(here, home), path.join(path.dirname(here), home)]
+  for (const cand of probes) if (checkFile(path.join(cand, anchor))) return cand
+  const renderPosix = (f) => f.split(path.sep).join('/')
+  const e = new Error(`no ${home} kit holding ${anchor} in this install: looked in ${renderPosix(receipt)}, ${renderPosix(probes[0])} and ${renderPosix(probes[1])}`)
+  e.receipt = receipt
+  throw e
+}
+// <<< resolveKitDir
+
 function loadReaders() {
   const path = require('path')
+  const hooksDir = resolveKitDir('hooks', 'agent-cap.js', __dirname)
   for (const [file, names] of [['agent-cap.js', ['extractWorkflowArgs', 'extractBuildSlug']], ['scratch-guard.js', ['readFrontMatterKey', 'readConfKey']]]) {
-    const at = path.join(HOOKS_DIR, file).split(path.sep).join('/')
+    const at = path.join(hooksDir, file).split(path.sep).join('/')
     let m
     try { m = require(at) } catch (e) { throw new Error(`${file}'s ${names.join(' and ')} could not be loaded from ${at} (${(e && e.code) || (e && e.message) || e})`) }
     const miss = names.filter((n) => typeof m[n] !== 'function')
@@ -258,7 +299,7 @@ function main() {
     process.stderr.write(
       `BLOCKED by spec-audit-optin: ${(e && e.message) || e}, so this Workflow call, whose args may be ` +
         `a spec audit, cannot be judged against its build's opt-in (TOOL-aBlindedTrial-6), and a call ` +
-        `this rule cannot judge is not admitted. Install the hooks kit beside the review kit.\n`,
+        `this rule cannot judge is not admitted. Install the hooks kit at a place that message names.\n`,
     )
     process.exit(2)
   }

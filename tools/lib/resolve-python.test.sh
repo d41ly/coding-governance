@@ -691,9 +691,10 @@ print(";".join(c.replace(root, "F").replace(os.sep, "/").replace(".EXE", ".exe")
   || bad "the canonical resolve_bash order left the one TOOL-dGroundRules-81 states: $rb_py"; ok
 
 # ---- 2k. THE JS KIT RESOLVER PORT, BEHAVIOUR (TOOL-dFairHearing-32 S26) -----------------------------
-# The hooks kit's agent-cap.js carries `resolveKitDir`, a JS port of resolve_kit_dir, between its
-# `// >>> resolveKitDir` and `// <<< resolveKitDir` markers. Parity cannot hold a port to a Python block,
-# so this holds its BEHAVIOUR, shaped as §2b: the canonical and the port sliced between those markers
+# The hooks kit's agent-cap.js and the review kit's spec-audit-optin.js each carry `resolveKitDir`, a JS
+# port of resolve_kit_dir, between `// >>> resolveKitDir` and `// <<< resolveKitDir` markers, and the two
+# blocks must be byte-identical (TOOL-dFairHearing-43 S5). Parity cannot hold a port to a Python block,
+# so this holds its BEHAVIOUR, shaped as §2b: the canonical and each port sliced between those markers
 # answer TOOL-dFairHearing-32 §4's seven layouts, one directory each with its own `.git` and `here` at
 # `<layout>/p`, and must print one answer per row: the kit directory relative to the layout, or
 # `refused`. The rows: a receipt row inside the tree; a row naming a missing path, the kit beside
@@ -703,8 +704,10 @@ print(";".join(c.replace(root, "F").replace(os.sep, "/").replace(".EXE", ".exe")
 # probe: row 8's `.git` is a FILE, a worktree's, and the receipt beside `$JR/.git` names `r8/k/a.js`, so a
 # port testing `isDirectory()` walks past the worktree to it and answers `k`; row 9's receipt is not JSON,
 # so a port letting `JSON.parse` throw answers `refused`. A host with no node prints no list and reds, never skips. WHAT THIS
-# DOES NOT CHECK: the refusal's wording, or the port's two call sites, which agent-cap.test.sh's pack arms read.
+# DOES NOT CHECK: the refusal's wording, or the ports' call sites, which agent-cap.test.sh's pack arms and
+# spec-audit-optin.test.sh's receipt arms read.
 HOOKS_DIR=$(resolve_kit_dir "$REALPY" hooks agent-cap.js "$HERE") || exit 2
+WORKFLOWS_DIR=$(resolve_kit_dir "$REALPY" workflows spec-audit-optin.js "$HERE") || exit 2
 JR="$TMP/jr"
 add_resolver_layout() { # <row> <receipt rows or empty> <file>... — one layout of the nine
   local d="$JR/r$1" j=$2 f; shift 2
@@ -735,6 +738,9 @@ for r in range(1, 10):
         print(pathlib.Path(resolve_kit_dir("h", "a.js", root / "p")).relative_to(root).as_posix())
     except LookupError:
         print("refused")' "$HERE" "$JR" 2>&1 | tr -d '\r')
+[ "$jr_py" = "$(printf '%s\n' k h refused k p/h h refused h h)" ] \
+  || bad "the canonical resolve_kit_dir disagrees with the nine layouts of TOOL-dFairHearing-32 and -37: ${jr_py//$'\n'/ }"; ok
+for jr_port in "$HOOKS_DIR/agent-cap.js" "$WORKFLOWS_DIR/spec-audit-optin.js"; do
 jr_js=$("$NODE" -e '
 const fs = require("fs"), path = require("path")
 const m = /^\/\/ >>> resolveKitDir\n([\s\S]*?)^\/\/ <<< resolveKitDir$/m.exec(fs.readFileSync(process.argv[1], "utf8").replace(/\r/g, ""))
@@ -743,11 +749,13 @@ const resolveKitDir = new Function("require", m[1] + "\nreturn resolveKitDir")(r
 for (let r = 1; r <= 9; r++) {
   const root = path.join(process.argv[2], "r" + r)
   try { console.log(path.relative(root, resolveKitDir("h", "a.js", path.join(root, "p"))).split(path.sep).join("/")) } catch (e) { console.log("refused") }
-}' "$ROOT/$HOOKS_DIR/agent-cap.js" "$JR" 2>&1 | tr -d '\r')
-[ "$jr_py" = "$(printf '%s\n' k h refused k p/h h refused h h)" ] \
-  || bad "the canonical resolve_kit_dir disagrees with the nine layouts of TOOL-dFairHearing-32 and -37: ${jr_py//$'\n'/ }"; ok
+}' "$ROOT/$jr_port" "$JR" 2>&1 | tr -d '\r')
 [ "$jr_js" = "$jr_py" ] \
-  || bad "agent-cap.js's resolveKitDir disagrees with the canonical row for row: port ${jr_js//$'\n'/ } · canonical ${jr_py//$'\n'/ }"; ok
+  || bad "${jr_port##*/}'s resolveKitDir disagrees with the canonical row for row: port ${jr_js//$'\n'/ } · canonical ${jr_py//$'\n'/ }"; ok
+done
+read_kit_block() { sed -n '/^\/\/ >>> resolveKitDir$/,/^\/\/ <<< resolveKitDir$/p' "$ROOT/$1"; }
+[ "$(read_kit_block "$HOOKS_DIR/agent-cap.js" | wc -l)" -gt 2 ] && [ "$(read_kit_block "$HOOKS_DIR/agent-cap.js")" = "$(read_kit_block "$WORKFLOWS_DIR/spec-audit-optin.js")" ] \
+  || bad "the two marked resolveKitDir blocks differ, or the hook carries none"; ok
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver
@@ -947,6 +955,27 @@ done
 [ -n "$(printf '%s\n' "$plant" | scan_prefix_token)" ] || bad "the {prefix} block exemption leaks past its closing marker"; ok
 printf '    # s.replace("%s/", "") is the hand-written form\n' "$PT" > "$plant"
 [ -z "$(printf '%s\n' "$plant" | scan_prefix_token)" ] || bad "the {prefix} ban fires on a COMMENT explaining the form"; ok
+
+# ---- 3d. THE SIBLING-KIT PATH BAN (TOOL-dFairHearing-43 S6) -----------------------------------------
+# A kit file finds a sibling kit through `resolveKitDir`, never at a hard-coded path: no tracked JS file
+# under the install prefix joins `dirname(__dirname)` to a quoted name, on a line whose first non-space
+# characters are not `//` or `*`. WHAT IT CANNOT SEE: a sibling path built over two statements, or one
+# joined from `__dirname` and `'..'`.
+scan_sibling_path() {  # file paths on stdin -> "file:line:text" per hard-coded sibling join
+  while IFS= read -r f; do
+    grep -nE "dirname\(__dirname\)[[:space:]]*,[[:space:]]*['\"\`]" "$f" | grep -vE '^[0-9]+:[[:space:]]*(//|\*)' | sed "s|^|$f:|"
+  done
+}
+sib_pop=$(cd "$ROOT" && git ls-files -- "${PFX}*.js")
+sib_hits=$(cd "$ROOT" && printf '%s\n' "$sib_pop" | scan_sibling_path)
+[ -z "$sib_hits" ] || { echo "FAIL a JS file finds a sibling kit at a hard-coded path:"; printf '%s\n' "$sib_hits" | sed 's/^/    /'; st=1; }
+ok
+[ "$(printf '%s\n' "$sib_pop" | grep -c .)" -gt 10 ] || bad "the sibling-kit path ban scanned a collapsed population"; ok
+plant="$TMP/sib.js"
+printf "const p = path.join(path.dirname(__dirname), 'kit', 'a.js')\n" > "$plant"
+[ "$(printf '%s\n' "$plant" | scan_sibling_path | wc -l)" = 1 ] || bad "the sibling-kit path ban does not fire on a planted line"; ok
+printf "  // path.join(path.dirname(__dirname), 'kit') is the retired form\n" > "$plant"
+[ -z "$(printf '%s\n' "$plant" | scan_sibling_path)" ] || bad "the sibling-kit path ban fires on a planted comment"; ok
 
 [ "$st" = 0 ] && echo "PASS — resolve-python: $n assertions held"
 exit "$st"

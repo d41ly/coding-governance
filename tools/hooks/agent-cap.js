@@ -36,11 +36,11 @@
  * self-consistent hand-written prompt file and a hand-edited index all pass it, and it never compares
  * `role-sha` with the role an agent type was rendered from.
  *
- * RULE 7 (TOOL-dGroundRules-10) — the settings in force. With the policy kit's `policy-mirror.js` in
- * the `policy` kit beside this hooks kit, every `Agent` and `Workflow` call reads the landed limit
- * through `readPolicy`, then every settings layer `readSettingsLayers` reads at the payload `cwd`'s
+ * RULE 7 (TOOL-dGroundRules-10) — the settings in force. With the policy kit's `policy-mirror.js` found
+ * through `resolveKitDir`, the receipt's row and then the sibling probes, every `Agent` and `Workflow`
+ * call reads the landed limit through `readPolicy`, then every settings layer `readSettingsLayers` reads at the payload `cwd`'s
  * checkout root, and refuses when no layer sets a harness variable, or any layer that sets one holds
- * a value that is not a positive integer, or is above the limit (TOOL-dGroundRules-61). No policy kit beside this one adds
+ * a value that is not a positive integer, or is above the limit (TOOL-dGroundRules-61). No policy kit found adds
  * no rule; a `cwd` in no checkout refuses, naming it (TOOL-dGroundRules-21 S38). A throw inside it refuses.
  *
  * Wiring (per project): run `python <prefix>/settings-merge.py` (idempotent) — it merges the block
@@ -400,7 +400,11 @@ function runBothViews(rule, script) {
 const MAX_VERIFIERS = 5
 // TOOL-dGroundRules-10 F2 — a VERIFIER split's comparand is MAX_VERIFIERS, the verify total. TOOL-dGroundRules-18 — a WRITER
 // split's is the agent limit (receiver (a)), read through rule 7's `readPolicy` once, only for a script carrying the marker.
-const POLICY_HELPER = require('path').join(require('path').dirname(__dirname), 'policy', 'policy-mirror.js')
+// TOOL-dFairHearing-43 S6 - found through `resolveKitDir`; a refusal reads as the absent helper, an empty path.
+function resolvePolicyHelper() {
+  try { return require('path').join(resolveKitDir('policy', 'policy-mirror.js', __dirname), 'policy-mirror.js') } catch { return '' }
+}
+const POLICY_HELPER = resolvePolicyHelper()
 function readWriterBound(repo) {
   if (!require('fs').existsSync(POLICY_HELPER)) return { n: MAX_VERIFIERS, key: 'MAX_VERIFIERS, as no policy kit sits beside this hooks kit' }
   let v
@@ -762,9 +766,8 @@ function checkHarnessCall(data, index, root) {
 // through the two variables the policy kit renders into `.claude/settings.json`; the harness reads
 // them from the working tree, so a hand-raised `env`, or a render left behind a lowering, would run
 // past the landed limit. This rule refuses that at the next call. It reads the landed limit through
-// the policy kit's `readPolicy`, located beside this hooks kit as `resolveHarnessName` probes the
-// workflows kit, and never the working-tree mirror; a hooks kit with no `policy` kit beside it adds no
-// rule. WHAT IT DOES NOT SEE: an environment override of the two variables, which the harness applies
+// the policy kit's `readPolicy`, found through `resolveKitDir`, and never the working-tree mirror; a
+// hooks kit that finds no `policy` kit adds no rule. WHAT IT DOES NOT SEE: an environment override of the two variables, which the harness applies
 // and no hook can read. UNVERIFIED: that a session started before a lowering keeps its settings until
 // it restarts. Read: every layer readSettingsLayers returns (TOOL-dGroundRules-61 S1); a cwd in no checkout, or a throw at any step, refuses, naming it (TOOL-dGroundRules-21 S38). A refused policy read is no settings fault, so it denies under its own text, printing the reader's line and never the settings remedy (TOOL-dGroundRules-73). null = allow · string = deny.
 const SETTINGS_VARS = ['CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS', 'CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS']

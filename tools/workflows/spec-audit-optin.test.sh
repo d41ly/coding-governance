@@ -547,9 +547,9 @@ rm -rf "$SAOTH"
 printf -- '---\nslug: tSA\n---\n' > "$SAREADME"
 
 # ---- the pack's own: a reader it cannot load (TOOL-dFairHearing-16 AC6) ----------------------------
-# The pack reads agent-cap.js's `extractWorkflowArgs` and scratch-guard.js's `readFrontMatterKey`,
-# probed in the hooks kit beside the review kit. A copy with no hooks kit beside it cannot place a call,
-# so one whose args may be a spec audit is DENIED naming the reader it could not load, and any other
+# The pack reads agent-cap.js's `extractWorkflowArgs` and scratch-guard.js's `readFrontMatterKey`, from
+# the directory its inline `resolveKitDir` finds the hooks kit in. A copy finding no hooks kit cannot place
+# a call, so one whose args may be a spec audit is DENIED naming the three places looked, and any other
 # call is admitted: a missing reader must not turn the one call the rule refuses into an admission.
 # The kit directory names are DERIVED, so the copy types no kit name.
 WFK=${HERE##*/}
@@ -563,7 +563,7 @@ check_copy() { # name expected_exit needle(empty for an allow) json
 }
 SAQ="{\"tool_name\":\"Workflow\",\"tool_input\":{\"name\":\"tier2-review\",\"args\":{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}}}"
 check_copy "no hooks kit beside the pack: a spec-audit call is denied, naming agent-cap.js" 2 'agent-cap.js' "$SAQ"
-check_copy "no hooks kit beside the pack: a harness call carrying specAudit is denied too" 2 'could not be loaded' \
+check_copy "no hooks kit beside the pack: a harness call carrying specAudit is denied too" 2 'looked in' \
   "{\"tool_name\":\"Workflow\",\"tool_input\":{\"scriptPath\":\"$GOOD\",\"args\":\"{\\\"repo\\\":\\\"$SAJ\\\",\\\"slug\\\":\\\"tSA\\\",\\\"specAudit\\\":\\\"2026-10-05\\\"}\"}}"
 check_copy "no hooks kit beside the pack: a diff review is admitted" 0 "" \
   "{\"tool_name\":\"Workflow\",\"tool_input\":{\"name\":\"tier2-review\",\"args\":{\"kind\":\"diff-review\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}}}"
@@ -571,11 +571,30 @@ check_copy "no hooks kit beside the pack: a diff review is admitted" 0 "" \
 HK_DIR=$(resolve_kit_dir "$TESTPY" hooks agent-cap.js "$HERE") || { echo "FAIL no hooks kit resolves beside this kit, so the last arm has no agent-cap.js to copy"; fail=$((fail+1)); }
 mkdir -p "$Q/${HK_DIR##*/}"; cp "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$HK_DIR/agent-cap.js" "$Q/${HK_DIR##*/}/"
 check_copy "agent-cap.js beside the pack and no scratch-guard.js: denied, naming scratch-guard.js" 2 'scratch-guard.js' "$SAQ"
+# TOOL-dFairHearing-43 AC4: a receipt homes the hooks kit in a directory not named after it, so the pack
+# finds it by agent-cap's rule and admits the dated opt-in; with the rows naming no file and no hooks kit
+# beside the copy, it denies naming the receipt it read. RED against the pack at unit 40, whose hard-coded
+# sibling path denies the first call with `could not be loaded`.
+RH="$TMP/rh"; RHJ="$NODEDIR/rh"
+mkdir -p "$RH/.git" "$RH/.governance" "$RH/$WFK" "$RH/x/hk" "$RH/memory/builds/tSA/reviews"
+cp "$HOOK" "$RH/$WFK/"
+QPACK="$RH/$WFK/spec-audit-optin.js"
+cp "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$HK_DIR/agent-cap.js" \
+   "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$HK_DIR/scratch-guard.js" "$RH/x/hk/"
+printf -- '---\nslug: tSA\nspec-audit: 2026-09-20\n---\n' > "$RH/memory/builds/tSA/README.md"
+RHQ="{\"tool_name\":\"Workflow\",\"tool_input\":{\"name\":\"tier2-review\",\"args\":{\"kind\":\"spec-audit\",\"repo\":\"$RHJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}}}"
+printf '{"files": [{"source": "t/%s/agent-cap.js", "path": "x/hk/agent-cap.js"}]}\n' "${HK_DIR##*/}" > "$RH/.governance/install.json"
+check_copy "FH43 AC4 a receipt homes the hooks kit outside a sibling directory: the dated opt-in is admitted" 0 "" "$RHQ"
+printf '{"files": [{"source": "t/%s/agent-cap.js", "path": "y/agent-cap.js"}]}\n' "${HK_DIR##*/}" > "$RH/.governance/install.json"
+rm -rf "$RH/x"
+check_copy "FH43 AC4 the receipt's row names no file and no hooks kit is beside the copy: denied, naming the receipt" 2 '.governance/install.json' "$RHQ"
 
 # ---- verdict -------------------------------------------------------------------------------------
 # FLOOR_ASSERTIONS is the count every host runs: 53 rule-0 calls of check_spec_audit, two forms each,
-# 3 check arms, 6 pair and 4 fold arms, and the 4 above; on win32 the MSYS-mount arm adds 2 more.
-FLOOR_ASSERTIONS=123
+# 3 check arms, 6 pair and 4 fold arms, and the 6 above; on win32 the MSYS-mount arm adds 2 more.
+# RAISED 123 -> 125 by TOOL-dFairHearing-43: the two `FH43 AC4` receipt arms. Counted by hand, not by a
+# run: the pass runs no suite.
+FLOOR_ASSERTIONS=125
 echo "---- $pass passed, $fail failed ----"
 if [ "$pass" -lt "$FLOOR_ASSERTIONS" ]; then
   echo "FAIL executed $pass passing assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE or failing rather than absent"

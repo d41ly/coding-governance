@@ -195,9 +195,11 @@ python <prefix>/settings-merge.py --fragment <prefix>/workflows/spec-audit-optin
 A default install wires it through govkit, and `<prefix>/check-wiring.sh` grades it with the same
 per-fragment loop that grades the hooks kit's fragments, reporting it UNWIRED in a tree that unwired
 it. It reads `extractWorkflowArgs` and `extractBuildSlug` from the hook and `readFrontMatterKey` and
-`readConfKey` from scratch-guard.js, both in the hooks kit beside this one; a copy with no hooks kit
-beside it denies a call whose args may be a spec audit, naming the reader it could not load, and
-admits every other. What the rule denies is stated in `<prefix>/hooks/README.md`.
+`readConfKey` from scratch-guard.js, both in the directory its inline `resolveKitDir`, agent-cap's
+resolver, finds the hooks kit in: the install receipt's row, then the two sibling probes. A copy that
+finds no hooks kit denies a call whose args may be a spec audit, naming the three places it looked, and
+admits every other; one that cannot load a reader from there denies naming that reader. What the rule
+denies is stated in `<prefix>/hooks/README.md`.
 
 ## `tier2-review.js` — the five diff lenses, and `lensNotes`
 
@@ -553,7 +555,8 @@ printed as `twin` when given and checked against the four values only; absent, n
 `--unclassed` is the `review.unclassed` value, printed as `unclassed` the same way and checked against
 the three values only.
 `unattended-build.js` forwards a
-caller's `optIn`, `preset` and `lensNotes` to its audit stage's review call unchanged, and unchecked.
+caller's `optIn`, `preset`, `lensNotes`, `twin`, `unclassed`, `fixJudge` and `walk` to its audit stage's
+review call unchanged, and unchecked.
 
 Every finding carries `lens`, the key of the lens the harness dispatched, never the label the agent
 echoed back, and every finding line in a skeptic prompt, the synthesis prompt and the run log names
@@ -629,9 +632,10 @@ Every return carries seven fields beside the counts:
   ninth joins the `classes` names with one space, so a class's hits can be counted across records. The
   tenth is the disposition: the synthesis is handed the table with `(synthesis)` in each confirmed row's
   cell and `-` in every other, and told to copy it verbatim but for those cells, each written with the
-  disposition it returns, a `none` as `none — <reason>`, the reason on one line and a pipe written as
-  `\|`; a reason carrying a raw `|` or a line break refuses the set, its note naming the record's
-  appendix as needing a re-render (TOOL-dFairHearing-23). The returned table carries the accepted
+  disposition it returns, a `none` as `none — <reason>`. That cell of the record is the synthesis's own
+  text, which the harness does not encode, so the prompt asks for the reason on one line and each `|`
+  written as `\|`. The returned reason is plain text: the harness encodes the returned table, so a raw
+  `|` or a line break in it refuses nothing (TOOL-dFairHearing-43). The returned table carries the accepted
   dispositions so, and `-` in every cell when the set was refused. A
   cell is `-` when its value is absent or empty, a `|` is escaped, and line breaks fold to a space.
 - `lensYield` — per lens, `defects` and `unique` are `null` when no item list can be trusted (see below).

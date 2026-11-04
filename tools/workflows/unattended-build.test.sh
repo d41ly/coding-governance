@@ -536,6 +536,32 @@ has "FH3 AC9 ...and preset unchanged" "$w" '"preset":"design-audit"'
 o=$(run_wf "${UNITS%\}}"',"lensNotes":{"unit-spec":{"reuse":"N1"},"design-audit":{"alternatives-and-cost":"N2"}}}' "$(returns CONVERGED 0)")
 w=$(printf '%s\n' "$o" | grep '^wargs:')
 has "FH9 AC8 the review call receives a per-preset lensNotes unchanged" "$w" '"lensNotes":{"unit-spec":{"reuse":"N1"},"design-audit":{"alternatives-and-cost":"N2"}}'
+# TOOL-dFairHearing-43 AC3: `twin`, `unclassed`, `fixJudge` and `walk` reach the review call unchanged, and
+# a call passing none sends none. Then the population is review_pin.py's own output, never typed here: each
+# key a whole-design pin prints reaches the call with its value, so a key a later pin prints reds this arm
+# until it is given a route. RED against the harness at unit 40, whose audit call carries none of the four.
+w=$(run_wf "$UNITS" "$(returns CONVERGED 0)" | grep '^wargs:')
+for k in twin unclassed fixJudge walk; do
+  hasnt_ "FH43 AC3 a call passing none of the four sends no $k key" "$w" "\"$k\":"
+done
+FH43_WALK='{"runs":2,"run":1,"seed":"reverted-escapes"}'
+w=$(run_wf "${UNITS%\}}"',"twin":"always","unclassed":"reason","fixJudge":"instance","walk":'"$FH43_WALK"'}' "$(returns CONVERGED 0)" | grep '^wargs:')
+has "FH43 AC3 the review call receives twin unchanged" "$w" '"twin":"always"'
+has "FH43 AC3 ...and unclassed unchanged" "$w" '"unclassed":"reason"'
+has "FH43 AC3 ...and fixJudge unchanged" "$w" '"fixJudge":"instance"'
+has "FH43 AC3 ...and walk unchanged" "$w" "\"walk\":$FH43_WALK"
+pin_rows=$("$_rkd_py" -B "$HERE/review_pin.py" --subject memory/builds/tB/build/d.md --design-record-preset whole-design \
+    --twin always --unclassed reason --opt-in '{"whole-design": {"topology": "blast-radius"}}' | "$_rkd_py" -c '
+import json, sys
+for line in sys.stdin:
+    for k, v in json.loads(line).items():
+        print(k + "\t" + json.dumps(v, separators=(",", ":")))' | tr -d '\r' | sort -u)
+has "FH43 AC3 the pin prints a walk, so the population below is real" "$pin_rows" 'walk'
+while IFS=$'\t' read -r k v; do
+  [ -n "$k" ] || continue
+  w=$(run_wf "${UNITS%\}}"",\"$k\":$v}" "$(returns CONVERGED 0)" | grep '^wargs:')
+  has "FH43 AC3 the pin's $k reaches the review call with its value" "$w" "\"$k\":$v"
+done <<< "$pin_rows"
 
 # S3 — CONVERGING paired with 0 blockers is REFUSED BY NAME. A loop with nothing left to
 # converge on has converged, so the pairing is this repo's signature for a record no verb
@@ -3760,7 +3786,10 @@ has    "FA15 AC25 the undeclared throw" "$o" "a disposal passes the hand-out's \
 # RAISED 903 -> 905 by TOOL-dFairHearing-9: the two `FH9 AC8` sites, the absence on a call without
 # `lensNotes` and the forwarded per-preset value on one with it. Not measured by a run: the pass that
 # wrote it runs no suite.
-FLOOR_ASSERTIONS=905
+# RAISED 905 -> 920 by TOOL-dFairHearing-43: the `FH43 AC3` sites, four absences, four forwarded values, the
+# population's own check and the pin's six distinct key and value rows (its two lines differ in `walk` alone).
+# Not measured by a run: the pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=920
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

@@ -17,7 +17,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dClosedLoop](builds/dClosedLoop/README.md) | INPROGRESS | d | 2026-10-14 | playbook+kickoff+tooling+deployer | 39 | 2026-10-26 | active | 1 |
 | [dConvergedCharter](builds/dConvergedCharter/README.md) | OPEN | d | 2026-10-21 | playbook | 24 | 2026-10-21 | active | 0 |
 | [dDeclaredLoop](builds/dDeclaredLoop/README.md) | DEFERRED | d | 2026-10-21 | tooling | 108 | 2026-11-02 | active | 0 |
-| [dFairHearing](builds/dFairHearing/README.md) | INPROGRESS | d | 2026-10-21 | tooling | 46 | 2026-11-04 | active | 0 |
+| [dFairHearing](builds/dFairHearing/README.md) | OPEN | d | 2026-10-21 | tooling | 46 | 2026-11-04 | active | 0 |
 | [dFurnishedOrders](builds/dFurnishedOrders/README.md) | DEFERRED | d | 2026-10-21 | tooling | 61 | 2026-10-28 | active | 0 |
 | [dIndexedDesign](builds/dIndexedDesign/README.md) | DEFERRED | d | 2026-10-21 | tooling | 53 | 2026-10-28 | active | 0 |
 | [dKeptSession](builds/dKeptSession/README.md) | DEFERRED | d | 2026-10-21 | kickoff | 66 | 2026-10-26 | active | 0 |

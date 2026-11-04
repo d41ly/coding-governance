@@ -121,7 +121,8 @@ cases copy the hooks kit's agent-cap.js and scratch-guard.js beside a copy of th
 the fixture's own limit, and judge each call by its exit code and the text its criterion names;
 `limit-hook-writer-split` (TOOL-dGroundRules-18) runs the workflows kit's build-harness template,
 rendered at 6, through that kit's `check-verifier-fanout.js` over the hook copy, which holds rule 2
-since TOOL-dFairHearing-16, so rule 2 judges its `gov:fixed-writers` split by that limit.
+since TOOL-dFairHearing-16, so rule 2 judges its `gov:fixed-writers` split by that limit, and runs
+that kit's `check-review-join.js`, which holds rule 5, over a case holding a ref-keyed verdict join.
 
 THE SIZE CAPS (TOOL-dGroundRules-9) add two arms and three kinds of case. `arm_limits_readers` reds a
 tracked code file outside this kit, the memory root, `help/` and the self-tests that reads the
@@ -2946,7 +2947,8 @@ def run_limit_case(name):
                            f"{ledger.as_posix()} {'exists' if ledger.exists() else 'is absent'}"))
         elif name == "limit-hook-rules-kept":
             # Every row ADMITS since TOOL-dFairHearing-16: rules 1 and 3 retired, and rules 2 and 5 left
-            # the hook for the review kit, whose checks `limit-hook-writer-split` runs.
+            # the hook for the review kit, whose two checkers `limit-hook-writer-split` runs: the verifier
+            # fan-out check, `check-verifier-fanout.js`, and the ref-keyed join ban, `check-review-join.js`.
             repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))
             write_settings(repo, render_limit_env(2))
             checks += [
@@ -3026,10 +3028,10 @@ def run_limit_case(name):
             render = (wf / "unattended-build.template.js").read_text(encoding="utf-8").replace("{{FANOUT_CAP}}", "6")
             finds = lambda *needles: lambda rc, o, e: rc == 1 and all(n in e for n in needles)  # noqa: E731
 
-            def judge(repo, hook, script, what, want):
+            def judge(repo, hook, script, what, want, checker="check-verifier-fanout.js"):
                 case = Path(repo, "fanout-case.js")
                 case.write_text(script, encoding="utf-8", newline="\n")
-                return check_run(name, what, ["node", str(wf / "check-verifier-fanout.js"), "--hook", str(hook), str(case)],
+                return check_run(name, what, ["node", str(wf / checker), "--hook", str(hook), str(case)],
                                  want, cwd=repo)
             for i, (n, script, what, want) in enumerate((
                     (6, render, "the render at 6 under a landed limit of 6", lambda rc, o, e: rc == 0),
@@ -3042,6 +3044,9 @@ def run_limit_case(name):
             (kit / "policy-mirror.js").unlink()
             checks.append(judge(repo, hook, render, "the render at 6, policy-mirror.js removed",
                                 finds("gov:fixed-writers", "above the bound 5: MAX_VERIFIERS, as no policy kit")))
+            # TOOL-dFairHearing-43 S10: rule 5, run over the same hook copy, so the claim above is an executed check.
+            checks.append(judge(repo, hook, "m.set(f.ref, v)\n", "check-review-join.js over a ref-keyed join",
+                                finds("a ref-keyed verdict join"), "check-review-join.js"))
         elif name == "limit-settings-elsewhere":
             # TOOL-dGroundRules-21 S34: GOV_SETTINGS_JSON names the settings in force, for the render and rule 7.
             repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))

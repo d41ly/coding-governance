@@ -294,6 +294,15 @@ if (!isSpec && !String(base || '').trim()) {
       'git rev-parse <the default branch>.',
   )
 }
+// TOOL-dFairHearing-43 S1 - `base` and `head` reach the checklist agent's and the resume probe's shell
+// lines, so each is refused outside a closed ref shape before any agent spawns, at every round.
+const REF_SHAPE = /^[0-9A-Za-z._\/~^][0-9A-Za-z._\/~^-]*$/
+if (!isSpec) for (const [field, v] of [['base', base], ['head', head]]) {
+  if (!REF_SHAPE.test(String(v)))
+    throw new Error('tier2-review: `' + field + '` must be a git revision of letters, digits and . _ / ~ ^ -, ' +
+      'not opening with -, because it is pasted into the checklist agent\'s and the resume probe\'s ' +
+      'shell commands. Got ' + JSON.stringify(v) + '. Refusing before any agent spawns.')
+}
 // TOOL-aSightedSkeptic-7 S1/S2 - `intensity`, the CALLER's choice of a full or a light review. A
 // closed set refused outside it, like `kind`, and the harness never picks light itself. A spec audit
 // has no light lens subset (spec F2), so light refuses there rather than buying a full audit silently.
@@ -2845,7 +2854,7 @@ const synth = await agent(
     `- gate:<leg> - a defect an existing gate leg should catch, <leg> being one of the leg names below, spelled exactly;\n` +
     `- new:<slug> - a recurring class no slug below names, <slug> matching ${CLASS_SLUG};\n` +
     `- none - nothing above homes it, with a non-empty reason, and only as the unclassed value admits. The reason ` +
-    `becomes the appendix cell \`none — <reason>\`, so write it on one line, a pipe written as \`\\|\`.\n` +
+    `becomes the appendix cell \`none — <reason>\`, which the harness encodes, so return it as plain text.\n` +
     `unclassed: ${unclassed} - ` + (unclassed === 'refuse'
       ? 'none is refused: home every confirmed finding as class:, gate: or new:.'
       : unclassed === 'reason'
@@ -2968,7 +2977,8 @@ const synth = await agent(
       ? `\n\nAPPENDIX - the report's LAST section, after everything else, is the text between the two marker lines ` +
         `below, copied VERBATIM: unedited, no row added, dropped, reordered or reworded, and neither marker line copied. ` +
         `The one exception is each \`(synthesis)\` cell of the disposition column: write it as the disposition you return ` +
-        `for that row's id, a none as \`none — <reason>\`.\n` +
+        `for that row's id, a none as \`none — <reason>\`. In that cell, which you write and the harness does not encode, ` +
+        `put the reason on one line, with each \`|\` written as \`\\|\`.\n` +
         `<<<APPENDIX\n${synthAppendix}\nAPPENDIX>>>\n\n`
       : '') +
     `Return JSON {path, items, summary${addressTwins === 'shown' ? ', twinFlags' : ''}} with a FORWARD-SLASH path, and ` +
@@ -3141,11 +3151,10 @@ function checkDisposition(d) {
   const form = at === -1 ? s : s.slice(0, at)
   const name = at === -1 ? '' : s.slice(at + 1)
   const said = JSON.stringify(d.disposition)
-  // TOOL-dFairHearing-23 S32 - a reason carrying a raw `|` or a line break would break its appendix row, so the set is
-  // refused and the record's appendix needs a re-render with the reason on one line, each pipe as `\|`.
+  // TOOL-dFairHearing-43 S2 - two tests only: the returned cell is encoded by `renderCell`, so a raw `|` or a line
+  // break in the reason refuses nothing.
   if (s === 'none') return unclassed === 'refuse' ? 'is none, which unclassed refuse does not admit'
-    : typeof d.reason !== 'string' || !d.reason.trim() ? 'is none with an empty reason'
-      : /(^|[^\\])\||[\r\n]/.test(d.reason) ? 'is none with a reason carrying a raw | or a line break, so the record\'s appendix needs a re-render' : ''
+    : typeof d.reason !== 'string' || !d.reason.trim() ? 'is none with an empty reason' : ''
   if (form === 'class') return classSlugs.indexOf(name) !== -1 ? '' : `is ${said}, and ${JSON.stringify(name)} is no class slug this run handed`
   if (form === 'gate') return !legs ? `is ${said}, and no leg manifest was read, so no gate: disposition is legal`
     : legs.indexOf(name) !== -1 ? '' : `is ${said}, and ${JSON.stringify(name)} is no leg of ${gateManifest}`

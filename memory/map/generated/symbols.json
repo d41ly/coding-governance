@@ -3543,6 +3543,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "checkFile",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.js"
+    },
+    {
       "id": "checkGateLeg",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -15778,6 +15783,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_kit_block",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
       "id": "read_kit_conf",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -18403,6 +18413,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "renderPosix",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.js"
+    },
+    {
       "id": "renderPrompt",
       "kind": "function",
       "file": "tools/workflows/orient-counterfactual.js"
@@ -19633,12 +19648,22 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "resolveKitDir",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.js"
+    },
+    {
       "id": "resolveLease",
       "kind": "function",
       "file": "tools/unattended/run-lease.js"
     },
     {
       "id": "resolveLiteralEnd",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "resolvePolicyHelper",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
     },
@@ -24316,6 +24341,11 @@
       "id": "scan_shell_tokens",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "scan_sibling_path",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
     },
     {
       "id": "scan_skill_copies",

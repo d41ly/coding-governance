@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 149 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 154 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 149 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 158 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -289,6 +289,7 @@ Inventories: gate-legs: 149 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `canary-waits-on-a-rendezvous-not-a-clock.md` | run-gates |
 | `check-format-grades-two-populations.md` | build-readme-surface |
 | `check-grades-one-layer-of-a-layered-config.md` | policy |
+| `comment-claims-a-check-the-case-does-not-run.md` | memory-tree-hygiene |
 | `concurrency-is-not-a-budget.md` | baseline |
 | `concurrent-runs-are-announced-not-refused.md` | unattended-mandate |
 | `conf-value-interpolated-into-a-regex.md` | agent-cap |
@@ -298,6 +299,7 @@ Inventories: gate-legs: 149 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `decision-re-derived-by-a-second-process.md` | run-gates |
 | `degradation-known-but-unreported.md` | review-harnesses |
 | `destructive-step-before-its-precondition.md` | unattended |
+| `doc-names-an-argument-the-code-never-reads.md` | memory-tree-hygiene |
 | `empty-field-collapses-unless-it-is-last.md` | run-gates |
 | `fallback-drain-strands-its-witnesses.md` | build-method |
 | `fallback-fabricates-the-passing-value.md` | unattended |
@@ -317,6 +319,7 @@ Inventories: gate-legs: 149 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `guard-fed-the-value-it-supersedes.md` | unattended |
 | `hand-named-gate-list-green-while-the-bar-reds.md` | build-method |
 | `held-suite-guard-misses-a-sibling-kit.md` | agent-cap |
+| `helper-whose-only-caller-is-its-selftest.md` | memory-tree-hygiene |
 | `heredoc-escape-reaches-the-regex.md` | baseline |
 | `history-leg-graded-before-the-reconcile-commit.md` | memory-tree-hygiene |
 | `hookspath-resolves-into-another-checkout.md` | run-gates |
@@ -401,6 +404,7 @@ Inventories: gate-legs: 149 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `two-answers-to-one-question.md` | baseline |
 | `two-guards-one-question-two-answers.md` | unattended |
 | `two-readers-of-one-config-one-re-derived.md` | unattended |
+| `unvalidated-arg-reaches-an-agent-shell-line.md` | memory-tree-hygiene |
 | `vacuous-selector-empty-population.md` | baseline |
 | `verdict-printed-before-the-step-that-reverts-it.md` | govkit |
 | `waiver-row-that-hides-nothing-reds.md` | memory-tree-hygiene |

@@ -237,6 +237,10 @@ function chunk(a, n) {
 //                                                   //   per-preset or flat lens notes, forwarded the same
 //                                                   //   way, unchecked; the review harness reads its run
 //                                                   //   literal's entry. Absent, no key is sent
+//   twin: "<review.twin value>",                    // optional (TOOL-dFairHearing-43): forwarded the same
+//   unclassed: "<review.unclassed value>",          //   way, unchecked, each of the four: the review
+//   fixJudge: "<the review harness's fixJudge>",    //   harness's boundary refuses what it does not take.
+//   walk: { "runs": 2, "run": 1, "seed": "<seed>" } //   `review_pin.py` prints all but fixJudge. Absent, no key is sent
 // }
 // TOOL-aEvidencedLens-5 - the two fold args are REFUSED at a callee round of 1 (a fresh generation has
 // no previous round) and refused by name when malformed, before any agent spawns.
@@ -1757,6 +1761,12 @@ const auRaw = !specAudit ? null : await workflow(
     // TOOL-dFairHearing-9 S5 - the caller's lens notes, forwarded the same way: the callee holds the
     // literal's keys and derives the run's notes, so this harness neither checks nor rewrites them.
     ...(a.lensNotes !== undefined ? { lensNotes: a.lensNotes } : {}),
+    // TOOL-dFairHearing-43 S3 - the pin's other keys and `fixJudge`, forwarded the same way, so a pinned key
+    // never runs the audit at the callee's default.
+    ...(a.twin !== undefined ? { twin: a.twin } : {}),
+    ...(a.unclassed !== undefined ? { unclassed: a.unclassed } : {}),
+    ...(a.fixJudge !== undefined ? { fixJudge: a.fixJudge } : {}),
+    ...(a.walk !== undefined ? { walk: a.walk } : {}),
   },
 )
 

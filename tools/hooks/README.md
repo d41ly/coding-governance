@@ -126,8 +126,8 @@ stated here, beside the constants it turns on. How to run each: `<prefix>/workfl
   `gov:fixed-verifiers` split or of a `gov:sequential-agents` header. The burden is on the fan-out.
 - A `gov:fixed-writers` split whose `K` is above the agent limit (TOOL-dGroundRules-18). A WRITER
   split, the spec stage's in the build harness, is no verify stage, so its bound is
-  `runtime.agents-in-flight`, read through the policy kit's `readPolicy` beside this hooks kit once
-  per call and only for a script carrying the marker. With no policy kit there the bound is
+  `runtime.agents-in-flight`, read through the policy kit's `readPolicy`, found by `resolveKitDir`, once
+  per call and only for a script carrying the marker. With no policy kit found the bound is
   `MAX_VERIFIERS`, the stricter answer; a reader that refuses denies, naming its line. The shape
   rules are the verifier marker's, a verifier split stays at `MAX_VERIFIERS` whatever the limit, and
   a line carrying both markers is refused as ambiguous. The refusal names the marker, the `K` it read
@@ -181,8 +181,9 @@ stated here, beside the constants it turns on. How to run each: `<prefix>/workfl
   reads the WORKTREE README and conf while that driver reads the README at BASE and the conf at its
   default-branch side, so the two can disagree for exactly one uncommitted edit. An `args` string that does
   not parse shows the pack no `kind` and is admitted; the harness itself throws on it, so no audit
-  runs. A pack with no hooks kit beside it cannot load those readers, so it denies a call whose args
-  may be a spec audit, naming the reader, and admits every other.
+  runs. The pack finds this kit through its inline `resolveKitDir`, the install receipt's row and then
+  the two sibling probes. A pack that finds no hooks kit cannot load those readers, so it denies a call
+  whose args may be a spec audit, naming the three places it looked, and admits every other.
 
 ## Every `--only=` refuses
 
@@ -209,8 +210,9 @@ queues) in `.claude/settings.json`, and every landing regenerates that render. T
 settings from the working tree, so a hand-raised `env`, or a render left behind a lowering, would run
 past the landed limit. Rule 7 refuses that at the next call.
 
-On every `Agent` and `Workflow` call, after rule 6, the hook locates
-`policy-mirror.js` in the `policy` kit beside its own kit, reads the landed limit through
+On every `Agent` and `Workflow` call, after rule 6, the hook finds
+`policy-mirror.js` through `resolveKitDir`, the install receipt's row and then the sibling `policy`
+directory, with no rule where none is found, reads the landed limit through
 `readPolicy`, then the settings file in force, `GOV_SETTINGS_JSON` else `.claude/settings.json`,
 resolved as `check-wiring.sh` resolves it, and `.claude/settings.local.json`, each at the payload
 `cwd`'s checkout root (TOOL-dGroundRules-21 S34). For each variable it takes the value the harness

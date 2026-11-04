@@ -671,6 +671,7 @@ const H = 'c'.repeat(40)
 // arms that read the defaults themselves delete the pins.
 const DIFF = { repo: '/tmp/r', base: B, head: H, round: 1, context: 'ctx', reviewDir: 'memory/reviews', workerType: 'none', addressTwins: 'hidden', fixJudge: 'instance' }
 const SPEC = { repo: '/tmp/r', kind: 'spec-audit', round: 1, context: 'ctx', subjects: [{ path: 'memory/builds/dX/spec/s.md', blob: 'abc1234', id: 'TOOL-x-1', rev: 1 }], scratch: '/tmp/s', workerType: 'none', addressTwins: 'hidden', fixJudge: 'instance' }
+const DESIGN = Object.assign({}, SPEC, { subjects: [{ path: 'memory/builds/dX/build/a.md', blob: 'abc1234', id: 'PLAY-dX-1' }] })
 const buildProbe = (finds, verifies, base, head) => ({ commonDir: '/cd', base: base || B, head: head || H, finds: finds || [], verifies: verifies || [] })
 // One finding per lens, so five lenses make five ids and five batches of one: verify:batch-1 .. verify:batch-5.
 const buildLensReturn = (label) => {
@@ -730,12 +731,13 @@ async function runWholeScriptArms() {
   // ---- TOOL-dFairHearing-40 AC19: every `git -C` quotes `repo`, so a `repo` of `C:/x y/z` reaches each
   // prompt as one argument, and a `repo` holding `$`, `"` or a backtick is refused naming it before any
   // agent spawns. RED against the harness at unit 37's commit `6d768c563`, where all 13 interpolations
-  // are bare and no character of `repo` is refused.
+  // are bare and no character of `repo` is refused. This run is the diff kind; the spec presets are the
+  // `FH43 AC7` arm in runWalkArms.
   {
     const rs = await runReview(Object.assign({}, DIFF, { repo: 'C:/x y/z' }), ALL_OK)
     const named = rs.trace.map((t) => t.prompt).join('\n').match(/git -C (?:"[^"]*"|[^\s`]+)/g) || []
     ck(!rs.threw && named.length > 0 && named.every((g) => g === 'git -C "C:/x y/z"'),
-      'FH40 AC19 a repo of C:/x y/z reaches every prompt as git -C "C:/x y/z": ' + named.length + ' git -C command(s), ' +
+      'FH40 AC19 a repo of C:/x y/z reaches every prompt of a diff review as git -C "C:/x y/z": ' + named.length + ' git -C command(s), ' +
       JSON.stringify(named.filter((g) => g !== 'git -C "C:/x y/z"').slice(0, 3)))
     const unrefused = []
     for (const c of ['$', '"', '`']) {
@@ -743,6 +745,25 @@ async function runWholeScriptArms() {
       if (!rr.threw || rr.threw.indexOf(JSON.stringify(c)) === -1 || rr.trace.length !== 0) unrefused.push(c + ' ' + (rr.threw || 'did not throw'))
     }
     ck(unrefused.length === 0, 'FH40 AC19 a repo holding $, " or a backtick is refused naming it before any agent spawns: ' + JSON.stringify(unrefused))
+  }
+
+  // ---- TOOL-dFairHearing-43 AC1: `base` and `head` reach the checklist agent's and the probe's shell lines, so a
+  // value outside the ref shape is refused naming its field before any agent; a moving ref and a parent suffix
+  // complete, the checklist agent first. RED against the harness at unit 40, where the `head` run spawns that agent
+  // with the value in its command.
+  {
+    const unrefused = []
+    for (const [field, v] of [['head', 'HEAD;echo PWNED'], ['base', 'abc $(echo PWNED)'], ['base', 'ab`c'], ['base', '-x']]) {
+      const rr = await runReview(Object.assign({}, DIFF, { [field]: v }), ALL_OK)
+      if (!rr.threw || rr.threw.indexOf('tier2-review:') !== 0 || rr.threw.indexOf('`' + field + '`') === -1 || rr.trace.length !== 0) unrefused.push(field + ' ' + v + ' ' + (rr.threw || 'did not throw'))
+    }
+    ck(unrefused.length === 0, 'FH43 AC1 a base or head outside the ref shape is refused naming its field before any agent spawns: ' + JSON.stringify(unrefused))
+    const stopped = []
+    for (const over of [{ base: 'origin/main' }, { head: 'HEAD~1' }]) {
+      const rr = await runReview(Object.assign({}, DIFF, over), ALL_OK)
+      if (rr.threw || !rr.trace[0] || rr.trace[0].label !== 'resume:checklist') stopped.push(JSON.stringify(over) + ' ' + rr.threw)
+    }
+    ck(stopped.length === 0, 'FH43 AC1 a base of origin/main and a head of HEAD~1 each complete, the checklist agent first: ' + JSON.stringify(stopped))
   }
 
   // ---- TOOL-aOrientedCast-27 AC8: every whole label is `<slug> · <kind> round <n> · <stage>`, the slug
@@ -2402,6 +2423,25 @@ async function runWalkArms() {
   ck(unseeded.length === 5 && unseeded.every((t) => t.prompt.indexOf('SHA-256') === -1 && !/[0-9a-f]{64}/.test(t.prompt)),
     'walk: under seed none no walker prompt carries a SHA-256: ' + unseeded.length + ' walker(s)')
   ck(src.split('\n').filter((l) => /\bconst WALK_RULES\b/.test(l)).length === 1, 'walk: the harness defines WALK_RULES once')
+  // ---- TOOL-dFairHearing-43 AC7: the spaced-repo quoting over every preset the harness ships, here beside WD and its
+  // walker stubs: each run holds a `git -C` and every one is quoted. The diff kind is the `FH40 AC19` arm. The round-2
+  // fold's subject is the THREE fixture's first, `prevBlob` unequal to its blob. RED on the quotes stripped from the
+  // probe's hash-object command alone, then from the acquire sentence's alone.
+  const SPACED = 'git -C "C:/x y/z"'
+  const FOLD = { round: 2, subjects: [{ path: 'memory/builds/dX/spec/one.md', blob: 'd'.repeat(40), id: 'TOOL-x-1', rev: 1, prevBlob: 'a'.repeat(40) }], priorFindings: [{ ref: 'one.md:section 2', claim: 'PRIOR' }] }
+  for (const [preset, args, stubs] of [['unit-spec at round 1', SPEC, ALL_OK], ['the unit-spec round-2 fold', Object.assign({}, SPEC, FOLD), ALL_OK],
+    ['design-audit', Object.assign({}, DESIGN, { preset: 'design-audit' }), ALL_OK], ['whole-design', WD, WALK_OK_STUBS]]) {
+    const rq = await runReview(Object.assign({}, args, { repo: 'C:/x y/z' }), stubs)
+    const named = rq.trace.map((t) => t.prompt).join('\n').match(/git -C (?:"[^"]*"|[^\s`]+)/g) || []
+    ck(!rq.threw && named.length > 0 && named.every((g) => g === SPACED),
+      'FH43 AC7 ' + preset + ' reaches every prompt as ' + SPACED + ': ' + named.length + ' git -C command(s), ' + JSON.stringify(named.filter((g) => g !== SPACED).slice(0, 3)) + (rq.threw ? ' threw ' + rq.threw : ''))
+    if (args !== SPEC) continue
+    const holds = (t, c) => t.prompt.indexOf(SPACED + ' ' + c) !== -1
+    const probeSpawn = rq.trace.find((t) => t.label === 'resume:probe') || { prompt: '' }
+    const others = rq.trace.filter((t) => t !== probeSpawn)
+    ck(holds(probeSpawn, 'hash-object <path>') && others.some((t) => holds(t, 'hash-object <path>')) && others.some((t) => holds(t, 'diff <blob> -- <path>')),
+      'FH43 AC7 unit-spec at round 1 carries the probe\'s hash-object command and the acquire sentence\'s hash-object and diff commands')
+  }
 }
 
 // ==== TOOL-dFairHearing-2 — the design-audit preset: its lenses, its review key and its announcements ====
@@ -2418,7 +2458,6 @@ async function runPresetArms() {
   }
   const DL = readLiteral('DESIGN_LENSES')
   const SL = readLiteral('SPEC_LENSES')
-  const DESIGN = Object.assign({}, SPEC, { subjects: [{ path: 'memory/builds/dX/build/a.md', blob: 'abc1234', id: 'PLAY-dX-1' }] })
   const scanFinds = (run) => run.trace.filter((t) => t.label.indexOf('find:') === 0)
   const checkBriefs = (finds, lenses) => finds.length === 5 && lenses.length === 5 &&
     finds.every((t, i) => t.label === 'find:' + lenses[i].key && t.prompt.indexOf('LENS: ' + lenses[i].brief + '\n') !== -1)
@@ -3082,18 +3121,31 @@ async function runDispositionArms() {
       'dispositions: under ' + u + ' none with a reason is ' + (u === 'refuse' ? 'refused' : 'accepted') + ', ownerItems ' + JSON.stringify(x.result && x.result.ownerItems) +
       ', and none with an empty reason is refused')
   }
-  // ---- TOOL-dFairHearing-23 AC23: the reason cell is one line, a pipe written as `\|`: the prompt says so, and a raw `|`
-  // or a line break refuses the set, its note naming the appendix as needing a re-render. RED against the parent render,
-  // whose prompt states no such rule and whose check admits any non-empty reason.
+  // ---- TOOL-dFairHearing-43 AC2: `renderCell` is the one encoder of the returned appendix, so a `none` reason is plain
+  // text: a raw `|` and a line break are each accepted, and `parse_appendix_rows` reads id 1's cell back. The agent writes
+  // the record's own cell, so the appendix paragraph states the escape. RED against the render at unit 40, which refuses
+  // both reasons and states no such sentence.
   {
+    const py = process.argv[5] || ''
+    const { spawnSync } = require('child_process')
     const buildReason = (reason) => buildDisposingSynth((ids) => ids.map((id) => (id === 1 ? { id: id, disposition: 'none', reason: reason } : { id: id, disposition: 'new:fresh-class' })))
+    const readCell = (x) => {
+      if (x.threw || !py) return 'no read-back: ' + (x.threw || 'no python was resolved')
+      const p = spawnSync(py, ['-B', '-c', 'import json, sys\nsys.path.insert(0, sys.argv[1])\nimport replay_scorer\nrows, err = replay_scorer.parse_appendix_rows(sys.stdin.read())\n' +
+        'print(json.dumps(err or [r["disposition"] for r in rows if r["id"] == "1"][0]))', require('path').dirname(FILE)],
+      { input: 'confirmed ' + x.result.confirmed + '\n' + x.result.appendix, encoding: 'utf8', env: Object.assign({}, process.env, { PYTHONUTF8: '1' }) })
+      try { return JSON.parse(p.stdout) } catch { return 'no read-back: ' + p.stdout + p.stderr }
+    }
     const raw = await runReview(Object.assign({}, DIFF, { unclassed: 'reason' }), buildStubs({ synth: buildReason('a | b') }))
     const brk = await runReview(Object.assign({}, DIFF, { unclassed: 'reason' }), buildStubs({ synth: buildReason('a\nb') }))
-    const esc = await runReview(Object.assign({}, DIFF, { unclassed: 'reason' }), buildStubs({ synth: buildReason('a \\| b') }))
-    ck(!raw.threw && !brk.threw && !esc.threw && [raw, brk].every((x) => x.result.dispositions === null && x.result.note.indexOf('appendix needs a re-render') !== -1) &&
-      Array.isArray(esc.result.dispositions) && synthCall(raw).prompt.indexOf('so write it on one line, a pipe written as `\\|`') !== -1,
-      'FH23 AC23 a raw | and a line break refuse the set naming the appendix re-render, an escaped one is accepted, and the prompt says so: ' +
-      (raw.threw || raw.result.note))
+    ck(!raw.threw && Array.isArray(raw.result.dispositions) && readCell(raw) === 'none — a | b',
+      'FH43 AC2 a reason holding a raw | is accepted and reads back whole: ' + readCell(raw))
+    ck(!brk.threw && Array.isArray(brk.result.dispositions) && readCell(brk) === 'none — a b',
+      'FH43 AC2 a reason holding a line break is accepted and reads back as one space: ' + readCell(brk))
+    const ask = synthCall(raw).prompt
+    const paragraph = ask.slice(ask.indexOf('APPENDIX - the report\'s LAST section'))
+    ck(ask.indexOf('a pipe written as') === -1 && paragraph.indexOf('APPENDIX - ') === 0 && paragraph.indexOf('which you write and the harness does not encode') !== -1,
+      'FH43 AC2 the prompt asks for no escape in the returned reason, and the appendix paragraph states it for the record\'s cell')
   }
   // ---- TOOL-dFairHearing-23 AC22: the leg list is used whole or not at all. RED against the parent render, whose filter keeps a
   // truncated list and an empty one as the manifest, so the short list admits the gate and the empty one names no missing manifest.
@@ -3924,7 +3976,10 @@ printf '%s\n' "$out"
 # RAISED 627 -> 629 by TOOL-dFairHearing-40: 2 assertions, the `FH40` arms — AC19's spaced repo (1) and its three
 # refused characters (1). The three quoted expectations it rewrites add none. Counted by hand and by a scratch
 # probe of the same calls, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=629
+# RAISED 629 -> 638 by TOOL-dFairHearing-43: 9 assertions, the `FH43` arms — AC1's refusals and admissions (2), AC2's
+# three in place of the one it moved (2 net), and AC7's four runs and its command check (5). Counted by hand and by
+# scratch probes of the same calls, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=638
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"
