@@ -8,6 +8,10 @@
 
 — owner, 2026-11-04, answering the run's parked item on whether the 2026-10-23 stop covers the units the close added.
 
+> No, override, run a review on those units' code
+
+— owner, 2026-11-04, minutes later, while unit 47's spec commit was in flight. That commit's trailer still reads no further diff review; this record is the later word.
+
 ## What the run was doing
 
 - The close added units `TOOL-dFairHearing-43` to `TOOL-dFairHearing-47`. Units 43 and 44 carry the closing diff review's eight minors; units 45 to 47 repair reds the bar's lint legs attribute to this build.
@@ -18,4 +22,4 @@
 
 - No spec audit runs on units 43 to 47. Unit 47 builds from its spec as written.
 - The close's `specs-audited` override cites this record beside the 2026-10-23 stop.
-- No further diff review runs.
+- A diff review runs over the code of units 43 to 47, from `bc4bb6e17` to the tip, once unit 47 lands. The run reads the second message as overriding only that clause, so spec audits stay stopped.
