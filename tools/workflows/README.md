@@ -1094,6 +1094,41 @@ harness replay runs through `tier2-review.js`, a declared harness.
 a template default: the harness's own `preset` default stays `unit-spec`, so only a pin over design
 records alone moves to `design-audit`.
 
+**The per-arm step, when one record is replayed under two arms** (TOOL-dFairHearing-30 S7). The
+harness writes its report under `${repo}/${reviewDir}`, so a second arm run in the first arm's clone
+reviews a tree holding the first arm's report. Each record and arm therefore takes its own clone
+`f<r><a><n>`: `<r>` the record's position in the corpus, `<a>` the arm's letter, `<n>` the attempt
+from 1. A re-run, for any cause, takes the next `<n>` and a new clone, and no clone is reused. Run
+this block per clone as one script from the repository, the recipe above in place of its comment
+line, with `$t` for `$TEMP`, `<name>` the clone's name and `<commit>` the record's range head, so
+the recipe's stale refusal reads `$c`:
+
+```bash
+test -n "$SCRATCH" || { echo "SCRATCH is empty"; exit 2; }
+test -n "$ORCH" || { echo "ORCH is empty"; exit 2; }
+t="${TEMP:-$TMPDIR}"
+test -n "$t" || { echo "no temp directory: TEMP and TMPDIR are both empty"; exit 2; }
+if command -v cygpath >/dev/null 2>&1; then t=$(cygpath -m "$t"); fi
+c="$t/f<r><a><n>"
+# the replay section's recipe over "$c" at the record's range head: stale refusal, exact-commit check
+s=$(git -C "$c" status --porcelain --untracked-files=all) || { echo "status failed: $c"; exit 2; }
+test -z "$s" || { echo "dirty: $c"; exit 2; }
+o=$(git -C "$ORCH" rev-parse --verify HEAD) || { echo "orchestrating head unreadable: $ORCH"; exit 2; }
+echo "orchestrating $o clone $c" >> "$SCRATCH/run.log"
+# the harness call, `repo` set to "$c"; its report lands under "$c/<reviewDir>"
+```
+
+`SCRATCH` is the run's scratch directory and `ORCH` this repository's root; either one empty refuses
+with exit 2 naming it, before any path is built. `TEMP` is the Windows name of the temp directory
+and `TMPDIR` the POSIX one: the clone's parent is `TEMP`, else `TMPDIR`, refused when both are empty,
+and folded to forward slashes by `cygpath -m` where `cygpath` exists. The clone's status and the
+orchestrating commit are each read as their own call with the exit checked, because a substitution
+inside `test -z` hides its exit: over an overwritten `.git/index`, `git status` exits 128 and
+`test -z "$(git status …)"` reads the tree as clean. A non-empty status refuses the call, and the arm
+takes a new attempt. The `orchestrating <sha> clone <path>` line is appended to `$SCRATCH/run.log`
+before the harness call, and the verdict record quotes those lines, which all name one sha. After the
+call, the clone's status lists one untracked path, the arm's own report.
+
 ## `orient-counterfactual.js` — one stage-2 arm per call
 
 The stage-2 `orient` subagent is deferred behind a measurement: whether moving a kickoff's
