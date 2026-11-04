@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-45 — the bar's own reds in the kits: renders the ban can read, a fragment that ships, one anchor, no-fork forms, eight renames, and the honest brief record
 
-**Status:** OPEN · rev-4 · 2026-11-04 · node d · Tier-2 · base f4120c83 · streams tooling · order 30 · ratified 2026-11-04
+**Status:** INPROGRESS · rev-4 · 2026-11-04 · node d · Tier-2 · base f4120c83 · streams tooling · order 30 · ratified 2026-11-04
 
 **Derived:** PLAY-dClosedLoop-2
 
