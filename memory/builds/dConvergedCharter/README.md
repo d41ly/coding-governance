@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: playbook
 roster: PLAY
-ids: PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-24 PLAY-dConvergedCharter-25 PLAY-dConvergedCharter-26 PLAY-dConvergedCharter-27 PLAY-dConvergedCharter-28 PLAY-dConvergedCharter-29 PLAY-dConvergedCharter-30 PLAY-dConvergedCharter-31 PLAY-dConvergedCharter-32 PLAY-dConvergedCharter-33 PLAY-dConvergedCharter-34 PLAY-dConvergedCharter-35 PLAY-dConvergedCharter-36 PLAY-dConvergedCharter-37 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40
+ids: PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-24 PLAY-dConvergedCharter-25 PLAY-dConvergedCharter-26 PLAY-dConvergedCharter-27 PLAY-dConvergedCharter-28 PLAY-dConvergedCharter-29 PLAY-dConvergedCharter-30 PLAY-dConvergedCharter-31 PLAY-dConvergedCharter-32 PLAY-dConvergedCharter-33 PLAY-dConvergedCharter-34 PLAY-dConvergedCharter-35 PLAY-dConvergedCharter-36 PLAY-dConvergedCharter-37 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-41
 spec-audit: 2026-10-21
 parents: dScopedBuild dShippedRelease dCalibratedLens dMindYourWords
 may: PLAY-dClosedLoop-3
@@ -83,27 +83,29 @@ none
 | 21 | `PLAY-dConvergedCharter-21` | `cl-dClosedLoop-0495@53f4c9b2` | `tools/roles/house/policy.toml` retired as a seed: a repository's efforts folded into the `roles.effort.*` policy keys |
 | 22 | `PLAY-dConvergedCharter-22` | `cl-dClosedLoop-0496@a94b54b6` | the census of gov's own flow and role settings: the legs no descriptor declares |
 | 23 | `PLAY-dConvergedCharter-23` | `cl-dClosedLoop-0502@fbfa8f4f` | the release asks' join: Maintain's `release-verify-failed` ask and `release.route`'s keyed alike by (reading |
+| 24 | `PLAY-dConvergedCharter-41` | `cl-dClosedLoop-0485@dde21704` part 2/2 | the named readers of the folded conf keys re-pointed, and the house-file fallback's arm (the owner's 2026-11-04 split of unit 11) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 26 unit(s) · node d · opened 2026-10-21 · streams playbook
+**Build status:** DEFERRED · 27 unit(s) · node d · opened 2026-10-21 · streams playbook
 ids PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11
 ids PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22
 ids PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-24 PLAY-dConvergedCharter-25 PLAY-dConvergedCharter-26 PLAY-dConvergedCharter-27 PLAY-dConvergedCharter-28 PLAY-dConvergedCharter-29 PLAY-dConvergedCharter-30 PLAY-dConvergedCharter-31 PLAY-dConvergedCharter-32 PLAY-dConvergedCharter-33
-ids PLAY-dConvergedCharter-34 PLAY-dConvergedCharter-35 PLAY-dConvergedCharter-36 PLAY-dConvergedCharter-37 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40
+ids PLAY-dConvergedCharter-34 PLAY-dConvergedCharter-35 PLAY-dConvergedCharter-36 PLAY-dConvergedCharter-37 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-41
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [PLAY-dConvergedCharter-22 — the census of gov's own flow and role settings, each row ruled by the owner and the gov-only ones moved](spec/2026-11-03-spec-PLAY-dConvergedCharter-22.md) | 1 | 2 | DEFERRED | rev-3 | 2026-11-04 |
-| [PLAY-dConvergedCharter-11 — every kit conf key the retrofit does not convert folded into the policy file, its readers inventoried by value and re-pointed](spec/2026-11-03-spec-PLAY-dConvergedCharter-11.md) | 2 | 2 | DEFERRED | rev-4 | 2026-11-04 |
+| [PLAY-dConvergedCharter-11 — every kit conf key the retrofit does not convert folded into the policy file, its readers inventoried by value and re-pointed](spec/2026-11-03-spec-PLAY-dConvergedCharter-11.md) | 2 | 2 | DEFERRED | rev-5 | 2026-11-04 |
 | [PLAY-dConvergedCharter-38 — the memory root's live carriers declared once in the dead-path gate and read by the reader inventory, so a retirement's inventory names a dossier or gotcha still citing the retired path](spec/2026-11-04-spec-PLAY-dConvergedCharter-38.md) | 3 | 2 | DEFERRED | rev-2 | 2026-11-04 |
-| [PLAY-dConvergedCharter-12 — the unattended kit, its four guides and `/unattended` retired once the driver carries every run, every reader by path and by value re-pointed or retired with it](spec/2026-11-03-spec-PLAY-dConvergedCharter-12.md) | 4 | 2 | DEFERRED | rev-3 | 2026-11-04 |
+| [PLAY-dConvergedCharter-41 — the folded homes' named readers re-pointed: the four `read_policy_key` copies, `read_modes`, `held_halves.py`, govkit's conf-key gap check and the placeholder arm, with the house-file arm](spec/2026-11-04-spec-PLAY-dConvergedCharter-41.md) | 3 | 2 | DEFERRED | rev-1 | 2026-11-04 |
+| [PLAY-dConvergedCharter-12 — the unattended kit, its four guides and `/unattended` retired once the driver carries every run, every reader by path and by value re-pointed or retired with it](spec/2026-11-03-spec-PLAY-dConvergedCharter-12.md) | 4 | 2 | DEFERRED | rev-4 | 2026-11-04 |
 | [PLAY-dConvergedCharter-17 — the `/build` Skill retired once the supervisor drives attended builds, its client held by a `skill` shim for the deprecation window](spec/2026-11-03-spec-PLAY-dConvergedCharter-17.md) | 4 | 2 | DEFERRED | rev-3 | 2026-11-04 |
 | [PLAY-dConvergedCharter-16 — the `/session-kickoff` Skill retired: its kit homed under the tool root, a `[[retired]]` row, a forwarding stub and the dangling-link report](spec/2026-11-03-spec-PLAY-dConvergedCharter-16.md) | 5 | 2 | DEFERRED | rev-2 | 2026-11-04 |
 | [PLAY-dConvergedCharter-5 — adopters migrated onto the ranked charter and the loop by the walk that exists, each read migrated or put to the owner](spec/2026-11-03-spec-PLAY-dConvergedCharter-5.md) | 6 | 2 | DEFERRED | rev-1 | 2026-11-03 |
-| [PLAY-dConvergedCharter-20 — the conf fold and the unattended kit's retirement shipped as upgrade steps, every shim closed when its window does, and the adopter exit check widened](spec/2026-11-03-spec-PLAY-dConvergedCharter-20.md) | 7 | 2 | DEFERRED | rev-3 | 2026-11-04 |
-| [PLAY-dConvergedCharter-21 — `tools/roles/house/policy.toml` retired as a seed: a repository's unruled efforts folded into `roles.effort.*` by an upgrade step, and the house-file fallback gone](spec/2026-11-03-spec-PLAY-dConvergedCharter-21.md) | 8 | 2 | DEFERRED | rev-2 | 2026-11-04 |
+| [PLAY-dConvergedCharter-20 — the conf fold and the unattended kit's retirement shipped as upgrade steps, every shim closed when its window does, and the adopter exit check widened](spec/2026-11-03-spec-PLAY-dConvergedCharter-20.md) | 7 | 2 | DEFERRED | rev-4 | 2026-11-04 |
+| [PLAY-dConvergedCharter-21 — `tools/roles/house/policy.toml` retired as a seed: a repository's unruled efforts folded into `roles.effort.*` by an upgrade step, and the house-file fallback gone](spec/2026-11-03-spec-PLAY-dConvergedCharter-21.md) | 8 | 2 | DEFERRED | rev-3 | 2026-11-04 |
 | [PLAY-dConvergedCharter-23 — the release asks' join: one key hash and one ask text for Maintain's and `release.route`'s `release-verify-failed` filings](spec/2026-11-03-spec-PLAY-dConvergedCharter-23.md) | 9 | 2 | DEFERRED | rev-3 | 2026-11-04 |
 | [PLAY-dConvergedCharter-6 — every record kind on dTotalRecall's registry: the residue sweep of the memory tree's homes, and the kinds no spec registers](spec/2026-11-03-spec-PLAY-dConvergedCharter-6.md) | 10 | 2 | DEFERRED | rev-2 | 2026-11-04 |
 | [PLAY-dConvergedCharter-3 — records merged by evidence: two kinds the registry and the commit history call one become one, the other name an alias shipped as an upgrade step](spec/2026-11-03-spec-PLAY-dConvergedCharter-3.md) | 11 | 2 | DEFERRED | rev-2 | 2026-11-04 |
@@ -123,21 +125,21 @@ ids PLAY-dConvergedCharter-34 PLAY-dConvergedCharter-35 PLAY-dConvergedCharter-3
 | [PLAY-dConvergedCharter-18 — the owner's cycle walked by key from a planted build's intake, red on a hop resolved by search or prose](spec/2026-11-03-spec-PLAY-dConvergedCharter-18.md) | 23 | 2 | DEFERRED | rev-1 | 2026-11-03 |
 <!-- /gen:build-units -->
 
-Records: 30 bound to this build, across 4 record folder(s).
+Records: 35 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: PLAY-dConvergedCharter-40.
+Ids no `spec-audit` record has ever named: PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-41.
 
-Ids whose spec moved past its audited revision: none — 25 of 26 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: PLAY-dConvergedCharter-11@rev-3 PLAY-dConvergedCharter-12@rev-2 PLAY-dConvergedCharter-20@rev-2 PLAY-dConvergedCharter-21@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dConvergedCharter's 23 clause(s) and 1 owned node(s), over 26 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dConvergedCharter's 23 clause(s) and 1 owned node(s), over 27 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
-- carried whole: 23
-- carried in parts: 0 (none)
+- carried whole: 22
+- carried in parts: 1 (cl-dClosedLoop-0485)
 - moved, retired or deferred: none
 - uncarried: 0 (none)
 - stale: 0 (none)
@@ -153,7 +155,7 @@ Coverage of dConvergedCharter's 23 clause(s) and 1 owned node(s), over 26 spec(s
 |---|---|---|
 | 1 | `PLAY-dConvergedCharter-22` | no |
 | 2 | `PLAY-dConvergedCharter-11` | no |
-| 3 | `PLAY-dConvergedCharter-38` | no |
+| 3 | `PLAY-dConvergedCharter-38`, `PLAY-dConvergedCharter-41` | no |
 | 4 | `PLAY-dConvergedCharter-12`, `PLAY-dConvergedCharter-17` | no |
 | 5 | `PLAY-dConvergedCharter-16` | no |
 | 6 | `PLAY-dConvergedCharter-5` | no |

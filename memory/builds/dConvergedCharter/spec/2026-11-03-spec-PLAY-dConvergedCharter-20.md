@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-20 — the conf fold and the unattended kit's retirement shipped as upgrade steps, every shim closed when its window does, and the adopter exit check widened
 
-**Status:** DEFERRED · rev-3 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 7 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-4 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 7 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0494@4e004b72 whole
 
@@ -11,7 +11,7 @@
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md](../build/2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md) | research | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 |
 | [2026-11-03-build-PLAY-dConvergedCharter-20-deviation-201.md](../build/2026-11-03-build-PLAY-dConvergedCharter-20-deviation-201.md) | deviation | — |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-41 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
 | [2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-39 |
@@ -76,7 +76,7 @@ and the owner-item mailbox (TOOL-dWellOiledMachine-48 S1, S4). `read_releases`
   the fifth row, `push-main/gate-env-to-policy`, in `tools/govkit/entries/push-main.kit.toml`, the
   descriptor whose `pre-push` hook reads the file: no descriptor ships the file, but the runbook tells
   every push-main adopter to declare `GATE_DOC_PATHS` and `GATE_POST_MERGE` in its own committed copy
-  (`WIRE-INTO-PROJECT.md:921-936`), and unit 11 re-points those reads to the policy file. Its map is the
+  (`WIRE-INTO-PROJECT.md:921-936`), and unit 41 re-points those reads to the policy file. Its map is the
   gate file's `owner-policy` keys alone, the only ones with a catalogue row, so its `mechanic` lines and
   its shell code stay and the file is never removed. `process-monitor/conf-to-policy` deletes the
   adopter's `.process-monitor.conf`, every non-comment line of which is a folded `PROCMON_` key; its
@@ -86,10 +86,11 @@ and the owner-item mailbox (TOOL-dWellOiledMachine-48 S1, S4). `read_releases`
   .process-monitor.conf` prints a key, or the file exists", in the adopter's installed copies that the
   same `update` ships, so the step lands only with that re-point and the deleted file disables nothing.
   Observed by AC3, AC7 and AC8.
-  **Readers:** by name: the keys' readers in each kit, re-pointed by unit 11 before this unit's steps
+  **Readers:** by name: the keys' readers in each kit, re-pointed by units 11 and 41 before this unit's steps
   land, and `tools/policy/legacy-homes.txt`, drained by `policy.py lists --write` · by value: each kit's
   conf-key gap check `read_conf_key_gaps` (`tools/govkit/govkit.py:4943`), which reads `*_keys` and
-  unit 11 re-points; and the presence tests of `tools/run-gates/run-gates.sh:1543` and
+  PLAY-dConvergedCharter-41 S1 re-points; and the presence tests of
+  `tools/run-gates/run-gates.sh:1543` and
   `tools/process-monitor/adopt-process-monitor.sh:227-229`, re-pointed by unit 11 S4's fifth shape.
 - **S3** — The unattended kit's retirement as a step. `unattended/run-conf-retired`, an `[[upgrade]]`
   row in `tools/govkit/steps.toml`, the file for a surface no live entry owns, since unit 12's
@@ -159,6 +160,7 @@ and the owner-item mailbox (TOOL-dWellOiledMachine-48 S1, S4). `read_releases`
 ### Edges
 
 - **consumes-from** `PLAY-dConvergedCharter-11` — `render_folded_lines`, the `legacy` verb S1 reads a home's assignments through, and `legacy-homes.txt` with the catalogue's `legacy` field it drains into, the key map S1 derives and S2's homes, the derived-default refusal of `get` S1 reads as no catalogue value, and S4's presence shape that keeps `process-monitor/conf-to-policy` from disabling an adopter's monitor; without it no key is folded and the steps move nothing
+- **consumes-from** `PLAY-dConvergedCharter-41` — `read_conf_key_gaps`, re-pointed to `policy.py legacy`, and the pre-push hook's `gate.doc-paths` and `gate.post-merge` reads through `policy.py get`, which S2's `push-main/gate-env-to-policy` step relies on; without it the step strips an adopter's gate keys its hook still reads from the file
 - **consumes-from** `PLAY-dConvergedCharter-12` — `tools/unattended/` leaving gov under its `[[retired]]` row, which S3's step follows at the adopter, the `unattended.*` catalogue rows that unit leaves standing for keys read outside the kit, the map S3 moves, and `.memory-tree.conf` as the moved checkers' cutoff home, where S3 carries an adopter's cutoffs; without it the step would strip a conf a live kit reads
 - **consumes-from** `PLAY-dConvergedCharter-17` — `shims.toml`, the `roles/build-skill` row S4 holds to its window and reds, naming the roles kit as the one that closes it, once a release lets the window close
 - **consumes-from** `PLAY-dConvergedCharter-5` — `steps-pending`, read through `derive_migration_state`, the state S5 grades
@@ -245,7 +247,7 @@ until a release is cut.
   records; a step per home walks the same keys under one before-image.
 - **No step for `.githooks/gate-env.sh`.** Rejected by reading the runbook: no descriptor ships the
   file, but `WIRE-INTO-PROJECT.md:921-936` tells adopters to write `GATE_DOC_PATHS` and
-  `GATE_POST_MERGE` into their own, and unit 11 re-points those reads to the policy file, so an adopter
+  `GATE_POST_MERGE` into their own, and unit 41 re-points those reads to the policy file, so an adopter
   would lose both with no message.
 - **`policy.py get <key> --explain` as the detector of a home's value.** `get` reads no kit conf, and
   unit 11 puts the home fallback in `legacy` alone, so the up would move nothing and still strip the
@@ -310,7 +312,7 @@ until a release is cut.
   `.githooks/gate-env.sh` holds `GATE_POST_MERGE=local`, `GATE_DOC_PATHS="memory/ README.md"` and
   `GOV_KITROOT=tools`, the policy file gains `gate.post-merge` and `gate.doc-paths`, the gate file keeps
   its `GOV_KITROOT` line and every non-assignment line, and `down` restores both files byte-identical.
-  Red when: an adopter's owner-policy gate key is left unread after unit 11's re-point, or a mechanic
+  Red when: an adopter's owner-policy gate key is left unread after unit 41's re-point, or a mechanic
   line leaves the gate file.
 - **AC8** — When `process-monitor/conf-to-policy`'s up runs over a scratch adopter holding the
   process-monitor and run-gates kits at this build's tip and a committed `.process-monitor.conf`, the
@@ -361,6 +363,10 @@ New arm: tools/govkit/selftest.py · covers AC6 · a planted register and mailbo
   presence-testing readers named, landing with unit 11 S4's presence shape, AC8 and the adopter suite's
   leg) and 1 (S3 carries the moved checkers' cutoffs into the target's `.memory-tree.conf`, AC4), with
   the consumes-from edges to PLAY-dConvergedCharter-11 and -12 naming what each now supplies.
+- rev-4 · 2026-11-04 · S2 §3 §4 AC7 · sibling edit for the owner's split of PLAY-dConvergedCharter-11,
+  `2026-11-04-prompt-PLAY-dConvergedCharter-1-owner-decisions` ("fold vs re-points"): the re-points of
+  the gate keys' hook reads and of `read_conf_key_gaps` are PLAY-dConvergedCharter-41's, cited as unit
+  41 with a consumes-from edge to it; S4's presence shape stays unit 11's.
 
 ## 10. Reuse audit
 

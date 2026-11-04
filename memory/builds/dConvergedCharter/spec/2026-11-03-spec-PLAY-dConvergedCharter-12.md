@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-12 — the unattended kit, its four guides and `/unattended` retired once the driver carries every run, every reader by path and by value re-pointed or retired with it
 
-**Status:** DEFERRED · rev-3 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 4 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-4 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 4 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0486@36def3b5 whole
 
@@ -10,7 +10,7 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md](../build/2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md) | research | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-41 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
@@ -37,7 +37,7 @@ before this unit's pass begins:
 |---|---|---|
 | P1 | TOOL-dWellOiledMachine-25 and -28: `run` drives every build and `/unattended` is its client | `git grep -l 'unattended/' -- tools/runtime tools/loop` lists no file but WOM-28's `driver.sh`, and `driver.sh` resolves no verb into `unattended.sh` |
 | P2 | the driver verbs this build's own run uses have homes outside the kit: dispatch, phase and witness, `--close`, the run record (TOOL-dDeclaredLoop-7, TOOL-dWellOiledMachine-2, -3, -25) | `run.py --help` names each |
-| P3 | PLAY-dConvergedCharter-11 has landed: the kit's `read_policy_key` copy is gone and its conf keys read through `policy.py legacy .unattended.conf` | `check_policy.py --readers read_policy_key --kind value` exits 0 |
+| P3 | PLAY-dConvergedCharter-11 and PLAY-dConvergedCharter-41 have landed: the kit's `read_policy_key` copy is gone (unit 41 S1) and its conf keys read through `policy.py legacy .unattended.conf` (unit 11 S4) | `check_policy.py --readers read_policy_key --kind value` exits 0 |
 | P4 | the unit row with its `help` field, `instructions_edit.py check` and the change record's door (PLAY-dOrderedCharter-9 S1, -15 S6, S7), and the edge registry `tools/playbook/edges.toml` with its closed set and grammar (PLAY-dOrderedCharter-24 S1), into which S7 writes the `explains` row | `python tools/playbook/edge_grammar.py --list` exits 0 and `instructions_edit.py check` passes a planted unit row carrying an edge type the registry already holds |
 
 - **S7** — The `explains` edge type, the first write of this unit's pass, before S1 writes any edge of
@@ -189,6 +189,7 @@ before this unit's pass begins:
 
 - **consumes-from** `PLAY-dConvergedCharter-22` — `settings_census.py`, whose `leaves-with` rows name the run conf's extension keys this unit takes out with `.unattended.conf`
 - **consumes-from** `PLAY-dConvergedCharter-11` — `derive_readers`, the inventory by path and by value whose `--readers` CLI lists every reader and reds a survivor on the scratch clone
+- **consumes-from** `PLAY-dConvergedCharter-41` — `read_policy_key`, the copy in `tools/unattended/unattended.sh` that unit deletes and re-points before this unit removes the kit; without it P3's probe finds the copy
 - **hands-off** `PLAY-dConvergedCharter-20` — `tools/unattended/`, removed from gov's tree, which the upgrade step removes from an adopter's, the `unattended.*` catalogue rows a reader outside the kit still reads, which its step moves, the tick forwarder's `unattended/resume-tick` row, which that unit's S4 holds to its window, and `.memory-tree.conf` as the moved checkers' cutoff home (S3), into which its step carries an adopter's cutoffs
 - **hands-off** `PLAY-dConvergedCharter-2` — `tools/unattended/`, gone, so `DIRECTIVES_CORE`'s M-number keys no longer hold a positional reference
 - **hands-off** `PLAY-dConvergedCharter-19` — `tools/unattended/`, gone with its guides and its line-ending pin rows, so the tag and class-pin migration never reaches them
@@ -456,6 +457,10 @@ not in the manifest at base.
   the pass's base), 23 (32 verbs at `unattended.sh:113`, `:116`) and 30 (every `memory/project/*.txt`
   registry row naming the kit drained or re-pointed, AC5, and the shell-hygiene and harness-arms legs);
   the hands-off edge to PLAY-dConvergedCharter-20 names the cutoff home its step carries at an adopter.
+- rev-4 · 2026-11-04 · P3 §3 · sibling edit for the owner's split of PLAY-dConvergedCharter-11,
+  `2026-11-04-prompt-PLAY-dConvergedCharter-1-owner-decisions` ("fold vs re-points"): P3 names
+  PLAY-dConvergedCharter-41, which now re-points the kit's `read_policy_key` copy, and the
+  consumes-from edge to it.
 
 ## 10. Reuse audit
 
