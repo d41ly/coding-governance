@@ -69,3 +69,11 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Your spec header's `advances PLAY-dOrderedCharter-38` stays `advances` when you flip it to `CLOSED`; you are not the last unit.
 - The unattended kit's own self-test suites are WAIVED for this build's landing (README, "Build-level rules"); a
   criterion they would observe is named as owed with PLAY-dClosedLoop-12, never run.
+
+## Owed by the unit before yours
+
+- Unit 9's fixture in `tools/playbook/instruction_units.py` holds a literal fixture path with a line number, an expected
+  error line, and the positional check reads it as an unlisted citation: the tags leg reds once.
+- Build that expected string from a placeholder, as unit 47's `SELFTEST_ROWS` do with `{x}`, so the source holds no
+  `path:line` text. Declare `tools/playbook/instruction_units.py` in your `--dispatch` if your spec does not, and confirm
+  the module's plants stay green.
