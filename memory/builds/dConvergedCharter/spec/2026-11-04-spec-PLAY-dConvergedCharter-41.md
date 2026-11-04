@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-41 — the folded homes' named readers re-pointed: the four `read_policy_key` copies, `read_modes`, `held_halves.py`, govkit's conf-key gap check and the placeholder arm, with the house-file arm
 
-**Status:** DEFERRED · rev-3 · 2026-11-04 · node d · Tier-2 · base 923954b6 · streams playbook · order 3 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 923954b6 · streams playbook · order 3 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0485@43490b62 part 2/2
 
@@ -15,6 +15,7 @@
 | [2026-11-04-prompt-PLAY-dConvergedCharter-41-split-brief.md](../prompts/2026-11-04-prompt-PLAY-dConvergedCharter-41-split-brief.md) | research | PLAY-dConvergedCharter-11 |
 | [2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
 | [2026-11-04-review-PLAY-dConvergedCharter-11-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 |
+| [2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md](../reviews/2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
 
 <!-- /gen:spec-records -->
 
@@ -85,12 +86,20 @@ S3 grades gov's tree only once PLAY-dConvergedCharter-21 retires the seed.
     blobs, `render_folded_lines(repo, <sha>, ".memory-tree.conf")` in-process, the policy kit reached
     by the inlined `resolve_kit_dir`, which takes the policy blob's `memory-tree.backlog-mode` where it
     sets one, else the conf blob's line; its second caller, `migrate_backlog.py:1325`, takes the result
-    unchanged;
+    unchanged. Where the policy kit does not resolve (`tools/memory-tree/kit.toml:7` reads `requires =
+    []`), it reads the conf blob alone, as at base, by unit 11 S4's absent-kit rule, under its standing
+    permanent exempt row; and at a commit whose policy blob `validate` rejects it takes unit 11 S3's
+    rule, the last valid revision's value, or, where that refuses, the conf blob's line with one line
+    naming the commit, never refusing the walk;
   - `tools/run-gates/held_halves.py`'s `resolve_wsl_host` (`:210-238`) parses the gate file's
     `GATE_WSL_MIRROR_DEFAULT`, a `mechanic`, and `GATE_WSL_PARITY_RUNS` from one `policy.py legacy
     .githooks/gate-env.sh` read at `HEAD` in place of the file's text, as unit 11 S3 reads a folded key,
-    never `get` at the landed revision; a non-zero exit refuses through `print_refusal` (`:69`),
-    naming `policy.py legacy` and its exit, and a blank count keeps its refusal (`:234-236`);
+    never `get` at the landed revision, the kit reached by `resolve_kit_dir("policy", "policy.py",
+    <the run-gates kit dir>)`; a non-zero exit refuses through `print_refusal` (`:69`), naming `policy.py
+    legacy` and its exit, and a blank count keeps its refusal (`:234-236`). Where that resolver raises
+    `LookupError` (`tools/run-gates/kit.toml:15` reads `requires = []`, and the default selection
+    carries no policy kit), it parses the gate file's own text through `parse_conf` as at base (`:214`),
+    by unit 11 S4's absent-kit rule, one `FOLDED_HOME_EXEMPT` row;
   - govkit's conf-key gap check `read_conf_key_gaps` (`tools/govkit/govkit.py:4943`, called by `check`
     at `:5484` and `update` at `:11897`) reads a kit's assignments from `policy.py legacy
     <[config].file>` in place of the file, so the `*_keys` lists of every kit whose `[config].file` is
@@ -120,10 +129,14 @@ S3 grades gov's tree only once PLAY-dConvergedCharter-21 retires the seed.
     (PLAY-dConvergedCharter-11 S3), never reading the catalogue's `legacy` field itself, so a template
     spelling a folded key's value still reds once the key leaves the shipped example.
   Each re-pointed shell caller captures the read and tests its exit before binding, the shape
-  PLAY-dConvergedCharter-11 S4 states, so a missing python or kit refuses naming the reader. The legs
-  `pre-push self-test`, `transition-audit arms` and `straggler-guard arms` add
-  `{prefix}/policy/policy.py` to their `guard` in `tools/gate-legs.json`, as unit 11 S4 does for its
-  suites. Observed by AC1, AC2, AC3, AC4, AC5, AC6, AC7, AC10, AC11 and AC12.
+  PLAY-dConvergedCharter-11 S4 states, so a missing python or kit refuses naming the reader, but for
+  `read_modes` and `held_halves.py`, which take that unit's absent-kit rule above. The leg guards are
+  unit 11 S4's derived join, never typed here: each leg whose guard lists, or whose argv entry names, a
+  file this S1 re-points adds `{prefix}/policy/policy.py` to its `guard` in `tools/gate-legs.json`; at
+  `34b387e69` that is `pre-push self-test`, `transition-audit arms`, `straggler-guard arms`, `pre-push
+  run-log line`, which drives the hook whose gate-key reads at `pre-push:1453-1454` this S1 re-points,
+  and `backlog migration selftest`, which runs `migrate_backlog.py` and so `read_modes`. Observed by
+  AC1, AC2, AC3, AC4, AC5, AC6, AC7, AC10, AC11 and AC12.
   **Readers:** by name: `.githooks/pre-push`, `tools/push-main.sh`, `tools/run-gates/post-merge.sh`,
   `tools/unattended/unattended.sh`, `tools/push-main.test.sh`, `.githooks/pre-push.test.sh`,
   `tools/unattended/unattended.test.sh`, `tools/lib/resolve-python.test.sh`, `tools/policy/README.md`,
@@ -205,7 +218,7 @@ S3 grades gov's tree only once PLAY-dConvergedCharter-21 retires the seed.
 
 ### Edges
 
-- **consumes-from** `PLAY-dConvergedCharter-11` — `render_folded_lines` behind `policy.py legacy`, the folded key names with each catalogue row's `legacy` field and `legacy --keys`, the one map the placeholder arm reads, `derive_readers` with its `--readers` CLI, `FOLDED_HOME_EXEMPT` with its two permanent rows and the transitional rows S2 drains, the held keys S2 moves by the held rule that unit's S2 states, and its commit route for a policy-file change, the owner's terminal commit then the agent's mirror; without it there is no verb to re-point to and no key to read
+- **consumes-from** `PLAY-dConvergedCharter-11` — `render_folded_lines` behind `policy.py legacy`, with that unit's S3 rule for an invalid policy blob that `read_modes` takes, the folded key names with each catalogue row's `legacy` field and `legacy --keys`, the one map the placeholder arm reads, `derive_readers` with its `--readers` CLI, `FOLDED_HOME_EXEMPT` with its permanent rows, the absent-kit rows among them, and the transitional rows S2 drains, that unit's S4 absent-kit rule, which `read_modes` and `held_halves.py` take, and its derived leg-guard join, which names this unit's legs, the held keys S2 moves by the held rule that unit's S2 states, and its commit route for a policy-file change, the owner's terminal commit then the agent's mirror; without it there is no verb to re-point to and no key to read
 - **hands-off** `PLAY-dConvergedCharter-12` — `read_policy_key`, the copy in `tools/unattended/unattended.sh` S1 deletes and re-points before that unit removes the kit, so its P3 probe reads no copy
 - **hands-off** `PLAY-dConvergedCharter-20` — `read_conf_key_gaps`, re-pointed to `policy.py legacy`, and the pre-push hook's `GATE_DOC_PATHS` and `GATE_POST_MERGE` reads through `policy.py legacy .githooks/gate-env.sh --rev <sha> --key`, which read `gate.doc-paths` and `gate.post-merge` where the policy file sets them and the gate file's line where it does not, which that unit's gate-file step relies on at an adopter
 - **hands-off** `PLAY-dConvergedCharter-21` — `arm_house_readers`, armed when the seed retires, its reach every code file outside the policy kit, which holds the arm's own constant and plants, and `HOUSE_MIGRATORS`, the exempt paths that unit's AC6 passes as `--except` beside `tools/policy/check_policy.py`
@@ -304,7 +317,9 @@ Nothing else is named here.
 - perf / scale — one interpreter start per read in each hook; `read_modes` stays two batch processes
   per home over the whole history.
 - error / empty / loading states — a reader whose `legacy` call fails refuses naming the
-  reader, exit 2 (unit 11 S4's capture shape); an absent key prints nothing and each caller's own
+  reader, exit 2 (unit 11 S4's capture shape); with no policy kit, `read_modes` and `held_halves.py`
+  read their homes as at base (unit 11 S4's absent-kit rule); a past invalid policy blob reads its last
+  valid revision in `read_modes`, else the conf blob with a named line (unit 11 S3); an absent key prints nothing and each caller's own
   default stands, as an absent line did; a remote with no tip reads `park` before any read, as
   `read_policy_at` did.
 - observability — the `--decide` line names the reading it took; the house-file arm prints `unarmed`
@@ -346,16 +361,22 @@ scratch repository under `%TEMP%` with a short name.
 - **AC3** — When `read_modes` runs over the `both-homes` fixture, whose first commit holds
   `BACKLOG_MODE=shards` in the conf and no policy value and whose second sets
   `memory-tree.backlog-mode = "builds"` and drops the line, it returns `shards` then `builds`, each
-  equal to `policy.py legacy .memory-tree.conf --rev <sha> --key BACKLOG_MODE` at that commit.
-  Red when: a commit whose policy blob sets the mode reads the conf blob's absence as `shards`, or
-  `read_modes` and `legacy` answer one commit differently.
+  equal to `policy.py legacy .memory-tree.conf --rev <sha> --key BACKLOG_MODE` at that commit; over
+  unit 11's `invalid-mid` fixture it returns `builds` at the invalid commit, and over
+  `invalid-mid-refuse` it returns the conf blob's mode there and prints one line naming that commit,
+  never raising; and in a scratch repository holding copies of `tools/memory-tree/` and `tools/lib/`
+  and no policy kit, over the same first commit, it returns `shards` from the conf blob alone.
+  Red when: a commit whose policy blob sets the mode reads the conf blob's absence as `shards`,
+  `read_modes` and `legacy` answer one commit differently, one invalid past blob ends the walk, or a
+  tree with no policy kit refuses check 26.
 - **AC4** — When `python held_halves.py` resolves its parity count over the `parity` fixture, which
   commits `gate.wsl-parity-runs = 5` in the policy file and `GATE_WSL_PARITY_RUNS=3` in the gate file,
   it reads 5; on a scratch clone of gov after S2 whose remote's default branch predates the move, it
-  reads gov's count from the policy file at `HEAD`; and with `policy.py` replaced by one exiting 3, it
-  refuses naming `policy.py legacy` and `exit 3`.
-  Red when: the working tree's gate file still wins, the count is read at the landed revision, or a
-  failed read is not refused.
+  reads gov's count from the policy file at `HEAD`; with `policy.py` replaced by one exiting 3, it
+  refuses naming `policy.py legacy` and `exit 3`; and with `tools/policy/` removed from the clone, it
+  reads the gate file's `GATE_WSL_PARITY_RUNS` from the file's text, as at base.
+  Red when: the working tree's gate file still wins, the count is read at the landed revision, a
+  failed read is not refused, or a tree with no policy kit refuses its parity count.
   fixture: the clone under `%TEMP%` with a short name; its remote a second local clone.
 - **AC5** — When `python check-kit-placeholders.py --root <dir>` runs over the `template-leak` fixture,
   a rendered template spelling `BACKLOG_MODE=500` while the example no longer assigns it, it exits 1
@@ -378,9 +399,10 @@ scratch repository under `%TEMP%` with a short name.
 - **AC8** — When `python policy.py lists --write` runs over gov's tree after S2, `grep -vc '^#'
   legacy-homes.txt` prints 14, every row a `mechanic` row of `.githooks/gate-env.sh`, one of the six
   `.unattended.conf` extension rows or a house row; `grep -cE '^#\s+GATE_WSL_PARITY_RUNS='
-  .githooks/gate-env.sh` prints 0; and `python check_policy.py` prints exactly two exempt rows of
-  `arm_folded_homes`, `tools/memory-tree/transition_audit.py` `read_modes` and the `.githooks/pre-push`
-  source of the gate file, and no finding.
+  .githooks/gate-env.sh` prints 0; and `python check_policy.py` prints exactly the permanent exempt
+  rows of `arm_folded_homes` PLAY-dConvergedCharter-11 S5 names, `tools/memory-tree/transition_audit.py`
+  `read_modes`, the `.githooks/pre-push` source of the gate file, `adopt-codebase-map.sh`'s root walk
+  and the absent-kit rows, `held_halves.py`'s among them, and no finding.
   Red when: a held key stays in its home, or a transitional exempt row outlives its reader's re-point.
   figure: PINNED at `d8a12f046`, 6 mechanic rows, 6 extension rows and 2 house rows.
 - **AC9** — When `python check_policy.py` runs over the `house-reader` fixture, a tree with no house
@@ -403,9 +425,12 @@ scratch repository under `%TEMP%` with a short name.
   Red when: a commit whose policy blob sets the mode reads the conf blob's absence as `shards`, the
   guard spawns python, or a spelling reads differently in the two parsers.
   fixture: the repository under `%TEMP%` with a short name.
-- **AC12** — When `python -c` loads `tools/gate-legs.json` after S1, the `guard` of `pre-push
-  self-test`, `transition-audit arms` and `straggler-guard arms` each holds `{prefix}/policy/policy.py`.
-  Red when: a suite re-pointed through `policy.py legacy` is selected by a guard that misses it.
+- **AC12** — When PLAY-dConvergedCharter-11 AC30's join runs after S1 over this S1's re-pointed
+  readers, it prints the derived set and its count, at least the five legs S1 names at `34b387e69`,
+  and every leg in it holds `{prefix}/policy/policy.py` in its `guard`; with that entry taken out of
+  `pre-push run-log line`'s guard in a scratch copy, it reds naming that leg, and a count of 0 is red.
+  Red when: a suite re-pointed through `policy.py legacy` is selected by a guard that misses it, or the
+  set is typed rather than joined.
 - **AC11** — When `python tools/run-gates/regen.py --list` runs over a scratch clone of gov after S2,
   whose `.memory-tree.conf` assigns no `BACKLOG_MODE` and whose policy file sets
   `memory-tree.backlog-mode = "builds"`, it lists the two `{memory_root}/backlog` generated rows of
@@ -415,16 +440,16 @@ scratch repository under `%TEMP%` with a short name.
 
 ## 7. Gates
 
-`policy fixtures` · `policy check` · `run-gates canary` · `transition-audit arms` · `straggler-guard arms` · `shell hygiene (a fork spent on builtin work)` · `shell hygiene (a loop fed by a command substitution)` · `shell hygiene (a fixed-name temp renamed into place)` · `pre-push self-test` · `pre-push bar self-test` · `push-main self-test` · `held-halves selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `kit placeholders (a declared token its adopter substitutes)` · `kit-placeholders self-test` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `measure-legs selftest` · `recall floor` · `recall floor arms` · `lexicon selftest` · `runlog selftest` · `unattended kit gate` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `kit/dogfood doc parity` · `pre-push run-log line` · `run-gates run-log line`
+`policy fixtures` · `policy check` · `run-gates canary` · `transition-audit arms` · `straggler-guard arms` · `backlog migration selftest` · `shell hygiene (a fork spent on builtin work)` · `shell hygiene (a loop fed by a command substitution)` · `shell hygiene (a fixed-name temp renamed into place)` · `pre-push self-test` · `pre-push bar self-test` · `push-main self-test` · `held-halves selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `kit placeholders (a declared token its adopter substitutes)` · `kit-placeholders self-test` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `measure-legs selftest` · `recall floor` · `recall floor arms` · `lexicon selftest` · `runlog selftest` · `unattended kit gate` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `kit/dogfood doc parity` · `pre-push run-log line` · `run-gates run-log line`
 
 The unattended kit's suites are waived for this build's landing (README rule 8); the parity arms S1
 deletes there are named for the close. The arms below are declared for the main loop's close.
 
-New arm: tools/policy/check_policy.py · covers AC2 AC3 AC8 AC9 · the `both-homes` and house fixture cases and gov's tree run with `read_modes` reading the conf blob alone, a transitional exempt row left standing, and `arm_house_readers` grading while the seed is present, exempting nothing, or grading the policy kit's own files · none
+New arm: tools/policy/check_policy.py · covers AC2 AC3 AC8 AC9 · the `both-homes`, `invalid-mid`, `invalid-mid-refuse` and house fixture cases and gov's tree run with `read_modes` reading the conf blob alone, raising on an invalid past blob, a transitional exempt row left standing, and `arm_house_readers` grading while the seed is present, exempting nothing, or grading the policy kit's own files · none
 New arm: tools/lib/resolve-python.test.sh · covers AC6 · post-merge's two inlined blocks as `PARITY_ROWS` rows, staged red by one byte changed in a copy · none
 New arm: .githooks/pre-push.test.sh · covers AC1 · the inherited-red read staged against R's policy file alone in place of `policy.py legacy --rev`, and with the null-sha arm removed · none
 New arm: .githooks/straggler-guard.test.sh · covers AC10 · the `both-homes` case and the policy-file spelling table, staged red with `read_conf_modes` reading the conf blob alone and with one byte changed in `read_policy_backlog_mode` · none
-New arm: tools/run-gates/held_halves.py · covers AC4 · the `parity` case and a failing `legacy` read, staged red with the count read from the gate file's text and with a non-zero exit read as a blank count · none
+New arm: tools/run-gates/held_halves.py · covers AC4 · the `parity` case, a failing `legacy` read and a tree with no policy kit, staged red with the count read from the gate file's text, with a non-zero exit read as a blank count, and with a missing kit refusing · none
 New arm: tools/run-gates/run-gates.test.sh · covers AC11 · a `--regen-list` case over a folded tree, staged red with `check_when` reading the conf's text alone · none
 New arm: tools/push-main.test.sh · covers none · the `pm9` parity arm deleted with the copy it compared · none
 
@@ -495,6 +520,16 @@ New arm: tools/push-main.test.sh · covers none · the `pm9` parity arm deleted 
   --keys`), 3 (the three legs' guards name `policy.py`, AC12) and 28 (`drift_report.py` named
   unit 11's in §3); AC10 runs the guard's function, not its suite; the consumes-from edge to
   PLAY-dConvergedCharter-11 names `--keys`.
+- rev-4 · 2026-11-05 · S1 §3 §5 AC3 AC4 AC8 AC12 §7 · folded
+  `2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2` findings 10, 28 and 21 (H2, M1:
+  the leg guards are unit 11 S4's derived join, `pre-push run-log line` and `backlog migration
+  selftest` named, AC12 iterating the join with a planted removal and a red at 0, `backlog migration
+  selftest` in §7), 2 (M1: the same derived set restated over this unit's readers), 29 (H6: `read_modes`
+  and `held_halves.py` take unit 11 S4's absent-kit rule, `held_halves.py` naming its resolver and
+  parsing the gate file's text where no kit resolves, AC3's and AC4's kit-removed cases, AC8 counting
+  the permanent rows unit 11 S5 names) and 30 (M10: `read_modes` takes unit 11 S3's invalid-blob rule,
+  AC3's `invalid-mid` cases); the consumes-from edge to PLAY-dConvergedCharter-11 names the absent-kit
+  rule, the derived guard join and the invalid-blob rule.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-40 — `guide_move.py apply`'s amend route: an entry whose target tag a kit manifest already holds gains its `help` and edge on that row under an `edit` change record, never a second row
 
-**Status:** DEFERRED · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 15 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-3 · 2026-11-05 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 15 · advances PLAY-dConvergedCharter-24
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-11-04-build-PLAY-dConvergedCharter-40-deviation-401.md](../build/2026-11-04-build-PLAY-dConvergedCharter-40-deviation-401.md) | deviation | — |
 | [2026-11-04-prompt-PLAY-dConvergedCharter-7-r4-fold-brief.md](../prompts/2026-11-04-prompt-PLAY-dConvergedCharter-7-r4-fold-brief.md) | research | PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 |
 | [2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
+| [2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md](../reviews/2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
 
 <!-- /gen:spec-records -->
 
@@ -67,12 +68,21 @@ Build-run preconditions: PLAY-dConvergedCharter-13 has landed `tools/playbook/gu
   the row already carries the entry's `help` and edge, the record part where a change record with
   `Action edit`, `Promoted-from` the section tag and `After` the amended row's `<tag>@<hash8>` exists, so
   a re-run writes only the missing part and, with both standing, prints `skipped <section>: already at
-  <tag>`. Observed by AC1 and AC3.
+  <tag>`. THE ORPHAN. An interrupted amend leaves an `edit` record whose `After` names a row never on
+  disk: `apply` exits non-zero there naming that record, so the pass, whose check is red, commits
+  nothing past it (BUILD-METHOD M6). A re-run, its plan unchanged or with the entry's `help` corrected
+  so its `After` differs, finds the orphan as a record with `Action edit`, `Promoted-from` the section
+  tag and `Before` the row's current `<tag>@<hash8>` whose `After` no row on disk carries; where the
+  orphan is not in `HEAD` (the file `apply` itself wrote), the re-run unlinks it before writing the
+  amend's record, so the trail holds one `edit` per change; where it is committed, history the pass
+  cannot rewrite, `apply` exits 2 naming it and writes nothing. Observed by AC1 and AC3.
 - **S3** — id 27, the plants. `guide_move.py --fixture --plant <case>` gains `amend-existing` (a kit
   manifest holding a unit whose `help` is empty, an entry targeting it), `amend-missing` (a `target` no
   row holds), `amend-conflict` (a target row whose `help` already differs), `amend-two-sections` (two
   entries targeting one row), `amend-twice` (the `amend-existing` apply run a second time) and
-  `amend-interrupted` (the manifest write raises after the amend's record is written), each run by
+  `amend-interrupted` (the manifest write raises after the amend's record is written),
+  `amend-interrupted-then-edited` (that interruption, then the entry's `help` corrected before the
+  re-run) and `amend-orphan-committed` (the orphan record committed before the re-run), each run by
   `guide_move.py --selftest` under `adopt-playbook.sh --selftest`, as unit 13 S6's plants are. Observed by AC1 to AC3.
 - **S4** — id 27, the docs. `tools/playbook/README.md`'s mover section names the `target` field and the
   amend route beside the add route. NOT OBSERVED by a criterion: prose, graded by the `docs` leg at the
@@ -194,9 +204,12 @@ writes its rationale rows. `guide_move.py` ships with the playbook kit; an adopt
   twice.
 - **AC3** — When `python guide_move.py --fixture --plant amend-twice` runs, the second `apply` writes no
   byte and no record and prints `skipped <section>: already at <tag>`; under `amend-interrupted` the
-  re-run amends the row and writes no second record.
-  Red when: a re-run appends the edge twice, writes a second change record, or skips a row whose record
-  alone stands.
+  first `apply` exits non-zero naming the record it left, and the re-run amends the row and writes no
+  second record; under `amend-interrupted-then-edited` the re-run leaves exactly one `edit` record for
+  the section, its `After` the row's hash on disk; under `amend-orphan-committed` the re-run exits 2
+  naming the committed orphan and writes nothing.
+  Red when: a re-run appends the edge twice, writes a second change record, skips a row whose record
+  alone stands, leaves a record whose `After` no row on disk carries, or rewrites a committed record.
 
 ## 7. Gates
 
@@ -207,7 +220,7 @@ declares; this unit's plants join it. The parent legs `instruction render (one r
 `writing practice (records and units)` read the amended rows once they land; neither is in the manifest
 at base.
 
-New arm: tools/playbook/guide_move.py · covers AC1 AC2 AC3 · the plants `amend-existing`, `amend-missing`, `amend-conflict`, `amend-two-sections`, `amend-twice` and `amend-interrupted`, staged red with the amend branch removed so the existing tag gains a second row, with the `help` conflict check skipped, and with the row part skipped on its record alone · none
+New arm: tools/playbook/guide_move.py · covers AC1 AC2 AC3 · the plants `amend-existing`, `amend-missing`, `amend-conflict`, `amend-two-sections`, `amend-twice`, `amend-interrupted`, `amend-interrupted-then-edited` and `amend-orphan-committed`, staged red with the amend branch removed so the existing tag gains a second row, with the `help` conflict check skipped, with the row part skipped on its record alone, and with the orphan search skipped so a corrected re-run writes a second `edit` record · none
 
 ## 8. Open questions
 
@@ -233,6 +246,11 @@ New arm: tools/playbook/guide_move.py · covers AC1 AC2 AC3 · the plants `amend
   corrected fix closed with the record written before the row (each part skipped on its own test, the
   plant `amend-interrupted`), and 38 (a plan with two entries on one `target` refused, the refusals
   reading the manifest on disk, §8 F1, the plant `amend-two-sections`).
+- rev-3 · 2026-11-05 · S2 S3 AC3 §7 · folded
+  `2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2` finding 37 (M19: the orphan
+  record an interrupted amend leaves is named: `apply` exits non-zero on it, a re-run with the plan
+  changed or not removes an uncommitted orphan before writing its record and refuses a committed one,
+  the plants `amend-interrupted-then-edited` and `amend-orphan-committed`, AC3 and the arm).
 
 ## 10. Reuse audit
 

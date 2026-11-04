@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-11 — every kit conf key the retrofit does not convert folded into the policy file, its readers inventoried by value and re-pointed
 
-**Status:** DEFERRED · rev-7 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 2 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-8 · 2026-11-05 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 2 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0485@43490b62 part 1/2
 
@@ -25,6 +25,7 @@
 | [2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
 | [2026-11-04-review-PLAY-dConvergedCharter-11-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 |
 | [2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-39 |
+| [2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md](../reviews/2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md) | spec-audit | PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
 
 <!-- /gen:spec-records -->
 
@@ -57,7 +58,7 @@ Every item needs only the policy reader, which is CLOSED (dGroundRules).
   `(home, KEY)` on two rows. ONE READER OF THE FIELD: `derive_home_folds(rows, home)` in `policy.py`
   returns each `(KEY, row)` whose `legacy` names `home`; `render_folded_lines`, S5's expansion, S9's
   census, `legacy --keys` (S3) and PLAY-dConvergedCharter-20 S1 call it, and no other code reads the
-  field. A row's `allowed` is in the catalogue's grammar (`SET_TYPES`, `COUNT_TYPES`, `enum`, `pattern`,
+  field but the shape audit above, which validates it (AC33). A row's `allowed` is in the catalogue's grammar (`SET_TYPES`, `COUNT_TYPES`, `enum`, `pattern`,
   `policy.py:105-106`; `check_value` refuses any other type, `:196`) and is the one every reader of the
   key parses: `{ type = "count", min = 0 }` for a count, `{ type = "list" }` only where every reader
   splits the value on whitespace, a literal `allowed` list for a flag (`[true, false]` only where every
@@ -83,14 +84,24 @@ Every item needs only the policy reader, which is CLOSED (dGroundRules).
   `--rev <rev>`, handed to `resolve_caps`' existing `rev` (`budgets.py:205`), the hygiene engine's call
   (`check-memory-hygiene.sh:651`) passes `--rev HEAD` and `gotchas.py`'s (`:510`) `rev="HEAD"`; every
   other enforcer keeps the landed revision. At base gov's values sat in the unguarded working-tree
-  conf, read at once, so a `HEAD` read of the guarded file widens no write.
+  conf, read at once, so a `HEAD` read of the guarded file widens no write. The two enforcers' suites
+  assume no fixture has a landed revision, so the reader refuses and every breach refuses
+  (`tools/memory-tree/check-memory-hygiene.test.sh:264-268`, `:1632`; `gotchas.py:846-849`); a `HEAD`
+  read with no policy file succeeds and reads `budgets.enforce` at its catalogue default `warn`
+  (`catalogue.toml:1315-1317`), turning those breaches into warnings. So each suite's fixtures commit a
+  `.governance/policy.toml` setting `budgets.enforce = "refuse"`, its assertions name that rule, as the
+  refusal does (`help/size-caps.md:38`), and the comments saying no fixture has a landed revision are
+  re-worded. The flag is declared where its census reads it: the `budgets.py#resolve` row of
+  `tools/govkit/usage.toml` (`:159-164`) gains `--rev`, `help/size-caps.md` documents it with its `:40`
+  anchor re-stamped in the same commit, and `check_policy.scan_cap_requests` (`:578-590`) skips the
+  token after `--rev`, so a shell enforcer passing `--rev HEAD` requests no cap named `HEAD`.
   `PASS_ORDER_CUTOFF`, `BRIEF_RECORDED_CUTOFF`, `PASS_ORDER_PREANCHOR_CAP` and `PASS_ORDER_WAIVER` are
   not folded by this unit: `legacy-homes.txt` holds no row for any of them (the two `_CUTOFF` keys are
   retrofit keys, `RETROFIT_KEY`, `policy.py:1139`, `:1227`; gov's `.unattended.conf` assigns neither
   other, which only `tools/unattended/.unattended.conf.example:476` and the checkers' defaults spell), so
   they take no catalogue row, no drained row and no derived reader. PLAY-dConvergedCharter-12 S3 moves
   the four into `.memory-tree.conf` with their checkers; PLAY-dConvergedCharter-20 S3 carries that move
-  to an adopter. Observed by AC1, AC24, AC27 and AC33.
+  to an adopter. Observed by AC1, AC24, AC25, AC27, AC33 and AC36.
 - **S2** — Gov's values moved. Each folded key's value in gov's home is written to gov's
   `.governance/policy.toml` under its folded name, and its line leaves the home. A home keeps its
   retrofit keys (`_CUTOFF`, `_PIN`), `.unattended.conf` its six extension keys, and
@@ -157,7 +168,8 @@ Every item needs only the policy reader, which is CLOSED (dGroundRules).
   `:2800-2867`), whose population on gov's tree S2 empties: it keeps grading every shipped file for a
   shell assignment of those keys, and its note's `0 file(s)` is that population, seen red by AC31's
   plant; `tools/govkit/selftest.py` M5's gov-line arm (`:9244-9249`), which skips once the line
-  leaves, grades a planted multi-path `GATE_DOC_PATHS` line in its place;
+  leaves, is deleted, since the three planted multi-path `GATE_DOC_PATHS` lines above it
+  (`:9241-9243`) already grade the predicate unconditionally and no arm is added in its place;
   `.governance/install.json`, whose engine row (`:452-455`) and seed row (`:476-479`) name the two files
   S2 deletes and which `govkit.py check` fails while a row is absent on disk (`govkit.py:5251-5254`),
   the rows leaving through the deployer's own withdrawal (`VERDICT_GRID`'s `("equal", "absent")` cell,
@@ -197,6 +209,15 @@ Every item needs only the policy reader, which is CLOSED (dGroundRules).
   2, as a revision naming no commit does (`policy.py:468`). Keyed by commit, the precedent
   `read_legacy_fanout` and `derive_lowered_limit` (`policy.py:767-807`). Observed by AC2, AC14, AC16
   and AC22.
+  At a revision whose policy text `validate` rejects, `render_folded_lines` reads a folded key's
+  policy value by `resolve_read`'s rule (`policy.py:740-750`), `read_last_valid_value` (`:631-660`),
+  the rule `get` already takes, so the owner's unchecked terminal commit of a typo reads the last
+  valid revision's value. Where that rule refuses (no valid revision precedes, or
+  `policy-file.on-invalid` is not `last-valid`), a reader of `HEAD` or of one named revision refuses as
+  S4 states; a HISTORY reader walking many commits (drift_report's two signals, S4, and
+  PLAY-dConvergedCharter-41's `read_modes`) reads that commit's home line alone and prints one line
+  naming the commit and the refusal, so one past typo never refuses every later run and is never read
+  silently. Observed by AC37.
   The home's lines are parsed, never sourced, CRs stripped: a blank line, a comment line, or one
   assignment `[export ]KEY=<value>`, the value bare, `"…"` or `'…'`, with an optional trailing
   ` # comment`. An admitted line's value is read by `parse_conf_assignment`'s body
@@ -231,11 +252,15 @@ Every item needs only the policy reader, which is CLOSED (dGroundRules).
     (`format-guard.js:91`, `agent-cap.js:1465`). The readers:
     `scratch-guard.js` (`MEMORY_ROOT`, `ROUTED_PATHS`, `:1155-1156`, `:1487-1488`), `format-guard.js`
     (`MEMORY_ROOT`, `:147`), `agent-cap.js` (`SPEC_AUDIT_DEFAULT`, `:1466`; its comments and deny
-    strings placing the key in `.unattended.conf`, `:44`, `:1426`, `:1478`, `:1590-1595`, re-worded to
-    name `unattended.spec-audit-default` in `.governance/policy.toml`, as are `help/spec-audit.md:19` and
-    `tools/hooks/README.md:159`),
-    `tools/process-monitor/procmon-hook.js` (`PROCMON_THROTTLE_S`, `:61-69`, its root walk `:50-53`
-    finding the root by the policy file), and `tools/unattended/gate-guard.js` and
+    strings placing the key in `.unattended.conf`, re-worded to name `unattended.spec-audit-default` in
+    `.governance/policy.toml`: `:44`, `:1426`, the deny split across `:1477-1478`, and the two deny
+    strings at `:1590` and `:1595` that interpolate `${conf}`, bound at `:1587` to
+    `path.join(root, '.unattended.conf')`, which name the policy file's key in place of `${conf}` while
+    the legacy home is still read through `readFoldedKey`; as are `help/spec-audit.md:19` and
+    `tools/hooks/README.md:159-160`, which splits the key and the path across two lines),
+    `tools/process-monitor/procmon-hook.js` (`PROCMON_THROTTLE_S`, `:61-69`; its `resolveRoot`,
+    `:48-59`, takes the per-level walk shape below, its `CLAUDE_PROJECT_DIR`/`PROCMON_ROOT` branch at
+    `:50` included), and `tools/unattended/gate-guard.js` and
     `tools/unattended/run-lease.js` (`MEMORY_ROOT`, `gate-guard.js:596`, `run-lease.js:103-108`) until
     PLAY-dConvergedCharter-12 removes them. Scratch-guard's unarmed message and admitted write
     (`:1158-1160`) name `.governance/policy.toml` too, and its ARMING test, which today returns `write
@@ -253,6 +278,16 @@ Every item needs only the policy reader, which is CLOSED (dGroundRules).
     the memory root `derive_code_files` skips, `:617-623`) reads `MEMORY_ROOT` with no revision, and the
     landed-builds reader (`:463-464`) reads it at its sha, each falling to `memory` only where neither
     home sets it, so an adopter whose root is elsewhere is graded over its own tree;
+  - the spec-audit opt-in's two other readers, which S2's move of `SPEC_AUDIT_DEFAULT` (gov's value
+    blank, so the held rule does not hold it) would otherwise leave on the conf while agent-cap reads
+    the policy file: the driver's `check_authorization` (`tools/unattended/unattended.sh:4193-4206`),
+    which evals `git show "$_cb:.unattended.conf"`, reads `policy.py legacy .unattended.conf --rev
+    "$_cb"` in its place, §4's by-revision shape, a failed read taking its existing `fail 55`; and
+    check 19's `scan_grant_writes` (`tools/unattended/check-unattended.sh:2136-2150`, read at
+    `:3024-3030`), whose `diff-tree` pathspec gains `.governance/policy.toml` and which prints
+    `SPEC_AUDIT_DEFAULT` for an added `spec-audit-default =` line there, bare in its `[unattended]` table
+    or dotted, so an opt-in set in the policy file reads alike to the hook, the driver and check 19
+    until PLAY-dConvergedCharter-12 retires the kit;
   - every reader testing the PRESENCE of a folded home a step may delete (every folded home but
     `.githooks/gate-env.sh`, which PLAY-dConvergedCharter-20 S2 never removes), the fifth shape, reads
     "adopted when `policy.py legacy <home>` prints at least one of the home's folded keys, or the home
@@ -264,7 +299,11 @@ Every item needs only the policy reader, which is CLOSED (dGroundRules).
     `[ "$PROCMON_CONF" = 1 ]` condition is replaced, so the python is always handed the question, answers
     presence through `render_folded_lines` in-process in its leading line, and the runner sets
     `PROCMON_CONF` from that line; the prelude's `:1543` test leaves, only the default `PROCMON_CONF=0`
-    staying, so the question costs no python of its own;
+    staying, so the question costs no python of its own. Where the policy kit does not resolve, or
+    `render_folded_lines` refuses, the branch catches both, as its kit-dir question already does ("a
+    refusal never ends this program", `:2836-2842`), never exits, answers from the home's own presence
+    and puts one line naming the policy kit and the reason in its leading line's place, so a default
+    adopter, whose selection carries run-gates and no policy kit, keeps its delegation;
     `tools/process-monitor/adopt-process-monitor.sh:219-234`, whose step 1 exits 1 on an absent conf and
     which then reads its `PROCMON_` keys from S3's output;
     `tools/process-monitor/adopt-process-monitor.test.sh`, testing gov's conf for presence (`:297`,
@@ -279,26 +318,74 @@ Every item needs only the policy reader, which is CLOSED (dGroundRules).
     ".governance/policy.toml"` as above, `:143` keeping its `must_not_exist`. For `.codebase-map.conf`:
     `.githooks/pre-commit:280`, which gates the codebase-map leg, and
     `tools/memory-tree/check-memory-hygiene.sh:305`. The rest DERIVED at the pass by S5's presence red
-    over gov's tree. A WALK-UP resolver, testing presence at each ancestor, takes the shape PER LEVEL,
-    since `--root` at the kit's own directory reads the toplevel's policy file: one condition, "the home
-    exists here, or this level holds `.git` and `legacy <home> --root <this level>` prints a folded
-    key", so the walk stops at the toplevel: `row_grammar.resolve_root`
-    (`tools/memory-tree/row_grammar.py:129-138`), `map_lib.resolve_root`
-    (`tools/codebase-map/map_lib.py:84-110`) and `tools/codebase-map/adopt-codebase-map.sh`'s walk
-    (`:28-35`); `procmon-hook.js`'s `resolveRoot` (`:48-59`) walks by the policy file, as above;
+    over gov's tree, and by `git grep` for a `parents` loop or an ancestor walk testing a folded home.
+    A WALK-UP resolver, testing presence at each ancestor, takes the shape PER LEVEL, since `--root` at
+    the kit's own directory reads the toplevel's policy file: one condition, "the home exists here, or
+    this level holds `.git` and `legacy <home> --root <this level>` prints a folded key", read in-process
+    through `render_folded_lines` in Python and `readFoldedKey` in a hook. The folded-key test only
+    decides whether a `.git` level counts as ADOPTED; it moves no stop: a walk keeps every `.git` stop it
+    has, raising or falling back there as at base. The walks: `row_grammar.resolve_root`
+    (`tools/memory-tree/row_grammar.py:129-138`, raising at `.git`), `map_lib.resolve_root`
+    (`tools/codebase-map/map_lib.py:84-110`, falling back to the kit's parent at `.git`),
+    `merge-rows.py`'s `_anchor_root` (`tools/memory-tree/merge-rows.py:218-235`, the row-keyed merge
+    driver), `transition_audit.resolve_root` (`tools/memory-tree/transition_audit.py:92-105`, run in
+    commit-msg), `backlog._resolve_anchor_at` (`tools/memory-tree/backlog.py:1797-1801`), and
+    `procmon-hook.js`'s `resolveRoot` (`:48-59`), whose env branch takes the same test at the env root
+    and whose `.process-monitor.conf` test becomes "the home exists here, or this level holds `.git`
+    and `readFoldedKey`'s mirror at `HEAD` holds a `process-monitor.*` row sourced `file`", since null is
+    the hook's only "not adopted" test (`:102-103`) and a policy file's existence adopts no monitor.
+    `tools/codebase-map/adopt-codebase-map.sh`'s walk (`:28-35`) is NOT one of them: it stops at a bare
+    `.git` on purpose, because it creates the conf (`:25-27`), so a first adoption, holding no conf and
+    no folded key, still resolves its root; a folded conf changes no root it finds, and its conf test
+    is S5's permanent exempt row;
   - `tools/drift-audit/drift_report.py`'s history readers of `LANGS`, which S3's overlay never reaches,
     read in-process through `render_folded_lines` under the inline `resolve_kit_dir`, a kit that does
     not resolve reading the signal not asked, naming it: `build_lang_mode_findings` (`:367-392`)
     compares the `LANGS` members at `base_ref` and at `HEAD`, its justification read above the line
     holding the value at `HEAD`, `.lexicon.conf`'s `LANGS=` or the policy file's `langs` in its
-    `[lexicon]` table; `signal_lexicon_ratified_stale` (`:1318-1351`) takes the newest commit `git log
-    -G` finds touching `LANGS=` in `.lexicon.conf` or `langs =` in `.governance/policy.toml` at which
-    the `LANGS` value differs from its parent's, so the fold, which moves no value, is no surface move.
-  Each leg whose suite now reads through the policy kit names it in its `guard`, in
-  `tools/gate-legs.json` and in a descriptor's `[[gate_leg]]` row where one declares the leg:
-  `{prefix}/policy/policy-mirror.js` and `{prefix}/policy/policy.py` for `scratch-guard self-test`,
-  `format-guard self-test` and `agent-cap self-test`, and `{prefix}/policy/policy.py` for `process-monitor
-  adopter selftest`, `lexicon selftest`, `drift-audit selftest` and `manifest-check self-test`.
+    `[lexicon]` table; `signal_lexicon_ratified_stale` (`:1318-1351`) takes the newest commit, among
+    those `git log -G LANGS=` finds touching `.lexicon.conf` (`:1342`) and every commit `git log
+    --format=%H -- .governance/policy.toml` lists, at which the `LANGS` value `render_folded_lines`
+    reads differs from its parent's, a PARSED compare, never a line regex over the policy file, so a
+    multi-line `langs` array or a `langs=` with no spaces is seen, and the fold, which moves no value, is
+    no surface move.
+  - THE ABSENT-KIT RULE. A reader this unit re-points sits in a kit whose `requires` may not list
+    `policy` (`tools/run-gates/kit.toml:15` and `tools/memory-tree/kit.toml:7` read `requires = []`,
+    and the registry's default selection, `tools/govkit/registry.toml:38-53`, carries neither the policy
+    kit nor a `requires` on it). Where the policy kit does NOT RESOLVE (the inlined `resolve_kit_dir`
+    raises `LookupError`, or a hook's `existsSync(POLICY_HELPER)` is false, the shape `agent-cap.js:466`
+    already takes for its writer bound), the reader reads its home as it did at base and the walk-up
+    test reads the home's presence alone, since no step of PLAY-dConvergedCharter-20 folds a home
+    without that kit (its S1 imports `derive_home_folds` from it); where the kit resolves and its read
+    then fails, the reader refuses as above, but for the legs-parse branch, which never exits. Each
+    fallback read is one `FOLDED_HOME_EXEMPT` row (S5), so the arm still reds a raw read anywhere else.
+    Observed by AC34.
+  THE LEG GUARDS, DERIVED. The guard set is never typed: the pass computes it, and AC30 recomputes it at
+  the tip. (a) Each leg in `tools/gate-legs.json`, and each descriptor `[[gate_leg]]` row, whose `guard`
+  entries, `{prefix}` read as gov's tool root and passed to `git ls-files`, list a code file this unit
+  or PLAY-dConvergedCharter-41 S1 re-points through the policy kit (each S's **Readers:** by name and by
+  value), or whose argv entry spells such a file's basename, adds `{prefix}/policy/policy.py` to its
+  guard, `{prefix}/policy/budgets.py` too where the read goes through it (S1's two enforcers), and
+  `{prefix}/policy/policy-mirror.js` too for a hook's leg. At `34b387e69` the set holds at least the
+  seven legs rev-7 named, `scratch-guard self-test`, `format-guard self-test`, `agent-cap self-test`,
+  `process-monitor adopter selftest`, `lexicon selftest`, `drift-audit selftest` and `manifest-check
+  self-test`, and the legs the round-2 chain audit found unguarded: `row-grammar selftest`,
+  `corpus-ids selftest`, `gotchas selftest`, `memory-hygiene self-test`, `codebase-map kit selftest`,
+  `codebase-map adopter e2e`, `codebase-map gate coverage`, `run-gates turnstile`, `run-gates adopter
+  e2e`, `profile-bar selftest`, `run-gates gov canary`, `run-gates run-log line`, and unit 41's
+  `backlog migration selftest` and `pre-push run-log line`. (b) Each such leg or row whose `guard`
+  names a folded home (`.memory-tree.conf`, `.lexicon.conf`, `.codebase-map.conf`, and any home `legacy
+  <home> --keys` covers) also names `.governance/policy.toml`, since a guard's files are its reuse key's
+  inputs (`input_key`, `build_key_text`, `run-gates.sh:3300-3346`) and the moved values live there: at
+  `34b387e69` `kit/dogfood doc parity`, `recall floor`, `transition-audit arms`, `straggler-guard
+  arms`, `codebase-map gate coverage`, `lexicon naming predicates` and `govkit acceptance matrix`, and
+  the descriptor rows `tools/lexicon/kit.toml:167`, `tools/codebase-map/kit.toml:138` and
+  `tools/memory-tree/kit.toml:250`; the home stays in the guard beside it. govkit selfcheck's check 7c
+  (`tools/govkit/govkit.py:2307-2338`) partitions every guard entry into exactly one class, and
+  `.governance/policy.toml` falls in none at base, so its `verbatim` prefixes (`:2315`) gain
+  `.governance/`, a path that sits at one place in every target as `.githooks/` does. What the join does
+  not see: a suite that runs a re-pointed reader its guard does not list and its argv entry does not
+  name, the class of `process-monitor census selftest` (§7), which the close runs by name.
   **Readers:** by name: `tools/hooks/scratch-guard.js`, `tools/hooks/format-guard.js`,
   `tools/hooks/agent-cap.js`, `procmon-hook.js`, `gate-guard.js`, `run-lease.js`,
   `tools/policy/policy-mirror.js` (the new export), `tools/policy/check_policy.py` (its two readers),
@@ -306,12 +393,15 @@ Every item needs only the policy reader, which is CLOSED (dGroundRules).
   `adopt-process-monitor.sh` and its test, `tools/process-monitor/scope.py`,
   `tools/process-monitor/kit.toml`, `tools/process-monitor/selftest.py`, whose fixtures write the conf
   into a root that is no repository (`:562-566`) and one with no commit (`:1097-1099`) and which S3's
-  no-git reading keeps whole, `tools/lexicon/lexicon_conf.py`, the three walk-up resolvers,
-  `drift_report.py`, `help/spec-audit.md`, `tools/hooks/README.md`, `tools/policy/budgets.py`,
-  `tools/memory-tree/gotchas.py` (S1's `HEAD` read) and `tools/gate-legs.json`. by value: every
+  no-git reading keeps whole, `tools/lexicon/lexicon_conf.py`, the walk-up resolvers above
+  (`row_grammar.py`, `map_lib.py`, `merge-rows.py`, `transition_audit.py`'s `resolve_root`,
+  `backlog.py`, `procmon-hook.js`), `drift_report.py`, `help/spec-audit.md`, `tools/hooks/README.md`,
+  `tools/unattended/check-unattended.sh` (check 19), `tools/policy/budgets.py`,
+  `tools/memory-tree/gotchas.py` (S1's `HEAD` read), `tools/gate-legs.json` with the three descriptor
+  `[[gate_leg]]` rows, and `tools/govkit/govkit.py` (check 7c's `verbatim` class). by value: every
   hit of `derive_readers(repo, <home>, "path")` at the pass for a folded home, less the policy kit's own
   files and PLAY-dConvergedCharter-41 S1's readers; and each presence reader above. Observed by AC12,
-  AC13, AC18, AC23, AC26, AC28, AC29, AC30 and AC32.
+  AC13, AC18, AC23, AC26, AC28, AC29, AC30, AC32, AC34 and AC35.
 - **S5** — The red arm, `arm_folded_homes` in `tools/policy/check_policy.py`, one more entry of `ARMS`
   (`:740`), a sibling of `arm_single_reader` (`:631-656`) sharing its population `derive_code_files`
   (`:617`), its skipping of comment lines (`COMMENT_LEADS`, `:575`) and docstrings
@@ -333,7 +423,11 @@ Every item needs only the policy reader, which is CLOSED (dGroundRules).
   `tools/memory-tree/transition_audit.py` `read_modes`, which reads a home's history by revision, and
   the `.githooks/pre-push` source of the gate file (`:652-657`), reason `the gate file's mechanic keys
   stay in the gate file (§8 F3)`, which binds only `mechanic` keys once PLAY-dConvergedCharter-41
-  re-points the folded ones. At
+  re-points the folded ones. Two kinds of permanent row join them: `tools/codebase-map/adopt-codebase-map.sh`'s
+  root walk, reason `the adopter creates the conf; its .git stop is unconditional, so a folded home
+  moves no root (S4)`; and one row per `(file, function)` holding an ABSENT-KIT fallback read (S4),
+  reason `the policy kit does not resolve, so no step folded this home (S4)`, the set DERIVED at the
+  pass as the fallbacks S4's rule adds. At
   this unit's landing it also holds a row per `(file, function)` of PLAY-dConvergedCharter-41 S1's
   readers that the arm reds at this unit's tip, reason `re-pointed by PLAY-dConvergedCharter-41`, which
   that unit's S2 empties; the arm prints each exempt row it skips. `policy.py` itself is not graded, as
@@ -384,7 +478,7 @@ Every item needs only the policy reader, which is CLOSED (dGroundRules).
 ### Edges
 
 - **consumes-from** `PLAY-dConvergedCharter-22` — `settings_census.py`, whose run conf and gate environment population S9 re-points from `legacy-homes.txt` rows to the catalogue's `legacy` field, a folded key reading `moved by the fold`
-- **hands-off** `PLAY-dConvergedCharter-41` — `render_folded_lines` behind `policy.py legacy`, the folded key names and their `legacy` field with `legacy --keys`, which its placeholder arm calls, `derive_readers`, `FOLDED_HOME_EXEMPT` with its two permanent rows and the transitional rows that unit drains, the held keys S2 leaves it by the held rule S2 states and that unit cites, and S2's commit route, the policy file's values the owner's terminal commit and the mirror the agent's next one
+- **hands-off** `PLAY-dConvergedCharter-41` — `render_folded_lines` behind `policy.py legacy`, with S3's rule for an invalid policy blob that its history reader `read_modes` takes, the folded key names and their `legacy` field with `legacy --keys`, which its placeholder arm calls, `derive_readers`, `FOLDED_HOME_EXEMPT` with its permanent rows, the absent-kit rows among them, and the transitional rows that unit drains, S4's absent-kit rule and its derived leg-guard join, which that unit's readers take, the held keys S2 leaves it by the held rule S2 states and that unit cites, and S2's commit route, the policy file's values the owner's terminal commit and the mirror the agent's next one
 - **hands-off** `PLAY-dConvergedCharter-17` — `derive_readers`, the inventory by value whose `--readers` CLI reds a surviving reader of `/build`
 - **hands-off** `PLAY-dConvergedCharter-12` — `derive_readers`, whose `--readers` CLI reds a surviving reader of `tools/unattended/` on the scratch clone; S4's re-points of the `.unattended.conf` readers outside the kit, through `policy.py legacy .unattended.conf` and the presence shape, which read the policy file once that unit deletes the conf; and `PASS_ORDER_CUTOFF`, `BRIEF_RECORDED_CUTOFF`, `PASS_ORDER_PREANCHOR_CAP` and `PASS_ORDER_WAIVER`, left unfolded for that unit's S3 to move into `.memory-tree.conf`
 - **hands-off** `PLAY-dConvergedCharter-16` — `derive_readers`, the inventory over `skills/session-kickoff/` and `/session-kickoff`
@@ -427,6 +521,16 @@ Read at `d8a12f046`; no product file differs from base `0d1c1dda`.
   (`transition_audit.py:208-223`), gov's being `builds` (`.memory-tree.conf:734`); `held_halves.py:234-236`
   refuses a blank `GATE_WSL_PARITY_RUNS`; `read_conf_key_gaps` (`govkit.py:4943`) reads a required key
   missing from the conf's text as `absent`. These are S2's held keys.
+- Read at `34b387e69` for chain round 2: `adopt-codebase-map.sh:28-35` stops at
+  `[ -f "$_parent/.codebase-map.conf" ] || [ -e "$_parent/.git" ]`; `merge-rows.py:218-235`,
+  `transition_audit.py:92-105` and `backlog.py:1797-1801` walk every parent for `.memory-tree.conf`; no
+  guard in `tools/gate-legs.json` names `.governance/policy.toml` or a `{prefix}/policy/` file, and
+  govkit's check 7c puts no class on a `.governance/` path (`govkit.py:2315-2338`); the legs-parse
+  branch never exits on a refusal (`run-gates.sh:2836-2842`); `agent-cap.js:1587` binds `conf` to
+  `.unattended.conf`, and the driver's opt-in read (`unattended.sh:4193-4206`) and check 19's
+  `scan_grant_writes` (`check-unattended.sh:2136-2150`) read only that conf; `resolve_read` takes
+  `read_last_valid_value` on invalid text (`policy.py:740-750`); `drift_report.py:1342` finds `LANGS`
+  by `-G LANGS=`; `procmon-hook.js:50` tests `.process-monitor.conf` at the env root.
 
 ### The folded names
 
@@ -497,8 +601,16 @@ count above its ceiling goes to the owner by §8 F5, never raised by the pass.
   commit N+1), `.governance/install.json` (the two rows withdrawn by `govkit.py update`)
 - `help/size-caps.md`, `tools/govkit/usage.toml`, `tools/run-gates/README.md`, `help/spec-audit.md`,
   `tools/hooks/README.md`, `tools/gate-legs.json` (the legs' guards, S4)
-- `tools/policy/budgets.py` (`--rev`), `tools/memory-tree/gotchas.py`, `tools/drift-audit/drift_report.py`,
-  `tools/drift-audit/selftest.py`, `tools/codebase-map/map_lib.py`, `tools/codebase-map/adopt-codebase-map.sh`
+- `tools/policy/budgets.py` (`--rev`), `tools/memory-tree/gotchas.py` (its `HEAD` read and its scratch
+  fixture's committed `budgets.enforce`), `tools/memory-tree/check-memory-hygiene.test.sh` (the same),
+  `tools/drift-audit/drift_report.py`, `tools/drift-audit/selftest.py`, `tools/codebase-map/map_lib.py`
+- the walk-ups `tools/memory-tree/merge-rows.py`, `tools/memory-tree/transition_audit.py`
+  (`resolve_root`), `tools/memory-tree/backlog.py` (`_resolve_anchor_at`)
+- `tools/unattended/check-unattended.sh` (check 19's population), `tools/govkit/govkit.py` (check 7c's
+  `verbatim` prefixes), the descriptor `[[gate_leg]]` rows `tools/lexicon/kit.toml:167`,
+  `tools/codebase-map/kit.toml:138`, `tools/memory-tree/kit.toml:250`, `tools/hooks/agent-cap.test.sh`
+  (the deny path over a policy-file opt-in)
+- `tools/policy/check_policy.py`'s `scan_cap_requests` (S1), `help/size-caps.md` (the `--rev` anchor)
 - `memory/project/fork-ceilings.txt` (each changed entrypoint's setup copies `.governance/policy.toml`),
   `tools/run-gates/run-gates.runlog.test.sh` (its adopted-monitor case, `:845-850`, over a folded tree)
 - `tools/process-monitor/selftest.py` (its conf fixtures, read through S3's no-git reading)
@@ -515,7 +627,7 @@ count above its ceiling goes to the owner by §8 F5, never raised by the pass.
   `.github/workflows/remote-ci.yml`, and the live carriers `check-dead-paths.sh --list` names after S2
 - `tools/lexicon/lexicon_conf.py`, `tools/lexicon/kit.toml`
 - `tools/govkit/settings_census.py` (S9), `tools/govkit/selftest.py` (the fourth parity reader, S3, and
-  M5's planted line, S2)
+  M5's dead gov-line arm deleted, S2)
 - `tools/codebase-map/.codebase-map.conf.example`, `tools/memory-tree/.memory-tree.conf.example`,
   `tools/unattended/.unattended.conf.example`
 - `tools/hooks/scratch-guard.js`, `tools/hooks/format-guard.js`, `tools/hooks/agent-cap.js`,
@@ -562,7 +674,10 @@ count above its ceiling goes to the owner by §8 F5, never raised by the pass.
 - error / empty / loading states — an absent home with no policy value prints nothing and each reader's
   default stands; a reader whose `legacy` call fails refuses (S4); a hook whose mirror is absent, stale
   or unparsable at `HEAD` reads the home's line, and with that line gone reads UNARMED and denies. A
-  root that is no repository, or a `HEAD` naming no commit, reads the home's own lines (S3).
+  root that is no repository, or a `HEAD` naming no commit, reads the home's own lines (S3). A tree
+  with no policy kit reads every home as at base (S4's absent-kit rule); a past policy blob `validate`
+  rejects reads its last valid revision, and a history reader that meets a refusal there reads that
+  commit's home line and names it (S3).
 - observability — `policy.py get --explain` names a folded key's source; the arm prints every exempt row.
 - risks — a reader that read its home from the working tree now reads a folded key, and S1's two
   enforcers a `switch` cap, at `HEAD`, so an uncommitted policy edit, and a staged move of a key, take effect at their commit, and a
@@ -724,9 +839,12 @@ and AC15 moved to PLAY-dConvergedCharter-41 with the split.
   at least 1, the row naming `--rev`, `--key`, `--keys` and `--root`, and the `check_policy.py` row
   names `--readers`, `--kind` and `--except`; and over the folded names `python policy.py legacy <home>
   --keys` prints for the six homes, whose count the pass prints, `grep -c` of each over `help/policy.md`
-  prints at least 1 and over `memory/project/docs-undocumented.txt` prints 0.
-  Red when: a verb or flag a page spells is undeclared, a folded key is undocumented, or the count is 0
-  or differs from S1's mint.
+  prints at least 1 and over `memory/project/docs-undocumented.txt` prints 0; `grep -A5
+  'budgets.py#resolve' tools/govkit/usage.toml` prints a `flags` line holding `--rev`, `grep -c -- '--rev'
+  help/size-caps.md` prints at least 1, and `python -c` calling `check_policy.scan_cap_requests` on the
+  line `python budgets.py resolve --rev HEAD index-bytes=default:1` returns `index-bytes` alone.
+  Red when: a verb or flag a page spells is undeclared, a folded key is undocumented, the count is 0
+  or differs from S1's mint, or `--rev`'s argument is read as a cap.
   figure: PINNED at `52945ea0d`, 96 folded names, re-derived through `--keys` at observation.
 - **AC26** — When `bash tools/gate-lint/fork-count.sh memory/project/fork-ceilings.txt .` runs on a
   scratch clone of the tip, the `run-gates-1leg` and `run-gates-2leg` rows read at most their ceilings
@@ -745,51 +863,139 @@ and AC15 moved to PLAY-dConvergedCharter-41 with the split.
   after S2, it prints no `LANGS` ratchet line and the `lexicon_ratified_older_than_language_surface`
   signal reads as at the pass's base; after a commit narrowing one extension's mode in the policy
   file's `[lexicon]` `langs`, with no justification and no restamp, it prints that extension's ratchet
-  line and the signal reads 1.
-  Red when: the fold reads as a moved language surface, or a `lexicon.langs` edit goes unseen.
+  line and the signal reads 1; and on a second clone whose policy file spells `langs` as a multi-line
+  array, the narrowing made on a continuation line, the signal reads 1 too.
+  Red when: the fold reads as a moved language surface, or a `lexicon.langs` edit goes unseen in any
+  TOML spelling.
   fixture: the clone under `%TEMP%` with a short name.
 - **AC29** — When, on a scratch clone of gov after S2 with `.memory-tree.conf` and `.codebase-map.conf`
   deleted and committed and their keys in the policy file, `python -c 'import row_grammar;
   print(row_grammar.resolve_root())'` runs from `tools/memory-tree` and `python -c 'import map_lib,
-  pathlib; print(map_lib.resolve_root(pathlib.Path(".")))'` from `tools/codebase-map`, each prints the
-  path `git rev-parse --show-toplevel` prints.
-  Red when: a walk stops at a kit's own directory, where `--root` reads the toplevel's policy file.
-  fixture: the clone under `%TEMP%` with a short name.
-- **AC30** — When `python -c` loads `tools/gate-legs.json` at the tip and prints the `guard` of each
-  leg S4 names, every guard holds `{prefix}/policy/policy.py`, and the three hook legs' also
-  `{prefix}/policy/policy-mirror.js`.
-  Red when: a re-pointed suite's leg is selected by a guard missing the policy-kit file it now reads.
+  pathlib; print(map_lib.resolve_root(pathlib.Path(".")))'` from `tools/codebase-map`, and each of
+  `merge-rows.py`'s `_anchor_root()`, `transition_audit.resolve_root()` and `backlog._resolve_anchor_at()`
+  is called the same way from `tools/memory-tree`, each root it returns names the directory `git
+  rev-parse --show-toplevel` prints, compared by `os.path.samefile`, never as printed strings, since on
+  gov's Windows nodes the resolvers print backslashes and git forward slashes; with `.git` holding no
+  folded key and no conf, `row_grammar.resolve_root()` raises and `map_lib.resolve_root` returns the
+  kit's parent, as at base. On a scratch repository holding a copy of the codebase-map kit, no
+  `.codebase-map.conf` and no policy file, `bash <kit>/adopt-codebase-map.sh --scaffold` does not print
+  `no repo root above`, and writes `.codebase-map.conf` in the directory `git rev-parse
+  --show-toplevel` names. `node tools/process-monitor/procmon-hook.js`, fed a SessionStart input in a
+  clone whose policy file holds no process-monitor key and no `.process-monitor.conf`, exits 0 and
+  writes nothing, with `CLAUDE_PROJECT_DIR` set to the clone and unset; with the process-monitor keys
+  committed in the policy file and the mirror re-rendered, it resolves the clone's root.
+  Red when: a walk stops at a kit's own directory, a `.git` stop moves, a first adoption finds no root,
+  a correct root reads unequal by its slashes, or a repository with a policy file and no monitor keys
+  reads as monitor-adopted.
+  fixture: the clone and the scratch repository under `%TEMP%` with short names.
+- **AC30** — When a `python -c` join runs at the tip over `tools/gate-legs.json` and every tracked
+  `kit.toml`'s `[[gate_leg]]` rows, computing S4's two derived sets, (a) the legs whose guard,
+  `{prefix}` read as `tools`, lists through `git ls-files` a code file this unit or
+  PLAY-dConvergedCharter-41 S1 re-points, or whose argv entry spells one's basename, and (b) the legs
+  whose guard names a folded home, it prints each set and its count, every leg of (a) holds
+  `{prefix}/policy/policy.py` (and `{prefix}/policy/budgets.py` for `memory-hygiene self-test` and
+  `gotchas selftest`, `{prefix}/policy/policy-mirror.js` for the three hook legs), every leg of (b)
+  holds `.governance/policy.toml`, and `python tools/govkit/govkit.py selfcheck` prints no check-7c
+  line naming `.governance/policy.toml`. With `{prefix}/policy/policy.py` taken out of `row-grammar
+  selftest`'s guard in a scratch copy it reds naming that leg, and with `.governance/policy.toml` taken
+  out of `recall floor`'s it reds naming that leg; a count of 0 in either set is red.
+  Red when: a leg running a re-pointed reader keeps a guard that omits the policy kit, a guard naming a
+  folded home omits the policy file, the set is typed rather than joined, or an empty set reads green.
+  figure: DERIVED at observation; at `34b387e69` set (a) holds at least the 21 legs S4 names and set
+  (b) the 7 manifest legs and 3 descriptor rows.
 - **AC31** — When `python tools/govkit/govkit.py selfcheck` runs on a scratch clone of gov after S2 it
   prints `gate policy: 0 file(s)`; with `INHERITED_RED=land` committed into
   `tools/process-monitor/adopt-process-monitor.sh`, a shipped file, it fails naming that file and
   `INHERITED_RED`.
   Red when: a kit-shipped assignment of a folded gate key passes once gov's own lines leave.
   fixture: the clone under `%TEMP%` with a short name.
-- **AC32** — When `git grep -nE '\.unattended\.conf.*SPEC_AUDIT_DEFAULT|SPEC_AUDIT_DEFAULT.*\.unattended\.conf'
-  -- help/spec-audit.md tools/hooks/README.md tools/hooks/agent-cap.js` runs after S2 it prints nothing,
-  and `git grep -c 'unattended.spec-audit-default' -- help/spec-audit.md tools/hooks/README.md` prints
-  at least 1 for each file.
-  Red when: a page or a deny string sends the owner to a home line `readFoldedKey` no longer reads.
-- **AC33** — When `git grep -nE "\[.legacy.\]|get\(.legacy.\)" -- tools/policy/check_policy.py
-  tools/govkit/settings_census.py tools/check-kit-placeholders.py '*conf_to_policy.py'` runs at the tip
-  it prints nothing, and for each folded home the keys `python policy.py legacy <home> --keys` prints
-  are the keys `legacy <home>` folds.
-  Red when: a second reader of the `legacy` field derives the home-to-keys map.
+- **AC32** — When `node tools/hooks/agent-cap.js` is fed, on a scratch clone of gov after S2, the
+  PreToolUse input of a spec audit for a build README carrying no `spec-audit:` key, as
+  `tools/hooks/agent-cap.test.sh`'s `check_spec_audit` cases feed it (`:1069-1080`), with
+  `unattended.spec-audit-default = "soon"` committed in `.governance/policy.toml` and the mirror
+  re-rendered, it denies, and the deny text names `unattended.spec-audit-default` and
+  `.governance/policy.toml`; and a scan of `tools/hooks/agent-cap.js`, `tools/hooks/README.md` and
+  `help/spec-audit.md`, each file's lines joined so a string split across lines is one, flags no
+  `.unattended.conf`, and no `${conf}` bound to it at `agent-cap.js:1587`, within three lines of
+  `SPEC_AUDIT_DEFAULT`, and `git grep -c 'unattended.spec-audit-default' -- help/spec-audit.md
+  tools/hooks/README.md tools/hooks/agent-cap.js` prints at least 1 for each. With `:1477-1478` left
+  as at base in a scratch copy, the scan reds naming that line. Nothing here asserts that the conf is
+  no longer read: an adopter's legacy home is still read through `readFoldedKey`.
+  Red when: a page or a deny string, on one line, split across two or interpolated, sends the owner to
+  a home line the fold moved.
+  fixture: the clone under `%TEMP%` with a short name.
+- **AC33** — When `git grep -nE "\[\s*[\"']legacy[\"']\s*\]|get\(\s*[\"']legacy[\"']\s*[,)]" --` runs at
+  the tip over every tracked `*.py` file outside the memory root that spells `catalogue.toml` or
+  `load_catalogue` (the policy catalogue's loaders, the pass printing the population and its count,
+  red at 0), its only hits sit in `tools/policy/policy.py` inside `derive_home_folds` or the shape
+  audit `check_shape`, each hit's function read from the nearest `def` above it; with `row.get("legacy",
+  "")` planted in a scratch copy of `tools/policy/check_policy.py`, a loader at base, it reds naming
+  that file and line.
+  For each folded home, the `KEY` set `python policy.py legacy <home> --keys` prints equals the set of
+  `KEY`s on the `legacy = "<home> <KEY>"` lines `grep -E '^legacy = "<home> '` finds in
+  `tools/policy/catalogue.toml`, an oracle independent of `derive_home_folds`.
+  Red when: a second reader of the `legacy` field, in any `.get` or subscript spelling and in any
+  catalogue loader, derives the home-to-keys map, or `--keys` disagrees with the catalogue's lines.
+- **AC34** — When, on a scratch clone of gov at this unit's tip with `tools/policy/` removed and every
+  home holding its lines as at base, `python -c 'import row_grammar; print(row_grammar.resolve_root())'`
+  runs from `tools/memory-tree`, it names the toplevel by the conf's presence; `bash
+  tools/memory-tree/check-memory-hygiene.sh --only 2` exits as it does at base, reading the conf as at
+  base; and `tools/hooks/scratch-guard.js`, fed a routed Write with a routed card, admits it, reading
+  the conf through `readConfKey` with `policy-mirror.js` absent. The legs-parse branch's two cases, the
+  kit removed and `policy.py` replaced by one exiting 3, are the `procmon-no-policy-kit` arm of §7: in
+  both the runner sets `PROCMON_CONF` from the conf's presence, prints one line naming the policy kit
+  and reads the manifest on, while a shell reader under the failing `policy.py` refuses as AC13 states.
+  Red when: a tree with no policy kit refuses a read no fold can have moved, the bar exits on the
+  presence question, or a failing kit is read as an absent one by a reader that must refuse.
+  fixture: the clone under `%TEMP%` with a short name, the card planted as the hook's self-test does.
+- **AC35** — When, on a scratch clone of gov after S2 whose policy file commits
+  `unattended.spec-audit-default = "2026-11-05"` and whose `.unattended.conf` assigns no
+  `SPEC_AUDIT_DEFAULT`, `python policy.py legacy .unattended.conf --rev HEAD --key SPEC_AUDIT_DEFAULT`
+  prints `2026-11-05`; `git grep -n 'show "$_cb:.unattended.conf"' -- tools/unattended/unattended.sh`
+  prints nothing and `git grep -c 'policy.py.*legacy .unattended.conf --rev' --
+  tools/unattended/unattended.sh` prints at least 1; and the `diff-tree` pathspec of `scan_grant_writes`
+  in `tools/unattended/check-unattended.sh` names `.governance/policy.toml` beside `.unattended.conf`.
+  Not checked here: the driver's own run of `check_authorization` and check 19, whose suites are waived
+  for this build's landing (README rule 8), PLAY-dConvergedCharter-12 retiring both readers.
+  Red when: agent-cap reads an opt-in from the policy file that the driver or check 19 cannot see.
+  fixture: the clone under `%TEMP%` with a short name.
+- **AC36** — When, in a scratch repository on `master` with no remote, holding a memory tree whose
+  backlog file has a 301-character row as `check-memory-hygiene.test.sh` plants it, `bash
+  tools/memory-tree/check-memory-hygiene.sh --only 7` runs with S1's `--rev HEAD` and no policy file, it
+  prints a `BUDGET WARN` line for that row; with `budgets.enforce = "refuse"` committed in
+  `.governance/policy.toml` it refuses the row naming `budgets.enforce is refuse`, the reading both
+  suites' fixtures now commit.
+  Red when: a suite's fixture keeps relying on a refused reader that a `HEAD` read no longer refuses.
+  fixture: the repository under `%TEMP%` with a short name.
+- **AC37** — When `python policy.py legacy .memory-tree.conf --rev <sha> --key BACKLOG_MODE` runs over
+  the `invalid-mid` fixture, whose first commit sets `memory-tree.backlog-mode = "builds"` validly,
+  second commits a policy file `validate` rejects and third repairs it, it prints `builds` at the second
+  commit, read from the first as the last valid revision (`policy-file.on-invalid` at its catalogue
+  default `last-valid`, `catalogue.toml:84-86`); over `invalid-mid-refuse`, whose first commit also sets
+  `policy-file.on-invalid = "refuse"`, it refuses at the second, exit 2; and on a clone of the
+  `invalid-mid-refuse` history, `drift_report.py --check`'s two `LANGS` signals read every commit,
+  printing one line naming the second commit and its refusal, and no traceback.
+  Red when: one historic invalid blob makes a history reader refuse forever, or is read silently as an
+  absent value.
 
 ## 7. Gates
 
-`policy fixtures` · `policy check` · `docs` · `spawn budget (forks per hot entrypoint)` · `process-monitor census selftest` · `dead-path carriers (deleted files still named)` · `codebase-map coverage + freshness` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `transition-audit arms` · `straggler-guard arms` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `process-monitor adopter selftest` · `measure-legs selftest` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `run-gates canary` · `lexicon selftest` · `lexicon naming predicates` · `unattended kit gate` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `held-halves selftest` · `scratch-guard self-test` · `format-guard self-test` · `agent-cap self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `manifest-check self-test` · `drift-audit records` · `drift-audit selftest` · `govkit selfcheck`
+`policy fixtures` · `policy check` · `docs` · `spawn budget (forks per hot entrypoint)` · `process-monitor census selftest` · `dead-path carriers (deleted files still named)` · `codebase-map coverage + freshness` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `transition-audit arms` · `straggler-guard arms` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `process-monitor adopter selftest` · `measure-legs selftest` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `run-gates canary` · `run-gates turnstile` · `run-gates adopter e2e` · `run-gates gov canary` · `profile-bar selftest` · `lexicon selftest` · `lexicon naming predicates` · `unattended kit gate` · `memory hygiene` · `memory-hygiene self-test` · `gotchas selftest` · `row-grammar selftest` · `corpus-ids selftest` · `backlog migration selftest` · `spec tokens (a spec's own names resolve)` · `held-halves selftest` · `scratch-guard self-test` · `format-guard self-test` · `agent-cap self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `manifest-check self-test` · `drift-audit records` · `drift-audit selftest` · `govkit selfcheck`
 
 The unattended kit's suites are waived for this build's landing (README rule 8). `process-monitor
 census selftest`'s guard names `census.py` and `selftest.py` alone (`tools/gate-legs.json:965-973`),
-so the close runs it by name over S4's re-points of `scope.py` and `reap.py`. The arms below are
-declared for the main loop's close.
+so the close runs it by name over S4's re-points of `scope.py` and `reap.py`. The list is DERIVED at
+the pass, as AC30 derives set (a): every leg whose guard lists a §4 Files-touched path, joined by `git
+ls-files` over its guard; the legs above are that join at `34b387e69`. `memory-hygiene self-test` and
+`gotchas selftest` carry S1's re-worded fixtures, observed red at the close with the `HEAD` read and
+the fixtures untouched, and green with them committed. The arms below are declared for the main
+loop's close.
 
-New arm: tools/policy/check_policy.py · covers AC2 AC3 AC4 AC6 AC13 AC14 AC16 AC18 AC22 AC23 · each case run with `arm_folded_homes` matching nothing, skipping no comment or presence test, or letting one adapter call excuse a file's other read, `render_folded_lines` skipping the home, admitting an expansion, reading the landed revision or the working tree for a folded key, rendering a typed value in another shape or refusing a root with no commit, the `legacy` shape check removed, a substitution evaled untested, and `read_memory_root` reading the conf alone · none
-New arm: tools/govkit/selftest.py · covers AC20 AC31 · `check_conf_reader_parity`'s fourth reader, `policy.py`'s inline copy, staged red by one byte changed in its trailing-comment cut, which the rows `K=plain   # note` and `K="a # b"` reach; and M5's planted `GATE_DOC_PATHS` line in place of gov's, staged red with the predicate narrowed to stop at a blank · none
-New arm: tools/drift-audit/selftest.py · covers AC28 · a folded fixture whose `LANGS` moved to the policy file unchanged, then narrowed there, staged red with both readers on `.lexicon.conf`'s raw text and history · none
-New arm: tools/run-gates/run-gates.test.sh · covers AC18 · the `procmon-folded` case, staged red with the presence test reading the file alone · none
-New arm: tools/hooks/scratch-guard.test.sh · covers AC12 · a routed write over a folded tree and an unrouted write over a tree whose conf is deleted, staged red with `readFoldedKey` skipping the mirror and with the arming test reading the conf's presence alone · none
+New arm: tools/policy/check_policy.py · covers AC2 AC3 AC4 AC6 AC13 AC14 AC16 AC18 AC22 AC23 AC37 · the `invalid-mid` and `invalid-mid-refuse` cases run with `render_folded_lines` refusing every invalid blob, or reading one as unset; each case run with `arm_folded_homes` matching nothing, skipping no comment or presence test, or letting one adapter call excuse a file's other read, `render_folded_lines` skipping the home, admitting an expansion, reading the landed revision or the working tree for a folded key, rendering a typed value in another shape or refusing a root with no commit, the `legacy` shape check removed, a substitution evaled untested, and `read_memory_root` reading the conf alone · none
+New arm: tools/govkit/selftest.py · covers AC20 AC31 · `check_conf_reader_parity`'s fourth reader, `policy.py`'s inline copy, staged red by one byte changed in its trailing-comment cut, which the rows `K=plain   # note` and `K="a # b"` reach; M5's planted multi-path lines at `:9241-9243` already grade the predicate, and its gov-line arm is deleted · none
+New arm: tools/drift-audit/selftest.py · covers AC28 AC37 · a folded fixture whose `LANGS` moved to the policy file unchanged, then narrowed there on one line and, in a second fixture, on a continuation line of a multi-line array, and a history holding an invalid policy blob under `policy-file.on-invalid = "refuse"`, staged red with both readers on `.lexicon.conf`'s raw text and history, with the policy half found by `-G 'langs ='`, and with a refused past blob ending the read · none
+New arm: tools/run-gates/run-gates.test.sh · covers AC18 AC34 · the `procmon-folded` case, staged red with the presence test reading the file alone; and the `procmon-no-policy-kit` case, the policy kit removed and then `policy.py` exiting 3, staged red with the branch exiting on the refusal · none
+New arm: tools/hooks/scratch-guard.test.sh · covers AC12 AC34 · a routed write over a folded tree, an unrouted write over a tree whose conf is deleted, and a routed write with `policy-mirror.js` absent, staged red with `readFoldedKey` skipping the mirror, with the arming test reading the conf's presence alone, and with a missing `POLICY_HELPER` denying · none
 New arm: tools/run-gates/run-gates.runlog.test.sh · covers AC26 · the adopted-monitor case over a folded tree with the conf deleted, staged red with the presence question asked by a python spawned in the shell prelude · none
 
 ## 8. Open questions
@@ -903,6 +1109,34 @@ New arm: tools/run-gates/run-gates.runlog.test.sh · covers AC26 · the adopted-
   `unattended-status` in F5) and 32 (the `SPEC_AUDIT_DEFAULT` carriers re-worded, AC32); 36's consequence,
   no folded key read through `get`, makes every row's default derived (S1, F2); the hands-off edges to
   PLAY-dConvergedCharter-41 and -20 name `--keys` and `derive_home_folds`.
+- rev-8 · 2026-11-05 · S1 S2 S3 S4 S5 §3 §4 §5 AC25 AC28-AC37 §7 · folded
+  `2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2` findings 1 and 11 (H1: the
+  adopter's walk leaves S4's walk-up list, its bare `.git` stop kept and its conf test a permanent
+  `FOLDED_HOME_EXEMPT` row, the folded-key test moving no stop, AC29's first-adoption clause), 10, 28,
+  2 and 20 (H2, M1: the leg guards DERIVED by joining the re-pointed readers against each guard and argv
+  entry, `budgets.py` where the read goes through it, AC30 iterating the join with a planted removal
+  and a red at 0, §7 gaining `row-grammar selftest` and `corpus-ids selftest`), 19 and 3 (H3, M2: every
+  guard naming a folded home also names `.governance/policy.toml`, in the manifest and three descriptor
+  rows, govkit check 7c's `verbatim` prefixes gaining `.governance/`, AC30's set (b)), 13, 5 and 32 (H4,
+  M3: AC32 drives agent-cap's deny path over a policy-file opt-in and scans joined lines for the split
+  and `${conf}` carriers, asserting nothing about the conf's read), 33, 6, 14 and 25 (H5, M4: AC33's
+  pattern admits a default argument, its population the catalogue's loaders with a printed count,
+  `derive_home_folds` and `check_shape` the admitted sites, a planted red, and an oracle from the
+  catalogue's own `legacy` lines in place of the tautological half; S1 names the shape audit's read),
+  29 (H6: S4's absent-kit rule, the legs-parse branch never exiting and falling back to the home's
+  presence, its fallbacks exempt rows, AC34 and the `procmon-no-policy-kit` arm), 4 (M5: §7 re-derived
+  by the Files-touched join, the six legs added), 18 (M6: the two cap enforcers' suites commit
+  `budgets.enforce = "refuse"` under the `HEAD` read, AC36), 22 (M7: `merge-rows.py`'s
+  `_anchor_root`, `transition_audit.resolve_root` and `backlog._resolve_anchor_at` on the walk-up list,
+  §4 and AC29), 12 (M8: AC29 compares roots by `os.path.samefile`), 26 (M9: the driver's
+  `check_authorization` and check 19's `scan_grant_writes` re-pointed, AC35), 30 (M10: S3's rule for
+  an invalid past blob, `read_last_valid_value` and a named history fallback, AC37), 31 (M11: the
+  `LANGS` signal compares parsed values over every policy-file commit, AC28's multi-line case), 36
+  (M12: `procmon-hook.js`'s `resolveRoot` keyed on the process-monitor keys per level, env branch
+  included, AC29), 9 and 27 (L1: `budgets.py resolve --rev` declared in `usage.toml`, documented and
+  re-stamped, `scan_cap_requests` skipping its argument, AC25) and 16 (L2: M5's dead gov-line arm
+  deleted, the planted lines at `:9241-9243` already covering it, no arm added); the hands-off edge to
+  PLAY-dConvergedCharter-41 names the absent-kit rule, the derived guard join and the invalid-blob rule.
 
 ## 10. Reuse audit
 

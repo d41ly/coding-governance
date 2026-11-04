@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-7 — protocols and templates as tag-sliced views, the guides retired, their rationale in units' `help` and the `help/why/` tree under `help.explanation`
 
-**Status:** DEFERRED · rev-5 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 17 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-6 · 2026-11-05 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 17 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0481@a6574329 whole
 **Carries:** node:policy-key.help.explanation
@@ -20,6 +20,7 @@
 | [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
 | [2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-9 |
 | [2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-39 |
+| [2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md](../reviews/2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-9 |
 
 <!-- /gen:spec-records -->
 
@@ -112,10 +113,24 @@ cannot be retired, which the arm of S6 proves on a planted retirement (the owner
   its `manifest_path` (`.governance/deploy.toml:54`) and readers re-pointed (§8 F5).
   THE COMMIT ROUTE. `.governance/deploy.toml` is a guarded path (`tools/policy/guarded-paths.txt`), and
   `guard.py --staged` refuses it in an agent's commit, any change but one cap raise being "the owner's,
-  committed from a terminal" (`tools/policy/guard.py:5-12`). So its two edits, `:54` and the charter line
+  committed from a terminal" (`tools/policy/guard.py:5-12`). So its edits, `:54` and the charter line
   `:68`, are the OWNER's, never `--no-verify`: the pass stages them with the manifest's `git mv` as one
-  commit and hands it over, the owner commits it from a terminal, and the agent's commits that re-point
-  the other readers and, last, remove the guides follow it. Observed by AC14. It removes the kit
+  commit and hands it over, the owner commits it from a terminal, the pass records that commit's sha in
+  the build record, and the agent's commits that re-point the other readers and, last, remove the
+  guides follow it. Observed by AC14.
+  THE DESTINATION'S RULES. Hygiene check 3 admits under `memory/project/` only its named registries
+  and the names `PROJECT_REGISTRY_EXTRA` lists (`tools/memory-tree/check-memory-hygiene.sh:903-965`,
+  the `F:*` case at `:944-964`), which at base does not list `SESSION-KICKOFF.md`
+  (`.memory-tree.conf:925`), and the charter line `.governance/deploy.toml:65`, rendered at
+  `AGENTS.md:91`, says `memory/project/` holds only the gates' row registries. The manifest is the
+  ratchet gate's guarded row manifest (§8 F5, fates `:201`), so it is admitted as one: the same owner
+  commit adds `SESSION-KICKOFF.md` to `PROJECT_REGISTRY_EXTRA` where `python
+  tools/policy/policy.py legacy .memory-tree.conf --key PROJECT_REGISTRY_EXTRA` reads it, which after
+  PLAY-dConvergedCharter-11 is `memory-tree.project-registry-extra` in `.governance/policy.toml`, a
+  guarded path too, and re-words `:65` to "`memory/project/` holds only the gates' row registries, the
+  kickoff manifest among them"; the agent's next commit re-renders `AGENTS.md`. Unit 6's
+  `check_record_homes` reads the same key for its `registry` admission (PLAY-dConvergedCharter-6 S1),
+  so both arms admit the moved manifest from one declaration. Observed by AC15. It removes the kit
   sources `tools/memory-tree/ANNOTATION-STYLE.template.md`,
   `tools/memory-tree/BUILD-METHOD.template.md` and `tools/workflows/REVIEW-PROTOCOL.template.md`. Their
   pairs leave `PAIRS` in `tools/memory-tree/kit-dogfood-parity.test.sh:61` and
@@ -125,7 +140,8 @@ cannot be retired, which the arm of S6 proves on a planted retirement (the owner
   **Readers:** by name: `coding-governance-agents.template.md` (rendered to `AGENTS.md`), the nine role
   sources under `tools/roles/agents/` (rendered to `.claude/agents/*.md`), `tools/roles/SKILL.template.md`,
   `skills/session-kickoff/SKILL.md`, `README.md`, `WIRE-INTO-PROJECT.md`, `help/spec-audit.md`,
-  `.governance/deploy.toml:68`, `.memory-tree.conf:531`, `tools/memory-tree/kit.toml` (its
+  `.governance/deploy.toml:65` and `:68`, `AGENTS.md:91` (its render), `PROJECT_REGISTRY_EXTRA` in
+  the policy file, `.memory-tree.conf:531`, `tools/memory-tree/kit.toml` (its
   `kit/dogfood doc parity` leg row, `:247`, whose guard drops the two removed guide paths, as its
   manifest row in `tools/gate-legs.json:437` does),
   `tools/memory-tree/adopt-memory-tree.sh`, `tools/memory-tree/README.md`,
@@ -308,8 +324,9 @@ that removes them.
   `tools/memory-tree/adopt-memory-tree.sh`, `tools/memory-tree/README.md`, `tools/workflows/kit.toml`,
   `tools/workflows/README.md`, `tools/template-size-limits.txt`, `tools/policy/caps.toml`,
   `memory/project/method-carriers.txt`, `.memory-tree.conf`, `tools/hooks/agent-cap.js`,
-  `tools/drift-audit/drift_signals.py`, `tools/policy/check_policy.py`, `.governance/deploy.toml` (the
-  owner's terminal commit, S8), `README.md`, `WIRE-INTO-PROJECT.md`, `help/spec-audit.md` (the readers of S8)
+  `tools/drift-audit/drift_signals.py`, `tools/policy/check_policy.py`, `.governance/deploy.toml` and
+  `.governance/policy.toml`'s `memory-tree.project-registry-extra` (the owner's terminal commit, S8),
+  `AGENTS.md` (re-rendered), `README.md`, `WIRE-INTO-PROJECT.md`, `help/spec-audit.md` (the readers of S8)
 
 ### Alternatives rejected
 
@@ -409,12 +426,24 @@ that removes them.
   tools/govkit/registry.toml` run on the tip, each prints 0, and `python tools/govkit/govkit.py
   selfcheck` prints no stale-exemption line.
   Red when: a manifest leg, a guard or an `[[exempt_leg]]` row still names a removed guide.
-- **AC14** — When a non-TTY shell on a scratch clone of gov, `core.hooksPath` set to `.githooks`,
-  stages S8's `.governance/deploy.toml` edit and runs `git commit -m t </dev/null 2>log`, it exits
-  non-zero and `log` holds `policy-guard: refused` naming the file; the same staged change committed
-  from a terminal exits 0.
-  Red when: the pass plans an agent commit of `.governance/deploy.toml`.
-  fixture: the clone under `%TEMP%` with a short name.
+- **AC14** — When `git log --format='%H %s' <pass base>..<tip> -- .governance/deploy.toml` runs over
+  the landed range, it prints exactly one commit; that commit's sha is the one the build record names
+  as the owner commit S8 handed over, its message carries no `Co-Authored-By:` agent trailer, `git show
+  --name-status --format= <sha>` lists `.governance/deploy.toml`, `.governance/policy.toml` and the
+  manifest's rename to `memory/project/SESSION-KICKOFF.md` and no other path, and `git merge-base
+  --is-ancestor <sha> <c>` exits 0 for every other commit `c` of S8 in the range. As a precondition,
+  not the observation, a non-TTY `git commit` of the staged `deploy.toml` edit on a scratch clone,
+  `core.hooksPath` set to `.githooks`, exits non-zero with `policy-guard: refused`.
+  Red when: `deploy.toml` lands in an agent commit, in more than one commit, with paths beside the
+  route's, or after an agent commit of S8 that re-points its readers.
+  fixture: the precondition's clone under `%TEMP%` with a short name.
+- **AC15** — When `bash tools/memory-tree/check-memory-hygiene.sh --only 3` runs on the tip, with the
+  manifest at `memory/project/SESSION-KICKOFF.md`, it prints no `memory/project/SESSION-KICKOFF.md`
+  line; `grep -c 'kickoff manifest' .governance/deploy.toml AGENTS.md` prints at least 1 for each; and
+  `python tools/policy/policy.py legacy .memory-tree.conf --key PROJECT_REGISTRY_EXTRA` prints a value
+  holding `SESSION-KICKOFF.md`.
+  Red when: the move reds check 3, or the charter still says `memory/project/` holds only registries
+  with a manifest beside them.
 
 ## 7. Gates
 
@@ -492,6 +521,13 @@ New arm: tools/playbook/guide_move.py · covers AC12 · the `rationale-route` pl
   memory root's live carriers by `git grep` at base: `memory/README.md`, six dossiers with the map
   regenerated and three gotcha pages; §7 gains the spawn-budget and codebase-map legs; AC10 leaves out
   `memory/DECISIONS.md` and `memory/archive`).
+- rev-6 · 2026-11-05 · S8 §4 AC14 AC15 · folded
+  `2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2` findings 7 and 24 (M13: AC14
+  grades the landed range, one owner commit of `deploy.toml` with no agent trailer, the sha the build
+  record names, the route's paths alone, ahead of every agent commit of S8, the guard's refusal kept as a
+  precondition) and 23 (M14: the destination's rules named, the owner commit adding `SESSION-KICKOFF.md`
+  to `PROJECT_REGISTRY_EXTRA` and re-wording `deploy.toml:65`, `AGENTS.md` re-rendered, unit 6's
+  residue arm admitting it from the same key, AC15 running check 3 on the moved tree).
 
 ## 10. Reuse audit
 

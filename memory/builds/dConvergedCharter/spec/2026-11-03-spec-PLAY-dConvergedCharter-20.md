@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-20 — the conf fold and the unattended kit's retirement shipped as upgrade steps, every shim closed when its window does, and the adopter exit check widened
 
-**Status:** DEFERRED · rev-6 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 7 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-7 · 2026-11-05 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 7 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0494@4e004b72 whole
 
@@ -18,6 +18,7 @@
 | [2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
 | [2026-11-04-review-PLAY-dConvergedCharter-11-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-21 |
 | [2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-39 |
+| [2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md](../reviews/2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
 
 <!-- /gen:spec-records -->
 
@@ -94,8 +95,15 @@ and the owner-item mailbox (TOOL-dWellOiledMachine-48 S1, S4). `read_releases`
   guard admits from an agent as the render at `HEAD`, takes the mirror and the home lines' removal. So
   at no commit does a hook's `readFoldedKey` meet a stale mirror over a home whose line has left; until
   N+1 the working tree's home is short its lines and scratch-guard reads UNARMED, a window the route
-  needs no routed write in. An up that staged the policy file prints the route as its last line.
-  Observed by AC1, AC2, AC10 and AC11.
+  needs no routed write in. UNARMED denies every Write and Edit but the conf's
+  (`tools/hooks/scratch-guard.js:1157-1160`), to this session and to every other in the checkout, so the
+  window has two exits and the up names both: commit N then N+1 as above, or, where commit N is not
+  coming (an agent's or unattended `update`, an owner who declines), the step's own DOWN,
+  `python <the step's own absolute path> down <target> --home <home>`, which restores the home and the
+  policy file from the up's before-image, followed by `git -C <target> restore --staged <home>
+  .governance/policy.toml`, both run from Bash, which scratch-guard does not gate; nothing is lost on
+  either exit. An up that staged the policy file prints the route and then that rollback as its last two
+  lines. Observed by AC1, AC2, AC10, AC11 and AC12.
   **Readers:** by name: `tools/policy/policy.py:1211` (`derive_legacy_homes`, which lists each home's
   keys), `tools/policy/legacy-homes.txt`, and the kit descriptors' `[config]` tables, `tools/memory-tree/kit.toml:80`,
   `tools/codebase-map/kit.toml:70`, `tools/lexicon/kit.toml:78`, `tools/process-monitor/kit.toml:60` ·
@@ -395,12 +403,20 @@ until a release is cut.
   `policy-guard`; the up's last line names the route, and following it commits with exit 0.
   Red when: the step's output can be committed only past the policy guard.
   fixture: as AC10.
+- **AC12** — When, on that scratch adopter, `govkit update` has staged the memory-tree step's output and
+  no commit N follows, `scratch-guard.js` fed a PreToolUse Write under a `ROUTED_PATHS` entry with a
+  routed card denies naming `UNARMED`; the up's last line prints the rollback, and after running it
+  from Bash the same Write is admitted, the conf's lines and the policy file are byte-equal to `HEAD`,
+  and `git diff --cached --quiet` exits 0.
+  Red when: a declined or never-made commit N leaves the checkout locked out of every write, or the
+  printed rollback leaves a path changed or staged.
+  fixture: as AC10.
 
 ## 7. Gates
 
 `govkit selfcheck` · `govkit selftest` · `process-monitor adopter selftest` · `govkit refusal join` · `govkit acceptance matrix` · `upgrade-walk` · `step-rows-frozen` · `step-gate` · `docs` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `lexicon selftest` · `recall floor arms` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/govkit/selftest.py · covers AC1 AC4 AC7 AC8 AC9 AC10 AC11 · scratch targets for the home mode, the commit route with the mirror left stale at N+1, the gate-file step, the run-conf step, the process-monitor step and a multi-conf walk, failing cases a literal default restated, a derived-default value dropped, a home read through `get`, a typed value written as a string, a rejected value written, a cutoff dropped, the monitor's presence test left on the deleted file, and a step refusing its walk's own staged write · none
+New arm: tools/govkit/selftest.py · covers AC1 AC4 AC7 AC8 AC9 AC10 AC11 AC12 · scratch targets for the home mode, the commit route with the mirror left stale at N+1, the route abandoned before commit N and rolled back by the printed line, failing case the rollback leaving the home short its lines, the gate-file step, the run-conf step, the process-monitor step and a multi-conf walk, failing cases a literal default restated, a derived-default value dropped, a home read through `get`, a typed value written as a string, a rejected value written, a cutoff dropped, the monitor's presence test left on the deleted file, and a step refusing its walk's own staged write · none
 New arm: tools/govkit/selftest.py · covers AC2 · the frozen importers' byte-identity over their scratch targets, staged red with the shared module's output changed by one byte · none
 New arm: tools/govkit/selftest.py · covers AC5 · the window plant with an open row past its window · none
 New arm: tools/govkit/selftest.py · covers AC6 · a planted register and mailbox under `migration --grade`, failing case a pending row with no owner item · none
@@ -459,6 +475,10 @@ New arm: tools/govkit/selftest.py · covers AC6 · a planted register and mailbo
   inverse parse in the catalogue's grammar, `render_toml_value`'s spellings, AC1's `list` and `count`
   rows) and 24 (`derive_home_folds` is unit 11's in `policy.py`, imported here, its mint dropped from
   §4); the consumes-from edge to PLAY-dConvergedCharter-11 names it.
+- rev-7 · 2026-11-05 · S1 AC12 §7 · folded
+  `2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2` finding 35 (M18: the UNARMED
+  window's bounds stated, its two exits the route or the step's own DOWN with the index restored, the
+  up printing that rollback beside the route, AC12 with no commit N and the arm's abandoned-route case).
 
 ## 10. Reuse audit
 
