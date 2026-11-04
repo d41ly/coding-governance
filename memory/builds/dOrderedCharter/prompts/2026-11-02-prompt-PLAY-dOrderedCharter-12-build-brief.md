@@ -66,3 +66,11 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Your spec header's `advances PLAY-dOrderedCharter-38` stays `advances` when you flip it to `CLOSED`; you are not the last unit.
 - The unattended kit's own self-test suites are WAIVED for this build's landing (README, "Build-level rules"); a
   criterion they would observe is named as owed with PLAY-dClosedLoop-12, never run.
+
+## Owed by the unit before yours
+
+- Unit 42's `typed-kinds` fixture in `tools/memory-tree/build_records.py` defines a nested helper named `git`. The naming
+  lexicon grades nested helpers, and this one takes the verb count to 1217 against its pin of 1216.
+- Rename it to a declared verb (`python tools/lexicon/lexicon.py --suggest git --as py.function` names one) in your pass.
+  Declare `tools/memory-tree/build_records.py` and `memory/map/generated/symbols.json` in your `--dispatch`, and
+  confirm the lexicon prints OK after your commit.
