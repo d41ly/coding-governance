@@ -115,8 +115,9 @@ KIT_DIR = pathlib.Path(__file__).resolve().parent
 #: The two instances the factory exists for; `check_instances` reds when the table lacks one.
 INSTANCE_KEYS = ("review-replay", "scouted-seam")
 #: The arm count `run_selftest` must reach, as review_replay.py declares its own. Raised 18 -> 21 by
-#: TOOL-dFairHearing-27 S19: its three arms, tag-item, experiment-freeze-spelling and pairing-walk.
-ARMS_DECLARED = 21
+#: TOOL-dFairHearing-27 S19: its three arms, tag-item, experiment-freeze-spelling and pairing-walk. Raised 21 -> 24
+#: by TOOL-dFairHearing-32 S9: replay-subject, experiment-references and held-out-pathspec.
+ARMS_DECLARED = 24
 
 
 class Refusal(Exception):
@@ -806,7 +807,15 @@ def derive_scouted_evidence(case):
 
 
 def derive_replay_evidence(case):
-    """A review-replay case's evidence: the known item's ref and the record it came from; empty when either is missing."""
+    """A review-replay case's evidence, read in unit 23 S4's terms (TOOL-dFairHearing-32 S11); empty when it has none.
+
+    A RUN-CASE, one review run of one subject record, carries `subject`: its report's `Reviewed:` pins as
+    `<path>@<blob>`, else a diff review's `<base>..<head>` range, and that list is its evidence. A KNOWN-SET
+    row, the half of the case it is scored against, is its address and the record it came from (spec 1
+    S2). `measure_replay_experiment` asks this hook of every known row, then of every run-case.
+    """
+    if "subject" in case:
+        return list(case["subject"])
     return [f"{case['path']}:{case['line']}", case["record"]] if case.get("path") and case.get("record") else []
 
 
@@ -824,7 +833,9 @@ def check_held_out_frozen(path, tuning_ids, repo="."):
     The path is normalised once, to its repo-relative POSIX form through `git ls-files --full-name`, before
     any `<rev>:<path>` read, and any git call exiting non-zero refuses naming the call and its stderr, its
     stdout never compared (TOOL-dFairHearing-27 S7).
-    Refused: a path opening `-`, outside the repository, not a working-tree file or not tracked; a shallow history,
+    Refused: a path opening `-` or outside the repository; one whose literal `git ls-files` lists other than
+    exactly its own path, which a directory, a glob and an untracked path all do (TOOL-dFairHearing-32 S31);
+    one not a working-tree file; a shallow history,
     whose boundary commit lists every file; a history of other than exactly one commit, read by ONE
     `git log --format=%H` with argv; working-tree bytes whose `git hash-object` (the checkout's filters
     applied, so a CRLF checkout of an LF blob agrees) differ from the freeze's blob; and an id that is
@@ -843,8 +854,6 @@ def check_held_out_frozen(path, tuning_ids, repo="."):
         rel = pathlib.Path(path).resolve().relative_to(root).as_posix()
     except ValueError:
         raise Refusal(f"heldOut {path}: outside the repository {root.as_posix()}") from None
-    if not pathlib.Path(path).is_file():
-        raise Refusal(f"heldOut {path}: not a working-tree file")
 
     def read_git(*argv):
         """One git call's stdout; a non-zero exit refuses naming the call and its stderr, its stdout never read."""
@@ -855,9 +864,15 @@ def check_held_out_frozen(path, tuning_ids, repo="."):
 
     # TOOL-dFairHearing-27 S7: the path is normalised ONCE, through git, before any `<rev>:<path>` read, so a
     # backslashed or an absolute spelling reads the same blob as the repo-relative POSIX one.
-    rel = read_git("ls-files", "--full-name", "--", str(pathlib.Path(path).resolve()))
-    if not rel:
-        raise Refusal(f"heldOut {path}: not tracked, so no freeze can be read")
+    # TOOL-dFairHearing-32 S31: exactly ONE line, and it is the path's own: a directory lists every file under
+    # it and a glob what it matches, so a first line taken would check a file other than the one named.
+    # `--literal-pathspecs` is git's own option, so it stands before the verb, where git reads it.
+    listed = read_git("--literal-pathspecs", "ls-files", "--full-name", "--", str(pathlib.Path(path).resolve())).splitlines()
+    if listed != [rel]:
+        raise Refusal(f"heldOut {path}: `git ls-files` lists {len(listed)} line(s) for it, not the one line {rel}, "
+                      "so it names no single tracked file to read a freeze from")
+    if not pathlib.Path(path).is_file():
+        raise Refusal(f"heldOut {path}: not a working-tree file")
     shallow = read_git("rev-parse", "--is-shallow-repository")
     if shallow != "false":
         raise Refusal(f"heldOut {rel}: `git rev-parse --is-shallow-repository` printed {shallow!r}, not 'false': "
@@ -879,7 +894,8 @@ def check_held_out_frozen(path, tuning_ids, repo="."):
 
 
 def check_one_variable(arms):
-    """One line per arm: `base`, or the ONE settings key it varies from its base, compared as JSON values."""
+    """One line per arm: `base`, or the ONE settings key it varies from its base, compared as JSON values.
+    Every `base` is a declared arm here: `check_experiment` refused a dangling one and a cycle first."""
     by_name = {a["name"]: a for a in arms}
     lines = []
     for a in arms:
@@ -887,8 +903,6 @@ def check_one_variable(arms):
         if base is None:
             lines.append(f"arm {a['name']}: base")
             continue
-        if base not in by_name or base == a["name"]:
-            raise Refusal(f"arm {a['name']}: base {base!r} is not another declared arm")
         mine, theirs = a["settings"], by_name[base]["settings"]
         varied = [k for k in sorted(set(mine) | set(theirs)) if k not in mine or k not in theirs
                   or json.dumps(mine[k], sort_keys=True) != json.dumps(theirs[k], sort_keys=True)]
@@ -1059,12 +1073,20 @@ def measure_replay_experiment(manifest, arms, repo="."):
         if err:
             raise Refusal(f"known {manifest['known']}: {err}")
         check_case_evidence("review-replay", [{**it, "record": manifest["known"]} for it in known["items"] if it["path"]])
+    # TOOL-dFairHearing-32 S11: each run-case's subject, pinned in its own report, before any run is scored.
+    reports = {a["name"]: [(c, read_raw_output(c["report"], repo)) for c in runs[a["name"]]] for a in arms}
+    run_cases = []
+    for pairs in reports.values():
+        for c, text in pairs:
+            rng = extract_range(text)
+            run_cases.append({"id": c["case"], "subject": [f"{p}@{b}" for p, b in extract_subject_pins(text)]
+                              or ([f"{rng[0]}..{rng[1]}"] if rng else [])})
+    check_case_evidence("review-replay", run_cases)
     head = check_one_variable(arms)
     parsed, figures = {}, []
     for a in arms:
         parsed[a["name"]] = []
-        for c in runs[a["name"]]:
-            text = read_raw_output(c["report"], repo)
+        for c, text in reports[a["name"]]:
             cands, err = parse_candidates(text, read_record_kind(text) or "diff-review")
             if err or not cands:
                 continue
@@ -1113,6 +1135,23 @@ def check_experiment(manifest, repo="."):
         if a["name"] in seen:
             raise Refusal(f"arm {a['name']}: declared twice")
         seen.add(a["name"])
+    # TOOL-dFairHearing-32 S12: the manifest's references. Every `base` names another declared arm and the
+    # base graph has no cycle; every `union` member is a declared arm. The union's shape is its reader's.
+    bases = {a["name"]: a.get("base") for a in arms}
+    for name, base in bases.items():
+        if base is not None and (not isinstance(base, str) or base not in seen or base == name):
+            raise Refusal(f"arm {name}: base {base!r} is not another declared arm")
+    for name in bases:
+        chain = [name]
+        while bases[chain[-1]] is not None:
+            if bases[chain[-1]] in chain:
+                raise Refusal(f"arm {name}: its base chain {' -> '.join(chain + [bases[chain[-1]]])} is a cycle, so no arm is its root")
+            chain.append(bases[chain[-1]])
+    union = manifest.get("union")
+    stray = [m for v in (union.values() if isinstance(union, dict) else ()) if isinstance(v, list)
+             for m in v if isinstance(m, str) and m not in seen]
+    if stray:
+        raise Refusal(f"union: arm(s) {', '.join(stray)} named but not declared, so they add no coverage")
     return INSTANCES[instance]["experiment"](manifest, arms, repo)
 
 
@@ -1538,7 +1577,7 @@ def run_selftest():
         """TOOL-dFairHearing-23 AC2: four review runs, each with a report and a matched list, parse 4 of 4; one
         report's appendix cut parses 3 of 4; an unknown key still refuses by name."""
         head = "**Serves:** research X-1\n\n**Population:** 2 · reviewed 2 · escaped 0 · high 1\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"
-        report = ("**Serves:** spec-audit X-1\n\nReview shape: raw 1, confirmed 1, refuted 0.\n\n" + APPENDIX_HEADING +
+        report = (f"**Serves:** spec-audit X-1\n\nReviewed: x.md@{'a' * 40}\n\nReview shape: raw 1, confirmed 1, refuted 0.\n\n" + APPENDIX_HEADING +
                   "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n| 1 | l | x.md:[act] lifetime | confirmed |\n")
         with tempfile.TemporaryDirectory() as tmp:
             pathlib.Path(tmp, "known.md").write_text(head + "| a | x.md:[supervise] | high | no |\n| b | x.md:[act] | medium | no |\n", encoding="utf-8")
@@ -1558,6 +1597,64 @@ def run_selftest():
                 return f"a run whose appendix is cut read {lines!r}"
             return (check_refused(lambda: check_experiment({**manifest, "cases": "x"}), "unknown key(s) cases")
                     or check_refused(lambda: check_experiment({**manifest, "candidates": {"a": str(pathlib.Path(tmp, "r0.md"))}}), "not a list"))
+
+    def check_replay_subject_arm():
+        """TOOL-dFairHearing-32 AC6: a run-case's subject is its report's `Reviewed:` pin or its range. A report
+        whose subject blob is blanked refuses naming its case and `case_evidence`, and a known row with no
+        source record refuses naming the row."""
+        head = "**Serves:** research X-1\n\n**Population:** 1 · reviewed 1 · escaped 0 · high 0\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"
+        rows = APPENDIX_HEADING + "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n| 1 | l | x.md:[act] lifetime | confirmed |\n"
+        with tempfile.TemporaryDirectory() as tmp:
+            known = pathlib.Path(tmp, "known.md")
+            known.write_text(head + "| a | x.md:[act] | medium | no |\n", encoding="utf-8")
+            for name, pin in (("spec", f"Reviewed: x.md@{'a' * 40}"), ("diff", f"Range: {'b' * 40}...{'c' * 40} (round 1)"),
+                              ("bare", "Reviewed: x.md@")):
+                pathlib.Path(tmp, f"{name}.md").write_text(f"**Serves:** spec-audit X-1\n\n{pin}\n\n"
+                                                           f"Review shape: raw 1, confirmed 1, refuted 0.\n\n{rows}", encoding="utf-8")
+
+            def derive_run_entry(n):
+                return {"case": f"run {n}", "report": str(pathlib.Path(tmp, f"{n}.md")), "matched": None}
+            manifest = {"instance": "review-replay", "known": str(known), "candidates": [derive_run_entry("spec"), derive_run_entry("diff")],
+                        "arms": [{"name": "a", "base": None, "settings": {}, "dispatched": 3}]}
+            lines = check_experiment(manifest)
+            if "parsed a: 2 of 3" not in lines:
+                return f"a pinned spec run and a ranged diff run read {lines!r}"
+            why = check_refused(lambda: check_experiment({**manifest, "candidates": manifest["candidates"] + [derive_run_entry("bare")]}),
+                                "case run bare", "case_evidence")
+            known.write_text(head + "| a | :[act] | medium | no |\n", encoding="utf-8")
+            return why or check_refused(lambda: check_experiment(manifest), "row a")
+
+    def check_references_arm():
+        """TOOL-dFairHearing-32 AC7: a duplicate arm, a dangling base, a two-arm base cycle and a union member no
+        arm declares each refuse naming the arm, never a KeyError."""
+        with tempfile.TemporaryDirectory() as tmp:
+            dup, dangling, cycle, union = (derive_fixture_manifest(tmp) for _ in range(4))
+            dup["arms"].append(dict(dup["arms"][1]))
+            dangling["arms"][1]["base"] = "m1c"
+            cycle["arms"][0]["base"] = "m1b@medium"
+            union["union"] = {"tuning": ["m1b", "m1b@hgih"]}
+            return (check_refused(lambda: check_experiment(dup), "arm m1b@medium", "declared twice")
+                    or check_refused(lambda: check_experiment(dangling), "arm m1b@medium", "'m1c'", "not another declared arm")
+                    or check_refused(lambda: check_experiment(cycle), "arm m1b", "cycle")
+                    or check_refused(lambda: check_experiment(union), "m1b@hgih", "not declared"))
+
+    def check_held_out_pathspec_arm():
+        """TOOL-dFairHearing-32 AC19: `heldOut` naming a directory, or a path holding `*`, refuses naming the path
+        and its literal `git ls-files` line count; a first line taken would check another file."""
+        with tempfile.TemporaryDirectory() as tmp:
+            _, _, run_git = derive_frozen_repo(tmp)
+            sub = pathlib.Path(tmp, "d")
+            sub.mkdir()
+            for n in ("x.json", "y.json"):
+                (sub / n).write_text("[]", encoding="utf-8")
+            run_git("add", "d")
+            run_git("commit", "-q", "--no-verify", "-m", "two files under d")
+            union = {"tuning": ["m1b"], "heldOut": ["m1b"]}
+            star = str(pathlib.Path(tmp, "*.json"))
+            return (check_refused(lambda: check_experiment(derive_fixture_manifest(tmp, heldOut=str(sub), union=union), tmp),
+                                  str(sub), "2 line(s)")
+                    or check_refused(lambda: check_experiment(derive_fixture_manifest(tmp, heldOut=star, union=union), tmp),
+                                     star, "0 line(s)"))
 
     def check_conformance_root_arm():
         """TOOL-dFairHearing-23 AC16: at the repository root and at this kit, no pairing site is under memory/."""
@@ -1637,7 +1734,8 @@ def run_selftest():
             ("known-set", check_known_set_arm), ("tag-drive", check_tag_drive_arm), ("design-recall", check_design_recall_arm),
             ("replay-manifest", check_replay_manifest_arm), ("conformance-root", check_conformance_root_arm),
             ("tag-item", check_tag_item_arm), ("experiment-freeze-spelling", check_freeze_spelling_arm),
-            ("pairing-walk", check_pairing_walk_arm)]
+            ("pairing-walk", check_pairing_walk_arm), ("replay-subject", check_replay_subject_arm),
+            ("experiment-references", check_references_arm), ("held-out-pathspec", check_held_out_pathspec_arm)]
     passed = skipped = ran = 0
     for name, arm in arms:
         ran += 1

@@ -279,16 +279,17 @@ fixture() {
   cp "$GATE_SRC" "$d/${FX}check-playbook-parity.sh"
   : > "$d/${FX}${MT_KIT}/engine.sh"
   printf 'const CAP = 5\nconst MAX_VERIFIERS = 5\n' > "$d/${FX}${HOOKS}/agent-cap.js"
-  # The lens-array bound's owner (TOOL-dFairHearing-27 S16). Undeclared in the fixture's registry, so no kit to S1.
+  # The lens-array bound's owner (TOOL-dFairHearing-27 S16): a planted workflows kit the registry declares and the
+  # waivers excuse (TOOL-dFairHearing-32 S29), so the valid-fixture control stays green with it in the population.
   printf 'const LENS_SLOTS = 5\n' > "$d/${FX}${WF}/check-verifier-fanout.js"
   # The hook README states two of the bounds, the lens-array bound and the resolved-K ceiling, the
   # latter in the rule-2 sentence its row reads (TOOL-dGroundRules-21 S35, TOOL-dGroundRules-25 S34).
   printf 'an array LITERAL of <=5 elements\n- Any marker `K` it cannot resolve to an integer <=5, the hook MAX_VERIFIERS\n' \
     | sed 's/<=/≤/g' > "$d/${FX}${HOOKS}/README.md"
-  # The registry declares the two kits this fixture plants. `lib` is declared and holds no tracked
+  # The registry declares the three kits this fixture plants. `lib` is declared and holds no tracked
   # file, so it is no kit; the registry's own directory is declared nowhere, so it is none either.
-  printf '[[entry]]\nid = "memory-tree"\ndescriptor = "{prefix}/%s/kit.toml"\n\n[[entry]]\nid = "agent-cap"\ndescriptor = "{prefix}/%s/kit.toml"\n\n[[exempt]]\npath = "{prefix}/lib"\nwhy = "gov-internal"\n' \
-    "$MT_KIT" "$HOOKS" > "$d/${FX}${GK}/registry.toml"
+  printf '[[entry]]\nid = "memory-tree"\ndescriptor = "{prefix}/%s/kit.toml"\n\n[[entry]]\nid = "agent-cap"\ndescriptor = "{prefix}/%s/kit.toml"\n\n[[entry]]\nid = "review-harness"\ndescriptor = "{prefix}/%s/kit.toml"\n\n[[exempt]]\npath = "{prefix}/lib"\nwhy = "gov-internal"\n' \
+    "$MT_KIT" "$HOOKS" "$WF" > "$d/${FX}${GK}/registry.toml"
   printf '{ "hooks": { "PreToolUse": [ { "matcher": "Workflow|Agent" } ] } }\n' > "$d/.claude/settings.json"
   # The trio. hooks is waived; memory-tree is documented, and it is documented in the RUNBOOK.
   #
@@ -313,7 +314,7 @@ fixture() {
   # through the `<prefix>/` token (VERIFYING repair: a bare `memory-tree/` documents nothing).
   # The bare `§2` is S4's NEAR-MISS: a section sign with no charter word, counted and never failed.
   printf 'runbook {{MEMORY_ROOT}}\nadopt '"${FX:-<prefix>/}${MT_KIT}/"' into the target repo\nthe runbook §2 lists the steps\n' > "$d/WIRE-INTO-PROJECT.md"
-  printf '# waivers\nhooks   not adopter-facing as a kit.\n' > "$d/${FX}playbook-kit-waivers.txt"
+  printf '# waivers\nhooks   not adopter-facing as a kit.\n%s   planted as the lens-array bound owner, not a kit under test.\n' "$WF" > "$d/${FX}playbook-kit-waivers.txt"
   # The stamp-rule pair (TOOL-aHonedRuleset-5) is the one row whose two homes both sit OUTSIDE
   # <prefix>/: the manifest template states the expression and manifest-check.sh owns it. The control
   # redded on a missing owning source from the day that row landed, because this fixture built no

@@ -232,12 +232,16 @@ rule above ships at `<prefix>/workflows/tier2-review.js`.
 declared `spec-audit:` is judged by the review kit's `spec-audit-optin.js` pack alone, the opt-in's
 one home. Last, after rules 6 and 7, a `Workflow` call whose structured `args` carry
 `kind: "spec-audit"` or a `specAudit` key, the pack's own trigger, is refused, exit 2, unless the
-pack is found in the sibling-kit resolver's order (`TOOL-dFairHearing-27`): first a row of the install
-receipt, `.governance/install.json` at the root the nearest `.git` names, whose `source` ends
-`workflows/spec-audit-optin.js` and whose `path` is a file inside the tree; then
-`<prefix>/workflows/spec-audit-optin.js` beside the hook's own directory. A receipt row whose `path` is
-no such file refuses naming that path, and no `..` path is followed; no row and no probe hit refuses
-naming the probed path. The refusal names two remedies. The first follows the receipt: `govkit update
+pack is found by `resolveKitDir`, the hook's port of the sibling-kit resolver `resolve_kit_dir`, rung
+for rung (`TOOL-dFairHearing-32`): first a row of the install receipt, `.governance/install.json` at
+the root the nearest `.git` names, whose `source` ends `workflows/spec-audit-optin.js` (or a
+`rendered` row from that home naming the file) and whose `path` is a file inside the tree; then the
+probes `<hook dir>/workflows/` and `<hook dir>/../workflows/`. A receipt row whose `path` is missing,
+escapes the tree or holds `..` is skipped, never followed and never a deny, so a stale row with the
+pack beside the hook admits. Only the resolver's own refusal denies, and the deny quotes it: the
+receipt and both probe paths, the three places looked. The port sits between `// >>> resolveKitDir`
+and `// <<< resolveKitDir`, and gov's own lib-dir resolver suite holds it to the canonical row for
+row; `resolveHarnessName` finds `tier2-review.js` through it too. The refusal names two remedies. The first follows the receipt: `govkit update
 --kits review-harness` when its `kits` claims `review-harness`, and `govkit apply --kits
 review-harness` otherwise or with no receipt, because `update` refuses a kit the receipt does not
 claim. The second is a hand copy wired with `<prefix>/settings-merge.py --fragment`. Why: the hooks

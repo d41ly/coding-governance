@@ -327,8 +327,19 @@ run_pack "FH27 AC8: a receipt claiming both names the update remedy" 2 "$RCP/.cl
 : > "$RCP/tools/workflows/spec-audit-optin.js"
 printf '{"kits":["agent-cap","review-harness"],"files":[%s]}' "$RCP_ROW" > "$RCP/.governance/install.json"
 run_pack "FH27 AC15: the pack under a per-kit prefix the receipt names is admitted" 0 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED"
+# TOOL-dFairHearing-32 AC15: `resolveKitDir`'s rungs. A row naming a missing path is SKIPPED, so the pack beside the
+# hook admits; only the resolver's refusal denies, naming the receipt and both probes, and a `..` row is skipped
+# even where it names a file. RED against the hook at TOOL-dFairHearing-27's commit, which denied the stale row
+# whatever sat beside the hook. The paths are matched by their tails: node spells the scratch root its own way.
 printf '{"kits":["agent-cap","review-harness"],"files":[%s]}' "${RCP_ROW//tools\/workflows\/spec-audit-optin.js\",\"kit/tools/gone/spec-audit-optin.js\",\"kit}" > "$RCP/.governance/install.json"
-run_pack "FH27 AC15: a receipt row naming a missing path is refused, naming it" 2 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED" 'tools/gone/spec-audit-optin.js'
+mkdir -p "$RCP/.claude/workflows"; : > "$RCP/.claude/workflows/spec-audit-optin.js"
+run_pack "FH32 AC15: a stale receipt row with the pack beside the hook is admitted" 0 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED"
+rm -f "$RCP/.claude/workflows/spec-audit-optin.js"
+run_pack "FH32 AC15: ...and with the pack removed too, refused naming the receipt and both probes" 2 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED" \
+  'rcpt/p/.governance/install.json' 'rcpt/p/.claude/hooks/workflows and ' 'rcpt/p/.claude/workflows. '
+printf '{"kits":["agent-cap","review-harness"],"files":[%s]}' "${RCP_ROW//\"path\":\"tools\/workflows/\"path\":\"tools/x/../workflows}" > "$RCP/.governance/install.json"
+run_pack "FH32 AC15: a receipt row whose path holds .. is skipped though it names the pack, refused the same way" 2 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED" \
+  'rcpt/p/.governance/install.json' 'rcpt/p/.claude/hooks/workflows and ' 'rcpt/p/.claude/workflows. '
 printf '{"kits":["agent-cap","review-harness"],"files":[]}' > "$RCP/.governance/install.json"
 run_pack "FH27 AC15: with the row left out, the probe beside the hook misses and the call is refused" 2 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED" 'spec-audit-optin.js'
 if [ -z "$PKWF" ]; then

@@ -253,6 +253,10 @@ function evalAddress(extra, ret) {
       'address: the order is file, line by value, lens and id, in a new array, the argument left in id order: ' + ord.map((f) => f.id).join(','))
     const sord = sfn[2]([{ id: 1, file: 'x.md', where: 'status header', lens: 'a' }, { id: 2, file: 'x.md', where: '§9', lens: 'b' }, { id: 3, file: 'w.md', where: '', lens: 'c' }])
     ck(sord.map((f) => f.id).join(',') === '3,2,1', 'address: a spec finding with no address sorts after every addressed finding of its file: ' + sord.map((f) => f.id).join(','))
+    // TOOL-dFairHearing-32 AC2 - the section class is `section ?<n>` or `§ ?<n>`, any case, each as `§<n>`.
+    // RED against a class that requires the space, which keys `§4` and `section4` to null.
+    const secs = ['§4', 'Section 3 Design', 'section4', '§ 4', 'SECTION 12'].map((w) => sk(w).at)
+    ck(secs.join(' ') === '§4 §3 §4 §4 §12', 'address: FH32 AC2 the section forms key as §4 §3 §4 §4 §12: ' + JSON.stringify(secs))
   }
 }
 // ---- TOOL-dFairHearing-23 AC39 — a repo-absolute path, its repo-relative spelling and a lower-case drive key as one file.
@@ -705,6 +709,10 @@ async function runWholeScriptArms() {
     // TOOL-dFairHearing-15 - DIFF passes no `checklist`, so the checklist agent spawns first and the probe second.
     ck(r.trace[0] && r.trace[0].label === 'resume:checklist' && r.trace[1] && r.trace[1].label === 'resume:probe',
       'the checklist agent, then the resume probe, are the first two agents, before any lens')
+    // TOOL-dFairHearing-32 AC1 - the resume probe's instruction names the skeptic file by the name the
+    // batches write. The retired id-range spelling is AC1's tree-wide grep, so this file never spells it.
+    const probeAsk = (r.trace.find((t) => t.label === 'resume:probe') || { prompt: '' }).prompt
+    ck(probeAsk.indexOf('verify-batch-<n>.json') !== -1, 'FH32 AC1 the resume:probe prompt names verify-batch-<n>.json')
   }
   const K = r.result ? r.result.key : ''
 
@@ -3879,7 +3887,10 @@ printf '%s\n' "$out"
 # RAISED 620 -> 624 by TOOL-dFairHearing-27: 4 assertions, counted off the `FH27` arms — AC19's run-2 refusal and its
 # run-1 control (2) and AC20's complete-walk absence and gapped-walk presence (2). The two re-labelled key-pinning
 # headers add none. Counted by hand, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=624
+# RAISED 624 -> 626 by TOOL-dFairHearing-32: 2 assertions, the `FH32` arms — AC1's resume:probe prompt (1) and AC2's
+# five section forms (1). AC11's arm reads DESIGN_RECORD_PRESET already and adds none. Counted by hand, not by a
+# run: the pass runs no suite.
+FLOOR_ASSERTIONS=626
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

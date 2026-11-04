@@ -413,9 +413,10 @@ def check_gate_token(t: str, tracked: set, legs):
 
 
 GATED_LINE_RE = re.compile(r"gated (?:by|in|at)", re.I)
-# From a `gated by|in|at` match to the end of its sentence: a full stop followed by whitespace or the
-# paragraph's end, never a dot inside a backticked token (TOOL-dFairHearing-27 S11).
-GATED_SCOPE_RE = re.compile(r"(?:`[^`]*`|\.(?=\S)|[^.`])*")
+# From a `gated by|in|at` match to the end of its sentence: a full stop, optionally closed by `*`, `_`,
+# `)` or a backtick, then whitespace or the paragraph's end, never a dot inside a backticked token
+# (TOOL-dFairHearing-27 S11, TOOL-dFairHearing-32 S32: `.**` ends a bold sentence too).
+GATED_SCOPE_RE = re.compile(r"(?:`[^`]*`|\.(?![*_)`]*(?:\s|\Z))|[^.`])*")
 GATED_SECTION_RE = re.compile(r"^## Gated by[ \t]*\n(.*?)(?=^## |\Z)", re.M | re.S | re.I)
 
 
@@ -996,6 +997,16 @@ def cmd_selftest() -> int:
             return 0
         arm("check_ungated: a wrapped gated sentence and a `## Gated by` body are gated, a leg under a blank "
             "manifest is ungated and announced", "scoped False False False True note", read_scoped_ungated)
+        # TOOL-dFairHearing-32 S32 — a bold sentence closing on `.**` ends there, so the next sentence's token is
+        # outside the scope: with only that token tracked the class reads ungated. RED against TOOL-dFairHearing-27's
+        # scope, which ran past `.**` and read `y` as the gate.
+        def read_bold_scope():
+            text = f"**Gated by `{PFX}check-wiring.sh`.** Next sentence names `{PFX}y`.\n"
+            print("bold", *[t for s in extract_gated_scope(text) for t in GUARD_TOKEN_RE.findall(s)],
+                  check_ungated(text, {f"{PFX}y"}, set()))
+            return 0
+        arm("check_ungated: a gated sentence closing on `.**` keeps the next sentence out of its scope",
+            f"bold {PFX}check-wiring.sh True\n[rc=0]", read_bold_scope)
         arm("--declares is the one predicate: 'no machine gate' declares", "[rc=0]",
             lambda: 0 if declares(_rec("x", "d", "There is no machine gate for this.\n")) else 1)
         arm("--declares reads the BODY, not the front matter", "[rc=0]",

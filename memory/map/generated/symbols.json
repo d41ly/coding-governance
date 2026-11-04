@@ -648,6 +648,11 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
+      "id": "add_resolver_layout",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
       "id": "add_row",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -3531,6 +3536,11 @@
       "id": "checkEmptyTempVar",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkFile",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "checkGateLeg",
@@ -18388,6 +18398,11 @@
       "file": "tools/workflows/check-review-join.js"
     },
     {
+      "id": "renderPosix",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "renderPrompt",
       "kind": "function",
       "file": "tools/workflows/orient-counterfactual.js"
@@ -19611,6 +19626,11 @@
       "id": "resolveHomeRoots",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "resolveKitDir",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "resolveLease",

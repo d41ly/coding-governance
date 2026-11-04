@@ -68,14 +68,14 @@
 
 const KIT_AGENT_CAP_VERSION = '1.42' // gov:kit agent-cap@1.42 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 
-// The review harness a deny message points at, DERIVED (TOOL-aRepatriatedFork-2 S6): probed in the
-// workflows kit beside this hook's own directory, and the bare name when that probe misses, because
-// a path spelled at gov's prefix sends an adopter's reader to a file that is not there.
+// The review harness a deny message points at, DERIVED (TOOL-aRepatriatedFork-2 S6): found by
+// `resolveKitDir` in the workflows kit (TOOL-dFairHearing-32 S25), and the bare name when it refuses,
+// because a path spelled at gov's prefix sends an adopter's reader to a file that is not there.
 function resolveHarnessName() {
   const path = require('path')
-  const p = path.join(path.dirname(__dirname), 'workflows', 'tier2-review.js')
-  if (!require('fs').existsSync(p)) return 'tier2-review.js'
-  return path.relative(process.env.CLAUDE_PROJECT_DIR || process.cwd(), p).split(path.sep).join('/')
+  let dir
+  try { dir = resolveKitDir('workflows', 'tier2-review.js', __dirname) } catch { return 'tier2-review.js' }
+  return path.relative(process.env.CLAUDE_PROJECT_DIR || process.cwd(), path.join(dir, 'tier2-review.js')).split(path.sep).join('/')
 }
 
 function readStdin() {
@@ -947,46 +947,29 @@ function readSettingsLayers(root) {
 // that names this kit alone lands the hook without it: the hooks kit cannot require the review kit,
 // which requires it back, a cycle govkit refuses. So a Workflow call carrying the opt-in's own
 // trigger, `kind: 'spec-audit'` or a `specAudit` key in its structured args, is refused unless the
-// pack is found in `resolve_kit_dir`'s order (TOOL-dFairHearing-27 S20): first the install receipt,
-// `.governance/install.json` at the root the nearest `.git` names, whose row `source` ends
-// `workflows/spec-audit-optin.js` with a `path` that is a file inside the tree; then the probe in the
-// workflows kit beside this hook's directory. A row whose `path` is no such file refuses naming it, and
-// no `..` path is followed. The receipt's `kits` picks the remedy (S13): `update` for a receipt claiming
-// review-harness, else `apply`, since govkit's `update` refuses a kit its receipt does not claim; an
-// absent or unreadable receipt is the hand-copy case, and the probe decides. WHAT IT DOES NOT CHECK:
-// that the pack is wired, which check-wiring.sh reports, or that it judges correctly, which its own
-// suite does. A throw refuses. null = allow · string = deny.
+// pack is found by `resolveKitDir` (TOOL-dFairHearing-32 S25), `resolve_kit_dir`'s three rungs: a
+// receipt row, then `<here>/workflows/` and `<here>/../workflows/`. A stale or escaping row is skipped,
+// never followed and never a deny; only the resolver's refusal denies, naming the three places looked.
+// The receipt's `kits` picks the remedy (TOOL-dFairHearing-27 S13): `update` for a receipt claiming
+// review-harness, else `apply`, since govkit's `update` refuses a kit its receipt does not claim; it is
+// read a second time on the deny path alone. WHAT IT DOES NOT CHECK: that the pack is wired, which
+// check-wiring.sh reports, or that it judges correctly, which its own suite does. A throw refuses.
+// null = allow · string = deny.
 function checkOptinPackPresent(data) {
   const path = require('path')
   const fs = require('fs')
   try {
     const a = data.tool_name === 'Workflow' ? extractWorkflowArgs(data) : null
     if (!a || (String(a.kind) !== 'spec-audit' && a.specAudit === undefined)) return null
-    const kits = path.dirname(__dirname)
-    let root = __dirname
-    for (let d = __dirname; ; d = path.dirname(d)) {
-      if (fs.existsSync(path.join(d, '.git'))) { root = d; break }
-      if (path.dirname(d) === d) break
-    }
+    let refusal
+    try { resolveKitDir('workflows', 'spec-audit-optin.js', __dirname); return null } catch (e) { refusal = e }
     let receipt = null
-    try { receipt = JSON.parse(fs.readFileSync(path.join(root, '.governance', 'install.json'), 'utf8')) } catch { receipt = null }
-    const rows = receipt && Array.isArray(receipt.files) ? receipt.files : []
-    const row = rows.find((r) => r && typeof r.path === 'string' && r.path && String(r.source || '').split('/').slice(-2).join('/') === 'workflows/spec-audit-optin.js')
-    let p = path.join(kits, 'workflows', 'spec-audit-optin.js')
-    let where = 'is not beside this hook'
-    if (row) {
-      p = path.resolve(root, row.path)
-      const rel = path.relative(root, p)
-      const inside = rel !== '' && !path.isAbsolute(rel) && !rel.split(path.sep).includes('..') && !row.path.split(/[\\/]/).includes('..')
-      let isFile = false
-      try { isFile = fs.statSync(p).isFile() } catch { isFile = false }
-      if (inside && isFile) return null
-      where = `is the path the install receipt names, and it is not a file inside this tree`
-    } else if (fs.existsSync(p)) return null
+    try { receipt = JSON.parse(fs.readFileSync(refusal.receipt, 'utf8')) } catch { receipt = null }
     const claimed = !!receipt && Array.isArray(receipt.kits) && receipt.kits.includes('review-harness')
+    const kits = path.dirname(__dirname)
     const renderRel = (f) => path.relative(process.env.CLAUDE_PROJECT_DIR || process.cwd(), f).split(path.sep).join('/')
-    return `BLOCKED by agent-cap: this Workflow call is a spec audit, and the spec-audit opt-in pack ` +
-      `${row ? row.path : renderRel(p)} ${where}. The opt-in moved to the review kit (TOOL-dFairHearing-16), ` +
+    return `BLOCKED by agent-cap: this Workflow call is a spec audit, and the spec-audit opt-in pack was not found: ` +
+      `${refusal.message}. The opt-in moved to the review kit (TOOL-dFairHearing-16), ` +
       `and a hook landed without its pack does not admit an audit nobody judged.\n` +
       `Install the pack: govkit ${claimed ? 'update' : 'apply'} --kits review-harness, or wire a hand copy with ` +
       `python ${renderRel(path.join(kits, 'settings-merge.py'))} --fragment ${renderRel(path.join(kits, 'workflows', 'spec-audit-optin.fragment.json'))}.\n`
@@ -994,3 +977,48 @@ function checkOptinPackPresent(data) {
     return `BLOCKED by agent-cap: the spec-audit pack check (TOOL-dFairHearing-22) threw (${(e && e.message) || e}), and a rule that cannot finish does not admit.\n`
   }
 }
+
+// TOOL-dFairHearing-32 S25 — THE SIBLING-KIT RESOLVER, ported from `resolve_kit_dir.py` in gov's lib dir
+// rung for rung, and held to it row for row by that dir's resolve-python.test.sh (§2k), so it cannot
+// drift silently the way a hand port did (TOOL-aMendedFleet-102). The directory holding <anchor> of the
+// kit gov homes at <home>: 1. a `.governance/install.json` row, at the root the nearest `.git` names,
+// whose `path` is a file inside the tree and whose `source` ends <home>/<anchor>, or a `rendered` row
+// whose template sits under <home>/ and whose `path` names <anchor>; a row whose path escapes the tree,
+// holds `..` or names no file is skipped; 2. <here>/<home>/<anchor>, then <here>/../<home>/<anchor>;
+// 3. a thrown Error naming the three places looked, its `receipt` the receipt's path.
+// >>> resolveKitDir
+function resolveKitDir(home, anchor, here) {
+  const path = require('path')
+  const fs = require('fs')
+  const checkFile = (f) => { try { return fs.statSync(f).isFile() } catch { return false } }
+  here = path.resolve(here)
+  let root = here
+  for (let d = here; ; d = path.dirname(d)) {
+    if (fs.existsSync(path.join(d, '.git'))) { root = d; break }
+    if (path.dirname(d) === d) break
+  }
+  const receipt = path.join(root, '.governance', 'install.json')
+  let rows = []
+  try {
+    const data = JSON.parse(fs.readFileSync(receipt, 'utf8'))
+    rows = data && typeof data === 'object' && Array.isArray(data.files) ? data.files : []
+  } catch { rows = [] }
+  for (const row of rows) {
+    if (!row || typeof row !== 'object' || Array.isArray(row) || !row.path) continue
+    const src = String(row.source || '').split('/')
+    const n = src.length
+    const made = row.role === 'rendered' && String(row.path).split('/').pop() === anchor
+    if (!(n >= 2 && src[n - 2] === home && (src[n - 1] === anchor || made))) continue
+    const hit = path.resolve(root, String(row.path))
+    const rel = path.relative(root, hit)
+    const inside = rel !== '' && !path.isAbsolute(rel) && rel.split(path.sep)[0] !== '..'
+    if (checkFile(hit) && inside && !String(row.path).split(/[\\/]/).includes('..')) return path.dirname(hit)
+  }
+  const probes = [path.join(here, home), path.join(path.dirname(here), home)]
+  for (const cand of probes) if (checkFile(path.join(cand, anchor))) return cand
+  const renderPosix = (f) => f.split(path.sep).join('/')
+  const e = new Error(`no ${home} kit holding ${anchor} in this install: looked in ${renderPosix(receipt)}, ${renderPosix(probes[0])} and ${renderPosix(probes[1])}`)
+  e.receipt = receipt
+  throw e
+}
+// <<< resolveKitDir

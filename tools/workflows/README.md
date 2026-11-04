@@ -943,10 +943,17 @@ so a misspelt rule is never skipped. Every rule runs before the first figure lin
 exits 2 naming the rule, the arm or case, and the value:
 
 - **evidence** — each instance's `case_evidence` hook: a `scouted-seam` case's `sha` and every
-  ground-truth item's `path` and `why`, a `review-replay` item's ref and its record. A case it returns
-  nothing for is refused by id, and an instance registered without the hook fails `check_instances`.
-- **freeze** — `check_held_out_frozen`: `heldOut` names a working-tree file inside the repository
-  whose `git log` lists exactly one commit, printed first as `held-out: frozen at <sha>`, and shares
+  ground-truth item's `path` and `why`. A `review-replay` case is one review run of one subject record
+  (`TOOL-dFairHearing-32`): its evidence is that subject pinned in its report, a `Reviewed:` line's
+  `<path>@<blob>` or a diff review's range, and the known set it is scored against, whose every row
+  carries an address and the record it came from. A case it returns nothing for is refused by id, a
+  known row by its tag, and an instance registered without the hook fails `check_instances`.
+- **references** — `check_experiment`: arm names are unique, every `base` names another declared arm
+  and the base graph has no cycle, and every `union` member is a declared arm; each break exits 2
+  naming the arm (`TOOL-dFairHearing-32`).
+- **freeze** — `check_held_out_frozen`: `heldOut` names a working-tree file inside the repository,
+  the one line a literal `git ls-files --full-name` prints for it (a directory or a glob exits 2
+  naming the path and the line count, `TOOL-dFairHearing-32`), whose `git log` lists exactly one commit, printed first as `held-out: frozen at <sha>`, and shares
   no id with the tuning cases. The freeze is the bytes scored: `git hash-object` of the working-tree
   file, hashed through the checkout's filters so a CRLF checkout of an LF blob agrees, must equal the
   freeze commit's blob, or it exits 2 naming both object ids (`TOOL-dFairHearing-21`). A shallow

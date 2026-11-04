@@ -636,6 +636,10 @@ const ADDRESS_SECTION = /\bsection ?(\d+)\b|§ ?(\d+)\b|\b(S|AC)(\d+)\b/i
 // case-insensitively, so a repo-absolute path and its repo-relative spelling key as one file.
 const renderDriveFold = (p) => p.replace(/^[A-Za-z]:/, (d) => d.toLowerCase())
 const ADDRESS_ROOT = renderDriveFold(String(repo).replace(/\\/g, '/').replace(/\/+$/, '')) + '/'
+// TOOL-dFairHearing-32 S6 - the key differs from the replay instrument's `loc` in THREE places, so a
+// replay rate unlike its 541 of 924 reads as a key change: a token stands as a whole word; an
+// unaddressed finding keys `at` null and falls to its lens in the order, where `loc` keys its whole
+// `where`; and every section form is normalised to `§<n>`, where `loc` keys `t.group(1).lower()`.
 function deriveAddressKey(f) {
   const slashed = String(f.file).trim().replace(/\\/g, '/')
   const file = (renderDriveFold(slashed).indexOf(ADDRESS_ROOT) === 0 ? slashed.slice(ADDRESS_ROOT.length) : slashed).replace(/^\.\//, '')
