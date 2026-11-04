@@ -207,3 +207,61 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-04T23:08:36Z dispatch · item bdffc93d PLAY-dOrderedCharter-45 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
 
 2026-11-04T23:25:46Z dispatch · item bdffc93d PLAY-dOrderedCharter-45 · reason memory/builds/dOrderedCharter/build/2026-11-05-build-PLAY-dOrderedCharter-45-deviation-453.md
+
+2026-11-04T23:50:45Z rescope · item defer PLAY-dOrderedCharter-11 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:50:47Z rescope · item defer PLAY-dOrderedCharter-14 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:50:48Z rescope · item defer PLAY-dOrderedCharter-2 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:50:50Z rescope · item defer PLAY-dOrderedCharter-21 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:50:52Z rescope · item defer PLAY-dOrderedCharter-23 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:50:54Z rescope · item defer PLAY-dOrderedCharter-27 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:50:56Z rescope · item defer PLAY-dOrderedCharter-29 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:50:58Z rescope · item defer PLAY-dOrderedCharter-3 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:50:59Z rescope · item defer PLAY-dOrderedCharter-30 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:01Z rescope · item defer PLAY-dOrderedCharter-31 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:03Z rescope · item defer PLAY-dOrderedCharter-32 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:05Z rescope · item defer PLAY-dOrderedCharter-33 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:07Z rescope · item defer PLAY-dOrderedCharter-34 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:08Z rescope · item defer PLAY-dOrderedCharter-35 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:10Z rescope · item defer PLAY-dOrderedCharter-36 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:12Z rescope · item defer PLAY-dOrderedCharter-37 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:14Z rescope · item defer PLAY-dOrderedCharter-4 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:16Z rescope · item defer PLAY-dOrderedCharter-5 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:17Z rescope · item defer PLAY-dOrderedCharter-6 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:20Z rescope · item defer PLAY-dOrderedCharter-8 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:21Z rescope · item defer PLAY-dOrderedCharter-39 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:23Z rescope · item defer PLAY-dOrderedCharter-40 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:25Z rescope · item defer PLAY-dOrderedCharter-41 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:27Z rescope · item defer PLAY-dOrderedCharter-43 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:29Z rescope · item defer PLAY-dOrderedCharter-46 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:30Z rescope · item defer PLAY-dOrderedCharter-49 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:32Z rescope · item defer PLAY-dOrderedCharter-52 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:34Z rescope · item defer PLAY-dOrderedCharter-54 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-04T23:51:36Z rescope · item defer PLAY-dOrderedCharter-55 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
