@@ -154,3 +154,9 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-04T07:25:43Z dispatch · item 794c3df3 PLAY-dOrderedCharter-13 · reason tools/playbook/instruction_units.py tools/gate-legs.json tools/govkit/registry.toml tools/govkit/subject-pins.tsv memory/map/features/playbook.md memory/map/generated/MAP.md memory/map/generated/symbols.json memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/guides/SESSION-KICKOFF.md memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-13.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-13-ledger.md memory/builds/dOrderedCharter/README.md memory/LIVE.md
 
 2026-11-04T07:25:53Z brief · item PLAY-dOrderedCharter-13 · reason 8bb434b1e95e memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-13-build-brief.md
+
+2026-11-04T08:09:00Z dispatch · item 17a4ab1a PLAY-dOrderedCharter-42 · reason tools/memory-tree/tree_lib.py tools/memory-tree/build_records.py tools/memory-tree/HYGIENE.template.md tools/memory-tree/check-memory-hygiene.test.sh memory/HYGIENE.md memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-42.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-42-ledger.md memory/builds/dOrderedCharter/README.md memory/LIVE.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json
+
+2026-11-04T08:09:09Z brief · item PLAY-dOrderedCharter-42 · reason 9ab0ced973a3 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-42-build-brief.md
+
+2026-11-04T08:26:49Z dispatch · item 17a4ab1a PLAY-dOrderedCharter-42 · reason memory/backlog/PLAY.md

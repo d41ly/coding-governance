@@ -3107,6 +3107,13 @@ s10conf ''
 out=$(cd "$S10" && SPEC10_CUTOFF=1999-01-01 bash "$SCRIPT" 2>/dev/null)
 cnot 12 'memory/builds/tTen/spec/2026-08-01-spec-tTen-1.md'
 
+# --- PLAY-dOrderedCharter-42 S4 (AC4) — the typed-kinds round trip: the record factory writes one
+# --- record of every kind tree_lib.TYPED_RECORD_KINDS names into its own scratch repository, and
+# --- check 21's predicate, --print-bindings, prints no A row over it. Red on a kind the factory
+# --- mints and the bindings reader does not admit.
+out=$("$_PY" "$HERE/build_records.py" --fixture --plant typed-kinds 2>&1)
+hit 'build-records: PASS typed-kinds'
+
 # ---- the verdict, printed AFTER the last arm. Upstream printed PASS ~150 lines early and landed a
 # ---- red merge bar because the head of the output said success.
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23, and it closes TOOL-cTracedPromise-4 rather than
@@ -4521,7 +4528,9 @@ fi
 # each top-level and never skipped. Counted by reading; OWED: observed at the close.
 # RAISED 670 -> 673 by PLAY-dOrderedCharter-64: its three words-form rev-scope assertions, fixtures
 # 95, 96 and 97, each top-level and never skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=673
+# RAISED 673 -> 674 by PLAY-dOrderedCharter-42: its typed-kinds round-trip assertion, top-level and
+# never skipped. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=674
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

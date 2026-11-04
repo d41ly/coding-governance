@@ -403,7 +403,13 @@ BIND_HEAD_LINES = 12
 # deviation join's (`deviation_join.read_record`). Its kind and its file name are joined both ways in
 # `read_bindings`, so an untyped departure cannot pass for research and a typed one cannot hide from
 # the join's glob.
-RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "journal", "research", "deviation")
+# PLAY-dOrderedCharter-42 S1: the TYPED kinds, each a record the factory (`build_records.py`) names
+# `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, joined to that name the same
+# way. The factory's kind table is refused at import when its keys differ from this tuple: the
+# reader owns the one list, and the factory reads it, because the reader importing the factory
+# would cycle through `deviation_join.py`.
+TYPED_RECORD_KINDS = ("deviation", "exception", "override", "change")
+RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "journal", "research") + TYPED_RECORD_KINDS
 # Optional leading whitespace and an optional comment marker: the corpus holds a non-markdown record
 # (a shell script), where the line can only be a comment. An extension-scoped rule would structurally
 # exclude the one file most easily forgotten.
@@ -476,9 +482,11 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
     does (TOOL-dTrueNorth-5 S3), read by `read_id_pins` beside the `_expand_ids` call
     (TOOL-dTrueNorth-9 S2). A `**Commissions:**` line pins nothing.
 
-    A file named `-deviation-<n>.md` in a build's `build/` folder must carry kind `deviation`, and a
-    `deviation` record must be named `<date>-build-<unit id>-deviation-<n>.md` there; either mismatch is
-    `malformed` with its reason (TOOL-dTrueNorth-4 S2).
+    For each kind of `TYPED_RECORD_KINDS`: a file named `<date>-build-<unit id>-<kind>-<n>.md` in a
+    build's `build/` folder must carry that kind, and a record of that kind must be so named there;
+    either mismatch is `malformed` with its reason, naming the kind (TOOL-dTrueNorth-4 S2, generalised
+    by PLAY-dOrderedCharter-42 S3). The name is read on that stem only, never on any name ending
+    `-<kind>-<n>.md`, so a research record named `…-return-plan-2.md` stays bound.
 
     Does not raise for an UNREADABLE file — a decode or IO failure becomes a `state` row carrying
     `why`. It CAN still raise for a malformed conf. The former docstring said "Never raises."
@@ -488,9 +496,9 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
     """
     m = conf["MEMORY_ROOT"]
     alt = _id_alternation(conf)
-    deviation_named = re.compile(r"^" + re.escape(m) + r"/builds/[^/]+/build/[^/]*-deviation-\d+\.md$")
-    deviation_name = re.compile(r"^" + re.escape(m) + r"/builds/[^/]+/build/\d{4}-\d{2}-\d{2}-build-(?:" + alt
-                                + r")-[A-Za-z0-9]+-\d+-deviation-\d+\.md$")
+    typed_name = re.compile(r"^" + re.escape(m) + r"/builds/[^/]+/build/\d{4}-\d{2}-\d{2}-build-(?:" + alt
+                            + r")-[A-Za-z0-9]+-\d+-(?P<kind>" + "|".join(map(re.escape, TYPED_RECORD_KINDS))
+                            + r")-\d+\.md$")
     out = {}
     for rel in record_paths(tracked, m):
         rec = {"state": "absent", "kind": None, "ids": [], "pins": {}, "commissions": [], "reason": None,
@@ -563,17 +571,18 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
                 got = toks[0] if toks else "(empty)"
                 rec["why"] = (f"first token {got} is not one of "
                               + " ".join(RECORD_KIND_TOKENS) + ", and the line is not the none form")
-        # TOOL-dTrueNorth-4 S2 — the deviation kind joined to the file name, both ways: a file the
-        # deviation join's glob reads must say it is one, and a record saying so must be where the glob
-        # reads. A record with no Serves line keeps its own reason.
-        named = deviation_named.search(rel)
-        if named and rec["state"] in ("bound", "unbound") and rec["kind"] != "deviation":
+        # TOOL-dTrueNorth-4 S2, every typed kind by PLAY-dOrderedCharter-42 S3 — the kind joined to the
+        # file name, both ways: a file on a typed kind's stem must say it is one, and a record saying so
+        # must be on its stem. A record with no Serves line keeps its own reason.
+        named = typed_name.match(rel)
+        named_kind = named.group("kind") if named else None
+        if named and rec["state"] in ("bound", "unbound") and rec["kind"] != named_kind:
             rec["state"] = "malformed"
-            rec["why"] = (f"named as a deviation record, -deviation-<n>.md in a build/ folder, and its Serves "
-                          f"kind is {rec['kind'] or 'the none form'}, not deviation")
-        elif rec["kind"] == "deviation" and not deviation_name.match(rel):
+            rec["why"] = (f"named as a {named_kind} record, -{named_kind}-<n>.md in a build/ folder, and its "
+                          f"Serves kind is {rec['kind'] or 'the none form'}, not {named_kind}")
+        elif rec["kind"] in TYPED_RECORD_KINDS and named_kind != rec["kind"]:
             rec["state"] = "malformed"
-            rec["why"] = ("Serves kind deviation, and the file is not named "
-                          "<date>-build-<unit id>-deviation-<n>.md in a build's build/ folder")
+            rec["why"] = (f"Serves kind {rec['kind']}, and the file is not named "
+                          f"<date>-build-<unit id>-{rec['kind']}-<n>.md in a build's build/ folder")
         out[rel] = rec
     return out

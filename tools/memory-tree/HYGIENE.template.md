@@ -627,8 +627,13 @@ carry it too:
 
 - `<kind>` is closed: `spec-audit` (a pre-code pass over a spec) · `diff-review` (a pass over built
   code) · `journal` (evidence of what was built) · `research` (a report that precedes the specs) ·
-  `deviation` (a departure from the design or from a spec, in the grammar under "Deviation records").
-  An open kind field stops being groupable the first time two authors spell one relation differently.
+  `deviation` (a departure from the design or from a spec, in the grammar under "Deviation records") ·
+  `exception` (a principle excused for one part, minted by `PLAY-dOrderedCharter-7`'s record factory) ·
+  `override` (minted by `PLAY-dOrderedCharter-2`) · `change` (minted by `PLAY-dOrderedCharter-15`).
+  The four after `research` are the typed kinds: each record is named
+  `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
+  joined both ways. An open kind field stops being groupable the first time two authors spell one
+  relation differently.
 - `<id>` is family-qualified, so a record can name a spec in ANOTHER build — which real corpora need,
   because one closing review legitimately covers two builds. On a `spec-audit` record dated on or
   after `SPEC_AUDIT_PIN_CUTOFF`, or carrying no date, each id is written `<id>@rev-<N>`, N the

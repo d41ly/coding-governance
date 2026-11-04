@@ -22710,6 +22710,11 @@
     {
       "id": "run_fixture",
       "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
@@ -29216,6 +29221,11 @@
       "id": "write_reclaimed_lock",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "write_record",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "write_record",

@@ -18,7 +18,15 @@ THE EXCEPTION KIND and its stand-in door (S8): `build_records.py new exception -
 dTotalRecall's record door adopts it. The core gates read the register (`core.py exceptions`).
 
 `build_records.py read <path>` prints one record's fields and every refusal: exit 0 well-formed, 1 malformed,
-2 an unreadable path.
+2 an unreadable path or a pending kind.
+
+ONE KIND LIST (PLAY-dOrderedCharter-42 S2): `KINDS`' keys are `tree_lib.TYPED_RECORD_KINDS`, the kinds the
+bindings reader admits and joins to their file names, and an import whose table differs from that tuple
+raises naming each kind. A kind whose fields a later unit owns holds a declared-pending entry,
+`{"pending": "<unit id>"}`. `build_records.py --fixture --plant typed-kinds` writes one record of every typed
+kind into a scratch git repository, through `new <kind>` where the kind has a door and `write_record`
+otherwise, and asserts `tree_lib.read_bindings` reads each `bound` and `gen_build_index.py --print-bindings`
+prints no `A` row: exit 0 PASS, 1 FAIL naming each failure.
 """
 from __future__ import annotations
 
@@ -34,6 +42,7 @@ KIT = pathlib.Path(__file__).resolve().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from design_lib import read_design_conf, read_tracked_builds  # noqa: E402  the tracked population
+from tree_lib import TYPED_RECORD_KINDS  # noqa: E402  the reader's kind list, this table's keys
 
 FIELD = re.compile(r"^- \*\*([A-Z][a-z-]+(?: [a-z]+)?):\*\* (.+)$")     # the instrument deviations.py's
 ID = r"[A-Za-z]+-[A-Za-z0-9]+-\d+"
@@ -55,7 +64,14 @@ KINDS = {
         "required": ("Principle", "Excuses", "Reason", "Caused-by"),
         "closed": (),
     },
+    "override": {"pending": "PLAY-dOrderedCharter-2"},
+    "change": {"pending": "PLAY-dOrderedCharter-15"},
 }
+if set(KINDS) != set(TYPED_RECORD_KINDS):
+    raise ImportError("build_records: the kind table and tree_lib.TYPED_RECORD_KINDS differ on "
+                      + ", ".join(sorted(set(KINDS) ^ set(TYPED_RECORD_KINDS))))
+DOORS = ("exception",)          # the kinds `new <kind>` writes; every other kind is `write_record`'s alone
+PLANTS = ("typed-kinds",)
 
 
 def derive_stem(kind):
@@ -155,42 +171,125 @@ def write_exception(root, build, unit, principle, excuses, reason, expires=None,
     for name, value in (("--excuses", excuses), ("--reason", reason)):
         if not value or not value.strip() or "\n" in value or "\r" in value:
             raise ValueError(f"{name} is one non-empty line")
-    if not SLUG.match(build):
-        raise ValueError(f"--build {build!r} is not a build slug")
-    if not re.fullmatch(ID, unit):
-        raise ValueError(f"--unit {unit!r} is not a unit id")
     if not PRINCIPLE.match(principle):
         raise ValueError(f"--principle {principle!r} is not a principle.p<n> tag")
     if expires is not None and not DATE.match(expires):
         raise ValueError(f"--expires {expires!r} is not a YYYY-MM-DD date")
+    fields = [("Principle", principle), ("Excuses", excuses), ("Reason", reason)]
+    if expires is not None:
+        fields.append(("Expires", expires))
+    fields.append(("Caused-by", unit))
+    return write_record(root, build, unit, "exception", f"{principle} excused for {excuses}", fields, today)
+
+
+def write_record(root, build, unit, kind, title, fields, today=None):
+    """The record writer every door shares: the next `kind` record of `build` under `root`'s own memory tree,
+    headed `# <unit> <kind> <n> — <title>`, then `**Serves:** <kind> <unit>` and each `(key, value)` of
+    `fields` as a bold-key bullet. -> its repo-relative path. A refusal is ValueError."""
+    if kind not in KINDS:
+        raise ValueError(f"{kind!r} is not a typed kind: " + ", ".join(KINDS))
+    if not SLUG.match(build):
+        raise ValueError(f"--build {build!r} is not a build slug")
+    if not re.fullmatch(ID, unit):
+        raise ValueError(f"--unit {unit!r} is not a unit id")
     memory_root = (read_design_conf(root).get("MEMORY_ROOT") or "memory").strip().strip("/")
     folder = pathlib.Path(root, memory_root, "builds", build)
     if not folder.is_dir():
         raise ValueError(f"{memory_root}/builds/{build}/ is no build folder of this tree")
     out = folder / "build"
-    stem = derive_stem("exception")
-    taken = [int(m.group(1)) for p in (out.glob("*-exception-*.md") if out.is_dir() else ())
+    stem = derive_stem(kind)
+    taken = [int(m.group(1)) for p in (out.glob(f"*-{kind}-*.md") if out.is_dir() else ())
              if (m := re.fullmatch(stem + r"(\d+)\.md", p.name))]
     n = max(taken, default=0) + 1
     day = today or datetime.date.today().isoformat()
-    path = out / f"{day}-build-{unit}-exception-{n}.md"
-    body = [f"# {unit} exception {n} — {principle} excused for {excuses}", "",
-            f"**Serves:** exception {unit}", "",
-            f"- **Principle:** {principle}", f"- **Excuses:** {excuses}", f"- **Reason:** {reason}"]
-    if expires is not None:
-        body.append(f"- **Expires:** {expires}")
-    body.append(f"- **Caused-by:** {unit}")
+    path = out / f"{day}-build-{unit}-{kind}-{n}.md"
+    body = [f"# {unit} {kind} {n} — {title}", "", f"**Serves:** {kind} {unit}", ""]
+    body += [f"- **{key}:** {value}" for key, value in fields]
     out.mkdir(exist_ok=True)
     with open(path, "x", encoding="utf-8", newline="\n") as fh:   # never over a record already there
         fh.write("\n".join(body) + "\n")
     return path.relative_to(root).as_posix()
 
 
+# -------------------------------------------------------------------------------- the fixture
+def run_fixture(plant):
+    """`--fixture --plant typed-kinds` (PLAY-dOrderedCharter-42 S4): one record of every kind of
+    `TYPED_RECORD_KINDS`, read at run time, in a build folder of a scratch git repository under the host
+    temp directory, each read back `bound` as its kind and `--print-bindings` printing no `A` row."""
+    import contextlib
+    import io
+    import subprocess
+    import tempfile
+    from deviation_join import remove_tree, set_env_aside   # noqa: E402  the kit's fixture helpers
+    from tree_lib import GIT_ENV_LEAKS, read_bindings        # noqa: E402
+    unit, bad, written = "ARCH-tKinds-1", [], {}
+    root = pathlib.Path(tempfile.mkdtemp(prefix="br-"))
+    try:
+        with set_env_aside(GIT_ENV_LEAKS):
+            def git(*args):
+                return subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, check=True).stdout
+            git("init", "-q", "--template=")
+            with open(root / ".memory-tree.conf", "w", encoding="utf-8", newline="\n") as fh:
+                fh.write('MEMORY_ROOT=memory\nFAMILIES="arch:ARCH"\n')
+            spec = root / "memory/builds/tKinds/spec/2026-01-01-spec-ARCH-tKinds-1.md"
+            spec.parent.mkdir(parents=True)
+            with open(spec, "w", encoding="utf-8", newline="\n") as fh:
+                fh.write(f"# {unit} — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01 · node a · Tier-2 · "
+                         "base 0123abcd\n")
+            for kind in TYPED_RECORD_KINDS:
+                if kind in DOORS:
+                    buf = io.StringIO()
+                    with contextlib.redirect_stdout(buf):
+                        rc = main(["new", kind, "--root", str(root), "--build", "tKinds", "--unit", unit,
+                                   "--principle", "principle.p1", "--excuses", "the fixture",
+                                   "--reason", "the typed-kinds round trip"])
+                    got = re.search(r"wrote (\S+)", buf.getvalue())
+                    if rc != 0 or not got:
+                        bad.append(f"{kind}: new {kind} exited {rc}")
+                        continue
+                    written[kind] = got.group(1)
+                else:
+                    written[kind] = write_record(root, "tKinds", unit, kind, "the typed-kinds round trip",
+                                                 [("Caused-by", unit)])
+            git("add", "-A")
+            tracked = [p for p in git("ls-files").split("\n") if p]
+            binds = read_bindings(str(root), tracked, read_design_conf(root))
+            for kind, rel in written.items():
+                rec = binds.get(rel) or {"state": "absent", "kind": None, "why": "not read"}
+                if rec["state"] != "bound" or rec["kind"] != kind:
+                    bad.append(f"{kind}: {rel} reads {rec['state']} as {rec['kind']} — {rec['why']}")
+                else:
+                    print(f"build-records: {plant} · {kind} · {rel} · bound")
+            p = subprocess.run([sys.executable, str(KIT / "gen_build_index.py"), "--print-bindings"], cwd=root,
+                               capture_output=True, text=True)
+            lines = p.stdout.splitlines()
+            if p.returncode != 0:
+                bad.append(f"--print-bindings exited {p.returncode}: {(p.stdout + p.stderr).strip()[:300]}")
+            bad += [f"--print-bindings printed {ln}" for ln in lines if ln.startswith("A\t")]
+            # no A row is an answer only where the predicate read the records: each owes its S row
+            bad += [f"--print-bindings printed no S row for {rel}" for kind, rel in written.items()
+                    if not any(ln.startswith(f"S\t{rel}\t{kind}\t") for ln in lines)]
+            if not written:
+                bad.append("no typed kind was written, so no A row proves nothing")
+    except (subprocess.CalledProcessError, OSError, ValueError) as exc:
+        bad.append(f"the fixture could not be built: {exc}")
+    finally:
+        remove_tree(root)
+    for why in bad:
+        print(f"build-records: FAIL {plant} · {why}")
+    if bad:
+        return 1
+    print(f"build-records: PASS {plant} — {len(written)} typed kinds bound, --print-bindings printed no A row")
+    return 0
+
+
 def main(argv):
     ap = argparse.ArgumentParser(prog="build_records.py", description=__doc__.split("\n\n")[0])
-    sub = ap.add_subparsers(dest="verb", required=True)
+    ap.add_argument("--fixture", action="store_true", help="run a plant's round trip over a scratch repository")
+    ap.add_argument("--plant", choices=PLANTS)
+    sub = ap.add_subparsers(dest="verb")
     new = sub.add_parser("new", help="write the next record of a kind through its door")
-    new.add_argument("kind", choices=["exception"])
+    new.add_argument("kind", choices=DOORS)
     new.add_argument("--build", required=True)
     new.add_argument("--unit", required=True)
     new.add_argument("--principle", required=True)
@@ -201,6 +300,14 @@ def main(argv):
     read = sub.add_parser("read", help="read one record and name every refusal")
     read.add_argument("path")
     args = ap.parse_args(argv)
+    if args.fixture:
+        if args.verb or not args.plant:
+            ap.error("--fixture takes --plant <case> and no verb")
+        return run_fixture(args.plant)
+    if args.plant:
+        ap.error("--plant takes --fixture")
+    if args.verb is None:
+        ap.error("a verb, new or read, or --fixture --plant <case>")
     if args.verb == "new":
         root = pathlib.Path(args.root).absolute()
         try:
@@ -221,6 +328,9 @@ def main(argv):
     if kind is None:
         print(f"build-records: {rel} · malformed · file name is no typed record's: " + ", ".join(KINDS))
         return 1
+    if "pending" in KINDS[kind]:
+        print(f"build-records: {rel} · the {kind} kind is pending on {KINDS[kind]['pending']}, which gives it fields")
+        return 2
     if kind == "deviation":
         import deviation_join  # noqa: E402  the deviation kind's own rules live with its join
         bad = deviation_join.read_record(rel, text)["malformed"]
