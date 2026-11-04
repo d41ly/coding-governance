@@ -11,7 +11,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 ## Run facts
 refreshed-at: 2c50ab3117f23f2b8d5336fd922418bbd6610736 · park · 5 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 70b3ac3f53bd9bfe6a80baf9141f1f896de4f606
+witness: bc4bb6e1751a3f0229c22ac3cb56090603ff0d5c
 phase: BUILDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
@@ -231,3 +231,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-04T07:38:51Z brief · item TOOL-dFairHearing-40 · reason 65d3574a33d9 memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-40-build-brief.md
 
 2026-11-04T08:40:59Z dispatch · item a565f833 TOOL-dFairHearing-40 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-40-1-acceptance-ledger.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-40.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dFairHearing/README.md
+
+2026-11-04T09:02:16Z review · item dFairHearing · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 8 · disposition promote
+
+2026-11-04T09:02:19Z rescope · item add TOOL-dFairHearing-43 · reason the closing diff review's exit promotes its 8 confirmed minors (5 medium, 3 low) into one unit, memory/builds/dFairHearing/reviews/2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md
