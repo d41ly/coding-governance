@@ -119,7 +119,7 @@ class Case:
     def __init__(self, top, out):
         self.top, self.out, self.failed = top, out, 0
 
-    def expect(self, label, ok, detail=""):
+    def check(self, label, ok, detail=""):
         self.out.append(f"{SAY}:   {'ok' if ok else 'FAILED'} · {label}{' · ' + detail if detail and not ok else ''}")
         self.failed += not ok
 
@@ -130,47 +130,47 @@ class Case:
         run_git(self.top, "add", "--", rel)
 
 
-def plant_parse(c):
+def arm_parse(c):
     for good in [*range(len(LEVELS)), *(str(n) for n in range(len(LEVELS)))]:
-        c.expect(f"parse_level({good!r}) is {int(good)}", parse_level(good) == int(good))
+        c.check(f"parse_level({good!r}) is {int(good)}", parse_level(good) == int(good))
     for bad in (8, -1, PLATFORM, True, "01"):
         try:
             parse_level(bad)
-            c.expect(f"parse_level({bad!r}) raises LevelError", False, "it parsed")
+            c.check(f"parse_level({bad!r}) raises LevelError", False, "it parsed")
         except LevelError as exc:
-            c.expect(f"parse_level({bad!r}) raises LevelError", repr(bad) in str(exc), str(exc))
+            c.check(f"parse_level({bad!r}) raises LevelError", repr(bad) in str(exc), str(exc))
 
 
-def plant_tags(c):
+def arm_tags(c):
     import tag_index
     shipped = pathlib.Path(os.path.abspath(__file__)).read_text(encoding="utf-8")
     c.out.append(f"{SAY}:   extract_level · {' '.join(r[0] for r in tag_index.extract_level({}, '', shipped))}")
     reds = check_level_tags(shipped)
-    c.expect("the shipped module names level.charter to level.records in LEVELS order", not reds, "; ".join(reds))
+    c.check("the shipped module names level.charter to level.records in LEVELS order", not reds, "; ".join(reds))
     planted = re.sub(r"^LEVELS = .*$", 'LEVELS = tuple(name for name in ("charter", "card"))', shipped,
                      count=1, flags=re.M)
     c.write_file("tools/playbook/instruction_units.py", planted)
     reds = check_level_tags(planted)
-    c.expect("a computed LEVELS names no tag and reds", bool(reds), "it passed")
+    c.check("a computed LEVELS names no tag and reds", bool(reds), "it passed")
 
 
-def plant_priority(c):
+def arm_priority(c):
     lines, rc = run_ladder_terms(c.top)
-    c.expect("a tree with no tracked source reds", rc == 1 and "matches no tracked file" in lines[0],
+    c.check("a tree with no tracked source reds", rc == 1 and "matches no tracked file" in lines[0],
              " | ".join(lines))
     c.write_file("skills/demo/SKILL.md", "[AGENTS.md · Priority 1 · …]\n")
     c.write_file("tools/demo.template.md", "this sits at rank 3\n")
     lines, rc = run_ladder_terms(c.top)
     both = all(any(p in ln and "'level'" in ln for ln in lines)
                for p in ("skills/demo/SKILL.md", "tools/demo.template.md"))
-    c.expect("ladder-terms exits 1 naming both", rc == 1 and both, " | ".join(lines))
+    c.check("ladder-terms exits 1 naming both", rc == 1 and both, " | ".join(lines))
     c.write_file("skills/demo/SKILL.md", "[AGENTS.md · Level 1 · …]\n")
     c.write_file("tools/demo.template.md", "this sits at Level 3\n")
     lines, rc = run_ladder_terms(c.top)
-    c.expect("ladder-terms exits 0 once each reads Level", rc == 0, " | ".join(lines))
+    c.check("ladder-terms exits 0 once each reads Level", rc == 0, " | ".join(lines))
 
 
-PLANTS = {"parse": plant_parse, "tags": plant_tags, "priority": plant_priority}
+PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority}
 
 
 def run_fixture(plant=None) -> tuple[list, int]:
