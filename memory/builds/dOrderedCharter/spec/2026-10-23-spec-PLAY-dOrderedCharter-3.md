@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them
 
-**Status:** DEFERRED · rev-7 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-8 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0033@756303be whole
 
@@ -17,6 +17,7 @@
 | [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 |
 | [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-3-deviation-33.md](../build/2026-10-25-build-PLAY-dOrderedCharter-3-deviation-33.md) | deviation | — |
+| [2026-11-04-build-PLAY-dOrderedCharter-3-deviation-31.md](../build/2026-11-04-build-PLAY-dOrderedCharter-3-deviation-31.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
@@ -24,6 +25,9 @@
 | [2026-11-02-prompt-PLAY-dOrderedCharter-3-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-3-build-brief.md) | journal | — |
 | [2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md) | research | PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-11-04-prompt-PLAY-dOrderedCharter-1-drift-sweep-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-1-drift-sweep-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-41 |
+| [2026-11-04-prompt-PLAY-dOrderedCharter-3-1-spec-writer.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-3-1-spec-writer.md) | journal | — |
+| [2026-11-04-prompt-PLAY-dOrderedCharter-3-interim-addendum-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-3-interim-addendum-brief.md) | research | — |
+| [2026-11-04-prompt-PLAY-dOrderedCharter-3-interim-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-3-interim-brief.md) | research | — |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -36,6 +40,8 @@ This unit registers every load-bearing instruction document with its level and a
 wraps each in the envelope S16 fixes, `[<doc> · Level <n> · <direction>]` … `[/<doc>]`, emitted by
 whatever renders that document, and adds a gate holding every registered document to its envelope and
 every load-bearing document to a registry row (foundations R2, v2:949-957 P13, layer-instruction R-A).
+One registered document, `memory/guides/BUILD-METHOD.md`, is held out of its envelope until the owner
+rules on its row (S9, F5): the gate names it as not checked on every run and never counts it as covered.
 
 ## 2. Scope (IN)
 
@@ -56,10 +62,12 @@ every load-bearing document to a registry row (foundations R2, v2:949-957 P13, l
   field off its own row (`tools/playbook/tag_index.py#check_namespace_purpose`, through
   `tools/playbook/tag_index.py#read_toml_field`), so a class tag with no `h1` reds on the first tags run.
   A charter or guide row carries none, its file's own `# ` line being its purpose. The `doc` row's
-  `source` text (`tools/playbook/namespaces.toml@c7269a97:17`) gains this registry's rows. Observed by AC1.
+  `source` text (`tools/playbook/namespaces.toml@c7269a97:17`) gains this registry's rows. A row may also
+  carry `hold`, S9's field, which the reader validates. Observed by AC1 and AC12.
 - **S2** — The seeded rows (§4 Inventory): the charter at level 0, every guide under
   `{memory_root}/guides/`, `TEMPLATE-SPEC.md` and `HYGIENE.md` at level 3, every Skill and path rule
-  at level 4, and the role agent files at level 5. Observed by AC1.
+  at level 4, and the role agent files at level 5. The `memory/guides/BUILD-METHOD.md` row is seeded
+  like its sibling guides and also carries S9's `hold`. Observed by AC1.
 - **S3** — The helper. `render_envelope(doc, level, direction, body)` and `read_envelopes(text)` live
   canonically in `tools/lib/envelope.py`, and are carried inline, byte-identical, as a
   `# >>> render_envelope — canonical copy` block in `tools/playbook/render_playbook.py` and
@@ -78,17 +86,20 @@ every load-bearing document to a registry row (foundations R2, v2:949-957 P13, l
   checked against the one declaration both ways. Every Skill in S6's population has its source named:
   `.claude/skills/cleanup/SKILL.md` renders from `tools/branch-reconcile/SKILL.template.md`
   (`tools/branch-reconcile/adopt-branch-reconcile.sh`'s `--scaffold`), and `.claude/skills/build/SKILL.md`
-  from `tools/roles/SKILL.template.md` (`tools/roles/adopt-roles.sh`'s `OUT` and `TEMPLATE`). Observed by
-  AC4.
+  from `tools/roles/SKILL.template.md` (`tools/roles/adopt-roles.sh`'s `OUT` and `TEMPLATE`). One guide
+  template is the exception: `tools/memory-tree/BUILD-METHOD.template.md`, which S9 holds, gains no lines.
+  Observed by AC4 and AC7.
 - **S6** — The gate, `python tools/playbook/instruction_units.py envelopes --check`, a new leg
   `instruction envelopes` in `tools/gate-legs.json`, its argv
   `["python", "{prefix}/playbook/instruction_units.py", "envelopes", "--check"]`. Its arms, each naming the path: a registered
-  document with no envelope, or one whose doc, level or direction differs from its row; an opener with
-  no closer, a closer with no opener, or a closer naming another doc; a second document at level 0; a
-  load-bearing document with no row. The load-bearing population is derived, never typed: every path
+  document with no envelope, or one whose doc, level or direction differs from its row, S9's one held
+  row excepted and stated; an opener with no closer, a closer with no opener, or a closer naming
+  another doc; a second document at level 0; a load-bearing document with no row. The load-bearing population is derived, never typed: every path
   the charter's Protocols lines name, every `*.md` under `{memory_root}/guides/`, every
   `.claude/agents/*.md`, `.claude/rules/*.md`, `.claude/skills/*/SKILL.md` and `skills/*/SKILL.md`. The
-  gate asserts that population is non-empty and prints its count. Observed by AC5 and AC6.
+  gate asserts that population is non-empty and prints the count it covers, which leaves out S9's held
+  file. The leg declares no `guard`, so every run of the bar reaches S9's arms. Observed by AC4, AC5 and
+  AC6.
 - **S7** — Size. A document's cap is its row in `tools/template-size-limits.txt`. dSafePassage's limits
   step is TOOL-dSafePassage-61, still DEFERRED, so `.governance/policy.toml`'s `[budgets]` holds only
   `enforce` and `pinned`, the census `tools/policy/caps.toml` names each cap's home `limits:<path>`, and
@@ -106,8 +117,9 @@ every load-bearing document to a registry row (foundations R2, v2:949-957 P13, l
   plus its direction, passes the 122 free; and `memory/guides/BUILD-METHOD.md` (30659 of 30720), whose
   block reserves the row to the owner once its remainder is spent ("Spent, it is the owner's again")
   and ties it to the figure the document spells ("Change both or neither"), so the second condition
-  fails and no run raises it: its envelope, 80 bytes plus its direction against 61 free, waits on the
-  fork record's F5. A registered document with no row is measured by none; this unit adds no row, a
+  fails and no run raises it: its envelope, 80 bytes plus its direction against 61 free, is held by S9
+  until the owner rules on that row (the fork record's F5), so this unit raises three rows and leaves that one at 30720. A
+  registered document with no row is measured by none; this unit adds no row, a
   new row being the owner's (the same paragraph). Observed by AC7.
 
 - **S8** — The leg's own rows, written in its pass. The claiming row is an `[[exempt_leg]]` row in
@@ -119,6 +131,44 @@ every load-bearing document to a registry row (foundations R2, v2:949-957 P13, l
   (unit 26's pass, `fe22fcf80`). The `envelopes` verb's planted defects are cases joining
   `tools/playbook/instruction_units.py#PLANTS`, each `instruction_units.py fixture --plant <case>`, so the
   `instruction units selftest` leg runs them through its bare `fixture` verb (unit 20's F12). Observed by AC8.
+- **S9** — The hold, this unit's shape under F5's mark, the row staying the owner's. `memory/guides/BUILD-METHOD.md`
+  keeps its `[[document]]` row and carries no envelope, and this unit changes neither that file, its
+  source `tools/memory-tree/BUILD-METHOD.template.md`, nor its row in `tools/template-size-limits.txt`.
+  Observed by AC4, AC7, AC9, AC10, AC11 and AC12.
+  - **The field.** The row declares the hold as `hold = "PLAY-dOrderedCharter-3 F5"`, the unit and fork
+    whose parked choice it waits on (F7). `read_document_registry` refuses, exit 2, a value off the shape `<unit id> F<n>`
+    and a `hold` on a row whose `path` holds a `*`. A row with no `hold` is read as every other row is.
+  - **The statement.** Every `envelopes --check` run that reads the registry prints, green or red,
+    `instruction-units: envelopes · HELD <path> · NOT checked · waits on <hold>`, and its count line,
+    `<n> documents covered · <k> held`, leaves the held file out of `<n>`.
+  - **What the gate does not check of the held document.** It does not check that the document carries
+    its identity, level or direction, so an agent reading the file sees none of them and gap-found-01
+    stays open for this one document. It does not compare the row's `level` or `direction` with the
+    file. It does not read the source, which the `kit/dogfood doc parity` leg compares with the render.
+    It does not read the fork `hold` names, so no arm turns on that fork's mark or its parked choice,
+    and it does not check who moved the row. A row move not yet committed is unseen, the cap being read at `HEAD`. The skip is not coverage, which is why the count
+    leaves the file out.
+  - **The reds.** The gate exits 1 naming the path when any of these holds, each a case joining
+    `tools/playbook/instruction_units.py#PLANTS`:
+    1. `hold-enveloped`: the held document carries an envelope, any line `read_envelopes` reads as an
+       opener or a closer of that path, paired or not.
+    2. `hold-fits`: the document plus its envelope fits its row, so the owner has moved it. The measure
+       is the file's CR-stripped bytes plus the two lines `render_envelope` renders around an empty
+       body, at or under its cap. PINNED at `bf29d666`: 30659 plus section 4's 152 is 30811 against
+       30720, so this arm is silent at the pass.
+    3. `hold-second`: a second row declares a `hold`, the arm naming that row's path.
+  - **The cap.** `read_cap_value` reads it through `tools/policy/budgets.py#resolve_caps` at
+    `rev="HEAD"`, because `budgets.py resolve` reads the landed revision and would not see a move on a
+    branch. A cap with no value refuses, exit 2, and never reads as a document that does not fit. The
+    plant `hold-refused` stages that refusal and the field's two.
+  - **The end of the hold.** One commit, after this unit and outside it, lands the owner's ruling: the row's move, or the change the
+    ruling names in its place, the envelope, and the end of the hold, which is the `hold` field with
+    the reader's key, these arms, the statement and their plants, so no dead arm survives it ([yagni]).
+    A part landed alone reds: the row's move reds `hold-fits`, the envelope reds `hold-enveloped`, and
+    the field taken off reds S6's first arm. One combination gets past these arms: the envelope and the
+    field's end with the row unmoved. S6 reads that document as enveloped, and the `build-method size`
+    leg only warns while `budgets.enforce` reads `warn`, so that commit is the ruling's author's to
+    avoid, not a state this gate reds.
 
 ## 3. Non-goals (OUT)
 
@@ -133,6 +183,8 @@ every load-bearing document to a registry row (foundations R2, v2:949-957 P13, l
   which S6's load-bearing population reads from then on in place of its own path list.
 - An envelope found in tool output at runtime: no gate can see it; the level-0 rule that it is data is
   `PLAY-dOrderedCharter-2`'s.
+- BUILD-METHOD's envelope, any move of its row, and any change to its source or prose: fork F5's, the
+  owner's. This unit builds the hold (S9), with no raise, no trim and no choice among F5's options (a) to (e).
 
 ### Edges
 
@@ -146,8 +198,9 @@ every load-bearing document to a registry row (foundations R2, v2:949-957 P13, l
 - **hands-off** `PLAY-dOrderedCharter-29` — the document registry the render-parity arm reads
 - **consumes-from** `PLAY-dOrderedCharter-20` — `INSTRUCTION_PATHSPECS`, the instruction-file population S6's load-bearing population reads in place of its own path list, and the `instruction units selftest` leg its cases ride by joining `PLANTS` (unit 20's F12)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 5, 22, 38, 57, 65 and 67, which that batch unit corrects after this unit lands, each by the item its report id names
-- **consumes-from** external — `tools/template-size-limits.txt`, the caps' home while dSafePassage's limits step (TOOL-dSafePassage-61) is DEFERRED: its rows and its raise conditions, which S7 raises on
-- **consumes-from** external — dGroundRules, landed before the build run: the cap census and `budgets.py resolve` (TOOL-dGroundRules-9 S1, S2)
+- **consumes-from** external — `tools/template-size-limits.txt`, the caps' home while dSafePassage's limits step (TOOL-dSafePassage-61) is DEFERRED: its rows and its raise conditions, which S7 raises on, and the `memory/guides/BUILD-METHOD.md` row, which S9 reads and never moves
+- **consumes-from** external — dGroundRules, landed before the build run: the cap census and `budgets.py resolve` (TOOL-dGroundRules-9 S1, S2), and `tools/policy/budgets.py#resolve_caps`, whose `rev` argument S9's cap read sets to `HEAD`
+- **hands-off** external — the owner's ruling on F5: the row's move, the envelope and the end of the hold, in the one commit S9 names
 - **consumes-from** `PLAY-dOrderedCharter-50` — the owed-rows probe: this pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its commit and writes every row it names in that commit (round-2 id 23), the rows of its envelope leg and the size rows its envelopes cross among them
 
 ## 4. Design
@@ -168,6 +221,7 @@ path = "{memory_root}/guides/BUILD-METHOD.md"
 level = 3
 direction = "Read whole before a build of more than one pass; yields to levels 0 to 2"
 source = "{prefix}/memory-tree/BUILD-METHOD.template.md"
+hold = "PLAY-dOrderedCharter-3 F5"
 
 [[document]]
 tag = "doc.agents"
@@ -182,12 +236,21 @@ The charter's direction is the owner's form (layer-instruction:376, v2:1094). An
 `[<path> · Level <n> · <direction>]`, the rendered path being the document's own repo-relative path,
 and the closer `[/<path>]`; both are whole lines.
 
+`hold` is optional, `HOLD_RE` is its shape, and `check_hold` in `tools/playbook/instruction_units.py`
+owns S9's statement and arms. `read_cap_value(cap, root, rev)` sits beside `read_policy_value` in
+`tools/playbook/policy_value.py`. It puts the policy kit on `sys.path` through `resolve_kit_dir`, as
+`tools/playbook/instruction_units.py#load_memory_tree_path` does for the memory-tree kit, calls
+`tools/policy/budgets.py#resolve_caps` with `rev`, and returns the cap's value. A `LookupError`, a
+policy `Refusal` or a value of `None` raises `PolicyRefused`.
+
 ### Inventory
 
 Minted: `tools/playbook/documents.toml`; its `[[document]]` row; `read_document_registry`;
 `tools/lib/envelope.py` with `render_envelope` and `read_envelopes`; the inline block name
 `render_envelope`; the `PARITY_ROWS` row `render_envelope`; the CLI verb `envelopes`; the leg
-`instruction envelopes`; the row field `h1`; the plant names of AC5 and AC6; the tags `doc.skills`,
+`instruction envelopes`; the row fields `h1` and `hold`; `HOLD_RE`; `check_hold`; `read_cap_value`; the
+plant names of AC5 and AC6; the plants `hold-enveloped`, `hold-fits`, `hold-second` and `hold-refused`,
+each an `arm_` function by the module's convention; the tags `doc.skills`,
 `doc.kickoff-skill`, `doc.deploy-skill`, `doc.rules` and `doc.agents`. The charter's and the guides' rows reuse the tags `PLAY-dOrderedCharter-19` derives
 (`doc.charter`, `doc.build-method`, `doc.hygiene`, `doc.template-spec`, `doc.annotation-style`,
 `doc.review-protocol`, `doc.merge-bar`, `doc.session-kickoff`, `doc.unattended-protocol`,
@@ -201,7 +264,8 @@ adopter's own gate run names each such document, which its next `govkit update` 
 ### Rollout
 
 Live at landing. The leg carries the principle key `PLAY-dOrderedCharter-7` adds to leg rows,
-naming `P13`.
+naming `P13`. The hold is live with it and outlasts this unit's close: the owner's ruling lands after
+the unit, by the hands-off edge in section 3.
 
 ### Files touched (estimate)
 
@@ -209,12 +273,13 @@ naming `P13`.
 - `tools/lib/resolve-python.test.sh`
 - `tools/playbook/documents.toml`
 - `tools/playbook/instruction_units.py`
+- `tools/playbook/policy_value.py` (`read_cap_value`)
 - `tools/playbook/tag_index.py`
 - `tools/playbook/render_playbook.py`
 - `tools/roles/roles_lib.py`
 - `tools/roles/render_agents.py`
 - `tools/gate-legs.json`
-- `tools/template-size-limits.txt` (S7's raises, one commit each)
+- `tools/template-size-limits.txt` (S7's three raises, one commit each; BUILD-METHOD's row stays)
 - `tools/playbook/namespaces.toml` (the `doc` row's `source` text)
 - `tools/govkit/registry.toml` (the `[[exempt_leg]]` row)
 - `tools/govkit/subject-pins.tsv` (regenerated)
@@ -222,7 +287,6 @@ naming `P13`.
 - `memory/map/generated/*` (regenerated)
 - `memory/DECISIONS.md`
 - `coding-governance-agents.template.md`
-- `tools/memory-tree/BUILD-METHOD.template.md`
 - `tools/memory-tree/HYGIENE.template.md`
 - `tools/memory-tree/SPEC-TEMPLATE.template.md`
 - `tools/memory-tree/ANNOTATION-STYLE.template.md`
@@ -244,8 +308,9 @@ naming `P13`.
 - `memory/guides/MERGE-BAR.md`
 - `memory/guides/SESSION-KICKOFF.md` (its envelope and the `last-audit` re-stamp)
 - `.claude/rules/product.md`
-- the renders of the sources above, re-rendered and never edited: `AGENTS.md`, `memory/guides/*.md`,
-  `memory/TEMPLATE-SPEC.md`, `memory/HYGIENE.md`, `.claude/agents/*.md`, `.claude/skills/*/SKILL.md`
+- the renders of the sources above, re-rendered and never edited: `AGENTS.md`, `memory/guides/*.md`
+  (BUILD-METHOD's excepted, its source being untouched), `memory/TEMPLATE-SPEC.md`,
+  `memory/HYGIENE.md`, `.claude/agents/*.md`, `.claude/skills/*/SKILL.md`
 
 ### Alternatives rejected
 
@@ -254,27 +319,39 @@ naming `P13`.
   same one fact, checked both ways.
 - **Registering each agent file and Skill by its own row.** The roles kit already derives that
   population; a glob row keeps one declaration per class.
+- **`budgets.py resolve` for S9's cap read.** That verb reads the landed revision
+  (`tools/policy/policy.py#derive_landed_revision`). Measured 2026-11-04 in a scratch tree, a row moved
+  to 300 on a side branch read 200 through the verb and 300 through
+  `tools/policy/budgets.py#resolve_caps` at `HEAD`. The arm must red before the move lands. A `--rev`
+  flag on the verb changes the policy kit for one reader.
+- **Reading the limits file in the arm.** `tools/policy/budgets.py#parse_limits_rows` is that file's one
+  parser, and a `budgets.*` value in `.governance/policy.toml` takes the row's place, which a direct
+  read misses.
 
 ## 5. Production-readiness checklist
 
 - security: no write path; the envelope carries no value from outside the registry.
-- perf / scale: the gate reads about 35 files once.
+- perf / scale: the gate reads about 35 files once, and one cap through the policy kit.
 - error / empty / loading states: an absent registry or an empty load-bearing population refuses with
-  exit 2, never reads green.
-- observability: the gate prints the population count and one line per offender.
+  exit 2, never reads green. So do a malformed `hold` and a held row whose cap reads no value.
+- observability: the gate prints the covered count, one `HELD` line per held row, and one line per
+  offender.
 - risks: four documents sit at or near their rows (S7), one the owner's (F5); a raise is a decision row,
-  not a silent edit.
+  not a silent edit. That document is held (S9), so until the ruling it carries no envelope and an agent
+  reading it sees no level. The gate states that on every run, and three arms end the hold once its
+  state moves.
 - testing: §6 and the `New arm:` lines of §7.
 - migration: §4 Migration.
 - user docs: `help/charter.md`, created by `PLAY-dOrderedCharter-1`, gains a paragraph on levels and
-  envelopes.
+  envelopes, naming the held document.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When `python instruction_units.py envelopes --list` runs, it prints every
   seeded row with its resolved path, its level and the count of files its path matches, each count at
-  least 1, and each row whose tag the `doc` namespace does not derive with its `h1`.
-  Red when: a row's path matches no file, or such a row has no `h1`.
+  least 1, each row whose tag the `doc` namespace does not derive with its `h1`, and the
+  `memory/guides/BUILD-METHOD.md` row with its `hold`.
+  Red when: a row's path matches no file, such a row has no `h1`, or the held row lists no `hold`.
 - **AC2** — When `diff` compares the `render_envelope` block of `envelope.py` with the
   block in `tools/playbook/render_playbook.py` and in `tools/roles/roles_lib.py`, CR stripped, both are
   empty.
@@ -283,23 +360,29 @@ naming `P13`.
   its front matter are read after a re-render, they are `[AGENTS.md · Level 0 · …]` and the same
   opener naming `.claude/agents/gov-builder.md` at `Level 5`, and each file ends its body with its closer.
   Red when: either renderer drops the envelope.
-- **AC4** — When `envelopes --check --root .` runs over gov's tree after the build, it exits 0 and prints a
-  population count equal to the number of files S6 derives.
-  Red when: a source's envelope lines differ from its row.
+- **AC4** — When `envelopes --check --root .` runs over gov's tree after the build, it exits 0, prints a
+  `HELD` line naming `memory/guides/BUILD-METHOD.md` with the words `NOT checked`, and prints a covered
+  count equal to the number of files S6 derives less the one held.
+  Red when: a source's envelope lines differ from its row, the `HELD` line is absent, or the count
+  includes the held document.
   figure: the count is DERIVED by the gate on each run.
 - **AC5** — When `envelopes --check --root <fixture>` runs over a scratch tree copied from gov with
-  one planted defect at a time (a guide's envelope removed, its level changed, its closer removed, a
-  closer naming another doc, a second row at level 0), it exits 1 naming the path each time.
-  Red when: any planted defect exits 0.
+  one planted defect at a time (the envelope of a guide other than the held one removed, its level
+  changed, its closer removed, a closer naming another doc, a second row at level 0), it exits 1 naming
+  the path each time, and each red run still prints its `HELD` line.
+  Red when: any planted defect exits 0, or a red run prints no `HELD` line.
 - **AC6** — When the same fixture gains an unregistered guide, `NEW.md` in its guides folder, the gate exits 1
   naming it; with its row added and its envelope written, it exits 0.
   Red when: an unregistered load-bearing document passes.
 - **AC7** — When `git grep -n -e . HEAD -- tools/template-size-limits.txt` is read after the envelopes' commits,
   each row S7 raised holds at least its document's CR-stripped bytes, equal where its block's rule is no
-  headroom, under a `RAISED <old> -> <new>` line naming this unit; `python tools/policy/budgets.py
-  resolve <path>` prints that value for each; and the `memory/guides/BUILD-METHOD.md` row reads 30720
-  unless the owner moved it (F5).
-  Red when: an envelope lands with its document over its row, or a row moves without its argued line.
+  headroom, under a `RAISED <old> -> <new>` line naming this unit; once that row has landed, `python
+  tools/policy/budgets.py resolve <path>` prints that value for each, the verb reading the landed
+  revision; the `memory/guides/BUILD-METHOD.md` row reads 30720 under no line naming this unit; and
+  `git diff <pass base> HEAD -- tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md`
+  prints nothing.
+  Red when: an envelope lands with its document over its row, a row moves without its argued line, or
+  this unit moves BUILD-METHOD's row, source or render.
 
 - **AC8** — When `git grep -n -F 'name = "instruction envelopes"' -- tools/govkit/registry.toml` runs
   after the pass, it prints one line under an `[[exempt_leg]]` header; `git grep -n -F "instruction
@@ -309,13 +392,35 @@ naming `P13`.
   memory/guides/SESSION-KICKOFF.md` at the pass commit shows its `last-audit` line rewritten.
   Red when: the leg lands without its claiming row, its pins row, its dossier claim, the rewritten map
   or the re-stamp.
+- **AC9** — When `python instruction_units.py fixture --plant hold-enveloped` runs, its scratch tree's
+  held `memory/guides/BUILD-METHOD.md` gains the envelope's two lines, then the opener alone, and
+  `envelopes --check --root <fixture>` exits 1 naming that path each time; with neither it exits 0,
+  printing the `HELD` line and a covered count that leaves the held file out.
+  Red when: a held document carrying an envelope, whole or half, exits 0.
+- **AC10** — When `python instruction_units.py fixture --plant hold-fits` runs, its scratch tree commits
+  the `memory/guides/BUILD-METHOD.md` row of `tools/template-size-limits.txt`, on a side branch, at the
+  document's CR-stripped bytes plus its envelope's two lines, and `envelopes --check --root <fixture>`
+  exits 1 naming that path; at one byte under that figure it exits 0.
+  Red when: the moved row exits 0, as a cap read at the landed revision would, or the row one byte
+  short reds.
+  figure: DERIVED by the plant from its own document and row.
+  fixture: a scratch tree with `main` left at the old row, so the move sits on no landed ref.
+- **AC11** — When `python instruction_units.py fixture --plant hold-second` runs, a second registry row
+  carrying `hold` makes `envelopes --check --root <fixture>` exit 1 naming that row's path, and with
+  that field gone it exits 0.
+  Red when: two holds exit 0.
+- **AC12** — When `python instruction_units.py fixture --plant hold-refused` runs,
+  `envelopes --check --root <fixture>` exits 2 naming the row over a `hold` of `F5` alone, over a `hold`
+  on a row whose path holds a `*`, and over a held row with no row in
+  `tools/template-size-limits.txt`.
+  Red when: any of the three exits 0 or 1.
 
 ## 7. Gates
 
 `playbook render selftest` · `playbook render wiring` · `roles render wiring` · `roles render selftest` · `template size <=48KiB` · `charter size` · `build-method size` · `unattended protocol size` · `govkit acceptance matrix` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `check-wiring self-test` · `lexicon naming predicates` · `manifest-check self-test` · `scratch-guard self-test` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `codebase-map kit selftest` · `drift-audit selftest` · `lexicon selftest` · `pre-push run-log line` · `run-gates run-log line` · `runlog selftest` · `kit/dogfood doc parity` · `policy fixtures` · `unattended skill size` · `kickoff engine size <=18KiB` · `govkit selftest` · `govkit refusal join` · `branch-reconcile selftest` · `tags (the resolver's checks)` · `instruction units selftest`
 
 New arm: tools/lib/resolve-python.test.sh · covers AC2 · the parity table's `render_envelope` row, its failing case a copy with one byte changed · none
-New arm: tools/playbook/instruction_units.py · covers AC5 AC6 · `PLANTS` cases run by `instruction_units.py fixture --plant <case>`, one per defect of AC5 and the unregistered guide of AC6 in a scratch tree, under the `instruction units selftest` leg · none
+New arm: tools/playbook/instruction_units.py · covers AC5 AC6 AC9 AC10 AC11 AC12 · `PLANTS` cases run by `instruction_units.py fixture --plant <case>`, one per defect of AC5, the unregistered guide of AC6, and `hold-enveloped`, `hold-fits`, `hold-second` and `hold-refused` in a scratch tree, under the `instruction units selftest` leg · none
 
 ## 8. Open questions
 
@@ -342,12 +447,12 @@ New arm: tools/playbook/instruction_units.py · covers AC5 AC6 · `PLANTS` cases
   add the class rows to its extractor's population; (b) a tag scheme of this registry's own. RESOLVED
   (agent, 2026-10-23, delegated): (a), rung 3; (b) spells one document's tag twice, the M2 interface
   disagreement this build's brief forbids. widens: none · relaxes: none
-- **F5 — BUILD-METHOD's envelope against its row. OPEN, the owner's.** The render measures 30659 of
+- **F5 — BUILD-METHOD's envelope against its row.** The render measures 30659 of
   30720, CR-stripped, and the envelope S16 fixes takes 80 bytes plus its direction, 152 with section 4's
   example, so it crosses. Options: (a) the owner raises the row, and the document's `**Budget:` figure
   with it, by at least the envelope's bytes less the 61 free, in the envelope's commit; (b) trim
   BUILD-METHOD's prose by that much, such as the raise history its budget paragraph carries; (c) leave BUILD-METHOD out of the registry; (d) exempt it from the
-  envelope arm; (e) a shorter envelope for it. No delegated option survives: (a) is the owner's, the
+  envelope arm; (e) a shorter envelope for it; (f) this unit holds the envelope, the row staying as it is and the gate stating the document as not checked (S9). Of (a) to (e) no delegated option survives: (a) is the owner's, the
   row's block reserving its next movement ("Spent, it is the owner's again"), so the raise terms'
   second condition fails and the build method's fork rule keeps its own budget out of any delegation;
   (b) changes a governance carrier beyond the clause's two lines, its budget prose included (veto 2);
@@ -355,7 +460,25 @@ New arm: tools/playbook/instruction_units.py · covers AC5 AC6 · `PLANTS` cases
   and fails S6's first arm (veto 1); (e) is not S16's shape, and with an empty direction its two lines
   still take 80 against 61 free (veto 1). Recommendation: (a), the row's own block naming the owner as
   its next mover and the envelope being the clause's content. Until the owner rules, S2's BUILD-METHOD
-  envelope does not land and this unit does not build.
+  envelope does not land.
+  RESOLVED (agent, 2026-11-04, delegated): (f), the main loop's ruling, which settles this unit's shape and not the row. widens: none · relaxes: S6's first arm, for the one held row until the owner rules
+
+  The mark settles what this unit builds, from `2026-11-04-prompt-PLAY-dOrderedCharter-3-interim-brief.md`
+  and `2026-11-04-prompt-PLAY-dOrderedCharter-3-interim-addendum-brief.md`: BUILD-METHOD's envelope is
+  held (S9), its row, source and prose untouched. (f) changes no governance carrier and moves no budget,
+  so the delegation reaches it. It does not settle the row. The owner's choice among (a) to (e) stays
+  parked in the run record, and the options, vetoes and recommendation above stand for that choice.
+
+  (f) shares (d)'s skip and is not (d). The veto on (d) bites on an exemption read as coverage; S9
+  states the held path as not checked on every run, leaves it out of the covered count, and reds once
+  the state it waits on moves. S6's first arm admits the hold for its life alone, and (d) as an answer
+  on the row stays refused.
+
+  The cost of (f) is stated. `cl-dClosedLoop-0033` names every registered document, and the binding
+  grammar's `part k/n` form is one of n carriers, which this clause does not have, so the spec's
+  `**Carries:**` line stays `whole` with BUILD-METHOD's envelope undone under it. The owner's ruling
+  completes the clause: that envelope, in the one commit S9 names. Until then the gate's `HELD` line
+  keeps the gap visible.
 - **F6 — Which row claims the `instruction envelopes` leg?** Options: (a) an `[[exempt_leg]]` row in
   `tools/govkit/registry.toml`; (b) a `[[gate_leg]]` row in `tools/playbook/kit.toml`, as
   `playbook render wiring` carries. RESOLVED (agent, 2026-11-04, delegated): (a), rung 3. (b) lost on
@@ -364,6 +487,15 @@ New arm: tools/playbook/instruction_units.py · covers AC5 AC6 · `PLANTS` cases
   the leg reds on a document it never received; and the registry records beside `run-gates.gov.test.sh`
   that a descriptor row naming a leg the target cannot carry reds the deployer. widens: none · relaxes:
   none
+- **F7 — How a row declares the hold.** Options: (a) a string `hold = "<unit id> F<n>"` on the
+  `[[document]]` row, naming the fork it waits on; (b) a boolean `held = true`, the additive shape
+  `PLAY-dOrderedCharter-8`'s `untracked` takes; (c) a `[[hold]]` table or a list file beside the registry,
+  as `tools/playbook/instructions-legacy.txt` lists its paths. RESOLVED (agent, 2026-11-04, delegated):
+  (a), rung 3, the most feature-rich survivor. (b) lost: it gives the statement its path and the count
+  its exclusion, but a boolean names no reason, so the gate could not say what the hold waits on and the
+  reader would validate a type alone. (c) lost on veto 1: S9 has the row declare the hold, and a second
+  declaration needs a join back to its row, two places for one fact. What (a) cannot do is see where the
+  choice it waits on stands, and S9 says so. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -378,6 +510,7 @@ New arm: tools/playbook/instruction_units.py · covers AC5 AC6 · `PLANTS` cases
 - rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 - rev-6 · 2026-11-04 · section 2 S1 S5 S6 S7, new S8 · section 3 Edges · section 4 Data model, Inventory and Files touched · section 5 · AC1 AC4 AC7, new AC8 · section 7 · section 8 F3, new F5 and F6 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-1-drift-fold-brief.md` (findings 3-1 to 3-7): the caps are rows of `tools/template-size-limits.txt`, raised on its terms, and four cross; BUILD-METHOD's row is the owner's, so F5 is open; rows the `doc` namespace does not derive carry `h1`; the deploy, cleanup and build Skills have their sources; the leg's own rows are S8 and AC8, claimed by an `[[exempt_leg]]` (F6); AC4 runs an argv the leg does not; moved lines are cited by symbol or pinned at `c7269a97`.
 - rev-7 · 2026-11-04 · S8 · section 3 Edges · section 4 Files touched · AC7 · section 7 · from `2026-11-04-prompt-PLAY-dOrderedCharter-20-3-sweep-fix-brief.md` items 2 and 3: the plants join `PLANTS` and ride unit 20's `instruction units selftest` leg, spelled `fixture --plant`, `adopt-playbook.sh` leaves the write set, and AC7 reads the limits file at HEAD with the plain path as its own token.
+- rev-8 · 2026-11-04 · section 1 · S1 S2 S5 S6 S7, new S9 · section 3 Non-goals and Edges · section 4 Data model, Inventory, Rollout, Files touched and Alternatives rejected · section 5 · AC1 AC4 AC5 AC7, new AC9 AC10 AC11 AC12 · section 7 · section 8 F5, new F7 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-3-interim-brief.md` and `2026-11-04-prompt-PLAY-dOrderedCharter-3-interim-addendum-brief.md`: the unit builds under F5's new option (f), marked as an interim on this unit's shape with the owner's choice on the row parked and S6's first arm carried as `relaxes:`, BUILD-METHOD's envelope held by a validated `hold` field (F7), its row, source and prose untouched, the gate stating the held path as not checked and leaving it out of its covered count, and three planted reds ending the hold; AC7's `budgets.py resolve` limb reads after landing, that verb reading the landed revision.
 
 ## 10. Reuse audit
 
@@ -394,4 +527,13 @@ envelope sits, inside `REGION_OPEN` and `REGION_CLOSE` (`:121-122`). `render_age
 none of which wraps a document; the source holds the precedents above, so the map and the source
 disagree here. Scout A's grep for "Level 0" in `tools` and `skills` found nothing, and it still does.
 
+The hold extends one seam more. `python tools/codebase-map/reuse_lookup.py "read a size cap at a revision
+and hold one registered document out of a gate's coverage"` ranked `read_policy_value` (fan-in 8, a seam),
+in `tools/playbook/policy_value.py`, the playbook kit's one caller of the policy kit. `read_cap_value` sits
+beside it, reusing that module's `PolicyRefused` and `resolve_kit_dir`, and
+`tools/policy/budgets.py#resolve_caps` gives the value. The row field follows `PLAY-dOrderedCharter-8`'s
+additive `untracked`.
+
 Recall terms used: `python tools/memory-recall/query.py "how is each instruction document wrapped in a level envelope and gated" --terms "envelope level instruction document registry gate region marker precedence rank playbook"`
+
+Recall terms used for the hold: `python tools/memory-recall/query.py "how does a gate state a document it skips and hold an exemption until the owner rules" --terms "hold exempt skip coverage NOT checked budget cap row owner fork interim envelope registry"`

@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: playbook
 roster: PLAY
-ids: PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-38 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-56 PLAY-dOrderedCharter-57 PLAY-dOrderedCharter-58 PLAY-dOrderedCharter-59 PLAY-dOrderedCharter-60 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 TOOL-dOrderedCharter-7
+ids: PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-38 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-56 PLAY-dOrderedCharter-57 PLAY-dOrderedCharter-58 PLAY-dOrderedCharter-59 PLAY-dOrderedCharter-60 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-66 TOOL-dOrderedCharter-7
 spec-audit: 2026-10-21
 parents: dSafePassage
 may: PLAY-dClosedLoop-3
@@ -108,7 +108,7 @@ ids PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY
 ids PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36
 ids PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-38 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48
 ids PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-56 PLAY-dOrderedCharter-57 PLAY-dOrderedCharter-58 PLAY-dOrderedCharter-59 PLAY-dOrderedCharter-60
-ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 TOOL-dOrderedCharter-7
+ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-66 TOOL-dOrderedCharter-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -141,9 +141,9 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY
 | [PLAY-dOrderedCharter-9 — the instruction-unit registry: one row per unit in each kit's manifest, its one reader, and documents rendered from units](spec/2026-10-23-spec-PLAY-dOrderedCharter-9.md) | 14 | 2 | CLOSED | rev-5 | 2026-11-04 |
 | [PLAY-dOrderedCharter-20 — the unit schema, the one renderer of record and its templates, the render gate with its legacy list, and one fact in one unit](spec/2026-10-23-spec-PLAY-dOrderedCharter-20.md) | 15 | 2 | CLOSED | rev-9 | 2026-11-04 |
 | [PLAY-dOrderedCharter-15 — the instruction manifest and its guarded write command, each change recorded, and the pack catalogue](spec/2026-10-23-spec-PLAY-dOrderedCharter-15.md) | 16 | 2 | CLOSED | rev-10 | 2026-11-04 |
-| [PLAY-dOrderedCharter-1 — the practice catalogue and `charter.practices`](spec/2026-10-23-spec-PLAY-dOrderedCharter-1.md) | 17 | 2 | DEFERRED | rev-7 | 2026-11-04 |
+| [PLAY-dOrderedCharter-1 — the practice catalogue and `charter.practices`](spec/2026-10-23-spec-PLAY-dOrderedCharter-1.md) | 17 | 2 | DEFERRED | rev-8 | 2026-11-04 |
 | [PLAY-dOrderedCharter-45 — the merge driver's TOML-table class states its whole conflict envelope and proves its output parses](spec/2026-10-24-spec-PLAY-dOrderedCharter-45.md) | 17 | 2 | DEFERRED | rev-3 | 2026-11-04 |
-| [PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them](spec/2026-10-23-spec-PLAY-dOrderedCharter-3.md) | 18 | 2 | DEFERRED | rev-7 | 2026-11-04 |
+| [PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them](spec/2026-10-23-spec-PLAY-dOrderedCharter-3.md) | 18 | 2 | DEFERRED | rev-8 | 2026-11-04 |
 | [PLAY-dOrderedCharter-41 — the `cross-os` block stays live, so every v4 template renders after the practice catalogue lands](spec/2026-10-24-spec-PLAY-dOrderedCharter-41.md) | 18 | 2 | DEFERRED | rev-4 | 2026-11-04 |
 | [PLAY-dOrderedCharter-52 — the TOML-table merge envelope is total: every base, ours and theirs state has a row, and an unlisted one is a conflict](spec/2026-10-24-spec-PLAY-dOrderedCharter-52.md) | 18 | 2 | DEFERRED | rev-2 | 2026-11-04 |
 | [PLAY-dOrderedCharter-6 — the drive section composed from each adopted kit's drive table, and the charter held inside 32 KiB](spec/2026-10-23-spec-PLAY-dOrderedCharter-6.md) | 19 | 2 | DEFERRED | rev-7 | 2026-11-04 |
@@ -174,7 +174,7 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-4 | 2026-11-04 |
 <!-- /gen:build-units -->
 
-Records: 371 bound to this build, across 4 record folder(s).
+Records: 377 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

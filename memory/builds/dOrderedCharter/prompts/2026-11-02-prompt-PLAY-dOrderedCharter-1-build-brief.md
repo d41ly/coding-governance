@@ -44,6 +44,16 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Run no gate leg, no `*.test.sh` suite, no merge bar. Verify each AC by the probe or fixture the spec names. A new
   suite arm goes in the suite file and on a `New arm:` line; the main loop observes it red and green at the close.
 
+## Owed by a unit before yours
+
+Unit 18's pass (`2d03321ab`) left two names undefined. Fix both in your pass, and add both paths to your `--dispatch` write set.
+
+- `tools/memory-tree/row_grammar.py`: `read_relation_gate` went with `load_recall_kit`, and both callers stayed, so
+  `--check-relations` raises `NameError` on this tree, where `NEAR_MATCH_GATE` is armed. Restore the function byte for byte from
+  `2d03321ab^`. Observe `--check-relations` running to its verdict, whatever that verdict is.
+- `tools/memory-recall/selftest.py`: `test_digest_covers_kit_version` lost its definition but stays in the run list. Read what
+  unit 18 changed. Restore the test if its subject survives, and otherwise take its name out of the list.
+
 ## Traps this repository has already paid for
 
 - `--dispatch` takes ONE `--writes <path>` per path (`--writes a --writes b`); a space-joined list is refused by
