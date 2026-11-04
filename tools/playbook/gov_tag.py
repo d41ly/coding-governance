@@ -360,7 +360,7 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "registry-ghost", "registry-missing", "registry-joined", "new-no-purpose", "two-versions",
           "served-across", "positional-seed", "positional-new", "positional-stale", "positional-listed",
           "positional-symbol", "positional-pinned", "positional-pin", "positional-forked-before",
-          "positional-producer-new", "positional-producer-stale", "bundle-manifest", "bundle-fold",
+          "positional-edited-after", "positional-renamed-after", "positional-uncommitted", "positional-producer-new", "positional-producer-stale", "bundle-manifest", "bundle-fold",
           "bundle-rows-values", "bundle-inline", "bundle-mode-values", "bundle-unregistered-type",
           "bundle-dangling-target", "bundle-empty-sections")
 #: PLAY-dOrderedCharter-44's `extractor-edit`: the fixture extractor's module edited to stop yielding one tag
@@ -803,9 +803,19 @@ def derive_cite(n, oid=None) -> str:
     return f"{POS_CODE}{'@' + oid if oid else ''}:{n}"
 
 
+def write_forked_record(root, kit, record, text) -> None:
+    """PLAY-dOrderedCharter-47 S4's history: `record` committed on a branch forked before the check's module
+    lands on main, then that branch merged."""
+    run_git(root, "checkout", "-q", "-b", "side")
+    write_commit(root, {record: text}, "a record on a branch forked before the check")
+    run_git(root, "checkout", "-q", "main")
+    write_commit(root, {f"{kit}/positional.py": "# the check\n"}, "the check lands")
+    run_git(root, "merge", "-q", "--no-ff", "side", "-m", "the side branch merged")
+
+
 def run_positional_plant(root, top, plant, say, check) -> int:
-    """S8's seven plants, PLAY-dOrderedCharter-47's forked-before plant and PLAY-dOrderedCharter-48's two producer
-    plants over the fixture's own lists. `check` runs the fixture's whole `check`, whose
+    """S8's seven plants, PLAY-dOrderedCharter-47's forked-before plant, PLAY-dOrderedCharter-53's three
+    per-line plants and PLAY-dOrderedCharter-48's two producer plants over the fixture's own lists. `check` runs the fixture's whole `check`, whose
     `positional` arm each plant moves; a plant of several steps returns 0 only when every step held."""
     import positional as pos
     kit, guide = FIXTURE_KIT, "memory/guides/ALPHA.md"
@@ -881,13 +891,23 @@ def run_positional_plant(root, top, plant, say, check) -> int:
         write_files(root, {guide: GUIDE + good})
         say(f"without the live bad pins: rc={check()}")
         return rc
+    record, cite = "memory/builds/x/build/record.md", "see x.py:{}\n"
+    if plant in ("positional-edited-after", "positional-renamed-after", "positional-uncommitted"):
+        # PLAY-dOrderedCharter-53 S4: the pre-fork record edited, renamed, or edited and left uncommitted after the merge
+        write_forked_record(root, kit, record, cite.format(1))
+        if plant == "positional-renamed-after":
+            run_git(root, "mv", record, "memory/builds/x/build/moved.md")
+            write_commit(root, {}, "the record renamed after the merge")
+            return check()
+        appended = {record: cite.format(1) + cite.format(3)}
+        if plant == "positional-uncommitted":
+            write_files(root, appended)
+        else:
+            write_commit(root, appended, "a citation appended after the merge")
+        return check()
     if plant == "positional-forked-before":  # PLAY-dOrderedCharter-47 S4: a branch forked before the check lands
-        record, after, cite = "memory/builds/x/build/record.md", "memory/builds/x/build/after.md", "see x.py:{}\n"
-        run_git(root, "checkout", "-q", "-b", "side")
-        write_commit(root, {record: cite.format(1)}, "a record on a branch forked before the check")
-        run_git(root, "checkout", "-q", "main")
-        write_commit(root, {f"{kit}/positional.py": "# the check\n"}, "the check lands")
-        run_git(root, "merge", "-q", "--no-ff", "side", "-m", "the side branch merged")
+        after = "memory/builds/x/build/after.md"
+        write_forked_record(root, kit, record, cite.format(1))
         rc1 = check()
         write_commit(root, {after: cite.format(2)}, "a record after the merge")
         rc2 = check()

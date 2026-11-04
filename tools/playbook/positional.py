@@ -17,11 +17,12 @@ in SYMBOL_EXTENSIONS, or a blob-pinned line, `<path>@<oid>:<n>[-<m>]`.
 as `tags.positional` says (`shrink-only`, `refuse` or `report`), every pinned line read against its
 blob and every symbol citation against its file's definitions. An unresolved pin or symbol under
 `<MEMORY_ROOT>/builds/` is printed and never red: those records are frozen. So is an unlisted file:line
-citation in a record there whose adding commit does not descend from `L`, the commit that added this
-module (PLAY-dOrderedCharter-47): it was written on a branch that never held the check, and prints
-`positional — grandfathered:`. With no `L`, the module staged and not landed, every record is graded.
-A record deleted and re-added after `L` is graded from its original add, the oldest the reader keeps,
-so a record first added before `L` stays grandfathered. `seed` writes the rows
+citation in a record there when every line holding it was written, as `git blame -M` over the working
+tree reads it, by a commit that does not descend from `L`, the commit that added this module
+(PLAY-dOrderedCharter-47, -53): it was written on a branch that never held the check, and prints
+`positional — grandfathered: <path>:<line>`. A line appended later, or not yet committed, is graded,
+and a rename keeps each line's first writer. With no `L`, the module staged and not landed, every
+record is graded. `seed` writes the rows
 once and refuses a list already holding a file:line row; `shrink` drops the stale rows and never adds
 one; `pin` rewrites a file's unlisted file:line citations to the blob-pinned line at `--at` (HEAD).
 `producers` prints every hit of PRODUCER_RE over PRODUCER_PATHSPECS, the directive sources, a render's
@@ -68,6 +69,8 @@ PRODUCER_PATHSPECS = ("tools/roles/agents/", "tools/workflows/", "skills/", "cod
 PRODUCERS_NAME = "positional-producers.txt"
 #: a producer line naming a stable form, spelled as a placeholder or as a real pin, directs no line citation
 STABLE_FORM_RE = re.compile(r"#<?symbol>?|@<(?:oid|sha8?)>:|" + PINNED_RE.pattern)
+#: the commit blame names for a line no commit wrote yet
+ZERO_SHA = "0" * 40
 
 
 def read_positional_mode(root, sets=None) -> str:
@@ -327,12 +330,37 @@ def check_symbols(root, frozen) -> tuple[list, list, int, int]:
     return reds, printed, len(cites), passed
 
 
-def read_grandfathered(root, kit_rel, frozen, paths) -> dict:
-    """{path: adding sha} for each of `paths` under `frozen` added by a commit outside the set that holds
-    the check: `L`, the oldest add of this module at `kit_rel`, and `git rev-list --ancestry-path L..HEAD`.
-    Both adds are read through `tree_lib.read_adding_commits`; no `L` grandfathers nothing."""
-    wanted = {p for p in paths if p.startswith(frozen)}
-    if not wanted:
+def read_line_commits(root, path) -> dict:
+    """{line number: the sha of the commit that wrote it} for `path`, from one `git blame --porcelain -M`
+    over the working tree, naming no revision, so an uncommitted line reads the all-zero sha
+    (PLAY-dOrderedCharter-53 S1). A failed blame is a refusal, never a silent grandfather."""
+    p = subprocess.run(["git", "-C", str(root), "blame", "--porcelain", "-M", "--", path],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace")
+    if p.returncode:
+        raise ti.TagError(f"git blame failed for {path}: {(p.stderr or '').strip()[:200]}")
+    lines, sha, n = {}, ZERO_SHA, 0
+    for rec in p.stdout.split("\n"):
+        if rec.startswith("\t"):
+            lines[n] = sha
+            continue
+        word = rec.split(" ")
+        if len(word) >= 3 and re.fullmatch(r"[0-9a-f]{40}", word[0]):
+            sha, n = word[0], int(word[2])
+    return lines
+
+
+def read_grandfathered(root, kit_rel, frozen, rows) -> dict:
+    """{row: [(line, sha), ...]} for each unlisted file:line `row` under `frozen` whose every line holding
+    its reference was written by a commit outside the set that holds the check: `L`, the oldest add of
+    this module at `kit_rel`, read through `tree_lib.read_adding_commits`, and `git rev-list
+    --ancestry-path L..HEAD`; the all-zero sha of an uncommitted line is inside it. Each line's commit is
+    one blame per record (PLAY-dOrderedCharter-53); no `L` grandfathers nothing."""
+    refs = {}
+    for r in rows:
+        path, _, ref = r.partition("\t")
+        if path.startswith(frozen):
+            refs.setdefault(path, set()).add(ref)
+    if not refs:
         return {}
     tree_lib, _id_grammar = ti.load_memory_tree()
     module = f"{kit_rel}/positional.py"
@@ -340,12 +368,21 @@ def read_grandfathered(root, kit_rel, frozen, paths) -> dict:
         landing = tree_lib.read_adding_commits(root, module, {module}).get(module)
         if not landing:
             return {}
-        held = {landing, *tree_lib.read_git_output(
+        held = {landing, ZERO_SHA, *tree_lib.read_git_output(
             root, ("rev-list", "--ancestry-path", f"{landing}..HEAD")).decode("utf-8").split()}
-        added = tree_lib.read_adding_commits(root, f":(glob){frozen}**", wanted)
     except OSError as exc:
         raise ti.TagError(str(exc)) from None
-    return {p: sha for p, sha in added.items() if sha not in held}
+    old = {}
+    for path in sorted(refs):
+        blame = read_line_commits(root, path)
+        text = (pathlib.Path(root) / path).read_text(encoding="utf-8", errors="replace")
+        hits = {}
+        for n, line in enumerate(text.split("\n"), 1):
+            for m in FILE_LINE_RE.finditer(line):
+                if f"{m.group(1)}:{m.group(2)}" in refs[path]:
+                    hits.setdefault(f"{m.group(1)}:{m.group(2)}", []).append((n, blame.get(n, ZERO_SHA)))
+        old.update({f"{path}\t{ref}": h for ref, h in sorted(hits.items()) if all(s not in held for _n, s in h)})
+    return old
 
 
 def check_positional(root, kit_rel, mode, memory_root) -> tuple[list, list, dict]:
@@ -369,11 +406,11 @@ def check_positional(root, kit_rel, mode, memory_root) -> tuple[list, list, dict
         return f"cite `{tag}`, the alias row's tag" if tag else "cite the tag an aliases.toml row maps it to"
 
     unlisted, grandfathered = sorted(tree - listed), []
-    old = read_grandfathered(root, kit_rel, frozen,
-                             {r.partition("\t")[0] for r in unlisted if check_file_line_row(r)})
-    for r in [r for r in unlisted if check_file_line_row(r) and r.partition("\t")[0] in old]:
+    old = read_grandfathered(root, kit_rel, frozen, [r for r in unlisted if check_file_line_row(r)])
+    for r, hits in old.items():
         path, _, ref = r.partition("\t")
-        grandfathered.append(f"positional — grandfathered: {path} {ref} (added in {old[path][:8]}, before the check)")
+        grandfathered += [f"positional — grandfathered: {path}:{n} {ref} (written in {sha[:8]}, before the check)"
+                          for n, sha in hits]
         unlisted.remove(r)
     findings = [f"{say}unlisted · {r.replace(chr(9), ' · ')} · {derive_remedy(r)}" for r in unlisted]
     findings += [f"{say}stale · {r.replace(chr(9), ' · ')} · the reference is gone from the tree; "
@@ -524,10 +561,15 @@ positional-pinned|1|pin, frozen record, printed · memory/builds/x/record.md · 
 positional-pinned|1|without the live bad pins: rc=0
 positional-pin|0|pin rewrote the citation to the blob at HEAD; check: rc=0
 positional-pin|0|pin outside the repository: rc=1, nothing written
-positional-forked-before|0|positional — grandfathered: memory/builds/x/build/record.md {x}:1 (added in
+positional-forked-before|0|positional — grandfathered: memory/builds/x/build/record.md:1 {x}:1 (written in
 positional-forked-before|0|tags: positional · unlisted · memory/builds/x/build/after.md · {x}:2
 positional-forked-before|0|tags: positional · unlisted · tools/notes.md · {x}:1
 positional-forked-before|0|the pre-fork record: rc=0; a record after the merge: rc=1; the pre-fork record moved under tools: rc=1
+positional-edited-after|1|positional — grandfathered: memory/builds/x/build/record.md:1 {x}:1 (written in
+positional-edited-after|1|tags: positional · unlisted · memory/builds/x/build/record.md · {x}:3
+positional-renamed-after|0|positional — grandfathered: memory/builds/x/build/moved.md:1 {x}:1 (written in
+positional-uncommitted|1|positional — grandfathered: memory/builds/x/build/record.md:1 {x}:1 (written in
+positional-uncommitted|1|tags: positional · unlisted · memory/builds/x/build/record.md · {x}:3
 positional-producer-new|1|tags: positional · producer · tools/roles/agents/gov-x.agent.md:3 · - cite it by file:line · re-point it
 positional-producer-new|1|re-pointed to a stable form: rc=0
 positional-producer-stale|0|tags: positional · producer stale · tools/roles/agents/gov-x.agent.md · - cite it by file:line · no hit

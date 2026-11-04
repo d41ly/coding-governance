@@ -255,9 +255,11 @@ bracketed Markdown spans outside `<MEMORY_ROOT>/builds/` (`resolves`, `retired`,
 `owned`) and counts what it does not grade. `aliases.toml` maps each positional label that never moved
 to its section; `positional-refs.txt` keeps the live positional references, one `<path>` TAB `<ref>` row
 each, as `--list-positional` prints them. An unlisted file:line citation in a `<MEMORY_ROOT>/builds/`
-record whose adding commit does not descend from the commit that added `positional.py` is printed
-`positional — grandfathered:` and never red, since it was written on a branch that never held the
-check (PLAY-dOrderedCharter-47). The sources that tell a writer what to cite are a query, not a list:
+record is printed `positional — grandfathered: <path>:<line>` and never red when every line holding
+it was written, as `git blame -M` over the working tree reads it, by a commit that does not descend
+from the commit that added `positional.py`, since it was written on a branch that never held the check
+(PLAY-dOrderedCharter-47, -53). The key is the line's commit, never the file's: a citation appended
+to an old record later, or not yet committed, is graded, and a rename keeps each line's first writer. The sources that tell a writer what to cite are a query, not a list:
 `positional.py producers` prints every line of the directive sources (`PRODUCER_PATHSPECS`: the role and
 workflow sources, `skills/`, the charter template and the kits' `.template.` sources) spelling
 `file:line`, `path and line` or `<path>:<line>`, a render's lines carried by its `.template.` source.

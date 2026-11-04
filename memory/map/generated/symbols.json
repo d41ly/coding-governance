@@ -16178,6 +16178,11 @@
       "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
+      "id": "read_line_commits",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "read_line_ending_config",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -28706,6 +28711,11 @@
       "id": "write_fork_spec",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_forked_record",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
     },
     {
       "id": "write_from_before_image",

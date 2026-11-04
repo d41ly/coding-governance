@@ -144,3 +144,9 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-04T05:50:08Z dispatch · item f4acbd4a PLAY-dOrderedCharter-65 · reason tools/playbook/kinds.toml tools/playbook/core-pending.txt tools/playbook/core.py memory/builds/dOrderedCharter/spec/2026-11-04-spec-PLAY-dOrderedCharter-65.md memory/builds/dOrderedCharter/build/2026-11-04-build-PLAY-dOrderedCharter-65-ledger.md memory/LIVE.md memory/builds/dOrderedCharter/README.md
 
 2026-11-04T05:50:16Z brief · item PLAY-dOrderedCharter-65 · reason d0c4cbe4d526 memory/builds/dOrderedCharter/prompts/2026-11-04-prompt-PLAY-dOrderedCharter-65-build-brief.md
+
+2026-11-04T06:35:07Z dispatch · item 0e89b19b PLAY-dOrderedCharter-53 · reason tools/playbook/positional.py tools/playbook/gov_tag.py memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-53.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-53-ledger.md memory/LIVE.md memory/builds/dOrderedCharter/README.md
+
+2026-11-04T06:35:15Z brief · item PLAY-dOrderedCharter-53 · reason ba40d4516796 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-53-build-brief.md
+
+2026-11-04T06:47:25Z dispatch · item 0e89b19b PLAY-dOrderedCharter-53 · reason tools/playbook/README.md memory/map/generated/symbols.json
