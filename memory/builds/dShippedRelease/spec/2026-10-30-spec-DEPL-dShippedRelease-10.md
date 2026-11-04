@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-10 — the kit factory, its conformance gate, and one version and one wiring verdict
 
-**Status:** DEFERRED · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 1 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-4 · 2026-11-04 · node d · Tier-2 · base f4597719 · streams deployer · order 1 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0420@7a9716bf whole
 **Carries:** node:item.kits.version
@@ -21,7 +21,7 @@
 
 Kit is the last of foundations C3's seventeen kinds with no factory or gate worth the name: 30
 descriptors carry 27 top-level keys, nothing validates a key (`gap-tool-07`), and wiring and version
-lockstep are each judged several ways (`gap-tool-02`). This unit lands the kit schema, the `new kit`
+lockstep are each judged several ways (`gap-tool-02`). This unit lands the kit schema, the `new tool-kit`
 factory, the core `kit conformance` gate over the whole population, the one version check, the one
 wiring verdict, and `item.kits.version`, the row and slot for what `cmd_mint` already does.
 
@@ -32,7 +32,7 @@ wiring verdict, and `item.kits.version`, the row and slot for what `cmd_mint` al
   `type` (`text`, `list`, `table`, `rows` or `bool`) and `required` (`every` or `optional`). It holds
   today's 27 keys and the keys of S2, read through `read_kind_schema`
   (`tools/playbook/row_checks.py`, PLAY-dOrderedCharter-36 S1). No row declares `widens`, so every
-  field reads fixed, and the `kind.kit` row carries no `schema` key, so an overlay table naming a kit
+  field reads fixed, and the `kind.tool-kit` row carries no `schema` key, so an overlay table naming a kit
   stays refused (PLAY-dOrderedCharter-35 S10). Observed by AC1.
 - **S2** — The P28 fields (§8 F3). Two new list keys, `records` (each a `name` of
   `tools/memory-tree/record-kinds.toml`) and `policies` (each a `name` of
@@ -49,12 +49,12 @@ wiring verdict, and `item.kits.version`, the row and slot for what `cmd_mint` al
   `not graded here` line naming the arm. An empty population refuses. The leg is a `[[gate_leg]]`
   row of `tools/playbook/kit.toml` carrying `enforces` with every tag of the kind's `binds`.
   Observed by AC1, AC2, AC3 and AC5.
-- **S4** — The factory. `python tools/playbook/core.py new kit <name> --layer <tag>`, which runs the
+- **S4** — The factory. `python tools/playbook/core.py new tool-kit <name> --layer <tag>`, which runs the
   kind row's `factory`, writes `tools/<name>/kit.toml`, a `README.md` carrying the `gov:kit` marker, a
   module holding the version constant, and the `[[entry]]` row of `tools/govkit/registry.toml`. It
   refuses a name that fails `seg` or is taken, and refuses what `--conform` would refuse.
   Observed by AC4.
-- **S5** — The kind row. The `kind.kit` row of `tools/playbook/kinds.toml` (PLAY-dOrderedCharter-7
+- **S5** — The kind row. The `kind.tool-kit` row of `tools/playbook/kinds.toml` (PLAY-dOrderedCharter-7
   S4) gains `population`, `factory` and `gate`, and its `kind` row leaves
   `tools/playbook/core-pending.txt`. Observed by AC6.
 - **S6** — The readers. `read_kit_rows(root, ids=None)` returns the descriptor rows in install order,
@@ -134,7 +134,7 @@ wiring verdict, and `item.kits.version`, the row and slot for what `cmd_mint` al
   the slot, unchanged but for one sentence: its no-deployer line names the version check rather than
   the push bar's epoch legs, which S9 ends. Observed by AC13.
 - **S12** — The docs. A section "The kit factory" in `tools/playbook/README.md`, and a page
-  `help/kits.md` with its row in `help/README.md`, stating what `new kit` writes and which legs an
+  `help/kits.md` with its row in `help/README.md`, stating what `new tool-kit` writes and which legs an
   adopter loses at update. NOT OBSERVED as behaviour: prose.
 
 ## 3. Non-goals (OUT)
@@ -231,7 +231,7 @@ the unknown-key, required and type arms, generic over any `[[field]]` file (§8 
 
 ```toml
 [[kind]]
-tag = "kind.kit"
+tag = "kind.tool-kit"
 owner = "dShippedRelease"
 binds = ["principle.p28", "principle.p16"]   # the row PLAY-dOrderedCharter-7 writes; read, not typed here
 population = "python {prefix}/playbook/kit_factory.py --list"
@@ -342,7 +342,7 @@ Live at landing. The leg set loses sixteen and gains three; each ceiling is meas
 ## 5. Production-readiness checklist
 
 - security — no new secret, write or egress path: `--conform` reads, `kit_wiring.py` runs the argvs
-  the bar's legs ran before it, and `new kit` writes only under the named home and one registry row.
+  the bar's legs ran before it, and `new tool-kit` writes only under the named home and one registry row.
 - perf / scale — `--conform` is one pass over 30 descriptors plus a detector walk of tracked kit
   files; `kit wiring` costs the sum of eleven legs it replaces, in one leg.
 - error / empty / loading states — an empty population refuses; a missing registry prints `not
@@ -371,7 +371,7 @@ Live at landing. The leg set loses sixteen and gains three; each ceiling is meas
   `version_from = { none = "x" }`, it exits 1 naming the entry; with a descriptor shipping nothing it
   exits 0.
   Red when: `none` passes on a kit that ships bytes.
-- **AC4** — When `python core.py new kit fixture-kit --layer layer.memory` runs in a scratch copy, the
+- **AC4** — When `python core.py new tool-kit fixture-kit --layer layer.memory` runs in a scratch copy, the
   four files and the registry row exist and `python kit_factory.py --conform` exits 0 there; a second
   run exits non-zero naming the duplicate; `--layer layer.nosuch` exits non-zero.
   Red when: the factory writes a kit its own gate refuses.
@@ -380,8 +380,8 @@ Live at landing. The leg set loses sixteen and gains three; each ceiling is meas
   sibling home it names nowhere, it exits 1 naming both; with `--plant stale-resolves` it exits 1
   naming the row.
   Red when: an undeclared sibling edge passes, or a declared one outlives its code.
-- **AC6** — When `python core.py kinds` runs it names `kind.kit` with its factory and gate, and
-  `grep -c "kind.kit" core-pending.txt` prints 0.
+- **AC6** — When `python core.py kinds` runs it names `kind.tool-kit` with its factory and gate, and
+  `grep -c "kind.tool-kit" core-pending.txt` prints 0.
   Red when: the kind stays pending, or the gate leg's `enforces` lacks a `binds` tag.
 - **AC7** — When `python kit_factory.py --list` runs it prints `memory-tree` before `memory-recall`;
   with `--fixture --plant requires-cycle` it exits non-zero naming the cycle.
@@ -474,6 +474,7 @@ New arm: tools/loop/loop_lib.py · covers AC13 · `check_program` over a fixture
   E's rows and disagreements 11-14, and the spec brief's I3.
 - rev-2 · 2026-10-30 · §3 · the Edges gain the mirror of each edge the round-1 spec audit's promoted units declare toward this unit (units 65, 66, 67, 78); no scope, design or criterion moved. The pair with unit 17 is restated on what it still carries.
 - rev-3 · 2026-11-01 · §3 · the Edges gain the mirror of each edge the round-2 spec audit's promoted units declare toward this unit (units 100, 106); no scope, design or criterion moved.
+- rev-4 · 2026-11-04 · S1, S4, S5, S12, AC4, AC6 · the kind tag `kind.kit` becomes `kind.tool-kit` and the factory `core.py new kit` becomes `core.py new tool-kit`, in those items, the Goal, the Design section's kind-row block and the readiness checklist. AC6's grep now counts `kind.tool-kit`, since the old spelling would print 0 for no reason. The reuse audit's recall-terms line keeps `kind.kit`, the query as it was run, and the schema's `name = "kit"` and every plain-prose kit stay. Cause: PLAY-dOrderedCharter-65 renamed the kind, and this is an outside write recorded by dOrderedCharter under `2026-11-04-prompt-PLAY-dOrderedCharter-65-kind-rename-fold-brief`; no other meaning moved.
 
 ## 10. Reuse audit
 
