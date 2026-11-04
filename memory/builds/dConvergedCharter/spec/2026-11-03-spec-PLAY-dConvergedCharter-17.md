@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-17 — the `/build` Skill retired once the supervisor drives attended builds, its client held by a `skill` shim for the deprecation window
 
-**Status:** DEFERRED · rev-3 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 4 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-4 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 4 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0491@3aafd2a1 whole
 
@@ -15,7 +15,9 @@
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-04-prompt-PLAY-dConvergedCharter-17-1-spec-writer.md](../prompts/2026-11-04-prompt-PLAY-dConvergedCharter-17-1-spec-writer.md) | journal | — |
 | [2026-11-04-prompt-PLAY-dConvergedCharter-17-fold-brief.md](../prompts/2026-11-04-prompt-PLAY-dConvergedCharter-17-fold-brief.md) | research | — |
+| [2026-11-04-prompt-PLAY-dConvergedCharter-7-r4-fold-brief.md](../prompts/2026-11-04-prompt-PLAY-dConvergedCharter-7-r4-fold-brief.md) | research | PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-40 |
 | [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
+| [2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
 | [2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-39 |
 
 <!-- /gen:spec-records -->
@@ -76,17 +78,26 @@ supervisor does not drive attended builds and this unit does not build.
     comment name the held client;
   - the codebase-map dossier `memory/map/features/roles.md:41` and `:149`, a live carrier the
     inventory reads once PLAY-dConvergedCharter-38 widens it, which names the `/build` Skill the roles
-    adopter renders: re-worded to name the held client and `run.py`. Gotcha pages naming `/build/`, the
-    records directory, are not this Skill and are not `--kind value` hits, the token's right boundary
-    excluding `/`.
+    adopter renders: re-worded to name the held client and `run.py`;
+  - `tools/unattended/VERBS.template.md:821`, where PLAY-dConvergedCharter-12, at the same order, has
+    not yet removed it, with its render `memory/guides/UNATTENDED-VERBS.md:821`, and the kickoff
+    manifest's attended-build line (`memory/guides/SESSION-KICKOFF.md:54`): the two renders are guides,
+    outside the inventory's walk (PLAY-dConvergedCharter-38 S1), and are re-pointed by name.
+  The token's right boundary excludes only a following `/`, `-` or word character, so a records path
+  ending `…/build` and followed by a space, a quote or `)` is a value hit: `WIRE-INTO-PROJECT.md:328`'s
+  is written `…/<your-slug>/build/`, and `tools/unattended/unattended.test.sh:3066`, `:3175` are
+  excepted. These lists are the readers commands' output at base, not a typed set: the pass re-runs
+  both at its own base and sorts every printed `path:line` into the re-points above, the held set, or
+  excepted with its reason, the sort written in its build record.
   **Readers:** by name: `coding-governance-agents.template.md`, `AGENTS.md`, `skills/session-kickoff/SKILL.md`,
   `WIRE-INTO-PROJECT.md`, `help/roles.md`, `help/README.md`, `tools/roles/README.md`,
   `tools/roles/kit.toml`, `tools/check-wiring.sh`, `tools/govkit/usage.toml`, `tools/govkit/registry.toml`,
-  `memory/map/features/roles.md`.
+  `memory/map/features/roles.md`, `memory/guides/SESSION-KICKOFF.md`.
   by value: the held set, kept until the row closes: `tools/roles/SKILL.template.md`,
-  `tools/roles/adopt-roles.sh` (`:249`), `tools/roles/adopt-roles.test.sh`, `tools/roles/kit.toml`'s
-  install row (`:55-57`), probe (`:88-92`) and `[[lf_pin]]` (`:145-147`), `.gitattributes:143`, the
-  render checks of `tools/govkit/selftest.py:2872,2889` and `tools/check-wiring.sh:1844`.
+  `tools/roles/adopt-roles.sh` (`:2`, `:35`, `:249`, `:375`), `tools/roles/adopt-roles.test.sh`,
+  `tools/roles/kit.toml`'s install row (`:55-57`), probe (`:88-92`) and `[[lf_pin]]` (`:145-147`),
+  `.gitattributes:141,143`, the render checks of `tools/govkit/selftest.py:2872,2889` with its comments
+  `:2818` and `:9547`, and `tools/check-wiring.sh:1844`.
   `tools/roles/SKILL.template.md` is this unit's held `/build` client until the `roles/build-skill` row
   closes, and for that reason PLAY-dConvergedCharter-9 AC2 counts only the five renamed kits' templates
   and excludes it. While the row is open the roles kit's `to`, `probe` and `pattern` rows naming
@@ -175,7 +186,8 @@ PLAY-dConvergedCharter-20 removes the held set then.
   `tools/roles/adopt-roles.sh`), `tools/roles/README.md`, `tools/roles/kit.toml`
 - `tools/check-wiring.sh`
 - `WIRE-INTO-PROJECT.md`, `help/roles.md`, `help/README.md`, `help/shims.md`
-- `memory/map/features/roles.md`
+- `memory/map/features/roles.md`, `memory/guides/SESSION-KICKOFF.md`, and
+  `tools/unattended/VERBS.template.md` with `memory/guides/UNATTENDED-VERBS.md` while they stand
 
 ### Alternatives rejected
 
@@ -226,8 +238,9 @@ added.
   Red when: the row closes before the window, a `skill` row is refused as an unknown kind, or the held
   client or one of its install rows is gone while the row is open.
 - **AC4** — When `python check_policy.py --readers /build --kind value --except <path>…` runs on a
-  scratch clone of the tip with the row closed and the held set of S4 removed, each `--except` naming
-  `registry.toml`, `shims.toml` or `usage.toml`, it exits 0 with the dossier `memory/map/features/roles.md`
+  scratch clone of the tip with the row closed and the held set of S4 removed, the `--except` paths
+  `registry.toml`, `shims.toml`, `usage.toml` and each file whose every base hit S4's sort excepts, a
+  file holding a re-pointed hit never among them, it exits 0 with the dossier `memory/map/features/roles.md`
   among the files the walk read; the same run with a planted line naming `/build` in `help/roles.md`
   exits 1 naming that file and line, and one planted in the dossier exits 1 naming the dossier.
   Red when: a reader of `/build` survives the removal and the inventory passes.
@@ -287,6 +300,12 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 · the `skill` plants ru
   `memory/map/features/roles.md:41,149` among S4's readers, AC4 reading it and the `/build/` gotcha hits
   explained) and 35 (§7 drops `playbook render wiring` and `roles render wiring`, which
   DEPL-dShippedRelease-10 S10 retires into `kit wiring (every descriptor's check)`).
+- rev-4 · 2026-11-04 · S4 §4 AC4 · folded
+  `2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1` finding 4: S4's boundary sentence
+  corrected (a records path followed by a space, quote or `)` is a value hit), the hits S4 missed sorted
+  (the manifest's and the verbs guide's lines re-pointed, `WIRE-INTO-PROJECT.md:328` written with a
+  trailing `/`, the comments joined to the held set, the test's records paths excepted), and AC4's except
+  set derived from S4's sort of the readers commands' output at the pass base.
 
 ## 10. Reuse audit
 

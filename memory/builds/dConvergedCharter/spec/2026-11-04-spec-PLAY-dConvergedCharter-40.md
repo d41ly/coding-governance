@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-40 — `guide_move.py apply`'s amend route: an entry whose target tag a kit manifest already holds gains its `help` and edge on that row under an `edit` change record, never a second row
 
-**Status:** DEFERRED · rev-1 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 15 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 15 · advances PLAY-dConvergedCharter-24
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,8 @@
 |---|---|---|
 | [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-41 |
 | [2026-11-04-build-PLAY-dConvergedCharter-40-deviation-401.md](../build/2026-11-04-build-PLAY-dConvergedCharter-40-deviation-401.md) | deviation | — |
+| [2026-11-04-prompt-PLAY-dConvergedCharter-7-r4-fold-brief.md](../prompts/2026-11-04-prompt-PLAY-dConvergedCharter-7-r4-fold-brief.md) | research | PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 |
+| [2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
 
 <!-- /gen:spec-records -->
 
@@ -45,27 +47,33 @@ Build-run preconditions: PLAY-dConvergedCharter-13 has landed `tools/playbook/gu
   `type`, `level`, `text` and `scope`, so its directive text is untouched; it gains the entry's `help`,
   and the entry's edge (`explains=doc.<name>#<seg>` on unit 7's route) is appended to its `edges` unless
   the row already carries it. An amend entry's `type`, `level` and `text` may be blank, the refusal of a
-  blank `text` (unit 13 S3) applying to an add entry only. Two refusals, each exit 2 writing nothing for
-  the whole plan and naming the entry's section and the tag: a `target` no active row holds, so an
-  amend never creates a row; and a row whose `help` is already non-empty and differs from the entry's,
-  so an amend never overwrites rationale another pass wrote. An entry with no `target` takes unit 13's
-  add route unchanged. Observed by AC1 and AC2.
+  blank `text` (unit 13 S3) applying to an add entry only. Three refusals, each exit 2 writing nothing
+  for the whole plan and naming the entry's section and the tag: a `target` no active row holds, so an
+  amend never creates a row; a row whose `help` is already non-empty and differs from the entry's, so an
+  amend never overwrites rationale another pass wrote; and two entries of the plan sharing one `target`,
+  naming both sections (§8 F1). Each refusal reads the manifest on disk, which, with one entry per
+  target, is the row its amend changes. An entry with no `target` takes unit 13's add route unchanged.
+  Observed by AC1 and AC2.
 - **S2** — id 27, the amend's write and record. An amend rewrites the one row in place in the kit's
   `instructions.toml` as the pass's own kit edit, by the same route and guard as unit 13 S4: the whole
   plan, adds and amends together, is written only when `instructions_edit.py check` passes over the
   would-be tree, and refused otherwise with both the manifest and the guide byte-identical. Each amend
   writes one change record through `python tools/memory-tree/build_records.py new change` with `Action
   edit`, `Before` and `After` the row's `<tag>@<hash8>` before and after the amend under
-  PLAY-dOrderedCharter-15 S7's normaliser, `Mark` as that normaliser reads the two, `Successor none`,
-  and `Promoted-from` the section tag, the same record kind an add writes. Idempotence follows unit 13
-  S1's destination predicate: an amend whose row already carries the entry's `help` and edge is skipped
-  and printed `skipped <section>: already at <tag>`, so a re-run writes no second record. Observed by AC1
-  and AC3.
+  PLAY-dOrderedCharter-15 S7's normaliser, `Mark` as that normaliser reads the two, `Proof` `none —
+  agent pass`, and `Promoted-from` the section tag: the field set S7 gives an `edit`, with no
+  `Successor`. Each amend's record is written BEFORE the manifest is rewritten, the one order in which
+  `Before` is still on disk. Idempotence follows unit 13 S1 part by part: the row part is skipped where
+  the row already carries the entry's `help` and edge, the record part where a change record with
+  `Action edit`, `Promoted-from` the section tag and `After` the amended row's `<tag>@<hash8>` exists, so
+  a re-run writes only the missing part and, with both standing, prints `skipped <section>: already at
+  <tag>`. Observed by AC1 and AC3.
 - **S3** — id 27, the plants. `guide_move.py --fixture --plant <case>` gains `amend-existing` (a kit
   manifest holding a unit whose `help` is empty, an entry targeting it), `amend-missing` (a `target` no
-  row holds), `amend-conflict` (a target row whose `help` already differs) and `amend-twice` (the
-  `amend-existing` apply run a second time), each run by `guide_move.py --selftest` under
-  `adopt-playbook.sh --selftest`, as unit 13 S6's plants are. Observed by AC1 to AC3.
+  row holds), `amend-conflict` (a target row whose `help` already differs), `amend-two-sections` (two
+  entries targeting one row), `amend-twice` (the `amend-existing` apply run a second time) and
+  `amend-interrupted` (the manifest write raises after the amend's record is written), each run by
+  `guide_move.py --selftest` under `adopt-playbook.sh --selftest`, as unit 13 S6's plants are. Observed by AC1 to AC3.
 - **S4** — id 27, the docs. `tools/playbook/README.md`'s mover section names the `target` field and the
   amend route beside the add route. NOT OBSERVED by a criterion: prose, graded by the `docs` leg at the
   close.
@@ -98,8 +106,9 @@ Read at `45022c64a`; no product file differs from base `0d1c1dda`.
   name no amend.
 - PLAY-dOrderedCharter-15's `WRITE_VERBS` is `("add", "edit", "remove", "rename", "split")`
   (`memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-15.md:180`), and its change
-  record carries `Unit`, `Action`, `Before`, `After`, `Mark`, `Successor`, `Proof` and `Promoted-from`
-  (`:97-104`), so an amend's record is an `edit` with both hashes; there is no `amend` action.
+  record carries `Unit`, `Action`, `Before`, `After`, `Mark`, `Successor` (on every action but `add`
+  and `edit`), `Proof` and `Promoted-from` (`:97-104`), so an amend's record is an `edit` with both
+  hashes and no `Successor`; there is no `amend` action.
 - PLAY-dOrderedCharter-20's one-fact check reds two active units sharing one text (`instruction_units.py
   one-fact`, its S2), so a second row carrying the rationale beside unit 1's directive row is refused,
   not merely redundant.
@@ -124,8 +133,8 @@ text    = ""
 
 ### Inventory
 
-Minted: the plan field `target`; the plant cases `amend-existing`, `amend-missing`, `amend-conflict`
-and `amend-twice` of `guide_move.py --fixture`. No function name is minted: the amend is a branch of
+Minted: the plan field `target`; the plant cases `amend-existing`, `amend-missing`, `amend-conflict`,
+`amend-two-sections`, `amend-twice` and `amend-interrupted` of `guide_move.py --fixture`. No function name is minted: the amend is a branch of
 unit 13's `apply`, and any helper the builder names is asked of `python tools/lexicon/lexicon.py
 --suggest <name> --as py.function` at the pass.
 
@@ -157,8 +166,9 @@ writes its rationale rows. `guide_move.py` ships with the playbook kit; an adopt
   names, under the same refuse-unless-`check` guard, and refuses to overwrite a non-empty `help` or to
   create a row from a `target`.
 - perf / scale — one `read_units` per kit the plan names; one extra record per amend.
-- error / empty / loading states — a missing target and a conflicting `help` each refuse the whole
-  plan, exit 2, naming the section and the tag; a re-run skips each done amend with a printed line.
+- error / empty / loading states — a missing target, a conflicting `help` and two entries on one target
+  each refuse the whole plan, exit 2, naming the section and the tag; a re-run writes only an amend's
+  missing part and skips a done one with a printed line.
 - observability — `apply` prints each amend as `amend <section> -> <tag>` and each skip with its reason.
 - risks — a `target` naming a retired row is refused as missing, since only an active row is amended.
 - testing — the plants of S3 and the arm of §7.
@@ -170,18 +180,23 @@ writes its rationale rows. `guide_move.py` ships with the playbook kit; an adopt
 - **AC1** — When `python guide_move.py --fixture --plant amend-existing` runs, `apply` leaves the kit
   manifest holding the target tag on exactly one row, that row's `type`, `level`, `text` and `scope`
   byte-equal to before, its `help` equal to the entry's and its `edges` holding the entry's edge, and
-  `build_records.py` lists one change record for it with `Action edit` and two different hashes; with
+  `build_records.py` lists one change record for it with `Action edit` and two different hashes, its
+  field set the one PLAY-dOrderedCharter-15 S7 gives an `edit`, `Proof` set and no `Successor`; with
   `instructions_edit.py check` made to fail over the would-be tree, the manifest and the guide are
   byte-identical after the run.
   Red when: a second row is appended for an existing tag, the directive text changes, the record reads
-  `add`, or a row is written past a failing check.
+  `add` or departs from the parent's `edit` shape, or a row is written past a failing check.
 - **AC2** — When `python guide_move.py --fixture --plant amend-missing` runs, `apply` exits 2 naming the
   section and the missing tag and writes nothing; under `amend-conflict` it exits 2 naming the tag whose
-  `help` differs, and the row's `help` is unchanged.
-  Red when: an amend creates a row, or overwrites a `help` another pass wrote.
+  `help` differs, and the row's `help` is unchanged; under `amend-two-sections` it exits 2 naming both
+  sections and the tag, the manifest unchanged.
+  Red when: an amend creates a row, overwrites a `help` another pass wrote, or one plan amends one row
+  twice.
 - **AC3** — When `python guide_move.py --fixture --plant amend-twice` runs, the second `apply` writes no
-  byte and no record and prints `skipped <section>: already at <tag>`.
-  Red when: a re-run appends the edge twice or writes a second change record.
+  byte and no record and prints `skipped <section>: already at <tag>`; under `amend-interrupted` the
+  re-run amends the row and writes no second record.
+  Red when: a re-run appends the edge twice, writes a second change record, or skips a row whose record
+  alone stands.
 
 ## 7. Gates
 
@@ -192,11 +207,18 @@ declares; this unit's plants join it. The parent legs `instruction render (one r
 `writing practice (records and units)` read the amended rows once they land; neither is in the manifest
 at base.
 
-New arm: tools/playbook/guide_move.py · covers AC1 AC2 AC3 · the plants `amend-existing`, `amend-missing`, `amend-conflict` and `amend-twice`, staged red with the amend branch removed so the existing tag gains a second row, and with the `help` conflict check skipped · none
+New arm: tools/playbook/guide_move.py · covers AC1 AC2 AC3 · the plants `amend-existing`, `amend-missing`, `amend-conflict`, `amend-two-sections`, `amend-twice` and `amend-interrupted`, staged red with the amend branch removed so the existing tag gains a second row, with the `help` conflict check skipped, and with the row part skipped on its record alone · none
 
 ## 8. Open questions
 
-none
+- **F1 — Two entries of one plan on one `target`.** Options: (a) refuse the plan, exit 2, naming both
+  sections and the tag; (b) apply the entries in plan order, each reading the row the earlier left, so
+  the second meets the first's `help` and the conflict refusal fires; (c) merge them, the helps joined and
+  each edge appended. (b) refuses the same plans as (a) naming one section only; (c) adds a merge grammar
+  and a record whose `Promoted-from` names two sections where PLAY-dOrderedCharter-15 S7 gives one.
+  RESOLVED (agent, 2026-11-04, delegated): (a), rung 3, the narrowest: a plan
+  PLAY-dConvergedCharter-7's pass writes that meets it fails at that pass naming both sections, and a
+  merge is specced only when one does. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -205,6 +227,12 @@ none
   repairing PLAY-dConvergedCharter-13, whose `apply` it extends; PLAY-dConvergedCharter-7's S7, §3, §10 and
   AC12 rewritten as this unit's sibling edit (its rev-4), and PLAY-dConvergedCharter-13's §3 given the
   hands-off edge (its rev-4).
+- rev-2 · 2026-11-04 · S1 S2 S3 §4 §5 §8 AC1 AC2 AC3 §7 · folded
+  `2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1` findings 16 (the amend's record
+  drops `Successor` and sets `Proof`, AC1 holding it to the parent's `edit` shape), 37, the skeptic's
+  corrected fix closed with the record written before the row (each part skipped on its own test, the
+  plant `amend-interrupted`), and 38 (a plan with two entries on one `target` refused, the refusals
+  reading the manifest on disk, §8 F1, the plant `amend-two-sections`).
 
 ## 10. Reuse audit
 

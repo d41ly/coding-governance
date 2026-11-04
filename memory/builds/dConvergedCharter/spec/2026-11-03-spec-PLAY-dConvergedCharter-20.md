@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-20 — the conf fold and the unattended kit's retirement shipped as upgrade steps, every shim closed when its window does, and the adopter exit check widened
 
-**Status:** DEFERRED · rev-5 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 7 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-6 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 7 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0494@4e004b72 whole
 
@@ -13,7 +13,9 @@
 | [2026-11-03-build-PLAY-dConvergedCharter-20-deviation-201.md](../build/2026-11-03-build-PLAY-dConvergedCharter-20-deviation-201.md) | deviation | — |
 | [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-41 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
+| [2026-11-04-prompt-PLAY-dConvergedCharter-11-r4-fold-brief.md](../prompts/2026-11-04-prompt-PLAY-dConvergedCharter-11-r4-fold-brief.md) | research | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-41 |
 | [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
+| [2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
 | [2026-11-04-review-PLAY-dConvergedCharter-11-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-21 |
 | [2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-39 |
 
@@ -41,8 +43,9 @@ and the owner-item mailbox (TOOL-dWellOiledMachine-48 S1, S4). `read_releases`
 (`tools/govkit/shims.py:302`) stays the stand-in it is until DEPL-dShippedRelease-3 S1 replaces it.
 
 - **S1** — The home mode of the shared step. `conf_to_policy.py up|down|witness <target> --home <conf>`
-  derives its key map with `derive_home_folds(home)`: each catalogue row whose `legacy` field reads
-  `<home> <KEY>`, so the step and unit 11's `legacy` verb read one map (I5). The up reads the home's
+  derives its key map with `derive_home_folds(rows, home)`, unit 11 S1's one reader of the catalogue's
+  `legacy` field, imported in-process from the policy kit whose `legacy` verb it runs: each `(KEY, row)`
+  whose `legacy` reads `<home> <KEY>`, so the step and the verb read one map (I5). The up reads the home's
   assignments once, with `python policy.py legacy <home> --rev HEAD` in the target (unit 11's
   `render_folded_lines`), which prints the home's own line for a key the policy file does not set.
   `policy.py get` is never the detector: `resolve_read` reads a legacy home only for `AGENTS_PATH`
@@ -58,13 +61,15 @@ and the owner-item mailbox (TOOL-dWellOiledMachine-48 S1, S4). `read_releases`
   default is restated. A row whose catalogue `default` is `{ derived = … }` (unit 11 S1 and §8 F2,
   every folded key not read through `get`) holds no catalogue value, and `get` refuses it, exit 2,
   wherever the policy file does not set it (`DerivedDefault`, `tools/policy/policy.py:686-697`). The up
-  knows such a row from the `default` shape `derive_home_folds` reads with its `legacy` field, never
+  knows such a row from the `default` shape of the row `derive_home_folds` returns, never
   from a refusal's text: for it, absence from the render reads as "no value", and the assigned home
   value always moves; where the policy file already sets the key, the render holds that value and the
   compare above holds. A render that refuses stops the up writing nothing, exit 2, naming the key.
-  Each home value is parsed to its row's `allowed` type by the inverse of unit 11 S3's rendering rule,
-  a list split on whitespace, an int read as decimal, a bool read from `true` or `false`, a string as
-  it stands, and passed to `check_value` (`policy.py:143`) before anything is written; a value the row
+  Each home value is parsed to its row's `allowed` by the inverse of unit 11 S3's rendering rule, in the
+  catalogue's grammar: a `list` or `set` row's value split on whitespace, a `count` row's read as
+  decimal, a literal `allowed` list's member matched by `render_toml_value`'s spelling
+  (`policy.py:1315`), so `true` reads as the bool, and an `enum` or `pattern` value as it stands, then
+  passed to `check_value` (`policy.py:143`) before anything is written; a value the row
   rejects, an out-of-set or non-numeric adopter value, refuses the whole up, writing nothing, exit 2,
   naming the file, the key and the row's `allowed`. It writes through `render_policy_text`
   (`tools/govkit/upgrade_steps.py:1365`) behind one before-image, and takes the conf out last, the file
@@ -81,7 +86,16 @@ and the owner-item mailbox (TOOL-dWellOiledMachine-48 S1, S4). `read_releases`
   the home is absent. `fanout_cap.py` keeps its argv and its
   bytes out, since its row is frozen, and keeps its own `LOWERED_RE` read. A home line `legacy` refuses
   (unit 11 S3's grammar) stops the up writing nothing, exit 2, naming the file and the line.
-  Observed by AC1 and AC2.
+  THE ADOPTER'S COMMIT ROUTE is unit 11 S2's, carried to the target: `update` stages and never commits,
+  and where the target's pre-commit runs `guard.py --staged` an agent's staged policy file is refused
+  (`tools/policy/guard.py:5-12`). Commit N, the owner's from a terminal, takes `.governance/policy.toml`
+  alone (`git commit -- .governance/policy.toml`), every home line still at `HEAD`; then `python
+  <prefix>/policy/policy.py mirror --write` renders the mirror at that `HEAD`, and commit N+1, which the
+  guard admits from an agent as the render at `HEAD`, takes the mirror and the home lines' removal. So
+  at no commit does a hook's `readFoldedKey` meet a stale mirror over a home whose line has left; until
+  N+1 the working tree's home is short its lines and scratch-guard reads UNARMED, a window the route
+  needs no routed write in. An up that staged the policy file prints the route as its last line.
+  Observed by AC1, AC2, AC10 and AC11.
   **Readers:** by name: `tools/policy/policy.py:1211` (`derive_legacy_homes`, which lists each home's
   keys), `tools/policy/legacy-homes.txt`, and the kit descriptors' `[config]` tables, `tools/memory-tree/kit.toml:80`,
   `tools/codebase-map/kit.toml:70`, `tools/lexicon/kit.toml:78`, `tools/process-monitor/kit.toml:60` ·
@@ -118,7 +132,7 @@ and the owner-item mailbox (TOOL-dWellOiledMachine-48 S1, S4). `read_releases`
   `[[retired]]` row takes the entry out of the registry. Its up runs S1 over `.unattended.conf` and then,
   under `--drop-rest`, takes out every key the catalogue does not carry, and deletes the file; down
   restores both files from the before-image; the witness exits 0 when `.unattended.conf` is absent. The
-  map S1 moves is `derive_home_folds('.unattended.conf')` over the catalogue unit 12 leaves: the folded
+  map S1 moves is `derive_home_folds(rows, '.unattended.conf')` over the catalogue unit 12 leaves: the folded
   keys a reader outside the kit still reads keep their rows there (unit 12 S2) and move. Two sets drop:
   the six extension keys, which unit 11 S1 gives no row and which leave with the conf
   (PLAY-dConvergedCharter-22 S5), and each folded key whose row unit 12 removed because only the kit read
@@ -184,7 +198,7 @@ and the owner-item mailbox (TOOL-dWellOiledMachine-48 S1, S4). `read_releases`
 
 ### Edges
 
-- **consumes-from** `PLAY-dConvergedCharter-11` — `render_folded_lines`, the `legacy` verb S1 reads a home's assignments through, and `legacy-homes.txt` with the catalogue's `legacy` field it drains into, the key map S1 derives and S2's homes, the derived-default refusal of `get` S1 reads as no catalogue value, S4's presence shape for every folded home a step deletes, which keeps a deleted home from disabling an adopter's monitor or write gate, and S3's one rendering rule for a typed value, whose inverse S1 parses each home value by; without it no key is folded and the steps move nothing
+- **consumes-from** `PLAY-dConvergedCharter-11` — `render_folded_lines`, the `legacy` verb S1 reads a home's assignments through, `derive_home_folds`, the one reader of the `legacy` field S1 imports for its key map, and `legacy-homes.txt` with the catalogue's `legacy` field it drains into, the key map S1 derives and S2's homes, the derived-default refusal of `get` S1 reads as no catalogue value, S4's presence shape for every folded home a step deletes, which keeps a deleted home from disabling an adopter's monitor or write gate, and S3's one rendering rule for a typed value, whose inverse S1 parses each home value by; without it no key is folded and the steps move nothing
 - **consumes-from** `PLAY-dConvergedCharter-41` — `read_conf_key_gaps`, re-pointed to `policy.py legacy`, and the pre-push hook's `GATE_DOC_PATHS` and `GATE_POST_MERGE` reads through `policy.py legacy .githooks/gate-env.sh --rev <sha> --key`, which read `gate.doc-paths` and `gate.post-merge` where the policy file sets them, and which S2's `push-main/gate-env-to-policy` step relies on; without it the step strips an adopter's gate keys its hook still reads from the file
 - **consumes-from** `PLAY-dConvergedCharter-12` — `tools/unattended/` leaving gov under its `[[retired]]` row, which S3's step follows at the adopter, the `unattended.*` catalogue rows that unit leaves standing for keys read outside the kit, the map S3 moves, and `.memory-tree.conf` as the moved checkers' cutoff home, where S3 carries an adopter's cutoffs; without it the step would strip a conf a live kit reads
 - **consumes-from** `PLAY-dConvergedCharter-17` — `shims.toml`, the `roles/build-skill` row S4 holds to its window and reds, naming the roles kit as the one that closes it, once a release lets the window close
@@ -234,7 +248,6 @@ pinned here as read at base.
 
 | Minted | Kind | Naming cell |
 |---|---|---|
-| `derive_home_folds` | function, `tools/govkit/steps/conf_to_policy.py` | `py.function`, OK by `--suggest` |
 | `--home`, `--drop-rest` | flags of `conf_to_policy.py` | none |
 | `check_adopters_converged` | function, `tools/govkit/adopter_reading.py` | `py.function`, OK by `--suggest` |
 | `--grade` | flag of unit 5's `migration` verb of `adopter_reading.py` | none |
@@ -310,8 +323,8 @@ until a release is cut.
   non-default value and the derived-default key any value, and whose policy file sets none of them, the
   policy file gains the second and the third keys and not the first, the conf loses all three lines,
   and `down` restores both files byte-identical.
-  With the fixture catalogue holding a list row and an int row and the conf assigning them `"a b"` and
-  `5`, the policy file gains `["a", "b"]` and the integer `5`; with the int row assigned `five`, or an
+  With the fixture catalogue holding a `list` row and a `count` row and the conf assigning them `"a b"`
+  and `5`, the policy file gains `["a", "b"]` and the integer `5`; with the count row assigned `five`, or an
   enum row a value outside its `allowed`, the up exits 2 naming the file, the key and the row's
   `allowed`, and both files are byte-identical.
   Red when: a literal default is restated, a derived-default key's refusal is read as "equal" and its
@@ -368,12 +381,26 @@ until a release is cut.
   Red when: a step refuses a write an earlier step of the same walk staged, or admits an edit no step
   made.
   fixture: the scratch adopter is built under `%TEMP%` with a short name.
+- **AC10** — When a scratch adopter holding the hooks and memory-tree kits and a committed mirror runs
+  `govkit update`, then commits by S1's route, commit N of `.governance/policy.toml` alone from a
+  terminal and commit N+1 of `mirror --write`'s render and the conf's removed lines, `scratch-guard.js`
+  fed a PreToolUse Write under a `ROUTED_PATHS` entry with a routed card admits it and prints no
+  `UNARMED` line; with commit N+1 holding the conf's removal and no re-rendered mirror, it denies naming
+  `UNARMED`.
+  Red when: the route leaves a commit whose mirror is stale over a home whose hook keys have left.
+  fixture: the scratch adopter is built under `%TEMP%` with a short name, the card planted as the hook's
+  self-test does.
+- **AC11** — When a non-TTY shell on that scratch adopter, `core.hooksPath` set to `.githooks`, runs `git
+  commit -m t </dev/null 2>log` over `update`'s staged output, it exits non-zero and `log` names
+  `policy-guard`; the up's last line names the route, and following it commits with exit 0.
+  Red when: the step's output can be committed only past the policy guard.
+  fixture: as AC10.
 
 ## 7. Gates
 
 `govkit selfcheck` · `govkit selftest` · `process-monitor adopter selftest` · `govkit refusal join` · `govkit acceptance matrix` · `upgrade-walk` · `step-rows-frozen` · `step-gate` · `docs` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `lexicon selftest` · `recall floor arms` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/govkit/selftest.py · covers AC1 AC4 AC7 AC8 AC9 · scratch targets for the home mode, the gate-file step, the run-conf step, the process-monitor step and a multi-conf walk, failing cases a literal default restated, a derived-default value dropped, a home read through `get`, a typed value written as a string, a rejected value written, a cutoff dropped, the monitor's presence test left on the deleted file, and a step refusing its walk's own staged write · none
+New arm: tools/govkit/selftest.py · covers AC1 AC4 AC7 AC8 AC9 AC10 AC11 · scratch targets for the home mode, the commit route with the mirror left stale at N+1, the gate-file step, the run-conf step, the process-monitor step and a multi-conf walk, failing cases a literal default restated, a derived-default value dropped, a home read through `get`, a typed value written as a string, a rejected value written, a cutoff dropped, the monitor's presence test left on the deleted file, and a step refusing its walk's own staged write · none
 New arm: tools/govkit/selftest.py · covers AC2 · the frozen importers' byte-identity over their scratch targets, staged red with the shared module's output changed by one byte · none
 New arm: tools/govkit/selftest.py · covers AC5 · the window plant with an open row past its window · none
 New arm: tools/govkit/selftest.py · covers AC6 · a planted register and mailbox under `migration --grade`, failing case a pending row with no owner item · none
@@ -426,6 +453,12 @@ New arm: tools/govkit/selftest.py · covers AC6 · a planted register and mailbo
   edge to PLAY-dConvergedCharter-41 names the pre-push hook's gate-key reads through `policy.py legacy
   --rev`, which that unit now takes in place of `get`); the consumes-from edges to
   PLAY-dConvergedCharter-11, -41 and -5 name what each now supplies.
+- rev-6 · 2026-11-04 · S1 §3 §4 AC1 AC10 AC11 §7 · folded
+  `2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1` findings 35 (the adopter's commit
+  route, unit 11 S2's two commits carried to the target, the up printing it, AC10 and AC11), 23 (the
+  inverse parse in the catalogue's grammar, `render_toml_value`'s spellings, AC1's `list` and `count`
+  rows) and 24 (`derive_home_folds` is unit 11's in `policy.py`, imported here, its mint dropped from
+  §4); the consumes-from edge to PLAY-dConvergedCharter-11 names it.
 
 ## 10. Reuse audit
 

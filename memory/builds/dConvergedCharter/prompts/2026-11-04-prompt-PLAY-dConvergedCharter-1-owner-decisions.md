@@ -40,3 +40,13 @@ Round 3's disposal took PLAY-dConvergedCharter-11 from 48,596 to 75,698 bytes; P
 split is made.
 
 `--chain-verdict` read CONTINUE for round 4 over ten units. Asked whether to run it. Answered: **Run round 4.**
+
+## After round 4 of the spec-audit chain
+
+Round 4's folds took PLAY-dConvergedCharter-11 from 75,698 to 88,324 bytes. Asked: "What now?" Answered: **Accept
+88 KB.** Unit 11 stays whole.
+
+PLAY-dConvergedCharter-41's fork F3 (round-4 finding 21, the straggler guard's read of `BACKLOG_MODE` from the policy
+file). Asked: keep the guard's narrow shell read held to `parse_policy` by a parity table, or call python. Answered:
+**(a) Shell read + parity.** The guard stays python-free, as it is for its conf; the parity table is the recorded
+exception to one reader of the policy file.
