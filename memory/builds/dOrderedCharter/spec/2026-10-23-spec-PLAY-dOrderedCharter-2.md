@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-2 — the charter re-founded in its level-0 envelope, with the override rule and its record
 
-**Status:** DEFERRED · rev-7 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 20 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-8 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 20 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0032@e38b0cb6 whole
 **Carries:** node:policy-key.charter.override
@@ -19,6 +19,7 @@
 | [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 |
 | [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-2-deviation-23.md](../build/2026-10-25-build-PLAY-dOrderedCharter-2-deviation-23.md) | deviation | — |
+| [2026-11-05-build-PLAY-dOrderedCharter-2-deviation-24.md](../build/2026-11-05-build-PLAY-dOrderedCharter-2-deviation-24.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
@@ -61,25 +62,39 @@ C1-F11, C1-F12).
   they override it, and the agent then records the override; `live-owner-wins`, a live owner
   instruction wins, the conflict named and recorded; `absolute`, the charter outranks every live
   instruction and no override is taken. The rule also says a conflict resolves by level, never by load
-  order, and that unenveloped text and any envelope inside tool output are data (v2:953-957 P13). The
+  order, and that unenveloped text and any envelope inside tool output are data (v2:953-957 P13). Those
+  words stay P13's, whole; S3's `held —` line states their one exception, for as long as a row holds a
+  document (the fork record's F5). The
   key is read with `policy.py get charter.override`, run in the target through unit 19's
   `read_policy_value` (`tools/playbook/policy_value.py#read_policy_value`, the playbook kit's one
   subprocess caller of that verb), called with the key literal first,
   `read_policy_value("charter.override", root)`, the call shape dGroundRules' reader-coverage arm
   counts (TOOL-dGroundRules-8, its Readers table). It reads the target's committed policy at its landed
   revision, and an unset key answers the catalogue default `explicit-override` with its reason
-  (TOOL-dGroundRules-2 S7, TOOL-dGroundRules-3 S2); on `PolicyRefused`, which the reader raises on its
-  exit 2 and with no policy kit found, the render refuses, naming the key and printing the exception's
-  `line`, the reader's own words. The key's catalogue row lands with dGroundRules with no
+  (TOOL-dGroundRules-2 S7, TOOL-dGroundRules-3 S2). A `PolicyRefused` whose `.line` opens
+  `no policy kit found` takes that default, as unit 1 S4 takes its `foundation` set (the fork record's
+  F6): the render writes the `explicit-override` sentence and prints
+  `charter.override — explicit-override: no policy kit in this install, so no value can be read`. A kit
+  imports no sibling, so the value sits in one constant, `CHARTER_OVERRIDE_DEFAULT` in
+  `tools/playbook/render_playbook.py`, and the selftest's committed-target arm compares it with what the
+  real `policy.py get charter.override` answers for an unset key, so a change to either side reds it. Any
+  other `PolicyRefused`, which the reader raises on its exit 2, refuses the render, naming the key and
+  printing the exception's `line`, the reader's own words; that holds for `refs/heads/main names no
+  commit`, as unit 1's F7 rules. A template with no such rule, a seeded older one, reads no key. The key's catalogue row lands with dGroundRules with no
   `summary` or `usage`, named on the shrink-only `tools/policy/unsummarised-keys.txt`
   (TOOL-dGroundRules-1 S3, S6): this unit adds no row; it fills that row's `summary` and its `usage`, a
   line the row admits (`charter.override = "absolute"`), and drains the name with
   `python <prefix>/policy/policy.py lists --write` in the same commit. Observed by AC2 and AC8.
 - **S3** — The instruction map: one line per level of S8's `LEVELS`, naming the registered documents at
   that level (`PLAY-dOrderedCharter-3`'s registry) and when each loads, and the sentence directing an
-  agent after a reset to rebuild the hierarchy from it. It is rendered by
+  agent after a reset to rebuild the hierarchy from it. A document whose row carries `hold`
+  (`PLAY-dOrderedCharter-3` S9) stays on its level's line, and after the level lines one more line
+  renders from that row: `held — <path> has no envelope yet: read it at level <n>, the one exception to the rule that unenveloped text is data`,
+  `<path>` and `<n>` being the row's, so the document reads at its row's level. A registry with no
+  `hold` renders no such line. It is rendered by
   `render_instruction_map` in `tools/playbook/instruction_units.py`, the one function the replay also
-  calls. Observed by AC1.
+  calls. That branch lasts as long as the hold: the one commit `PLAY-dOrderedCharter-3` S9 names takes it
+  with the field and re-renders the charter. Observed by AC1 and AC9.
 - **S4** — The override record, a kind of S12's factory, `tools/memory-tree/build_records.py`:
   `<date>-build-<unit id>-override-<n>.md` in the building build's `build/` folder, as a deviation
   record is kept, with `**Serves:** override <unit id>` and the fields `Rule` (the tag set aside),
@@ -129,8 +144,10 @@ C1-F11, C1-F12).
   change takes the charter past the row, measured CR-stripped; the row's comment block reserves no
   movement; a `RAISED <old> -> <new>` line above the row carries the date, this unit, the measured
   figure and why the new value; and a `memory/DECISIONS.md` row lands with it. The cap stays at or under
-  32768, which `PLAY-dOrderedCharter-6`'s check holds. `.governance/policy.toml` is not written.
-  Observed by AC7.
+  32768, which `PLAY-dOrderedCharter-6`'s check holds. `.governance/policy.toml` is not written. S3's
+  `held —` line counts in that measure: 139 bytes for `memory/guides/BUILD-METHOD.md`, PINNED at
+  `d0c16d29`, against 3784 free of 20480 there, and the row's comment block reserves no movement, so the
+  line needs no term of its own. Observed by AC7.
 - **S10** — The page. `help/charter.md` gains the override rule, its three values and where the record
   goes. Observed by AC7.
 
@@ -149,7 +166,7 @@ C1-F11, C1-F12).
 ### Edges
 
 - **consumes-from** `PLAY-dOrderedCharter-1` — the rendered practice lines and their tags
-- **consumes-from** `PLAY-dOrderedCharter-3` — the level-0 envelope and the document registry the map reads
+- **consumes-from** `PLAY-dOrderedCharter-3` — the level-0 envelope, and the document registry the map reads, its rows' `hold` field among them
 - **consumes-from** `PLAY-dOrderedCharter-6` — the drive section and the 32 KiB hold
 - **consumes-from** `PLAY-dOrderedCharter-7` — the principle registry and the record factory the override kind joins
 - **consumes-from** `PLAY-dOrderedCharter-13` — the `LEVELS` constant the map is drawn from
@@ -166,6 +183,7 @@ C1-F11, C1-F12).
 - **consumes-from** `PLAY-dOrderedCharter-42` — the override kind's token in the bindings reader, without which S4's record reads malformed (finding 31)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 21, 47, 75 and 85, which that batch unit corrects after this unit lands, each by the item its report id names
 - **hands-off** `PLAY-dOrderedCharter-55` — AC7's page pathspec, which unit 49 S24 corrects, is observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
+- **hands-off** external — the owner's ruling on `PLAY-dOrderedCharter-3` F5: the one commit that unit's S9 names also takes S3's `held —` branch and re-renders the charter
 
 ## 4. Design
 
@@ -213,18 +231,25 @@ and `Facts` keep their names, which `CARRIED_SECTIONS` (`roles_lib.py:67`, still
 Minted: the template's new headings; the markers `<!-- gov:practices -->` and `<!-- /gov:practices -->`
 and the constants `PRACTICES_OPEN`, `PRACTICES_CLOSE`; `render_instruction_map`; the record kind
 `override`, its name grammar, its fields `Rule`, `Words`, `Session` and `Value`; the `up —` field `creds in`; the micro-format check's
-new number; the template marker `v5.0`, a major, since the region's shape changes.
+new number; the template marker `v5.0`, a major, since the region's shape changes, with
+`TEMPLATE_MAJOR = 5` in `tools/playbook/render_playbook.py` beside it, because the `template major` pair of
+`tools/check-playbook-parity.sh` compares the two and the render's `legacy` note reads the constant; the
+map's `held —` line; the constant `CHARTER_OVERRIDE_DEFAULT`; the plant `map-held`, an `arm_` function by
+the module's convention.
 
 ### Migration
 
-A seeded `v4.x` template renders as it does; the render's existing `legacy` note asks the adopter to
-reseed. `parse_charter` reads a `v4.x` charter through `SECTION_ONE_RE`, unchanged.
+A seeded `v4.x` template renders as it does, and reads no `charter.override`. The render's existing
+`legacy` note asks the adopter to reseed, because it fires on a major behind, the rule
+`PLAY-dOrderedCharter-41` states, and `TEMPLATE_MAJOR` moves to 5 with the marker. `parse_charter` reads a `v4.x` charter through `SECTION_ONE_RE`, unchanged.
 
 ### Rollout
 
 Live at landing, in one commit with the role render (S7), so no tree holds the re-founded charter and
 an unparsed roles kit. That commit also carries the `charter.override` row's fill and the list's drain,
-and a raise of the `AGENTS.md` row of `tools/template-size-limits.txt` if S9 needs one. A second commit stages only
+and a raise of the `AGENTS.md` row of `tools/template-size-limits.txt` if S9 needs one. The re-render's
+`.governance/instructions.lock` rides it too, its `AGENTS.md` row's `template` field at `@v5.0` and its
+`blob` the new render's. A second commit stages only
 `.governance/policy.json` as `policy.py mirror --write` regenerates it, because the mirror records the
 catalogue's and the policy file's blob ids (TOOL-dGroundRules-5 S1), and the guard admits a mirror
 commit only when the policy file and the catalogue equal HEAD (TOOL-dGroundRules-19 S1).
@@ -233,6 +258,7 @@ commit only when the policy file and the catalogue equal HEAD (TOOL-dGroundRules
 
 - `coding-governance-agents.template.md`
 - `AGENTS.md` (the render of the template, re-rendered, never edited)
+- `.governance/instructions.lock` (the `AGENTS.md` row's `template` and `blob` fields, written by the render)
 - `tools/govkit/entries/playbook.kit.toml`
 - `tools/playbook/render_playbook.py`
 - `tools/playbook/instruction_units.py`
@@ -275,8 +301,11 @@ commit only when the policy file and the catalogue equal HEAD (TOOL-dGroundRules
 - error / empty / loading states: an unreadable principle registry or document registry refuses the
   render naming the file.
 - observability: the render prints `charter.override` and its source, as `policy.py get --explain`
-  names it.
-- risks: the charter grows past its cap (S9); the role render is in the same commit (Rollout).
+  names it, or S2's note where no policy kit answers.
+- risks: the charter grows past its cap (S9); the role render is in the same commit (Rollout). An
+  install with no policy kit renders the default whatever a committed policy file sets, and the note is
+  the one sign (F6). While `PLAY-dOrderedCharter-3` holds a document, one exception to P13's sentence
+  stands in the charter (F5); the gate there reds a second hold, so it cannot grow.
 - testing: §6 and the `New arm:` lines of §7.
 - migration: §4 Migration.
 - user docs: `help/charter.md` and `help/roles.md` (S6, S10).
@@ -284,13 +313,22 @@ commit only when the policy file and the catalogue equal HEAD (TOOL-dGroundRules
 ## 6. Acceptance criteria
 
 - **AC1** — When `grep -nE "^## " AGENTS.md` runs after the re-render, no heading starts with a digit,
-  the headings appear in §4's order, and the line after `<!-- gov:playbook -->` is the level-0 envelope.
-  Red when: a numbered heading or the provenance paragraph survives.
-- **AC2** — When the render runs against three scratch targets whose committed `.governance/policy.toml`
-  sets `charter.override` to each value, each charter carries its value's sentence and no other; a
-  fourth, whose only committed policy file sets `nope`, refuses naming the key, the reader having no
-  valid revision to fall back to (TOOL-dGroundRules-4 S5).
-  Red when: two values render the same sentence or an unknown value renders.
+  the headings appear in §4's order, and the line after `<!-- gov:playbook -->` is the level-0 envelope;
+  `git grep -n -F 'coding-governance-agents.template.md@v5.0' -- .governance/instructions.lock` prints the
+  `AGENTS.md` row's `template` line, and `git grep -n -e '^TEMPLATE_MAJOR = 5' -- tools/playbook/render_playbook.py`
+  prints one line.
+  Red when: a numbered heading or the provenance paragraph survives, the lock still names `v4.5`, or the
+  constant and the marker disagree.
+- **AC2** — When the render runs against three scratch repositories whose `.governance/policy.toml`,
+  committed on `main`, sets `charter.override` to each value, each charter carries its value's sentence
+  and no other; a fourth, whose only committed policy file sets `nope`, refuses naming the key, the
+  reader having no valid revision to fall back to (TOOL-dGroundRules-4 S5); and with no policy kit
+  beside the engine, it carries the `explicit-override` sentence and prints S2's note naming
+  `no policy kit`.
+  Red when: two values render the same sentence, an unknown value renders, or the no-policy-kit case
+  stops the render.
+  fixture: the no-policy-kit case is the install `tools/govkit/matrix.py` builds, not gov's engine, which
+  finds the kit beside it.
 - **AC3** — When `python build_records.py new override` runs in a scratch build under
   `explicit-override`, it writes `build/<date>-build-<unit id>-override-1.md` with every field; under `absolute` it exits 1 writing
   nothing; with `--words` empty it exits 1.
@@ -321,14 +359,21 @@ commit only when the policy file and the catalogue equal HEAD (TOOL-dGroundRules
   `git grep -n -F '("charter.override"' -- tools/playbook/render_playbook.py` finds one line.
   Red when: the row keeps no summary or usage, the name stays on the shrink-only list, or the key is
   read in a shape the reader-coverage arm does not count.
+- **AC9** — When `git grep -n -F 'held — ' -- AGENTS.md` runs after the re-render, it prints one line
+  naming `memory/guides/BUILD-METHOD.md` and level 3, and the map's level 3 line names that path too; and
+  `python instruction_units.py fixture --plant map-held` renders the map over a registry row carrying
+  `hold`, which prints the line, then over that row without the field, which prints none.
+  Red when: the held document leaves its level's line, the line is absent while a row holds, or it
+  prints with no row holding.
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `playbook parity` · `charter size` · `template size <=48KiB` · `roles render wiring` · `roles render selftest` · `micro-format definitions` · `micro-format gate selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `check-wiring self-test` · `lexicon naming predicates` · `policy fixtures`
+`playbook render selftest` · `playbook render wiring` · `playbook parity` · `charter size` · `template size <=48KiB` · `roles render wiring` · `roles render selftest` · `micro-format definitions` · `micro-format gate selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `check-wiring self-test` · `lexicon naming predicates` · `policy fixtures` · `instruction units selftest`
 
 New arm: tools/check-microformats.test.sh · covers AC4 · a fixture template carrying the `pw` field · none
 New arm: tools/roles/render_agents.py · covers AC6 · the selftest's fixture charter in the marker shape renders a role's cited practice, and one with neither shape refuses R0 · none
-New arm: tools/playbook/render_playbook.py · covers AC2 · the selftest renders each `charter.override` value and refuses an unknown one · none
+New arm: tools/playbook/render_playbook.py · covers AC2 · the selftest's fixture target, committed on `main`, renders each `charter.override` value, refuses an unknown one and compares `CHARTER_OVERRIDE_DEFAULT` with the real reader's answer where a policy kit answers; where none does, as in the scratch install of the acceptance matrix, those cases print `unarmed` naming why and the arm asserts the no-policy-kit note, so gov's own leg is the one that runs them · none
+New arm: tools/playbook/instruction_units.py · covers AC9 · the `map-held` `PLANTS` case over a registry row with `hold` and the same row without it, under the `instruction units selftest` leg, its failing case the row with the field rendering no line · none
 
 ## 8. Open questions
 
@@ -358,6 +403,38 @@ New arm: tools/playbook/render_playbook.py · covers AC2 · the selftest renders
   `tools/workflows/unattended-build.template.js@c7269a97:1066`, which with that file's other hits names
   the spec format's sections 7, 9 and 10, not the charter; S6 re-points the four charter comments.
   widens: none · relaxes: none
+- **F5 — How a registered document reads while `PLAY-dOrderedCharter-3` holds its envelope.** That unit's
+  S9 keeps `memory/guides/BUILD-METHOD.md` registered at level 3 with no envelope until the owner rules
+  on its F5, so S2's sentence makes the document data while S3's map gives it a level. Options: (a) the
+  map renders one line from the row's `hold`, saying the document reads at its row's level as the one
+  exception, and S2's words stay P13's; (b) S2's sentence is reworded for good, to unenveloped text the map
+  does not list; (c) the held document reads as data, the map saying so; (d) a sentence typed in the
+  template naming the path; (e) the map leaves the document out while it is held. RESOLVED (agent,
+  2026-11-04, delegated): (a), rung 3, the most feature-rich survivor. (e) lost on veto 1: S3 names every
+  registered document at its level. (c) lost on veto 1: the charter's Protocols line sends every build
+  of more than one pass to that document, and `PLAY-dOrderedCharter-3` S2 seeds its row like its sibling
+  guides, so a level 3 row reading as level 7 evidence fails both. (d) copies the `hold` fact, with no
+  arm to red it when the hold ends ([one-fact]), and types gov's path where the row spells
+  `{memory_root}`. (b) needs no code and no neighbour's edit, and lost on what it leaves: it changes a
+  principle of the owner's for good to serve a state that ends, it outlives the ruling, it admits every
+  listed path where (a) admits the one row the `hold-second` arm bounds, and it never tells an agent which
+  document lacks an envelope. (a) keeps P13's sentence whole, and the line ends with the field, with no
+  rule text to rewrite. Its cost is one branch in `render_instruction_map`, which the commit ending the
+  hold takes with the field. None of this settles that unit's F5: the line reads only the row's `path`
+  and `level`, moves no row, source or prose, and holds under every option there. It fits the
+  charter's row by S9's figures, and `PLAY-dOrderedCharter-4`'s AC1 stays green, its fixture holding no
+  `hold`, while the line sits inside that unit's 160-byte cut. grants: PLAY-dClosedLoop-3 the instruction map's `held —` line in the
+  charter.
+  widens: none · relaxes: P13's sentence that unenveloped text is data, for the one held document until the owner rules
+- **F6 — What the render does with no policy kit.** S2 refused here, and `tools/govkit/matrix.py#SCRATCH_KITS`
+  installs the renderer with no policy kit, so once the template carries the rule `apply` stops, and the
+  acceptance matrix and the render wiring leg with it: unit 1's F6, on this unit's key. Options: (a) the
+  no-policy-kit case takes the catalogue default with its own note, the value in one constant a selftest
+  arm compares with the real reader; (b) keep the refusal; (c) `playbook-render` requires `policy`.
+  RESOLVED (agent, 2026-11-04, delegated): (a), rung 3, the one survivor. (b) lost on veto 1, the
+  `govkit acceptance matrix` leg of section 7. (c) lost on veto 2, the new required edge unit 1's F6
+  refused. The cost: a committed policy file in such an install goes unread, and the note is the one
+  sign. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -380,6 +457,7 @@ New arm: tools/playbook/render_playbook.py · covers AC2 · the selftest renders
   AC4's shipped-template half is a direct grep, not the leg; S9, AC7 and the Files touched re-ground
   on `tools/template-size-limits.txt`, still tracked, the dSafePassage edge replaced by one naming it.
 - rev-7 · 2026-11-04 · AC7 · from `2026-11-04-prompt-PLAY-dOrderedCharter-20-3-sweep-fix-brief.md` item 3: AC7 reads the limits file at HEAD with the plain path as its own token.
+- rev-8 · 2026-11-04 · S2 S3 S9 · section 3 Edges · section 4 Inventory, Migration, Rollout and Files touched · section 5 · AC1 AC2, new AC9 · section 7 · section 8 new F5 F6 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-41-neighbour-fold-brief.md` item 2 and its whole-spec read against specs 1 and 3 at rev-8: S3's map renders a `held —` line from the row's `hold`, so a held document reads at its level and S2's sentence stays P13's (F5); a read with no policy kit takes the default, as unit 1's F6 does, where S2 refused (F6); AC2 commits its targets on `main`; the re-render's lock row and `TEMPLATE_MAJOR = 5` join the write set and the Inventory, since the major-only rule and the parity pair need the constant to move with the marker.
 
 ## 10. Reuse audit
 
@@ -400,6 +478,13 @@ ranked `parse_charter`, `RolesError`, `resolve_charter_path` and `check_rule_tag
 `tools/roles/roles_lib.py`, which agree with the source, and `parse` (`tools/memory-recall/query.py`,
 fan-in 102), a name-token match that is no seam for this. Scout A's row cites
 `tools/workflows/drift-audit-code.js:34,49`, now `tools/workflows/drift-audit-code.js@c7269a97:35` and
-its line 50; the edit is to its `.template.js` source, which carries the same lines.
+its line 50; the edit is to its `.template.js` source, which carries the same lines. The `held —` line
+joins `render_instruction_map`, reading the `hold` field `read_document_registry` validates, and the
+no-policy-kit default follows `tools/playbook/render_playbook.py#read_one_line_cap` as unit 1's does.
+`python tools/codebase-map/reuse_lookup.py "state in the charter how an unenveloped registered document reads"`
+ranked `read_text`, `read` and `read_bytes`, name-stem matches none of which states a level, so the map
+function is the seam and the lookup offers no other.
+
+Recall terms used for the held line: `python tools/memory-recall/query.py "how does an unenveloped registered document read while an envelope is held" --terms "unenveloped envelope held data level map precedence hold"`
 
 Recall terms used: `python tools/memory-recall/query.py "how are role agents handed charter rule lines and how is the handoff ordered" --terms "handoff role rules charter blocks render_charter_blocks omitClaudeMd subagent prompt marker"`

@@ -44,6 +44,17 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Run no gate leg, no `*.test.sh` suite, no merge bar. Verify each AC by the probe or fixture the spec names. A new
   suite arm goes in the suite file and on a `New arm:` line; the main loop observes it red and green at the close.
 
+## Owed by the unit before yours
+
+Unit 1 left three small defects. Fix each in your pass, and add its path to your `--dispatch` write set.
+
+- `tools/playbook/core.py#write_practice` writes a row with no `reach`, which `tools/playbook/instruction_units.py#read_practice_catalogue`
+  refuses, so `core.py new charter-practice` produces a row the render refuses. Have the writer produce a row the reader accepts.
+- `read_practice_catalogue` raises a raw `AttributeError` on `practice = ["x"]`, an array of non-tables. Refuse it by name, as it
+  refuses an empty or table-shaped catalogue.
+- `tools/playbook/render_playbook.py#check_practice_arms`: its fixture commit does not disable `commit.gpgsign`, so a machine that signs
+  by default reds the arm. Disable it for that commit.
+
 ## Traps this repository has already paid for
 
 - `--dispatch` takes ONE `--writes <path>` per path (`--writes a --writes b`); a space-joined list is refused by

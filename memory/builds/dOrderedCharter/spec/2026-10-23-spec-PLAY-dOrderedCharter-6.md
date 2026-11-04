@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-6 — the drive section composed from each adopted kit's drive table, and the charter held inside 32 KiB
 
-**Status:** DEFERRED · rev-7 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 19 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-8 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 19 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0036@3667f2f3 whole
 
@@ -129,6 +129,8 @@ F1-6, F1-7; v2:961-965 P15).
 - Ranking a handoff's blocks in envelopes: `PLAY-dOrderedCharter-5`.
 - Refusing a composition over a harness's limit at render: `PLAY-dOrderedCharter-34`.
 - The `step` namespace that will replace the workflow list as stage order: dDeclaredLoop.
+- The wiring guide's lines on which practices bind: `PLAY-dOrderedCharter-41` S5, whose fork record's F4
+  says why that unit corrects them.
 
 ### Edges
 
@@ -181,8 +183,10 @@ read_cap_home --as py.function` answered OK on 2026-10-25; the lexicon declares 
 
 ### Migration
 
-A seeded adopter template without `{{DRIVE}}` renders without the section, and the render notes the
-template's vintage as it does today. A kit without rows contributes nothing.
+A seeded adopter template without `{{DRIVE}}` renders without the section. It takes no note from this
+unit: the render's `legacy` note fires only on a major behind, the rule `PLAY-dOrderedCharter-41` states,
+and a `v4.4` or `v4.5` template is at this engine's major until `PLAY-dOrderedCharter-2` moves it. A kit
+without rows contributes nothing.
 
 ### Rollout
 
@@ -210,6 +214,7 @@ in its row of `tools/template-size-limits.txt`, on the four conditions that file
 - `tools/check-template-size.test.sh`
 - `coding-governance-agents.template.md`
 - `AGENTS.md` (the render of the template, re-rendered, never edited)
+- `.governance/instructions.lock` (the `AGENTS.md` row's `blob` field, written by the render)
 - `help/charter.md`
 - `tools/policy/budgets.py` (the `home` verb and `read_cap_home`)
 - `tools/policy/check_policy.py` (the `budgets-home` case)
@@ -244,9 +249,13 @@ in its row of `tools/template-size-limits.txt`, on the four conditions that file
   seeded row with its kit, at least one per role in `tools/roles/workflows.toml` and one `start` row
   for each of the five situations S2 names.
   Red when: a role or a situation has no row.
-- **AC2** — When the render runs against a scratch target selecting `memory-tree` and `roles` only, the
+- **AC2** — When the render runs against a scratch repository committed on `main`, selecting
+  `memory-tree` and `roles` only, the
   drive section holds exactly those two kits' rows in S3's order; against gov it holds every seeded row.
   Red when: an unselected kit's row renders, or the order differs.
+  fixture: gov's `.governance/deploy.toml` with `kits` narrowed to the two, `playbook_path` naming the
+  template, and an answer for each probe that finds nothing there; unit 1 S4 refuses a target that is no
+  repository, or whose default branch has no commit.
 - **AC3** — When `drive --check` runs over a scratch tree with one planted defect at a time (a row whose
   role is `gov-nobody`, a role with no row, a row with an empty `command`), it exits 1 naming the kit
   and the row.
@@ -259,7 +268,7 @@ in its row of `tools/template-size-limits.txt`, on the four conditions that file
   Red when: the handoff carries no drive line.
 - **AC6** — When the scratch copy of the script runs as `bash <scratch>/tools/check-template-size.sh
   <scratch>/AGENTS.md`, never the `charter size` leg's argv, in a scratch repository holding the policy
-  kit, whose committed `.governance/policy.toml` sets `"AGENTS.md" = 40960` under `[budgets]` and whose
+  kit, whose `.governance/policy.toml`, committed on `main`, sets `"AGENTS.md" = 40960` under `[budgets]` and whose
   limits file carries no `AGENTS.md` row (a cap held in both homes refuses, in
   `resolve_caps` of `tools/policy/budgets.py`), it exits non-zero naming `CODEX_MAX` under
   `budgets.enforce = "warn"`; at 20480 it exits 0, and the measured bytes it prints are at most 20480.
@@ -368,6 +377,7 @@ New arm: tools/playbook/instruction_units.py · covers AC3 AC4 · the `drive-bad
 - 2026-11-04 · section 2 S6 · from `2026-11-04-prompt-PLAY-dOrderedCharter-1-hygiene-fix-brief.md` item 2:
   S6 gains its Readers clause, which says it retires nothing; a records fix, so the status line keeps its rev.
 - rev-7 · 2026-11-04 · S4 · section 3 Edges · section 4 Inventory, Files touched · AC6 · section 7 · the fork record's F6 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-20-3-sweep-fix-brief.md` items 2 and 3: the drive cases join `PLANTS` and ride unit 20's `instruction units selftest` leg, `run_plant_rows` keeps two arguments and `adopt-playbook.sh` leaves the write set, F6 re-resolved to (e); AC6 names `resolve_caps` beside the plain path.
+- rev-8 · 2026-11-04 · section 3 Non-goals · section 4 Migration and Files touched · AC2 AC6 · from `2026-11-04-prompt-PLAY-dOrderedCharter-41-neighbour-fold-brief.md` item 6 and its whole-spec read against specs 1 and 3 at rev-8: the wiring guide's correction is `PLAY-dOrderedCharter-41` S5, not this unit's, so section 3 says so and the Files touched do not gain that file; Migration no longer claims a note on a minor behind; the re-render's lock row joins the Files touched; AC2 and AC6 commit their scratch repositories on `main`, which unit 1's F7 and the landed-revision read need.
 
 ## 10. Reuse audit
 

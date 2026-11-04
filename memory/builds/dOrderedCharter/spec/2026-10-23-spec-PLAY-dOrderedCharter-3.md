@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them
 
-**Status:** DEFERRED · rev-8 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-9 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0033@756303be whole
 
@@ -26,6 +26,7 @@
 | [2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md) | research | PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-11-04-prompt-PLAY-dOrderedCharter-1-drift-sweep-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-1-drift-sweep-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-41 |
 | [2026-11-04-prompt-PLAY-dOrderedCharter-3-1-spec-writer.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-3-1-spec-writer.md) | journal | — |
+| [2026-11-04-prompt-PLAY-dOrderedCharter-3-held-line-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-3-held-line-brief.md) | research | — |
 | [2026-11-04-prompt-PLAY-dOrderedCharter-3-interim-addendum-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-3-interim-addendum-brief.md) | research | — |
 | [2026-11-04-prompt-PLAY-dOrderedCharter-3-interim-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-3-interim-brief.md) | research | — |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
@@ -163,7 +164,9 @@ rules on its row (S9, F5): the gate names it as not checked on every run and nev
     plant `hold-refused` stages that refusal and the field's two.
   - **The end of the hold.** One commit, after this unit and outside it, lands the owner's ruling: the row's move, or the change the
     ruling names in its place, the envelope, and the end of the hold, which is the `hold` field with
-    the reader's key, these arms, the statement and their plants, so no dead arm survives it ([yagni]).
+    the reader's key, these arms, the statement and their plants, and the map's `held —` branch in
+    `render_instruction_map` with its plant `map-held` (`PLAY-dOrderedCharter-2` F5), the charter
+    re-rendered, so no dead arm survives it ([yagni]).
     A part landed alone reds: the row's move reds `hold-fits`, the envelope reds `hold-enveloped`, and
     the field taken off reds S6's first arm. One combination gets past these arms: the envelope and the
     field's end with the row unmoved. S6 reads that document as enveloped, and the `build-method size`
@@ -311,6 +314,7 @@ the unit, by the hands-off edge in section 3.
 - the renders of the sources above, re-rendered and never edited: `AGENTS.md`, `memory/guides/*.md`
   (BUILD-METHOD's excepted, its source being untouched), `memory/TEMPLATE-SPEC.md`,
   `memory/HYGIENE.md`, `.claude/agents/*.md`, `.claude/skills/*/SKILL.md`
+- `.governance/instructions.lock` (the charter's re-render moves it)
 
 ### Alternatives rejected
 
@@ -511,6 +515,7 @@ New arm: tools/playbook/instruction_units.py · covers AC5 AC6 AC9 AC10 AC11 AC1
 - rev-6 · 2026-11-04 · section 2 S1 S5 S6 S7, new S8 · section 3 Edges · section 4 Data model, Inventory and Files touched · section 5 · AC1 AC4 AC7, new AC8 · section 7 · section 8 F3, new F5 and F6 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-1-drift-fold-brief.md` (findings 3-1 to 3-7): the caps are rows of `tools/template-size-limits.txt`, raised on its terms, and four cross; BUILD-METHOD's row is the owner's, so F5 is open; rows the `doc` namespace does not derive carry `h1`; the deploy, cleanup and build Skills have their sources; the leg's own rows are S8 and AC8, claimed by an `[[exempt_leg]]` (F6); AC4 runs an argv the leg does not; moved lines are cited by symbol or pinned at `c7269a97`.
 - rev-7 · 2026-11-04 · S8 · section 3 Edges · section 4 Files touched · AC7 · section 7 · from `2026-11-04-prompt-PLAY-dOrderedCharter-20-3-sweep-fix-brief.md` items 2 and 3: the plants join `PLANTS` and ride unit 20's `instruction units selftest` leg, spelled `fixture --plant`, `adopt-playbook.sh` leaves the write set, and AC7 reads the limits file at HEAD with the plain path as its own token.
 - rev-8 · 2026-11-04 · section 1 · S1 S2 S5 S6 S7, new S9 · section 3 Non-goals and Edges · section 4 Data model, Inventory, Rollout, Files touched and Alternatives rejected · section 5 · AC1 AC4 AC5 AC7, new AC9 AC10 AC11 AC12 · section 7 · section 8 F5, new F7 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-3-interim-brief.md` and `2026-11-04-prompt-PLAY-dOrderedCharter-3-interim-addendum-brief.md`: the unit builds under F5's new option (f), marked as an interim on this unit's shape with the owner's choice on the row parked and S6's first arm carried as `relaxes:`, BUILD-METHOD's envelope held by a validated `hold` field (F7), its row, source and prose untouched, the gate stating the held path as not checked and leaving it out of its covered count, and three planted reds ending the hold; AC7's `budgets.py resolve` limb reads after landing, that verb reading the landed revision.
+- rev-9 · 2026-11-04 · S9 · section 4 Files touched · from `2026-11-04-prompt-PLAY-dOrderedCharter-3-held-line-brief.md`: level with `PLAY-dOrderedCharter-2` rev-8, S9's end of the hold names the map's `held —` branch and its plant `map-held`, and Files touched gains `.governance/instructions.lock`, which the charter's re-render moves.
 
 ## 10. Reuse audit
 
