@@ -10,7 +10,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 399788aca767e69a83e524f6297c7ccf9c55fdc7
+witness: fe437c99590ac05f01b456b00a8d47bb53cbba75
 phase: BUILDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
@@ -138,3 +138,5 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-04T04:52:03Z dispatch · item 40427f33 PLAY-dOrderedCharter-64 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/memory-tree/.memory-tree.conf.example .memory-tree.conf memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-4.md memory/builds/dOrderedCharter/spec/2026-11-04-spec-PLAY-dOrderedCharter-64.md memory/builds/dOrderedCharter/build/2026-11-04-build-PLAY-dOrderedCharter-64-ledger.md memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/PLAY.md memory/builds/dOrderedCharter/README.md
 
 2026-11-04T04:52:15Z brief · item PLAY-dOrderedCharter-64 · reason 9d7da2401920 memory/builds/dOrderedCharter/prompts/2026-11-04-prompt-PLAY-dOrderedCharter-64-build-brief.md
+
+2026-11-04T05:05:15Z rescope · item add PLAY-dOrderedCharter-65 · reason unit 7's kinds register mints kind.kit, kind.layer and kind.practice, whose first segment is a namespace word; the tags leg reds six times (mid-build lint after unit 7); a repair renames them before unit 53
