@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-43 — seven of the closing diff review's eight minors: caller refs refused before any agent, one cell encoding, every pin key routed, one sibling-kit resolver, and arms over every preset
 
-**Status:** INPROGRESS · rev-3 · 2026-11-04 · node d · Tier-2 · base 23e1a54d · streams tooling · order 29
+**Status:** INPROGRESS · rev-4 · 2026-11-04 · node d · Tier-2 · base 23e1a54d · streams tooling · order 29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -130,6 +130,8 @@ the record's `## Items`. The ids S8 and AC8 are unused: id 5's docstrings moved 
 - No re-review: the diff exit is CONVERGED, and its minors are disposed here and in
   `TOOL-dFairHearing-44`, not folded.
 - No edit to `tools/memory-tree/gotchas.py`: id 5's docstrings are `TOOL-dFairHearing-44`'s scope.
+- No edit to `tools/gate-legs.json`: the `policy fixtures` guard's missing `.governance/install.json`
+  line predates this unit and goes to `TOOL-dFairHearing-45`.
 - No change to any class record the review disposed `class:` (ids 2, 3, 4 and 7). Each class's
   left-shift is the arm its item adds: the round trip for `pipe-in-a-code-span-splits-a-table-cell`,
   the pin-key arm for `policy-value-with-no-route`, the parity and the ban for
@@ -222,12 +224,15 @@ root and not for a kit.
 At :403 the constant takes the resolver's answer:
 
 ```js
-const POLICY_HELPER = (() => {
+function resolvePolicyHelper() {
   try { return require('path').join(resolveKitDir('policy', 'policy-mirror.js', __dirname), 'policy-mirror.js') } catch { return '' }
-})()
+}
+const POLICY_HELPER = resolvePolicyHelper()
 ```
 
-`resolveKitDir` is a function declaration, so it is hoisted above :403. An empty path fails the
+The lookup is a named function because the lexicon reads a constant holding an invoked function
+expression as a function, and `POLICY_HELPER` would then fail its camel-case cell. `resolveKitDir` is
+a function declaration, so it is hoisted above :403. An empty path fails the
 `existsSync` test both readers already make (:405, :776), which is today's behaviour with no policy
 kit beside the hook. The python resolver suite's policy row (`tools/lib/resolve-python.test.sh:668`)
 and the policy fixtures' `policy-mirror.js removed` row (`tools/policy/check_policy.py:3042-3044`) keep
@@ -258,6 +263,7 @@ neither moves the fold, and neither answers anything the ask asks.
 ### Inventory
 
 - `REF_SHAPE`, a constant in `tools/workflows/tier2-review.template.js` and its render.
+- `resolvePolicyHelper`, a function in `tools/hooks/agent-cap.js`.
 - The suite arm labels `FH43 AC1`, `FH43 AC2`, `FH43 AC3`, `FH43 AC4`, `FH43 AC5`, `FH43 AC6`,
   `FH43 AC7` and `FH43 AC10`, one prefix per arm the Gates section declares, apart from the arm at
   `tools/workflows/spec-audit-optin.test.sh:566`, which keeps its label and changes its needle.
@@ -389,11 +395,16 @@ prompt and the arguments of every `workflow` call. Scratch layouts go under `$TE
 - **AC9** — When `git grep -n legManifest -- tools` runs, it prints nothing, and
   `grep -c "gateManifest" tools/workflows/kit.toml` prints a number above 0.
   Red when: the descriptor names an argument key the harness never reads.
-- **AC10** — When `python tools/policy/check_policy.py --fixture limit-hook-writer-split` runs, it
-  exits 0, no line it prints carries `WRONG:`, and one `policy-fixture: limit-hook-writer-split` line
-  names `check-review-join.js`; `grep -c "check-review-join" tools/policy/check_policy.py` prints a
-  number above 1.
-  Red when: a comment credits the case with a check the case does not run.
+- **AC10** — When `python tools/policy/check_policy.py --fixture limit-hook-writer-split` runs, no line
+  opening `policy-fixture: limit-hook-writer-split` carries `WRONG:`, and exactly one such line names
+  `check-review-join.js` and carries `exit 1` and `a ref-keyed verdict join`;
+  `grep -c "check-review-join" tools/policy/check_policy.py` prints a number above 1.
+  Red when: a comment credits the case with a check the case does not run, as at `23e1a54d`, where no
+  line of the case names `check-review-join.js`, or the row runs and its ban does not fire, which
+  prints `WRONG:` on the row's line.
+  fixture: the command's exit status is not graded. Measured at `3f2ca384f`, untouched, it exits 1 on
+  the line `policy-fixture: guard-trace · WRONG .governance/install.json · not under the policy fixtures guard`,
+  which belongs to no case and carries no `WRONG:`.
 - **AC11** — When `python tools/memory-tree/gotchas.py --for-paths tools/workflows/tier2-review.template.js`
   runs, it prints a line naming `unvalidated-arg-reaches-an-agent-shell-line`; `--for-paths` over
   `tools/memory-tree/gotchas.py` names `helper-whose-only-caller-is-its-selftest`, over
@@ -424,10 +435,13 @@ New arm: tools/lib/resolve-python.test.sh · covers AC5 · the JS-port section o
 
 New arm: tools/lib/resolve-python.test.sh · covers AC6 · the sibling-kit path ban with its population and its two plants, staged against `23e1a54d`, where it names the hook's :403 and the pack's :24 · none
 
-New arm: tools/policy/check_policy.py · covers AC10 · the ref-keyed join row of `limit-hook-writer-split`, staged against a fixture copy of `check-review-join.js` whose ban matches nothing and exits 0 · none
+New arm: tools/policy/check_policy.py · covers AC10 · the ref-keyed join row of `limit-hook-writer-split`, staged against a fixture copy of `check-review-join.js` whose ban matches nothing and exits 0, read on the row's own line, since the case exits 1 either way until the guard line lands · none
 
 AC6's agent-cap half, AC9 and AC11 take no arm: the ban stops the hard-coded path from returning, the
 comment changes no behaviour, and the catalogue's own check and selftest grade the records.
+
+The `policy fixtures` leg stays on the leg line because this unit's paths trip its guard, and it reds
+on the `.governance/install.json` read until `TOOL-dFairHearing-45` lands that guard line.
 
 ## 8. Open questions
 
@@ -465,6 +479,12 @@ comment changes no behaviour, and the catalogue's own check and selftest grade t
   named among the text S4 changes, its needle `looked in`, with its `New arm:` line and the Inventory's
   label sentence; brief `2026-11-04-prompt-TOOL-dFairHearing-43-2-spec-writer`.
 - rev-3 · 2026-11-04 · §7 · the no-arm sentence loses AC8 and the docstrings; brief `2026-11-04-prompt-TOOL-dFairHearing-43-2-spec-writer`.
+- rev-4 · 2026-11-04 · AC10 · grades the case's own lines in place of the exit status, which is 1 on
+  the untouched tree through the guard-trace line, and stays red on an unrun or unfired row; return `2026-11-04-build-TOOL-dFairHearing-43-3-builder-return`.
+- rev-4 · 2026-11-04 · §3 · §7 · the `policy fixtures` guard line named as `TOOL-dFairHearing-45`'s,
+  the leg's red until then stated, and AC10's arm read on the row's own line; return `2026-11-04-build-TOOL-dFairHearing-43-3-builder-return`.
+- rev-4 · 2026-11-04 · §4 · S6 · the `POLICY_HELPER` snippet spelled `resolvePolicyHelper` then the
+  constant, with the Inventory naming the function, so the lexicon count does not rise; return `2026-11-04-build-TOOL-dFairHearing-43-3-builder-return`.
 
 ## 10. Reuse audit
 

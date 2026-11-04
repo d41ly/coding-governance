@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-45 — the bar's own reds in the kits: renders the ban can read, a fragment that ships, one anchor, no-fork forms, eight renames, and the honest brief record
 
-**Status:** OPEN · rev-3 · 2026-11-04 · node d · Tier-2 · base f4120c83 · streams tooling · order 30 · ratified 2026-11-04
+**Status:** OPEN · rev-4 · 2026-11-04 · node d · Tier-2 · base f4120c83 · streams tooling · order 30 · ratified 2026-11-04
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -61,6 +61,9 @@ finds each site by the text quoted here and not by its number.
   `memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-45-deviation-451.md`, written
   with this spec. NOT OBSERVED by a criterion: it is a record of the roster change, and the hygiene
   gate's record join grades it.
+- **S11** — policy fixtures guard. The `policy fixtures` row of `tools/gate-legs.json` adds
+  `.governance/install.json` to its guard, the file the fixture's own `resolve_kit_dir` reads.
+  Observed by AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -273,6 +276,19 @@ to the fan-out rule can change that suite's verdict while the leg sits skipped. 
 one home of this guard: the leg is an `exempt_leg` with no descriptor row, and
 `tools/govkit/subject-pins.tsv` holds no guard field.
 
+### The policy fixtures guard (S11)
+
+This red is not on the close's list. Unit 43's third pass found it
+(`memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-43-3-builder-return.md`). The
+fixture's `resolve_kit_dir` reads `.governance/install.json`, tracked since `3ada42ab1`, and
+`check_guard_trace` (`tools/policy/check_policy.py:4065`) joins every tracked read to the leg's guard.
+No guard names that file, so every case prints the guard-trace `WRONG` and exits 1, with no change
+to any kit. In a scratch clone holding unit 43's patch, this one line gave exit 0 and
+`83 assertion(s) executed · 0 wrong`, a figure of that pass and no pin here.
+
+The existing join is the gate, so the line takes no arm. It sits after the row's last entry, and the
+manifest is its one home: `policy fixtures` is not a row of any `tools/*/kit.toml`.
+
 ### The brief record (S9)
 
 History is append-only, and the waiver file is the leg's declared home for a unit that cannot be
@@ -476,6 +492,12 @@ brief's list was cut there. A `permission:` line marks every criterion the hook 
   Red when: a unit the leg reports has no row, or a row names a unit it does not report.
   figure: 26 is PINNED, the leg's own count at `f4120c83`.
   permission: the hook refuses the leg to a pass; the main loop observes it.
+- **AC11** — When `grep -A76 '"name": "policy fixtures"' tools/gate-legs.json` runs, the lines it
+  prints between `"guard"` and the next `]` hold `.governance/install.json`. When
+  `python tools/policy/check_policy.py --fixture limit-hook-writer-split` runs after unit 43, it exits
+  0, and no line it prints carries `guard-trace · WRONG`.
+  Red when: a tracked file a fixture case reads trips no guard of the leg, as at `f4120c83`, where the
+  second command prints that `WRONG` naming `.governance/install.json` and exits 1.
 
 ## 7. Gates
 
@@ -486,7 +508,7 @@ New arm: tools/check-install-prefix.test.sh · covers AC2 · a fixture template 
 New arm: tools/check-hook-destinations.test.sh · covers AC3 · a `{here}` fragment in the review kit's home naming `spec-audit-optin.js`, staged against `f4120c83`, whose compare prints `NO kit.toml rule ships`, beside the same fragment naming an unshipped file, which must stay red · none
 
 The other criteria take no arm: each repairs a site an existing leg already grades, and that leg is
-the regression gate. S8 changes one guard row, which no arm exercises. No version moves on this
+the regression gate. S8 and S11 each change one guard row, which no new arm exercises. No version moves on this
 branch, and the lander mints `review-harness`, `agent-cap`, `policy` and `run-gates`.
 
 ## 8. Open questions
@@ -522,6 +544,8 @@ branch, and the lander mints `review-harness`, `agent-cap`, `policy` and `run-ga
 - rev-3 · 2026-11-04 · AC9 · the probe re-spelt as a grep of the leg's manifest row, because the spec token
   check read the python one-liner as an untracked path, and the guard entry spelt with the prose
   prefix token, which that check skips; the observation is unchanged.
+- rev-4 · 2026-11-04 · S11 · AC11 · the `policy fixtures` guard gains `.governance/install.json`, the
+  red unit 43's third pass found, with its design note.
 
 ## 10. Reuse audit
 

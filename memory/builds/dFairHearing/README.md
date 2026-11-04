@@ -125,10 +125,10 @@ ids TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHea
 | [TOOL-dFairHearing-38 — a `selected` verdict observed by the parser `gotchas.py` has, so a correct build passes and a shipped flag reds](spec/2026-10-23-spec-TOOL-dFairHearing-38.md) | 27 | 2 | CLOSED | rev-3 | 2026-11-04 |
 | [TOOL-dFairHearing-39 — a criterion quoting an error text its tool never emits, carried into the bug-class catalogue a spec commit selects](spec/2026-10-23-spec-TOOL-dFairHearing-39.md) | 27 | 2 | CLOSED | rev-3 | 2026-11-04 |
 | [TOOL-dFairHearing-40 — the round-5 spec audit's 35 minors: one build-wide version reading on one base, an attempt checker that refuses what it cannot place, and criteria a correct build can pass](spec/2026-10-23-spec-TOOL-dFairHearing-40.md) | 28 | 2 | CLOSED | rev-6 | 2026-11-04 |
-| [TOOL-dFairHearing-43 — seven of the closing diff review's eight minors: caller refs refused before any agent, one cell encoding, every pin key routed, one sibling-kit resolver, and arms over every preset](spec/2026-11-04-spec-TOOL-dFairHearing-43.md) | 29 | 2 | INPROGRESS | rev-3 | 2026-11-04 |
+| [TOOL-dFairHearing-43 — seven of the closing diff review's eight minors: caller refs refused before any agent, one cell encoding, every pin key routed, one sibling-kit resolver, and arms over every preset](spec/2026-11-04-spec-TOOL-dFairHearing-43.md) | 29 | 2 | INPROGRESS | rev-4 | 2026-11-04 |
 | [TOOL-dFairHearing-44 — the closing diff review's second batch unit: two docstrings say who calls the ungated reader](spec/2026-11-04-spec-TOOL-dFairHearing-44.md) | 29 | 1 | OPEN | rev-1 | 2026-11-04 |
 | [TOOL-dFairHearing-46 — the bar's own reds in the replay scorer, and its stated-count reader](spec/2026-11-04-spec-TOOL-dFairHearing-46.md) | 29 | 1 | OPEN | rev-2 | 2026-11-04 |
-| [TOOL-dFairHearing-45 — the bar's own reds in the kits: renders the ban can read, a fragment that ships, one anchor, no-fork forms, eight renames, and the honest brief record](spec/2026-11-04-spec-TOOL-dFairHearing-45.md) | 30 | 2 | OPEN | rev-3 | 2026-11-04 |
+| [TOOL-dFairHearing-45 — the bar's own reds in the kits: renders the ban can read, a fragment that ships, one anchor, no-fork forms, eight renames, and the honest brief record](spec/2026-11-04-spec-TOOL-dFairHearing-45.md) | 30 | 2 | OPEN | rev-4 | 2026-11-04 |
 <!-- /gen:build-units -->
 
 Records: 311 bound to this build, across 4 record folder(s).
