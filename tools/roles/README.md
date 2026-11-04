@@ -43,7 +43,9 @@ The checker grades that each entry names something, not that the thing exists.
 into the prompt its agent is handed (TOOL-aOrientedCast-2). The file holds the role as `render_role`
 renders it under `## Role`, then `## Task`: one block per key of the role's `reads`, in declared
 order, then, as its last block, the role's charter blocks (described under "The agent types"),
-whose library notes print on stderr as `handoff: note — `. A `task:` key is read from the session card's `## task`
+whose library notes print on stderr as `handoff: note — `. The section order is the work-order
+template's, `templates/work-order.template.md`, which holds the two headings and the slots `role`,
+`opening`, `reads` and `charter-blocks`, each `<!-- slot: <name> -->` on its own line. A `task:` key is read from the session card's `## task`
 field by the kickoff checker's field grammar, a `card:` key from that card's section, a `brief:` key
 from the build's brief record, and an `input:` key from `--input`. A required key that resolves to
 nothing, an empty value or a placeholder refuses by name and writes nothing; an optional one is named

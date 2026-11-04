@@ -537,6 +537,29 @@ def write_practice(root, rel, name, line):
     return rel
 
 
+def derive_instruction_row(root, prefix, name, rest):
+    """`new instruction-unit`: a row the schema check passes and the command that writes it, printed. It writes
+    no manifest: the instructions.edit command is that write's one door (PLAY-dOrderedCharter-15)."""
+    import instruction_units as iu
+    flags = dict(zip(rest[::2], rest[1::2]))
+    if set(flags) != {"--kit", "--type", "--level", "--text"} or len(rest) != 8:
+        raise ValueError("new instruction-unit <name> --kit <kit> --type <t> --level <n> --text <line>")
+    kits = {tomllib.loads(p.read_text(encoding="utf-8")).get("id") for p in pathlib.Path(root, prefix).glob("*/kit.toml")}
+    if flags["--kit"] not in kits:
+        raise ValueError(f"--kit {flags['--kit']!r} is no kit's descriptor id")
+    check_one_line("--text", flags["--text"], iu.BUDGET_BYTES["block"])
+    budget = "line" if len(flags["--text"].encode("utf-8")) <= iu.BUDGET_BYTES["line"] else "block"
+    trigger = 'trigger = "always"\n' if flags["--type"] == iu.DIRECTIVE else ""
+    row = (f'[[unit]]\ntag = "unit.{name}"\nlevel = {flags["--level"]}\ntype = {json.dumps(flags["--type"])}\n{trigger}'
+           f'budget = "{budget}"\ntext = {json.dumps(flags["--text"], ensure_ascii=False)}\n')
+    units, faults = iu.parse_unit_rows(row, "the factory's row")
+    reds = [str(f) for f in faults] + [r for u in units for r in iu.check_unit_row(u, tomllib.loads(row)["unit"][0])]
+    if reds:
+        raise ValueError("; ".join(reds))
+    return [row.rstrip("\n"), f"{SAY}: new · no manifest written; write it with: python {prefix}/playbook/"
+                              f"instructions_edit.py add --manifest {flags['--kit']}"], 0
+
+
 def run_new(argv, root=None):
     root, kit_rel, prefix = derive_layout(root)
     if len(argv) < 2:
@@ -565,6 +588,8 @@ def run_new(argv, root=None):
                 raise ValueError("new charter-practice <name> --line <text>")
             rel = row.get("population", "").replace("{prefix}", prefix)
             return [f"{SAY}: new · appended practice.{name} to {write_practice(root, rel, name, flags['--line'])}"], 0
+        if own and own.group("kind") == "instruction-unit":
+            return derive_instruction_row(root, prefix, name, rest)
     except ValueError as exc:
         return [f"{SAY}: refused · {exc}"], 2
     words = shlex.split(row["factory"].replace("{prefix}", prefix))

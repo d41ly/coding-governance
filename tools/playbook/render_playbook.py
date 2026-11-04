@@ -63,17 +63,53 @@ THE REGION READER IS THIS FILE'S OWN. The memory-tree kit's region helper RAISES
 is present, so it serves neither the absent-charter nor the charter-without-a-region state. This
 engine therefore CONFORMS to the marker-region contract and adds a fifth reader to its case table; it
 does not import that implementation, which would be a cross-kit edge the contract itself forbids.
+
+THE ONE RENDERER OF RECORD (PLAY-dOrderedCharter-20). `--render-scope <scope>` writes a scope and
+`--check-render --scope <scope>` compares it, `--target` defaulting to this kit's repository. `charter` is
+`render()` above, and `--check` is its check spelled for the adopter. `entry-files` is `CLAUDE.md` and each
+other harness alias, the pointer or copy pointing at AGENTS.md, taking `--aliases`, `--mode` and `--force`
+and with no `--aliases` the ones `renderers.toml` assigns it. `claims`, check only, runs the parity gate
+until the charter's stated values render from sourced fact units. `--check-render` with no scope is the
+render gate: every scope, then `renderers.toml` (each instruction file has exactly one renderer of record),
+the status arm, and the legacy list under the policy key `instructions.legacy`. A template's
+`<!-- units: <selector> -->` line expands to the selected units' lines, one per unit.
 """
 from __future__ import annotations
 
 import argparse
+import functools
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tomllib
 from pathlib import Path
+
+# >>> resolve_bash_py -- canonical copy: resolve_bash.py in the gov lib dir (byte-identical; gated)
+def resolve_bash(script):
+    r"""The bash that can SEE `script`, by RUNNING each candidate, or None. GOV_BASH first, then the
+    bash PATH names, then Git for Windows' two paths, each kept only when `test -f` on the script
+    exits 0 under it. On Windows PATH order commonly puts the System32 WSL launcher first, which
+    cannot open a `C:/` path, and a stub that exits 127 can sit there too (gotcha
+    subprocess-resolves-a-different-shell); being on PATH is not evidence."""
+    cands = [os.environ.get("GOV_BASH", ""), shutil.which("bash") or "",
+             "C:/Program Files/Git/bin/bash.exe", "C:/Program Files/Git/usr/bin/bash.exe", "bash"]
+    tried = []
+    for c in cands:
+        if not c or c in tried:
+            continue
+        tried.append(c)
+        try:
+            r = subprocess.run([c, "-c", 'test -f "$1"', "_", str(script)], capture_output=True, timeout=20)
+        except (OSError, subprocess.SubprocessError):
+            continue
+        if r.returncode == 0:
+            return c
+    return None
+# <<< resolve_bash_py
+
 
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
@@ -131,6 +167,17 @@ ONE_LINE_MAX = 200
 # seeded three are govkit-derived, so they are never an operator's key.
 ARGV_TOKEN_RE = re.compile(r'(?<!\$)\{([a-z_]+)\}')
 ARGV_DERIVED_TOKENS = {'prefix', 'kit_id', 'kit', 'relpath', 'memory_root'}
+# PLAY-dOrderedCharter-20: the scopes of the one renderer, and the entry files' wiring.
+RENDER_SCOPES = ('charter', 'entry-files')
+CHECK_SCOPES = (*RENDER_SCOPES, 'claims')
+UNIT_SLOT_RE = re.compile(r'^[ \t]*<!--\s*units:\s*(\S+)\s*-->[ \t]*$', re.M)
+CANON = 'AGENTS.md'
+ALIAS_PATHS = {'claude': 'CLAUDE.md', 'gemini': 'GEMINI.md', 'copilot': '.github/copilot-instructions.md',
+               'cursor': '.cursorrules', 'windsurf': '.windsurfrules'}
+GEMINI_SETTINGS = '.gemini/settings.json'
+GEMINI_CONFIGURED_RE = re.compile(rf'"fileName"[^\S\n]*:[^\S\n]*(\[[^\S\n]*)?"{re.escape(CANON)}"')
+IMPORT_LINE_RE = re.compile(rf'^@\.*/?([^/\n]*/)*{re.escape(CANON)}[^\S\n]*$', re.M)
+PARITY_GATE = 'check-playbook-parity.sh'
 
 
 class Refusal(Exception):
@@ -756,23 +803,33 @@ def write_region(charter_path: Path, body: str) -> None:
     charter_path.write_text(build_region(cur, body), encoding='utf-8', newline='\n')
 
 
-def write_charter_lock(gov_root: Path, target: Path, charter_path: Path) -> None:
-    """PLAY-dOrderedCharter-12 S5: the charter's row of the target's `.governance/instructions.lock`,
-    written after every write-mode render: `blob` hashes the bytes `write_region` just wrote, `renderer`
-    is this kit at KIT_PLAYBOOK_RENDER_VERSION and `template` the template's path and its version marker,
-    the provenance the rendered text no longer carries. `instruction_units.write_lock_row` writes it."""
+def load_units_module():
+    """The kit's `instruction_units`, imported from beside this engine however it was launched."""
     engine = str(Path(__file__).resolve().parent)
     if engine not in sys.path:
         sys.path.insert(0, engine)
     import instruction_units
+    return instruction_units
+
+
+def derive_renderer_label() -> str:
+    """This kit at KIT_PLAYBOOK_RENDER_VERSION, a lock row's `renderer`."""
     import render_playbook   # the module's own constant: as a script, `main` runs above the line defining it
+    return f'playbook-render@{render_playbook.KIT_PLAYBOOK_RENDER_VERSION}'
+
+
+def write_charter_lock(gov_root: Path, target: Path, charter_path: Path, units=()) -> None:
+    """PLAY-dOrderedCharter-12 S5: the charter's row of the target's `.governance/instructions.lock`,
+    written after every write-mode render: `blob` hashes the bytes `write_region` just wrote, `renderer`
+    is this kit at KIT_PLAYBOOK_RENDER_VERSION, `template` the template's path and its version marker,
+    the provenance the rendered text no longer carries, and `units` each `(tag, line)` a slot expanded to.
+    `instruction_units.write_lock_row` writes it."""
     template = resolve_template_path(gov_root, target, read_deploy(target)[2]).resolve()
     marker = TEMPLATE_MARKER_RE.search(read_input(template, 'the charter template'))
     base = target if template.is_relative_to(target) else gov_root.resolve()
-    instruction_units.write_lock_row(
-        target, Path(os.path.relpath(charter_path, target)).as_posix(),
-        f'playbook-render@{render_playbook.KIT_PLAYBOOK_RENDER_VERSION}',
-        f'{template.relative_to(base).as_posix()}@v{marker.group(1)}.{marker.group(2)}' if marker else '')
+    load_units_module().write_lock_row(
+        target, Path(os.path.relpath(charter_path, target)).as_posix(), derive_renderer_label(),
+        f'{template.relative_to(base).as_posix()}@v{marker.group(1)}.{marker.group(2)}' if marker else '', units)
 
 
 def build_region(charter: str | None, body: str) -> str:
@@ -1042,8 +1099,47 @@ def resolve_answers(engine_dir: Path, gov_root: Path, target: Path,
     return out
 
 
+def render_unit_slots(text: str, target: Path, notes: list, slots: list | None = None) -> str:
+    """Each `<!-- units: <selector> -->` line replaced by the lines of the units its selector selects, and
+    nothing of its own. A selector no namespace registers, a selected unit whose change records retired it
+    and an unreadable manifest each refuse; a slot selecting nothing is noted `unarmed`. Each `(tag, line)`
+    lands in `slots`, what the lock's row records."""
+    if not UNIT_SLOT_RE.search(text):
+        return text
+    iu = load_units_module()
+    from policy_value import read_policy_value
+    read_key = functools.partial(read_policy_value, root=target)
+    try:
+        units, records = iu.read_units(target), iu.read_change_records(target)
+    except ValueError as e:    # UnitRowError and the git reader's LevelError
+        raise Refusal(f'the units a slot selects are unreadable: {e}') from None
+
+    def render_slot(match) -> str:
+        selector = match.group(1)
+        fault = iu.check_tag_entry(selector)
+        if fault:
+            raise Refusal(f'the slot `{selector}` {fault}')
+        chosen = iu.derive_unit_selection(units, selector)
+        for u in chosen:
+            status = iu.derive_status(u.tag, records)
+            if status != 'active':
+                raise Refusal(f'the slot `{selector}` selects {u.tag}, whose status is {status}: a template '
+                              f'selects active units only')
+        if not chosen:
+            notes.append(f'unarmed   slot {selector} selects no unit')
+        try:
+            lines = [iu.render_unit(u, read_key) for u in chosen]
+        except iu.UnitRowError as e:
+            raise Refusal(str(e)) from None
+        if slots is not None:
+            slots.extend((u.tag, line) for u, line in zip(chosen, lines))
+        return '\n'.join(lines)
+
+    return UNIT_SLOT_RE.sub(render_slot, text)
+
+
 def render(engine_dir: Path, gov_root: Path, target: Path,
-           charter_path: Path | None = None) -> tuple[str, list[str]]:
+           charter_path: Path | None = None, slots: list | None = None) -> tuple[str, list[str]]:
     desc, blocks, entries = load_declarations(*resolve_declaration_paths(engine_dir, gov_root))
     dep, cfg, answers = read_deploy(target)
     rows = desc.get('placeholder', [])
@@ -1113,6 +1209,7 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
         # A TOML multi-line string ends in a newline, and the template line holding the token ends in
         # one too; without the strip every multi-line answer adds a blank line after itself.
         text = build_substitution(text, key, str(val).rstrip('\n'))
+    text = render_unit_slots(text, target, notes, slots)
     notes += check_one_line_regions(text, read_one_line_cap(target) if ONE_LINE_OPEN in text else None)
     for ns, name in sorted(set(present)):
         if (ns, name) in drop:
@@ -1156,6 +1253,59 @@ def _write_fixture(tmp: Path, kits: str, variances: str) -> tuple[Path, Path]:
         f'kits = {kits}\n\n[answers]\nplaybook_path = "CHARTER.md"\n'
         f'variances_a = {variances}\n', encoding='utf-8')
     return eng, tgt
+
+
+def check_scope_arms(check_arm) -> None:
+    """PLAY-dOrderedCharter-20: each scope re-rendered over a fixture target and its bytes compared, the failing
+    case a scope holding one byte differently. The claims scope's gate is a stub, its exit what is compared."""
+    import contextlib
+    import io
+    import tempfile
+
+    def run_main(*argv) -> tuple[int, str]:
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(out):
+            rc = main([str(a) for a in argv])
+        return rc, out.getvalue()
+
+    with tempfile.TemporaryDirectory() as td:
+        tgt = Path(td).resolve()
+        read_git(tgt, 'init', '-q')
+        (tgt / '.governance').mkdir()
+        (tgt / '.governance' / 'deploy.toml').write_text(
+            'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
+        (tgt / 'TPL.md').write_text('# fixture charter\n\n- MUST land.\n', encoding='utf-8')
+        rc, said = run_main('--render-scope', 'charter', '--target', tgt)
+        check_arm(rc == 0 and '- MUST land.' in (tgt / CANON).read_text(encoding='utf-8'),
+                  'the charter scope writes its region', said)
+        rc, said = run_main('--check-render', '--scope', 'charter', '--target', tgt)
+        check_arm(rc == 0, 'the charter scope compares its own render green', said)
+        rendered = (tgt / CANON).read_bytes()
+        (tgt / CANON).write_bytes(rendered.replace(b'MUST land.', b'MUST land!'))
+        rc, said = run_main('--check-render', '--scope', 'charter', '--target', tgt)
+        check_arm(rc == 1 and 'DRIFT' in said, 'one byte off reds the charter scope', said)
+        (tgt / CANON).write_bytes(rendered)
+
+        rc, said = run_main('--render-scope', 'entry-files', '--target', tgt, '--aliases', 'claude copilot')
+        check_arm(rc == 0 and (tgt / 'CLAUDE.md').read_bytes() == f'@{CANON}\n'.encode('utf-8')
+                  and (tgt / ALIAS_PATHS['copilot']).read_bytes() == rendered,
+                  'the entry-files scope writes the pointer and the copy', said)
+        rows = {r['path'] for r in load_units_module().read_lock(tgt)}
+        check_arm({'CLAUDE.md', ALIAS_PATHS['copilot'], CANON} <= rows, 'every scope write records its lock row', str(rows))
+        rc, said = run_main('--check-render', '--scope', 'entry-files', '--target', tgt, '--aliases', 'claude copilot')
+        check_arm(rc == 0, 'the entry-files scope compares its own render green', said)
+        (tgt / ALIAS_PATHS['copilot']).write_bytes(rendered + b'x')
+        rc, said = run_main('--check-render', '--scope', 'entry-files', '--target', tgt, '--aliases', 'claude copilot')
+        check_arm(rc == 1 and 'stale copy' in said, 'one byte off reds the entry-files scope', said)
+
+        gate = tgt / load_units_module().derive_kit_prefix() / PARITY_GATE
+        rc, said = run_main('--check-render', '--scope', 'claims', '--target', tgt)
+        check_arm(rc == 1 and PARITY_GATE in said, 'the claims scope reds a tree holding no gate', said)
+        gate.parent.mkdir(parents=True, exist_ok=True)
+        for code in (0, 1):
+            gate.write_text(f'exit {code}\n', encoding='utf-8')
+            rc, said = run_main('--check-render', '--scope', 'claims', '--target', tgt)
+            check_arm(rc == code, f'the claims scope carries the gate\'s exit {code}', said)
 
 
 def run_selftest() -> int:
@@ -1802,12 +1952,196 @@ def run_selftest() -> int:
               and 'render-playbook: ROLE_ROSTER:' in said and 'looked in' in said,
               'an absent roles kit prints the resolver\'s reason and refuses',
               f'refused {got!r}, stderr {said!r}')
+    check_scope_arms(check_arm)
 
     if failed:
         print(f'render_playbook.selftest FAILED — {failed} of {passed + failed} arm(s)')
         return 1
     print(f'render_playbook.selftest OK — {passed} arm(s)')
     return 0
+
+
+def derive_entry_aliases(target: Path, aliases: str | None) -> list[str]:
+    """The aliases of the `entry-files` scope: `--aliases`, else those of `renderers.toml`'s row for it."""
+    if aliases is not None:
+        return aliases.split()
+    names = {path: name for name, path in ALIAS_PATHS.items()}
+    return [names[p] for r in load_units_module().read_renderers(target)
+            if r['renderer'] == 'playbook:entry-files' for p in r['paths'] if p in names]
+
+
+def check_gemini_configured(target: Path) -> bool:
+    path = target / GEMINI_SETTINGS
+    return path.is_file() and bool(GEMINI_CONFIGURED_RE.search(path.read_text(encoding='utf-8', errors='replace')))
+
+
+def check_import_line(path: Path) -> bool:
+    return bool(IMPORT_LINE_RE.search(path.read_text(encoding='utf-8', errors='replace')))
+
+
+def check_same_bytes(target: Path, path: Path) -> bool:
+    return path.read_bytes() == (target / CANON).read_bytes()
+
+
+def check_link_target(path: Path) -> bool:
+    return Path(os.readlink(path)).name == CANON
+
+
+def check_entry_files(target: Path, aliases: list[str]) -> int:
+    """The `entry-files` scope's compare: each alias a live link, a pointer, a copy of the canonical's bytes
+    or, for gemini, its configured settings file."""
+    if not (target / CANON).is_file():
+        print(f'AGENT-INSTR CHECK FAILED — no canonical {CANON}')
+        return 1
+    reds = []
+    for name in aliases:
+        rel = ALIAS_PATHS.get(name)
+        path = target / rel if rel else None
+        if path is None:
+            reds.append(f"unknown alias '{name}'")
+        elif name == 'gemini' and not os.path.lexists(path):
+            if not check_gemini_configured(target):
+                reds.append(f'gemini: neither GEMINI.md nor {GEMINI_SETTINGS} context.fileName={CANON}')
+        elif path.is_symlink():
+            if not path.exists():
+                reds.append(f'{rel} is a DANGLING symlink → {os.readlink(path)}')
+            elif not check_link_target(path):
+                reds.append(f"{rel} symlinks '{os.readlink(path)}', not {CANON}")
+        elif not path.exists():
+            reds.append(f"{name} alias '{rel}' missing")
+        elif not (check_import_line(path) or check_same_bytes(target, path)):
+            reds.append(f'{rel} is a stale copy — re-run with --force to re-sync from {CANON} (or it drifted)')
+    for why in reds:
+        print(f'AGENT-INSTR CHECK FAILED — {why}')
+    if not reds:
+        print(f'agent-instructions OK — {CANON} + aliases [{" ".join(aliases)}] correctly wired.')
+    return 1 if reds else 0
+
+
+def write_pointer_or_copy(target: Path, name: str, rel: str, back: str) -> None:
+    """A claude alias's `@<canonical>` import, any other alias's copy of the canonical's bytes."""
+    path = target / rel
+    path.unlink(missing_ok=True)
+    if name == 'claude':
+        path.write_bytes(f'@{back}\n'.encode('utf-8'))
+        print(f'  + {rel} (@{back} import)')
+    else:
+        shutil.copyfile(target / CANON, path)
+        print(f'  + {rel} (copy — no native pointer; drift re-syncs with --force)')
+
+
+def write_entry_file(target: Path, name: str, mode: str, force: bool) -> str | None:
+    """One alias wired, or found wired, returning the file its lock row names; None on a refusal it printed."""
+    def print_refusal(why: str) -> None:
+        print(f'AGENT-INSTR wire FAILED — {why}')
+
+    rel = ALIAS_PATHS.get(name)
+    if rel is None:
+        return print_refusal(f"unknown alias '{name}'")
+    path = target / rel
+    held = os.path.lexists(path)
+    if name == 'gemini' and not held and check_gemini_configured(target):
+        print(f'  = {GEMINI_SETTINGS} (context.fileName, current)')
+        return GEMINI_SETTINGS
+    if path.is_symlink():
+        if path.exists() and check_link_target(path):
+            print(f'  = {rel} (symlink, current)')
+            return rel
+    elif path.is_file() and check_import_line(path):
+        print(f'  = {rel} (pointer, current)')
+        return rel
+    elif path.is_file() and check_same_bytes(target, path):
+        print(f'  = {rel} (copy, current)')
+        return rel
+    if held and not force:
+        return print_refusal(f'{rel} exists and is not {CANON} wiring — pass --force to replace it')
+    path.parent.mkdir(parents=True, exist_ok=True)
+    back = '../' * rel.count('/') + CANON
+    if name == 'gemini' and mode == 'pointer':
+        settings = target / GEMINI_SETTINGS
+        if settings.is_file():
+            return print_refusal(f'gemini: {GEMINI_SETTINGS} exists without context.fileName={CANON} — merge '
+                                 f'"context":{{"fileName":"{CANON}"}} in by hand (JSON can\'t be safely auto-merged)')
+        settings.parent.mkdir(parents=True, exist_ok=True)
+        settings.write_bytes(f'{{\n  "context": {{\n    "fileName": "{CANON}"\n  }}\n}}\n'.encode('utf-8'))
+        print(f'  + {GEMINI_SETTINGS} (context.fileName={CANON})')
+        return GEMINI_SETTINGS
+    if mode == 'symlink':
+        path.unlink(missing_ok=True)
+        try:
+            os.symlink(back, path)
+            linked = path.exists()
+        except OSError:
+            linked = False
+        if linked:
+            print(f'  + {rel} → {back} (symlink)')
+            return rel
+        print('  ! symlink unavailable/dangling (Windows Developer Mode?) — falling back')
+        write_pointer_or_copy(target, name, rel, back)
+    elif mode == 'copy':
+        path.unlink(missing_ok=True)
+        shutil.copyfile(target / CANON, path)
+        print(f'  + {rel} (copy — drift re-syncs with --force)')
+    else:
+        write_pointer_or_copy(target, name, rel, back)
+    return rel
+
+
+def run_entry_files(target: Path, aliases: list[str], mode: str, force: bool) -> int:
+    """The `entry-files` scope's write: each alias wired, its lock row recorded; 1 when one refused."""
+    if not (target / CANON).is_file():
+        raise Refusal(f'no {CANON} to wire: render the charter, or give the adopter a --source')
+    iu, rc = load_units_module(), 0
+    for name in aliases:
+        rel = write_entry_file(target, name, mode, force)
+        if rel is None:
+            rc = 1
+        else:
+            iu.write_lock_row(target, rel, derive_renderer_label(), '')
+    return rc
+
+
+def run_claims_scope(target: Path) -> int:
+    """The `claims` scope: the parity gate's three arms, run where the tree under check holds it."""
+    gate = target / load_units_module().derive_kit_prefix() / PARITY_GATE
+    bash = resolve_bash(gate) if gate.is_file() else None
+    if bash is None:
+        print(f'render-playbook: red · claims · no bash ran {gate.as_posix()} · remedy: the claims scope is gov\'s '
+              f'and needs that gate')
+        return 1
+    sys.stdout.flush()
+    return subprocess.run([bash, gate.as_posix()], cwd=target, stdin=subprocess.DEVNULL).returncode
+
+
+def run_check_render(engine_dir: Path, gov_root: Path, target: Path, charter_path: Path,
+                     scope: str | None, aliases: str | None) -> int:
+    """`--check-render`: one scope's compare, or with no scope the render gate: every scope, each instruction
+    file's one renderer of record, the status arm, and the legacy list under `instructions.legacy`."""
+    if scope == 'entry-files':
+        return check_entry_files(target, derive_entry_aliases(target, aliases))
+    if scope == 'claims':
+        return run_claims_scope(target)
+    iu = load_units_module()
+    from policy_value import PolicyRefused, read_policy_value
+    rc = max(run_charter_scope(engine_dir, gov_root, target, charter_path, True),
+             check_entry_files(target, derive_entry_aliases(target, aliases)), run_claims_scope(target))
+    reds = iu.check_renderers(target)
+    try:
+        iu.read_change_records(target)
+    except iu.UnitRowError as e:
+        reds.append(f'render-playbook: red · status · {e}')
+    note = iu.derive_status_note()
+    if note:
+        print(f'render-playbook: {note}')
+    try:
+        reds += iu.check_legacy(target, read_policy_value("instructions.legacy", target)[0][0])
+    except PolicyRefused as e:
+        reds.append(f'render-playbook: red · instructions.legacy · {e.line} · remedy: repair the committed '
+                    f'policy file; a refused read grades under no default')
+    for red in reds:
+        print(red)
+    print(f'render-playbook: gate · {len(reds)} red in the table, the status arm and the legacy list')
+    return rc or (1 if reds else 0)
 
 
 def main(argv: list[str]) -> int:
@@ -1824,7 +2158,16 @@ def main(argv: list[str]) -> int:
     ap.add_argument('--host', default='')
     ap.add_argument('--projects-root', default='')
     ap.add_argument('--variances', default='')
+    # PLAY-dOrderedCharter-20: the one renderer's scopes, and the entry-files scope's three inputs.
+    ap.add_argument('--render-scope', choices=RENDER_SCOPES)
+    ap.add_argument('--check-render', action='store_true')
+    ap.add_argument('--scope', choices=CHECK_SCOPES)
+    ap.add_argument('--aliases')
+    ap.add_argument('--mode', choices=('symlink', 'pointer', 'copy'), default='pointer')
+    ap.add_argument('--force', action='store_true')
     a = ap.parse_args(argv)
+    if a.scope and not a.check_render:
+        ap.error('--scope names what --check-render compares')
 
     if a.selftest:
         return run_selftest()
@@ -1839,10 +2182,12 @@ def main(argv: list[str]) -> int:
               f'commit the fleet registry with the governance charter rendered again beside it; every other '
               f'repository receives it at its next govkit update')
         return 0
+    engine_dir = Path(__file__).resolve().parent
+    if not a.target and (a.render_scope or a.check_render):
+        a.target = read_git(engine_dir, 'rev-parse', '--show-toplevel')
     if not a.target:
         ap.error('--target is required')
 
-    engine_dir = Path(__file__).resolve().parent
     gov_root = engine_dir.parent.parent
     target = Path(a.target).resolve()
     charter_path = target / a.charter
@@ -1855,18 +2200,33 @@ def main(argv: list[str]) -> int:
             return 1
         return 0
 
+    try:
+        if a.check_render and a.scope != 'charter':
+            return run_check_render(engine_dir, gov_root, target, charter_path, a.scope, a.aliases)
+        if a.render_scope == 'entry-files':
+            return run_entry_files(target, derive_entry_aliases(target, a.aliases), a.mode, a.force)
+    except (Refusal, ValueError, OSError) as e:   # ValueError: the lock module's LevelError, LockError, UnitRowError
+        print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
+        return 1
+    return run_charter_scope(engine_dir, gov_root, target, charter_path, a.check or a.check_render)
+
+
+def run_charter_scope(engine_dir: Path, gov_root: Path, target: Path, charter_path: Path, check: bool) -> int:
+    """The `charter` scope: write the region and its lock row, or with `check` compare it. `--check` and
+    `--check-render --scope charter` are one check."""
     # NOT ADOPTED is exit 0, and only in --check. A wiring leg runs unguarded against a tree that
     # has not run intake yet — gov's own, until its charter is rendered — and a leg that refuses
     # there is red for a reason that is not drift. It says so explicitly rather than passing
     # silently, because a leg green for "nothing was measured" is the shape this repo refuses.
     # Writing without a descriptor still REFUSES: that is an operator asking for a render.
-    if a.check and not (target / '.governance' / 'deploy.toml').is_file():
+    if check and not (target / '.governance' / 'deploy.toml').is_file():
         print(f'render-playbook: NOT ADOPTED — {target.as_posix()} has no .governance/deploy.toml, '
               f'so no region was rendered here and there is nothing to compare')
         return 0
 
+    slots: list = []
     try:
-        body, notes = render(engine_dir, gov_root, target, charter_path)
+        body, notes = render(engine_dir, gov_root, target, charter_path, slots)
     except Refusal as e:
         print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
         return 1
@@ -1882,7 +2242,7 @@ def main(argv: list[str]) -> int:
                   'the rendered region, and readers take the first one, so this repository still '
                   'reads its old tags. Delete that section to adopt the fleet tags')
 
-    if a.check:
+    if check:
         rc = 0
         # PARITY and PLACEHOLDER COMPLETENESS are two questions, and a render whose descriptor
         # declares nothing for a key is perfectly in sync while telling the agent to invoke a
@@ -1919,7 +2279,7 @@ def main(argv: list[str]) -> int:
         return 1
     write_region(charter_path, body)
     try:
-        write_charter_lock(gov_root, target, charter_path)
+        write_charter_lock(gov_root, target, charter_path, slots)
     except (Refusal, ValueError) as e:   # ValueError: the lock module's LevelError and LockError
         print(f'render-playbook: REFUSED — the charter is written but its lock row is not: {e}',
               file=sys.stderr)

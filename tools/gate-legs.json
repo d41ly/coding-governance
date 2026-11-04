@@ -82,8 +82,11 @@
   {
     "name": "playbook parity",
     "argv": [
-      "bash",
-      "{prefix}/check-playbook-parity.sh"
+      "python",
+      "{prefix}/playbook/render_playbook.py",
+      "--check-render",
+      "--scope",
+      "claims"
     ],
     "chunk": "product",
     "subject": "repo",
@@ -1915,6 +1918,43 @@
     "subject": "repo",
     "ceiling": 120,
     "enforces": ["principle.p11"]
+  },
+  {
+    "name": "instruction units (schema, one fact)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/instruction_units.py",
+      "schema",
+      "one-fact"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p11", "principle.p13", "principle.p16"]
+  },
+  {
+    "name": "instruction render (one renderer of record)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/render_playbook.py",
+      "--check-render"
+    ],
+    "chunk": "wiring",
+    "subject": "repo",
+    "ceiling": 560,
+    "enforces": ["principle.p11", "principle.p13"]
+  },
+  {
+    "name": "instruction units selftest",
+    "argv": [
+      "python",
+      "{prefix}/playbook/instruction_units.py",
+      "fixture"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "enforces": ["principle.p16"]
   },
   {
     "name": "tags (the resolver's checks)",

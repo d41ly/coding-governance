@@ -10,11 +10,12 @@
     python handoff.py roster
     python handoff.py agents (--handoff <path> | --run <run-id>) [--session <file>] [--write]
 
-`render` composes the role as `roles_lib.render_role` renders it with a task block holding exactly
-the inputs the role's `reads` declares, in that order, then `roles_lib.render_charter_blocks` for
-the role as the last block: the section 1 rule lines its `rules` tags cite and the charter's carried
-sections (TOOL-aOrientedCast-16), each library note printed on stderr as `handoff: note — `. It writes
-the file under the build's `prompts/` folder, printing its repo-relative path. `--part task` prints
+`render` fills the work-order template, `templates/work-order.template.md` in this kit, whose slots are
+`role`, `roles_lib.render_role`'s output; `opening`; `reads`, a block per input the role's `reads`
+declares, in that order; and `charter-blocks`, `roles_lib.render_charter_blocks` for the role: the
+section 1 rule lines its `rules` tags cite and the charter's carried sections (TOOL-aOrientedCast-16),
+each library note printed on stderr as `handoff: note — `. A slot with nothing to fill leaves no line.
+It writes the file under the build's `prompts/` folder, printing its repo-relative path. `--part task` prints
 the marker line, a blank line and the `## Task` section instead; `--stdout` writes nothing and prints.
 Outside `--stand-in` it prints one stderr line after the notes, `handoff: description — <name>`, the
 spawn's name `<build> · <unit> · <workflow>`, the unit part left out with no `--unit`: the `Agent`
@@ -104,6 +105,8 @@ SLUG_RE = lib.SLUG_RE
 UNIT_RE = re.compile(r"^[A-Z]+-([A-Za-z]+)-[0-9]+$")
 READY_RE = re.compile(r"^(- )?READY — ")
 BLANK_EDGES_RE = re.compile(r"\A\s*\n|\n\s*\Z")
+WORK_ORDER = KIT_DIR / "templates" / "work-order.template.md"
+SLOT_RE = re.compile(r"<!-- slot: ([a-z-]+) -->")
 MARKER_RE = lib.MARKER_RE
 ROLE_HEAD_RE, TASK_HEAD_RE = re.compile(r"^## Role$", re.M), re.compile(r"^## Task$", re.M)
 PROMPT_HEAD_RE = re.compile(r"^## The prompt[ \t]*$", re.M)
@@ -309,6 +312,27 @@ def derive_section_sha(section):
     return hashlib.sha256(section.replace("\r\n", "\n").encode("utf-8")).hexdigest()[:12]
 
 
+def render_work_order(fills):
+    """`(role_sec, task_sec)` of the work-order template: each paragraph kept, a slot line its fill, a slot
+    filled with nothing dropped, the two sections split at the template's own `## Task` line."""
+    text = lib.load_text(WORK_ORDER).strip("\n")
+    task = TASK_HEAD_RE.search(text)
+    if not task:
+        raise lib.RolesError("%s carries no '## Task' line" % WORK_ORDER.as_posix())
+
+    def render_section(section):
+        paras = []
+        for para in section.strip("\n").split("\n\n"):
+            slot = SLOT_RE.fullmatch(para)
+            if slot and slot.group(1) not in fills:
+                raise lib.RolesError("%s names the slot '%s', which no handoff fills"
+                                     % (WORK_ORDER.as_posix(), slot.group(1)))
+            paras.append(fills[slot.group(1)] if slot else para)
+        return "\n\n".join(p for p in paras if p)
+
+    return render_section(text[:task.start()]) + "\n\n", render_section(text[task.start():]) + "\n"
+
+
 def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card_arg, inputs, out_path,
                    notes=None, tail=""):
     """`(path, text, task_part)` of the prompt file; raises RolesError naming every key that refused.
@@ -403,8 +427,6 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
             charter, (KIT_DIR / "agents" / (role + ".agent.md")).as_posix(), keys.get("rules", ""), notes)
     except lib.RolesError as e:
         refusals += str(e).split("\n")
-    else:
-        blocks += [charter_blocks.rstrip("\n")] if charter_blocks else []
     if refusals:
         raise lib.RolesError("\n".join(refusals))
     opening = ("This handoff is for build `%s`, unit `%s`." % (slug, unit_id) if unit
@@ -412,8 +434,9 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     if absent:
         opening += "\nNot supplied, optional: %s%s." % (
             ", ".join("`%s`" % k for k in absent), " — " + "; ".join(reasons) if reasons else "")
-    role_sec = "## Role\n\n%s\n\n" % lib.render_role(KIT_DIR, role, memory_root).strip("\n")
-    task_sec = "\n\n".join(["## Task", opening] + blocks) + "\n"
+    role_sec, task_sec = render_work_order({
+        "role": lib.render_role(KIT_DIR, role, memory_root).strip("\n"), "opening": opening,
+        "reads": "\n\n".join(blocks), "charter-blocks": charter_blocks.rstrip("\n")})
     path = out_path or build_dir / "prompts" / derive_prompt_name(
         build_dir / "prompts", datetime.date.today().isoformat(), unit_id, role, tail)
     rel = path.relative_to(root).as_posix()

@@ -1,0 +1,38 @@
+# instructions-legacy.txt — the instruction files not yet rendered from units (PLAY-dOrderedCharter-20), one
+# path per line, in the idiom of the shrink-only lists. `render_playbook.py --check-render` reads it under the
+# policy key `instructions.legacy`: `shrink-only` reds an instruction file neither rendered from units nor
+# listed, and a listed file whose lock row lists units as stale; `refuse` reds every listed file. Seeded once
+# from INSTRUCTION_PATHSPECS at the build pass; a row leaves when its file renders from units.
+.claude/agents/gov-builder.md
+.claude/agents/gov-diff-reviewer.md
+.claude/agents/gov-orienter.md
+.claude/agents/gov-researcher.md
+.claude/agents/gov-reuse-scout.md
+.claude/agents/gov-skeptic.md
+.claude/agents/gov-spec-reviewer.md
+.claude/agents/gov-spec-writer.md
+.claude/agents/gov-synthesizer.md
+.claude/rules/product.md
+.claude/skills/build/SKILL.md
+.claude/skills/cleanup/SKILL.md
+.claude/skills/drift-audit/SKILL.md
+.claude/skills/lexicon/SKILL.md
+.claude/skills/memory-recall/SKILL.md
+.claude/skills/runlog/SKILL.md
+.claude/skills/unattended/SKILL.md
+AGENTS.md
+CLAUDE.md
+memory/HYGIENE.md
+memory/TEMPLATE-SPEC.md
+memory/guides/ANNOTATION-STYLE.md
+memory/guides/BUILD-METHOD.md
+memory/guides/MERGE-BAR.md
+memory/guides/PLAYBOOK-TEMPLATE.md
+memory/guides/REVIEW-PROTOCOL.md
+memory/guides/SESSION-KICKOFF.md
+memory/guides/UNATTENDED-ASKS.md
+memory/guides/UNATTENDED-PROTOCOL.md
+memory/guides/UNATTENDED-STOPS.md
+memory/guides/UNATTENDED-VERBS.md
+skills/deploy-governance/SKILL.md
+skills/session-kickoff/SKILL.md

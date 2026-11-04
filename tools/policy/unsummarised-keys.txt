@@ -75,7 +75,6 @@ install.steps
 instructions.checks
 instructions.edit
 instructions.exclude
-instructions.legacy
 instructions.proof
 instructions.slices
 instructions.stale

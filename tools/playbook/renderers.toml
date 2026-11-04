@@ -1,0 +1,31 @@
+# renderers.toml — the renderer-of-record table (PLAY-dOrderedCharter-20). Read by instruction_units.read_renderers.
+#
+# One [[target]] row per instruction-file population: `paths`, globs whose `*` holds within one segment, with
+# `{charter}` the conf's CHARTER and `{memory_root}` its MEMORY_ROOT; `renderer`, one of `playbook:charter` and
+# `playbook:entry-files` (a scope of render_playbook.py), `kit-adopter` (a kit's adopter renders the file from
+# that kit's template or role files and holds it by its own `--check`) or `hand` (no renderer writes it).
+# `render_playbook.py --check-render` reds an instruction file two rows claim or none, and a path claiming no
+# file, so each instruction file has exactly one renderer of record. A file of `kit-adopter` under a glob `hand`
+# also covers is named by path.
+
+[[target]]
+paths = ["{charter}"]
+renderer = "playbook:charter"
+
+[[target]]
+paths = ["CLAUDE.md"]
+renderer = "playbook:entry-files"
+
+[[target]]   # each from its kit's template or role files, by that kit's adopter
+paths = [".claude/agents/*.md", ".claude/skills/*/SKILL.md",
+         "{memory_root}/TEMPLATE-SPEC.md", "{memory_root}/HYGIENE.md",
+         "{memory_root}/guides/ANNOTATION-STYLE.md", "{memory_root}/guides/BUILD-METHOD.md",
+         "{memory_root}/guides/PLAYBOOK-TEMPLATE.md", "{memory_root}/guides/REVIEW-PROTOCOL.md",
+         "{memory_root}/guides/UNATTENDED-ASKS.md", "{memory_root}/guides/UNATTENDED-PROTOCOL.md",
+         "{memory_root}/guides/UNATTENDED-STOPS.md", "{memory_root}/guides/UNATTENDED-VERBS.md"]
+renderer = "kit-adopter"
+
+[[target]]   # no renderer writes these; each is edited by hand
+paths = [".claude/rules/*.md", "skills/*/SKILL.md", "{memory_root}/guides/MERGE-BAR.md",
+         "{memory_root}/guides/SESSION-KICKOFF.md"]
+renderer = "hand"

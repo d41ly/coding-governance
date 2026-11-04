@@ -174,7 +174,9 @@ PY_BIN=$(resolve_python "${PLAYBOOK_PY:-}") || exit 2
 # this case is a declaration, not a second parser.
 case " $* " in
   *" --selftest "*) : ;;   # the engine's arms, over its own temp fixtures — no target is read
-  *" --check "*)    : ;;   # assert the region still matches a fresh render, and that none survived
+  *" --check "*)    : ;;   # the charter scope's compare: the region matches a fresh render, none survived
+  *" --check-render "*) : ;;  # with --scope, one scope's compare; bare, the render gate over every scope
+  *" --render-scope "*) : ;;  # write one scope: charter, or entry-files
   *)                : ;;   # write the region
 esac
 

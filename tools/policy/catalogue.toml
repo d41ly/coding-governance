@@ -1408,6 +1408,8 @@ owner = "dFurnishedOrders"
 name = "instructions.legacy"
 allowed = ["shrink-only", "refuse"]
 default = "shrink-only"
+summary = "What the render gate does with the list of instruction files not yet rendered from units: hold it to shrinking, a listed file rendered from units reading as stale, or refuse every listed file."
+usage = 'instructions.legacy = "refuse"'
 owner = "dOrderedCharter"
 
 [[key]]

@@ -47,6 +47,11 @@ Both facts are stamped where they were checked, because a vendor can move either
 <prefix>/agent-instructions/adopt-agent-instructions.sh --check
 ```
 
+The aliases are written by the `playbook-render` kit's renderer, `render_playbook.py`'s `entry-files` scope, so
+this kit requires that kit and a python at its floor. The adopter installs the canonical, calls the renderer for
+its render and its `--check`, and keeps no fallback: with no renderer it exits 2 naming `playbook-render` and
+writes nothing.
+
 ## Modes (`--mode`)
 
 - **pointer** (default) — uses each tool's native indirection where one exists, so **no symlinks are
@@ -55,7 +60,7 @@ Both facts are stamped where they were checked, because a vendor can move either
   get a synced copy.
 - **symlink** — real symlinks → `AGENTS.md` (needs Developer Mode / elevation on Windows; the script
   auto-falls back to copy if the link can't be created or would dangle).
-- **copy** — real duplicate files, compared with `cmp -s` (byte-exact, EOL-attribute-safe, no git
+- **copy** — real duplicate files, compared byte for byte (EOL-attribute-safe, no git
   needed) and kept honest by `--check`.
 
 Idempotent: re-running converges (already-correct wiring is left untouched). `--check` verifies

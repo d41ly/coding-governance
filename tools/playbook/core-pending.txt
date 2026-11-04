@@ -14,7 +14,6 @@ principle	principle.p7	dDeclaredLoop
 principle	principle.p8	dOrderedCharter
 principle	principle.p9	dGroundRules
 principle	principle.p10	dGroundRules
-principle	principle.p11	dOrderedCharter
 principle	principle.p12	dIndexedDesign
 principle	principle.p15	dOrderedCharter
 principle	principle.p17	dIndexedDesign
@@ -196,7 +195,6 @@ leg	extract-arms self-test	dWitnessedBar
 leg	run-selftests self-test	dWitnessedBar
 kind	kind.tool-kit	dShippedRelease
 kind	kind.command	dDeclaredLoop
-kind	kind.instruction-unit	dOrderedCharter
 kind	kind.policy-key	dDeclaredLoop
 kind	kind.preset	dDeclaredLoop
 kind	kind.gate-leg	dWitnessedBar

@@ -30,8 +30,8 @@ tag = "kind.instruction-unit"
 owner = "dOrderedCharter"
 binds = ["principle.p13", "principle.p16"]
 population = "{prefix}/*/instructions.toml"
-factory = ""
-gate = ""
+factory = "python {prefix}/playbook/core.py new instruction-unit"
+gate = "instruction units (schema, one fact)"
 
 [[kind]]
 tag = "kind.policy-key"

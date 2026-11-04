@@ -21,9 +21,15 @@
 # --check    verify wiring only (symlinks resolve / pointers intact / copies match AGENTS.md); exit 1 on drift.
 # --force    overwrite an existing alias (file OR symlink) that isn't already correct wiring.
 #
+# THE ALIASES ARE THE RENDERER'S (PLAY-dOrderedCharter-20): this adopter installs the canonical and calls
+# the playbook-render kit's `entry-files` scope, which writes them and records each one's lock row. It keeps
+# no fallback, so with no renderer it exits 2 and writes nothing.
+#
 # Exit 0 clean · 1 a wiring/check failure · 2 environment/usage error. Idempotent: re-running converges
-# (copy-mode drift is the one exception — it needs --force). No hard deps beyond git + coreutils.
+# (copy-mode drift is the one exception — it needs --force). Needs git, coreutils, python at the floor
+# below and the playbook-render kit.
 set -u
+HERE=$(cd "$(dirname "$0")" && pwd)   # before the cd: $0 may be relative
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || ROOT=$PWD
 cd "$ROOT" || { echo "AGENT-INSTR env ERROR — cannot enter repo root"; exit 2; }
 
@@ -43,23 +49,213 @@ while [ $# -gt 0 ]; do
 done
 case "$MODE" in symlink|pointer|copy) ;; *) echo "AGENT-INSTR env ERROR — --mode must be symlink|pointer|copy (got '$MODE')"; exit 2;; esac
 
-status=0
-fail() { echo "AGENT-INSTR $1 FAILED — $2"; status=1; }
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  # THE FLOOR is declared once, in python-floor.txt in gov's lib dir. The literal below is its
+  # generated copy, held equal to it by the floor module's `check` and by these blocks' parity rows,
+  # because a copy-installed kit has no lib dir to read. A candidate that runs below it is passed
+  # over and named, exactly as a candidate that does not run.
+  _rp_floor="3.15"
+  _rp_fv=$(( ${_rp_floor%%.*} * 1000 + ${_rp_floor#*.} ))
+  _rp_tried=""; _rp_seen=""; _rp_best=""; _rp_bv=0; _rp_bver=""; _rp_o1=""; _rp_og=""; _rp_i=0
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    _rp_i=$((_rp_i + 1))
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    # ONE spawn per candidate, isolated: its major.minor and its own executable, forward-slashed,
+    # because a backslashed C:\ path handed to MSYS bash loses its separators.
+    _rp_out=$("$_rp_c" -I -c 'import sys; print("%d.%d" % sys.version_info[:2], sys.executable.replace("\\", "/"))' 2>/dev/null) || _rp_out=""
+    _rp_out=${_rp_out%$'\r'}
+    if [[ ${_rp_out%% *} =~ ^([0-9]+)\.([0-9]+)$ ]]; then
+      _rp_cv=$(( 10#${BASH_REMATCH[1]} * 1000 + 10#${BASH_REMATCH[2]} ))
+      if [ "$_rp_cv" -ge "$_rp_fv" ]; then
+        # An override, the caller's or GOV_PYTHON, names the command a consumer spawns, a wrapper
+        # or a venv launcher included, and is echoed as given. Only the three launcher names give
+        # way to the direct executable where the probe named a file; the launcher's own name
+        # otherwise. The `[ -f ]` HOLDS on a Windows App Execution Alias, so a Store Python whose
+        # own sys.executable is an alias is echoed as printed: a gap the run-gates kit's
+        # check_app_alias closes for the legs it measures, and this block does not.
+        _rp_exe=${_rp_out#* }
+        if [ "$_rp_i" -gt 2 ] && [ "$_rp_exe" != "$_rp_out" ] && [ -f "$_rp_exe" ]; then printf '%s\n' "$_rp_exe"; else printf '%s\n' "$_rp_c"; fi
+        return 0
+      fi
+      _rp_why="ran ${_rp_out%% *}, below the floor $_rp_floor"
+      if [ "$_rp_cv" -gt "$_rp_bv" ]; then _rp_best=$_rp_c; _rp_bv=$_rp_cv; _rp_bver=${_rp_out%% *}; fi
+    else
+      _rp_why="did not run"
+    fi
+    _rp_seen="${_rp_seen}resolve_python:   $_rp_c: $_rp_why"$'\n'
+    [ "$_rp_i" != 1 ] || _rp_o1=$_rp_why
+    [ "$_rp_i" != 2 ] || _rp_og=$_rp_why
+  done
+  {
+    echo "resolve_python: no usable python launcher at the floor $_rp_floor (python-floor.txt in gov's lib dir)."
+    echo "resolve_python: Each candidate was RUN with -I -c — being on PATH is not evidence (the Microsoft Store"
+    echo "resolve_python: python3 stub answers \`command -v\` and exits 9009 without running anything)."
+    printf '%s' "$_rp_seen"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and $_rp_o1."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and $_rp_og. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+    # THE INSTALL COMMAND, as platforms.provision says. The policy kit's own reader answers it at the
+    # landed revision, run by the newest candidate that ran, since its tomllib needs 3.11, and never
+    # through the policy shim, which resolves a launcher itself and would re-enter this refusal.
+    _rp_prov=name; _rp_pwhy=""
+    if [ -z "$_rp_best" ]; then
+      _rp_pwhy="no reader ran, because no candidate ran"
+    elif [ "$_rp_bv" -lt 3011 ]; then
+      _rp_pwhy="no reader ran, because the newest candidate that ran, $_rp_best, is $_rp_bver, below the 3.11 the reader needs"
+    else
+      IFS= read -r -d '' _rp_rkd <<'RKD' || :
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
 
-alias_path() {
-  case "$1" in
-    claude)   echo "CLAUDE.md";;
-    gemini)   echo "GEMINI.md";;
-    copilot)  echo ".github/copilot-instructions.md";;
-    cursor)   echo ".cursorrules";;
-    windsurf) echo ".windsurfrules";;
-    *) echo "";;
-  esac
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+      case "${BASH_SOURCE[0]:-}" in */*) _rp_here=${BASH_SOURCE[0]%/*} ;; *) _rp_here=. ;; esac
+      _rp_kit=$("$_rp_best" -I -c "${_rp_rkd%$'\n'}"'
+import sys
+try:
+    print(resolve_kit_dir("policy", "policy.py", sys.argv[1]).as_posix())
+except LookupError as e:
+    sys.exit(str(e))' "$_rp_here" 2>&1) || _rp_pwhy="no reader ran, because ${_rp_kit%$'\r'}"
+      if [ -z "$_rp_pwhy" ]; then
+        _rp_kit=${_rp_kit%$'\r'}
+        _rp_val=$("$_rp_best" "$_rp_kit/policy.py" get platforms.provision 2>/dev/null) || _rp_pwhy="the reader, policy.py get, exited $?"
+        _rp_val=${_rp_val%$'\r'}
+        case "$_rp_pwhy:$_rp_val" in
+          :name|:uv|:off) _rp_prov=$_rp_val ;;
+          :*) _rp_pwhy="the reader, policy.py get, printed '$_rp_val', which is no value of the key" ;;
+        esac
+      fi
+    fi
+    [ -z "$_rp_pwhy" ] || echo "resolve_python: platforms.provision reads its catalogue default, name: $_rp_pwhy."
+    if [ "$_rp_prov" = uv ]; then
+      if [ ! -t 2 ]; then _rp_no="not offered, because stderr is not a terminal"
+      elif ! uv --version >/dev/null 2>&1; then _rp_no="not offered, because uv does not run"
+      else
+        printf 'resolve_python: platforms.provision is uv. Run `uv python install %s` now? [y/N] ' "$_rp_floor"
+        _rp_a=""; read -r _rp_a </dev/tty || :
+        if [ "$_rp_a" = y ]; then
+          uv python install "$_rp_floor" || :
+          echo "resolve_python: re-run once the floor is on PATH, or name it in GOV_PYTHON."
+          _rp_prov=offered
+        else
+          _rp_no="declined at the prompt"
+        fi
+      fi
+      [ "$_rp_prov" = offered ] || echo "resolve_python: platforms.provision is uv, and the install was $_rp_no."
+    fi
+    case "$_rp_prov" in
+      off) echo "resolve_python: platforms.provision is off, so this refusal names no install command." ;;
+      name|uv)
+        echo "resolve_python: install the floor with: uv python install $_rp_floor"
+        case "${OSTYPE:-}" in msys*|cygwin*|win*) echo "resolve_python: or, on Windows: py install $_rp_floor" ;; esac ;;
+    esac
+    # LAST, verbatim: the first line names the refusal and this one the candidates, and the lines
+    # between them carry the outcomes, the overrides and the install (TOOL-dSafePassage-26 S20).
+    echo "resolve_python: tried:$_rp_tried"
+  } >&2
+  return 1
 }
-# relative path from an alias file back to the repo-root CANON, in pure shell (no python).
-rel_to_canon() { local p=$1 depth pref=""; depth=$(printf '%s' "$p" | tr -cd '/' | wc -c); while [ "$depth" -gt 0 ]; do pref="../$pref"; depth=$((depth-1)); done; printf '%s%s' "$pref" "$CANON"; }
-gemini_configured() { [ -f .gemini/settings.json ] && grep -Eq '"fileName"[[:space:]]*:[[:space:]]*(\[[[:space:]]*)?"'"$CANON"'"' .gemini/settings.json; }
-is_import() { grep -qE "^@\.*/?([^/]*/)*$CANON[[:space:]]*$" "$1" 2>/dev/null; }
+# <<< resolve_python
+# The sibling-kit resolver, INLINED byte-identically from the canonical copy named on its marker line
+# and gated by the resolve-python self-test's parity table. `resolve_renderer <python> <here>` prints
+# the playbook-render kit's directory, or the resolver's named refusal on stderr and exits 1.
+resolve_renderer() {
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+  "$1" -I -c "${_rkd%$'\n'}"'
+import sys
+try:
+    print(resolve_kit_dir("playbook", "render_playbook.py", sys.argv[1]).as_posix())
+except LookupError as e:
+    sys.exit(str(e))' "$2"
+}
+PY=$(resolve_python) || { echo "AGENT-INSTR env ERROR — no python, and the playbook-render kit's renderer needs one"; exit 2; }
+KIT=$(resolve_renderer "$PY" "$HERE") || { echo "AGENT-INSTR env ERROR — no render_playbook.py: install the playbook-render kit, this adopter's renderer"; exit 2; }
+RENDERER=${KIT%$'\r'}/render_playbook.py
+
 # announce, never refuse: the size is the adopter's choice, and Codex can be configured past it.
 print_size_note() {
   local n; n=$(wc -c < "$CANON"); n=$((n))
@@ -71,23 +267,7 @@ print_size_note() {
 if [ "$CHECK" = 1 ]; then
   [ -f "$CANON" ] || { echo "AGENT-INSTR CHECK FAILED — no canonical $CANON"; exit 1; }
   print_size_note
-  for a in $ALIASES; do
-    p=$(alias_path "$a"); [ -n "$p" ] || { fail CHECK "unknown alias '$a'"; continue; }
-    if [ "$a" = gemini ] && [ ! -e "$p" ] && [ ! -L "$p" ]; then
-      gemini_configured && continue
-      fail CHECK "gemini: neither GEMINI.md nor .gemini/settings.json context.fileName=$CANON"; continue
-    fi
-    if [ -L "$p" ]; then
-      [ -e "$p" ] || { fail CHECK "$p is a DANGLING symlink → $(readlink "$p")"; continue; }
-      [ "$(basename "$(readlink "$p")")" = "$CANON" ] || fail CHECK "$p symlinks '$(readlink "$p")', not $CANON"
-    elif [ ! -e "$p" ]; then fail CHECK "$a alias '$p' missing"
-    elif is_import "$p"; then :
-    elif cmp -s "$CANON" "$p"; then :
-    else fail CHECK "$p is a stale copy — re-run with --force to re-sync from $CANON (or it drifted)"
-    fi
-  done
-  [ "$status" = 0 ] && echo "agent-instructions OK — $CANON + aliases [$ALIASES] correctly wired."
-  exit "$status"
+  exec "$PY" "$RENDERER" --check-render --scope entry-files --target "$ROOT" --aliases "$ALIASES"
 fi
 
 # ---- install the canonical ---------------------------------------------
@@ -100,52 +280,7 @@ if [ -n "$SOURCE" ]; then
 fi
 [ -f "$CANON" ] || { echo "AGENT-INSTR env ERROR — no $CANON and no --source to create it from."; exit 2; }
 
-wire() {
-  local a=$1 p rel; p=$(alias_path "$a") || true
-  [ -n "$p" ] || { fail wire "unknown alias '$a'"; return; }
-
-  # already correctly wired? (idempotent no-op)
-  if [ "$a" = gemini ] && [ ! -e "$p" ] && [ ! -L "$p" ] && gemini_configured; then echo "  = .gemini/settings.json (context.fileName, current)"; return; fi
-  if [ -L "$p" ] && [ -e "$p" ] && [ "$(basename "$(readlink "$p")")" = "$CANON" ]; then echo "  = $p (symlink, current)"; return; fi
-  if [ ! -L "$p" ] && [ -f "$p" ] && is_import "$p"; then echo "  = $p (pointer, current)"; return; fi
-  if [ ! -L "$p" ] && [ -f "$p" ] && cmp -s "$CANON" "$p"; then echo "  = $p (copy, current)"; return; fi
-
-  # exists but not correct wiring → protected unless --force (covers files AND symlinks, incl. dangling)
-  if { [ -e "$p" ] || [ -L "$p" ]; } && [ "$FORCE" != 1 ]; then
-    fail wire "$p exists and is not $CANON wiring — pass --force to replace it"; return
-  fi
-
-  local dir; dir=$(dirname "$p"); [ "$dir" = "." ] || mkdir -p "$dir"
-  rel=$(rel_to_canon "$p")
-
-  # gemini prefers config-driven indirection (pointer mode); symlink/copy modes wire GEMINI.md as a file
-  if [ "$a" = gemini ] && [ "$MODE" = pointer ]; then
-    mkdir -p .gemini
-    if [ -f .gemini/settings.json ]; then
-      fail wire "gemini: .gemini/settings.json exists without context.fileName=$CANON — merge \"context\":{\"fileName\":\"$CANON\"} in by hand (JSON can't be safely auto-merged)"
-    else
-      printf '{\n  "context": {\n    "fileName": "%s"\n  }\n}\n' "$CANON" > .gemini/settings.json
-      echo "  + .gemini/settings.json (context.fileName=$CANON)"
-    fi
-    return
-  fi
-
-  case "$MODE" in
-    symlink)
-      rm -f "$p"
-      if ln -s "$rel" "$p" 2>/dev/null && [ -e "$p" ]; then echo "  + $p → $rel (symlink)"
-      else echo "  ! symlink unavailable/dangling (Windows Developer Mode?) — falling back"; rm -f "$p"; _wire_pointer_or_copy "$a" "$p" "$rel"; fi;;
-    copy) rm -f "$p"; cp "$CANON" "$p"; echo "  + $p (copy — drift re-syncs with --force)";;
-    pointer|*) _wire_pointer_or_copy "$a" "$p" "$rel";;
-  esac
-}
-_wire_pointer_or_copy() {
-  local a=$1 p=$2 rel=$3
-  if [ "$a" = claude ]; then rm -f "$p"; printf '@%s\n' "$rel" > "$p"; printf '  + %s (@%s import)\n' "$p" "$rel"
-  else rm -f "$p"; cp "$CANON" "$p"; echo "  + $p (copy — no native pointer; drift re-syncs with --force)"; fi
-}
-
 echo "canonical: $CANON ($(wc -c < "$CANON") bytes) · mode: $MODE · aliases: $ALIASES"
 print_size_note
-for a in $ALIASES; do wire "$a"; done
-exit "$status"
+if [ "$FORCE" = 1 ]; then set -- --force; else set --; fi
+exec "$PY" "$RENDERER" --render-scope entry-files --target "$ROOT" --aliases "$ALIASES" --mode "$MODE" "$@"

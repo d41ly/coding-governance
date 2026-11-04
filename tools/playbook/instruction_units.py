@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 """instruction_units.py — the instruction ladder, levels 0 to 7, and the one term for a place on it
 (PLAY-dOrderedCharter-13); the statement grammar and the render provenance lock (PLAY-dOrderedCharter-12);
-the instruction-unit registry, its one reader and documents rendered from units (PLAY-dOrderedCharter-9).
+the instruction-unit registry, its one reader and documents rendered from units (PLAY-dOrderedCharter-9);
+the unit schema, one fact in one unit, status from the change record, and the instruction-file population
+the renderer-of-record table and the legacy list grade (PLAY-dOrderedCharter-20).
 
     python instruction_units.py ladder-terms             # the leg: no source names a ladder place by priority or rank
     python instruction_units.py grammar [--doc <path>]   # the leg: unit rows, unit-rendered documents, the lock
     python instruction_units.py lock --check             # the lock against the tree
+    python instruction_units.py schema one-fact          # the leg: both verbs, each also run alone
+    python instruction_units.py schema                   # every row's fields
+    python instruction_units.py one-fact                 # no fact and no term held by two active units
     python instruction_units.py fixture [--plant <case>]  # the plants, each in a throwaway tree
 
 `LEVELS` is the one place an envelope, a unit row, a card or a map reads a level from: a tuple whose index is
@@ -38,10 +43,19 @@ caller, and `read_lock` its one reader. LOCK --CHECK reds an absent or empty loc
 fields, an untracked path, a blob the working tree no longer matches, and a rendered charter carrying a
 version marker.
 
+THE SCHEMA AND ONE FACT. SCHEMA grades each row's fields, naming the manifest, the tag and the field;
+ONE-FACT reds two active units holding one key, a typed unit's type and pinned text or a derived unit's type
+and source, and two active definitions of one term. A row carries no status: `derive_status` reads it from
+the records naming the tag, and `read_change_records` is every tree read's one source of them.
+
+THE POPULATION. `INSTRUCTION_PATHSPECS` is the instruction files, closed. `check_renderers` holds them against
+`renderers.toml` both ways and `check_legacy` against `instructions-legacy.txt`; the render gate calls both.
+
 Exit 0 green, 1 red, 2 a usage refusal.
 """
 from __future__ import annotations
 
+import datetime
 import functools
 import os
 import json
@@ -127,6 +141,30 @@ ENFORCED_NONE = "none — "
 #: S1's string fields and list fields, in their row spelling; `level`, `enforced-by` and `class` read apart
 UNIT_STRINGS = ("tag", "type", "trigger", "budget", "text", "source", "owner", "usage", "help")
 UNIT_LISTS = ("scope", "required-by", "edges")
+UNIT_KEYS = frozenset((*UNIT_STRINGS, *UNIT_LISTS, "level", "enforced-by", "class"))
+UNIT_REQUIRED = ("tag", "level", "type")
+UNIT_CLASSES = ("fixed", "open")
+BUDGET_BYTES = {"line": 200, "block": 600}
+TYPED_TYPES = (DIRECTIVE, CONSTRAINT, DEFINITION, POINTER)
+#: A change record's `Action` values that end a tag; every other leaves it active.
+ENDING_ACTIONS = ("remove", "rename", "split")
+ACTIVE = "active"
+
+INSTRUCTION_PATHSPECS = (
+    "{charter}",
+    "CLAUDE.md",
+    ".claude/agents/*.md",
+    ".claude/rules/*.md",
+    ".claude/skills/*/SKILL.md",
+    "skills/*/SKILL.md",
+    "{memory_root}/guides/*.md",
+    "{memory_root}/TEMPLATE-SPEC.md",
+    "{memory_root}/HYGIENE.md",
+)
+"""Every instruction file, closed; `{charter}` the conf's CHARTER and `{memory_root}` its MEMORY_ROOT."""
+RENDERERS_TABLE = "renderers.toml"
+LEGACY_LIST = "instructions-legacy.txt"
+RENDERERS = ("playbook:charter", "playbook:entry-files", "kit-adopter", "hand")
 
 
 class LockError(ValueError):
@@ -273,9 +311,9 @@ def parse_unit_rows(text, path, origin=None) -> tuple[list, list]:
     return units, faults
 
 
-def read_units(root) -> list:
-    """S2's tree entry: the Units of every `kit` manifest git tracks under `root`, in path then row order,
-    each `origin` its kit's descriptor `id`. Raises one UnitRowError naming every fault."""
+def read_unit_rows(root) -> tuple[list, list]:
+    """`(units, faults)` of every `kit` manifest git tracks under `root`, in path then row order, each
+    `origin` its kit's descriptor `id`; `read_units` raises what this returns."""
     root, prefix = pathlib.Path(root), derive_kit_prefix()
     paths = sorted(p for p in run_git(root, "ls-files", "-z", "--", f"*{MANIFEST}").split("\0")
                    if p and derive_manifest_kind(p, prefix) == "kit")
@@ -293,6 +331,12 @@ def read_units(root) -> list:
         got, bad = parse_unit_rows(text, rel, kit if isinstance(kit, str) else None)
         units += got
         faults += bad
+    return units, faults
+
+
+def read_units(root) -> list:
+    """S2's tree entry: `read_unit_rows`' Units. Raises one UnitRowError naming every fault."""
+    units, faults = read_unit_rows(root)
     if faults:
         raise UnitRowError("\n".join(str(f) for f in faults))
     return units
@@ -517,14 +561,239 @@ def check_document(text, units=()) -> list[str]:
     return found
 
 
-def derive_unit_pin(text) -> str:
-    """Unit 24's `derive_pin_hash` of `text`, read from the memory-tree kit beside this one."""
+def load_memory_tree_path():
+    """The memory-tree kit beside this one, put on `sys.path`, since a kit imports no sibling by name."""
     from policy_value import resolve_kit_dir
     mt = str(resolve_kit_dir("memory-tree", "design_lib.py", KIT_DIR))
     if mt not in sys.path:
         sys.path.append(mt)
+
+
+def derive_unit_pin(text) -> str:
+    """Unit 24's `derive_pin_hash` of `text`, read from the memory-tree kit beside this one."""
+    load_memory_tree_path()
     import design_lib
     return design_lib.derive_pin_hash(text)
+
+
+def derive_status_note() -> str | None:
+    """The line a tree read prints while the `change` kind is pending: its status arm grades nothing yet."""
+    load_memory_tree_path()
+    import build_records
+    pending = build_records.KINDS["change"].get("pending")
+    return f"status: unarmed · the change kind is pending on {pending}" if pending else None
+
+
+def read_change_records(root) -> list:
+    """Every tree read's change records. While `build_records.KINDS` holds `change` as pending no record can
+    exist, so this returns none and each unit reads active. With the kind landed and this body unchanged it
+    raises, so `unarmed` cannot outlive the pending row: unit 15 replaces the body with the kind's reader."""
+    if derive_status_note():
+        return []
+    raise UnitRowError(f"{root}: the change kind has landed and read_change_records holds no reader of it: "
+                       f"PLAY-dOrderedCharter-15 gives it one")
+
+
+def derive_status(tag, records) -> str:
+    """`active`, or `retired:<successors>` from the last record naming `tag`, `retired:none` for a removal;
+    each record a mapping of the change record's `Unit`, `Action` and `Successor`."""
+    last = next((r for r in reversed(list(records)) if r.get("Unit") == tag), None)
+    if last is None or last.get("Action") not in ENDING_ACTIONS:
+        return ACTIVE
+    heirs = [s.strip() for s in str(last.get("Successor") or "none").split(",") if s.strip()]
+    return "retired:" + ",".join(heirs or ["none"])
+
+
+@functools.lru_cache(maxsize=None)
+def read_namespace_words() -> frozenset:
+    """The words the registry beside this module registers."""
+    import tag_index
+    return frozenset(r["ns"] for r in tag_index.read_namespaces(KIT_DIR / "namespaces.toml"))
+
+
+def check_tag_entry(value) -> str | None:
+    """Why `value` is no tag of a registered namespace, or None when it is one."""
+    import tag_index
+    if not tag_index.TAG_RE.fullmatch(value):
+        return "breaks the tag grammar"
+    word = value.split(".", 1)[0]
+    return None if word in read_namespace_words() else f"opens with `{word}`, which no namespace registers"
+
+
+def check_unit_row(unit, row) -> list[str]:
+    """S1: one row's fields, `row` the table as TOML reads it; each red names the manifest, the tag and the
+    field. A row with no `budget` is held to `line`, the smaller."""
+    found = []
+
+    def add_red(field, why, remedy):
+        found.append(f"{SAY}: red · {unit.path} · {unit.tag or f'row {unit.index}'} · `{field}` {why} · remedy: {remedy}")
+
+    for key in UNIT_REQUIRED:
+        if row.get(key) is None:
+            add_red(key, "is missing", f"give the row its `{key}`")
+    for key in sorted(set(row) - UNIT_KEYS):
+        add_red(key, "is no field of a unit row", "delete it: status derives from the change record, origin "
+                                                  "from the kit" if key in ("status", "origin") else "delete it")
+    if unit.tag is not None:
+        import tag_index
+        if not unit.tag.startswith("unit.") or not tag_index.TAG_RE.fullmatch(unit.tag):
+            add_red("tag", f"{unit.tag!r} is no tag of the `unit` namespace", "spell it unit.<name>")
+    if unit.type is not None and unit.type not in STATEMENT_TYPES:
+        add_red("type", f"{unit.type!r} is no statement type", f"type it one of {', '.join(STATEMENT_TYPES)}")
+    if unit.budget is not None and unit.budget not in BUDGET_BYTES:
+        add_red("budget", f"{unit.budget!r} is no budget class", f"use one of {', '.join(BUDGET_BYTES)}")
+    limit = BUDGET_BYTES.get(unit.budget or "line")
+    if limit is not None and len((unit.text or "").encode("utf-8")) > limit:
+        add_red("text", f"is over its budget's {limit} bytes", "shorten it, or point at what holds the rest")
+    if unit.type in TYPED_TYPES and not unit.text:
+        add_red("text", f"a {unit.type} carries no text", f"type the {unit.type}'s line")
+    if unit.type in (POLICY_VALUE, FACT) and not unit.source:
+        add_red("source", f"a {unit.type} carries no source", "source it from a policy key or a command")
+    if unit.klass not in UNIT_CLASSES:
+        add_red("class", f"{unit.klass!r} is no class", f"use one of {', '.join(UNIT_CLASSES)}")
+    for key, values in (("scope", unit.scope), ("required-by", unit.required_by)):
+        for value in values:
+            fault = check_tag_entry(value)
+            if fault:
+                add_red(key, f"entry {value!r} {fault}", "name a tag of a registered namespace")
+    if isinstance(unit.enforced_by, tuple) and not all(d.strip() for d in unit.enforced_by):
+        add_red("enforced-by", "holds an empty description", f"describe the enforcer, or write `{ENFORCED_NONE}<why>`")
+    return found
+
+
+def run_schema(root=".") -> tuple[list, int]:
+    """S1 over every row `read_units` reads, `unarmed` with none; a row the reader cannot read reds as its
+    fault names it."""
+    root = pathlib.Path(root)
+    units, faults = read_unit_rows(root)
+    reds = [f"{SAY}: red · {f}" for f in faults]
+    tables = {}
+    for u in units:
+        if u.path not in tables:
+            tables[u.path] = tomllib.loads((root / u.path).read_text(encoding="utf-8"))["unit"]
+        reds += check_unit_row(u, tables[u.path][u.index - 1])
+    if not units and not reds:
+        return [f"{SAY}: schema · unarmed: the tree holds no unit row (PLAY-dOrderedCharter-40 writes the first)"], 0
+    return reds + [f"{SAY}: schema · {len(units)} row(s) · {len(reds)} red"], 1 if reds else 0
+
+
+def check_one_fact(units, records) -> list[str]:
+    """S2: two active units holding one key, and two active definitions of one term, each red."""
+    held = {}
+    for u in units:
+        if derive_status(u.tag, records) != ACTIVE:
+            continue
+        if u.type in TYPED_TYPES and u.text:
+            held.setdefault(("the fact", u.type, derive_unit_pin(u.text)), []).append(u)
+        elif u.type in (POLICY_VALUE, FACT) and u.source:
+            held.setdefault(("the fact", u.type, u.source), []).append(u)
+        if u.type == DEFINITION and u.text:
+            held.setdefault(("the term", DEFINITION, u.text.split(" — ", 1)[0].strip()), []).append(u)
+    return [f"{SAY}: red · {what} {key!r} ({kind}) is held by {', '.join(f'{u.tag} in {u.path}' for u in us)} · "
+            f"remedy: keep one unit and point at it"
+            for (what, kind, key), us in held.items() if len(us) > 1]
+
+
+def run_one_fact(root=".") -> tuple[list, int]:
+    """S2 over the tree: every row `read_units` reads, statuses from `read_change_records`."""
+    root = pathlib.Path(root)
+    units, records, note = read_units(root), read_change_records(root), derive_status_note()
+    head = [f"{SAY}: {note}"] if note else []
+    if not units:
+        return head + [f"{SAY}: one-fact · unarmed: the tree holds no unit row"], 0
+    reds = check_one_fact(units, records)
+    return head + reds + [f"{SAY}: one-fact · {len(units)} row(s) · {len(reds)} red"], 1 if reds else 0
+
+
+def derive_kit_file(root, name) -> pathlib.Path:
+    """`name` of this kit in the tree under check, the tree's own table rather than this module's."""
+    return pathlib.Path(root) / derive_kit_prefix() / KIT_DIR.name / name
+
+
+def derive_instruction_tokens(root) -> dict:
+    """The two tokens of `INSTRUCTION_PATHSPECS` and `renderers.toml`, read from the tree's conf."""
+    from render_playbook import derive_memory_root, read_conf
+    root = pathlib.Path(root)
+    return {"charter": read_conf(root, ".memory-tree.conf", "CHARTER") or "AGENTS.md",
+            "memory_root": derive_memory_root(root, {})}
+
+
+def derive_instruction_files(root) -> list:
+    """S4: the tracked files `INSTRUCTION_PATHSPECS` names, sorted."""
+    tokens = derive_instruction_tokens(root)
+    specs = [":(glob)" + p.format(**tokens) for p in INSTRUCTION_PATHSPECS]
+    return sorted(p for p in run_git(root, "ls-files", "-z", "--", *specs).split("\0") if p)
+
+
+def read_renderers(root) -> list[dict]:
+    """`renderers.toml`'s `[[target]]` rows, their tokens filled; raises UnitRowError on one it cannot read."""
+    path = derive_kit_file(root, RENDERERS_TABLE)
+    try:
+        rows = tomllib.loads(path.read_text(encoding="utf-8")).get("target") or []
+    except (OSError, tomllib.TOMLDecodeError) as exc:
+        raise UnitRowError(f"{path.as_posix()} is unreadable: {exc}") from None
+    tokens = derive_instruction_tokens(root)
+    for i, row in enumerate(rows, 1):
+        paths, renderer = row.get("paths"), row.get("renderer")
+        if not isinstance(paths, list) or not paths or not isinstance(renderer, str):
+            raise UnitRowError(f"{path.as_posix()}: target row {i} carries no `paths` list and `renderer`")
+    return [{"paths": [p.format(**tokens) for p in r["paths"]], "renderer": r["renderer"]} for r in rows]
+
+
+def check_path_match(path, pattern) -> bool:
+    """A table glob against a tracked path, `*` holding within one segment as the pathspec's does."""
+    return pathlib.PurePosixPath(path).full_match(pattern)
+
+
+def check_renderers(root) -> list[str]:
+    """S4, both ways: each instruction file claimed by exactly one row, each row's path claiming a file, and
+    each renderer one the table knows. An empty population is red, never green."""
+    say = "render-playbook: red · renderers"
+    rows, files = read_renderers(root), derive_instruction_files(root)
+    reds = [] if files else [f"{say} · INSTRUCTION_PATHSPECS matches no tracked file"]
+    for row in rows:
+        if row["renderer"] not in RENDERERS:
+            reds.append(f"{say} · {row['renderer']!r} is no renderer · remedy: use one of {', '.join(RENDERERS)}")
+        for pattern in row["paths"]:
+            if not any(check_path_match(f, pattern) for f in files):
+                reds.append(f"{say} · {pattern} claims no instruction file · remedy: drop the path from "
+                            f"{RENDERERS_TABLE}")
+    for path in files:
+        owners = [r["renderer"] for r in rows if any(check_path_match(path, p) for p in r["paths"])]
+        if not owners:
+            reds.append(f"{say} · {path} has no renderer of record · remedy: claim it in {RENDERERS_TABLE}")
+        elif len(owners) > 1:
+            reds.append(f"{say} · {path} has {len(owners)} renderers of record, {', '.join(owners)} · remedy: leave "
+                        f"it on one row of {RENDERERS_TABLE}")
+    return reds
+
+
+def read_legacy(root) -> list:
+    """`instructions-legacy.txt`'s paths; absent, none."""
+    path = derive_kit_file(root, LEGACY_LIST)
+    if not path.is_file():
+        return []
+    lines = path.read_text(encoding="utf-8").splitlines()
+    return [ln.strip() for ln in lines if ln.strip() and not ln.startswith("#")]
+
+
+def check_legacy(root, value) -> list[str]:
+    """S8 under `instructions.legacy`: an instruction file neither rendered from units nor listed is red under
+    either value and a listed path no instruction file holds is stale; `shrink-only` reds a listed file now
+    rendered from units as stale, and `refuse` reds every listed file."""
+    say = "render-playbook: red · legacy"
+    listed, files = read_legacy(root), set(derive_instruction_files(root))
+    rendered = {r.get("path") for r in read_lock(root) if r.get("units")}
+    reds = [f"{say} · {f} is neither rendered from units nor on {LEGACY_LIST} · remedy: render it from units"
+            for f in sorted(files - rendered - set(listed))]
+    for path in listed:
+        if path not in files:
+            reds.append(f"{say} · {path} is stale: it is no instruction file · remedy: drop it from {LEGACY_LIST}")
+        elif value == "refuse":
+            reds.append(f"{say} · {path} is listed and instructions.legacy is refuse · remedy: render it from units")
+        elif path in rendered:
+            reds.append(f"{say} · {path} is stale: its lock row lists units · remedy: drop it from {LEGACY_LIST}")
+    return reds
 
 
 def read_lock(root=".") -> list[dict]:
@@ -929,7 +1198,7 @@ def arm_unreadable(c):
     except EdgeRefusal as exc:
         said = str(exc)
     c.check("read_unit_edges refuses it naming the file, the row's line and the entry",
-            "tools/x/instructions.toml:1: unit unit.pairless edges entry 'part-of'" in said, said)
+            "tools/x/instructions.toml:{}: unit unit.pairless edges entry 'part-of'".format(1) in said, said)
     enforces = [e["source"] for e in read_unit_edges(NONE_WHY, "tools/x/instructions.toml") if e["type"] == "enforces"]
     c.check("a `none — <why>` enforced-by yields no enforces edge, a list one",
             enforces == ["the guide size leg"], str(enforces))
@@ -1022,9 +1291,291 @@ def arm_extractor(c):
             all(before.get(n) != after.get(n) for n in names), f"{before} {after}")
 
 
+GOOD_ROW = ('[[unit]]\ntag = "unit.good"\nlevel = 3\ntype = "directive"\nscope = ["reader.every"]\n'
+            'trigger = "always"\nbudget = "line"\ntext = "MUST probe the map."\nenforced-by = ["the schema leg"]\n')
+SCHEMA_ROWS = (
+    # (a malformed row's fields, the field its red names)
+    ('tag = "unit.levelless"\ntype = "directive"\ntext = "MUST hold."\n', "level"),
+    ('tag = "unit.prose"\nlevel = 3\ntype = "prose"\ntext = "Some prose."\n', "type"),
+    (f'tag = "unit.long"\nlevel = 3\ntype = "directive"\nbudget = "line"\ntext = "{"x" * 201}"\n', "text"),
+    ('tag = "unit.sourceless"\nlevel = 3\ntype = "fact"\ntext = "Worktrees: none yet"\n', "source"),
+    ('tag = "unit.keyed"\nlevel = 3\ntype = "directive"\ntext = "MUST hold."\nprio = 1\n', "prio"),
+    ('tag = "unit.unenforced"\nlevel = 3\ntype = "directive"\ntext = "MUST hold."\nenforced-by = ""\n', "enforced-by"),
+    ('tag = "repo.elsewhere"\nlevel = 3\ntype = "directive"\ntext = "MUST hold."\n', "tag"),
+    ('tag = "unit.classed"\nlevel = 3\ntype = "directive"\ntext = "MUST hold."\nclass = "loose"\n', "class"),
+    ('tag = "unit.scoped"\nlevel = 3\ntype = "directive"\ntext = "MUST hold."\nscope = ["nosuch.reader"]\n', "scope"),
+    ('tag = "unit.budgeted"\nlevel = 3\ntype = "directive"\ntext = "MUST hold."\nbudget = "page"\n', "budget"),
+)
+ONE_FACT_ROWS = ('[[unit]]\ntag = "unit.a"\nlevel = 3\ntype = "directive"\ntext = "MUST land  through it."\n\n'
+                 '[[unit]]\ntag = "unit.b"\nlevel = 3\ntype = "directive"\ntext = "MUST land through it."\n')
+TWO_TERMS = ('[[unit]]\ntag = "unit.c"\nlevel = 3\ntype = "definition"\ntext = "level — a place on the ladder"\n\n'
+             '[[unit]]\ntag = "unit.d"\nlevel = 3\ntype = "definition"\ntext = "level — a height of a document"\n')
+GATE_TABLE = ('[[target]]\npaths = ["{charter}"]\nrenderer = "playbook:charter"\n\n'
+              '[[target]]\npaths = ["CLAUDE.md"]\nrenderer = "playbook:entry-files"\n\n'
+              '[[target]]\npaths = [".claude/agents/*.md"]\nrenderer = "kit-adopter"\n\n'
+              '[[target]]\npaths = ["memory/guides/KEPT.md"]\nrenderer = "hand"\n')
+GATE_FILES = {".memory-tree.conf": 'MEMORY_ROOT=memory\nCHARTER="AGENTS.md"\n', "AGENTS.md": "# fixture charter\n",
+              "CLAUDE.md": "@AGENTS.md\n", ".claude/agents/a.md": "an agent\n", "memory/guides/KEPT.md": "a guide\n"}
+GATE_LEGACY = "AGENTS.md\nCLAUDE.md\n.claude/agents/a.md\nmemory/guides/KEPT.md\n"
+SLOT_ROWS = ('[[unit]]\ntag = "unit.sub"\nlevel = 3\ntype = "directive"\nscope = ["reader.subagent"]\n'
+             'trigger = "always"\ntext = "MUST answer the subagent."\n\n'
+             '[[unit]]\ntag = "unit.driver"\nlevel = 3\ntype = "directive"\nscope = ["reader.driver"]\n'
+             'trigger = "always"\ntext = "MUST stay out of a subagent\'s slot."\n')
+SLOT_DEPLOY = 'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "TPL.md"\n'
+SLOT_TEMPLATE = "<!-- governance-template: v4.4 -->\n\n# fixture — agent charter\n\n<!-- units: {} -->\n"
+SLOT_CHARTER = ("<!-- gov:playbook -->\n# fixture — agent charter\n\nMUST answer the subagent.\n"
+                "<!-- /gov:playbook -->\n")
+#: The handoff a kit renders over the case's build, pinned from `render_handoff` before the template held it.
+ORDER_ROLE = ("---\nname: gov-fixture\ndescription: A fixture role.\nworkflow: fixture\nreads: {}\nrules: {}\n---\n\n"
+              "You are the fixture role of {{{{MEMORY_ROOT}}}}.\n")
+ORDER_CHARTER = ("## 1. Governing practices\n\n- [alpha] The first rule.\n- [beta] The second rule.\n\n"
+                 "## Protocols\n\n- A protocol line.\n\n## Facts\n\n- A fact line.\n")
+ORDER_HEAD = ("**Serves:** journal PLAY-fixture-1\n\n# gov-fixture handoff — PLAY-fixture-1\n\n"
+              "<!-- gov:handoff role=gov-fixture build=fixture unit=PLAY-fixture-1 path=memory/builds/fixture/prompts/"
+              "{date}-prompt-PLAY-fixture-1-1-fixture.md role-sha=e883c92f6c96 task-sha=TASK -->\n\n"
+              "## Role\n\nYou are the fixture role of memory.\n\n## Task\n\n"
+              "This handoff is for build `fixture`, unit `PLAY-fixture-1`.\nNot supplied, optional: `input:spec`.\n")
+ORDER_CASES = (
+    # (case, reads, rules, charter, --input, the bytes it pins)
+    ("every slot", "input:question, input:spec?", "alpha", ORDER_CHARTER, ["--input", "question=why"],
+     ORDER_HEAD.replace("TASK", "9465cdbea5bd") + "\n### input:question\n\nwhy\n\n### Charter rules\n\n"
+     "- [alpha] The first rule.\n\n### Protocols\n\n- A protocol line.\n\n### Facts\n\n- A fact line.\n"),
+    ("two slots with nothing to fill", "input:spec?", "", "## §1 — Practices\n\n- A pre-tag rule.\n", [],
+     ORDER_HEAD.replace("TASK", "64d22ea8580c")),
+)
+
+
+def run_tool(argv, cwd) -> tuple[int, str]:
+    """`argv` in `cwd`, no inherited `GIT_*` variable reaching it: `(exit, stdout and stderr)`."""
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    done = subprocess.run(argv, cwd=cwd, env=env, capture_output=True, stdin=subprocess.DEVNULL)
+    return done.returncode, (done.stdout + done.stderr).decode("utf-8", "replace")
+
+
+def run_render(top, *args) -> tuple[int, str]:
+    """`render_playbook.main` over the fixture: `(exit, what it printed)`."""
+    import contextlib
+    import io
+    import render_playbook
+    out = io.StringIO()
+    with contextlib.redirect_stdout(out), contextlib.redirect_stderr(out):
+        rc = render_playbook.main(["--target", str(top), *args])
+    return rc, out.getvalue()
+
+
+def derive_kit_rel(name) -> str:
+    """`name` of this kit, tree-relative: the render gate's two tables as a fixture tree holds them."""
+    return f"{derive_kit_prefix()}/{KIT_DIR.name}/{name}"
+
+
+def write_gate_tree(c, legacy=GATE_LEGACY, **files):
+    """The tree the render gate grades green, `GATE_FILES` with `files` over them, one commit on main."""
+    run_git(c.top, "checkout", "-q", "-b", "main")
+    c.write_file(derive_kit_rel(RENDERERS_TABLE), GATE_TABLE)
+    c.write_file(derive_kit_rel(LEGACY_LIST), legacy)
+    c.write_file(f"{derive_kit_prefix()}/check-playbook-parity.sh", "exit 0\n")
+    for rel, text in {**GATE_FILES, **{k.replace("__", "/"): v for k, v in files.items()}}.items():
+        c.write_file(rel, text)
+    run_commit(c.top, "the gate's tree")
+
+
+def arm_schema(c):
+    write_kits(c, GOOD_ROW)
+    lines, rc = run_schema(c.top)
+    c.check("a well-formed row passes", rc == 0 and "1 row(s) · 0 red" in lines[-1], " | ".join(lines))
+    for row, field in SCHEMA_ROWS:
+        write_kits(c, GOOD_ROW + "\n[[unit]]\n" + row)
+        lines, rc = run_schema(c.top)
+        tag = row.split('"')[1]
+        c.check(f"{tag} reds naming the manifest, the tag and `{field}`",
+                rc == 1 and any(f"`{field}`" in ln and tag in ln and "tools/alpha/instructions.toml" in ln for ln in lines),
+                " | ".join(lines))
+
+
+def arm_one_fact(c):
+    for rows, tags, what in ((ONE_FACT_ROWS, ("unit.a", "unit.b"), "two directives of one normalised text"),
+                             (TWO_TERMS, ("unit.c", "unit.d"), "two definitions of one term")):
+        write_kits(c, rows)
+        lines, rc = run_one_fact(c.top)
+        c.check(f"{what} red one-fact naming both", rc == 1 and any(all(t in ln for t in tags) for ln in lines),
+                " | ".join(lines))
+        units = parse_unit_rows(rows, "tools/alpha/instructions.toml")[0]
+        reds = check_one_fact(units, [{"Unit": tags[1], "Action": "remove", "Successor": "none"}])
+        c.check(f"{what}, one retired, pass", not reds, " | ".join(reds))
+
+
+def arm_status(c):
+    import instruction_units as tree   # the module instance the renderer imports, not this script's
+    load_memory_tree_path()
+    import build_records
+    for records, want in (([], ACTIVE), ([{"Unit": "unit.a", "Action": "edit", "Successor": ""}], ACTIVE),
+                          ([{"Unit": "unit.a", "Action": "rename", "Successor": "unit.b"}], "retired:unit.b"),
+                          ([{"Unit": "unit.a", "Action": "split", "Successor": "unit.b, unit.c"}], "retired:unit.b,unit.c"),
+                          ([{"Unit": "unit.a", "Action": "remove", "Successor": "none"}], "retired:none")):
+        got = derive_status("unit.a", records)
+        c.check(f"derive_status is {want} over {records}", got == want, got)
+    write_gate_tree(c, GATE_LEGACY.replace("AGENTS.md\n", "", 1), **{
+        ".governance__deploy.toml": SLOT_DEPLOY, "TPL.md": SLOT_TEMPLATE.format("reader.subagent")})
+    write_kits(c, SLOT_ROWS +'\n[[unit]]\ntag = "unit.typed"\nlevel = 3\ntype = "directive"\ntext = "MUST x."\n'
+               'status = "active"\n')
+    lines, rc = run_schema(c.top)
+    c.check("a row typing `status` reds schema", rc == 1 and any("`status`" in ln for ln in lines), " | ".join(lines))
+    write_kits(c, SLOT_ROWS)
+    rc, said = run_render(c.top)
+    c.check("the slot renders while its units are active", rc == 0, said)
+    run_git(c.top, "add", "--", "AGENTS.md", LOCK)
+    run_commit(c.top, "the rendered charter")
+    c.check("read_change_records over the tree returns no record", read_change_records(c.top) == [])
+    rc, said = run_render(c.top, "--check-render")
+    c.check("the gate prints the unarmed status line naming the kind's unit", rc == 0
+            and "status: unarmed · the change kind is pending on PLAY-dOrderedCharter-15" in said, said)
+    held = tree.read_change_records
+    tree.read_change_records = lambda root: [{"Unit": "unit.sub", "Action": "remove", "Successor": "none"}]
+    try:
+        rc, said = run_render(c.top)
+    finally:
+        tree.read_change_records = held
+    c.check("a retired unit a template selects reds the render", rc == 1 and "retired:none" in said, said)
+    landed = build_records.KINDS["change"]
+    build_records.KINDS["change"] = {"fields": ("Unit",)}
+    try:
+        rc, said = run_render(c.top, "--check-render")
+        try:
+            read_change_records(c.top)
+            raised = "it read"
+        except UnitRowError as exc:
+            raised = str(exc)
+    finally:
+        build_records.KINDS["change"] = landed
+    c.check("with the kind landed the read raises", "holds no reader" in raised, raised)
+    c.check("with the kind landed the render reds", rc == 1 and "holds no reader" in said, said)
+
+
+def arm_renderers(c):
+    write_gate_tree(c)
+    rc, said = run_render(c.top, "--check-render")
+    c.check("a table claiming each file once is green", rc == 0, said)
+    c.write_file("memory/guides/NEW.md", "a guide no row claims\n")
+    c.write_file(derive_kit_rel(RENDERERS_TABLE), GATE_TABLE + '\n[[target]]\npaths = [".claude/agents/a.md"]\n'
+                 'renderer = "hand"\n')
+    rc, said = run_render(c.top, "--check-render")
+    c.check("--check-render exits 1 naming the unclaimed guide",
+            rc == 1 and "memory/guides/NEW.md has no renderer of record" in said, said)
+    c.check("--check-render exits 1 naming the agent file two rows claim",
+            rc == 1 and ".claude/agents/a.md has 2 renderers of record" in said, said)
+    c.write_file(derive_kit_rel(RENDERERS_TABLE), GATE_TABLE + '\n[[target]]\npaths = ["memory/guides/GONE.md"]\n'
+                 'renderer = "hand"\n')
+    rc, said = run_render(c.top, "--check-render")
+    c.check("a row claiming no file reds", rc == 1 and "memory/guides/GONE.md claims no instruction file" in said, said)
+
+
+def arm_slots(c):
+    run_git(c.top, "checkout", "-q", "-b", "main")
+    write_kits(c, SLOT_ROWS)
+    c.write_file(".governance/deploy.toml", SLOT_DEPLOY)
+    c.write_file("TPL.md", SLOT_TEMPLATE.format("reader.subagent"))
+    rc, said = run_render(c.top)
+    charter = (c.top / "AGENTS.md").read_text(encoding="utf-8")
+    c.check("the slot expands to the selected unit's line and nothing of its own",
+            rc == 0 and charter == SLOT_CHARTER, f"{said} {charter!r}")
+    rows = read_lock(c.top)
+    c.check("the lock's row lists the unit the slot rendered",
+            [r.get("units") for r in rows] == [[f"unit.sub@{derive_unit_pin('MUST answer the subagent.')}"]], str(rows))
+    c.write_file("TPL.md", SLOT_TEMPLATE.format("nosuch.reader"))
+    rc, said = run_render(c.top)
+    c.check("a selector no namespace registers refuses the render", rc == 1 and "no namespace registers" in said, said)
+
+
+def arm_legacy(c):
+    write_gate_tree(c)
+    rc, said = run_render(c.top, "--check-render")
+    c.check("every instruction file listed reads green", rc == 0, said)
+    c.write_file(".claude/agents/b.md", "an agent on no list\n")
+    write_lock_row(c.top, ".claude/agents/a.md", "playbook-render@1.0", "", [("unit.x", "MUST x.")])
+    rc, said = run_render(c.top, "--check-render")
+    c.check("shrink-only reds a file neither rendered from units nor listed",
+            rc == 1 and ".claude/agents/b.md is neither rendered from units nor on" in said, said)
+    c.check("shrink-only reds a listed file whose lock row lists units as stale",
+            rc == 1 and ".claude/agents/a.md is stale" in said, said)
+    c.write_file(derive_kit_rel(LEGACY_LIST), GATE_LEGACY + "memory/guides/GONE.md\n.claude/agents/b.md\n")
+    rc, said = run_render(c.top, "--check-render")
+    c.check("a listed path no instruction file holds is stale", rc == 1 and "memory/guides/GONE.md is stale" in said, said)
+    c.write_file(derive_kit_rel(LEGACY_LIST), GATE_LEGACY)
+    c.write_file(".governance/policy.toml", 'instructions.legacy = "refuse"\n')
+    run_commit(c.top, "refuse the list")
+    rc, said = run_render(c.top, "--check-render")
+    c.check("refuse reds every listed file", rc == 1 and all(
+        f"{p} is listed and instructions.legacy is refuse" in said for p in ("AGENTS.md", "CLAUDE.md", "memory/guides/KEPT.md")),
+        said)
+    loose = Case(c.top / "loose", c.out)
+    loose.top.mkdir()
+    run_git(loose.top, "init", "-q")
+    write_gate_tree(loose, **{".governance__policy.toml": 'instructions.legacy = "loose"\n'})
+    rc, said = run_render(loose.top, "--check-render")
+    c.check("a refused read reds the gate naming instructions.legacy, under no default",
+            rc == 1 and "red · instructions.legacy" in said and "legacy · " not in said.replace("red · instructions.legacy", ""),
+            said)
+    c.failed += loose.failed
+
+
+def arm_work_order(c):
+    from policy_value import resolve_kit_dir
+    try:
+        kit = resolve_kit_dir("roles", "handoff.py", KIT_DIR)
+    except LookupError as exc:
+        c.check("the roles kit is present: this case needs it", False, str(exc))
+        return
+    home = c.top / derive_kit_prefix() / kit.name
+    shutil.copytree(kit, home, ignore=shutil.ignore_patterns("__pycache__"))
+    c.write_file(".memory-tree.conf", 'MEMORY_ROOT=memory\nCHARTER="AGENTS.md"\n')
+    (c.top / "memory" / "builds" / "fixture" / "prompts").mkdir(parents=True)
+    argv = [sys.executable, str(home / "handoff.py"), "render", "--role", "gov-fixture", "--build", "fixture",
+            "--unit", "PLAY-fixture-1", "--stdout"]
+
+    def read_order(reads, rules, charter, inputs) -> str:
+        c.write_file("AGENTS.md", charter)
+        (home / "agents" / "gov-fixture.agent.md").write_text(ORDER_ROLE.format(reads, rules), encoding="utf-8", newline="")
+        rc, said = run_tool(argv + inputs, c.top)
+        return said.split("handoff: ")[0].replace(datetime.date.today().isoformat(), "{date}") if rc == 0 else said
+
+    c.check("the tree holds no playbook kit", not (home.parent / KIT_DIR.name).exists())
+    for case, reads, rules, charter, inputs, pinned in ORDER_CASES:
+        got = read_order(reads, rules, charter, inputs)
+        c.check(f"{case}: handoff.py prints the bytes it printed before the template", got == pinned, repr(got))
+    template = home / "templates" / "work-order.template.md"
+    text = template.read_text(encoding="utf-8")
+    template.write_text(text.replace("slot: reads", "slot: swap").replace("slot: charter-blocks", "slot: reads")
+                        .replace("slot: swap", "slot: charter-blocks"), encoding="utf-8", newline="")
+    case, reads, rules, charter, inputs, pinned = ORDER_CASES[0]
+    c.check("a template moving a slot moves the bytes", read_order(reads, rules, charter, inputs) != pinned)
+
+
+def arm_no_renderer(c):
+    from policy_value import resolve_kit_dir
+    from render_playbook import resolve_bash
+    name = "adopt-agent-instructions.sh"
+    try:
+        kit = resolve_kit_dir("agent-instructions", name, KIT_DIR)
+    except LookupError as exc:
+        c.check("the agent-instructions kit is present: this case needs it", False, str(exc))
+        return
+    script = c.top / derive_kit_prefix() / kit.name / name
+    script.parent.mkdir(parents=True)
+    shutil.copyfile(kit / name, script)
+    c.write_file("src.md", "# Rules\n")
+    bash = resolve_bash(script)
+    c.check("a bash sees the adopter", bash is not None)
+    rc, said = run_tool([bash or "bash", script.as_posix(), "--source", "src.md"], c.top)
+    c.check("the adopter exits 2 naming playbook-render", rc == 2 and "playbook-render" in said, said)
+    written = [p for p in ("AGENTS.md", "CLAUDE.md", ".gemini", LOCK) if (c.top / p).exists()]
+    c.check("it writes no target", not written, str(written))
+
+
 PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority, "statements": arm_statements,
           "document": arm_document, "lock": arm_lock, "row": arm_row, "two-kits": arm_two_kits,
-          "unreadable": arm_unreadable, "arms": arm_arms, "render": arm_render, "extractor": arm_extractor}
+          "unreadable": arm_unreadable, "arms": arm_arms, "render": arm_render, "extractor": arm_extractor,
+          "schema": arm_schema, "one-fact": arm_one_fact, "status": arm_status, "renderers": arm_renderers,
+          "work-order": arm_work_order, "slots": arm_slots, "legacy": arm_legacy, "no-renderer": arm_no_renderer}
 
 
 def run_fixture(plant=None) -> tuple[list, int]:
@@ -1046,9 +1597,18 @@ def run_fixture(plant=None) -> tuple[list, int]:
 def main(argv) -> int:
     try:
         root = pathlib.Path(run_git(KIT_DIR, "rev-parse", "--show-toplevel").strip()) if argv[:1] in (
-            ["grammar"], ["lock"]) else None
+            ["grammar"], ["lock"], ["schema"], ["one-fact"]) else None
         if argv == ["ladder-terms"]:
             lines, rc = run_ladder_terms()
+        elif argv == ["schema"]:
+            lines, rc = run_schema(root)
+        elif argv == ["one-fact"]:
+            lines, rc = run_one_fact(root)
+        elif argv == ["schema", "one-fact"]:     # the leg: one argv, both verbs, every row's fields first
+            lines, rc = run_schema(root)
+            if rc == 0:
+                more, rc = run_one_fact(root)
+                lines += more
         elif argv == ["grammar"] or (len(argv) == 3 and argv[:2] == ["grammar", "--doc"]):
             lines, rc = run_grammar(root, argv[2] if len(argv) == 3 else None)
         elif argv == ["lock", "--check"]:

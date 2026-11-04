@@ -783,11 +783,6 @@
       "file": "tools/memory-recall/query.py"
     },
     {
-      "id": "alias_path",
-      "kind": "function",
-      "file": "tools/agent-instructions/adopt-agent-instructions.sh"
-    },
-    {
       "id": "all_inventories",
       "kind": "function",
       "file": "tools/codebase-map/map_extractors.py"
@@ -1008,6 +1003,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_legacy",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_legacy_homes",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -1033,6 +1033,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "arm_no_renderer",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_noop",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -1046,6 +1051,11 @@
       "id": "arm_on_invalid",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "arm_one_fact",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "arm_parse",
@@ -1108,6 +1118,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "arm_renderers",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_rotated",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -1121,6 +1136,11 @@
       "id": "arm_row_edit",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_schema",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "arm_schema",
@@ -1143,12 +1163,22 @@
       "file": "tools/playbook/core.py"
     },
     {
+      "id": "arm_slots",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_stash",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
       "id": "arm_statements",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_status",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
     },
@@ -1191,6 +1221,11 @@
       "id": "arm_wall",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "arm_work_order",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "arm_write",
@@ -4628,6 +4663,11 @@
       "file": "tools/run-gates/check-receipt.py"
     },
     {
+      "id": "check_entry_files",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "check_entry_producer",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -4806,6 +4846,11 @@
       "id": "check_gate_wall",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "check_gemini_configured",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "check_gen_region_only",
@@ -5033,6 +5078,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "check_import_line",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "check_in_era",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -5188,6 +5238,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "check_legacy",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "check_legacy_graded",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -5221,6 +5276,11 @@
       "id": "check_line",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
+    },
+    {
+      "id": "check_link_target",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "check_list",
@@ -5413,6 +5473,11 @@
       "file": "tools/branch-reconcile/adopt-branch-reconcile.sh"
     },
     {
+      "id": "check_one_fact",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "check_one_line",
       "kind": "function",
       "file": "tools/playbook/core.py"
@@ -5526,6 +5591,11 @@
       "id": "check_path_match",
       "kind": "function",
       "file": "tools/codebase-map/replay-phrases.py"
+    },
+    {
+      "id": "check_path_match",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "check_path_read_arm",
@@ -5863,6 +5933,11 @@
       "file": "tools/roles/render_agents.py"
     },
     {
+      "id": "check_renderers",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "check_residue_gone",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -6033,6 +6108,11 @@
       "file": "tools/unattended/stop-guard.test.sh"
     },
     {
+      "id": "check_same_bytes",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "check_same_file",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
@@ -6061,6 +6141,11 @@
       "id": "check_sc_value",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "check_scope_arms",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "check_scratch_guard",
@@ -6383,6 +6468,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "check_tag_entry",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "check_tag_name",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -6531,6 +6621,11 @@
       "id": "check_under",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_unit_row",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "check_unmerged_live",
@@ -8118,6 +8213,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "derive_entry_aliases",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "derive_env_digest",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -8453,6 +8553,21 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "derive_instruction_files",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "derive_instruction_row",
+      "kind": "function",
+      "file": "tools/playbook/core.py"
+    },
+    {
+      "id": "derive_instruction_tokens",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "derive_int_slots",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -8503,6 +8618,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "derive_kit_file",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "derive_kit_glob",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
@@ -8546,6 +8666,11 @@
       "id": "derive_kit_rel",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
+    },
+    {
+      "id": "derive_kit_rel",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "derive_kit_rel",
@@ -9023,6 +9148,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_renderer_label",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "derive_repo_root",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
@@ -9468,9 +9598,19 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "derive_status",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "derive_status_class",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "derive_status_note",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "derive_statuses",
@@ -10495,11 +10635,6 @@
     {
       "id": "fail",
       "kind": "function",
-      "file": "tools/agent-instructions/adopt-agent-instructions.sh"
-    },
-    {
-      "id": "fail",
-      "kind": "function",
       "file": "tools/check-line-length.sh"
     },
     {
@@ -10651,11 +10786,6 @@
       "id": "gdrows",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
-    },
-    {
-      "id": "gemini_configured",
-      "kind": "function",
-      "file": "tools/agent-instructions/adopt-agent-instructions.sh"
     },
     {
       "id": "getval",
@@ -11091,11 +11221,6 @@
       "id": "is_ids_value",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
-    },
-    {
-      "id": "is_import",
-      "kind": "function",
-      "file": "tools/agent-instructions/adopt-agent-instructions.sh"
     },
     {
       "id": "is_overridden",
@@ -11558,6 +11683,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "load_memory_tree_path",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "load_module",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -11671,6 +11801,11 @@
       "id": "load_tree_lib",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "load_units_module",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "load_upgrade_steps",
@@ -15058,6 +15193,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_change_records",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "read_charter_shapes",
       "kind": "function",
       "file": "tools/runlog/prose.py"
@@ -16248,6 +16388,11 @@
       "file": "tools/govkit/docs_leg.py"
     },
     {
+      "id": "read_legacy",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "read_legacy_fanout",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -16516,6 +16661,11 @@
       "id": "read_named_hold",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_namespace_words",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "read_namespaces",
@@ -17121,6 +17271,11 @@
       "id": "read_remote_red",
       "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "read_renderers",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "read_repo_root",
@@ -18038,6 +18193,11 @@
       "file": "tools/playbook/edge_grammar.py"
     },
     {
+      "id": "read_unit_rows",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "read_units",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -18351,11 +18511,6 @@
       "id": "relUnderThisRepo",
       "kind": "function",
       "file": "tools/memory-recall/recall-opened.js"
-    },
-    {
-      "id": "rel_to_canon",
-      "kind": "function",
-      "file": "tools/agent-instructions/adopt-agent-instructions.sh"
     },
     {
       "id": "relative_kit",
@@ -19908,6 +20063,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "render_unit_slots",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "render_units",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -19934,6 +20094,11 @@
     },
     {
       "id": "render_wall",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "render_work_order",
       "kind": "function",
       "file": "tools/roles/handoff.py"
     },
@@ -20226,6 +20391,11 @@
       "id": "resolve_bash",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "resolve_bash",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "resolve_bash",
@@ -21290,6 +21460,11 @@
     {
       "id": "resolve_python",
       "kind": "function",
+      "file": "tools/agent-instructions/adopt-agent-instructions.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
       "file": "tools/check-agent-cap-restatement.test.sh"
     },
     {
@@ -21776,6 +21951,11 @@
       "id": "resolve_render_inputs",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "resolve_renderer",
+      "kind": "function",
+      "file": "tools/agent-instructions/adopt-agent-instructions.sh"
     },
     {
       "id": "resolve_repair_sides",
@@ -22608,6 +22788,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_charter_scope",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "run_check",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -22628,6 +22813,11 @@
       "file": "tools/playbook/positional.py"
     },
     {
+      "id": "run_check_render",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "run_checks",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
@@ -22641,6 +22831,11 @@
       "id": "run_claim_cell",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_claims_scope",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "run_clean_hook",
@@ -22801,6 +22996,11 @@
       "id": "run_engine",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "run_entry_files",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "run_exceptions",
@@ -23503,6 +23703,11 @@
       "file": "tools/unattended/run-unattended-gates.sh"
     },
     {
+      "id": "run_one_fact",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "run_orphan_reap",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -23763,6 +23968,11 @@
       "file": "tools/run-gates/post-merge.sh"
     },
     {
+      "id": "run_render",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "run_render_helper",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -23876,6 +24086,11 @@
       "id": "run_sc_bar",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "run_schema",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "run_scoped",
@@ -24171,6 +24386,11 @@
       "id": "run_tick_over",
       "kind": "function",
       "file": "tools/unattended/resume-tick.test.sh"
+    },
+    {
+      "id": "run_tool",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "run_touching_probe",
@@ -28423,11 +28643,6 @@
       "file": "tools/memory-recall/recall-opened.test.sh"
     },
     {
-      "id": "wire",
-      "kind": "function",
-      "file": "tools/agent-instructions/adopt-agent-instructions.sh"
-    },
-    {
       "id": "wired",
       "kind": "function",
       "file": "tools/check-wiring.sh"
@@ -28798,6 +29013,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "write_entry_file",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "write_entry_plant",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
@@ -28956,6 +29176,11 @@
       "id": "write_gate_record",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_gate_tree",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "write_gates_staged",
@@ -29276,6 +29501,11 @@
       "id": "write_pm_red",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "write_pointer_or_copy",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "write_policy",

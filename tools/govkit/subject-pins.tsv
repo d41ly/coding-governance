@@ -62,6 +62,9 @@ install-prefix (shipped surface)	repo	product
 install-prefix self-test	kit	selftests
 instruction grammar (statement types, provenance lock)	repo	product
 instruction ladder (level is the one term)	repo	product
+instruction render (one renderer of record)	repo	wiring
+instruction units (schema, one fact)	repo	declarations
+instruction units selftest	kit	selftests
 kickoff engine size <=18KiB	repo	product
 kickoff-manifest ratchet	repo	records
 kit epoch (shipped bytes move, the version moves)	repo	declarations

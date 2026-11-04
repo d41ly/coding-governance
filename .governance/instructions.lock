@@ -7,3 +7,10 @@ blob = "8ade85049cd21699dddcfe3c78102cc18d009eb8"
 units = []
 renderer = "playbook-render@1.33"
 template = "coding-governance-agents.template.md@v4.4"
+
+[[target]]
+path = "CLAUDE.md"
+blob = "43c994c2d3617f947bcb5adf1933e21dabe46bb5"
+units = []
+renderer = "playbook-render@1.33"
+template = ""

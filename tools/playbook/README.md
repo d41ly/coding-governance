@@ -6,7 +6,30 @@ Fills `coding-governance-agents.template.md` into a target repo's charter, as a 
 python <prefix>/govkit/govkit.py intake --target <repo> --kits playbook,playbook-render,…
 bash  <prefix>/playbook/adopt-playbook.sh --target <repo>
 bash  <prefix>/playbook/adopt-playbook.sh --target <repo> --check
+python <prefix>/playbook/render_playbook.py --render-scope <charter|entry-files> [--target <repo>]
+python <prefix>/playbook/render_playbook.py --check-render [--scope <charter|entry-files|claims>] [--target <repo>]
 ```
+
+## The one renderer of record
+
+`render_playbook.py` writes two scopes and compares three, `--target` defaulting to this kit's repository.
+`charter` is the region below, and `--check` is its compare. `entry-files` is `CLAUDE.md` and every other
+harness alias, the pointer or copy `adopt-agent-instructions.sh` used to write itself: that adopter now calls
+this scope with its `--aliases`, `--mode` and `--force`, and with no `--aliases` the scope wires the ones
+`renderers.toml` assigns it. `claims`, compare only, runs `check-playbook-parity.sh`'s arms until the charter's
+stated values render from sourced fact units. Every write records the target's row in
+`.governance/instructions.lock`. The agent files are not a scope: `render_agents.py` keeps them.
+
+`--check-render` with no scope is the render gate, the `instruction render (one renderer of record)` leg, gov's
+own: every scope; `renderers.toml`, where an instruction file claimed by two rows or none is red, the closed
+population being `INSTRUCTION_PATHSPECS` in `instruction_units.py`; the status arm, printing `status: unarmed`
+until the `change` record kind lands; and `instructions-legacy.txt`, one path per instruction file not yet
+rendered from units, under the policy key `instructions.legacy`. A template's `<!-- units: <selector> -->` line
+expands to the lines of the units that selector selects, each unit active, and to nothing of its own.
+
+`instruction_units.py schema` grades each unit row's fields and `one-fact` reds two active units holding one
+fact or defining one term. `python <prefix>/playbook/core.py new instruction-unit <name> --kit <kit> --type <t>
+--level <n> --text <line>` prints a row the schema passes and the command that writes it, and writes nothing.
 
 ## Why this exists
 

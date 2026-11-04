@@ -724,6 +724,18 @@ name = "edges (every declared edge parses, is registered and resolves)"
 why = "it runs `<prefix>/playbook/edge_grammar.py --check`, the edge check over gov's own tree: every record header, record section, spec `**Carries:**` line, `gov:handoff` marker and commit trailer read as a typed edge, graded against `<prefix>/playbook/edges.toml` and resolved against gov's own index, defined ids and design view. The checker and its registries ship with the playbook-render kit's `**` include, so an adopter receives them, but the LEG is gov's: the records, specs and trailers it grades are authored here, beside the `tags` leg it joins in the `tags` pack. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-28."
 
 [[exempt_leg]]
+name = "instruction units (schema, one fact)"
+why = "it runs `<prefix>/playbook/instruction_units.py schema one-fact`, which grades each row of the kit manifests gov authors: an adopter copy-installs those manifests and never edits them, the reason `layer dependencies` gives, so an adopter carrying the leg grades nothing of its own. The module ships with the playbook-render kit's `**` include, but the LEG is gov's. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-20."
+
+[[exempt_leg]]
+name = "instruction render (one renderer of record)"
+why = "it runs `<prefix>/playbook/render_playbook.py --check-render`, the render gate over gov's own files against gov's own `<prefix>/playbook/renderers.toml` and `<prefix>/playbook/instructions-legacy.txt`, whose rows name gov's instruction files. The engine ships with the playbook-render kit's `**` include and an adopter keeps its renders through the absorbed wiring legs, but the LEG is gov's. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-20."
+
+[[exempt_leg]]
+name = "instruction units selftest"
+why = "it runs `<prefix>/playbook/instruction_units.py fixture`, every plant of the module's table. `work-order`, `no-renderer` and `legacy` reach the `roles`, `agent-instructions` and `policy` kits, which a `playbook-render` target may not hold, so the LEG is gov's: on gov's bar each kit is present, and a kit not found reds the case, never a skip. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-20."
+
+[[exempt_leg]]
 name = "core meta-check"
 why = "it runs `<prefix>/playbook/core.py meta-check`, which joins gov's own principle registry, `<prefix>/playbook/principles.toml`, both ways to the `enforces` of gov's own legs and the `binds` of gov's own kinds register, against gov's own pending list and design record. The script and its registries ship with the playbook-render kit's `**` include, but the LEG is gov's: the principles, legs and pending rows it grades are authored here. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-7."
 
