@@ -263,7 +263,8 @@ fail=0
 # floor where it was, and its four ceiling checks, counted off the arm.
 # 388 + 339 -> 401, TOOL-aSparedSpawn-34, the merge of local main: base 326, plus 62 and 13.
 # 401 -> 405, TOOL-dRedressedBar-24 S9: arm 9e2's four, outside the `HAVE_TIMEOUT` gate, counted off the arm.
-FLOOR_ASSERTIONS=405
+# 405 -> 407, PLAY-dOrderedCharter-50: arm 1a's `enforces` control and arm 1a-owed, neither gated.
+FLOOR_ASSERTIONS=407
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -361,7 +362,7 @@ if bad:
 n=$((n+1))
 "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack"}
+KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack", "enforces"}
 try:
     legs = json.load(open(sys.argv[1]))
 except Exception as e:
@@ -697,7 +698,7 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
 keyset_probe() { "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack"}
+KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack", "enforces"}
 legs = json.load(open(sys.argv[1]))
 sys.exit(1 if any(k not in KNOWN for l in legs for k in l) else 0)
 ' "$1"; }
@@ -735,7 +736,22 @@ else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`reads\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
+# ...and `enforces` (PLAY-dOrderedCharter-50 S1), by the same two halves, in both KNOWN copies before
+# the first leg row carries it.
+n=$((n+1))
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"enforces":["r"]}]' > "$ctl/enf.json"
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"enforce":["r"]}]' > "$ctl/enftypo.json"
+if keyset_probe "$ctl/enf.json" && ! keyset_probe "$ctl/enftypo.json"; then :
+else
+  echo "canary: the manifest key-set predicate must PASS a row carrying \`enforces\` and FAIL a near-miss of it; one of the two did not hold"
+  fail=1
+fi
 rm -rf "$ctl"
+# 1a-owed: the owed-rows probe's own fixtures (PLAY-dOrderedCharter-50 S4), each population's failing
+#     case and a tree owing nothing, planted in a scratch repository the probe builds and removes.
+n=$((n+1))
+_or_out=$("$PYBIN" "$KITDIR/owed_rows.py" --selftest 2>&1) \
+  || { echo "canary: owed_rows.py --selftest failed:"; printf '    %s\n' "${_or_out//$'\n'/$'\n'    }"; fail=1; }
 # 1b. every `guard` pathspec matches at least one TRACKED path. This is the quietest hole a guard can
 #     open: `git diff --quiet BASE -- does/not/exist` reports NO difference, so a leg guarded on a
 #     typo, a renamed kit or a deleted file skips on EVERY scoped run, forever, printing a reassuring

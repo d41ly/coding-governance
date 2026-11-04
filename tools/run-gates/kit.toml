@@ -101,6 +101,13 @@ role = "project-owned"
 include = ["windows-only-legs.txt"]
 role = "project-owned"
 
+# AND SO IS THE OWED-ROWS PROBE. PLAY-dOrderedCharter-50. `owed_rows.py` names the rows GOV's own
+# registries owe a pass that adds or retires a leg, reading govkit and the codebase map from this
+# repo's tree: a probe a pass runs before its commit, not a leg, and no adopter receives it.
+[[files]]
+include = ["owed_rows.py"]
+role = "project-owned"
+
 # AND SO ARE THE GATE PROFILER'S FIXTURES. TOOL-dRedressedBar-19 S29. `measure_legs.py` ships, but
 # its `--selftest` needs a Windows host and the process-monitor kit beside this one, so its leg is
 # GOV's, an [[exempt_leg]] in <prefix>/govkit/registry.toml, and the fixture legs it profiles have no

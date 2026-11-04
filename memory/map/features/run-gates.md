@@ -65,6 +65,7 @@ globs = [
   "tools/run-gates/measure_legs.py",
   "tools/run-gates/fixtures/measure-legs/*",
   "tools/run-gates/post-merge.sh",
+  "tools/run-gates/owed_rows.py",
 ]
 ```
 

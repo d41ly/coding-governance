@@ -270,8 +270,8 @@ The gate runner, its harnesses, and the adopter that keeps a target's verdict re
 - kits 1
 - gotcha-classes 15
 - guides 1
-- globs 26
-- cut 43 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- globs 27
+- cut 44 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## run-gates-turnstile
 

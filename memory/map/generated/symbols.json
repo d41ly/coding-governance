@@ -318,6 +318,11 @@
       "file": "tools/run-gates/regen.py"
     },
     {
+      "id": "Refused",
+      "kind": "class",
+      "file": "tools/run-gates/owed_rows.py"
+    },
+    {
       "id": "Report",
       "kind": "class",
       "file": "tools/govkit/govkit.py"
@@ -2026,6 +2031,11 @@
       "id": "build_fixture_record",
       "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
+      "id": "build_fixture_repo",
+      "kind": "function",
+      "file": "tools/run-gates/owed_rows.py"
     },
     {
       "id": "build_fixtures",
@@ -8558,6 +8568,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "derive_owed_rows",
+      "kind": "function",
+      "file": "tools/run-gates/owed_rows.py"
+    },
+    {
       "id": "derive_owned_engine_refusals",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -8856,6 +8871,11 @@
       "id": "derive_rule_kind",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_rule_text",
+      "kind": "function",
+      "file": "tools/run-gates/owed_rows.py"
     },
     {
       "id": "derive_run_eras",
@@ -11303,6 +11323,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "load_readers",
+      "kind": "function",
+      "file": "tools/run-gates/owed_rows.py"
+    },
+    {
       "id": "load_records_at",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
@@ -11881,6 +11906,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/run-gates/owed_rows.py"
     },
     {
       "id": "main",
@@ -14673,6 +14703,11 @@
       "file": "tools/memory-tree/check-memory-hygiene.sh"
     },
     {
+      "id": "read_cap_values",
+      "kind": "function",
+      "file": "tools/run-gates/owed_rows.py"
+    },
+    {
       "id": "read_carries_coverage",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -15226,6 +15261,11 @@
       "id": "read_files_touched",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_first_column",
+      "kind": "function",
+      "file": "tools/run-gates/owed_rows.py"
     },
     {
       "id": "read_first_commit_date",
@@ -15801,6 +15841,11 @@
       "id": "read_knob",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
+    },
+    {
+      "id": "read_known_copies",
+      "kind": "function",
+      "file": "tools/run-gates/owed_rows.py"
     },
     {
       "id": "read_kwarg",
@@ -20430,6 +20475,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/run-gates/owed_rows.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
@@ -22550,6 +22600,11 @@
     {
       "id": "run_git",
       "kind": "function",
+      "file": "tools/run-gates/owed_rows.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
     },
     {
@@ -23093,6 +23148,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "run_probe",
+      "kind": "function",
+      "file": "tools/run-gates/owed_rows.py"
+    },
+    {
       "id": "run_probe_in_empty_dir",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -23386,6 +23446,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/run-gates/owed_rows.py"
     },
     {
       "id": "run_selftest",

@@ -80,3 +80,11 @@ argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check
 name = "playbook render selftest"
 subject = "kit"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--selftest"]
+
+# THE POSITIONAL PLANTS, the engine's own too (PLAY-dOrderedCharter-26 S7, claimed by -50 S5): every
+# plant runs `gov_tag.py --fixture` in a scratch repository, so an adopter carries the leg as it
+# carries the resolver's other plants above.
+[[gate_leg]]
+name = "tags positional selftest"
+subject = "kit"
+argv = ["python", "{prefix}/playbook/positional.py", "--selftest"]
