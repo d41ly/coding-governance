@@ -8018,6 +8018,11 @@
       "file": "tools/playbook/tag_bundle.py"
     },
     {
+      "id": "derive_folds",
+      "kind": "function",
+      "file": "tools/playbook/tag_bundle.py"
+    },
+    {
       "id": "derive_foreign",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -10386,11 +10391,6 @@
       "id": "fnmatchcase_path",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
-    },
-    {
-      "id": "fold_rows",
-      "kind": "function",
-      "file": "tools/playbook/tag_bundle.py"
     },
     {
       "id": "foreign_kit_present",

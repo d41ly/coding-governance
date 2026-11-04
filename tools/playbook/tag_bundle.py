@@ -110,7 +110,7 @@ def read_bundle_rows(root, con, ns_path, node, refs, tool_root) -> list[dict]:
     return sorted(rows, key=lambda r: (order.get(r["type"], len(order)), r["path"], r["range"] or (0, 0)))
 
 
-def fold_rows(rows, budget) -> tuple[list, bool]:
+def derive_folds(rows, budget) -> tuple[list, bool]:
     """`(entries, over)`: the rows with the largest (type, group) folded first until the count is within
     `budget`; a fold entry stands where its group's first row stood. `over` when every group that folds
     has folded and the count still passes the budget: the bundle prints folded, never cut."""
@@ -154,7 +154,7 @@ def run_bundle(root, con, ns_path, node, refs, *, tool_root, mode, budget, inlin
         rows = [r for r in rows if r["group"].rstrip("/") == under.rstrip("/")]
         entries = rows
     else:
-        entries, over = fold_rows(rows, budget)
+        entries, over = derive_folds(rows, budget)
     inlined, total = 0, 0
     if inline:
         stop = False
@@ -347,12 +347,12 @@ def run_bundle_plant(plant, run, say, write) -> int:
         b_rc, b_out = run("bundle", TAG, {key: "both"})
         b2_rc, b2_out = run("bundle", TAG, {key: "both"}, inline=True, nbytes=200)
 
-        def inlined(out):
+        def check_inlined(out):
             return any(ln.startswith("tags:     | ") for ln in out)
         got = {"manifest --inline": (m_rc, any(key in ln for ln in m_out)),
                "inline bare": (i_rc, any("--bytes" in ln for ln in i_out)),
-               "inline --bytes": (i2_rc, inlined(i2_out)), "both bare": (b_rc, not inlined(b_out)),
-               "both --inline": (b2_rc, inlined(b2_out))}
+               "inline --bytes": (i2_rc, check_inlined(i2_out)), "both bare": (b_rc, not check_inlined(b_out)),
+               "both --inline": (b2_rc, check_inlined(b2_out))}
         ok = got == {"manifest --inline": (2, True), "inline bare": (2, True), "inline --bytes": (0, True),
                      "both bare": (0, True), "both --inline": (0, True)}
         say("mode values: " + ", ".join(f"{k} rc={v[0]}{'' if v[1] else ' WRONG'}" for k, v in got.items()))
