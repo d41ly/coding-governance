@@ -237,3 +237,9 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-04T09:02:19Z rescope · item add TOOL-dFairHearing-43 · reason the closing diff review's exit promotes its 8 confirmed minors (5 medium, 3 low) into one unit, memory/builds/dFairHearing/reviews/2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md
 
 2026-11-04T11:35:27Z decision · item unit 43's builder (run wf_8508c2cd-8b0) killed PID 453281, another session's packet.py --write dOrderedCharter, outside this run's ledger; that session's dOrderedCharter packet render may need re-running · reason a process not in the ledger is never killed; the run cannot repair another session's work, so the owner checks the dOrderedCharter worktree and re-runs its packet render if it is partial
+
+2026-11-04T12:28:26Z rescope · item add TOOL-dFairHearing-44 · reason the closing review's second batch unit: finding id 5's gotchas.py docstrings split from unit 43, because the dispatch check forbids declaring gotchas.py beside its generated index
+
+2026-11-04T12:28:28Z rescope · item add TOOL-dFairHearing-45 · reason the close's lint bar reds this build owns in the kits, green at BASE: install-prefix, hook destinations, docs, shell hygiene, lexicon, the playbook-parity leg guard, one drift citation, and the brief-recorded rows
+
+2026-11-04T12:28:30Z rescope · item add TOOL-dFairHearing-46 · reason the close's lint bar reds this build owns in replay_scorer.py, green at BASE: encoding, drift citations, an adopter name, install-prefix lines, and the stated-count reader's defect
