@@ -13,6 +13,7 @@
 | [2026-11-04-build-TOOL-dFairHearing-43-1-builder-return.md](../build/2026-11-04-build-TOOL-dFairHearing-43-1-builder-return.md) | journal | — |
 | [2026-11-04-build-TOOL-dFairHearing-43-2-builder-return.md](../build/2026-11-04-build-TOOL-dFairHearing-43-2-builder-return.md) | journal | — |
 | [2026-11-04-build-TOOL-dFairHearing-43-3-builder-return.md](../build/2026-11-04-build-TOOL-dFairHearing-43-3-builder-return.md) | journal | — |
+| [2026-11-04-build-TOOL-dFairHearing-43-4-builder-return.md](../build/2026-11-04-build-TOOL-dFairHearing-43-4-builder-return.md) | journal | — |
 | [2026-11-04-build-TOOL-dFairHearing-43-deviation-431.md](../build/2026-11-04-build-TOOL-dFairHearing-43-deviation-431.md) | deviation | — |
 | [2026-11-04-prompt-TOOL-dFairHearing-43-1-spec-writer.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-43-1-spec-writer.md) | journal | — |
 | [2026-11-04-prompt-TOOL-dFairHearing-43-2-spec-writer.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-43-2-spec-writer.md) | journal | — |
