@@ -1,7 +1,8 @@
 """gov_tag — the one tag resolver, standing in for `gov tag` (PLAY-dOrderedCharter-19 S6, §8 F1).
 
     python gov_tag.py show|where|refs|check <address> [--json]
-    python gov_tag.py check [--base <rev>]
+    python gov_tag.py bundle <address> [--inline --bytes <n>] [--under <dir>] [--json]
+    python gov_tag.py check [--base <rev>] [--only type-registered|target-resolves]
     python gov_tag.py --rebuild | --gc | --list-positional
     python gov_tag.py --fixture --plant <case> [--set <key>=<value>]
 
@@ -11,12 +12,13 @@ arms over the citations outside `<MEMORY_ROOT>/builds/`, and the shape check, th
 name-check slot (PLAY-dOrderedCharter-10), and the `purpose` arm, the namespace rows' `owner` and
 `purpose-source` and the chain registry joined to the design view (PLAY-dOrderedCharter-22), and the `positional` arm, the
 tree's positional references against `positional-refs.txt` with every pinned line and symbol citation resolved
-(PLAY-dOrderedCharter-26, `positional.py`). An address is a tag, `doc.<name>#<seg>`, or a
+(PLAY-dOrderedCharter-26, `positional.py`). `bundle` prints the node and every inbound edge as ranges to
+pull, and `check --only` runs one edge arm alone (PLAY-dOrderedCharter-25, `tag_bundle.py`). An address is a tag, `doc.<name>#<seg>`, or a
 positional label `aliases.toml` maps. `--gc` collects the index rows of every extractor version no live
 worktree derives (PLAY-dOrderedCharter-51 S5). Every line opens `tags:`; `--json` is the index's only JSON.
 Exit 0 green, 1 red, 2 a refusal (an unreadable registry, a refused policy read, a locked index).
 
-The three keys are read through `policy_value.read_policy_value`, the committed policy at its landed
+The policy keys are read through `policy_value.read_policy_value`, the committed policy at its landed
 revision. `--set` is honoured under `--fixture` only, so the leg cannot be relaxed past the policy file.
 """
 from __future__ import annotations
@@ -63,8 +65,34 @@ def derive_build_counts(state) -> str:
             f"{sum(state['skipped'].values())} skipped as fresh")
 
 
-def run_kit_verb(root, verb, address, *, sets, as_json=False, base=None, kit_rel=None) -> int:
+def read_refs(con, tag) -> list[dict]:
+    """Every citation of `tag`, `{path, line}` each: `refs`' rows, and a bundle's `cites` rows."""
+    return [{"path": p, "line": n} for _t, p, n, *_ in ti.read_rows(con, ("span",), tag=tag)]
+
+
+def run_bundle_verb(con, root, kit_rel, address, aliases, *, sets, opts, as_json) -> int:
+    """`bundle` (PLAY-dOrderedCharter-25 S1-S4): the node `show` resolves, then tag_bundle's manifest."""
+    import tag_bundle
+    mode = read_key("tags.bundle", root, sets, lambda: read_policy_value("tags.bundle", root)[0][0])
+    budget = read_key("tags.bundle-rows", root, sets, lambda: read_policy_value("tags.bundle-rows", root)[0][0])
+    try:
+        budget = int(budget)
+    except ValueError:
+        print(f"tags: refused · tags.bundle-rows is '{budget}', which is no row count", file=sys.stderr)
+        return 2
+    nodes = ti.resolve_address(con, address, "leaf", aliases)
+    if not nodes:
+        print(f"tags: {address} resolves to no row", file=sys.stderr)
+        return 1
+    return tag_bundle.run_bundle(root, con, root / kit_rel / "namespaces.toml", nodes[0],
+                                 read_refs(con, nodes[0]["tag"]), tool_root=pathlib.PurePosixPath(kit_rel).parent.as_posix(),
+                                 mode=mode, budget=budget, inline=opts.get("inline", False), nbytes=opts.get("nbytes"),
+                                 under=opts.get("under"), as_json=as_json)
+
+
+def run_kit_verb(root, verb, address, *, sets, as_json=False, base=None, kit_rel=None, opts=None) -> int:
     kit_rel = kit_rel or derive_kit_rel(root)
+    opts = opts or {}
     ctx = ti.derive_context(root, root / kit_rel / "namespaces.toml")
     aliases = ti.read_aliases(root / kit_rel / "aliases.toml")
     con = ti.load_index(root)
@@ -73,7 +101,7 @@ def run_kit_verb(root, verb, address, *, sets, as_json=False, base=None, kit_rel
         if verb == "rebuild":
             print(f"tags: index {state['tree'][:12]} built, {derive_build_counts(state)}")
             return state["parsed"]
-        if verb in ("show", "where", "refs") and not address:
+        if verb in ("show", "where", "refs", "bundle") and not address:
             print(f"tags: {verb} needs an address", file=sys.stderr)
             return 2
         if verb == "show":
@@ -99,13 +127,18 @@ def run_kit_verb(root, verb, address, *, sets, as_json=False, base=None, kit_rel
             return 0 if rows else 1
         if verb == "refs":
             tag = aliases.get(address, address)
-            rows = [{"path": p, "line": n} for _t, p, n, *_ in ti.read_rows(con, ("span",), tag=tag)]
+            rows = read_refs(con, tag)
             if as_json:
                 print(json.dumps(rows))
             for r in rows if not as_json else ():
                 print(f"tags: {r['path']}:{r['line']}")
             print(f"tags: {len(rows)} citation(s) of {tag}", file=sys.stderr)
             return 0
+        if verb == "bundle":
+            return run_bundle_verb(con, root, kit_rel, address, aliases, sets=sets, opts=opts, as_json=as_json)
+        if opts.get("only"):  # one edge arm alone, so `check`'s own verdict prints no edge red twice
+            import tag_bundle
+            return tag_bundle.run_edge_arm(root, con, root / kit_rel / "namespaces.toml", opts["only"], base)
         return run_check(con, root, ctx, kit_rel, sets=sets, base=base, as_json=as_json, state=state)
     finally:
         con.close()
@@ -327,7 +360,9 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "registry-ghost", "registry-missing", "registry-joined", "new-no-purpose", "two-versions",
           "served-across", "positional-seed", "positional-new", "positional-stale", "positional-listed",
           "positional-symbol", "positional-pinned", "positional-pin", "positional-forked-before",
-          "positional-producer-new", "positional-producer-stale")
+          "positional-producer-new", "positional-producer-stale", "bundle-manifest", "bundle-fold",
+          "bundle-rows-values", "bundle-inline", "bundle-mode-values", "bundle-unregistered-type",
+          "bundle-dangling-target", "bundle-empty-sections")
 #: PLAY-dOrderedCharter-44's `extractor-edit`: the fixture extractor's module edited to stop yielding one tag
 EDITED_EXTRACTOR = FIXTURE_EXTRACTOR.replace("elif len(word) == 1:",
                                              'elif len(word) == 1 and word[0] != "layer.memory.recall":')
@@ -463,6 +498,11 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
     if plant in PURPOSE_PLANTS:
         old, new = PURPOSE_PLANTS[plant]
         files[f"{kit}/namespaces.toml"] = files[f"{kit}/namespaces.toml"].replace(old, new, 1)
+    if plant.startswith("bundle-"):  # PLAY-dOrderedCharter-25 S8: `practice` selects, and the case's sources
+        import tag_bundle
+        old, new = tag_bundle.PRACTICE_ROLE
+        files[f"{kit}/namespaces.toml"] = files[f"{kit}/namespaces.toml"].replace(old, new, 1)
+        files.update(tag_bundle.PLANT_FILES[plant])
     if plant in ("retired", "retired-old", "retired-reminted"):
         files["tools/corekit/core.tags"] += "retired practice.old\n"
     if plant == "retired-reminted":
@@ -535,6 +575,18 @@ def run_plant(root, top, plant, sets) -> int:
         return run_kit_verb(*args, kit_rel=FIXTURE_KIT, **kw)
     if plant.startswith("positional-"):
         return run_positional_plant(root, top, plant, say, lambda: run_verb(root, "check", None, sets=sets))
+    if plant.startswith("bundle-"):
+        import contextlib
+        import io
+        import tag_bundle
+
+        def run_captured(verb, address, more=None, as_json=False, **opts):  # -> (exit, printed lines), echoed
+            buf = io.StringIO()
+            with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
+                rc = run_verb(root, verb, address, sets={**sets, **(more or {})}, as_json=as_json, opts=opts)
+            print(buf.getvalue(), end="")
+            return rc, buf.getvalue().splitlines()
+        return tag_bundle.run_bundle_plant(plant, run_captured, say, lambda files: write_files(root, files))
 
     def read_cold_dump():  # the rows a build from nothing writes for the same HEAD
         remove_index(root)
@@ -880,10 +932,14 @@ def run_positional_plant(root, top, plant, say, check) -> int:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="gov_tag.py", description="the tag resolver (gov tag)")
-    ap.add_argument("verb", nargs="?", choices=("show", "where", "refs", "check"))
+    ap.add_argument("verb", nargs="?", choices=("show", "where", "refs", "check", "bundle"))
     ap.add_argument("address", nargs="?")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--base")
+    ap.add_argument("--inline", action="store_true", help="bundle: inline each row's content under --bytes")
+    ap.add_argument("--bytes", type=int, dest="nbytes", metavar="N", help="bundle: the byte budget --inline fills")
+    ap.add_argument("--under", metavar="DIR", help="bundle: list one folded group's rows unfolded")
+    ap.add_argument("--only", choices=("type-registered", "target-resolves"), help="check: run one edge arm alone")
     ap.add_argument("--rebuild", action="store_true")
     ap.add_argument("--gc", action="store_true")
     ap.add_argument("--list-positional", action="store_true")
@@ -916,7 +972,10 @@ def main(argv=None) -> int:
             return 0
         if not a.verb:
             ap.error("a verb, --rebuild, --gc, --list-positional or --fixture")
-        return run_kit_verb(root, a.verb, a.address, sets={}, as_json=a.json, base=a.base)
+        if (a.inline or a.nbytes is not None or a.under) and a.verb != "bundle" or a.only and a.verb != "check":
+            ap.error("--inline, --bytes and --under are bundle's flags, --only is check's")
+        opts = {"inline": a.inline, "nbytes": a.nbytes, "under": a.under, "only": a.only}
+        return run_kit_verb(root, a.verb, a.address, sets={}, as_json=a.json, base=a.base, opts=opts)
     except PolicyRefused as exc:
         print(f"tags: refused · {exc.key} · {exc.line}", file=sys.stderr)
         return 2

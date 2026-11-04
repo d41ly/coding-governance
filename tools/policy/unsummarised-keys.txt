@@ -235,8 +235,6 @@ runtime.restarts
 runtime.secret-home
 runtime.secret-scan
 runtime.spawn-backend
-tags.bundle
-tags.bundle-rows
 tests.landing-levels
 tests.product
 tests.without-cadence

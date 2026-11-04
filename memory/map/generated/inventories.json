@@ -137,6 +137,7 @@
       "step-rows-frozen",
       "straggler-guard arms",
       "tags (the resolver's checks)",
+      "tags bundle selftest",
       "tags positional selftest",
       "template size <=48KiB",
       "template size gate selftest",

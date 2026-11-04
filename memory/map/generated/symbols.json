@@ -8013,6 +8013,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "derive_fold_files",
+      "kind": "function",
+      "file": "tools/playbook/tag_bundle.py"
+    },
+    {
       "id": "derive_foreign",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -8051,6 +8056,11 @@
       "id": "derive_grants",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "derive_group",
+      "kind": "function",
+      "file": "tools/playbook/tag_bundle.py"
     },
     {
       "id": "derive_guardable_reads",
@@ -9201,6 +9211,11 @@
       "id": "derive_source_top",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_span",
+      "kind": "function",
+      "file": "tools/playbook/tag_bundle.py"
     },
     {
       "id": "derive_spec_class_plant",
@@ -10371,6 +10386,11 @@
       "id": "fnmatchcase_path",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "fold_rows",
+      "kind": "function",
+      "file": "tools/playbook/tag_bundle.py"
     },
     {
       "id": "foreign_kit_present",
@@ -14663,6 +14683,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "read_bundle_rows",
+      "kind": "function",
+      "file": "tools/playbook/tag_bundle.py"
+    },
+    {
       "id": "read_bytes",
       "kind": "function",
       "file": "tools/govkit/fixtures/retired_edits.py"
@@ -16218,6 +16243,11 @@
       "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
+      "id": "read_node_spans",
+      "kind": "function",
+      "file": "tools/playbook/tag_bundle.py"
+    },
+    {
       "id": "read_note_refs",
       "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
@@ -16548,6 +16578,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_printed",
+      "kind": "function",
+      "file": "tools/playbook/tag_bundle.py"
+    },
+    {
       "id": "read_probe_allow",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -16601,6 +16636,11 @@
       "id": "read_pybin_alias",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "read_range",
+      "kind": "function",
+      "file": "tools/playbook/tag_bundle.py"
     },
     {
       "id": "read_receipt",
@@ -16671,6 +16711,11 @@
       "id": "read_refs",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "read_refs",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
     },
     {
       "id": "read_refs",
@@ -22103,6 +22148,21 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_bundle",
+      "kind": "function",
+      "file": "tools/playbook/tag_bundle.py"
+    },
+    {
+      "id": "run_bundle_plant",
+      "kind": "function",
+      "file": "tools/playbook/tag_bundle.py"
+    },
+    {
+      "id": "run_bundle_verb",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
+    },
+    {
       "id": "run_callers_probe",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -22356,6 +22416,11 @@
       "id": "run_driver",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_edge_arm",
+      "kind": "function",
+      "file": "tools/playbook/tag_bundle.py"
     },
     {
       "id": "run_edit",
@@ -23436,6 +23501,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/playbook/tag_bundle.py"
     },
     {
       "id": "run_selftest",

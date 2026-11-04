@@ -179,10 +179,10 @@ The governance playbook — the shipped template + companions, and the gates ove
 
 - status `shipped` · streams `playbook`, `tooling` · dossier `memory/map/features/playbook.md`
 - decisions 1: `TOOL-aSiftedPlaybook-1`
-- gate-legs 14: `template size gate selftest`, `playbook parity`, `playbook parity selftest`, `playbook render wiring`, `playbook render selftest`, `charter size`, `micro-format definitions`, `micro-format gate selftest`, `line length`, `line-length gate selftest`, `layer dependencies (the core never depends on an expansion)`, `tags (the resolver's checks)`, `tags positional selftest`, `edges (every declared edge parses, is registered and resolves)`
+- gate-legs 15: `template size gate selftest`, `playbook parity`, `playbook parity selftest`, `playbook render wiring`, `playbook render selftest`, `charter size`, `micro-format definitions`, `micro-format gate selftest`, `line length`, `line-length gate selftest`, `layer dependencies (the core never depends on an expansion)`, `tags (the resolver's checks)`, `tags positional selftest`, `tags bundle selftest`, `edges (every declared edge parses, is registered and resolves)`
 - kits 1: `playbook`
-- globs 8: `tools/check-template-size.sh`, `tools/check-template-size.test.sh`, `tools/template-size-highwater.txt`, `tools/check-playbook-parity.sh`, `tools/check-playbook-parity.test.sh`, `tools/playbook-kit-waivers.txt`
-- cut 2 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- globs 8: `tools/check-template-size.sh`, `tools/check-template-size.test.sh`, `tools/template-size-highwater.txt`, `tools/check-playbook-parity.sh`, `tools/check-playbook-parity.test.sh`
+- cut 3 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## playbook-mode
 

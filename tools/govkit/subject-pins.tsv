@@ -144,6 +144,7 @@ step-gate	repo	declarations
 step-rows-frozen	repo	declarations
 straggler-guard arms	repo	declarations
 tags (the resolver's checks)	repo	declarations
+tags bundle selftest	kit	selftests
 tags positional selftest	kit	selftests
 template size <=48KiB	repo	product
 template size gate selftest	kit	selftests

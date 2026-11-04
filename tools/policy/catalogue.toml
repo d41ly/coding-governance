@@ -1364,12 +1364,16 @@ owner = "dOrderedCharter"
 name = "tags.bundle"
 allowed = ["manifest", "inline", "both"]
 default = "both"
+summary = "What `gov tag bundle` does with a range's content: print the manifest alone and refuse --inline, inline every call under its --bytes budget, or print the manifest and inline on --inline."
+usage = 'tags.bundle = "manifest"'
 owner = "dOrderedCharter"
 
 [[key]]
 name = "tags.bundle-rows"
 allowed = [20, 40, 80]
 default = 40
+summary = "How many rows `gov tag bundle` prints before it folds rows by their kit directory, the largest group first; --under opens a folded group."
+usage = 'tags.bundle-rows = 80'
 owner = "dOrderedCharter"
 
 [[key]]

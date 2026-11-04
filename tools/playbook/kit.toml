@@ -88,3 +88,10 @@ argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--selftest"]
 name = "tags positional selftest"
 subject = "kit"
 argv = ["python", "{prefix}/playbook/positional.py", "--selftest"]
+
+# THE BUNDLE PLANTS (PLAY-dOrderedCharter-25 S10): every `bundle-*` case runs `gov_tag.py --fixture` in a
+# scratch repository too, so an adopter carries the leg as it carries the positional plants.
+[[gate_leg]]
+name = "tags bundle selftest"
+subject = "kit"
+argv = ["python", "{prefix}/playbook/tag_bundle.py", "--selftest"]

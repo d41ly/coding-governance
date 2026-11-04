@@ -1854,6 +1854,18 @@
     "pack": "tags"
   },
   {
+    "name": "tags bundle selftest",
+    "argv": [
+      "python",
+      "{prefix}/playbook/tag_bundle.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "pack": "tags"
+  },
+  {
     "name": "edges (every declared edge parses, is registered and resolves)",
     "argv": [
       "python",
