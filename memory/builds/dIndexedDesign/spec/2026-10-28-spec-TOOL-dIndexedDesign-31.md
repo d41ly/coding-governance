@@ -13,6 +13,7 @@
 | [2026-10-28-build-TOOL-dIndexedDesign-31-promoted-fix-return.md](../build/2026-10-28-build-TOOL-dIndexedDesign-31-promoted-fix-return.md) | research | TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-31-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-31-1-spec-writer.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-31-promoted-fix-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-31-promoted-fix-brief.md) | research | TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
 | [2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 |
 
 <!-- /gen:spec-records -->

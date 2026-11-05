@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-10 — the playbook record kind: its row, its one resolver, the `repeat` route resolving through it, and `check-playbook` as Design's pack
 
-**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 13 · closes TOOL-dIndexedDesign-19 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-3 · 2026-11-05 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 13 · closes TOOL-dIndexedDesign-19 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0392@c9f3c2f0 whole
 **Carries:** node:record-kind.playbook
@@ -12,7 +12,15 @@
 | [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-47 TOOL-dIndexedDesign-48 TOOL-dIndexedDesign-49 TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-52 TOOL-dIndexedDesign-53 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-d.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-d.md) | research | TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-1 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-10-deviation-101.md](../build/2026-11-05-build-TOOL-dIndexedDesign-10-deviation-101.md) | deviation | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground-followup.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground-followup.md) | research | TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-10-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-10-1-spec-writer.md) | journal | — |
 | [2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-3 |
 
 <!-- /gen:spec-records -->
@@ -36,8 +44,8 @@ kind rather than a path that merely exists (ask TOOL-dIndexedDesign-19, gap-flow
 - **S1** — The kind's row. `playbook` appended to `tools/memory-tree/record-kinds.toml` through
   TOOL-dTotalRecall-1 S9's factory, `python record_kinds.py new playbook --tag record.playbook
   --writer hand --check "playbook validity gate" --purpose "a playbook: dScriptedRepeat's twelve-section
-  canon and its declaration block, followed by a recipe-mode run and by the repeat disposition; its
-  pieces and sets identified by hash, amended by proposal"`, with the columns TOOL-dTotalRecall-18 S1
+  canon and declaration block, followed by recipe-mode runs and repeats"`, within
+  TOOL-dTotalRecall-16 S1's 120-byte cap, with the columns TOOL-dTotalRecall-18 S1
   requires set through that unit's landed verb: layer `layer.memory`, home `**/*.md` (§8 F1), id-rule
   `""` (keyed by its repo-relative path), schema `{ form = "header" }` (§8 F2), lifecycle
   `current-state`, and `readers = []` with `readers-none = "no work-order read key hands a playbook;
@@ -96,8 +104,10 @@ kind rather than a path that merely exists (ask TOOL-dIndexedDesign-19, gap-flow
   kit's fixture (scout D, disagreement 1). The pieces built as units are dScopedBuild's.
 - The `STAND_INS` row for `repeat` in `tools/loop/placement.py` (TOOL-dPlacedRequest-4 S8): it holds
   the Design-entry owner-item stand-in, which Design's entry item arms, not the path stand-in.
-- A writer door for the kind: TOOL-dTotalRecall-2's door registers one; until then the writer is
-  `hand`, an authoring build.
+- A writer door for the kind. Its writer stays `hand`, an authoring build: TOOL-dTotalRecall-1 §4
+  "Data model" makes `hand` legal on any row TOOL-dTotalRecall-2 S9 does not move, and S9 moves only
+  `fields`-form rows, so this `header` row keeps it. Any door is the unattended kit's own or an ask of
+  the build that would own it, named by that owner; this unit adds none.
 
 ### Edges
 
@@ -248,9 +258,23 @@ New arm: tools/unattended/unattended.test.sh · covers AC5 · the recipe preflig
   `**/*.md`, membership decided by the declaration block, the home only admitting; (b) a fixed home
   for new playbooks, `memory/builds/*/build/*-playbook-*.md`, the fixture and any adopter's playbook
   left outside the kind; (c) the conf's `PLAYBOOK_GLOB` as the home. RESOLVED (agent, 2026-10-28,
-  delegated): (a), rung 3, the most feature-rich survivor: TOOL-dTotalRecall-42 S5 makes the kind
-  decide and the home admit, so a home matching many paths misgrades nothing, and every path recipe
-  mode and the `repeat` route already follow stays a record of the kind; (b) fails AC1, the kit's own
+  delegated): (a), rung 3, the most feature-rich survivor: S2's resolver decides membership and the
+  home only admits, so a home matching many paths misgrades nothing, since the registry grades no
+  `header` row's fields (TOOL-dTotalRecall-1 §4 "Data model"), and every path recipe mode and the
+  `repeat` route already follow, each resolved through S2, stays a record of the kind. The registry's
+  classifier does not decide it: TOOL-dTotalRecall-42 S5's `derive_record_kind` returns a row only for
+  a record's `**Serves:**` kind, TOOL-dTotalRecall-53 S21 passes it the kind `read_bindings`
+  classified, and TOOL-dTotalRecall-43 S13 makes it the `record` extractor's sole classifier; a
+  playbook carries no Serves line, so it is registered but not tagged `record.playbook` by that
+  extractor until dTotalRecall classifies a kind without a Serves line. That is the ask this build's
+  run files in dTotalRecall's `BACKLOG.md`, its row text: "THE RECORD EXTRACTOR TAGS NO KIND WITHOUT A
+  SERVES LINE. TOOL-dTotalRecall-42 S5's `derive_record_kind` returns a row only for a record's Serves
+  kind and TOOL-dTotalRecall-43 S13 makes it the `record` extractor's sole classifier, so
+  TOOL-dIndexedDesign-10's `playbook` and TOOL-dIndexedDesign-11's `playbook-set`, registered kinds
+  whose records carry no `**Serves:**` line, are never tagged · accept `derive_record_kind` classifies
+  a record under a registered row with no Serves membership by a predicate that row declares, seen on
+  `tools/unattended/playbook.fixture.md` tagged `record.playbook` and
+  `tools/unattended/fixture-records/set-dScriptedRepeat.md` tagged `record.playbook-set`". (b) fails AC1, the kit's own
   fixture sitting outside it, and breaks every adopter's README `playbook:` value; (c) puts a per-repo
   conf value where the registry holds a literal glob (TOOL-dTotalRecall-18 §4 "Columns"), and nothing
   applies that glob today. widens: none · relaxes: none
@@ -270,6 +294,13 @@ New arm: tools/unattended/unattended.test.sh · covers AC5 · the recipe preflig
   rows 10 and 19 and disagreements 1, 7, 8 and 10, and the sources read at `4bf0f400d`.
 - rev-2 · 2026-10-28 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from edge of TOOL-dIndexedDesign-38,
   promoted by the round-1 spec audit of this build; nothing else moved.
+- rev-3 · 2026-11-05 · §3 · §8 F1 · the writer non-goal restated on TOOL-dTotalRecall-1 §4: `hand`
+  stays on this `header` row, which TOOL-dTotalRecall-2 S9 never moves, and no door is promised; F1's
+  ground no longer says TOOL-dTotalRecall-42 S5 decides the kind, which it does by the Serves kind
+  alone, and names the ask for a classifier of a kind without a Serves line, its pick untouched, by
+  the brief prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md; S1 · S1's `--purpose`
+  falls from 198 bytes to 114, under TOOL-dTotalRecall-16 S1's 120-byte cap, keeping the canon, its
+  declaration block and its two followers, no AC quoting it, and by the brief prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground-followup.md
 
 ## 10. Reuse audit
 

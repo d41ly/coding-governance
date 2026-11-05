@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-1 — the Design-to-Build hand-off as `design.handoff` says
 
-**Status:** DEFERRED · rev-4 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 4 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-5 · 2026-11-05 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 4 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0383@77f2882f whole
 **Carries:** node:item.design.ready
@@ -21,6 +21,10 @@
 | [2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-c.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-c.md) | research | TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-12 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-d.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-d.md) | research | TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-15 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md) | research | TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md) | research | TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-deviation-13.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-deviation-13.md) | deviation | — |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md) | research | TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-1-reuse-scout.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-1-reuse-scout.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-2-reuse-scout.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-2-reuse-scout.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-3-reuse-scout.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-3-reuse-scout.md) | journal | — |
@@ -29,6 +33,9 @@
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-fix-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-fix-brief.md) | research | TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md) | research | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md) | research | TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-1-spec-reviewer.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-1-spec-reviewer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md) | research | TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
 | [2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-3 |
 
 <!-- /gen:spec-records -->
@@ -90,13 +97,13 @@ today's floor. Today `--dispatch` refuses only MISSING and THIN, so a FORKED uni
   (`:796`): unchanged under every value (§8 F1).
 - Design review by policy and the audit's opt-in: TOOL-dIndexedDesign-3. This unit reads an audit's
   pin; it never asks for one to run.
-- Arming `item.design.exit` by deleting its `[[stand-in]]` row (§8 F5).
+- Arming `item.design.ready` or `item.design.exit` by deleting its `[[stand-in]]` row (§8 F5).
 
 ### Edges
 
 - **consumes-from** `TOOL-dIndexedDesign-16` — `check_design_exit`, the I5 driver function S2 adds its arms into, with `derive_ready_state`, the I4 state S1 grades, and the rule that a `coverage-lens` record is no audit, which S3 keeps; without them S2 has no call site
 - **consumes-from** `TOOL-dIndexedDesign-16` — `read_design_policy`, I3, whose shell form S2 spells as `policy.py get design.handoff`
-- **consumes-from** external — TOOL-dDeclaredLoop-12 S2's `[[item]]` rows for `item.design.ready` and `item.design.exit` and TOOL-dDeclaredLoop-13 S8's stand-in row for the second, each DEFERRED at base and built before this build run
+- **consumes-from** external — TOOL-dDeclaredLoop-12 S2's `[[item]]` rows for `item.design.ready` and `item.design.exit` and TOOL-dDeclaredLoop-13 S8's stand-in rows for both, derived for every item owned outside dDeclaredLoop (§4 "The stand-ins"), each DEFERRED at base and built before this build run
 - **hands-off** external — §8 F5's ask to dDeclaredLoop, and ask PLAY-dClosedLoop-21, which can read S3's mode
 - **hands-off** `TOOL-dIndexedDesign-36` — the dispatch refusals this unit adds, which that unit names in BUILD-METHOD M6 (report id 33, HIGH)
 - **hands-off** `TOOL-dIndexedDesign-38` — the round-1 spec audit's minors that land on this spec, report ids 4, 9, 14, 24 and 44, each a scope item of that batch unit
@@ -322,7 +329,11 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC5 · the `--selftest` 
   the row TOOL-dDeclaredLoop-13 S8 lists, whose stand-in, the mover naming its witnessing commit, now
   carries this unit's refusal at the `BUILDING` move; (b) arm it now. (b) needs the witness reader an
   owning build lands, and no spec states that contract: TOOL-dDeclaredLoop-13 names it in one sentence
-  (spec line 239) and specs nothing, so building it here writes a parent's surface. RESOLVED (agent,
+  (§4 "The stand-ins") and specs nothing, so building it here writes a parent's surface. The same
+  section gives `item.design.ready` a stand-in row too, since S8 derives one for every item owned
+  outside dDeclaredLoop, and this unit keeps that row on the same ground it keeps exit's: S2's arms
+  grade readiness at `--dispatch` and the `BUILDING` move, and no witness-reader contract exists to arm
+  it. RESOLVED (agent,
   2026-10-28, delegated): (a), rung 3, with an ask for the main loop to file once, target dDeclaredLoop's
   `BACKLOG.md`: "AN OWNING BUILD HAS NO WITNESS-READER CONTRACT TO ARM ITS STAND-IN ITEM.
   TOOL-dDeclaredLoop-13 S8 has an owning build arm its item by landing its witness reader and deleting
@@ -344,6 +355,10 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC5 · the `--selftest` 
 - rev-4 · 2026-10-28 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edge of TOOL-dIndexedDesign-49, promoted by the round-1 spec audit of units 39 to 46; nothing else
   moved.
+- rev-5 · 2026-11-05 · §3, its Edges · §8 F5 · the external edge and the non-goal name
+  TOOL-dDeclaredLoop-13 S8's stand-in row for `item.design.ready` beside exit's, and F5, its pick
+  untouched, keeps that row on exit's ground and cites the parent by section, row 3 of
+  `2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck`, by the brief prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md
 
 ## 10. Reuse audit
 

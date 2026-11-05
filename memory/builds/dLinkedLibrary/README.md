@@ -107,7 +107,7 @@ ids TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-d
 | [TOOL-dLinkedLibrary-12 — the `marker` namespace's members, one per existing `gov:` word, and the check that refuses an unregistered one](spec/2026-10-26-spec-TOOL-dLinkedLibrary-12.md) | 3 | 2 | DEFERRED | rev-4 | 2026-10-28 |
 | [TOOL-dLinkedLibrary-43 — the region census stated exactly, its exclusions written as rules, and the two parsers it missed re-pointed](spec/2026-10-26-spec-TOOL-dLinkedLibrary-43.md) | 3 | 2 | DEFERRED | rev-2 | 2026-10-27 |
 | [TOOL-dLinkedLibrary-45 — govkit's `find_block` and `write_block` re-pointed to the factory, and a census arm that sees a parser with no marker constant](spec/2026-10-26-spec-TOOL-dLinkedLibrary-45.md) | 3 | 2 | DEFERRED | rev-2 | 2026-10-27 |
-| [TOOL-dLinkedLibrary-22 — `decides` on every decision row, `Decided:` trailers read as decision rows, and every bug class naming its cause, language and platform](spec/2026-10-26-spec-TOOL-dLinkedLibrary-22.md) | 4 | 2 | DEFERRED | rev-4 | 2026-11-05 |
+| [TOOL-dLinkedLibrary-22 — `decides` on every decision row, `Decided:` trailers read as decision rows, and every bug class naming its cause, language and platform](spec/2026-10-26-spec-TOOL-dLinkedLibrary-22.md) | 4 | 2 | DEFERRED | rev-5 | 2026-11-05 |
 | [TOOL-dLinkedLibrary-48 — the marker registry in an adopter: a reader resolved through the install, and "appears nowhere" graded only on this repository's own rows](spec/2026-10-26-spec-TOOL-dLinkedLibrary-48.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-27 |
 | [TOOL-dLinkedLibrary-54 — the shipped micro-format gate carries the `region_sh` block inline, so it runs where `<prefix>/lib/` never travels](spec/2026-10-27-spec-TOOL-dLinkedLibrary-54.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-27 |
 | [TOOL-dLinkedLibrary-55 — the micro-format gate's selftest runs the gate alone at a prefix that holds no `lib/`](spec/2026-10-27-spec-TOOL-dLinkedLibrary-55.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-27 |
@@ -116,11 +116,11 @@ ids TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-d
 | [TOOL-dLinkedLibrary-62 — an unresolved reader stays red on a row this repository's own builds own; only rows owned outside read `not installed`](spec/2026-10-27-spec-TOOL-dLinkedLibrary-62.md) | 5 | 2 | DEFERRED | rev-1 | 2026-10-27 |
 | [TOOL-dLinkedLibrary-65 — the micro-format gate refuses by name when its inline region reader is absent](spec/2026-10-27-spec-TOOL-dLinkedLibrary-65.md) | 5 | 2 | DEFERRED | rev-1 | 2026-10-27 |
 | [TOOL-dLinkedLibrary-66 — the micro-format suite's lib-less arm stages its failing case as the stripped block](spec/2026-10-27-spec-TOOL-dLinkedLibrary-66.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-27 |
-| [TOOL-dLinkedLibrary-13 — the research-return kind: its declared line, its check, and the dated backfill over the existing returns](spec/2026-10-26-spec-TOOL-dLinkedLibrary-13.md) | 6 | 2 | DEFERRED | rev-2 | 2026-10-28 |
+| [TOOL-dLinkedLibrary-13 — the research-return kind: its declared line, its check, and the dated backfill over the existing returns](spec/2026-10-26-spec-TOOL-dLinkedLibrary-13.md) | 6 | 2 | DEFERRED | rev-3 | 2026-11-05 |
 | [TOOL-dLinkedLibrary-49 — `--observe` records `refused` only on the leg's failing status, bounded, and every other outcome as `unobservable`](spec/2026-10-26-spec-TOOL-dLinkedLibrary-49.md) | 6 | 2 | DEFERRED | rev-2 | 2026-10-27 |
 | [TOOL-dLinkedLibrary-6 — the research view over the research-return kind, and the library-view seam it lands](spec/2026-10-26-spec-TOOL-dLinkedLibrary-6.md) | 7 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dLinkedLibrary-61 — `--observe` kills the process tree at its bound and routes each run's output to a file](spec/2026-10-27-spec-TOOL-dLinkedLibrary-61.md) | 7 | 2 | DEFERRED | rev-2 | 2026-10-27 |
-| [TOOL-dLinkedLibrary-1 — decisions split by kind: reuse entries as level-3 units, the major-decision log, its rows routed by two raters, and the `[records]` rule reworded](spec/2026-10-26-spec-TOOL-dLinkedLibrary-1.md) | 8 | 2 | DEFERRED | rev-4 | 2026-10-28 |
+| [TOOL-dLinkedLibrary-1 — decisions split by kind: reuse entries as level-3 units, the major-decision log, its rows routed by two raters, and the `[records]` rule reworded](spec/2026-10-26-spec-TOOL-dLinkedLibrary-1.md) | 8 | 2 | DEFERRED | rev-5 | 2026-11-05 |
 | [TOOL-dLinkedLibrary-67 — `--observe` resolves a leading bash and python before it runs an observed argv](spec/2026-10-27-spec-TOOL-dLinkedLibrary-67.md) | 8 | 2 | DEFERRED | rev-2 | 2026-10-27 |
 | [TOOL-dLinkedLibrary-5 — the generated views: the decision log's holds-now view and the reuse view](spec/2026-10-26-spec-TOOL-dLinkedLibrary-5.md) | 9 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dLinkedLibrary-60 — `propose` reads the call unit 19 spells, filing each seam as the part `<feature>.<n>` before that unit's pass](spec/2026-10-27-spec-TOOL-dLinkedLibrary-60.md) | 9 | 2 | DEFERRED | rev-2 | 2026-10-27 |
@@ -140,7 +140,7 @@ ids TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-d
 | [TOOL-dLinkedLibrary-15 — code purposes: derived first from docstrings and headers, an agent's pass for the rest as `memory.code-enrich` says, keyed to body hashes and joined both ways with a pending population](spec/2026-10-26-spec-TOOL-dLinkedLibrary-15.md) | 18 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dLinkedLibrary-16 — the code replay: a unit's files read and its lookups counted with the `code` slot and without, scored by the scorer factory against the seed alone](spec/2026-10-26-spec-TOOL-dLinkedLibrary-16.md) | 19 | 2 | DEFERRED | rev-5 | 2026-11-05 |
 | [TOOL-dLinkedLibrary-46 — the `code record selftest` leg, which runs the code reader's, the enrichment's and the ctags pack's selftests the arm lines claimed](spec/2026-10-26-spec-TOOL-dLinkedLibrary-46.md) | 19 | 2 | DEFERRED | rev-3 | 2026-10-28 |
-| [TOOL-dLinkedLibrary-8 — retrofit's record kinds, the `origin` field, and the `adopt` program the core's own command runs](spec/2026-10-26-spec-TOOL-dLinkedLibrary-8.md) | 20 | 2 | DEFERRED | rev-4 | 2026-11-05 |
+| [TOOL-dLinkedLibrary-8 — retrofit's record kinds, the `origin` field, and the `adopt` program the core's own command runs](spec/2026-10-26-spec-TOOL-dLinkedLibrary-8.md) | 20 | 2 | DEFERRED | rev-5 | 2026-11-05 |
 | [TOOL-dLinkedLibrary-47 — the `adopt program selftest` leg, which runs the adopt program's plants unit 8's arm line claimed](spec/2026-10-26-spec-TOOL-dLinkedLibrary-47.md) | 21 | 2 | DEFERRED | rev-3 | 2026-10-28 |
 | [TOOL-dLinkedLibrary-51 — the CI census reads every workflow file, every line a job runs, and refuses a job that publishes, pushes or holds a write grant](spec/2026-10-26-spec-TOOL-dLinkedLibrary-51.md) | 21 | 2 | DEFERRED | rev-2 | 2026-10-27 |
 | [TOOL-dLinkedLibrary-9 — the origin check: each record's `origin` re-derived from history, shown in every slice and ranked in the reuse digest](spec/2026-10-26-spec-TOOL-dLinkedLibrary-9.md) | 21 | 2 | DEFERRED | rev-3 | 2026-10-28 |
@@ -195,7 +195,7 @@ ids TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-d
 | [TOOL-dLinkedLibrary-102 — the spec audit of units 92 to 96: its medium and low findings, batched](spec/2026-10-27-spec-TOOL-dLinkedLibrary-102.md) | 39 | 2 | DEFERRED | rev-1 | 2026-10-27 |
 <!-- /gen:build-units -->
 
-Records: 166 bound to this build, across 4 record folder(s).
+Records: 177 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

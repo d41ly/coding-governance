@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-11 — the playbook set record as a kind, its identity derived once, and a set check that reds at the bar, registered at Test's leg-pack point
 
-**Status:** DEFERRED · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 14 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-2 · 2026-11-05 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 14 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0393@c8409a33 whole
 **Carries:** node:record-kind.playbook-set
@@ -13,8 +13,15 @@
 | [2026-10-28-build-TOOL-dIndexedDesign-1-fix-return.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-fix-return.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-d.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-d.md) | research | TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-1 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-11-deviation-111.md](../build/2026-11-05-build-TOOL-dIndexedDesign-11-deviation-111.md) | deviation | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-fix-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-fix-brief.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground-followup.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground-followup.md) | research | TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-13 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
 | [2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-3 |
 
 <!-- /gen:spec-records -->
@@ -69,8 +76,8 @@ that can go red at the merge bar, registered at Test's leg-pack point (night pas
 - **S5** — The kind's row. `playbook-set` appended to `tools/memory-tree/record-kinds.toml` through
   TOOL-dTotalRecall-1 S9's factory, `python record_kinds.py new playbook-set --tag record.playbook-set
   --writer "unattended.sh --record-set" --check "playbook set check" --purpose "a playbook run's set
-  record: the run's pieces joined by hash, the set's identity derived from them, one verdict per
-  set-scoped check"`, with TOOL-dTotalRecall-18's columns set through its landed verb: layer
+  record: its pieces joined by hash, the set identity derived from them, a verdict per set check"`,
+  within TOOL-dTotalRecall-16 S1's 120-byte cap, with TOOL-dTotalRecall-18's columns set through its landed verb: layer
   `layer.memory`, home `**/set-*.md` (§8 F2), id-rule `set-<run>.md`, schema `{ form = "header" }`,
   lifecycle `current-state`, and `readers = []` with `readers-none = "read by the set check and by
   --close's set-checks-recorded, under the root its playbook declares"`. Its node is
@@ -243,7 +250,14 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 · the record-set
   (a) `**/set-*.md`, the kind decided by the set check's population, the home admitting; (b) a fixed
   folder for set records; (c) one row per declared root. RESOLVED (agent, 2026-10-28, delegated):
   (a), rung 3, the most feature-rich survivor and the shape TOOL-dIndexedDesign-10 §8 F1 takes for the
-  playbook itself: TOOL-dTotalRecall-42 S5 has the kind decide and the home admit; (b) moves every
+  playbook itself: the set check's population decides membership and the home only admits, the
+  registry grading no `header` row's fields (TOOL-dTotalRecall-1 §4 "Data model"). The registry's
+  classifier does not decide it: TOOL-dTotalRecall-42 S5's `derive_record_kind` returns a row only for
+  a record's `**Serves:**` kind, TOOL-dTotalRecall-43 S13 makes it the `record` extractor's sole
+  classifier, and a set record carries no Serves line, so it is registered but not tagged
+  `record.playbook-set` by that extractor until dTotalRecall classifies a kind without a Serves line,
+  the one ask TOOL-dIndexedDesign-10 §8 F1 states, its row text naming this kind too, which this
+  build's run files in dTotalRecall's `BACKLOG.md`; (b) moves every
   adopter's set records and the fixture's, which `record_set` writes under the declared root
   (:13203); (c) makes the registry change with each adopter playbook. widens: none · relaxes: none
 - **F3 — Is the set check a new leg or a verdict of the existing one?** Options: (a) a new leg, a mode
@@ -256,6 +270,12 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 · the record-set
 
 - rev-1 · 2026-10-28 · initial draft, from the packet's Items 11, scout D's row 11, shared interfaces
   4 to 6 and disagreement 8, and the sources read at `4bf0f400d`.
+- rev-2 · 2026-11-05 · §8 F2 · F2's ground no longer says TOOL-dTotalRecall-42 S5 decides the kind,
+  which it does by the Serves kind alone, and a set record has none: the record is registered but
+  untagged by the `record` extractor until the ask TOOL-dIndexedDesign-10 §8 F1 states lands, its pick
+  untouched, by the brief prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md; S5 ·
+  S5's `--purpose` falls from 132 bytes to 115, under TOOL-dTotalRecall-16 S1's 120-byte cap, keeping
+  the pieces by hash, the derived identity and the per-check verdict, no AC quoting it, and by the brief prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground-followup.md
 
 ## 10. Reuse audit
 

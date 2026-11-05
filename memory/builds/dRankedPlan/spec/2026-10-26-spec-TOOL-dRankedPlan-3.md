@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-3 — triage as `plan.triage` says: declared rules, the planner judging the rest
 
-**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 10 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node a · Tier-2 · base 0689e7fa · streams tooling · order 10 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0371@3ec4f25f whole
 **Carries:** node:policy-key.plan.triage
@@ -17,9 +17,17 @@
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md) | journal | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-55 TOOL-dRankedPlan-56 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-59 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82 TOOL-dRankedPlan-83 |
 | [2026-10-28-build-TOOL-dRankedPlan-3-deviation-31.md](../build/2026-10-28-build-TOOL-dRankedPlan-3-deviation-31.md) | deviation | — |
+| [2026-11-05-build-TOOL-dRankedPlan-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dRankedPlan-1-crosscheck-returns.md) | research | TOOL-dRankedPlan-1 |
+| [2026-11-05-build-TOOL-dRankedPlan-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dRankedPlan-1-parents-crosscheck.md) | research | TOOL-dRankedPlan-1 |
+| [2026-11-05-build-TOOL-dRankedPlan-1-reground-returns.md](../build/2026-11-05-build-TOOL-dRankedPlan-1-reground-returns.md) | research | TOOL-dRankedPlan-1 |
+| [2026-11-05-build-TOOL-dRankedPlan-3-deviation-32.md](../build/2026-11-05-build-TOOL-dRankedPlan-3-deviation-32.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-48 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-57 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-64 TOOL-dRankedPlan-67 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81 |
 | [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-4 TOOL-dRankedPlan-9 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-24 TOOL-dRankedPlan-29 TOOL-dRankedPlan-31 TOOL-dRankedPlan-37 TOOL-dRankedPlan-45 |
+| [2026-11-05-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-6 TOOL-dRankedPlan-10 TOOL-dRankedPlan-16 TOOL-dRankedPlan-33 |
+| [2026-11-05-prompt-TOOL-dRankedPlan-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dRankedPlan-1-parents-reground.md) | research | TOOL-dRankedPlan-1 |
+| [2026-11-05-prompt-TOOL-dRankedPlan-3-1-spec-reviewer.md](../prompts/2026-11-05-prompt-TOOL-dRankedPlan-3-1-spec-reviewer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dRankedPlan-3-2-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dRankedPlan-3-2-spec-writer.md) | journal | — |
 | [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
@@ -81,7 +89,16 @@ by its labels (walkthrough:380-383).
   through it, one record per pass per home build that the pass decided an ask in. `Rows` is `<n> rows
   · <key>`, the key memory-tree's own `derive_content_key` (TOOL-dTotalRecall-2 S5,
   `tools/memory-tree/build_records.py`, the shape of `derive_section_sha`) over the kind name `triage`
-  and the rendered rows in order. Observed by AC3, AC7.
+  and the rendered rows in order. Per home, the record goes through the door before that home's rows
+  are appended, by S2 and S3 alike, so a refused home gets neither. The door mints a `<n>` record only
+  under the home build's lease or claim and refuses one another session holds, naming the holder
+  (TOOL-dTotalRecall-2 §4 "Minting"). On that refusal, exit 2 with `refused triage: <why>` (its §4
+  "The command"), the pass prints `triage — <home> held by <holder>`, the holder the one that line
+  names, appends no row to that home, and leaves its asks undecided for the next pass. It goes on to
+  the next home and exits 0. The pass reads no lease of its own. It tells this refusal from the door's
+  others by the authority cause of `check_mint_authority` (TOOL-dTotalRecall-2 §4 "Inventory"), taken
+  from `build_records.py` in `triage.py`'s own kit and never retyped. Any other refusal stops the
+  pass, exit 2, naming the door's line. Observed by AC3, AC7, AC13.
 - **S6** — The batch ratification, the owner breakpoint of `owner-batches`. `triage.py ratify
   <record>` asks `read_plan_ratification` (TOOL-dRankedPlan-9, I6) by running its CLI form `ratify.py
   <home>` as a subprocess argv list, the loop kit found through `backlog.resolve_kit_dir`, since a kit
@@ -145,7 +162,7 @@ by its labels (walkthrough:380-383).
 - **consumes-from** `TOOL-dRankedPlan-2` — `gov-planner`, the slot whose return S3 schema-checks as `plan.triage-judge`
 - **consumes-from** `TOOL-dRankedPlan-2` — `check_plan_dupes`, the dedupe finding S7 records as the dupes record, and `read_plan_item_witness` in `tools/loop/plan_items.py`, which S11 extends to arm `item.plan.dedupe`, `item.plan.triage-rule` and `item.plan.triage-judge`
 - **consumes-from** external — dDeclaredLoop: the eleven Plan item rows (TOOL-dDeclaredLoop-12 S2) and the `[[stand-in]]` rule (TOOL-dDeclaredLoop-13 §4, S8) S11 follows
-- **consumes-from** external — dTotalRecall, built before this build run: `record_kinds.py new` and the typed kind's writer cell (TOOL-dTotalRecall-1 S9, §4), and `gov_record.py new` with `write_new_record` and `derive_content_key` (TOOL-dTotalRecall-2 S1, S2, S5)
+- **consumes-from** external — dTotalRecall, built before this build run: `record_kinds.py new` and the typed kind's writer cell (TOOL-dTotalRecall-1 S9, §4), and `gov_record.py new` with `write_new_record` and `derive_content_key` (TOOL-dTotalRecall-2 S1, S2, S5), and its refusal of a mint under a build another session holds, naming the holder (TOOL-dTotalRecall-2 S6, §4 "Minting"), which S5 skips on
 - **consumes-from** external — dGroundRules, landed: `policy.py get` and `policy.py lists --write`
 - **hands-off** `TOOL-dRankedPlan-28` — the `triage` and `dupes` rows of `record-kinds.toml`, which that unit registers in the binding reader, the factory table and the HYGIENE kind list (round-1 spec audit, id 28)
 - **hands-off** `TOOL-dRankedPlan-29` — `triage.py`'s policy read and its row writer, which that unit's S6 to S8 and S17 correct (round-1 spec audit, ids 9, 17, 20, 44)
@@ -280,7 +297,7 @@ None is `retire` or `refuse`: a rule that ends an ask is the owner's to add.
 | `.governance/triage-rules.toml`, `[[triage-rule]]` | declared-rules file and table | none |
 | `triage`, `dupes` | `[[record-kind]]` rows | none |
 | `--record` | flag of `plan_items.py dedupe` | none |
-| the plants `rules`, `judge`, `owner-batches`, `archive-legacy`, `default`, `bad-rule`, `kinds`, `intake` | fixture cases of `triage.py` | none |
+| the plants `rules`, `judge`, `owner-batches`, `archive-legacy`, `default`, `bad-rule`, `kinds`, `intake`, `held-home` | fixture cases of `triage.py` | none |
 | the plant `triage-witness` | fixture case of `plan_items.py` | none |
 
 ### Rollout
@@ -321,9 +338,10 @@ backlog. Its fixture arms run inside the `build-index selftest` leg: `gen_build_
   write (S3). A rule can only render the four row shapes, each undone by a later row.
 - perf / scale — one fold per pass, about 620 asks at base; rows are appended once per home file.
 - error / empty / loading states — an absent rules file sends every ask to the judge; an empty
-  population prints `triage — nothing to triage` and writes no record.
-- observability — the pass prints one `triage — <id> · <verdict> · <rule|judge>` line per ask and a
-  count per rule.
+  population prints `triage — nothing to triage` and writes no record; a home another session holds
+  is skipped with its asks left undecided (S5).
+- observability — the pass prints one `triage — <id> · <verdict> · <rule|judge>` line per ask, a
+  count per rule, and one `triage — <home> held by <holder>` line per skipped home.
 - risks — a loose rule labels many asks at once. Under `rules` the owner reads the result by its
   labels (`--asks` with the rule named in each why), and every row is reversible. A rule that ends
   asks is never seeded. The ratification predicate answers for a build's plan, so a backlog batch is
@@ -331,7 +349,7 @@ backlog. Its fixture arms run inside the `build-index selftest` leg: `gen_build_
   `terminal-command` by the owner's terminal disposition record in that folder, and under `request`
   only in a session that typed the home's own request; a home with no claim stays held under
   `request`, which the help section states.
-- testing — the eight `triage.py` plants and the `plan_items.py` plant, red and green.
+- testing — the nine `triage.py` plants and the `plan_items.py` plant, red and green.
 - migration — none: no row is rewritten, and an ask labelled before this unit is not re-triaged.
 - user docs — `help/plan.md`, S10.
 
@@ -390,12 +408,19 @@ backlog. Its fixture arms run inside the `build-index selftest` leg: `gen_build_
   reading `Batch: held` the triage-rule witness does not hold; and `grep -c "item.plan.triage-rule"`
   over the fixture's `[[stand-in]]` rows prints 0.
   Red when: a held batch witnesses the item, or a stand-in row survives beside its armed reader.
+- **AC13** — When `python triage.py --fixture --plant held-home` runs `pass` over two home builds,
+  `hA` and `hB`, each holding one ask a rule decides, with the fixture's bare remote holding the lease
+  `refs/gov/leases/hA/build` for another session as TOOL-dTotalRecall-2 AC5 plants it, `pass` exits
+  0 and prints `triage — hA held by <holder>`, the holder the door's refusal line names;
+  `git status --porcelain -- <hA's folder>` prints nothing, and `hB` gains its row and its triage
+  record. With the lease released, a second `pass` labels `hA`'s ask.
+  Red when: the pass writes a row or a record into a home another session holds, or exits non-zero.
 
 ## 7. Gates
 
 `build-index selftest` · `memory hygiene` · `policy fixtures` · `policy check` · `tier2-review self-test` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/memory-tree/triage.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC11 · the eight plants, run inside the build-index selftest leg through gen_build_index.py's cmd_selftest, the failing case a label written without its rule · none
+New arm: tools/memory-tree/triage.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC11 AC13 · the nine plants, run inside the build-index selftest leg through gen_build_index.py's cmd_selftest, the failing cases a label written without its rule and a row written into a home another session holds · none
 
 New arm: tools/loop/plan_items.py · covers AC12 · the `triage-witness` plant beside TOOL-dRankedPlan-2's plants, the failing case a held batch read as a witness · none
 
@@ -452,6 +477,12 @@ New arm: tools/loop/plan_items.py · covers AC12 · the `triage-witness` plant b
   by running `ratify.py <home>` as a subprocess, matching TOOL-dRankedPlan-22 S1 (writer-found, not a
   record row). S5 and S7 spell the writer cell in the `deviation` row's form, with no `new`, since no
   parent claims a generic `new` verb on the factory (TOOL-dTotalRecall-1 §4).
+- rev-4 · 2026-11-05 · S5 · §3 · §4 · §5 · AC13 · §7 · S5 skips a home build another session leases
+  or claims, printing `triage — <home> held by <holder>` from the door's own refusal line, minting a
+  home's record before its rows so a refused home gets neither, and leaving its asks undecided for the
+  next pass; AC13 and the `held-home` plant observe it, re-grounded on TOOL-dTotalRecall-2 §4
+  "Minting" by row 6 of `build/2026-11-05-build-TOOL-dRankedPlan-1-parents-crosscheck.md`, by the
+  brief prompts/2026-11-05-prompt-TOOL-dRankedPlan-1-parents-reground.md
 
 ## 10. Reuse audit
 

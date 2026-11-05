@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-13 — the reuse scout's return under M1c's contract: the `seams` record, its caps and MUST definition, read once and its seams handed on as rows
 
-**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 9 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-3 · 2026-11-05 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 9 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0395@07a81090 whole
 **Carries:** node:item.design.seams
@@ -14,8 +14,15 @@
 | [2026-10-28-build-TOOL-dIndexedDesign-1-fix-return.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-fix-return.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-b.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-b.md) | research | TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-1 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-13-deviation-131.md](../build/2026-11-05-build-TOOL-dIndexedDesign-13-deviation-131.md) | deviation | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-fix-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-fix-brief.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground-followup.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground-followup.md) | research | TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
 | [2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-3 |
 
 <!-- /gen:spec-records -->
@@ -37,19 +44,29 @@ duplicate, the unmet needs, and the MUST and SHOULD seams handed on as rows.
 Build-run preconditions this unit calls and does not build: `tools/codebase-map/house_index.py`, its
 `## Steps` and the scout's record with its one reader `read_reuse_scouts(root, slug)` and `python
 gen_build_index.py --reuse-scouts <slug>` (TOOL-dLinkedLibrary-2 S2, S3, S5, S6); the record-kind factory
-(TOOL-dTotalRecall-1 S9); the `[[item]]` and `[[stand-in]]` rows of `tools/loop/loop.toml`
-(TOOL-dDeclaredLoop-12 S2, -13 S8) and the `upstream` field with its `## Establishes` rows
-(TOOL-dDeclaredLoop-29 S1, S3, S4); the tag bundle as TOOL-dIndexedDesign-12 routes it (`bundle`).
+(TOOL-dTotalRecall-1 S9) with its `--purpose` (TOOL-dTotalRecall-16 S2) and its columns
+(TOOL-dTotalRecall-18 S1); the `[[item]]` and `[[stand-in]]` rows of `tools/loop/loop.toml` and their
+loader `loop_lib.py --check` (TOOL-dDeclaredLoop-12 S2, S3, -13 S8) and the `upstream` field with its
+`## Establishes` rows and its `finding` route rule (TOOL-dDeclaredLoop-29 S1, S3, S4, S7); the tag bundle as TOOL-dIndexedDesign-12 routes it (`bundle`).
 
 Shared file the build run sequences: `tools/loop/loop.toml`, where TOOL-dIndexedDesign-8 S11 (order 8)
 arms `item.design.decompose`'s row before S6 below adds its `upstream` entry to that same row, and
 TOOL-dIndexedDesign-20 S10, at this unit's order 9, arms the `input`, `reentry` and `inventory` rows.
 
 - **S1** — The record kind `seams`, tag `record.seams`, registered by `python record_kinds.py new seams
-  --tag record.seams --writer hand --check "memory hygiene" --field Index` (I15). Its home stays
-  TOOL-dLinkedLibrary-2 S6's `<date>-build-<unit id>-reuse-scout[-<x>].md`, now bound `**Serves:**
-  seams <ids>` with its `**Index:** <sha8>` line. A `-reuse-scout` record bound `research`, every one in
-  the tree at base, is read as TOOL-dLinkedLibrary-2 reads it and graded by nothing here. Observed by AC6.
+  --tag record.seams --writer hand --check "memory hygiene" --field Index --purpose "a reuse scout's
+  return: needs, sketch, anchors, census, up to twelve seams and five MUSTs, unmet needs, seams as
+  rows"` (I15), the `--purpose` TOOL-dTotalRecall-16 S2 requires, within its S1's 120-byte cap, its
+  schema the `fields` form `--field` writes, with the columns TOOL-dTotalRecall-18 S1 requires set through that
+  unit's landed verb, as TOOL-dIndexedDesign-10 S1 and -11 S5 set theirs: layer `layer.memory`, home
+  `memory/builds/*/build/*-reuse-scout*.md`, a tracked glob over TOOL-dLinkedLibrary-2 S6's name
+  `<date>-build-<unit id>-reuse-scout[-<x>].md`, which is the id-rule, lifecycle `append-only`, and
+  `readers = ["task:reuse"]`, the key whose block TOOL-dLinkedLibrary-2 S7's slot renders from the
+  record. Each record is now bound `**Serves:** seams <ids>` with its `**Index:** <sha8>` line. A
+  `-reuse-scout` record bound `research`, every one in the tree at base, matches the home and is read as
+  TOOL-dLinkedLibrary-2 reads it; TOOL-dTotalRecall-42 S5 derives its kind from its Serves kind, so it is
+  graded by nothing here. `writer` stays `hand`, legal on a row TOOL-dTotalRecall-2 S9 never moves, since
+  that one-time pass runs before this row lands (TOOL-dTotalRecall-1 §4 "Data model"). Observed by AC6.
 - **S2** — The return grammar, sections in M1c's order (I10, refined in §4 "The return"): `## Needs`,
   `## Sketch`, `## Anchors`, `## Census`, `## Matches`, `## Unmet`, `## Bug classes`, `## Establishes`.
   `## Matches` keeps TOOL-dLinkedLibrary-2's heading and takes TOOL-aScoutedSeam-1 §4's line spelling,
@@ -78,7 +95,13 @@ TOOL-dIndexedDesign-20 S10, at this unit's order 9, arms the `input`, `reentry` 
   <path> :: <symbol>`, `<n>` its match's position, in TOOL-dDeclaredLoop-29 S3's grammar and closed
   kind set. `item.design.decompose`'s row in `tools/loop/loop.toml` gains `upstream = [{ item =
   "item.design.seams" }]`, gate `record`, so `derive_upstream_rows` hands each row to the decompose
-  item; no entry is `measured` (TOOL-dDeclaredLoop-29 S2). Observed by AC4 and AC7.
+  item; no entry is `measured` (TOOL-dDeclaredLoop-29 S2). Since its `upstream` is now non-empty, the
+  same row gains the outcome `finding` in its closed `outcomes` and a route for it under
+  `[item.routes]`, or TOOL-dDeclaredLoop-29 S7's loader refuses the row. The route is the item its
+  decomposed outcome takes, `finding = "item.design.overlaps"`: on a `record` edge a finding is recorded
+  and the return stands (TOOL-dDeclaredLoop-29 S6, S8), so a bypassed seam moves the build on as a
+  decomposition does, and gates nothing (§4 "Rollout"). Its other outcomes and routes stay as
+  TOOL-dDeclaredLoop-12 transcribed them. Observed by AC4 and AC7.
 - **S7** — The item goes live. `item.design.seams`'s `[[stand-in]]` row leaves `tools/loop/loop.toml`,
   its row's `witness` names `--reuse-scouts --check` and its `returns` `record-kind.seams`; its other
   fields stay as TOOL-dDeclaredLoop-12 transcribed them. Observed by AC7.
@@ -264,14 +287,23 @@ answered and gate nothing until a measurement moves the edge.
   record with sections out of order, it fails check 31 naming the record; over this tree at landing it
   passes and prints the count of `research` scout records it passed over.
   Red when: the misordered record passes, or a `research` record is graded.
-- **AC6** — When `python -c` loads `record-kinds.toml` with `tomllib`, a `seams` row has tag
-  `record.seams` and field `Index`, and `python gen_build_index.py --reuse-scouts dIndexedDesign`
-  still prints the four scout records of this build.
-  Red when: the row is missing, or a `research` record leaves the reader's list.
-- **AC7** — When `python -c` loads `loop.toml` with `tomllib`, no `[[stand-in]]` row names
-  `item.design.seams`, that item's `witness` names `--reuse-scouts`, and `item.design.decompose`'s
-  `upstream` holds `item.design.seams` at gate `record`.
-  Red when: the stand-in survives the witness, or the upstream entry is absent or `measured`.
+- **AC6** — When `python record_kinds.py --check` runs at the pass tip, it lists `seams` with tag
+  `record.seams`, form `fields` with field `Index`, home `memory/builds/*/build/*-reuse-scout*.md`,
+  writer `hand`, check `memory hygiene` and its purpose, and exits 0; and `python gen_build_index.py
+  --reuse-scouts dIndexedDesign` still prints the four scout records of this build.
+  Red when: the row is missing or lacks a column TOOL-dTotalRecall-16 or -18 requires, or a `research`
+  record leaves the reader's list.
+  fixture: the registry is TOOL-dTotalRecall-1's, absent at base until it lands.
+- **AC7** — When `python tools/loop/loop_lib.py --check` runs at the pass tip, it exits 0 having loaded
+  every item; a `python -c` `tomllib` read of `loop.toml` finds no `[[stand-in]]` row naming
+  `item.design.seams`, that item's `witness` naming `--reuse-scouts`, and `item.design.decompose`'s
+  `upstream` holding `item.design.seams` at gate `record`, its `outcomes` holding `finding` routed to
+  `item.design.overlaps`; and in a copy of `tools/loop/` whose `loop.toml` drops that route,
+  `loop_lib.py --check` exits 1 naming `item.design.decompose`.
+  Red when: the stand-in survives the witness, the upstream entry is absent or `measured`, or the
+  row carries `upstream` with no `finding` route and the loader reads it green.
+  fixture: the copy under `%TEMP%`, written by the pass; the loader is TOOL-dDeclaredLoop-12's and -29's,
+  absent at base until they land.
 - **AC8** — When `python house_index.py --out <scratch>/hi.md` runs, its `## Steps` holds a Return step
   naming the eight sections, `12` and `5`, which equal `tree_lib.MATCH_CAP` and `tree_lib.MUST_CAP` read
   by `python -c`; `grep -n "## Needs" gov-reuse-scout.agent.md` finds the `returns:` line, and the body
@@ -316,6 +348,13 @@ New arm: tools/codebase-map/selftest.py · covers AC8 · the Return step's caps 
   TOOL-dDeclaredLoop-29 S1 to S4, and scout B's row for this unit.
 - rev-2 · 2026-10-28 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from edges of TOOL-dIndexedDesign-33, TOOL-dIndexedDesign-38,
   promoted by the round-1 spec audit of this build; nothing else moved.
+- rev-3 · 2026-11-05 · §2 preconditions, S1, S6 · AC6, AC7 · S1's `new seams` gains the `--purpose`
+  TOOL-dTotalRecall-16 S2 requires, a glob home and the columns TOOL-dTotalRecall-18 S1 requires, and
+  AC6 reds a missing column; S6 gives `item.design.decompose` the `finding` outcome and its route that
+  TOOL-dDeclaredLoop-29 S7 requires of a row with `upstream`, and AC7 runs the loop loader over the
+  row, by the brief prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md; S1 · S1's
+  `--purpose` falls from 137 bytes to 117, under TOOL-dTotalRecall-16 S1's 120-byte cap, keeping every
+  section of the return and its caps, no AC quoting it, and by the brief prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground-followup.md
 
 ## 10. Reuse audit
 

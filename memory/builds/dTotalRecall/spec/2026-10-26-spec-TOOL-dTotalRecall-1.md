@@ -26,6 +26,9 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-11-03-build-TOOL-dTotalRecall-1-deviation-13.md](../build/2026-11-03-build-TOOL-dTotalRecall-1-deviation-13.md) | deviation | — |
 | [2026-11-03-build-TOOL-dTotalRecall-2-owner-fork-returns.md](../build/2026-11-03-build-TOOL-dTotalRecall-2-owner-fork-returns.md) | research | TOOL-dTotalRecall-2 |
+| [2026-11-05-build-TOOL-dTotalRecall-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dTotalRecall-1-crosscheck-returns.md) | research | TOOL-dTotalRecall-11 TOOL-dTotalRecall-25 |
+| [2026-11-05-build-TOOL-dTotalRecall-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-11 TOOL-dTotalRecall-25 |
+| [2026-11-05-build-TOOL-dTotalRecall-1-reground-returns.md](../build/2026-11-05-build-TOOL-dTotalRecall-1-reground-returns.md) | research | TOOL-dTotalRecall-11 TOOL-dTotalRecall-25 |
 | [2026-10-25-prompt-TOOL-dTotalRecall-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dTotalRecall-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dTotalRecall-1-2-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dTotalRecall-1-2-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dTotalRecall-1-3-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dTotalRecall-1-3-reuse-scout.md) | journal | — |
@@ -48,6 +51,8 @@
 | [2026-10-26-prompt-TOOL-dTotalRecall-93-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-93-1-spec-writer.md) | journal | TOOL-dTotalRecall-93 |
 | [2026-11-03-prompt-TOOL-dTotalRecall-1-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dTotalRecall-1-1-spec-writer.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dTotalRecall-2-owner-fork.md](../prompts/2026-11-03-prompt-TOOL-dTotalRecall-2-owner-fork.md) | research | TOOL-dTotalRecall-2 |
+| [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-3 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-11 TOOL-dTotalRecall-19 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-43 TOOL-dTotalRecall-50 TOOL-dTotalRecall-61 TOOL-dTotalRecall-70 TOOL-dTotalRecall-89 |
+| [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-11 TOOL-dTotalRecall-25 |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
 
 <!-- /gen:spec-records -->

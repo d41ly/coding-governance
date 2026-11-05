@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-5 — the research harness: one experiment factory on dBoundRoles' `experiment` shape, the reuse bench its first entry
 
-**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 10 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-3 · 2026-11-05 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 10 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0387@f264e3f3 whole
 **Carries:** node:item.design.research
@@ -12,7 +12,13 @@
 | [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-47 TOOL-dIndexedDesign-48 TOOL-dIndexedDesign-49 TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-52 TOOL-dIndexedDesign-53 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-b.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-b.md) | research | TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-1 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-5-deviation-51.md](../build/2026-11-05-build-TOOL-dIndexedDesign-5-deviation-51.md) | deviation | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
 | [2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-3 |
 
 <!-- /gen:spec-records -->
@@ -38,9 +44,10 @@ experiment"); the composed workflow rows `compose_workflows`, the overlay `.gove
 and the open workflow registry that replaces `WORKFLOW_NAMES` (TOOL-dBoundRoles-20 S3, S4); the scorer
 factory `replay_scorer.py`, its `INSTANCES`, `case_evidence` and `--experiment <manifest>`
 (TOOL-dFairHearing-12 S1, TOOL-dFairHearing-14 S1, S2); `reuse-bench.js` and its committed manifest
-(TOOL-dLinkedLibrary-2 S11); the `kind: research-return` line (TOOL-dLinkedLibrary-13 S1); and the
-item factory `loop_items.py new` with `tools/loop/loop.toml` (TOOL-dDeclaredLoop-24 S6). Every one
-of those builds is an ancestor of this one, dFairHearing through dDeclaredLoop.
+(TOOL-dLinkedLibrary-2 S11); the `kind: research-return` line (TOOL-dLinkedLibrary-13 S1); and
+`item.design.research`'s `[[item]]` row in `tools/loop/loop.toml` (TOOL-dDeclaredLoop-12 S2) with its
+`[[stand-in]]` row (TOOL-dDeclaredLoop-13 S8). Every one of those builds is an ancestor of this one,
+dFairHearing through dDeclaredLoop.
 
 - **S1** — The factory. `tools/workflows/experiment.template.js`, rendered to
   `tools/workflows/experiment.js` with the one token `{{FANOUT_CAP}}`: a `rendered` `[[files]]` row in
@@ -116,11 +123,13 @@ of those builds is an ancestor of this one, dFairHearing through dDeclaredLoop.
   bench and is unbuilt at base · by value: NO VALUE READERS — a workflow script is run by its
   `scriptPath` and nothing compares, counts or derives from the file; `.claude/roles.json` never
   listed it. Observed by AC8.
-- **S8** — The item `design.research`, node `item.design.research`. The item factory,
-  `loop_items.py new design.research`, appends its `[[item]]` row to `tools/loop/loop.toml` with
-  `--step step.design`, `--actor role:gov-researcher`, `--owner dIndexedDesign` and the witness "the
-  research record's kind line and Serves binding". That witness is TOOL-dLinkedLibrary-13's
-  `read_declared_kind` returning `research-return` on the record S2 shapes. This is the item that TOOL-dLinkedLibrary-13 S2 says
+- **S8** — The item `design.research` goes live, node `item.design.research`. TOOL-dDeclaredLoop-12 S2
+  already transcribes its `[[item]]` row from flow-steps' `[design]` table, so this unit arms that row
+  and mints none: the row's `witness` names "the research record's kind line and Serves binding",
+  TOOL-dLinkedLibrary-13's `read_declared_kind` returning `research-return` on the record S2 shapes,
+  and the item's `[[stand-in]]` row (TOOL-dDeclaredLoop-13 S8) leaves `tools/loop/loop.toml` in the
+  same landing. Its step, actor, needs, outcomes and routes stay as TOOL-dDeclaredLoop-12 transcribed
+  them. This is the item that TOOL-dLinkedLibrary-13 S2 says
   writes the kind line, and that TOOL-dDeclaredLoop-11 maps the directives `researched` and
   `solution-tested` onto. Observed by AC9.
 - **S9** — The docs: a new page `help/experiments.md` and its line in `help/README.md`. The page
@@ -150,7 +159,7 @@ of those builds is an ancestor of this one, dFairHearing through dDeclaredLoop.
 - **consumes-from** external — dBoundRoles: the `[workflow.experiment]` table, R9, `compose_workflows` and the overlay rows (TOOL-dBoundRoles-16 S4, TOOL-dBoundRoles-20 S3, S4)
 - **consumes-from** external — dFairHearing: `replay_scorer.py`, `INSTANCES`, `case_evidence` and `--experiment` (TOOL-dFairHearing-12 S1, TOOL-dFairHearing-14 S1, S2)
 - **consumes-from** external — dLinkedLibrary: `reuse-bench.js` and its manifest (TOOL-dLinkedLibrary-2 S11), the `kind: research-return` line (TOOL-dLinkedLibrary-13 S1)
-- **consumes-from** external — dDeclaredLoop: `loop_items.py new` and `tools/loop/loop.toml` (TOOL-dDeclaredLoop-24 S6)
+- **consumes-from** external — dDeclaredLoop: `item.design.research`'s `[[item]]` row in `tools/loop/loop.toml` (TOOL-dDeclaredLoop-12 S2), which S8 arms, and its `[[stand-in]]` row (TOOL-dDeclaredLoop-13 S8), which S8 deletes
 - **hands-off** `TOOL-dIndexedDesign-31` — S6's `scouted-seam` input, which that unit makes a true allow-list, and AC7, which it supersedes (report id 37, BLOCKER)
 
 ## 4. Design
@@ -216,7 +225,6 @@ has a judge, `judge`.
 | `researcher`, `subject`, `judge` | harness stage keys | none |
 | `<cases stem>.variants.md`, `## Returns`, `## Losing` | the variants file and its sections | none |
 | `reuse-bench` | repository workflow row | none |
-| `design.research` | loop item, node `item.design.research` | none |
 | `help/experiments.md` | help page | none |
 
 ### Migration
@@ -242,7 +250,7 @@ loop's Workflow call. The unit's ledger answers AC10 from the scored figures.
 - `tools/roles/handoff.py`, `tools/roles/adopt-roles.test.sh`: S5
 - `tools/roles/workflows.toml`, `.claude/roles.json` (render): S7
 - `.governance/instructions.toml`: S7
-- `tools/loop/loop.toml`: S8
+- `tools/loop/loop.toml`: S8, the research item's witness and its stand-in row deleted
 - `help/experiments.md` (new), `help/README.md`: S9
 
 ### Alternatives rejected
@@ -312,10 +320,12 @@ loop's Workflow call. The unit's ledger answers AC10 from the scored figures.
   `python render_agents.py --check` passes with `.claude/roles.json` listing `experiment.js`, and
   `git ls-files "*reuse-bench.js"` prints nothing.
   Red when: research keeps `harness = "none"`, or the old dispatcher remains.
-- **AC9** — When a `python -c` `tomllib` read of the loop kit's `loop.toml` lists its `[[item]]` rows, the
-  row `design.research` carries `step.design`, the actor `role:gov-researcher` and the owner
-  `dIndexedDesign`.
-  Red when: the row is absent or names another actor.
+- **AC9** — When a `python -c` `tomllib` read of the loop kit's `loop.toml` runs at this unit's tip,
+  the `[[item]]` row tagged `item.design.research` carries a `witness` naming `read_declared_kind` and
+  `research-return`, and no `[[stand-in]]` row names `item.design.research`.
+  Red when: the witness is the transcribed one TOOL-dDeclaredLoop-12 wrote, or the stand-in survives
+  the witness; either is the state before this unit builds.
+  fixture: `loop.toml` is TOOL-dDeclaredLoop-12's, absent at base until it lands.
 - **AC10** — When the main loop runs the `reuse-bench` entry through `experiment.js` over the
   benchmark cases and then the held-out cases, and `python replay_scorer.py --experiment <manifest>`
   scores each committed run, the parsed lines print before the figures, and the figures read at least
@@ -366,6 +376,11 @@ New arm: tools/workflows/replay_scorer.py · covers AC7 · `run_selftest`'s arms
   and -14, TOOL-dLinkedLibrary-2 S11 and -13 S1, I12 and scout B's row for this unit.
 - rev-2 · 2026-10-28 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from edge of TOOL-dIndexedDesign-31,
   promoted by the round-1 spec audit of this build; nothing else moved.
+- rev-3 · 2026-11-05 · §2 preamble · S8 · §3 Edges · §4 Inventory, Files touched · AC9 · S8 arms
+  TOOL-dDeclaredLoop-12 S2's existing `item.design.research` row, its witness set to the
+  `read_declared_kind` check and its TOOL-dDeclaredLoop-13 S8 stand-in row deleted, in place of the
+  item factory call that would exit 2 on the transcribed row; AC9 reads the armed witness, so it is red
+  at base, row 37 of `2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck`, by the brief prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md
 
 ## 10. Reuse audit
 
