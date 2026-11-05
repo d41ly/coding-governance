@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 149 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 158 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 149 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 159 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -312,6 +312,7 @@ Inventories: gate-legs: 149 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `fold-text-is-unreviewed-surface.md` | build-method |
 | `foreign-code-runs-on-the-ambient-credential.md` | build-method |
 | `format-derived-from-arity.md` | run-gates |
+| `forwarded-arg-opens-an-unhandled-return-shape.md` | memory-tree-hygiene |
 | `gate-green-by-accident-on-generated-bytes.md` | baseline |
 | `git-rm-cached-refuses-a-diverged-index-blob.md` | agent-cap |
 | `grammar-bound-to-the-wrong-root.md` | baseline |

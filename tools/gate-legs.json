@@ -1842,6 +1842,8 @@
       "{prefix}/govkit/registry.toml",
       "{prefix}/govkit/selftest.py",
       "{prefix}/workflows/unattended-build.template.js",
+      "{prefix}/workflows/check-review-join.js",
+      "{prefix}/workflows/check-verifier-fanout.js",
       "{prefix}/lib/",
       "{prefix}/hooks/agent-cap.js",
       "{prefix}/memory-tree/tree_lib.py",

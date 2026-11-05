@@ -1851,6 +1851,22 @@ if (specAudit && auRaw.exit === 'deferred-platform') {
       (attended ? ' · ATTENDED, so no driver-side check ran' : ''),
   }
 }
+// TOOL-dFairHearing-48 S4 - A GAPPED WALK IS A BLOCKED VERDICT, NOT A DEGRADED RUN. `tier2-review.js`
+// returns `blockers: null` beside the gaps, so the non-integer refusal below would misname it. It is
+// no round the driver can count: `--blockers` takes an integer, and a gap is not a confirmed finding.
+const walkGaps = specAudit && Array.isArray(auRaw.walkGaps) ? auRaw.walkGaps : []
+if (walkGaps.length > 0) {
+  log('audit round ' + roundNo + ': BLOCKED by ' + walkGaps.length + ' walk gap(s) — ' + walkGaps.join('; ') +
+    '; no round recorded, no unit built')
+  return {
+    identity: identity, slug: slug, mode: mode, base: base, stage: 'Audit', exit: 'walk-red',
+    round: roundNo, walkGaps: walkGaps, report: auRaw.report || '', units: ordered.length,
+    specced: speccedCount, specRefused: specRefused, subjectRound: subjectRound, auditIds: auditIds,
+    roster: [],
+    next: 'Read the review report, have the walkers return every cell of the slice each gap names, and re-run this workflow.',
+    note: 'BLOCKED AT AUDIT — ' + walkGaps.length + ' walk gap(s), so the round is unrecorded and no unit was built',
+  }
+}
 // THE CALLEE'S EARLY RETURNS CARRY `confirmed: []` AND `blockers: null`, and they are NOT all
 // degraded (closing review round 1, cluster F). `tier2-review.js` returns that pairing on four
 // paths: every lens dead; no lens raised a finding; every finding refuted; and, with `confirmed` an

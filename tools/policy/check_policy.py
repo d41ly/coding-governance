@@ -1543,6 +1543,7 @@ def build_reader_repo(path, *texts):
 def check_run(scenario, what, argv, want, cwd=None, env=None):
     """`argv` run in `cwd` -> (scenario, what, ok, what it observed), `want` judging (exit code,
     stdout, stderr), CR stripped. A program that does not start is exit None."""
+    add_argv_reads(argv, cwd)
     try:
         p = subprocess.run(argv, cwd=cwd, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
         rc, out, err = p.returncode, p.stdout.replace("\r", ""), p.stderr.replace("\r", "")
@@ -3045,7 +3046,7 @@ def run_limit_case(name):
             checks.append(check_case(repo, hook, render, "the render at 6, policy-mirror.js removed",
                                      finds("gov:fixed-writers", "above the bound 5: MAX_VERIFIERS, as no policy kit")))
             # TOOL-dFairHearing-43 S10: rule 5, run over the same hook copy, so the claim above is an executed check.
-            checks.append(check_case(repo, hook, "m.set(f.ref, v)\n", "check-review-join.js over a ref-keyed join",
+            checks.append(check_case(repo, hook, "m.set(f.ref, v)\n", "FH43 AC10 check-review-join.js over a ref-keyed join",
                                      finds("a ref-keyed verdict join"), "check-review-join.js"))
         elif name == "limit-settings-elsewhere":
             # TOOL-dGroundRules-21 S34: GOV_SETTINGS_JSON names the settings in force, for the render and rule 7.
@@ -3266,6 +3267,7 @@ def render_said(out, mark):
 def run_case_argv(cwd, argv, env=None, stdin=None):
     """-> (exit code, stdout and stderr with CR stripped); a `bash` argv[0] is `resolve_bash`'s, an
     `env` value of None drops that variable, and `stdin` is the text piped in."""
+    add_argv_reads(argv, cwd)
     if argv[0] == "bash":
         argv = [resolve_bash(Path(cwd, str(argv[1])).as_posix()) or "bash", *argv[1:]]
     merged = {**os.environ, **(env or {})}
@@ -4029,7 +4031,10 @@ def add_source_read(event, args):
     `O_WRONLY`, `O_RDWR` or `O_CREAT` (TOOL-dGroundRules-43 S9), on a path that resolves, against the working directory,
     under the source repository's top level, under no case's temporary directory and under neither of
     the source's git directories (TOOL-dGroundRules-38 S2: the snapshot's index and exclude-file copies
-    are git's reads, never a source file's), is kept in SOURCE_READS, top-relative in `/` form. Only this process's reads are seen, never a subprocess's.
+    are git's reads, never a source file's), is kept in SOURCE_READS, top-relative in `/` form. Only this process's reads are seen, never a subprocess's;
+    `add_argv_reads` keeps the script a generic runner hands a child (TOOL-dFairHearing-48 S2). Outside it stay a file the
+    child itself reads; a child of the seven inline `subprocess.run` sites that take neither runner, each naming a file a
+    guard already covers or a fixture copy; and the two workflows checkers' own reads of the hook and the case file.
     A hook that raised would fail the very open it audits, so a path that does not resolve keeps nothing.
     A bytecode-cache read is kept as the source file it was compiled from (TOOL-dGroundRules-35 S1), so
     a warm load still records its `.py`; a cache name `source_from_cache` refuses is kept as spelled,
@@ -4067,6 +4072,15 @@ def add_source_read(event, args):
         return
 
 
+def add_argv_reads(argv, cwd=None):
+    """FH48 AC2: each argv element naming a file, read against `cwd` as the child reads it, kept by
+    `add_source_read`, so the guard trace joins a script a child runs (TOOL-dFairHearing-48 S2)."""
+    for a in argv:
+        p = os.path.join(str(cwd or ""), str(a))
+        if os.path.isfile(p):
+            add_source_read("open", (p, "r", 0))
+
+
 def check_guard_trace():
     """The guard trace's join (TOOL-dGroundRules-33 S3): every path `add_source_read` kept that exists
     under the source top when this runs (TOOL-dGroundRules-43 S9, the rest counted as absent) and git does
@@ -4075,7 +4089,10 @@ def check_guard_trace():
     no `policy fixtures` guard: an edit to it alone would skip the leg whose cases read it. The count
     line comes first, then the set-aside count on every run, so an empty trace is seen, and is a WRONG of
     its own, as is an ignore query or a checker that does not run: a join over nothing, or with no
-    judge, proves nothing. -> (assertions, wrong)."""
+    judge, proves nothing. WHAT THE JOIN CANNOT SEE (TOOL-dFairHearing-48 S2): a file a child itself reads,
+    since the audit hook sees this process alone; a child of the seven inline `subprocess.run` sites that
+    take neither generic runner, each naming a file a guard already covers or a fixture copy; and the two
+    workflows checkers' own reads of the hook and the case file. -> (assertions, wrong)."""
     kept = sorted(SOURCE_READS)
     print(f"policy-fixture: guard-trace · {len(kept)} source read(s)")
     for p in sorted(UNMAPPED_READS):  # TOOL-dGroundRules-52 S25, before any set-aside can hide it

@@ -1412,12 +1412,15 @@ async function runWholeScriptArms() {
     const sp = run.trace.find((t) => t.label === 'synth')
     return (/(^|\n)(Checklist: [^\n]*)/.exec(sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : '') || ['', '', ''])[2]
   }
+  // TOOL-dFairHearing-48 S6 - a prefix of any depth: one spelling ending the memory-tree kit's directory, one not.
+  const CHECKER_SPELLED = /ls-files --error-unmatch (\S*\/)?gotchas\.py/g
   r = await runReview(DIFF, buildStubs({ 'resume:checklist': { checklist: ACQ } }))
   if (checkNoThrow(r, 'FH15 checklist acquired')) {
     const cp = r.trace[0] || { label: '', prompt: '' }
+    const inKit = [...cp.prompt.matchAll(CHECKER_SPELLED)].map((x) => /(^|\/)memory-tree\/$/.test(x[1] || ''))
     ck(cp.label === 'resume:checklist' && cp.prompt.indexOf('--for-diff ' + B + '..' + H) !== -1 &&
-      /ls-files --error-unmatch \S*memory-tree\/gotchas\.py/.test(cp.prompt) && /ls-files --error-unmatch [^\s\/]*\/?gotchas\.py/.test(cp.prompt),
-      'FH15 AC1 the first agent is resume:checklist, naming --for-diff <base>..<head> and both checker spellings: ' + cp.label)
+      inKit.includes(true) && inKit.includes(false),
+      'FH48 AC6 FH15 AC1 the first agent is resume:checklist, naming --for-diff <base>..<head> and both checker spellings: ' + cp.label)
     ck(['ACQONEX', 'ACQTWOX', 'ACQTHREEX'].every((x, i) => scanPrompts(r, 'find:').some((t) => new RegExp('(^|\\n)C' + (i + 1) + ' \\[ \\] ' + x).test(t.prompt))),
       'FH15 AC1 the three acquired items reach the finder prompts as C1, C2 and C3')
     ck(r.logs.indexOf('checklist from --for-diff ' + B + '..' + H) !== -1 &&

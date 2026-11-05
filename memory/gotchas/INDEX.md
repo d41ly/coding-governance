@@ -73,6 +73,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [fold-text-is-unreviewed-surface](fold-text-is-unreviewed-surface.md) | class | 8 |  | a review round's fixes are folded into fresh prose nobody has reviewed, and that prose is where the next round's findings are |
 | [foreign-code-runs-on-the-ambient-credential](foreign-code-runs-on-the-ambient-credential.md) | class | 10 |  | an unattended item runs code another repository authored, on the node's whole environment and ambient credential, so that repository's committers gain the node's rights |
 | [format-derived-from-arity](format-derived-from-arity.md) | class | 3 |  | a producer that picks its output FORMAT from the number of items has two shapes, and a consumer written against the many-item one reads the single-item case as empty |
+| [forwarded-arg-opens-an-unhandled-return-shape](forwarded-arg-opens-an-unhandled-return-shape.md) | class | 2 |  | a harness starts forwarding an argument to its callee, which opens a return shape the adapter never handled, so a real verdict reaches a refusal written for another case and is misnamed |
 | [gate-green-by-accident-on-generated-bytes](gate-green-by-accident-on-generated-bytes.md) | class | 2 |  | a byte-compare gate over a generated file is CRLF-red on Windows and green only right after a render |
 | [git-rm-cached-refuses-a-diverged-index-blob](git-rm-cached-refuses-a-diverged-index-blob.md) | class | 2 |  | `git rm --cached` refuses a path whose index blob differs from both HEAD and the worktree, so a fixture cleanup without `-f` silently leaves the file staged and the next arm measures the wrong fixture |
 | [grammar-bound-to-the-wrong-root](grammar-bound-to-the-wrong-root.md) | class | 2 |  | a module-level grammar resolved at import describes the repo the KIT lives in, not the tree being classified |
@@ -174,6 +175,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 | [zero-witness-over-an-unnamed-population](zero-witness-over-an-unnamed-population.md) | class | 5 |  | a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean |
 
-158 record(s): 155 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+159 record(s): 156 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

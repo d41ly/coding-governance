@@ -119,8 +119,9 @@ INSTANCE_KEYS = ("review-replay", "scouted-seam")
 #: The arm count `run_selftest` must reach, as review_replay.py declares its own. Raised 18 -> 21 by
 #: TOOL-dFairHearing-27 S19: its three arms, tag-item, experiment-freeze-spelling and pairing-walk. Raised 21 -> 24
 #: by TOOL-dFairHearing-32 S9: replay-subject, experiment-references and held-out-pathspec. Raised 24 -> 25 by
-#: TOOL-dFairHearing-37 S5: held-out-tracked. Raised 25 -> 26 by TOOL-dFairHearing-46 S5: stated-shape.
-ARMS_DECLARED = 26
+#: TOOL-dFairHearing-37 S5: held-out-tracked. Raised 25 -> 26 by TOOL-dFairHearing-46 S5: stated-shape. Raised 26 -> 29
+#: by TOOL-dFairHearing-48 S3, S5: appendix-pipe, appendix-break and proof-pinned.
+ARMS_DECLARED = 29
 
 
 class Refusal(Exception):
@@ -279,7 +280,8 @@ def extract_stated_count(text):
 def parse_appendix_rows(text):
     """The appendix's CONFIRMED rows as dicts keyed by header name, and an error or None.
 
-    Refused: no appendix, a missing column, or a confirmed-row count differing from the stated one.
+    Refused: no appendix, a missing column, a row whose cell count differs from the header's, or a
+    confirmed-row count differing from the stated one.
     Cell encoding inverted: `\\|` is a literal bar, and a cell reading `-` is an absent value.
     Rows split on a newline ONLY: `splitlines` also breaks on U+2028, `\\x85` and others a cell may
     carry, and one cut row ends the table and drops every row after it.
@@ -300,6 +302,10 @@ def parse_appendix_rows(text):
     for col in ("id", "lens", "ref", "verdict"):
         if col not in header:
             return None, f"malformed: the appendix has no `{col}` column"
+    for cells in table[2:]:
+        if len(cells) != len(header):
+            row = dict(zip(header, cells)).get("id", "?")
+            return None, f"malformed: row {row} holds {len(cells)} cells against {len(header)} columns"
     rows = [{h: (None if c == "-" else c) for h, c in zip(header, cells)} for cells in table[2:]]
     confirmed = [r for r in rows if r.get("verdict") == "confirmed"]
     stated = extract_stated_count(text)
@@ -1279,7 +1285,22 @@ EXPERIMENT_KEY = {"a": {"ARM-A": "m1b", "ARM-B": "m1b@medium"}, "b": {"ARM-A": "
                   "c": {"ARM-A": "m1b", "ARM-B": "m1b@medium"}}
 #: The method's own experiment: the cases and results at this commit, and the held-out file frozen at b6c828a92.
 UNION_PROOF_COMMIT = "5f8ef021d"
-HELD_OUT_FILE = "-1-13-held-out-cases.json"  # the record's name ending under PROOF_DIR
+PROOF_CASES = "-aScoutedSeam-1-3-cases.json"
+PROOF_RESULTS = "-aScoutedSeam-1-5-results.json"
+HELD_OUT_FILE = "-aScoutedSeam-1-13-held-out-cases.json"  # each a record's name ending under PROOF_DIR
+
+
+def derive_proof_path(top, commit, ending):
+    """The one record `commit` holds under `PROOF_DIR` whose name ends `ending`, repo-relative; refused
+    unless exactly one does. Read from the commit, so nothing in today's tree moves the answer."""
+    proc = subprocess.run(["git", "-C", str(top), "ls-tree", "--name-only", commit, PROOF_DIR + "/"],
+                          capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
+    if proc.returncode:
+        raise Refusal(f"proof: `git ls-tree {commit}` exited {proc.returncode}: {proc.stderr.strip() or 'no stderr'}")
+    found = [p for p in proc.stdout.splitlines() if p.endswith(ending)]
+    if len(found) != 1:
+        raise Refusal(f"proof: {len(found)} record(s) under {PROOF_DIR} at {commit} end {ending}, not one")
+    return found[0]
 
 
 def read_proof_tree():
@@ -1302,13 +1323,6 @@ def run_selftest():
         except Refusal as exc:
             return None if all(n in str(exc) for n in needles) else f"refused without naming {needles}: {exc}"
         return f"not refused; wanted a refusal naming {needles}"
-
-    def derive_proof_path(ending):
-        """The one record under `PROOF_DIR` whose name ends `ending`, repo-relative; refused unless exactly one does."""
-        found = sorted(pathlib.Path(top, PROOF_DIR).glob("*" + ending))
-        if len(found) != 1:
-            raise Refusal(f"proof: {len(found)} record(s) under {PROOF_DIR} end {ending}, not one")
-        return found[0].relative_to(top).as_posix()
 
     def check_paired_refuses():
         return (check_refused(lambda: derive_paired_cases(["a", "b"], {"x": ["a"], "y": ["b"]}), "empty pairing", "x", "y")
@@ -1346,8 +1360,8 @@ def run_selftest():
     def check_scouted_proof():
         if top is None:
             return no_tree
-        corpus, results = read_scouted_population(f"{PROOF_COMMIT}:{derive_proof_path('-1-3-cases.json')}",
-                                                  f"{PROOF_COMMIT}:{derive_proof_path('-1-5-results.json')}", top)
+        corpus, results = read_scouted_population(f"{PROOF_COMMIT}:{derive_proof_path(top, PROOF_COMMIT, PROOF_CASES)}",
+                                                  f"{PROOF_COMMIT}:{derive_proof_path(top, PROOF_COMMIT, PROOF_RESULTS)}", top)
         grade = measure_scouted_grade(corpus, results, "m1b")[-1]
         compare = "\n".join(measure_scouted_compare(corpus, results, ["m1b", "m1b@medium"]))
         judged = "\n".join(measure_scouted_judged(corpus, results, ["m1cA@medium"]))
@@ -1555,8 +1569,9 @@ def run_selftest():
                 return why
         if top is None:
             return no_tree
-        proof = {"instance": "scouted-seam", "cases": f"{UNION_PROOF_COMMIT}:{derive_proof_path('-1-3-cases.json')}",
-                 "results": f"{UNION_PROOF_COMMIT}:{derive_proof_path('-1-5-results.json')}", "heldOut": str(top / derive_proof_path(HELD_OUT_FILE)),
+        proof = {"instance": "scouted-seam", "cases": f"{UNION_PROOF_COMMIT}:{derive_proof_path(top, UNION_PROOF_COMMIT, PROOF_CASES)}",
+                 "results": f"{UNION_PROOF_COMMIT}:{derive_proof_path(top, UNION_PROOF_COMMIT, PROOF_RESULTS)}",
+                 "heldOut": str(top / derive_proof_path(top, UNION_PROOF_COMMIT, HELD_OUT_FILE)),
                  "arms": [{"name": a, "base": None, "settings": {"prompt": a}, "dispatched": n}
                           for a, n in (("m1cA@medium", 30), ("t1r@medium", 35), ("m1c@medium", 12))],
                  "judge": {"verdicts": "judge2", "key": None},
@@ -1765,6 +1780,45 @@ def run_selftest():
         want = [("confirmed 2\n", 2), ("Review shape: raw 1, confirmed 1, refuted 0.\n", 1), ("no count here\n", None)]
         return next((f"{t!r} read {extract_stated_count(t)!r}, not {w!r}" for t, w in want if extract_stated_count(t) != w), None)
 
+    appendix_head = ("Review shape: raw 2, confirmed 2, refuted 0.\n\n" + APPENDIX_HEADING +
+                     "\n\n| id | lens | ref | verdict | disposition |\n|---|---|---|---|---|\n")
+    appendix_row = "| 1 | l | a.py:1 | confirmed | none |\n"
+
+    def check_appendix_pipe_arm():
+        """FH48 AC3: a raw `|` in a cell is one cell too many, refused by name; the same bar escaped still parses."""
+        _, err = parse_appendix_rows(appendix_head + appendix_row + "| 2 | l | a.py:2 | confirmed | none — a | b |\n")
+        if err != "malformed: row 2 holds 6 cells against 5 columns":
+            return f"a raw pipe read {err!r}"
+        rows, err = parse_appendix_rows(appendix_head + appendix_row + "| 2 | l | a.py:2 | confirmed | none — a \\| b |\n")
+        return None if not err and rows[1]["disposition"] == "none — a | b" else f"an escaped pipe read {err or rows!r}"
+
+    def check_appendix_break_arm():
+        """FH48 AC3: a line break in a cell cuts its row one cell short, in the last row and in a middle one."""
+        cut = "| 2 | l | a.py:2 | confirmed | none — a\nb |\n"
+        want = "malformed: row 2 holds 4 cells against 5 columns"
+        return next((f"a break read {err!r}" for err in (parse_appendix_rows(appendix_head + rows)[1]
+                                                          for rows in (appendix_row + cut, cut + appendix_row)) if err != want), None)
+
+    def check_proof_pinned_arm():
+        """FH48 AC5: a proof name resolves in its commit: neither a stray file nor a later commit moves
+        the answer, two matches at a commit refuse, and a commit git cannot read refuses by name."""
+        name, stray = f"{PROOF_DIR}/a-x-cases.json", f"{PROOF_DIR}/stray-x-cases.json"
+        commit = ["-c", "user.name=p", "-c", "user.email=p@p", "commit", "-qm", "proof"]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = derive_git_tree(pathlib.Path(tmp, "r"), {name: "{}\n"})
+            subprocess.run(["git", "-C", str(root), *commit], capture_output=True, check=True)
+            sha = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"], capture_output=True, text=True,
+                                 encoding="utf-8", errors="replace", check=True).stdout.strip()
+            pathlib.Path(root, stray).write_text("{}\n", encoding="utf-8")
+            if derive_proof_path(root, sha, "-x-cases.json") != name:
+                return "an untracked stray moved a pinned read"
+            for argv in (["add", "-A"], commit):
+                subprocess.run(["git", "-C", str(root), *argv], capture_output=True, check=True)
+            if derive_proof_path(root, sha, "-x-cases.json") != name:
+                return "a later commit moved a pinned read"
+            return (check_refused(lambda: derive_proof_path(root, "HEAD", "-x-cases.json"), "2 record(s)", "not one")
+                    or check_refused(lambda: derive_proof_path(root, "0" * 40, "-x-cases.json"), "git ls-tree"))
+
     arms = [("paired-refuses", check_paired_refuses), ("row-refuses", check_row_refuses), ("tag-section", check_tag_section),
             ("instances", check_instances_arm), ("scouted-proof", check_scouted_proof), ("conformance", check_conformance),
             ("deterministic", check_deterministic), ("experiment-evidence", check_evidence_arm),
@@ -1775,7 +1829,9 @@ def run_selftest():
             ("tag-item", check_tag_item_arm), ("experiment-freeze-spelling", check_freeze_spelling_arm),
             ("pairing-walk", check_pairing_walk_arm), ("replay-subject", check_replay_subject_arm),
             ("experiment-references", check_references_arm), ("held-out-pathspec", check_held_out_pathspec_arm),
-            ("held-out-tracked", check_held_out_tracked_arm), ("stated-shape", check_stated_shape_arm)]
+            ("held-out-tracked", check_held_out_tracked_arm), ("stated-shape", check_stated_shape_arm),
+            ("appendix-pipe", check_appendix_pipe_arm), ("appendix-break", check_appendix_break_arm),
+            ("proof-pinned", check_proof_pinned_arm)]
     passed = skipped = ran = 0
     for name, arm in arms:
         ran += 1

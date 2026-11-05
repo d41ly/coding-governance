@@ -25,7 +25,8 @@ gotcha-classes = ["a-grep-for-a-word-is-a-presence-probe.md",
   "line-claim-matched-over-the-whole-output.md", "parser-drops-rows-it-cannot-place.md",
   "insert-after-a-key-that-occurs-twice.md", "pipe-in-a-code-span-splits-a-table-cell.md",
   "unvalidated-arg-reaches-an-agent-shell-line.md", "helper-whose-only-caller-is-its-selftest.md",
-  "doc-names-an-argument-the-code-never-reads.md", "comment-claims-a-check-the-case-does-not-run.md"]
+  "doc-names-an-argument-the-code-never-reads.md", "comment-claims-a-check-the-case-does-not-run.md",
+  "forwarded-arg-opens-an-unhandled-return-shape.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []

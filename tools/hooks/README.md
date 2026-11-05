@@ -212,14 +212,16 @@ past the landed limit. Rule 7 refuses that at the next call.
 
 On every `Agent` and `Workflow` call, after rule 6, the hook finds
 `policy-mirror.js` through `resolveKitDir`, the install receipt's row and then the sibling `policy`
-directory, with no rule where none is found, reads the landed limit through
+directory, with no rule where none is found. The limit is landed; the helper that reads it is not:
+its location rests on the working-tree receipt, so a forged row chooses the code this rule runs
+(TOOL-dFairHearing-48 F1). The hook reads the landed limit through
 `readPolicy`, then the settings file in force, `GOV_SETTINGS_JSON` else `.claude/settings.json`,
 resolved as `check-wiring.sh` resolves it, and `.claude/settings.local.json`, each at the payload
 `cwd`'s checkout root (TOOL-dGroundRules-21 S34). For each variable it takes the value the harness
 applies, the local file's where it sets one, else the project file's, and it refuses, exit 2, when
 either is absent, not a positive integer, or above the limit, naming the file, the variable, both
-numbers and the render command. A refused policy read refuses with its line. With no `policy` kit
-beside the hooks kit it adds no rule; beside one, a `cwd` in no checkout refuses, a settings file
+numbers and the render command. A refused policy read refuses with its line.
+With no policy kit found it adds no rule; with one, a `cwd` in no checkout refuses, a settings file
 that does not parse refuses naming it, and a throw at any step refuses naming the step, since a rule
 that cannot finish does not admit (S38). After rule 7 only the pack's presence check below is left.
 
@@ -236,7 +238,8 @@ one home. Last, after rules 6 and 7, a `Workflow` call whose structured `args` c
 `kind: "spec-audit"` or a `specAudit` key, the pack's own trigger, is refused, exit 2, unless the
 pack is found by `resolveKitDir`, the hook's port of the sibling-kit resolver `resolve_kit_dir`, rung
 for rung (`TOOL-dFairHearing-32`): first a row of the install receipt, `.governance/install.json` at
-the root the nearest `.git` names, whose `source` ends `<prefix>/workflows/spec-audit-optin.js` (or a
+the root the nearest `.git` names,
+whose `source`'s last two segments are the review kit's home and the pack's file name (or a
 `rendered` row from that home naming the file) and whose `path` is a file inside the tree; then the
 probes `<hook dir>/workflows/` and `<hook dir>/../workflows/`. A receipt row whose `path` is missing,
 escapes the tree or holds `..` is skipped, never followed and never a deny, so a stale row with the

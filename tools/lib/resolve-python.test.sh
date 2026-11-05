@@ -703,13 +703,14 @@ print(";".join(c.replace(root, "F").replace(os.sep, "/").replace(".EXE", ".exe")
 # denies on row 2's missing path. TOOL-dFairHearing-37 S13 adds rows 8 and 9, each answering the outer
 # probe: row 8's `.git` is a FILE, a worktree's, and the receipt beside `$JR/.git` names `r8/k/a.js`, so a
 # port testing `isDirectory()` walks past the worktree to it and answers `k`; row 9's receipt is not JSON,
-# so a port letting `JSON.parse` throw answers `refused`. A host with no node prints no list and reds, never skips. WHAT THIS
+# so a port letting `JSON.parse` throw answers `refused`. TOOL-dFairHearing-48 S1 adds row 10: a forged
+# row beside a real sibling answers the row, so a port reordered probes-first answers `h` and reds. A host with no node prints no list and reds, never skips. WHAT THIS
 # DOES NOT CHECK: the refusal's wording, or the ports' call sites, which agent-cap.test.sh's pack arms and
 # spec-audit-optin.test.sh's receipt arms read.
 HOOKS_DIR=$(resolve_kit_dir "$REALPY" hooks agent-cap.js "$HERE") || exit 2
 WORKFLOWS_DIR=$(resolve_kit_dir "$REALPY" workflows spec-audit-optin.js "$HERE") || exit 2
 JR="$TMP/jr"
-add_resolver_layout() { # <row> <receipt rows or empty> <file>... — one layout of the nine
+add_resolver_layout() { # <row> <receipt rows or empty> <file>... — one layout of the ten
   local d="$JR/r$1" j=$2 f _p; shift 2
   mkdir -p "$d/.git" "$d/p" "$d/q"
   [ -z "$j" ] || { mkdir -p "$d/.governance"; printf '{"files": [%s]}\n' "$j" > "$d/.governance/install.json"; }
@@ -728,34 +729,67 @@ mkdir -p "$JR/.git" "$JR/.governance"
 printf '{"files": [{"source": "t/h/a.js", "path": "r8/k/a.js"}]}\n' > "$JR/.governance/install.json"
 add_resolver_layout 9 '' h/a.js
 mkdir -p "$JR/r9/.governance"; printf '{not json\n' > "$JR/r9/.governance/install.json"
+add_resolver_layout 10 '{"source": "t/h/a.js", "path": "f/a.js"}' f/a.js h/a.js
 jr_py=$("$REALPY" -B -c '
 import pathlib, sys
 sys.path.insert(0, sys.argv[1])
 from resolve_kit_dir import resolve_kit_dir
-for r in range(1, 10):
+for r in range(1, 11):
     root = pathlib.Path(sys.argv[2], "r%d" % r).absolute()
     try:
         print(pathlib.Path(resolve_kit_dir("h", "a.js", root / "p")).relative_to(root).as_posix())
     except LookupError:
         print("refused")' "$HERE" "$JR" 2>&1 | tr -d '\r')
-[ "$jr_py" = "$(printf '%s\n' k h refused k p/h h refused h h)" ] \
-  || bad "the canonical resolve_kit_dir disagrees with the nine layouts of TOOL-dFairHearing-32 and -37: ${jr_py//$'\n'/ }"; ok
+[ "$jr_py" = "$(printf '%s\n' k h refused k p/h h refused h h f)" ] \
+  || bad "the canonical resolve_kit_dir disagrees with the ten layouts of TOOL-dFairHearing-32, -37 and -48: ${jr_py//$'\n'/ }"; ok
 for jr_port in "$HOOKS_DIR/agent-cap.js" "$WORKFLOWS_DIR/spec-audit-optin.js"; do
 jr_js=$("$NODE" -e '
 const fs = require("fs"), path = require("path")
 const m = /^\/\/ >>> resolveKitDir\n([\s\S]*?)^\/\/ <<< resolveKitDir$/m.exec(fs.readFileSync(process.argv[1], "utf8").replace(/\r/g, ""))
 if (!m) { console.log("no marked resolveKitDir block in " + process.argv[1]); process.exit(0) }
 const resolveKitDir = new Function("require", m[1] + "\nreturn resolveKitDir")(require)
-for (let r = 1; r <= 9; r++) {
+for (let r = 1; r <= 10; r++) {
   const root = path.join(process.argv[2], "r" + r)
   try { console.log(path.relative(root, resolveKitDir("h", "a.js", path.join(root, "p"))).split(path.sep).join("/")) } catch (e) { console.log("refused") }
 }' "$ROOT/$jr_port" "$JR" 2>&1 | tr -d '\r')
 [ "$jr_js" = "$jr_py" ] \
-  || bad "${jr_port##*/}'s resolveKitDir disagrees with the canonical row for row: port ${jr_js//$'\n'/ } · canonical ${jr_py//$'\n'/ }"; ok
+  || bad "FH43 AC5 ${jr_port##*/}'s resolveKitDir disagrees with the canonical row for row: port ${jr_js//$'\n'/ } · canonical ${jr_py//$'\n'/ }"; ok
 done
 read_kit_block() { sed -n '/^\/\/ >>> resolveKitDir$/,/^\/\/ <<< resolveKitDir$/p' "$ROOT/$1"; }
 [ "$(read_kit_block "$HOOKS_DIR/agent-cap.js" | wc -l)" -gt 2 ] && [ "$(read_kit_block "$HOOKS_DIR/agent-cap.js")" = "$(read_kit_block "$WORKFLOWS_DIR/spec-audit-optin.js")" ] \
-  || bad "the two marked resolveKitDir blocks differ, or the hook carries none"; ok
+  || bad "FH43 AC5 the two marked resolveKitDir blocks differ, or the hook carries none"; ok
+# TOOL-dFairHearing-48 S1 - THE STATED LIMIT, PINNED. Row 10 holds the rung order; this holds the two real
+# load sites and the sentences. A forged receipt row beside a real sibling chooses what `readWriterBound`
+# and the pack load, 99 and the FORGED line being the fixture's own plants, and each kit home says so. It is
+# a pin, and it has no opinion on whether a row is honest. WHAT THIS DOES NOT CHECK: the Python call sites,
+# which byte parity and row 10 stand for, or `help/agent-limit.md`, which a foreign-prefix run does not move.
+FG="$TMP/fg"
+mkdir -p "$FG/.git" "$FG/.governance" "$FG/k/hooks" "$FG/k/policy" "$FG/k/workflows" "$FG/f/policy" "$FG/f/hooks" "$FG/r/memory/builds/b/reviews"
+cp "$ROOT/$HOOKS_DIR/agent-cap.js" "$ROOT/$HOOKS_DIR/scratch-guard.js" "$FG/k/hooks/"
+cp "$ROOT/$WORKFLOWS_DIR/spec-audit-optin.js" "$FG/k/workflows/"
+printf 'module.exports = { readPolicy: () => ({ value: 7 }) }\n' > "$FG/k/policy/policy-mirror.js"
+printf 'module.exports = { readPolicy: () => ({ value: 99 }) }\n' > "$FG/f/policy/policy-mirror.js"
+printf 'console.log("FORGED agent-cap loaded"); module.exports = { extractWorkflowArgs: () => null, extractBuildSlug: () => null }\n' > "$FG/f/hooks/agent-cap.js"
+cp "$ROOT/$HOOKS_DIR/scratch-guard.js" "$FG/f/hooks/scratch-guard.js"
+printf '{"files": [{"source": "t/policy/policy-mirror.js", "path": "f/policy/policy-mirror.js"}, {"source": "t/hooks/agent-cap.js", "path": "f/hooks/agent-cap.js"}]}\n' > "$FG/.governance/install.json"
+fg_bound=$("$NODE" -e 'console.log("bound " + JSON.stringify(require(process.argv[1]).readWriterBound(process.argv[2])))' "$FG/k/hooks/agent-cap.js" "$FG" 2>&1 | tr -d '\r')
+[ "$fg_bound" = 'bound {"n":99,"key":"runtime.agents-in-flight"}' ] \
+  || bad "FH48 AC1 a forged row did not choose the policy helper rule 7 loads: $fg_bound"; ok
+fg_pack=$(printf '{"tool_name":"Workflow","tool_input":{"args":{"kind":"spec-audit","repo":"%s","reviewDir":"memory/builds/b/reviews"}},"cwd":"%s"}' "$FG/r" "$FG/r" | "$NODE" "$FG/k/workflows/spec-audit-optin.js" 2>&1); fg_rc=$?
+[ "$fg_rc" = 0 ] && [[ $fg_pack == *"FORGED agent-cap loaded"* ]] \
+  || bad "FH48 AC1 a forged row did not choose the readers the pack loads: exit $fg_rc, $fg_pack"; ok
+FG_PHRASE='rests on the working-tree receipt'
+[ "$(grep -c "$FG_PHRASE" "$ROOT/$HOOKS_DIR/agent-cap.js")" = 2 ] \
+  || bad "FH48 AC1 agent-cap.js does not state rule 7's footing at both of its homes"; ok
+for fg_home in "$ROOT/$HOOKS_DIR/README.md" "$ROOT/$WORKFLOWS_DIR/spec-audit-optin.js" "$HERE/resolve_kit_dir.py"; do
+  [ "$(grep -c "$FG_PHRASE" "$fg_home")" = 1 ] || bad "FH48 AC1 ${fg_home##*/} does not state the receipt's footing on one line"; ok
+done
+# TOOL-dFairHearing-48 S7, S8: no leg reads the README's prose, so these hold two instances. A stale
+# sentence neither needle names passes both, so the class stays on the checklist.
+grep -qF 'With no policy kit found' "$ROOT/$HOOKS_DIR/README.md" \
+  || bad "FH48 AC7 the hooks README states a sibling lookup, not the one resolveKitDir makes"; ok
+grep -qF 'last two segments' "$ROOT/$HOOKS_DIR/README.md" \
+  || bad "FH48 AC8 the hooks README names a prefix the resolver never compares"; ok
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver
@@ -968,15 +1002,15 @@ scan_sibling_path() {  # file paths on stdin -> "file:line:text" per hard-coded 
 }
 sib_pop=$(cd "$ROOT" && git ls-files -- "${PFX}*.js")
 sib_hits=$(cd "$ROOT" && printf '%s\n' "$sib_pop" | scan_sibling_path)
-[ -z "$sib_hits" ] || { echo "FAIL a JS file finds a sibling kit at a hard-coded path:"; printf '    %s\n' "${sib_hits//$'\n'/$'\n'    }"; st=1; }
+[ -z "$sib_hits" ] || { echo "FAIL FH43 AC6 a JS file finds a sibling kit at a hard-coded path:"; printf '    %s\n' "${sib_hits//$'\n'/$'\n'    }"; st=1; }
 ok
 mapfile -t _sib_rows <<<"$sib_pop"
-[ "${#_sib_rows[@]}" -gt 10 ] || bad "the sibling-kit path ban scanned a collapsed population"; ok
+[ "${#_sib_rows[@]}" -gt 10 ] || bad "FH43 AC6 the sibling-kit path ban scanned a collapsed population"; ok
 plant="$TMP/sib.js"
 printf "const p = path.join(path.dirname(__dirname), 'kit', 'a.js')\n" > "$plant"
-[ "$(printf '%s\n' "$plant" | scan_sibling_path | wc -l)" = 1 ] || bad "the sibling-kit path ban does not fire on a planted line"; ok
+[ "$(printf '%s\n' "$plant" | scan_sibling_path | wc -l)" = 1 ] || bad "FH43 AC6 the sibling-kit path ban does not fire on a planted line"; ok
 printf "  // path.join(path.dirname(__dirname), 'kit') is the retired form\n" > "$plant"
-[ -z "$(printf '%s\n' "$plant" | scan_sibling_path)" ] || bad "the sibling-kit path ban fires on a planted comment"; ok
+[ -z "$(printf '%s\n' "$plant" | scan_sibling_path)" ] || bad "FH43 AC6 the sibling-kit path ban fires on a planted comment"; ok
 
 [ "$st" = 0 ] && echo "PASS — resolve-python: $n assertions held"
 exit "$st"

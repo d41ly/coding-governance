@@ -588,6 +588,16 @@ n=$((n+1)); case "$o" in
   *) echo "ok   S2 ...and a degraded audit does not reach DISPOSAL" ;;
 esac
 
+# TOOL-dFairHearing-48 S4 — A GAPPED WALK STOPS AS A BLOCKED AUDIT. The callee's walk-red return holds
+# `blockers: null` beside an integer `confirmed`, and no agent died, so it is no DEGRADED run and no round.
+rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec-write":%s,"workflow":{"blockers":null,"confirmed":2,"highs":null,"unverified":0,"report":"r.md","walkGaps":["x"]},"record":%s,"dispose":%s}' \
+    "$SPEC_OK" "$_rec" "$DISPOSE_OK")")
+has "FH48 AC4 a gapped walk returns exit walk-red" "$o" 'RESULT '
+has "FH48 AC4 ...naming the exit" "$o" '"exit":"walk-red"'
+has "FH48 AC4 ...and its gaps" "$o" '"walkGaps":["x"]'
+hasnt_ "FH48 AC4 ...and it throws nothing" "$o" "THROW "
+hasnt_ "FH48 AC4 ...and it spawns no record" "$o" "agent:record"
+
 # THE SUBJECT GUARD. An unpinned subject audits whatever the file happens to say when the lens
 # reads it, which is not a review of anything in particular — and tier2-review would refuse it
 # downstream with a message about its own arguments rather than about which stage failed.
@@ -3791,7 +3801,9 @@ has    "FA15 AC25 the undeclared throw" "$o" "a disposal passes the hand-out's \
 # RAISED 905 -> 920 by TOOL-dFairHearing-43: the `FH43 AC3` sites, four absences, four forwarded values, the
 # population's own check and the pin's six distinct key and value rows (its two lines differ in `walk` alone).
 # Not measured by a run: the pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=920
+# RAISED 920 -> 925 by TOOL-dFairHearing-48: the five `FH48 AC4` sites, the result, its exit and gaps, and the
+# two absences. Counted by reading, not measured by a run: the pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=925
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

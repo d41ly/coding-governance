@@ -42,6 +42,9 @@
  * checkout root, and refuses when no layer sets a harness variable, or any layer that sets one holds
  * a value that is not a positive integer, or is above the limit (TOOL-dGroundRules-61). No policy kit found adds
  * no rule; a `cwd` in no checkout refuses, naming it (TOOL-dGroundRules-21 S38). A throw inside it refuses.
+ * The limit is landed; the helper that reads it is not.
+ * Its location rests on the working-tree receipt, so a forged row chooses the code this rule runs
+ * (TOOL-dFairHearing-48 F1).
  *
  * Wiring (per project): run `python <prefix>/settings-merge.py` (idempotent) — it merges the block
  * below into .claude/settings.json; or merge it by hand:
@@ -406,7 +409,7 @@ function resolvePolicyHelper() {
 }
 const POLICY_HELPER = resolvePolicyHelper()
 function readWriterBound(repo) {
-  if (!require('fs').existsSync(POLICY_HELPER)) return { n: MAX_VERIFIERS, key: 'MAX_VERIFIERS, as no policy kit sits beside this hooks kit' }
+  if (!require('fs').existsSync(POLICY_HELPER)) return { n: MAX_VERIFIERS, key: 'MAX_VERIFIERS, as no policy kit was found by resolveKitDir' }
   let v
   try { v = require(POLICY_HELPER).readPolicy('runtime.agents-in-flight', { repo }).value } catch (e) { return { why: `the agent limit could not be read: ${(e && e.message) || e}` } }
   return Number.isInteger(v) && v > 0 ? { n: v, key: 'runtime.agents-in-flight' } : { why: `runtime.agents-in-flight reads ${JSON.stringify(v)}, not a positive integer` }
@@ -767,7 +770,11 @@ function checkHarnessCall(data, index, root) {
 // them from the working tree, so a hand-raised `env`, or a render left behind a lowering, would run
 // past the landed limit. This rule refuses that at the next call. It reads the landed limit through
 // the policy kit's `readPolicy`, found through `resolveKitDir`, and never the working-tree mirror; a
-// hooks kit that finds no `policy` kit adds no rule. WHAT IT DOES NOT SEE: an environment override of the two variables, which the harness applies
+// hooks kit that finds no `policy` kit adds no rule.
+// The limit is landed; the helper that reads it is not.
+// Its location rests on the working-tree receipt, so a forged row chooses the code this rule runs
+// (TOOL-dFairHearing-48 F1).
+// WHAT IT DOES NOT SEE: an environment override of the two variables, which the harness applies
 // and no hook can read. UNVERIFIED: that a session started before a lowering keeps its settings until
 // it restarts. Read: every layer readSettingsLayers returns (TOOL-dGroundRules-61 S1); a cwd in no checkout, or a throw at any step, refuses, naming it (TOOL-dGroundRules-21 S38). A refused policy read is no settings fault, so it denies under its own text, printing the reader's line and never the settings remedy (TOOL-dGroundRules-73). null = allow · string = deny.
 const SETTINGS_VARS = ['CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS', 'CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS']

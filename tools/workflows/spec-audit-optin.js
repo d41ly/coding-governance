@@ -16,7 +16,9 @@
  * ITS READERS ARE THE HOOKS KIT'S, one copy each: `extractWorkflowArgs` and `extractBuildSlug` from
  * agent-cap.js's exports, `readFrontMatterKey` and `readConfKey` from scratch-guard.js, both read from
  * the directory `resolveKitDir` finds the hooks kit in, as agent-cap finds this pack: the install
- * receipt's row, then the two sibling probes. A call it cannot load them for is judged without them: one
+ * receipt's row, then the two sibling probes. That location
+ * rests on the working-tree receipt, so a forged row chooses the code this pack loads
+ * (TOOL-dFairHearing-48 F1). A call it cannot load them for is judged without them: one
  * whose `args` may be a spec audit is DENIED by name, naming the reader, and every other call is
  * admitted, since a missing reader must not turn the one call this rule refuses into an admission.
  */

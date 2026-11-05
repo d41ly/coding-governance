@@ -1213,7 +1213,7 @@ write_limit_stub 6
 run_limit_call "writer split: K 6 at a stub limit of 6 -> allow (control)" 0 "$WS_WRITER" "$WS_HOOKS/agent-cap.js"
 run_limit_call "verifier split: K 6 under a stub limit of 6 -> deny, against MAX_VERIFIERS" 2 "$WS_VERIFIER" "$WS_HOOKS/agent-cap.js" 'above the bound 5: MAX_VERIFIERS'
 rm -f "$WS_POLICY/policy-mirror.js"
-run_limit_call "writer split: no policy kit beside the hooks kit -> deny, against MAX_VERIFIERS" 2 "$WS_WRITER" "$WS_HOOKS/agent-cap.js" 'above the bound 5: MAX_VERIFIERS, as no policy kit'
+run_limit_call "FH48 AC7 writer split: no policy kit found -> deny, against MAX_VERIFIERS" 2 "$WS_WRITER" "$WS_HOOKS/agent-cap.js" 'above the bound 5: MAX_VERIFIERS, as no policy kit was found by resolveKitDir'
 
 # ---- rule 2: LENS PROSE IS NOT CODE (TOOL-aLexedStripper-2) --------------------------------------
 # Every arm below is the SAME correct five-element lens array, fanned through the sanctioned helper.
