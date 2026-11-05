@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-5 — adopters migrated onto the ranked charter and the loop by the walk that exists, each read migrated or put to the owner
 
-**Status:** DEFERRED · rev-1 · 2026-11-03 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 6 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 6 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0479@8dc7a199 whole
 
@@ -10,7 +10,7 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-03-build-PLAY-dConvergedCharter-5-reuse-scout-d.md](../build/2026-11-03-build-PLAY-dConvergedCharter-5-reuse-scout-d.md) | research | PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-23 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-41 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
 
@@ -84,7 +84,7 @@ dDeclaredLoop's loop kit.
 
 ### Edges
 
-- **hands-off** `PLAY-dConvergedCharter-20` — `steps-pending`, read through `derive_migration_state`'s states, which the widened exit check grades for every registered adopter
+- **hands-off** `PLAY-dConvergedCharter-20` — `steps-pending`, read through `derive_migration_state`'s states, which the widened exit check grades for every registered adopter, and S2's `migration` verb with its one row walk, which that unit's exit check extends with `--grade` rather than walking the register a second time
 - **consumes-from** external — DEPL-dShippedRelease-31 (`read_adopter_rows`, `registered`), -7 (`adopter_reading.py read`, `steps-pending`, `derive_adopter_route`), -16 (`kits.offer`), -25 (schema 5) and -3 (`read_release_tags`), and TOOL-dWellOiledMachine-48 (`raise_owner_item`), each specced and unbuilt at base `0d1c1dda`
 - **consumes-from** external — the migration content: PLAY-dOrderedCharter-31 S4, TOOL-dBoundRoles-19, TOOL-dTotalRecall-20 and dDeclaredLoop's loop kit, each a parent's own `[[upgrade]]` rows
 
@@ -218,6 +218,10 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 · `adopter_reading.
 
 - rev-1 · 2026-11-03 · initial draft, from the packet's Items 5, `gap-spine-04`, scout D's row for 0479
   and its disagreement 2, and the spec brief's I7.
+- rev-2 · 2026-11-04 · §3 · the hands-off edge to PLAY-dConvergedCharter-20 names S2's `migration` walk,
+  which that unit's S5 extends with `--grade`, mirroring the consumes-from edge PLAY-dConvergedCharter-20
+  rev-5 wrote when it folded `2026-11-04-review-PLAY-dConvergedCharter-11-spec-audit-round1` finding 24;
+  this unit's S2 and its exit codes are unchanged.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-7 — protocols and templates as tag-sliced views, the guides retired, their rationale in units' `help` and the `help/why/` tree under `help.explanation`
 
-**Status:** DEFERRED · rev-4 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 17 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-6 · 2026-11-05 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 17 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0481@a6574329 whole
 **Carries:** node:policy-key.help.explanation
@@ -11,11 +11,16 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-03-build-PLAY-dConvergedCharter-6-reuse-scout-b.md](../build/2026-11-03-build-PLAY-dConvergedCharter-6-reuse-scout-b.md) | research | PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-15 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-41 |
+| [2026-11-04-build-PLAY-dConvergedCharter-11-r4-fold-returns.md](../build/2026-11-04-build-PLAY-dConvergedCharter-11-r4-fold-returns.md) | journal | PLAY-dConvergedCharter-11 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
+| [2026-11-04-prompt-PLAY-dConvergedCharter-7-1-spec-writer.md](../prompts/2026-11-04-prompt-PLAY-dConvergedCharter-7-1-spec-writer.md) | journal | — |
+| [2026-11-04-prompt-PLAY-dConvergedCharter-7-r4-fold-brief.md](../prompts/2026-11-04-prompt-PLAY-dConvergedCharter-7-r4-fold-brief.md) | research | PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-40 |
 | [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
+| [2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-9 |
 | [2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-39 |
+| [2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md](../reviews/2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-9 |
 
 <!-- /gen:spec-records -->
 
@@ -105,7 +110,27 @@ cannot be retired, which the arm of S6 proves on a planted retirement (the owner
   moved to the runtime descriptor with `check-playbook.sh` and its template; this unit removes those two
   rows with the render, and the template stays as the checker's input,
   and moves the kickoff manifest `memory/guides/SESSION-KICKOFF.md` to `memory/project/SESSION-KICKOFF.md`,
-  its `manifest_path` (`.governance/deploy.toml:54`) and readers re-pointed (§8 F5). It removes the kit
+  its `manifest_path` (`.governance/deploy.toml:54`) and readers re-pointed (§8 F5).
+  THE COMMIT ROUTE. `.governance/deploy.toml` is a guarded path (`tools/policy/guarded-paths.txt`), and
+  `guard.py --staged` refuses it in an agent's commit, any change but one cap raise being "the owner's,
+  committed from a terminal" (`tools/policy/guard.py:5-12`). So its edits, `:54` and the charter line
+  `:68`, are the OWNER's, never `--no-verify`: the pass stages them with the manifest's `git mv` as one
+  commit and hands it over, the owner commits it from a terminal, the pass records that commit's sha in
+  the build record, and the agent's commits that re-point the other readers and, last, remove the
+  guides follow it. Observed by AC14.
+  THE DESTINATION'S RULES. Hygiene check 3 admits under `memory/project/` only its named registries
+  and the names `PROJECT_REGISTRY_EXTRA` lists (`tools/memory-tree/check-memory-hygiene.sh:903-965`,
+  the `F:*` case at `:944-964`), which at base does not list `SESSION-KICKOFF.md`
+  (`.memory-tree.conf:925`), and the charter line `.governance/deploy.toml:65`, rendered at
+  `AGENTS.md:91`, says `memory/project/` holds only the gates' row registries. The manifest is the
+  ratchet gate's guarded row manifest (§8 F5, fates `:201`), so it is admitted as one: the same owner
+  commit adds `SESSION-KICKOFF.md` to `PROJECT_REGISTRY_EXTRA` where `python
+  tools/policy/policy.py legacy .memory-tree.conf --key PROJECT_REGISTRY_EXTRA` reads it, which after
+  PLAY-dConvergedCharter-11 is `memory-tree.project-registry-extra` in `.governance/policy.toml`, a
+  guarded path too, and re-words `:65` to "`memory/project/` holds only the gates' row registries, the
+  kickoff manifest among them"; the agent's next commit re-renders `AGENTS.md`. Unit 6's
+  `check_record_homes` reads the same key for its `registry` admission (PLAY-dConvergedCharter-6 S1),
+  so both arms admit the moved manifest from one declaration. Observed by AC15. It removes the kit
   sources `tools/memory-tree/ANNOTATION-STYLE.template.md`,
   `tools/memory-tree/BUILD-METHOD.template.md` and `tools/workflows/REVIEW-PROTOCOL.template.md`. Their
   pairs leave `PAIRS` in `tools/memory-tree/kit-dogfood-parity.test.sh:61` and
@@ -115,7 +140,8 @@ cannot be retired, which the arm of S6 proves on a planted retirement (the owner
   **Readers:** by name: `coding-governance-agents.template.md` (rendered to `AGENTS.md`), the nine role
   sources under `tools/roles/agents/` (rendered to `.claude/agents/*.md`), `tools/roles/SKILL.template.md`,
   `skills/session-kickoff/SKILL.md`, `README.md`, `WIRE-INTO-PROJECT.md`, `help/spec-audit.md`,
-  `.governance/deploy.toml:68`, `.memory-tree.conf:531`, `tools/memory-tree/kit.toml` (its
+  `.governance/deploy.toml:65` and `:68`, `AGENTS.md:91` (its render), `PROJECT_REGISTRY_EXTRA` in
+  the policy file, `.memory-tree.conf:531`, `tools/memory-tree/kit.toml` (its
   `kit/dogfood doc parity` leg row, `:247`, whose guard drops the two removed guide paths, as its
   manifest row in `tools/gate-legs.json:437` does),
   `tools/memory-tree/adopt-memory-tree.sh`, `tools/memory-tree/README.md`,
@@ -126,8 +152,16 @@ cannot be retired, which the arm of S6 proves on a planted retirement (the owner
   `tools/govkit/selftest.py:9758`, `tools/run-gates/run-gates.gov.test.sh`, `tools/check-template-size.test.sh`,
   and for the manifest `.governance/install.json`, `tools/drift-audit/drift_signals.py:35`,
   `tools/policy/check_policy.py:3175` and `tools/govkit/fixtures/release-0/deploy.toml`, and
-  READER NOT IN TREE: `tools/kickoff-manifest/manifest-check.sh`, the manifest's checker, which unit 16 S1 moves
-  there by `git mv` from `skills/session-kickoff/` at order 5, after base;
+  READER NOT IN TREE: `tools/kickoff-manifest/manifest-check.sh`, the manifest's checker, and
+  `tools/kickoff-manifest/manifest-check.test.sh`, whose fixtures write the manifest at the old path,
+  which unit 16 S1 moves there by `git mv` from `skills/session-kickoff/` at order 5, after base;
+  under the memory root, its live carriers and registries: `memory/project/fork-ceilings.txt:20`, the
+  `manifest-check` row, whose setup `cp` and argv are re-pointed to `memory/project/SESSION-KICKOFF.md`
+  and whose count is re-measured, a moved setup path and not a ceiling raise; `memory/README.md:22`;
+  the dossiers `agent-cap.md`, `annotation-style.md`, `build-method.md`, `playbook.md`,
+  `session-kickoff.md` and `unattended.md` under `memory/map/features/`, with `memory/map/generated/`
+  regenerated; and the gotcha pages `a-new-leg-trips-a-growing-set-of-meta-gates.md`,
+  `concurrency-is-not-a-budget.md` and `fold-text-is-unreviewed-surface.md`;
   gov's manifest `tools/gate-legs.json`, which is hand-kept and edited in the same commit as the
   descriptor row it spells (no generator writes it, `tools/govkit/govkit.py:2560-2564`): the
   `build-method size` leg, which measures `memory/guides/BUILD-METHOD.md` (`check-template-size.sh:339` fails when the
@@ -253,8 +287,10 @@ three OK. No leg is added: the arm runs in `instruction render (one renderer of 
 
 ### Migration
 
-The rationale moves in one pass per guide, its `plan` read before its `apply`. The guides are removed in
-the last commit of the unit, after S6 reads green over a scratch commit that removes them.
+The rationale moves in one pass per guide, its `plan` read before its `apply`. S8's owner commit, the two
+`.governance/deploy.toml` edits with the manifest's move, lands from a terminal before any agent commit
+of S8. The guides are removed in the last commit of the unit, after S6 reads green over a scratch commit
+that removes them.
 
 ### Files touched (estimate)
 
@@ -275,7 +311,10 @@ the last commit of the unit, after S6 reads green over a scratch commit that rem
   `memory/guides/REVIEW-PROTOCOL.md`, `memory/guides/PLAYBOOK-TEMPLATE.md` (removed)
 - `memory/guides/SESSION-KICKOFF.md` moved to `memory/project/SESSION-KICKOFF.md`; its readers
   `.governance/install.json`, `tools/kickoff-manifest/manifest-check.sh`,
-  `tools/govkit/fixtures/release-0/deploy.toml`
+  `tools/kickoff-manifest/manifest-check.test.sh`, `tools/govkit/fixtures/release-0/deploy.toml`,
+  `memory/project/fork-ceilings.txt`
+- `memory/README.md`, the six dossiers of S8 under `memory/map/features/` and `memory/map/generated/`
+  (regenerated), the three gotcha pages of S8
 - `tools/memory-tree/ANNOTATION-STYLE.template.md`, `tools/memory-tree/BUILD-METHOD.template.md`,
   `tools/workflows/REVIEW-PROTOCOL.template.md` (removed)
 - `tools/memory-tree/HYGIENE.template.md`, `tools/memory-tree/SPEC-TEMPLATE.template.md` (slot templates);
@@ -285,8 +324,9 @@ the last commit of the unit, after S6 reads green over a scratch commit that rem
   `tools/memory-tree/adopt-memory-tree.sh`, `tools/memory-tree/README.md`, `tools/workflows/kit.toml`,
   `tools/workflows/README.md`, `tools/template-size-limits.txt`, `tools/policy/caps.toml`,
   `memory/project/method-carriers.txt`, `.memory-tree.conf`, `tools/hooks/agent-cap.js`,
-  `tools/drift-audit/drift_signals.py`, `tools/policy/check_policy.py`, `.governance/deploy.toml`,
-  `README.md`, `WIRE-INTO-PROJECT.md`, `help/spec-audit.md` (the readers of S8)
+  `tools/drift-audit/drift_signals.py`, `tools/policy/check_policy.py`, `.governance/deploy.toml` and
+  `.governance/policy.toml`'s `memory-tree.project-registry-extra` (the owner's terminal commit, S8),
+  `AGENTS.md` (re-rendered), `README.md`, `WIRE-INTO-PROJECT.md`, `help/spec-audit.md` (the readers of S8)
 
 ### Alternatives rejected
 
@@ -363,9 +403,10 @@ the last commit of the unit, after S6 reads green over a scratch commit that rem
   Red when: a section of any of the nine is graded unmapped, or a file survives under the guides path.
   figure: nine is PINNED at `d8a12f046` (ten guides less the moved manifest); the section count is
   DERIVED by the run.
-- **AC10** — When `git grep -n -E "guides/(BUILD-METHOD|SESSION-KICKOFF)\.md" -- . ':!memory/builds'` runs
-  after the unit lands, it prints no reader outside the frozen records, the charter's protocol lines each
-  name a `gov_tag.py bundle` command, and `bash manifest-check.sh` reads the manifest at its new path.
+- **AC10** — When `git grep -n -E "guides/(BUILD-METHOD|SESSION-KICKOFF)\.md" -- . ':!memory/builds'
+  ':!memory/DECISIONS.md' ':!memory/archive'` runs after the unit lands, the pathspec leaving out the
+  frozen records alone, it prints nothing, the charter's protocol lines each name a `gov_tag.py bundle`
+  command, and `bash manifest-check.sh` reads the manifest at its new path.
   Red when: a reader still names a removed or moved guide.
 - **AC11** — When `render_playbook.py --check-render --scope protocols` runs after the unit lands, it
   exits 0 over `memory/TEMPLATE-SPEC.md` and `memory/HYGIENE.md`, the skeleton block of the first equal
@@ -385,9 +426,28 @@ the last commit of the unit, after S6 reads green over a scratch commit that rem
   tools/govkit/registry.toml` run on the tip, each prints 0, and `python tools/govkit/govkit.py
   selfcheck` prints no stale-exemption line.
   Red when: a manifest leg, a guard or an `[[exempt_leg]]` row still names a removed guide.
+- **AC14** — When `git log --format='%H %s' <pass base>..<tip> -- .governance/deploy.toml` runs over
+  the landed range, it prints exactly one commit; that commit's sha is the one the build record names
+  as the owner commit S8 handed over, its message carries no `Co-Authored-By:` agent trailer, `git show
+  --name-status --format= <sha>` lists `.governance/deploy.toml`, `.governance/policy.toml` and the
+  manifest's rename to `memory/project/SESSION-KICKOFF.md` and no other path, and `git merge-base
+  --is-ancestor <sha> <c>` exits 0 for every other commit `c` of S8 in the range. As a precondition,
+  not the observation, a non-TTY `git commit` of the staged `deploy.toml` edit on a scratch clone,
+  `core.hooksPath` set to `.githooks`, exits non-zero with `policy-guard: refused`.
+  Red when: `deploy.toml` lands in an agent commit, in more than one commit, with paths beside the
+  route's, or after an agent commit of S8 that re-points its readers.
+  fixture: the precondition's clone under `%TEMP%` with a short name.
+- **AC15** — When `bash tools/memory-tree/check-memory-hygiene.sh --only 3` runs on the tip, with the
+  manifest at `memory/project/SESSION-KICKOFF.md`, it prints no `memory/project/SESSION-KICKOFF.md`
+  line; `grep -c 'kickoff manifest' .governance/deploy.toml AGENTS.md` prints at least 1 for each; and
+  `python tools/policy/policy.py legacy .memory-tree.conf --key PROJECT_REGISTRY_EXTRA` prints a value
+  holding `SESSION-KICKOFF.md`.
+  Red when: the move reds check 3, or the charter still says `memory/project/` holds only registries
+  with a manifest beside them.
+
 ## 7. Gates
 
-`policy fixtures` · `playbook render selftest` · `govkit selftest` · `govkit selfcheck` · `review-protocol parity (kit vs dogfood)` · `govkit refusal join` · `govkit acceptance matrix` · `manifest-check self-test` · `lexicon naming predicates` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `transition-audit arms` · `straggler-guard arms` · `agent-cap self-test` · `scratch-guard self-test` · `hook destinations self-test` · `drift-audit selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `policy check` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`policy fixtures` · `playbook render selftest` · `govkit selftest` · `govkit selfcheck` · `review-protocol parity (kit vs dogfood)` · `govkit refusal join` · `govkit acceptance matrix` · `manifest-check self-test` · `lexicon naming predicates` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `transition-audit arms` · `straggler-guard arms` · `spawn budget (forks per hot entrypoint)` · `codebase-map coverage + freshness` · `agent-cap self-test` · `scratch-guard self-test` · `hook destinations self-test` · `drift-audit selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `policy check` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 The parents' legs `instruction render (one renderer of record)` and `writing practice (records and
 units)` run this unit's arm and AC5 once they land; neither is in the manifest at base. The
@@ -453,6 +513,21 @@ New arm: tools/playbook/guide_move.py · covers AC12 · the `rationale-route` pl
   `2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1` finding 27: a section whose directive text
   is already a unit gains its `help` and edge through `apply`'s amend route under an `Action edit`
   record, AC12's planted existing unit, and the consumes-from edge to that unit.
+- rev-5 · 2026-11-04 · S8 §4 AC10 AC14 §7 · folded
+  `2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1` findings 15 (the two
+  `.governance/deploy.toml` edits are the owner's terminal commit, staged with the manifest's move and
+  landed before the agent's commits, AC14 observing the guard refuse an agent's) and 7, 17 and 33 (S8's
+  readers gain `fork-ceilings.txt`'s `manifest-check` row, the moved `manifest-check.test.sh`, and the
+  memory root's live carriers by `git grep` at base: `memory/README.md`, six dossiers with the map
+  regenerated and three gotcha pages; §7 gains the spawn-budget and codebase-map legs; AC10 leaves out
+  `memory/DECISIONS.md` and `memory/archive`).
+- rev-6 · 2026-11-05 · S8 §4 AC14 AC15 · folded
+  `2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2` findings 7 and 24 (M13: AC14
+  grades the landed range, one owner commit of `deploy.toml` with no agent trailer, the sha the build
+  record names, the route's paths alone, ahead of every agent commit of S8, the guard's refusal kept as a
+  precondition) and 23 (M14: the destination's rules named, the owner commit adding `SESSION-KICKOFF.md`
+  to `PROJECT_REGISTRY_EXTRA` and re-wording `deploy.toml:65`, `AGENTS.md` re-rendered, unit 6's
+  residue arm admitting it from the same key, AC15 running check 3 on the moved tree).
 
 ## 10. Reuse audit
 

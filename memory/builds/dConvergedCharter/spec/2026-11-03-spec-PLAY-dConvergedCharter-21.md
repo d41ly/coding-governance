@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-21 — `tools/roles/house/policy.toml` retired as a seed: a repository's unruled efforts folded into `roles.effort.*` by an upgrade step, and the house-file fallback gone
 
-**Status:** DEFERRED · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 8 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-4 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 8 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0495@53f4c9b2 whole
 
@@ -10,10 +10,13 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md](../build/2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md) | research | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-22 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-41 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
+| [2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
+| [2026-11-04-review-PLAY-dConvergedCharter-11-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-20 |
+| [2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md](../reviews/2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
 
 <!-- /gen:spec-records -->
 
@@ -40,9 +43,12 @@ home mode; and `derive_readers` (unit 11's I1).
   program `tools/govkit/steps/house_seed.py`, a caller of `conf_to_policy.py` that hands it a reader of
   its own for the TOML home. Its up, in order: (1) `derive_house_folds(target)` reads the house file's
   customizations through `derive_house_proposals` (DEPL-dShippedRelease-28 S2), each keyed
-  `<source>#<name>`; (2) `read_ruled_keys(target)` reads every `ruling` record's subject, and each ruled
-  key is dropped, an `accept` already written by DEPL-dShippedRelease-28 S4 and a `decline` read as a
-  drop; (3) each unruled effort is written to its key, `[effort.roles] <r>` to `roles.effort.<r>`,
+  `<source>#<name>`; (2) the unruled set is DEPL-dShippedRelease-28's own, never re-derived here: the
+  filter its S1 applies to `scan_declarations(root)` (S2) to print each unruled proposal, the same
+  reading its S3 uses to refuse a second ruling, called as the function `adopt_declarations.py`
+  exports for it (§8 F4), so a key one process reads as ruled the other never folds; each ruled key is
+  dropped, an `accept` already written by DEPL-dShippedRelease-28 S4 and a `decline` read as a drop;
+  (3) each unruled effort is written to its key, `[effort.roles] <r>` to `roles.effort.<r>`,
   `[effort.stages.<w>] <s>` to `roles.effort.<w>.<s>` and its `default` to `roles.effort.default`, through
   `render_policy_text` behind one before-image; (4) the house file is deleted last. A value equal to
   the role's declared level, or a `default` of `medium`, is no proposal, so it goes with the file:
@@ -52,7 +58,7 @@ home mode; and `derive_readers` (unit 11's I1).
   unruled grant does (S2), writing nothing, exit 1, naming the key and `core.py adopt declarations
   --rule <key> accept|decline`, so the level reaches the policy file only through the owner's ruling and
   `check_effort_floor` never reds a value the step wrote. `house_seed.py` spells `house/policy.toml`
-  literally, as `HOUSE_MIGRATORS` requires (unit 11 S8), so the inventory still lists it.
+  literally, as `HOUSE_MIGRATORS` requires (PLAY-dConvergedCharter-41 S3), so the inventory still lists it.
   Observed by AC1, AC2, AC3 and AC7.
   **Readers:** by name: `tools/roles/kit.toml:39`, `tools/roles/roles_lib.py:398-411`,
   `tools/roles/check_roles.py:367`, `tools/roles/handoff.py:480`, `tools/roles/render_agents.py:140`,
@@ -73,8 +79,14 @@ home mode; and `derive_readers` (unit 11's I1).
   and grants, each its role's declared value, so gov's own `update` folds nothing. Observed by AC6.
   **Readers:** by name: `tools/roles/kit.toml:31-40`, `tools/roles/house/policy.toml:1-3`,
   `tools/roles/README.md:173-195`, `help/roles.md:44`, `help/roles.md:126`, `help/policy.md:234`,
-  `help/policy.md:246` · by value: the receipt's `seed` row for the file, which `update` withdraws
-  when the entry stops shipping it.
+  `help/policy.md:246`, `tools/policy/README.md:150-151`, `memory/map/features/roles.md:48` (a dossier
+  the dead-path gate and the codebase-map legs grade, re-worded to name the role effort keys),
+  and `.governance/install.json:1088-1091`, gov's own receipt's seed row, which leaves through the
+  same withdrawal as an adopter's, never a hand edit · by value: the receipt's `seed` row for the file,
+  which `update` withdraws when the entry stops shipping it; and every hit of `check_policy.py --readers
+  house/policy.toml --kind path`, the `HOUSE_ANCHOR` spelling (`policy.py:1119`) the readers write as
+  `house/policy.toml`, `<prefix>/roles/house/policy.toml` or `<tool-root>/roles/house/policy.toml`,
+  which a needle of the full path cannot see.
 - **S4** — The fallback leaves every reader. `load_policy` (`tools/roles/roles_lib.py:398`) is deleted
   with its last caller; the order's step 4 leaves `resolve_stage_efforts` and `resolve_effort`, so
   after the keys a role's declared `effort` answers; `print_stage_efforts` (`tools/roles/handoff.py:474`)
@@ -109,14 +121,15 @@ home mode; and `derive_readers` (unit 11's I1).
 
 - The keys, the declared `effort`, the `gates` field and the order with its fallback: TOOL-dBoundRoles-21.
 - Proposing a customization or writing a ruling: DEPL-dShippedRelease-28's `adopt.declarations`.
-- The arm that reds a planted reader still reading the house file: unit 11's, over the
-  `READER_SHAPES` row it adds. This unit removes the readers that arm would find.
+- The arm that reds a planted reader still reading the house file: PLAY-dConvergedCharter-41's
+  `arm_house_readers` (its S3). This unit removes the readers that arm would find.
 - The house overlays `house/gov-*.md`: TOOL-dBoundRoles-19 moves them into the overlay.
 - A conf-to-policy step module of this unit's own: S1 calls the shared one.
 
 ### Edges
 
-- **consumes-from** `PLAY-dConvergedCharter-11` — `derive_readers` and its house-file arm `arm_house_readers`, the inventory AC6 runs over the house file's path, and the two `legacy-homes.txt` rows S4 drains; without it the re-point is a typed list nothing re-derives
+- **consumes-from** `PLAY-dConvergedCharter-11` — `derive_readers`, the inventory AC6 runs over the house file's path, and the two `legacy-homes.txt` rows S4 drains; without it the re-point is a typed list nothing re-derives
+- **consumes-from** `PLAY-dConvergedCharter-41` — `arm_house_readers`, the house-file arm AC6 reads armed, its reach every code file outside the policy kit, which holds the arm's own constant and plants, and `HOUSE_MIGRATORS`, the exempt paths AC6 passes as `--except` beside `tools/policy/check_policy.py`; without it a reader of the retired seed reds nothing
 - **consumes-from** `PLAY-dConvergedCharter-22` — `settings_census.py`, whose effort and grant rows read the house file through `load_policy`; S4 takes that population out of the census with the file
 - **consumes-from** `PLAY-dConvergedCharter-20` — `fanout_cap.py`'s shared step `conf_to_policy.py` with its home mode, which S1 calls with a TOML reader; without it the step copies the before-image and writer a third time
 - **consumes-from** external — TOOL-dBoundRoles-21 (with -2 and -23), DEPL-dShippedRelease-28, TOOL-dLinkedLibrary-8 and TOOL-dDeclaredLoop-21 S8, each specced and unbuilt at base `0d1c1dda`
@@ -152,7 +165,7 @@ Read at `d8a12f04`; no product file differs from base `0d1c1dda`.
 
 | Minted | Kind | Naming cell |
 |---|---|---|
-| `derive_house_folds`, `read_ruled_keys` | functions, `tools/govkit/steps/house_seed.py` | `py.function`, OK by `--suggest` |
+| `derive_house_folds` | function, `tools/govkit/steps/house_seed.py` | `py.function`, OK by `--suggest` |
 | `roles/house-seed-to-policy` | `[[upgrade]]` id | none |
 | `house_seed.py` | step program | none, `py.file` is no declared cell |
 
@@ -177,6 +190,7 @@ forever.
 - `tools/govkit/settings_census.py`: S4, the house population retired
 - `tools/govkit/usage.toml`, `tools/govkit/selftest.py`: the step's `[[usage]]` rows and §6's plants
 - `help/roles.md`, `help/policy.md`: S5
+- `memory/map/features/roles.md`, `.governance/install.json` (its seed row withdrawn): S3
 
 ### Alternatives rejected
 
@@ -187,6 +201,8 @@ forever.
   disabled branch, and `[yagni]` deletes rather than disables.
 - **A second conf-to-policy module for the TOML home.** The shared step owns the before-image and the
   writer; only the home's reader differs, so the caller supplies that.
+- **A ruled-key reader of this step's own.** DEPL-dShippedRelease-28 S1 and S3 already decide whether
+  a key is ruled; a second reader can read a decline as unruled and fold it, the defect AC1 guards.
 
 ## 5. Production-readiness checklist
 
@@ -223,16 +239,19 @@ forever.
   with no key set, it returns the role's declared level; and `python house_seed.py down <target>` after
   AC1 restores both files byte-identical.
   Red when: a reader still reads the house file, or the down leaves a written key.
-- **AC6** — When `python check_policy.py --readers tools/roles/house/policy.toml --kind path
-  --except tools/govkit/steps/house_seed.py --except tools/playbook/adopt_declarations.py --except
-  tools/govkit/selftest.py` runs over the unit's tip with `house_seed.py` present, it exits 0, the three
-  exempt paths being unit 11's `HOUSE_MIGRATORS` and the self-test holding their plants, each still
-  spelling the path; `git grep -n load_policy -- tools` prints nothing; unit 11's `arm_house_readers`
-  reads armed and names no reader; a scratch copy with `tools/roles/house/policy.toml` read in
-  `tools/roles/check_roles.py` makes both the CLI and the arm red naming that file; and `python
-  tools/policy/policy.py lists --check` exits 0 with the two house rows gone.
-  Red when: a reader of the retired seed survives, a migrator the step needs reds, or the shrink-only
-  list keeps a row no home yields.
+- **AC6** — When `python check_policy.py --readers house/policy.toml --kind path --except
+  tools/govkit/steps/house_seed.py --except tools/playbook/adopt_declarations.py --except
+  tools/govkit/selftest.py --except tools/policy/check_policy.py` runs over the unit's tip with
+  `house_seed.py` present, it exits 0, the exempt paths being PLAY-dConvergedCharter-41's
+  `HOUSE_MIGRATORS`, the self-test holding their plants and the policy kit's arm row with its fixture
+  plants, each still spelling the path; `git grep -n load_policy -- tools ':!tools/policy/'` prints
+  nothing, the policy kit excluded because it holds `arm_house_readers`' own `const="load_policy"` and
+  its fixture plants, which that arm itself never grades (unit 41 S3); unit 41's `arm_house_readers`
+  reads armed and names no reader; a scratch copy with `roles/house/policy.toml` read in
+  `tools/roles/check_roles.py`, the commonest real spelling, makes both the CLI and the arm red naming
+  that file; and `python tools/policy/policy.py lists --check` exits 0 with the two house rows gone.
+  Red when: a reader of the retired seed survives in any spelling, a migrator the step needs reds, or
+  the shrink-only list keeps a row no home yields.
 - **AC7** — When `python house_seed.py up <target>` runs over a scratch target whose house file sets
   `gov-skeptic = "low"`, below the floor, with no ruling, it exits 1 naming `effort.roles.gov-skeptic` and
   the `--rule` command, and the house file and the policy file are byte-identical; with an `accept`
@@ -246,7 +265,7 @@ forever.
 
 ## 7. Gates
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `policy check` · `policy fixtures` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `upgrade-walk` · `step-gate` · `docs` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `policy check` · `policy fixtures` · `dead-path carriers (deleted files still named)` · `codebase-map coverage + freshness` · `recall floor` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `upgrade-walk` · `step-gate` · `docs` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC7 AC8 · scratch targets under `house_seed.py`'s plants and the census over a seedless tree, failing cases a declined or below-floor effort written and an empty census population · none
 New arm: tools/roles/render_agents.py · covers AC5 · its fixture with a planted house file and no key, failing case the house level read · none
@@ -268,6 +287,17 @@ New arm: tools/roles/render_agents.py · covers AC5 · its fixture with a plante
 - **F3 — `load_policy` once the file is gone.** Options: (a) deleted with its last caller; (b) kept,
   reading an absent file as an empty fallback, as TOOL-dBoundRoles-21 S7 lets R12 read it. (b) is a branch
   no tree can reach. RESOLVED (agent, 2026-11-03, delegated): (a), rung 3. widens: none · relaxes: none
+- **F4 — An ask on dShippedRelease.** S1 step (2) reads DEPL-dShippedRelease-28's unruled set, and that
+  spec names its scan, `scan_declarations(root)`, but no exported function for the filter its S1 and
+  S3 apply. Options: (a) an ask, target dShippedRelease: "DEPL-dShippedRelease-28's filter of unruled
+  proposals, the reading its S1 prints and its S3 refuses a second ruling by, is one named function
+  `adopt_declarations.py` exports"; accept: that spec names the function before this unit's pass;
+  (b) this step filters `scan_declarations(root)` against the `ruling` records itself, a second reader
+  of one decision, which the audit's finding 23 refuses; (c) this step runs `core.py adopt
+  declarations` with no flag and parses its printed proposals, a reader of prose output. The README's
+  build-level rule routes a change to a foreign record as an ask row in that build's `BACKLOG.md`,
+  written by whoever dispatched this stage, never by a spec writer. Recommendation: (a), the one
+  option holding one reader. Open for the owner: this run holds no mandate.
 
 ## 9. Revision log
 
@@ -278,16 +308,30 @@ New arm: tools/roles/render_agents.py · covers AC5 · its fixture with a plante
   readers and Files touched, its retired-population line), 42 and 49 (AC6 passes unit 11's
   `HOUSE_MIGRATORS` as `--except` paths, the policy README and the selftest comment re-worded, a planted
   non-exempt reader reds) and 48 (a below-floor effort stops the up like an unruled grant).
+- rev-3 · 2026-11-04 · S1 §3 AC6 · sibling edit for the owner's split of PLAY-dConvergedCharter-11,
+  `2026-11-04-prompt-PLAY-dConvergedCharter-1-owner-decisions` ("fold vs re-points"): the house-file
+  arm `arm_house_readers` and `HOUSE_MIGRATORS` are PLAY-dConvergedCharter-41's (its S3), the
+  consumes-from edge to unit 11 naming `derive_readers` and the rows alone and a new one to unit 41.
+- rev-4 · 2026-11-04 · S1 S3 §3 §4 AC6 §7 §8 §10 · folded
+  `2026-11-04-review-PLAY-dConvergedCharter-11-spec-audit-round1` findings 3 and 14 (AC6's `load_policy`
+  grep excludes the policy kit, which holds unit 41's arm constant and plants, and the readers CLI
+  excepts `tools/policy/check_policy.py`), 30 (AC6 runs the anchor needle `house/policy.toml`, its
+  staged break plants the abbreviated spelling, `memory/map/features/roles.md`, the policy README and
+  gov's receipt's seed row named in S3, the dead-path, codebase-map and recall-floor legs in §7) and 23
+  (`read_ruled_keys` removed, the unruled set read from DEPL-dShippedRelease-28's own filter, §8 F4's
+  ask); the consumes-from edge to PLAY-dConvergedCharter-41 names the arm's reach.
 
 ## 10. Reuse audit
 
 The seams are TOOL-dDeclaredLoop-21 S8's `conf_to_policy.py` with unit 20's home mode, for the
 before-image and the writer; DEPL-dShippedRelease-28's `derive_house_proposals` and its `ruling`
-records, for which values fold; and TOOL-dBoundRoles-21's order, from which this unit deletes step 4.
+records, for which values fold, with the unruled filter its S1 and S3 apply, which S1 step (2) calls
+rather than re-deriving (§8 F4); and TOOL-dBoundRoles-21's order, from which this unit deletes step 4.
 `python tools/codebase-map/reuse_lookup.py "fold a seeded house effort file into policy keys skipping
 ruled proposals"` ranked `load_policy` (`tools/roles/roles_lib.py`), `read_conf_key`, `readConfKey` and
 `read_design_keys`; `load_policy` is the reader this unit deletes, and the rest read other files. No
-seam at HEAD reads a ruling, since the kind is TOOL-dLinkedLibrary-8's and unbuilt. Scout C's row
+seam at HEAD reads a ruling, since the kind is TOOL-dLinkedLibrary-8's and unbuilt, but
+DEPL-dShippedRelease-28, a consumed spec, specifies the reader of rulings this unit needs. Scout C's row
 disagrees with source once: it names `render_agents.py:330` the seed's writer, and that line writes a
 fixture's copy; the seed ships through `tools/roles/kit.toml:31-40`.
 

@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-9 — Skills as level-4 thin entries from their commands' drive rows, renamed `gov-<name>` by upgrade step, the old names forwarded, the prefix and stale-path arms
 
-**Status:** DEFERRED · rev-4 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 18 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-6 · 2026-11-05 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 18 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0483@5b53c82b whole
 
@@ -10,10 +10,13 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-03-build-PLAY-dConvergedCharter-6-reuse-scout-b.md](../build/2026-11-03-build-PLAY-dConvergedCharter-6-reuse-scout-b.md) | research | PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-15 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-41 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
+| [2026-11-04-prompt-PLAY-dConvergedCharter-7-r4-fold-brief.md](../prompts/2026-11-04-prompt-PLAY-dConvergedCharter-7-r4-fold-brief.md) | research | PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-40 |
 | [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
+| [2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-7 |
 | [2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-39 |
+| [2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md](../reviews/2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-7 |
 
 <!-- /gen:spec-records -->
 
@@ -77,8 +80,10 @@ without the prefix (SK-2).
   tools/govkit/step_gate.py` over a scratch tree with the rename applied and copying each member its
   `RED … vanished` lines name, never typed from this paragraph: S5's forwarder is a `shims.toml` row and
   no shipped survivor, so it witnesses nothing, and only a `surfaces` value of an `[[upgrade]]` row or
-  of a succession row does (`step_gate.py:208-215`). The UP clears the old path, since S5's forwarder re-occupies
-  it, and decides what the file is the way `update` decides, never by a byte compare of its own: it
+  of a succession row does (`step_gate.py:208-215`). The UP clears the old path and then writes S5's
+  forwarder there, since `update` never calls `write_shims` (`tools/govkit/govkit.py` reads `shims` only in
+  selfcheck's arm 11, `:3522-3540`) and no `[[files]]` row ships the old path. It decides what the
+  file is the way `update` decides, never by a byte compare of its own: it
   classifies the old Skill's `[[files]]` row against the target's receipt through `VERDICT_GRID`
   (`tools/govkit/govkit.py:8283-8292`), CRs stripped before any compare, and withdraws the file on `withdrawn`,
   keeping and naming the file on the `("differs", "absent")` cell, a file the target edited. Where the receipt holds no row for the file, an
@@ -86,9 +91,28 @@ without the prefix (SK-2).
   matter's `name: <old>` and the command's name in the body, read through `tr -d '\r'`, as
   `adopt-branch-reconcile.sh:104-115` recognised `/branch-reconcile` at kit 1.4
   (`tools/branch-reconcile/README.md:169-172`), so a CRLF copy, an older template's render and a render
-  with other answers are each withdrawn; anything else is named and kept. The DOWN restores it
-  byte-identical. The WITNESS exits 0 when the old path holds no kit render by the same test.
-  Observed by AC4.
+  with other answers are each withdrawn; anything else is named and kept. A file carrying this
+  rename's `gov:shim <id>` marker is its forwarder, left to the write below and never classified.
+  The UP has three outcomes at the old path: WITHDRAWN (a kit render, cleared), KEPT (the target's own
+  file, `edited`, named and left), or ABSENT (no file, so the path gains the forwarder alone). It
+  writes through one before-image, `STEPS.write_before_image(target, <step id>, derive_after)`
+  (`tools/govkit/upgrade_steps.py:1121`), the precedent `fanout_cap.py` takes, whose `derive_after`
+  names the old path with the forwarder's bytes on WITHDRAWN and ABSENT and names no path on KEPT, so
+  the image records the target's own pre-UP bytes, CRLF and older renders included, and nothing for a
+  kept file. Right after clearing, the UP writes the forwarder by calling PLAY-dConvergedCharter-17
+  S2's per-row writer, `write_shim(target, row)`, on its rename's `[[shim]]` row, read with
+  `read_shim_rows(GOV, troot=govkit.derive_tool_root(target))` (`tools/govkit/shims.py:60-67`) at the
+  tool root the step ships in, as `fanout_cap.py`'s `GOV` resolves it, so `{prefix}` resolves against
+  the target's install. `write_shim` renders a `.md` `from` through `render_skill_shim` (unit 17 §4),
+  which `read_shim_rows` admits for a `skill` row by unit 17 S2's language rule, never `render_shim`
+  (`:232`), whose `LANGS` (`:49`) hold only `.sh`, `.js` and `.py`. The `skill` kind's write rule, an
+  absent path or that row's own marker, lives in `write_shim` alone, so on KEPT it writes nothing and
+  this step restates no rule. The DOWN is `STEPS.write_from_before_image(target, <step id>)`
+  (`:1192`), as `fanout_cap.py:201-203`'s is: it restores the adopter's own pre-UP bytes where the UP
+  withdrew, leaves the path empty again where it was absent, and touches a kept file not at all, since
+  the image holds no path for it; a path changed since the UP refuses the whole DOWN, naming it, as
+  that function does. The WITNESS exits 0 when the old path holds a file and no kit render: the
+  forwarder, or the target's own file the UP kept. Observed by AC4 and AC10.
 - **S5** — The old names forwarded. Five `[[shim]]` rows in `tools/govkit/shims.toml`, `kind = "skill"`
   (I3, unit 17), `from = ".claude/skills/<old>/SKILL.md"`, `to = ".claude/skills/gov-<new>/SKILL.md"`,
   `closed = false`. Each stays open until `install.deprecation-window` releases are cut, which
@@ -142,7 +166,7 @@ without the prefix (SK-2).
 ### Edges
 
 - **consumes-from** `PLAY-dConvergedCharter-11` — `derive_readers`, the reader inventory by path and by value S6 re-derives at its first pass and re-points
-- **consumes-from** `PLAY-dConvergedCharter-17` — `KINDS`, holding `skill`, so S5's five forwarder rows validate in `shims.toml`
+- **consumes-from** `PLAY-dConvergedCharter-17` — `KINDS`, holding `skill`, with `read_shim_rows`' language rule admitting a `skill` row's `.md` paths, so S5's five forwarder rows validate in `shims.toml`, and `write_shim`, the per-row writer holding the `skill` kind's write rule and rendering a `.md` forwarder through `render_skill_shim`, which S4's UP calls rather than restating the rule
 - **consumes-from** `PLAY-dConvergedCharter-19` — `.gitattributes`, its class pins, so S6 re-points only the per-Skill lines the class leaves standing
 - **consumes-from** `PLAY-dConvergedCharter-10` — `renderers.toml`, the `skills` scope's `[[target]]` row and the `skill` key of `[[drive]]` that S2 renders and S8 reads
 - **hands-off** `PLAY-dConvergedCharter-39` — `.claude/skills/gov-<name>/SKILL.md`, the five entries S2 renders, whose `rendered-skills` keys that unit claims in the dossiers and whose old keys it releases
@@ -184,18 +208,17 @@ A kit's command named here is the one its Skill runs today; the build pass reads
 ### Inventory
 
 Minted: the step program `tools/govkit/steps/skill_rename.py` with its fixture verb `--fixture --plant
-<case>` (cases `rename`, `edited`, `edited-then-write`, `absent`, `crlf`, `older-render`, `no-receipt`); the five step ids of S4; `check_skill_paths` and
+<case>` (cases `rename`, `edited`, `edited-then-write`, `absent`, `crlf`, `older-render`, `no-receipt`,
+`adopter-update`); the five step ids of S4; `check_skill_paths` and
 `check_skill_prefix`, each asked of `python tools/lexicon/lexicon.py --suggest <name> --as py.function` at
 `d8a12f046`: OK; the plant cases `skill-stale-probe`, `skill-held-client` and `skill-no-prefix` on `core.py fixture --plant`.
 
 ### Migration
 
-Per adopter, `govkit update` runs each step: the new entry is rendered by the `[[regenerate]]` argv, the
-UP withdraws the old render, and `shims.py --write` renders the forwarder at the old path. Where the UP
-kept a hand-edited old Skill, `shims.py --write` leaves it and names it, by the `skill` kind's write rule
-(PLAY-dConvergedCharter-17 S2): a forwarder is written only at an absent path or over a forwarder
-carrying its own `gov:shim <id>` marker. A rollback's DOWN restores the old render and the forwarder is
-not written.
+Per adopter, `govkit update` runs each step: the new entry is rendered by the `[[regenerate]]` argv, and
+the UP withdraws the old render and writes the forwarder in its place (S4), keeping and naming a
+hand-edited old Skill. A rollback's DOWN restores the before-image: the adopter's own bytes where the
+UP withdrew, no file where the path was absent, and a kept file untouched.
 
 ### Files touched (estimate)
 
@@ -236,12 +259,14 @@ not written.
 
 ## 5. Production-readiness checklist
 
-- security — the step writes only under `.claude/skills/<old>/` in its target, and withdraws a file
+- security — the step writes only under `.claude/skills/<old>/` in its target, writes the forwarder only
+  where the `skill` kind's write rule admits it, and withdraws a file
   only when `VERDICT_GRID` reads it `withdrawn`, or, with no receipt row, when the precedent's test
   recognises it as a kit render; any other file is named and kept.
 - perf / scale — five rows, one descriptor read per arm.
-- error / empty / loading states — an adopter with no old Skill is a witness-true no-op; a hand-edited
-  old Skill is kept and named, and the step still records applied.
+- error / empty / loading states — an adopter with no old Skill gains the forwarder alone, and its DOWN
+  leaves the path absent again; a hand-edited old Skill is kept and named, the step still records
+  applied, and its DOWN changes no byte of it.
 - observability — the UP names what it withdrew or kept; each arm names descriptor, key and path.
 - risks — a reader the inventory misses keeps an old path; the stale-path arm reds any descriptor row,
   and the forwarder catches a prose reader for the window.
@@ -270,12 +295,18 @@ not written.
   render and the WITNESS exits 0, the DOWN restores it byte-identical, and the `edited` plant keeps a
   hand-edited old Skill and names it; the `crlf` plant, a CRLF copy of the render, and the
   `older-render` plant, a render of an older template, are each withdrawn, and the `no-receipt` plant,
-  a scaffolded render with no receipt row, is withdrawn by the precedent's recognition test. The `edited-then-write` plant runs the UP over a hand-edited old
-  Skill and then `shims.py --write`, as the migration does (§4 "Migration"), and the edited file's bytes
-  are unchanged after both, `shims.py --check` naming it `held: <from> is the target's own file`.
+  a scaffolded render with no receipt row, is withdrawn by the precedent's recognition test; after
+  each withdrawal the old path holds the forwarder, and a second UP over it changes no byte. The
+  `edited-then-write` plant runs the UP over a hand-edited old Skill, and the edited file's bytes are
+  unchanged after its forwarder write, `shims.py --check` naming it `held: <from> is the target's own
+  file`; with the UP's `write_shim` call swapped for an unconditional `write_bytes` in a scratch copy of
+  the step, that plant reds. The DOWN runs after the UP over every plant the UP runs, `rename`,
+  `edited`, `absent`, `crlf`, `older-render` and `no-receipt`, and the tree under the old Skill's
+  directory, each path's presence and bytes, equals the pre-UP tree: a kept edit unchanged, an absent
+  path absent again, a CRLF copy and an older render back in their own bytes, never a fresh render.
   Red when: an edited Skill is withdrawn, a CRLF copy or an older render is kept as hand-edited, the
-  DOWN differs by a byte, or the forwarder write that follows the step overwrites the edited Skill it
-  kept.
+  forwarder is read as a kit render and withdrawn, the DOWN differs from the pre-UP tree by a byte or a
+  path on any plant, or the UP's forwarder write overwrites the edited Skill it kept.
 - **AC5** — When `python tools/govkit/shims.py --check` runs after the unit lands, the five `skill` rows
   are open and each forwarder at an old path matches its render.
   Red when: a row is closed while `read_releases` returns none, or a forwarder is missing.
@@ -306,6 +337,13 @@ not written.
   its `surfaces` in a scratch copy, it exits 1 naming `command:<old>` vanished.
   Red when: a renamed Skill's old member vanishes with no `[[upgrade]]` row naming it, or a `surfaces`
   value names a class the step gate does not declare.
+- **AC10** — When `python skill_rename.py --fixture --plant adopter-update` runs `govkit update --write`
+  over a scratch adopter installed at the release before this unit, each of the five old paths
+  `.claude/skills/<old>/SKILL.md` holds its forwarder with the row's `gov:shim <id>` marker after the
+  update; with the UP's forwarder render skipped in a copy of the step, the update's step walk stops at
+  that step, its WITNESS failing after the UP.
+  Red when: an old name vanishes at an adopter's update with no forwarder, or a step that wrote none
+  records applied.
 
 ## 7. Gates
 
@@ -315,7 +353,7 @@ The parent legs `core skills conformance` and `instruction render (one renderer 
 and AC1 once they land; neither is in the manifest at base.
 
 New arm: tools/playbook/core.py · covers AC6 AC8 · the plants `skill-stale-probe`, `skill-held-client` and `skill-no-prefix`, the failing cases a stale `probe` with no open shim, a held client's rows red while open, and a drive row's `skill` without `gov-` · none
-New arm: tools/govkit/steps/skill_rename.py · covers AC4 · the plants `rename`, `edited`, `edited-then-write`, `absent`, `crlf`, `older-render` and `no-receipt`, the failing cases an edited old Skill withdrawn, a CRLF copy kept, and the forwarder write overwriting a kept edit · none
+New arm: tools/govkit/steps/skill_rename.py · covers AC4 AC10 · the plants `rename`, `edited`, `edited-then-write`, `absent`, `crlf`, `older-render`, `no-receipt` and `adopter-update`, each UP followed by its DOWN and a tree compare with the pre-UP tree, the failing cases an edited old Skill withdrawn, a CRLF copy kept, the forwarder write overwriting a kept edit, the UP skipping the forwarder render, and a DOWN restoring a fresh render over a kept edit or into an absent path · none
 
 ## 8. Open questions
 
@@ -353,11 +391,30 @@ New arm: tools/govkit/steps/skill_rename.py · covers AC4 · the plants `rename`
   the `step-gate` leg), 5 and 19 (AC7 admits the strings S4, AC6 and the step's plants write and greps the
   reader keys alone) and 38 (the `edited-then-write` plant, and the migration naming the `skill` kind's
   write rule that keeps an edited Skill).
+- rev-5 · 2026-11-04 · S4 §4 §5 AC4 AC10 §7 · folded
+  `2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1` finding 26, the skeptic's corrected
+  fix: the UP renders its row's forwarder at the target's old path right after clearing it, under the
+  `skill` kind's write rule, the DOWN clears it first and the WITNESS requires it; the Migration's
+  per-adopter `shims.py --write` is dropped, and AC10 observes the forwarder after `govkit update
+  --write` at a scratch adopter, red when the UP skips the render.
+- rev-6 · 2026-11-05 · S4 §3 §4 §5 AC4 §7 §10 · folded
+  `2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2` findings 34 (H7: the UP's three
+  outcomes written through `write_before_image`, the DOWN `write_from_before_image`, restoring the
+  adopter's own bytes where the UP withdrew, leaving an absent path absent and a kept file untouched,
+  AC4's DOWN over every plant compared with the pre-UP tree), 15 (M16: the forwarder rendered through
+  unit 17's `render_skill_shim`, never `render_shim`, `read_shim_rows` admitting the row by unit 17 S2's
+  language rule) and 17 (M17: the UP calls unit 17's per-row writer `write_shim`, which holds the
+  `skill` kind's write rule, with `read_shim_rows(GOV, troot=…)`, AC4's `edited-then-write` plant
+  staged red with an unconditional write, §10 naming both seams); the consumes-from edge to
+  PLAY-dConvergedCharter-17 names `write_shim` and the language rule.
 
 ## 10. Reuse audit
 
 The seams extended are the `[[drive]]` row (PLAY-dOrderedCharter-6 S1) and unit 10's `skills` scope, the
-shim row grammar (`read_shim_rows`, `tools/govkit/shims.py:60`) with unit 17's `skill` kind, the
+shim row grammar (`read_shim_rows`, `tools/govkit/shims.py:60`) with unit 17's `skill` kind and its
+per-row writer `write_shim`, called and never restated, the before-image pair `write_before_image`
+and `write_from_before_image` (`tools/govkit/upgrade_steps.py:1121`, `:1192`) the UP and DOWN write
+through as `fanout_cap.py:201-203` does, the
 descriptor `[[upgrade]]` row and its step-program shape (`tools/hooks/kit.toml:138-145`,
 `tools/govkit/steps/fanout_cap.py`), and `core skills conformance` (PLAY-dOrderedCharter-7 S6).
 `python tools/codebase-map/reuse_lookup.py "render a Skill entry from a command row and rename it with a

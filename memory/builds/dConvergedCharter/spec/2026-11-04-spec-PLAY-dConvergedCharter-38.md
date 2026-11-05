@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-38 — the memory root's live carriers declared once in the dead-path gate and read by the reader inventory, so a retirement's inventory names a dossier or gotcha still citing the retired path
 
-**Status:** DEFERRED · rev-2 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 3 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-3 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 3 · advances PLAY-dConvergedCharter-24
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,9 +8,12 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-41 |
 | [2026-11-04-build-PLAY-dConvergedCharter-38-deviation-381.md](../build/2026-11-04-build-PLAY-dConvergedCharter-38-deviation-381.md) | deviation | — |
+| [2026-11-04-prompt-PLAY-dConvergedCharter-7-r4-fold-brief.md](../prompts/2026-11-04-prompt-PLAY-dConvergedCharter-7-r4-fold-brief.md) | research | PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-40 |
+| [2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
 | [2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-39 |
+| [2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md](../reviews/2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
 
 <!-- /gen:spec-records -->
 
@@ -157,8 +160,9 @@ line.
 
 ## 6. Acceptance criteria
 
-The fixture is `python check_policy.py --fixture <case> <dir>`, PLAY-dConvergedCharter-11's verb, which
-writes a scratch repository under `%TEMP%` with a short name.
+The fixture is the policy kit's existing verb `python check_policy.py --fixture <case>`
+(`check_policy.py:4577`, `--fixture [--strict-from <dir>] [<case>]`), whose runner writes the case's
+scratch repository under `%TEMP%` with a short name.
 
 - **AC1** — When `bash tools/check-dead-paths.sh --carriers` runs at the unit's tip, it prints
   `memory/map/features/*` and `memory/gotchas/*`, one per line, and exits 0; and `grep -c
@@ -171,9 +175,11 @@ writes a scratch repository under `%TEMP%` with a short name.
   and a byte copy of the tracked `tools/check-dead-paths.sh` at `<fixture>/tools/check-dead-paths.sh`,
   never a stub, in a tree whose history holds no deletion, it exits 1 naming the dossier and its line
   and not the spec; with `--except 'memory/map/features/x.md'` it exits 0. The same run with `GOV_BASH`
-  unset and a `PATH` whose first `bash` cannot see the tree still exits 1 naming the dossier; with
-  `GOV_BASH` pointed at a stub that exits 127 and no other candidate seeing the script, it prints
-  `live carriers: not read` with `no bash sees` and exits 0.
+  unset and a `PATH` whose first `bash` cannot see the tree still exits 1 naming the dossier. The case's
+  third arm calls `derive_readers` in process with the module's `resolve_bash` replaced by one returning
+  `None`, and it prints `live carriers: not read` with `no bash sees` and exits 0: the case is injected,
+  because `resolve_bash` always tries Git for Windows' two fixed paths (`check_policy.py:903`),
+  which see the script on every gov node, so no environment can remove every candidate.
   Red when: a live carrier naming the path is not returned, a frozen record is, or a bare `bash` that
   cannot see the tree reads the carriers as not read.
   fixture: the copy is the tracked script byte for byte, so the shipped mode's position is what is
@@ -192,7 +198,7 @@ writes a scratch repository under `%TEMP%` with a short name.
 `dead-path carriers (deleted files still named)` · `dead-path carriers self-test` · `policy fixtures` · `policy check` · `python resolver (behaviour + inline parity + idiom ban)` · `docs` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates`
 
 New arm: tools/check-dead-paths.test.sh · covers AC1 AC4 · the `--carriers` mode and the haystack over a planted dossier, staged red with the haystack's literal pathspecs restored beside an emptied array · none
-New arm: tools/policy/check_policy.py · covers AC2 AC3 · the fixture cases `live-carrier` and `no-dead-path-gate`, staged red with `read_live_carriers` returning an empty list silently, spawning a bare `bash`, or reading a copy of the gate whose `--carriers` mode is moved below the needle derivation, over the history-less fixture · none
+New arm: tools/policy/check_policy.py · covers AC2 AC3 · the fixture cases `live-carrier`, its injected `None` arm included, and `no-dead-path-gate`, staged red with `read_live_carriers` returning an empty list silently, spawning a bare `bash`, or reading a copy of the gate whose `--carriers` mode is moved below the needle derivation, over the history-less fixture · none
 
 ## 8. Open questions
 
@@ -210,6 +216,11 @@ none
   below the derivation), 12 (S2 runs `<repo>/<tool root>/check-dead-paths.sh` with cwd `<repo>`, AC2 and
   AC3 stating the fixture's copy) and 4 (strictly before units 12 and 17 at order 4, the hands-off edge
   to PLAY-dConvergedCharter-17).
+- rev-3 · 2026-11-04 · §6 AC2 §7 · folded
+  `2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1` findings 8 (§6's preamble gives the
+  fixture verb's real grammar, `--fixture [--strict-from <dir>] [<case>]`, and drops the claim that unit
+  11 owns it) and 14 (AC2's "no bash sees" case is injected by replacing `resolve_bash` in process, with
+  the reason the environment cannot produce it, and the arm line names the injected arm).
 
 ## 10. Reuse audit
 

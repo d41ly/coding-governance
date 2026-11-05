@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-13 — feature-specific guide prose migrated into feature-scoped units through one prose mover
 
-**Status:** DEFERRED · rev-4 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 14 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-5 · 2026-11-04 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 14 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0487@ff29708d whole
 
@@ -10,10 +10,13 @@
 |---|---|---|
 | [2026-11-03-build-PLAY-dConvergedCharter-1-reuse-scout-a.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-reuse-scout-a.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-19 |
 | [2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md](../build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
-| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 |
+| [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-41 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
+| [2026-11-04-prompt-PLAY-dConvergedCharter-7-r4-fold-brief.md](../prompts/2026-11-04-prompt-PLAY-dConvergedCharter-7-r4-fold-brief.md) | research | PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-40 |
 | [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
+| [2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
 | [2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-39 |
+| [2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md](../reviews/2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md) | spec-audit | PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
 
 <!-- /gen:spec-records -->
 
@@ -45,8 +48,11 @@ Build-run preconditions, each landed before this unit's pass: TOOL-dLinkedLibrar
   `write_moves(path, moves, write, written)` is idempotent on the DESTINATION, never on the source
   alone: it skips `write(move)` wherever the caller's predicate `written(move)` reads the move already
   at its destination, so a run that died after some writes and before `path` was rewritten re-runs
-  writing no second row or record; the guide caller's `written` is S5's own predicate, an active unit
-  whose `help`, whitespace squeezed, equals the move's text, and the dossier caller's is its existing
+  writing no second row or record. The guide caller's `written` holds only when both parts of S4's
+  write stand, the row (S5's predicate: an active unit whose `help`, whitespace squeezed, equals the
+  move's text) and its change record (`Promoted-from` the section tag, `After` that row's
+  `<tag>@<hash8>`), and its `write` writes each part only where it is missing, so a run that died
+  between a row and its record re-runs writing the record alone; the dossier caller's is its existing
   destination test. It then replaces each move's span in REVERSE document order, each span re-located by
   its text in the current buffer rather than by the offsets taken at plan time, so one replacement never
   shifts another, and writes `path` once. A move whose text no longer stands, or that `written` reads
@@ -89,9 +95,11 @@ Build-run preconditions, each landed before this unit's pass: TOOL-dLinkedLibrar
 - **S6** — The plants, `python tools/playbook/guide_move.py --fixture --plant <case>` in a throwaway
   tree with one guide, two dossier headers and one kit manifest: `feature-move`, `feature-twice`,
   `feature-two-features`, `feature-no-path`, `feature-left`, `feature-two-in-one` (two feature
-  paragraphs in one guide, both moved by one apply) and `feature-interrupted` (the second `write`
-  raises after the first row and record are written; the re-run completes with no second row). `guide_move.py --selftest` runs each
-  and is called by `adopt-playbook.sh --selftest`. Observed by AC1 to AC3.
+  paragraphs in one guide, both moved by one apply), `feature-interrupted` (the second `write`
+  raises after the first row and record are written; the re-run completes with no second row) and
+  `feature-record-interrupted` (the record write raises after its row is appended; the re-run writes
+  that record and no second row). `guide_move.py --selftest` runs each and is called by
+  `adopt-playbook.sh --selftest`. Observed by AC1 to AC3.
 - **S7** — The migration at this unit's pass: `plan` over gov's guides, each entry typed by the pass,
   `apply`, and the units and change records committed together. Every guide stays on
   `instructions-legacy.txt`: unit 7 takes it off the list at its own pass. Observed by AC6.
@@ -109,7 +117,7 @@ Build-run preconditions, each landed before this unit's pass: TOOL-dLinkedLibrar
 ### Edges
 
 - **consumes-from** `PLAY-dConvergedCharter-19` — `extract_section`'s rule honoured for guide headings, through which S1 reads a guide's sections; without it a retagged guide heading folds to a third spelling
-- **hands-off** `PLAY-dConvergedCharter-1` — `dossier_move.py`'s plan and apply as the factory `prose_move.py`, which unit 1 calls for the residue
+- **hands-off** `PLAY-dConvergedCharter-1` — `guide_move.py`, the guide caller of the factory `prose_move.py`, with S4's write route, to which unit 1 adds `--residue`
 - **hands-off** `PLAY-dConvergedCharter-7` — `guide_move.py`, the guide caller of the factory `prose_move.py` with S4's write route, to which unit 7 adds `--rationale` to move each retired guide section's rationale into a unit's `help` with an `explains=` edge
 - **hands-off** `PLAY-dConvergedCharter-40` — `guide_move.py apply` and S4's write route, which that unit extends with an amend route for an entry whose target tag the kit manifest already holds, since S4 only appends
 - **consumes-from** external — TOOL-dLinkedLibrary-19 and -20, TOOL-dTotalRecall-9, PLAY-dOrderedCharter-3, -9, -15 and -20, each DEFERRED at base and landed before this build run
@@ -123,9 +131,10 @@ Build-run preconditions, each landed before this unit's pass: TOOL-dLinkedLibrar
 - The guides, `memory/HYGIENE.md` and `memory/TEMPLATE-SPEC.md` hold 424,697 bytes at `d8a12f046`
   (`wc -c`, PINNED), the figure scout A measured; the population this unit reads is DERIVED at the
   pass from the legacy list, after unit 12 removes the four unattended guides.
-- The envelope helper is the precedent for a shared block in two copy-installed kits:
-  `render_envelope` canonical in `tools/lib/envelope.py`, carried inline under a `PARITY_ROWS` row
-  (PLAY-dOrderedCharter-3 S3); the table it joins is `tools/lib/resolve-python.test.sh:351-370`.
+- The precedent for a shared block in copy-installed kits is a live `PARITY_ROWS` row,
+  `resolve_bash_py` (`tools/lib/resolve-python.test.sh:369`): canonical `tools/lib/resolve_bash.py`,
+  carried inline in `tools/policy/check_policy.py:896`; the table is `:351-370`.
+  PLAY-dOrderedCharter-3 S3's `render_envelope` specifies the same shape and is unbuilt at base.
 
 ### The plan entry
 
@@ -211,10 +220,11 @@ renders and move when the kit's own templates move, so an adopter runs nothing.
   `feature-twice` a second `apply` writes nothing; under `feature-two-in-one` one apply writes two rows
   and the guide holds neither paragraph; under `feature-interrupted` the re-run after the raise leaves
   each paragraph's tag on exactly one row with one change record, prints the skipped move with `already
-  at`, and the guide holds neither paragraph.
+  at`, and the guide holds neither paragraph; under `feature-record-interrupted` the re-run leaves the
+  row once and writes its one change record.
   Red when: the paragraph stays, the `help` differs from it, a second apply writes a byte, a span shifted
   by an earlier replacement drops a move with no line, or an interrupted run's re-run writes a duplicate
-  row or record.
+  row or record, or skips a move whose record is missing.
 - **AC2** — When `python guide_move.py --fixture --plant feature-two-features` runs, `plan` writes no
   entry for the paragraph citing paths of two features, and under `feature-no-path` none for the
   paragraph citing no path; `apply` refuses an entry whose `text` is blank, writing nothing.
@@ -245,7 +255,7 @@ renders and move when the kit's own templates move, so an adopter runs nothing.
 
 `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `govkit acceptance matrix` · `playbook render selftest` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `python resolver (behaviour + inline parity + idiom ban)`
 
-New arm: tools/playbook/guide_move.py · covers AC1 AC2 AC3 · its `--selftest` running the seven plants of S6 under `adopt-playbook.sh --selftest`, the residue's failing case `feature-left` and the idempotence case `feature-interrupted` staged red with `written` returning false · none
+New arm: tools/playbook/guide_move.py · covers AC1 AC2 AC3 · its `--selftest` running the eight plants of S6 under `adopt-playbook.sh --selftest`, the residue's failing case `feature-left` and the idempotence cases `feature-interrupted`, staged red with `written` returning false, and `feature-record-interrupted`, staged red with `written` reading the row alone · none
 New arm: tools/lib/resolve-python.test.sh · covers AC4 · the `prose_move` parity row, its failing case one byte changed in the guide mover's copy · none
 
 ## 8. Open questions
@@ -277,7 +287,7 @@ New arm: tools/lib/resolve-python.test.sh · covers AC4 · the `prose_move` pari
   each copy-installed caller under a parity row; (b) in the codebase-map kit, imported by playbook; (c)
   in the playbook kit, imported by codebase-map. RESOLVED (agent, 2026-11-03, delegated): (a), rung 3:
   (b) and (c) import a sibling kit, which TOOL-dGroundRules-1 §4 forbids, and (a) is the
-  `render_envelope` precedent (PLAY-dOrderedCharter-3 S3). widens: none · relaxes: none
+  `resolve_bash_py` row's shape (§4 Evidence). widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -295,6 +305,13 @@ New arm: tools/lib/resolve-python.test.sh · covers AC4 · the `prose_move` pari
 - rev-4 · 2026-11-04 · §3 · sibling edit by the repair unit PLAY-dConvergedCharter-40 for
   `2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1` finding 27: the hands-off edge to that
   unit, which adds `apply`'s amend route beside S4's append.
+- rev-5 · 2026-11-04 · S1 S6 §3 §4 §8 AC1 §7 · folded
+  `2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1` findings 37, the skeptic's
+  corrected fix (the guide caller's `written` holds only when the row and its change record both stand,
+  and `write` writes the missing part alone; the plant `feature-record-interrupted` and its AC1 clause),
+  10 (the hands-off edge to PLAY-dConvergedCharter-1 names `guide_move.py` and the `--residue` route
+  unit 1 adds) and 19 (§4 Evidence and F4 cite the live `resolve_bash_py` row, `render_envelope` marked
+  unbuilt).
 
 ## 10. Reuse audit
 
