@@ -6,6 +6,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-05-build-TOOL-dFinishedRecord-1-1-acceptance-ledger.md](../build/2026-11-05-build-TOOL-dFinishedRecord-1-1-acceptance-ledger.md) | journal | — |
+| [2026-11-05-build-TOOL-dFinishedRecord-1-agent-ledger.md](../build/2026-11-05-build-TOOL-dFinishedRecord-1-agent-ledger.md) | journal | TOOL-dFinishedRecord-2 |
 | [2026-11-05-prompt-TOOL-dFinishedRecord-1-brief.md](../prompts/2026-11-05-prompt-TOOL-dFinishedRecord-1-brief.md) | research | — |
 | [2026-11-05-review-TOOL-dFinishedRecord-1-closing-diff-round1.md](../reviews/2026-11-05-review-TOOL-dFinishedRecord-1-closing-diff-round1.md) | diff-review | — |
 

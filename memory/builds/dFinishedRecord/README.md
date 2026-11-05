@@ -59,7 +59,7 @@ ids TOOL-dFinishedRecord-1 TOOL-dFinishedRecord-2
 | [TOOL-dFinishedRecord-2 — check 24's HELD exclusion gets its arm, and the roster row names the placement built](spec/2026-11-05-spec-TOOL-dFinishedRecord-2.md) | 2 | 1 | CLOSED | rev-1 | 2026-11-05 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 6 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
