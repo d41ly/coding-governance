@@ -774,3 +774,7 @@ why = "it runs `<prefix>/govkit/docs_leg.py`, which grades gov's own pages under
 [[exempt_leg]]
 name = "upgrade-walk"
 why = "it runs `<prefix>/govkit/upgrade_walk.py`, which builds release-0 with the `apply` of a scratch clone of gov at the commit `<prefix>/govkit/fixtures/release-0/pin.txt` pins, then walks every declared `[[upgrade]]` step over it up, down, up again, skipped, killed and failed through the deployer's own `update`. The deployer is a registry exemption that never travels into a target, and the steps, the pin and the fixture are gov's, so the leg grades gov's kit source; an adopter has no deployer and no step to prove. TOOL-dSafePassage-5."
+
+[[exempt_leg]]
+name = "python reads (a name never bound, an import outside its guard)"
+why = "it runs `<prefix>/run-gates/py_reads.py`, which reads gov's own manifest and gov's own tracked Python through the memory-tree kit's import walk. The file is withheld by its `project-owned` row in the run-gates descriptor, so no target's manifest can carry the leg. PLAY-dOrderedCharter-67."

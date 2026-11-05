@@ -211,8 +211,9 @@ fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
 # Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
 # reverse declaration). Stated ABSOLUTELY, never as a delta.
-FLOOR_ASSERTIONS=16
+FLOOR_ASSERTIONS=17
 # Raised 15 -> 16 by TOOL-dDerivedDocket-23, which adds G1b, the four-leg `signature` pin.
+# Raised 16 -> 17 by PLAY-dOrderedCharter-67, which adds the python-reads scanner's plants.
 
 # The manifest, derived the same way run-gates.sh derives it. GATE_LEGS still outranks it, which is
 # what lets the fixture arms below drive this file without touching the real bar.
@@ -575,6 +576,12 @@ if bad:
         print("  " + b)
     sys.exit(1)
 ' "$ROOT" "$ROOT/${PFX}gate-legs.json" || fail=1
+
+# ---- THE PYTHON-READS SCANNER'S PLANTS (PLAY-dOrderedCharter-67) ---------------------------------
+# An undefined name and a suite import outside its guard, each staged in a scratch tool root and
+# each beside its passing case, so the leg's own green is not the only witness that either arm reds.
+a=$((a+1))
+"$PYBIN" "$KITDIR/py_reads.py" --selftest || { echo "gov-canary: py_reads.py --selftest failed"; fail=1; }
 
 [ "$a" -ge "$FLOOR_ASSERTIONS" ] || { echo "gov-canary: executed $a assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 if [ "$fail" = 0 ]; then

@@ -111,6 +111,7 @@ process-monitor wiring	repo	records
 profile-bar selftest	kit	selftests
 push-main self-test	kit	selftests
 pytest-guardrails self-test	kit	selftests
+python reads (a name never bound, an import outside its guard)	repo	declarations
 python resolver (behaviour + inline parity + idiom ban)	kit	wiring
 recall floor	repo	declarations
 recall floor arms	repo	selftests

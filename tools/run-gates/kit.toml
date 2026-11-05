@@ -108,6 +108,13 @@ role = "project-owned"
 include = ["owed_rows.py"]
 role = "project-owned"
 
+# AND SO IS THE PYTHON-READS SCANNER. PLAY-dOrderedCharter-67. `py_reads.py` walks GOV's manifest and
+# gov's tracked Python through the memory-tree kit's import walk, and its leg is GOV's, an
+# [[exempt_leg]] in <prefix>/govkit/registry.toml, so no adopter receives the file.
+[[files]]
+include = ["py_reads.py"]
+role = "project-owned"
+
 # AND SO ARE THE GATE PROFILER'S FIXTURES. TOOL-dRedressedBar-19 S29. `measure_legs.py` ships, but
 # its `--selftest` needs a Windows host and the process-monitor kit beside this one, so its leg is
 # GOV's, an [[exempt_leg]] in <prefix>/govkit/registry.toml, and the fixture legs it profiles have no

@@ -275,3 +275,9 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-05T00:19:10Z rescope · item add PLAY-dOrderedCharter-69 · reason promoted from the closing diff review: H3, fixtures act on the real repository under an inherited GIT_DIR
 
 2026-11-05T00:19:16Z rescope · item add PLAY-dOrderedCharter-70 · reason promoted from the closing diff review: the closing review's mediums and low, batched
+
+2026-11-05T03:23:09Z dispatch · item 7ae097e4 PLAY-dOrderedCharter-67 · reason tools/gate-legs.json tools/run-gates/py_reads.py tools/run-gates/kit.toml tools/run-gates/run-gates.gov.test.sh tools/govkit/registry.toml tools/govkit/subject-pins.tsv memory/map/features/run-gates.md memory/map/generated/symbols.json memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/gotchas/held-suite-guard-misses-a-sibling-kit.md memory/guides/SESSION-KICKOFF.md memory/builds/dOrderedCharter/spec/2026-11-05-spec-PLAY-dOrderedCharter-67.md memory/builds/dOrderedCharter/build/2026-11-05-build-PLAY-dOrderedCharter-67-ledger.md memory/builds/dOrderedCharter/build/2026-11-05-build-PLAY-dOrderedCharter-67-deviation-671.md memory/builds/dOrderedCharter/README.md memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-05T03:23:19Z brief · item PLAY-dOrderedCharter-67 · reason 781325610c98 memory/builds/dOrderedCharter/prompts/2026-11-05-prompt-PLAY-dOrderedCharter-67-build-brief.md
+
+2026-11-05T03:51:22Z dispatch · item 7ae097e4 PLAY-dOrderedCharter-67 · reason memory/gotchas/INDEX.md

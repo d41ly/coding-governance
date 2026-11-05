@@ -104,6 +104,7 @@
       "profile-bar selftest",
       "push-main self-test",
       "pytest-guardrails self-test",
+      "python reads (a name never bound, an import outside its guard)",
       "python resolver (behaviour + inline parity + idiom ban)",
       "recall floor",
       "recall floor arms",

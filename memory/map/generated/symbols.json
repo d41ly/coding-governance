@@ -358,6 +358,11 @@
       "file": "tools/run-gates/owed_rows.py"
     },
     {
+      "id": "Refused",
+      "kind": "class",
+      "file": "tools/run-gates/py_reads.py"
+    },
+    {
       "id": "Report",
       "kind": "class",
       "file": "tools/govkit/govkit.py"
@@ -8243,6 +8248,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "derive_closure",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
+    },
+    {
       "id": "derive_code_files",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -8586,6 +8596,11 @@
       "id": "derive_group",
       "kind": "function",
       "file": "tools/playbook/tag_bundle.py"
+    },
+    {
+      "id": "derive_guard_gaps",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
     },
     {
       "id": "derive_guardable_reads",
@@ -11958,6 +11973,11 @@
       "file": "tools/run-gates/owed_rows.py"
     },
     {
+      "id": "load_readers",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
+    },
+    {
       "id": "load_records_at",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
@@ -12576,6 +12596,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
     },
     {
       "id": "main",
@@ -14308,6 +14333,11 @@
       "file": ".githooks/straggler-guard.test.sh"
     },
     {
+      "id": "print_gaps",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
+    },
+    {
       "id": "print_gate_backstop",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -14366,6 +14396,11 @@
       "id": "print_measure",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
+    },
+    {
+      "id": "print_name_hits",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
     },
     {
       "id": "print_note",
@@ -16693,6 +16728,11 @@
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
+      "id": "read_legs",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
+    },
+    {
       "id": "read_legs_for",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -18526,6 +18566,11 @@
       "id": "read_turnstile",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "read_unbound_names",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
     },
     {
       "id": "read_unit_edges",
@@ -21415,6 +21460,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
@@ -23048,6 +23098,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "run_both",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
+    },
+    {
       "id": "run_bounded",
       "kind": "function",
       "file": "tools/process-monitor/census.py"
@@ -23733,6 +23788,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_guards",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
+    },
+    {
       "id": "run_gw",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -24081,6 +24141,11 @@
       "id": "run_name_check",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
+    },
+    {
+      "id": "run_names",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
     },
     {
       "id": "run_new",
@@ -24601,6 +24666,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/run-gates/owed_rows.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
     },
     {
       "id": "run_selftest",
@@ -25433,6 +25503,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "scan_kit_homes",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
+    },
+    {
       "id": "scan_landed_carry",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -25743,6 +25818,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "scan_tracked_names",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
+    },
+    {
       "id": "scan_tracked_specs",
       "kind": "function",
       "file": "tools/codebase-map/replay-phrases.py"
@@ -25776,6 +25856,11 @@
       "id": "scan_unarmed_slots",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "scan_unbound_names",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
     },
     {
       "id": "scan_uncontained_writes",

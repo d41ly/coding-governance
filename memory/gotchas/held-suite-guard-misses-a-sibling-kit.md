@@ -30,6 +30,8 @@ imports, what that module imports, and `{prefix}/lib/` when the suite inlines a 
 files to the sibling's directory, which can tip a shared guard past `BROAD_LEG_FLOOR` in
 `tools/check-spec-tokens.py` and drop it out of the spec-tokens join.
 
-No machine gate yet: a lint that reads each held suite for the sibling kits it resolves reds scratch-guard's leg
-on arrival, so it is a build of its own. Until then this record is the checklist entry, selected by
-`gotchas.py --for-paths` for a diff touching `tools/gate-legs.json`.
+Gated by the leg `python reads (a name never bound, an import outside its guard)` for a Python suite:
+`tools/run-gates/py_reads.py` walks the import closure of each guarded leg whose argv runs a Python file and
+reds a module its guard does not cover. A shell suite is not walked, `tools/hooks/scratch-guard.test.sh` among
+them, because a shell walker is a build of its own. For those this record stays the checklist entry, selected
+by `gotchas.py --for-paths` for a diff touching `tools/gate-legs.json`.
