@@ -32,6 +32,7 @@
 | [2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-control.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-control.md) | research | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-replay-void-runs.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-void-runs.md) | research | — |
 | [2026-11-03-build-TOOL-dFairHearing-1-verdicts.md](../build/2026-11-03-build-TOOL-dFairHearing-1-verdicts.md) | research | — |
+| [2026-11-04-build-TOOL-dFairHearing-1-1-acceptance-ledger.md](../build/2026-11-04-build-TOOL-dFairHearing-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-04-build-TOOL-dFairHearing-25-replay-verdicts.md](../build/2026-11-04-build-TOOL-dFairHearing-25-replay-verdicts.md) | research | TOOL-dFairHearing-25 TOOL-dFairHearing-15 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-1-reuse-scout.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-1-reuse-scout.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-2-spec-writer.md) | journal | — |

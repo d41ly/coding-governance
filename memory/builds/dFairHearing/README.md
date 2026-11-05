@@ -133,7 +133,7 @@ ids TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHea
 | [TOOL-dFairHearing-48 — the nine items of the diff review of units 43 to 47](spec/2026-11-05-spec-TOOL-dFairHearing-48.md) | 32 | 2 | CLOSED | rev-1 | 2026-11-05 |
 <!-- /gen:build-units -->
 
-Records: 337 bound to this build, across 4 record folder(s).
+Records: 371 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
