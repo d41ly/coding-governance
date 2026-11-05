@@ -49,22 +49,23 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node d · opened 2026-11-05 · streams tooling
+**Build status:** SPECCED · 2 unit(s) · node d · opened 2026-11-05 · streams tooling
 ids TOOL-dFinishedRecord-1 TOOL-dFinishedRecord-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dFinishedRecord-1 — check 24 stops grading a run that derived LANDED](spec/2026-11-05-spec-TOOL-dFinishedRecord-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-05 |
+| [TOOL-dFinishedRecord-2 — check 24's HELD exclusion gets its arm, and the roster row names the placement built](spec/2026-11-05-spec-TOOL-dFinishedRecord-2.md) | 2 | 1 | SPECCED | rev-1 | 2026-11-05 |
 <!-- /gen:build-units -->
 
 Records: 3 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dFinishedRecord-1.
+Ids no `spec-audit` record has ever named: TOOL-dFinishedRecord-1 TOOL-dFinishedRecord-2.
 
-Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -72,6 +73,7 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-dFinishedRecord-1` | no |
+| 2 | `TOOL-dFinishedRecord-2` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
