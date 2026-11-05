@@ -49,7 +49,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Traps this repository has already paid for
 
 - `--dispatch` costs about 15 minutes a call. Declare everything in the first call: your spec, this brief's ledger, any deviation record,
-  `memory/builds/dOrderedCharter/RUN.md`, `memory/builds/dOrderedCharter/README.md`, `memory/LIVE.md`,
+  `memory/builds/dOrderedCharter/README.md`, `memory/LIVE.md`, never `RUN.md`, which `--dispatch` refuses,
   `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` and `memory/map/generated/`. A commit refused for an
   undeclared path costs another call.
 - `--dispatch` takes ONE `--writes <path>` per path (`--writes a --writes b`); a space-joined list is refused by

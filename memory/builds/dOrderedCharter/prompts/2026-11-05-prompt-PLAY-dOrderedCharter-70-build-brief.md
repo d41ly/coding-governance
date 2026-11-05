@@ -46,10 +46,16 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Run no gate leg, no `*.test.sh` suite, no merge bar. Verify each AC by the probe or fixture the spec names. A new
   suite arm goes in the suite file and on a `New arm:` line; the main loop observes it red and green at the close.
 
+## Owed by a unit before yours
+
+`tools/playbook/positional-refs.txt` names adopters NicoCares and inCMS, so `govkit selfcheck` reports 2 problems and its leg reds at the
+close. Fix it in your pass, and add the path to your `--dispatch` write set. Each listed citation is keyed by its bytes, so a change to a
+row must leave the positional check green: read how `tools/playbook/positional.py` joins that file first.
+
 ## Traps this repository has already paid for
 
 - `--dispatch` costs about 15 minutes a call. Declare everything in the first call: your spec, this brief's ledger, any deviation record,
-  `memory/builds/dOrderedCharter/RUN.md`, `memory/builds/dOrderedCharter/README.md`, `memory/LIVE.md`,
+  `memory/builds/dOrderedCharter/README.md`, `memory/LIVE.md`, never `RUN.md`, which `--dispatch` refuses,
   `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` and `memory/map/generated/`. A commit refused for an
   undeclared path costs another call.
 - `--dispatch` takes ONE `--writes <path>` per path (`--writes a --writes b`); a space-joined list is refused by
