@@ -44,19 +44,19 @@ None.
 
 | # | Unit | Mechanism |
 |---|---|---|
-| 1 | `TOOL-dFinishedRecord-1` | check 24's roster loop asks `check_derived_landed` after its recorded-phase skip and excludes a derived-LANDED record |
+| 1 | `TOOL-dFinishedRecord-1` | check 24's roster loop asks `check_derived_landed` after every skip, its recorded phase and its build README, as check 23 does, and excludes a derived-LANDED record |
 | 2 | `TOOL-dFinishedRecord-2` | promoted from the closing review: round 1's two lows, batched, in check 24's arm block, the roster's mechanism cell and the classes that name them |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 2 unit(s) · node d · opened 2026-11-05 · streams tooling
+**Build status:** CLOSED · 2 unit(s) · node d · opened 2026-11-05 · streams tooling
 ids TOOL-dFinishedRecord-1 TOOL-dFinishedRecord-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dFinishedRecord-1 — check 24 stops grading a run that derived LANDED](spec/2026-11-05-spec-TOOL-dFinishedRecord-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-05 |
-| [TOOL-dFinishedRecord-2 — check 24's HELD exclusion gets its arm, and the roster row names the placement built](spec/2026-11-05-spec-TOOL-dFinishedRecord-2.md) | 2 | 1 | SPECCED | rev-1 | 2026-11-05 |
+| [TOOL-dFinishedRecord-2 — check 24's HELD exclusion gets its arm, and the roster row names the placement built](spec/2026-11-05-spec-TOOL-dFinishedRecord-2.md) | 2 | 1 | CLOSED | rev-1 | 2026-11-05 |
 <!-- /gen:build-units -->
 
 Records: 3 bound to this build, across 3 record folder(s).

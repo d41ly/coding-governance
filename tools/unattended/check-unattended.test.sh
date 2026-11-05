@@ -4229,9 +4229,9 @@ reset_tree
 # ---- DERIVED LANDED IS NOT GRADED BY CHECK 24 EITHER (TOOL-dFinishedRecord-1): an in-place landing
 # ---- leaves its record at LANDING, and a roster that grows after the landing owes a rescope row the
 # ---- driver's --rescope refuses on a finished record. Each arm is tRos live with ARCH-tRos-1, its
-# ---- record moved to LANDING, then ARCH-tRos-7 added AFTER the landing commit with no row - the
-# ---- dConvergedCharter shape. Each asserts only check 24's strings, because a LANDING record also
-# ---- moves checks 7, 15 and 19.
+# ---- record moved to LANDING, or in arm D to HELD under a hand-off code, then ARCH-tRos-7 added
+# ---- AFTER the landing commit with no row - the dConvergedCharter shape. Each asserts only check
+# ---- 24's strings, because a LANDING record also moves checks 7, 15 and 19.
 # A: pushed, so derived LANDED - excluded, naming the record and its landing commit
 seed_ros
 sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRos/RUN.md
@@ -4269,6 +4269,20 @@ same "check 24 exclusion UNAVAILABLE prints once" "$(grep -c 'check 24 exclusion
 hit  "$out" "so the scope moved with nothing on the record saying so: ARCH-tRos-7 in memory/builds/tRos/RUN.md"
 miss "$out" "check 24 EXCLUDED"
 git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main
+# D: HELD under a hand-off code, pushed, so derived LANDED too. Check 24's call admits every phase the
+# predicate admits there, and this is the arm a call narrowed to LANDING turns red
+# (TOOL-dFinishedRecord-2, the closing review's L1). The code is check 7's HELD arm's.
+seed_ros
+sed -i 's/^phase: .*/phase: HELD\nhold-code: owner-landing/' memory/builds/tRos/RUN.md
+git add -A && git commit -q -m "tRos hands off" --no-verify
+c24_hold=$(git rev-parse HEAD)
+git push -q -f origin HEAD:main
+add_u7
+git add -A && git commit -q -m "a unit added after the hand-off" --no-verify
+out=$(run)
+hit  "$out" "check 24 EXCLUDED memory/builds/tRos/RUN.md — derived LANDED: its landing commit $c24_hold"
+miss "$out" "check 24 FAILED"
+git push -q -f origin "$ANCHOR0":main
 reset_tree
 
 # ---- check 23 (TOOL-dUnstalledConvoy-10): a DECLARED write set against what the pass COMMITTED.
@@ -7325,7 +7339,11 @@ fi   # ---- end of the region-8 span, re-cut across the eight regions by TOOL-aG
 # ---- C after the roster block in region 8, three `hit`, three `miss` and one `same`, so FLOOR_SHARD_8
 # ---- carries the same +7 and the other seven are untouched. COUNTED off the block's own lines; this pass
 # ---- runs no suite, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=1140
+# ---- RAISED 1140 -> 1142 by exactly the arms, TOOL-dFinishedRecord-2: check 24's derived-LANDED arm D
+# ---- after arm C in region 8, one `hit` and one `miss`, so FLOOR_SHARD_8 carries the same +2 and the
+# ---- other seven are untouched. COUNTED off the block's own lines; this pass runs no suite, and its
+# ---- RED-first observation is the close's.
+FLOOR_ASSERTIONS=1142
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
@@ -7337,7 +7355,7 @@ FLOOR_SHARD_4=101
 FLOOR_SHARD_5=133
 FLOOR_SHARD_6=150
 FLOOR_SHARD_7=301
-FLOOR_SHARD_8=215
+FLOOR_SHARD_8=217
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
   *) _fv="FLOOR_SHARD_$SH_I"; FLOOR=${!_fv}; MODE="shard $SH_I/$SHARD_ARITY" ;;

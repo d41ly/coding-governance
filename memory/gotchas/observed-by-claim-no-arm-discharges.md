@@ -47,6 +47,14 @@ closing review's round 3, M1, ids 1, 3 and 5). `TOOL-dRenderedAnchor-4` added ar
 check: each branch of a conditional resolver needs a fixture whose answer depends on that branch,
 observed red against the collapsed branch.
 
+It bit again in `TOOL-dFinishedRecord-1`, whose S1 excluded from check 24 every record
+`check_derived_landed` answers 0 for, at its call in `tools/unattended/check-unattended.sh`. The
+predicate admits two phases there, LANDING and HELD under a hand-off code, and S1's three arms in
+`tools/unattended/check-unattended.test.sh` all set LANDING, so a call narrowed to that phase left
+the suite green (dFinishedRecord's closing review, round 1, L1). `TOOL-dFinishedRecord-2` added
+arm D, a HELD record under `owner-landing`. The check: a call to a shared admission predicate needs
+one arm per phase the predicate admits at that call, each red against the call narrowed to the others.
+
 ## The fix
 
 Stage the break of the scope item's OWN surface and watch the cited arm go red. Never read the arm

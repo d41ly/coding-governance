@@ -1,6 +1,6 @@
 # TOOL-dFinishedRecord-2 — check 24's HELD exclusion gets its arm, and the roster row names the placement built
 
-**Status:** SPECCED · rev-1 · 2026-11-05 · node d · Tier-1 · base 51912ffc · streams tooling · order 2
+**Status:** CLOSED · rev-1 · 2026-11-05 · node d · Tier-1 · base 51912ffc · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
