@@ -265,3 +265,13 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-04T23:51:34Z rescope · item defer PLAY-dOrderedCharter-54 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
 
 2026-11-04T23:51:36Z rescope · item defer PLAY-dOrderedCharter-55 · reason owner ordered the build paused after unit 45 and the branch landed; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-05T00:19:03Z review · item dOrderedCharter · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 3 · minors 20 · disposition promote
+
+2026-11-05T00:19:05Z rescope · item add PLAY-dOrderedCharter-67 · reason promoted from the closing diff review: H1, the recall suites' guards miss the moved id grammar
+
+2026-11-05T00:19:08Z rescope · item add PLAY-dOrderedCharter-68 · reason promoted from the closing diff review: H2, the tag scanners drop every line after an unclosed fence
+
+2026-11-05T00:19:10Z rescope · item add PLAY-dOrderedCharter-69 · reason promoted from the closing diff review: H3, fixtures act on the real repository under an inherited GIT_DIR
+
+2026-11-05T00:19:16Z rescope · item add PLAY-dOrderedCharter-70 · reason promoted from the closing diff review: the closing review's mediums and low, batched
