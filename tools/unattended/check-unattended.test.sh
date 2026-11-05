@@ -4226,6 +4226,51 @@ hit  "$out" "check 24's ADD arm skipped for memory/builds/tSpc/RUN.md — the ba
 miss "$out" "so the scope moved with nothing on the record saying so: ARCH-tSpc-1 in"
 reset_tree
 
+# ---- DERIVED LANDED IS NOT GRADED BY CHECK 24 EITHER (TOOL-dFinishedRecord-1): an in-place landing
+# ---- leaves its record at LANDING, and a roster that grows after the landing owes a rescope row the
+# ---- driver's --rescope refuses on a finished record. Each arm is tRos live with ARCH-tRos-1, its
+# ---- record moved to LANDING, then ARCH-tRos-7 added AFTER the landing commit with no row - the
+# ---- dConvergedCharter shape. Each asserts only check 24's strings, because a LANDING record also
+# ---- moves checks 7, 15 and 19.
+# A: pushed, so derived LANDED - excluded, naming the record and its landing commit
+seed_ros
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRos/RUN.md
+git add -A && git commit -q -m "tRos lands" --no-verify
+c24_land=$(git rev-parse HEAD)
+git push -q -f origin HEAD:main
+add_u7
+git add -A && git commit -q -m "a unit added after the landing" --no-verify
+out=$(run)
+hit  "$out" "check 24 EXCLUDED memory/builds/tRos/RUN.md — derived LANDED: its landing commit $c24_land"
+miss "$out" "check 24 FAILED"
+git push -q -f origin "$ANCHOR0":main
+# B (control): the same LANDING record, NOT pushed, is a live run and is graded
+seed_ros
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRos/RUN.md
+git add -A && git commit -q -m "tRos lands" --no-verify
+add_u7
+git add -A && git commit -q -m "a unit added after the landing" --no-verify
+out=$(run)
+hit  "$out" "so the scope moved with nothing on the record saying so: ARCH-tRos-7 in memory/builds/tRos/RUN.md"
+miss "$out" "check 24 EXCLUDED"
+# C: no advertised tip resolves, with TWO LANDING records before the predicate - UNAVAILABLE once,
+# and the record is graded rather than excluded. With one record the count is 1 with or without the
+# guard, so the arm could not tell a working guard from a missing one.
+seed_ros
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRos/RUN.md
+git add -A && git commit -q -m "tRos lands" --no-verify
+add_u7
+git add -A && git commit -q -m "a unit added after the landing" --no-verify
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "tRun lands" --no-verify
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/nothing-here
+out=$(run)
+same "check 24 exclusion UNAVAILABLE prints once" "$(grep -c 'check 24 exclusion UNAVAILABLE' <<<"$out")" "1"
+hit  "$out" "so the scope moved with nothing on the record saying so: ARCH-tRos-7 in memory/builds/tRos/RUN.md"
+miss "$out" "check 24 EXCLUDED"
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main
+reset_tree
+
 # ---- check 23 (TOOL-dUnstalledConvoy-10): a DECLARED write set against what the pass COMMITTED.
 # ---- The sibling verb records what a dispatched pass said it would write; this is the half that can
 # ---- catch the declaration out, because the two artifacts are made by different acts at different
@@ -7276,7 +7321,11 @@ fi   # ---- end of the region-8 span, re-cut across the eight regions by TOOL-aG
 # ---- carries +18, and 9 in region 1 beside the HALT arms, three `miss` and three `hit` with the three
 # ---- `mutate` counts, so FLOOR_SHARD_1 carries +9. COUNTED off the block's own lines; this pass runs no
 # ---- suite, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=1133
+# ---- RAISED 1133 -> 1140 by exactly the arms, TOOL-dFinishedRecord-1: check 24's derived-LANDED arms A to
+# ---- C after the roster block in region 8, three `hit`, three `miss` and one `same`, so FLOOR_SHARD_8
+# ---- carries the same +7 and the other seven are untouched. COUNTED off the block's own lines; this pass
+# ---- runs no suite, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=1140
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
@@ -7288,7 +7337,7 @@ FLOOR_SHARD_4=101
 FLOOR_SHARD_5=133
 FLOOR_SHARD_6=150
 FLOOR_SHARD_7=301
-FLOOR_SHARD_8=208
+FLOOR_SHARD_8=215
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
   *) _fv="FLOOR_SHARD_$SH_I"; FLOOR=${!_fv}; MODE="shard $SH_I/$SHARD_ARITY" ;;

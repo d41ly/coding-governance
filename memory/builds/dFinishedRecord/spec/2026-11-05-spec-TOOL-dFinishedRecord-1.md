@@ -1,6 +1,6 @@
 # TOOL-dFinishedRecord-1 — check 24 stops grading a run that derived LANDED
 
-**Status:** SPECCED · rev-1 · 2026-11-05 · node d · Tier-2 · base 51912ffc · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-11-05 · node d · Tier-2 · base 51912ffc · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

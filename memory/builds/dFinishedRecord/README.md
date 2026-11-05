@@ -48,13 +48,13 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 1 unit(s) · node d · opened 2026-11-05 · streams tooling
+**Build status:** CLOSED · 1 unit(s) · node d · opened 2026-11-05 · streams tooling
 ids TOOL-dFinishedRecord-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dFinishedRecord-1 — check 24 stops grading a run that derived LANDED](spec/2026-11-05-spec-TOOL-dFinishedRecord-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-11-05 |
+| [TOOL-dFinishedRecord-1 — check 24 stops grading a run that derived LANDED](spec/2026-11-05-spec-TOOL-dFinishedRecord-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-05 |
 <!-- /gen:build-units -->
 
 Records: 1 bound to this build, across 2 record folder(s).
