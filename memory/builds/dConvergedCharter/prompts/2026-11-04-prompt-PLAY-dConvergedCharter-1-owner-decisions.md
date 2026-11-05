@@ -50,3 +50,13 @@ PLAY-dConvergedCharter-41's fork F3 (round-4 finding 21, the straggler guard's r
 file). Asked: keep the guard's narrow shell read held to `parse_policy` by a parity table, or call python. Answered:
 **(a) Shell read + parity.** The guard stays python-free, as it is for its conf; the parity table is the recorded
 exception to one reader of the policy file.
+
+## After round 5 of the spec-audit chain
+
+Round 5, the fold review over round 4's folds, confirmed 37 findings with 0 blockers and 9 HIGHs, refuted none, and the
+disposal folded them all (9e4ca98e8). `--chain-verdict` read HOLD at the ceiling of 4 rounds; the HIGH count went from 5
+to 9, eight of them in PLAY-dConvergedCharter-11. Asked: stop the chain, re-split unit 11, or run round 6. Answered:
+**Stop the chain.** The folds stand, and the builders' closing review takes what remains.
+
+Round 5's folds took PLAY-dConvergedCharter-11 from 88,324 to 113,351 bytes. Asked whether to accept it. Answered:
+**Accept 113 KB.** Unit 11 stays whole.
