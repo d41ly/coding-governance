@@ -46,6 +46,12 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Run no gate leg, no `*.test.sh` suite, no merge bar. Verify each AC by the probe or fixture the spec names. A new
   suite arm goes in the suite file and on a `New arm:` line; the main loop observes it red and green at the close.
 
+## Owed by the unit before yours
+
+`tools/run-gates/py_reads.py` holds a nested helper named `gaps`, which the lexicon counts as a verb offender, taking it to 1210 over its pin
+of 1209. Rename it to a declared verb in your pass, and add the path to your `--dispatch` write set. `python tools/lexicon/lexicon.py` must
+print `lexicon OK` after your pass.
+
 ## Traps this repository has already paid for
 
 - `--dispatch` costs about 15 minutes a call. Declare everything in the first call: your spec, this brief's ledger, any deviation record,
