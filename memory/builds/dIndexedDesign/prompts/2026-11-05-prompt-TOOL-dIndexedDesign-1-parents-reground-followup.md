@@ -1,4 +1,4 @@
-**Serves:** research TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13
+**Serves:** research TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13
 
 # Brief: the re-ground's writer-found follow-ups on dIndexedDesign specs 8, 10, 11 and 13
 
