@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-11 — every kit conf key the retrofit does not convert folded into the policy file, its readers inventoried by value and re-pointed
 
-**Status:** DEFERRED · rev-8 · 2026-11-05 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 2 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-9 · 2026-11-05 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 2 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0485@43490b62 part 1/2
 
@@ -13,6 +13,7 @@
 | [2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md](../build/2026-11-03-build-PLAY-dConvergedCharter-11-reuse-scout-c.md) | research | PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 |
 | [2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md](../build/2026-11-04-build-PLAY-dConvergedCharter-1-agent-ledger.md) | journal | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-41 |
 | [2026-11-04-build-PLAY-dConvergedCharter-11-r4-fold-returns.md](../build/2026-11-04-build-PLAY-dConvergedCharter-11-r4-fold-returns.md) | journal | PLAY-dConvergedCharter-7 |
+| [2026-11-05-build-PLAY-dConvergedCharter-11-deviation-112.md](../build/2026-11-05-build-PLAY-dConvergedCharter-11-deviation-112.md) | deviation | — |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-fix-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-21 |
 | [2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md](../prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md) | research | PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 |
 | [2026-11-04-prompt-PLAY-dConvergedCharter-1-owner-decisions.md](../prompts/2026-11-04-prompt-PLAY-dConvergedCharter-1-owner-decisions.md) | research | PLAY-dConvergedCharter-1 |
@@ -21,6 +22,8 @@
 | [2026-11-04-prompt-PLAY-dConvergedCharter-11-fold-brief.md](../prompts/2026-11-04-prompt-PLAY-dConvergedCharter-11-fold-brief.md) | research | — |
 | [2026-11-04-prompt-PLAY-dConvergedCharter-11-r4-fold-brief.md](../prompts/2026-11-04-prompt-PLAY-dConvergedCharter-11-r4-fold-brief.md) | research | PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 |
 | [2026-11-04-prompt-PLAY-dConvergedCharter-41-split-brief.md](../prompts/2026-11-04-prompt-PLAY-dConvergedCharter-41-split-brief.md) | research | PLAY-dConvergedCharter-41 |
+| [2026-11-05-prompt-PLAY-dConvergedCharter-11-1-spec-writer.md](../prompts/2026-11-05-prompt-PLAY-dConvergedCharter-11-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-PLAY-dConvergedCharter-11-owner-forks.md](../prompts/2026-11-05-prompt-PLAY-dConvergedCharter-11-owner-forks.md) | research | PLAY-dConvergedCharter-21 |
 | [2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-1-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-18 |
 | [2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-chain-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-9 |
 | [2026-11-04-review-PLAY-dConvergedCharter-11-spec-audit-round1.md](../reviews/2026-11-04-review-PLAY-dConvergedCharter-11-spec-audit-round1.md) | spec-audit | PLAY-dConvergedCharter-41 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 |
@@ -590,7 +593,7 @@ refusing it (AC21), so the route is observed rather than assumed. Every `memory/
 row whose setup copies a folded home (`unattended-status`, `check-unattended` and `memory-hygiene` at
 base) copies and commits `.governance/policy.toml` beside it; the rows a re-point changes are DERIVED by
 running `fork-count.sh` three times on a scratch clone at the pass's base and after the re-points, and a
-count above its ceiling goes to the owner by §8 F5, never raised by the pass.
+count above its ceiling the owner raises to the largest of the three (§8 F5), never the pass.
 
 ### Files touched (estimate)
 
@@ -1029,7 +1032,7 @@ New arm: tools/run-gates/run-gates.runlog.test.sh · covers AC26 · the adopted-
   folded keys from the home's text, which fails the clause (veto 1); (c) the read moved into a python
   the entrypoint already starts, which neither has before its conf load. Recommendation: (a), the one
   survivor, the measured delta stated with the ruling. A row the re-points leave within its ceiling
-  needs no ruling. Open for the owner: no mandate delegates a declared ceiling.
+  needs no ruling. RESOLVED (owner, 2026-11-05): (a) the owner raises each row over, at the pass.
 
 ## 9. Revision log
 
@@ -1137,6 +1140,8 @@ New arm: tools/run-gates/run-gates.runlog.test.sh · covers AC26 · the adopted-
   re-stamped, `scan_cap_requests` skipping its argument, AC25) and 16 (L2: M5's dead gov-line arm
   deleted, the planted lines at `:9241-9243` already covering it, no arm added); the hands-off edge to
   PLAY-dConvergedCharter-41 names the absent-kit rule, the derived guard join and the invalid-blob rule.
+- rev-9 · 2026-11-05 · §4 §8 · F5 resolved by the owner to (a),
+  `2026-11-05-prompt-PLAY-dConvergedCharter-11-owner-forks`: the owner raises a row over its ceiling.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-7 — a false handed fact repaired in the return and filed as an ask against its producer's record, routed by `roles.on-contradiction` through the refusal outcome table
 
-**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 2193e25d · streams tooling · order 9 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 2193e25d · streams tooling · order 9 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0198@9197dfef whole
 **Carries:** node:policy-key.roles.on-contradiction
@@ -15,10 +15,13 @@
 | [2026-10-27-build-TOOL-dFurnishedOrders-7-deviation-71.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-7-deviation-71.md) | deviation | — |
 | [2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md) | journal | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
 | [2026-10-28-build-TOOL-dFurnishedOrders-7-deviation-72.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-7-deviation-72.md) | deviation | — |
+| [2026-11-05-build-TOOL-dFurnishedOrders-7-deviation-73.md](../build/2026-11-05-build-TOOL-dFurnishedOrders-7-deviation-73.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-fix-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 |
 | [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
 | [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-58 |
+| [2026-11-05-prompt-TOOL-dFurnishedOrders-7-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dFurnishedOrders-7-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dFurnishedOrders-7-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dFurnishedOrders-7-owner-forks.md) | research | TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-46 |
 | [2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-16 |
 
 <!-- /gen:spec-records -->
@@ -66,7 +69,7 @@ route rides TOOL-dBoundRoles-26's refusal outcome table, never a second one.
   prints one JSON line per repair, `{n, actor, route, producer, family, handed, read}`; with
   `--row <n> --id <ask id> --filed <date>` it prints instead the three rows S7 files for repair `n`,
   rendered by `render_ask_row`, `render_sev_row` and `render_status_row` (`tools/memory-tree/backlog.py:1516-1540`)
-  through the memory-tree verb §8 F9 asks for, run as a subprocess of `backlog.py` found by
+  through `backlog.py render --json`, the memory-tree verb §8 F9 asks for, run as a subprocess of `backlog.py` found by
   `resolve_kit_dir`; no file under `tools/roles/` imports `backlog.py`. Observed by AC4.
 - **S7** — The driver door, `bash tools/unattended/unattended.sh --repaired <slug> --return <file>`:
   for each `ask` route it mints the id in the producer's family (§8 F2), re-uses an open repair ask
@@ -340,9 +343,10 @@ kit's suites: they are waived for this build's landing (the README's build-level
   `write_ask_rows` §4 rejects, and renders no `SEV` or `KEEP` row; (b) needs no parent change but is
   the in-process sibling edge the rule names; (a) is one verb over the three renderers that already
   exist, and its cost is a wait, since AC5 and AC6 pass only against the landed verb.
-  Recommendation (a). Open for the owner: the ask the build run files, on the build that owns
+  Recommendation (a). RESOLVED (owner, 2026-11-05): (a) one `backlog.py render --json` verb, asked
+  of memory-tree. The ask the build run files in the `BACKLOG.md` of the build that owns
   `tools/memory-tree/backlog.py` at the pass (dTotalRecall today, whose units 7 and 41 extend its
-  ask door), is "`backlog.py` gains `render --json`, printing the row `render_ask_row`,
+  ask door) is "`backlog.py` gains `render --json`, printing the row `render_ask_row`,
   `render_sev_row` or `render_status_row` returns for each `{shape, args}` it reads on stdin".
 
 ## 9. Revision log
@@ -356,6 +360,9 @@ kit's suites: they are waived for this build's landing (the README's build-level
   `roles.on-contradiction` is read through `read_policy_setting(..., with_default=True)`, the
   default typed only for no policy kit; the rows are rendered through a memory-tree verb run by
   subprocess, and F9, open for the owner, is the ask for it.
+- rev-4 · 2026-11-05 · §2 S6 · §8 F9 · F9 resolved by the owner to (a), per the brief
+  `2026-11-05-prompt-TOOL-dFurnishedOrders-7-1-spec-writer`: S6 names the `render --json` verb, and the
+  fork holds the ask the build run files in the owning build's `BACKLOG.md`.
 
 ## 10. Reuse audit
 

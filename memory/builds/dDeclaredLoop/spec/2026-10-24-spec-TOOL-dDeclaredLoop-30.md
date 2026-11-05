@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-30 — the rework budget: one per build on its transition record, frozen at Design's exit, drawn by every repetition and never by contention
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 28 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-3 · 2026-11-05 · node d · Tier-2 · base ed497191 · streams tooling · order 28 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0115@cc7f99e5 whole
 **Carries:** node:policy-key.flow.rework-budget
@@ -14,7 +14,9 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-c.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-c.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-30-deviation-301.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-30-deviation-301.md) | deviation | — |
+| [2026-11-05-build-TOOL-dDeclaredLoop-30-deviation-302.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-30-deviation-302.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md) | research | TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
 <!-- /gen:spec-records -->
@@ -70,11 +72,17 @@ audit generations, about 12M tokens, before a run's own override stopped it (`ga
   written, so a draw never moves the build's terminal state. The originating slug is the first entry of
   the patch build's `parents:` front matter (`tools/memory-tree/gen_build_index.py:1204`) until
   dPlacedRequest's `entry.claim` carries it. Observed by AC4.
-- **S8** — The fixture: `python tools/loop/budget.py --fixture --plant <case>` builds a scratch build
-  with transition records, a roster and driver run-state, for the plants §6 names, each run against its
+- **S8** — The fixture: `python tools/loop/budget.py --fixture --plant <case>` builds a scratch build with
+  transition records, a roster and driver run-state, for the plants §6 names, each run against its
   expected observation by `--fixture` alone; the leg `loop budget fixtures` in `tools/gate-legs.json`,
-  argv `python {prefix}/loop/budget.py --fixture`, declared in `tools/loop/kit.toml`. Observed by AC1
-  to AC9.
+  argv `python {prefix}/loop/budget.py --fixture`, carrying `enforces = ["principle.p39"]`
+  (dOrderedCharter-7 S2), the tag of the v2 `[enforcement]` row naming this unit's clause
+  `cl-dClosedLoop-0115`, declared in `tools/loop/kit.toml`. Where the pending list holds a `principle` row
+  for that tag, this pass deletes it, as the meta-check reds it stale. Observed by AC1 to AC9 and AC12.
+  **Readers:** by name: READER NOT IN TREE — the pending list and its reader, the meta-check verb of the
+  playbook kit's core.py, are minted by PLAY-dOrderedCharter-7, DEFERRED, so no tracked file spells the
+  row of `principle.p39` at this spec's base · by value: NO VALUE READERS — a pending row's value is its
+  arming build, which the meta-check prints only in its pending count.
 - **S9** — Where no log record can hold a row. A draw made before the build's first `transition` log
   record exists, which TOOL-dDeclaredLoop-3 writes only once the build defines a spec, is appended to
   the build's run-state file as `<ts> draw · <cause> · <item> · <spent>/<total>`, read with the log rows
@@ -171,7 +179,8 @@ repetitions; v2:1261 sets that figure and only the owner raises it.
 - `tools/loop/loop_transition.py`: `write_transition` calling `freeze_budget` at `designing` to
   `building`, and `record_draw` on a backward row TOOL-dDeclaredLoop-10 records
 - `tools/loop/kit.toml`: the module and the leg declared
-- `tools/gate-legs.json`: the leg `loop budget fixtures`
+- `tools/gate-legs.json`: the leg `loop budget fixtures`, its `enforces` holding `principle.p39`
+- `tools/playbook/core-pending.txt`: the stale `principle` row of S8's tag, where it holds one
 - `help/loop.md`: the section of S10
 
 ### Alternatives rejected
@@ -243,6 +252,11 @@ repetitions; v2:1261 sets that figure and only the owner raises it.
 - **AC11** — When `grep -n "flow.rework-budget" loop.md` runs over the help page at this unit's commit,
   it finds the section naming the freeze at Design's exit and contention.
   Red when: the bound ships and the page says nothing of what spends it.
+- **AC12** — When `python -m json.tool gate-legs.json` runs in the tools folder, the row named
+  `loop budget fixtures` carries `enforces` holding `principle.p39`, and
+  `python tools/playbook/core.py meta-check` on this unit's pass exits 0, naming neither that leg nor a
+  stale pending row.
+  Red when: the leg carries no `enforces`, which dOrderedCharter-7 S3's meta-check reds.
 
 ## 7. Gates
 
@@ -284,6 +298,10 @@ New arm: tools/loop/budget.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10
   rule (:40-53) and the stall-and-loop record's design items 1 and 2, read at base `ed497191`.
 - rev-2 · 2026-10-24 · §3 · the Edges block gains a hands-off TOOL-dDeclaredLoop-48, a hands-off TOOL-dDeclaredLoop-49, a hands-off TOOL-dDeclaredLoop-56, the mirror of each unit the round-1 spec audit
   promoted (reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md); no scope moved.
+- rev-3 · 2026-11-05 · S8 · §4 Files touched · AC12 · TOOL-dDeclaredLoop-56 §8 F5 (a), per the brief
+  `2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade`: the leg `loop budget fixtures` carries
+  `principle.p39`, its clause's `[enforcement]` row; its own pass writes it, so the core meta-check never
+  reds the leg.
 
 ## 10. Reuse audit
 

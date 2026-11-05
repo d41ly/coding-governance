@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-15 — `test.seed` at every check's registration
 
-**Status:** DEFERRED · rev-6 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 4 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-7 · 2026-11-05 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 4 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0353@24ae0391 whole
 **Carries:** node:item.test.seed
@@ -16,10 +16,12 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-build-TOOL-dWitnessedBar-15-deviation-151.md](../build/2026-10-25-build-TOOL-dWitnessedBar-15-deviation-151.md) | deviation | — |
 | [2026-10-26-build-TOOL-dWitnessedBar-15-deviation-152.md](../build/2026-10-26-build-TOOL-dWitnessedBar-15-deviation-152.md) | deviation | — |
+| [2026-11-05-build-TOOL-dWitnessedBar-15-deviation-153.md](../build/2026-11-05-build-TOOL-dWitnessedBar-15-deviation-153.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 |
 | [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
+| [2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md) | research | TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-28 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -54,7 +56,8 @@ absent-only rule with their own shell test (`research-retrofit-a.md:31`).
   seeds `drift_signals.py` through `--copy` of its template. `gen_map.py` gains `--out`. Observed by
   AC7.
 - **S6** — The item row `item.test.seed`, in TOOL-dDeclaredLoop-12's item schema, per §4 "The item":
-  an adopt-program item, which that unit's §3 keeps out of the five steps, so its home is §8 F4's.
+  an adopt-program item, which that unit's §3 keeps out of the five steps, so it lands in
+  `tools/loop/loop.toml` with `program = "adopt"` in place of `step`, by §8 F4's ask.
   Observed by AC8.
 
 ## 3. Non-goals (OUT)
@@ -125,14 +128,15 @@ populations a failed run left absent or unarmed.
 ### The item
 
 ```toml
-# the home §8 F4 settles, in TOOL-dDeclaredLoop-12's schema; no `step` of the five (§8 F4)
+# in tools/loop/loop.toml, TOOL-dDeclaredLoop-12's schema; no `step` of the five (§8 F4)
 [[item]]
 tag = "item.test.seed"
+program = "adopt"                # in place of `step`, §8 F4's ask
 actor = "command:test.seed"
 needs = []                       # adopt.census, dLinkedLibrary's, joins when it lands
 inputs = ["layer.flow:the [[ledger]] registrations"]
 allowance = "the registered homes"
-returns = "none"                 # it writes no record kind; the value is §8 F5's
+returns = "none"                 # it writes no record kind, §8 F5's ask
 outcomes = ["armed", "unarmed"]
 witness = { class = "history", by = "the population files, each with its seed SHA and direction" }
 owner = "dWitnessedBar"
@@ -218,9 +222,9 @@ The adopters keep their absent-only behaviour, now through one verb. A repositor
   `adopt-drift-audit.sh` run twice leaves a tuned `drift_signals.py` byte-identical.
   Red when: either adopter re-seeds a present population.
 - **AC8** — When `grep -n 'item.test.seed' loop.toml` runs in the loop kit's directory after the
-  pass, it names one row, carrying no `step` and an `inputs` member opening `layer.flow:`, and
-  `python loop_lib.py --check` run there exits 0 with that row in its population; while §8 F4's home
-  or F5's value has not landed, the pass records AC8 `NOT OBSERVED` naming the fork.
+  pass, it names one row, carrying no `step`, `program = "adopt"` and an `inputs` member opening `layer.flow:`, and
+  `python loop_lib.py --check` run there exits 0 with that row in its population; while §8 F4's or
+  F5's ask has not landed, the pass records AC8 `NOT OBSERVED` naming the ask.
   Red when: the row is absent, so the owned node has no declaration, or it sits under `step.test`.
   fixture: the loop definition is TOOL-dDeclaredLoop-1's file, landed by that build's run.
 
@@ -258,17 +262,20 @@ New arm: tools/codebase-map/adopt-codebase-map.test.sh · covers AC7 · a second
   items, and S6 writes nothing; (c) `step = "step.test"`, which that §3 rules out. (a) keeps every item
   in the one file the item join reads and lets this unit observe its own owned node; its cost is a
   parent change and a wait. (b) needs no dDeclaredLoop change, but leaves `item.test.seed` undeclared
-  until another build runs and AC8 unobservable here. Recommendation (a). Open for the owner: the ask
-  the build run files is "TOOL-dDeclaredLoop-12: an `[[item]]` row may name a program outside the
-  five steps, such as `adopt`, in place of `step`".
+  until another build runs and AC8 unobservable here. Recommendation (a). RESOLVED (owner,
+  2026-11-05): (a) an ask to dDeclaredLoop for a `program` row. The ask this build run files in
+  `memory/builds/dDeclaredLoop/BACKLOG.md` is "TOOL-dDeclaredLoop-12: an `[[item]]` row may name a
+  program outside the five steps, such as `adopt`, in place of `step`".
 - **F5 — What does the row's `returns` name, when the item writes no record kind?**
   TOOL-dDeclaredLoop-12's `returns` names the record kind an item writes (its §4 Data model), and
   TOOL-dDeclaredLoop-9 requires it non-empty; `test.seed` is proven by the population files and writes
   no record. Options: (a) an ask to dDeclaredLoop: `returns = "none"` declares an item that writes no
   record kind, as `allowance = "none"` already reads; (b) a new `record-kind.seed`, one record per
   seed run, a typed kind the clause does not ask for; (c) prose, which TOOL-dDeclaredLoop-12 rules
-  out. (b) builds a record nobody reads. Recommendation (a). Open for the owner: the ask the build run
-  files is "TOOL-dDeclaredLoop-12: `returns = "none"` declares an item that writes no record kind".
+  out. (b) builds a record nobody reads. Recommendation (a). RESOLVED (owner, 2026-11-05): (a) an
+  ask to dDeclaredLoop for `returns = "none"`. The ask this build run files in
+  `memory/builds/dDeclaredLoop/BACKLOG.md` is "TOOL-dDeclaredLoop-12: `returns = "none"` declares an
+  item that writes no record kind".
 
 ## 9. Revision log
 
@@ -288,6 +295,10 @@ New arm: tools/codebase-map/adopt-codebase-map.test.sh · covers AC7 · a second
   record `2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck`, rows 44, 45 and 46: the row is an
   adopt-program item outside the five steps, its home F4's; `inputs` names the core row `layer.flow`;
   `returns` reads `none`, F5's; AC8 runs `python loop_lib.py --check`.
+- rev-7 · 2026-11-05 · S6 · §4 The item · AC8 · §8 F4 · §8 F5 · F4 and F5 RESOLVED (owner) to (a),
+  by the brief `2026-11-05-prompt-TOOL-dWitnessedBar-3-1-spec-writer`: the row lands in
+  `tools/loop/loop.toml` with `program = "adopt"` and `returns = "none"`, by the two asks filed in
+  dDeclaredLoop's `BACKLOG.md`; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -117,7 +117,7 @@ ids TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-52 TOOL-dI
 | [TOOL-dIndexedDesign-15 — the planner's `design.streams` item: the planning workflow, its run decision under `design.streams-when`, and the stream plan checked against order, write sets and the overlap record](spec/2026-10-28-spec-TOOL-dIndexedDesign-15.md) | 15 | 2 | DEFERRED | rev-2 | 2026-10-28 |
 | [TOOL-dIndexedDesign-3 — design review by policy: `review.design` read at the guarded revision, its effort, and the opt-in guard](spec/2026-10-28-spec-TOOL-dIndexedDesign-3.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-28 |
 | [TOOL-dIndexedDesign-37 — one write-set path predicate, `check_meet_path`, that keeps root files, so the stream plan and the build order refuse two writers of one root file](spec/2026-10-28-spec-TOOL-dIndexedDesign-37.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-28 |
-| [TOOL-dIndexedDesign-38 — the round-1 spec audit's 42 minors batched: shared budgets priced, one resolver and one path rule, readers that refuse what they cannot read, and every unbuildable criterion restated](spec/2026-10-28-spec-TOOL-dIndexedDesign-38.md) | 17 | 2 | DEFERRED | rev-3 | 2026-10-28 |
+| [TOOL-dIndexedDesign-38 — the round-1 spec audit's 42 minors batched: shared budgets priced, one resolver and one path rule, readers that refuse what they cannot read, and every unbuildable criterion restated](spec/2026-10-28-spec-TOOL-dIndexedDesign-38.md) | 17 | 2 | DEFERRED | rev-4 | 2026-11-05 |
 | [TOOL-dIndexedDesign-40 — the three new cutoff keys ship blank in the passes that add them, so `cutoff_keys_armed` holds its pin of 36 at every pass tip](spec/2026-10-28-spec-TOOL-dIndexedDesign-40.md) | 18 | 2 | DEFERRED | rev-1 | 2026-10-28 |
 | [TOOL-dIndexedDesign-41 — the design-exit refusals add no net `fail` site, so `unattended.sh` stays within its refusal ceiling at every pass tip](spec/2026-10-28-spec-TOOL-dIndexedDesign-41.md) | 18 | 2 | DEFERRED | rev-2 | 2026-10-28 |
 | [TOOL-dIndexedDesign-46 — the round-1 audit of units 31 to 38: its 27 minors batched, one writer and one allocator per typed name, one predicate per question, and every vacuous criterion made to observe](spec/2026-10-28-spec-TOOL-dIndexedDesign-46.md) | 19 | 2 | DEFERRED | rev-2 | 2026-10-28 |
@@ -129,7 +129,7 @@ ids TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-52 TOOL-dI
 | [TOOL-dIndexedDesign-53 — the round-1 audit of units 39 to 46: its 20 minors batched, one home for each record number, one reader per opt-in, and every criterion made to observe](spec/2026-10-28-spec-TOOL-dIndexedDesign-53.md) | 21 | 2 | DEFERRED | rev-1 | 2026-10-28 |
 <!-- /gen:build-units -->
 
-Records: 74 bound to this build, across 4 record folder(s).
+Records: 77 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
