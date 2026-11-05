@@ -11,8 +11,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 ## Run facts
 refreshed-at: 923954b6150a57861b3fb64c412fa5f1cb1c6752 · park · 31 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 0da41b723dfacfe94a4d544678379921dc4361c2
-phase: VERIFYING
+witness: bdd2e5f39b694f014888ab737d5be4665f762172
+phase: BUILDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -281,3 +281,5 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-05T00:36:19Z dispatch · item f6a0bdf8 TOOL-dFairHearing-48 · reason tools/hooks/agent-cap.js tools/hooks/README.md tools/workflows/spec-audit-optin.js tools/lib/resolve_kit_dir.py tools/lib/resolve-python.test.sh help/agent-limit.md tools/gate-legs.json memory/guides/SESSION-KICKOFF.md tools/policy/check_policy.py tools/workflows/replay_scorer.py tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh tools/workflows/tier2-review.test.sh tools/workflows/check-verifier-fanout.test.sh tools/check-spec-tokens.py tools/check-spec-tokens.test.sh memory/gotchas/amendment-leaves-its-other-half-standing.md memory/gotchas/fold-text-is-unreviewed-surface.md memory/gotchas/held-suite-guard-misses-a-sibling-kit.md memory/gotchas/forwarded-arg-opens-an-unhandled-return-shape.md memory/gotchas/INDEX.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/CARDS.md memory/map/features/memory-tree-hygiene.md memory/builds/dFairHearing/build/2026-11-05-build-TOOL-dFairHearing-48-1-acceptance-ledger.md memory/builds/dFairHearing/spec/2026-11-05-spec-TOOL-dFairHearing-48.md memory/builds/dFairHearing/README.md memory/LIVE.md memory/backlog/TOOL.md
 
 2026-11-05T01:29:52Z rescope · item add TOOL-dFairHearing-50 · reason the close's first suite baseline at 948e4141b read six of twelve suites red, arms no pass could run; memory/builds/dFairHearing/prompts/2026-11-05-prompt-TOOL-dFairHearing-50-spec-brief.md names them, with unit 48's two leftovers
+
+2026-11-05T03:09:35Z brief · item TOOL-dFairHearing-50 · reason a77d432c7363 memory/builds/dFairHearing/prompts/2026-11-05-prompt-TOOL-dFairHearing-50-build-brief.md
