@@ -1,6 +1,6 @@
 # KICK-dKeptSession-7 — dependency coordination: `deps.coordination` switching the dependency gate by the parent's lease, `deps.early-build` admitting Build, and the `confirmed`, `changed` and `landed` notices
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 24 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 24 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0145@b38efe3e whole
 **Carries:** node:policy-key.deps.coordination
@@ -15,10 +15,12 @@
 | [2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md](../build/2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-build-KICK-dKeptSession-7-deviation-71.md](../build/2026-10-26-build-KICK-dKeptSession-7-deviation-71.md) | deviation | — |
 | [2026-10-26-build-KICK-dKeptSession-7-deviation-72.md](../build/2026-10-26-build-KICK-dKeptSession-7-deviation-72.md) | deviation | — |
+| [2026-11-05-build-KICK-dKeptSession-7-deviation-73.md](../build/2026-11-05-build-KICK-dKeptSession-7-deviation-73.md) | deviation | — |
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-25 KICK-dKeptSession-36 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-prompt-KICK-dKeptSession-7-1-spec-writer.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-7-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md](../prompts/2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-9 KICK-dKeptSession-20 KICK-dKeptSession-25 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -64,8 +66,9 @@ dependency gate is specced as one rule, any unlanded parent blocks the build
   parent's build lease record (TOOL-dPlacedRequest-1 S2, field 15 of `CLAIM_ROWS`), the commit that
   records the parent's newest transition on the channel `transitions.record` makes the source (its
   S8), fetched from the remote when absent. `--claims` prints fields 1 to 5 only (its §4 "The rows";
-  `print_claims`, `tools/unattended/unattended.sh:2204`), so the field is read through the driver
-  verb §8 F5 asks for. Exit 1, a lease with no witness, or a listing that cannot be derived, holds
+  `print_claims`, `tools/unattended/unattended.sh:2204`), so the field is read through
+  `unattended.sh --lease show build <parent>`, the driver verb §8 F5 (a) asks dPlacedRequest for.
+  Exit 1, a lease with no witness, or a listing that cannot be derived, holds
   with the cause `awaiting confirmed`. `design-only`: Build
   waits for the parent's landing.
   `anything-coordinated`: Build runs while the parent is reachable. Every unit of the dependent counts
@@ -104,7 +107,7 @@ dependency gate is specced as one rule, any unlanded parent blocks the build
 - No landing order and no held landing: `landing.order` and `deps.landing` are dShippedRelease's.
 - No `deps.on-parent-withdrawn`: dDeclaredLoop's.
 - No lease, verb or verdict: TOOL-dPlacedRequest-1's and -17's; this unit reads `--claims`, and the
-  lease's `witness` through the verb §8 F5 asks for.
+  lease's `witness` through `--lease show build`, the verb §8 F5 (a) asks dPlacedRequest for.
 - No mailbox, kind or post path: `KICK-dKeptSession-5`'s; no content key or supersession rule:
   `KICK-dKeptSession-27`'s.
 - No per-unit interface declaration (§8 F2).
@@ -307,8 +310,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC8 · the landed notice,
   refuses. (a) keeps `read_claims` the one parser and the five-field row unchanged; its cost is a
   wait, since until it lands S3 reads no witness and `confirmed-interfaces` holds every reachable
   parent's dependents as `awaiting confirmed`, the landing fallback, and AC4's admitting half runs on
-  a stub driver only. Recommendation (a). Open for the owner: the ask the build run files is
-  "TOOL-dPlacedRequest-1: a verb `unattended.sh --lease show build <slug>` prints the lease's `witness`
+  a stub driver only. Recommendation (a). RESOLVED (owner, 2026-11-05): (a) the `--lease show` read
+  verb. The ask this build's run files in dPlacedRequest's `BACKLOG.md` is "TOOL-dPlacedRequest-1: a verb `unattended.sh --lease show build <slug>` prints the lease's `witness`
   field from `CLAIM_ROWS`, or `-` where it holds none".
 
 ## 9. Revision log
@@ -324,6 +327,9 @@ New arm: tools/unattended/unattended.test.sh · covers AC8 · the landed notice,
   `build/2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck.md`, rows 23, 24 and 26: the lease
   `witness` is read through the verb F5 asks for, the listing is taken at the transition commit, and
   the keys are read by `policy.py get` as a subprocess.
+- rev-4 · 2026-11-05 · §2 S3 · §3 Non-goals · §8 F5 · F5 resolved by the owner to (a), the
+  `--lease show build <slug>` read verb asked of dPlacedRequest in its `BACKLOG.md`, under the brief
+  `2026-11-05-prompt-KICK-dKeptSession-1-owner-forks`; no other section moved.
 
 ## 10. Reuse audit
 

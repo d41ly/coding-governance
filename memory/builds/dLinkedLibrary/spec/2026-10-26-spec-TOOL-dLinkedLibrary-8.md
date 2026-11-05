@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-8 — retrofit's record kinds, the `origin` field, and the `adopt` program the core's own command runs
 
-**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 5fede642 · streams tooling · order 20 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 5fede642 · streams tooling · order 20 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0245@2d7af537 whole
 **Carries:** node:record-kind.baseline
@@ -24,9 +24,12 @@
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-27-build-TOOL-dLinkedLibrary-8-deviation-81.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-8-deviation-81.md) | deviation | — |
 | [2026-10-28-build-TOOL-dLinkedLibrary-8-deviation-82.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-8-deviation-82.md) | deviation | — |
+| [2026-11-05-build-TOOL-dLinkedLibrary-8-deviation-83.md](../build/2026-11-05-build-TOOL-dLinkedLibrary-8-deviation-83.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
 | [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-74 |
+| [2026-11-05-prompt-TOOL-dLinkedLibrary-8-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dLinkedLibrary-8-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dLinkedLibrary-8-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dLinkedLibrary-8-owner-forks.md) | research | TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-22 |
 | [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
@@ -145,7 +148,7 @@ module `tools/memory-tree/decision_rubric.py` with `CLASSES`, `RUBRIC`, its labe
   `inputs`, `allowance` and `returns` on every non-role item (TOOL-dDeclaredLoop-12:127-128), each
   input naming a layer tag, each `returns` written `record-kind.<name>@<n>` (TOOL-dDeclaredLoop-24 §4
   "Records at a version"), and `routes` holding exactly the outcomes as keys, each naming a declared
-  item (TOOL-dDeclaredLoop-12 §4 "The program check") or, for a terminal outcome, §8 F5's target.
+  item (TOOL-dDeclaredLoop-12 §4 "The program check") or, for a terminal outcome, `end` (§8 F5's ask).
   `tools/loop/item-schema.toml` gains the `[[record-version]]` rows pinning `record-kind.census` and
   `record-kind.ruling` at version 1, their hashes from S1's factory rows; the `research` and `dossier`
   versions are their owners'. `item.test.seed`'s `needs` gains `item.adopt.census`. Observed by AC10.
@@ -275,8 +278,8 @@ labels, its settled class and its origin `reconstructed@<sha8> <source>`.
 | `item.adopt.census` | `command:adopt.census` | none | `layer.memory:the tracked tree at HEAD` | `records` | `record-kind.census@1` | `taken` to `item.test.seed` |
 | `item.adopt.practices` | `owner` | census | `layer.memory:record-kind.census@1` | `records` | `record-kind.ruling@1` | `ruled` to `item.test.seed`; `pending` to itself |
 | `item.adopt.decisions` | `role:gov-researcher` | census | the role's | the role's | `record-kind.research@1` | `routed` to `item.adopt.decisions-ratify`; `below-floor` to itself, within `flow.route-backs` |
-| `item.adopt.decisions-ratify` | `owner` | decisions | `layer.memory:record-kind.research@1` | `records` | `record-kind.ruling@1` | `ratified`, `declined` to §8 F5's target |
-| `item.adopt.reconstruct` | `command:adopt.reconstruct` | census | `layer.memory:record-kind.census@1` | `records` | `record-kind.dossier@1` | `done`, `skipped` (under `on-touch`) to §8 F5's target |
+| `item.adopt.decisions-ratify` | `owner` | decisions | `layer.memory:record-kind.research@1` | `records` | `record-kind.ruling@1` | `ratified`, `declined` to `end` (§8 F5) |
+| `item.adopt.reconstruct` | `command:adopt.reconstruct` | census | `layer.memory:record-kind.census@1` | `records` | `record-kind.dossier@1` | `done`, `skipped` (under `on-touch`) to `end` (§8 F5) |
 
 Each row's `owner` is `dLinkedLibrary`, its `witness` the record its `returns` names, and each
 `allowance` a word of `WRITES` (`tools/roles/check_roles.py:96`). A ruling routes to `item.test.seed`,
@@ -458,10 +461,10 @@ New arm: tools/memory-tree/adopt_program.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC
   flow-steps' `[adopt]` table (`flow-steps.md:710-719`) does not name, so the design owns no such
   node; (c) `transition`, which reads a cross-step move the transition tables join both ways
   (TOOL-dDeclaredLoop-12 §3), from a program with no step. (b) mints an undesigned node and (c) a
-  transition no table holds. Recommendation: (a). The ask the build run would file in dDeclaredLoop's
-  `BACKLOG.md`, with F2's: "an adopt-program item's terminal outcome routes to `end`" · accept
-  `check_program` admits `end` on a `program = "adopt"` row and refuses it on a step row, seen on one
-  planted row of each. Open for the owner.
+  transition no table holds. Recommendation: (a). RESOLVED (owner, 2026-11-05): (a) join F2's ask, the
+  target `end`. The ask the build run files in dDeclaredLoop's `BACKLOG.md`, with F2's: "an
+  adopt-program item's terminal outcome routes to `end`" · accept `check_program` admits `end` on a
+  `program = "adopt"` row and refuses it on a step row, seen on one planted row of each.
 
 ## 9. Revision log
 
@@ -470,6 +473,7 @@ New arm: tools/memory-tree/adopt_program.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC
   (:702-718), layer-memory.md:463-465, and scout D's row for cl-0245.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-37, TOOL-dLinkedLibrary-47, TOOL-dLinkedLibrary-51, TOOL-dLinkedLibrary-52, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
 - rev-3 · 2026-10-28 · §2 preconditions, S1, S9, S10, S12 · §3 Edges · §4 "The kinds", "The items", Files touched · §6 AC9, AC10 · §8 F5 added, open · §10 · re-grounded on the parents at `1a61f21a2` per the cross-check record `2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck.md`, rows 22, 24, 25, 26 and 27: the three calls spell their purpose and every column; `census` and `ruling` join `TYPED_RECORD_KINDS`, the factory's per-kind table and the HYGIENE closed list; the item rows take TOOL-dDeclaredLoop-12's and -24's schema; the `retrofit.*` keys are read through the memory-tree policy adapter. Row 26's split of `item.adopt.decisions` is not made: one role dispatched twice is one actor. F2 stays as it stands.
+- rev-4 · 2026-11-05 · §2 S9 · §4 "The items" · §8 F5 · the owner resolved F5 to (a), by `2026-11-05-prompt-TOOL-dLinkedLibrary-8-owner-forks`: an adopt item's terminal outcome routes to `end`, the ask filed with F2's in dDeclaredLoop's `BACKLOG.md`.
 
 ## 10. Reuse audit
 

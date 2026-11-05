@@ -1,6 +1,6 @@
 # KICK-dKeptSession-9 — orientation cost recorded per stage and held as `orient.budget` says
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 13 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-05 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 13 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0147@9a464fcd whole
 **Carries:** node:policy-key.orient.budget
@@ -16,10 +16,12 @@
 | [2026-10-26-build-KICK-dKeptSession-9-deviation-91.md](../build/2026-10-26-build-KICK-dKeptSession-9-deviation-91.md) | deviation | — |
 | [2026-10-26-build-KICK-dKeptSession-9-deviation-92.md](../build/2026-10-26-build-KICK-dKeptSession-9-deviation-92.md) | deviation | — |
 | [2026-10-26-build-KICK-dKeptSession-9-deviation-93.md](../build/2026-10-26-build-KICK-dKeptSession-9-deviation-93.md) | deviation | — |
+| [2026-11-05-build-KICK-dKeptSession-9-deviation-94.md](../build/2026-11-05-build-KICK-dKeptSession-9-deviation-94.md) | deviation | — |
 | [2026-10-26-prompt-KICK-dKeptSession-1-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-fix-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-5 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-14 KICK-dKeptSession-28 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-25 KICK-dKeptSession-36 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
+| [2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md](../prompts/2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-7 KICK-dKeptSession-20 KICK-dKeptSession-25 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -57,9 +59,9 @@ warn (orientation OR-8; the whole-design audit's C2-F11; gap-orient-06).
   and no `trailer`, the build's `-transition-<n>.md` records, each one's `**To:**` and the committer
   date of the commit that added it; with `micro-format` alone nothing is stored, so every row reads
   `none` with one NOTE naming the key. Each `to` state maps to its step through TOOL-dDeclaredLoop-1
-  S3's `read_steps`, reached by the verb §8 F5 asks for. Every sibling verb this unit runs is found
-  through one `resolve_kit_dir` block carried inline in `extract.py` under the `resolve_kit_dir` row of
-  `PARITY_ROWS` (`tools/lib/resolve-python.test.sh:172`). Observed by AC2.
+  S3's `read_steps`, reached by `loop_lib.py --steps`, the verb §8 F5 (a) asks dDeclaredLoop for.
+  Every sibling verb this unit runs is found through one `resolve_kit_dir` block carried inline in
+  `extract.py` under the `resolve_kit_dir` row of `PARITY_ROWS` (`tools/lib/resolve-python.test.sh:172`). Observed by AC2.
 - **S4** — The hold, `orient.budget` read once per run through the Python reader of I8,
   `python <prefix>/policy/policy.py get orient.budget` run in `repo`, the catalogue default
   `record-only` with one NOTE when the reader refuses or is absent:
@@ -111,7 +113,7 @@ warn (orientation OR-8; the whole-design audit's C2-F11; gap-orient-06).
 
 - **consumes-from** `KICK-dKeptSession-1` — `presets.toml`, whose strict cell `warn-at-evidence-ceiling` AC3 reads through the policy reader, the preset step in whose `RESOLUTION_ORDER` is KICK-dKeptSession-2's
 - **consumes-from** `KICK-dKeptSession-14` — `measure_context_fill` and its `derive_context_fill`, the one context reader S2's `context` column calls
-- **consumes-from** external — TOOL-dDeclaredLoop-3's transition channel, read with `git` on its §4 source table, and TOOL-dDeclaredLoop-1's `read_steps` through the verb §8 F5 asks for, which give S3 its stage
+- **consumes-from** external — TOOL-dDeclaredLoop-3's transition channel, read with `git` on its §4 source table, and TOOL-dDeclaredLoop-1's `read_steps` through `loop_lib.py --steps`, the verb §8 F5 (a) asks dDeclaredLoop for, which give S3 its stage
 - **consumes-from** external — TOOL-dGroundRules-9's cap census `tools/policy/caps.toml`, `budgets.py resolve` and `budgets.py check`, run as subprocesses, which hold S6's owner number
 - **hands-off** external — dCalibratedLens's value ledger, which reads the rows S2 reports
 - **hands-off** `KICK-dKeptSession-44` — the orient report, its `orient-calls` cap row and its token sums, the batch's S11, S14, S15 and S40 (ids 15, 21, 46, 42)
@@ -270,8 +272,9 @@ New arm: tools/runlog/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · a planted
   the definition. (a) keeps `loop_lib.py` the one reader and the call in the shape dDeclaredLoop uses
   for its own sibling reads (TOOL-dDeclaredLoop-12 S4, §8 F5); its cost is a wait, since AC2 cannot
   pass until the ask lands. (b) needs no parent change but makes runlog the one in-process consumer of
-  a module its owner's siblings reach by subprocess; (c) is a second fact. Recommendation (a). Open
-  for the owner: the ask the build run files is "TOOL-dDeclaredLoop-1: `loop_lib.py --steps` prints
+  a module its owner's siblings reach by subprocess; (c) is a second fact. Recommendation (a).
+  RESOLVED (owner, 2026-11-05): (a) the `loop_lib.py --steps` ask. The ask this build's run files in
+  dDeclaredLoop's `BACKLOG.md` is "TOOL-dDeclaredLoop-1: `loop_lib.py --steps` prints
   one `<step tag>` TAB `<state>` line per `[[step]]` row, from `read_steps`".
 
 ## 9. Revision log
@@ -286,6 +289,9 @@ New arm: tools/runlog/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · a planted
   `build/2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck.md`, row 36: the transition channel
   is read with `git`, the steps through the verb F5 asks for, and the owner cap through
   `budgets.py check`, each by subprocess, never an in-process import of a sibling kit.
+- rev-5 · 2026-11-05 · §2 S3 · §3 Edges · §8 F5 · F5 resolved by the owner to (a), the
+  `loop_lib.py --steps` ask filed in dDeclaredLoop's `BACKLOG.md`, under the brief
+  `2026-11-05-prompt-KICK-dKeptSession-1-owner-forks`; no other section moved.
 
 ## 10. Reuse audit
 

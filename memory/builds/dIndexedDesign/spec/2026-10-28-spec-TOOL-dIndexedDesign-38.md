@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-38 — the round-1 spec audit's 42 minors batched: shared budgets priced, one resolver and one path rule, readers that refuse what they cannot read, and every unbuildable criterion restated
 
-**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 17 · advances TOOL-dIndexedDesign-17 · ratified 2026-10-28
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 17 · advances TOOL-dIndexedDesign-17 · ratified 2026-10-28
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,8 +13,11 @@
 | [2026-10-28-build-TOOL-dIndexedDesign-38-deviation-381.md](../build/2026-10-28-build-TOOL-dIndexedDesign-38-deviation-381.md) | deviation | — |
 | [2026-10-28-build-TOOL-dIndexedDesign-38-deviation-382.md](../build/2026-10-28-build-TOOL-dIndexedDesign-38-deviation-382.md) | deviation | — |
 | [2026-10-28-build-TOOL-dIndexedDesign-38-deviation-383.md](../build/2026-10-28-build-TOOL-dIndexedDesign-38-deviation-383.md) | deviation | — |
+| [2026-11-05-build-TOOL-dIndexedDesign-38-deviation-384.md](../build/2026-11-05-build-TOOL-dIndexedDesign-38-deviation-384.md) | deviation | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-31-promoted-fix-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-31-promoted-fix-brief.md) | research | TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-37 |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-38-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-38-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-38-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-38-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-38-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-38-owner-forks.md) | research | — |
 | [2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-37 |
 
 <!-- /gen:spec-records -->
@@ -92,8 +95,9 @@ Every item builds at this unit's pass on the code its unit built, unless it says
 - **S2** — id 2. The lens reading this build owes itself. Once unit 35 has landed, and before the next
   `--dispatch`, the main loop runs `tier2-review.js` with `coverage: 'only'` over the build's remaining
   specs and commits the `coverage-lens` record, so every later dispatch meets a reading. Until it exists,
-  every dispatch after unit 16's pass meets unit 16's coverage refusal, unit 35's own included, and §8
-  F1 holds how the run passes that window. Observed by AC2.
+  every dispatch after unit 16's pass meets unit 16's coverage refusal, unit 35's own included, and the
+  owner passes that window as §8 F1 rules: at unit 16's pass the owner commits `design.coverage = "warn"`
+  to `.governance/policy.toml` on the run branch, and restores `refuse` once S2's record lands. Observed by AC2.
 - **S3** — id 3. One predicate for "the build declares a spec audit": `check_spec_audit_declared(root, slug)`
   in `gen_build_index.py`, true when the README carries `spec-audit:` or when
   `policy.py get review.design --rev <base>`, the read unit 3 S1 re-points, prints a value
@@ -304,7 +308,7 @@ never its own `- AC` line.
 ### Rollout
 
 The pass lands every item but S2 at order 17. S2 is one act earlier, after unit 35's pass, because
-the stall it ends falls there; §8 F1 is the window before it. The close reads the ledgers.
+the stall it ends falls there; the window before it passes under the owner's `warn` of §8 F1. The close reads the ledgers.
 
 ### Files touched (estimate)
 
@@ -342,8 +346,8 @@ the stall it ends falls there; §8 F1 is the window before it. The close reads t
 - perf / scale — S35 runs `--design-exit` once per call instead of once per unit.
 - error / empty / loading states — S22, S25 and S42 turn silent passes into named refusals.
 - observability — every refusal names its cause; S23 prints the parsed count it ruled on.
-- risks — S2's act precedes this unit's order, and the window before it needs §8 F1's owner act; AC2
-  shows whether the reading came in time.
+- risks — S2's act precedes this unit's order, and the window before it passes under the owner's
+  `design.coverage = "warn"` at unit 16's pass (§8 F1); AC2 shows whether the reading came in time.
 - testing — AC1 to AC27, by probe, fixture or ledger; the arms §7 declares.
 - migration — three conf values and four stand-in rows; nothing else.
 - user docs — none under `help/`; `tools/workflows/README.md` is S14's and S19's.
@@ -461,8 +465,9 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC8 · an `**o
   and it relaxes `design.coverage` for every unit audited before the lens. (c) Unit 16's S8 and S9 moved
   to the build's last order, the skeptic's second fix: a re-scope of unit 16, which no repair unit may
   make. Recommendation: (a), the one option that passes the window without weakening the gate for later
-  builds. It needs the owner, so a delegated run parks at unit 16's boundary until it is taken, and the
-  M3 sweep before the build run's first unit is where the owner sees it.
+  builds. RESOLVED (owner, 2026-11-05): (a) the owner's `warn` at unit 16's pass. At unit 16's pass
+  boundary the owner commits `design.coverage = "warn"` on the run branch, and restores `refuse` once
+  S2's record lands.
 - **F2 — Raise `REFUSAL_CEILINGS` or fold the sites (ids 13 to 15)?** Options: (a) raise by a dated
   decision; (b) fold into existing sites. (a) moves a declared ceiling the conf gives no run the terms to
   move (M3). RESOLVED (agent, 2026-10-28, delegated): (b), rung 3, the one survivor. widens: none · relaxes: none
@@ -489,6 +494,9 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC8 · an `**o
   edges of TOOL-dIndexedDesign-51, TOOL-dIndexedDesign-52 and TOOL-dIndexedDesign-53 and the
   consumes-from bullet mirroring the hands-off edge of TOOL-dIndexedDesign-50, promoted by the round-1
   spec audit of units 39 to 46; nothing else moved.
+- rev-4 · 2026-11-05 · §2 S2 · §4 Rollout · §5 risks · §8 F1 · the owner resolved F1 to (a), by
+  `2026-11-05-prompt-TOOL-dIndexedDesign-38-1-spec-writer`: the owner commits `design.coverage = "warn"`
+  at unit 16's pass and restores `refuse` once S2's record lands; no design moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-22 — `decides` on every decision row, `Decided:` trailers read as decision rows, and every bug class naming its cause, language and platform
 
-**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 5fede642 · streams tooling · order 4 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 5fede642 · streams tooling · order 4 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0259@2b91da03 whole
 **Carries:** node:record-kind.gotcha
@@ -13,9 +13,11 @@
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-a.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-a.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-28-build-TOOL-dLinkedLibrary-22-deviation-221.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-22-deviation-221.md) | deviation | — |
+| [2026-11-05-build-TOOL-dLinkedLibrary-22-deviation-222.md](../build/2026-11-05-build-TOOL-dLinkedLibrary-22-deviation-222.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
 | [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-74 |
+| [2026-11-05-prompt-TOOL-dLinkedLibrary-8-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dLinkedLibrary-8-owner-forks.md) | research | TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 |
 | [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
@@ -36,7 +38,8 @@ Build-run preconditions, each specced and unbuilt at base: TOOL-dDeclaredLoop-23
 `tools/memory-tree/commit_trailers.py`; PLAY-dOrderedCharter-24 S2 and S3's edge-target form and
 `parse_edge_target`, with `decides` widened to any node by PLAY-dOrderedCharter-28 S1; TOOL-dTotalRecall-1
 S9's `record_kinds.py new`, with the purpose and columns of TOOL-dTotalRecall-16 S2 and -18 S1; and the
-memory-tree policy adapter `tools/memory-tree/policy_value.py` (TOOL-dTotalRecall-8 S10).
+memory-tree policy adapter `tools/memory-tree/policy_value.py` (TOOL-dTotalRecall-8 S10); and
+`policy.py get <key> --allowed`, §8 F4's ask of dGroundRules.
 
 - **S1** — The bug-class fields, shared interface I5's first half: front-matter keys `cause:`,
   `language:`, `platform:` and `from:` on a `kind: class` record, kept by `build_record`
@@ -45,8 +48,8 @@ memory-tree policy adapter `tools/memory-tree/policy_value.py` (TOOL-dTotalRecal
   of the `platforms.supported` row's allowed set, read through the memory-tree adapter
   `tools/memory-tree/policy_value.py` (TOOL-dTotalRecall-8 S10), which runs the policy kit's `get` as a
   subprocess, a kit importing no sibling kit (PLAY-dOrderedCharter-7 §4 "The policy reads"); `get`
-  prints a key's value and not its allowed set (`tools/policy/policy.py:1332-1360`), so the read is the
-  mode §8 F4 asks for; `from` is a comma list of
+  prints a key's value and not its allowed set (`tools/policy/policy.py:1332-1360`), so the read is
+  `get platforms.supported --allowed`, the mode §8 F4 asks for; `from` is a comma list of
   `<review record stem>#<finding id>`, each stem a tracked file under `memory/builds/*/reviews/` whose
   text carries the finding id, or `none — <reason>`. A value outside its set, or a `from` that does not
   resolve, is refused naming the record, the key and the value. Observed by AC1 and AC2.
@@ -304,10 +307,10 @@ New arm: tools/memory-tree/row_grammar.py · covers AC7 AC8 · its selftest's sc
   adapter, which narrows S1 to the platforms the repository supports and refuses a class that bit
   under another, against the portability lens S1 serves; (c) `tomllib` over the policy kit's
   `catalogue.toml`, found by the inline `resolve_kit_dir`, a second reader of the catalogue beside
-  `load_catalogue`, against `[core]`. Recommendation: (a). The ask the build run would file in
-  dGroundRules' `BACKLOG.md`: "`policy.py get` prints a key's allowed set" · accept `get
+  `load_catalogue`, against `[core]`. Recommendation: (a). RESOLVED (owner, 2026-11-05): (a) ask
+  dGroundRules for `get <key> --allowed`. The ask the build run files in dGroundRules' `BACKLOG.md`: "`policy.py get` prints a key's allowed set" · accept `get
   platforms.supported --allowed` prints `windows-gitbash`, `linux`, `macos` and `pwsh-launch`, one per
-  line, exit 0, and a key with no closed set exits 2 naming it. Open for the owner.
+  line, exit 0, and a key with no closed set exits 2 naming it.
 
 ## 9. Revision log
 
@@ -316,6 +319,7 @@ New arm: tools/memory-tree/row_grammar.py · covers AC7 AC8 · its selftest's sc
   scout A's row 22, each source re-read at base `5fede642`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-52, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
 - rev-3 · 2026-10-28 · §2 preconditions, S1, S4 · §3 Edges · §6 AC5 · §8 F4 added, open · §10 · re-grounded on the parents at `1a61f21a2` per the cross-check record `2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck.md`, rows 64, 65 and 66: the `gotcha` call spells its purpose and every column; the row is the `header` form `gotchas selftest` grades, with no `--field`; the platform set is read through the memory-tree policy adapter by the mode F4 asks for.
+- rev-4 · 2026-11-05 · §2 preconditions, S1 · §8 F4 · the owner resolved F4 to (a), by `2026-11-05-prompt-TOOL-dLinkedLibrary-8-owner-forks`: S1 reads the allowed set by `policy.py get platforms.supported --allowed`, the ask the build run files in dGroundRules' `BACKLOG.md`, now a build-run precondition.
 
 ## 10. Reuse audit
 

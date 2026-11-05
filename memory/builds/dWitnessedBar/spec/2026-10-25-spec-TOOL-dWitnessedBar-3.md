@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-3 — attribution deciding what blocks
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 20 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 20 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0341@65d333f3 whole
 **Carries:** node:item.test.route
@@ -19,12 +19,15 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-3-deviation-31.md](../build/2026-10-25-build-TOOL-dWitnessedBar-3-deviation-31.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-40-round1-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-40-round1-fix-return.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-51 |
 | [2026-10-26-build-TOOL-dWitnessedBar-3-deviation-32.md](../build/2026-10-26-build-TOOL-dWitnessedBar-3-deviation-32.md) | deviation | — |
+| [2026-11-05-build-TOOL-dWitnessedBar-3-deviation-33.md](../build/2026-11-05-build-TOOL-dWitnessedBar-3-deviation-33.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-51 |
 | [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-10-26-prompt-TOOL-dWitnessedBar-3-1-spec-reviewer.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-3-1-spec-reviewer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dWitnessedBar-3-2-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-3-2-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dWitnessedBar-3-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-3-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md) | research | TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-28 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -114,7 +117,7 @@ policy is `INHERITED_RED=park|land`, which only knows `INHERITED`; it is retired
 - **hands-off** `TOOL-dWitnessedBar-8` — `verdict.blocks` and the routing record, into which the nondeterministic route to `test.flakes` is written ahead of the class routes
 - **hands-off** `TOOL-dWitnessedBar-30` — `verdict.blocks` and the `quiet-rerun` route a blocking `CONTENDED` red takes, which that unit arms
 - **consumes-from** external — dGroundRules' `policy.py get` (TOOL-dGroundRules-2 S7) and its catalogue rows for `verdict.blocks` and `verdict.red-route`, and TOOL-dSafePassage-1's step rows
-- **consumes-from** external — TOOL-dDeclaredLoop-12's `item.test.attribute` row, which `judge` reads through a `loop_lib.py` read verb run as a subprocess, the verb §8 F6 asks for
+- **consumes-from** external — TOOL-dDeclaredLoop-12's `item.test.attribute` row, which `judge` reads through `loop_lib.py items --tag` run as a subprocess, the verb §8 F6's ask adds
 - **hands-off** `TOOL-dWitnessedBar-44` — the step script `inherited_red.py`, whose reads and value mapping unit 44 widens to both policy files and every value (id 62)
 - **hands-off** `TOOL-dWitnessedBar-51` — the round-1 minors ids 19 and 39: the undeclared path's witness line, and the protocol edit's byte budget, each a scope item of that unit
 
@@ -190,9 +193,9 @@ The routes are a closed tuple `ROUTES` in `verdict_flow.py`, and `route` prints 
 TOOL-dDeclaredLoop-12 S4), so `judge` reaches both siblings by subprocess, each found through the
 inline `resolve_kit_dir` block that `tools/run-gates/measure_legs.py:116-153` already carries under
 the `resolve_kit_dir` parity row: `policy.py get verdict.red-route` for the value, and for
-`item.test.attribute`'s outcomes in `tools/loop/loop.toml` the `loop_lib.py` read verb of §8 F6.
-`loop_lib.py` has only `--check` and `--fixture` (TOOL-dDeclaredLoop-12 AC1, AC2), so until that verb
-lands `judge` exits 2 naming it; a missing loop kit refuses `judge` with exit 2 naming the kit.
+`item.test.attribute`'s outcomes in `tools/loop/loop.toml` `loop_lib.py items --tag`, the verb §8 F6
+asks dDeclaredLoop for. `loop_lib.py` has only `--check` and `--fixture` (TOOL-dDeclaredLoop-12 AC1,
+AC2), so until that verb lands `judge` exits 2 naming it; a missing loop kit refuses `judge` with exit 2 naming the kit.
 
 ### Policy reads
 
@@ -305,7 +308,7 @@ catalogue default at R, `own-only`, which v2 chose (walk T1) and the step's `lan
 - **AC5** — When `python verdict_flow.py --fixture red-route` runs, under `fix-pass-or-design` it
   prints `code-miss -> fix-pass` and `spec-wrong -> new-unit`, under `always-new-unit` both
   `-> new-unit`, and `judge --judgment maybe` exits 2 naming the outcome set, the fixture's `here`
-  holding a stub loop kit that answers §8 F6's verb; with no loop kit, and with one whose `loop_lib.py`
+  holding a stub loop kit that answers `items --tag`; with no loop kit, and with one whose `loop_lib.py`
   lacks the verb, `judge` exits 2 naming the kit or the verb; and
   `git grep -nwE '(import|from) (loop_lib|policy)' -- tools/run-gates` prints nothing.
   Red when: `judge` accepts a word outside `item.test.attribute`'s outcomes, or imports a sibling kit.
@@ -368,7 +371,8 @@ this landing by the README's self-test waiver rule, its clean reading owed with 
   (a) keeps the call in the shape dDeclaredLoop uses for its own sibling reads (its S4 and §8 F5); its
   cost is a wait, since live `judge` exits 2 until the ask lands. (b) needs no parent change but makes
   run-gates the one in-process consumer of a module its owner runs by subprocess; (c) is a second fact.
-  Recommendation (a). Open for the owner: the ask the build run files is "TOOL-dDeclaredLoop-12:
+  Recommendation (a). RESOLVED (owner, 2026-11-05): (a) an `items --tag` ask to dDeclaredLoop. The
+  ask this build run files in `memory/builds/dDeclaredLoop/BACKLOG.md` is "TOOL-dDeclaredLoop-12:
   `loop_lib.py items --tag <tag>` prints the item row's `outcomes`, one per line".
 
 ## 9. Revision log
@@ -383,6 +387,9 @@ this landing by the README's self-test waiver rule, its clean reading owed with 
   narrowed to a core gate's red matched by principle and part, none admitted under
   `owner-only-expiring` until PLAY-dOrderedCharter-15's check lands; `judge` reaches the loop and
   policy kits by subprocess, with F6 open for the loop read verb.
+- rev-4 · 2026-11-05 · §3 Edges · §4 The routes · AC5 · §8 F6 · F6 RESOLVED (owner) to (a), by the
+  brief `2026-11-05-prompt-TOOL-dWitnessedBar-3-1-spec-writer`: `judge` runs `loop_lib.py items
+  --tag`, the ask this build run files in dDeclaredLoop's `BACKLOG.md`; nothing else moved.
 
 ## 10. Reuse audit
 

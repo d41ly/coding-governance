@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-20 — this build's own upgrade steps: the journal alias, the scaffold verbs forwarded to record, the front matter graded, and the retag
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 21 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 462d20f3 · streams tooling · order 21 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0231@392c9e56 whole
 
@@ -12,9 +12,11 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-20-deviation-201.md](../build/2026-10-26-build-TOOL-dTotalRecall-20-deviation-201.md) | deviation | — |
+| [2026-11-05-build-TOOL-dTotalRecall-20-deviation-202.md](../build/2026-11-05-build-TOOL-dTotalRecall-20-deviation-202.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
+| [2026-11-05-prompt-TOOL-dTotalRecall-18-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-18-owner-forks.md) | research | TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
 
 <!-- /gen:spec-records -->
@@ -67,7 +69,7 @@ through `govkit.resolve_kit_dir` (`tools/govkit/govkit.py:197`). All are DEFERRE
   `surfaces = ["front-matter:build-readme"]`. Its program,
   `tools/govkit/steps/memory_front_matter.py`, grades every build README's front matter in the target
   against unit 4's `FRONT_MATTER_KEYS` by running gov's `gen_build_index.py` as a subprocess in the
-  target, through the front-matter print verb §8 F5 settles, never an import of memory-tree. It
+  target, through its `--print-front-matter-findings` mode (§8 F5 (a)), never an import of memory-tree. It
   prints `<path>: <key> unknown` or `<path>: <key> derived` per finding, and exits 1 on any finding,
   so the walk stops before the adopter's next hygiene run refuses the key. It writes no file. The
   witness is the same grade. Observed by AC4 and AC8.
@@ -78,7 +80,7 @@ through `govkit.resolve_kit_dir` (`tools/govkit/govkit.py:197`). All are DEFERRE
   through govkit's `read_policy_value("memory.legacy-anchors", target)`. Under `derived` or `none` it
   writes nothing and exits 0. Under `retag`, `plan` lists each untagged heading of the target's
   records with the anchor unit 19 derives for it (`derive_anchor`, I15, in the playbook kit's
-  `tools/playbook/tag_index.py`, reached as §8 F6 settles), and `up` writes each as the heading's
+  `tools/playbook/tag_index.py`, reached by subprocess through `gov_tag.py anchors <path>`, §8 F6 (a)), and `up` writes each as the heading's
   authored tag, `## [<anchor>] <heading>`. Observed by AC5, AC6 and AC8.
 - **S6** — The retag's conservation. Before writing, and again after, each rewritten record equals
   its earlier bytes once every inserted `[<anchor>] ` is cut. Every untagged heading it planned is
@@ -166,7 +168,7 @@ Minted: the step ids `memory-tree/serves-journal-read-as-log`, `memory-tree/read
 and `memory-tree/legacy-anchors-retag`; the shim ids `memory-tree/new-build-to-record` and
 `memory-tree/new-spec-to-record`; the shim kind `verb` and its template; the programs
 `tools/govkit/steps/memory_journal_alias.py`, `memory_front_matter.py` and `memory_retag.py`; the
-surface classes `serves-kind`, `front-matter` and `record-headings`; under §8's recommendations,
+surface classes `serves-kind`, `front-matter` and `record-headings`; under §8 F5 (a) and F6 (a),
 the mode `gen_build_index.py --print-front-matter-findings` and the verb `gov_tag.py anchors`.
 
 ### Migration
@@ -302,7 +304,8 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC2 · a `--selftest` ar
   one gov release. (c) `ast.literal_eval` of `FRONT_MATTER_KEYS` (a pure literal, unit 4 §4) and the
   step's own parse of each README: a second grader, which `TOOL-dTotalRecall-43` S20 removes. (a)
   costs one mode on a file this unit touches and keeps the legacy exception in the one grader; (b)
-  adds a second in-process reach the rule does not admit. Recommendation (a). Open for the owner.
+  adds a second in-process reach the rule does not admit. Recommendation (a). RESOLVED (owner,
+  2026-11-05): (a) this unit adds `--print-front-matter-findings`, run by subprocess.
 - **F6 — How does the retag step reach `derive_anchor`, which lives in the playbook kit?** A govkit
   module imports no playbook module (TOOL-dWitnessedBar-28 S5), and no playbook verb prints a
   heading's derived anchor: `gov_tag.py` and `tag_index.py` are unbuilt at `c8d46e188`, and the verbs
@@ -314,8 +317,9 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC2 · a `--selftest` ar
   shape of `tools/memory-tree/kit.toml:8`, which TOOL-dWitnessedBar-28's own open fork recommends
   against for `leg_factory.py`, since an adopter often runs without the playbook kit. (c) An inline copy of the
   fold: a second fold beside `TOOL-dTotalRecall-10` S2's one. (a) adds one verb to a sibling unit's
-  kit and keeps one fold; its cost is a wait on that verb. Recommendation (a). Open for the owner:
-  the ask the build run files is "TOOL-dTotalRecall-10: `gov_tag.py anchors <path>` prints each
+  kit and keeps one fold; its cost is a wait on that verb. Recommendation (a). RESOLVED (owner,
+  2026-11-05): (a) the `gov_tag.py anchors` verb, run by subprocess. The ask the build run files in
+  dTotalRecall's `BACKLOG.md` is "TOOL-dTotalRecall-10: `gov_tag.py anchors <path>` prints each
   untagged heading's derived anchor".
 
 ## 9. Revision log
@@ -331,6 +335,10 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC2 · a `--selftest` ar
   through govkit's own `read_policy_value`, the journal step runs `--print-bindings` by subprocess,
   and the front-matter grade and `derive_anchor` are reached by verbs §8 F5 and F6 leave open for
   the owner.
+- rev-4 · 2026-11-05 · S4, S5 · §4 Inventory · §8 F5, F6 · the owner resolved F5 and F6 to (a), by
+  `2026-11-05-prompt-TOOL-dTotalRecall-18-owner-forks`: the front-matter step runs this unit's
+  `--print-front-matter-findings` mode, and the retag step runs `gov_tag.py anchors`, asked of
+  TOOL-dTotalRecall-10 in this build's `BACKLOG.md`.
 
 ## 10. Reuse audit
 

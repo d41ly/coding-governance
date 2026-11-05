@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-18 — the kind registry completed: every column declared, readers and writers rendered, the pockets witnessed, and `journal` renamed `log`
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 4 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 462d20f3 · streams tooling · order 4 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0229@03c635cf whole
 **Carries:** node:record-kind.view
@@ -18,11 +18,14 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-18-deviation-181.md](../build/2026-10-26-build-TOOL-dTotalRecall-18-deviation-181.md) | deviation | — |
+| [2026-11-05-build-TOOL-dTotalRecall-18-deviation-182.md](../build/2026-11-05-build-TOOL-dTotalRecall-18-deviation-182.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-14 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-18-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-18-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dTotalRecall-18-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-18-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dTotalRecall-18-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-18-owner-forks.md) | research | TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
 
 <!-- /gen:spec-records -->
@@ -56,9 +59,9 @@ example and the fixtures, each re-pointed or found to hold no reader (§8 F3).
   and `written by`, the roles whose `writes:` class's folder (`WRITE_FOLDERS`,
   `tools/roles/check_roles.py:101` at `c8d46e188`) covers the kind's `home` and the items whose
   `returns` is `record-kind.<name>@<n>` (TOOL-dDeclaredLoop-12's item row). A kit imports no sibling
-  kit (TOOL-dGroundRules-1 §4), so the roles kit is read through the channel §8 F6 settles, never an
-  undeclared import. Observed by AC2 and AC8.
-- **S3** — The render-parity arm: `--check` re-reads the roles through §8 F6's channel and
+  kit (TOOL-dGroundRules-1 §4), so the roles kit is read through a declared `requires_if` row on
+  `tools/memory-tree/kit.toml` (§8 F6 (a)), never an undeclared import. Observed by AC2 and AC8.
+- **S3** — The render-parity arm: `--check` re-reads the roles through that row and
   `tools/loop/loop.toml` with `tomllib`, found through the inline `resolve_kit_dir` block, derives
   both columns again and compares them with the committed view, red on any difference. Observed by
   AC2.
@@ -263,8 +266,7 @@ at the pass.
 - **AC8** — When `python record_kinds.py --check` runs over a fixture whose roles kit does not
   resolve (`--plant roles-unresolved`), it exits 1 printing `unarmed` naming the roles kit; at the
   pass tip a `tomllib` probe of `tools/memory-tree/kit.toml` prints a `requires_if` edge whose `kit`
-  is `roles` with a non-empty `why`. Written to §8 F6's recommendation; the pass re-writes it to the
-  owner's pick.
+  is `roles` with a non-empty `why`, the route §8 F6 (a) picks.
   Red when: the roles kit is read through an undeclared import, or an unresolved kit reads as an
   empty column.
 
@@ -327,9 +329,8 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC5 AC6 · a `
   which TOOL-dBoundRoles-14 §4 rejects. (a) needs no other build and matches a parent's read of the
   same module, at the cost of one more declared in-process sibling read. (b) keeps memory-tree
   import-free but waits on dBoundRoles, which is not a parent of this build. Recommendation (a).
-  Open for the owner. Under (b), the ask the build run files is "TOOL-dBoundRoles-14:
-  `check_roles.py --print-tag-rows` gains a mode printing each role's `reads` keys and `writes`
-  class".
+  RESOLVED (owner, 2026-11-05): (a) declared `requires_if` rows naming `roles` and `loop`, read in
+  process; no ask is filed with dBoundRoles.
 
 ## 9. Revision log
 
@@ -344,6 +345,9 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC5 AC6 · a `
   through TOOL-dDeclaredLoop-24's typed record reference, never an input's prose, and the roles kit
   is read through a channel §8 F6 leaves open for the owner, recommending a declared `requires_if`
   row.
+- rev-4 · 2026-11-05 · S2, S3 · §6 AC8 · §8 F6 · the owner resolved F6 to (a), by
+  `2026-11-05-prompt-TOOL-dTotalRecall-18-owner-forks`: the roles and loop kits are read through
+  declared `requires_if` rows on memory-tree's `kit.toml`, and the (b) ask to dBoundRoles is dropped.
 
 ## 10. Reuse audit
 
