@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-05-prompt-TOOL-dFinishedRecord-1-brief.md](../prompts/2026-11-05-prompt-TOOL-dFinishedRecord-1-brief.md) | research | — |
+| [2026-11-05-review-TOOL-dFinishedRecord-1-closing-diff-round1.md](../reviews/2026-11-05-review-TOOL-dFinishedRecord-1-closing-diff-round1.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
 
