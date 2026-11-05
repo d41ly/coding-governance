@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-6 — each role's `memory.item-budget` derived from its p90 over 30 sliced work orders under `measured`
 
-**Status:** DEFERRED · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 8 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-5 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 8 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0463@33710e39 whole
 
@@ -8,14 +8,24 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md) | journal | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-returns.md) | research | TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-1 |
 | [2026-11-03-build-TOOL-dCalibratedLens-6-deviation-62.md](../build/2026-11-03-build-TOOL-dCalibratedLens-6-deviation-62.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-6-deviation-63.md](../build/2026-11-03-build-TOOL-dCalibratedLens-6-deviation-63.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-6-deviation-64.md](../build/2026-11-03-build-TOOL-dCalibratedLens-6-deviation-64.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-6-deviation-65.md](../build/2026-11-03-build-TOOL-dCalibratedLens-6-deviation-65.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-6-deviation-66.md](../build/2026-11-03-build-TOOL-dCalibratedLens-6-deviation-66.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-48 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-6-1-spec-reviewer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-6-1-spec-reviewer.md) | journal | — |
 | [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
+| [2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md](../reviews/2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-46 |
 
 <!-- /gen:spec-records -->
 
@@ -46,7 +56,7 @@ role win.
   commit. Per role, the newest 30 counted work orders go to `derive_measured_value(rows, "bytes", 30)`
   (TOOL-dCalibratedLens-4 S1). Observed by AC2, AC3 and AC4.
 - **S3** — The owner's own setting wins. A role whose value at `HEAD` is the owner's, the per-role
-  member the ask of §8 F4 admits, or a scalar `96` or `128` for every role, reads `owner-set <value>`:
+  member ask TOOL-dTotalRecall-107 admits (§8 F4), or a scalar `96` or `128` for every role, reads `owner-set <value>`:
   no measured value is recorded as its budget and no proposal is made for it. Observed by AC5.
 - **S4** — (amended, id 2) The field: the `loop-review` record kind (the brief's S4, TOOL-dCalibratedLens-3) gains the
   field `item-budgets`, one line per role S2 or S3 names, `<role> · work orders <n> · p90 <bytes> B ·
@@ -75,14 +85,16 @@ role win.
 
 - Writing `memory.item-budget`. The step proposes; the owner writes through `policy_edit.py set` at a
   terminal (TOOL-dDeclaredLoop-2 S4).
-- The per-role form of the key and its grammar: the ask §8 F4 files on dTotalRecall, the key's owner.
+- The per-role form of the key and its grammar: ask TOOL-dTotalRecall-107 (§8 F4), filed in
+  `memory/builds/dTotalRecall/BACKLOG.md`, dTotalRecall being the key's owner.
 - The slice manifest and the bytes an executor actually inlined: dWellOiledMachine's executor and ask
   TOOL-dTotalRecall-35 (§8 F1).
 - `memory.over-budget` and the over-budget line: TOOL-dTotalRecall-9 S6. This unit changes only which
   cap that check reads under `measured`.
 - Build-run preconditions, each landed before this unit's build pass: TOOL-dTotalRecall-9 (`record
   find`, `record show`, `check_read_set`, the `reads:` list), TOOL-dDeclaredLoop-2 (`policy_edit.py`),
-  TOOL-dCalibratedLens-3 and -4, and the ask of §8 F4.
+  TOOL-dCalibratedLens-3 and -4, and ask TOOL-dTotalRecall-107 (§8 F4), filed in
+  `memory/builds/dTotalRecall/BACKLOG.md`.
 
 ### Edges
 
@@ -103,8 +115,8 @@ role win.
   measured" and names no reading after; its §3 hands "each role's p90 under `measured`" to the Loop
   Review. Its S8 is the only writer of a work order's slice bytes, the `reads:` list.
 - The work order today is the handoff `render_handoff` writes (`tools/roles/handoff.py:312`), its
-  marker line carrying the role (`tools/roles/roles_lib.py:79`); TOOL-dTotalRecall-9 §4 treats it as
-  the work order.
+  marker line carrying the role (`tools/roles/roles_lib.py:79`); TOOL-dTotalRecall-9 S8 ("The work
+  order: `render_handoff`") and §10 treat it as the work order.
 - The design source: `measured: 96 for every role until 30 sliced work orders per role are measured,
   then each role's own p90` (`memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md:504`).
 
@@ -139,8 +151,8 @@ and printed OK.
 
 **Waits on:** TOOL-dTotalRecall-9 (the `reads:` list, `check_read_set`, `record find`, `record show`),
 TOOL-dDeclaredLoop-2 (`policy_edit.py propose`), TOOL-dCalibratedLens-3 (the module, the verbs and the
-record kind), TOOL-dCalibratedLens-4 (the factory, the proposal and the fixture's leg), and the ask of
-§8 F4 (the per-role form).
+record kind), TOOL-dCalibratedLens-4 (the factory, the proposal and the fixture's leg), and ask
+TOOL-dTotalRecall-107 (§8 F4, the per-role form).
 
 ### Migration
 
@@ -281,7 +293,8 @@ findings below, and its disposal amended this text. Its ids restart at 1, so eac
 - **AC5** — When the plant `item-budget-owner` sets the per-role member `gov-builder = 64` at `HEAD`
   over the same 31 work orders, the line reads `owner-set 64` and no `policy_edit.py` line follows it.
   Red when: a measured value or a proposal is made for an owner-set role.
-  permission: the per-role form is the ask of §8 F4, landed by dTotalRecall before this unit's pass.
+  permission: the per-role form is ask TOOL-dTotalRecall-107 (§8 F4), landed by dTotalRecall before this
+  unit's pass.
 - **AC6** — When `item-budget-measured` finishes, its output carries `policy_edit.py propose
   memory.item-budget."gov-builder" 28` and the lines that verb prints, and `git status --porcelain` in
   the scratch repository prints nothing.
@@ -296,7 +309,8 @@ findings below, and its disposal amended this text. Its ids restart at 1, so eac
   is non-empty (r3 id 11).
   Red when: the check reads 96,000 bytes while a measured line exists, a missing record reads as 0,
   or a staged record hides the committed one.
-  permission: `record_find.py` and `gov_record.py` are TOOL-dTotalRecall-9's, built before this pass.
+  permission: `gov_record.py` is TOOL-dTotalRecall-2's door and its `budget` verb is
+  TOOL-dTotalRecall-9 S6's, with `record_find.py`, built before this pass.
 - **AC8** — (amended, ids 2, 3) When `item-budget-measured` runs `loop_review.py gather` and `record`, the written record's
   `item-budgets` field holds the S4 line, and `loop_review.py file --dry-run` names one proposal keyed
   `item-budget` and `gov-builder`.
@@ -336,7 +350,7 @@ New arm: tools/loop/measure.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 · the 
   dTotalRecall, the key's owner, whose S6 already reads "a per-role value"; (b) this unit widens the
   catalogue row and the policy kit's `allowed` grammar itself, another build's key in a built kit;
   (c) no per-role setting, which fails the clause's "the owner's own setting for a role winning".
-  Rung 3. RESOLVED (agent, 2026-11-02, delegated): (a), the main loop files it in
+  Rung 3. RESOLVED (agent, 2026-11-03, delegated): (a), filed as TOOL-dTotalRecall-107 in
   `memory/builds/dTotalRecall/BACKLOG.md` · THE ITEM BUDGET HAS NO PER-ROLE FORM. v2:1370 gives
   `memory.item-budget` "KB per role (each role's cap the owner's to adjust)" and TOOL-dTotalRecall-9 S6
   reads "a per-role value", and the catalogue row (`tools/policy/catalogue.toml:1457-1461`) admits only
@@ -362,6 +376,12 @@ New arm: tools/loop/measure.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 · the 
   `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`, §4 "Amendments (round-3 spec audit)": r3 id
   11 (`TOOL-dCalibratedLens-43`), the prefix listing and AC7's non-empty assertion; r3 id 15
   (`TOOL-dCalibratedLens-48`), the newest add; §3's hands-off to unit 38 names the newest add.
+- rev-5 · 2026-11-03 · §3 §4 §8 S3 AC5 AC7 · re-grounded against dTotalRecall's and dDeclaredLoop's
+  specs, the work order cited to TOOL-dTotalRecall-9 S8 and §10, `gov_record.py` named
+  TOOL-dTotalRecall-2's door with `budget` TOOL-dTotalRecall-9 S6's verb, and §8 F4 re-marked
+  `RESOLVED (agent, 2026-11-03, delegated)` naming the filed ask TOOL-dTotalRecall-107, a build-run
+  precondition, by the brief prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md
+  (cross-check rows 46, 48, 50)
 
 ## 10. Reuse audit
 

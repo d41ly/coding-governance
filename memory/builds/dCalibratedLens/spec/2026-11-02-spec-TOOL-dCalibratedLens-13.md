@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-13 — the `lens` kind and namespace: gov's lenses tagged, a repository's lenses from its overlay, the fixed set with the five slots, and lens tags joined to the step gate
 
-**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 15 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 15 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0470@dfafc75a whole
 **Carries:** node:tag-namespace.lens
@@ -10,10 +10,22 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-13-deviation-132.md](../build/2026-11-02-build-TOOL-dCalibratedLens-13-deviation-132.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md) | journal | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-03-build-TOOL-dCalibratedLens-13-deviation-133.md](../build/2026-11-03-build-TOOL-dCalibratedLens-13-deviation-133.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-13-deviation-134.md](../build/2026-11-03-build-TOOL-dCalibratedLens-13-deviation-134.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-48 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
 | [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
+| [2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md](../reviews/2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-46 |
 
 <!-- /gen:spec-records -->
 
@@ -31,34 +43,38 @@ install without a change record naming its successor.
 ## 2. Scope (IN)
 
 Build-run preconditions, each specced and unbuilt at base `8bec4cef`: TOOL-dFairHearing-13 (the
-catalogue, `render_lenses.py` and the `LENS_SLOTS` count) and -3 (the opt-in swap and `OPTIN_LENSES`);
+catalogue and `render_lenses.py`), -23 S42 (`LENS_SLOTS` in `tools/workflows/check-verifier-fanout.js`)
+and -3 (the opt-in swap and `OPTIN_LENSES`);
 PLAY-dOrderedCharter-7 S4 and S7 (the kinds register and the record factory), -15 S7 (the change
 record), -19 S2 (the namespace registry and `tag_index.py`), -35 S1 to S10 (the overlay's rows and a
-kind's `schema` key) and -36 S1 to S7 (the fixed set and the exclusion refusals); TOOL-dDeclaredLoop-26
-§8 F5 (the playbook kit's `compose` verb on `overlay_rows.py`); TOOL-dWitnessedBar-11 (`leg_factory.py
+kind's `schema` key) and -36 S1 to S7 (the fixed set and the exclusion refusals); the owner's pick on TOOL-dDeclaredLoop-26
+§8 F5, which reads "OPEN for the owner", and under its option (a) the playbook kit's `compose` verb on
+`overlay_rows.py`, an ask on dOrderedCharter that "the build run would file" and no `BACKLOG.md` holds
+yet; TOOL-dWitnessedBar-11 (`leg_factory.py
 new`). The build run re-grounds on each and stops the unit when one is absent.
 
 - **S1** — (amended, id 8) The namespace. A `[[namespace]]` row in `tools/playbook/namespaces.toml` in
   PLAY-dOrderedCharter-19 S2's shape: `ns = "lens"`, `owner = "dCalibratedLens"`, `layer =
   "layer.flow"`, `source` the `key` of each `[[lens]]` row of `tools/workflows/lenses.toml` and of the
   overlay `.governance/instructions.toml`, `extractor = "tag_index:extract_lens"`, `role = "describes"`.
-  `extract_lens` in `tools/playbook/tag_index.py` yields `lens.<key>` for each gov row and
-  `lens.adopter.<name>` for each overlay row, each tag derived by `derive_lens_tag` and never typed. Each
-  tag addresses its row's `brief`, so a brief is an instruction unit a return or a finding can cite by
+  `extract_lens` in `tools/playbook/tag_index.py` yields `lens.<key>` once for each distinct gov key and
+  `lens.adopter.<name>` for each overlay row, each tag derived by `derive_lens_tag` and never typed. A key
+  may recur in rows whose `presets` are disjoint (TOOL-dFairHearing-13 §8 F2), so a tag addresses every
+  row of its key and each row's `brief`, so a brief is an instruction unit a return or a finding can cite by
   that tag (§8 F1). Observed by AC1.
 - **S2** — The kind. A `[[kind]]` row `kind.lens` in `tools/playbook/kinds.toml` (PLAY-dOrderedCharter-7
   S4): `owner = "dCalibratedLens"`, `binds = ["principle.p8"]`, `population = "python
   {prefix}/workflows/render_lenses.py members"`, `factory = "python {prefix}/workflows/render_lenses.py
   new"`, `gate = "lens kind fixtures"`, and `schema = "tools/workflows/lens-schema.toml"`
-  (PLAY-dOrderedCharter-35 S10). `members` prints each composed row's tag, one per line. `new <name>`
+  (PLAY-dOrderedCharter-35 S10). `members` prints each composed tag once, one per line. `new <name>`
   appends a gov `[[lens]]` row with `default_in = []` and `optin = false`, the state a lens holds until its
   losing test (TOOL-dFairHearing-13 §4); given `adopter.<name>` it writes nothing and prints the overlay
   row and the `instructions_edit.py` command that would add it, since `instructions.edit` is the one door
   to the overlay (PLAY-dOrderedCharter-15 S2). Observed by AC1.
 - **S3** — The composition. `read_lens_composition(root, rev)` in `tools/workflows/render_lenses.py` returns
   gov's rows and the overlay's `[[lens]]` rows composed by `compose_rows` (PLAY-dOrderedCharter-35),
-  which runs `check_rows` (PLAY-dOrderedCharter-36 S7), reached as the playbook kit's `compose` verb run
-  as a subprocess found through the inline `resolve_kit_dir`, as TOOL-dBoundRoles-20 S3 reaches it; with
+  which runs `check_rows` (PLAY-dOrderedCharter-36 S7), reached, under TOOL-dDeclaredLoop-26 §8 F5
+  (a), as the playbook kit's `compose` verb run as a subprocess found through the inline `resolve_kit_dir`, as TOOL-dBoundRoles-20 S3 reaches it; with
   the playbook kit absent it returns gov's rows and prints one note naming it. An overlay row's harness
   key is `adopter-<name>` (§8 F3), and the render fills `OPTIN_LENSES` (TOOL-dFairHearing-3 S6) from every
   composed `optin = true` row, the repository's included, so a repository lens can be swapped into a run.
@@ -66,8 +82,8 @@ new`). The build run re-grounds on each and stops the unit when one is absent.
   lens fills a slot only by a swap, never as a sixth default. Observed by AC2 and AC4.
 - **S4** — The fixed set, declared in `tools/workflows/lens-schema.toml` in PLAY-dOrderedCharter-36 S1's
   grammar (§4 "The schema"), `owner-seat = "adopter"`: `key`, `brief` and `kinds` fixed by the renderer's
-  parse; `default_in` fixed by `parser=tools/workflows/check-verifier-fanout.sh#LENS_SLOTS`, the five lens
-  slots; `presets` open, widening on `add`; `optin` open, an ordered scalar `false` then `true`. An
+  parse; `default_in` fixed by `parser=tools/workflows/check-verifier-fanout.js#LENS_SLOTS`, the five lens
+  slots (TOOL-dFairHearing-23 S42); `presets` open, widening on `add`; `optin` open, an ordered scalar `false` then `true`. An
   `amends` patch adding a literal to a gov row's `default_in` is the planted patch adding a sixth slot,
   refused by PLAY-dOrderedCharter-36 S3 naming the row, `default_in` and `LENS_SLOTS`. Observed by AC3.
 - **S5** — `review.opt-in` chooses. Its value grammar is TOOL-dFairHearing-3 S9's, the key's owner: a
@@ -85,7 +101,8 @@ new`). The build run re-grounds on each and stops the unit when one is absent.
   "{prefix}/workflows/render_lenses.py:read_lens_members"`, every gov row's `key` in `lenses.toml` at
   the tree it reads, empty where the file is absent (`tools/govkit/step_gate.py`'s reader contract,
   `:32-35`); `plant = "{prefix}/workflows/render_lenses.py:write_lens_plant"`, staging the removal of one
-  gov row whose `default_in` is empty, so the render still fills every slot; `witness =
+  gov row whose `default_in` is empty and whose key no other row holds, so the render still fills every
+  slot and the row's tag vanishes; `witness =
   "{prefix}/workflows/render_lenses.py:read_lens_successors"`, each key whose `lens.<key>` tag a change
   record (PLAY-dOrderedCharter-15 S7) ends with a `Successor` that is one tag, the record read through
   the change kind's reader of PLAY-dOrderedCharter-7 S7's factory, never a parser of this unit's. A lens
@@ -121,7 +138,7 @@ new`). The build run re-grounds on each and stops the unit when one is absent.
 
 - **hands-off** `TOOL-dCalibratedLens-14` — `lens.<key>`, `derive_opt_in_tags` and the refusal of an exclusion of an opt-in key `review.opt-in` names, which a swap, an exclusion of a default and the slot an opt-in fills read
 - **hands-off** `TOOL-dCalibratedLens-1` — `kind.lens` and the `lens` namespace, under which the stage lenses' rows are tagged
-- **consumes-from** external — TOOL-dFairHearing-13 and -3, PLAY-dOrderedCharter-7 S4 and S7, -15 S7, -19 S2, -35, -36, TOOL-dDeclaredLoop-26 §8 F5's `compose` verb, TOOL-dWitnessedBar-11 and TOOL-dSafePassage-10 S1, each specced and unbuilt at base `8bec4cef` but the last, built
+- **consumes-from** external — TOOL-dFairHearing-13, -23 S42 and -3, PLAY-dOrderedCharter-7 S4 and S7, -15 S7, -19 S2, -35, -36, TOOL-dDeclaredLoop-26 §8 F5's `compose` verb (OPEN for the owner, and an unfiled ask on dOrderedCharter), TOOL-dWitnessedBar-11 and TOOL-dSafePassage-10 S1, each specced and unbuilt at base `8bec4cef` but the last, built
 
 ## 4. Design
 
@@ -165,15 +182,15 @@ owner-seat = "adopter"                     # lens.adopter.<name>
 [[field]]  key = "key"         shape = "scalar"  fixed-by = ["parser=tools/workflows/render_lenses.py#check_catalogue"]
 [[field]]  key = "brief"       shape = "scalar"  fixed-by = ["parser=tools/workflows/render_lenses.py#check_catalogue"]
 [[field]]  key = "kinds"       shape = "set"     fixed-by = ["parser=tools/workflows/render_lenses.py#check_catalogue"]
-[[field]]  key = "default_in"  shape = "set"     fixed-by = ["parser=tools/workflows/check-verifier-fanout.sh#LENS_SLOTS"]
+[[field]]  key = "default_in"  shape = "set"     fixed-by = ["parser=tools/workflows/check-verifier-fanout.js#LENS_SLOTS"]
 [[field]]  key = "presets"     shape = "set"     widens = "add"
 [[field]]  key = "optin"       shape = "scalar"  widens = [false, true]
 ```
 
 `brief` is fixed because a changed brief is a different lens: a repository adds its own row and swaps it
 in. `default_in` is fixed because every default slot is one of the five a literal holds; the slot count
-keeps its one home in the fan-out leg (TOOL-dFairHearing-13 §4), and the schema cites it rather than
-restating it.
+keeps its one home in `tools/workflows/check-verifier-fanout.js`, `LENS_SLOTS = 5` beside rule 2
+(TOOL-dFairHearing-23 S42), and the schema cites it rather than restating it.
 
 ### The tag and the key
 
@@ -276,11 +293,11 @@ names; the unit it names owns the finding and its proof.
 ## 6. Acceptance criteria
 
 - **AC1** — When `python render_lenses.py members` runs over this tree after the build, it
-  prints one `lens.<key>` line per `[[lens]]` row of `lenses.toml` and no other, and
-  `python gov_tag.py show lens.coherence` resolves the tag to that row; `render_lenses.py
+  prints one `lens.<key>` line per distinct key of the `[[lens]]` rows of `lenses.toml` and no other,
+  and `python gov_tag.py show lens.coherence` resolves the tag to every `coherence` row; `render_lenses.py
   new adopter.security` writes nothing and prints a `[[lens]]` row and an `instructions_edit.py` command.
   Red when: a tag is typed in a row instead of derived, or the factory writes the overlay.
-  figure: DERIVED, the catalogue's row count at the run.
+  figure: DERIVED, the catalogue's distinct-key count at the run.
 - **AC2** — When `render_lenses.py --fixture --plant repository-swap` runs, it exits 0 with the rendered
   `OPTIN_LENSES` holding `key: 'adopter-security'` and `members` printing `lens.adopter.security`.
   Red when: the render reads gov's catalogue alone, so the repository lens never reaches a run.
@@ -299,7 +316,7 @@ names; the unit it names owns the finding and its proof.
   committed beside it, it exits 0; with that record's `Successor` reading `none`, it exits 1.
   Red when: the class reads no change record, or reads `none` as a successor.
 - **AC7** — When `python tools/govkit/step_gate.py --list` runs over this tree after the build, it prints
-  the class `lens` with a member count equal to the catalogue's row count.
+  the class `lens` with a member count equal to the catalogue's distinct-key count.
   Red when: the class row is missing or its reader returns nothing at the tip, which the gate refuses as
   an empty class.
 
@@ -356,6 +373,15 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC2 · the rendered fixt
 - rev-2 · 2026-11-02 · §4 §7 S1 S6 S7 AC5 · amended at the disposal of the round-1 spec audit
   `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1 spec
   audit)": ids 8, 40, 42 and 14 (`TOOL-dCalibratedLens-30`).
+- rev-3 · 2026-11-03 · §2 S1 S2 S4 S6 §3 §4 AC1 AC7 · re-grounded against the parents' specs,
+  `LENS_SLOTS` cited at `tools/workflows/check-verifier-fanout.js` by TOOL-dFairHearing-23 S42 and
+  that unit made a precondition, a `lens.<key>` tag addressing every row of its key, and AC1 and AC7
+  counting distinct keys, by the brief
+  prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md (cross-check rows 115 and 116)
+- rev-4 · 2026-11-03 · §2 S3 §3 · re-grounded against dTotalRecall's and dDeclaredLoop's specs, the
+  `compose` precondition moved to the owner's pick on TOOL-dDeclaredLoop-26 §8 F5, OPEN for the owner,
+  its verb an unfiled ask on dOrderedCharter, and S3's route stated under option (a), by the brief
+  prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md (cross-check row 86)
 
 ## 10. Reuse audit
 

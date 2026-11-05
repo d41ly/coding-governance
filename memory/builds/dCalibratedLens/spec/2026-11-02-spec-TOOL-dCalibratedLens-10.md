@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-10 — instruction evals: a replay suite of recorded items with known outcomes, scored through the scorer factory, owed again by a held leg when an instruction unit changes
 
-**Status:** DEFERRED · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 12 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-6 · 2026-11-04 · node a · Tier-2 · base 8bec4cef · streams tooling · order 12 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0467@0bd9d49f whole
 
@@ -9,13 +9,27 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-10-deviation-101.md](../build/2026-11-02-build-TOOL-dCalibratedLens-10-deviation-101.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md) | journal | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-crosscheck-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-crosscheck-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-9 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
 | [2026-11-03-build-TOOL-dCalibratedLens-10-deviation-102.md](../build/2026-11-03-build-TOOL-dCalibratedLens-10-deviation-102.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-10-deviation-103.md](../build/2026-11-03-build-TOOL-dCalibratedLens-10-deviation-103.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-10-deviation-104.md](../build/2026-11-03-build-TOOL-dCalibratedLens-10-deviation-104.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-10-deviation-105.md](../build/2026-11-03-build-TOOL-dCalibratedLens-10-deviation-105.md) | deviation | — |
+| [2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md](../build/2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-24 |
+| [2026-11-04-build-TOOL-dCalibratedLens-10-deviation-106.md](../build/2026-11-04-build-TOOL-dCalibratedLens-10-deviation-106.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-48 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-10-1-spec-reviewer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-10-1-spec-reviewer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-10-2-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-10-2-spec-writer.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md](../prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-24 |
 | [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
+| [2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md](../reviews/2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-46 |
 
 <!-- /gen:spec-records -->
 
@@ -33,7 +47,7 @@ score fell; and a confirmed finding whose cause is an instruction adding a case 
 Build-run preconditions, each specced and unbuilt at base `8bec4cef`, re-grounded by the build run, which
 stops this unit when one is absent: TOOL-dFairHearing-12 (`tools/workflows/replay_scorer.py`,
 `INSTANCES`, `read_raw_output`, `derive_paired_cases` and its arms in `review-replay selftest`),
-TOOL-dFairHearing-1 S1 to S3 (the known-set grammar, `parse_known_set`, the adjudicated `--matched`
+TOOL-dFairHearing-14 S2 (the `case_evidence` hook), TOOL-dFairHearing-1 S1 to S3 (the known-set grammar, `parse_known_set`, the adjudicated `--matched`
 scoring) and TOOL-dFairHearing-25 (the owed replays' verdict record the seed case reads);
 TOOL-dCalibratedLens-5 (the appendix's `units` column, `read_finding_units` and `PROPOSERS`);
 PLAY-dOrderedCharter-9 (the instruction manifests, `instructions.toml`).
@@ -43,11 +57,15 @@ PLAY-dOrderedCharter-9 (the instruction manifests, `instructions.toml`).
   `**Population:**` line and `| tag | address | grade | escaped |` rows, both read by
   `parse_known_set` (TOOL-dFairHearing-1 S2). `parse_eval_case(text, repo)` in the factory returns the
   header and the rows, reading a `**Known:**` source through `read_raw_output`, and refuses a missing or
-  malformed header line by name. Observed by AC1.
+  malformed header line by name. The instance's `case_evidence(case)` (TOOL-dFairHearing-14 S2) is the
+  case's `**Subject:**` at `**Base:**` and its known rows' addresses; a case missing either is refused
+  by id. The instance's arms are arms of `replay_scorer.run_selftest`, raising its `ARMS_DECLARED` by
+  the arms added (TOOL-dFairHearing-12 F3), and `--fixture --plant <name>` runs one. Observed by AC1.
 - **S2** — The score and its record. `measure_instruction_eval(case, candidate, matched)` scores a
   replay's candidate report through TOOL-dFairHearing-1 S3's adjudicated matches: an `**Expect:**
   found` case scores the known rows matched, an `**Expect:** absent` case the known rows NOT matched,
-  each as `<k>/<n>`. `python replay_scorer.py --instance instruction-eval --record --case <path>
+  each as `<k>/<n>`, `n` the rows whose `escaped` is `no`, the `**Population:**` line's `reviewed`
+  figure, and `k` counted among them, as TOOL-dFairHearing-1 S3 prints `reviewed <k>/59`. `python replay_scorer.py --instance instruction-eval --record --case <path>
   --candidate <src> --matched <src>` writes the score into the case's `**Replayed:**` line with `HEAD`'s
   sha and the candidate's source, and raises `**Baseline:**` to the score when it is higher, through a
   temp file and `os.replace`; it writes nothing else. Observed by AC2.
@@ -59,19 +77,34 @@ PLAY-dOrderedCharter-9 (the instruction manifests, `instructions.toml`).
   (`unguarded`) and every tracked `instructions.toml` the guard lacks (`guard misses <path>`), and an
   empty suite prints `instruction-eval — unarmed · no case under <suite>`, never a pass. Exit 0 only when
   every case is held and nothing else red; 1 otherwise; 2 on a refusal. Observed by AC3 and AC4.
-- **S4** — (amended, id 41) The held leg. A row `instruction-eval` in `tools/gate-legs.json`: argv `["python3",
+- **S4** — (amended, id 41) The held leg. The leg `instruction-eval`, its declaration decided at the
+  pass by `test -f tools/run-gates/leg_factory.py` and the case named in the pass's commit as a
+  `Decided:` trailer, as TOOL-dCalibratedLens-46 S2 and TOOL-dCalibratedLens-47 S2 decide theirs.
+  Factory case: one `[[exempt_leg]]` row of `tools/govkit/registry.toml` carrying the leg's whole row
+  under TOOL-dWitnessedBar-11 S1, as TOOL-dTendedCadence-7 S4 declares its leg, appended by
+  `leg_factory.py new --exempt <why>` (TOOL-dWitnessedBar-11 S3), and `tools/gate-legs.json` that
+  row's render through `leg_factory.py --write`. Hand case: the leg's row in `tools/gate-legs.json`,
+  the only spelling of its guard, plus an `[[exempt_leg]]` row of `tools/govkit/registry.toml`
+  carrying `name` and `why` alone, the shape of its `tier2-review self-test` row (`:666-668`). The
+  leg's row: argv `["python3",
   "{prefix}/workflows/evals/check_evals.py"]`, `subject = "kit"`, `chunk = "selftests"`, and the guard of §4
   "The guard". `tools/workflows/evals/check_evals.py` runs `check_eval_suite` over its own directory with
-  the guard it reads from that row by name, so the guard is one fact. `tools/workflows/kit.toml`'s
+  the guard it reads by name from the leg's `tools/gate-legs.json` row, which holds it in either case,
+  so the guard is one fact. `tools/workflows/kit.toml`'s
   `project-owned` rule (`:36-37`) gains `evals/**`, withholding the suite and its entry from every
-  adopter, and `silenced_legs` (`tools/govkit/govkit.py:3842`) leaves the leg out of an adopter's manifest with them; the leg is an
-  `[[exempt_leg]]` row of `tools/govkit/registry.toml` in the form `tier2-review self-test`'s takes, and
-  `memory/map/features/review-harnesses.md` claims it. Because no kit ships its entry, `GATE_SELFTESTS=changed`
+  adopter, and `silenced_legs` (`tools/govkit/govkit.py:3842`) leaves the leg out of an adopter's manifest with them, and
+  `memory/map/features/review-harnesses.md` claims the leg. Because no kit ships its entry, `GATE_SELFTESTS=changed`
   selects it by its guard (`tools/run-gates/run-gates.sh:3075-3080`, §8 F1). Observed by AC5.
 - **S5** — (amended, id 4) The seed case, `tools/workflows/evals/design-audit-runtime-record.md`: the design-audit replay
   of the runtime record at blob `767187aa` (TOOL-dFairHearing-1 S5), `**Known:**` that unit's known set,
   `**Expect:** found`, its `**Replayed:**` and `**Baseline:**` the reviewed score TOOL-dFairHearing-25's
   verdict record states for that replay, or `none` and `0/59` when no adjudicated score is recorded.
+  That record scores two runs, each `reviewed <k>/59` (TOOL-dFairHearing-25 AC3), and its switch flips
+  only when both meet the bar (its S5), so the seed takes the lower run, `fhr1` on a tie, its report the
+  `<candidate src>`. `**Replayed:**`'s sha is the record's orchestrating commit (TOOL-dFairHearing-32
+  S14), never a clone's `HEAD`; `**Base:**` is `6cfd21619e9cbe6084dd9d38982194750aa908b2`, the replay
+  adding TOOL-dFairHearing-25 S2's placement commit by the README's placement step
+  (TOOL-dFairHearing-32 S18), since only a transient ref holds it.
   (r2 id 6) Its `**Loads:**` line is `tools/workflows/tier2-review.template.js,
   tools/workflows/lenses.toml, tools/roles/agents/gov-spec-reviewer.agent.md,
   tools/roles/agents/gov-skeptic.agent.md, tools/roles/agents/gov-synthesizer.agent.md,
@@ -82,17 +115,18 @@ PLAY-dOrderedCharter-9 (the instruction manifests, `instructions.toml`).
   `derive_eval_case(...)` and writes `tools/workflows/evals/<record stem>-<id>.md` with `**Expect:**
   absent`, one known row built from the finding (§4 "A case from a finding"), `**Baseline:** 0/1` and
   `**Replayed:** none`. It refuses a finding whose appendix row is not `confirmed`, one whose `units` cell
-  is `-` (no instruction is its cause, TOOL-dCalibratedLens-5 S2), and a finding a case's `**From:**`
-  already names. Observed by AC7.
+  is `-` (no instruction is its cause, TOOL-dCalibratedLens-5 S2), one whose `ref` carries no `[tag]`
+  (§4 "A case from a finding"), and a finding a case's `**From:**` already names. Observed by AC7.
 - **S7** — The Loop Review finds them. `derive_eval_proposals` joins `PROPOSERS` (TOOL-dCalibratedLens-5
   S6): for each confirmed finding in the window whose `units` cell names a tag, read through
-  `read_finding_units`, and that no tracked case's `**From:**` names, one proposal `{"kind":
+  `read_finding_units`, whose `ref` carries a `[tag]`, and that no tracked case's `**From:**` names, one proposal `{"kind":
   "eval-case", "id": "<record stem>#<id>", "action": "add-case", "accept": …, "row": "<units> ·
   <ref>"}`, its `accept` the case added by S6's command or the finding kept by a keep record; a
   `METRICS` entry `eval-candidates` answers `<n> finding(s) · <m> case(s) · <glob>`. Observed by AC8.
 - **S8** — The docs. `tools/workflows/README.md` gains "Instruction evals": the case grammar, the leg,
-  the replay procedure (the item run in an isolated clone at `**Base:**` as TOOL-dFairHearing-1 S5 runs
-  its replay, the output reviewed by `tier2-review.js`, the matches adjudicated, then `--record`) and
+  the replay procedure (the item run at `**Base:**` in a clone made by the section "Replaying a review
+  blind", the procedure every later replay runs (TOOL-dFairHearing-23 S17, TOOL-dFairHearing-32 S17
+  and S18), the output reviewed by `tier2-review.js`, the matches adjudicated, then `--record`) and
   `--add-case`; `help/roles.md` gains "When an instruction changes". Observed by AC9.
 
 ## 3. Non-goals (OUT)
@@ -111,15 +145,18 @@ PLAY-dOrderedCharter-9 (the instruction manifests, `instructions.toml`).
 
 - **consumes-from** `TOOL-dCalibratedLens-5` — the appendix's `units` column, which marks a finding's cause an instruction, `read_finding_units`, and `PROPOSERS`, which gains `derive_eval_proposals`
 - **consumes-from** `TOOL-dCalibratedLens-3` — `METRICS` and `run_loop_file`, through which the proposal is filed
-- **consumes-from** external — TOOL-dFairHearing-12, -1 and -25 (the factory, the known-set grammar and adjudicated scoring, the seed's verdict) and PLAY-dOrderedCharter-9 (the instruction manifests), each DEFERRED at base and of a parent or ancestor build
+- **consumes-from** external — TOOL-dFairHearing-12, -14, -1 and -25 (the factory, its `case_evidence` hook, the known-set grammar and adjudicated scoring, the seed's verdict) and PLAY-dOrderedCharter-9 (the instruction manifests), each DEFERRED at base and of a parent or ancestor build
+- **consumes-from** external — TOOL-dWitnessedBar-11 (`leg_factory.py`), DEFERRED at base; its absence at the pass selects the hand case of S4
 - **hands-off** `TOOL-dCalibratedLens-23` — `check_evals.py`, the seed case and `replay_scorer.py --record`, which that unit observes held and owed (id 4)
 - **hands-off** `TOOL-dCalibratedLens-36` — the seed case and the `--fixture` frame of `replay_scorer.py --instance instruction-eval`, which that unit's `seed-loads` plant copies (round-2 id 6)
 
 ## 4. Design
 
-**Waits on:** TOOL-dFairHearing-12, TOOL-dFairHearing-1, TOOL-dFairHearing-25, TOOL-dCalibratedLens-5,
+**Waits on:** TOOL-dFairHearing-12, TOOL-dFairHearing-14, TOOL-dFairHearing-1, TOOL-dFairHearing-25, TOOL-dCalibratedLens-5,
 TOOL-dCalibratedLens-3 and PLAY-dOrderedCharter-9; none exists at `8bec4cef`
 (`tools/workflows/replay_scorer.py`, `tools/workflows/evals/` and every `instructions.toml` are absent).
+It does not wait on TOOL-dWitnessedBar-11: `tools/run-gates/leg_factory.py` is absent at `8bec4cef`,
+and S4's hand case covers that.
 
 ### Evidence
 
@@ -129,9 +166,10 @@ TOOL-dCalibratedLens-3 and PLAY-dOrderedCharter-9; none exists at `8bec4cef`
   `tools/workflows/review_replay.py` under `review-harness` and does not list the withheld
   `tools/workflows/tier2-review.test.sh`, so a leg whose argv names a withheld file is selected by its
   guard, and one naming `replay_scorer.py` by the kit's shipped sources (§8 F1).
-- A gov-only leg is a `gate-legs.json` row plus an `[[exempt_leg]]` row, never a `[[gate_leg]]`
-  (`tools/govkit/registry.toml:666-668`, the `tier2-review self-test` row), and the kit withholds its
-  suite by claiming it `project-owned` (`tools/workflows/kit.toml:36-37`).
+- A gov-only leg is an `[[exempt_leg]]` row, never a `[[gate_leg]]` (`tools/govkit/registry.toml:666-668`,
+  the `tier2-review self-test` row), which TOOL-dWitnessedBar-11 S1 makes the leg's whole row and
+  `gate-legs.json` its render; the kit withholds its suite by claiming it `project-owned`
+  (`tools/workflows/kit.toml:36-37`).
 - The review harness's design-audit replays cost a full spec audit each, about 0.81 M tokens and 11 or 12
   agents (gap-review-03, PINNED by the gap register); that is why the leg owes a replay rather than
   running one.
@@ -155,7 +193,7 @@ TOOL-dCalibratedLens-3 and PLAY-dOrderedCharter-9; none exists at `8bec4cef`
 
 | tag | address | grade | escaped |
 |---|---|---|---|
-| 2026-10-31-review-TOOL-dExample-3-spec-audit-7 | memory/builds/dExample/spec/2026-10-30-spec-TOOL-dExample-3.md:[§10] | high | no |
+| 2026-10-31-review-TOOL-dExample-3-spec-audit-7 | memory/builds/dExample/spec/2026-10-30-spec-TOOL-dExample-3.md:[recall-probe] | high | no |
 ```
 
 `**Replayed:**` once scored reads `<40-hex sha> · <k>/<n> · <candidate src>`. `**Known:** <src>` replaces
@@ -191,7 +229,9 @@ header name): `tag` is `<record stem>-<id>`; `address` the row's `ref`; `grade` 
 `high` severity and `medium` otherwise; `escaped` `no`. `**Subject:**` is the path of the row's `ref`,
 `**Base:**` the commit that added the review record (`git log --diff-filter=A --format=%H -1 --
 <record>`), `**Item:**` the item that wrote the subject as `--brief`'s record names it, and `**Loads:**`
-the `--loads` paths, each within the guard. The file name is built from the record's stem and an id
+the `--loads` paths, each within the guard. A finding whose `ref` carries no `[tag]`, a lower-case
+slug in brackets (TOOL-dFairHearing-12 S3), is refused: TOOL-dFairHearing-1 S3 counts a pair only when
+its candidate's `ref` cites the known row's `[tag]`, so its case could never be scored. The file name is built from the record's stem and an id
 held to `^[0-9]+$`, so no argument is a path.
 
 ### Inventory
@@ -202,6 +242,7 @@ held to `^[0-9]+$`, so no argument is a path.
 | `parse_eval_case`, `measure_instruction_eval`, `check_eval_suite`, `write_eval_case`, `derive_eval_case` | functions, `tools/workflows/replay_scorer.py` | `parse`, `measure`, `check`, `write`, `derive`, each answered OK by `python tools/lexicon/lexicon.py --suggest <name> --as py.function` at base |
 | `derive_eval_proposals`, `read_eval_candidates` | functions, `tools/loop/loop_review.py` | `derive`, `read`, OK at base |
 | `--record`, `--add-case` | `replay_scorer.py` flags under the instance | none |
+| `--fixture`, `--plant <name>` | `replay_scorer.py` flags under the instance, running one named arm of `run_selftest` | none |
 | `tools/workflows/evals/`, `check_evals.py` | the suite and its entry | none |
 | `held`, `owed`, `fell`, `unguarded`, `unarmed` | verdicts | none |
 | `eval-case`, `add-case`, `eval-candidates` | proposal kind and action, `METRICS` name | none |
@@ -274,8 +315,10 @@ findings below, and its disposal amended this text. Its ids restart at 1, so eac
 - `tools/workflows/evals/design-audit-runtime-record.md` (S5, new)
 - `tools/workflows/kit.toml` (S4)
 - `tools/workflows/README.md` (S8)
-- `tools/gate-legs.json` (S4)
-- `tools/govkit/registry.toml` (S4)
+- `tools/govkit/registry.toml` (S4, the leg's `[[exempt_leg]]` row, whole in the factory case, `name`
+  and `why` in the hand case)
+- `tools/gate-legs.json` (S4, rendered by `leg_factory.py --write` in the factory case, the leg's hand
+  row in the hand case)
 - `memory/map/features/review-harnesses.md` (S4)
 - `tools/loop/loop_review.py` (S7)
 - `help/roles.md` (S8)
@@ -329,8 +372,12 @@ findings below, and its disposal amended this text. Its ids restart at 1, so eac
 - **AC5** — When the leg manifest `gate-legs.json` is read with `json.load` and filtered to the row
   whose `name` is `instruction-eval`, it holds one row with `subject` `kit` and an `argv` naming `check_evals.py`;
   `python tools/govkit/govkit.py shipped --epoch` prints no `tools/workflows/evals/` path; and `grep -n
-  'name = "instruction-eval"' tools/govkit/registry.toml` prints the `[[exempt_leg]]` row.
-  Red when: a kit ships the entry, so `changed` ignores the guard.
+  'name = "instruction-eval"' tools/govkit/registry.toml` prints the `[[exempt_leg]]` row. In the case
+  the pass's `Decided:` trailer names: factory, `python tools/run-gates/leg_factory.py --check` exits
+  0 and the registry row carries the leg's `argv` and `guard`; hand, the registry row carries `name`
+  and `why` alone and the `gate-legs.json` row carries the guard of §4 "The guard".
+  Red when: a kit ships the entry, so `changed` ignores the guard, or the declaration read is not the
+  one the trailer's case writes.
 - **AC6** — (amended, id 4; r3 id 2) When `python check_evals.py` runs over the tree at this unit's
   order, it prints one line for `design-audit-runtime-record`, `owed` naming the paths unit 5 moved
   after the replayed sha, or `held` where none moved, and never `unarmed`; red on `owed` is
@@ -338,9 +385,10 @@ findings below, and its disposal amended this text. Its ids restart at 1, so eac
   Red when: the seed case is missing or refused.
   figure: DERIVED, the verdict depends on the tree at observation time.
 - **AC7** — When the plant `add-case` runs `--add-case --from <record> --finding 7` over a review record
-  whose row 7 is confirmed with `units` `unit.reuse-first`, it writes `<record stem>-7.md` with
-  `**Expect:** absent`, `**Baseline:** 0/1` and one known row at the row's `ref`; finding 8, confirmed
-  with `units` `-`, and finding 9, refuted, are each refused by name; a second `--add-case` for finding 7
+  whose row 7 is confirmed with `units` `unit.reuse-first` and a `ref` carrying a `[tag]`, it writes
+  `<record stem>-7.md` with `**Expect:** absent`, `**Baseline:** 0/1` and one known row at the row's
+  `ref`; finding 8, confirmed with `units` `-`, finding 9, refuted, and finding 10, confirmed with
+  `units` `unit.reuse-first` and a `ref` carrying no `[tag]`, are each refused by name; a second `--add-case` for finding 7
   is refused naming the existing case.
   Red when: a finding with no cited unit becomes a case, or a finding gets two.
 - **AC8** — When `python loop_review.py --fixture --plant eval-candidates` holds two confirmed
@@ -359,7 +407,7 @@ findings below, and its disposal amended this text. Its ids restart at 1, so eac
 The new leg `instruction-eval` is not in the manifest at base and is named here in prose; the loop kit's
 `loop-review selftest` grades S7's plant once TOOL-dCalibratedLens-2 lands.
 
-New arm: tools/workflows/replay_scorer.py · covers AC1 AC2 AC3 AC4 AC7 · the instance's `--fixture` plants, run inside `review-replay selftest`, staged red by an `absent` case scored as `found`, a check that reads a moved load as held, and an empty suite exiting 0 · none
+New arm: tools/workflows/replay_scorer.py · covers AC1 AC2 AC3 AC4 AC7 · the instance's `--fixture` plants, arms of `replay_scorer.run_selftest` reached through `review-replay selftest` (TOOL-dFairHearing-12 F3), staged red by an `absent` case scored as `found`, a check that reads a moved load as held, and an empty suite exiting 0 · that runner's `ARMS_DECLARED`, raised by the five arms added
 New arm: tools/loop/loop_review.py · covers AC8 · the `eval-candidates` plant, staged red by a proposer that ignores `**From:**` · none
 
 ## 8. Open questions
@@ -416,6 +464,20 @@ New arm: tools/loop/loop_review.py · covers AC8 · the `eval-candidates` plant,
   2, 3, 13 and 31 (`TOOL-dCalibratedLens-48`), AC6 at this unit's order, the editors of the loads, the
   rendered agent files as loads with `.claude/agents/` in the guard, and the owed rule over the
   working tree.
+- rev-5 · 2026-11-03 · §2 §3 §4 §6 §7 S1 S2 S4 S5 S6 S7 S8 AC7 · re-grounded against the parents' specs,
+  the arms in `replay_scorer.run_selftest` under `ARMS_DECLARED` with `--fixture --plant` minted, the
+  `case_evidence` hook, cases from a finding scoped to tagged refs, `n` the `reviewed` rows, the seed's
+  lower run, `**Replayed:**` the orchestrating commit and `**Base:**` `6cfd21619`, the README replay
+  section, and the leg as one whole `[[exempt_leg]]` row rendered by `leg_factory.py`, by the brief
+  prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md (cross-check rows 91, 92, 94,
+  95, 96, 97, 98 and 102)
+- rev-6 · 2026-11-04 · §2 §3 §4 §6 S4 AC5 · the cross-check folds' spec audit disposed, S4's leg
+  declared in the two-case form of units 46 and 47, decided by `test -f
+  tools/run-gates/leg_factory.py` with a `Decided:` trailer, the hand case the `gate-legs.json` row
+  plus a `name` and `why` `[[exempt_leg]]` row, the factory's edge added and AC5 reading the case
+  taken, and the Inventory's joined row split in two, by the brief
+  prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md (review
+  2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit, items M9, L3)
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-23 — the instruction-eval seed lands held, and a guarded edit's owed replay is recorded before the close bar
 
-**Status:** DEFERRED · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 13 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 13 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,10 +9,17 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-23-deviation-231.md](../build/2026-11-02-build-TOOL-dCalibratedLens-23-deviation-231.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md) | journal | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
 | [2026-11-03-build-TOOL-dCalibratedLens-23-deviation-232.md](../build/2026-11-03-build-TOOL-dCalibratedLens-23-deviation-232.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-23-deviation-233.md](../build/2026-11-03-build-TOOL-dCalibratedLens-23-deviation-233.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
 | [2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 |
+| [2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md](../reviews/2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-46 |
 
 <!-- /gen:spec-records -->
 
@@ -34,7 +41,8 @@ verdicts on the landed leg. It repairs `TOOL-dCalibratedLens-10`.
 - **S1** — The design change, made at the audit's disposal in the sibling specs' text (each at rev-2,
   its §4 "Amendments (round-1 spec audit)", id 4): unit 10 S5 — the seed's `**Replayed:**` and
   `**Baseline:**` are the adjudicated score TOOL-dFairHearing-25's verdict record states for the
-  design-audit replay of the runtime record, a build-run precondition, and `none` is not admitted at
+  design-audit replay of the runtime record, the lower of its two runs' `reviewed <k>/59` at the
+  record's orchestrating commit (TOOL-dFairHearing-32 S14), as unit 10 S5 reads it at rev-5, a build-run precondition, and `none` is not admitted at
   landing; its AC6 reds on `owed` at the close (round-3 id 2). Units 5 and 1 name `instruction-eval`
   in their §7 prose: each edits a load of the seed; unit 8's guard-path edit selects the leg and owes
   the seed nothing (round-3 id 3). The replay is a rule, not an instance (round-2 id 36): ONE replay of every owed case is
@@ -49,9 +57,11 @@ verdicts on the landed leg. It repairs `TOOL-dCalibratedLens-10`.
 - **S2** — The proof, at the close and never at this unit's order (round-2 id 6): once the main loop
   has recorded the replay S1 owes, `python tools/workflows/evals/check_evals.py` over the tree prints
   `instruction-eval — design-audit-runtime-record · held` and exits 0. At this unit's order the seed
-  is already owed, since unit 5 edited two of its loads after the replayed sha. Observed by AC2.
+  is already owed, since parent units after TOOL-dFairHearing-25 and unit 5 edited its loads after the
+  replayed sha (§4 Evidence). Observed by AC2.
 - **S3** — The owed path and its discharge, a `--fixture` plant `close-bar` of `replay_scorer.py
-  --instance instruction-eval`: in a scratch repository it copies the seed case, commits an edit to a
+  --instance instruction-eval`, an arm of `replay_scorer.run_selftest` raising its `ARMS_DECLARED` by one
+  (TOOL-dFairHearing-12 F3): in a scratch repository it copies the seed case, commits an edit to a
   guarded `tools/workflows/tier2-review.template.js`, and runs `check_eval_suite`: one `owed` line naming
   that path, exit 1; then `--record` with a planted candidate and matches at the seed's baseline: `held`,
   exit 0. Observed by AC3.
@@ -80,11 +90,17 @@ verdicts on the landed leg. It repairs `TOOL-dCalibratedLens-10`.
 
 - spec-10 S3 (owed when `**Replayed:**` is `none` or a load moved), S5 (`none` and `0/59` admitted),
   AC6 (`held` or `owed`), §4 "The guard" (`tier2-review.template.js`, `unattended-build.template.js`).
-- The owed rule diffs from the seed's replayed sha, TOOL-dFairHearing-25's replay, which predates
-  this build (spec-10 S3), so every edit this build makes to a path the seed loads counts, whatever
-  its order (round-2 id 6). The seed's loads are unit 10 S5's as amended: the review harness
+- The owed rule diffs from the seed's replayed sha, the orchestrating commit TOOL-dFairHearing-25's
+  verdict record names (TOOL-dFairHearing-32 S14), which predates this build (spec-10 S3), so every
+  edit after it to a path the seed loads counts, a parent's or this build's, whatever its order
+  (round-2 id 6). The seed's loads are unit 10 S5's as amended: the review harness
   template, `tools/workflows/lenses.toml`, the three audit agents' files and the charter template.
-- Edits to those loads, read from each spec's Files touched: unit 5 (order 11)
+- Parent edits to those loads after TOOL-dFairHearing-25 (order 20), read from each spec's Files
+  touched: `tools/workflows/tier2-review.template.js` by TOOL-dFairHearing-27 (order 21, `:227`),
+  TOOL-dFairHearing-30 (21, `:117`), TOOL-dFairHearing-35 (22, `:144`), TOOL-dFairHearing-32 (23,
+  `:258`), TOOL-dFairHearing-37 (24, `:186`) and TOOL-dFairHearing-40 (26, `:316`); no parent unit
+  after order 20 names another load.
+- Edits to those loads in this build, read from each spec's Files touched: unit 5 (order 11)
   `coding-governance-agents.template.md`, `tools/workflows/tier2-review.template.js` and the
   re-rendered `.claude/agents/` files (round-3 id 13); unit 1
   (order 16) `tools/workflows/tier2-review.template.js` and `tools/workflows/lenses.toml`.
@@ -141,7 +157,7 @@ last commit touching a loaded path  ->  replay recorded (main loop, README proce
   seed's `held` line and exits 0.
   Red when: the seed is owed at the close bar, or fell.
   permission: the main loop's, at the close; a unit pass reads the seed `owed` and records nothing.
-  fixture: the seed's score is TOOL-dFairHearing-25's verdict record, a build-run precondition.
+  fixture: the seed's score is the lower run of TOOL-dFairHearing-25's verdict record, a build-run precondition.
 - **AC3** — When `python replay_scorer.py --instance instruction-eval --fixture --plant close-bar`
   runs from the workflows kit directory, it prints one `owed` line naming `tools/workflows/tier2-review.template.js` and exit 1, then
   `held` and exit 0 after the planted `--record`.
@@ -153,7 +169,7 @@ last commit touching a loaded path  ->  replay recorded (main loop, README proce
 
 The leg `instruction-eval` is not in the manifest at base and is named here in prose.
 
-New arm: tools/workflows/replay_scorer.py · covers AC3 · the `close-bar` plant, staged red by a check that reads a moved guard path as held · none
+New arm: tools/workflows/replay_scorer.py · covers AC3 · the `close-bar` plant, staged red by a check that reads a moved guard path as held · that runner's `ARMS_DECLARED`, raised by one
 
 ## 8. Open questions
 
@@ -174,6 +190,12 @@ none
   of the seed's loads are units 5 and 1 and AC1 greps them (id 3), AC6's red is at the close (id 2),
   the rule reads the working tree (id 31), and §4 counts the re-rendered agent files among the loads
   (id 13).
+- rev-4 · 2026-11-03 · §4 §6 §7 S1 S2 S3 AC2 · re-grounded against the parents' specs, the seed's
+  score the lower of TOOL-dFairHearing-25's two runs at its orchestrating commit, the parent units'
+  template edits after TOOL-dFairHearing-25 counted among the edits since the replay, and the
+  `close-bar` plant an arm of `replay_scorer.run_selftest` under `ARMS_DECLARED`, by the brief
+  prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md (cross-check rows 152, 153 and
+  154)
 
 ## 10. Reuse audit
 

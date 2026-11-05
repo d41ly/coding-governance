@@ -428,6 +428,9 @@ Cite ids, never line numbers.
 | [TOOL-dDeclaredLoop-106](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE PER-ORDER RETURN SCHEMA IS HANDED IN A CIRCLE.… |
 | [TOOL-dDeclaredLoop-107](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | A DROPPED, INVENTED OR DOUBLED ROW STANDS ON A RECORD EDGE.… |
 | [TOOL-dDeclaredLoop-108](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | item.entry.intake'S FIXED ROW IS NEVER ARMED. TOOL-dDeclaredLoop-24 §4… |
+| [TOOL-dDeclaredLoop-109](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | DERIVE_BREAKPOINTS READS NO REVIEW.MAINTAIN. v2:1656 lists… |
+| [TOOL-dDeclaredLoop-110](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE LOOP KIT REFUSES A CADENCE STEP VALUE. TOOL-dDeclaredLoop-50 S3… |
+| [TOOL-dDeclaredLoop-111](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | REVIEW.COST WRITES NO SHAPE-RUN RECORD. TOOL-dDeclaredLoop-20 S3 only… |
 | [TOOL-dDerivedDocket-38](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/run-gates/run-selftests.sh SELECTS SUITES ONLY BY A --kit <dir>… |
 | [TOOL-dDerivedDocket-39](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | govkit's requires_if SELECTS NO KIT AT APPLY. Its one reader is… |
 | [TOOL-dDerivedDocket-40](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-16 | NO LEASE-MATRIX ROW NAMES WHO REACHES IT, AND NOTHING COUNTS ROWS… |
@@ -626,6 +629,8 @@ Cite ids, never line numbers.
 | [TOOL-dTotalRecall-104](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE MEMORY READ LIST IS RENDERED AS A SECOND BLOCK. TOOL-dTotalRecall-9… |
 | [TOOL-dTotalRecall-105](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE SHAPE-RUN KIND HAS NO ACT FORM. TOOL-dTotalRecall-11 admits only a… |
 | [TOOL-dTotalRecall-106](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE CAUSES CHECK READS NO BINDING. TOOL-dTotalRecall-19 S8's… |
+| [TOOL-dTotalRecall-107](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE ITEM BUDGET HAS NO PER-ROLE FORM. v2:1370 gives memory.item-budget… |
+| [TOOL-dTotalRecall-108](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE RECORD-KIND CHECK READS NO SERVES LINE OUTSIDE THE BUILD FOLDERS.… |
 | [TOOL-dTracedLedger-2](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aSparedSpawn's owner: memory hygiene check 23 is red at origin/main… |
 | [TOOL-dTracedLedger-3](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aOrientedCast's owner: memory hygiene check 23 is red at origin/main… |
 | [TOOL-dTrueNorth-21](../builds/dTrueNorth/BACKLOG.md) | DEFERRED | LOW | TOOL-dPinnedHandoff-2 | 2026-10-21 | TWO LIVE SPECS OF dPinnedHandoff OMIT TWO LEGS THEIR FILES TRIP. Since… |
@@ -651,6 +656,8 @@ Cite ids, never line numbers.
 | [TOOL-dUnstuckLanding-11](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | carry the kit that ships asks 3 to 10 into inCMS and NicoCares through… |
 | [TOOL-dUnstuckLanding-26](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | a gate for a merge whose resolution drops one side's hunks: for each… |
 | [TOOL-dWellOiledMachine-62](../builds/dWellOiledMachine/BACKLOG.md) | DEFERRED | MED | TOOL-dWellOiledMachine-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dWellOiledMachine-128](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE PERIOD KEY HAS NO MONTH AND NO LANDING COUNT. derive_period knows… |
+| [TOOL-dWellOiledMachine-129](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | TWO STALL AND LOOP CLASSES HAVE NO WRITER. cl-dClosedLoop-0473 trends… |
 | [TOOL-dWitnessedBar-31](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | MED | TOOL-dWitnessedBar-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dWitnessedBar-32](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-22 | 2026-10-25 | THE enforces EDGE ROW OMITS principle. PLAY-dOrderedCharter-7 S2 admits… |
 | [TOOL-dWitnessedBar-33](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-22 | 2026-10-25 | THE DOSSIERS' gate-legs CLAIMS AND THE LEGS' tests EDGES ARE ONE FACT… |

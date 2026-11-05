@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-8 — the not-in-view cause on every confirmed finding, and the Loop Review's 38-finding reading of its share
 
-**Status:** DEFERRED · rev-3 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 14 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-6 · 2026-11-04 · node a · Tier-2 · base 8bec4cef · streams tooling · order 14 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0465@f1db8527 whole
 
@@ -9,13 +9,28 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-8-deviation-81.md](../build/2026-11-02-build-TOOL-dCalibratedLens-8-deviation-81.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md) | journal | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
 | [2026-11-03-build-TOOL-dCalibratedLens-8-deviation-82.md](../build/2026-11-03-build-TOOL-dCalibratedLens-8-deviation-82.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-8-deviation-83.md](../build/2026-11-03-build-TOOL-dCalibratedLens-8-deviation-83.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-8-deviation-84.md](../build/2026-11-03-build-TOOL-dCalibratedLens-8-deviation-84.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-8-deviation-85.md](../build/2026-11-03-build-TOOL-dCalibratedLens-8-deviation-85.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-8-deviation-86.md](../build/2026-11-03-build-TOOL-dCalibratedLens-8-deviation-86.md) | deviation | — |
+| [2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md](../build/2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-24 |
+| [2026-11-04-build-TOOL-dCalibratedLens-8-deviation-87.md](../build/2026-11-04-build-TOOL-dCalibratedLens-8-deviation-87.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-48 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md](../prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-24 |
 | [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
+| [2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md](../reviews/2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-46 |
 
 <!-- /gen:spec-records -->
 
@@ -35,7 +50,8 @@ Review's reading of its share.
 ## 2. Scope (IN)
 
 Build-run preconditions, each specced and unbuilt at base `8bec4cef`: TOOL-dFairHearing-8 S8 (the
-appendix's `disposition` column), TOOL-dDeclaredLoop-20 S6 (`review.dispose`'s module
+appendix's `disposition` column), TOOL-dFairHearing-12 S2 (the appendix parser moved into
+`tools/workflows/replay_scorer.py`), TOOL-dDeclaredLoop-20 S6 (`review.dispose`'s module
 `tools/loop/review_dispose.py` and its DISPOSAL-stage call), TOOL-dFurnishedOrders-4, -12 and -17 (the
 work order's slot blocks, its `map` slot and its `code` slot), TOOL-dCalibratedLens-3 (the Loop Review's
 `METRICS` table, its `file` and `record` verbs and the `loop-review` record) and TOOL-dCalibratedLens-5
@@ -45,8 +61,11 @@ work order's slot blocks, its `map` slot and its `code` slot), TOOL-dCalibratedL
   column, `cause`, after the last column of a review record's `## Appendix — every finding` table, which
   at this unit's pass is `units` (TOOL-dCalibratedLens-5 S2, after TOOL-dFairHearing-8 S8's
   `disposition`): one cell per row, the derived cause for a confirmed row and `-` for every other. The
-  rows are read through `parse_appendix_rows` (`tools/workflows/review_replay.py:151`), the kit's one
-  appendix parser. Without `--write` it prints the cells; with it, it rewrites the record through a
+  rows are read through `parse_appendix_rows`, the kit's one appendix parser, at base
+  `tools/workflows/review_replay.py:151` and moved "into the factory unedited",
+  `tools/workflows/replay_scorer.py`, with `extract_line_ref`, `extract_subject_pins`,
+  `read_record_kind` and the constants they read, `LINE_REF` among them (TOOL-dFairHearing-12 S2);
+  every `review_replay.py` line cited below is that base line of a moved name. Without `--write` it prints the cells; with it, it rewrites the record through a
   temp file and `os.replace`, contained under the record's `reviews/` folder. A record that already
   carries `cause` has its column re-derived in place, never a second one. Observed by AC1, AC5 and AC7.
 - **S2** — The address the fix needs: every path tracked at the reviewed revision that a confirmed row
@@ -56,9 +75,11 @@ work order's slot blocks, its `map` slot and its `code` slot), TOOL-dCalibratedL
 - **S3** — The author's view: every path tracked at the reviewed revision spelled in the authors' work
   orders, the committed handoff files under `<MEMORY_ROOT>/builds/<slug>/prompts/` whose marker names the
   record's build, an authoring role (`gov-spec-writer` for a spec-audit, `gov-builder` for a
-  diff-review) and a `unit=` that is one of the record's served ids or `-`. A work order is the rendered
-  union of the slices, the `map` slot and the `code` slot it hands (TOOL-dFurnishedOrders-4 S1), so its
-  paths are the slice manifest, the map and the code slot together (§8 F2). The orders are listed by a
+  diff-review) and a `unit=` that is one of the record's served ids or `-`. A work order renders the slices
+  and a block per `ORDER_SLOTS` point it carries, nine with `map` and `code` among them
+  (TOOL-dFurnishedOrders-4 S1), so its paths are every path it spells: the slice manifest, the map, the
+  code slot and the other slots' bodies, the `bug-classes` slot's class paths among them (§8 F2, §5
+  risks). The orders are listed by a
   new verb, `python tools/roles/handoff.py orders --build <slug> --role <name> [--unit <id>]`, which
   reads each file's marker through `MARKER_RE` (`tools/roles/roles_lib.py:79-80`) and prints one path per
   line. Observed by AC3 and AC6.
@@ -95,8 +116,11 @@ work order's slot blocks, its `map` slot and its `code` slot), TOOL-dCalibratedL
 ## 3. Non-goals (OUT)
 
 - The map itself, its renderer and its slot: TOOL-dTotalRecall-14 and TOOL-dFurnishedOrders-12. The
-  map's pre-build losing test: TOOL-dTotalRecall-17, whose `lose` files the slice-manifest-only ask here;
-  S3 already computes the cause without the map, so on `lose` every cell reads `/no-map` and S7 proposes
+  map's pre-build losing test: TOOL-dTotalRecall-17, whose S7 on `lose` asks this build "to compute its
+  not-in-view cause from the slice manifest alone". This unit does not serve that ask, a departure:
+  S3's view drops only the map slot when no map is built and still counts the `code`, `bug-classes` and
+  other `ORDER_SLOTS` slots' paths, which is not the slice manifest alone. The ask, once filed, is
+  answered against S3 by the unit that takes it. On `lose` every cell still reads `/no-map`, so S7 proposes
   nothing, there being no map to retire.
 - Writing `memory.project-map`. The owner writes it through the guarded policy command on the proposal
   (the brief's S8).
@@ -125,7 +149,7 @@ work order's slot blocks, its `map` slot and its `code` slot), TOOL-dCalibratedL
 | 5 | reuse | tools/x.py:30 | low | low | refuted | ... | - | - | - | - | - |
 ```
 
-`review_replay.py` finds columns by header name (its docstring, `:20-22`), so the appended column moves
+`parse_appendix_rows` finds columns by header name (`review_replay.py`'s docstring, `:20-22`), so the appended column moves
 none of its reads, and `review_dispose.py classes` reads `disposition` by name as well
 (TOOL-dDeclaredLoop-20 §4). The cell grammar is `^(in-view|not-in-view|unaddressed|unread)/(map|no-map)$`
 or `-`, held in one constant, `CAUSE_CELL_RE`, which `fill` writes through and `share` reads through.
@@ -184,12 +208,12 @@ names; the unit it names owns the finding and its proof.
   main loop after unit 1, the build's last guard-path editor, and before the close bar
   (TOOL-dCalibratedLens-23 S1).
 - **id 33 · S1, Files touched, Inventory (M16, `TOOL-dCalibratedLens-30`)** — `parse_appendix_rows`
-  is factored in `tools/workflows/review_replay.py`: a new `read_appendix_table(text)` returns every
+  is factored in `tools/workflows/replay_scorer.py`, where TOOL-dFairHearing-12 S2 moves it: a new `read_appendix_table(text)` returns every
   row with its header and its line span, and `parse_appendix_rows` keeps its confirmed-only filter
   and its count liveness check on top of it. `fill` rewrites the table through
   `read_appendix_table`, so a refuted or unverified row gets its `-` cell and a record with no
   stated count still gets the column. The Files touched line saying this unit writes none of
-  `review_replay.py` is withdrawn, and `read_appendix_table` joins the Inventory.
+  the parser's module is withdrawn, and `read_appendix_table` joins the Inventory.
 
 ### Amendments (round-3 spec audit)
 
@@ -205,15 +229,14 @@ findings below, and its disposal amended this text. Its ids restart at 1, so eac
 
 ### Files touched (estimate)
 
-- `tools/workflows/review_cause.py` (new: S1, S2, S4, S6; it imports `review_replay.py` within the kit
-  and writes none of it)
+- `tools/workflows/review_cause.py` (new: S1, S2, S4, S6; it imports `replay_scorer.py` within the kit)
 - `tools/workflows/unattended-build.template.js` and its render `tools/workflows/unattended-build.js` (S5)
 - `tools/workflows/README.md` (S8)
 - `tools/roles/handoff.py` (S3, the `orders` verb)
 - `tools/roles/README.md` (S8)
 - `tools/loop/loop_review.py` (S7, the field and the proposal)
 - `help/spec-audit.md` (S8)
-- `tools/workflows/review_replay.py` — `read_appendix_table` (id 33)
+- `tools/workflows/replay_scorer.py` — `read_appendix_table` (id 33)
 
 ## 5. Production-readiness checklist
 
@@ -228,9 +251,10 @@ findings below, and its disposal amended this text. Its ids restart at 1, so eac
   `not-in-view none · of 0 · window 38`.
 - observability — the cause sits in the committed record beside the disposition, so any node reads it.
 - risks — the view is the union of the build's authoring work orders, not the one author's whose work
-  the finding is about, so `in-view` is over-read and the share is a lower bound; the 38-finding reading
-  compares the share against the research's own figure, and a consistent bias in the instrument is
-  accepted rather than modelled (`ponytail:` ceiling: per-unit join through the run-state's recorded
+  the finding is about, and every slot's paths count in it, the `bug-classes` slot's class paths among
+  them (TOOL-dFurnishedOrders-4 S3), so a finding addressed at one reads `in-view`: `in-view` is over-read and the share is a lower
+  bound; the 38-finding reading compares the share against the research's own figure, and a consistent
+  bias in the instrument is accepted rather than modelled (`ponytail:` ceiling: per-unit join through the run-state's recorded
   dispatch write sets, the upgrade when a review shows the union hiding a fall). Authoring agents
   started without a committed work order, as a harness's SPEC stage starts them today, read `unread`.
 - testing — each criterion is a probe or a fixture of this unit's code; the arms in §7 are observed RED
@@ -308,7 +332,7 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC8 · the DISPOSAL 
   delegated): (a), rung 3, the most feature-rich survivor; the departure is
   `2026-11-02-build-TOOL-dCalibratedLens-8-deviation-81.md`. widens: none · relaxes: none
 - **F3 — Where does the computation live?** The appendix parser is the review kit's
-  (`review_replay.py`) and `review.dispose`'s module is the loop kit's (`tools/loop/review_dispose.py`).
+  (`tools/workflows/replay_scorer.py`, after TOOL-dFairHearing-12 S2's move) and `review.dispose`'s module is the loop kit's (`tools/loop/review_dispose.py`).
   Options: (a) a review-kit module importing the parser within its kit, run by `review.dispose`; (b) a
   `cause` verb on `review_dispose.py`, which would need a second appendix parser, a kit importing no
   sibling. RESOLVED (agent, 2026-11-02, delegated): (a), rung 3, reuse of the one parser. widens: none · relaxes: none
@@ -331,12 +355,25 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC8 · the DISPOSAL 
 - rev-3 · 2026-11-03 · §4 · amended at the disposal of the round-3 spec audit
   `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`, §4 "Amendments (round-3 spec audit)": r3 id
   3 (`TOOL-dCalibratedLens-48`), the guard-path edit owing the seed nothing.
+- rev-4 · 2026-11-03 · §2 §4 §5 §10 S1 S3 · re-grounded against the parents' specs, the work order's
+  view every `ORDER_SLOTS` slot's paths with §5's over-read risk widened, and the appendix parser and
+  `read_appendix_table` in `replay_scorer.py` after TOOL-dFairHearing-12 S2's move, by the brief
+  prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md (cross-check rows 76, 80)
+- rev-5 · 2026-11-03 · §3 · re-grounded against dTotalRecall's and dDeclaredLoop's specs, the claim
+  that S3 already serves TOOL-dTotalRecall-17 S7's slice-manifest-only ask withdrawn and named a
+  departure, S3's view on `lose` dropping only the map slot, by the brief
+  prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md (cross-check row 69)
+- rev-6 · 2026-11-04 · §4 §8 F3 · the cross-check folds' spec audit disposed, F3 and the rejected
+  cause-verb alternative home the appendix parser in `replay_scorer.py` after TOOL-dFairHearing-12
+  S2's move, `review_replay.py` kept only as the base line of the moved name, by the brief
+  prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md (review
+  2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit, items L7)
 
 ## 10. Reuse audit
 
 The seams extended are the review kit's appendix parser `parse_appendix_rows`, `read_record_kind`,
 `extract_line_ref` and `extract_subject_pins` (`tools/workflows/review_replay.py:151`, `:118`, `:87`,
-`:127`), imported within the kit; the handoff marker's one pattern `MARKER_RE`
+`:127` at base, in `replay_scorer.py` after TOOL-dFairHearing-12 S2), imported within the kit; the handoff marker's one pattern `MARKER_RE`
 (`tools/roles/roles_lib.py:79-80`), behind a new `orders` verb beside `roster`
 (`tools/roles/handoff.py:956`); and the harness's appendix columns (`renderAppendix`,
 `tools/workflows/tier2-review.template.js:1638-1644`), extended after TOOL-dFairHearing-8's tenth. `python
@@ -355,5 +392,6 @@ Recall terms used: `python tools/memory-recall/query.py "where is a confirmed fi
 - **The cause from transcripts** (F2 c). Rejected by reading runlog's extract store
   (`tools/runlog/extract.py:266`, `resolve_session_tree`): it is the user profile's, on one node.
 - **A cause verb on `review_dispose.py`** (F3 b). Rejected by reading TOOL-dGroundRules-1 §4's rule that a
-  kit imports no sibling kit, and `review_replay.py`'s docstring (`:10-23`), which makes its parser the one
-  that must reproduce a record's stated confirmed count.
+  kit imports no sibling kit, and the one appendix parser, `parse_appendix_rows` in `replay_scorer.py`
+  after TOOL-dFairHearing-12 S2's move, which `review_replay.py`'s docstring at base (`:10-23`) makes
+  the parser that must reproduce a record's stated confirmed count.

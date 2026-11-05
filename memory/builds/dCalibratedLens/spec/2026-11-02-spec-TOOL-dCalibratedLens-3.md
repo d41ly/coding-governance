@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-3 — the Loop Review: a cadence step run as `review.loop.cadence` says, its lease keyed by the selected period, its walk and its record
 
-**Status:** DEFERRED · rev-4 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 2 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-7 · 2026-11-04 · node a · Tier-2 · base 8bec4cef · streams tooling · order 2 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0460@401ecbd8 whole
 **Carries:** node:record-kind.loop-review
@@ -15,14 +15,34 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md) | journal | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-crosscheck-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-crosscheck-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
 | [2026-11-03-build-TOOL-dCalibratedLens-3-deviation-32.md](../build/2026-11-03-build-TOOL-dCalibratedLens-3-deviation-32.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-3-deviation-33.md](../build/2026-11-03-build-TOOL-dCalibratedLens-3-deviation-33.md) | deviation | — |
 | [2026-11-03-build-TOOL-dCalibratedLens-3-deviation-34.md](../build/2026-11-03-build-TOOL-dCalibratedLens-3-deviation-34.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-3-deviation-35.md](../build/2026-11-03-build-TOOL-dCalibratedLens-3-deviation-35.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-3-deviation-36.md](../build/2026-11-03-build-TOOL-dCalibratedLens-3-deviation-36.md) | deviation | — |
+| [2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md](../build/2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-24 |
+| [2026-11-04-build-TOOL-dCalibratedLens-3-deviation-37.md](../build/2026-11-04-build-TOOL-dCalibratedLens-3-deviation-37.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-15 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-48 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-3-1-spec-reviewer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-3-1-spec-reviewer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-3-2-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-3-2-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-3-3-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-3-3-spec-writer.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md](../prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-24 |
+| [2026-11-04-prompt-TOOL-dCalibratedLens-3-1-spec-writer.md](../prompts/2026-11-04-prompt-TOOL-dCalibratedLens-3-1-spec-writer.md) | journal | — |
 | [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
+| [2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md](../reviews/2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-46 |
 
 <!-- /gen:spec-records -->
 
@@ -41,14 +61,14 @@ Build-run preconditions, each specced and unbuilt at base `8bec4cef`: TOOL-dCali
 `read_loop_policy`, `derive_loop_window`, `price` and the home `loop-review/`); TOOL-dWellOiledMachine-59
 S1 to S3 (`point.cadence-items`, `check_cadence_row`, the tick) and -13 S5, S6 (`derive_period`,
 `run_cadence_period`), with asks TOOL-dTendedCadence-27 (`GOV_CADENCE_KEY`), TOOL-dTendedCadence-29
-(`period-key`) and TOOL-dTendedCadence-30 (the `session-start` host) and this unit's ask of §8 F2;
+(`period-key`) and TOOL-dTendedCadence-30 (the `session-start` host) and TOOL-dWellOiledMachine-128 (§8 F2);
 TOOL-dDeclaredLoop-12 (the item rows, `check_program`, `order_by_needs` and its inline `needs_graph_py`
-block); TOOL-dWellOiledMachine-27 S1 (`intake.py file --origin cadence`); TOOL-dTotalRecall-1 (the
+block) with ask TOOL-dDeclaredLoop-110 (§8 F5), each ask filed in its build's `BACKLOG.md`; TOOL-dWellOiledMachine-27 S1 (`intake.py file --origin cadence`); TOOL-dTotalRecall-1 (the
 registry); DEPL-dShippedRelease-1 (the landing records `every-n-landings` counts). The build run
 re-grounds on each and stops the unit when one is absent.
 
-- **S1** — (amended, id 26) The rows. Four `[[item]]` rows in `tools/loop/loop.toml`, in TOOL-dDeclaredLoop-12's data
-  model, `step = "cadence.loop"`, `owner = "dCalibratedLens"`, as §4 "The items" tabulates:
+- **S1** — (amended, id 26) The rows. Four `[[item]]` rows in `tools/loop/loop.toml`, in TOOL-dDeclaredLoop-12 §4's row
+  form, `step = "cadence.loop"`, `owner = "dCalibratedLens"`, as §4 "The items" tabulates:
   `item.loop.lease`, `item.loop.gather`, `item.loop.file` and `item.loop.record`. This unit re-points
   unit 2's `item.loop.price` row: `needs = ["item.loop.gather"]` and `routes = { priced =
   "item.loop.file" }`; unit 5 inserts `item.loop.propose` between them. Observed by AC7.
@@ -60,7 +80,10 @@ re-grounds on each and stops the unit when one is absent.
   handed the outcomes routed to it, and prints `loop — <key> · <item tag> · <outcome>`; the walk exits 0
   once `item.loop.record` has run, and exits 1 when an item raises or refuses, so `run_cadence_period`
   releases the lease as a hand-over and the next wake runs the period again
-  (TOOL-dWellOiledMachine-13 S6 step 5). This is TOOL-dTendedCadence-1 S2's walk over another step's rows.
+  (TOOL-dWellOiledMachine-13 S6 step 5). It keeps no re-run journal, the one TOOL-dTendedCadence-48 S28
+  gives Maintain's walk: the record is checked before the first filing (TOOL-dCalibratedLens-27 S1), so a
+  re-run after a filing follows a failed final write and re-files each proposal as one `seen` receipt on
+  the intake already open, never a second intake.
   Observed by AC7.
 - **S3** — `loop.lease`, `read_loop_key(root)`. Its actor is the executor: `run_cadence_period` takes
   `refs/gov/leases/run/loop-review/<period>` before it runs the walk and releases it after, so a held or
@@ -75,8 +98,8 @@ re-grounds on each and stops the unit when one is absent.
   "review.loop.cadence"`, `landings = 21`, `run = ["python", "tools/loop/loop_review.py", "run"]`,
   `events = []`, with the grant, tenancy, retention and region fields the point's rows carry. The
   observability expansion's one host key is `maintain.host` (§8 F1). The tick derives the period from
-  the key's value through `derive_period`, whose `monthly` and `every-n-landings` forms are this unit's
-  ask of §8 F2. Observed by AC1 and AC2.
+  the key's value through `derive_period`, whose `monthly` and `every-n-landings` forms are ask
+  TOOL-dWellOiledMachine-128 (§8 F2). Observed by AC1 and AC2.
 - **S5** — (amended, ids 2, 49) `loop.gather`, `measure_loop_metrics(root, window)`: each entry of `METRICS`, a list of
   `(name, reader)` pairs, read over the one window `derive_loop_window` returns, each answering `(value,
   source)` and a reader whose source holds nothing answering `searched-none` with the path or glob it
@@ -108,8 +131,14 @@ re-grounds on each and stops the unit when one is absent.
   before a path is built. The walk commits nothing: it files one records-only intake, `intake.py file
   --origin cadence --filer item.loop.record`, its stable text the record's and the snapshot's content as
   JSON, so the patch build that takes it re-writes both with `python loop_review.py record --key <key>
-  --base <sha>`, the JSON on stdin, and lands them, as TOOL-dTendedCadence-1 S6 lands a maintenance
-  record. Observed by AC6.
+  --base <sha>`, the JSON on stdin, and lands them; the commit landing the first period's record and its
+  snapshot also edits both the `loop-review` row and unit 2's `value-ledger` row to carry no `unarmed`
+  key (TOOL-dTotalRecall-42 S2), which AC8 observes on both. The JSON is never cut: the pre-render
+  (TOOL-dCalibratedLens-27 S1) builds it with every route `pending`, the longest route word, and over
+  `INTAKE_CAP_BYTES` (65536, TOOL-dWellOiledMachine-4 S2) exits 1, `loop — refused: record text <n>
+  bytes over INTAKE_CAP_BYTES`, filing nothing. A span `render_redacted` replaces lands as its
+  placeholder, and no digest covers the text (TOOL-dTendedCadence-49 rejects the JSON for its digest);
+  `record` exits 2 on stdin that is not JSON. Observed by AC6 and AC10.
 - **S9** — (amended, ids 1, 36, 37) The registry row `loop-review` in `tools/memory-tree/record-kinds.toml`, §4 "The registry
   row". Observed by AC8.
 - **S10** — The catalogue rows `review.loop.cadence` (`tools/policy/catalogue.toml:1283-1287`) and
@@ -200,6 +229,18 @@ TOOL-dTendedCadence-2's `<event>.<sha12>` keys do).
 | `item.loop.file` | `command:loop.file` | `item.loop.price` | `filed` → `item.loop.record` | one intake per (ledger kind, id) |
 | `item.loop.record` | `command:loop.record` | `item.loop.file` | `recorded` → `transition` | the record |
 
+Each of the four rows also carries the keys TOOL-dDeclaredLoop-12 §4 requires of a non-role actor
+(TOOL-dDeclaredLoop-9 S1, S4), in the form unit 2 S9 uses: `returns = "record-kind.loop-review"`;
+`allowance = "none"` on `lease` and `gather` and `allowance = "records"` on `file` and `record`, each one
+word of `WRITES` (`tools/roles/check_roles.py:96`); and `witness = { class = "<class>", by = "<the
+table's Witness cell>" }`. The class is `history` on `lease` (a ref), `gather` and `record` (a tracked
+file), and `hook-record` on `file`: its intake is node-local and never committed
+(TOOL-dWellOiledMachine-4 S1), so it is no `history` fact, and it is written through that hook's one
+writer `write_intake` (TOOL-dWellOiledMachine-27 S1), the class TOOL-dDeclaredLoop-5's table gives a
+record a hook writes. `inputs` is `["layer.runtime:GOV_CADENCE_KEY"]` on `lease`, and
+`["layer.observability:<what it reads>"]` on the others: the `METRICS` sources, the proposals, the walk's
+readings. `python loop_lib.py --check` passes the four rows (AC7).
+
 ### The record
 
 ```markdown
@@ -270,8 +311,10 @@ names; the unit it names owns the finding and its proof.
   `home = "memory/loop-review/*-loop-review-*.md"`, the glob of the row's id-rule, as
   TOOL-dTotalRecall-42 S1 spells the shape-run home.
 - **id 36 · §4 "The record" (H2, `TOOL-dCalibratedLens-20`)** — The record's third line is
-  `**Serves:** loop-review TOOL-dCalibratedLens-3`, and `loop-review` joins `TYPED_RECORD_KINDS` in
-  `tools/memory-tree/tree_lib.py` and HYGIENE's closed `<kind>` list in this pass.
+  `**Serves:** loop-review TOOL-dCalibratedLens-3`, and `loop-review` joins the untyped part of
+  `RECORD_KIND_TOKENS` in `tools/memory-tree/tree_lib.py` (TOOL-dTotalRecall-18 S7), an untyped kind as
+  TOOL-dTotalRecall-1 S2 registers them, and HYGIENE's closed `<kind>` list in this pass: PLAY-dOrderedCharter-42
+  S2 and S3 tie `TYPED_RECORD_KINDS` to the factory's table and its `-<kind>-<n>.md` name.
 - **id 2 · S5, §4 "The record" (H3, `TOOL-dCalibratedLens-21`)** — A `METRICS` reader may answer a
   single pair or a reader answering a LIST of `(value, source)` pairs, each written as its own
   Metrics line `<name>: <value> · <source>` in list order; a reading never adds a `fields`-form
@@ -306,10 +349,12 @@ names; the unit it names owns the finding and its proof.
   TOOL-dTendedCadence-25 as the upgrade (§8 F5).
 - **id 26 · S1, §8 F5 (M10, `TOOL-dCalibratedLens-30`)** — §8 gains F5, which places the rows
   against TOOL-dTendedCadence-1 F1 and ask TOOL-dTendedCadence-25, and states the ask on
-  dDeclaredLoop that admits `cadence.loop`.
+  dDeclaredLoop that admits `cadence.loop`, filed as TOOL-dDeclaredLoop-110.
 - **id 37 · §4 "The registry row", AC8 (M17, `TOOL-dCalibratedLens-30`)** — The row carries
-  `unarmed = "no record is tracked until the first period's record lands"`, and AC8 also runs
-  `python tools/memory-tree/record_kinds.py --check` after the pass: exit 0.
+  `unarmed = "no record yet; its writer is loop_review.py record"` (TOOL-dTotalRecall-42 S2). The
+  commit that lands S8's first record and its snapshot drops `unarmed` from both the `loop-review` and
+  the `value-ledger` rows, and AC8 observes both drops; AC8 also runs `python tools/memory-tree/record_kinds.py --check` after the
+  pass: exit 0.
 - **id 38 · Files touched, §7 (M18, `TOOL-dCalibratedLens-30`)** — After the row edit the pass runs
   `python tools/memory-tree/record_kinds.py --write`, then `adopt-memory-tree.sh --render`;
   `tools/memory-tree/HYGIENE.template.md` and `memory/HYGIENE.md` land in the same commit.
@@ -379,7 +424,7 @@ findings below, and its disposal amended this text. Its ids restart at 1, so eac
 - `tools/memory-tree/record-kinds.toml`: the row (S9)
 - `tools/policy/catalogue.toml` and `tools/policy/unsummarised-keys.txt` (S10)
 - `help/loop-review.md` (S11)
-- `tools/memory-tree/tree_lib.py` — `TYPED_RECORD_KINDS` gains `loop-review` (id 36)
+- `tools/memory-tree/tree_lib.py` — `RECORD_KIND_TOKENS`' untyped part gains `loop-review` (id 36)
 - `tools/memory-tree/HYGIENE.template.md` and its render `memory/HYGIENE.md` — the kind list and the re-rendered registry region (ids 36, 38)
 - `tools/govkit/usage.toml` — the `[[usage]]` row of each verb or flag added (id 39)
 
@@ -405,7 +450,7 @@ findings below, and its disposal amended this text. Its ids restart at 1, so eac
 - perf / scale — once per period across the fleet, by the lease; gather is three file reads and one
   glob of review records, price unit 2's cost.
 - error / empty / loading states — no key: exit 2 naming the route; a key of another form: exit 2; no
-  review record in the window: `searched-none`; no proposal: the zero line; fewer than `n` landings: not
+  review record in the window: `searched-none`; a record text over `INTAKE_CAP_BYTES`: exit 1, nothing filed; no proposal: the zero line; fewer than `n` landings: not
   due.
 - observability — one line per item; the record is the period's history, the lease record its witness.
 - risks — `maintain.host`'s default `session-start` runs the review at session start; under
@@ -449,16 +494,25 @@ findings below, and its disposal amended this text. Its ids restart at 1, so eac
 - **AC7** — When `python loop_review.py run --check` runs over the tree, it prints `loop — 5
   item(s) · ok`; `run --dry-run --key 2026-W45` in the fixture prints the items in the order lease,
   gather, price, file, record, each with its outcome; the plant `dangling-route`, a route naming no row,
-  exits 2 naming it.
-  Red when: the walk runs out of `needs` order, or a dangling route passes.
+  exits 2 naming it; `python loop_lib.py --check` over the tree exits 0, refusing none of the four rows.
+  Red when: the walk runs out of `needs` order, a dangling route passes, or a row's allowance is not a
+  word of `WRITES` or its witness carries no class.
+  permission: `loop_lib.py` is TOOL-dDeclaredLoop-12's, built with ask TOOL-dDeclaredLoop-110 before this unit's build run.
 - **AC8** — (amended, id 37) When `grep -n 'name = "loop-review"' record-kinds.toml` and `grep -n -A8
   'name = "review.loop.cadence"' tools/policy/catalogue.toml` run, the first prints the row and the second
   shows `summary` and `usage`; `grep -cxE 'review\.loop\.(cadence|window-days)'
-  tools/policy/unsummarised-keys.txt` prints `0`.
-  Red when: either row lacks a field, or a name stays undrained.
+  tools/policy/unsummarised-keys.txt` prints `0`; in a scratch worktree committing one record and one
+  snapshot, `record_kinds.py --check` exits 1 naming `unarmed` while either the `loop-review` or the
+  `value-ledger` row keeps the key, and 0 only once that commit drops it from both.
+  Red when: either row lacks a field, a name stays undrained, or the key outlives the first record on
+  either row.
 - **AC9** — When `grep -n 'every-n-landings' loop-review.md` runs, it prints the section's line
   naming the period key form and the `landings` field.
   Red when: the section is absent.
+- **AC10** — When the plant `over-cap`, a planted ledger whose snapshot is over 64 KiB, runs `run` with
+  `GOV_CADENCE_KEY=2026-W45` and a counting stub for the intake filer, it exits 1 printing `over
+  INTAKE_CAP_BYTES`, and the stub's count reads 0.
+  Red when: a text over the cap is filed, and cut.
 
 ## 7. Gates
 
@@ -466,7 +520,7 @@ findings below, and its disposal amended this text. Its ids restart at 1, so eac
 
 The fixture cases run in unit 2's leg `loop-review selftest`, which the manifest does not hold at base.
 
-New arm: tools/loop/loop_review.py · covers AC1 AC3 AC4 AC5 AC6 AC7 · the `--fixture` plants, staged red by a key check that accepts any form, a gather that reads its own window, a filer whose text carries the period, and a walk that runs rows in file order · none
+New arm: tools/loop/loop_review.py · covers AC1 AC3 AC4 AC5 AC6 AC7 AC10 · the `--fixture` plants, staged red by a key check that accepts any form, a gather that reads its own window, a filer whose text carries the period, a record text filed at any length, and a walk that runs rows in file order · none
 
 ## 8. Open questions
 
@@ -480,15 +534,10 @@ New arm: tools/loop/loop_review.py · covers AC1 AC3 AC4 AC5 AC6 AC7 · the `--f
   `weekly`, and the clause asks every value seen on its planted case. (a) Ask dWellOiledMachine for both
   forms of §4 "The periods", `n` a row field `landings`; (b) literal rows that exit when the key names
   another, which certify empty periods (§4); (c) the program deriving its own period, which can disagree
-  with its lease. Rung 3, (a) the only option keeping one period per lease. RESOLVED (agent, 2026-11-02,
-  delegated): (a), a new ask the main loop files · dWellOiledMachine · THE PERIOD KEY HAS NO MONTH AND NO
-  LANDING COUNT: `derive_period` gains `monthly`, the UTC `YYYY-MM` of `at`, and `every-n-landings`,
-  `n<k>.<sha12>` over the landing records (DEPL-dShippedRelease-1) on the default branch's first-parent
-  chain, `n` the cadence row's `landings` field, which `check_cadence_row` admits as a positive integer
-  on a row whose `period-key` admits `every-n-landings`, and fewer than `n` landings is not due · accept
-  the tick over a `period-key` row prints `2026-11` under `monthly` at `2026-11-02T09:00:00Z`, and under
-  `every-n-landings` with `landings = 2` over five landing records `n2.` and the fourth's sha12, seen on
-  three plants. Build-run precondition. widens: none · relaxes: none
+  with its lease. Rung 3, (a) the only option keeping one period per lease. RESOLVED (agent, 2026-11-03,
+  delegated): (a), ask TOOL-dWellOiledMachine-128 in `memory/builds/dWellOiledMachine/BACKLOG.md`, THE
+  PERIOD KEY HAS NO MONTH AND NO LANDING COUNT, whose row holds the forms and the accept. Build-run
+  precondition. widens: none · relaxes: none
 - **F3 — What is `n`?** No record states it: the owner's R1 answer is "Weekly by default,
   owner-adjustable" (walkthrough:735). (a) A row field set from the measured landings per week, 21 at
   base (PINNED, 2026-11-02), so the value's default cadence matches the key's default and the owner edits
@@ -506,12 +555,9 @@ New arm: tools/loop/loop_review.py · covers AC1 AC3 AC4 AC5 AC6 AC7 · the `--f
   `tools/loop/loop.toml`, beside the module `tools/loop/loop_review.py` the brief's shared interface S3 places in the
   loop kit, with an ask on dDeclaredLoop to admit `cadence.loop`; (c) a `[[step]]` row `cadence.loop`, a public surface
   no clause names (veto 2). (a) has no kit to hold the rows: the Loop Review's module is the loop kit's and no
-  observability kit exists, a new install location (veto 2). Rung 3, spec audit id 26. RESOLVED (agent, 2026-11-02,
-  delegated): (b), a new ask the main loop files · dDeclaredLoop · THE LOOP KIT REFUSES A CADENCE STEP VALUE:
-  `check_program` admits `step = "cadence.loop"` on `item.loop.*` rows in the form TOOL-dDeclaredLoop-50 S3 admits
-  `step = "none"`, and grades a cadence program with no `[[step]]` exit row as ask TOOL-dTendedCadence-25 asks ·
-  accept `loop_lib.py --check` passes the `item.loop.*` rows and still refuses a planted `item.loop.*` row whose need
-  names no row. A build-run precondition of unit 2's AC8 and of S2. widens: none · relaxes: none
+  observability kit exists, a new install location (veto 2). Rung 3, spec audit id 26. RESOLVED (agent, 2026-11-03,
+  delegated): (b), ask TOOL-dDeclaredLoop-110 in `memory/builds/dDeclaredLoop/BACKLOG.md`, THE LOOP KIT REFUSES A
+  CADENCE STEP VALUE, whose row holds the accept. A build-run precondition of unit 2's AC8 and of S2. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -531,14 +577,29 @@ New arm: tools/loop/loop_review.py · covers AC1 AC3 AC4 AC5 AC6 AC7 · the `--f
   `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`, §4 "Amendments (round-3 spec audit)": r3 id
   11 (`TOOL-dCalibratedLens-43`), the prefix listing; r3 ids 33 and 32 (`TOOL-dCalibratedLens-48`),
   the Metrics section's bounds and the per-entry refusal; §3 gains the hands-off to unit 43.
+- rev-5 · 2026-11-03 · §5 §6 §7 §10 S2 S8 · re-grounded against the parents' specs, the walk no longer
+  called TOOL-dTendedCadence-1 S2's and why a re-run's `seen` receipt stands, and the record's JSON
+  capped at `INTAKE_CAP_BYTES` with AC10 over 64 KiB, by the brief
+  prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md (cross-check rows 41, 46)
+- rev-6 · 2026-11-03 · §2 §4 §6 §8 S1 S4 S8 AC8 · re-grounded against dTotalRecall's and dDeclaredLoop's
+  specs, the item rows given dl12's non-role keys, F2 and F5 re-marked to name the filed asks
+  TOOL-dWellOiledMachine-128 and TOOL-dDeclaredLoop-110, id 37's `unarmed` naming its writer and dropped
+  by the first record's commit, and `loop-review` bound through `RECORD_KIND_TOKENS`, by the brief
+  prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md (cross-check rows 24, 26, 30, 31)
+- rev-7 · 2026-11-04 · §4 S8 AC7 AC8 · the cross-check folds' spec audit disposed, the four item rows'
+  `allowance` held to `WRITES` and each given a classed `witness`, `loop_lib.py --check` observed by AC7,
+  and the first period's commit dropping `unarmed` from both the `loop-review` and `value-ledger` rows
+  with AC8 committing a snapshot beside the record, by the brief
+  prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md (review
+  2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit, items M1 M5)
 
 ## 10. Reuse audit
 
 The seams extended: unit 2's module and `derive_loop_window`; the cadence row, tick and period witness
 of TOOL-dWellOiledMachine-59 S1 to S3 and -13 S5, S6 with asks TOOL-dTendedCadence-27, -29, -30 and §8
-F2's; the walk TOOL-dTendedCadence-1 S2 gives Maintain, over TOOL-dDeclaredLoop-12's `order_by_needs`;
+F2's; a walk over TOOL-dDeclaredLoop-12's `order_by_needs`, as Maintain's is, without TOOL-dTendedCadence-48 S28's re-run journal (S2);
 `intake.py file --origin cadence` (TOOL-dWellOiledMachine-27 S1) for the asks and the records-only
-landing, as TOOL-dTendedCadence-15 S2 and -1 S6 use it; the record shape and contained atomic write of
+landing, as TOOL-dTendedCadence-15 S2 uses it, where Maintain's record lands through TOOL-dTendedCadence-49 (S8); the record shape and contained atomic write of
 the maintenance record (TOOL-dTendedCadence-6 S6, `tools/runlog/record.py:1179-1201`); the registry of
 TOOL-dTotalRecall-1. The probe `python tools/codebase-map/reuse_lookup.py "run a review program once per
 period under a lease, gather metrics from committed records and write one record per period"` ranked

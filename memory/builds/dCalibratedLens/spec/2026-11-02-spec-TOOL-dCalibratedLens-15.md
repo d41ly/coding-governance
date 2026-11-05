@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-15 — each size breach priced by its bytes and its reads, and a persisting or grown breach raised to the owner
 
-**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 6 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-4 · 2026-11-04 · node a · Tier-2 · base 8bec4cef · streams tooling · order 6 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0472@bf8d8ee5 whole
 
@@ -9,10 +9,21 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-15-deviation-152.md](../build/2026-11-02-build-TOOL-dCalibratedLens-15-deviation-152.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md) | journal | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-03-build-TOOL-dCalibratedLens-15-deviation-153.md](../build/2026-11-03-build-TOOL-dCalibratedLens-15-deviation-153.md) | deviation | — |
+| [2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md](../build/2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-24 |
+| [2026-11-04-build-TOOL-dCalibratedLens-15-deviation-154.md](../build/2026-11-04-build-TOOL-dCalibratedLens-15-deviation-154.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-48 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 |
+| [2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md](../prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-24 |
 | [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
+| [2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md](../reviews/2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-46 |
 
 <!-- /gen:spec-records -->
 
@@ -32,7 +43,8 @@ Build-run preconditions, each specced and unbuilt at base `8bec4cef`, re-grounde
 which stops this unit when one is absent: TOOL-dCalibratedLens-2 (the module, `PROVIDERS`, the row
 grammar, `price`), TOOL-dCalibratedLens-3 (`METRICS`, the walk `run_loop_walk`, `run_loop_file` and
 its proposal shape, the record and its home, and the window), the `warned` and `warn.<k>` verdict keys
-(TOOL-dWitnessedBar-29 S7) and the `tree` key (TOOL-dWitnessedBar-4 S1). The verdict record's
+(TOOL-dWitnessedBar-29 S7), the `tree` key (TOOL-dWitnessedBar-4 S1), and the read counter
+`measure_path_reads` with its `reads` verb (TOOL-dTendedCadence-9 S1). The verdict record's
 directory, its `ended`, `verdict`, `skipped` and `reused` keys, and runlog's transcript walker are built
 at base and cited where used.
 
@@ -50,12 +62,12 @@ at base and cited where used.
   `tree` key, else the review's base where the key reads `-` or names no local object. A subject absent
   from that tree is no breach and is dropped with one `ledger — cap · <subject> · absent at <tree8>`
   line. Observed by AC3.
-- **S3** — Reads, the producer the brief found missing. `python runlog.py reads --since <epoch>
-  [--transcripts <dir>] [--entry <path>]... <subject>...`, a new verb of `tools/runlog/runlog.py`,
-  calls `measure_subject_reads(root, repo_key, subjects, since, entry)` in `tools/runlog/extract.py`,
-  beside `measure_ready_tree` (`:1204`) and walking the projects root as it does, through
-  `build_session_tree` (`:238`) and `read_records` (`:308`). It prints one `<subject>\t<n>` line per
-  subject on stdout and one `runlog: reads · <files> transcript file(s) since <iso>` line on stderr,
+- **S3** — Reads, through TOOL-dTendedCadence-9 S1's read counter. This unit extends that verb,
+  `python runlog.py reads [--days <n>] [--projects-root <dir>]`, with `--since <epoch>`, `--entry
+  <path>`... and `<subject>...` arguments, and `measure_path_reads(projects_root, repo_root, since)` in
+  `tools/runlog/extract.py` with an `entry` keyword, per §4 "Reads"; `--since` with `--days` exits 2,
+  and with no subject the verb prints as TOOL-dTendedCadence-9 S1 states. With subjects it prints one
+  `<subject>\t<n>` line per subject on stdout and one `runlog: reads · <files> transcript file(s) since <iso>` line on stderr,
   per §4 "Reads". Nothing of a transcript is printed but the counts: the subjects are the caller's.
   The loop kit runs it as a bounded subprocess (120 s) through `resolve_kit_dir`; a refused run leaves
   every breach's reads `-`. Observed by AC4 and AC5.
@@ -152,15 +164,17 @@ the owner's affordance and the breach is what makes the cost visible.
 
 A read of a subject is one of:
 
-- a `tool_use` block named `Read` or `NotebookRead` whose `file_path` or `notebook_path`, with every
-  `\` folded to `/`, equals the subject or ends with `/<subject>`, in a record at or after `--since`;
+- a `Read` tool call that `measure_path_reads` counts (TOOL-dTendedCadence-9 S1: at or after `since`,
+  its `file_path` inside the repository's top level or one of its worktrees, keyed by the path
+  relative to that tree, forward-slashed), whose key equals the subject;
 - for a subject given as `--entry`, one per transcript file, a session's main file or one of its
   `agent-*.jsonl` files, whose first record is at or after `--since`, since the harness injects the
   entry files into each.
 
 The loop kit passes `--entry CLAUDE.md` and one `--entry` per `@<path>` line of `CLAUDE.md` at the
-review's base (`CLAUDE.md:1` imports `AGENTS.md` at base). The transcripts walked are those under
-`<projects root>/<key>/` whose `<key>` begins with the main checkout's repository key, from
+review's base (`CLAUDE.md:1` imports `AGENTS.md` at base). An injection carries no `file_path`, so
+the `entry` keyword counts the transcript files under `<projects root>/<key>/` whose `<key>` begins
+with the main checkout's repository key, from
 `resolve_projects_root` (`tools/runlog/extract.py:185`) and `resolve_repo_key` (`:230`), so every
 worktree of the clone counts (`ponytail:` a sibling repository whose path extends this one's is
 counted too; matching the key to `git worktree list` is the upgrade).
@@ -192,9 +206,9 @@ what it could not see; the next decided review compares against the last decided
 
 Minted: the functions `read_verdict_warnings`, `read_cap_breaches`, `derive_cap_rows`,
 `read_previous_breaches`, `derive_cap_trends` and `derive_cap_raises` in `tools/loop/loop_review.py`,
-and `measure_subject_reads` in `tools/runlog/extract.py`, each answered OK by `python
-tools/lexicon/lexicon.py --suggest <name> --as py.function` at this base (`count_subject_reads` was
-refused for `measure`); the `reads` verb of `runlog.py`; the `PROVIDERS` key `cap`; the `METRICS`
+each answered OK by `python tools/lexicon/lexicon.py --suggest <name> --as py.function` at this
+base; the `reads` verb's `--since`, `--entry` and subject arguments and `measure_path_reads`'s `entry`
+keyword (TOOL-dTendedCadence-9 S1 mints the verb and the function); the `PROVIDERS` key `cap`; the `METRICS`
 entries `cap-breaches` and `cap-counted`; the cost unit `B`; the proposal action `raise`; the trend words
 `new`, `grown`, `held` and `cleared`; the output lines `ledger — cap · …`.
 
@@ -295,7 +309,7 @@ names; the unit it names owns the finding and its proof.
   bytes read `20912`; when its subject is absent from that tree, the breach is dropped with one
   `ledger — cap · AGENTS.md · absent at` line.
   Red when: bytes are read from the working tree, or an absent subject prices as 0.
-- **AC4** — When `python runlog.py reads --since <epoch> --transcripts <dir> --entry AGENTS.md
+- **AC4** — When `python runlog.py reads --since <epoch> --projects-root <dir> --entry AGENTS.md
   AGENTS.md memory/guides/BUILD-METHOD.md` runs over a planted projects dir, one session of a main
   file and one agent file, both started after `<epoch>`, with two `Read` calls of a backslashed
   absolute path ending in the method guide's path and one before `<epoch>`, it prints `AGENTS.md` `2`
@@ -353,14 +367,17 @@ New arm: tools/runlog/selftest.py · covers AC4 AC5 · a planted projects dir of
   lands. RESOLVED (agent, 2026-11-02, delegated): (a), rung 3, the most feature-rich survivor and a
   reuse of the ancestor's verdict keys; its one-node reach is stated in §3. widens: none · relaxes:
   none
-- **F2 — "Reads" has no producer (the brief's PRIMITIVE GAP); what counts a document's reads?**
-  Options: (a) a runlog verb over the lease holder's transcripts, counting `Read` calls and entry
-  injections and printing counts only (S3); (b) the act count times a declared load set, which no
-  record declares per document; (c) an ask on dWellOiledMachine for a slice manifest per work order
-  (TOOL-dTotalRecall-12 S9 hands it there, unspecced), pricing reads `-` until then. (b) has no source;
-  (c) leaves every row unpriced. RESOLVED (agent, 2026-11-02, delegated): (a), rung 3: runlog already
-  walks the projects root for `extract --ready` (`tools/runlog/runlog.py:512`, `extract.py:1204`), and
-  counts of caller-given paths widen no data surface. widens: none · relaxes: none
+- **F2 — What counts a document's reads?** The producer is TOOL-dTendedCadence-9 S1's `reads` verb
+  and `measure_path_reads` in `tools/runlog/extract.py` (its §8 F5 (a)), which S3 extends with
+  `--since`, `--entry` and subjects. Options: (a) that counter over the lease holder's transcripts,
+  counting `Read` calls and entry injections and printing counts only, as S3 extends it; (b) the act
+  count times a declared load set, which no record declares per document; (c) an ask on
+  dWellOiledMachine for a slice manifest per work order (TOOL-dTotalRecall-12 S9 hands it there,
+  unspecced), pricing reads `-` until then. (b) has no source; (c) leaves every row unpriced.
+  RESOLVED (agent, 2026-11-02, delegated): (a), rung 3: it is the one transcript reader
+  TOOL-dTendedCadence-9 F5 places beside runlog's own walk of the projects root for `extract --ready`
+  (`tools/runlog/runlog.py:512`, `extract.py:1204`), and counts of caller-given paths widen no data
+  surface. widens: none · relaxes: none
 - **F3 — What fills the catch columns of a `cap` row?** RESOLVED (agent, 2026-11-02, delegated): `-`,
   rung 1 of the records: TOOL-dCalibratedLens-2 §4 "The row" keeps `-` in the three catch columns of a
   row its provider returns with `catches` `-`, so a breach, which catches nothing, never reads as a row
@@ -400,19 +417,26 @@ New arm: tools/runlog/selftest.py · covers AC4 AC5 · a planted projects dir of
   `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1 spec
   audit)": ids 49 (`TOOL-dCalibratedLens-27`), and 10, 46, 30, 22, 34 and 39
   (`TOOL-dCalibratedLens-30`); §3 gains the hands-off to unit 30.
+- rev-3 · 2026-11-03 · §2 §4 §6 §10 S3 AC4 · re-grounded against the parents' specs, S3 extends
+  TOOL-dTendedCadence-9 S1's `reads` verb and `measure_path_reads`, a precondition in §2, in place of
+  a verb and reader of its own, and §10 no longer says the read count has no seam, by the brief prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md (cross-check rows 131)
+- rev-4 · 2026-11-04 · §8 F2 · the cross-check folds' spec audit disposed, F2 re-worded to name
+  TOOL-dTendedCadence-9 S1's `reads` verb and `measure_path_reads` (its F5 (a)) as the producer S3
+  extends, its "has no producer" title and PRIMITIVE GAP mark dropped, by the brief
+  prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md (review
+  2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit, items L6)
 
 ## 10. Reuse audit
 
 The seams extended are TOOL-dCalibratedLens-2's `PROVIDERS` and TOOL-dCalibratedLens-3's `METRICS`,
 walk and proposal shape; the runner's verdict record and its run directories
 (`tools/run-gates/run-gates.sh:2721-2722`, the keys at `:5675-5681`) with TOOL-dWitnessedBar-29's
-`warn.<k>` keys read as that spec spells them; runlog's transcript walk, `measure_ready_tree`
-(`tools/runlog/extract.py:1204`) beside which `measure_subject_reads` sits, over `build_session_tree`
-and `read_records`; and `extract --ready`'s CLI shape (`tools/runlog/runlog.py:512`) for the `reads`
-verb. `python tools/codebase-map/reuse_lookup.py "persist a size cap breach and count how often a
+`warn.<k>` keys read as that spec spells them; and TOOL-dTendedCadence-9 S1's read counter,
+`measure_path_reads` and the `reads` verb of `runlog.py`, which S3 extends rather than adding a second
+reader of the session records (TOOL-dTendedCadence-9 §8 F5). `python tools/codebase-map/reuse_lookup.py "persist a size cap breach and count how often a
 document is read"` ranked `read_text`, `read`, `counts`, `read_journal` and `resolve_caps`
 (`tools/policy/budgets.py:206`); `resolve_caps` answers a cap's value and mode and `check_cap` (`:304`)
-its verdict, neither persists a breach, and no seam counts a document's reads, which is why S3 adds one.
+its verdict, and neither persists a breach.
 Where record and source disagree: the brief says no journal class or record carries a breach, and
 research-caps' pick B says a breach "is journaled automatically, keyed by unit"; neither
 TOOL-dWellOiledMachine-16's `JOURNAL_CLASSES` nor TOOL-dWitnessedBar-29 journals one, and its verdict

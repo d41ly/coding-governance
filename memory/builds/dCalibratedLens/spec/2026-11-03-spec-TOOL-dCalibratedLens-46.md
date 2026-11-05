@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-46 — the loop legs' and `tier2-review self-test`'s guards widened in every spelling the leg is declared in, and rendered where the manifest is a render
 
-**Status:** DEFERRED · rev-1 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 20 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-2 · 2026-11-03 · node a · Tier-2 · base 8bec4cef · streams tooling · order 20 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,8 +8,15 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md) | journal | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 |
 | [2026-11-03-build-TOOL-dCalibratedLens-46-deviation-461.md](../build/2026-11-03-build-TOOL-dCalibratedLens-46-deviation-461.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-46-deviation-462.md](../build/2026-11-03-build-TOOL-dCalibratedLens-46-deviation-462.md) | deviation | — |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-47 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-42-promoted-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-42-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md](../reviews/2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 |
 
 <!-- /gen:spec-records -->
 
@@ -56,7 +63,11 @@ states the build run can find, and proves the widening survives. It repairs
   Observed by AC1.
 - **S5** — The `tier2-review self-test` entries, the hook unit 24's arm runs and what it loads:
   `{prefix}/hooks/agent-cap.js`, `{prefix}/policy/policy-mirror.js` (`tools/hooks/agent-cap.js:465`)
-  and `{prefix}/hooks/scratch-guard.js` (`:1465`) (id 28). Observed by AC2.
+  and `{prefix}/hooks/scratch-guard.js` (`:1465`) (id 28). They go beside whatever entries the
+  guard holds at the pass, re-read then and never rewritten from the base list: TOOL-dFairHearing-17
+  S5 adds `{prefix}/unattended/unattended.sh` to it, which the declaration keeps beside the three new
+  entries, in the `[[exempt_leg]]` row in the factory case and the manifest row in the hand case.
+  Observed by AC2.
 
 ## 3. Non-goals (OUT)
 
@@ -83,8 +94,10 @@ states the build run can find, and proves the widening survives. It repairs
   puts every manifest key of a leg in one declaration, an `[[exempt_leg]]` row carrying the whole
   row beside its `why`, and its S2 (`:43-47`) makes `--check` exit 1 on any difference.
 - `tools/govkit/registry.toml:666-668` at base: the `tier2-review self-test` `[[exempt_leg]]` row
-  holds `name` and `why` only, and `tools/gate-legs.json` holds its guard,
-  `{prefix}/workflows/` and `{prefix}/memory-tree/gen_build_index.py`.
+  holds `name` and `why` only, and `tools/gate-legs.json` holds its guard. TOOL-dFairHearing-17 S5
+  adds the driver's path to that guard ("`{prefix}/unattended/unattended.sh` joins that leg's `guard`
+  list", `memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md:183`), so the list
+  S5 widens is the one the pass reads, not the base's two entries.
 - `tools/govkit/govkit.py:2530-2700`: check 7h compares a descriptor's `subject`, `chunk`,
   `doc_reads`, `impure`, `reads` and `ceiling` with the manifest's, and never `guard`.
 - Unit 4 S9 and AC10 already assume the factory; unit 2 S11 states a hand-written fallback until it
@@ -128,8 +141,10 @@ No identifier is minted.
   `tree_lib.py`, `policy.py`, `catalogue.toml` and `budgets.py`, each names `loop measure fixtures`.
   Red when: a file a loop plant imports still selects no leg that runs the plant.
 - **AC2** — When the same query runs over `tools/hooks/agent-cap.js`, `tools/policy/policy-mirror.js`
-  and `tools/hooks/scratch-guard.js`, each names `tier2-review self-test`.
-  Red when: an edit to the hook or what it loads still skips the suite whose arm runs it.
+  and `tools/hooks/scratch-guard.js`, each names `tier2-review self-test`, and over each file an
+  entry of that guard held before the pass, it still names it.
+  Red when: an edit to the hook or what it loads still skips the suite whose arm runs it, or the
+  pass drops an entry the guard held, such as `{prefix}/unattended/unattended.sh`.
 - **AC3** — In the factory case, when `leg_factory.py --check` runs from its S2 path after the pass,
   it exits 0. In the hand case, when a `python -c` probe reads each of the three legs' guards
   from `tools/gate-legs.json` and from every `tools/*/kit.toml` row of the same name that spells one,
@@ -153,6 +168,10 @@ none
 - rev-1 · 2026-11-03 · initial draft, promoted from id 22 (HIGH, item H4) of the round-3 spec audit
   `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit`, carrying id 28 (M13) from
   `TOOL-dCalibratedLens-48`; units 41, 2 and 4 amended at the disposal (their rev-2, rev-4 and rev-4).
+- rev-2 · 2026-11-03 · §4 S5 AC2 · re-grounded against the parents' specs, the `tier2-review
+  self-test` guard named as TOOL-dFairHearing-17 S5 leaves it, `{prefix}/unattended/unattended.sh`
+  kept beside the three new entries and the guard re-read at the pass, by the brief
+  prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-reground.md (cross-check rows 168)
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-12 — the Loop Review pricing cost per item kind from trace rows
 
-**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 5 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-3 · 2026-11-04 · node a · Tier-2 · base 8bec4cef · streams tooling · order 5 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0469@653feb80 whole
 
@@ -9,8 +9,13 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-12-deviation-122.md](../build/2026-11-02-build-TOOL-dCalibratedLens-12-deviation-122.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md) | journal | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md](../build/2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-24 |
+| [2026-11-04-build-TOOL-dCalibratedLens-12-deviation-123.md](../build/2026-11-04-build-TOOL-dCalibratedLens-12-deviation-123.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 |
+| [2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md](../prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-24 |
 | [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
@@ -84,7 +89,7 @@ TOOL-dCalibratedLens-9 (`ledgers.py acts` and `derive_act_tokens`), and the act 
 | Column | Value for one item kind |
 |---|---|
 | `kind` | `item` |
-| `id` | the act record's `item`, an item tag such as `item.build.unit`, or `unattributed` |
+| `id` | the act record's `item`, an item tag such as `item.build.unit-pass`, or `unattributed` |
 | `since` | the earliest `<date>` of that kind's act record keys, over every act record and not only the window's |
 | `cost` | `<tokens>tok/<acts>`: the sum of `derive_act_tokens` over the kind's in-window act records with a cost, and their count; `-` per S3 |
 | `catches` | `-`, so `derive_ledger_rows` keeps `-` in all three catch columns |
@@ -95,8 +100,8 @@ with no act record in the window writes no row, since the review prices what the
 sort by kind and then id, the grammar's order (TOOL-dCalibratedLens-2 §4 "The row").
 
 ```
-| item | item.build.unit | 2026-08-02 | 1840221tok/38 | - | - | - | 60d | idle |
-| item | item.review.synth | 2026-08-05 | 402118tok/12 | - | - | - | 60d | idle |
+| item | item.build.unit-pass | 2026-08-02 | 1840221tok/38 | - | - | - | 60d | idle |
+| item | item.review.dispose | 2026-08-05 | 402118tok/12 | - | - | - | 60d | idle |
 | item | unattributed | 2026-10-11 | - | - | - | - | 60d | new |
 ```
 
@@ -163,14 +168,14 @@ names; the unit it names owns the finding and its proof.
 ## 6. Acceptance criteria
 
 - **AC1** — When a probe calls `derive_item_costs` from `loop_review.py` over planted act rows, two
-  `item.build.unit` acts of 100 and 50 tokens and one `item.review.synth` act of 70 tokens inside the
-  window and one `item.build.unit` act of 900 tokens dated before it, it returns `item.build.unit` with
-  `cost` `150tok/2` and `since` the earlier act's date, and `item.review.synth` with `cost` `70tok/1`,
+  `item.build.unit-pass` acts of 100 and 50 tokens and one `item.review.dispose` act of 70 tokens inside the
+  window and one `item.build.unit-pass` act of 900 tokens dated before it, it returns `item.build.unit-pass` with
+  `cost` `150tok/2` and `since` the earlier act's date, and `item.review.dispose` with `cost` `70tok/1`,
   each with `catches` `-`, and no event.
   Red when: an out-of-window act is summed, `since` is read from the window alone, or a catch column
   carries a number.
-- **AC2** — When the same probe adds an `item.review.synth` act whose `tokens-in` is `withheld`, that
-  row's `cost` stays `70tok/1` and stderr carries one `ledger — item · item.review.synth · 1 act(s)
+- **AC2** — When the same probe adds an `item.review.dispose` act whose `tokens-in` is `withheld`, that
+  row's `cost` stays `70tok/1` and stderr carries one `ledger — item · item.review.dispose · 1 act(s)
   unrecorded` line.
   Red when: the withheld act is summed as zero, or counted in `<acts>`, with no line.
 - **AC3** — When the probe plants one in-window act with no `item` and `tokens-out` `withheld`, the
@@ -216,6 +221,11 @@ New arm: tools/loop/loop_review.py · covers AC1 AC2 AC3 AC4 · `--fixture` case
 - rev-2 · 2026-11-02 · §3 §4 §7 S1 S4 · amended at the disposal of the round-1 spec audit
   `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1 spec
   audit)": ids 23, 51 and 39 (`TOOL-dCalibratedLens-30`); §3 gains the hands-off to unit 30.
+- rev-3 · 2026-11-04 · §4 §6 AC1 AC2 · the cross-check folds' spec audit disposed, the example rows
+  and the probe's item tags are spelled as dDeclaredLoop declares them, `item.build.unit-pass` and
+  `item.review.dispose`, aligned with TOOL-dCalibratedLens-16, by the brief
+  prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md (review
+  2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit, items L2)
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-14 — lens removal by a swap or an exclusion, a repository lens's replay result, and scenario promotion as `flow.promote` says
 
-**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 17 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-4 · 2026-11-04 · node a · Tier-2 · base 8bec4cef · streams tooling · order 17 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0471@453f9872 whole
 **Carries:** node:policy-key.flow.promote
@@ -10,11 +10,26 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-14-deviation-142.md](../build/2026-11-02-build-TOOL-dCalibratedLens-14-deviation-142.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md) | journal | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-returns.md) | research | TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-1 |
 | [2026-11-03-build-TOOL-dCalibratedLens-14-deviation-143.md](../build/2026-11-03-build-TOOL-dCalibratedLens-14-deviation-143.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-14-deviation-144.md](../build/2026-11-03-build-TOOL-dCalibratedLens-14-deviation-144.md) | deviation | — |
+| [2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md](../build/2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-24 |
+| [2026-11-04-build-TOOL-dCalibratedLens-14-deviation-145.md](../build/2026-11-04-build-TOOL-dCalibratedLens-14-deviation-145.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-48 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-14-1-spec-reviewer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-14-1-spec-reviewer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-14-2-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-14-2-spec-writer.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md](../prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-24 |
+| [2026-11-04-prompt-TOOL-dCalibratedLens-14-1-spec-writer.md](../prompts/2026-11-04-prompt-TOOL-dCalibratedLens-14-1-spec-writer.md) | journal | — |
 | [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 |
+| [2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md](../reviews/2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-46 |
 
 <!-- /gen:spec-records -->
 
@@ -51,13 +66,15 @@ repository lens records a replay result when one ran and never owes one.
   <stem>` row names, whose `flow-state <row tag> · applied` row the same file carries
   (TOOL-dDeclaredLoop-28 S2, S5), dated inside `review.loop.window-days`, each read as its `After`
   value, its build's slug and the scenario its build ran at the step it applied in, read from the
-  `scenario=` field of the transition record into that step (TOOL-dDeclaredLoop-27 S8). A held or
-  refused change is not carried. Observed by AC6.
+  `scenario=` field of the transition record into that step, which carries "the placed scenarios in
+  declared order joined by `+`" (TOOL-dDeclaredLoop-27 S8). A held or refused change is not carried,
+  and neither is one whose field names more than one placed scenario, since the proposed row's
+  `extends` takes one tag (TOOL-dDeclaredLoop-27 S3). Observed by AC6.
 - **S5** — (amended, id 7) The proposals. `derive_scenario_proposals(changes, keeps, mode)` is a `propose` step: under
   `loop-proposes` it raises one proposal per pair of an `After` value and a scenario carried by two or
   more distinct builds, unless a `keep` record keyed (`scenario`, that `After`) governs it; a row
-  whose kind is not activatable (`kind.item` or `kind.splice`, TOOL-dDeclaredLoop-27 S3) is not
-  raised. Each proposal is a `[[scenario]]` row, §4 "The proposed row", with the
+  whose kind is not in the schema's `activatable` list (TOOL-dDeclaredLoop-27 S3, read from
+  `tools/loop/scenario-schema.toml`, so a later build's added kind is admitted) is not raised. Each proposal is a `[[scenario]]` row, §4 "The proposed row", with the
   `instructions_edit.py add --manifest overlay` command that would write it and the `Promoted-from`
   value naming every carrying change record. `file` (TOOL-dCalibratedLens-3) files each as an owner
   item. Observed by AC6, AC7 and AC8.
@@ -80,10 +97,16 @@ repository lens records a replay result when one ran and never owes one.
   transition into a step, each promoted scenario `read_promoted_scenarios(root)` returns that the build
   complies with: its `extends` among the build's placed scenarios, its predicate holding over the
   build's facts, the build's composition with it passing every row check and `flow.scenario-conflict`,
-  and `compare_path` (TOOL-dDeclaredLoop-28 S7) finding no `skip` against it over the steps already
-  walked. A build that does not comply keeps its scenarios, and the writer prints
+  and `compare_path` finding no `skip` against that promoted composition over the steps already
+  walked. TOOL-dDeclaredLoop-28 S7's `compare_path(build, step)` reads only "the step's pinned
+  composition" and "files one order through `write_row_order`" per deviation, so this unit widens it
+  in `tools/loop/adapt.py` with two keyword parameters, `composition` (default the pinned one) and
+  `file_orders` (default true), under §8 F9's grant: S9 passes the promoted composition and
+  `file_orders=False`, and reads the returned deviations, filing nothing. dl28's boundary call
+  `compare_path(build, step)`, with no keywords, still files one `flow-deviation` order per deviation,
+  observed by AC15. A build that does not comply keeps its scenarios, and the writer prints
   `scenario: <tag> held — <the failing condition>`. Between boundaries nothing moves, and under `off`
-  nothing moves. Observed by AC11 and AC12.
+  nothing moves. Observed by AC11, AC12 and AC15.
 - **S10** — The catalogue row. `flow.promote` (`tools/policy/catalogue.toml:826-830`) gains `summary`
   and `usage`, its values and default unchanged, and `python tools/policy/policy.py lists --write`
   drains the name from `tools/policy/unsummarised-keys.txt` (`:65`). Observed by AC13.
@@ -127,7 +150,9 @@ The build run builds this unit once each is CLOSED, and re-grounds every line th
 **Waits on:** TOOL-dFairHearing-3, TOOL-dFairHearing-12, TOOL-dDeclaredLoop-20, TOOL-dDeclaredLoop-27,
 TOOL-dDeclaredLoop-28, PLAY-dOrderedCharter-15, PLAY-dOrderedCharter-28, PLAY-dOrderedCharter-35,
 TOOL-dCalibratedLens-3, TOOL-dCalibratedLens-5 and TOOL-dCalibratedLens-13. This unit specs none of
-their primitives.
+their primitives but one: it widens TOOL-dDeclaredLoop-28 S7's `compare_path` in `tools/loop/adapt.py`
+with the `composition` and `file_orders` keyword parameters (S9, §8 F9), leaving its default call as
+dl28 lands it.
 
 ### Evidence
 
@@ -172,8 +197,8 @@ of a default and the opt-in that fills its slot.
 ```toml
 [[scenario]]
 tag = "scenario.adopter.<the last segment of the carried row's tag>"
-extends = "<the scenario every carrier ran at that step>"
-activates = { "<kind.item or kind.splice>" = [ <the carried row, from the change record's fence> ] }
+extends = "<the one tag every carrier's scenario= field names at that step>"
+activates = { "<the carried row's kind, a member of the schema's activatable list>" = [ <the carried row, from the change record's fence> ] }
 ```
 
 `admits`, `entry` and `then` are inherited from `extends` (TOOL-dDeclaredLoop-27 §4), so the
@@ -213,6 +238,8 @@ runs it in list order beside that unit's three. Its keeps are read with `read_ke
 | `--promoted-from` | flag of `instructions_edit.py`'s write verbs | none |
 | `check_promote_policy` | Python function, `instructions_edit.py` | `py.function`, `--suggest` OK |
 | `read_promoted_scenarios` | Python function, `scenario.py` | `py.function`, `--suggest` OK |
+| `composition`, `file_orders` | keyword parameters of `compare_path`, `adapt.py` | none |
+| `unrecorded-skip-unfiled` | fixture plant of `adapt.py` | none |
 
 ### Migration
 
@@ -254,6 +281,8 @@ names; the unit it names owns the finding and its proof.
 - `tools/unattended/unattended.test.sh`
 - `tools/loop/loop_review.py`
 - `tools/loop/scenario.py`
+- `tools/loop/adapt.py` — `compare_path`'s `composition` and `file_orders` parameters (S9), and the
+  `unrecorded-skip-unfiled` plant (AC15)
 - `tools/playbook/instructions_edit.py`
 - `tools/policy/catalogue.toml`
 - `tools/policy/unsummarised-keys.txt`
@@ -285,7 +314,7 @@ names; the unit it names owns the finding and its proof.
 - risks — a promoted scenario inherits its parent's admission, so it reaches every later build the
   parent does; that is the reusable variant the clause asks for, and the owner's ratification is the
   gate. A carrier whose transition records name no scenario reads `flow.scenario-default`'s value.
-- testing — AC1 to AC14 as probes and fixtures; the arms in §7.
+- testing — AC1 to AC15 as probes and fixtures; the arms in §7.
 - migration — none.
 - user docs — `help/policy.md` and `help/loop.md`.
 
@@ -314,9 +343,11 @@ names; the unit it names owns the finding and its proof.
   Red when: the first is refused, so a repository lens owes a replay, or the third passes.
 - **AC6** — (amended, id 7) When `python loop_review.py --fixture --plant promote-two-builds` runs, under
   `loop-proposes` with two builds applying one change under `scenario.feature`, the record's
-  `scenario-proposals` field names that `After` once with both slugs; with one of the two held, or
-  with the second build under another scenario, it reads `0`.
-  Red when: one carrier, a held change, or two scenarios raise a proposal.
+  `scenario-proposals` field names that `After` once with both slugs; with one of the two held, with
+  the second build under another scenario, or with the second build's transition record carrying
+  `scenario=scenario.feature+scenario.patch`, it reads `0`.
+  Red when: one carrier, a held change, two scenarios, or a carrier placed under two scenarios raise a
+  proposal.
 - **AC7** — When the fixture plants a `keep` record keyed (`scenario`, that `After`), the next review's
   field reads `0`; when two builds then carry a changed form of the same row, it names the new
   `After`.
@@ -335,8 +366,8 @@ names; the unit it names owns the finding and its proof.
 - **AC11** — When `python scenario.py --fixture --plant promoted-in-flight` runs, a build
   under `scenario.feature` that complies gains the promoted scenario on its next transition record's
   `scenario=` field, and a build that skipped a promoted item in a walked step keeps its scenarios and
-  prints `scenario: <tag> held — skip`.
-  Red when: a non-complying build moves, or a complying one does not.
+  prints `scenario: <tag> held — skip`; neither build's check files a `flow-deviation` order.
+  Red when: a non-complying build moves, a complying one does not, or the check files an order.
 - **AC12** — When that fixture derives the scenario between two boundaries, and at a boundary under
   `flow.promote = "off"`, the build's scenarios are unchanged.
   Red when: a build moves mid-step, or moves under `off`.
@@ -346,21 +377,29 @@ names; the unit it names owns the finding and its proof.
 - **AC14** — When `grep -c 'flow.promote' help/policy.md loop.md` and
   `grep -c '\-\-exclude' tools/workflows/README.md` run, each file counts at least one.
   Red when: a page describes promotion or exclusion without the key or the flag.
+- **AC15** — When `python tools/loop/adapt.py --fixture --plant unrecorded-skip` (TOOL-dDeclaredLoop-28
+  AC5) runs, its `compare_path(build, step)` call with no keywords files one order whose name carries
+  `flow-deviation` in the fixture repository's outbox folder, naming the item and `skip`, as before
+  this unit; when the plant `unrecorded-skip-unfiled`, added by this unit, makes the same call with
+  `file_orders=False`, no order file appears and the call returns that one `skip` deviation.
+  Red when: the default call files nothing, so the widening changed dl28's boundary call, or
+  `file_orders=False` files an order. The red is staged by flipping `file_orders`'s default to false.
 
 ## 7. Gates
 
 `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `workflow script syntax` · `govkit acceptance matrix` · `playbook render selftest` · `policy check` · `policy fixtures` · `unattended kit gate` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 The loop kit's and the instruction command's legs, `loop scenario fixtures` (TOOL-dDeclaredLoop-27
-S10) and `instruction edits (manifest checks)` (PLAY-dOrderedCharter-15 S10), are not in the manifest
-at base, so they are named here and not on the line; the build pass adds them to the line once they
-resolve.
+S10), `loop adapt fixtures` (TOOL-dDeclaredLoop-28 S8) and `instruction edits (manifest checks)`
+(PLAY-dOrderedCharter-15 S10), are not in the manifest at base, so they are named here and not on the
+line; the build pass adds them to the line once they resolve.
 
 New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC2 AC3 AC5 · `review_pin.py` with an excluded default filled, unfilled and absent from the literal, and a scratch overlay of three repository lens rows, red against the pin with no `--exclude` and the renderer with no `replay` check · FLOOR_ASSERTIONS in that suite, raised by the arms added
 New arm: tools/unattended/unattended.test.sh · covers AC4 · a `--trigger` call in a fixture excluding a default lens, red against the verb as TOOL-dDeclaredLoop-20 lands it, which reads no exclusion · none
-New arm: tools/loop/loop_review.py · covers AC6 AC7 AC8 · fixture plants of two carriers, a held change, two scenarios, a `keep` record, a changed form and each value, red against the Loop Review with no promotion step · none
+New arm: tools/loop/loop_review.py · covers AC6 AC7 AC8 · fixture plants of two carriers, a held change, two scenarios, a carrier placed under two scenarios, a `keep` record, a changed form and each value, red against the Loop Review with no promotion step · none
 New arm: tools/playbook/instructions_edit.py · covers AC9 AC10 · fixture plants of a promotion under `off` and under `owner-only`, red against the command with no `--promoted-from` · none
 New arm: tools/loop/scenario.py · covers AC11 AC12 · fixture plants of a complying build, a skipping build, a mid-step derivation and `off`, red against `derive_step_scenarios` as TOOL-dDeclaredLoop-27 lands it · none
+New arm: tools/loop/adapt.py · covers AC15 · the `unrecorded-skip` plant through `compare_path` with no keywords and the `unrecorded-skip-unfiled` plant with `file_orders=False`, red with `file_orders`'s default flipped to false · none
 
 ## 8. Open questions
 
@@ -412,8 +451,20 @@ New arm: tools/loop/scenario.py · covers AC11 AC12 · fixture plants of a compl
   proposal, the ratification through `instructions.edit` with `promoted-from` edges, the move at a
   step boundary and each value of `flow.promote`; every file of §4's estimate is that change.
   RESOLVED (agent, 2026-11-02, delegated): lifted by `PLAY-dClosedLoop-3`, rung 3. grants:
-  PLAY-dClosedLoop-3 the exclusion fill, the replay field, the promotion route and its policy refusal
+  PLAY-dClosedLoop-3 the exclusion fill, the replay field, the promotion route and its policy refusal,
+  and `tools/loop/adapt.py`'s `compare_path` widening by `composition` and `file_orders` (F9)
   · widens: none · relaxes: none
+- **F9 — How does S9 compare a promoted composition without filing?** PRIMITIVE GAP: compare_path
+  takes no composition and always files. TOOL-dDeclaredLoop-28 S7's `compare_path(build, step)` reads
+  only "the step's pinned composition" and "files one order through `write_row_order`" per deviation.
+  (a) Widen it in this build's run, in `tools/loop/adapt.py`, with the `composition` and `file_orders`
+  keyword parameters under F8's grant, the default call unchanged and observed by AC15. (b) File an
+  ask on dDeclaredLoop and leave S9's compliance check without its walked-path half until it lands.
+  (c) A local comparison function in `loop_review.py` or `scenario.py`, a second copy of dl28's
+  set comparison. (b) counts on a foreign build for functionality this build can fold in, against
+  the owner's standing rule (the record
+  `2026-11-03-build-TOOL-dCalibratedLens-1-parents-crosscheck`, row 83); (c) is the copy the charter's `[reuse]` rule refuses. Recommendation (a). RESOLVED (agent,
+  2026-11-04, delegated): (a), the in-build widening, rung 3. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -422,6 +473,17 @@ New arm: tools/loop/scenario.py · covers AC11 AC12 · fixture plants of a compl
 - rev-2 · 2026-11-02 · §4 S3 S5 S6 AC5 AC6 · amended at the disposal of the round-1 spec audit
   `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1 spec
   audit)": ids 7, 44 and 47 (`TOOL-dCalibratedLens-30`).
+- rev-3 · 2026-11-03 · S4 S5 S9 §4 AC6 AC11 · re-grounded against dTotalRecall's and dDeclaredLoop's
+  specs, the `scenario=` field read as dl27 S8's `+`-joined list with a multi-scenario carrier not
+  carried, the activatable kinds read from dl27 S3's schema list, and `compare_path` widened to take
+  the promoted composition and file nothing, by the brief
+  prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md (cross-check rows 94, 95, 97)
+- rev-4 · 2026-11-04 · S9 §4 §5 §6 §7 §8 AC15 · the cross-check folds' spec audit disposed, the
+  `compare_path` widening recorded as §8 F9's PRIMITIVE GAP resolved in-build and granted in F8,
+  "Waits on" corrected to name it, `loop adapt fixtures` named in §7, and AC15 with its `adapt.py`
+  arm observing the default call still files and `file_orders=False` files nothing, by the brief
+  prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md (review
+  2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit, items M2, L8)
 
 ## 10. Reuse audit
 

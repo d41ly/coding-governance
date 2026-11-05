@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-7 — the value ledger's shape rows, priced from the shape-run records `review.cost` and the journal reconcile write
 
-**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 3 · advances TOOL-dCalibratedLens-18
+**Status:** DEFERRED · rev-4 · 2026-11-04 · node a · Tier-2 · base 8bec4cef · streams tooling · order 3 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0464@b1127f93 whole
 
@@ -9,10 +9,23 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-7-deviation-72.md](../build/2026-11-02-build-TOOL-dCalibratedLens-7-deviation-72.md) | deviation | — |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md) | journal | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
+| [2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-returns.md](../build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-returns.md) | research | TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-1 |
+| [2026-11-03-build-TOOL-dCalibratedLens-7-deviation-73.md](../build/2026-11-03-build-TOOL-dCalibratedLens-7-deviation-73.md) | deviation | — |
+| [2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md](../build/2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-24 |
+| [2026-11-04-build-TOOL-dCalibratedLens-7-deviation-74.md](../build/2026-11-04-build-TOOL-dCalibratedLens-7-deviation-74.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-48 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-42 |
 | [2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-departures-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-29 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-parents-crosscheck.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 |
+| [2026-11-03-prompt-TOOL-dCalibratedLens-7-1-spec-reviewer.md](../prompts/2026-11-03-prompt-TOOL-dCalibratedLens-7-1-spec-reviewer.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md](../prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-24 |
 | [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
+| [2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md](../reviews/2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-46 |
 
 <!-- /gen:spec-records -->
 
@@ -20,24 +33,30 @@
 
 Nothing reads the review-shape line (gap-review-11), so a review's cost and yield are measured per run
 and never per shape. This unit adds the value ledger's `kind=shape` rows: one row per shape, priced from
-the shape-run records `review.cost` writes for review acts (TOOL-dDeclaredLoop-20 S3, recorded by
-TOOL-dTotalRecall-11) and the journal reconcile writes for every other act (TOOL-dWellOiledMachine-19
-S6), its cost their output tokens and its catches a review's confirmed findings.
+the shape-run records written for review acts through TOOL-dTotalRecall-11 S4's `gov_record.py new
+shape-run --review`, its caller ask TOOL-dDeclaredLoop-111, and those the journal reconcile writes for
+every other act (TOOL-dWellOiledMachine-19 S6), its cost their output tokens and its catches a review's confirmed findings.
 
 ## 2. Scope (IN)
 
 Build-run preconditions, each specced and unbuilt at base `8bec4cef`: TOOL-dCalibratedLens-2 (`PROVIDERS`,
 `derive_ledger_rows`, `read_record_fields` and the `-` catches rule); TOOL-dTotalRecall-11 (the
-`shape-run` kind, its record and its writer `gov_record.py new shape-run --review`);
-TOOL-dDeclaredLoop-20 S3 (`review.cost`'s `trigger=`, `shape=`, `efforts=` and `role-sha=` fields on
-the line); TOOL-dWellOiledMachine-19 S6 (the `--act` form, `Kind` `act`). The build run re-grounds on
+`shape-run` kind, its record and its door verb `gov_record.py new shape-run --review`, S4);
+TOOL-dDeclaredLoop-20 S3, the source of the line's `trigger=`, `shape=`, `efforts=` and `role-sha=`
+fields only; ask TOOL-dDeclaredLoop-111 in `memory/builds/dDeclaredLoop/BACKLOG.md`, the review-act
+writer calling that verb at each review exit, which no ancestor spec calls (TOOL-dTotalRecall-42 S2's
+`unarmed` reason); TOOL-dWellOiledMachine-19 S6 (the `--act` form, `Kind` `act`); the record door's
+`find` and `show` (TOOL-dTotalRecall-9 S3, S5) and `find --all`, the uncapped mode
+TOOL-dWellOiledMachine-32 §8 F6 asks of dTotalRecall (owner, 2026-10-29), whose interim refusal holds
+until it lands: "a reader that meets the total line refuses, naming it". The build run re-grounds on
 each and stops the unit when one is absent.
 
 - **S1** — The provider, `read_shape_rows(root, window)`, the `PROVIDERS` entry `shape` in
-  `tools/loop/loop_review.py`. It reads every tracked shape-run record,
-  `<MEMORY_ROOT>/builds/*/build/*-shape-run-*.md` listed by `git ls-files`, through
-  `read_shape_records(root)`, each record's fields as `read_record_fields` returns them and its date the
-  file name's `<date>`. A record missing `Kind` or `Out-tokens` is skipped and counted. Observed by AC1
+  `tools/loop/loop_review.py`. It reads every shape-run record through `read_shape_records(root)`,
+  listed by one `gov_record.py find --kind shape-run --all` (TOOL-dWellOiledMachine-32 §8 F6 (b), the
+  owner's pick over a `git ls-files` listing) and each read through `gov_record.py show <key>`, its
+  fields as `read_record_fields` returns them from that text and its date the file name's `<date>`. A
+  listing that meets `find`'s total line refuses as §2 states, so no row is priced short. A record missing `Kind` or `Out-tokens` is skipped and counted. Observed by AC1
   and AC4.
 - **S2** — The row. `id` is `<Kind>/<Shape>`: `Kind` is `spec-audit` or `diff-review` for a review act
   and `act` for every other act; `Shape` is the record's `Shape` field, or `-` where it has none or reads
@@ -56,13 +75,14 @@ each and stops the unit when one is absent.
 - **S5** — The fixture cases `shape-review`, `shape-act`, `shape-unshaped`, `shape-unknown-tokens` and
   `shape-none` join `python loop_review.py --fixture`. Observed by AC1 to AC4.
 - **S6** — The docs: the "The value ledger" section of `help/loop-review.md` gains the `shape` row: its
-  id, its two writers, its cost and its catches. Observed by AC5.
+  id, its two writers (ask TOOL-dDeclaredLoop-111's review-act writer and TOOL-dWellOiledMachine-19
+  S6's act writer), its cost and its catches. Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
 - The ledger, its grammar, its window, the snapshot and `price`: unit 2.
-- The shape-run kind, its record, its writers and `check_shape_runs`: TOOL-dTotalRecall-11,
-  TOOL-dDeclaredLoop-20 S3 and TOOL-dWellOiledMachine-19 S6. This unit reads the records and writes none.
+- The shape-run kind, its record, its writers and `check_shape_runs`: TOOL-dTotalRecall-11, ask
+  TOOL-dDeclaredLoop-111 and TOOL-dWellOiledMachine-19 S6. This unit reads the records and writes none.
 - The shape registry that fills `Shape` for review acts: dBoundRoles'.
 - Proposing a shape change from its row, or reading the noise between twin runs: unit 5's `propose`
   and the Loop Review's proposal rule. What `propose` does with an `act` row whose `catches` read `-` is
@@ -72,7 +92,7 @@ each and stops the unit when one is absent.
 ### Edges
 
 - **consumes-from** `TOOL-dCalibratedLens-2` — `PROVIDERS`, `derive_ledger_rows`, `read_record_fields`, the `-` catches rule an `act` row takes, and `price`, which prints this provider's rows and its summary line
-- **consumes-from** external — TOOL-dTotalRecall-11 (the shape-run record), TOOL-dDeclaredLoop-20 S3 (`review.cost`'s fields) and TOOL-dWellOiledMachine-19 S6 (the act form), each DEFERRED at base
+- **consumes-from** external — TOOL-dTotalRecall-11 (the shape-run record), TOOL-dDeclaredLoop-20 S3 (the line's four fields), ask TOOL-dDeclaredLoop-111 (the review-act writer) and TOOL-dWellOiledMachine-19 S6 (the act form), each DEFERRED or unserved at base
 - **hands-off** `TOOL-dCalibratedLens-30` — the `[[usage]]` row of any verb it adds, which the minors batch's `docs_leg.py --list` observation reads (id 39)
 
 ## 4. Design
@@ -151,8 +171,8 @@ names; the unit it names owns the finding and its proof.
 
 ## 5. Production-readiness checklist
 
-- security — read-only: tracked files listed by `git ls-files` and read as text; no field value
-  reaches a shell or a path.
+- security — read-only: records listed by `find --kind shape-run --all` and read as text through
+  `show`; no field value reaches a shell or a path.
 - perf / scale — one read per shape-run record, one per review exit and act; the population grows with
   the trail and is read once a period.
 - error / empty / loading states — no record: no `shape` row and the summary's zero line; `unknown`
@@ -216,12 +236,21 @@ New arm: tools/loop/loop_review.py · covers AC1 AC2 AC3 AC4 · the five shape p
 - rev-2 · 2026-11-02 · §3 §4 §7 · amended at the disposal of the round-1 spec audit
   `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1 spec
   audit)": ids 39 (`TOOL-dCalibratedLens-30`); §3 gains the hands-off to unit 30.
+- rev-3 · 2026-11-03 · §1 §2 §3 §10 S6 · re-grounded against dTotalRecall's and dDeclaredLoop's specs,
+  TOOL-dDeclaredLoop-20 S3 cited for the line's four fields only and the review-act writer named as ask
+  TOOL-dDeclaredLoop-111, a build-run precondition, with S6's two writers following, by the brief
+  prompts/2026-11-03-prompt-TOOL-dCalibratedLens-1-ancestors-reground.md (cross-check row 61)
+- rev-4 · 2026-11-04 · §2 §5 S1 · the cross-check folds' spec audit disposed, S1 lists shape-run
+  records through `find --kind shape-run --all` and `show` in place of `git ls-files`, and §2 names the
+  door and F6's interim refusal as a build-run precondition, by the brief
+  prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md (review
+  2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit, items L5)
 
 ## 10. Reuse audit
 
 The seams extended: unit 2's `PROVIDERS`, `derive_ledger_rows` and `read_record_fields`; the shape-run
 record of TOOL-dTotalRecall-11 (§4 "The record"), the one parsed form of `renderShapeLine`'s line
-(`tools/workflows/tier2-review.template.js:78-83`), with its review writer and TOOL-dWellOiledMachine-19
+(`tools/workflows/tier2-review.template.js:78-83`), with ask TOOL-dDeclaredLoop-111's review writer and TOOL-dWellOiledMachine-19
 S6's act writer. The probe `python tools/codebase-map/reuse_lookup.py "sum review cost tokens and
 confirmed findings per review shape from the review-shape line records"` ranked name stems only (`sum`,
 `records`, `shape` in `tools/govkit/matrix.py`, an acceptance-matrix shape, `render_line` in
