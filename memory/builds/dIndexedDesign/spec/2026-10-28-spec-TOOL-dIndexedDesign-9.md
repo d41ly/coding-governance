@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-9 — spec sections named by tag across tiers: one heading rule, one reader and its twins, and the tagged canon behind a cutoff
 
-**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 1 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-3 · 2026-11-05 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 1 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0391@17b40187 whole
 
@@ -12,8 +12,15 @@
 | [2026-10-28-build-TOOL-dIndexedDesign-1-fix-return.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-fix-return.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-c.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-c.md) | research | TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-1 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-9-deviation-91.md](../build/2026-11-05-build-TOOL-dIndexedDesign-9-deviation-91.md) | deviation | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-fix-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-fix-brief.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-9-1-spec-reviewer.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-9-1-spec-reviewer.md) | journal | — |
 | [2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-3 |
 
 <!-- /gen:spec-records -->
@@ -70,8 +77,10 @@ scout's reading at `66934d2d4`.
   AC5.
 - **S6** — The Python twins outside memory-tree, each a regex keyed on its title and tag pair:
   `extract_open_questions` (`tools/runlog/model.py:1444-1453`), which reads `## 8.` and so returns a
-  Tier-1 spec's Revision log; `S10_RE` (`tools/memory-recall/check-recall.py:447`); `_SEC10`
-  (`tools/codebase-map/replay-phrases.py:139`). Observed by AC6 and AC8.
+  Tier-1 spec's Revision log; `S10_RE` (`tools/memory-recall/check-recall.py:447`). The third twin
+  the base held, `_SEC10` (`tools/codebase-map/replay-phrases.py:139`), is not in the tree when this
+  unit builds: that harness is TOOL-dLinkedLibrary-3 S1's to take out, a parent's landing, as its
+  S1 and §4 Files touched name it. Observed by AC6 and AC8.
 - **S7** — `tools/workflows/review_replay.py` keys a section by tag: `SECTION_REF` (:67) also reads
   `[section.<seg>]`; `ITEM_SECTIONS` (:70) maps `S`, `AC` and `F` to `section.scope`,
   `section.acceptance` and `section.open-questions`; a numeric `§<n>` or `section <n>` maps through the
@@ -150,7 +159,7 @@ title. `## 6. [section.acceptance] Acceptance criteria` is no heading of either 
 
 The unattended kit grades sections in awk, and the marker-contract harness slices `plan_state` out of
 the shipped bytes (`marker-contract.test.sh:281-284`), so its rule must be a literal inside the slice.
-runlog, memory-recall, codebase-map and workflows are other kits; a kit does not import a sibling
+runlog, memory-recall and workflows are other kits; a kit does not import a sibling
 (PLAY-dOrderedCharter-7 §4, "The policy reads"). Each twin spells its own title and tag pair, so no
 twin carries the table, and contract 3 is the agreement: it is where the rule lives as data, the way
 contract 2 holds the section-8 mark (`marker-contract.test.sh:247-275`).
@@ -207,7 +216,7 @@ blank.
 - `.memory-tree.conf`, `tools/memory-tree/.memory-tree.conf.example`: S3
 - `tools/unattended/unattended.sh`, `tools/unattended/lib-unattended.sh`: S5
 - `tools/runlog/model.py`, `tools/runlog/selftest.py`: S6
-- `tools/memory-recall/check-recall.py`, `tools/codebase-map/replay-phrases.py`: S6
+- `tools/memory-recall/check-recall.py`: S6
 - `tools/workflows/review_replay.py`: S7
 - `tools/check-spec-tokens.py`: S8
 - `tools/workflows/tier2-review.template.js`, `tools/workflows/unattended-build.template.js`: S10;
@@ -282,7 +291,7 @@ blank.
   `x.md:AC2` and `x.md:section 5` over a Tier-1 subject both reading `section.acceptance`, and
   `x.md:[section.scope] S5` reading `section.scope`, and they pass.
   Red when: `ITEM_SECTIONS` maps by number, or a numeric ref ignores the subject's own ordinals.
-- **AC8** — When `check-recall.py`, `replay-phrases.py`, `check-spec-tokens.py` and `read_spec_edges` read
+- **AC8** — When `check-recall.py`, `check-spec-tokens.py` and `read_spec_edges` read
   the tagged Tier-2 scratch spec of AC1 and its numbered twin, each finds the same Reuse audit, Gates,
   Acceptance criteria and Edges in both: `check-spec-tokens.py`, run from a scratch repository tracking
   the two, prints the same leg-join and witness lines for each, and a `python -c` call of each other
@@ -363,6 +372,10 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC9 · `--new-spec` unde
   `57bc3b91`.
 - rev-2 · 2026-10-28 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from edge of TOOL-dIndexedDesign-38,
   promoted by the round-1 spec audit of this build; nothing else moved.
+- rev-3 · 2026-11-05 · S6 · §4 "Why twins and not one import", Files touched · AC8 ·
+  `tools/codebase-map/replay-phrases.py` and its `_SEC10` leave the twins, the kits named, the files
+  touched and AC8, since TOOL-dLinkedLibrary-3 S1 takes that harness out before this unit builds; S11's
+  contract reads the twins through S6 and loses that row with it, by the brief prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md
 
 ## 10. Reuse audit
 

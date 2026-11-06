@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-5 — the `breakpoint` disposition: an owner's request for a review on a live build, fired through `review.trigger`
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node a · Tier-2 · base c63aabbb · streams tooling · order 19 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-5 · 2026-11-05 · node a · Tier-2 · base c63aabbb · streams tooling · order 19 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0503@65f19d46 whole
 
@@ -14,10 +14,17 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-5-deviation-51.md](../build/2026-10-25-build-TOOL-dPlacedRequest-5-deviation-51.md) | deviation | — |
 | [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-10-26-build-TOOL-dPlacedRequest-5-deviation-52.md](../build/2026-10-26-build-TOOL-dPlacedRequest-5-deviation-52.md) | deviation | — |
+| [2026-11-05-build-TOOL-dPlacedRequest-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dPlacedRequest-1-crosscheck-returns.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 |
+| [2026-11-05-build-TOOL-dPlacedRequest-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 |
+| [2026-11-05-build-TOOL-dPlacedRequest-1-reground-returns.md](../build/2026-11-05-build-TOOL-dPlacedRequest-1-reground-returns.md) | research | TOOL-dPlacedRequest-1 |
+| [2026-11-05-build-TOOL-dPlacedRequest-5-deviation-53.md](../build/2026-11-05-build-TOOL-dPlacedRequest-5-deviation-53.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
+| [2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-34 |
+| [2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-1 |
+| [2026-11-05-prompt-TOOL-dPlacedRequest-5-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dPlacedRequest-5-1-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
 
 <!-- /gen:spec-records -->
@@ -64,22 +71,30 @@ the trigger's witness (the whole-design audit's A1-F5, settled by the owner's FK
   AC4.
 - **S5** — The listing. TOOL-dDeclaredLoop-19 S1's `derive_breakpoints(policy, definition, build)` in
   `tools/loop/breakpoints.py` reads the build's `disposition` records whose `Item` is `item.entry.place` and
-  `Disposition` is `breakpoint` and lists each as a placed breakpoint, cause `placement`, disposer the
-  reviewer lens, at the position S2 of that unit gives the name, or at the named item's boundary. `--plan`
-  prints it on its `breakpoint:` line (TOOL-dDeclaredLoop-19 S9). Observed by AC5.
-- **S6** — The firing. A listed placed breakpoint fires through TOOL-dDeclaredLoop-20's
-  `bash tools/unattended/unattended.sh --trigger <slug> --subject <s> --cause placement` (shared interface I22),
-  never a new verb: at its position, as TOOL-dDeclaredLoop-19 S6 fires every review breakpoint; and at once,
-  by `placement.py breakpoint`, when the build's newest transition record is already past that position. The
-  subject is `<slug>-specs` for `spec audit`, the bare `<slug>` for `closing review` (the driver's subject
-  rule at `tools/unattended/unattended.sh:11866-11869`), and the item tag otherwise. Observed by AC6.
+  `Disposition` is `breakpoint` and lists each as a placed breakpoint, disposer the reviewer lens, at the
+  position S2 of that unit gives the name, or at the named item's boundary, its cause `owed` for a
+  `spec audit`, the audit S7 makes owed, and `placement` for every other name and item. `--plan` prints it
+  on its `breakpoint:` line (TOOL-dDeclaredLoop-19 S9). Observed by AC5.
+- **S6** — The firing. A listed placed breakpoint fires through TOOL-dDeclaredLoop-20 S2's
+  `bash tools/unattended/unattended.sh --trigger <slug> --subject <s> --cause <c>` (shared interface I22),
+  never a new verb, at its position as TOOL-dDeclaredLoop-19 S6 fires every review breakpoint, with the
+  cause S5 lists. A placed `spec audit` so fires at Design's exit with `--cause owed`: once the run's
+  preflight reads the record at its BASE, `AUTH_SPEC_AUDIT_FROM` holds `placement` and the spec-audit line
+  already names that audit owed (S7). Every other placed name and item fires with `--cause placement`, and
+  so does the firing at once, by `placement.py breakpoint`, when the build's newest transition record is
+  already past the position. The subject is `<slug>-specs` for `spec audit`, the bare `<slug>` for
+  `closing review` (the driver's subject rule at `tools/unattended/unattended.sh:11866-11869`), and the item
+  tag otherwise. Observed by AC1, AC6.
 - **S7** — The hold at Design's exit. A placed `spec audit` makes the pre-code audit owed: the driver's
   derivation in `check_authorization` (`tools/unattended/unattended.sh:3975-4041`, re-pointed by
   TOOL-dDeclaredLoop-19 S8) gains a third source, `placement`, set when the build's folder at the pinned BASE
   holds such a record, beside `readme` and `project` in `AUTH_SPEC_AUDIT_FROM` (`:1964-1968`), and
   `print_spec_audit_line` prints it. The source can only add an owed audit, never cancel one, so check 89's
-  rule that a run never opts itself out is untouched. The build harness then holds the roster's hand-out until
-  the audit's verdict is terminal, and `--close`'s specs-audited term is owed. Observed by AC1.
+  rule that a run never opts itself out is untouched, and `--close`'s specs-audited term is owed. The build
+  harness's hand-out gate then holds the roster as TOOL-dDeclaredLoop-20 S7 gives it for each
+  `review.blocks` value: under `every-review`, the default, until the audit's verdict is terminal; under
+  `owed-only` the same, the Design-exit audit firing with cause `owed` (S6); under `none` never, the
+  hand-out following the audit's start and the review running alongside. Observed by AC1.
 - **S8** — The fixture plants of §6, run by `python tools/loop/placement.py --fixture` under
   TOOL-dPlacedRequest-4's leg, the AC1 plant building a scratch repository with the driver copied in.
   Observed by AC1 to AC6.
@@ -115,7 +130,9 @@ owner prompt "audit the specs" ──▶ scout return: disposition breakpoint ·
      ├─ build_records.py … --item item.entry.place --disposition breakpoint --channel prompt   (dX/build/)
      └─ dX past item.design.reason?  yes ─▶ unattended.sh --trigger dX --subject dX-specs --cause placement
 next preflight of dX at a BASE holding that record
-     └─ AUTH_SPEC_AUDIT_FROM=placement ─▶ the audit owed: hand-out held, --close owes specs-audited
+     └─ AUTH_SPEC_AUDIT_FROM=placement ─▶ the audit owed, --close owes specs-audited
+dX at item.design.reason ─▶ unattended.sh --trigger dX --subject dX-specs --cause owed
+     └─ hand-out held to a terminal verdict under every-review and owed-only; alongside under none
 ```
 
 ### Data model
@@ -198,10 +215,17 @@ such a request derives exactly what it derived before.
 - **AC1** — When `python placement.py --fixture --plant audit-request` places the planted owner prompt "audit
   the specs" on a build in designing with no `spec-audit:` key and no `SPEC_AUDIT_DEFAULT`, and then runs
   `bash unattended.sh --preflight <slug>` in the scratch repository at the BASE holding the declaration, the
-  preflight's spec-audit line names the source `placement` and the audit as owed.
+  preflight's spec-audit line names the source `placement` and the audit as owed. With
+  `--plant audit-request-owed-only`, whose scratch policy file sets `review.blocks = "owed-only"`, the plant
+  lists the build's breakpoints through `derive_breakpoints` and fires the listed `spec audit` through the
+  copied driver's `--trigger <slug> --subject <slug>-specs --cause <its listed cause>`, and the trigger line
+  carries `"trigger": "owed"` and `"blocks": "yes"`.
   Red when: the prompt is placed as `continue`, or the record is not read, so the line says no audit is owed
-  and the build passes Design's exit with no spec audit.
-  fixture: built by the plant, a scratch repository with the driver copied in; the tree holds none today.
+  and the build passes Design's exit with no spec audit; or the placed audit fires with `--cause placement`,
+  so `blocks` is `no` under `owed-only` and the roster is handed out at the audit's start.
+  fixture: built by the plant, a scratch repository with the driver copied in, and for the second plant what
+  `--trigger` reads beside it, as TOOL-dDeclaredLoop-20 AC2's fixture holds it; the tree holds none today.
+  Not checked here: the harness's reading of `blocks`, which TOOL-dDeclaredLoop-20 AC8 observes.
 - **AC2** — When `python placement.py --fixture --plant breakpoint-unnamed` checks a `breakpoint` block with no
   `breakpoint:` key, and `--plant breakpoint-closed` one naming a CLOSED build, each refuses naming the fact.
   Red when: a breakpoint is declared with no position, or on a terminal build.
@@ -218,7 +242,8 @@ such a request derives exactly what it derived before.
   fixture: the factory call the plant reaches is re-grounded on the landed factory at the build pass
   (TOOL-dDeclaredLoop-16 S4).
 - **AC5** — When `python breakpoints.py --fixture --plant placed` lists a build carrying that record,
-  `derive_breakpoints` returns a `spec audit` entry with cause `placement` after `item.design.reason`.
+  `derive_breakpoints` returns a `spec audit` entry with cause `owed` after `item.design.reason`, and a
+  record naming `item <tag>` returns an entry with cause `placement` at that item's boundary.
   Red when: the record exists and the listing omits it, so nothing fires at the position.
 - **AC6** — When `python placement.py --fixture --plant past-position` declares a `spec audit` on a build whose
   newest transition record is in building, the stub driver in the fixture records one call
@@ -229,7 +254,7 @@ such a request derives exactly what it derived before.
 
 `unattended protocol size` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/loop/placement.py · covers AC2 AC3 AC4 AC6 · the `loop placement fixtures` leg's plants, its failing case staged by `relayed` with the provenance read removed · none
+New arm: tools/loop/placement.py · covers AC1 AC2 AC3 AC4 AC6 · the `loop placement fixtures` leg's plants, its failing cases staged by `relayed` with the provenance read removed and by `audit-request-owed-only` with the placed `spec audit` listed with cause `placement` · none
 New arm: tools/loop/breakpoints.py · covers AC5 · TOOL-dDeclaredLoop-19's fixture plants, its failing case staged by `placed` with `read_placed_breakpoints` unhooked · none
 New arm: tools/unattended/unattended.test.sh · covers AC1 · the preflight case whose build folder holds a placed spec-audit record, its failing case staged by dropping the `placement` source · none
 
@@ -274,11 +299,19 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 · the preflight case
   `build/2026-10-26-build-TOOL-dPlacedRequest-1-parents-crosscheck.md`, row 32: the declaration
   passes the record factory TOOL-dDeclaredLoop-16 S4's flags, no `new disposition` door claimed, and
   AC4's call is re-grounded on the landed factory.
+- rev-5 · 2026-11-05 · §2 S5 S6 S7 · §4 The flow · §6 AC1 AC5 · §7 · §10 · the hand-out hold agrees with
+  TOOL-dDeclaredLoop-20 S7, the cross-check record
+  `build/2026-11-05-build-TOOL-dPlacedRequest-1-parents-crosscheck.md` row 6: a placed `spec audit` is
+  listed and fired at Design's exit with cause `owed`, `placement` kept for every other placed name and item
+  and for the at-once firing past the position; S7 states the hold for each `review.blocks` value; AC1 gains
+  the `audit-request-owed-only` plant, by the brief
+  prompts/2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-reground.md
 
 ## 10. Reuse audit
 
-The seams are TOOL-dDeclaredLoop-20's `--trigger … --cause placement`, whose closed cause set already holds
-`placement`, so this unit is a caller; TOOL-dDeclaredLoop-16 S4's disposition record for the
+The seams are TOOL-dDeclaredLoop-20 S2's `--trigger … --cause owed|placement`, whose closed cause set
+already holds both, so this unit is a caller, and its S7 `review.blocks`, whose `owed-only` hold the
+Design-exit firing meets by its cause `owed`; TOOL-dDeclaredLoop-16 S4's disposition record for the
 declaration, written by the record factory with that unit's flags; TOOL-dDeclaredLoop-19 S1's `derive_breakpoints` for the listing; and the driver's spec-audit
 derivation in `check_authorization` (`tools/unattended/unattended.sh:3975-4041`) for the hold. `python
 tools/codebase-map/reuse_lookup.py "fire a review breakpoint on a live build from an owner request"` ranked

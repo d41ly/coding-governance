@@ -13,6 +13,7 @@
 | [2026-10-26-build-TOOL-dTotalRecall-61-round4-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-61-round4-fix-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-61-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-61-1-spec-writer.md) | journal | TOOL-dTotalRecall-1 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-61-round4-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-61-round4-fix-brief.md) | research | — |
+| [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-11 TOOL-dTotalRecall-19 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-43 TOOL-dTotalRecall-50 TOOL-dTotalRecall-70 TOOL-dTotalRecall-89 |
 | [2026-10-26-review-TOOL-dTotalRecall-61-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-61-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-62 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 |
 
 <!-- /gen:spec-records -->

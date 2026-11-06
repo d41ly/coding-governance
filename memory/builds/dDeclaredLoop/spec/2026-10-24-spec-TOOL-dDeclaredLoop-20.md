@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-20 — the breakpoint program's own items: trigger, dispose, fold and cost, and the four keys `review.dispose` reads
 
-**Status:** DEFERRED · rev-3 · 2026-11-02 · node d · Tier-2 · base ed497191 · streams tooling · order 31 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base ed497191 · streams tooling · order 31 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0105@cab8e16c whole
 
@@ -27,7 +27,11 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-96 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-c.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-c.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-11-05-build-TOOL-dDeclaredLoop-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-1-parents-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 |
+| [2026-11-05-build-TOOL-dDeclaredLoop-1-reground-returns.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-1-reground-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 |
+| [2026-11-05-build-TOOL-dDeclaredLoop-20-deviation-201.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-20-deviation-201.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
 <!-- /gen:spec-records -->
@@ -81,8 +85,10 @@ take the opt-in and the unclassed values as arguments a caller types (AF-1, FM4)
   never held. The build harness takes the value with the other three in one `reviewPolicy` argument the
   driver prints at preflight, and its hand-out gate reads it. Observed by AC8.
 - **S8** — `review.fold`, the in-loop fold of an unbuilt spec, keeps its mechanism: the build harness's fold
-  instruction (`tools/workflows/unattended-build.template.js:1990-1997`) gains the item's tag and its
-  NON-CONVERGENT and CEILING route, findings promoted as `review.dispose` promotes them. Observed by AC1.
+  instruction (`tools/workflows/unattended-build.template.js:1990-1997`) gains the item's tag and the spec
+  subject's terminal states, BOUNDED or CEILING: a spec subject takes `no-fall` (`TOOL-dDeclaredLoop-32`
+  S3) and ends at its target or its bound, never NON-CONVERGENT, its new-mechanism findings promoted as
+  `review.dispose` promotes a spec subject's. Observed by AC1.
 - **S9** — BUILD-METHOD M4's disposal paragraphs (`tools/memory-tree/BUILD-METHOD.template.md`, rendered
   at `memory/guides/BUILD-METHOD.md`, as TOOL-dFoldedAudit-1 rewrote them) point at `review.findings` and
   `review.unverified` for the count and the unverified route, their default reading unchanged: a spec
@@ -112,7 +118,8 @@ take the opt-in and the unclassed values as arguments a caller types (AF-1, FM4)
 - **consumes-from** `TOOL-dDeclaredLoop-21` — `review.max-rounds`: the terminal state `review.trigger`
   refuses on, from the spec and closing bounds `review_bounds.py show` prints
 - **consumes-from** `TOOL-dDeclaredLoop-32` — `flow.route-backs`: the route-back exit `review.trigger`
-  refuses past, and the ` · to units` or ` · to asks` target `review.dispose` promotes by
+  refuses past on the build slug, and the target `review.dispose` promotes by, ` · to units` or
+  ` · to asks` on built work and always ` · to units` on a spec subject
 - **hands-off** `TOOL-dDeclaredLoop-19` — `review.dispose`: the breakpoint's disposal, which a review
   breakpoint runs and whose trigger cause `TOOL-dDeclaredLoop-19` sets
 - **hands-off** `TOOL-dDeclaredLoop-50` — the review program's item rows made to pass the program and declaration checks (the round-1 spec audit's id 2)
@@ -124,9 +131,9 @@ take the opt-in and the unclassed values as arguments a caller types (AF-1, FM4)
 
 | Tag | Actor | Needs | Witness | Routes | Reads |
 |---|---|---|---|---|---|
-| `item.review.trigger` | command | none | the trigger line `--trigger` prints, joined to the review record's `trigger=` field | fired to `item.review.pin`; a round past `review.max-rounds` or `flow.route-backs` refused, its open findings to `item.review.dispose`; not fired, the flow continues | `review.blocks`, `review.opt-in`, `review.unclassed`, `review.max-rounds`, `flow.route-backs` |
-| `item.review.dispose` | command | `item.review.report` | each confirmed finding joined to its fold, unit or ask | a local finding on an unbuilt spec to `item.review.fold`; built work and a new mechanism to new units or asks by `review.findings`; NON-CONVERGENT or CEILING on built work or for a new mechanism promoted to units while budget remains and to asks after; an unverified finding under `block` to a verification round | `review.findings`, `review.unverified`, `review.left-shift`, `flow.rework-budget` |
-| `item.review.fold` | spec writer | `item.review.dispose` | each confirmed finding joined to its fold at the spec's new blob, which the re-invoke's `prevSubjects` pins | the next round as `review.design.rounds` says, or released; NON-CONVERGENT or CEILING promoted as `item.review.dispose` promotes | `review.design.rounds` |
+| `item.review.trigger` | command | none | the trigger line `--trigger` prints, joined to the review record's `trigger=` field | fired to `item.review.pin`; a round past `review.max-rounds`, or on the build slug past `flow.route-backs`, refused, its open findings to `item.review.dispose`; not fired, the flow continues | `review.blocks`, `review.opt-in`, `review.unclassed`, `review.max-rounds`, `flow.route-backs` |
+| `item.review.dispose` | command | `item.review.report` | each confirmed finding joined to its fold, unit or ask | a local finding on an unbuilt spec to `item.review.fold`; built work and a new mechanism to new units or asks by `review.findings`; NON-CONVERGENT or CEILING on built work promoted to units while budget remains and to asks after; a spec subject's new mechanism promoted by `TOOL-dDeclaredLoop-32`'s target, always units; a plan revision to `plan.record` and a landing record to its patch-build intakes, both declared and unarmed (§3); an unverified finding under `block` to a verification round | `review.findings`, `review.unverified`, `review.left-shift`, `flow.rework-budget` |
+| `item.review.fold` | spec writer | `item.review.dispose` | each confirmed finding joined to its fold at the spec's new blob, which the re-invoke's `prevSubjects` pins | the next round as `review.design.rounds` says, or released; BOUNDED or CEILING, the spec subject's terminal states, its new mechanism promoted as `item.review.dispose` promotes a spec subject's | `review.design.rounds` |
 | `item.review.cost` | command | `item.review.report` | the `review-shape` line's cost fields | done | none |
 
 The rows take the field names `TOOL-dDeclaredLoop-9` and `TOOL-dDeclaredLoop-12` give every item row; the
@@ -275,8 +282,10 @@ is the edit.
 - **AC1** — When a scratch probe loads the loop definition through the loop kit's reader, it finds rows
   tagged `item.review.trigger`, `item.review.dispose`, `item.review.fold` and `item.review.cost`, each with a
   non-empty actor, witness and route set, the dispose row reading `review.findings`, `review.unverified` and
-  `review.left-shift`, and the fold row's routes naming the NON-CONVERGENT and CEILING promotion.
-  Red when: a row lacks its witness, so the item has no computed proof.
+  `review.left-shift`, and the fold row's routes naming the BOUNDED and CEILING terminal states and no
+  NON-CONVERGENT route.
+  Red when: a row lacks its witness, so the item has no computed proof; or the fold row keeps a
+  NON-CONVERGENT route a `no-fall` spec subject never reaches.
 - **AC2** — When a fixture repository under `%TEMP%` runs `unattended.sh --trigger <slug> --subject <spec>
   --cause owed`, it prints one JSON line carrying `preset`, `optIn`, `unclassed`, `"trigger": "owed"` and
   `"blocks": "yes"`, the `unclassed` value being the one the fixture's policy file sets; `--cause later`
@@ -360,6 +369,12 @@ here and read by the owner's run PLAY-dClosedLoop-13 names.
   promoted (reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md); no scope moved.
 - rev-3 · 2026-11-02 · §4 · S9 · the dispose row is limited to built work or a new mechanism and S9 rebases
   on M4 as rewritten, for the owner's 2026-11-01 ruling (TOOL-dFoldedAudit-8).
+- rev-4 · 2026-11-05 · §2 §3 §4 §6 · S8 AC1 · the rev-3 fold's leftovers: the dispose row promotes a spec
+  subject's new mechanism by TOOL-dDeclaredLoop-32's target, always units, and declares the plan-revision
+  and landing-record routes §3 names, unarmed; S8, the fold row and AC1 take the spec subject's BOUNDED or
+  CEILING in place of NON-CONVERGENT; the trigger row and the TOOL-dDeclaredLoop-32 edge refuse past
+  `flow.route-backs` on the build slug only, by the brief
+  prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-reground.md
 
 ## 10. Reuse audit
 

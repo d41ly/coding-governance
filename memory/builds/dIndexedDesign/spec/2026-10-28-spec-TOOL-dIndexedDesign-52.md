@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-52 — the standalone `--design-exit` opt-in reader refuses a present undated value and a conf it cannot evaluate, as the driver does
 
-**Status:** DEFERRED · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 20 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-2 · 2026-11-05 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 20 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,8 +11,12 @@
 | [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-47 TOOL-dIndexedDesign-48 TOOL-dIndexedDesign-49 TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-53 |
 | [2026-10-28-build-TOOL-dIndexedDesign-47-promoted-fix-return.md](../build/2026-10-28-build-TOOL-dIndexedDesign-47-promoted-fix-return.md) | research | TOOL-dIndexedDesign-47 TOOL-dIndexedDesign-49 TOOL-dIndexedDesign-53 |
 | [2026-10-28-build-TOOL-dIndexedDesign-52-deviation-521.md](../build/2026-10-28-build-TOOL-dIndexedDesign-52-deviation-521.md) | deviation | — |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-build-TOOL-dIndexedDesign-52-deviation-522.md](../build/2026-11-05-build-TOOL-dIndexedDesign-52-deviation-522.md) | deviation | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-47-promoted-fix-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-47-promoted-fix-brief.md) | research | TOOL-dIndexedDesign-47 TOOL-dIndexedDesign-49 TOOL-dIndexedDesign-53 |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-52-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-52-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
 
 <!-- /gen:spec-records -->
 
@@ -36,8 +40,11 @@ a missing key reads absent. It repairs `TOOL-dIndexedDesign-46` and takes order 
 ## 2. Scope (IN)
 
 - **S1** — An act ahead of this unit's order, in unit 46's pass commit. `check_spec_audit_declared` in
-  `tools/memory-tree/gen_build_index.py` answers by the table in §4 Data model, which supersedes unit 46
-  S11's "An undated value reads absent". A refusal makes `--design-exit` exit 2 and print the key, its
+  `tools/memory-tree/gen_build_index.py` answers, under `review.design` `opt-in`, by the table in §4
+  Data model, which supersedes unit 46 S11's "An undated value reads absent". That table is the
+  `opt-in` branch of TOOL-dDeclaredLoop-19 S8's table, the one branch that reads the README and the
+  default; under `owed`, `owed-above-tier` or `off`, unit 46 S11 decides from `review.design` before
+  either is read, so no value of theirs refuses. A refusal makes `--design-exit` exit 2 and print the key, its
   source, `readme` or `project`, and the value. Unit 38 S22 already treats an exit other than 0 or 1 as a
   refusal. Unit 46's Edges block names this, and its builder reads it there. Observed by AC1 and AC2.
 - **S2** — The conf read the driver's way. The `.unattended.conf` blob unit 46 S11 reads is evaluated by
@@ -50,8 +57,8 @@ a missing key reads absent. It repairs `TOOL-dIndexedDesign-46` and takes order 
 
 ## 3. Non-goals (OUT)
 
-- The `review.design` source, the third route unit 3 reads: unchanged, consulted only when both of the
-  others are absent.
+- The `review.design` source, which unit 3 reads and unit 46 S11 reads first, as TOOL-dDeclaredLoop-19
+  S8 orders it: unchanged; §4's table is its `opt-in` branch.
 - Unit 46 §8 F1's claim about AC9, the bare-line case's own record and a parity arm against the driver:
   report ids 6 and 11, MEDIUM, in `TOOL-dIndexedDesign-53`.
 - The driver's `check_authorization`: unchanged; it is the reference this reader matches.
@@ -60,6 +67,7 @@ a missing key reads absent. It repairs `TOOL-dIndexedDesign-46` and takes order 
 
 - **consumes-from** `TOOL-dIndexedDesign-46` — S11's `check_spec_audit_declared` and AC9, which S1 restates in that unit's pass commit and S3 supersedes (id 26)
 - **consumes-from** `TOOL-dIndexedDesign-38` — S3's `check_spec_audit_declared` and S22's reading of a `--design-exit` exit 2 as a refusal, on which S1's exit rests (id 26)
+- **consumes-from** external — TOOL-dDeclaredLoop-19 S8's opt-in table, whose `opt-in` branch §4's table answers, DEFERRED at base and an ancestor's
 - **hands-off** `TOOL-dIndexedDesign-53` — the restated reader, which that unit's parity arm runs beside the driver over one fixture set, and AC9's claim in unit 46 §8 F1 (ids 6 and 11)
 
 ## 4. Design
@@ -77,6 +85,10 @@ a missing key reads absent. It repairs `TOOL-dIndexedDesign-46` and takes order 
 
 ### Data model
 
+The table is the `opt-in` row of TOOL-dDeclaredLoop-19 S8's table (its §4 "The opt-in"):
+`review.design` is read first, and under any other value no README or conf value is read, so none
+refuses.
+
 | Input | Driver | This reader |
 |---|---|---|
 | README `spec-audit:` a date shaped like `2026-10-01` | declared, readme | declared, readme |
@@ -84,7 +96,7 @@ a missing key reads absent. It repairs `TOOL-dIndexedDesign-46` and takes order 
 | no README line; conf key a date | declared, project | declared, project |
 | no README line; conf key any other non-empty value | `fail 54` | exit 2, `project` |
 | no README line; conf blob not evaluated to its end | `fail 55` | exit 2, `project` |
-| no README line; no conf, or the key blank | absent | absent, then `review.design` |
+| no README line; no conf, or the key blank | absent | absent |
 
 ### Inventory
 
@@ -130,8 +142,11 @@ unit's own pass at order 20, alone at that order.
 - **AC1** — When `python tools/memory-tree/gen_build_index.py --design-exit tFix` runs under
   `with-spec-audit` over a fixture README carrying `spec-audit: yes`, and again over one carrying a bare
   `spec-audit:`, it exits 2 each time, printing `spec-audit`, `readme` and the value, `(empty)` for the
-  bare line. Over a README carrying `spec-audit: 2026-10-01` it prints a lens line.
-  Red when: an undated value reads absent or declared, or a dated one refuses.
+  bare line. Over a README carrying `spec-audit: 2026-10-01` it prints a lens line. Over the
+  `spec-audit: yes` README with a `.governance/policy.toml` setting `review.design = "off"`, it neither
+  exits 2 nor prints a lens line.
+  Red when: an undated value reads absent or declared, a dated one refuses, or a README value refuses
+  under `off`.
   fixture: scratch repositories under `%TEMP%/tfix-52`, which the tree does not hold today.
 - **AC2** — When the fixture README carries no `spec-audit:` line and its `.unattended.conf` declares
   `SPEC_AUDIT_DEFAULT="soon"`, `--design-exit` exits 2 naming `SPEC_AUDIT_DEFAULT` and `project`. When the
@@ -156,6 +171,10 @@ none
 
 - rev-1 · 2026-10-28 · initial draft, promoted from the round-1 spec audit of units 39 to 46, id 26
   (HIGH, item H4), on its sound fix, repairing TOOL-dIndexedDesign-46 S11 and AC9.
+- rev-2 · 2026-11-05 · §2 S1 · §3 non-goals, Edges · §4 Data model · §6 AC1 · the restatement of
+  TOOL-dIndexedDesign-46 S11's reader follows its rev-3: §4's table is the `opt-in` branch of
+  TOOL-dDeclaredLoop-19 S8's table, `review.design` read first, and AC1 plants `off` with a present
+  README key, by the brief prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md
 
 ## 10. Reuse audit
 

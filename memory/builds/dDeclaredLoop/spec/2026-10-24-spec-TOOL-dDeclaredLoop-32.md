@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-32 — the convergence routing: every closing-review and fix-pass loop ends on a non-decrease of its blocker and high count, its findings promoted by budget
 
-**Status:** DEFERRED · rev-3 · 2026-11-02 · node d · Tier-2 · base ed497191 · streams tooling · order 29 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base ed497191 · streams tooling · order 29 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0117@afb50a20 whole
 
@@ -11,7 +11,14 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-96 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-c.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-c.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-11-05-build-TOOL-dDeclaredLoop-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-1-crosscheck-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 |
+| [2026-11-05-build-TOOL-dDeclaredLoop-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-1-parents-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 |
+| [2026-11-05-build-TOOL-dDeclaredLoop-1-reground-returns.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-1-reground-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 |
+| [2026-11-05-build-TOOL-dDeclaredLoop-32-deviation-321.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-32-deviation-321.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-56 |
+| [2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 |
+| [2026-11-05-prompt-TOOL-dDeclaredLoop-32-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-32-1-spec-writer.md) | journal | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
 <!-- /gen:spec-records -->
@@ -56,8 +63,8 @@ budget ends as `flow.on-exhausted` says. Today the driver's `review_state`
 - **S4** — The promotion target. Every exit row that records `disposition promote` also records the target
   in a field before it, ` · to units` or ` · to asks`, from `TOOL-dDeclaredLoop-30`'s
   `promotion_target(build, subject, blocking)` called with the subject blocking: its `unit` answer is
-  ` · to units`, and its `on-exhausted` answer, the budget spent, is ` · to asks`, because a review loop's
-  findings go to asks after the budget (flow-steps.md:47-49). `review_exit_note` names the target. No
+  ` · to units`, and its `on-exhausted` answer, the budget spent, is ` · to asks`, because a closing-review
+  loop's findings go to asks after the budget (flow-steps.md:47-49). `review_exit_note` names the target. No
   target rule of this unit's own. A spec subject's target is always ` · to units`: `promotion_target` is
   not called for it, because a budget does not outrank a spec audit's chain stop (dFoldedAudit's README,
   owner, 2026-11-01). Observed by AC4, AC11.
@@ -69,8 +76,10 @@ budget ends as `flow.on-exhausted` says. Today the driver's `review_state`
   `fix-pass` on. Its target is `promotion_target`'s answer as it stands, ` · to units` or
   ` · to on-exhausted`, because an acceptance red blocks its unit's step exit. `fix-pass` joins `PARK_KINDS`
   in the driver and in its two read-side copies. Observed by AC5, AC6.
-- **S6** — Check 2 of `tools/unattended/check-unattended.sh` reads the same count: its non-decrease reading
-  (`:842`) adds `round-highs` to `blockers`, and an exit recording ` · to asks` is held to a floor of asks
+- **S6** — Check 2 of `tools/unattended/check-unattended.sh` reads the same count: its stalled-loop arm's
+  `flat` reading adds `round-highs` to `blockers` and reads the build slug's rows and `fix-pass` rows only,
+  never a spec subject's, which takes `no-fall` (S3) and is legally flat while it runs; and an exit
+  recording ` · to asks` is held to a floor of asks
   filed in the build's `BACKLOG.md` since BASE, counted with `asks_filed_in`
   (`tools/unattended/lib-unattended.sh:2207`), in place of new unit ids. Observed by AC7.
 - **S7** — The build harness passes `--round-highs` and `--round-minors` on every round it records.
@@ -98,19 +107,24 @@ budget ends as `flow.on-exhausted` says. Today the driver's `review_state`
 - A change to `deriveRoundState` in `tools/workflows/tier2-review.js`. It already counts blockers and highs
   and takes no route-back bound, and its parity arm with `review_state` holds over the domain where the
   fourth and sixth arguments are unset.
+- Passing `review.max-rounds` to `TOOL-dFairHearing-17`'s harness as `roundLimit`, or routing on its
+  `roundState`. That unit's §3 Edges hands the edge to dDeclaredLoop's convergence routing; no
+  dDeclaredLoop unit takes it up, and the edge is reported to dFairHearing
+  (`2026-11-05-build-TOOL-dDeclaredLoop-1-parents-crosscheck`).
 - No help page: `help/` documents neither the driver's verbs nor the review loop.
 
 ### Edges
 
 - **consumes-from** `TOOL-dDeclaredLoop-21` — `review.max-rounds`: the spec and closing bounds
-  `review_bounds.py show` prints, the ceiling `review_state` tests and the `roundLimit` it passes; without it there is no ceiling to
+  `review_bounds.py show` prints and the ceiling `review_state` tests; without it there is no ceiling to
   end at
 - **consumes-from** `TOOL-dDeclaredLoop-30` — `flow.rework-budget`: `promotion_target` and `count_returns`,
   the promotion answer every exit records and the returns the route-back test equals
 - **consumes-from** external — BUILD-METHOD M4's spec-audit rule, which owns a spec subject's disposal
   and its chain stop; TOOL-dFoldedAudit-1 states it
-- **hands-off** `TOOL-dDeclaredLoop-20` — `flow.route-backs`: `review.trigger` refuses a round past it and
-  `review.dispose` promotes by the ` · to units` or ` · to asks` target this unit writes
+- **hands-off** `TOOL-dDeclaredLoop-20` — `flow.route-backs`: `review.trigger` refuses a build-slug round
+  past it, and `review.dispose` promotes by the target this unit writes, ` · to units` or ` · to asks` on
+  the build slug and always ` · to units` on a spec subject (S4)
 - **hands-off** `TOOL-dDeclaredLoop-31` — `flow.route-backs`: a fix-pass loop past it with the budget spent
   records ` · to on-exhausted`, and the build then ends as `flow.on-exhausted` says
 - **hands-off** `TOOL-dDeclaredLoop-56` — the minors of the round-1 spec audit that land on this unit, id 53, a scope item of that unit
@@ -129,12 +143,14 @@ review_state <prior counts> <count> <bound> [<route-backs>] [<target>] [<no-fall
   otherwise                                     -> CONVERGING
 ```
 
-The four existing tests and their order are `TOOL-dDeclaredLoop-21`'s and stay as that unit leaves them
-(I18). The new test sits last, so a loop whose round bound comes first exits `BOUNDED` or `CEILING` as
+The four existing tests and their order are `TOOL-dDeclaredLoop-21`'s (I18). This unit gates the second,
+the non-decrease test, on `no-fall` unset (S3), and the first reads the target, defaulting to the count
+(S3). The route-back test sits last, so a loop whose round bound comes first exits `BOUNDED` or `CEILING` as
 before, and one whose `flow.route-backs` comes first exits `NON-CONVERGENT`, the "loop ends non-converging"
 of flow-steps.md:44-45. Both are terminal and both promote, which is the clause's "both promoting its open
-findings the same way". With neither new argument the function is byte-for-byte its predecessor, which
-keeps the `tools/workflows/tier2-review.test.sh` parity arm's domain unchanged.
+findings the same way". With arguments 4 to 6 all unset the function behaves as
+`TOOL-dDeclaredLoop-21` leaves it, which keeps the `tools/workflows/tier2-review.test.sh` parity arm's
+domain unchanged.
 
 | Value | Key | Target count |
 |---|---|---|
@@ -167,12 +183,12 @@ and ends.
 
 | Loop | `promotion_target(build, subject, true)` | Row field |
 |---|---|---|
-| review | `unit` | ` · to units` |
-| review | `on-exhausted` | ` · to asks` |
+| closing review | `unit` | ` · to units` |
+| closing review | `on-exhausted` | ` · to asks` |
 | fix-pass | `unit` | ` · to units` |
 | fix-pass | `on-exhausted` | ` · to on-exhausted` |
 
-A review loop's open findings go to asks once the budget is spent (flow-steps.md:47-49, stall-and-loop.md:186).
+A closing-review loop's open findings go to asks once the budget is spent (flow-steps.md:47-49, stall-and-loop.md:186).
 A fix-pass loop's open work blocks its unit's step exit, so with no budget left it cannot become a unit and
 cannot be dropped to an ask; the build ends as `flow.on-exhausted` says. The driver calls `budget.py` on its
 command line, as `TOOL-dDeclaredLoop-30`'s draw sites do, and parses nothing itself.
@@ -202,8 +218,11 @@ nothing.
 
 ### Check 2
 
-The awk at `tools/unattended/check-unattended.sh:822-870` keeps `b` as the blockers and adds `round-highs`
-for its `flat` reading, and reads ` · to asks` on an exit row. For such a subject the owed floor is the same
+Check 2's review-row awk in `tools/unattended/check-unattended.sh` keeps `b` as the blockers and adds
+`round-highs` for the stalled-loop arm's `flat` reading. That reading counts a row only when its subject is
+the build slug, the awk's `slug` variable, or the row is a `fix-pass` row, whose `reds` is its count: a
+flat non-terminal spec subject is a loop still running toward its target or bound (S3), not a stalled
+one. The awk also reads ` · to asks` on an exit row. For such a subject the owed floor is the same
 count, compared with the ask ids `asks_filed_in` finds in the build's `BACKLOG.md` at HEAD and not at BASE.
 A `to units` exit keeps today's comparison against the generated units region.
 
@@ -224,7 +243,7 @@ flight when this lands records its next round with `--round-highs`.
 
 ### Rollout
 
-The landing turns the rule on for every subject at once. A closing review whose rounds fall
+The landing turns the rule on for every closing-review and fix-pass subject at once. A closing review whose rounds fall
 in blockers but not in blockers plus highs ends one round earlier than it would have.
 
 ### Files touched (estimate)
@@ -307,9 +326,12 @@ copy.
   Red when: a read-side copy lacks the kind, so a `fix-pass` row is an unknown kind to that reader.
 - **AC7** — When `check-unattended.sh` runs over a fixture whose exit row records ` · to asks · disposition
   promote` with one blocker standing and the build's `BACKLOG.md` files no new ask, check 2 reds naming the
-  subject; with one ask filed since BASE it is green; and a fixture whose rows read `blockers 2 ·
-  round-highs 1` then `blockers 1 · round-highs 2 · NON-CONVERGENT` is not read as converging.
-  Red when: check 2 counts unit ids for a `to asks` exit, so the asks floor is never read.
+  subject; with one ask filed since BASE it is green; a fixture whose rows read `blockers 2 ·
+  round-highs 1` then `blockers 1 · round-highs 2 · NON-CONVERGENT` is not read as converging; and a
+  fixture whose spec subject records `blockers 1 · round-highs 0` twice with no terminal token stays green,
+  while the same two rows on the build slug red naming it as non-convergent.
+  Red when: check 2 counts unit ids for a `to asks` exit, so the asks floor is never read; or the
+  stalled-loop arm reads a spec subject flat, so a `no-fall` audit still running reds.
 - **AC8** — When a scratch node probe slices `writeRound` from `tools/workflows/unattended-build.js` and
   calls it with a stub driver, the first command it hands carries `--round-highs` with `au.highs`; and
   `sed 's/{{FANOUT_CAP}}/5/g' tools/workflows/unattended-build.template.js | diff - tools/workflows/unattended-build.js`
@@ -341,7 +363,7 @@ copy.
 
 New arm: tools/unattended/unattended.test.sh · covers AC1 AC3 AC4 AC5 AC10 AC11 · the planted flat follow-up, the route-back-first sequence, the spent-budget target and the never-greening fix pass, each staged against the base driver, which counts blockers alone and has no fix-pass verb · none
 
-New arm: tools/unattended/check-unattended.test.sh · covers AC7 · a `to asks` exit with no ask filed, staged against the base check, which counts unit ids · none
+New arm: tools/unattended/check-unattended.test.sh · covers AC7 · a `to asks` exit with no ask filed and a flat non-terminal spec subject, staged against the base check, which counts unit ids and reads every subject flat · none
 
 The unattended kit's own suites are waived for this build's landing (README rule 8): both arms are declared
 here and read by the owner's run PLAY-dClosedLoop-13 names.
@@ -378,6 +400,12 @@ here and read by the owner's run PLAY-dClosedLoop-13 names.
 - rev-3 · 2026-11-02 · §1 §3 §4 §6 §7 · S2 S3 S4 AC11 · spec subjects leave the strict-fall exit, for the
   owner's 2026-11-01 ruling (TOOL-dFoldedAudit-8), and the `**Carries:**` pin follows the amends row of
   `2026-11-01-build-TOOL-dFoldedAudit-8-deviation-81`; follow-ups and fix passes keep the rule.
+- rev-4 · 2026-11-05 · §2 §3 §4 §6 §7 · S4 S6 AC7 · the rev-3 fold's leftovers: the parity paragraph states the
+  `no-fall`-gated second test and behaviour equal to TOOL-dDeclaredLoop-21's with arguments 4 to 6 unset;
+  the asks route and the Rollout name closing-review and fix-pass loops; check 2's stalled-loop arm reads
+  the build slug and fix-pass rows only, with an AC7 plant of a flat non-terminal spec subject; the
+  TOOL-dDeclaredLoop-20 edge gives a spec subject ` · to units` always; the `roundLimit` claim is dropped,
+  by the brief prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-reground.md
 
 ## 10. Reuse audit
 

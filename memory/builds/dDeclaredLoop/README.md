@@ -159,17 +159,17 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-26 — a build's composition pinned per step, its position read at the pin, and the move at the next step boundary](spec/2026-10-24-spec-TOOL-dDeclaredLoop-26.md) | 23 | 2 | DEFERRED | rev-4 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-27 — the scenario kind and namespace: gov's five scenarios, admission, conflicts and the pin per step](spec/2026-10-24-spec-TOOL-dDeclaredLoop-27.md) | 24 | 2 | DEFERRED | rev-3 | 2026-10-25 |
 | [TOOL-dDeclaredLoop-28 — a build's recorded changes under flow.adapt, applied at its next step boundary, and its witnessed path held to its composition](spec/2026-10-24-spec-TOOL-dDeclaredLoop-28.md) | 25 | 2 | DEFERRED | rev-4 | 2026-11-05 |
-| [TOOL-dDeclaredLoop-21 — the review round bounds as policy keys: review.max-rounds, the design rounds and follow-ups, REVIEW_ROUNDS and RUNAWAY_CEILING retired](spec/2026-10-24-spec-TOOL-dDeclaredLoop-21.md) | 26 | 2 | DEFERRED | rev-3 | 2026-11-05 |
+| [TOOL-dDeclaredLoop-21 — the review round bounds as policy keys: review.max-rounds, the design rounds and follow-ups, REVIEW_ROUNDS and RUNAWAY_CEILING retired](spec/2026-10-24-spec-TOOL-dDeclaredLoop-21.md) | 26 | 2 | DEFERRED | rev-4 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-34 — the deviation approval route read from deviation.approval: by its risk, the owner for all, or its author recorded](spec/2026-10-24-spec-TOOL-dDeclaredLoop-34.md) | 27 | 2 | DEFERRED | rev-3 | 2026-11-05 |
-| [TOOL-dDeclaredLoop-30 — the rework budget: one per build on its transition record, frozen at Design's exit, drawn by every repetition and never by contention](spec/2026-10-24-spec-TOOL-dDeclaredLoop-30.md) | 28 | 2 | DEFERRED | rev-3 | 2026-11-05 |
-| [TOOL-dDeclaredLoop-32 — the convergence routing: every closing-review and fix-pass loop ends on a non-decrease of its blocker and high count, its findings promoted by budget](spec/2026-10-24-spec-TOOL-dDeclaredLoop-32.md) | 29 | 2 | DEFERRED | rev-3 | 2026-11-02 |
+| [TOOL-dDeclaredLoop-30 — the rework budget: one per build on its transition record, frozen at Design's exit, drawn by every repetition and never by contention](spec/2026-10-24-spec-TOOL-dDeclaredLoop-30.md) | 28 | 2 | DEFERRED | rev-4 | 2026-11-05 |
+| [TOOL-dDeclaredLoop-32 — the convergence routing: every closing-review and fix-pass loop ends on a non-decrease of its blocker and high count, its findings promoted by budget](spec/2026-10-24-spec-TOOL-dDeclaredLoop-32.md) | 29 | 2 | DEFERRED | rev-4 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-48 — the rework budget keeps a home under every channel set `transitions.record` admits](spec/2026-10-24-spec-TOOL-dDeclaredLoop-48.md) | 29 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-49 — the budget's `spent` counts every draw of the build, across every record, in commit order](spec/2026-10-24-spec-TOOL-dDeclaredLoop-49.md) | 29 | 2 | DEFERRED | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-31 — `flow.on-exhausted`: a build whose budget is spent ends by a transition row, and never laps again](spec/2026-10-24-spec-TOOL-dDeclaredLoop-31.md) | 30 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-31 — `flow.on-exhausted`: a build whose budget is spent ends by a transition row, and never laps again](spec/2026-10-24-spec-TOOL-dDeclaredLoop-31.md) | 30 | 2 | DEFERRED | rev-3 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-60 — the budget reader counts draws in every run record, rotated archives included, under `MEMORY_ROOT`](spec/2026-10-24-spec-TOOL-dDeclaredLoop-60.md) | 30 | 2 | DEFERRED | rev-3 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-61 — every draw row carries a draw id, so two identical parallel draws stay two rows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-61.md) | 30 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-62 — the transition-record merge driver chosen against the recorded union measurement and the row driver's own refusal](spec/2026-10-24-spec-TOOL-dDeclaredLoop-62.md) | 30 | 2 | DEFERRED | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-20 — the breakpoint program's own items: trigger, dispose, fold and cost, and the four keys `review.dispose` reads](spec/2026-10-24-spec-TOOL-dDeclaredLoop-20.md) | 31 | 2 | DEFERRED | rev-3 | 2026-11-02 |
+| [TOOL-dDeclaredLoop-20 — the breakpoint program's own items: trigger, dispose, fold and cost, and the four keys `review.dispose` reads](spec/2026-10-24-spec-TOOL-dDeclaredLoop-20.md) | 31 | 2 | DEFERRED | rev-4 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-22 — the stage-exit recommendation: a command scores it, the producing role reasons it, one record carries both](spec/2026-10-24-spec-TOOL-dDeclaredLoop-22.md) | 32 | 2 | DEFERRED | rev-3 | 2026-10-25 |
 | [TOOL-dDeclaredLoop-50 — the review program's item rows pass the program and declaration checks](spec/2026-10-24-spec-TOOL-dDeclaredLoop-50.md) | 32 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-19 — breakpoints at any item boundary: reviews and owner gates one mechanism under `review.breakpoints`, `review.<stage>` and `autonomy`](spec/2026-10-24-spec-TOOL-dDeclaredLoop-19.md) | 33 | 2 | DEFERRED | rev-2 | 2026-10-24 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 195 bound to this build, across 4 record folder(s).
+Records: 209 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -221,13 +221,13 @@ Ids no `spec-audit` record has ever named: TOOL-dDeclaredLoop-100 TOOL-dDeclared
 
 Ids whose spec moved past its audited revision: TOOL-dDeclaredLoop-1@rev-1 TOOL-dDeclaredLoop-11@rev-1 TOOL-dDeclaredLoop-12@rev-1 TOOL-dDeclaredLoop-13@rev-1 TOOL-dDeclaredLoop-14@rev-1 TOOL-dDeclaredLoop-15@rev-1 TOOL-dDeclaredLoop-16@rev-1 TOOL-dDeclaredLoop-17@rev-1 TOOL-dDeclaredLoop-18@rev-1
 TOOL-dDeclaredLoop-2@rev-1 TOOL-dDeclaredLoop-20@rev-1 TOOL-dDeclaredLoop-21@rev-1 TOOL-dDeclaredLoop-22@rev-1 TOOL-dDeclaredLoop-24@rev-1 TOOL-dDeclaredLoop-25@rev-1 TOOL-dDeclaredLoop-26@rev-1 TOOL-dDeclaredLoop-27@rev-1 TOOL-dDeclaredLoop-28@rev-1 TOOL-dDeclaredLoop-29@rev-1
-TOOL-dDeclaredLoop-3@rev-1 TOOL-dDeclaredLoop-30@rev-1 TOOL-dDeclaredLoop-32@rev-1 TOOL-dDeclaredLoop-33@rev-1 TOOL-dDeclaredLoop-34@rev-1 TOOL-dDeclaredLoop-36@rev-1 TOOL-dDeclaredLoop-37@rev-1 TOOL-dDeclaredLoop-38@rev-1 TOOL-dDeclaredLoop-4@rev-1 TOOL-dDeclaredLoop-40@rev-1
-TOOL-dDeclaredLoop-41@rev-1 TOOL-dDeclaredLoop-42@rev-1 TOOL-dDeclaredLoop-43@rev-1 TOOL-dDeclaredLoop-44@rev-1 TOOL-dDeclaredLoop-45@rev-1 TOOL-dDeclaredLoop-46@rev-1 TOOL-dDeclaredLoop-47@rev-1 TOOL-dDeclaredLoop-48@rev-1 TOOL-dDeclaredLoop-49@rev-1 TOOL-dDeclaredLoop-5@rev-1
-TOOL-dDeclaredLoop-50@rev-1 TOOL-dDeclaredLoop-51@rev-1 TOOL-dDeclaredLoop-52@rev-1 TOOL-dDeclaredLoop-53@rev-1 TOOL-dDeclaredLoop-54@rev-1 TOOL-dDeclaredLoop-55@rev-1 TOOL-dDeclaredLoop-56@rev-1 TOOL-dDeclaredLoop-57@rev-1 TOOL-dDeclaredLoop-59@rev-1 TOOL-dDeclaredLoop-6@rev-1
-TOOL-dDeclaredLoop-60@rev-1 TOOL-dDeclaredLoop-61@rev-1 TOOL-dDeclaredLoop-62@rev-1 TOOL-dDeclaredLoop-63@rev-1 TOOL-dDeclaredLoop-64@rev-1 TOOL-dDeclaredLoop-65@rev-1 TOOL-dDeclaredLoop-66@rev-1 TOOL-dDeclaredLoop-67@rev-1 TOOL-dDeclaredLoop-68@rev-1 TOOL-dDeclaredLoop-69@rev-1
-TOOL-dDeclaredLoop-7@rev-1 TOOL-dDeclaredLoop-70@rev-1 TOOL-dDeclaredLoop-71@rev-1 TOOL-dDeclaredLoop-72@rev-1 TOOL-dDeclaredLoop-73@rev-1 TOOL-dDeclaredLoop-74@rev-1 TOOL-dDeclaredLoop-75@rev-1 TOOL-dDeclaredLoop-76@rev-1 TOOL-dDeclaredLoop-77@rev-1 TOOL-dDeclaredLoop-78@rev-1
-TOOL-dDeclaredLoop-79@rev-1 TOOL-dDeclaredLoop-8@rev-1 TOOL-dDeclaredLoop-80@rev-1 TOOL-dDeclaredLoop-81@rev-1 TOOL-dDeclaredLoop-82@rev-1 TOOL-dDeclaredLoop-83@rev-1 TOOL-dDeclaredLoop-84@rev-1 TOOL-dDeclaredLoop-85@rev-1 TOOL-dDeclaredLoop-86@rev-1 TOOL-dDeclaredLoop-87@rev-1
-TOOL-dDeclaredLoop-88@rev-1 TOOL-dDeclaredLoop-89@rev-1 TOOL-dDeclaredLoop-90@rev-1 TOOL-dDeclaredLoop-91@rev-1 TOOL-dDeclaredLoop-92@rev-1 TOOL-dDeclaredLoop-93@rev-1 TOOL-dDeclaredLoop-94@rev-1 TOOL-dDeclaredLoop-95@rev-1 TOOL-dDeclaredLoop-96@rev-1.
+TOOL-dDeclaredLoop-3@rev-1 TOOL-dDeclaredLoop-30@rev-1 TOOL-dDeclaredLoop-31@rev-1 TOOL-dDeclaredLoop-32@rev-1 TOOL-dDeclaredLoop-33@rev-1 TOOL-dDeclaredLoop-34@rev-1 TOOL-dDeclaredLoop-36@rev-1 TOOL-dDeclaredLoop-37@rev-1 TOOL-dDeclaredLoop-38@rev-1 TOOL-dDeclaredLoop-4@rev-1
+TOOL-dDeclaredLoop-40@rev-1 TOOL-dDeclaredLoop-41@rev-1 TOOL-dDeclaredLoop-42@rev-1 TOOL-dDeclaredLoop-43@rev-1 TOOL-dDeclaredLoop-44@rev-1 TOOL-dDeclaredLoop-45@rev-1 TOOL-dDeclaredLoop-46@rev-1 TOOL-dDeclaredLoop-47@rev-1 TOOL-dDeclaredLoop-48@rev-1 TOOL-dDeclaredLoop-49@rev-1
+TOOL-dDeclaredLoop-5@rev-1 TOOL-dDeclaredLoop-50@rev-1 TOOL-dDeclaredLoop-51@rev-1 TOOL-dDeclaredLoop-52@rev-1 TOOL-dDeclaredLoop-53@rev-1 TOOL-dDeclaredLoop-54@rev-1 TOOL-dDeclaredLoop-55@rev-1 TOOL-dDeclaredLoop-56@rev-1 TOOL-dDeclaredLoop-57@rev-1 TOOL-dDeclaredLoop-59@rev-1
+TOOL-dDeclaredLoop-6@rev-1 TOOL-dDeclaredLoop-60@rev-1 TOOL-dDeclaredLoop-61@rev-1 TOOL-dDeclaredLoop-62@rev-1 TOOL-dDeclaredLoop-63@rev-1 TOOL-dDeclaredLoop-64@rev-1 TOOL-dDeclaredLoop-65@rev-1 TOOL-dDeclaredLoop-66@rev-1 TOOL-dDeclaredLoop-67@rev-1 TOOL-dDeclaredLoop-68@rev-1
+TOOL-dDeclaredLoop-69@rev-1 TOOL-dDeclaredLoop-7@rev-1 TOOL-dDeclaredLoop-70@rev-1 TOOL-dDeclaredLoop-71@rev-1 TOOL-dDeclaredLoop-72@rev-1 TOOL-dDeclaredLoop-73@rev-1 TOOL-dDeclaredLoop-74@rev-1 TOOL-dDeclaredLoop-75@rev-1 TOOL-dDeclaredLoop-76@rev-1 TOOL-dDeclaredLoop-77@rev-1
+TOOL-dDeclaredLoop-78@rev-1 TOOL-dDeclaredLoop-79@rev-1 TOOL-dDeclaredLoop-8@rev-1 TOOL-dDeclaredLoop-80@rev-1 TOOL-dDeclaredLoop-81@rev-1 TOOL-dDeclaredLoop-82@rev-1 TOOL-dDeclaredLoop-83@rev-1 TOOL-dDeclaredLoop-84@rev-1 TOOL-dDeclaredLoop-85@rev-1 TOOL-dDeclaredLoop-86@rev-1
+TOOL-dDeclaredLoop-87@rev-1 TOOL-dDeclaredLoop-88@rev-1 TOOL-dDeclaredLoop-89@rev-1 TOOL-dDeclaredLoop-90@rev-1 TOOL-dDeclaredLoop-91@rev-1 TOOL-dDeclaredLoop-92@rev-1 TOOL-dDeclaredLoop-93@rev-1 TOOL-dDeclaredLoop-94@rev-1 TOOL-dDeclaredLoop-95@rev-1 TOOL-dDeclaredLoop-96@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->

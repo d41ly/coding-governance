@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-14 — the scout's bug classes by intent: at most five from the catalogue's index, armed only by a replay that beats the anchor ranking's top five
 
-**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 12 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-3 · 2026-11-05 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 12 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0396@bf718415 whole
 
@@ -11,7 +11,13 @@
 | [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-47 TOOL-dIndexedDesign-48 TOOL-dIndexedDesign-49 TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-52 TOOL-dIndexedDesign-53 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-b.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-b.md) | research | TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-1 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-14-deviation-141.md](../build/2026-11-05-build-TOOL-dIndexedDesign-14-deviation-141.md) | deviation | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
 | [2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-3 |
 
 <!-- /gen:spec-records -->
@@ -35,6 +41,8 @@ specced as acceptance.
 Build-run preconditions this unit calls and does not build: the scout's return grammar, its grader
 `check_reuse_scout` and `read_reuse_scouts` (TOOL-dIndexedDesign-13, I10); `house_index.py` with its
 `## Steps` and the slot that hands a scout record to a work order (TOOL-dLinkedLibrary-2 S2, S3, S7);
+`cmd_for_paths` with its gated cut and `record` tier, and `derive_gate_status` (TOOL-dLinkedLibrary-24
+S2, S5, S6);
 the experiment factory `experiment.js`, `experiment-args`, `--blind` and the `case_input` hook
 (TOOL-dIndexedDesign-5, I12); `replay_scorer.py`'s `INSTANCES`, `case_evidence`,
 `derive_paired_cases` and `--experiment` (TOOL-dFairHearing-12 S1, TOOL-dFairHearing-14 S1 to S5);
@@ -42,13 +50,16 @@ and the `experiment` entry with its overlay row (TOOL-dBoundRoles-16 S4, TOOL-dB
 
 The scout record is unit 13's `record-kind.seams` kind; this unit owns no node.
 
-- **S1** — The anchor ranking, extracted. `derive_class_ranking(recs, paths, m)` in
+- **S1** — The anchor ranking, extracted. `derive_class_ranking(recs, paths, m, gated)` in
   `tools/memory-tree/gotchas.py` holds the class half of `cmd_for_paths`'s selection
-  (`tools/memory-tree/gotchas.py:688-710`). It takes every non-universal `kind: class` record that
-  `selectable` (:340) anchors to a path, and orders them by best `derive_anchor_tier` (:358), then by
-  reach, then by name. It returns their names. `cmd_for_paths` calls it, and its checklist is
-  byte-identical before and after. "The anchor ranking's top five" is the first five names it
-  returns. Observed by AC1.
+  (`tools/memory-tree/gotchas.py:688-710` at base) as TOOL-dLinkedLibrary-24 S5 and S6 leave it. It
+  takes every non-universal `kind: class` record that `selectable` (:340) anchors to a path and whose
+  name is not in `gated`, the names whose `derive_gate_status` (TOOL-dLinkedLibrary-24 S2) reads
+  `gated`, a set its caller derives. It orders them by best `derive_anchor_tier` (:358) over that
+  unit's S6 tiers, `record` last, then by reach, then by name, and returns their names.
+  `cmd_for_paths` derives `gated` over its catalogue and calls it, and its checklist is byte-identical
+  before and after. "The anchor ranking's top five" is the first five names it returns. Observed by
+  AC1.
 - **S2** — The corpus, pre-registered.
   - The instrument `memory/builds/dIndexedDesign/build/<date>-build-TOOL-dIndexedDesign-14-replay-corpus.py`
     has two verbs. `write` writes `<date>-build-TOOL-dIndexedDesign-14-replay-cases.json`, opening
@@ -60,11 +71,16 @@ The scout record is unit 13's `record-kind.seams` kind; this unit owns no node.
   - The snapshot `before` is the parent of the range's first commit that touches a path outside the
     memory root: the tree as it stood before the build (§8 F3).
   - Each case holds `id`, `review`, `before`, `confirmed` (the class names in confirmed rows'
-    `classes` cells), `anchor` (the top five of `derive_class_ranking` over the range's changed paths
-    and the catalogue at `before`), `control` (true when `confirmed` is empty), and `input`.
+    `classes` cells), `anchor` (the top five of `derive_class_ranking` over the range's changed paths,
+    the catalogue at `before` and the case's `gated` set), `control` (true when `confirmed` is empty),
+    and `input`.
   - `input` holds only `spec`, each `<before>:<spec path>`, and `index`, the `name — description` of
-    every `kind: class` record that `load_records_at(root, m, before)` (`gotchas.py:301`) returns.
-    That is the catalogue's one-line index as it stood.
+    every `kind: class` record that `load_records_at(root, m, before)` (`gotchas.py:301`) returns, less
+    the case's `gated` set. That is the catalogue's one-line index as it stood, over the class set the
+    anchor ranks.
+  - A case's `gated` set is the names whose `derive_gate_status` reads `gated` over the records at
+    `before`, derived once by `write` and passed to both arms. A record carrying no `gate:` is never
+    `gated`, so a case whose `before` precedes TOOL-dLinkedLibrary-24 S8's backfill has it empty.
   - `write` prints the population: records considered, excluded by reason, cases and controls.
 
   Observed by AC2.
@@ -135,8 +151,12 @@ The scout record is unit 13's `record-kind.seams` kind; this unit owns no node.
 - The factory itself: TOOL-dIndexedDesign-5's.
 - A blind judge. The confirmed classes are objective evidence, so the deterministic scorer is the
   table's one choice.
-- Gated classes. Once TOOL-dLinkedLibrary-24 S5 marks a class gated it leaves the index the corpus
-  reads, and this unit reads whatever `load_records_at` returns at `before`.
+- Deciding which classes are gated. TOOL-dLinkedLibrary-24 S5 cuts a `gated` class from
+  `cmd_for_paths` only, and its S6 keeps it in `memory/gotchas/INDEX.md` under a `Gate` column. S1
+  extracts that cut with the ranking, and S2 leaves the same classes out of each case's `index`, so
+  the anchor and the intent arm rank one class set. The status is `derive_gate_status`'s over the
+  records at `before`, graded against the leg manifest and plants of the tree the instrument runs in,
+  not as they stood at `before`; this unit does not check that difference.
 
 ### Edges
 
@@ -144,6 +164,7 @@ The scout record is unit 13's `record-kind.seams` kind; this unit owns no node.
 - **consumes-from** `TOOL-dIndexedDesign-13` — `read_reuse_scouts`, the widened reader whose `bug_classes` key the slot reads, and the `## Bug classes` slot S2 places, which S7 grades through `check_reuse_scout` and S8 arms; without them the classes have no section and no grade
 - **consumes-from** external — dFairHearing: `INSTANCES`, `case_evidence`, `derive_paired_cases` and `--experiment` (TOOL-dFairHearing-12 S1, TOOL-dFairHearing-14 S1 to S5)
 - **consumes-from** external — dBoundRoles: the `experiment` entry and the overlay row (TOOL-dBoundRoles-16 S4, TOOL-dBoundRoles-20 S3)
+- **consumes-from** external — dLinkedLibrary: `cmd_for_paths` with its gated cut and its `record` tier, and `derive_gate_status` (TOOL-dLinkedLibrary-24 S2, S5, S6), which S1 extracts and S2 calls
 - **hands-off** external — dFurnishedOrders: the spec's `### Bug classes` field reading the scout record's `## Bug classes`, the ask of §8 F4
 - **hands-off** `TOOL-dIndexedDesign-38` — the round-1 spec audit's minors that land on this spec, report ids 41, each a scope item of that batch unit
 
@@ -251,13 +272,17 @@ with that verdict line.
 - **AC1** — When `gotchas.py --for-paths` runs over the two paths `tools/memory-tree/gotchas.py`
   and `tools/memory-tree/tree_lib.py` before and after S1, the two outputs are byte-identical. A
   `python -c` call of `gotchas.derive_class_ranking` over the same records and paths returns the
-  classes in the order the checklist prints them.
-  Red when: the extraction reorders a tier or drops a class.
+  classes in the order the checklist prints them; with a fixture class whose `derive_gate_status`
+  reads `gated`, neither the checklist nor `derive_class_ranking` names it.
+  Red when: the extraction reorders a tier, drops a class, or ranks a class `cmd_for_paths` cuts.
 - **AC2** — When the corpus instrument's `check` verb runs over the committed cases file, it exits 0,
   and every case's `input` holds only `spec` and `index`. Each `spec` names a commit at which
   `git cat-file -e` finds that spec, and at least one case is a control. With a case planted whose
-  `before` follows its range's first product commit, `check` exits 1 naming the case.
-  Red when: a snapshot taken after the build passes, or a case carries a key past `input`.
+  `before` follows its range's first product commit, `check` exits 1 naming the case. Over a scratch
+  catalogue holding one class whose `derive_gate_status` reads `gated`, `write` leaves it out of every
+  case's `index` and `anchor`.
+  Red when: a snapshot taken after the build passes, a case carries a key past `input`, or a gated
+  class reaches one arm and not the other.
   figure: the case and control counts are DERIVED by `write`; the 47 is PINNED at dispatch 135.
 - **AC3** — When `python replay_scorer.py --experiment <manifest>` scores planted results on a
   three-case fixture, it refuses an answer naming six classes and one naming a class absent from the
@@ -347,6 +372,11 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC7 · check 3
   (:446-503), I10, I12 and scout B's row for this unit.
 - rev-2 · 2026-10-28 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from edge of TOOL-dIndexedDesign-38,
   promoted by the round-1 spec audit of this build; nothing else moved.
+- rev-3 · 2026-11-05 · §2 preconditions, S1, S2 · §3 · AC1, AC2 · S1 extracts `cmd_for_paths` as
+  TOOL-dLinkedLibrary-24 S5 and S6 leave it, its gated cut and `record` tier, and S2 cuts the same
+  gated set from each case's `index`, so both arms rank one class set; §3 no longer says a gated class
+  leaves the index, which that unit keeps, and gains the dLinkedLibrary edge, by the brief
+  prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md
 
 ## 10. Reuse audit
 
