@@ -22,9 +22,16 @@ reference; this page is the short version.
 3. **The handoff renderer joins them.** `handoff.py render` writes one prompt file under the build's
    `prompts/` folder, with `## Role` and then `## Task`, filled from the card, the build's brief and
    any `--input` values. A required input that is missing or still a placeholder refuses by name.
+   The prompt carries no charter text: the charter rides once, in the agent file.
 4. **The agent runs as a native type.** Each role is rendered into `.claude/agents/gov-<role>.md`,
    which starts without the full charter and at the reasoning effort the policy file sets. It
-   carries the practices its role cites and the charter's Protocols and Facts sections.
+   carries the practices its role cites and the charter's Protocols and Facts sections, first.
+5. **Each block carries its level.** With the playbook kit installed, every block a subagent gets
+   sits in an envelope, `[<doc> · Level <n> · <direction>]` up to `[/<doc>]`, so it ranks them as
+   the main session does. The agent file holds the charter at level 0 inside its own level 5. The
+   task part holds the practices at its step at level 0, then the task at level 6.
+   `handoff.py check <file>` refuses an envelope left open or a level that falls within a part.
+   Without the playbook kit the render prints one `envelope — unarmed` note and ranks nothing.
 
 ## When a render checks a role's load set
 

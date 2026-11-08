@@ -160,7 +160,7 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-11 — load sets derived per reader and item, budgeted, and refused when a required unit is missing](spec/2026-10-23-spec-PLAY-dOrderedCharter-11.md) | 21 | 2 | CLOSED | rev-9 | 2026-11-08 |
 | [PLAY-dOrderedCharter-27 — each role's load set budgeting the `code` slot](spec/2026-10-23-spec-PLAY-dOrderedCharter-27.md) | 22 | 2 | CLOSED | rev-6 | 2026-11-08 |
 | [PLAY-dOrderedCharter-21 — each practice's reach per step rendered as step-scoped units handed in work orders](spec/2026-10-23-spec-PLAY-dOrderedCharter-21.md) | 23 | 2 | CLOSED | rev-4 | 2026-11-09 |
-| [PLAY-dOrderedCharter-5 — ranked envelopes in every subagent handoff, the charter carried once](spec/2026-10-23-spec-PLAY-dOrderedCharter-5.md) | 24 | 2 | DEFERRED | rev-6 | 2026-11-08 |
+| [PLAY-dOrderedCharter-5 — ranked envelopes in every subagent handoff, the charter carried once](spec/2026-10-23-spec-PLAY-dOrderedCharter-5.md) | 24 | 2 | CLOSED | rev-6 | 2026-11-09 |
 | [PLAY-dOrderedCharter-4 — the instruction map re-injected on compact and resume through the existing replay fragment](spec/2026-10-23-spec-PLAY-dOrderedCharter-4.md) | 25 | 2 | DEFERRED | rev-5 | 2026-11-08 |
 | [PLAY-dOrderedCharter-8 — the build's card at level 1, through an ignored per-worktree card file the charter's entry file imports](spec/2026-10-23-spec-PLAY-dOrderedCharter-8.md) | 26 | 2 | DEFERRED | rev-3 | 2026-11-08 |
 | [PLAY-dOrderedCharter-14 — memory instructing nothing: the auto-memory index measured at session start, its directives detected, a standing directive promoted into a unit](spec/2026-10-23-spec-PLAY-dOrderedCharter-14.md) | 27 | 2 | DEFERRED | rev-4 | 2026-11-08 |
@@ -183,7 +183,7 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-6 | 2026-11-08 |
 <!-- /gen:build-units -->
 
-Records: 459 bound to this build, across 4 record folder(s).
+Records: 462 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

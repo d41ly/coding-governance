@@ -1838,7 +1838,8 @@ SLOT_DEPLOY = 'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "TPL.md"\n'
 SLOT_TEMPLATE = "<!-- governance-template: v4.4 -->\n\n# fixture — agent charter\n\n<!-- units: {} -->\n"
 SLOT_CHARTER = ("<!-- gov:playbook -->\n# fixture — agent charter\n\nMUST answer the subagent.\n"
                 "<!-- /gov:playbook -->\n")
-#: The handoff a kit renders over the case's build, pinned from `render_handoff` before the template held it.
+#: The handoff a kit renders over the case's build, pinned from `render_handoff` before the template held it and
+#: re-pinned to the unranked render once the charter left the task (PLAY-dOrderedCharter-5 S3).
 ORDER_ROLE = ("---\nname: gov-fixture\ndescription: A fixture role.\nworkflow: fixture\nreads: {}\nrules: {}\n---\n\n"
               "You are the fixture role of {{{{MEMORY_ROOT}}}}.\n")
 ORDER_CHARTER = ("## 1. Governing practices\n\n- [alpha] The first rule.\n- [beta] The second rule.\n\n"
@@ -1847,14 +1848,13 @@ ORDER_HEAD = ("**Serves:** journal PLAY-fixture-1\n\n# gov-fixture handoff — P
               "<!-- gov:handoff role=gov-fixture build=fixture unit=PLAY-fixture-1 path=memory/builds/fixture/prompts/"
               "{date}-prompt-PLAY-fixture-1-1-fixture.md role-sha=e883c92f6c96 task-sha=TASK -->\n\n"
               "## Role\n\nYou are the fixture role of memory.\n\n## Task\n\n"
-              "This handoff is for build `fixture`, unit `PLAY-fixture-1`.\nNot supplied, optional: `input:spec`.\n")
+              "This handoff is for build `fixture`, unit `PLAY-fixture-1`.\nNot supplied, optional: `input:spec`, `input:code`.\n")
 ORDER_CASES = (
     # (case, reads, rules, charter, --input, the bytes it pins)
     ("every slot", "input:question, input:spec?", "alpha", ORDER_CHARTER, ["--input", "question=why"],
-     ORDER_HEAD.replace("TASK", "9465cdbea5bd") + "\n### input:question\n\nwhy\n\n### Charter rules\n\n"
-     "- [alpha] The first rule.\n\n### Protocols\n\n- A protocol line.\n\n### Facts\n\n- A fact line.\n"),
+     ORDER_HEAD.replace("TASK", "12fd487f1fd2") + "\n### input:question\n\nwhy\n"),
     ("two slots with nothing to fill", "input:spec?", "", "## §1 — Practices\n\n- A pre-tag rule.\n", [],
-     ORDER_HEAD.replace("TASK", "64d22ea8580c")),
+     ORDER_HEAD.replace("TASK", "d6544825734a")),
 )
 
 
@@ -2060,8 +2060,8 @@ def arm_work_order(c):
         c.check(f"{case}: handoff.py prints the bytes it printed before the template", got == pinned, repr(got))
     template = home / "templates" / "work-order.template.md"
     text = template.read_text(encoding="utf-8")
-    template.write_text(text.replace("slot: reads", "slot: swap").replace("slot: charter-blocks", "slot: reads")
-                        .replace("slot: swap", "slot: charter-blocks"), encoding="utf-8", newline="")
+    template.write_text(text.replace("slot: reads", "slot: swap").replace("slot: opening", "slot: reads")
+                        .replace("slot: swap", "slot: opening"), encoding="utf-8", newline="")
     case, reads, rules, charter, inputs, pinned = ORDER_CASES[0]
     c.check("a template moving a slot moves the bytes", read_order(reads, rules, charter, inputs) != pinned)
 

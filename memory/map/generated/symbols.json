@@ -5003,6 +5003,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "check_envelope_order",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "check_envelopes_green",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -6171,6 +6176,11 @@
       "id": "check_range_whole",
       "kind": "function",
       "file": "tools/unattended/check-pass-order.test.sh"
+    },
+    {
+      "id": "check_ranked_arms",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "check_reaches",
@@ -12136,6 +12146,11 @@
       "id": "load_design_lib",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "load_document_registry",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "load_dossier_texts",

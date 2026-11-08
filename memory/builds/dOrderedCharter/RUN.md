@@ -361,3 +361,11 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-08T22:12:25Z brief · item PLAY-dOrderedCharter-21 · reason 51b6d02a3c42 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-21-build-brief.md
 
 2026-11-08T22:30:25Z dispatch · item 61e38b49 PLAY-dOrderedCharter-21 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-08T23:07:44Z dispatch · item 6ff4f227 PLAY-dOrderedCharter-5 · reason tools/roles/handoff.py tools/roles/render_agents.py tools/roles/roles_lib.py tools/roles/templates/work-order.template.md tools/roles/README.md tools/playbook/instruction_units.py help/roles.md memory/map/generated/symbols.json memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-5.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-5-ledger.md memory/builds/dOrderedCharter/README.md memory/LIVE.md
+
+2026-11-08T23:07:45Z brief · item PLAY-dOrderedCharter-5 · reason e2023435fb0b memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-5-build-brief.md
+
+2026-11-08T23:23:14Z dispatch · item 6ff4f227 PLAY-dOrderedCharter-5 · reason memory/builds/dOrderedCharter/build/2026-11-09-build-PLAY-dOrderedCharter-5-deviation-53.md memory/builds/dOrderedCharter/build/2026-11-09-build-PLAY-dOrderedCharter-5-deviation-54.md
+
+2026-11-08T23:34:12Z dispatch · item 6ff4f227 PLAY-dOrderedCharter-5 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

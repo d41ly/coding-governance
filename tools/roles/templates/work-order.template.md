@@ -4,10 +4,8 @@
 
 ## Task
 
+<!-- slot: practices -->
+
 <!-- slot: opening -->
 
 <!-- slot: reads -->
-
-<!-- slot: charter-blocks -->
-
-<!-- slot: practices -->

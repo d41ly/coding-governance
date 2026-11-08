@@ -42,10 +42,19 @@ The checker grades that each entry names something, not that the thing exists.
 [--input <key>=<value>]... [--out <path> | --stdout | --stand-in] [--part full|task]` turns a role and one task
 into the prompt its agent is handed (TOOL-aOrientedCast-2). The file holds the role as `render_role`
 renders it under `## Role`, then `## Task`: one block per key of the role's `reads`, in declared
-order, then, as its last block, the role's charter blocks (described under "The agent types"),
-whose library notes print on stderr as `handoff: note — `. The section order is the work-order
+order. The charter's blocks ride once, in the role's agent file (described under "The agent types"),
+never in the prompt, and a stand-in, the main loop, holds the whole charter already
+(PLAY-dOrderedCharter-5 S3); the render still grades the role's `rules` tags, and their library notes
+print on stderr as `handoff: note — `. The section order is the work-order
 template's, `templates/work-order.template.md`, which holds the two headings and the slots `role`,
-`opening`, `reads`, `charter-blocks` and `practices`, each `<!-- slot: <name> -->` on its own line. The
+`practices`, `opening` and `reads`, each `<!-- slot: <name> -->` on its own line. Where the playbook
+kit's document registry reads, each block sits in the envelope of its level, opened under its section's
+heading (PLAY-dOrderedCharter-5 S2): the `## Role` body in the agent file's registry row, level 5; first
+under `## Task`, the `practices` block at level 0, its doc `<charter>#practices-at-<step>` and its
+direction the charter row's; then the rest of the task at level 6, its doc the prompt file's path. The
+level-0 block sits inside `## Task` because the spawn guard hands a native agent only the marker and
+that section. With no playbook kit the prompt renders unranked and one `envelope — unarmed` note
+prints; a registry that does not read refuses, naming it. The
 `practices` slot is a `### Practices at <step>` block, one `- [<name>] <reach>` line per active practice
 whose catalogue row reaches the `step` of the role's workflow row, which the playbook kit's load-set check
 prints in the run it already makes; a step of `none`, no playbook kit or a workflow with no row leaves it
@@ -62,7 +71,10 @@ The card is `--card`, else the file the kickoff checker's `--card --path` prints
 
 The file is written under the build's `prompts/` folder as
 `<date>-prompt-<id>-<n>-<role without gov->.md`, and its `gov:handoff` marker line carries a hash of
-each section. `python handoff.py check <file>` re-derives both hashes and the marker's path;
+each section. `python handoff.py check <file>` re-derives both hashes and the marker's path, then
+grades the envelopes: every one opened closes, and their levels never decrease down the `## Role` part
+or the `## Task` part, each failure naming the envelope; it prints each part's levels in order, and a
+file holding no envelope, a prompt record rendered before them, reads `unranked` and passes;
 `--part task` prints the marker and the task section alone, which is what a typed agent spawn
 carries. Outside `--stand-in`, `render` also prints one stderr line, `handoff: description — <name>`,
 after its notes: the spawn's name, `<build> · <unit> · <workflow>` with the role's catalogue
@@ -214,18 +226,21 @@ then every role's list is empty, the strict reading.
 `python render_agents.py --write | --check | --selftest` renders each role whose `agent` is true
 into a Claude Code agent type, `.claude/agents/<name>.md` (TOOL-aOrientedCast-3). Its front matter
 is the role's Claude keys, then `omitClaudeMd: true`, then the role's `workflow` and `writes` for
-the hooks to read. Its body is `render_role`'s output, then `## Charter` and
-`render_charter_blocks` for the role (TOOL-aOrientedCast-16): a `### Charter rules` block holding the
+the hooks to read. Its body is `## Charter` and `render_charter_blocks` for the role
+(TOOL-aOrientedCast-16), then `render_role`'s output. The charter blocks are a `### Charter rules` block holding the
 practice lines whose tag the role's `rules` key cites, in charter order, then the charter's
-`## Protocols` and `## Facts` sections whole, each under a `### ` heading — the same text a handoff
-appends to its task. `parse_charter` reads only the span between the `gov:playbook` region markers
+`## Protocols` and `## Facts` sections whole, each under a `### ` heading. Where the playbook kit's
+document registry reads, the charter part sits in the envelope of the charter's registry row, level 0,
+and the whole body in the agent file's own level-5 envelope (PLAY-dOrderedCharter-5 S1); with no
+playbook kit the body renders unranked, the role first and the charter after it, with one
+`envelope — unarmed` note, and a registry that does not read refuses the render naming it. `parse_charter` reads only the span between the `gov:playbook` region markers
 when the doc holds them, so an adopter's own sections around the region never reach an agent. Inside
 it the rule lines are those between the `<!-- gov:practices -->` and `<!-- /gov:practices -->` lines
 (PLAY-dOrderedCharter-2), so a tag resolves to its practice line whatever the headings say; a charter
 seeded before the markers is read under its numbered first heading until it is reseeded. An
 agent started with the charter omitted holds only its system prompt and its task, so a harness that
-hands it no handoff would otherwise give it no charter at all; a typed spawn that IS handed a
-handoff carries the blocks twice, which is the accepted cost. A pre-tag (v3.x) charter, with
+hands it no handoff would otherwise give it no charter at all; the agent file is the one copy, since
+a handoff carries none. A pre-tag (v3.x) charter, with
 `## §<n> — ` headings and no rule tag, renders every type with no `## Charter` and prints one note
 asking for a reseed; a doc of neither shape refuses. Beside the types sits `.claude/roles.json`, the generated index the hooks read: every role
 with its `workflow`, `writes` and `agent`, `agent: false` roles included, and `harnesses`, the

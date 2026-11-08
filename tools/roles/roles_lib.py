@@ -92,6 +92,9 @@ WAIVER_OWNER_RE = re.compile(r"^owner \S+$")
 #: The governing doc's micro-format fence and one definition line inside it (TOOL-aOrientedCast-20).
 MICROFORMATS_OPEN, MICROFORMATS_CLOSE = "<!-- microformats -->", "<!-- /microformats -->"
 MICROFORMAT_LINE_RE = re.compile(r"^- `(.*)`$")
+#: The one line an agent-type or handoff render prints with no playbook kit, so no registry ranks its
+#: blocks (PLAY-dOrderedCharter-5 F4); `%s` is the resolver's refusal, which names where it looked.
+UNRANKED_NOTE = "envelope — unarmed · no playbook kit, so the blocks render unranked: %s"
 
 
 class RolesError(Exception):
@@ -266,19 +269,27 @@ def resolve_charter_path(root):
     return charter
 
 
-def read_envelope_row(kit_dir, rel, memory_root):
-    """`(level, direction)` of the document registry row whose path matches the agent file `rel`, else None
-    (PLAY-dOrderedCharter-3 S4). The registry is the playbook kit's `documents.toml` beside `kit_dir`; no
-    registry, a registry that does not parse, or no matching row reads as None, so a tree without one
+def load_document_registry(kit_dir):
+    """The rows of the playbook kit's document registry, `documents.toml`, found from `kit_dir` by
+    `resolve_kit_dir`. No playbook kit raises its LookupError, which the caller prints as one
+    `UNRANKED_NOTE` and renders unranked; a registry that is there and does not read raises RolesError
+    naming it (PLAY-dOrderedCharter-5 F4)."""
+    reg = resolve_kit_dir("playbook", "documents.toml", kit_dir) / "documents.toml"
+    try:
+        rows = tomllib.loads(reg.read_text(encoding="utf-8")).get("document") or []
+    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError) as exc:
+        raise RolesError("%s: the document registry does not read, so no envelope can rank a block — %s"
+                         % (reg.as_posix(), exc))
+    return [r for r in rows if isinstance(r, dict)] if isinstance(rows, list) else []
+
+
+def read_envelope_row(rows, rel, memory_root):
+    """`(level, direction)` of the registry row among `rows` whose path matches the document `rel`, else
+    None (PLAY-dOrderedCharter-3 S4); `rows` None, no registry, reads as None too, so a tree without one
     renders no envelope. A row's `*` holds within one segment, and a held row envelopes nothing."""
     import fnmatch
-    try:
-        reg = resolve_kit_dir("playbook", "documents.toml", kit_dir) / "documents.toml"
-        rows = tomllib.loads(reg.read_text(encoding="utf-8")).get("document") or []
-    except (LookupError, OSError, tomllib.TOMLDecodeError):
-        return None
     want = rel.split("/")
-    for row in rows:
+    for row in rows or []:
         path = str(row.get("path", "")).replace("{memory_root}", memory_root).split("/")
         if "hold" not in row and len(path) == len(want) and all(
                 fnmatch.fnmatchcase(w, p) for w, p in zip(want, path)):
