@@ -12,6 +12,7 @@
 | [2026-11-05-build-PLAY-dOrderedCharter-70-deviation-701.md](../build/2026-11-05-build-PLAY-dOrderedCharter-70-deviation-701.md) | deviation | — |
 | [2026-11-05-build-PLAY-dOrderedCharter-70-deviation-702.md](../build/2026-11-05-build-PLAY-dOrderedCharter-70-deviation-702.md) | deviation | — |
 | [2026-11-05-build-PLAY-dOrderedCharter-70-ledger.md](../build/2026-11-05-build-PLAY-dOrderedCharter-70-ledger.md) | journal | — |
+| [2026-11-08-build-PLAY-dOrderedCharter-70-1-builder-return.md](../build/2026-11-08-build-PLAY-dOrderedCharter-70-1-builder-return.md) | journal | — |
 | [2026-11-05-prompt-PLAY-dOrderedCharter-67-repair-brief.md](../prompts/2026-11-05-prompt-PLAY-dOrderedCharter-67-repair-brief.md) | research | PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 |
 | [2026-11-05-prompt-PLAY-dOrderedCharter-70-build-brief.md](../prompts/2026-11-05-prompt-PLAY-dOrderedCharter-70-build-brief.md) | journal | — |
 
