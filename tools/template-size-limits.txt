@@ -164,7 +164,12 @@ memory/guides/UNATTENDED-PROTOCOL.md	67361
 # in the fenced verb list, which the kit gate requires of every declared verb, so they are a block
 # the gate reads and no prose coming back. The render measures 10369 CR-stripped, and the row is
 # that figure, with no headroom. A run's raise, on the four terms above (memory/DECISIONS.md).
-.claude/skills/unattended/SKILL.md	10369
+# RAISED 10369 -> 10524, 2026-11-08, by PLAY-dOrderedCharter-3: the Skill's envelope, its opener after
+# the front matter and its closer at the end, which the document registry's gate holds every
+# registered document to, so no prose is coming back. The render measures 10524 CR-stripped, and the
+# row is that figure, with no headroom. A run's raise, on the four terms above (memory/DECISIONS.md,
+# PLAY-dOrderedCharter-3).
+.claude/skills/unattended/SKILL.md	10524
 
 # --- every LIVE spec, a CLASS row (TOOL-aMendedFleet-25) --------------------------------------
 # 49152 bytes = 48 KiB, CR-stripped, the charter template's own ceiling, so no spec costs more to
