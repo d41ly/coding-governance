@@ -9,13 +9,15 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-179411885330596231862-105390 7b42f2c4
+asks-at-landing: TOOL-dFairHearing-19=CLOSED TOOL-dFairHearing-41=OPEN TOOL-dFairHearing-42=OPEN TOOL-dFairHearing-49=OPEN TOOL-dFairHearing-51=OPEN TOOL-dFairHearing-52=OPEN TOOL-dFairHearing-53=OPEN TOOL-dFairHearing-54=OPEN TOOL-dFairHearing-55=OPEN TOOL-dFairHearing-56=OPEN
+units-at-landing: TOOL-dFairHearing-13 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-9 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-11 TOOL-dFairHearing-8 TOOL-dFairHearing-16 TOOL-dFairHearing-10 TOOL-dFairHearing-22 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-1 TOOL-dFairHearing-21 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-23 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-25 TOOL-dFairHearing-31 TOOL-dFairHearing-30 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-46 TOOL-dFairHearing-45 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50
+gates-run: unattended-17941210736568787259-191027 0a760477
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 refreshed-at: 923954b6150a57861b3fb64c412fa5f1cb1c6752 · park · 31 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 40182fe337aeb156920577e5004710036685bb28
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -290,3 +292,5 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-05T04:43:21Z dispatch · item 65ad5ac8 TOOL-dFairHearing-50 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh tools/workflows/README.md tools/workflows/check-review-join.test.sh tools/workflows/check-verifier-fanout.sh tools/workflows/check-protocol-parity.test.sh tools/workflows/unattended-build.test.sh tools/check-playbook-parity.test.sh tools/check-spec-tokens.test.sh tools/check-spec-tokens.py tools/check-wiring.sh tools/lib/resolve-python.test.sh tools/policy/catalogue.toml tools/policy/README.md memory/map/generated/symbols.json memory/builds/dFairHearing/build/2026-11-05-build-TOOL-dFairHearing-50-1-acceptance-ledger.md memory/builds/dFairHearing/spec/2026-11-05-spec-TOOL-dFairHearing-50.md memory/builds/dFairHearing/README.md memory/LIVE.md memory/backlog/TOOL.md
 
 2026-11-08T03:19:18Z dispatch · item 65ad5ac8 TOOL-dFairHearing-50 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh tools/workflows/README.md tools/workflows/check-review-join.test.sh tools/workflows/check-verifier-fanout.sh tools/workflows/check-protocol-parity.test.sh tools/workflows/unattended-build.test.sh tools/check-playbook-parity.test.sh tools/check-spec-tokens.test.sh tools/check-spec-tokens.py tools/check-wiring.sh tools/lib/resolve-python.test.sh tools/policy/catalogue.toml tools/policy/README.md memory/map/generated/symbols.json memory/builds/dFairHearing/build/2026-11-05-build-TOOL-dFairHearing-50-1-acceptance-ledger.md memory/builds/dFairHearing/spec/2026-11-05-spec-TOOL-dFairHearing-50.md memory/builds/dFairHearing/README.md memory/LIVE.md memory/backlog/TOOL.md
+
+2026-11-08T07:30:01Z override · item specs-audited · reason the owner stopped further spec audits on 2026-10-23 (memory/builds/dFairHearing/prompts/2026-10-23-prompt-TOOL-dFairHearing-1-owner-stop-reviews.md) and on 2026-11-04 accepted that stop for units 43 to 47, ordering a diff review of their code instead (memory/builds/dFairHearing/prompts/2026-11-04-prompt-TOOL-dFairHearing-1-owner-accept-stop.md); units 48 and 50 carry that review's items and the close's own reds under the same stop
