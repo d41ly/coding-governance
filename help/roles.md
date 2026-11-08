@@ -26,6 +26,26 @@ reference; this page is the short version.
    which starts without the full charter and at the reasoning effort the policy file sets. It
    carries the practices its role cites and the charter's Protocols and Facts sections.
 
+## When a render checks a role's load set
+
+Before it writes, the handoff renderer, and the agent-type render for every agent at once, asks the
+playbook kit which instruction units the role loads. A unit can name the readers that must load it,
+under `required-by`. When the role's set lacks such a unit, the policy key `instructions.checks`
+decides:
+
+- `refuse`, the default: nothing is written. The refusal reads
+  `load-set — refused · role.<name> · missing <unit> · instructions.checks=refuse`, and the remedy is
+  to scope the unit to that role, or to drop the role from its `required-by`.
+- `warn`: the render is written with a `Missing required unit: <unit> · role.<name>` line where the
+  agent reads it, in the handoff's task opening or the agent type's body.
+- `record`: the render is written, and the handoff's prompt file gains a `**Load gaps:**` line under
+  its `**Serves:**` line. The agent's text is unchanged.
+
+No value skips the check, and `budgets.enforce` never softens it. The same render measures the role
+block against its body ceiling: under `budgets.enforce = "warn"` an oversized block prints a
+`BUDGET WARN` note, and under `refuse` the render is refused. With no playbook kit installed, the
+render prints one `load-set — unarmed` note and proceeds.
+
 ## How to use it
 
 - **Run an attended build:** after kickoff's READY card and the owner's go, invoke `/build`. It walks

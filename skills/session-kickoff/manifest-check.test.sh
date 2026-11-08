@@ -1164,6 +1164,22 @@ export CARD_OVERLAP_BOUND=1
 run_card "overlaps cell: a driver past the bound is unknown, not none" "$R" 0 "overlaps — skipped: --overlaps did not answer within 1s" --card --write --session "$NONCE-t77d"
 unset CARD_OVERLAP_BOUND
 
+# PLAY-dOrderedCharter-11 S5 — the injected load points measured at a card write: the playbook kit's
+# load_sets.py, found in gov as the checker finds every sibling and copied beside the fixture's root, over
+# one agent file, with a scratch cap below the agent list's bytes and then one above it. Staged red by
+# deleting the `derive_injected_breaches` call in `write_card`.
+mkrepo injcell
+ij_src=$(ROOT="$GOVROOT" MC_DIR="$(dirname "$CHECK")" resolve_kit_file playbook load_sets.py)
+mkdir -p "$R/playbook" "$R/.claude/agents"
+cp "$ij_src" "$R/playbook/load_sets.py" \
+  || { echo "FAIL injected cell: no load_sets.py resolves from $GOVROOT"; fail=$((fail+1)); }
+printf -- '---\nname: a\ndescription: An agent that does one thing well.\n---\nbody\n' > "$R/.claude/agents/a.md"
+commit_all "$R" "the load-set module and one agent file"
+CARD_INJECTED_CAPS="agent-list=5" run_card "injected cell: a cap below the agent list prints its breach" "$R" 0 "injected — breach · agent list" --card --write --session "$NONCE-t78a"
+check_eq "injected cell: the breach line is appended to the stored card" "1" "$(grep -c '^injected — breach · agent list' "$R/.git/orientation/$NONCE-t78a.md")"
+CARD_INJECTED_CAPS="agent-list=5000" run_card "injected cell: a cap above it writes the card" "$R" 0 - --card --write --session "$NONCE-t78b"
+check_eq "injected cell: no breach line under the cap" "0" "$(grep -c '^injected — ' "$R/.git/orientation/$NONCE-t78b.md")"
+
 # TOOL-aSparedSpawn-11 S6, AC9 — a card write OUTSIDE the `cli —` block starts no `claude`. A stub that
 # appends to a log stands first on PATH for one write; the log must not exist after it. Staged red by
 # deleting the prologue's `unset AI_AGENT`, which this arm can observe only when the runner set
@@ -2018,7 +2034,9 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # +2: TOOL-aOrientedCast-15 S5 — the KC L1 pair, an OUT label spaced before its colon, filled and
 # placeholder, counted off the diff; no suite ran in the pass.
 # 310 = the base 279 + aSparedSpawn's 1 + local main's 30, summed at TOOL-aSparedSpawn-34's reconcile.
-FLOOR_ASSERTIONS=310
+# +4: PLAY-dOrderedCharter-11 S5's injected cell, two run_card and two check_eq calls, counted off the
+# block; no suite ran in the pass, the card write was probed alone over a scratch fixture.
+FLOOR_ASSERTIONS=314
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

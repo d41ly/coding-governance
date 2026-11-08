@@ -3003,6 +3003,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "build_plant_tree",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
+    },
+    {
       "id": "build_planted",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -4493,6 +4498,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_budget",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
+    },
+    {
       "id": "check_budget_breach",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -4661,6 +4671,11 @@
       "id": "check_change_fields",
       "kind": "function",
       "file": "tools/memory-tree/build_records.py"
+    },
+    {
+      "id": "check_charter_budget",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "check_charter_shape_arms",
@@ -5618,6 +5633,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "check_load_set",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "check_lock",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -6293,6 +6313,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "check_required",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
+    },
+    {
       "id": "check_residue_gone",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -6526,6 +6551,11 @@
       "id": "check_selected",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
+    },
+    {
+      "id": "check_selector_armed",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
     },
     {
       "id": "check_self_containment",
@@ -8938,6 +8968,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "derive_injected_breaches",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "derive_install_order",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -9246,6 +9281,11 @@
       "id": "derive_liveness",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "derive_load_set",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
     },
     {
       "id": "derive_location",
@@ -10861,6 +10901,11 @@
       "id": "extract_decorators",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "extract_description",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
     },
     {
       "id": "extract_doc",
@@ -12745,6 +12790,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/playbook/load_sets.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/playbook/positional.py"
     },
     {
@@ -12998,6 +13048,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "measure_blob",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
+    },
+    {
       "id": "measure_census",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
@@ -13106,6 +13161,11 @@
       "id": "measure_hook_entries",
       "kind": "function",
       "file": "tools/process-monitor/adopt-process-monitor.sh"
+    },
+    {
+      "id": "measure_injected",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
     },
     {
       "id": "measure_job_children",
@@ -15558,6 +15618,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "read_body_ceiling",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
+    },
+    {
       "id": "read_boot_clock",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -15656,6 +15721,11 @@
       "id": "read_cap_answer",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "read_cap_answers",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
     },
     {
       "id": "read_cap_census",
@@ -15776,6 +15846,11 @@
       "id": "read_checked_text",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "read_checks_mode",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
     },
     {
       "id": "read_cited_ids",
@@ -17298,6 +17373,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_namespace_rows",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
+    },
+    {
       "id": "read_namespace_words",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -18016,6 +18096,11 @@
       "id": "read_role",
       "kind": "function",
       "file": "tools/govkit/fixtures/retired_edits.py"
+    },
+    {
+      "id": "read_role_rules",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
     },
     {
       "id": "read_root_dir",
@@ -18906,6 +18991,11 @@
       "id": "read_units",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "read_units_arg",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
     },
     {
       "id": "read_universal_cap",
@@ -23508,9 +23598,19 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_budget_check",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
+    },
+    {
       "id": "run_budget_home",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_budgets",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
     },
     {
       "id": "run_bundle",
@@ -23645,6 +23745,11 @@
     {
       "id": "run_check",
       "kind": "function",
+      "file": "tools/playbook/load_sets.py"
+    },
+    {
+      "id": "run_check",
+      "kind": "function",
       "file": "tools/playbook/positional.py"
     },
     {
@@ -23746,6 +23851,11 @@
       "id": "run_dense",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "run_derive",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
     },
     {
       "id": "run_detached",
@@ -24151,6 +24261,11 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "run_git_bytes",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
     },
     {
       "id": "run_git_staged",
@@ -24681,6 +24796,11 @@
       "id": "run_plant",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
+    },
+    {
+      "id": "run_plant",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
     },
     {
       "id": "run_plant_arms",

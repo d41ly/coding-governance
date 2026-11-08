@@ -704,7 +704,7 @@ derive_claims_line() {   # $1 = the writer verb → the cell's head line and its
 # card leaves no file: every startup field is bounded, so an overflow means a derivation went wrong
 # and a truncated card would carry that error into every later reader.
 write_card() {
-  local card bytes
+  local card bytes breach
   card=$(render_card "$1")
   bytes=$(printf '%s\n' "$card" | wc -c | tr -d '[:space:]')
   if [ "$bytes" -gt "$CARD_CAP_BYTES" ]; then
@@ -713,7 +713,30 @@ write_card() {
   fi
   mkdir -p "$CARD_DIR" || { echo "MANIFEST env ERROR — cannot create $CARD_DIR"; exit 2; }
   printf '%s\n' "$card" > "$CARD_FILE" || { echo "MANIFEST env ERROR — cannot write $CARD_FILE"; exit 2; }
+  breach=$(derive_injected_breaches)
+  if [ -n "$breach" ]; then
+    printf '%s\n' "$breach" >> "$CARD_FILE"
+    card="$card"$'\n'"$breach"
+  fi
   printf '%s\n' "$card"
+}
+
+# The injected load points, measured once the card is on disk (PLAY-dOrderedCharter-11 S5): the playbook
+# kit's `load_sets.py injected` over the agent list, the Skill list and the card just written, its
+# `injected — breach` lines kept and every other line dropped, so a card over nothing gains no line.
+# The kit is found as every sibling is, by `resolve_kit_file`; no kit, no python or no working
+# `timeout` adds nothing. CARD_INJECTED_CAPS hands in `<name>=<bytes>` caps the cap census does not hold.
+# WHAT THIS DOES NOT CHECK: the harness's own composition of those lists, only the bytes they carry.
+derive_injected_breaches() {
+  local ls py caps=()
+  ls=$(resolve_kit_file playbook load_sets.py)
+  [ -n "$ls" ] || return 0
+  py=$(resolve_python 2>/dev/null) || return 0
+  timeout -k 1 5 true </dev/null >/dev/null 2>&1 || return 0
+  read -ra caps <<< "${CARD_INJECTED_CAPS:-}"
+  timeout -k 1 "${CARD_INJECTED_BOUND:-10}" "$py" "$ls" injected --root "$ROOT" --card "$CARD_FILE" \
+    ${caps[@]+"${caps[@]/#/--cap=}"} </dev/null 2>/dev/null | tr -d '\r' | grep '^injected — breach'
+  return 0
 }
 
 # The stored card, unchanged, then ONE `now —` line computed here and never stored — a second replay

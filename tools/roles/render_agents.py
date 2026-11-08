@@ -146,14 +146,17 @@ def load_catalogue(kit_dir, target_root):
             "notes": notes, "charter": charter}
 
 
-def render_agent_file(kit_dir, slot, role, memory_root, charter, notes, effort):
+def render_agent_file(kit_dir, slot, role, memory_root, charter, notes, effort, missing=()):
     """One agent type's text: Claude keys, its effort, the trim, gov's two keys, the rendered role,
-    then `## Charter` and the role's charter blocks when the charter yields any."""
+    each `Missing required unit:` line the load-set check printed for it under `warn`, then
+    `## Charter` and the role's charter blocks when the charter yields any."""
     keys = role["keys"]
     head = ["---"] + ["%s: %s" % (k, keys[k]) for k in CLAUDE_KEYS if k in keys]
     head += ["effort: %s" % effort, "omitClaudeMd: true", "workflow: %s" % keys.get("workflow", ""),
              "writes: %s" % keys.get("writes", ""), "---"]
     body = lib.render_role(kit_dir, slot, memory_root)
+    if missing:
+        body += "\n" + "\n".join(missing) + "\n"
     blocks = lib.render_charter_blocks(charter, role["path"].as_posix(), keys.get("rules", ""), notes)
     if blocks:
         body += "\n## Charter\n\n" + blocks
@@ -280,12 +283,20 @@ def run_mode(mode, kit_dir, tool_root, target_root):
     """Render the catalogue at kit_dir into target_root and `--write` or `--check` it; the exit code."""
     try:
         cat = load_catalogue(kit_dir, target_root)
+        agents = [slot for slot, role in cat["roles"].items() if role["keys"].get("agent", "true") == "true"]
+        # PLAY-dOrderedCharter-11 S4: every agent type's load set and role block, ONE check before writing
+        refused, gate = lib.check_load_set(target_root, kit_dir, [
+            (slot, len(lib.render_role(kit_dir, slot, cat["memory_root"]).encode("utf-8"))) for slot in agents])
+        if refused:
+            raise lib.RolesError("\n".join(gate))
+        missing = {slot: [ln for ln in gate if ln.startswith("Missing required unit:")
+                          and ln.endswith(" · role." + slot)] for slot in agents}
+        cat["notes"].extend(ln for ln in gate if not ln.startswith("Missing required unit:"))
         rendered = {}
-        for slot, role in cat["roles"].items():
-            if role["keys"].get("agent", "true") == "true":
-                rendered["%s/%s.md" % (AGENTS_REL, slot)] = render_agent_file(
-                    kit_dir, slot, role, cat["memory_root"], cat["charter"], cat["notes"],
-                    lib.resolve_effort(cat["policy"], slot))
+        for slot in agents:
+            rendered["%s/%s.md" % (AGENTS_REL, slot)] = render_agent_file(
+                kit_dir, slot, cat["roles"][slot], cat["memory_root"], cat["charter"], cat["notes"],
+                lib.resolve_effort(cat["policy"], slot), missing[slot])
         harnesses, absent = derive_harness_paths(cat["workflows"], tool_root, target_root)
         manifest = resolve_gate_manifest(tool_root, target_root)
         rendered[INDEX_REL] = render_roles_index(cat["roles"], harnesses, cat["policy"], manifest)

@@ -1488,7 +1488,23 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
     for ns, name in sorted(set(present)):
         if (ns, name) in drop:
             notes.append(f'dropped   {ns}:{name}')
-    return render_charter_envelope(target, charter_path, text), notes
+    text = render_charter_envelope(target, charter_path, text)
+    if charter_path is not None:
+        notes += check_charter_budget(target, charter_path, text)
+    return text, notes
+
+
+def check_charter_budget(target: Path, charter_path: Path, body: str) -> list[str]:
+    """PLAY-dOrderedCharter-11 S4: the charter this render would write, CR stripped, against its caps through
+    the load-set budget check; a refusal raises, every other line returns as a `budget` note."""
+    import load_sets
+    cur = charter_path.read_text(encoding='utf-8') if charter_path.is_file() else None
+    size = len(build_region(cur, body).replace('\r', '').encode('utf-8'))
+    rel = Path(os.path.relpath(charter_path, target)).as_posix()
+    refused, lines = load_sets.run_budget_check(target, [(rel, size)])
+    if refused:
+        raise Refusal('\n'.join(lines))
+    return [f'budget    {ln}' for ln in lines]
 
 
 def render_charter_envelope(target: Path, charter_path: Path | None, text: str) -> str:
@@ -2753,7 +2769,7 @@ def run_charter_scope(engine_dir: Path, gov_root: Path, target: Path, charter_pa
         # N5: the two notes an adopter must act on print here too. `govkit update` runs the
         # regenerate (unless GOVKIT_RERENDER=0) with its output captured, so `--check` is where they are seen.
         for n in notes:
-            if n.startswith(('legacy', 'retired')):
+            if n.startswith(('legacy', 'retired', 'budget')):
                 print(f'  {n}')
         if rc == 0:
             print(f'render-playbook OK — region matches a fresh render, no placeholder survived')

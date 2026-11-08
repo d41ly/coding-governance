@@ -190,6 +190,35 @@ def read_cap_answer(request, root, kit_dir):
     return held, "refuse", "%s; a breach refuses as before" % why
 
 
+def check_load_set(root, kit_dir, blocks):
+    """`(refused, lines)` of the playbook kit's load-set check for `blocks`, `[(slot, role block bytes)]`
+    (PLAY-dOrderedCharter-11 S4): ONE run of its `check` verb, each slot's reader set checked for a missing
+    required unit and its block measured against its body ceiling. The kit is found by `resolve_kit_dir`
+    and run as a subprocess, since a kit imports no sibling kit; with none found the check is one
+    `unarmed` line and the render proceeds. The caller places each line: a `Missing required unit:` line
+    in the reader's text, a `**Load gaps:**` line in the prompt record, any other as a note."""
+    import os
+    import subprocess
+    import sys
+    try:
+        kit = resolve_kit_dir("playbook", "load_sets.py", kit_dir)
+    except LookupError as exc:
+        return False, ["load-set — unarmed · no playbook kit: %s" % exc]
+    argv = [sys.executable, str(kit / "load_sets.py"), "check", "--root", str(root)]
+    for slot, size in blocks:
+        argv += ["--reader", "role." + slot, "--load-point", "role.%s=%d" % (slot, size)]
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    try:
+        r = subprocess.run(argv, cwd=str(root), env=env, capture_output=True, encoding="utf-8",
+                           errors="replace", stdin=subprocess.DEVNULL, timeout=120)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return True, ["load-set — refused · the load-set check did not run: %s" % exc]
+    lines = [ln for ln in (r.stdout + r.stderr).splitlines() if ln.strip()]
+    if r.returncode not in (0, 1):
+        return True, lines or ["load-set — refused · the load-set check exited %d" % r.returncode]
+    return r.returncode == 1, lines
+
+
 def load_text(path):
     """A file's text, UTF-8, CRLF folded to LF; a missing file raises RolesError naming it."""
     try:

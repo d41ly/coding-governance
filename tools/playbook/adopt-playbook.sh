@@ -385,3 +385,29 @@ bad-note-refs|1|site.py:1: `# gov:note layer.memory — x → y refs=a b` refs s
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf edge-grammar arm(s) failed"; exit 1; fi
 echo "PASS — the edge grammar's plants"
+
+# THE LOAD SETS' ARMS (PLAY-dOrderedCharter-11, its New arm line). Each row runs `load_sets.py --fixture` over one plant in
+# its own scratch repository, the same row shape: a unit required by the builder and scoped only to the
+# skeptic refused under `refuse`, the builder's handoff writing no prompt file, `budgets.enforce`'s `warn`
+# leaving that refusal standing, and the gap printed under `warn` and `record`; a unit scoped
+# `role.gov-builder` selected only once a `role` row selects, and one scoped `feature.roles` only once a
+# `feature` row does, each unregistered part printed `unarmed`; a 40000-byte charter under a 50000 cap
+# refused on CODEX_MAX under `warn`; a role block ten bytes past its ceiling warned under `warn` and
+# refused under `refuse`.
+_tf=0
+run_plant_rows load-sets "$HERE/load_sets.py" <<'PLANTS'
+required-away --checks refuse|1|handoff: no prompt file written
+required-away --checks refuse --budgets-enforce warn|1|missing unit.needed · instructions.checks=refuse
+required-away --checks warn|0|Missing required unit: unit.needed|refused
+required-away --checks record|0|**Load gaps:** role.gov-builder · unit.needed|Missing required unit
+role-unregistered|0|role — unarmed — role.*|unit.builder
+role-unregistered|0|item — unarmed|unit.skeptic
+role-registered|0|  unit.builder|unit.skeptic
+feature-unregistered|0|feature — unarmed — feature.*|selected: unit.roles
+feature-registered|0|selected: unit.roles|unarmed — feature.*
+charter-over --budgets-enforce warn|1|over CODEX_MAX 32768
+role-block-over --budgets-enforce warn|0|BUDGET WARN · role.gov-builder
+role-block-over --budgets-enforce refuse|1|BUDGET REFUSE · role.gov-builder
+PLANTS
+if [ "$_tf" != 0 ]; then echo "FAIL — $_tf load-set arm(s) failed"; exit 1; fi
+echo "PASS — the load sets' plants"

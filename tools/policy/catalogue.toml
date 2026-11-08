@@ -650,6 +650,8 @@ name = "instructions.checks"
 allowed = ["refuse", "warn", "record"]
 default = "refuse"
 owner = "dOrderedCharter"
+summary = "What a render does when a reader's load set lacks a unit its required-by names: refuse the render, render with a missing-unit line the reader sees, or render and record the gap in the prompt record."
+usage = 'instructions.checks = "warn"'
 
 [[key]]
 name = "instructions.edit"

@@ -359,6 +359,15 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     build_dir = root / memory_root / "builds" / slug
     if not build_dir.is_dir():
         raise lib.RolesError("the build folder %s does not exist" % build_dir.as_posix())
+    # PLAY-dOrderedCharter-11 S4: the role's load set and its block's budget, before anything is read
+    role_text = lib.render_role(KIT_DIR, role, memory_root)
+    refused, gate = lib.check_load_set(root, KIT_DIR, [(role, len(role_text.encode("utf-8")))])
+    if refused:
+        raise lib.RolesError("\n".join(gate))
+    missing = [ln for ln in gate if ln.startswith("Missing required unit:")]
+    gaps = [ln for ln in gate if ln.startswith("**Load gaps:**")]
+    if notes is not None:
+        notes.extend(ln for ln in gate if ln not in missing and ln not in gaps)
     unit_id = unit
     if unit_id is None:
         fm = lib.FRONT_MATTER_RE.match(lib.load_text(build_dir / "README.md")) \
@@ -450,12 +459,14 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         raise lib.RolesError("\n".join(refusals))
     opening = ("This handoff is for build `%s`, unit `%s`." % (slug, unit_id) if unit
                else "This handoff is for build `%s`, and names no single unit." % slug)
+    if missing:
+        opening += "\n" + "\n".join(missing)
     if absent:
         opening += "\nNot supplied, optional: %s%s." % (
             ", ".join("`%s`" % k for k in absent), " — " + "; ".join(reasons) if reasons else "")
     drive = extract_drive_lines(charter_text, role)
     role_sec, task_sec = render_work_order({
-        "role": lib.render_role(KIT_DIR, role, memory_root).strip("\n")
+        "role": role_text.strip("\n")
         + ("\n\n### Drive\n\n" + "\n".join(drive) if drive else ""), "opening": opening,
         "reads": "\n\n".join(blocks), "charter-blocks": charter_blocks.rstrip("\n")})
     path = out_path or build_dir / "prompts" / derive_prompt_name(
@@ -463,7 +474,8 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     rel = path.relative_to(root).as_posix()
     marker = "<!-- gov:handoff role=%s build=%s unit=%s path=%s role-sha=%s task-sha=%s -->" % (
         role, slug, unit or "-", rel, derive_section_sha(role_sec), derive_section_sha(task_sec))
-    head = "**Serves:** journal %s\n\n# %s handoff — %s\n\n%s\n\n" % (unit_id, role, unit_id, marker)
+    head = "**Serves:** journal %s\n%s\n# %s handoff — %s\n\n%s\n\n" % (
+        unit_id, "".join(g + "\n" for g in gaps), role, unit_id, marker)
     return path, head + role_sec + task_sec, marker + "\n\n" + task_sec
 
 
