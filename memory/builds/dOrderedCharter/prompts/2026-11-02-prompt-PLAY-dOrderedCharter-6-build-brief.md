@@ -69,3 +69,6 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Your spec header's `advances PLAY-dOrderedCharter-38` stays `advances` when you flip it to `CLOSED`; you are not the last unit.
 - The unattended kit's own self-test suites are WAIVED for this build's landing (README, "Build-level rules"); a
   criterion they would observe is named as owed with PLAY-dClosedLoop-12, never run.
+- Unit 3 left one name over the naming lexicon's pin: `plant_envelope_text` in `tools/playbook/instruction_units.py`, whose
+  leading verb the declared table lacks. Your pass edits that file, so rename it `write_envelope_text` at its definition and its four
+  callers, and leave `python tools/lexicon/lexicon.py --check` at or under its pin. Name the rename in your return.
