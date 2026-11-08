@@ -69,3 +69,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Your spec header's `advances PLAY-dOrderedCharter-38` stays `advances` when you flip it to `CLOSED`; you are not the last unit.
 - The unattended kit's own self-test suites are WAIVED for this build's landing (README, "Build-level rules"); a
   criterion they would observe is named as owed with PLAY-dClosedLoop-12, never run.
+- Unit 2 retired the charter's numbered sections, and two readers in your Files touched still cite one: the `[tools]` practice line in
+  `tools/playbook/practices.toml` says "tools in section 3", and `WIRE-INTO-PROJECT.md` names a charter section by number. Name each by
+  its heading or tag instead, re-render what the practice line feeds (`AGENTS.md`, the agent files through the main loop), and name the
+  change in your return.
