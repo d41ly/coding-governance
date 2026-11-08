@@ -17,6 +17,7 @@
 | [2026-11-04-prompt-PLAY-dOrderedCharter-1-drift-sweep-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-1-drift-sweep-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-3 |
 | [2026-11-04-prompt-PLAY-dOrderedCharter-41-9-spec-writer.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-41-9-spec-writer.md) | journal | — |
 | [2026-11-04-prompt-PLAY-dOrderedCharter-41-neighbour-fold-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-41-neighbour-fold-brief.md) | research | — |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-3-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-3-drift-fold-brief.md) | research | PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 |
 | [2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md](../reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-49 |
 
 <!-- /gen:spec-records -->

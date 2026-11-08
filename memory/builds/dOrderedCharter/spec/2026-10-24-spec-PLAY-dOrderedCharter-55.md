@@ -25,6 +25,7 @@
 | [2026-11-05-prompt-PLAY-dOrderedCharter-55-owner-pause-land.md](../prompts/2026-11-05-prompt-PLAY-dOrderedCharter-55-owner-pause-land.md) | research | — |
 | [2026-11-08-prompt-PLAY-dOrderedCharter-55-1-researcher.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-55-1-researcher.md) | journal | — |
 | [2026-11-08-prompt-PLAY-dOrderedCharter-55-own-reds-triage-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-55-own-reds-triage-brief.md) | research | — |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-55-owner-resume.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-55-owner-resume.md) | research | — |
 
 <!-- /gen:spec-records -->
 

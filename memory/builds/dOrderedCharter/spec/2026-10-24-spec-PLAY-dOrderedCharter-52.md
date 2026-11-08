@@ -17,6 +17,7 @@
 | [2026-11-04-prompt-PLAY-dOrderedCharter-52-1-spec-writer.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-52-1-spec-writer.md) | journal | — |
 | [2026-11-04-prompt-PLAY-dOrderedCharter-52-drift-fold-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-52-drift-fold-brief.md) | research | — |
 | [2026-11-04-prompt-PLAY-dOrderedCharter-52-drift-sweep-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-52-drift-sweep-brief.md) | research | PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-3-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-3-drift-fold-brief.md) | research | PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 |
 
 <!-- /gen:spec-records -->
 
