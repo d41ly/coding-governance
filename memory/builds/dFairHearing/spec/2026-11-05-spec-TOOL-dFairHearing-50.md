@@ -12,6 +12,7 @@
 | [2026-11-05-build-TOOL-dFairHearing-50-1-acceptance-ledger.md](../build/2026-11-05-build-TOOL-dFairHearing-50-1-acceptance-ledger.md) | journal | — |
 | [2026-11-05-build-TOOL-dFairHearing-50-deviation-501.md](../build/2026-11-05-build-TOOL-dFairHearing-50-deviation-501.md) | deviation | — |
 | [2026-11-05-build-TOOL-dFairHearing-50-deviation-502.md](../build/2026-11-05-build-TOOL-dFairHearing-50-deviation-502.md) | deviation | — |
+| [2026-11-08-build-TOOL-dFairHearing-50-1-builder-return.md](../build/2026-11-08-build-TOOL-dFairHearing-50-1-builder-return.md) | journal | — |
 | [2026-11-05-prompt-TOOL-dFairHearing-50-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dFairHearing-50-1-spec-writer.md) | journal | — |
 | [2026-11-05-prompt-TOOL-dFairHearing-50-build-brief.md](../prompts/2026-11-05-prompt-TOOL-dFairHearing-50-build-brief.md) | research | — |
 | [2026-11-05-prompt-TOOL-dFairHearing-50-spec-brief.md](../prompts/2026-11-05-prompt-TOOL-dFairHearing-50-spec-brief.md) | research | — |
@@ -708,7 +709,7 @@ print("dFairHearing rows", sum(1 for r in rows if r["owner"] == "dFairHearing"))
 - `said`, a local of the acquisition. `_nf` and `_fr`, shell locals of the fan-out gate. `_kit_file`, a
   global of `tools/check-wiring.sh`, beside `_first_of`. `wr_ret`, `FG_HK`, `FG_POL` and `FG_WF`,
   suite variables. No cell declares any of these, so none is graded.
-- Two arm groups, labelled `FH50 AC2` and `FH50 AC8`, each in a suite the Gates section's `New arm:` lines
+- The suite arm labels `FH50 AC2` and `FH50 AC8`, each in a suite the Gates section's `New arm:` lines
   cover.
 
 ### Generated files
