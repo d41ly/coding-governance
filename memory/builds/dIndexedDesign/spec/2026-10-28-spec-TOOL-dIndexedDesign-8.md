@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-8 — the feature level: `design.decompose`'s feature designs, roster and fork records, forks resolved as `design.forks` says
 
-**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 8 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 8 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0390@a096f77c part 1/2
 **Carries:** node:item.design.decompose
@@ -18,8 +18,16 @@
 | [2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-c.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-c.md) | research | TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-1 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
 | [2026-10-28-build-TOOL-dIndexedDesign-8-deviation-81.md](../build/2026-10-28-build-TOOL-dIndexedDesign-8-deviation-81.md) | deviation | — |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-8-deviation-82.md](../build/2026-11-05-build-TOOL-dIndexedDesign-8-deviation-82.md) | deviation | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-fix-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-fix-brief.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground-followup.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground-followup.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-8-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-8-1-spec-writer.md) | journal | — |
 | [2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-3 |
 
 <!-- /gen:spec-records -->
@@ -46,15 +54,18 @@ structured interface fields through `read_feature_designs`.
 ## 2. Scope (IN)
 
 Build-run preconditions this unit calls and does not build: the record-kind factory `record_kinds.py
-new` and `tools/memory-tree/record-kinds.toml` (TOOL-dTotalRecall-1 S1, S9); the `[[item]]` and
+new` and `tools/memory-tree/record-kinds.toml` (TOOL-dTotalRecall-1 S1, S9), with the `--purpose` it
+refuses a row without (TOOL-dTotalRecall-16 S2), the columns every row carries and the verb that sets
+them (TOOL-dTotalRecall-18 S1), and the `unarmed` key (TOOL-dTotalRecall-42 S2); the `[[item]]` and
 `[[stand-in]]` rows of `tools/loop/loop.toml` (TOOL-dDeclaredLoop-12 S2, -13 S8) and the item factory
 (TOOL-dDeclaredLoop-24); `read_spec_section` and the tag `section.open-questions` (TOOL-dIndexedDesign-9,
 I1); `read_spec_edge_lines` (TOOL-dIndexedDesign-12, I2); `read_design_policy` (TOOL-dIndexedDesign-16,
 I3); the `spec` row's `sections` column and the `### Interfaces` sub-head (TOOL-dIndexedDesign-7, I8, its
 S4).
 
-Shared files the build run sequences, this unit first at order 8: `tools/loop/loop.toml`, where S11
-arms `item.design.decompose`'s row, TOOL-dIndexedDesign-13 S6 adds an `upstream` entry to that same row
+Shared files the build run sequences, this unit at order 8: `tools/loop/loop.toml`, where
+TOOL-dIndexedDesign-2 S10 arms `item.design.overlaps`' row first, at order 6, S11 arms
+`item.design.decompose`'s row, TOOL-dIndexedDesign-13 S6 adds an `upstream` entry to that same row
 and TOOL-dIndexedDesign-20 S10 arms the `input`, `reentry` and `inventory` rows;
 `tools/memory-tree/design_lib.py`, whose `read_feature_designs` TOOL-dIndexedDesign-20 S1 widens with a
 revision argument; and `tools/memory-tree/BUILD-METHOD.template.md` M2, where S12 and
@@ -62,7 +73,9 @@ TOOL-dIndexedDesign-20 S12 each add a sentence.
 
 - **S1** — The feature design record, kind `feature-design`, tag `record.feature-design`, registered by
   `python record_kinds.py new feature-design --tag record.feature-design --writer hand --check "memory
-  hygiene" --field Feature --field Units --field Interface --field Boundary` (I15). Home
+  hygiene" --purpose "a feature's design: its units, the interfaces between them by producer,
+  consumers and contract, and its write bounds" --field Feature --field Units --field Interface
+  --field Boundary` (I15), its other columns as §4 "The registry rows" states. Home
   `memory/builds/<slug>/build/<date>-build-<first unit id>-feature-<seg>.md`, bound `**Serves:**
   feature-design <unit ids>`, its fields one per line: `- **Feature:** feature.<seg>`; `- **Units:**`
   the feature's unit ids; one `- **Interface:** <name> · producer <unit id> · consumers <unit id>[,
@@ -76,7 +89,9 @@ TOOL-dIndexedDesign-20 S12 each add a sentence.
 - **S3** — Membership. A unit joins its feature by `**Edges:** implements=feature.<seg>` in its spec,
   read only through `read_spec_edge_lines(text)` (I2, I9). Observed by AC2.
 - **S4** — The roster kind: `python record_kinds.py new roster --tag record.roster --writer hand
-  --check "memory hygiene"`, its home the build README's `<!-- roster:units -->` region, which M2
+  --check "memory hygiene" --purpose "a build's planned units: the README's authored Units table, the
+  roster BUILD-METHOD M2 detects"`, its other columns as §4 "The registry rows" states, its home the
+  build README's `<!-- roster:units -->` region, which M2
   already names as the roster (`memory/guides/BUILD-METHOD.md:39-42`). No column of that table changes,
   so `read_roster_at` and the packet renderer read it as they do. Observed by AC8.
 - **S5** — The interface schema check, `check_feature_designs(root, slug)` in `design_lib.py`, the
@@ -91,8 +106,10 @@ TOOL-dIndexedDesign-20 S12 each add a sentence.
   feature that declares one. A build with no `feature-design` record is graded by nothing and says so.
   Observed by AC2 and AC3.
 - **S6** — The fork record, kind `fork`, tag `record.fork`, registered by `python record_kinds.py new
-  fork --tag record.fork --writer hand --check "memory hygiene" --field Fork --field Level --field Class
-  --field Resolver --field Options --field Pick`. Home
+  fork --tag record.fork --writer hand --check "memory hygiene" --purpose "one resolved fork of a
+  spec's open questions: its level, class, resolver, its ranked options and the pick" --field Fork
+  --field Level --field Class --field Resolver --field Options --field Pick`, its other columns as §4
+  "The registry rows" states. Home
   `memory/builds/<slug>/build/<date>-build-<unit id>-fork-<n>.md`, `<n>` the F-item's number, bound
   `**Serves:** fork <unit id>`; fields `- **Fork:** F<n>`; `- **Level:** unit|feature`; `- **Class:**
   fact|preference|goal`; `- **Resolver:** agent|owner`; `- **Options:**` the admitted options in
@@ -123,8 +140,15 @@ TOOL-dIndexedDesign-20 S12 each add a sentence.
   repository for each case of §6. Observed by AC2 to AC6.
 - **S11** — The item goes live. `item.design.decompose`'s `[[stand-in]]` row leaves
   `tools/loop/loop.toml`, and its row's `witness` names `design_lib.py --decompose` and its `returns`
-  `record-kind.feature-design`; its needs, outcomes and routes stay as TOOL-dDeclaredLoop-12 transcribed
-  them. Observed by AC8.
+  `record-kind.feature-design@1`, the versioned form TOOL-dDeclaredLoop-24 §4 "Records at a version"
+  gives `returns`; its needs, outcomes and routes stay as TOOL-dDeclaredLoop-12 transcribed them. No
+  unit's pass adds the `[[record-version]]` row `@1` names: that section recomputes a version's
+  `fields` hash from `tools/memory-tree/build_records.py`'s kind row, whose keys PLAY-dOrderedCharter-42
+  S2 holds equal to `TYPED_RECORD_KINDS`, and `feature-design` stays untyped (TOOL-dIndexedDesign-32
+  S2), so no unit adds it a row to hash. The pin waits on the parent naming a hash for an untyped
+  kind, an item returned to the main loop; TOOL-dDeclaredLoop-24 S4 names no check that reds a
+  `returns` with no version row, and no spec or tool names `record-kind.feature-design` as an input.
+  Observed by AC8.
 - **S12** — The keys and the prose. `SPEC_FORK_RECORD_CUTOFF` joins the defaults block of
   `check-memory-hygiene.sh`, `tools/memory-tree/.memory-tree.conf.example`, blank, and
   `.memory-tree.conf`, set strictly ahead of the corpus. `tools/memory-tree/SPEC-TEMPLATE.template.md`'s
@@ -138,8 +162,10 @@ TOOL-dIndexedDesign-20 S12 each add a sentence.
 - Part 2 of the clause: `design.reentry`, `item.design.reentry`, `item.design.input`,
   `item.design.inventory`, the `diff` and `inventory` kinds and the additive-versus-breaking classifier
   (PLAY-dOrderedCharter-36 S5 is its nearest seam): TOOL-dIndexedDesign-20 (§8 F1).
-- Writing a door for these records: their writer is `hand`, the class TOOL-dTotalRecall-2 replaces
-  with doors; this unit adds none.
+- Writing a door for these records: their writer stays `hand`, legal on any row TOOL-dTotalRecall-2 S9
+  does not move (TOOL-dTotalRecall-1 §4 "Data model"). S9 is a one-time pass of dTotalRecall that lands
+  before this build, so it never moves these rows, and no door is promised for them; this unit adds
+  none.
 - Changing `plan_state`'s FORKED reading or its one-token contract: a mark the key refuses fails the
   join, and the spec writer then parks the fork, which `plan_state` already reads as FORKED.
 - The feature transition table and its states: TOOL-dDeclaredLoop-13 S4 owns F1 to F6.
@@ -152,6 +178,7 @@ TOOL-dIndexedDesign-20 S12 each add a sentence.
 - **consumes-from** `TOOL-dIndexedDesign-12` — `read_spec_edge_lines`, the one reader of `**Edges:** implements=feature.<seg>`, the membership S3 and S5 join on
 - **consumes-from** `TOOL-dIndexedDesign-16` — `read_design_policy`, the one reader S9 calls for `design.forks`; without it the join has no value to grade a mark against
 - **consumes-from** `TOOL-dIndexedDesign-7` — `record-kind.spec`, the `spec` row whose `sections` column S5 reads a unit's declared sections through, beside which S1, S4 and S6 register their rows, and its `### Interfaces` sub-head, each unit's half of a feature's interfaces that S5's arm (e) joins
+- **consumes-from** external — TOOL-dTotalRecall-1 S9's factory `record_kinds.py new` and its registry, with the `--purpose` of TOOL-dTotalRecall-16 S2, the columns of TOOL-dTotalRecall-18 S1 set through its landed verb, and the `unarmed` key of TOOL-dTotalRecall-42 S2; TOOL-dDeclaredLoop-12 S2's `[[item]]` row and TOOL-dDeclaredLoop-13 S8's `[[stand-in]]` row for `item.design.decompose`, which S11 arms, and TOOL-dDeclaredLoop-24 §4's versioned `returns`, which S11 writes; each DEFERRED at base and built before this build run
 - **hands-off** `TOOL-dIndexedDesign-20` — `read_feature_designs` and the `Interface` fields its structural diff classifies `additive` or `breaking`, part 2/2 of cl-dClosedLoop-0390
 - **hands-off** `TOOL-dIndexedDesign-32` — the `feature-design` and `fork` kinds of S1 and S6, which that unit makes bind, `fork` typed and `feature-design` untyped (report id 19, HIGH)
 - **hands-off** `TOOL-dIndexedDesign-38` — the round-1 spec audit's minors that land on this spec, report ids 6, 31 and 47, each a scope item of that batch unit
@@ -188,6 +215,32 @@ TOOL-dIndexedDesign-20 S12 each add a sentence.
 - **Boundary:** tools/fix/
 ```
 
+### The registry rows
+
+S1, S4 and S6 spell `name`, `tag`, `writer`, `check`, the `--purpose` TOOL-dTotalRecall-16 S2 requires
+and the `fields` through TOOL-dTotalRecall-1 S9's `new`, which takes no flag for the columns
+TOOL-dTotalRecall-18 S1 requires; the build run sets those through that unit's landed verb, as
+TOOL-dLinkedLibrary-13 S2 does.
+
+| Row | layer | home | id-rule | schema | lifecycle | readers |
+|---|---|---|---|---|---|---|
+| `feature-design` | `layer.memory` | `memory/builds/*/build/*-feature-*.md` | `<date>-build-<first unit id>-feature-<seg>.md` | `{ form = "fields" }`, S1's four fields | `current-state` | `[]`, `readers-none = "no work-order read key hands a feature design; read_feature_designs selects it by binding"` |
+| `fork` | `layer.memory` | `memory/builds/*/build/*-fork-[0-9]*.md` | `<date>-build-<unit id>-fork-<n>.md` | `{ form = "fields" }`, S6's six fields | `current-state` | `[]`, `readers-none = "no work-order read key hands a fork record; check_fork_records joins it to its F-item"` |
+| `roster` | `layer.memory` | `memory/builds/*/README.md` | `""`, keyed by the README's path | `{ form = "rows" }`, the authored Units table in its region | `current-state` | `[]`, `readers-none = "no work-order read key hands the roster; read_roster_at and the packet renderer read its region"` |
+
+- The two `fields` rows carry `unarmed` (TOOL-dTotalRecall-42 S2): no record matches either home at
+  landing (§4 "Migration"), and TOOL-dTotalRecall-18 S1 reds a `fields` home matching no tracked file.
+  The keys read `unarmed = "no feature design record yet; a build's decompose step writes the first by
+  hand"` and `unarmed = "no fork record yet; a spec writer writes the first from
+  SPEC_FORK_RECORD_CUTOFF"`. The commit writing a kind's first record deletes its key, since S2 reds
+  the key once the home matches a file.
+- `feature-design` and `fork` are `current-state`: TOOL-dIndexedDesign-20 reads a feature design at a
+  revision, and S8 joins a fork record's `Resolver` to its F-item's current mark, so each is edited
+  where it stands.
+- The fork home's `[0-9]` keeps out the three tracked `-fork-` files no fork kind wrote:
+  `git ls-files 'memory/builds/*/build/*-fork-*.md'` names three at `11ebd1e87`, among them
+  `2026-11-03-build-TOOL-dTotalRecall-2-owner-fork-returns.md`, and the `[0-9]` glob names none.
+
 ### The forks rule
 
 | `design.forks` | `agent` mark admitted for | `owner` mark admitted for |
@@ -203,7 +256,8 @@ value; the remedy is the owner's mark or a park, which leaves the fork open.
 ### What it does not check
 
 Whether an interface's contract means what both units think; whether the options are the real ones or
-ranked well; a fork nobody declared; and a build that writes no feature design record.
+ranked well; a fork nobody declared; a build that writes no feature design record; and that S11's
+`record-kind.feature-design@1` names a pinned version, which no `[[record-version]]` row holds.
 
 ### Inventory
 
@@ -227,7 +281,7 @@ Live at landing. The decompose item's stand-in leaves in the same commit as its 
 ### Files touched (estimate)
 
 - `tools/memory-tree/design_lib.py`: S2, S5, S7, S8, S9, S10
-- `tools/memory-tree/record-kinds.toml`: S1, S4, S6, written by the factory
+- `tools/memory-tree/record-kinds.toml`: S1, S4, S6, written by the factory and TOOL-dTotalRecall-18's verb
 - `tools/memory-tree/check-memory-hygiene.sh`, `tools/memory-tree/check-memory-hygiene.test.sh`: S7, S10, S12
 - `tools/memory-tree/.memory-tree.conf.example`, `.memory-tree.conf`: S12
 - `tools/memory-tree/SPEC-TEMPLATE.template.md`, render `memory/TEMPLATE-SPEC.md`: S12
@@ -305,9 +359,15 @@ Live at landing. The decompose item's stand-in leaves in the same commit as its 
   Red when: the row stays unsummarised or no literal call reads the key.
 - **AC8** — When `python -c` loads `record-kinds.toml` and `loop.toml` with `tomllib`, the first holds
   rows `feature-design`, `fork` and `roster` with tags `record.feature-design`, `record.fork` and
-  `record.roster`, and the second holds no `[[stand-in]]` row for `item.design.decompose` while its
-  item row's `witness` names `--decompose`.
-  Red when: a row is missing, or the stand-in survives the witness.
+  `record.roster`, each with writer `hand`, a `purpose` and the columns, forms and `unarmed` keys §4
+  "The registry rows" states, and `python record_kinds.py --check` exits 0 over it, printing
+  `feature-design: unarmed` and `fork: unarmed`; the second holds no `[[stand-in]]` row for
+  `item.design.decompose` while its item row's `witness` names `--decompose` and its `returns` reads
+  `record-kind.feature-design@1`.
+  Red when: a row is missing or lacks a column TOOL-dTotalRecall-16 or -18 requires, the stand-in
+  survives the witness, or the `returns` carries no `@<n>`.
+  fixture: the registry is TOOL-dTotalRecall-1's and `loop.toml` TOOL-dDeclaredLoop-12's, each absent at
+  base until it lands.
 - **AC9** — When `grep -n "SPEC_FORK_RECORD_CUTOFF" TEMPLATE-SPEC.md .memory-tree.conf.example` runs
   over the render and the kit's example conf, both name the key, and `grep -n "feature design"
   BUILD-METHOD.md` finds M2's sentence.
@@ -355,6 +415,17 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC2 AC3 AC4 AC
 - rev-3 · 2026-10-28 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dIndexedDesign-40 and TOOL-dIndexedDesign-42, promoted by the round-1 spec audit of
   units 31 to 38; nothing else moved.
+- rev-4 · 2026-11-05 · §2 preamble, S1, S4, S6 · §3, its Edges · §4 "The registry rows", Files
+  touched · AC8 · the three registrations carry the `--purpose` TOOL-dTotalRecall-16 S2 requires and
+  the columns TOOL-dTotalRecall-18 S1 requires, set through its landed verb, `fields` for feature-design
+  and fork with TOOL-dTotalRecall-42 S2's `unarmed`, `rows` for the roster; the `hand` non-goal stands
+  on TOOL-dTotalRecall-1 §4's ground, no door promised; the shared-files paragraph names unit 2's
+  earlier arming, rows 42 and 43 of `2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck`, by the brief prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md;
+  S11 · §3 its Edges · §4 "What it does not check" · AC8 · `item.design.decompose`'s `returns` reads
+  `record-kind.feature-design@1` in TOOL-dDeclaredLoop-24's versioned form, and AC8 reds a `returns`
+  with no `@<n>`; its `[[record-version]]` row is placed in no unit's pass, since `feature-design` is
+  untyped (TOOL-dIndexedDesign-32 S2) and has no `build_records.py` kind row to hash, the pin returned
+  to the main loop, row 99's class, and by the brief prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground-followup.md
 
 ## 10. Reuse audit
 

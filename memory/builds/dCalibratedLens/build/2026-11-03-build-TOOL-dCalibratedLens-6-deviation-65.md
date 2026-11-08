@@ -1,0 +1,15 @@
+# TOOL-dCalibratedLens-6 deviation 65 — Two §8 RESOLVED marks re-wrapped after the unit's audited revision
+
+**Serves:** deviation TOOL-dCalibratedLens-6
+
+- **Departs from:** `TOOL-dCalibratedLens-6@rev-4`
+- **Hand-off:** spec-revised
+- **Before:** two §8 RESOLVED marks of TOOL-dCalibratedLens-6's spec broke its line after `widens: none ·` (lines 327 and 334), so the next line opened `relaxes: none`.
+- **After:** the same words, re-wrapped so `widens: none · relaxes: none` sits on one line and no line of the mark ends in `·`; no word, mark, rev, status line or §9 line changed, and the spec stays at rev-4.
+- **Cause:** external
+- **Reason:** the pinned deviations instrument's `KEY` pattern ends a value at whitespace-`·`-whitespace or the next key, and it reads a mark's `RESOLVED (` line alone, so a newline after the `·` made it read `none ·` as a widens value joining no record, findings of the departures report on the prepared merge. The instrument's blob is pinned, so the marks move; dFairHearing's deviation 28 met the same class.
+- **Evidence:** the re-wrap (`git diff -- memory/builds/dCalibratedLens/spec/2026-11-02-spec-TOOL-dCalibratedLens-6.md` in this record's commit); `deviations.py --report dCalibratedLens`'s findings `entry N's widens: [none ·] joins no record`; `memory/builds/dFairHearing/build/2026-10-23-build-TOOL-dFairHearing-2-deviation-28.md`, the same class.
+- **Risk:** editorial
+- **Approver:** author, the main loop of dCalibratedLens's spec run, which made this whitespace-only re-wrap, recorded under the chain's `author-recorded` value (`PLAY-dClosedLoop-4`)
+- **Follow-through:** usage spec-audit-fold
+- **Caused-by:** PLAY-dClosedLoop-2

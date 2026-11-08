@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-3 — the entry step's five items: the card's orientation, the three placing items and the claim
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node a · Tier-2 · base c63aabbb · streams tooling · order 21 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-5 · 2026-11-05 · node a · Tier-2 · base c63aabbb · streams tooling · order 21 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0122@938c9643 whole
 
@@ -24,12 +24,19 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-3-deviation-31.md](../build/2026-10-25-build-TOOL-dPlacedRequest-3-deviation-31.md) | deviation | — |
 | [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-10-26-build-TOOL-dPlacedRequest-3-deviation-32.md](../build/2026-10-26-build-TOOL-dPlacedRequest-3-deviation-32.md) | deviation | — |
+| [2026-11-05-build-TOOL-dPlacedRequest-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dPlacedRequest-1-crosscheck-returns.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-5 |
+| [2026-11-05-build-TOOL-dPlacedRequest-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-5 |
+| [2026-11-05-build-TOOL-dPlacedRequest-3-deviation-33.md](../build/2026-11-05-build-TOOL-dPlacedRequest-3-deviation-33.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-26-prompt-TOOL-dPlacedRequest-3-1-spec-reviewer.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-3-1-spec-reviewer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dPlacedRequest-3-2-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-3-2-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-34 |
+| [2026-11-05-prompt-TOOL-dPlacedRequest-3-1-spec-reviewer.md](../prompts/2026-11-05-prompt-TOOL-dPlacedRequest-3-1-spec-reviewer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dPlacedRequest-3-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dPlacedRequest-3-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dPlacedRequest-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dPlacedRequest-3-owner-forks.md) | research | TOOL-dPlacedRequest-21 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 |
 
 <!-- /gen:spec-records -->
@@ -92,7 +99,9 @@ orders a session to re-derive the git state its card already printed, a median 6
   TOOL-dDeclaredLoop-24's `[[fixed-row]]` trigger names this build, "`entry.intake` gains its fixed
   row when dPlacedRequest declares it as an item" (its §4 "The schema", §8 F4), while
   dWellOiledMachine declares the item, so as written that floor item's fixed row is never armed.
-  Who owns it is §8 F8, open for the owner.
+  By §8 F8 the pass that declares the floor item writes its fixed row: this build's run files in
+  dDeclaredLoop's `BACKLOG.md` the ask on TOOL-dDeclaredLoop-24 §4 "The schema" and §8 F4, the trigger
+  re-worded to "when dWellOiledMachine declares it".
 - No `next`, no unit holders and no `build.unit-holders`: dWellOiledMachine's. A `unit` disposition is
   refused as under `driver-only` (flow-steps.md:144-145).
 - No `kickoff.runs` key: dRankedPlan's (v2:1172). S5 is the default's stand-in only.
@@ -206,7 +215,10 @@ return claims, before the placement (§8 F7).
 `awaiting`'s self-route carries no `draws`, and cannot: it is contention, which never draws on the
 budget (`cl-dClosedLoop-0115`; `cl-dClosedLoop-0501`'s live holder "waited for as contention within
 `flow.wait-ceiling`"). TOOL-dDeclaredLoop-33 S4 sets aside only counted edges and owner edges, so its
-`counted` rule reads this self-route as an uncounted cycle. §8 F9 holds the ask, open for the owner.
+`counted` rule reads this self-route as an uncounted cycle. By §8 F9 this build's run files in
+dDeclaredLoop's `BACKLOG.md` the ask on TOOL-dDeclaredLoop-33 S4 and §4 "Counted and owner edges": a
+route carrying `deadline` and `on-deadline` set aside beside counted and owner edges, bounded by the
+`wait` rule (S5) as an owner edge is.
 
 ### The kickoff text (S5, S6)
 
@@ -269,7 +281,7 @@ Live on landing: the parents' legs read the rows at the next bar.
   re-derived, never trusted.
 - observability — each route names its target, and a stand-in route names its tool by path.
 - risks — the rows rest on six unbuilt parent units; the build pass re-grounds each field against
-  their landed code (§8 F2, F3); two rest on asks open for the owner (§8 F8, F9).
+  their landed code (§8 F2, F3); two rest on asks this build's run files in dDeclaredLoop's `BACKLOG.md` (§8 F8, F9).
 - testing — staged breaks of the rows under the parents' checks (§6).
 - migration — S4's prune only.
 - user docs — `help/loop.md` (S7); the kickoff text is the skill itself.
@@ -374,16 +386,17 @@ transition tables and termination legs that TOOL-dDeclaredLoop-1, -24, -13 and -
   the row now, an item whose witness no hook writes until dWellOiledMachine lands; (c) this unit
   appends the fixed row to `tools/loop/item-schema.toml` ahead of the item, a parent's file and a fixed
   row naming no declared item. (b) and (c) each make this build carry another build's item.
-  Recommendation: (a). The ask the build run would file is that re-wording, on TOOL-dDeclaredLoop-24.
-  OPEN for the owner.
+  Recommendation: (a). RESOLVED (owner, 2026-11-05): (a) the ask re-wording TOOL-dDeclaredLoop-24's
+  trigger. The build run files that re-wording in dDeclaredLoop's `BACKLOG.md`, on TOOL-dDeclaredLoop-24.
 - **F9 — How does `item.entry.claim`'s `awaiting` self-route pass the `counted` rule?** Options: (a) a
   `draws` cause on the route; (b) the ask on TOOL-dDeclaredLoop-33 S4 and §4 "Counted and owner edges":
   a route carrying `deadline` and `on-deadline` set aside beside counted and owner edges, bounded by
   the `wait` rule (S5) as an owner edge is; (c) `awaiting` routed straight to unit 4's owner item, with
   no self-route. (a) spends the rework budget on contention, which `cl-dClosedLoop-0115` forbids, and
   no I19 cause names a wait; (c) makes a live holder an owner item at once, against
-  `cl-dClosedLoop-0501`'s wait within `flow.wait-ceiling`. Recommendation: (b). The ask the build run
-  would file is that set-aside, on TOOL-dDeclaredLoop-33. OPEN for the owner.
+  `cl-dClosedLoop-0501`'s wait within `flow.wait-ceiling`. Recommendation: (b). RESOLVED (owner,
+  2026-11-05): (b) the ask setting a deadlined route aside. The build run files that set-aside in
+  dDeclaredLoop's `BACKLOG.md`, on TOOL-dDeclaredLoop-33.
 
 ## 9. Revision log
 
@@ -399,6 +412,9 @@ transition tables and termination legs that TOOL-dDeclaredLoop-1, -24, -13 and -
   `build/2026-10-26-build-TOOL-dPlacedRequest-1-parents-crosscheck.md`, rows 13, 15, 20 and 22:
   `probe` sits on `item.entry.orient` only; the owner row names the factory's flags, not a door;
   `entry.intake`'s fixed row and the `awaiting` self-route are asks open for the owner.
+- rev-5 · 2026-11-05 · §3 · §4 The claim's outcomes · §5 · §8 F8, F9 · the owner resolved F8 to (a) and F9
+  to (b), by `2026-11-05-prompt-TOOL-dPlacedRequest-3-owner-forks`: each ask is the one this build's run
+  files in dDeclaredLoop's `BACKLOG.md`, where §3, §4 and §5 pointed at the open forks.
 
 ## 10. Reuse audit
 

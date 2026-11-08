@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-1 — decisions split by kind: reuse entries as level-3 units, the major-decision log, its rows routed by two raters, and the `[records]` rule reworded
 
-**Status:** DEFERRED · rev-4 · 2026-10-28 · node d · Tier-2 · base 5fede642 · streams tooling · order 8 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-5 · 2026-11-05 · node d · Tier-2 · base 5fede642 · streams tooling · order 8 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0238@b2c1827b whole
 **Carries:** node:policy-key.decisions.major
@@ -25,6 +25,10 @@
 | [2026-10-28-build-TOOL-dLinkedLibrary-1-deviation-13.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-1-deviation-13.md) | deviation | — |
 | [2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | — |
 | [2026-10-28-build-TOOL-dLinkedLibrary-1-reground-returns.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-1-reground-returns.md) | research | — |
+| [2026-11-05-build-TOOL-dLinkedLibrary-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dLinkedLibrary-1-crosscheck-returns.md) | research | TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-22 |
+| [2026-11-05-build-TOOL-dLinkedLibrary-1-deviation-14.md](../build/2026-11-05-build-TOOL-dLinkedLibrary-1-deviation-14.md) | deviation | — |
+| [2026-11-05-build-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-22 |
+| [2026-11-05-build-TOOL-dLinkedLibrary-1-reground-returns.md](../build/2026-11-05-build-TOOL-dLinkedLibrary-1-reground-returns.md) | research | TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-22 |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-1-reuse-scout.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-1-reuse-scout.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-2-reuse-scout.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-2-reuse-scout.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-3-reuse-scout.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-3-reuse-scout.md) | journal | — |
@@ -42,6 +46,10 @@
 | [2026-10-28-prompt-TOOL-dLinkedLibrary-1-2-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-2-spec-writer.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
 | [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md) | research | TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-74 |
+| [2026-11-05-prompt-TOOL-dLinkedLibrary-1-1-spec-reviewer.md](../prompts/2026-11-05-prompt-TOOL-dLinkedLibrary-1-1-spec-reviewer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dLinkedLibrary-1-2-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dLinkedLibrary-1-2-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-52 |
+| [2026-11-05-prompt-TOOL-dLinkedLibrary-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dLinkedLibrary-1-parents-reground.md) | research | TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-22 |
 | [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
@@ -139,7 +147,7 @@ row goes to its true home after two raters agree on it at kappa 0.8 or better, a
   `layer.memory`, home `memory/DECISIONS.md`, id-rule `""`, schema `{ form = "rows" }`, lifecycle
   `append-only` (a landed row is never edited, `memory/DECISIONS.md:5-6`), and `readers = []` with
   `readers-none = "no work-order read key hands the log; recall and TOOL-dLinkedLibrary-5's views
-  read it"`. S9's verb takes no flag for those six columns (TOOL-dTotalRecall-1:101-102), so the build
+  read it"`. S9's verb takes no flag for those six columns (TOOL-dTotalRecall-1 S9), so the build
   run sets them through TOOL-dTotalRecall-18's landed verb. Node `record-kind.decision`; its writer
   stays `hand`, which TOOL-dTotalRecall-2 S9 keeps on a row whose form is not `fields`, until
   dScopedBuild's `build.distill` appends a major fork's row. Observed by AC9.
@@ -433,6 +441,7 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC2 AC3 AC4 AC5 AC6 
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-38, TOOL-dLinkedLibrary-52, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
 - rev-3 · 2026-10-27 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-59, TOOL-dLinkedLibrary-60, TOOL-dLinkedLibrary-64, promoted from the spec audit of units 37 to 53; nothing else moved.
 - rev-4 · 2026-10-28 · §2 S3, S4, S7, S9, S12 · §3 Edges · §6 AC4, AC9 · §10 · re-grounded on the parents at `1a61f21a2` per the cross-check record `2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck.md`, rows 1, 4 and 5: the `decision` row's call spells its purpose and every column; the proposal record serves `log`; both keys are read through the memory-tree policy adapter, the fixture's policy committed.
+- rev-5 · 2026-11-05 · §2 S9 · the cite of TOOL-dTotalRecall-1's verb taking no flag for the other columns names its section, `TOOL-dTotalRecall-1 S9`, not `:101-102`, which that spec's rev-5 moved onto its S8; cross-check row 3, no design change, by the brief prompts/2026-11-05-prompt-TOOL-dLinkedLibrary-1-parents-reground.md
 
 ## 10. Reuse audit
 

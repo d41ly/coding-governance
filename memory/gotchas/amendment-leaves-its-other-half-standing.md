@@ -98,6 +98,15 @@ It bit again in dFairHearing's owner-ordered diff review, 2026-11-05
 TOOL-dFairHearing-43 S6 moved the policy lookup to `resolveKitDir`, and the header comment took the new rule. The
 deny key and one README sentence still stated the sibling lookup, so a deny sent its reader to the wrong directory.
 
+It bit again in dFinishedRecord's closing diff review, 2026-11-05
+(memory/builds/dFinishedRecord/reviews/2026-11-05-review-TOOL-dFinishedRecord-1-closing-diff-round1.md, L2).
+The build README's roster row for `TOOL-dFinishedRecord-1` was written from the brief, which placed check 24's
+call to `check_derived_landed` directly after the recorded-phase skip. The spec moved the call after every skip,
+as check 23 asks it, and listed the brief's placement under Alternatives rejected. The code in
+`tools/unattended/check-unattended.sh` followed the spec and the row kept the brief's words, so the next editor
+of the call had two placements to follow. `TOOL-dFinishedRecord-2` rewrote the row. The check, at the close: no
+roster Mechanism cell describes a design its unit's spec lists under Alternatives rejected.
+
 ## The fix
 
 **Amend the RULE, not the sentence.** Before writing the new wording, find everything whose truth
@@ -147,7 +156,7 @@ particular record: a class whose whole subject is a half-finished edit would be 
 ## The anchors
 
 The taken set is `memory/builds/` — where specs, their criteria and their revision logs live — and
-the review harness template named above, the one code surface where this class has been observed. It is deliberately NOT `memory/`, which
+the review harness template named above and the unattended kit gate whose call a roster row misplaced, the two code surfaces where this class has been observed. It is deliberately NOT `memory/`, which
 would select on every note and index in the tree, and not the two spec paths that produced it, which
 would make the record a citation of one build rather than a class. The record that found it is
 memory/builds/dTieredTribunal/reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-post-acceptance-round1.md,

@@ -117,7 +117,7 @@ ids TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan
 | [TOOL-dRankedPlan-50 — a command run through `timeout` or a same-file `$@` wrapper function is read through its arguments](spec/2026-10-27-spec-TOOL-dRankedPlan-50.md) | 9 | 2 | DEFERRED | rev-3 | 2026-10-27 |
 | [TOOL-dRankedPlan-51 — the op tokens `(`, `)`, `{` and `}` end a command, so a brace group, a subshell or a function body is read](spec/2026-10-27-spec-TOOL-dRankedPlan-51.md) | 9 | 2 | DEFERRED | rev-3 | 2026-10-27 |
 | [TOOL-dRankedPlan-19 — `plan.exit` admits a move only over a witnessed plan record](spec/2026-10-26-spec-TOOL-dRankedPlan-19.md) | 10 | 2 | DEFERRED | rev-2 | 2026-10-27 |
-| [TOOL-dRankedPlan-3 — triage as `plan.triage` says: declared rules, the planner judging the rest](spec/2026-10-26-spec-TOOL-dRankedPlan-3.md) | 10 | 2 | DEFERRED | rev-3 | 2026-10-28 |
+| [TOOL-dRankedPlan-3 — triage as `plan.triage` says: declared rules, the planner judging the rest](spec/2026-10-26-spec-TOOL-dRankedPlan-3.md) | 10 | 2 | DEFERRED | rev-4 | 2026-11-05 |
 | [TOOL-dRankedPlan-59 — a wrapper call reads its script word past the interpreter's options, as a bare call does](spec/2026-10-27-spec-TOOL-dRankedPlan-59.md) | 10 | 2 | DEFERRED | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-28 — the `triage` and `dupes` record kinds join the binding reader, the factory table and the HYGIENE kind list](spec/2026-10-26-spec-TOOL-dRankedPlan-28.md) | 11 | 2 | DEFERRED | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-33 — the shared `plan.exit` fixtures plant a witnessed plan record, so the precondition holds only where a plant removes it](spec/2026-10-27-spec-TOOL-dRankedPlan-33.md) | 11 | 2 | DEFERRED | rev-3 | 2026-10-27 |
@@ -170,7 +170,7 @@ ids TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan
 | [TOOL-dRankedPlan-83 — the routed commits leg's ceiling covers this run's close, sized through `derive-ceilings.py --observed` from the main loop's reading of the leg alone](spec/2026-10-28-spec-TOOL-dRankedPlan-83.md) | — | 1 | CLOSED | rev-1 | 2026-10-28 |
 <!-- /gen:build-units -->
 
-Records: 179 bound to this build, across 4 record folder(s).
+Records: 187 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

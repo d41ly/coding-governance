@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-1 — the record-kind registry, the memory contract's one declaration of every kind
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 1 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base 462d20f3 · streams tooling · order 1 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0212@121cf0ba whole
 **Carries:** node:system.memory-structure
@@ -24,6 +24,11 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-reground-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-reground-returns.md) | research | — |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
+| [2026-11-03-build-TOOL-dTotalRecall-1-deviation-13.md](../build/2026-11-03-build-TOOL-dTotalRecall-1-deviation-13.md) | deviation | — |
+| [2026-11-03-build-TOOL-dTotalRecall-2-owner-fork-returns.md](../build/2026-11-03-build-TOOL-dTotalRecall-2-owner-fork-returns.md) | research | TOOL-dTotalRecall-2 |
+| [2026-11-05-build-TOOL-dTotalRecall-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dTotalRecall-1-crosscheck-returns.md) | research | TOOL-dTotalRecall-11 TOOL-dTotalRecall-25 |
+| [2026-11-05-build-TOOL-dTotalRecall-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-11 TOOL-dTotalRecall-25 |
+| [2026-11-05-build-TOOL-dTotalRecall-1-reground-returns.md](../build/2026-11-05-build-TOOL-dTotalRecall-1-reground-returns.md) | research | TOOL-dTotalRecall-11 TOOL-dTotalRecall-25 |
 | [2026-10-25-prompt-TOOL-dTotalRecall-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dTotalRecall-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dTotalRecall-1-2-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dTotalRecall-1-2-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dTotalRecall-1-3-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dTotalRecall-1-3-reuse-scout.md) | journal | — |
@@ -44,6 +49,10 @@
 | [2026-10-26-prompt-TOOL-dTotalRecall-77-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-77-1-spec-writer.md) | journal | TOOL-dTotalRecall-77 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-89-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-89-1-spec-writer.md) | journal | TOOL-dTotalRecall-89 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-93-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-93-1-spec-writer.md) | journal | TOOL-dTotalRecall-93 |
+| [2026-11-03-prompt-TOOL-dTotalRecall-1-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dTotalRecall-1-1-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dTotalRecall-2-owner-fork.md](../prompts/2026-11-03-prompt-TOOL-dTotalRecall-2-owner-fork.md) | research | TOOL-dTotalRecall-2 |
+| [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-3 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-11 TOOL-dTotalRecall-19 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-43 TOOL-dTotalRecall-50 TOOL-dTotalRecall-61 TOOL-dTotalRecall-70 TOOL-dTotalRecall-89 |
+| [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-11 TOOL-dTotalRecall-25 |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
 
 <!-- /gen:spec-records -->
@@ -191,8 +200,9 @@ check = "memory hygiene"
   TOOL-dWitnessedBar-14 S5; `build_records.py new exception`, PLAY-dOrderedCharter-7 S8), else the
   factory with `--build`, `--unit` and the kind's field flags. No parent claims a generic
   `build_records.py new <kind>` (TOOL-dPlacedRequest-7:104-106), so the build run re-grounds each
-  factory cell on the landed factory. Empty is red (S3); `hand` is legal until TOOL-dTotalRecall-2
-  registers a door.
+  factory cell on the landed factory. Empty is red (S3); `hand` is legal on any row
+  TOOL-dTotalRecall-2 S9 does not move. S9 moves only the `fields`-form `hand` rows onto its door, and
+  a `hand` row of another form keeps `hand`, its door's owner named in that pass's `Decided:` trailer.
 - `check` names one leg of `tools/gate-legs.json` by its `name`.
 - `id-rule` is the record's name grammar, or `""` for a kind keyed by path.
 - Two columns later units add are admitted by S3 and never red: `root` (TOOL-dTotalRecall-19, true on
@@ -217,7 +227,8 @@ check = "memory hygiene"
 The last row stands for every member of `TYPED_RECORD_KINDS` at the build run's base; `deviation`,
 `probe` and `probe-trigger` are three of them, and a `-<kind>-<n>.md` record is graded once, by its
 factory row. The writer cells marked `hand` are the 32-of-76 class gap-mem-37
-names, and TOOL-dTotalRecall-2 replaces each with its door.
+names. TOOL-dTotalRecall-2 S9 replaces the `fields`-form ones with its door; `backlog-row` and
+`dossier` keep `hand`.
 
 ### The view
 
@@ -405,6 +416,10 @@ New arm: tools/govkit/step_gate.py · covers AC3 AC4 · the `record-kind-schema`
   `2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck.md`: factory writers name each owner's
   command or the factory and its flags, `deviation` is one factory row joined through
   `TYPED_RECORD_KINDS`, the leg carries `enforces`, and F1 re-cites TOOL-dPlacedRequest-1:145-146.
+- rev-5 · 2026-11-03 · §4 writer bullet, the note under the rows · `hand` stays legal on any row
+  TOOL-dTotalRecall-2 S9 does not move, and the promise that unit 2 gives every `hand` row a door is
+  dropped: S9 moves only `fields`-form rows, per row 2 of
+  `2026-11-03-build-TOOL-dMindYourWords-1-parents-crosscheck`. Nothing this unit builds changes.
 
 ## 10. Reuse audit
 

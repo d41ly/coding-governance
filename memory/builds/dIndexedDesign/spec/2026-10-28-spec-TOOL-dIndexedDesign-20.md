@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-20 — two-level re-entry: `design.input`'s pin, `design.reentry`'s additive-versus-breaking diff record, and the re-design inventory
 
-**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 9 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 9 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0390@a096f77c part 2/2
 **Carries:** node:item.design.input
@@ -18,7 +18,14 @@
 | [2026-10-28-build-TOOL-dIndexedDesign-1-fix-return.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-fix-return.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
 | [2026-10-28-build-TOOL-dIndexedDesign-20-deviation-201.md](../build/2026-10-28-build-TOOL-dIndexedDesign-20-deviation-201.md) | deviation | — |
 | [2026-10-28-build-TOOL-dIndexedDesign-20-deviation-202.md](../build/2026-10-28-build-TOOL-dIndexedDesign-20-deviation-202.md) | deviation | — |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-20-deviation-203.md](../build/2026-11-05-build-TOOL-dIndexedDesign-20-deviation-203.md) | deviation | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-fix-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-fix-brief.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-20-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-20-1-spec-writer.md) | journal | — |
 | [2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-3 |
 
 <!-- /gen:spec-records -->
@@ -44,7 +51,9 @@ unit's feature design records and adds no second grammar for them.
 ## 2. Scope (IN)
 
 Build-run preconditions this unit calls and does not build: the record-kind factory `record_kinds.py
-new` and `tools/memory-tree/record-kinds.toml` (TOOL-dTotalRecall-1 S1, S9); the `[[item]]` and
+new` and `tools/memory-tree/record-kinds.toml` (TOOL-dTotalRecall-1 S1, S9), with the `--purpose` it
+requires (TOOL-dTotalRecall-16 S2), the columns TOOL-dTotalRecall-18 S1 requires and that unit's landed
+verb that sets them, and the `unarmed` key (TOOL-dTotalRecall-42 S2); the `[[item]]` and
 `[[stand-in]]` rows of `tools/loop/loop.toml` (TOOL-dDeclaredLoop-12 S2, -13 S8) and the item factory
 (TOOL-dDeclaredLoop-24); `read_feature_designs`, the `feature-design` kind and `--decompose-fixture`
 (TOOL-dIndexedDesign-8 S1, S2, S10); `read_spec_section` (TOOL-dIndexedDesign-9, I1);
@@ -81,7 +90,16 @@ sentence to one paragraph.
 - **S4** — The diff record, kind `diff`, tag `record.diff`, registered by `python record_kinds.py new
   diff --tag record.diff --writer "design_lib.py --reentry --write" --check "memory hygiene" --field
   Feature --field Base --field Head --field Change --field Affected --field Triggers --field Level
-  --field Route` (I15). Home `memory/builds/<slug>/build/<date>-build-<unit id>-diff-<n>.md`, `<unit id>`
+  --field Route --purpose "a feature's interface changes between two revisions, each additive or
+  breaking, and the re-entry level they derive"` (I15), the `--purpose` TOOL-dTotalRecall-16 S2
+  requires, within its S1's 120 bytes, schema `{ form = "fields" }` from the `--field` flags. The columns TOOL-dTotalRecall-18
+  S1 requires are set through that unit's landed verb, as `TOOL-dIndexedDesign-10` S1 sets its row's:
+  layer `layer.memory`, home `memory/builds/*/build/*-diff-*.md`, lifecycle `append-only`, and
+  `readers = []` with `readers-none = "no work-order read key hands a diff record; the loop reads its
+  printed route"`. No diff record is tracked at landing, so the row carries
+  `unarmed = "no diff record yet; design_lib.py --reentry --write arms it"` (TOOL-dTotalRecall-42 S2),
+  without which TOOL-dTotalRecall-18 §4 "Columns" reds a `fields` home that matches no tracked file.
+  Home `memory/builds/<slug>/build/<date>-build-<unit id>-diff-<n>.md`, `<unit id>`
   the feature's first unit in its `Units` order at head, or at base for a feature head no longer
   declares, and `<n>` the next number free for that unit; bound `**Serves:** diff <every unit the
   feature declares at base or head>`; fields as §4's example spells them. Observed by AC5 and AC9.
@@ -103,7 +121,13 @@ sentence to one paragraph.
   not hold; 2 on no loop kit or no `item.design.input` row. Observed by AC6.
 - **S7** — The inventory record, kind `inventory`, tag `record.inventory`, registered by `python
   record_kinds.py new inventory --tag record.inventory --writer hand --check "memory hygiene" --field
-  Input --field Of --field Verdict`. Home
+  Input --field Of --field Verdict --purpose "a revised plan's verdict on each built unit, pinned to
+  the input that revised it"`, schema `{ form = "fields" }`, with
+  TOOL-dTotalRecall-18 S1's columns set through its landed verb as S4's are: layer `layer.memory`, home
+  `memory/builds/*/build/*-inventory-*.md`, lifecycle `append-only`, `readers = []` with
+  `readers-none = "no work-order read key hands an inventory; gen_build_index.py --inventory joins
+  it"`, and `unarmed = "no inventory record yet; the architect's first one arms it"`
+  (TOOL-dTotalRecall-42 S2). Home
   `memory/builds/<slug>/build/<date>-build-<unit id>-inventory-<n>.md`, `<unit id>` the first id its
   `Verdict` lines name; bound `**Serves:** inventory <each unit id a Verdict line names>`; fields
   `- **Input:** <path>@<sha8>`, the pin S6 printed; one `- **Of:** <slug> @ <rev>` per build whose built
@@ -130,8 +154,13 @@ sentence to one paragraph.
 - **S10** — The items go live. The `[[stand-in]]` rows of `item.design.input`, `item.design.reentry` and
   `item.design.inventory` leave `tools/loop/loop.toml`; the three rows' `witness` name
   `design_lib.py --input`, `design_lib.py --reentry` and `gen_build_index.py --inventory`, and the
-  `returns` of the second and third name `record-kind.diff` and `record-kind.inventory`. Their needs,
-  outcomes and routes stay as TOOL-dDeclaredLoop-12 transcribed them. Observed by AC9.
+  `returns` of the second and third read `record-kind.diff@1` and `record-kind.inventory@1`, the
+  versioned form TOOL-dDeclaredLoop-24 §4 "Records at a version" gives `returns`. Their
+  `[[record-version]]` rows in `tools/loop/item-schema.toml` hash the per-kind table rows
+  `TOOL-dIndexedDesign-34` S1 adds, so they land in that unit's pass (its S3), not here;
+  TOOL-dDeclaredLoop-24 S4 grades a pinned version's hash and an input's producer, and names no check
+  that reds a `returns` before its version row lands. Their needs, outcomes and routes stay as
+  TOOL-dDeclaredLoop-12 transcribed them. Observed by AC9.
 - **S11** — The plants. TOOL-dIndexedDesign-8's `--decompose-fixture <dir> --plant <case>` gains the
   cases of §6: `reentry-additive`, `reentry-consumer`, `reentry-breaking`, `input`, `inventory`,
   `inventory-missing`, `inventory-unbuilt`, `inventory-amender` and `inventory-of`, each a scratch
@@ -161,9 +190,9 @@ sentence to one paragraph.
 - **consumes-from** `TOOL-dIndexedDesign-8` — `read_feature_designs`, the `Interface` fields S2 diffs and the `--decompose-fixture` writer S11 extends; without them there is no declaration to diff
 - **consumes-from** `TOOL-dIndexedDesign-9` — `read_spec_section`, the reader S8's amender test reads `section.goal` and `section.scope` through
 - **consumes-from** `TOOL-dIndexedDesign-16` — `read_design_policy`, I3, the one reader S3 calls for `design.reentry`; without it the level has no trigger set
-- **consumes-from** external — TOOL-dTotalRecall-1's `record_kinds.py new` (S4, S7) and TOOL-dDeclaredLoop-12, -13 and -24's item and stand-in rows (S10), DEFERRED at base
+- **consumes-from** external — TOOL-dTotalRecall-1's `record_kinds.py new` (S4, S7), with TOOL-dTotalRecall-16 S2's `--purpose`, TOOL-dTotalRecall-18 S1's columns and TOOL-dTotalRecall-42 S2's `unarmed` key; TOOL-dDeclaredLoop-12, -13 and -24's item and stand-in rows and TOOL-dDeclaredLoop-24 §4 "Records at a version"'s versioned `returns` (S10); each DEFERRED at base
 - **hands-off** external — §8 F3's ask to dOrderedCharter and F1's ask to dDeclaredLoop
-- **hands-off** `TOOL-dIndexedDesign-34` — the `diff` and `inventory` kinds of S4 and S7, which that unit makes typed, and the diff record's name, which it takes from the factory (report id 21, HIGH)
+- **hands-off** `TOOL-dIndexedDesign-34` — the `diff` and `inventory` kinds of S4 and S7, which that unit makes typed, and the diff record's name, which it takes from the factory (report id 21, HIGH); and S10's `@1` versions, whose `[[record-version]]` rows that unit's S3 adds over its S1 table rows
 - **hands-off** `TOOL-dIndexedDesign-38` — the round-1 spec audit's minors that land on this spec, report ids 10 and 48, each a scope item of that batch unit
 - **hands-off** `TOOL-dIndexedDesign-43` — S7's inventory grammar, one `Of` line per build and one `Verdict` line per built unit, which that unit's repeatable set admits (id 13)
 
@@ -270,7 +299,8 @@ Live at landing; each item's stand-in leaves in the commit its witness lands in.
 
 - `tools/memory-tree/design_lib.py`: S1, S2, S3, S5, S6, S11
 - `tools/memory-tree/gen_build_index.py`: S8 and the arms of §7
-- `tools/memory-tree/record-kinds.toml`: S4, S7, written by the factory
+- `tools/memory-tree/record-kinds.toml`: S4, S7, written by the factory and TOOL-dTotalRecall-18's
+  verb
 - `tools/policy/catalogue.toml`, `tools/policy/unsummarised-keys.txt`, `.governance/policy.json`: S9
 - `tools/loop/loop.toml`: S10
 - `tools/memory-tree/BUILD-METHOD.template.md`, render `memory/guides/BUILD-METHOD.md`: S12
@@ -349,11 +379,17 @@ Live at landing; each item's stand-in leaves in the commit its witness lands in.
   at a revision where `TOOL-tOld-1` read `CLOSED` and HEAD reads it `WONTDO`, it exits 1 until a
   `Verdict` names `TOOL-tOld-1`, then 0; with the `Of` revision naming no commit it exits 2.
   Red when: the join reads the build at HEAD instead of the named revision.
-- **AC9** — When `python -c` loads `record-kinds.toml` and `loop.toml` with `tomllib`, the first holds
-  rows `diff` and `inventory` tagged `record.diff` and `record.inventory`, and the second holds no
-  `[[stand-in]]` row for `item.design.input`, `item.design.reentry` or `item.design.inventory`, whose
-  `witness` names `--input`, `--reentry` and `--inventory`.
-  Red when: a row is missing, or a stand-in survives its witness.
+- **AC9** — When `python record_kinds.py --check` runs at the pass tip, it lists `diff` and
+  `inventory` with tags `record.diff` and `record.inventory`, form `fields`, writers
+  `design_lib.py --reentry --write` and `hand`, check `memory hygiene`, their purposes, layer, homes,
+  lifecycle and readers, prints each row's `unarmed` line, and exits 0; and a `python -c` `tomllib`
+  read of `loop.toml` finds no `[[stand-in]]` row for `item.design.input`, `item.design.reentry` or
+  `item.design.inventory`, whose `witness` names `--input`, `--reentry` and `--inventory`, and whose
+  `returns` for the second and third read `record-kind.diff@1` and `record-kind.inventory@1`. The
+  `[[record-version]]` rows those versions name are `TOOL-dIndexedDesign-34` AC5's.
+  Red when: a row lacks a column TOOL-dTotalRecall-16 or -18 requires, a stand-in survives its
+  witness, or a `returns` names its kind with no version.
+  fixture: the registry is TOOL-dTotalRecall-1's, absent at base until it lands.
 - **AC10** — When `python policy.py get design.reentry` runs with no policy file it prints
   `interface-change`, `review-cross-unit-flaw` and `planner-or-owner-flag`; after `python policy.py lists
   --write` the unsummarised list no longer names `design.reentry`; and `grep -n
@@ -389,6 +425,11 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC2 AC3 AC4 AC5 AC6 
 - rev-3 · 2026-10-28 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edge of TOOL-dIndexedDesign-43, promoted by the round-1 spec audit of units 31 to 38; nothing else
   moved.
+- rev-4 · 2026-11-05 · §2 preconditions, S4, S7, S10 · §3 Edges · §4 Files touched · §6 AC9 · S4's and
+  S7's `new` calls gain `--purpose` (TOOL-dTotalRecall-16 S2), TOOL-dTotalRecall-18 S1's columns set
+  through its landed verb and TOOL-dTotalRecall-42 S2's `unarmed`; S10's `returns` read `@1`
+  (TOOL-dDeclaredLoop-24 §4), their version rows land in TOOL-dIndexedDesign-34's pass; AC9 reds a
+  missing column, by the brief prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md
 
 ## 10. Reuse audit
 

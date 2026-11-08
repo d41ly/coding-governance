@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-16 — the code replay: a unit's files read and its lookups counted with the `code` slot and without, scored by the scorer factory against the seed alone
 
-**Status:** DEFERRED · rev-4 · 2026-10-28 · node d · Tier-2 · base 5fede642 · streams tooling · order 19 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-5 · 2026-11-05 · node d · Tier-2 · base 5fede642 · streams tooling · order 19 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0253@22d88118 whole
 
@@ -15,12 +15,14 @@
 | [2026-10-27-build-TOOL-dLinkedLibrary-16-deviation-161.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-16-deviation-161.md) | deviation | — |
 | [2026-10-27-build-TOOL-dLinkedLibrary-54-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-54-promoted-fix-return.md) | research | TOOL-dLinkedLibrary-54 TOOL-dLinkedLibrary-55 TOOL-dLinkedLibrary-56 TOOL-dLinkedLibrary-57 TOOL-dLinkedLibrary-58 TOOL-dLinkedLibrary-59 TOOL-dLinkedLibrary-60 TOOL-dLinkedLibrary-62 TOOL-dLinkedLibrary-63 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-20 |
 | [2026-10-28-build-TOOL-dLinkedLibrary-16-deviation-162.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-16-deviation-162.md) | deviation | — |
+| [2026-11-05-build-TOOL-dLinkedLibrary-16-deviation-163.md](../build/2026-11-05-build-TOOL-dLinkedLibrary-16-deviation-163.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-fix-brief.md) | research | TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-27-prompt-TOOL-dLinkedLibrary-54-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dLinkedLibrary-54-promoted-fix-brief.md) | research | TOOL-dLinkedLibrary-54 TOOL-dLinkedLibrary-55 TOOL-dLinkedLibrary-56 TOOL-dLinkedLibrary-57 TOOL-dLinkedLibrary-58 TOOL-dLinkedLibrary-59 TOOL-dLinkedLibrary-60 TOOL-dLinkedLibrary-62 TOOL-dLinkedLibrary-63 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-20 |
 | [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
 | [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-74 |
 | [2026-10-28-prompt-TOOL-dLinkedLibrary-16-1-spec-reviewer.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-16-1-spec-reviewer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dLinkedLibrary-8-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dLinkedLibrary-8-owner-forks.md) | research | TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-22 |
 | [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
@@ -42,8 +44,8 @@ The scorer is TOOL-dFairHearing-12's factory `tools/workflows/replay_scorer.py` 
 S4) and its run procedure TOOL-dFairHearing-30 S1 to S3 (one fresh clone per case, arm and attempt,
 clean before the call). The transcript counts are TOOL-dTotalRecall-17 S1's `count_existence_searches`
 over runlog's `resolve_session_tree`, `read_records` and `extract_segments`
-(`tools/runlog/extract.py:266`, `:308`, `:372`, verified at base), reached across the kit boundary as
-§8 F3 settles. The record is TOOL-dTotalRecall-8's at a past tree: the sorted TSV rows `python
+(`tools/runlog/extract.py:266`, `:308`, `:372`, verified at base), read in process under the
+workflows kit's `requires_if` row for `runlog` (§8 F3). The record is TOOL-dTotalRecall-8's at a past tree: the sorted TSV rows `python
 code_record.py --dump --tree <rev>` prints (TOOL-dTotalRecall-8 §4 "Record size"), run as a subprocess
 and parsed by `replay_scorer.py`. All but runlog are DEFERRED at base `5fede642` and are a build-run
 precondition.
@@ -65,7 +67,7 @@ precondition.
   in P. `render_code_slot(record, seed)` renders the research's candidate B: the seed files with each
   definition's key and range, then the files one `calls`, `tests`, `invokes` or `registers` edge away
   from a seed definition in either direction, through TOOL-dLinkedLibrary-14's `derive_callers`,
-  `derive_callees` and `derive_tests`, reached as §8 F3 settles, then the seed files' kit siblings, as paths and ranges, never
+  `derive_callees` and `derive_tests`, read in process under the `requires_if` row for `memory-tree` (§8 F3), then the seed files' kit siblings, as paths and ranges, never
   bodies. It stops adding lines at 16 KiB (NP-8's answer, PINNED), and the manifest records the last
   file it named. Observed by AC2.
 - **S4** — The runs. For each corpus unit, two arms, `without` and `with`, two runs each: one fresh
@@ -103,7 +105,7 @@ precondition.
 
 ### Edges
 
-- **consumes-from** `TOOL-dLinkedLibrary-14` — `gov_code.py`, its `derive_callers`, `derive_callees` and `derive_tests`, from which S3 renders the slot's one hop, reached as §8 F3 settles
+- **consumes-from** `TOOL-dLinkedLibrary-14` — `gov_code.py`, its `derive_callers`, `derive_callees` and `derive_tests`, from which S3 renders the slot's one hop, read in process under the workflows kit's `requires_if` row for `memory-tree` (§8 F3)
 - **consumes-from** external — TOOL-dFairHearing-12 S1 and S6, TOOL-dFairHearing-23 S4 and TOOL-dFairHearing-30 S1 to S3 (the factory, its manifest check and its clone procedure), TOOL-dTotalRecall-17 S1 (`count_existence_searches`) and TOOL-dTotalRecall-8 (the record at a past tree), DEFERRED at base and built before this unit's pass
 - **hands-off** external — dBoundRoles, whose per-item `code` slot no spec carries: the verdict record of S7 is the input §8 F1's ask names
 - **hands-off** `TOOL-dLinkedLibrary-52` — `measure_read_files`, which unit 52 re-points at the one shell-read definition (id 42)
@@ -163,7 +165,7 @@ The runs happen once, at this unit's pass in the build run.
 
 - `tools/workflows/replay_scorer.py`: the `code-replay` instance
 - `tools/workflows/README.md`: the factory paragraph names the fourth instance
-- `tools/workflows/kit.toml`: §8 F3's two `requires_if` rows, where the owner picks (b)
+- `tools/workflows/kit.toml`: §8 F3's two `requires_if` rows, `memory-tree` and `runlog`
 - `tools/workflows/tier2-review.template.js`: the workflows kit's version line, moved with its shipped bytes
 - `tools/workflows/tier2-review.js`: its render
 - `memory/builds/dLinkedLibrary/build/<date>-build-TOOL-dLinkedLibrary-16-code-replay-verdict.md` (new)
@@ -268,7 +270,8 @@ New arm: tools/workflows/replay_scorer.py · covers AC1 AC2 AC3 AC4 AC5 AC7 · t
   inline as the `invocation_segments` block TOOL-dTotalRecall-8 S5 canonicalises, the transcript
   readers still a runlog row. (a) derives the record once per verb call per seed definition and
   waits on three owners; (c) still needs a runlog row. Recommendation (b), one reader per fact and the
-  edges declared where govkit reads them; the main loop files no ask under (b). Open for the owner.
+  edges declared where govkit reads them. RESOLVED (owner, 2026-11-05): (b) two declared
+  `requires_if` rows, `memory-tree` and `runlog`; the main loop files no ask.
 
 ## 9. Revision log
 
@@ -283,6 +286,7 @@ New arm: tools/workflows/replay_scorer.py · covers AC1 AC2 AC3 AC4 AC5 AC7 · t
   `2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck`, rows 47 and 49: the past-tree record is
   `code_record.py --dump --tree <rev>`, and how `replay_scorer.py` reaches memory-tree's and runlog's
   readers is F3's, subprocess verbs and their asks or declared `requires_if` rows.
+- rev-5 · 2026-11-05 · §2 preamble and S3 · §3 Edges · §4 Files touched · §8 F3 · the owner resolved F3 to (b), by `2026-11-05-prompt-TOOL-dLinkedLibrary-8-owner-forks`: `replay_scorer.py` reads memory-tree's edge readers and runlog's transcript readers in process, under two `requires_if` rows on `tools/workflows/kit.toml`; no ask is filed.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-4 — the deploy engine: `deploy.current` to `deploy.close`, `deploy.unlease` and the mailbox it closes
 
-**Status:** DEFERRED · rev-4 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 10 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base f4597719 · streams deployer · order 10 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0415@032149c3 whole
 **Carries:** node:item.deploy.current
@@ -20,7 +20,14 @@
 | [2026-10-30-build-DEPL-dShippedRelease-1-spec-stage-returns.md](../build/2026-10-30-build-DEPL-dShippedRelease-1-spec-stage-returns.md) | research | DEPL-dShippedRelease-1 DEPL-dShippedRelease-2 DEPL-dShippedRelease-3 DEPL-dShippedRelease-5 DEPL-dShippedRelease-6 DEPL-dShippedRelease-7 DEPL-dShippedRelease-8 DEPL-dShippedRelease-9 DEPL-dShippedRelease-10 DEPL-dShippedRelease-11 DEPL-dShippedRelease-12 DEPL-dShippedRelease-13 DEPL-dShippedRelease-14 DEPL-dShippedRelease-15 DEPL-dShippedRelease-16 DEPL-dShippedRelease-17 DEPL-dShippedRelease-18 DEPL-dShippedRelease-19 DEPL-dShippedRelease-20 DEPL-dShippedRelease-21 DEPL-dShippedRelease-22 DEPL-dShippedRelease-23 DEPL-dShippedRelease-24 DEPL-dShippedRelease-25 DEPL-dShippedRelease-26 DEPL-dShippedRelease-27 DEPL-dShippedRelease-28 DEPL-dShippedRelease-29 DEPL-dShippedRelease-30 DEPL-dShippedRelease-31 |
 | [2026-10-30-build-DEPL-dShippedRelease-4-deviation-41.md](../build/2026-10-30-build-DEPL-dShippedRelease-4-deviation-41.md) | deviation | — |
 | [2026-10-30-build-DEPL-dShippedRelease-4-deviation-42.md](../build/2026-10-30-build-DEPL-dShippedRelease-4-deviation-42.md) | deviation | — |
+| [2026-11-03-build-DEPL-dShippedRelease-1-crosscheck-returns.md](../build/2026-11-03-build-DEPL-dShippedRelease-1-crosscheck-returns.md) | research | DEPL-dShippedRelease-1 DEPL-dShippedRelease-95 |
+| [2026-11-03-build-DEPL-dShippedRelease-1-parents-crosscheck.md](../build/2026-11-03-build-DEPL-dShippedRelease-1-parents-crosscheck.md) | research | DEPL-dShippedRelease-1 |
+| [2026-11-03-build-DEPL-dShippedRelease-1-reground-returns.md](../build/2026-11-03-build-DEPL-dShippedRelease-1-reground-returns.md) | research | DEPL-dShippedRelease-1 |
+| [2026-11-03-build-DEPL-dShippedRelease-4-deviation-43.md](../build/2026-11-03-build-DEPL-dShippedRelease-4-deviation-43.md) | deviation | — |
 | [2026-10-30-prompt-DEPL-dShippedRelease-1-spec-brief.md](../prompts/2026-10-30-prompt-DEPL-dShippedRelease-1-spec-brief.md) | research | DEPL-dShippedRelease-1 DEPL-dShippedRelease-2 DEPL-dShippedRelease-3 DEPL-dShippedRelease-5 DEPL-dShippedRelease-6 DEPL-dShippedRelease-7 DEPL-dShippedRelease-8 DEPL-dShippedRelease-9 DEPL-dShippedRelease-10 DEPL-dShippedRelease-11 DEPL-dShippedRelease-12 DEPL-dShippedRelease-13 DEPL-dShippedRelease-14 DEPL-dShippedRelease-15 DEPL-dShippedRelease-16 DEPL-dShippedRelease-17 DEPL-dShippedRelease-18 DEPL-dShippedRelease-19 DEPL-dShippedRelease-20 DEPL-dShippedRelease-21 DEPL-dShippedRelease-22 DEPL-dShippedRelease-23 DEPL-dShippedRelease-24 DEPL-dShippedRelease-25 DEPL-dShippedRelease-26 DEPL-dShippedRelease-27 DEPL-dShippedRelease-28 DEPL-dShippedRelease-29 DEPL-dShippedRelease-30 DEPL-dShippedRelease-31 |
+| [2026-11-03-prompt-DEPL-dShippedRelease-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-DEPL-dShippedRelease-1-parents-crosscheck.md) | research | DEPL-dShippedRelease-1 DEPL-dShippedRelease-5 DEPL-dShippedRelease-6 DEPL-dShippedRelease-11 DEPL-dShippedRelease-12 DEPL-dShippedRelease-15 DEPL-dShippedRelease-30 DEPL-dShippedRelease-58 DEPL-dShippedRelease-68 DEPL-dShippedRelease-69 DEPL-dShippedRelease-78 DEPL-dShippedRelease-94 DEPL-dShippedRelease-95 DEPL-dShippedRelease-123 DEPL-dShippedRelease-125 DEPL-dShippedRelease-129 DEPL-dShippedRelease-138 DEPL-dShippedRelease-144 |
+| [2026-11-03-prompt-DEPL-dShippedRelease-1-parents-reground.md](../prompts/2026-11-03-prompt-DEPL-dShippedRelease-1-parents-reground.md) | research | DEPL-dShippedRelease-1 |
+| [2026-11-03-prompt-DEPL-dShippedRelease-4-1-spec-writer.md](../prompts/2026-11-03-prompt-DEPL-dShippedRelease-4-1-spec-writer.md) | journal | — |
 | [2026-10-30-review-DEPL-dShippedRelease-1-spec-audit-round1.md](../reviews/2026-10-30-review-DEPL-dShippedRelease-1-spec-audit-round1.md) | spec-audit | DEPL-dShippedRelease-10 DEPL-dShippedRelease-21 DEPL-dShippedRelease-23 DEPL-dShippedRelease-31 DEPL-dShippedRelease-11 DEPL-dShippedRelease-12 DEPL-dShippedRelease-1 DEPL-dShippedRelease-2 DEPL-dShippedRelease-13 DEPL-dShippedRelease-14 DEPL-dShippedRelease-15 DEPL-dShippedRelease-6 DEPL-dShippedRelease-27 DEPL-dShippedRelease-5 DEPL-dShippedRelease-30 DEPL-dShippedRelease-3 DEPL-dShippedRelease-25 DEPL-dShippedRelease-7 DEPL-dShippedRelease-16 DEPL-dShippedRelease-20 DEPL-dShippedRelease-17 DEPL-dShippedRelease-28 DEPL-dShippedRelease-29 DEPL-dShippedRelease-18 DEPL-dShippedRelease-24 DEPL-dShippedRelease-8 DEPL-dShippedRelease-26 DEPL-dShippedRelease-19 DEPL-dShippedRelease-22 DEPL-dShippedRelease-9 |
 
 <!-- /gen:spec-records -->
@@ -395,7 +402,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC9 · the status read af
   whose build lease goes terminal at `deploy.unlease`; accept S2 no longer lists those two lines and a
   fixture run's lease reads `live` after `--landed`. widens: none · relaxes: none
 - **F5 — How does `life.unlease` share a body?** TOOL-dWellOiledMachine-58 S9 writes `withdrawn`, exits
-  early on a `landed` tombstone with a message that goes stale here, and its acceptance at `:288`
+  early on a `landed` tombstone with a message that goes stale here, and its acceptance's AC4
   asserts `not-closing-verb` for this name (scout A disagreement 8). Options: (a) move the body to
   `run_unlease --as`, the early exit reading `already closed`; (b) a second body. RESOLVED (agent,
   2026-10-30, delegated): (a), rung 3, `[reuse]`. Ask for dWellOiledMachine, filed by the main loop:
@@ -417,6 +424,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC9 · the status read af
 - rev-2 · 2026-10-30 · §3 · the Edges gain the mirror of each edge the round-1 spec audit's promoted units declare toward this unit (units 56, 58, 59, 68, 69, 78); no scope, design or criterion moved.
 - rev-3 · 2026-11-01 · §3 · the Edges gain the mirror of each edge the round-2 spec audit's promoted units declare toward this unit (units 92, 95, 106); no scope, design or criterion moved.
 - rev-4 · 2026-11-01 · §3 · the Edges gain the mirror of each edge the round-3 spec audit's promoted units declare toward this unit (units 108, 123); no scope, design or criterion moved.
+- rev-5 · 2026-11-03 · §8 F5 · the citation of TOOL-dWellOiledMachine-58's `not-closing-verb` assertion for `deploy.unlease` moves from a line number, which that spec's rev-5 renumbered onto AC3's `not-holder` line, to its section AC4, by the brief prompts/2026-11-03-prompt-DEPL-dShippedRelease-1-parents-reground.md
 
 ## 10. Reuse audit
 

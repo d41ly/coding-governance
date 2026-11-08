@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-46 — the round-1 audit of units 31 to 38: its 27 minors batched, one writer and one allocator per typed name, one predicate per question, and every vacuous criterion made to observe
 
-**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 19 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-3 · 2026-11-05 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 19 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,8 +11,14 @@
 | [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-47 TOOL-dIndexedDesign-48 TOOL-dIndexedDesign-49 TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-52 TOOL-dIndexedDesign-53 |
 | [2026-10-28-build-TOOL-dIndexedDesign-41-promoted-fix-return.md](../build/2026-10-28-build-TOOL-dIndexedDesign-41-promoted-fix-return.md) | research | TOOL-dIndexedDesign-41 |
 | [2026-10-28-build-TOOL-dIndexedDesign-46-deviation-461.md](../build/2026-10-28-build-TOOL-dIndexedDesign-46-deviation-461.md) | deviation | — |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-38 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-46-deviation-462.md](../build/2026-11-05-build-TOOL-dIndexedDesign-46-deviation-462.md) | deviation | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-41-promoted-fix-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-41-promoted-fix-brief.md) | research | TOOL-dIndexedDesign-41 |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-46-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-46-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-52 |
 | [2026-10-28-review-TOOL-dIndexedDesign-39-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-39-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 |
 
 <!-- /gen:spec-records -->
@@ -116,10 +122,14 @@ Every item builds at this unit's pass, on the code its unit built, unless it nam
   answers today (`tools/check-spec-tokens.py:1104-1121`). Given none, it keeps unit 37 S1's shape rule,
   which keeps planned root files. `extract_files_touched` (`:564-583`) calls it with `git ls-files`, so
   one function answers both joins. Observed by AC8.
-- **S11** — id 22. The opt-in read once, the driver's way. `check_spec_audit_declared` applies the dated
-  rule `check_authorization` applies (`unattended.sh:928-931`, `:3975-3980`, `:4033`): a dated README
-  `spec-audit:` key, else a dated `SPEC_AUDIT_DEFAULT` on the default branch, else `review.design` as
-  unit 3 reads it. An undated value reads absent. Observed by AC9.
+- **S11** — id 22. The opt-in read once, the driver's way. `check_spec_audit_declared` derives from
+  TOOL-dDeclaredLoop-19 S8's table (its §4 "The opt-in") in that table's order, the order
+  `check_authorization` reads once that unit lands. `review.design` is read first, as unit 3 reads it:
+  `owed` declares the audit, `owed-above-tier` declares it when a spec of the build reads Tier-2 at
+  BASE, and `off` declares none, whatever the README or the default carries. Only under `opt-in`, the
+  default, does the dated rule `check_authorization` applies today decide (`unattended.sh:928-931`,
+  `:3975-3980`, `:4033`): a dated README `spec-audit:` key, else a dated `SPEC_AUDIT_DEFAULT` on the
+  default branch. An undated value reads absent. Observed by AC9.
 - **S12** — id 24. An act ahead of this unit's order, at unit 38's pass: unit 38 S4's four
   `[[stand-in]]` rows stay in `tools/loop/loop.toml` until ask TOOL-dIndexedDesign-23's reader shape
   lands, the ruling unit 1 §8 F5 made for `item.design.exit`. Unit 38's pass deletes none of them.
@@ -195,6 +205,7 @@ Every item builds at this unit's pass, on the code its unit built, unless it nam
 - **consumes-from** `TOOL-dIndexedDesign-37` — S10: `check_meet_path`
 - **consumes-from** `TOOL-dIndexedDesign-38` — S1 to S5, S9, S11 to S13, S15, S19 to S24, S26: its items, criteria and ledger
 - **consumes-from** `TOOL-dIndexedDesign-44` — S14: the coverage stage's finder bookkeeping, beside which the yield row is counted
+- **consumes-from** external — TOOL-dDeclaredLoop-19 S8's opt-in table, whose order S11 reads, DEFERRED at base and an ancestor's
 - **hands-off** `TOOL-dIndexedDesign-52` — S11's opt-in reader and AC9, which that unit restates in this unit's pass commit: a present undated value and a cut-short conf refuse (id 26)
 - **hands-off** `TOOL-dIndexedDesign-53` — S8, S10, S22, §8 F1 and the criteria that unit restates, several at this unit's pass: the pure number derivation, the moved `check_path_shaped`, the `PROBE_TIMEOUT_SECONDS` readers and `tree_lib.py` declared for S15 (ids 5, 6, 7, 8, 15, 16, 23, 24 and 25)
 
@@ -316,7 +327,10 @@ there. S1's reading runs last, before the close.
   Red when: the spec-token join's verdicts move, or a second rule classifies Files touched.
 - **AC9** — When `--design-exit` runs under `with-spec-audit` over a fixture opted in only by a dated
   `SPEC_AUDIT_DEFAULT`, it prints a lens line. Over one whose README carries `spec-audit: yes`, it prints none.
-  Red when: the default is ignored, or an undated key reads as declared.
+  Over one whose `.governance/policy.toml` sets `review.design = "off"` and whose README carries
+  `spec-audit: 2026-10-01`, it prints none.
+  Red when: the default is ignored, an undated key reads as declared, or a README key declares an audit
+  under `off`.
 - **AC10** — When `grep -n "TOOL-dIndexedDesign-46 S"` runs over the acceptance ledgers of units 20, 34,
   35, 36 and 38 at this pass, it prints the notes of S1, S3, S6, S7, S9, S12, S21, S23, S26 and S27, each
   under its criterion. A `tomllib` read of `loop.toml` still lists the four `[[stand-in]]` rows
@@ -393,12 +407,17 @@ New arm: tools/memory-tree/build_records.py · covers AC3 AC6 · the `typed-kind
 - rev-2 · 2026-10-28 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dIndexedDesign-52 and TOOL-dIndexedDesign-53, promoted by the round-1 spec audit of
   units 39 to 46; nothing else moved.
+- rev-3 · 2026-11-05 · §2 S11 · §3 Edges · §6 AC9 · §10 · S11 derives the opt-in from
+  TOOL-dDeclaredLoop-19 S8's table in its order, `review.design` first and the README key and
+  `SPEC_AUDIT_DEFAULT` only under `opt-in`, and cites it; AC9 plants `off` with a present README key,
+  by the brief prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md
 
 ## 10. Reuse audit
 
 Each item extends the seam its finding names. S2, S4 and S8 extend `build_records.py`'s name grammar and
 collision. S10 extends unit 37's `check_meet_path` with `check_path_shaped`'s rule
-(`tools/check-spec-tokens.py:1104`). S11 follows `check_authorization`'s dated rule. S19 reads the
+(`tools/check-spec-tokens.py:1104`). S11 follows TOOL-dDeclaredLoop-19 S8's order over
+`check_authorization`'s dated rule. S19 reads the
 per-kind table. S22 moves `PROBE_TIMEOUT_SECONDS` to a module both readers import. S24 lifts the slug
 test beside `backlog.SLUG_RE`. S18 extends the `verifier fan-out` leg's own self-test. The probe
 `python tools/codebase-map/reuse_lookup.py "allocate the next free record number from the working tree with exclusive create"`

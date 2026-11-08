@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-25 — the stream-plan kind, registered so the planner that writes it and the pick that reads it descend from one row
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 6 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 462d20f3 · streams tooling · order 6 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0236@4e9bd61a whole
 **Carries:** node:record-kind.stream-plan
@@ -13,9 +13,15 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-25-deviation-251.md](../build/2026-10-26-build-TOOL-dTotalRecall-25-deviation-251.md) | deviation | — |
+| [2026-11-05-build-TOOL-dTotalRecall-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dTotalRecall-1-crosscheck-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-11 |
+| [2026-11-05-build-TOOL-dTotalRecall-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-11 |
+| [2026-11-05-build-TOOL-dTotalRecall-1-reground-returns.md](../build/2026-11-05-build-TOOL-dTotalRecall-1-reground-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-11 |
+| [2026-11-05-build-TOOL-dTotalRecall-25-deviation-252.md](../build/2026-11-05-build-TOOL-dTotalRecall-25-deviation-252.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-26 |
+| [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-11 TOOL-dTotalRecall-19 TOOL-dTotalRecall-24 TOOL-dTotalRecall-43 TOOL-dTotalRecall-50 TOOL-dTotalRecall-61 TOOL-dTotalRecall-70 TOOL-dTotalRecall-89 |
+| [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-11 |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
 
 <!-- /gen:spec-records -->
@@ -64,7 +70,10 @@ owner's CL-3).
 - The pick that reads one: dWellOiledMachine's runtime.
 - Deriving streams from the specs' `· streams` header field or replacing the build-order region:
   the order verb stays the build order, and a stream plan is a planner's record.
-- A door for the kind: TOOL-dTotalRecall-2's `record` door adopts it when the planner lands.
+- A door for the kind. TOOL-dTotalRecall-2 S9 moves only `fields`-form `hand` rows onto its door, so
+  this `fence` row keeps `hand` through that pass, whose `Decided:` trailer names dIndexedDesign's
+  planner as the owner of its door. The writer cell moves when that planner lands its own verb
+  (TOOL-dIndexedDesign-15 S5), not through TOOL-dTotalRecall-2's door.
 
 ### Edges
 
@@ -185,8 +194,10 @@ New arm: tools/memory-tree/record_kinds.py · covers AC2 AC3 AC4 · the `record-
 - **F2 — What is the writer cell while the planner is unbuilt?** Options: (a) `hand`, the planner
   named in the purpose; (b) a new writer form naming a later build. (b) adds a grammar to
   TOOL-dTotalRecall-1's writer column for one row. RESOLVED (agent, 2026-10-26, delegated): (a), rung
-  3, and TOOL-dTotalRecall-2's door replaces `hand` when the planner registers. widens: none · relaxes:
-  none
+  3. The row keeps `hand` through TOOL-dTotalRecall-2 S9, which moves only `fields`-form rows, and that
+  pass's `Decided:` trailer names dIndexedDesign's planner as the owner of its door; the cell moves when
+  the planner lands its own verb (TOOL-dIndexedDesign-15 S5), not through TOOL-dTotalRecall-2's door.
+  widens: none · relaxes: none
 - **F3 — How does the typed name `<date>-build-<unit id>-stream-plan-<n>.md` meet
   PLAY-dOrderedCharter-42's join?** Under its S1 a kind whose records take that name is a member of
   `TYPED_RECORD_KINDS`, and its S3 joins name and Serves kind only for members, so a plan outside the
@@ -208,6 +219,11 @@ New arm: tools/memory-tree/record_kinds.py · covers AC2 AC3 AC4 · the `record-
 - rev-3 · 2026-10-26 · §2 S6 added · §3 the external edge · §4 Files touched · §6 AC6 added · §8 F3 added · the parents'
   re-ground, row 45 of `2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck.md`: `stream-plan`
   joins `TYPED_RECORD_KINDS`, the factory's table and the HYGIENE list, so its typed name is joined.
+- rev-4 · 2026-11-05 · §3 · §8 F2 · the `fence` row keeps `hand` through TOOL-dTotalRecall-2 S9, whose
+  pass's `Decided:` trailer names dIndexedDesign's planner as its door's owner, and the writer cell
+  moves when that planner lands its own verb, not through TOOL-dTotalRecall-2's door; F2's pick
+  untouched; rows 10 and 11 of `2026-11-05-build-TOOL-dTotalRecall-1-parents-crosscheck`, by the brief
+  prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-reground.md
 
 ## 10. Reuse audit
 

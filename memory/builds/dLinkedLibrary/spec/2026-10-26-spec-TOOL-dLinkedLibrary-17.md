@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-17 — typed edges from annotations, front matter, dossiers and decision rows, and the span rule with `gov:end <tag>`
 
-**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 5fede642 · streams tooling · order 13 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 5fede642 · streams tooling · order 13 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0254@e703feac whole
 
@@ -13,10 +13,12 @@
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-27-build-TOOL-dLinkedLibrary-17-deviation-171.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-17-deviation-171.md) | deviation | — |
 | [2026-10-28-build-TOOL-dLinkedLibrary-17-deviation-172.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-17-deviation-172.md) | deviation | — |
+| [2026-11-05-build-TOOL-dLinkedLibrary-17-deviation-173.md](../build/2026-11-05-build-TOOL-dLinkedLibrary-17-deviation-173.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-fix-brief.md) | research | TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
 | [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-74 |
+| [2026-11-05-prompt-TOOL-dLinkedLibrary-8-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dLinkedLibrary-8-owner-forks.md) | research | TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-22 |
 | [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
@@ -50,8 +52,8 @@ and its memory-tree copy (TOOL-dLinkedLibrary-18 S2), `derive_decision_rows` wit
 sibling kit (TOOL-dGroundRules-1 §4), so `edge_grammar.py`, a playbook-kit module, reads each
 memory-tree and codebase-map reader as JSON rows from a verb run as a subprocess, found through its
 inline `resolve_kit_dir`, as TOOL-dBoundRoles-14 S2 reads the roles kit: `annotations.py spans --json`
-(S4), `row_grammar.py --decisions --json` (TOOL-dLinkedLibrary-22 S5), and the two verbs §8 F4
-recommends, `gotchas.py --front-matter` and `gen_map.py --dossiers`; no kit found exits 2 naming it.
+(S4), `row_grammar.py --decisions --json` (TOOL-dLinkedLibrary-22 S5), and the two verbs this unit
+mints by §8 F4, `gotchas.py --front-matter` and `gen_map.py --dossiers`; no kit found exits 2 naming it.
 
 - **S1** — The annotation adapter, `extract_annotation_edges(root, rows)` in
   `tools/playbook/edge_grammar.py`'s adapter table, over the rows `annotations.py spans --json` prints:
@@ -209,7 +211,7 @@ Live at landing. The adapters feed the index on its next build; the span arm run
 - `tools/playbook/edge_grammar.py`: S1 to S3's four adapters in the site table
 - `tools/playbook/gov_tag.py`: the four `edges-*` plants of S7
 - `tools/memory-tree/annotations.py`: S4 and its `spans` verb, S5, S6, the `span-*` plants
-- `tools/memory-tree/gotchas.py`, `tools/codebase-map/gen_map.py`: §8 F4's two verbs, under (a)
+- `tools/memory-tree/gotchas.py`, `tools/codebase-map/gen_map.py`: §8 F4's two verbs
 
 ### Alternatives rejected
 
@@ -318,7 +320,8 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 · the playbook-
   of each copied into `edge_grammar.py`. (b) makes the playbook kit the one in-process consumer of
   kits its siblings reach by subprocess, as br14 F5 found, and (c) is a second grammar of each. No
   other build owns either module's verbs; this build already edits both kits (TOOL-dLinkedLibrary-22,
-  TOOL-dLinkedLibrary-2), so (a) needs no ask. Recommendation (a). Open for the owner.
+  TOOL-dLinkedLibrary-2), so (a) needs no ask. Recommendation (a). RESOLVED (owner, 2026-11-05): (a)
+  this unit mints the two subprocess verbs; no ask.
 
 ## 9. Revision log
 
@@ -332,6 +335,7 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 · the playbook-
   four adapters read memory-tree's and codebase-map's readers as JSON rows from subprocess verbs,
   `annotations.py spans` and `row_grammar.py --decisions` among them, the two verbs no kit prints yet
   being F4's, and AC7 reds an import.
+- rev-4 · 2026-11-05 · §2 preconditions · §4 Files touched · §8 F4 · the owner resolved F4 to (a), by `2026-11-05-prompt-TOOL-dLinkedLibrary-8-owner-forks`: this unit mints `gotchas.py --front-matter` and `gen_map.py --dossiers`, read by subprocess; no ask is filed.
 
 ## 10. Reuse audit
 

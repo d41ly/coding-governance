@@ -26,7 +26,8 @@
 # TWO: check 7's EXCLUSION notice and its UNAVAILABLE sibling print on the DEFAULT channel, and the
 # contract line above is written to admit them; so do check 23's `check 23 EXCLUDED` and
 # `check 23 exclusion UNAVAILABLE`, which share check 7's predicate (TOOL-aSightedSkeptic-13), and
-# check 23's `check 23 SOLO` line with its run's graded-and-overlapped count, an undeclared write the
+# check 24's `check 24 EXCLUDED` and `check 24 exclusion UNAVAILABLE`, over the same predicate
+# (TOOL-dFinishedRecord-1), and check 23's `check 23 SOLO` line with its run's graded-and-overlapped count, an undeclared write the
 # check found and did not count because its pass overlapped no sibling (TOOL-aWindowedPass-1), its
 # `check 23 OTHER RUN` and `check 23 UNBOUND` lines, counted writes of a run this tree does not drive
 # (TOOL-aWindowedPass-5), and its `check 23 fleet` line, which reports the whole fleet's
@@ -58,7 +59,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.113 # gov:kit unattended@1.113 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.114 # gov:kit unattended@1.114 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -4183,6 +4184,7 @@ fi
 # ---- check, and every arm read as green over a check that had not run. This one needs the RUN-STATE
 # ---- file's own history and the working README, never the pinned BASE, so it has no business behind
 # ---- that gate.
+rs_unavail=0
 for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac   # frozen retired records are not amendable
@@ -4191,6 +4193,20 @@ for f in $RUNS; do
   bslug=${f#"$M/builds/"}; bslug=${bslug%%/*}
   bre="$M/builds/$bslug/README.md"
   [ -f "$bre" ] || continue
+  # ---- DERIVED LANDED IS NOT GRADED (TOOL-dFinishedRecord-1). An in-place landing leaves its record
+  # ---- at LANDING, so the recorded-phase skip above never fires for it, and a roster that grows after
+  # ---- the landing owes a rescope row the driver's --rescope refuses on a finished record (check 26).
+  # ---- Check 7's predicate, asked AFTER every skip, as check 23 asks it: a record that was never
+  # ---- graded stays silent. Default channel, for header exception TWO's reason.
+  check_derived_landed "$f"; rs_dl=$?
+  if [ "$rs_dl" = 0 ]; then
+    printf 'unattended: check 24 EXCLUDED %s — derived LANDED: its landing commit %s is an ancestor of the advertised default-branch tip %s, so its roster is landed and an amendment after the landing owes a rescope row the driver refuses to write on a finished run\n' "$f" "$DERIVED_LANDING_COMMIT" "$ADV_HEAD"
+    continue
+  fi
+  if [ "$rs_dl" = 2 ] && [ "$rs_unavail" = 0 ]; then
+    rs_unavail=1
+    printf 'unattended: check 24 exclusion UNAVAILABLE — no advertised default-branch tip resolves in this clone, so a LANDING record already on the remote cannot be told from a live one; every LANDING record is graded for roster amendments\n'
+  fi
   # ---- 22: an AMENDMENT with no record. TOOL-dUnstalledConvoy-6.
   # ---- M3 delegates this build's own scope and M2 names the three acts, so the failure mode moved
   # ---- from STALLING to DRIFTING: a unit quietly retired because it was inconvenient, with

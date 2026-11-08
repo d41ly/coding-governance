@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-38 — the round-1 spec audit's 42 minors batched: shared budgets priced, one resolver and one path rule, readers that refuse what they cannot read, and every unbuildable criterion restated
 
-**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 17 · advances TOOL-dIndexedDesign-17 · ratified 2026-10-28
+**Status:** DEFERRED · rev-5 · 2026-11-05 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 17 · advances TOOL-dIndexedDesign-17 · ratified 2026-10-28
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,8 +13,17 @@
 | [2026-10-28-build-TOOL-dIndexedDesign-38-deviation-381.md](../build/2026-10-28-build-TOOL-dIndexedDesign-38-deviation-381.md) | deviation | — |
 | [2026-10-28-build-TOOL-dIndexedDesign-38-deviation-382.md](../build/2026-10-28-build-TOOL-dIndexedDesign-38-deviation-382.md) | deviation | — |
 | [2026-10-28-build-TOOL-dIndexedDesign-38-deviation-383.md](../build/2026-10-28-build-TOOL-dIndexedDesign-38-deviation-383.md) | deviation | — |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-46 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-38-deviation-384.md](../build/2026-11-05-build-TOOL-dIndexedDesign-38-deviation-384.md) | deviation | — |
+| [2026-11-05-build-TOOL-dIndexedDesign-38-deviation-385.md](../build/2026-11-05-build-TOOL-dIndexedDesign-38-deviation-385.md) | deviation | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-31-promoted-fix-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-31-promoted-fix-brief.md) | research | TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-37 |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-38-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-38-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-46 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-38-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-38-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-38-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-38-owner-forks.md) | research | — |
 | [2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-37 |
 
 <!-- /gen:spec-records -->
@@ -92,12 +101,16 @@ Every item builds at this unit's pass on the code its unit built, unless it says
 - **S2** — id 2. The lens reading this build owes itself. Once unit 35 has landed, and before the next
   `--dispatch`, the main loop runs `tier2-review.js` with `coverage: 'only'` over the build's remaining
   specs and commits the `coverage-lens` record, so every later dispatch meets a reading. Until it exists,
-  every dispatch after unit 16's pass meets unit 16's coverage refusal, unit 35's own included, and §8
-  F1 holds how the run passes that window. Observed by AC2.
+  every dispatch after unit 16's pass meets unit 16's coverage refusal, unit 35's own included, and the
+  owner passes that window as §8 F1 rules: at unit 16's pass the owner commits `design.coverage = "warn"`
+  to `.governance/policy.toml` on the run branch, and restores `refuse` once S2's record lands. Observed by AC2.
 - **S3** — id 3. One predicate for "the build declares a spec audit": `check_spec_audit_declared(root, slug)`
-  in `gen_build_index.py`, true when the README carries `spec-audit:` or when
-  `policy.py get review.design --rev <base>`, the read unit 3 S1 re-points, prints a value
-  TOOL-dDeclaredLoop-19 S8's table derives as owed. `--design-exit`'s `with-spec-audit` test calls it. Ledger note under unit 3's S1 criterion. Observed by AC3.
+  in `gen_build_index.py`, derived from TOOL-dDeclaredLoop-19 S8's table (its §4 "The opt-in") in that
+  table's order. `review.design` is read first, by `policy.py get review.design --rev <base>`, the read
+  unit 3 S1 re-points: `owed` declares the audit; `owed-above-tier` declares it when a spec of the
+  build reads Tier-2 at `<base>`; `off` declares none, whatever the README carries; and only under
+  `opt-in`, the default, does the README `spec-audit:` key decide, as `check_authorization` reads it
+  today. `--design-exit`'s `with-spec-audit` test calls it. Ledger note under unit 3's S1 criterion. Observed by AC3.
 - **S4** — id 4. The four stand-ins retired. The `[[stand-in]]` rows of `item.design.overlaps`,
   `item.design.unit-spec`, `item.design.streams` and `item.design.ready` leave `tools/loop/loop.toml`,
   and each row's `witness` names `design_lib.py --overlaps`, check 12's spec-token grade,
@@ -118,8 +131,13 @@ Every item builds at this unit's pass on the code its unit built, unless it says
   `tools/lib/resolve-python.test.sh`'s parity table, and refuses naming the resolver when it returns
   None. Observed by AC6.
 - **S9** — id 18. `coverage-lens` registered through the factory:
-  `python record_kinds.py new coverage-lens --tag record.coverage-lens --writer "tier2-review.js coverage=only" --check "memory hygiene"`.
-  It sits in the untyped head of `RECORD_KIND_TOKENS`, never `TYPED_RECORD_KINDS`, because
+  `python record_kinds.py new coverage-lens --tag record.coverage-lens --writer "tier2-review.js coverage=only" --check "memory hygiene" --purpose "a coverage-only review's reading of each spec's clauses against the design view, pinned by revision"`,
+  the `--purpose` TOOL-dTotalRecall-16 S2 requires, with TOOL-dTotalRecall-18 S1's columns set through
+  that unit's landed verb, as `TOOL-dIndexedDesign-10` S1 sets its row's: layer `layer.memory`, home
+  `memory/builds/*/reviews/*.md`, lifecycle `append-only`, and `readers = []` with
+  `readers-none = "no work-order read key hands a lens reading; --design-exit's coverage join reads it
+  through read_bindings"`. The home it shares with `spec-audit` grades each record once, by the row its
+  Serves kind names (TOOL-dTotalRecall-42 S5). It sits in the untyped head of `RECORD_KIND_TOKENS`, never `TYPED_RECORD_KINDS`, because
   tier2-review writes it into `reviews/`. Unit 16 S12's hand-written kind line leaves
   `tools/memory-tree/HYGIENE.template.md`, which takes the kind through the registry's generated region
   (TOOL-dTotalRecall-1 S6). Observed by AC7.
@@ -251,7 +269,7 @@ Every item builds at this unit's pass on the code its unit built, unless it says
 - **consumes-from** `TOOL-dIndexedDesign-20` — S30, S36: the revision binding and step 9
 - **consumes-from** `TOOL-dIndexedDesign-35` — S14, S38: the coverage stage and `COVERAGE_BRIEF`
 - **consumes-from** `TOOL-dIndexedDesign-37` — S11, S21: `check_meet_path`, which `--overlaps` and its payload rule call
-- **consumes-from** external — TOOL-dTotalRecall-1's `record_kinds.py new` and generated kind region, PLAY-dOrderedCharter-42's `TYPED_RECORD_KINDS` and `build_records.py`, TOOL-dBoundRoles-1's `gov-planner` role, each DEFERRED at base and an ancestor's
+- **consumes-from** external — TOOL-dTotalRecall-1's `record_kinds.py new` and generated kind region, with TOOL-dTotalRecall-16 S2's `--purpose` and TOOL-dTotalRecall-18 S1's columns (S9); TOOL-dDeclaredLoop-19 S8's opt-in table, whose order S3 reads; PLAY-dOrderedCharter-42's `TYPED_RECORD_KINDS` and `build_records.py`; TOOL-dBoundRoles-1's `gov-planner` role; each DEFERRED at base and an ancestor's
 - **consumes-from** `TOOL-dIndexedDesign-39` — §8 F1's premise: from unit 16's pass tip the harness is admitted, so the window is only the lack of a reading (id 1)
 - **consumes-from** `TOOL-dIndexedDesign-44` — S2's `coverage: 'only'` reading, which runs after that unit's pass, since before it an `only` run writes no record (id 26)
 - **hands-off** `TOOL-dIndexedDesign-40` — S15 to S17, which that unit lands in the passes of units 6, 8 and 4, so this unit's pass writes none of them and AC12 finds them true (id 2)
@@ -304,7 +322,7 @@ never its own `- AC` line.
 ### Rollout
 
 The pass lands every item but S2 at order 17. S2 is one act earlier, after unit 35's pass, because
-the stall it ends falls there; §8 F1 is the window before it. The close reads the ledgers.
+the stall it ends falls there; the window before it passes under the owner's `warn` of §8 F1. The close reads the ledgers.
 
 ### Files touched (estimate)
 
@@ -342,8 +360,8 @@ the stall it ends falls there; §8 F1 is the window before it. The close reads t
 - perf / scale — S35 runs `--design-exit` once per call instead of once per unit.
 - error / empty / loading states — S22, S25 and S42 turn silent passes into named refusals.
 - observability — every refusal names its cause; S23 prints the parsed count it ruled on.
-- risks — S2's act precedes this unit's order, and the window before it needs §8 F1's owner act; AC2
-  shows whether the reading came in time.
+- risks — S2's act precedes this unit's order, and the window before it passes under the owner's
+  `design.coverage = "warn"` at unit 16's pass (§8 F1); AC2 shows whether the reading came in time.
 - testing — AC1 to AC27, by probe, fixture or ledger; the arms §7 declares.
 - migration — three conf values and four stand-in rows; nothing else.
 - user docs — none under `help/`; `tools/workflows/README.md` is S14's and S19's.
@@ -359,8 +377,9 @@ the stall it ends falls there; §8 F1 is the window before it. The close reads t
   `coverage-lens` record committed after unit 35's pass commit and before the next pass commit.
   Red when: a dispatch after it met no reading. permission: at the close.
 - **AC3** — When `--design-exit` runs under `with-spec-audit` over a fixture whose `.governance/policy.toml`
-  sets `review.design = "owed"` and whose README has no `spec-audit:`, it prints a lens line. Red when:
-  the policy opt-in owes no reading.
+  sets `review.design = "owed"` and whose README has no `spec-audit:`, it prints a lens line; over one
+  that sets `review.design = "off"` and whose README carries `spec-audit: 2026-10-01`, it prints none.
+  Red when: the policy opt-in owes no reading, or the README key declares an audit under `off`.
 - **AC4** — When a `python -c` `tomllib` read of `loop.toml` lists `[[stand-in]]` rows, none names
   `item.design.overlaps`, `item.design.unit-spec`, `item.design.streams` or `item.design.ready`, and each
   item's `witness` names its reader. Red when: a stand-in survives its witness.
@@ -370,10 +389,12 @@ the stall it ends falls there; §8 F1 is the window before it. The close reads t
 - **AC6** — When `grep -c ">>> resolve_bash_py" placement.py` runs in the loop kit it prints 1, and a
   `repeat` fixture whose `--resolve` names the real fixture playbook passes through the resolved bash.
   Red when: a bare `bash` runs the script, or the copy drifts.
-- **AC7** — When a `python -c` `tomllib` read of `record-kinds.toml` finds rows `coverage-lens` and
-  `overlap`, and `tree_lib.read_bindings` reads a scratch `coverage-lens` record and the record
-  `--overlaps --record` writes as `bound`, kinds `coverage-lens` and `overlap`. Red when: either reads
-  `malformed` or has no row.
+- **AC7** — When `python record_kinds.py --check` runs at the pass tip, it lists `coverage-lens` with
+  tag `record.coverage-lens`, its purpose, layer, home, lifecycle and readers, and exits 0; a
+  `python -c` `tomllib` read of `record-kinds.toml` finds the `overlap` row; and `tree_lib.read_bindings`
+  reads a scratch `coverage-lens` record and the record `--overlaps --record` writes as `bound`, kinds
+  `coverage-lens` and `overlap`. Red when: either reads `malformed` or has no row, or the
+  `coverage-lens` row lacks a column TOOL-dTotalRecall-16 or -18 requires.
 - **AC8** — When `design_lib.py --overlaps` runs over two builds' specs sharing only `.memory-tree.conf`,
   it reports the pair, as `derive_parallel_step` reads `no` and `plan_streams.py check` reds arm (c);
   an `**overlaps**` bullet with payload `tools/` is refused and acknowledges nothing; and `--record ../x`
@@ -461,8 +482,9 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC8 · an `**o
   and it relaxes `design.coverage` for every unit audited before the lens. (c) Unit 16's S8 and S9 moved
   to the build's last order, the skeptic's second fix: a re-scope of unit 16, which no repair unit may
   make. Recommendation: (a), the one option that passes the window without weakening the gate for later
-  builds. It needs the owner, so a delegated run parks at unit 16's boundary until it is taken, and the
-  M3 sweep before the build run's first unit is where the owner sees it.
+  builds. RESOLVED (owner, 2026-11-05): (a) the owner's `warn` at unit 16's pass. At unit 16's pass
+  boundary the owner commits `design.coverage = "warn"` on the run branch, and restores `refuse` once
+  S2's record lands.
 - **F2 — Raise `REFUSAL_CEILINGS` or fold the sites (ids 13 to 15)?** Options: (a) raise by a dated
   decision; (b) fold into existing sites. (a) moves a declared ceiling the conf gives no run the terms to
   move (M3). RESOLVED (agent, 2026-10-28, delegated): (b), rung 3, the one survivor. widens: none · relaxes: none
@@ -489,6 +511,15 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC8 · an `**o
   edges of TOOL-dIndexedDesign-51, TOOL-dIndexedDesign-52 and TOOL-dIndexedDesign-53 and the
   consumes-from bullet mirroring the hands-off edge of TOOL-dIndexedDesign-50, promoted by the round-1
   spec audit of units 39 to 46; nothing else moved.
+- rev-4 · 2026-11-05 · §2 S2 · §4 Rollout · §5 risks · §8 F1 · the owner resolved F1 to (a), by
+  `2026-11-05-prompt-TOOL-dIndexedDesign-38-1-spec-writer`: the owner commits `design.coverage = "warn"`
+  at unit 16's pass and restores `refuse` once S2's record lands; no design moved.
+- rev-5 · 2026-11-05 · §2 S3, S9 · §3 Edges · §6 AC3, AC7 · S3 derives the opt-in from
+  TOOL-dDeclaredLoop-19 S8's table in its order, `review.design` first and the README key only under
+  `opt-in`, and AC3 plants `off` with a present README key; S9's `new` gains `--purpose`
+  (TOOL-dTotalRecall-16 S2) and TOOL-dTotalRecall-18 S1's columns through its landed verb, and AC7
+  reds a missing column, by the brief
+  prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md
 
 ## 10. Reuse audit
 

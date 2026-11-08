@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-21 — the review round bounds as policy keys: review.max-rounds, the design rounds and follow-ups, REVIEW_ROUNDS and RUNAWAY_CEILING retired
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 26 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base ed497191 · streams tooling · order 26 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0106@90aa01b6 whole
 **Carries:** node:policy-key.review.follow-up
@@ -17,8 +17,17 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-c.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-c.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-21-deviation-211.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-21-deviation-211.md) | deviation | — |
+| [2026-11-05-build-TOOL-dDeclaredLoop-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-1-crosscheck-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 |
+| [2026-11-05-build-TOOL-dDeclaredLoop-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-1-parents-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 |
+| [2026-11-05-build-TOOL-dDeclaredLoop-1-reground-returns.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-1-reground-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 |
+| [2026-11-05-build-TOOL-dDeclaredLoop-21-deviation-212.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-21-deviation-212.md) | deviation | — |
+| [2026-11-05-build-TOOL-dDeclaredLoop-21-deviation-213.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-21-deviation-213.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-56 |
+| [2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 |
+| [2026-11-05-prompt-TOOL-dDeclaredLoop-21-1-spec-reviewer.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-21-1-spec-reviewer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md) | research | TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
 <!-- /gen:spec-records -->
@@ -45,11 +54,18 @@ stall-and-loop round, P39; v2:1253-1255).
   `max-rounds=<n> spec-bound=<n> closing-bound=<n> follow-up=<value>` on one line. Observed by AC1, AC3.
 - **S2** — The refusal. A `review.design.round-count` above `review.max-rounds` is refused under
   `fixed-count`, naming both keys and both values, and a count equal to it is admitted (v2:1254). Any
-  value below 1 or outside a key's catalogued values is refused. The refusal lives in the loop kit, so
-  it holds with `unattended.sh` absent: `check_review_bounds` runs as an arm of `loop_lib.py --check`,
-  the leg `loop definition` (TOOL-dDeclaredLoop-1 S7), over the tree's policy file, and the module's
-  plants run by `python tools/loop/review_bounds.py --fixture`, the leg `loop review bounds fixtures` in
-  `tools/gate-legs.json`, declared in `tools/loop/kit.toml`. Observed by AC1 and AC2.
+  value below 1 or outside a key's catalogued values is refused. The refusal lives in the loop kit, so it
+  holds with `unattended.sh` absent: `check_review_bounds` runs as an arm of `loop_lib.py --check`, the
+  leg `loop definition` (TOOL-dDeclaredLoop-1 S7), over the tree's policy file, and the module's plants
+  run by `python tools/loop/review_bounds.py --fixture`, the leg `loop review bounds fixtures` in
+  `tools/gate-legs.json`, carrying `enforces = ["principle.p38"]` (dOrderedCharter-7 S2), the tag of the
+  v2 `[enforcement]` row naming this unit's clause `cl-dClosedLoop-0106`, declared in
+  `tools/loop/kit.toml`. Where the pending list holds a `principle` row for that tag, this pass deletes
+  it, as the meta-check reds it stale. Observed by AC1, AC2 and AC10.
+  **Readers:** by name: READER NOT IN TREE — the pending list and its reader, the meta-check verb of the
+  playbook kit's core.py, are minted by PLAY-dOrderedCharter-7, DEFERRED, so no tracked file spells the
+  row of `principle.p38` at this spec's base · by value: NO VALUE READERS — a pending row's value is its
+  arming build, which the meta-check prints only in its pending count.
 - **S3** — `RUNAWAY_CEILING` retired into `review.max-rounds`. `review_state`
   (`tools/unattended/unattended.sh:12610-12618`) keeps its test order, zero, then non-decrease, then the
   ceiling, then the bound, with the ceiling read as one round past `review.max-rounds`
@@ -60,7 +76,9 @@ stall-and-loop round, P39; v2:1253-1255).
   :876), `tools/unattended/unattended.test.sh` (:7073-7075), `tools/unattended/check-unattended.test.sh`
   (:1097-1100), `tools/unattended/runlog-writer.test.sh` (:396), and `tools/workflows/tier2-review.test.sh`,
   whose parity arm dFairHearing-17 S5 adds slices the constant's line and takes the ceiling as its
-  own variable instead · by value: the `ceiling of 8` arms of `tools/unattended/unattended.test.sh`
+  own variable instead, which the arm sets to each row's limit, so the driver's ceiling
+  sits one round past it as dFairHearing-17 §4 "The rule" puts the harness's, and the limit-4 row reads
+  `BOUNDED` in both · by value: the `ceiling of 8` arms of `tools/unattended/unattended.test.sh`
   (:9310, :9316), each re-pointed to `review.max-rounds`'s default of 3. Observed by AC4.
 - **S4** — `REVIEW_ROUNDS` retired into `review.design.rounds` and `review.design.round-count`, with
   `REVIEW_ROUNDS_DEFAULT` (:447), its `read_bound_key` call (:779), its strict-below refusal (:783) and
@@ -70,8 +88,10 @@ stall-and-loop round, P39; v2:1253-1255).
   `tools/unattended/.unattended.conf.example` (:118), `tools/unattended/lib-unattended.sh` (:222),
   `tools/unattended/README.md` (:359, :367), `tools/unattended/PROTOCOL.template.md` (:487) and its
   render `memory/guides/UNATTENDED-PROTOCOL.md`, `tools/unattended/VERBS.template.md` (:243, :798) and
-  its render `memory/guides/UNATTENDED-VERBS.md`, `tools/memory-tree/BUILD-METHOD.template.md` (:144)
-  and its render `memory/guides/BUILD-METHOD.md`, and `tools/workflows/unattended-build.template.js`
+  its render `memory/guides/UNATTENDED-VERBS.md`, `tools/memory-tree/BUILD-METHOD.template.md` (:144,
+  and :148, M4's chain paragraph, whose "so `REVIEW_ROUNDS` bounds no chain" becomes "so no round bound
+  bounds a chain", naming no policy key a reader could take for a chain stop) and its render
+  `memory/guides/BUILD-METHOD.md`, and `tools/workflows/unattended-build.template.js`
   (:224, :317) and its render `tools/workflows/unattended-build.js` · by value: the `REVIEW_ROUNDS="7"`
   fixture lines of `tools/unattended/unattended.test.sh` (the `mkconf` default at :243 and its
   seventh-positional caller at :7211, the seven conf heredocs from :10543 to :16542, and the two
@@ -121,9 +141,10 @@ stall-and-loop round, P39; v2:1253-1255).
 
 ## 3. Non-goals (OUT)
 
-- No stopping rule for an `until-*` or `while-*` value, no blocker-and-high count, and no promotion of
-  a NON-CONVERGENT or CEILING round's findings: TOOL-dDeclaredLoop-32's convergence routing, which also
-  passes `review.max-rounds` to dFairHearing-17's harness as `roundLimit`.
+- No stopping rule for an `until-*` or `while-*` value and no blocker-and-high count:
+  TOOL-dDeclaredLoop-32's convergence routing. No disposal of a terminal round's findings: a
+  closing-review follow-up's and a fix pass's are TOOL-dDeclaredLoop-32's; a spec audit's are
+  BUILD-METHOD M4's spec-audit rule's, applied through TOOL-dDeclaredLoop-20's `item.review.dispose` row.
 - No `review.trigger` refusal and no disposal: TOOL-dDeclaredLoop-20's items read the bound.
 - No catalogue row: dGroundRules-1 S3 writes one per v2 row, and dGroundRules-11 gives the loop bounds
   `direction = "raise-loosens"`, which makes raising each the owner's.
@@ -135,7 +156,7 @@ stall-and-loop round, P39; v2:1253-1255).
 
 ### Edges
 
-- **hands-off** `TOOL-dDeclaredLoop-32` — `review.max-rounds`, with the spec and closing bounds, which the convergence routing stops `until-*` and `while-*` loops against and passes as `roundLimit`
+- **hands-off** `TOOL-dDeclaredLoop-32` — `review.max-rounds`, with the spec and closing bounds, which the convergence routing stops `until-*` and `while-*` loops against
 - **hands-off** `TOOL-dDeclaredLoop-20` — `review.max-rounds`, the bound `review.trigger` refuses another round past
 - **hands-off** `TOOL-dDeclaredLoop-56` — the minors of the round-1 spec audit that land on this unit, ids 9, 39, 44, 63, each a scope item of that unit
 
@@ -150,7 +171,9 @@ stall-and-loop round, P39; v2:1253-1255).
 
 `review_state` then reads, for round `r = n + 1`: `CONVERGED` at count 0; `NON-CONVERGENT` when the
 count did not fall; `CEILING` when `r > max-rounds`; `BOUNDED` when `r >= bound`; `CONVERGING`
-otherwise. A bound equal to the ceiling is reached as `BOUNDED`, the equality S2 admits; today the
+otherwise. The non-decrease reading applies to the closing review's subject: a spec audit passes
+`no-fall` (TOOL-dDeclaredLoop-32 S3) and ends at its target or its bound, `CONVERGED`, `BOUNDED` or
+`CEILING`, never `NON-CONVERGENT`. A bound equal to the ceiling is reached as `BOUNDED`, the equality S2 admits; today the
 ceiling's `>=` test fired first, which is why `:783` refused equality.
 
 ### How the shell reads it
@@ -177,7 +200,8 @@ v2:1255's default, and a round past 3 now reads `CEILING`.
 - `tools/loop/review_bounds.py` (new)
 - `tools/loop/loop_lib.py`: `--check` calling `check_review_bounds`
 - `tools/loop/kit.toml`: the module and the leg declared
-- `tools/gate-legs.json`: the leg `loop review bounds fixtures`
+- `tools/gate-legs.json`: the leg `loop review bounds fixtures`, its `enforces` holding `principle.p38`
+- `tools/playbook/core-pending.txt`: the stale `principle` row of S2's tag, where it holds one
 - `help/loop.md`: the section of S10
 - `tools/unattended/unattended.sh`
 - `tools/unattended/check-unattended.sh`
@@ -264,6 +288,11 @@ v2:1255's default, and a round past 3 now reads `CEILING`.
 - **AC9** — When `grep -n "review.max-rounds" loop.md` runs over the help page at this unit's commit, it
   finds the section naming the four keys and the admitted equality.
   Red when: the keys move into the policy file and no page says where an owner sets the bound.
+- **AC10** — When `python -m json.tool gate-legs.json` runs in the tools folder, the row named
+  `loop review bounds fixtures` carries `enforces` holding `principle.p38`, and
+  `python tools/playbook/core.py meta-check` on this unit's pass exits 0, naming neither that leg nor a
+  stale pending row.
+  Red when: the leg carries no `enforces`, which dOrderedCharter-7 S3's meta-check reds.
 
 ## 7. Gates
 
@@ -293,7 +322,7 @@ New arm: tools/unattended/unattended.test.sh and tools/unattended/check-unattend
   table changes governance carriers; does the build's grant cover it?** The clause retires
   `REVIEW_ROUNDS` with its readers derived and each re-pointed, and both carriers read it by name.
   RESOLVED (agent, 2026-10-24, delegated): covered, rung 3.
-  grants: PLAY-dClosedLoop-3 the REVIEW_ROUNDS mentions in tools/memory-tree/BUILD-METHOD.template.md, tools/unattended/PROTOCOL.template.md and their renders re-worded to the policy keys
+  grants: PLAY-dClosedLoop-3 the REVIEW_ROUNDS mentions in tools/memory-tree/BUILD-METHOD.template.md, tools/unattended/PROTOCOL.template.md and their renders re-worded to the policy keys, M4's chain paragraph to name none
 
 ## 9. Revision log
 
@@ -301,6 +330,16 @@ New arm: tools/unattended/unattended.test.sh and tools/unattended/check-unattend
   row and conflicts 1 to 5, dSafePassage-1 S6 and S7 and dFairHearing-17, read at base `ed497191`.
 - rev-2 · 2026-10-24 · §3 · the Edges block gains a hands-off TOOL-dDeclaredLoop-56, the mirror of each unit the round-1 spec audit
   promoted (reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md); no scope moved.
+- rev-3 · 2026-11-05 · S2 · §4 Files touched · AC10 · TOOL-dDeclaredLoop-56 §8 F5 (a), per the brief
+  `2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade`: the leg `loop review bounds fixtures`
+  carries `principle.p38`, its clause's `[enforcement]` row; its own pass writes it, so the core
+  meta-check never reds the leg.
+- rev-4 · 2026-11-05 · §3 · §4 The bounds · S3 · S4 · F4 · the parity arm sets its ceiling variable to
+  each row's limit; the second `REVIEW_ROUNDS` reader, M4's chain paragraph, listed and re-worded to name no
+  key; the non-decrease reading kept to the closing review, a spec audit taking `no-fall`; a spec audit's
+  disposal named as M4's spec-audit rule's through TOOL-dDeclaredLoop-20's dispose row; the `roundLimit`
+  claim dropped from the non-goal and the edge, by the brief
+  prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-reground.md
 
 ## 10. Reuse audit
 

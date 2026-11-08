@@ -17,4 +17,4 @@ The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: ea
 - AC8 — `SPEC_SUBJECT_PATH` — `review_pin.py` exited 2 on each refusal, naming `SPEC_SUBJECT_PATH`, `--opt-in` and `--subject`
 - AC9 — `tools/workflows/unattended-build.js` — a node probe's `workflow()` stub received both keys, or neither when none were passed
 - AC10 — `OPTIN_LENSES` — a tomllib probe read the six rows of `'tools/workflows/lenses.toml'` as the table states, each `optin = false` with `default_in = []`, and the shipped `OPTIN_LENSES` is empty
-- AC11 — `grep -n "losing test" memory/builds/dCalibratedLens/BACKLOG.md` — it found the ask row, TOOL-dCalibratedLens-19, which names the six lenses. `optIn` appears 7 times in `tools/workflows/README.md`
+- AC11 — `grep -n "losing test" memory/builds/dCalibratedLens/BACKLOG.md` — it found the ask row, TOOL-dCalibratedLens-19, which names the six lenses. At the landing reconcile on 2026-11-08 the ask became TOOL-dCalibratedLens-56, the next id that build's index reported, because its own run had meanwhile minted TOOL-dCalibratedLens-19 for a unit. `optIn` appears 7 times in `tools/workflows/README.md`

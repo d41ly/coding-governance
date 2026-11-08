@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-34 — re-entry's `diff` and `inventory` kinds bind as typed kinds, and the diff record has one writer of the typed name
 
-**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 10 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 10 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,11 @@
 | [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-47 TOOL-dIndexedDesign-48 TOOL-dIndexedDesign-49 TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-52 TOOL-dIndexedDesign-53 |
 | [2026-10-28-build-TOOL-dIndexedDesign-34-deviation-341.md](../build/2026-10-28-build-TOOL-dIndexedDesign-34-deviation-341.md) | deviation | — |
 | [2026-10-28-build-TOOL-dIndexedDesign-34-deviation-342.md](../build/2026-10-28-build-TOOL-dIndexedDesign-34-deviation-342.md) | deviation | — |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-34-deviation-343.md](../build/2026-11-05-build-TOOL-dIndexedDesign-34-deviation-343.md) | deviation | — |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
 | [2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 |
 
 <!-- /gen:spec-records -->
@@ -30,7 +35,9 @@ disagree on `<n>`.
 
 Both homes fit the typed grammar, so this unit adds `diff` and `inventory` to `TYPED_RECORD_KINDS`
 and the factory's per-kind table, and makes the re-entry writer take the record's name and `<n>` from
-that factory. It repairs `TOOL-dIndexedDesign-20` and builds one step after it, at order 10.
+that factory. The same table rows are what unit 20 S10's versioned `returns` are pinned over, so their
+`[[record-version]]` rows land here too. It repairs `TOOL-dIndexedDesign-20` and builds one step after
+it, at order 10.
 
 ## 2. Scope (IN)
 
@@ -38,8 +45,10 @@ Build-run preconditions this unit calls and does not build: `TYPED_RECORD_KINDS`
 join (PLAY-dOrderedCharter-42 S1, S3); `tools/memory-tree/build_records.py`, its name grammar
 `<date>-build-<unit id>-<kind>-<n>.md`, its `<n>` collision rule and its per-kind table checked
 against `TYPED_RECORD_KINDS` at import (PLAY-dOrderedCharter-7 S7, PLAY-dOrderedCharter-42 S2); the
-`diff` and `inventory` registry rows unit 20 S4 and S7 write; and unit 20's `--reentry --write` and
-`check_inventory` (its S5, S8).
+`diff` and `inventory` registry rows unit 20 S4 and S7 write; unit 20's `--reentry --write` and
+`check_inventory` (its S5, S8) and S10's `returns`; and `tools/loop/item-schema.toml` with its
+`[[record-version]]` table and the hash its check recomputes (TOOL-dDeclaredLoop-24 S2, S4 and §4
+"Records at a version").
 
 - **S1** — Two typed kinds. `diff` and `inventory` join `TYPED_RECORD_KINDS` in
   `tools/memory-tree/tree_lib.py`, and `build_records.py`'s per-kind table gains their rows: `diff`
@@ -51,6 +60,11 @@ against `TYPED_RECORD_KINDS` at import (PLAY-dOrderedCharter-7 S7, PLAY-dOrdered
   `build_records.py` and takes each diff record's file name and `<n>` from the factory's name grammar
   and collision rule; `design_lib.py` derives no `<n>` of its own. Unit 20 S4's "the next number free
   for that unit" is the factory's number. Observed by AC3.
+- **S3** — The two kinds' versions. `tools/loop/item-schema.toml` gains two `[[record-version]]` rows,
+  `kind = "record-kind.diff"` and `kind = "record-kind.inventory"`, each `version = 1` and `fields`
+  the hash8 TOOL-dDeclaredLoop-24 §4 "Records at a version" computes over S1's per-kind table row, so
+  the `returns` unit 20 S10 writes, `record-kind.diff@1` and `record-kind.inventory@1`, name a pinned
+  version. They land in this pass, with the table rows they hash. Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -63,8 +77,8 @@ against `TYPED_RECORD_KINDS` at import (PLAY-dOrderedCharter-7 S7, PLAY-dOrdered
 
 ### Edges
 
-- **consumes-from** `TOOL-dIndexedDesign-20` — the `diff` and `inventory` kinds of its S4 and S7, `--reentry --write` and `check_inventory`, which read through `read_bindings` and see nothing until S1 binds, and whose own next-free `<n>` S2 replaces with the factory's (id 21)
-- **consumes-from** external — PLAY-dOrderedCharter-42 S1 to S3's `TYPED_RECORD_KINDS` and file-name join, and PLAY-dOrderedCharter-7 S7's `build_records.py`, each DEFERRED at base and an ancestor's
+- **consumes-from** `TOOL-dIndexedDesign-20` — the `diff` and `inventory` kinds of its S4 and S7, `--reentry --write` and `check_inventory`, which read through `read_bindings` and see nothing until S1 binds, and whose own next-free `<n>` S2 replaces with the factory's (id 21); and S10's `@1` `returns`, which S3 pins
+- **consumes-from** external — PLAY-dOrderedCharter-42 S1 to S3's `TYPED_RECORD_KINDS` and file-name join, PLAY-dOrderedCharter-7 S7's `build_records.py`, and TOOL-dDeclaredLoop-24 S2's `item-schema.toml` with its §4 "Records at a version", each DEFERRED at base and an ancestor's
 - **hands-off** `TOOL-dIndexedDesign-43` — S1's typed `inventory` row, to which that unit adds `Of` and `Verdict` as repeatable fields (id 13)
 - **hands-off** `TOOL-dIndexedDesign-46` — S2's diff writer, whose number that unit scopes to the build and allocates over tracked and on-disk files, and AC3's fixture (ids 14, 35 and 34)
 - **hands-off** `TOOL-dIndexedDesign-53` — this unit's pass commit also carries `TOOL-dIndexedDesign-43`'s S1 to S3 and that unit's S14 list shape, so `inventory` is typed and admits repeated `Of` and `Verdict` in one commit (ids 4 and 29)
@@ -83,8 +97,8 @@ against `TYPED_RECORD_KINDS` at import (PLAY-dOrderedCharter-7 S7, PLAY-dOrdered
 
 ### Inventory
 
-Minted: two tuple members and two per-kind table rows. No function, flag, file or constant. Naming
-cells: none apply.
+Minted: two tuple members, two per-kind table rows and two `[[record-version]]` rows. No function,
+flag, file or constant. Naming cells: none apply.
 
 ### Migration
 
@@ -93,13 +107,15 @@ None: no diff or inventory record exists at base.
 ### Rollout
 
 Live at its pass, order 10, one above unit 20's 9, beside `TOOL-dIndexedDesign-5` and
-`TOOL-dIndexedDesign-33`, which edits the same tuple, so `--dispatch` sequences the two.
+`TOOL-dIndexedDesign-33`, which edits the same tuple, so `--dispatch` sequences the two. S3's rows
+land in the commit of S1's table rows, so no pinned hash precedes the fields it hashes.
 
 ### Files touched (estimate)
 
 - `tools/memory-tree/tree_lib.py`: S1
 - `tools/memory-tree/build_records.py`: S1's table rows
 - `tools/memory-tree/design_lib.py`: S2
+- `tools/loop/item-schema.toml`: S3's two `[[record-version]]` rows
 
 ### Alternatives rejected
 
@@ -118,7 +134,8 @@ Live at its pass, order 10, one above unit 20's 9, beside `TOOL-dIndexedDesign-5
 - observability — the binding check names each malformed record.
 - risks — PLAY-dOrderedCharter-42 S2 refuses `build_records.py` at import if the tuple and the table
   differ, so S1's two edits land in one commit.
-- testing — AC1 to AC4 by `python -c` and the CLI over a scratch repository; the arm §7 declares.
+- testing — AC1 to AC4 by `python -c` and the CLI over a scratch repository, AC5 by the loop kit's
+  check; the arm §7 declares.
 - migration — none.
 - user docs — none under `help/`.
 
@@ -141,6 +158,13 @@ Live at its pass, order 10, one above unit 20's 9, beside `TOOL-dIndexedDesign-5
 - **AC4** — When `python -c "import build_records"` runs with both kinds in the tuple and the table, it
   imports; with the `inventory` row staged away, it refuses naming `inventory`.
   Red when: the module loads with the two lists apart.
+- **AC5** — When `python tools/loop/loop_items.py check` runs at the pass tip, it exits 0, and a
+  `python -c` `tomllib` read of `tools/loop/item-schema.toml` lists `[[record-version]]` rows
+  `record-kind.diff` and `record-kind.inventory`, each at version 1; in a scratch clone where `diff`'s
+  per-kind table row gains a required field while its version stays 1, `check` exits 1 naming
+  `record-kind.diff`.
+  Red when: either row is missing, or a moved hash passes at an unbumped version.
+  fixture: a scratch clone under `%TEMP%/<short-name>`.
 
 ## 7. Gates
 
@@ -163,6 +187,11 @@ none
 - rev-3 · 2026-10-28 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edge of TOOL-dIndexedDesign-53, promoted by the round-1 spec audit of units 39 to 46; nothing else
   moved.
+- rev-4 · 2026-11-05 · §1 · §2 preconditions, S3 · §3 Edges · §4 Inventory, Rollout, Files touched ·
+  §5 testing · §6 AC5 · S3 adds the `[[record-version]]` rows of `record-kind.diff@1` and
+  `record-kind.inventory@1`, which TOOL-dIndexedDesign-20 S10's revised `returns` name
+  (TOOL-dDeclaredLoop-24 §4), in this pass beside the table rows they hash; AC5 observes them, by the
+  brief prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md
 
 ## 10. Reuse audit
 

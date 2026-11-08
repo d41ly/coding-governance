@@ -5,14 +5,28 @@ cap's breach warns or refuses. The policy kit's catalogue, `tools/policy/catalog
 repository, is the file's schema. It has one row per key, giving the values the key admits, its
 default, and the build that owns it. A key the file does not set takes its default.
 
-One reader reads the file: `python tools/policy/policy.py get <key>`, below. Two families of keys <!-- usage: script:tools/policy/policy.py#get af650e87 -->
-have consumers so far: `runtime.agents-in-flight`, the agent limit, which `policy.py settings
---write` renders into the harness's settings and the agent-cap hook holds them to ([the agent
-limit](agent-limit.md)); and `budgets.enforce`, `budgets.pinned` and `budgets.<cap>`, which every
-gate that enforces a size cap reads ([the size caps](size-caps.md)). Each other key's consumer is
-re-pointed by the build its catalogue row names as `owner`, so a value you set for any other key
-today is checked but changes no behaviour. The one exception is an invalid file, which the push gate
-refuses when it has nothing to fall back to, below.
+One reader reads the file: `python tools/policy/policy.py get <key>`, below. These keys have <!-- usage: script:tools/policy/policy.py#get af650e87 -->
+consumers today, each family documented on its own page:
+
+- `runtime.agents-in-flight`, which `policy.py settings --write` renders into the harness's
+  settings and the agent-cap hook holds them to ([the agent limit](agent-limit.md));
+- `budgets.enforce`, `budgets.pinned` and `budgets.<cap>`, which every gate that enforces a size
+  cap reads ([the size caps](size-caps.md));
+- `help.enforce`, which the docs leg reads ([the docs leg](docs-leg.md));
+- `review.spec-audit.disposal`, `review.spec-audit.chain-stop` and
+  `review.spec-audit.chain-ceiling`, which the unattended driver reads
+  ([spec-audit chains](spec-audit.md));
+- `install.on-shim-call` and `install.deprecation-window`, which a forwarder and gov's forwarder
+  hold read ([forwarders for a moved path](shims.md));
+- `install.retired-edits`, which `update` reads
+  ([what update does with your edits](update-edits.md));
+- `platforms.provision`, which the Python resolver reads ([the Python floor](python-floor.md));
+- `policy-file.on-invalid`, which the reader itself reads ([below](#how-to-use-it)).
+
+Every other key has no consumer yet: the build its catalogue row names as `owner` adds one, so a
+value you set for any other key today is checked but changes no behaviour.
+The one exception is an invalid file, which the push gate refuses when it has nothing to fall back
+to, below.
 
 The kit README, `tools/policy/README.md`, is the full reference: the row fields, the grammar of
 allowed values and every check.

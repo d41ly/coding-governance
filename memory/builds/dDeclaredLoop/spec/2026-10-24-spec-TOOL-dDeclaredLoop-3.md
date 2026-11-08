@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-3 — the transition record three ways, its channels the set `transitions.record` selects
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base ed497191 · streams tooling · order 13 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base ed497191 · streams tooling · order 13 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0088@b1722a1e whole
 **Carries:** node:record-kind.transition
@@ -14,9 +14,12 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-a.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-a.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-26 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-25-build-TOOL-dDeclaredLoop-3-deviation-31.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-3-deviation-31.md) | deviation | — |
+| [2026-11-05-build-TOOL-dDeclaredLoop-3-deviation-32.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-3-deviation-32.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-56 |
+| [2026-11-05-prompt-TOOL-dDeclaredLoop-3-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-3-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dDeclaredLoop-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-3-owner-forks.md) | research | TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-56 |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
 <!-- /gen:spec-records -->
@@ -74,12 +77,12 @@ copy to another. C2-F9 asks for the key to be read, seen on a planted subset and
   `PARITY_ROWS` in `tools/lib/resolve-python.test.sh`. Observed by AC7 and AC8.
 - **S8** — The leg `loop transition record`, running `check --selftest`, with the rows a new leg owes,
   `enforces` among them: PLAY-dOrderedCharter-7 S3's meta-check reds a leg with no `enforces`, and its
-  pending list only shrinks after that unit's pass. The tag is §8 F7's, since no v2 `[enforcement]`
+  pending list only shrinks after that unit's pass. The tag is `principle.p20`, §8 F7's pick, since no v2 `[enforcement]`
   row names this unit's clause `cl-dClosedLoop-0088`. Where the pending list holds a `principle` row
   for that tag, this pass deletes it, as the meta-check reds it stale. Observed by AC9.
   **Readers:** by name: READER NOT IN TREE — the pending list and its reader, the meta-check verb of
   the playbook kit's core.py, are minted by PLAY-dOrderedCharter-7, DEFERRED, so no tracked file spells
-  the row of F7's tag at this spec's base; once that unit lands, the meta-check is the one reader, and it reds
+  the row of `principle.p20` at this spec's base; once that unit lands, the meta-check is the one reader, and it reds
   the row as stale once a leg enforces its tag · by value: NO VALUE READERS — a pending row's value is
   its arming build, which the meta-check prints only in its pending count.
 - **S9** — The page `help/loop.md` gains the record's three channels, the `transitions.record`
@@ -299,7 +302,7 @@ is the one door a mover calls.
   Red when: an unregistered field is written, or a registered one reaches one channel only.
 - **AC9** — When `grep -n '"loop transition record"' tools/gate-legs.json` runs, it finds the leg row
   and its argv naming `loop_transition.py check`; `python -m json.tool tools/gate-legs.json` read for
-  that row shows a non-empty `enforces` list holding F7's tag; and `python loop_transition.py check
+  that row shows a non-empty `enforces` list holding `principle.p20`; and `python loop_transition.py check
   --build tFix` over the AC1 fixture exits 0.
   Red when: the leg row is absent, names another command, or carries no `enforces`, so the bar never
   runs the check or the core meta-check reds it.
@@ -352,7 +355,8 @@ New arm: tools/loop/loop_transition.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8
   (b) `principle.p2`, since the record carries the witness commit of each exit; (c) `principle.p22`,
   since `read_transitions` feeds derived position. (b) and (c) describe what the record carries or
   feeds, while (a) is what the leg checks, the build's step records kept whole across channels.
-  Recommendation: (a). Open for the owner, who owns the `[enforcement]` table.
+  Recommendation: (a). RESOLVED (owner, 2026-11-05): (a) `principle.p20`, the step records the leg
+  checks.
 
 ## 9. Revision log
 
@@ -366,6 +370,8 @@ New arm: tools/loop/loop_transition.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8
   `build/2026-10-25-build-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md`, rows 16, 17 and 18:
   the record serves as `transition`, joined to `TYPED_RECORD_KINDS` and the HYGIENE kind list; no
   `new transition` door is claimed; the leg carries `enforces`.
+- rev-4 · 2026-11-05 · §2 S8 · §6 AC9 · §8 F7 · the owner resolved F7 to (a), `principle.p20`, per the
+  brief `2026-11-05-prompt-TOOL-dDeclaredLoop-3-owner-forks`; S8 and AC9 name the tag.
 
 ## 10. Reuse audit
 

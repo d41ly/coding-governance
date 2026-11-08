@@ -1,6 +1,6 @@
 # KICK-dKeptSession-25 — `mailbox.answer`: a `question` to a build answered by its owning role, or by the asker's default until `next` dispatches it, the waiting build's lease renewed
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 21 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 21 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0504@b051ecfa whole
 **Carries:** node:item.mailbox.answer
@@ -14,9 +14,11 @@
 | [2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md](../build/2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-build-KICK-dKeptSession-25-deviation-251.md](../build/2026-10-26-build-KICK-dKeptSession-25-deviation-251.md) | deviation | — |
 | [2026-10-26-build-KICK-dKeptSession-25-deviation-252.md](../build/2026-10-26-build-KICK-dKeptSession-25-deviation-252.md) | deviation | — |
+| [2026-11-05-build-KICK-dKeptSession-25-deviation-253.md](../build/2026-11-05-build-KICK-dKeptSession-25-deviation-253.md) | deviation | — |
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-36 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
+| [2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md](../prompts/2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-7 KICK-dKeptSession-9 KICK-dKeptSession-20 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -41,8 +43,8 @@ build waiting 72 hours loses its 24-hour lease on the way.
   `stand-in:tools/unattended/unattended.sh` (§8 F3), `deadline = "policy.flow.wait-ceiling"` and
   `on-deadline = "stand-in:tools/unattended/unattended.sh"`, the `defaulted` route's target, the wait
   TOOL-dDeclaredLoop-33 S5's `wait` rule requires of a row whose outcomes hold `awaiting` (its
-  `on-deadline`, "the route it takes past it"), `returns` prose while §8 F6 is open, and its witness
-  the computed join of S3. Observed by AC1.
+  `on-deadline`, "the route it takes past it"), `returns` prose, the reading §8 F6 (a) asks
+  dDeclaredLoop to admit, and its witness the computed join of S3. Observed by AC1.
 - **S2** — The answer verb, `unattended.sh --mail answer <slug> <question id> <body file> [--cite
   <path>@<sha>]…`, I19's member this unit owns. It posts one message of kind `answer`, `answers:
   <question id>`, addressed to the asking build, through `KICK-dKeptSession-5`'s post path. Before any
@@ -91,7 +93,7 @@ build waiting 72 hours loses its 24-hour lease on the way.
 - **consumes-from** external — TOOL-dDeclaredLoop-12's `[[item]]` row shape and `check_program`, TOOL-dDeclaredLoop-9's actor grammar, TOOL-dDeclaredLoop-33's `wait` rule, and TOOL-dPlacedRequest-1's build lease, its `--beat` renew, `--witness` and the witness check its renew applies
 - **hands-off** external — dWellOiledMachine's `next` dispatches `mailbox.answer` when a question arrives and re-points its actor to the owning role, with the per-question actor form TOOL-dDeclaredLoop-9's grammar does not spell
 - **hands-off** external — dPlacedRequest admits a declared wait on an open question as a renewing witness under `leases.renewal: progress` (§8 F4, an ask)
-- **hands-off** external — dDeclaredLoop admits a prose `returns` naming no record kind on a non-role row (§8 F6, an ask open for the owner)
+- **hands-off** external — dDeclaredLoop admits a prose `returns` naming no record kind on a non-role row (§8 F6 (a), an ask filed in its `BACKLOG.md`)
 - **hands-off** `KICK-dKeptSession-44` — §7's covers list, AC4 taken out of it by the batch's S2 (id 5)
 
 ## 4. Design
@@ -301,8 +303,9 @@ New arm: tools/loop/selftest.py · covers AC1 · the row with its `deadline` rem
   the claim ref"), so one answer re-grounds both; (b) `returns = "record-kind.mailbox-message@1"`, a
   record this item never writes, so an input could join to an item that does not produce it; (c) a
   new record kind per answer, a second copy of the mail commit. (b) states a false producer and (c)
-  writes one fact twice. Recommendation (a). Open for the owner: the ask the build run files is
-  "TOOL-dDeclaredLoop-24: on a non-role row, a `returns` naming no record kind is prose and joins
+  writes one fact twice. Recommendation (a). RESOLVED (owner, 2026-11-05): (a) the prose-`returns`
+  ask, the row keeping a prose `returns`. The ask this build's run files in dDeclaredLoop's
+  `BACKLOG.md` is "TOOL-dDeclaredLoop-24: on a non-role row, a `returns` naming no record kind is prose and joins
   nothing, as a prose input does, seen on `item.mailbox.answer` passing `check_item_composition` and
   red on an input naming `record-kind.<name>@<n>` from an item whose `returns` is prose".
 - **F7 — How does S4 know the landed lease verb admits a question commit as `--witness`?** Options:
@@ -329,6 +332,9 @@ New arm: tools/loop/selftest.py · covers AC1 · the row with its `deadline` rem
   lease witness is the channel source, trailer or log record; the beat passes a question commit only
   once the landed witness check admits it (F7), else the transition witness; `returns` stays prose
   under F6's open ask; `on-deadline` names the `defaulted` route's target and F3's deferral goes.
+- rev-4 · 2026-11-05 · §2 S1 · §3 Edges · §8 F6 · F6 resolved by the owner to (a), the prose-`returns`
+  ask filed in dDeclaredLoop's `BACKLOG.md`, under the brief
+  `2026-11-05-prompt-KICK-dKeptSession-1-owner-forks`; no other section moved.
 
 ## 10. Reuse audit
 

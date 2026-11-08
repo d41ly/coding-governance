@@ -84,7 +84,7 @@ ids TOOL-dScopedBuild-43
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dScopedBuild-1 — one exit contract with a history-derived base](spec/2026-11-01-spec-TOOL-dScopedBuild-1.md) | 1 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [TOOL-dScopedBuild-1 — one exit contract with a history-derived base](spec/2026-11-01-spec-TOOL-dScopedBuild-1.md) | 1 | 2 | DEFERRED | rev-4 | 2026-11-03 |
 | [TOOL-dScopedBuild-14 — the deviation gate under `deviation.gate`, at the commit and at the Build exit](spec/2026-11-01-spec-TOOL-dScopedBuild-14.md) | 2 | 2 | DEFERRED | rev-3 | 2026-11-01 |
 | [TOOL-dScopedBuild-32 — one bar call, `run_gate_bar`, carrying `gates-green`'s knob scrub, for the Build exit and the core run](spec/2026-11-01-spec-TOOL-dScopedBuild-32.md) | 2 | 2 | DEFERRED | rev-2 | 2026-11-01 |
 | [TOOL-dScopedBuild-33 — `read_first_passes` stays in `deviation_join.py` as two landed ancestors leave it, and `read_build_base` reaches it by the lazy import the leg already makes](spec/2026-11-01-spec-TOOL-dScopedBuild-33.md) | 2 | 2 | DEFERRED | rev-1 | 2026-11-01 |
@@ -120,7 +120,7 @@ ids TOOL-dScopedBuild-43
 | [TOOL-dScopedBuild-43 — the round-1 audit of units 40 and 41, its 11 minors batched: 7 MEDIUM and 4 LOW findings, each its own scope item](spec/2026-11-01-spec-TOOL-dScopedBuild-43.md) | 20 | 2 | DEFERRED | rev-1 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 80 bound to this build, across 4 record folder(s).
+Records: 88 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
