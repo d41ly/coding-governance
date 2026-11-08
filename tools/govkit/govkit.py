@@ -3504,12 +3504,15 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     #          names are `adopters.toml`'s `[[adopter]]` rows, never a literal here, so a new adopter
     #          is banned the day it registers. Not `registry.toml`: the playbook renderer ships that
     #          file, so a name declared there would reach every adopter. The population is
-    #          `cmd_shipped`'s, every role included: an adopter receives a `project-owned` seed as
-    #          surely as an engine. A PURE BAN: TOOL-aRepatriatedFork-35 drained the last carried
-    #          sites and retired the carry table, so a row still declaring one is refused rather
-    #          than silently ignored.
+    #          `cmd_shipped --epoch`'s, the survivors whose role is in `EPOCH_ROLES`: gov supplies no
+    #          bytes for a `project-owned`, `forked` or `generated` source, so only a receiving role
+    #          puts a source here (PLAY-dOrderedCharter-71). A PURE BAN: TOOL-aRepatriatedFork-35
+    #          drained the last carried sites and retired the carry table, so a row still declaring
+    #          one is refused rather than silently ignored.
     #          DOES NOT CHECK: gov's own records, the deployer, or any file no descriptor ships; a
-    #          name spelled across a line break; a brand no row declares.
+    #          name spelled across a line break; a brand no row declares; a source only a role
+    #          outside `EPOCH_ROLES` names; a `project-owned` file a `cp -r` copy install still
+    #          carries, which the runbook's `rm -f` steps own.
     _adopters = load_toml(resolve_tool_path(root, GOVKIT_DIR.name, "adopters.toml")).get("adopter", [])
     _akey: dict[str, str] = {}
     for _a in _adopters:
@@ -3527,7 +3530,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                "over every shipped file while grading nothing")
     _shipped = sorted({row["src"] for eid, (d, _p) in descs.items()
                        for row in resolve_entry(root, d, canonical_ctx(eid))["survivors"]
-                       if row.get("src")})
+                       if row.get("src") and row["role"] in EPOCH_ROLES})
     _measured: dict[tuple, int] = {}
     for _src in _shipped:
         try:

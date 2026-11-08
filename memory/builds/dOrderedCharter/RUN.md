@@ -295,3 +295,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-08T04:32:03Z brief · item PLAY-dOrderedCharter-70 · reason 681b42598d32 memory/builds/dOrderedCharter/prompts/2026-11-05-prompt-PLAY-dOrderedCharter-70-build-brief.md
 
 2026-11-08T05:15:34Z rescope · item add PLAY-dOrderedCharter-71 · reason found at the close: govkit selfcheck's adopter-name ban scans project-owned sources, which ship no bytes, so it reds on gov's own positional list
+
+2026-11-08T06:50:15Z dispatch · item b6a0090b PLAY-dOrderedCharter-71 · reason tools/govkit/govkit.py tools/govkit/adopters.toml tools/govkit/selftest.py tools/memory-tree/merge-rows.py tools/run-gates/owed_rows.py memory/builds/dOrderedCharter/spec/2026-11-08-spec-PLAY-dOrderedCharter-71.md memory/builds/dOrderedCharter/build/2026-11-08-build-PLAY-dOrderedCharter-71-ledger.md memory/builds/dOrderedCharter/build/2026-11-08-build-PLAY-dOrderedCharter-71-deviation-711.md memory/builds/dOrderedCharter/README.md memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/map/generated
+
+2026-11-08T06:50:23Z brief · item PLAY-dOrderedCharter-71 · reason f3518386ecde memory/builds/dOrderedCharter/prompts/2026-11-08-prompt-PLAY-dOrderedCharter-71-build-brief.md

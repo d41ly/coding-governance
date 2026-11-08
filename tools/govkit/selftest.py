@@ -7007,6 +7007,28 @@ user_skills = "/tmp/gk-fake-skills"
               rsr.returncode != 0 and f"'{PFX}{KIT_NAMES['playbook']}/README.md' ships as an engine file holding "
               "1 row(s)" in rsr.stdout + rsr.stderr, (rsr.stdout + rsr.stderr)[-1500:])
         rf.write_bytes(rkeep)
+        # --- PLAY-dOrderedCharter-71 S3: the ban reads only the roles an adopter receives.
+        import tomllib  # noqa: PLC0415
+        _an = tomllib.loads((gcopy / PFX / KIT_NAMES["govkit"] / "adopters.toml").read_text(
+            encoding="utf-8"))["adopter"][0]["names"][0]
+        pf = gcopy / PFX / KIT_NAMES["playbook"] / "positional-producers.txt"
+        pkt = gcopy / PFX / KIT_NAMES["playbook"] / "kit.toml"
+        pfkeep, pktkeep = pf.read_bytes(), pkt.read_text(encoding="utf-8")
+        pf.write_bytes(pfkeep + f"# {_an}\n".encode("utf-8"))
+        _named = f"'{PFX}{KIT_NAMES['playbook']}/positional-producers.txt' names the adopter"
+        rpo = _run_selfcheck(gcopy)
+        check("[dOC-71 S3] a project-owned source naming an adopter passes the ban",
+              rpo.returncode == 0 and _named not in rpo.stdout and "adopter names:" in rpo.stdout,
+              (rpo.stdout + rpo.stderr)[-1500:])
+        _pkt = pktkeep.replace('"positional-producers.txt", ', "", 1)
+        check("[dOC-71 S3] LIVENESS the staged descriptor really ships the planted list",
+              _pkt != pktkeep, "the replace matched nothing in the playbook-render descriptor")
+        pkt.write_text(_pkt, encoding="utf-8")
+        rsh = _run_selfcheck(gcopy)
+        check("[dOC-71 S3] the same file under the engine role reds, naming the file and the adopter",
+              rsh.returncode != 0 and f"{_named} `{_an}`" in rsh.stdout, (rsh.stdout + rsh.stderr)[-1500:])
+        pf.write_bytes(pfkeep)
+        pkt.write_text(pktkeep, encoding="utf-8")
         # --- TOOL-aWindowedPass-4 AC5: check 6c, a `[[generated]]` row whose generator the kit does
         #     not ship. Staged in the copy and restored, so the arm is observed red and green both.
         gk = gcopy / PFX / KIT_NAMES["codebase-map"] / "kit.toml"

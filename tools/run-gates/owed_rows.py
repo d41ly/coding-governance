@@ -356,11 +356,11 @@ def run_selftest() -> int:
         with open(s / "kits" / gk / "subject-pins.tsv", "a", encoding="utf-8", newline="\n") as f:
             f.write("new leg\trepo\t\n")
 
-    def split_known(s):
+    def add_known_twin(s):
         (s / "kits" / rg / "run-gates.test.sh").write_text(
             'KNOWN = {"name", "argv", "subject"}\nKNOWN = {"name", "argv"}\n', encoding="utf-8", newline="\n")
 
-    def warn_grown_file(s):
+    def add_warn_breach(s):
         add_grown_file(s)
         (s / ".governance/policy.toml").write_text(f'[budgets]\nenforce = "warn"\n{json.dumps(cap)} = {limit}\n',
                                                    encoding="utf-8", newline="\n")
@@ -379,10 +379,10 @@ def run_selftest() -> int:
         ("a leg with no descriptor row", add_bare_leg, "HEAD", 1,
          "a descriptor's [[gate_leg]] or kits/" + gk + "/registry.toml's [[exempt_leg]] <- bare leg"),
         ("a leg no dossier claims", add_unclaimed_leg, "HEAD", 1, "gate-legs claim under memory/map/features/ <- unclaimed leg"),
-        ("two KNOWN copies that differ", split_known, "HEAD", 2, "KNOWN copies in kits/" + rg + "/run-gates.test.sh disagree"),
+        ("two KNOWN copies that differ", add_known_twin, "HEAD", 2, "KNOWN copies in kits/" + rg + "/run-gates.test.sh disagree"),
         ("a leg with no ceiling row", add_owed_free_leg, "HEAD", 0, "deferred — kits/" + rg + "/ceiling-evidence.txt <- new leg"),
         # last: the budgets reader reads the landed policy, so this case commits it and no case runs after it
-        ("a breach the warn mode admits", warn_grown_file, "HEAD", 0, "· 1 size breach(es) the switch's warn admits"),
+        ("a breach the warn mode admits", add_warn_breach, "HEAD", 0, "· 1 size breach(es) the switch's warn admits"),
     )
     failed = 0
     scratch = pathlib.Path(tempfile.mkdtemp(prefix="owed-"))

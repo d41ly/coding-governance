@@ -1273,10 +1273,10 @@ def resolve_tables(o_lines, a_lines, b_lines) -> list[str]:
     written = read_tables(merged)[1]    # text that does not parse, or a key twice, raises here
     if list(written) != list(kept):
         raise RowLoss(f"the written tables {list(written)} are not the merged {list(kept)}")
-    def fold(t):  # PLAY-dOrderedCharter-70 S6: a side's unterminated last chunk is written terminated
+    def derive_terminated(t):  # PLAY-dOrderedCharter-70 S6: a side's unterminated last chunk is written terminated
         return t if t is None or t.endswith(("\n", "\r")) else t + term
     for entry, text in written.items():
-        if text not in (fold(O.get(entry)), fold(A.get(entry)), fold(B.get(entry))):
+        if text not in (derive_terminated(O.get(entry)), derive_terminated(A.get(entry)), derive_terminated(B.get(entry))):
             raise StructureDrift(f"the written chunk of {entry} is byte-identical to no side's")
     print(f"merge-rows: tables O/A/B {len(O)}/{len(A)}/{len(B)} -> {len(written)} written, clean", file=sys.stderr)
     return merged
