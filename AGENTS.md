@@ -149,6 +149,29 @@ gate or protocol named in section 3 carries the detail.*
 - `gov-session`: Opens a handoff to another session. Optional, when work leaves this session. Output: a prompt file in the build's `prompts/`.
 <!-- /one-line -->
 
+## Drive — how to start and advance the loop
+
+<!-- one-line -->
+- start · main — a new task from the owner: `/session-kickoff`
+- start · main — a resumed or compacted session, which re-reads its card before it acts: `/session-kickoff`
+- start · main — another harness without gov's hooks, which writes no card, so the kickoff runs by hand: `/session-kickoff`
+- start · main — a run that merges and pushes with no owner turn, started or resumed: `/unattended`
+- start · gov-session — a subagent's task, handed over as a prompt file: `python <prefix>/roles/handoff.py check <file>`
+- bookkeeping · main — a record, an index or the run state changed: `python <prefix>/memory-tree/gen_build_index.py --write`
+- research · gov-researcher — a design choosing between candidates no seam decides: `python <prefix>/memory-recall/query.py "<question>" --terms "<8-14 words>"`
+- handoff · gov-session — work leaving this session for another: `python <prefix>/roles/handoff.py render --role <role> --build <slug>`
+- orient · gov-orienter — once per session, before the first unit opens: `/session-kickoff`
+- reuse · gov-reuse-scout — a new behaviour about to be designed: `python <prefix>/codebase-map/reuse_lookup.py "<behaviour>"`
+- spec-write · gov-spec-writer — a build whose units lack a spec or hold a thin one: `Workflow <prefix>/workflows/unattended-build.js`
+- spec-review · gov-spec-reviewer — a spec audit the build or its project declares: `Workflow <prefix>/workflows/tier2-review.js`
+- spec-review · gov-skeptic — a finding handed on to refute: `Workflow <prefix>/workflows/tier2-review.js`
+- build · gov-builder — a unit whose spec is READY: `python <prefix>/roles/handoff.py render --role gov-builder --build <slug> --unit <id>`
+- closing-review · main — before any review, for the bug classes a diff can hit: `python <prefix>/memory-tree/gotchas.py --for-diff <base>..<head>`
+- closing-review · gov-diff-reviewer — the last unit terminal, over the cumulative diff: `Workflow <prefix>/workflows/tier2-review.js`
+- closing-review · gov-synthesizer — the verified findings, merged into one report: `Workflow <prefix>/workflows/tier2-review.js`
+- gate-bar · main — the close or the push boundary: the pre-push hook runs the full bar: `bash <prefix>/push-main.sh`
+<!-- /one-line -->
+
 ## Protocols — read the one whose trigger holds
 
 <!-- one-line -->

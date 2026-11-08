@@ -18,6 +18,8 @@ reader and its active set (PLAY-dOrderedCharter-1).
     python instruction_units.py practices --active [<tags>]  # the active set of a comma-joined value; none, the default
     python instruction_units.py envelopes --list [--root <dir>]   # the document registry's rows, resolved
     python instruction_units.py envelopes --check [--root <dir>]  # the leg: every document against its envelope
+    python instruction_units.py drive --list [--root <dir>]       # the selected kits' drive rows, each with its kit
+    python instruction_units.py drive --check [--root <dir>] [--charter <path>]  # the rows and the charter, both ways
 
 `LEVELS` is the one place an envelope, a unit row, a card or a map reads a level from: a tuple whose index is
 the level, so `len(LEVELS)` is the ladder's height and `LEVELS[n]` a level's name. `PLATFORM` names the
@@ -70,7 +72,17 @@ with no row; each entry file is the charter's alias, printed and never counted. 
 held row as not checked on every run and reds it once its envelope lands, its row moves or a second hold
 appears. It does not read a source: the parity legs compare each source with its render.
 
-Exit 0 green, 1 red, 2 a usage refusal, and for ENVELOPES a registry, population or held cap it cannot read.
+THE DRIVE TABLE (PLAY-dOrderedCharter-6). Each kit's descriptor may carry `[[drive]]` rows, `stage`, `role`,
+`command` and `when`, which the renderer composes into the charter's drive section for the kits the target's
+deploy answers select. DRIVE --LIST prints them in render order with each one's kit. DRIVE --CHECK reds a row
+whose stage names no workflow of the roles kit's list and is not `start`, whose role is no role of those lists
+and not `main`, or with an empty field; a role of those lists no row names; a line of the charter's drive
+region no row renders and a row's line the region lacks; and a flat registry entry, one whose descriptor's
+file name is not `kit.toml`, with no `root_relative` rule in this kit's descriptor landing it beside the engine.
+It reads this kit's descriptor beside this module and the registry as the renderer finds it.
+
+Exit 0 green, 1 red, 2 a usage refusal, and for ENVELOPES and DRIVE a registry, population, deploy answer or
+held cap it cannot read.
 """
 from __future__ import annotations
 
@@ -1216,6 +1228,91 @@ def run_envelopes_check(root) -> tuple[list, int]:
     return lines, 1 if reds else 0
 
 
+def read_drive(root, engine_dir=KIT_DIR) -> tuple[list, list]:
+    """(the drive rows of the kits `root`'s deploy answers select, in render order; the roles kit's workflows)."""
+    import render_playbook as rp
+    _dep, cfg, _answers = rp.read_deploy(pathlib.Path(root))
+    return rp.read_drive_rows(engine_dir, list(dict.fromkeys(cfg.get("kits") or []))), rp.read_workflows(engine_dir)
+
+
+def extract_drive_region(text) -> list | None:
+    """The non-blank lines of the first one-line region under the charter's drive heading; [] for a heading
+    with no region; None for no heading."""
+    import render_playbook as rp
+    lines = text.replace("\r\n", "\n").split("\n")
+    head = next((i for i, ln in enumerate(lines) if ln.strip() == rp.DRIVE_HEADING), None)
+    if head is None:
+        return None
+    out, inside = [], False
+    for ln in lines[head + 1:]:
+        if ln.strip() == rp.ONE_LINE_OPEN:
+            inside = True
+        elif inside and ln.strip() == rp.ONE_LINE_CLOSE:
+            break
+        elif inside and ln.strip():
+            out.append(ln.rstrip())
+        elif not inside and ln.startswith("## "):
+            break
+    return out
+
+
+def check_drive(root, engine_dir=KIT_DIR, charter=None) -> tuple[list, int]:
+    """DRIVE --CHECK over `root`, this kit's descriptor and the registry read from `engine_dir`."""
+    import render_playbook as rp
+    rows, workflows = read_drive(root, engine_dir)
+    reds = []
+    if not workflows:
+        reds.append(f"{SAY}: red · drive · roles · no workflows.toml of the roles kit found from {engine_dir.as_posix()}")
+    stages = {w.get("name") for w in workflows} | {rp.DRIVE_START}
+    roles = {r for w in workflows for r in (w.get("roles") or [])}
+    for r in rows:
+        where = f"{SAY}: red · drive · {r['kit']} · row {r['row']}"
+        empty = [k for k in rp.DRIVE_FIELDS if not (isinstance(r.get(k), str) and r[k].strip())]
+        if empty:
+            reds.append(f"{where} · empty {', '.join(empty)}")
+        if r.get("stage") not in stages:
+            reds.append(f"{where} · stage {r.get('stage')!r} names no workflow and is not {rp.DRIVE_START}")
+        if r.get("role") not in roles | {"main"}:
+            reds.append(f"{where} · role {r.get('role')!r} is no role of the workflow list and not main")
+    named = {r.get("role") for r in rows}
+    reds += [f"{SAY}: red · drive · roles · role {role} of the workflow list has no row in a selected kit"
+             for role in sorted(roles - named)]
+    path = pathlib.Path(charter) if charter else pathlib.Path(root) / rp.CANON
+    want = [rp.render_drive_line(r) for r in rows]
+    region = extract_drive_region(path.read_bytes().decode("utf-8", "replace")) if path.is_file() else None
+    if region is None and want:
+        reds.append(f"{SAY}: red · drive · {path.as_posix()} · no drive section, and {len(want)} row(s) render one")
+    for ln in [ln for ln in region or [] if ln not in want]:
+        reds.append(f"{SAY}: red · drive · {path.as_posix()} · a line no selected kit's row renders: {ln}")
+    for r, ln in [(r, ln) for r, ln in zip(rows, want) if ln not in (region or [])]:
+        reds.append(f"{SAY}: red · drive · {r['kit']} · row {r['row']} · its line is not in the drive region: {ln}")
+    desc = tomllib.loads((engine_dir / "kit.toml").read_text(encoding="utf-8"))
+    reg = tomllib.loads(rp.resolve_declaration_paths(engine_dir, engine_dir)[1].read_text(encoding="utf-8"))
+    rules = [f for f in desc.get("files", []) if f.get("root_relative")]
+    flat = [e for e in reg.get("entry", []) if not str(e.get("descriptor", "")).endswith("/kit.toml")]
+    for e in flat:
+        to = f"{{prefix}}/{desc.get('home', engine_dir.name)}/{str(e.get('descriptor')).rsplit('/', 1)[-1]}"
+        if not any(e.get("descriptor") in (f.get("include") or []) and f.get("to") == to for f in rules):
+            reds.append(f"{SAY}: red · drive · {e.get('id')} · a flat entry whose descriptor no root_relative rule "
+                        f"of this kit's descriptor lands at {to}")
+    said = "no selected kit declares a [[drive]] row · " if not rows else ""
+    return reds + [f"{SAY}: drive · {said}{len(rows)} row(s) · {len(region or [])} charter line(s) · "
+                   f"{len(flat)} flat entries · {len(reds)} red"], 1 if reds else 0
+
+
+def run_drive(root, verb, engine_dir=KIT_DIR, charter=None) -> tuple[list, int]:
+    """`drive <verb>` over `root`; a deploy answer, registry or descriptor it cannot read exits 2."""
+    import render_playbook as rp
+    try:
+        if verb == "--list":
+            rows, _workflows = read_drive(root, engine_dir)
+            return [f"{SAY}: drive · {r['kit']} · {rp.render_drive_line(r)}" for r in rows] + [
+                f"{SAY}: drive · {len(rows)} row(s) from {len({r['kit'] for r in rows})} kit(s)"], 0
+        return check_drive(root, engine_dir, charter)
+    except (rp.Refusal, ValueError, OSError) as exc:
+        return [f"{SAY}: refused · {exc}"], 2
+
+
 class Case:
     def __init__(self, top, out):
         self.top, self.out, self.failed = top, out, 0
@@ -2031,7 +2128,7 @@ def check_envelopes_red(c, what, path, rc_want=1):
             rc == rc_want and path in said and (rc_want != 1 or f"HELD {ENV_HELD} · NOT checked" in said), said)
 
 
-def plant_envelope_text(c, old, new):
+def write_envelope_text(c, old, new):
     """`old` swapped for `new` in the fixture guide's text."""
     text = (c.top / ENV_GUIDE).read_text(encoding="utf-8")
     c.write_file(ENV_GUIDE, text.replace(old, new))
@@ -2046,19 +2143,19 @@ def arm_envelope_missing(c):
 
 def arm_envelope_level(c):
     write_envelope_tree(c)
-    plant_envelope_text(c, " · Level 3 · ", " · Level 4 · ")
+    write_envelope_text(c, " · Level 3 · ", " · Level 4 · ")
     check_envelopes_red(c, "an envelope whose level differs from its row", ENV_GUIDE)
 
 
 def arm_envelope_unclosed(c):
     write_envelope_tree(c)
-    plant_envelope_text(c, f"[/{ENV_GUIDE}]\n", "")
+    write_envelope_text(c, f"[/{ENV_GUIDE}]\n", "")
     check_envelopes_red(c, "an opener with no closer", ENV_GUIDE)
 
 
 def arm_envelope_foreign_closer(c):
     write_envelope_tree(c)
-    plant_envelope_text(c, f"[/{ENV_GUIDE}]\n", "[/AGENTS.md]\n")
+    write_envelope_text(c, f"[/{ENV_GUIDE}]\n", "[/AGENTS.md]\n")
     check_envelopes_red(c, "a closer naming another document", ENV_GUIDE)
 
 
@@ -2066,7 +2163,7 @@ def arm_envelope_second_charter(c):
     write_envelope_tree(c)
     c.write_file(derive_kit_rel(DOCUMENTS), ENV_ROWS.replace("HOLD", ENV_HOLD).replace("level = 3\ndirection = "
                  f'"{ENV_DIRECTION}"', f'level = 0\ndirection = "{ENV_DIRECTION}"'))
-    plant_envelope_text(c, " · Level 3 · ", " · Level 0 · ")
+    write_envelope_text(c, " · Level 3 · ", " · Level 0 · ")
     check_envelopes_red(c, "a second document at level 0", ENV_GUIDE)
 
 
@@ -2126,6 +2223,95 @@ def arm_hold_refused(c):
     check_envelopes_red(c, "a held row with no size row", ENV_HELD, 2)
 
 
+DRIVE_DIR_ROWS = ('[[drive]]\nstage = "start"\nrole = "main"\ncommand = "/fixture-start"\nwhen = "a fixture session"\n\n'
+                  '[[drive]]\nstage = "build"\nrole = "gov-builder"\ncommand = "python fixture.py build"\n'
+                  'when = "a fixture unit"\n')
+DRIVE_FLAT_ROWS = '[[drive]]\nstage = "gate-bar"\nrole = "main"\ncommand = "bash fixture-land.sh"\nwhen = "the close"\n'
+DRIVE_WORKFLOWS = ('[[workflow]]\nname = "build"\nstage = 5\nroles = ["gov-builder"]\n\n'
+                   '[[workflow]]\nname = "gate-bar"\nstage = 7\nroles = []\n')
+DRIVE_KITS = ("memory-tree", "push-main")   # a dir kit and a flat entry of the real registry
+
+
+def write_drive_charter(c, drop=None, add=None):
+    """The fixture charter's drive region from the tree's own rows, less the line holding `drop`, plus `add`."""
+    import render_playbook as rp
+    rows, _w = read_drive(c.top, c.top / derive_kit_rel(""))
+    lines = [ln for ln in map(rp.render_drive_line, rows) if not drop or drop not in ln] + ([add] if add else [])
+    c.write_file("AGENTS.md", f"# fixture charter\n\n{rp.DRIVE_HEADING}\n\n{rp.ONE_LINE_OPEN}\n" + "\n".join(lines)
+                 + f"\n{rp.ONE_LINE_CLOSE}\n")
+
+
+def write_drive_tree(c, dir_rows=DRIVE_DIR_ROWS, kit_toml=None):
+    """The tree the drive check grades green, laid out as an install: this kit's descriptor and the registry
+    beside the engine, the flat entry's descriptor beside them, the dir kit's and the roles kit's at the tool
+    root, the deploy answers selecting the two, and a charter rendered from their rows."""
+    import render_playbook as rp
+    c.write_file(derive_kit_rel("kit.toml"), kit_toml or (KIT_DIR / "kit.toml").read_text(encoding="utf-8"))
+    c.write_file(derive_kit_rel("registry.toml"),
+                 rp.resolve_declaration_paths(KIT_DIR, KIT_DIR)[1].read_text(encoding="utf-8"))
+    c.write_file(derive_kit_rel(f"{DRIVE_KITS[1]}.kit.toml"), DRIVE_FLAT_ROWS)
+    c.write_file(derive_tool_rel(DRIVE_KITS[0], "kit.toml"), dir_rows)
+    c.write_file(derive_tool_rel("roles", "workflows.toml"), DRIVE_WORKFLOWS)
+    c.write_file(".governance/deploy.toml", f"kits = {json.dumps(list(DRIVE_KITS))}\n")
+    write_drive_charter(c)
+
+
+def check_drive_red(c, what, want, charter=None):
+    lines, rc = run_drive(c.top, "--check", c.top / derive_kit_rel(""), charter)
+    said = " | ".join(lines)
+    c.check(f"{what} exits 1 naming {' and '.join(want)}", rc == 1 and all(w in said for w in want), said)
+
+
+def check_drive_green(c):
+    lines, rc = run_drive(c.top, "--check", c.top / derive_kit_rel(""))
+    c.check("the unplanted drive tree exits 0", rc == 0 and "3 row(s) · 3 charter line(s)" in lines[-1], " | ".join(lines))
+
+
+def arm_drive_bad_role(c):
+    write_drive_tree(c)
+    check_drive_green(c)
+    write_drive_tree(c, DRIVE_DIR_ROWS.replace('role = "gov-builder"', 'role = "gov-nobody"'))
+    check_drive_red(c, "a row whose role is gov-nobody", [f"{DRIVE_KITS[0]} · row 2", "'gov-nobody'"])
+
+
+def arm_drive_no_row(c):
+    write_drive_tree(c)
+    check_drive_green(c)
+    write_drive_tree(c, DRIVE_DIR_ROWS.split("\n\n")[0] + "\n")
+    check_drive_red(c, "a role with no row", ["roles · role gov-builder"])
+
+
+def arm_drive_empty_command(c):
+    write_drive_tree(c)
+    check_drive_green(c)
+    write_drive_tree(c, DRIVE_DIR_ROWS.replace('"python fixture.py build"', '""'))
+    check_drive_red(c, "a row with an empty command", [f"{DRIVE_KITS[0]} · row 2 · empty command"])
+
+
+def arm_drive_unshipped_descriptor(c):
+    write_drive_tree(c)
+    check_drive_green(c)
+    shipped = (KIT_DIR / "kit.toml").read_text(encoding="utf-8").split("\n\n")
+    write_drive_tree(c, kit_toml="\n\n".join(p for p in shipped if f"/{DRIVE_KITS[1]}.kit.toml" not in p))
+    check_drive_red(c, "a copy of this kit's descriptor without the rule shipping push-main's",
+                    [f"{DRIVE_KITS[1]} · a flat entry"])
+
+
+def arm_drive_hand_line(c):
+    write_drive_tree(c)
+    check_drive_green(c)
+    hand = "- start · main — a hand-typed line: `true`"
+    write_drive_charter(c, add=hand)
+    check_drive_red(c, "a hand-typed line in the drive region", [hand])
+
+
+def arm_drive_lost_line(c):
+    write_drive_tree(c)
+    check_drive_green(c)
+    write_drive_charter(c, drop="fixture-land.sh")
+    check_drive_red(c, "a rendered line deleted from the drive region", [f"{DRIVE_KITS[1]} · row 1", "fixture-land.sh"])
+
+
 PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority, "statements": arm_statements,
           "document": arm_document, "lock": arm_lock, "row": arm_row, "two-kits": arm_two_kits,
           "unreadable": arm_unreadable, "arms": arm_arms, "render": arm_render, "extractor": arm_extractor,
@@ -2135,7 +2321,10 @@ PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority, "state
           "envelope-level": arm_envelope_level, "envelope-unclosed": arm_envelope_unclosed,
           "envelope-foreign-closer": arm_envelope_foreign_closer, "envelope-second-charter": arm_envelope_second_charter,
           "envelope-unregistered": arm_envelope_unregistered, "hold-enveloped": arm_hold_enveloped,
-          "hold-fits": arm_hold_fits, "hold-second": arm_hold_second, "hold-refused": arm_hold_refused}
+          "hold-fits": arm_hold_fits, "hold-second": arm_hold_second, "hold-refused": arm_hold_refused,
+          "drive-bad-role": arm_drive_bad_role, "drive-no-row": arm_drive_no_row,
+          "drive-empty-command": arm_drive_empty_command, "drive-unshipped-descriptor": arm_drive_unshipped_descriptor,
+          "drive-hand-line": arm_drive_hand_line, "drive-lost-line": arm_drive_lost_line}
 
 
 def run_fixture(plant=None) -> tuple[list, int]:
@@ -2185,6 +2374,11 @@ def main(argv) -> int:
             top = pathlib.Path(argv[3]) if len(argv) == 4 else pathlib.Path(
                 run_git(KIT_DIR, "rev-parse", "--show-toplevel").strip())
             lines, rc = run_envelopes(top, argv[1])
+        elif argv[:2] in (["drive", "--list"], ["drive", "--check"]) and len(argv) % 2 == 0 and all(
+                k in ("--root", "--charter") for k in argv[2::2]) and (argv[1] == "--check" or "--charter" not in argv):
+            opts = dict(zip(argv[2::2], argv[3::2]))
+            top = pathlib.Path(opts.get("--root") or run_git(KIT_DIR, "rev-parse", "--show-toplevel").strip())
+            lines, rc = run_drive(top, argv[1], charter=opts.get("--charter"))
         elif argv[:1] == ["fixture"] and (len(argv) == 1 or (len(argv) == 3 and argv[1] == "--plant")):
             plant = argv[2] if len(argv) == 3 else None
             if plant is not None and plant not in PLANTS:

@@ -99,3 +99,47 @@ second document at level 0, and a load-bearing document with no row. `CLAUDE.md`
 it prints as the charter's alias and is not counted. One document is held: `memory/guides/BUILD-METHOD.md`
 carries no envelope until the owner rules on its size row, and every check prints it as `HELD` and
 `NOT checked`, leaving it out of the covered count.
+
+## The drive section
+
+The charter's `## Drive — how to start and advance the loop` section says how a session starts, by
+situation, and which command advances each stage of the loop for each role. It is composed, never typed:
+each kit's descriptor, `kit.toml` in its directory or the flat entry's own descriptor, may carry `[[drive]]`
+rows, each a `stage`, a `role`, a `command` and a `when`:
+
+```toml
+[[drive]]
+stage = "build"
+role = "gov-builder"
+command = "python <prefix>/roles/handoff.py render --role gov-builder --build <slug> --unit <id>"
+when = "a unit whose spec is READY"
+```
+
+`stage` names a workflow of the roles kit's `workflows.toml`, or `start` for how a session begins; `role`
+is a role slot, or `main` for the main session. Where your template holds a `{{DRIVE}}` line, as gov's
+does, the render writes one line per row of the kits your `.governance/deploy.toml` selects there: the
+`start` rows first, then by the workflow's stage, then kit and row order. A kit you did not select adds
+nothing, and a selection with no rows renders no section. A subagent's handoff carries its own role's
+lines under `### Drive`, so it holds the line the main session does.
+
+Read your own rows, each with its kit, then check them against the rendered charter:
+
+```bash
+python tools/playbook/instruction_units.py drive --list
+python tools/playbook/instruction_units.py drive --check
+```
+
+The check reds a row whose stage, role or other field is wrong or empty, a role of the workflow list
+no row names, a line in the charter's drive region no row renders, a row whose line the region lacks,
+and a flat entry whose descriptor the playbook kit does not ship beside the renderer. A render refuses,
+naming the kit, when a selected kit's descriptor is found neither beside the renderer nor in gov's tree.
+
+## Raising a charter cap
+
+A run's raise of a charter cap is owed only under the four conditions the header of
+[the size limits file](../tools/template-size-limits.txt) states, argued in place above the row as
+`RAISED <old> -> <new>` with a `memory/DECISIONS.md` row in the same commit, the change record
+`cl-dClosedLoop-0012` names for this build; once a row is under `budgets.*`, the raise goes through the
+one write shape the minimal guard admits, as
+[who may change the policy file](policy.md#who-may-change-the-policy-file) states. Whatever the cap, the
+size gate refuses a cap on `AGENTS.md` above the smallest harness's limit, Codex's `CODEX_MAX`.

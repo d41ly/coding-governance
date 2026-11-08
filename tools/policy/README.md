@@ -1,4 +1,4 @@
-<!-- gov:kit policy@1.3 -->
+<!-- gov:kit policy@1.4 -->
 # policy — one file for a repository's policy, and the catalogue that is its schema
 
 A repository's policy lives in ONE file, `.governance/policy.toml`, TOML 1.0, read through `tomllib`

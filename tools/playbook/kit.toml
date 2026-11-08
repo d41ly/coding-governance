@@ -48,6 +48,78 @@ root_relative = true
 role = "engine"
 to = "{prefix}/playbook/playbook.kit.toml"
 
+# EVERY FLAT ENTRY'S DESCRIPTOR TRAVELS TOO (PLAY-dOrderedCharter-6, the fork record's F8). The drive
+# section reads each selected kit's `[[drive]]` rows, and a flat entry has no kit directory to carry its
+# descriptor, so each lands beside the engine under its own file name, where the renderer looks first.
+# One rule per flat entry, whether or not it declares rows; `instruction_units.py drive --check` reds a
+# flat entry of the registry with no rule here.
+
+[[files]]
+include = ["{prefix}/govkit/entries/check-line-length.kit.toml"]
+root_relative = true
+role = "engine"
+to = "{prefix}/playbook/check-line-length.kit.toml"
+
+[[files]]
+include = ["{prefix}/govkit/entries/check-microformats.kit.toml"]
+root_relative = true
+role = "engine"
+to = "{prefix}/playbook/check-microformats.kit.toml"
+
+[[files]]
+include = ["{prefix}/govkit/entries/check-placeholders.kit.toml"]
+root_relative = true
+role = "engine"
+to = "{prefix}/playbook/check-placeholders.kit.toml"
+
+[[files]]
+include = ["{prefix}/govkit/entries/kickoff-manifest.kit.toml"]
+root_relative = true
+role = "engine"
+to = "{prefix}/playbook/kickoff-manifest.kit.toml"
+
+[[files]]
+include = ["{prefix}/govkit/entries/settings-merge.kit.toml"]
+root_relative = true
+role = "engine"
+to = "{prefix}/playbook/settings-merge.kit.toml"
+
+[[files]]
+include = ["{prefix}/govkit/entries/check-testsuite-counts.kit.toml"]
+root_relative = true
+role = "engine"
+to = "{prefix}/playbook/check-testsuite-counts.kit.toml"
+
+[[files]]
+include = ["{prefix}/govkit/entries/check-wiring.kit.toml"]
+root_relative = true
+role = "engine"
+to = "{prefix}/playbook/check-wiring.kit.toml"
+
+[[files]]
+include = ["{prefix}/govkit/entries/push-main.kit.toml"]
+root_relative = true
+role = "engine"
+to = "{prefix}/playbook/push-main.kit.toml"
+
+[[files]]
+include = ["{prefix}/govkit/entries/check-kit-versions.kit.toml"]
+root_relative = true
+role = "engine"
+to = "{prefix}/playbook/check-kit-versions.kit.toml"
+
+[[files]]
+include = ["{prefix}/govkit/entries/check-agent-cap-restatement.kit.toml"]
+root_relative = true
+role = "engine"
+to = "{prefix}/playbook/check-agent-cap-restatement.kit.toml"
+
+[[files]]
+include = ["{prefix}/govkit/entries/check-install-prefix.kit.toml"]
+root_relative = true
+role = "engine"
+to = "{prefix}/playbook/check-install-prefix.kit.toml"
+
 [[files]]
 include = ["{prefix}/govkit/registry.toml"]
 root_relative = true

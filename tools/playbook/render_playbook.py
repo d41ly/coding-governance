@@ -80,6 +80,12 @@ inside a line resolves as it would in the template. The active set is the policy
 the `foundation` set where that key is a derived default or no policy kit answers, less each row whose `kit`
 is not selected and each `drop_blocks` member naming a row. A template with no such line reads neither the
 catalogue nor the key.
+
+THE DRIVE LINES (PLAY-dOrderedCharter-6). A template's `{{DRIVE}}` line expands, before the placeholder set
+is collected, to `render_drive_line` per `[[drive]]` row of the selected kits' descriptors, in
+`read_drive_rows` order: `start` rows first, then the stage integer of the roles kit's workflow the row
+names, then kit and row order. A selection with no row drops the section, heading and region. A selected
+kit whose descriptor is found neither beside this engine nor at the registry's path refuses the render.
 """
 from __future__ import annotations
 
@@ -213,6 +219,11 @@ GEMINI_CONFIGURED_RE = re.compile(rf'"fileName"[^\S\n]*:[^\S\n]*(\[[^\S\n]*)?"{r
 IMPORT_LINE_RE = re.compile(rf'^@\.*/?([^/\n]*/)*{re.escape(CANON)}[^\S\n]*$', re.M)
 PARITY_GATE = 'check-playbook-parity.sh'
 PRACTICES_LINE_RE = re.compile(r'^[ \t]*\{\{PRACTICES\}\}[ \t]*$', re.M)
+# PLAY-dOrderedCharter-6: the drive section, one line per `[[drive]]` row of the selected kits' descriptors.
+DRIVE_LINE_RE = re.compile(r'^[ \t]*\{\{DRIVE\}\}[ \t]*$', re.M)
+DRIVE_HEADING = '## Drive — how to start and advance the loop'
+DRIVE_FIELDS = ('stage', 'role', 'command', 'when')
+DRIVE_START = 'start'
 # The policy kit's DERIVED_WHY, spelled again because a kit imports no sibling; the selftest runs the real reader.
 POLICY_DERIVED_LINE = 'a derived default no reader computes yet'
 
@@ -1234,6 +1245,67 @@ def render_practice_lines(catalogue: dict, target: Path, kits: set, cut: list, n
     return [f"- [{r['tag'].split('.', 1)[1]}] {r['line']}" for r in kept]
 
 
+def resolve_kit_descriptor(engine_dir: Path, spelled: str) -> Path | None:
+    """The descriptor a registry row's `descriptor` names, in this install, or None. A flat entry's, whose
+    file name is not `kit.toml`, beside this engine first, where the kit's `root_relative` rules ship it; a
+    dir kit's through `resolve_kit_dir`, its home the directory the registry names; then the registry's own
+    path under the tool root, this engine's parent, which is gov's tree."""
+    rel = spelled.split('}/', 1)[1] if spelled.startswith('{prefix}/') else spelled
+    name = rel.rsplit('/', 1)[-1]
+    if name != 'kit.toml' and (engine_dir / name).is_file():
+        return engine_dir / name
+    if name == 'kit.toml' and '/' in rel:
+        try:
+            return resolve_kit_dir(rel.rsplit('/', 2)[-2], name, engine_dir) / name
+        except LookupError:
+            pass
+    hit = engine_dir.parent / rel
+    return hit if rel and hit.is_file() else None
+
+
+def read_workflows(engine_dir: Path) -> list[dict]:
+    """The roles kit's `workflows.toml` rows, found as `derive_role_roster` finds that kit; [] with none."""
+    try:
+        kit = resolve_kit_dir('roles', 'workflows.toml', engine_dir)
+    except LookupError:
+        return []
+    return tomllib.loads(read_input(kit / 'workflows.toml', "the roles kit's workflow list")).get('workflow', [])
+
+
+def read_drive_rows(engine_dir: Path, kits: list[str]) -> list[dict]:
+    """Every `[[drive]]` row of the selected `kits`, each with its `kit` and its 1-based `row` there, in render order: `start` rows
+    first, then by the stage integer of the workflow the row names, then kit order and row order. A stage
+    no workflow names sorts last. A selected kit whose descriptor no place holds refuses, naming the kit."""
+    reg = tomllib.loads(read_input(resolve_declaration_paths(engine_dir, engine_dir)[1], 'the govkit registry'))
+    spelled = {e.get('id'): e.get('descriptor', '') for e in reg.get('entry', [])}
+    rows = []
+    for kit in kits:
+        path = resolve_kit_descriptor(engine_dir, spelled.get(kit, ''))
+        if path is None:
+            raise Refusal(f'the drive section reads every selected kit\'s descriptor, and the kit {kit} has '
+                          f'none beside this engine or at the registry\'s path {spelled.get(kit) or "(no row)"}')
+        desc = tomllib.loads(read_input(path, f'the descriptor of {kit}'))
+        rows += [{**r, 'kit': kit, 'row': n} for n, r in enumerate(desc.get('drive', []), 1) if isinstance(r, dict)]
+    stages = {w.get('name'): w.get('stage', 0) for w in read_workflows(engine_dir)}
+    last = max([s for s in stages.values() if isinstance(s, int)], default=0) + 1
+    return sorted(rows, key=lambda r: (r.get('stage') != DRIVE_START, stages.get(r.get('stage'), last)))
+
+
+def render_drive_line(row: dict) -> str:
+    """One drive row as the charter carries it: `- <stage> · <role> — <when>: `<command>``."""
+    return f"- {row.get('stage', '')} · {row.get('role', '')} — {row.get('when', '')}: `{row.get('command', '')}`"
+
+
+def remove_drive_section(text: str) -> str:
+    """`text` without the drive section: from its heading to the one-line region holding `{{DRIVE}}`,
+    with the blank line after it."""
+    m = DRIVE_LINE_RE.search(text)
+    head = text.rfind('\n## ', 0, m.start()) + 1
+    close = text.find(ONE_LINE_CLOSE, m.end())
+    end = m.end() if close < 0 else text.find('\n', close) + 1 or len(text)
+    return text[:head] + text[end + (text[end:end + 1] == '\n'):]
+
+
 def render(engine_dir: Path, gov_root: Path, target: Path,
            charter_path: Path | None = None, slots: list | None = None) -> tuple[str, list[str]]:
     desc, blocks, entries = load_declarations(*resolve_declaration_paths(engine_dir, gov_root))
@@ -1299,6 +1371,13 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
     if catalogue:
         text = PRACTICES_LINE_RE.sub(
             lambda _m: '\n'.join(render_practice_lines(catalogue, target, kits, cut, notes)), text, count=1)
+    if DRIVE_LINE_RE.search(text):
+        drive = [render_drive_line(r) for r in read_drive_rows(engine_dir, list(dict.fromkeys(cfg['kits'])))]
+        if drive:
+            text = DRIVE_LINE_RE.sub(lambda _m: '\n'.join(drive), text, count=1)
+        else:
+            text = remove_drive_section(text)
+            notes.append('drive     no selected kit declares a [[drive]] row, so the section is not rendered')
     if marker and not current:
         notes.append(f'legacy    template v{marker.group(1)}.{marker.group(2)} at '
                      f'{template.as_posix()} — this engine ships v{TEMPLATE_MAJOR}.x; reseed the '

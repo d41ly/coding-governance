@@ -216,6 +216,32 @@ mkfile 5001 "$S/AGENTS.md"
 expect_out "A2p a pinned subject refuses under warn, naming budgets.pinned" \
   "budgets.pinned names it" 1 run_gate_in AGENTS.md
 
+# --- A25 · the rendered charter's cap is held inside CODEX_MAX, under warn too (PLAY-dOrderedCharter-6) --
+# A scratch repository holding the gate's copy, the policy kit's copy, the file the census row
+# `codex-instructions` homes CODEX_MAX in, this repository's charter, a limits file with no AGENTS.md row
+# and a committed policy file setting the cap. The gate is the scratch copy, run by its own path, so the
+# limit is the scratch policy kit's answer; at 40960 it refuses naming CODEX_MAX, at 20480 it passes.
+S2="$TMP/charter-cap"
+_hl=$(awk '/^name = "codex-instructions"/{f=1} f && /^home = /{print; exit}' "${PFX}policy/caps.toml")
+_hp=${_hl#*constant:}; _hp=${_hp%:CODEX_MAX\"}; _hp=${_hp/\{prefix\}\//$PFX}
+build_cap_repo() {
+  rm -rf "$S2"
+  mkdir -p "$S2/${PFX}policy" "$S2/$(dirname "$_hp")" "$S2/.governance" || exit 2
+  cp -R "${PFX}policy/." "$S2/${PFX}policy/" && tr -d '\r' < "$GATE" > "$S2/$GATE" && cp "$_hp" "$S2/$_hp" \
+    && tr -d '\r' < AGENTS.md > "$S2/AGENTS.md" || { printf 'harness FAILED — could not copy the charter-cap repository\n'; exit 2; }
+  printf '# no AGENTS.md row\n' > "$S2/${PFX}template-size-limits.txt"
+  printf '[budgets]\nenforce = "warn"\n"AGENTS.md" = %s\n' "$1" > "$S2/.governance/policy.toml"
+  git -C "$S2" init -q && git -C "$S2" symbolic-ref HEAD refs/heads/main \
+    && git -C "$S2" add -A && git -C "$S2" -c user.name=t -c user.email=t@t.test -c commit.gpgsign=false commit -qm fixture \
+    || { printf 'harness FAILED — could not build the charter-cap repository\n'; exit 2; }
+}
+run_cap_gate() { (cd "$S2" && bash "$S2/$GATE" "$S2/AGENTS.md"); }
+build_cap_repo 40960
+expect_out "A25 a charter cap of 40960 under warn refuses naming CODEX_MAX" \
+  "the rendered charter's cap is not held inside the smallest harness's limit, CODEX_MAX" 1 run_cap_gate
+build_cap_repo 20480
+expect_out "A25b a charter cap of 20480 passes, the charter measured within it" "/ 20480 bytes" 0 run_cap_gate
+
 # --- A24 · no python launcher: an over-cap subject refuses at check 5 (TOOL-dGroundRules-25 S35) --
 # Every launcher name on PATH answers as the Microsoft Store stub does, exit 9009, and no override is
 # set, so no policy kit can read the declaration: the gate's `fail 5`, never a pass unmeasured.

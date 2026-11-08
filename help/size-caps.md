@@ -41,6 +41,11 @@ in one place.
   `<cap> <value> <mode> <source>`, tab-separated. `python tools/policy/budgets.py check AGENTS.md
   25000` prints the verdict line and exits 1 when it refuses. Both read the policy file **as
   committed at the landed revision**, as `policy.py get` does, never your working tree.
+- **Ask where a cap's value lives:** `budgets.py home codex-instructions`, run in the repository,
+  prints one row, `<cap> <home> <value>`, tab-separated: the census row's home as `caps.toml` spells
+  it, and for a `constant:` home the integer its file assigns, read from your working tree; `-` for
+  any other home. A cap with no census row, or a constant its file does not assign as an integer,
+  refuses with exit 2, naming the file. The size gate reads Codex's limit for the charter this way.
 
 ## Which caps sit outside the switch
 

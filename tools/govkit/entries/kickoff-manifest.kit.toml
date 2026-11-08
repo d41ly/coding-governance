@@ -98,3 +98,32 @@ installation is a copy. The ratchet is this entry's gate LEG and grading it from
 [[lf_pin]]
 pattern = "{user_skills}/session-kickoff/SKILL.md"
 why = "measured: 224 CR bytes under a gate that greps its text"
+
+# THE DRIVE ROWS (PLAY-dOrderedCharter-6): how a session starts or advances a stage this kit serves. The
+# playbook render composes one charter line per row of each selected kit, and the role's handoff carries
+# its own role's lines. `stage` names a workflow of the roles kit's workflows.toml, or `start`; `role` a
+# role slot, or `main` for the main session.
+
+[[drive]]
+stage = "start"
+role = "main"
+command = "/session-kickoff"
+when = "a new task from the owner"
+
+[[drive]]
+stage = "start"
+role = "main"
+command = "/session-kickoff"
+when = "a resumed or compacted session, which re-reads its card before it acts"
+
+[[drive]]
+stage = "start"
+role = "main"
+command = "/session-kickoff"
+when = "another harness without gov's hooks, which writes no card, so the kickoff runs by hand"
+
+[[drive]]
+stage = "orient"
+role = "gov-orienter"
+command = "/session-kickoff"
+when = "once per session, before the first unit opens"

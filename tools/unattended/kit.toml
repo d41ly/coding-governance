@@ -411,3 +411,14 @@ why = "an installed artifact both its adopter and check 10 byte-compare"
 [[lf_pin]]
 pattern = ".claude/skills/unattended/SKILL.md"
 why = "a rendered artifact its own gate byte-compares"
+
+# THE DRIVE ROWS (PLAY-dOrderedCharter-6): how a session starts or advances a stage this kit serves. The
+# playbook render composes one charter line per row of each selected kit, and the role's handoff carries
+# its own role's lines. `stage` names a workflow of the roles kit's workflows.toml, or `start`; `role` a
+# role slot, or `main` for the main session.
+
+[[drive]]
+stage = "start"
+role = "main"
+command = "/unattended"
+when = "a run that merges and pushes with no owner turn, started or resumed"

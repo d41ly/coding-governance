@@ -3791,6 +3791,36 @@ def run_budget_case(name):
     return print_checks(name, checks)
 
 
+# A planted census row whose `constant:` home names a fixture file, for `budgets-home`.
+HOME_ROW = ('\n[[cap]]\nname = "zz-home"\nclass = "consumer"\nunit = "bytes"\nenforcer = "{prefix}/zz/fixture.sh"\n'
+            'home = "constant:{prefix}/zz/fixture.sh:FIXTURE_MAX"\nfamily = false\nresearch = 0\nships = false\n')
+
+
+def run_budget_home(name):
+    """`budgets-home` (PLAY-dOrderedCharter-6 AC8): a census row whose `constant:` home names a fixture file
+    assigning FIXTURE_MAX=4096, then the same row over that file with no such line. `budgets.py home` prints
+    4096 in its value column the first time, and exits 2 naming the file the second."""
+    t, checks = Path(tempfile.mkdtemp(prefix="pol-")), []
+    try:
+        fixture = posixpath.join(budgets.derive_tool_root(), "zz", "fixture.sh")
+        census = (KIT / budgets.CENSUS).read_text(encoding="utf-8").replace("\r\n", "\n") + HOME_ROW
+        r = build_cap_repo(t / "r", {budgets.derive_kit_rel() + budgets.CENSUS: census,
+                                     fixture: "#!/bin/sh\nFIXTURE_MAX=4096\n"}, "warn")
+        home = [sys.executable, KIT / "budgets.py", "home", "zz-home"]
+        rc, out = run_case_argv(r, home)
+        checks.append(("a home assigning FIXTURE_MAX=4096", "exit 0 and 4096 in the value column",
+                       rc == 0 and out.strip().split("\t")[-1] == "4096", f"exit {rc} · {out.strip()}"))
+        write_case_file(r, fixture, "#!/bin/sh\n# no assignment of the key here\n")
+        rc, out = run_case_argv(r, home)
+        checks.append(("the same row, its file assigning nothing", f"exit 2 naming {fixture}",
+                       rc == 2 and fixture in out and "4096" not in out, f"exit {rc} · {out.strip()}"))
+    except (subprocess.CalledProcessError, OSError, policy.Refusal) as exc:
+        checks.append((name, "the fixture", False, f"{type(exc).__name__}: {getattr(exc, 'stderr', '') or exc}"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
 BUDGET_CASES = ("budgets-pinned-warn", "budgets-two-homes", "budgets-limits-reader", "budgets-census-join",
                 "budgets-switch-refuse", "budgets-no-kit", "budgets-correctness-kept", "budgets-zero-cap",
                 "budgets-reader-refused", "limits-reader-docstring", "budgets-unset-derived")
@@ -4449,6 +4479,7 @@ CASES = [
     *((c, ARM["arm_schema"], s) for c, s in BUDGET_SCHEMA_SEEDS.items()),  # the size switch's schema plants
     *((c, None, run_budget_case) for c in BUDGET_CASES),  # outcome cases: the size switch
     ("budgets-ships-join", None, run_ships_join),  # the census's ships flags against the registry's exemptions
+    ("budgets-home", None, run_budget_home),  # the home verb over a planted constant: home, and over one assigning nothing
     ("fixtures-guard-census", None, run_fixtures_guard_census),  # the census's enforcers inside this leg's guard
     ("census-adopter-receipt", None, run_census_adopter_receipt),  # the census graded at each row's installed path
     ("census-receiptless-target", None, run_budget_case),  # no receipt and no registry: every row announced

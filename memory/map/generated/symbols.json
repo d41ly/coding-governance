@@ -998,6 +998,36 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "arm_drive_bad_role",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_drive_empty_command",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_drive_hand_line",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_drive_lost_line",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_drive_no_row",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_drive_unshipped_descriptor",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_envelope_foreign_closer",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -2121,6 +2151,11 @@
       "id": "build_cache",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "build_cap_repo",
+      "kind": "function",
+      "file": "tools/check-template-size.test.sh"
     },
     {
       "id": "build_cap_repo",
@@ -4871,6 +4906,21 @@
       "id": "check_down_floor",
       "kind": "function",
       "file": "tools/lib/python_floor.py"
+    },
+    {
+      "id": "check_drive",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "check_drive_green",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "check_drive_red",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "check_edges",
@@ -10798,6 +10848,16 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "extract_drive_lines",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "extract_drive_region",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "extract_families",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
@@ -14338,11 +14398,6 @@
       "file": "tools/govkit/govkit.py"
     },
     {
-      "id": "plant_envelope_text",
-      "kind": "function",
-      "file": "tools/playbook/instruction_units.py"
-    },
-    {
       "id": "pop_guard",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.sh"
@@ -15588,6 +15643,11 @@
       "file": "tools/policy/budgets.py"
     },
     {
+      "id": "read_cap_home",
+      "kind": "function",
+      "file": "tools/policy/budgets.py"
+    },
+    {
       "id": "read_cap_modes",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.sh"
@@ -16071,6 +16131,16 @@
       "id": "read_drift_cell",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "read_drive",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "read_drive_rows",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "read_dump",
@@ -18953,6 +19023,11 @@
       "file": "tools/govkit/step_gate.py"
     },
     {
+      "id": "read_workflows",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "read_worksheet_design",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -19181,6 +19256,11 @@
       "id": "remove_descendants",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "remove_drive_section",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "remove_entry",
@@ -20006,6 +20086,11 @@
       "id": "render_drift_offenders",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "render_drive_line",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "render_driver_lines",
@@ -21446,6 +21531,11 @@
       "id": "resolve_kickoff_checker",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "resolve_kit_descriptor",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -23363,6 +23453,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_budget_home",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "run_bundle",
       "kind": "function",
       "file": "tools/playbook/tag_bundle.py"
@@ -23386,6 +23481,11 @@
       "id": "run_cap_case",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_cap_gate",
+      "kind": "function",
+      "file": "tools/check-template-size.test.sh"
     },
     {
       "id": "run_cap_mode",
@@ -23661,6 +23761,11 @@
       "id": "run_down_git",
       "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
+      "id": "run_drive",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "run_driver",
@@ -29803,6 +29908,16 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "write_drive_charter",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "write_drive_tree",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "write_edge_spec",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -29831,6 +29946,11 @@
       "id": "write_envelope",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "write_envelope_text",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "write_envelope_tree",

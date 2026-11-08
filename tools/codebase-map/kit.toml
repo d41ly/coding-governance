@@ -155,3 +155,14 @@ why = "symbols.json, inventories.json and MAP.md, regenerated from the tree on e
 write = ["python", "{kit}/gen_map.py", "--write"]
 check = ["python", "{kit}/gen_map.py", "--check"]
 stage = 3
+
+# THE DRIVE ROWS (PLAY-dOrderedCharter-6): how a session starts or advances a stage this kit serves. The
+# playbook render composes one charter line per row of each selected kit, and the role's handoff carries
+# its own role's lines. `stage` names a workflow of the roles kit's workflows.toml, or `start`; `role` a
+# role slot, or `main` for the main session.
+
+[[drive]]
+stage = "reuse"
+role = "gov-reuse-scout"
+command = 'python <prefix>/codebase-map/reuse_lookup.py "<behaviour>"'
+when = "a new behaviour about to be designed"

@@ -22,14 +22,15 @@
 # limits-path override retired with this script's own parse of the file, and a positional limit or
 # limits path is refused rather than ignored.
 #
-# Exit 0 = within budget, or a warned breach (prints one line). Exit 1 = over budget, refused.
-# Exit 2 = file missing, or a retired positional given.
+# Exit 0 = within budget, or a warned breach (prints one line). Exit 1 = over budget, refused, or
+#          the rendered charter's cap above the smallest harness's limit (check 8).
+# Exit 2 = file missing, or a retired positional given, or that limit's home unreadable (check 8).
 # Exit 3 = the high-water record exists but this subject's row is not a number.
 # Exit 4 = --bump could not write the high-water record.
 # Exit 5 = the DECLARED limit could not be read: a row that is not a number, a cap held in both
 #          homes, no policy kit beside this gate, or any other refusal of the policy reader.
 # Exit 6 = the subject states its own budget in prose and it disagrees with its declared row.
-# Checks 3, 5 and 6 are correctness, never size: they refuse under `warn` too.
+# Checks 3, 5, 6 and 8 are correctness, never size: they refuse under `warn` too.
 #
 # THAT LIST IS THE FULL SET OF DISTINCT FAIL_CODE VALUES this file assigns, and it is stated here
 # because a gate's own header is where a reader learns what its exit codes mean. It omitted 4 for as
@@ -330,6 +331,22 @@ IFS=$'\t' read -r _cap MAX_BYTES MODE SOURCE <<<"$budget"
 # A row of the census, or the policy file's value, is a DECLARATION; the handed-in default is not.
 declared=""
 [ "$SOURCE" = constant ] || declared=$MAX_BYTES
+
+# Check 8, beside the budget read (PLAY-dOrderedCharter-6 S6): the rendered charter's cap is held inside
+# the smallest harness's limit, Codex's CODEX_MAX, under either value of the switch: a correctness check,
+# as checks 3, 5 and 6 are. The limit is the census row's own, read by `budgets.py home codex-instructions`
+# in the repository the policy kit sits in, so a move of the constant re-points the row and this follows
+# it; nothing here types the value or reads the census. That verb's refusal refuses the check, exit 2.
+if [ "$key" = AGENTS.md ]; then
+  _kroot=$(unset GIT_DIR GIT_WORK_TREE; git -C "$_pk" rev-parse --show-toplevel 2>/dev/null) || _kroot=$ROOT
+  _home=$(cd "$_kroot" && "$_py" "$_pk/budgets.py" home codex-instructions 2>&1); _hrc=$?
+  IFS=$'\t' read -r _ _ CODEX_MAX <<<"${_home%$'\r'}"
+  CODEX_MAX=${CODEX_MAX%$'\r'}
+  if [ "$_hrc" != 0 ] || ! [[ $CODEX_MAX =~ ^[0-9]+$ ]] || [ "$MAX_BYTES" -gt "$CODEX_MAX" ]; then
+    FAIL_CODE=1; [ "$_hrc" = 2 ] && FAIL_CODE=2
+    fail 8 "the rendered charter's cap is not held inside the smallest harness's limit, CODEX_MAX: $_name's cap is $MAX_BYTES (source $SOURCE), and budgets.py home codex-instructions answered '${_home%%$'\n'*}' (exit $_hrc). Lower the cap to CODEX_MAX or under; a harness reading less than the charter drops its tail."
+  fi
+fi
 
 # The high-water record, resolved three ways — positional $3, then the environment, then the
 # tracked default — because a gate leg cannot set an environment variable and the self-test must

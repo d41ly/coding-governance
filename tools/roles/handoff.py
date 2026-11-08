@@ -11,7 +11,8 @@
     python handoff.py agents (--handoff <path> | --run <run-id>) [--session <file>] [--write]
 
 `render` fills the work-order template, `templates/work-order.template.md` in this kit, whose slots are
-`role`, `roles_lib.render_role`'s output; `opening`; `reads`, a block per input the role's `reads`
+`role`, `roles_lib.render_role`'s output, then a `### Drive` block holding the charter's drive lines for the
+role where it has any (PLAY-dOrderedCharter-6); `opening`; `reads`, a block per input the role's `reads`
 declares, in that order; and `charter-blocks`, `roles_lib.render_charter_blocks` for the role: the
 section 1 rule lines its `rules` tags cite and the charter's carried sections (TOOL-aOrientedCast-16),
 each library note printed on stderr as `handoff: note — `. A slot with nothing to fill leaves no line.
@@ -114,6 +115,10 @@ BRIEF_HEAD_RE = re.compile(r"^## The brief[ \t]*$", re.M)
 # ponytail: the playbook's one-line region refuses a rendered rule past 200 characters; spelled
 # again because a kit file may not import a sibling kit. A drift fails closed either way.
 ROSTER_LINE_MAX = 200
+#: The charter's drive section and its line, `- <stage> · <role> — <when>: `<command>``, as the playbook kit
+#: renders them; a kit imports no sibling, so the heading's opening is spelled again here.
+DRIVE_HEAD = "## Drive — "
+DRIVE_LINE_RE = re.compile(r"^- \S+ · (\S+) — ")
 #: `agents` (TOOL-aOrientedCast-20): the ledger's file-name tail, the value of a field nothing
 #: answers, and the tool uses whose paths a `returned` line counts as written.
 LEDGER_TAIL = "-agent-ledger.md"
@@ -333,6 +338,19 @@ def render_work_order(fills):
     return render_section(text[:task.start()]) + "\n\n", render_section(text[task.start():]) + "\n"
 
 
+def extract_drive_lines(text, role):
+    """The charter's drive lines whose role is `role`: each `- <stage> · <role> — ` line of the section the
+    drive heading opens, as the playbook render composed it from the selected kits' `[[drive]]` rows
+    (PLAY-dOrderedCharter-6), so a subagent holds its role's lines as the main session does."""
+    out, inside = [], False
+    for line in text.replace("\r\n", "\n").split("\n"):
+        if line.startswith("## "):
+            inside = line.startswith(DRIVE_HEAD)
+        elif inside and DRIVE_LINE_RE.match(line) and DRIVE_LINE_RE.match(line).group(1) == role:
+            out.append(line.rstrip())
+    return out
+
+
 def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card_arg, inputs, out_path,
                    notes=None, tail=""):
     """`(path, text, task_part)` of the prompt file; raises RolesError naming every key that refused.
@@ -419,7 +437,8 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
             absent.append(key)
             reasons += [what] if why.get(src) and what not in reasons else []
     doc = charter_path.relative_to(root).as_posix() if root in charter_path.parents else charter_path.as_posix()
-    charter = lib.parse_charter(lib.load_text(charter_path), doc)
+    charter_text = lib.load_text(charter_path)
+    charter = lib.parse_charter(charter_text, doc)
     if charter["shape"] == "legacy" and notes is not None:
         notes.append(lib.LEGACY_NOTE % doc)
     try:
@@ -434,8 +453,10 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     if absent:
         opening += "\nNot supplied, optional: %s%s." % (
             ", ".join("`%s`" % k for k in absent), " — " + "; ".join(reasons) if reasons else "")
+    drive = extract_drive_lines(charter_text, role)
     role_sec, task_sec = render_work_order({
-        "role": lib.render_role(KIT_DIR, role, memory_root).strip("\n"), "opening": opening,
+        "role": lib.render_role(KIT_DIR, role, memory_root).strip("\n")
+        + ("\n\n### Drive\n\n" + "\n".join(drive) if drive else ""), "opening": opening,
         "reads": "\n\n".join(blocks), "charter-blocks": charter_blocks.rstrip("\n")})
     path = out_path or build_dir / "prompts" / derive_prompt_name(
         build_dir / "prompts", datetime.date.today().isoformat(), unit_id, role, tail)

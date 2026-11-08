@@ -128,6 +128,12 @@ gate or protocol named in section 3 carries the detail.*
 <!-- /one-line -->
 
 <!-- /kit:roles -->
+## Drive — how to start and advance the loop
+
+<!-- one-line -->
+{{DRIVE}}
+<!-- /one-line -->
+
 ## Protocols — read the one whose trigger holds
 
 <!-- one-line -->
