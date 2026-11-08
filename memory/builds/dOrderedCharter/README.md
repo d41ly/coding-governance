@@ -156,7 +156,7 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-41 — the `cross-os` block stays live, so every v4 template renders after the practice catalogue lands](spec/2026-10-24-spec-PLAY-dOrderedCharter-41.md) | 18 | 2 | CLOSED | rev-6 | 2026-11-08 |
 | [PLAY-dOrderedCharter-52 — the TOML-table merge envelope is total: every base, ours and theirs state has a row, and an unlisted one is a conflict](spec/2026-10-24-spec-PLAY-dOrderedCharter-52.md) | 18 | 2 | CLOSED | rev-3 | 2026-11-08 |
 | [PLAY-dOrderedCharter-6 — the drive section composed from each adopted kit's drive table, and the charter held inside 32 KiB](spec/2026-10-23-spec-PLAY-dOrderedCharter-6.md) | 19 | 2 | CLOSED | rev-10 | 2026-11-08 |
-| [PLAY-dOrderedCharter-2 — the charter re-founded in its level-0 envelope, with the override rule and its record](spec/2026-10-23-spec-PLAY-dOrderedCharter-2.md) | 20 | 2 | DEFERRED | rev-9 | 2026-11-08 |
+| [PLAY-dOrderedCharter-2 — the charter re-founded in its level-0 envelope, with the override rule and its record](spec/2026-10-23-spec-PLAY-dOrderedCharter-2.md) | 20 | 2 | DEFERRED | rev-10 | 2026-11-08 |
 | [PLAY-dOrderedCharter-11 — load sets derived per reader and item, budgeted, and refused when a required unit is missing](spec/2026-10-23-spec-PLAY-dOrderedCharter-11.md) | 21 | 2 | DEFERRED | rev-9 | 2026-11-08 |
 | [PLAY-dOrderedCharter-27 — each role's load set budgeting the `code` slot](spec/2026-10-23-spec-PLAY-dOrderedCharter-27.md) | 22 | 2 | DEFERRED | rev-6 | 2026-11-08 |
 | [PLAY-dOrderedCharter-21 — each practice's reach per step rendered as step-scoped units handed in work orders](spec/2026-10-23-spec-PLAY-dOrderedCharter-21.md) | 23 | 2 | DEFERRED | rev-4 | 2026-11-08 |
