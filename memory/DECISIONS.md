@@ -11,7 +11,7 @@
 - **PLAY-dDerivedDocket-1** — **attended landings keep local-main-first; an unattended run lands by its protocol's rule** (owner, D12-i3). §6's backlog bullet points at the memory tree's status rule, true in both modes. Detail `builds/dDerivedDocket/`. — _2026-09-28, `d`_
 - PLAY-aOrientedCast-3 · `AGENTS.md` ceiling 16384->20480 (owner, 2026-10-13): the agent and returned micro-formats put the charter at 16729; 20 KiB leaves room for more roles and rules without another owner turn soon, still 62% of the 32768 bytes Codex reads.
 - **PLAY-dOrderedCharter-3** - **its envelopes raise two no-headroom size rows to their renders' measured bytes, `memory/guides/UNATTENDED-PROTOCOL.md` and `.claude/skills/unattended/SKILL.md`**: agent, 2026-11-08, on the limits file's four raise terms. Detail `builds/dOrderedCharter/`.
-- **PLAY-dOrderedCharter-2** - **the re-founded charter raises the `AGENTS.md` size row to its render's measured bytes, at or under the 32768 Codex reads**: agent, 2026-11-08, on the limits file's four raise terms; the principle lines alone take 1875 bytes where 1283 were left under 20480, and the pass measured 23161. Detail `builds/dOrderedCharter/`.
+- **PLAY-dOrderedCharter-2** - **the re-founded charter raises the `AGENTS.md` size row 20480 -> 23161, its render's measured bytes, under the 32768 Codex reads**: agent, 2026-11-08, on the limits file's raise terms. Detail `builds/dOrderedCharter/`.
 
 ## KICK — kickoff
 

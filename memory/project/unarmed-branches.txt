@@ -190,3 +190,4 @@ tools/branch-reconcile/adopt-branch-reconcile.sh	exit	2	check_old_render || exit
 tools/playbook/adopt-playbook.sh	exit	1	layer-check arm(s) failed	no sibling suite: tools/playbook/adopt-playbook.test.sh does not exist, and the site is the selftest's own tally, taken whenever a plant row above it fails; the playbook render selftest leg runs
 tools/playbook/adopt-playbook.sh	exit	1	tag-resolver arm(s) failed	the same reason, for the tag resolver's plant rows
 tools/playbook/adopt-playbook.sh	exit	1	edge-grammar arm(s) failed	the same reason, for the edge grammar's plant rows
+tools/playbook/adopt-playbook.sh	exit	1	load-set arm(s) failed	the same reason, for the load set's plant rows
