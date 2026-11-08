@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-6 — the drive section composed from each adopted kit's drive table, and the charter held inside 32 KiB
 
-**Status:** DEFERRED · rev-8 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 19 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-9 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 19 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0036@3667f2f3 whole
 
@@ -70,8 +70,13 @@ F1-6, F1-7; v2:961-965 P15).
   is a line there. Each failure names the kit and the row. Its plants are cases of unit 9's
   `instruction_units.py fixture --plant` entry, `drive-bad-role`, `drive-no-row`, `drive-empty-command`,
   `drive-hand-line` and `drive-lost-line`, each joining `tools/playbook/instruction_units.py#PLANTS`, so
-  the `instruction units selftest` leg runs it through its bare `fixture` verb (the fork record's F6). Observed by AC3 and AC4.
-- **S5** — The role line in the handoff. `render_handoff` (`tools/roles/handoff.py:312`) adds the
+  the `instruction units selftest` leg runs it through its bare `fixture` verb (the fork record's F6). The
+  check finds `workflows.toml` through the roles kit's directory, and the plants lay their scratch tree out
+  at the install's layout through `tools/playbook/instruction_units.py#derive_tool_rel` and
+  `tools/playbook/instruction_units.py#derive_kit_rel`, so no line of the playbook kit spells a kit path,
+  which the shipped-surface ban reds since unit 72. Observed by AC3 and AC4.
+- **S5** — The role line in the handoff. `render_handoff` (`tools/roles/handoff.py:312`, now
+  `tools/roles/handoff.py#render_handoff`) adds the
   role's drive lines under a `### Drive` heading at the end of the `## Role` section, from the same
   rows, so a subagent holds its role's line as the main session does. Observed by AC5.
 - **S6** — The charter inside 32 KiB. `tools/check-template-size.sh` gains a check, numbered 8 after
@@ -287,7 +292,7 @@ in its row of `tools/template-size-limits.txt`, on the four conditions that file
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `playbook parity` · `policy check` · `policy fixtures` · `kit version markers` · `charter size` · `template size <=48KiB` · `template size gate selftest` · `roles render wiring` · `roles render selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `instruction units selftest`
+`playbook render selftest` · `playbook render wiring` · `playbook parity` · `policy check` · `policy fixtures` · `kit version markers` · `charter size` · `template size <=48KiB` · `template size gate selftest` · `roles render wiring` · `roles render selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `instruction units selftest` · `build-index selftest` · `gotchas selftest` · `memory-recall kit selftest` · `recall floor`
 
 New arm: tools/policy/check_policy.py --fixture · covers AC8 · the `budgets-home` case plants a `constant:` home with its assignment line and one without · none
 New arm: tools/check-template-size.test.sh · covers AC6 · a scratch repository whose committed policy file sets the charter's cap above the harness limit · none
@@ -379,6 +384,11 @@ New arm: tools/playbook/instruction_units.py · covers AC3 AC4 · the `drive-bad
   S6 gains its Readers clause, which says it retires nothing; a records fix, so the status line keeps its rev.
 - rev-7 · 2026-11-04 · S4 · section 3 Edges · section 4 Inventory, Files touched · AC6 · section 7 · the fork record's F6 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-20-3-sweep-fix-brief.md` items 2 and 3: the drive cases join `PLANTS` and ride unit 20's `instruction units selftest` leg, `run_plant_rows` keeps two arguments and `adopt-playbook.sh` leaves the write set, F6 re-resolved to (e); AC6 names `resolve_caps` beside the plain path.
 - rev-8 · 2026-11-04 · section 3 Non-goals · section 4 Migration and Files touched · AC2 AC6 · from `2026-11-04-prompt-PLAY-dOrderedCharter-41-neighbour-fold-brief.md` item 6 and its whole-spec read against specs 1 and 3 at rev-8: the wiring guide's correction is `PLAY-dOrderedCharter-41` S5, not this unit's, so section 3 says so and the Files touched do not gain that file; Migration no longer claims a note on a minor behind; the re-render's lock row joins the Files touched; AC2 and AC6 commit their scratch repositories on `main`, which unit 1's F7 and the landed-revision read need.
+- rev-9 · 2026-11-08 · S4 S5 · section 7 · from `2026-11-08-prompt-PLAY-dOrderedCharter-3-drift-fold-brief.md`:
+  re-read at `550ea807a`. The leg line gains `build-index selftest`, `gotchas selftest`,
+  `memory-recall kit selftest` and `recall floor`, whose guards unit 67 widened to `tools/policy/budgets.py`
+  and `tools/policy/policy.py`, both in the Files touched; S4's check and plants spell no kit path, as the
+  shipped-surface ban requires since unit 72; S5 names `render_handoff` by symbol, its line having moved.
 
 ## 10. Reuse audit
 

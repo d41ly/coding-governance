@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-2 — the charter re-founded in its level-0 envelope, with the override rule and its record
 
-**Status:** DEFERRED · rev-8 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 20 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-9 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 20 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0032@e38b0cb6 whole
 **Carries:** node:policy-key.charter.override
@@ -37,7 +37,8 @@
 The charter is numbered sections under a provenance paragraph (`coding-governance-agents.template.md:3-11`,
 `:91`, `:97`), with no precedence rule, no rule for a live instruction that conflicts with it
 (gap-found-04), no ranking of the decision principles above the practices (gap-flow-02), and an `up —`
-micro-format that asks for a password (gap-found-18, template:64). This unit re-founds the charter
+micro-format that asks for a password (gap-found-18, template:64 at base, and after unit 1 still the
+`up —` line of the template's micro-formats block). This unit re-founds the charter
 inside its level-0 envelope in v2's front-door order (v2:1092-1105, layer-instruction R-B), adds the
 override rule under `charter.override` with its record (foundations F1-1, the owner's FK-1-1), rewrites
 `up —` to name where a credential lives, and re-points every reader of the charter's section numbers to
@@ -95,7 +96,10 @@ C1-F11, C1-F12).
   `hold` renders no such line. It is rendered by
   `render_instruction_map` in `tools/playbook/instruction_units.py`, the one function the replay also
   calls. That branch lasts as long as the hold: the one commit `PLAY-dOrderedCharter-3` S9 names takes it
-  with the field and re-renders the charter. Observed by AC1 and AC9.
+  with the field and re-renders the charter. The function finds the registry through
+  `tools/playbook/instruction_units.py#derive_kit_file`, and the `map-held` plant lays its scratch tree
+  out through `tools/playbook/instruction_units.py#derive_tool_rel`, so neither spells a kit path, which
+  the shipped-surface ban reds since unit 72. Observed by AC1 and AC9.
 - **S4** — The override record, a kind of S12's factory, `tools/memory-tree/build_records.py`:
   `<date>-build-<unit id>-override-<n>.md` in the building build's `build/` folder, as a deviation
   record is kept, with `**Serves:** override <unit id>` and the fields `Rule` (the tag set aside),
@@ -105,7 +109,11 @@ C1-F11, C1-F12).
   --words <text>`, run by the session's agent for the recording session's commit, as `charter.override`
   admits: the writer refuses under `absolute`, and refuses a record with a field missing or empty. The
   writer is a stand-in door memory-plan `[doors]` lists, added to that list until dTotalRecall's record
-  door adopts it. Observed by AC3.
+  door adopts it. In the tree that list is `DOORS` in `tools/memory-tree/build_records.py`, which holds
+  the exception and change kinds at `550ea807a`, and `override` joins it. The kind's row in that
+  module's `KINDS` holds a declared-pending entry naming this unit, and takes the fields above in its
+  place; the typed-kind tuple in `tools/memory-tree/tree_lib.py` already names `override`. Observed by
+  AC3.
 - **S5** — The `up —` micro-format names where a credential lives and never asks its value:
   `up — <service> :<port> · <tree> · admin <user> · creds in <where-they-live>`. A new check in
   `tools/check-microformats.sh` refuses a definition field whose head is a credential word (`pw`,
@@ -437,6 +445,16 @@ New arm: tools/playbook/instruction_units.py · covers AC9 · the `map-held` `PL
   refused. The cost: a committed policy file in such an install goes unread, and the note is the one
   sign. widens: none · relaxes: none
 
+  Re-read at `550ea807a`. `PLAY-dOrderedCharter-73`'s F1 parks the same dependency with the owner: its
+  option (a) has `tools/playbook/kit.toml` require the memory-tree and policy kits, which is this fork's
+  (c), and until the ruling the acceptance matrix leg is red, because its scratch install holds no
+  memory-tree kit and the playbook render selftest dies in `tools/playbook/check_layers.py` before any
+  arm runs. This fork's mark is unchanged and holds at `HEAD`, where that install still holds no policy
+  kit. Two things wait on the owner's ruling and are not this unit's to settle: if the policy kit
+  becomes required, the matrix's install no longer stages AC2's no-policy-kit case and the branch above
+  is reached by no valid install; and until the ruling, the matrix cannot run the render selftest's
+  `unarmed` half that section 7's arm names.
+
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
@@ -459,6 +477,15 @@ New arm: tools/playbook/instruction_units.py · covers AC9 · the `map-held` `PL
   on `tools/template-size-limits.txt`, still tracked, the dSafePassage edge replaced by one naming it.
 - rev-7 · 2026-11-04 · AC7 · from `2026-11-04-prompt-PLAY-dOrderedCharter-20-3-sweep-fix-brief.md` item 3: AC7 reads the limits file at HEAD with the plain path as its own token.
 - rev-8 · 2026-11-04 · S2 S3 S9 · section 3 Edges · section 4 Inventory, Migration, Rollout and Files touched · section 5 · AC1 AC2, new AC9 · section 7 · section 8 new F5 F6 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-41-neighbour-fold-brief.md` item 2 and its whole-spec read against specs 1 and 3 at rev-8: S3's map renders a `held —` line from the row's `hold`, so a held document reads at its level and S2's sentence stays P13's (F5); a read with no policy kit takes the default, as unit 1's F6 does, where S2 refused (F6); AC2 commits its targets on `main`; the re-render's lock row and `TEMPLATE_MAJOR = 5` join the write set and the Inventory, since the major-only rule and the parity pair need the constant to move with the marker.
+- rev-9 · 2026-11-08 · section 1 · S3 S4 · section 8 F6 · section 10 · from
+  `2026-11-08-prompt-PLAY-dOrderedCharter-3-drift-fold-brief.md`: re-read at `550ea807a` after units 1,
+  45 and 67 to 73 landed. S4 names the factory's in-tree doors list and the pending `override` row unit 7 left
+  for this unit; S3's map and its plant derive their paths, as the shipped-surface ban requires since
+  unit 72; the reuse audit names unit 1's no-policy-kit precedent, `render_practice_lines`; F6 records,
+  mark unchanged, that unit 73's parked F1 is the same dependency, and what waits on the owner's ruling.
+  Re-checked unchanged: AC5's grep still finds 28 hits, every one S6 lists; `charter.override` is still
+  on the shrink-only list with a literal default; the lock's charter row names `v4.5`; `AGENTS.md` holds
+  16696 bytes, 3784 free of 20480.
 
 ## 10. Reuse audit
 
@@ -481,7 +508,9 @@ fan-in 102), a name-token match that is no seam for this. Scout A's row cites
 `tools/workflows/drift-audit-code.js:34,49`, now `tools/workflows/drift-audit-code.js@c7269a97:35` and
 its line 50; the edit is to its `.template.js` source, which carries the same lines. The `held —` line
 joins `render_instruction_map`, reading the `hold` field `read_document_registry` validates, and the
-no-policy-kit default follows `tools/playbook/render_playbook.py#read_one_line_cap` as unit 1's does.
+no-policy-kit default follows `tools/playbook/render_playbook.py#render_practice_lines`, unit 1's, which
+takes the `foundation` set on a `PolicyRefused` whose line opens `no policy kit found`, and
+`tools/playbook/render_playbook.py#read_one_line_cap`, an earlier reader with the same posture.
 `python tools/codebase-map/reuse_lookup.py "state in the charter how an unenveloped registered document reads"`
 ranked `read_text`, `read` and `read_bytes`, name-stem matches none of which states a level, so the map
 function is the seam and the lookup offers no other.

@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-11 — load sets derived per reader and item, budgeted, and refused when a required unit is missing
 
-**Status:** DEFERRED · rev-8 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 21 · closes PLAY-dOrderedCharter-57 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-9 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 21 · closes PLAY-dOrderedCharter-57 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0041@29cae3c8 whole
 **Carries:** node:policy-key.instructions.checks
@@ -105,13 +105,19 @@ audit's C1-F1 and C1-F14).
   move unit 31 makes re-points the row and this read with it, and this unit never parses that row. A set over it is refused whatever the mode
   (R-C). A load point with no census row prints `no cap declared`, never a pass; on `budgets.py`'s
   exit 2 the render refuses printing the reader's line, and with no policy kit found the budget check
-  prints `unarmed` naming it (§8 F4). Observed by AC4.
-- **S4** — The render calls. `render_handoff` (`tools/roles/handoff.py:312`) and `render_agent_file`
+  prints `unarmed` naming it (§8 F4). The subprocess keeps the script and its verb as separate list
+  elements, and no line of the module outside a comment spells the budgets script's name followed by a
+  space and its verb: the policy check's cap census reads that sequence as a request and every word after
+  it as a cap, which is how unit 73 found 30 English words requested in `tools/run-gates/owed_rows.py`.
+  Observed by AC4.
+- **S4** — The render calls. `render_handoff` (`tools/roles/handoff.py:312`, now
+  `tools/roles/handoff.py#render_handoff`) and `render_agent_file`
   (`tools/roles/render_agents.py:144`) derive the role's load set and run S2 and S3 before writing;
   `render()` (`tools/playbook/render_playbook.py:979`, now `tools/playbook/render_playbook.py#render`)
   runs S3 over the charter. The roles kit finds
   `load_sets.py` through `resolve_kit_dir` and runs its `check` verb as a subprocess, as
-  `derive_role_roster` finds and runs the roles kit's `roster` verb (`render_playbook.py:470-500`),
+  `derive_role_roster` finds and runs the roles kit's `roster` verb (`render_playbook.py:470-500`, now
+  `tools/playbook/render_playbook.py#derive_role_roster`),
   since a kit may not import a sibling kit (TOOL-dGroundRules-1 §4 Evidence); with the playbook kit
   absent the check prints `unarmed` and the render proceeds. Observed by AC2.
 - **S5** — The injected load points, measured. `python tools/playbook/load_sets.py injected` prints one
@@ -186,6 +192,14 @@ Two commits. The first lands the unit with the row's fill and the list's drain. 
 catalogue's blob id and the fill stales it (TOOL-dGroundRules-5 S1), and the guard admits a mirror
 commit only when the policy file and the catalogue equal HEAD (TOOL-dGroundRules-19 S1).
 
+The plants' rows in `tools/playbook/adopt-playbook.sh` close with their own tally, a fourth refusal
+site after a plant loop beside the layer check's, the tag resolver's and the edge grammar's. The
+check that every fail branch is armed or pinned reads each such site as unarmed, and no sibling suite
+stages a failing row, so the main loop writes its row in `memory/project/unarmed-branches.txt` in the
+second row shape, with the reason the three rows unit 73 named give. The module and its plants spell no
+kit path, deriving each from the module's own location as `tools/playbook/instruction_units.py#derive_tool_rel`
+does, because the shipped-surface ban reds a literal one since unit 72.
+
 ### Files touched (estimate)
 
 - `tools/playbook/load_sets.py`
@@ -255,7 +269,7 @@ commit only when the policy file and the catalogue equal HEAD (TOOL-dGroundRules
   figure: the bytes are DERIVED on each run.
 - **AC6** — When `python "tools/policy/policy.py" lists --check` runs after the first commit, it exits 0;
   `git grep -n -x -F "instructions.checks" -- "tools/policy/unsummarised-keys.txt"` finds no line; and
-  `git grep -n -F '("instructions.checks"' -- tools/playbook/load_sets.py` finds one line.
+  `git grep -n -F '("instructions.checks"' -- tools/playbook/` finds one line, in the new module.
   Red when: the row keeps no summary or usage, the name stays on the shrink-only list, or the key is
   read in a shape the reader-coverage arm does not count.
 - **AC7** — When `python -c` calls `load_sets.derive_load_set` with `features=("feature.roles",)` over a
@@ -291,7 +305,8 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC5 · a fixtur
   none
 - **F3 — Which harness limit applies per load point.** R-K gives harness limits to dWellOiledMachine's
   adapters. Options: (a) Codex's `CODEX_MAX` for the charter alone, read from
-  `tools/agent-instructions/adopt-agent-instructions.sh:31`; (b) wait for the adapters. RESOLVED (agent,
+  `tools/agent-instructions/adopt-agent-instructions.sh:31`, now
+  `tools/agent-instructions/adopt-agent-instructions.sh#CODEX_MAX`; (b) wait for the adapters. RESOLVED (agent,
   2026-10-23, delegated): (a), rung 3; it is the one harness limit the tree measures today (C1-F14's
   fix plants it), and the adapters add theirs as they land. widens: none · relaxes: none
 - **F4 — What the checks do when a policy reader cannot answer.** `policy.py get` and `budgets.py
@@ -303,6 +318,9 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC5 · a fixtur
   render of an adopter that has not installed a kit nothing else requires; TOOL-dGroundRules-9 §8 F4
   rules out both for its own enforcers. RESOLVED (agent, 2026-10-24, delegated): (a), rung 1, that
   fork's (a): a missing reader never loosens a refusal, and says so once. widens: none · relaxes: none
+  Re-read at `550ea807a`: whether `tools/playbook/kit.toml` requires the policy kit is
+  `PLAY-dOrderedCharter-73`'s F1, parked with the owner. This mark holds while nothing requires it; a
+  ruling that does leaves the `unarmed` branch reached by no valid install, and is not this unit's.
 - **F5 — How the role part selects while no `role` namespace is registered.** S1 and AC1 to AC3 select
   by `role.<name>`, and a `required-by` names `role.gov-builder`; at `c7269a97`
   `tools/playbook/namespaces.toml` registers no `role` row, `tools/playbook/readers.toml` holds only
@@ -345,10 +363,19 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC5 · a fixtur
   `run_plant_rows`; anchors written as symbols beside each listed citation; S3, the Edges and the
   reuse audit re-ground on `tools/template-size-limits.txt`, still tracked.
 - rev-8 · 2026-11-04 · AC7 · from `2026-11-04-prompt-PLAY-dOrderedCharter-20-3-sweep-fix-brief.md` item 3: AC7 names `REGISTRY_FIELDS` beside the plain path.
+- rev-9 · 2026-11-08 · S3 S4 · section 4 Rollout · AC6 · section 8 F3 F4 · section 10 · from
+  `2026-11-08-prompt-PLAY-dOrderedCharter-3-drift-fold-brief.md`: re-read at `550ea807a`. AC6's grep
+  reads the kit directory, the new module not being tracked yet; S3 keeps the budgets script and its
+  verb apart, as unit 73 found the cap census requires; the Rollout names the plant tally's pinned row
+  and the shipped-surface ban unit 72 left; moved anchors in S4, F3 and the reuse audit gain their
+  symbols; F4 notes, mark unchanged, that unit 73's parked F1 decides whether the policy kit is
+  required. Re-checked unchanged: no `role` or `feature` namespace row, `instructions.checks` still on the
+  shrink-only list, and `PolicyRefused` raised on the reader's exit 2 and with no policy kit found.
 
 ## 10. Reuse audit
 
-The seams extended: `render_handoff`'s `reads` walk (`tools/roles/handoff.py:337-396`), where a
+The seams extended: `render_handoff`'s `reads` walk (`tools/roles/handoff.py:337-396`, now inside
+`tools/roles/handoff.py#render_handoff`), where a
 handoff's blocks are assembled and where the load set joins; `BODY_CEILINGS`
 (`tools/roles/check_roles.py:85-89`, now `tools/roles/check_roles.py#BODY_CEILINGS`), the role
 block's one carrier, read and not copied; the policy kit's one cap reader, `budgets.py resolve`

@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them
 
-**Status:** DEFERRED · rev-9 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-10 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0033@756303be whole
 
@@ -53,7 +53,13 @@ rules on its row (S9, F5): the gate names it as not checked on every run and nev
   `tools/playbook/instruction_units.py`), `direction` (one line, no `]`), and `source` (the file the
   envelope is written from). A `path` may hold one `*` segment, so the role agent files and the Skills
   are each one row, every file the glob matches enveloped alike. Paths spell the adopter's roots through
-  `{memory_root}` and `{prefix}`, resolved at read as govkit's descriptors resolve `{prefix}`. The
+  `{memory_root}` and `{prefix}`, resolved at read by the kit's own readers, as
+  `tools/playbook/instruction_units.py#run_ladder_terms` resolves its sources: `{prefix}` first, through
+  the inline `resolve_prefix_token` of `tools/playbook/tag_index.py` against
+  `tools/playbook/instruction_units.py#derive_kit_prefix`, then `{memory_root}` from
+  `tools/playbook/instruction_units.py#derive_instruction_tokens`. The registry itself is found through
+  `tools/playbook/instruction_units.py#derive_kit_file`, so no line of the kit spells a kit path, which the
+  shipped-surface ban reds since unit 72. The
   reader is `read_document_registry` in `tools/playbook/instruction_units.py`. A row for the charter or
   a guide carries the tag the `doc` namespace already derives for that file, `doc.charter` or
   `doc.<file stem, lower-cased>` (`PLAY-dOrderedCharter-19` S3); the class rows for Skills, path rules
@@ -65,7 +71,8 @@ rules on its row (S9, F5): the gate names it as not checked on every run and nev
   field off its own row (`tools/playbook/tag_index.py#check_namespace_purpose`, through
   `tools/playbook/tag_index.py#read_toml_field`), so a class tag with no `h1` reds on the first tags run.
   A charter or guide row carries none, its file's own `# ` line being its purpose. The `doc` row's
-  `source` text (`tools/playbook/namespaces.toml@c7269a97:17`) gains this registry's rows. A row may also
+  `source` text (`tools/playbook/namespaces.toml@c7269a97:17`) gains this registry's rows, spelled
+  `{prefix}/playbook/documents.toml`, the tool-root token every path of that file takes since unit 72. A row may also
   carry `hold`, S9's field, which the reader validates. Observed by AC1 and AC12.
 - **S2** — The seeded rows (§4 Inventory): the charter at level 0, every guide under
   `{memory_root}/guides/`, `TEMPLATE-SPEC.md` and `HYGIENE.md` at level 3, every Skill and path rule
@@ -75,7 +82,9 @@ rules on its row (S9, F5): the gate names it as not checked on every run and nev
   canonically in `tools/lib/envelope.py`, and are carried inline, byte-identical, as a
   `# >>> render_envelope — canonical copy` block in `tools/playbook/render_playbook.py` and
   `tools/roles/roles_lib.py`, because both kits are copy-installed and `tools/lib/` travels to nobody.
-  A `PARITY_ROWS` row in `tools/lib/resolve-python.test.sh` gates both copies. Observed by AC2.
+  A `PARITY_ROWS` row in `tools/lib/resolve-python.test.sh` gates both copies. Each copy's marker line
+  names its canonical file as the existing rows' markers do, `envelope.py in the gov lib dir`, never by a
+  kit path. Observed by AC2.
 - **S4** — Emission by the Python renderers. `render()` wraps the `gov:playbook` region's body in the
   charter's envelope, inside the two region markers. `render_agent_file`
   (`tools/roles/render_agents.py:144`) wraps each agent file's body after its front matter. Observed
@@ -98,8 +107,13 @@ rules on its row (S9, F5): the gate names it as not checked on every run and nev
   document with no envelope, or one whose doc, level or direction differs from its row, S9's one held
   row excepted and stated; an opener with no closer, a closer with no opener, or a closer naming
   another doc; a second document at level 0; a load-bearing document with no row. The load-bearing population is derived, never typed: every path
-  the charter's Protocols lines name, every `*.md` under `{memory_root}/guides/`, every
-  `.claude/agents/*.md`, `.claude/rules/*.md`, `.claude/skills/*/SKILL.md` and `skills/*/SKILL.md`. The
+  the charter's Protocols lines name, and every tracked file unit 20's `INSTRUCTION_PATHSPECS` names,
+  read through `tools/playbook/instruction_units.py#derive_instruction_files`, less each entry file the
+  renderer table `renderers.toml` gives to `playbook:entry-files` (the fork record's F8). An entry file
+  is the charter's alias, a pointer to it, a symlink or a byte copy, so what it loads carries the
+  charter's envelope, and it can hold no envelope of its own. Each one prints
+  `instruction-units: envelopes · ALIAS <path> · NOT checked · the charter's entry file`, and is never
+  counted. The population is the tracked files, so a fixture stages each file it adds. The
   gate asserts that population is non-empty and prints the count it covers, which leaves out S9's held
   file. The leg declares no `guard`, so every run of the bar reaches S9's arms. Observed by AC4, AC5 and
   AC6.
@@ -123,7 +137,9 @@ rules on its row (S9, F5): the gate names it as not checked on every run and nev
   fails and no run raises it: its envelope, 80 bytes plus its direction against 61 free, is held by S9
   until the owner rules on that row (the fork record's F5), so this unit raises three rows and leaves that one at 30720. A
   registered document with no row is measured by none; this unit adds no row, a
-  new row being the owner's (the same paragraph). Observed by AC7.
+  new row being the owner's (the same paragraph). Re-measured at `550ea807a`, CR-stripped: the kickoff
+  Skill holds 18206 of 18432, 226 free, the figure its conditional raise reads, and the other three
+  hold the figures above. Observed by AC7.
 
 - **S8** — The leg's own rows, written in its pass. The claiming row is an `[[exempt_leg]]` row in
   `tools/govkit/registry.toml` naming the leg, with a `why` (the fork record's F6);
@@ -164,6 +180,13 @@ rules on its row (S9, F5): the gate names it as not checked on every run and nev
     `rev="HEAD"`, because `budgets.py resolve` reads the landed revision and would not see a move on a
     branch. A cap with no value refuses, exit 2, and never reads as a document that does not fit. The
     plant `hold-refused` stages that refusal and the field's two.
+  - **What the policy check reads in this code.** The policy kit's limits file has one reader, and the
+    policy check reds a code file outside that kit that opens it by name or names the kit's constant for
+    its name. So `hold-fits` finds the file through `tools/policy/budgets.py#derive_limits_rel` and
+    rewrites the row without opening the file by name. The same check's cap census reads a line spelling the
+    budgets script's name, a space and its `resolve` or `check` verb, outside a comment, as a request
+    naming every word after it, as unit 73 found in `tools/run-gates/owed_rows.py`; no line of this unit's
+    code spells that sequence.
   - **The end of the hold.** One commit, after this unit and outside it, lands the owner's ruling: the row's move, or the change the
     ruling names in its place, the envelope, and the end of the hold, which is the `hold` field with
     the reader's key, these arms, the statement and their plants, and the map's `held —` branch in
@@ -185,7 +208,8 @@ rules on its row (S9, F5): the gate names it as not checked on every run and nev
 - Records and memory at level 7, which are evidence and carry no envelope.
 - Moving any hand-written source onto the one renderer: `PLAY-dOrderedCharter-20`'s render gate and its
   legacy list. Unit 20 also declares the instruction-file population once, as `INSTRUCTION_PATHSPECS`,
-  which S6's load-bearing population reads from then on in place of its own path list.
+  which S6's load-bearing population reads from then on in place of its own path list. Unit 20 has
+  landed, so S6 reads it at this unit's pass.
 - An envelope found in tool output at runtime: no gate can see it; the level-0 rule that it is data is
   `PLAY-dOrderedCharter-2`'s.
 - BUILD-METHOD's envelope, any move of its row, and any change to its source or prose: fork F5's, the
@@ -340,8 +364,8 @@ the unit, by the hands-off edge in section 3.
 - perf / scale: the gate reads about 35 files once, and one cap through the policy kit.
 - error / empty / loading states: an absent registry or an empty load-bearing population refuses with
   exit 2, never reads green. So do a malformed `hold` and a held row whose cap reads no value.
-- observability: the gate prints the covered count, one `HELD` line per held row, and one line per
-  offender.
+- observability: the gate prints the covered count, one `HELD` line per held row, one `ALIAS` line per
+  entry file it leaves out, and one line per offender.
 - risks: four documents sit at or near their rows (S7), one the owner's (F5); a raise is a decision row,
   not a silent edit. That document is held (S9), so until the ruling it carries no envelope and an agent
   reading it sees no level. The gate states that on every run, and three arms end the hold once its
@@ -367,18 +391,19 @@ the unit, by the hands-off edge in section 3.
   opener naming `.claude/agents/gov-builder.md` at `Level 5`, and each file ends its body with its closer.
   Red when: either renderer drops the envelope.
 - **AC4** — When `envelopes --check --root .` runs over gov's tree after the build, it exits 0, prints a
-  `HELD` line naming `memory/guides/BUILD-METHOD.md` with the words `NOT checked`, and prints a covered
-  count equal to the number of files S6 derives less the one held.
-  Red when: a source's envelope lines differ from its row, the `HELD` line is absent, or the count
-  includes the held document.
+  `HELD` line naming `memory/guides/BUILD-METHOD.md` with the words `NOT checked`, prints an `ALIAS` line
+  naming `CLAUDE.md`, and prints a covered count equal to the number of files S6 derives less the one
+  held.
+  Red when: a source's envelope lines differ from its row, the `HELD` line is absent, the count
+  includes the held document, or `CLAUDE.md` is counted or reds as a document with no row.
   figure: the count is DERIVED by the gate on each run.
 - **AC5** — When `envelopes --check --root <fixture>` runs over a scratch tree copied from gov with
   one planted defect at a time (the envelope of a guide other than the held one removed, its level
   changed, its closer removed, a closer naming another doc, a second row at level 0), it exits 1 naming
   the path each time, and each red run still prints its `HELD` line.
   Red when: any planted defect exits 0, or a red run prints no `HELD` line.
-- **AC6** — When the same fixture gains an unregistered guide, `NEW.md` in its guides folder, the gate exits 1
-  naming it; with its row added and its envelope written, it exits 0.
+- **AC6** — When the same fixture gains an unregistered guide, `NEW.md` staged in its guides folder, the gate
+  exits 1 naming it; with its row added and its envelope written, it exits 0.
   Red when: an unregistered load-bearing document passes.
 - **AC7** — When `git grep -n -e . HEAD -- tools/template-size-limits.txt` is read after the envelopes' commits,
   each row S7 raised holds at least its document's CR-stripped bytes, equal where its block's rule is no
@@ -502,6 +527,23 @@ New arm: tools/playbook/instruction_units.py · covers AC5 AC6 AC9 AC10 AC11 AC1
   reader would validate a type alone. (c) lost on veto 1: S9 has the row declare the hold, and a second
   declaration needs a join back to its row, two places for one fact. What (a) cannot do is see where the
   choice it waits on stands, and S9 says so. widens: none · relaxes: none
+- **F8 — What S6 does with an entry file once it reads unit 20's population.** At `550ea807a`
+  `INSTRUCTION_PATHSPECS` names `CLAUDE.md`, which gov tracks as the one line `@AGENTS.md`, and section 2
+  seeds no row for it. `renderers.toml` gives it to `playbook:entry-files`, whose modes write a pointer,
+  a symlink or a byte copy of the charter, and whose own compare reds a copy one byte off. Options: (a)
+  a row for each entry file, enveloped like any document; (b) S6 leaves out each path `renderers.toml`
+  gives to `playbook:entry-files`, printing it as the charter's alias, not checked and never counted;
+  (c) S6 keeps its own glob list, which omits `CLAUDE.md`. (c) breaks section 3's statement that S6
+  reads unit 20's population in place of its own list, and its consumes-from edge (veto 1). (a) at level
+  0, the level of what the file loads, is the second level-0 document S6 reds, so AC4 fails (veto 1). (a)
+  at another level survives the vetoes and loses on follow-ups: its envelope states a level the charter
+  it loads does not have, and a symlink or copy alias can hold no line at all, so every adopter rendering
+  those modes is left open. RESOLVED (agent, 2026-11-08, delegated): (b), the most feature-rich
+  survivor. The exclusion is derived from the renderer table, so a
+  `CLAUDE.md` an adopter fills by hand, claimed by `hand`, returns to the population; what an entry file
+  loads carries the charter's own envelope. What (b) does not check: that an alias's loaded text is the
+  charter's, which unit 20's entry-files compare holds. widens: none · relaxes: the goal's row for every
+  load-bearing document, for an entry file, whose loaded text is the charter's and carries its envelope
 
 ## 9. Revision log
 
@@ -518,6 +560,14 @@ New arm: tools/playbook/instruction_units.py · covers AC5 AC6 AC9 AC10 AC11 AC1
 - rev-7 · 2026-11-04 · S8 · section 3 Edges · section 4 Files touched · AC7 · section 7 · from `2026-11-04-prompt-PLAY-dOrderedCharter-20-3-sweep-fix-brief.md` items 2 and 3: the plants join `PLANTS` and ride unit 20's `instruction units selftest` leg, spelled `fixture --plant`, `adopt-playbook.sh` leaves the write set, and AC7 reads the limits file at HEAD with the plain path as its own token.
 - rev-8 · 2026-11-04 · section 1 · S1 S2 S5 S6 S7, new S9 · section 3 Non-goals and Edges · section 4 Data model, Inventory, Rollout, Files touched and Alternatives rejected · section 5 · AC1 AC4 AC5 AC7, new AC9 AC10 AC11 AC12 · section 7 · section 8 F5, new F7 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-3-interim-brief.md` and `2026-11-04-prompt-PLAY-dOrderedCharter-3-interim-addendum-brief.md`: the unit builds under F5's new option (f), marked as an interim on this unit's shape with the owner's choice on the row parked and S6's first arm carried as `relaxes:`, BUILD-METHOD's envelope held by a validated `hold` field (F7), its row, source and prose untouched, the gate stating the held path as not checked and leaving it out of its covered count, and three planted reds ending the hold; AC7's `budgets.py resolve` limb reads after landing, that verb reading the landed revision.
 - rev-9 · 2026-11-04 · S9 · section 4 Files touched · from `2026-11-04-prompt-PLAY-dOrderedCharter-3-held-line-brief.md`: level with `PLAY-dOrderedCharter-2` rev-8, S9's end of the hold names the map's `held —` branch and its plant `map-held`, and Files touched gains `.governance/instructions.lock`, which the charter's re-render moves.
+- rev-10 · 2026-11-08 · S1 S3 S6 S7 S9 · section 3 Non-goals · AC4 AC6 · new F8 · section 10 · from
+  `2026-11-08-prompt-PLAY-dOrderedCharter-3-drift-fold-brief.md`: re-read at `550ea807a` after units 1,
+  45 and 67 to 73 landed, unit 20 having landed before rev-8. S6 reads unit 20's `INSTRUCTION_PATHSPECS` now, which adds `CLAUDE.md`, so
+  F8 rules an entry file an alias of the charter, printed and never counted, and AC4 and AC6 follow; S1
+  resolves its tokens and finds the registry as unit 72 left the kit, and the `doc` row's source spells
+  the tool root; S3's markers name no kit path; S7 re-measures the kickoff Skill; S9 states what the
+  policy check reads in the plant and the cap read, as unit 73 found; moved anchors in the reuse audit
+  gain their symbols.
 
 ## 10. Reuse audit
 
@@ -526,9 +576,13 @@ Three seams are extended. The `# >>> <name> — canonical copy` block with a `PA
 `tools/playbook/render_playbook.py:78` and `tools/roles/roles_lib.py:96`; the envelope helper is its
 next instance. The region writer `build_region` (`render_playbook.py:712` at base,
 `tools/playbook/render_playbook.py#build_region`) is where the charter's
-envelope sits, inside `REGION_OPEN` and `REGION_CLOSE` (`:121-122`). `render_agent_file`
+envelope sits, inside `REGION_OPEN` and `REGION_CLOSE` (`:121-122`, now
+`tools/playbook/render_playbook.py#REGION_OPEN`). `render_agent_file`
 (`render_agents.py:144`) is where an agent file's body is assembled. The fence pass `check_fences`
-(`render_playbook.py:582`) is the precedent for the pairing arm. `python tools/codebase-map/reuse_lookup.py
+(`render_playbook.py:582`, now `tools/playbook/render_playbook.py#check_fences`) is the precedent for the
+pairing arm. The population read is unit 20's
+`tools/playbook/instruction_units.py#derive_instruction_files`, and the entry files it leaves out are
+the rows `tools/playbook/instruction_units.py#read_renderers` reads for `playbook:entry-files`. `python tools/codebase-map/reuse_lookup.py
 "wrap a rendered document in a marked region and check the markers pair"` ranked `check` (fan-in 87),
 `pair` (`merge-rows.test.sh`) and `region` (`manifest-check.sh`, `unattended.sh`), name-token matches
 none of which wraps a document; the source holds the precedents above, so the map and the source

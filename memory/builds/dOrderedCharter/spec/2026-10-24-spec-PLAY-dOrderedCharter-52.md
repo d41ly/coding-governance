@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-52 — the TOML-table merge envelope is total: every base, ours and theirs state has a row, and an unlisted one is a conflict
 
-**Status:** DEFERRED · rev-2 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -35,6 +35,13 @@ over every reachable state, symmetric between the sides, with any state the tabl
 resolving to a conflict, and proves the table total by enumeration. It repairs unit 45 and is built
 right after it.
 
+Re-read at `550ea807a`, after unit 45 landed: the built per-key rule,
+`tools/memory-tree/merge-rows.py#resolve_table`, already gives each of the fourteen states below its
+row's result, rows 9, 11 and 12 among them. A probe calling it over the fourteen states measured that
+on 2026-11-08 (PINNED). So this unit changes no merge result. What it adds is the declared table, a
+lookup that fails closed on a state with no row, and the enumeration that proves the table total (the
+fork record's F3).
+
 ## 2. Scope (IN)
 
 - **S1** — The side states. Per key, against the base, each side is in exactly one state: with the
@@ -62,17 +69,23 @@ right after it.
   | 13 | absent | added | added, same | ours, once |
   | 14 | absent | added | added, different | **conflict** |
 
-  This supersedes unit 45 S3's table as the envelope's definition.
-  **Readers:** by name: READER NOT IN TREE — the table it supersedes is unit 45 S3's, built at unit
-  45's pass, and a grep for TABLE_ENVELOPE, resolve_tables and TableConflict outside memory/builds
-  finds no reader today. by value: `resolve_tables` (S3), the one reader of a row's result, and the
-  totality suite in `tools/memory-tree/merge-rows.test.sh` (S5).
-- **S3** — The catch-all. `resolve_tables` looks every key's state up in `TABLE_ENVELOPE`; a state the
-  mapping does not hold raises `TableConflict` naming the key, so a missed row fails closed rather
-  than defaulting to a side. Until unit 55 adds its `TableConflict` arm to `main()`, the exception
-  reaches the generic arm, which writes the whole-file conflict under its fixed label `theirs
-  (merge-rows failed; resolve by hand)` and names the key on stderr only, as `merge-rows: FAILED
-  (TableConflict: …)`. Observed by AC3.
+  This supersedes unit 45 S3's table as the envelope's definition, and the branches of
+  `tools/memory-tree/merge-rows.py#resolve_table` as the code that decides a result.
+  **Readers:** by name: `tools/memory-tree/merge-rows.py` spells `resolve_table`, `resolve_tables` and
+  `TableConflict`, and `tools/playbook/instructions_edit.py` calls `resolve_tables` directly, in its
+  written-chunk plant; no tracked file outside the records spells the new mapping's name, by a grep at
+  550ea807a. by value:
+  `tools/memory-tree/merge-rows.py#resolve_tables` (S3), whose two calls of `resolve_table`, one for the
+  preamble and one per key, are the one reader of a state's result; the `TableConflict` arm of
+  `tools/memory-tree/merge-rows.py#main`, which reads what S3 raises; and the totality suite in
+  `tools/memory-tree/merge-rows.test.sh` (S5).
+- **S3** — The catch-all. `resolve_tables` looks every key's state up in `TABLE_ENVELOPE`, and the
+  preamble's, which is always present and so reaches rows 1 to 5 only; `resolve_table` keeps its
+  signature and answers from the mapping. A state the mapping does not hold raises `TableConflict`
+  naming the key, so a missed row fails closed rather than defaulting to a side. The exception reaches
+  the `TableConflict` arm unit 15 built in `tools/memory-tree/merge-rows.py#main`, which writes the
+  whole-file conflict under the label `theirs (table conflict: <keys>)` and prints
+  `merge-rows: CONFLICT — each side changed <keys> apart` to stderr. Observed by AC3.
 - **S4** — The output. A clean result is ours' surviving entries in ours' order, then theirs' entries
   whose result is `theirs` and that ours does not hold, in theirs' order; an entry whose result is
   `deleted` is emitted nowhere. Unit 45 S4's three postconditions hold unchanged, the key set now
@@ -83,8 +96,9 @@ right after it.
   row and on any row no state reaches. Observed by AC1.
 - **S6** — The plants, through unit 15's fixture, `python tools/playbook/instructions_edit.py fixture
   --plant <case>`: `merge-theirs-delete` (row 9), `merge-both-delete` (row 12) and `merge-theirs-add`
-  (row 11). The fixture is unit 15's, built at order 16 and not in the tree at `c7269a97`; this unit
-  adds the three cases to it. Observed by AC2.
+  (row 11). The fixture is unit 15's and is in the tree: its `PLANTS` table holds `merge-same-add` and
+  the three both-sides plants. This unit adds the three cases to it, and the
+  leg that runs that fixture's bare `fixture` verb runs them. Observed by AC2.
 
 ## 3. Non-goals (OUT)
 
@@ -111,6 +125,13 @@ dispatch unit 45 S1 routes from, and `tools/memory-tree/merge-rows.py#main` writ
 conflict body for any exception that is not `ViewShardRefused`: its generic arm,
 `tools/memory-tree/merge-rows.py@c7269a97:1511-1514`, prints `merge-rows: FAILED (<class>: <message>)`
 to stderr and writes the body under the fixed label `theirs (merge-rows failed; resolve by hand)`.
+
+Re-read at `550ea807a`. Unit 45 built the class as `tools/memory-tree/merge-rows.py#read_tables`, which
+cuts each side into a preamble and keyed chunks, and `tools/memory-tree/merge-rows.py#resolve_tables`,
+which merges each key through `resolve_table`'s equality rule and raises `TableConflict` naming every
+clashing key. Unit 15 put a `TableConflict` arm in `tools/memory-tree/merge-rows.py#main` ahead of the
+generic one. A key is the array's name and the entry's tag, so a unit tagged `unit.a` is keyed
+`unit.unit.a`.
 
 ### Why a mapping and not branches
 
@@ -149,8 +170,8 @@ order 18 and write none of these files.
 - security: no new surface; the driver still writes only `%A`.
 - perf / scale: one mapping lookup per key.
 - error / empty / loading states: an unlisted state is a whole-file conflict, its key on stderr.
-- observability: the key is on stderr, `merge-rows: FAILED (TableConflict: …)`, from the generic arm of
-  `main()`; the label naming it, which unit 45 S4 states, is unit 55's arm.
+- observability: the key is on stderr, `merge-rows: CONFLICT — each side changed <key> apart`, and in the
+  closing label `theirs (table conflict: <key>)`, both from the `TableConflict` arm of `main()`.
 - risks: a key whose base entry does not parse is refused by unit 45 S2 before any lookup.
 - testing: AC1 to AC3; the enumeration runs in the driver's suite.
 - migration: none.
@@ -167,13 +188,13 @@ order 18 and write none of these files.
   `--plant merge-theirs-add` exits 0 with the key present once.
   Red when: a unit theirs deleted is emitted, or theirs' addition is dropped or doubled.
 - **AC3** — When a probe removes row 9 from `TABLE_ENVELOPE` in a scratch copy and runs
-  `merge-theirs-delete`, the merge exits 1 with the whole-file conflict body in `%A`, and its stderr
-  carries `FAILED (TableConflict:` and the key.
+  `merge-theirs-delete`, the merge exits 1 with the whole-file conflict body in `%A`, its stderr
+  carries `merge-rows: CONFLICT` and the key, and its closing label carries `table conflict:`.
   Red when: a state the table does not hold resolves to a side.
 
 ## 7. Gates
 
-`row-keyed merge driver replay` · `memory hygiene` · `check-wiring self-test` · `playbook render selftest` · `govkit acceptance matrix` · `lexicon naming predicates` · `verdict epoch (kit version dates the engine)` · `spec tokens (a spec's own names resolve)`
+`row-keyed merge driver replay` · `instruction edits selftest` · `memory hygiene` · `check-wiring self-test` · `playbook render selftest` · `govkit acceptance matrix` · `lexicon naming predicates` · `verdict epoch (kit version dates the engine)` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/memory-tree/merge-rows.test.sh · covers AC1 AC2 AC3 · the state enumeration and the three plants' inputs, each failing case staged by deleting its row from the mapping · none
 
@@ -186,6 +207,14 @@ New arm: tools/memory-tree/merge-rows.test.sh · covers AC1 AC2 AC3 · the state
 - **F2 — What a state the table does not list resolves to.** Options: (a) a conflict; (b) ours; (c)
   the base. (b) and (c) are the silent take the driver's fail-closed rule exists to prevent. RESOLVED
   (agent, 2026-10-24, delegated): (a), rung 3. widens: none · relaxes: none
+- **F3 — The built rule already gives every state its row's result; does the mapping still replace it?**
+  At `550ea807a`, `tools/memory-tree/merge-rows.py#resolve_table` answers all fourteen states as the
+  table does, so the defect the goal names is absent from the code. Options: (a) as written, the mapping
+  replaces the rule's branches and a state with no row raises; (b) keep the rule and hold the fourteen
+  rows only as the suite's expected table; (c) close this unit as `WONTDO`. (b) fails AC3, whose removed
+  row must turn a merge into a conflict, and (c) fails AC1 to AC3 (veto 1). RESOLVED (agent,
+  2026-11-08, delegated): (a), the one survivor. No merge result moves, and an edit that drops or
+  changes a row now reds on that row. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -195,6 +224,12 @@ New arm: tools/memory-tree/merge-rows.test.sh · covers AC1 AC2 AC3 · the state
   merge-rows anchors re-read at `c7269a97` and written as symbols or pinned lines beside the listed
   citation; AC1 is a direct probe of `TABLE_ENVELOPE`; a `TableConflict` names its key on stderr
   through the generic arm until unit 55's arm; the Edges gain unit 15, whose fixture S6 joins.
+- rev-3 · 2026-11-08 · section 1 · S2 S3 S6 · section 4 Evidence · section 5 · AC3 · section 7 · new F3 ·
+  section 10 · from `2026-11-08-prompt-PLAY-dOrderedCharter-3-drift-fold-brief.md`: re-read at
+  `550ea807a` after units 45 and 15 landed. The built rule already resolves all fourteen states, so F3
+  rules that the mapping still replaces it; S2's Readers clause names the readers now in the tree; a
+  `TableConflict` reaches the arm unit 15 built, not the generic one, and AC3 reads that arm's words;
+  S6's fixture is in the tree; the leg line gains `instruction edits selftest`, which runs the plants.
 
 ## 10. Reuse audit
 
@@ -205,6 +240,9 @@ tools/codebase-map/reuse_lookup.py "three-way merge table of every base ours the
 `merge` (`tools/memory-tree/merge-rows.py`, `tools/settings-merge.py`), `resolve_compare_base` and
 `plan_state` by name stem; `merge` is the seam and none of them holds a state table, so the mapping is
 new. The recall query returned TOOL-aMendedLedger-1 and TOOL-aMendedLedger-9, the driver's
-fail-closed design, which S3's catch-all keeps.
+fail-closed design, which S3's catch-all keeps. The three plants take the shape of
+`tools/playbook/instructions_edit.py#arm_merge_edit`, one function over a per-plant base, ours and
+theirs, bound to each name in `tools/playbook/instructions_edit.py#PLANTS`, with
+`tools/playbook/instructions_edit.py#run_merge_pair` running the real driver.
 
 Recall terms used: `python tools/memory-recall/query.py "how does merge-rows handle a key deleted on one side and unchanged on the other" --terms "merge-rows delete unchanged resurrect three-way base ours theirs envelope conflict fail closed"`

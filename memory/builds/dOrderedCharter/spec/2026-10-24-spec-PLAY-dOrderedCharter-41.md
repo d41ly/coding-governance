@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-41 — the `cross-os` block stays live, so every v4 template renders after the practice catalogue lands
 
-**Status:** DEFERRED · rev-5 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-6 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -29,8 +29,8 @@ confirmed **finding 30 at HIGH**, its item **H3**. A `cross-os` `[[block]]` row 
 the template marker moved only to v4.5, stops every v4 render. `render()` refuses any template
 at or above `TEMPLATE_MAJOR` (4) whose `when` fence names a legacy block
 (`tools/playbook/render_playbook.py:1004-1012` at base, `tools/playbook/render_playbook.py@c7269a97:1049-1057` at `c7269a97`), and gov's template still carries
-`<!-- when:cross-os -->` at line 198, around the Toolchain section, as every seeded v4.x adopter
-template carries the section-1 fence. The reseed note fires only when the major is behind
+a `<!-- when:cross-os -->` fence around the Toolchain fact, as every seeded v4.4 adopter template also
+carries the section-1 fence. The reseed note fires only when the major is behind
 (`tools/playbook/render_playbook.py@c7269a97:1071-1074`), never for v4.4 against v4.5. Unit 1's rev-8
 took both corrections into its own text: its S6 keeps the row as it is and appends a note of its own,
 and its section 4 Migration says a v4.4 template takes no reseed note, naming this unit as where that
@@ -52,8 +52,9 @@ template and a seeded previous-minor template, and corrects the wiring guide's l
   `tools/playbook/render_playbook.py@c7269a97:1053-1057`), which this
   item keeps `cross-os` out of. Observed by AC1 and AC2.
 - **S2** — The mapping, without the legacy path. A `drop_blocks` member `cross-os` still cuts the
-  fenced text the template carries (the Toolchain section at `coding-governance-agents.template.md:198-200`,
-  and on a seeded v4.4 template the section-1 line at `:42-44` too). Where the template carries
+  fenced text the template carries (the Toolchain section, `coding-governance-agents.template.md@ce13efbe:198-200`
+  at base and the template's one `when:cross-os` fence at `550ea807a`, and on a seeded v4.4 template the
+  section-1 line at `:42-44` too). Where the template carries
   `{{PRACTICES}}`, unit 1 S6's step also keeps `practice.cross-os` out of the active set and appends its
   note, whose `retired` prefix prints on a write and under `--check`, the filter in
   `tools/playbook/render_playbook.py#main` passing only notes that open `legacy` or `retired`. A seeded
@@ -63,7 +64,8 @@ template and a seeded previous-minor template, and corrects the wiring guide's l
   prefix · by value: NO VALUE READERS — this item ends no name; "retired" is the prefix of the note unit
   1 S6 lands, and no reader compares it.
 - **S3** — The rule restated. `render_playbook.py`'s comment above `TEMPLATE_MAJOR`
-  (`tools/playbook/render_playbook.py:336-342`) and unit 1's catalogue docs in `help/charter.md` say
+  (`tools/playbook/render_playbook.py:336-342`, today above `tools/playbook/render_playbook.py#TEMPLATE_MAJOR`)
+  and unit 1's catalogue docs in `help/charter.md` say
   what the code does: a template whose marker major is below `TEMPLATE_MAJOR` gets the reseed note and
   may carry a legacy fence; one at or above it may not carry a legacy fence and gets no note, a minor
   behind included. Unit 1's section 4 Migration names this unit as where that rule is stated, and its S6
@@ -77,7 +79,10 @@ template and a seeded previous-minor template, and corrects the wiring guide's l
   F7). The gov-template half copies gov's `.governance/deploy.toml` with section 4 Evidence's narrowing.
   Where the install holds no `coding-governance-agents.template.md` above the engine, as the scratch
   install of the acceptance matrix does not, that half prints `unarmed` naming why, and the seeded half
-  still runs; gov's own leg is the one that runs both. Observed by AC5.
+  still runs; gov's own leg is the one that runs both. Both halves read the shipped declarations through
+  `tools/playbook/render_playbook.py#resolve_declaration_paths`, as the arm refusing a legacy fence
+  already does, and spell no kit path, because the shipped-surface ban reds a literal one (unit 72).
+  Observed by AC5.
 - **S5** — The wiring guide. `charter.practices` lets an adopter choose its practices, so unit 1's
   landing makes two passages of `WIRE-INTO-PROJECT.md`'s subsection "The one block that is not about a
   kit" false or open to a wrong reading. This unit rewrites both (the fork record's F4), in words that
@@ -135,6 +140,19 @@ the `ci_file` probe. One holding gov's `.governance/deploy.toml` with `kits` nar
 `id_families` and `memory_disciplines` rendered gov's template, exit 0, with the Toolchain line and the
 `[cross-os]` line present, and with `drop_blocks = ["cross-os"]` with both absent. PINNED at `d0c16d29`,
 before unit 1's `{{PRACTICES}}` step.
+
+Re-read at `550ea807a`, after unit 1 landed. Gov's template carries `<!-- governance-template: v4.5 -->`
+and `{{PRACTICES}}`, and one `when:cross-os` fence, around the Toolchain fact; the section-1 fence left
+it with the practice lines. Unit 1's parent, `778a60196^`, holds the v4.4 template with both fences.
+The `cross-os` block row carries no `legacy` key. `render()` takes `practice.cross-os` out of the active
+set for a `drop_blocks` member and appends its note, which opens
+`retired   drop_blocks cross-os — practice.cross-os leaves the active set`. The `--check` filter in
+`tools/playbook/render_playbook.py#main` still passes only notes that open `legacy` or `retired`. The
+comment above `TEMPLATE_MAJOR` still says only that an older template gets the reseed note, and
+`help/charter.md` states no major-only rule. Unit 1's `tools/playbook/render_playbook.py#check_practice_arms`
+renders a v4.4 literal and a fenced `drop_blocks` member, but against a fixture descriptor that
+declares `cross-os` itself, so a `legacy` mark on the shipped row leaves it green; S4's arm is still
+owed.
 
 ### Flow
 
@@ -207,7 +225,7 @@ sequenced rather than run together (M6), and before unit 2 at order 20, which mo
   Red when: a block row's state change makes either template refuse.
   fixture: each repository commits its template under the name `playbook_path` gives it and gov's
   `.governance/deploy.toml` with section 4 Evidence's narrowing; the v4.4 copy is the template as unit 1's
-  parent commit holds it.
+  parent commit, `778a60196^`, holds it.
 - **AC6** — When `git grep -n -F 'charter.practices' -- WIRE-INTO-PROJECT.md` runs after the pass, it
   prints the rewritten paragraph's line; `git grep -n -F 'binds every adopter' -- WIRE-INTO-PROJECT.md`
   prints nothing; and `git grep -n -F 'asks for no removal' -- WIRE-INTO-PROJECT.md` prints the
@@ -262,6 +280,13 @@ New arm: tools/playbook/render_playbook.py · covers AC5 · the selftest renders
 - rev-3 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 - rev-4 · 2026-11-04 · section 1 · section 2 S1 · section 4 Evidence and Flow · section 5 · AC1 AC2 AC5 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-1-drift-fold-brief.md` (findings 41-1 to 41-3): `render()`'s lines, about 45 lower at `c7269a97`, are pinned there beside each base citation; AC5 renders four scratch targets directly, since scratch-guard refuses a builder the selftest, which stays owed at the close; AC1 and AC2 name their failing case, the staged `legacy` mark.
 - rev-5 · 2026-11-04 · section 1 · section 2 S1 S2 S3 S4, new S5 · section 3 Non-goals and Edges · section 4 Evidence, Flow, Inventory and Files touched · section 5 · AC3 AC5, new AC6 · section 7 · section 8 new F3 F4 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-41-neighbour-fold-brief.md` items 3 to 6: S4's arm and the AC3 and AC5 targets are scratch repositories committed on `main`, with the narrowing a target needs to render; S1 and S3 point at what spec 1 now says, and the row leaves the write set; S2 keeps unit 1's note, which prints under `--check` (F3); the wiring guide's correction lands here, not in unit 6 (F4). Beside the brief: the Goal reads spec 1 at rev-8, and S4's seeded template is a short literal, since a selftest in an install has no history to copy from.
+- rev-6 · 2026-11-08 · section 1 · S2 S3 S4 · section 4 Evidence · AC5 · section 10 · from
+  `2026-11-08-prompt-PLAY-dOrderedCharter-3-drift-fold-brief.md`: re-read at `550ea807a` after unit 1
+  landed. The charter template's Toolchain citation at line 198 is pinned at base, since the template is
+  now 162 lines and v4.5 with one `when:cross-os` fence; the comment S3 rewrites is named by its
+  constant; S4's arm reads the shipped declarations and spells no kit path, as the shipped-surface ban
+  requires since unit 72; AC5's v4.4 copy names unit 1's parent; the reuse audit names unit 1's practice
+  arms, which use a fixture descriptor and so leave S4 owed.
 
 ## 10. Reuse audit
 
@@ -273,6 +298,10 @@ the same three rules at an earlier line set (`:1000-1001`, `:1006-1009`, `:1023-
 source on their meaning. `python tools/codebase-map/reuse_lookup.py "render a template whose when
 fence names a block a deploy file drops"` ranked `render` (SEAM) first, which is the function above.
 The note stays unit 1's step in `tools/playbook/render_playbook.py#render`, and the `--check` filter in
-`tools/playbook/render_playbook.py#main` stays as it is.
+`tools/playbook/render_playbook.py#main` stays as it is. Re-probed at `550ea807a`: unit 1's
+`tools/playbook/render_playbook.py#check_practice_arms` holds a committed-target fixture, a v4.4 literal
+and `tools/playbook/render_playbook.py#CROSS_OS_FENCE`, which S4's seeded half reuses; its renders read a
+fixture descriptor, so the shipped-row arm stays this unit's. The shipped-declarations render is the one
+the arm refusing a legacy fence in `tools/playbook/render_playbook.py#run_selftest` already makes.
 
 Recall terms used: `python tools/memory-recall/query.py "why does a legacy block fence refuse a current major template" --terms "legacy block when fence TEMPLATE_MAJOR marker reseed drop_blocks cross-os refusal current major"`
