@@ -335,7 +335,8 @@ def run_fixture(plant):
     try:
         with set_env_aside(GIT_ENV_LEAKS):
             def run_git(*args):
-                return subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, check=True).stdout
+                return subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, encoding="utf-8",
+                                      check=True).stdout
             run_git("init", "-q", "--template=")
             with open(root / ".memory-tree.conf", "w", encoding="utf-8", newline="\n") as fh:
                 fh.write('MEMORY_ROOT=memory\nFAMILIES="arch:ARCH"\n')
@@ -376,7 +377,7 @@ def run_fixture(plant):
                 else:
                     print(f"build-records: {plant} · {kind} · {rel} · bound")
             p = subprocess.run([sys.executable, str(KIT / "gen_build_index.py"), "--print-bindings"], cwd=root,
-                               capture_output=True, text=True)
+                               capture_output=True, text=True, encoding="utf-8")
             lines = p.stdout.splitlines()
             if p.returncode != 0:
                 bad.append(f"--print-bindings exited {p.returncode}: {(p.stdout + p.stderr).strip()[:300]}")

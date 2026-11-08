@@ -2203,6 +2203,7 @@ check_says "an empty governed population refuses" "$Q" 1 "no tracked path under 
 MANIFEST=tools/alpha/instructions.toml
 OVERLAY=.governance/instructions.toml
 derive_fx_unit() { printf '[[unit]]\ntag = "unit.%s"\nlevel = 3\ntext = "%s"\n' "$1" "${2:-MUST hold.}"; }
+derive_fx_unterminated() { printf '[[unit]]\ntag = "unit.%s"\nlevel = 3\ntext = "%s"' "$1" "${2:-MUST hold.}"; }  # derive_fx_unit, no closing newline
 derive_fx_long() { printf '[[unit]]\ntag = "unit.%s"\nlevel = 3\ntext = """\n%b\n"""\n' "$1" "$2"; }
 derive_fx_policy() { printf '[[policy]]\nkey = "adopter.%s"\ndefault = "%s"\n' "$1" "${2:-a}"; }
 derive_table_fault() {  # $1 got rc · $2 want rc · $3 what the close names, empty on a clean want -> the first broken expectation
@@ -2259,14 +2260,14 @@ derive_fx_unit a > "$TMP/to"; { printf '  [[unit]]\ntag = "unit.hidden"\n'; deri
 check_table_case "an indented header in the preamble" "$MANIFEST" 1 "merge-rows failed" red "the cut does not reproduce tomllib's read"
 # PLAY-dOrderedCharter-70 S6: sides ending in an unterminated entry merge clean, each written chunk a side's bytes
 # once terminated; the merge writes the last entry terminated.
-{ derive_fx_unit a; printf "%s" "$(derive_fx_unit b)"; } > "$TMP/to"
-{ derive_fx_unit a 'MUST one.'; printf "%s" "$(derive_fx_unit b)"; } > "$TMP/ta"
-{ derive_fx_unit a; printf "%s" "$(derive_fx_unit b 'MUST two.')"; } > "$TMP/tb"
+{ derive_fx_unit a; derive_fx_unterminated b; } > "$TMP/to"
+{ derive_fx_unit a 'MUST one.'; derive_fx_unterminated b; } > "$TMP/ta"
+{ derive_fx_unit a; derive_fx_unterminated b 'MUST two.'; } > "$TMP/tb"
 { derive_fx_unit a 'MUST one.'; derive_fx_unit b 'MUST two.'; } > "$TMP/twant"
 check_table_case "disjoint edits over an unterminated last entry" "$MANIFEST" 0 "" red
-{ derive_fx_unit a; printf "%s" "$(derive_fx_unit b)"; } > "$TMP/to"
-{ derive_fx_unit a 'MUST one.'; printf "%s" "$(derive_fx_unit b)"; } > "$TMP/ta"
-{ derive_fx_unit a; derive_fx_unit b; printf "%s" "$(derive_fx_unit c)"; } > "$TMP/tb"
+{ derive_fx_unit a; derive_fx_unterminated b; } > "$TMP/to"
+{ derive_fx_unit a 'MUST one.'; derive_fx_unterminated b; } > "$TMP/ta"
+{ derive_fx_unit a; derive_fx_unit b; derive_fx_unterminated c; } > "$TMP/tb"
 { derive_fx_unit a 'MUST one.'; derive_fx_unit b; derive_fx_unit c; } > "$TMP/twant"
 check_table_case "an unterminated final chunk in ours, an add in theirs" "$MANIFEST" 0 "" red
 

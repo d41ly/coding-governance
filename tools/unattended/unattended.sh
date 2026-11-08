@@ -4068,7 +4068,9 @@ check_branch_carried() { # slug
   if ! out=$(GIT -c core.quotepath=off log --no-renames --format=%x01%h --name-only HEAD --not "$ASHA" ${ex:+"$ex"} 2>/dev/null); then
     hit="none, the listing itself failed - HEAD --not $ASHA${ex:+ $ex}"
   else
-    while IFS= read -r line; do
+    local -a rows
+    mapfile -t rows <<<"$out"
+    for line in "${rows[@]}"; do
       line=${line%$'\r'}
       case "$line" in
         $'\001'*) sha=${line#?}; continue ;;
@@ -4077,7 +4079,7 @@ check_branch_carried() { # slug
       ok=""
       for q in ${GENERATED_INDEXES:-}; do covers "${q%%:*}" "$line" && { ok=1; break; }; done
       [ -n "$ok" ] || { hit="$sha $line"; break; }
-    done <<<"$out"
+    done
   fi
   [ -n "$hit" ] || return 0
   fail 114 "a first preflight found this branch carrying a commit the default branch does not hold that touches a path outside this build's folder and the declared generated indexes, and it would land with the run without passing through the spec loop; start the run in a fresh worktree off the default branch, carrying only the build folder - the commit and the first such path: $hit"

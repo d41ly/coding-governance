@@ -19,13 +19,13 @@ FIVE POPULATIONS, each read from <rev> against the working tree:
                 unarmed-branches.txt names it.
   size          a path changed since <rev>, untracked ones included, that a path-named byte cap of
                 the policy kit's census names or matches. Owes its CR-stripped bytes within the value
-                `budgets.py resolve <cap>` prints, unless the mode it prints beside it is `warn`:
+                the `resolve` verb of `budgets.py` prints for it, unless the mode it prints beside it is `warn`:
                 a breach the switch admits reds no leg, so it is counted on the summary line.
 
 PRESENCE ONLY. The probe mints no predicate a leg owns: a pin row carrying the wrong subject passes
 here and still reds `govkit selfcheck`, and each leg grades its own row. The readers are the legs'
 own: govkit's registry and descriptor reads, the codebase-map kit's dossier tree and claimant index,
-and the policy kit's census and `budgets.py resolve`, the last as a subprocess. GOV-ONLY: this
+and the policy kit's census and the `resolve` verb of `budgets.py`, the last as a subprocess. GOV-ONLY: this
 kit's descriptor withholds the file from `govkit apply`, which is why it may import the first two.
 
 Exit 1 when any row is owed, 0 with a one-line count when none is, 2 on a refusal: a <rev> that
@@ -134,7 +134,7 @@ def read_known_copies(canary: pathlib.Path) -> list:
 
 
 def read_cap_values(policy: pathlib.Path, root: pathlib.Path, caps: list) -> dict:
-    """{cap: (bytes, mode)} as `budgets.py resolve` prints them for the repository at `root`."""
+    """{cap: (bytes, mode)} as the `resolve` verb of `budgets.py` prints them for the repository at `root`."""
     p = subprocess.run([sys.executable, str(policy / "budgets.py"), "resolve", *caps], cwd=str(root),
                        capture_output=True, text=True, encoding="utf-8", errors="replace",
                        stdin=subprocess.DEVNULL,
@@ -145,7 +145,7 @@ def read_cap_values(policy: pathlib.Path, root: pathlib.Path, caps: list) -> dic
         if len(f) >= 3 and f[1].isdigit():
             vals[f[0]] = (int(f[1]), f[2])
     if p.returncode or set(vals) != set(caps):
-        raise Refused(f"budgets.py resolve answered no value for {sorted(set(caps) - set(vals))}: "
+        raise Refused(f"the `resolve` verb of budgets.py answered no value for {sorted(set(caps) - set(vals))}: "
                       f"{(p.stderr or p.stdout).strip()}")
     return vals
 

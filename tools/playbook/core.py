@@ -650,7 +650,7 @@ def run_fixture_git(top, *args):
     env.update(GIT_AUTHOR_NAME="fx", GIT_AUTHOR_EMAIL="fx@fx", GIT_COMMITTER_NAME="fx",
                GIT_COMMITTER_EMAIL="fx@fx")
     return subprocess.run(["git", "-C", str(top), "-c", "core.autocrlf=false", "-c", "commit.gpgsign=false",
-                           *args], capture_output=True, text=True, env=env, stdin=subprocess.DEVNULL)
+                           *args], capture_output=True, text=True, encoding="utf-8", env=env, stdin=subprocess.DEVNULL)
 
 
 def write_fixture_commit(top, msg):
@@ -802,7 +802,7 @@ def arm_practice(c):
 def run_door(c, *args):
     _cov, build_records, _dl = load_memory_tree()
     p = subprocess.run([sys.executable, build_records.__file__, "new", "exception", "--root", str(c.top),
-                        "--build", "dFx", "--unit", "PLAY-dFx-1", *args], capture_output=True, text=True,
+                        "--build", "dFx", "--unit", "PLAY-dFx-1", *args], capture_output=True, text=True, encoding="utf-8",
                        stdin=subprocess.DEVNULL)
     c.out.append(f"{SAY}: fixture · door · rc={p.returncode} · {(p.stdout or p.stderr).strip()}")
     return p.returncode

@@ -153,6 +153,8 @@ ENFORCED_NONE = "none — "
 UNIT_STRINGS = ("tag", "type", "trigger", "budget", "text", "source", "owner", "usage", "help")
 UNIT_LISTS = ("scope", "required-by", "edges")
 UNIT_KEYS = frozenset((*UNIT_STRINGS, *UNIT_LISTS, "level", "enforced-by", "class"))
+#: the two keys a unit row derives and never carries: status from the change record, origin from the kit
+DERIVED_UNIT_KEYS = ("status", "origin")
 UNIT_REQUIRED = ("tag", "level", "type")
 UNIT_CLASSES = ("fixed", "open")
 BUDGET_BYTES = {"line": 200, "block": 600}
@@ -753,7 +755,7 @@ def check_unit_row(unit, row, ns="unit") -> list[str]:
             add_red(key, "is missing", f"give the row its `{key}`")
     for key in sorted(set(row) - UNIT_KEYS):
         add_red(key, "is no field of a unit row", "delete it: status derives from the change record, origin "
-                                                  "from the kit" if key in ("status", "origin") else "delete it")
+                                                  "from the kit" if key in DERIVED_UNIT_KEYS else "delete it")
     if unit.tag is not None:
         import tag_index
         if not unit.tag.startswith(f"{ns}.") or not tag_index.TAG_RE.fullmatch(unit.tag):
@@ -1374,7 +1376,7 @@ def arm_render(c):
     policy = resolve_kit_dir("policy", "policy.py", KIT_DIR) / "policy.py"
     value = subprocess.run([sys.executable, str(policy), "get", "tags.slice"], cwd=c.top, capture_output=True,
                            text=True, encoding="utf-8", stdin=subprocess.DEVNULL).stdout.rstrip("\n")
-    branch = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True,
+    branch = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True, encoding="utf-8",
                             stdin=subprocess.DEVNULL).stdout.strip()
     c.out.append(f"{SAY}:   rendered · {' | '.join(said)}")
     c.check("one line per unit: the command's output, the key's value as policy.py prints it, the typed text",

@@ -197,7 +197,7 @@ while IFS='|' read -r _lp _lrc _lwant; do
   case "$_lgot:$_lout" in
     "$_lrc:"*"$_lwant"*) printf 'arm ok    layers plant %s\n' "$_lp" ;;
     *) _lf=$((_lf+1)); printf 'arm FAIL  layers plant %s — wanted rc=%s + %s, got rc=%s\n' "$_lp" "$_lrc" "$_lwant" "$_lgot"
-       printf '%s\n' "$_lout" | sed 's/^/      /' ;;
+       printf '      %s\n' "${_lout//$'\n'/$'\n'      }" ;;
   esac
 done <<'PLANTS'
 none|0|0 allowed, 0 red; 0 contract red(s)
@@ -256,7 +256,7 @@ run_plant_rows() {
           *) printf 'arm ok    %s plant %s\n' "$1" "$_tp" ;;
         esac ;;
       *) _tf=$((_tf+1)); printf 'arm FAIL  %s plant %s — wanted rc=%s + %s, got rc=%s\n' "$1" "$_tp" "$_trc" "$_twant" "$_tgot"
-         printf '%s\n' "$_tout" | sed 's/^/      /' ;;
+         printf '      %s\n' "${_tout//$'\n'/$'\n'      }" ;;
     esac
   done
 }

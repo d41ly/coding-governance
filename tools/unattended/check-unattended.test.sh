@@ -5690,7 +5690,7 @@ cp "$TMP/$KIT_REL/ASKS.template.md" "$ak/memory/guides/UNATTENDED-ASKS.md"
 # that kit holds, never by a typed kit directory (the carried-prefix ban).
 _ig_rel=$(git -C "$HERE" ls-files --full-name -- ':(top)*id_grammar.py' | head -n 1)
 _ig_src="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/${_ig_rel%/*}"
-_ig_dst="$ak/$(dirname -- "$KIT_REL")/${_ig_src##*/}"
+_ig_dst="$ak/$_b1tr${_ig_src##*/}"
 mkdir -p "$_ig_dst" && cp "$_ig_src/id_grammar.py" "$_ig_dst/"
 n=$((n+1)); [ -f "$_ig_dst/id_grammar.py" ] || { echo "FAIL the ask block could not copy the memory-tree kit's id grammar, so every S3 arm below would grade a missing grammar"; st=1; }
 printf 'MEMORY_ROOT=memory\nFAMILIES="example:EXMP tooling:TOOL"\n' > "$ak/.memory-tree.conf"

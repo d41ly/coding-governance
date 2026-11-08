@@ -361,7 +361,7 @@ def anchor_at(line: str, g=None) -> str | None:
 
 def git(repo: pathlib.Path, *args: str) -> str:
     return subprocess.run(
-        ["git", "-C", str(repo), *args], capture_output=True, text=True, check=True
+        ["git", "-C", str(repo), *args], capture_output=True, text=True, encoding="utf-8", check=True
     ).stdout
 
 

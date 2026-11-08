@@ -8618,6 +8618,11 @@
       "file": "tools/memory-tree/merge-rows.test.sh"
     },
     {
+      "id": "derive_fx_unterminated",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.test.sh"
+    },
+    {
       "id": "derive_gate_backstop",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"

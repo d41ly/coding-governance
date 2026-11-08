@@ -514,9 +514,10 @@ def run_pin(root, memory_root, file, rev="HEAD") -> int:
 
     def read_oid(path):
         if path not in oids:
-            p = subprocess.run(["git", "-C", str(root), "cat-file", "-t", f"{rev}:{path}"], capture_output=True, text=True)
+            p = subprocess.run(["git", "-C", str(root), "cat-file", "-t", f"{rev}:{path}"], capture_output=True, text=True,
+                               encoding="utf-8")
             q = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet", "--short=8", f"{rev}:{path}"],
-                               capture_output=True, text=True)
+                               capture_output=True, text=True, encoding="utf-8")
             oids[path] = q.stdout.strip() if p.stdout.strip() == "blob" and not q.returncode else None
         return oids[path]
 

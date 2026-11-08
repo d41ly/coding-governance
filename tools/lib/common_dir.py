@@ -14,7 +14,7 @@ import subprocess
 
 def read_git_stdout(repo: pathlib.Path, *args: str) -> str:
     return subprocess.run(
-        ["git", "-C", str(repo), *args], capture_output=True, text=True, check=True
+        ["git", "-C", str(repo), *args], capture_output=True, text=True, encoding="utf-8", check=True
     ).stdout
 
 

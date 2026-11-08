@@ -1585,7 +1585,7 @@ else
 fi
 cp "$TMP/qconf" "$CWT2/.memory-tree.conf"
 # The reader exits 3 only when ITS grammar is absent, which is the memory-tree kit's id_grammar.py.
-q_grammar="$CWT2/$(dirname -- "$READER_REL")/id_grammar.py"; mv "$q_grammar" "$q_grammar.hid"
+q_grammar="$CWT2/${READER_REL%/*}/id_grammar.py"; mv "$q_grammar" "$q_grammar.hid"
 check_route_refusal "KQ AC8 R0 a route whose id reader exits 3 exits 2" "$KQ" 2 "route R0: no defined-id set" < "$TMP/qb"
 grep -q '^NOTE: id citations unchecked' "$CARD_OUT" && { echo "ok   KQ AC8 liveness: the reader took its exit-3 branch"; pass=$((pass+1)); } \
   || { echo "FAIL KQ AC8 liveness: the reader took its exit-3 branch"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
