@@ -94,7 +94,8 @@
     "guard": [
       "{prefix}/check-playbook-parity.sh",
       "{prefix}/check-playbook-parity.test.sh",
-      "{prefix}/playbook-kit-waivers.txt"
+      "{prefix}/playbook-kit-waivers.txt",
+      "{prefix}/workflows/check-verifier-fanout.js"
     ],
     "argv": [
       "bash",
@@ -339,7 +340,8 @@
     ],
     "guard": [
       "{prefix}/hooks/",
-      "{prefix}/lib/"
+      "{prefix}/lib/",
+      "{prefix}/workflows/spec-audit-optin.js"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -741,7 +743,8 @@
     ],
     "guard": [
       "{prefix}/workflows/",
-      "{prefix}/memory-tree/gen_build_index.py"
+      "{prefix}/memory-tree/gen_build_index.py",
+      "{prefix}/unattended/unattended.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -770,6 +773,16 @@
       "{prefix}/hooks/",
       "{prefix}/lib/",
       "{prefix}/workflows/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
+  },
+  {
+    "name": "spec-audit opt-in pack self-test",
+    "argv": [
+      "bash",
+      "{prefix}/workflows/spec-audit-optin.test.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1324,7 +1337,10 @@
     "guard": [
       "{prefix}/check-hook-destinations.sh",
       "{prefix}/hooks/",
-      "{prefix}/memory-recall/"
+      "{prefix}/memory-recall/",
+      "{prefix}/workflows/kit.toml",
+      "{prefix}/workflows/spec-audit-optin.fragment.json",
+      "{prefix}/workflows/spec-audit-optin.js"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1826,6 +1842,8 @@
       "{prefix}/govkit/registry.toml",
       "{prefix}/govkit/selftest.py",
       "{prefix}/workflows/unattended-build.template.js",
+      "{prefix}/workflows/check-review-join.js",
+      "{prefix}/workflows/check-verifier-fanout.js",
       "{prefix}/lib/",
       "{prefix}/hooks/agent-cap.js",
       "{prefix}/memory-tree/tree_lib.py",
@@ -1885,7 +1903,8 @@
       "{prefix}/workflows/kit.toml",
       "AGENTS.md",
       "memory/builds/dClosedLoop/build/",
-      "help/policy.md"
+      "help/policy.md",
+      ".governance/install.json"
     ],
     "chunk": "selftests",
     "subject": "kit",

@@ -1,10 +1,12 @@
-<!-- gov:kit policy@1.3 -->
+<!-- gov:kit policy@1.4 -->
 # policy — one file for a repository's policy, and the catalogue that is its schema
 
 A repository's policy lives in ONE file, `.governance/policy.toml`, TOML 1.0, read through `tomllib`
 and never sourced. This kit owns that file's schema: the catalogue `catalogue.toml`, one `[[key]]`
 row per policy key, taken row for row and in order from the design's `[policies]` table, each row's
-`name` and `owner` that table's own. Contract: TOOL-dGroundRules-1.
+`name` and `owner` that table's own, but for `review.opt-in`, `review.unclassed`, `review.twin`
+and the two `review.design-audit.*` rows, whose `owner` is the build their reader lands in, dDeclaredLoop,
+and not the table's dFairHearing (TOOL-dFairHearing-50 S16). Contract: TOOL-dGroundRules-1.
 
 The kit lands dark: one reader reads `.governance/policy.toml`, `policy.py get` (TOOL-dGroundRules-2),
 in one resolution order (TOOL-dGroundRules-3), and an invalid file never reads defaults

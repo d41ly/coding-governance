@@ -298,6 +298,21 @@
       "file": "tools/run-gates/regen.py"
     },
     {
+      "id": "Refusal",
+      "kind": "class",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "Refused",
+      "kind": "class",
+      "file": "tools/workflows/render_lenses.py"
+    },
+    {
+      "id": "Refused",
+      "kind": "class",
+      "file": "tools/workflows/review_pin.py"
+    },
+    {
       "id": "Report",
       "kind": "class",
       "file": "tools/govkit/govkit.py"
@@ -446,6 +461,11 @@
       "id": "add_ak_commit",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "add_argv_reads",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "add_arm",
@@ -631,6 +651,11 @@
       "id": "add_recipe_seam",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "add_resolver_layout",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
     },
     {
       "id": "add_row",
@@ -885,7 +910,7 @@
     {
       "id": "arm_growth_denies",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
     },
     {
       "id": "arm_keeps",
@@ -1375,12 +1400,12 @@
     {
       "id": "boundedBranch",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "boundedK",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "boundedParallel",
@@ -1508,14 +1533,44 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "buildLensCall",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "buildLensCall",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "buildNativePath",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "buildOptInError",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "buildOptInError",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "buildOpts",
       "kind": "function",
       "file": "tools/workflows/orient-counterfactual.js"
+    },
+    {
+      "id": "buildRefusal",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "buildRefusal",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "buildResolvedTarget",
@@ -1536,6 +1591,16 @@
       "id": "buildTaskDigest",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "buildWalkFields",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "buildWalkFields",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "build_aborted_run",
@@ -3385,6 +3450,21 @@
     {
       "id": "check",
       "kind": "function",
+      "file": "tools/workflows/check-review-join.test.sh"
+    },
+    {
+      "id": "check",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
+    },
+    {
+      "id": "check",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.test.sh"
+    },
+    {
+      "id": "check",
+      "kind": "function",
       "file": "tools/workflows/unattended-unit.js"
     },
     {
@@ -3418,6 +3498,16 @@
       "file": "tools/hooks/format-guard.js"
     },
     {
+      "id": "checkChecklistWhole",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "checkChecklistWhole",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "checkCommand",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -3433,6 +3523,16 @@
       "file": "tools/hooks/format-guard.js"
     },
     {
+      "id": "checkDisposition",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "checkDisposition",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "checkDriveRootLitter",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -3441,6 +3541,16 @@
       "id": "checkEmptyTempVar",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkFile",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "checkFile",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.js"
     },
     {
       "id": "checkGateLeg",
@@ -3478,6 +3588,11 @@
       "file": "tools/hooks/format-guard.js"
     },
     {
+      "id": "checkOptinPackPresent",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "checkOriented",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -3503,6 +3618,16 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkRepoPath",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "checkRepoPath",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "checkRoleGate",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -3518,9 +3643,19 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkSameAddress",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "checkSameAddress",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "checkSeqMarker",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "checkSession",
@@ -3540,7 +3675,7 @@
     {
       "id": "checkSpecAuditDeclared",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/spec-audit-optin.js"
     },
     {
       "id": "checkSpoke",
@@ -3596,6 +3731,16 @@
       "id": "checkUnwalkableTarget",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkWalk",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "checkWalk",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "check_absent",
@@ -3786,6 +3931,11 @@
       "id": "check_agentcap",
       "kind": "function",
       "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "check_all",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.test.sh"
     },
     {
       "id": "check_ancestor",
@@ -4078,6 +4228,21 @@
       "file": "tools/push-main.sh"
     },
     {
+      "id": "check_case",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "check_case_evidence",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "check_catalogue",
+      "kind": "function",
+      "file": "tools/workflows/render_lenses.py"
+    },
+    {
       "id": "check_catalogue_region",
       "kind": "function",
       "file": "tools/roles/check_roles.py"
@@ -4246,6 +4411,11 @@
       "id": "check_convention",
       "kind": "function",
       "file": "tools/lexicon/subtokens.py"
+    },
+    {
+      "id": "check_copy",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.test.sh"
     },
     {
       "id": "check_count_sources",
@@ -4438,6 +4608,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_experiment",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "check_extract_covers",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -4518,6 +4693,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_fragments",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
+    },
+    {
       "id": "check_frozen",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -4531,6 +4711,11 @@
       "id": "check_gate_refused",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "check_gate_token",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
     },
     {
       "id": "check_gate_unknown",
@@ -4663,6 +4848,11 @@
       "file": "tools/unattended/check-unattended.sh"
     },
     {
+      "id": "check_held_out_frozen",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "check_helpers_hoisted",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -4681,6 +4871,11 @@
       "id": "check_hit",
       "kind": "function",
       "file": "tools/unattended/stop-guard.test.sh"
+    },
+    {
+      "id": "check_hit",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "check_hold_code",
@@ -4818,6 +5013,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_instances",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "check_invariant",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
@@ -4841,6 +5041,11 @@
       "id": "check_json_value",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "check_judge_rotation",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "check_keepalive_reaped",
@@ -5118,6 +5323,11 @@
       "file": "tools/check-spec-tokens.test.sh"
     },
     {
+      "id": "check_one_variable",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "check_operand",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
@@ -5211,6 +5421,11 @@
       "id": "check_path_match",
       "kind": "function",
       "file": "tools/codebase-map/replay-phrases.py"
+    },
+    {
+      "id": "check_path_match",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "check_path_read_arm",
@@ -5356,6 +5571,11 @@
       "id": "check_pytest_ini_probe",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_python_floor",
+      "kind": "function",
+      "file": "tools/workflows/render_lenses.py"
     },
     {
       "id": "check_quiet",
@@ -5680,7 +5900,7 @@
     {
       "id": "check_same_file",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "check_same_value",
@@ -5875,7 +6095,12 @@
     {
       "id": "check_spec_audit",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/workflows/spec-audit-optin.test.sh"
+    },
+    {
+      "id": "check_spec_audit_optin",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
     },
     {
       "id": "check_spec_exit",
@@ -6146,6 +6371,11 @@
       "id": "check_under",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_ungated",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
     },
     {
       "id": "check_unmerged_live",
@@ -7168,12 +7398,52 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "deriveAddressKey",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveAddressKey",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "deriveAddressOrder",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveAddressOrder",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "deriveAtOrder",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveAtOrder",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "deriveBindingSeverity",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
     },
     {
       "id": "deriveBindingSeverity",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "deriveCellSample",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveCellSample",
       "kind": "function",
       "file": "tools/workflows/tier2-review.template.js"
     },
@@ -7238,6 +7508,16 @@
       "file": "tools/workflows/drift-audit-state.template.js"
     },
     {
+      "id": "deriveOrder",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveOrder",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "deriveReadRev",
       "kind": "function",
       "file": "tools/workflows/unattended-build.js"
@@ -7268,9 +7548,49 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "deriveRoundFields",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveRoundFields",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "deriveRoundState",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveRoundState",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "deriveSidecarPath",
       "kind": "function",
       "file": "tools/unattended/run-lease.js"
+    },
+    {
+      "id": "deriveSlotLens",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveSlotLens",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "deriveStatedItems",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveStatedItems",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "deriveSubjectPair",
@@ -7279,6 +7599,56 @@
     },
     {
       "id": "deriveSubjectPair",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "deriveTwinFigures",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveTwinFigures",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "deriveTwinPairs",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveTwinPairs",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "deriveWalkGaps",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveWalkGaps",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "deriveWalkRows",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveWalkRows",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "deriveWalkSlices",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveWalkSlices",
       "kind": "function",
       "file": "tools/workflows/tier2-review.template.js"
     },
@@ -8283,6 +8653,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_paired_cases",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "derive_parallel_step",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -8308,6 +8683,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "derive_path_key",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "derive_peak",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -8321,6 +8701,11 @@
       "id": "derive_phase",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "derive_pin",
+      "kind": "function",
+      "file": "tools/workflows/review_pin.py"
     },
     {
       "id": "derive_plant_needle",
@@ -8366,6 +8751,11 @@
       "id": "derive_prompt_name",
       "kind": "function",
       "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "derive_proof_path",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "derive_push_failure",
@@ -8428,6 +8818,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "derive_ref_parts",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "derive_refreshed_at",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -8481,6 +8876,11 @@
       "id": "derive_rename_map",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_replay_evidence",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "derive_repo_root",
@@ -8596,6 +8996,11 @@
       "id": "derive_scope",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
+    },
+    {
+      "id": "derive_scouted_evidence",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "derive_scrub_set",
@@ -9483,6 +9888,16 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "extractDuplicateTarget",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "extractDuplicateTarget",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "extractErrorClass",
       "kind": "function",
       "file": "tools/unattended/stall-recorder.js"
@@ -9501,6 +9916,16 @@
       "id": "extractHandoffMarker",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "extractItemSlug",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "extractItemSlug",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "extractNewCommits",
@@ -9598,6 +10023,11 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "extract_code_tokens",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "extract_conf_keys",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
@@ -9626,6 +10056,11 @@
       "id": "extract_files_touched",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "extract_gated_scope",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
     },
     {
       "id": "extract_gates",
@@ -9670,7 +10105,7 @@
     {
       "id": "extract_line_ref",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "extract_microformat_shapes",
@@ -9720,7 +10155,7 @@
     {
       "id": "extract_range",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "extract_reason",
@@ -9760,7 +10195,7 @@
     {
       "id": "extract_section_ref",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "extract_segments",
@@ -9775,17 +10210,22 @@
     {
       "id": "extract_stated_count",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "extract_subject_pins",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "extract_supersessions",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "extract_tag_ref",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "extract_task_fields",
@@ -9900,7 +10340,7 @@
     {
       "id": "fanoutFindings",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "field",
@@ -10375,7 +10815,7 @@
     {
       "id": "intConsts",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "inventory_ids",
@@ -10470,7 +10910,7 @@
     {
       "id": "joinCall",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "join_aliases",
@@ -10480,12 +10920,17 @@
     {
       "id": "js",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/workflows/check-review-join.test.sh"
+    },
+    {
+      "id": "js",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
     },
     {
       "id": "jso",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/workflows/check-review-join.test.sh"
     },
     {
       "id": "json_artifact_inventory",
@@ -10633,6 +11078,21 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "loadHook",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.js"
+    },
+    {
+      "id": "loadHook",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.js"
+    },
+    {
+      "id": "loadReaders",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.js"
+    },
+    {
       "id": "loadRoleIndex",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -10671,6 +11131,11 @@
       "id": "load_catalogue",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "load_catalogue",
+      "kind": "function",
+      "file": "tools/workflows/render_lenses.py"
     },
     {
       "id": "load_checker",
@@ -11505,12 +11970,42 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/workflows/check-review-join.js"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.js"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/workflows/check_by_design_parity.py"
     },
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/workflows/render_lenses.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/workflows/review_pin.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/workflows/review_replay.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.js"
     },
     {
       "id": "make_repo",
@@ -11593,6 +12088,11 @@
       "file": "tools/unattended/stop-guard.js"
     },
     {
+      "id": "measureLensSlots",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.js"
+    },
+    {
       "id": "measureRun",
       "kind": "function",
       "file": "tools/workflows/orient-counterfactual.js"
@@ -11636,6 +12136,11 @@
       "id": "measure_coverage",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "measure_design_recall",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "measure_dossier_staleness",
@@ -11728,6 +12233,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "measure_known_set",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "measure_legs_retried_after_timeout",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -11813,6 +12323,11 @@
       "file": "tools/run-gates/held_halves.py"
     },
     {
+      "id": "measure_parsed",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "measure_pass",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -11870,7 +12385,7 @@
     {
       "id": "measure_recall",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "measure_red_streak",
@@ -11885,7 +12400,12 @@
     {
       "id": "measure_replay",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "measure_replay_experiment",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "measure_round_count",
@@ -11916,6 +12436,26 @@
       "id": "measure_run",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "measure_scouted_compare",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "measure_scouted_experiment",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "measure_scouted_grade",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "measure_scouted_judged",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "measure_scratch_bytes",
@@ -11976,6 +12516,11 @@
       "id": "measure_typed_counts",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "measure_union",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "measure_view_delta",
@@ -12245,7 +12790,7 @@
     {
       "id": "msg",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
     },
     {
       "id": "mut",
@@ -12513,11 +13058,6 @@
       "file": "tools/memory-recall/recall-opened.test.sh"
     },
     {
-      "id": "openersOf",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
-    },
-    {
       "id": "order_verb_of",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -12570,7 +13110,7 @@
     {
       "id": "parseBranches",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "parseChecklist",
@@ -12595,7 +13135,7 @@
     {
       "id": "parse_appendix_rows",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "parse_args",
@@ -12615,7 +13155,7 @@
     {
       "id": "parse_candidates",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "parse_ceilings",
@@ -12763,6 +13303,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "parse_known_set",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "parse_legacy_rows",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -12791,6 +13336,11 @@
       "id": "parse_observed",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
+      "id": "parse_opt_in",
+      "kind": "function",
+      "file": "tools/workflows/review_pin.py"
     },
     {
       "id": "parse_pin",
@@ -12830,7 +13380,7 @@
     {
       "id": "parse_record_findings",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "parse_record_markdown",
@@ -13028,6 +13578,16 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "printRefusal",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.js"
+    },
+    {
+      "id": "printRefusal",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.js"
+    },
+    {
       "id": "print_abort_notice",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -13191,6 +13751,11 @@
       "id": "print_items",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
+    },
+    {
+      "id": "print_known_set_score",
+      "kind": "function",
+      "file": "tools/workflows/review_replay.py"
     },
     {
       "id": "print_landing_line",
@@ -13785,7 +14350,7 @@
     {
       "id": "readSpecAuditDefault",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/spec-audit-optin.js"
     },
     {
       "id": "readStatusCells",
@@ -13893,6 +14458,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "read_arm_lines",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "read_arm_marker",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -13901,6 +14471,11 @@
       "id": "read_arm_rows",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
+      "id": "read_arm_rows",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "read_ask_back",
@@ -14231,6 +14806,11 @@
       "id": "read_carries_specs",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "read_case_list",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "read_catalogue_row",
@@ -15218,6 +15798,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "read_judge_cell",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "read_judged_kinds",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -15226,6 +15811,11 @@
       "id": "read_kinds",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_kit_block",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
     },
     {
       "id": "read_kit_conf",
@@ -15486,6 +16076,16 @@
       "id": "read_margin",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "read_marker_lines",
+      "kind": "function",
+      "file": "tools/workflows/render_lenses.py"
+    },
+    {
+      "id": "read_matched_list",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "read_may_of",
@@ -15943,6 +16543,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "read_proof_tree",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "read_public_times",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -15951,6 +16556,11 @@
       "id": "read_pybin_alias",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "read_raw_output",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "read_receipt",
@@ -16000,7 +16610,7 @@
     {
       "id": "read_record_kind",
       "kind": "function",
-      "file": "tools/workflows/review_replay.py"
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "read_recorded_phase",
@@ -16096,6 +16706,11 @@
       "id": "read_remote_red",
       "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "read_replay_cases",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "read_repo_root",
@@ -16298,9 +16913,19 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
+      "id": "read_scouted_population",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "read_scratch_file",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "read_seam_row",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "read_serves_ids",
@@ -16548,6 +17173,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_spec_subject_path",
+      "kind": "function",
+      "file": "tools/workflows/review_pin.py"
+    },
+    {
       "id": "read_spec_uids",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -16686,6 +17316,11 @@
       "id": "read_sweep_expectations",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_table",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "read_target_bytes",
@@ -17578,6 +18213,16 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "renderCellKey",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderCellKey",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "renderChainAction",
       "kind": "function",
       "file": "tools/workflows/unattended-build.js"
@@ -17650,17 +18295,32 @@
     {
       "id": "renderDeny",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
-    },
-    {
-      "id": "renderDeny",
-      "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "renderDeny",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "renderDeny",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.js"
+    },
+    {
+      "id": "renderDriveFold",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderDriveFold",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "renderFanoutDeny",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "renderFixLine",
@@ -17689,6 +18349,31 @@
     },
     {
       "id": "renderIntent",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "renderJoinDeny",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.js"
+    },
+    {
+      "id": "renderLensFileName",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderLensFileName",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "renderLensStage",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderLensStage",
       "kind": "function",
       "file": "tools/workflows/tier2-review.template.js"
     },
@@ -17740,7 +18425,17 @@
     {
       "id": "renderPerLineBlanked",
       "kind": "function",
+      "file": "tools/workflows/check-review-join.js"
+    },
+    {
+      "id": "renderPosix",
+      "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderPosix",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.js"
     },
     {
       "id": "renderPrompt",
@@ -17771,6 +18466,11 @@
       "id": "renderReadRev",
       "kind": "function",
       "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
+      "id": "renderRel",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "renderRerunTail",
@@ -17806,6 +18506,16 @@
       "id": "renderRoster",
       "kind": "function",
       "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
+      "id": "renderRoundLine",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderRoundLine",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "renderRouteContext",
@@ -17893,6 +18603,16 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "renderTwinRange",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderTwinRange",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "renderUtc",
       "kind": "function",
       "file": "tools/unattended/run-lease.js"
@@ -17901,6 +18621,26 @@
       "id": "renderVerdict",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "renderWalkBrief",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderWalkBrief",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "renderWalkTable",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderWalkTable",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "render_affordance_exempt",
@@ -18253,6 +18993,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "render_lens_slots",
+      "kind": "function",
+      "file": "tools/workflows/render_lenses.py"
+    },
+    {
       "id": "render_limit_env",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -18391,6 +19136,11 @@
       "id": "render_policy_text",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "render_population",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "render_prof_line",
@@ -18913,12 +19663,27 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "resolveKitDir",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "resolveKitDir",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.js"
+    },
+    {
       "id": "resolveLease",
       "kind": "function",
       "file": "tools/unattended/run-lease.js"
     },
     {
       "id": "resolveLiteralEnd",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "resolvePolicyHelper",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
     },
@@ -19810,6 +20575,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.test.sh"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/workflows/tier2-review.test.sh"
     },
     {
@@ -20431,6 +21201,11 @@
       "id": "resolve_python",
       "kind": "function",
       "file": "tools/workflows/check-verifier-fanout.test.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.test.sh"
     },
     {
       "id": "resolve_python",
@@ -21578,6 +22353,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_fan",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
+    },
+    {
       "id": "run_fixture",
       "kind": "function",
       "file": "tools/govkit/fixtures/retired_edits.py"
@@ -21883,6 +22663,16 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "run_home",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.test.sh"
+    },
+    {
+      "id": "run_home",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
+    },
+    {
       "id": "run_hook",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
@@ -21956,6 +22746,11 @@
       "id": "run_isolation_fixture",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "run_join",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.test.sh"
     },
     {
       "id": "run_kill",
@@ -22046,6 +22841,11 @@
       "id": "run_limit_call",
       "kind": "function",
       "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
+      "id": "run_limit_call",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
     },
     {
       "id": "run_limit_case",
@@ -22181,6 +22981,11 @@
       "id": "run_owned_bar",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "run_pack",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.test.sh"
     },
     {
       "id": "run_parity_plant",
@@ -22556,6 +23361,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "run_selftest",
@@ -23005,12 +23815,12 @@
     {
       "id": "scan",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "scan",
       "kind": "function",
-      "file": "tools/memory-tree/row_grammar.py"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "scanCommandHeads",
@@ -23023,9 +23833,19 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "scanFanout",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.js"
+    },
+    {
+      "id": "scanJoin",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.js"
+    },
+    {
       "id": "scanJoinFindings",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-review-join.js"
     },
     {
       "id": "scanLauncherOptions",
@@ -23041,6 +23861,11 @@
       "id": "scanMessageLines",
       "kind": "function",
       "file": "tools/hooks/format-guard.js"
+    },
+    {
+      "id": "scanOpeners",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "scanSegments",
@@ -23084,6 +23909,11 @@
     },
     {
       "id": "scan_arm_covers",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "scan_arm_labels",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
     },
@@ -23413,6 +24243,11 @@
       "file": "tools/runlog/extract.py"
     },
     {
+      "id": "scan_pairing_sites",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "scan_prefix_token",
       "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
@@ -23536,6 +24371,11 @@
       "id": "scan_shell_tokens",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "scan_sibling_path",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
     },
     {
       "id": "scan_skill_copies",
@@ -26725,7 +27565,7 @@
     {
       "id": "topLevelArgs",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "tracked",
@@ -27066,6 +27906,11 @@
       "id": "write_alias_fixture",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "write_arm_label",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
     },
     {
       "id": "write_ask_rows",
@@ -27655,7 +28500,7 @@
     {
       "id": "write_limit_stub",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
     },
     {
       "id": "write_lin_fix",
@@ -27720,7 +28565,7 @@
     {
       "id": "write_nest_pair",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
     },
     {
       "id": "write_normaliser",
@@ -28081,6 +28926,11 @@
       "id": "write_sc_legs",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "write_second_spec",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
     },
     {
       "id": "write_session",

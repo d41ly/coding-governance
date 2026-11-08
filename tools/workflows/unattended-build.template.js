@@ -227,6 +227,20 @@ function chunk(a, n) {
 //                                                   //   dispatch.args; the three review keys go to the
 //                                                   //   audit's review call. An absent key runs at the
 //                                                   //   agent type's own level, else the session's.
+//   optIn: { "<opt-in lens>": "<default lens>" },   // optional (TOOL-dFairHearing-3): forwarded unchanged
+//                                                   //   to the audit's review call, never checked here:
+//                                                   //   the review harness's boundary is the one check.
+//                                                   //   `review_pin.py` prints it. Absent, no key is sent
+//   preset: "unit-spec" | "design-audit",           // optional: forwarded the same way, unchecked; the
+//                                                   //   review harness picks its lens literal by it
+//   lensNotes: { "<literal name>": { "<lens key>": "<note>" } } // optional (TOOL-dFairHearing-9): the
+//                                                   //   per-preset or flat lens notes, forwarded the same
+//                                                   //   way, unchecked; the review harness reads its run
+//                                                   //   literal's entry. Absent, no key is sent
+//   twin: "<review.twin value>",                    // optional (TOOL-dFairHearing-43): forwarded the same
+//   unclassed: "<review.unclassed value>",          //   way, unchecked, each of the four: the review
+//   fixJudge: "<the review harness's fixJudge>",    //   harness's boundary refuses what it does not take.
+//   walk: { "runs": 2, "run": 1, "seed": "<seed>" } //   `review_pin.py` prints all but fixJudge. Absent, no key is sent
 // }
 // TOOL-aEvidencedLens-5 - the two fold args are REFUSED at a callee round of 1 (a fresh generation has
 // no previous round) and refused by name when malformed, before any agent spawns.
@@ -1739,6 +1753,20 @@ const auRaw = !specAudit ? null : await workflow(
     specs: auditSpecs,
     ...(checklist !== null ? { checklist: checklist } : {}),
     ...(priorFindings ? { priorFindings: priorFindings } : {}),
+    // TOOL-dFairHearing-3 S10 - the caller's swap and lens literal, as `review_pin.py` printed them,
+    // forwarded unchanged and UNCHECKED: the callee refuses both at its argument boundary, once. No key
+    // when the caller passed none, so every existing call keeps its arguments.
+    ...(a.optIn !== undefined ? { optIn: a.optIn } : {}),
+    ...(a.preset !== undefined ? { preset: a.preset } : {}),
+    // TOOL-dFairHearing-9 S5 - the caller's lens notes, forwarded the same way: the callee holds the
+    // literal's keys and derives the run's notes, so this harness neither checks nor rewrites them.
+    ...(a.lensNotes !== undefined ? { lensNotes: a.lensNotes } : {}),
+    // TOOL-dFairHearing-43 S3 - the pin's other keys and `fixJudge`, forwarded the same way, so a pinned key
+    // never runs the audit at the callee's default.
+    ...(a.twin !== undefined ? { twin: a.twin } : {}),
+    ...(a.unclassed !== undefined ? { unclassed: a.unclassed } : {}),
+    ...(a.fixJudge !== undefined ? { fixJudge: a.fixJudge } : {}),
+    ...(a.walk !== undefined ? { walk: a.walk } : {}),
   },
 )
 
@@ -1751,8 +1779,11 @@ const auRaw = !specAudit ? null : await workflow(
 // `reportPath` I had invented, which is the fixture grading the fixture.
 //
 // WHO OWNS THE VERDICT VOCABULARY. `CONVERGING|CONVERGED|NON-CONVERGENT|CEILING|BOUNDED` is produced by
-// `unattended.sh`'s `review_state()` from the PRIOR round's counts — no JS can compute it, because
-// convergence is a property of the sequence and not of this round. The old prompt ran the driver's
+// `unattended.sh`'s `review_state()` from the PRIOR round's counts, because convergence is a property of
+// the sequence and not of this round. `tier2-review.js` now computes the same rule as its return's
+// `roundState` from the `priorCounts` a caller passes, held equal to `review_state()` by the parity arm in
+// `tier2-review.test.sh` (TOOL-dFairHearing-17); this harness passes none, so an unattended run's rounds are
+// still recorded through the driver, which owns the token here. The old prompt ran the driver's
 // `--review` and returned its token; that call was deleted with the agent and nothing replaced it,
 // so no round was recorded either and the DoD leg that reads the last round found none.
 //
@@ -1818,6 +1849,22 @@ if (specAudit && auRaw.exit === 'deferred-platform') {
           'beside the --reason and --reaped that the hold step of the unattended Skill names.'),
     note: 'DEFERRED AT AUDIT — ' + pending.length + ' review agent(s) did not return, so the round is unrecorded and no unit was built' +
       (attended ? ' · ATTENDED, so no driver-side check ran' : ''),
+  }
+}
+// TOOL-dFairHearing-48 S4 - A GAPPED WALK IS A BLOCKED VERDICT, NOT A DEGRADED RUN. `tier2-review.js`
+// returns `blockers: null` beside the gaps, so the non-integer refusal below would misname it. It is
+// no round the driver can count: `--blockers` takes an integer, and a gap is not a confirmed finding.
+const walkGaps = specAudit && Array.isArray(auRaw.walkGaps) ? auRaw.walkGaps : []
+if (walkGaps.length > 0) {
+  log('audit round ' + roundNo + ': BLOCKED by ' + walkGaps.length + ' walk gap(s) — ' + walkGaps.join('; ') +
+    '; no round recorded, no unit built')
+  return {
+    identity: identity, slug: slug, mode: mode, base: base, stage: 'Audit', exit: 'walk-red',
+    round: roundNo, walkGaps: walkGaps, report: auRaw.report || '', units: ordered.length,
+    specced: speccedCount, specRefused: specRefused, subjectRound: subjectRound, auditIds: auditIds,
+    roster: [],
+    next: 'Read the review report, have the walkers return every cell of the slice each gap names, and re-run this workflow.',
+    note: 'BLOCKED AT AUDIT — ' + walkGaps.length + ' walk gap(s), so the round is unrecorded and no unit was built',
   }
 }
 // THE CALLEE'S EARLY RETURNS CARRY `confirmed: []` AND `blockers: null`, and they are NOT all

@@ -1,0 +1,16 @@
+// **Serves:** research TOOL-dFairHearing-25
+{
+  "instance": "review-replay",
+  "known": "memory/builds/dFairHearing/build/2026-11-03-build-TOOL-dFairHearing-1-known-set.md",
+  "arms": [
+    {"name": "design-audit", "settings": {"preset": "design-audit"}, "dispatched": 2}
+  ],
+  "candidates": [
+    {"case": "run-1",
+     "report": "C:/Users/DAILY-~1/AppData/Local/Temp/fhr1c/memory/builds/dFairHearing/reviews/2026-11-04-tier2-PLAY-dClosedLoop-1-layer-runtime.md",
+     "matched": "memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-25-matched-fhr1c.md"},
+    {"case": "run-2",
+     "report": "C:/Users/DAILY-~1/AppData/Local/Temp/fhr2b/memory/builds/dFairHearing/reviews/2026-11-03-spec-audit-PLAY-dClosedLoop-1-layer-runtime.md",
+     "matched": "memory/builds/dFairHearing/build/2026-11-04-build-TOOL-dFairHearing-25-matched-fhr2b.md"}
+  ]
+}

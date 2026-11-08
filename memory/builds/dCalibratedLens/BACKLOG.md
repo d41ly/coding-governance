@@ -10,6 +10,7 @@
 - TOOL-dCalibratedLens-53 · filed 2026-11-03 · CHECK 24 READS A SPEC TITLE'S FOREIGN ID AS A ROSTER UNIT. The unattended kit gate's check 24 ADD arm (`tools/unattended/check-unattended.sh`) collects every `[A-Z]+-[A-Za-z0-9]+-[0-9]+` token in the build README's generated units table, so a spec whose H1 quotes another build's unit id (dCalibratedLens units 32 and 42 named two dTotalRecall units) reads that unit as one added to the run's roster with no rescope row; the dCalibratedLens close's bar went red on it, OWN, and the titles were reworded to land · accept check 24 reads the units table's unit-id column alone, seen green on a planted spec title quoting another build's unit id and red on a planted roster unit added with no rescope row
 - TOOL-dCalibratedLens-54 · filed 2026-11-03 · held red: suite unattended driver selftest shard 4/8 red at 2c50ab31 on the daily held job, run 41632620578 · seen `.github/workflows/remote-ci.yml`@2c50ab31 · accept the suite is green on the daily held job at the default branch's tip
 - TOOL-dCalibratedLens-55 · filed 2026-11-03 · held red: suite unattended runlog-writer selftest red at 2c50ab31 on the daily held job, run 41632620578 · seen `.github/workflows/remote-ci.yml`@2c50ab31 · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-dCalibratedLens-56 · filed 2026-11-02 · run the losing test of each of the six opt-in review lenses TOOL-dFairHearing-3 catalogued `optin = false` in tools/workflows/lenses.toml (security, alternatives, cost, portability, adopter-migration, topology), each a blind replay that needs the replay bundle, the known-set file and the scorer factory ordered after that unit; the tests are the review-lens research's `[candidates]` section, PLAY-dClosedLoop-1 · accept each of the six losing tests is recorded, and each row whose test it does not lose is flipped to `optin = true` and nothing else
 
 ## Dispositions
 
@@ -29,3 +30,4 @@
 - KEEP · TOOL-dCalibratedLens-54 · filed by an unattended run for the owning build; outside this build's goal
 - SEV · TOOL-dCalibratedLens-55 · HIGH · a held self-test is red on the default branch's daily job
 - KEEP · TOOL-dCalibratedLens-55 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-dCalibratedLens-56 · LOW · until the tests run, no opt-in lens is selectable and a review cannot aim one at its class; nothing that ships today breaks

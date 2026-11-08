@@ -34,11 +34,12 @@
 # purpose, and no line anywhere named the file. Creating a live copy is an install decision, so it
 # stays with the hand `--render` a fresh install runs; `--tracked-only` refreshes and skips out loud.
 #
-# FOUR TOKENS, and each one is DERIVED here rather than typed:
+# FIVE TOKENS, and each one is DERIVED here rather than typed:
 #   KIT_DIR          this kit's directory, repo-relative — the harness's own siblings live in it
 #   TOOL_ROOT        the directory the kits sit in, with a trailing slash; empty at a root install
 #   MEMORY_TREE_DIR  the directory holding the memory-tree kit's `gotchas.py`
 #   FANOUT_CAP       the agent limit, runtime.agents-in-flight, as the policy reader answers it at HEAD
+#   LENS_SLOTS       a marked lens literal's body, the rows of `lenses.toml` render_lenses.py fills
 # The third is NOT derivable from the second. Both adopters measured when this was written install
 # the memory-tree kit FLAT, directly in their tool root, so `TOOL_ROOT` plus `memory-tree/` names a
 # file neither of them has. It is PROBED instead: the first TRACKED of the nested and the flat
@@ -619,6 +620,15 @@ render() { # template -> stdout
     esac
   fi
   out=${out//\{\{FANOUT_CAP\}\}/"$FANOUT_CAP"}
+  # THE LENS SLOTS (TOOL-dFairHearing-13): each `{{LENS_SLOTS}}` line under a lens-slots marker is
+  # filled from this kit's lens catalogue, `lenses.toml`, by `render_lenses.py`, both beside this
+  # script, which refuses by name on a catalogue or marker fault. Last, so a brief is never read as a
+  # token. Only a template carrying the token pays the python start; the `X` sentinel keeps the
+  # trailing newlines a substitution strips, as the first read above does.
+  if [[ $out == *'{{LENS_SLOTS}}'* ]]; then
+    out=$( printf '%s' "$out" | "$_cite_py" -B "$HERE/render_lenses.py" "$HERE/lenses.toml" || exit 1; printf X ) || return 1
+    out=${out%X}
+  fi
   printf '%s' "$out"
 }
 read_lf() { sed 's/\r$//' "$1"; }
@@ -693,15 +703,17 @@ TMPD=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMPD"' EXIT
 
 # THE WRITER SPLIT, DECIDED BY THE HOOK'S OWN VERDICT (TOOL-dGroundRules-30). `unattended-build.js`
-# bounds its spec-writer split under `// gov:fixed-writers`, which a hook that predates the writer
-# marker denies, and that hook's rule 2 then refuses every `unattended-build` call. No version tells
-# the two hooks apart, because a version is minted only at the landing, so the installed hook judges
-# the candidate render through this kit's own gate, `check-verifier-fanout.sh`, in both modes. A
-# denial renders the verifier-bounded fallback `render` holds, with one stderr line naming the hook's
-# first line and the update; a hook that denies the fallback too exits 2 and nothing is written. A
-# gate exit other than 0 or 1 is no verdict: the gate could not ask the hook, which the kit
-# requires as `agent-cap`, for want of the hook, node or a checkout. The fallback would ask the same
-# gate, so the render refuses at once with the gate's own answer on stderr (TOOL-dGroundRules-83).
+# bounds its spec-writer split under `// gov:fixed-writers`, and the fan-out rule reads that bound
+# through the hook's `readWriterBound`, so a hook answering below the rendered width, or refusing,
+# denies the split (TOOL-dFairHearing-50 S8). No version tells the two hooks apart, because a
+# version is minted only at the landing, so the installed hook judges the candidate render through
+# this kit's own gate, `check-verifier-fanout.sh`, in both modes. A denial renders the
+# verifier-bounded fallback `render` holds, with one stderr line naming the hook's first line and
+# the update; a hook that denies the fallback too exits 2 and nothing is written. A gate exit other
+# than 0 or 1 is no verdict: the gate could not ask the hook, which the kit requires as
+# `agent-cap`, for want of the hook, a hook the rule can load, node or a checkout. The fallback
+# would ask the same gate, so the render refuses at once with the gate's own answer on stderr
+# (TOOL-dGroundRules-83).
 # VERIFY_TOTAL is the hook's
 # MAX_VERIFIERS as a literal it resolves, as the templates write that total; a hook whose total falls
 # below it denies the fallback. A pair the memory-tree skip leaves unrendered asks nothing.

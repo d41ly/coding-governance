@@ -93,6 +93,11 @@ to a refusal; TOOL-dGroundRules-9's consumes-from edge on the reader still expec
 read as no file value, source `default`. Both units were built, and every cap read `refuse` until
 TOOL-dGroundRules-62 typed the refusal and the caps module answered that type alone as unset.
 
+It bit again in dFairHearing's owner-ordered diff review, 2026-11-05
+(memory/builds/dFairHearing/reviews/2026-11-05-review-TOOL-dFairHearing-43-47-diff-review.md, ids 5 and 11).
+TOOL-dFairHearing-43 S6 moved the policy lookup to `resolveKitDir`, and the header comment took the new rule. The
+deny key and one README sentence still stated the sibling lookup, so a deny sent its reader to the wrong directory.
+
 It bit again in dFinishedRecord's closing diff review, 2026-11-05
 (memory/builds/dFinishedRecord/reviews/2026-11-05-review-TOOL-dFinishedRecord-1-closing-diff-round1.md, L2).
 The build README's roster row for `TOOL-dFinishedRecord-1` was written from the brief, which placed check 24's
@@ -138,6 +143,10 @@ owner and the old count before calling a fold done.
 consumes-from edge naming that function**, and restates each consumer's expectation in its own spec:
 kept, or changed with the consumer's code in the same unit. The earlier unit's edge is the other half,
 and it reads fine until both are built.
+
+**Checklist line: a change to a lookup greps every runtime string and doc sentence that states the old
+lookup.** The lookup is the amended half; a deny key and a README sentence are the other half, and no leg
+reads either as prose.
 
 There is **no machine gate** for this class today, and the two arms above are filed as
 `TOOL-dTieredTribunal-24` rather than built here. Saying so plainly matters more than usual for this

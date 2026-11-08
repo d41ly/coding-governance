@@ -1,6 +1,6 @@
 ---
 name: criterion-asserts-what-its-own-command-cannot-show
-description: an acceptance criterion names a command and then asserts a figure that command never prints, a field nothing the change moves, a state that holds when the scope item is skipped, an absence its own records break by quoting the pattern, or an input respelled shorter to pass a join so it no longer probes what its scope item names
+description: an acceptance criterion names a command and then asserts a figure that command never prints, a field nothing the change moves, a state that holds when the scope item is skipped, an absence its own records break by quoting the pattern, an input respelled shorter to pass a join so it no longer probes what its scope item names, or an error text its tool never emits
 kind: class
 universal: false
 ---
@@ -10,7 +10,7 @@ universal: false
 ## Symptom
 
 An acceptance criterion looks rigorous — it names a real command, gives a real number, reads like an
-observation. It cannot fail, or cannot pass. Seven ways, and a spec set usually has more than one:
+observation. It cannot fail, or cannot pass. Eight ways, and a spec set usually has more than one:
 
 - **The command does not print that.** The criterion asserts on a per-subject set or a breakdown the
   named invocation never emits, so nobody can run it as written and the nearest printed total moves
@@ -36,6 +36,10 @@ observation. It cannot fail, or cannot pass. Seven ways, and a spec set usually 
   line is written. The command prints the tree before it, and the line either claims an output
   nobody saw or records another form. A spec audit asks of each such criterion which commit its
   ledger line lands in, and wants a form observable before that commit or a line landing after it.
+- **The tool does not say that.** The criterion quotes an error text or an exit status that the
+  named tool never produces, often borrowed from a library the tool does not use: a parser's
+  "unrecognized arguments" from a tool that reads its arguments by hand. No line emits the text, so
+  the criterion cannot pass on a correct build and cannot tell a shipped flag from an absent one.
 
 ## Where it bit
 
@@ -99,6 +103,13 @@ ledger recorded a `--cached` spelling, and the reason lived only in a commit tra
 `TOOL-aOrientedCast-21` AC2's deviation had. A close compares each criterion's command with the form
 its ledger line records, and a difference owes a spec amendment or an observation of the named form.
 
+The quoted error text bit dFairHearing at its round-5 spec audit, as item H1, review ids 1 and 11.
+`TOOL-dFairHearing-37` AC4 expected the bug-class tool, called on a range with a flag it does not
+ship, to exit 2 with argparse's "unrecognized arguments". That tool has no argparse: at `3708a705`
+the `--for-diff` branch of its `main`, lines 1335 to 1339, reads one argument and never looks past
+it, so the call exits 0 and nothing prints the text. `TOOL-dFairHearing-38` repaired the criterion
+to observe what the parser does.
+
 ## The fix
 
 Make the criterion DERIVE rather than ASSERT. Name the invocation that enumerates the set and have
@@ -130,6 +141,9 @@ A criterion that names a scope item runs the shipped check on a staged break, wh
 a fixture, a suite function run alone or a `--selftest` flag, and names the suite on a `New arm:`
 line. A side read of the check's input never runs the check, so it may sit beside that observation
 and never stands in for it.
+
+A criterion that quotes a tool's error text or exit status cites the line of that tool that emits it
+at the spec's base, or the scope item that adds it.
 
 ## Related
 

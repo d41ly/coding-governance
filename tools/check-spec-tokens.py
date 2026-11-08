@@ -218,6 +218,15 @@ key, read across their line wraps.
          (TOOL-dSafePassage-41). Its line prints the graded count on every run. What it does NOT
          see: a spec dated before the key, which keeps an out-of-order list ungraded, and a repeated
          label, which is no descent.
+  arm-labels the arm-labels join: each backticked `<PREFIX><n> AC<m>` label a bullet opening `The suite
+         arm labels` declares, outside fenced blocks, in every tracked spec at any status but WONTDO
+         -> a hit unless a suite a `New arm:` line of that spec names under a `covers` field holding
+         its `AC<m>` spells the label, `FH1 AC1` not met by `FH1 AC10` (TOOL-dFairHearing-48 S9). Its
+         population is not the live specs, because each carrier closes in its own build commit; a hit
+         on a frozen spec is repaired in the suite or takes a waiver row. TWO LIMITS: it proves a label
+         is spelled in a suite, never that the arm under it runs, and it reads no label outside the
+         bullet. Its line prints on every run, and a zero carrier count is an adopter's normal state,
+         printed and not refused.
 
 REFUSALS, not passes. An empty spec population refuses: a lint that graded nothing reports the same
 zero as a clean tree. An unreadable manifest refuses. A waiver row naming a path no spec cites, or
@@ -924,7 +933,9 @@ def read_carries_specs(root, design, cutoff, files=None, conf=None):
     `design_lib.read_spec_revisions`, the one reader the deviation population reads too (S12); its
     deletion, a revision with no text, is skipped. `statuses` maps each kept path to its status.
 
-    THE ONE HOME OF THE WONTDO FILTER (TOOL-dTrueNorth-16 S9): each status is the generator's
+    THE CARRIES JOIN'S WONTDO FILTER (TOOL-dTrueNorth-16 S9), one of two: `main` sets a WONTDO spec apart
+    for the arm-labels join with `WONTDO_STATUS`, a header regex, so a header the grammar below refuses
+    is graded there and set apart here. Each status is the generator's
     `parse_spec_text`, loaded by path from the kit beside this file, with the conf's family
     alternation, so the join and the units table read one header grammar (S11). A `WONTDO` spec is set
     apart before its history is read and counted under `wontdo`, and a spec whose header does not
@@ -983,7 +994,7 @@ def scan_carries(design, specs, exit_mode=False):
 
     Two changes from the instrument, each named: the withdrawn ids are the design's, read at its
     baseline, and the clause population is the view's. It parses NO status (TOOL-dTrueNorth-16 S9):
-    `read_carries_specs` is the WONTDO filter's one home, so a superseded unit's binding lines never
+    `read_carries_specs` is this join's WONTDO filter, so a superseded unit's binding lines never
     reach this function to carry or collide with its successor's, and `specs` is measured whole.
     Returns `{"findings", "carriers", "measured", "bindings"}`: `carriers` maps `("clause", id)` and
     `("node", key)` to `[(path, "whole" or "part k/n", hash)]`, `measured` is `{build: [path]}` over
@@ -1393,6 +1404,49 @@ def scan_spec_sizes(root, specs, files, answer, highwater, hw_rel, judge):
     return hits, stale, held, largest, warned
 
 
+def read_arm_lines(text):
+    """`text`'s `New arm:` lines, the walk `scan_arm_covers` states, as `[(suite path, [covers tokens
+    per field])]`: the suite is the line's first field, its backticks dropped (TOOL-dFairHearing-48 S9)."""
+    gates = extract_gates(text)
+    if gates is None:
+        return []
+    arms, cur = [], None
+    for line in gates.splitlines():
+        if line.startswith("New arm:"):
+            cur = [line.strip()]
+            arms.append(cur)
+        elif cur is not None and line[:1] in (" ", "\t") and line.strip():
+            cur.append(line.strip())
+        else:
+            cur = None
+    read = []
+    for arm in arms:
+        parts = " ".join(arm).split(" · ")
+        read.append((parts[0].removeprefix("New arm:").strip().strip("`"),
+                     [fl.strip().split()[1:] for fl in parts if fl.strip().startswith("covers ")]))
+    return read
+
+
+def scan_arm_labels(root, specs, files):
+    """THE ARM-LABELS JOIN (TOOL-dFairHearing-48 S9). -> (hits, carriers, graded)."""
+    hits, carriers, graded = [], 0, 0
+    for f in specs:
+        text = render_unfenced((root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n"))
+        bullets = ARM_LABEL_BULLET.findall(text)
+        if not bullets:
+            continue
+        carriers += 1
+        arms = read_arm_lines(text)
+        for label, ac in ARM_LABEL.findall(" ".join(bullets)):
+            graded += 1
+            suites = [p for p, fields in arms if any(ac in toks for toks in fields) and p in files]
+            said = re.compile(re.escape(label) + r"(?![0-9])")
+            if not any(said.search((root / p).read_bytes().decode("utf-8", "replace")) for p in suites):
+                hits.append((f, "arm-labels", f"arm-labels <- {f} {label}",
+                             f"no suite a New arm line covers {ac} with carries this label"))
+    return hits, carriers, graded
+
+
 def scan_arm_covers(f, text):
     """THE COVERS JOIN (TOOL-aMendedFleet-75): every id a `New arm:` line's `covers` field names must
     be a criterion label this spec's acceptance section defines.
@@ -1405,23 +1459,10 @@ def scan_arm_covers(f, text):
     Returns `(hits, arm_lines, carriers, tokens_graded)`; the counts feed the join's liveness line.
     The hit token carries the spec path, so a waiver row reaches this spec's id and no other's.
     """
-    gates = extract_gates(text)
-    if gates is None:
-        return [], 0, 0, 0
-    arms, cur = [], None
-    for line in gates.splitlines():
-        if line.startswith("New arm:"):
-            cur = [line.strip()]
-            arms.append(cur)
-        elif cur is not None and line[:1] in (" ", "\t") and line.strip():
-            cur.append(line.strip())
-        else:
-            cur = None
+    arms = read_arm_lines(text)
     labels = set(AC_LABEL.findall(extract_acceptance(text) or ""))
     hits, carriers, graded = [], 0, 0
-    for arm in arms:
-        fields = [fl.strip().split()[1:] for fl in " ".join(arm).split(" · ")
-                  if fl.strip().startswith("covers ")]
+    for _suite, fields in arms:
         carriers += 1 if fields else 0
         for toks in fields:
             for tok in toks:
@@ -1436,6 +1477,12 @@ def scan_arm_covers(f, text):
                     why = "not a criterion label this spec's Acceptance section defines"
                 hits.append((f, "covers", f"covers <- {f} {tok}", why))
     return hits, len(arms), carriers, graded
+
+
+# THE ARM-LABELS JOIN (TOOL-dFairHearing-48 S9): the bullet, read across its indented wrap, and a label in it.
+ARM_LABEL_BULLET = re.compile(r"^- The suite arm labels\b(.*(?:\n[ \t]+.*)*)", re.M)
+ARM_LABEL = re.compile(r"`([A-Z]+[0-9]+ (AC[0-9]+))`")
+WONTDO_STATUS = re.compile(r"^\*\*Status:\*\*\s*WONTDO", re.M)
 
 
 # THE PACKET JOIN (TOOL-dGroundRules-63). The instrument is DERIVED from the one tracked file this
@@ -1496,12 +1543,15 @@ def main(argv):
         return 1
     allspecs = sorted(f for f in files
                       if re.match(r"memory/builds/[^/]+/spec/.*\.md$", f))
-    specs, frozen = [], 0
+    specs, frozen, unretired = [], 0, []
     for f in allspecs:
-        if LIVE.search((root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")):
+        text = (root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
+        if LIVE.search(text):
             specs.append(f)
         else:
             frozen += 1
+        if not WONTDO_STATUS.search(text):
+            unretired.append(f)
     if not specs:
         print("spec-tokens: REFUSING — no tracked spec matched "
               f"{SPEC_GLOB}; a lint that graded nothing reports the same zero as a clean tree")
@@ -1808,6 +1858,10 @@ def main(argv):
     su_hits, su_examined, su_carriers = scan_supersede(root, specs, supersede_cut)
     hits += su_hits
 
+    # The arm-labels join (TOOL-dFairHearing-48 S9): every status but WONTDO, so a closed carrier stays graded.
+    al_hits, al_carriers, al_graded = scan_arm_labels(root, unretired, files)
+    hits += al_hits
+
     live = [h for h in hits if h[1] == "supersede" or h[2] not in waivers]
     for h in hits:
         if h[2] in waivers:
@@ -1923,6 +1977,9 @@ def main(argv):
     else:
         print(f"spec-tokens: supersede join · {SUPERSEDE_KEY} blank (arm off) · {su_carriers} live spec(s) "
               f"carry it and are not graded{su_tail}")
+    # The arm-labels join's line, on every run, carrying `live spec(s) ·` for the hands-off line's reason.
+    print(f"spec-tokens: arm-labels join · {al_graded} label(s) in {al_carriers} spec(s), every status but "
+          f"WONTDO, not only live spec(s) · {len(al_hits)} hit(s)")
 
     if listing:
         return 0

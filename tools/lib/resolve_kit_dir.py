@@ -9,6 +9,9 @@ The key is the kit's HOME directory under gov's tool root, not its registry id: 
 `hooks`, review-harness at `workflows`, playbook-render at `playbook`. The receipt's `source` column
 spells the home, so the home is the join key that resolves. A rendered row's `source` spells its
 template, so that row joins on its home and its `path`'s file name (TOOL-dRenderedAnchor-1).
+
+A caller that loads code from the answer takes that code on the row's word: the location
+rests on the working-tree receipt, so a forged row chooses what such a caller runs (TOOL-dFairHearing-48 F1).
 """
 
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)

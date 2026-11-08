@@ -7,7 +7,7 @@ from the kits and answers it selected. Change a source and re-render with
 `<prefix>/playbook/adopt-playbook.sh`; never edit the rendered text. Every rule is one line: a tool,
 gate or protocol named in section 3 carries the detail.*
 
-<!-- governance-template: v4.4 -->
+<!-- governance-template: v4.5 -->
 
 ## 1. Governing practices
 
@@ -118,7 +118,6 @@ gate or protocol named in section 3 carries the detail.*
 
 <!-- one-line -->
 - `/session-kickoff` opens every unit: it orients, loads this repository's kickoff manifest and derives a closed scope.
-- `<prefix>/memory-tree/gotchas.py --for-diff <base>..<head>` lists the bug classes a diff can hit; run it before any review.
 - Read a feature's codebase-map dossier first, and run `reuse_lookup.py "<behaviour>"` before building anything new.
 - `/memory-recall` answers why a thing is the way it is from the decision records; a symbol, caller or filename is still a grep.
 - `/drift-audit` measures whether this repository's records still match its tree; run it when the state feels unclear.

@@ -8,8 +8,8 @@ and two verbs of the unattended driver, `tools/unattended/unattended.sh`, record
 answer the verdict.
 
 The method states the rule in `memory/guides/BUILD-METHOD.md`, section M4, and the verbs' full
-reference is `memory/guides/UNATTENDED-VERBS.md`. This page anchors the three keys and the two
-verbs for [the docs leg](docs-leg.md), which reds a landing that changes one and not this page.
+reference is `memory/guides/UNATTENDED-VERBS.md`. This page anchors the three keys, the two verbs
+and the hook for [the docs leg](docs-leg.md), which reds a landing that changes one and not this page.
 
 ## When a chain runs
 
@@ -22,6 +22,11 @@ A spec audit is owed only where the build or its project declares it:
 Under neither, none is owed, and the tooling says so instead of running one. The opt-in is the
 owner's: a run never writes the key, nor passes `specAudit` on its own reading, unless its prompt
 record quotes the owner asking. An audit that seems owed goes to the wrap-up.
+
+## The opt-in pack
+
+The pack is a `PreToolUse` hook on `Workflow` calls. It refuses a spec audit in a build that declares none, so the opt-in above holds at the tool call. <!-- usage: hook:spec-audit-optin f61373f5 -->
+A default install wires it, and the refusal names the key the build's README would carry.
 
 ## How a round disposes
 

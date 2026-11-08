@@ -56,3 +56,35 @@ TOOL-aFrugalTurnstile-2	late row: its --brief row is in RUN.md at a90b2d820, two
 TOOL-aFrugalTurnstile-3	late row: its --brief row is in RUN.md at a90b2d820, after its build commit b3bd680e6, because the main loop recorded no brief before dispatching it
 TOOL-aFrugalTurnstile-5	late row: its --brief row is in RUN.md at a90b2d820, after its build commit 587b006f7, because the main loop recorded no brief before dispatching it
 TOOL-dGroundRules-86	misread: 8b0492fe2 is the unit's rev-2 spec commit (subject names the unit first, diff revs dSafePassage-26 and the unit's spec); the build commit is 82d3643cc, trailered Pass: TOOL-dGroundRules-86, which carries its brief row
+# THE dFairHearing ROWS are two kinds, written by TOOL-dFairHearing-45 at that run's close on
+# 2026-11-04. A LATE ROW: the pass commit left RUN.md out, so its --brief row reached history in the
+# records commit the main loop made with the builder's return, and the row's hash joins the brief's
+# blob at the build commit. A STALE ROW: the build commit carries the unit's first hash, because the
+# brief changed before the pass built, and the re-brief's row reached RUN.md in the records commit
+# after it. History is append-only, so no honest row can move into a build commit.
+TOOL-dFairHearing-2	late row: its --brief row is in RUN.md at a3d92a6dc, the records commit after its build commit e21580aac, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-3	late row: its --brief row is in RUN.md at 15c032dc2, the records commit after its build commit 9ce7710ab, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-4	late row: its --brief row is in RUN.md at ef74afe3a, the records commit after its build commit be4358a01, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-5	late row: its --brief row is in RUN.md at 5778cd0df, the records commit after its build commit d1db0fc80, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-6	late row: its --brief row is in RUN.md at 1b56b65e0, the records commit after its build commit a8546e186, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-7	late row: its --brief row is in RUN.md at 2cf645929, the records commit after its build commit a1956d229, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-8	late row: its --brief row is in RUN.md at 8b2b995fb, the records commit after its build commit 4a0e73da6, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-9	late row: its --brief row is in RUN.md at e79afd096, the records commit after its build commit c70d6a020, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-10	late row: its --brief row is in RUN.md at 461ec9973, the records commit after its build commit 59c5af433, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-11	late row: its --brief row is in RUN.md at 9a2d4f222, the records commit after its build commit ef757de0c, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-12	late row: its --brief row is in RUN.md at fd056f697, the records commit after its build commit af3831a6c, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-13	stale row: its build commit 864f43d25 carries 5e821c99d8cc, an earlier hash of its brief, and the re-brief's row reached RUN.md at 22ddf9fa5, the records commit after it
+TOOL-dFairHearing-14	late row: its --brief row is in RUN.md at 208f13ede, the records commit after its build commit c2939c9a6, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-16	stale row: its build commit 886c11fea carries 68795d4dfb6a, an earlier hash of its brief, and the re-brief's row reached RUN.md at 9c1a2857a, the records commit after it
+TOOL-dFairHearing-17	late row: its --brief row is in RUN.md at d562f515e, the records commit after its build commit 3745b407a, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-18	late row: its --brief row is in RUN.md at 46921281d, the records commit after its build commit b21501741, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-20	late row: its --brief row is in RUN.md at 576f89daa, the records commit after its build commit 93531c2e8, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-21	late row: its --brief row is in RUN.md at a882a5e60, the records commit after its build commit 0e647030c, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-22	late row: its --brief row is in RUN.md at d059e36fd, the records commit after its build commit a72758e14, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-23	late row: its --brief row is in RUN.md at d65cd5636, the records commit after its build commit 7ff570cfa, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-25	late row: its --brief row is in RUN.md at 210f6ae34, the records commit after its build commit d3c98d523, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-27	late row: its --brief row is in RUN.md at 03ed40f98, the records commit after its build commit e3bd1ad45, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-30	late row: its --brief row is in RUN.md at 3cf918a65, the records commit after its build commit 0d11473c8, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-32	late row: its --brief row is in RUN.md at 884bcb6e6, the records commit after its build commit fb755fa80, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-37	late row: its --brief row is in RUN.md at ff578b9df, the records commit after its build commit 6d768c563, because the pass left RUN.md out and the main loop committed it with the builder's return
+TOOL-dFairHearing-39	late row: its --brief row is in RUN.md at 603b0aef0, the records commit after its build commit f27f8fa6a, because the pass left RUN.md out and the main loop committed it with the builder's return
