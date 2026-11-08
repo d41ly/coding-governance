@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-33 — pins and drift: each gov change record marked `editorial` or `semantic`, a stale pin acting as `instructions.stale` says, successors re-pointing or orphaning an edge
 
-**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 32 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-6 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 32 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0063@a1361320 whole
 **Carries:** node:policy-key.instructions.stale
@@ -26,6 +26,7 @@
 | [2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md](../prompts/2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-46 |
 | [2026-11-02-prompt-PLAY-dOrderedCharter-33-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-33-build-brief.md) | journal | — |
 | [2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md) | research | PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-43-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-43-drift-fold-brief.md) | research | PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -53,7 +54,10 @@ beside the repository's own (IA-3; v2:1246).
   applied to `before` (spelling); or when the record carries an owner's ruling that
   `instructions.edit`'s proof recorded. Anything else is `semantic`. A change record marked
   `editorial` that `derive_change_mark` reads `semantic` is red, naming the record, the unit and the
-  first differing word. Observed by AC1, AC2.
+  first differing word. A change record holds its `Before` and `After` as pins, `<tag>@<hash8>`, not
+  as texts, so the check reads both texts from the manifest's blobs at the record's commit and at that
+  commit's first parent, and a text whose pin differs from the record's is red as a record that does
+  not match its change. Observed by AC1, AC2.
 - **S2** — The pin walk. `derive_pin_state(tag, pin, records, units)` follows gov's change records for `tag`
   from the revision whose text hashes to `pin` up to the current text: no record or only `editorial`
   ones → `standing`; any `semantic` one → `stale`; a record whose `successor` is one tag → `renamed`
@@ -84,7 +88,8 @@ beside the repository's own (IA-3; v2:1246).
   registered class with none is a finding of dSafePassage's docs leg (TOOL-dSafePassage-13 S1, S8): usage
   shape `none`, with a `why`, because a gov unit's usage is no verb, key, hook, leg or page, and the units
   that do carry a `usage` field are PLAY-dOrderedCharter-37's own `unit-usage` class (its §8 F7).
-  Observed by AC7 and AC11.
+  The two rows land once the tree holds a gov unit row, in a later commit of this unit (the fork
+  record's F5). Observed by AC7 and AC11.
 - **S6** — New gov units beside the repository's. The update lists each gov unit tag present at the
   target revision and absent at the receipt's, whose `level` and `select` match a level and a
   selection the repository's overlay units hold, one `new-beside` line each, advisory. Observed by AC8.
@@ -96,10 +101,11 @@ beside the repository's own (IA-3; v2:1246).
   every pinned edge, journals `warn` edges under `--write`, and prints JSON: one line per gov unit in
   S22's verdict shape (`stale`, `orphaned`, beside PLAY-dOrderedCharter-32's states), each order as
   data, and whether `refuse` holds the update. `cmd_update` prints the lines among its verdicts, holds
-  the update under `refuse`, and writes each order with `write_row_order(outbox, "unit", row,
-  to_commit, body)` (TOOL-dSafePassage-9 S4), `row` a mapping whose `path`,
-  `.governance/instructions.toml#<repository tag>`, keys the order, as the writer keys its file on
-  `render_order_slug(row['path'])` (`tools/govkit/govkit.py:10760`). The verb then runs the row pass
+  the update under `refuse`, and writes each order with `write_row_order(outbox, "unit", path, text)`
+  (TOOL-dSafePassage-9 S4), the order's `path`, `.governance/instructions.toml#<repository tag>`,
+  keying it, as the writer keys its file on `render_order_slug` of that key
+  (`tools/govkit/govkit.py:10760`), and `text` the order the verb returned whole, its own title
+  included. The verb then runs the row pass
   for every row kind PLAY-dOrderedCharter-7's kinds register lists, through the composer
   PLAY-dOrderedCharter-35 registers; with none registered it prints `0 row kinds registered`.
   Observed by AC4, AC5, AC9.
@@ -155,6 +161,14 @@ owner's words, admitted only when the record's proof field shows `instructions.e
 `signed` proof (`instructions.proof`), PLAY-dOrderedCharter-15's `Proof` field; a ruling on a record whose
 `Proof` reads `none — <value>` is red.
 
+Re-read at `f56f6a189`, the change kind's grammar is `tools/memory-tree/build_records.py#KINDS`: required
+`Unit`, `Action`, `Before`, `After`, `Mark`, `Proof` and `Caused-by`, `Mark` closed to `editorial` and
+`semantic`, and `Successor` on an ending action. `Proof` admits `tty-cli` or `none — <value>`
+(`tools/memory-tree/build_records.py#PROOF`), and the command's door writes `none — stand-in door`, so no
+`signed` proof exists yet and a ruling is admitted on `tty-cli` alone until one does. `**Ruling:**` is an
+optional field the grammar does not list; `tools/memory-tree/build_records.py#read_record` takes an
+unlisted field without a fault, so the field needs no change to the kind's required or closed sets.
+
 ### The walk and the modes
 
 ```
@@ -181,15 +195,23 @@ body naming the edge, gov's old and new text, and the command that re-pins or re
 `cmd_update` writes it with `write_row_order(outbox, "unit", row, to_commit, body)` as
 `.governance/outbox/update-unit-<slug>.md`.
 
+Re-read at `f56f6a189`, the writer is `tools/govkit/govkit.py#write_row_order(outbox, kind, key, text)`,
+four arguments, the file named by `tools/govkit/govkit.py#render_row_order_key` as
+`update-<kind>-<slug>`. A row verdict's text comes from `tools/govkit/govkit.py#render_row_order`, whose
+title reads "gov no longer ships" for every kind but `render-edited`, a false title for a stale edge. So
+the drift verb's `body` is the order's whole text, its own title line, the target revision and the
+lines above, and `cmd_update` passes it as `text` with the entry's `path` as `key`; it composes no
+second text. The order still lands as `.governance/outbox/update-unit-<slug>.md`.
+
 ### The step gate class
 
 ```toml
 [[class]]
 id = "unit"
-reader = "playbook/pins.py:read_unit_members"
-plant = "playbook/pins.py:write_unit_plant"
+reader = "{prefix}/playbook/pins.py:read_unit_members"
+plant = "{prefix}/playbook/pins.py:write_unit_plant"
 summary = "each gov instruction unit, by its tag, from every kit's instructions.toml"
-witness = "playbook/pins.py:read_change_successors"
+witness = "{prefix}/playbook/pins.py:read_change_successors"
 ```
 
 ```toml
@@ -205,6 +227,19 @@ included, so a retired unit is witnessed by its record and needs no step row. Th
 names no row source, a `none` class having no rows; where TOOL-dSafePassage-13's grammar asks for
 `rows` on every class, the builder spells it as that unit's `file` and `installable` rows, its other
 `none` classes, spell theirs.
+
+Re-read at `f56f6a189`. `tools/govkit/surface-classes.toml` spells each function as `<path under the
+tool root>:<function>` through `{prefix}`, as its `file` and `installable` rows do, and
+`tools/govkit/step_gate.py` loads the reader, the plant and the witness from the tip's tree for both
+sides of a range, so each takes the tree's root and reads no import-time state. The step gate is
+landed (`tools/govkit/step_gate.py`, its keys `tools/govkit/step_gate.py#CLASS_KEYS`). `tools/govkit/usage.toml`
+says a `page` or `none` class carries no `rows`, and its `file` and `installable` rows carry none, so the
+`unit` row carries `class`, `usage = "none"` and a `why`, and no `rows`. The reader returns unit tags
+through `tools/playbook/instruction_units.py#read_units`, which finds nothing until
+`PLAY-dOrderedCharter-40` writes the first unit row, at a later order than this unit, and the step gate
+refuses, exit 2, a class empty at the tip. So the two rows land in a later commit of this unit, once the
+tree holds a gov unit row, and this unit's pass lands the three functions and their fixture arm (the
+fork record's F5).
 
 ### Inventory
 
@@ -225,7 +260,9 @@ overlay prints no unit line.
 ### Rollout
 
 Live at landing; `order` is the default, so a stale edge files an order and never blocks an update
-unless the repository sets `refuse`. S8 lands as two commits: the first fills the row and drains the
+unless the repository sets `refuse`. S5's two registry rows land in a later commit of this unit, made
+once the main loop records a tracked gov unit row, which `PLAY-dOrderedCharter-40` writes; until then
+the step gate holds no `unit` class (F5). S8 lands as two commits: the first fills the row and drains the
 list; the second stages only `.governance/policy.json` as `policy.py mirror --write` regenerates it,
 because a catalogue edit stales the mirror and the guard admits a mirror commit only when the policy
 file and the catalogue equal HEAD (TOOL-dGroundRules-5 S1, TOOL-dGroundRules-19 S1).
@@ -298,7 +335,8 @@ file and the catalogue equal HEAD (TOOL-dGroundRules-5 S1, TOOL-dGroundRules-19 
   no change record, it exits 1 naming `unit:<tag>`; with a change record naming its successor, it
   exits 0.
   Red when: a gov unit vanishes unwitnessed, or a witnessed one reds.
-  fixture: needs TOOL-dSafePassage-10's step gate landed, which the chain lands before this build run.
+  fixture: the step gate is in the tree, `tools/govkit/step_gate.py`; the observation is made at the
+  later commit that lands the `unit` class row, once a gov unit row is tracked (F5).
 - **AC8** — When `--plant new-beside` adds a gov unit at level 0 to a release whose adopter holds a
   level-0 `repo.` unit, the update prints one `new-beside` line naming both; a new gov unit at level 4,
   where the adopter holds none, prints nothing.
@@ -315,20 +353,31 @@ file and the catalogue equal HEAD (TOOL-dGroundRules-5 S1, TOOL-dGroundRules-19 
   `git grep -n -F 'read_policy_value("instructions.stale"' -- tools/govkit/govkit.py` finds one line.
   Red when: a second row is added, the row keeps no summary or usage, the name stays on the shrink-only
   list, or the mode is read in a shape the reader-coverage arm does not count.
-  fixture: the policy kit's paths are quoted because none is tracked until dGroundRules builds.
+  fixture: the policy kit is tracked since dGroundRules landed; at `f56f6a189` the row holds `allowed`,
+  `default` and `owner` alone and the name is on the list, so the probe prints `False`, `False` before the
+  pass.
 - **AC11** — When `git grep -n -A3 -F 'class = "unit"' -- tools/govkit/usage.toml` runs after the pass,
   it prints one `[[class]]` row carrying `usage = "none"` and a `why`, and `git grep -n -F 'id = "unit"'
   -- tools/govkit/surface-classes.toml` prints the registered class it joins.
   Red when: the `unit` class is registered with no `usage.toml` row, which the docs leg reads as a
   finding, or the row declares a usage shape a gov unit does not have.
+  fixture: run at the later commit that lands both rows (F5).
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit runbook parity` · `recall floor arms` · `playbook render selftest` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit runbook parity` · `recall floor arms` · `playbook render selftest` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `step-gate`
 
 New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC8 · `run_selftest` runs `pins.py --fixture` over every plant of §6, each staging its own failing case · none
 New arm: tools/govkit/selftest.py · covers AC9 · an update over the fixture adopter with a stale edge, staged by removing the handler call · none
 New arm: tools/govkit/surface-classes.toml · covers AC7 · the step gate's arms run the `unit` class row's plant, a gov unit tag removed with no change record · none
+
+The third arm arms at the later commit F5 rules, when the `unit` row lands; the leg line names
+`step-gate`, the leg that reads the class registry on every bar and refuses an empty class. The `govkit acceptance
+matrix` leg is red at HEAD for the renderer's dependency unit 73 parked for the owner (its fork
+record's F1). `pins.py` reaches `derive_pin_hash` through
+`tools/playbook/instruction_units.py#derive_unit_pin`, which resolves the memory-tree kit inside the
+call, and the step gate loads its class functions from the tip's tree, so the module adds no
+import-time edge to that red.
 
 ## 8. Open questions
 
@@ -355,6 +404,18 @@ New arm: tools/govkit/surface-classes.toml · covers AC7 · the step gate's arms
   layer. RESOLVED (agent, 2026-10-24, delegated): (a), rung 1, the parents' kit rule and writer
   signature; S5's class row takes TOOL-dSafePassage-10's `reader`, `plant` and own-record `witness`.
   widens: none · relaxes: none
+- **F5 — When S5's `unit` class row lands, given that no gov unit row exists yet.** At `f56f6a189` no
+  `instructions.toml` is tracked, and `PLAY-dOrderedCharter-40` writes the first unit row at a later
+  order than this unit. `tools/govkit/step_gate.py` refuses, exit 2, a class empty at the tip, so a
+  `unit` row landing with this unit's pass reds the `step-gate` leg until then. Options: (a) land both
+  rows with the pass; (b) hand both rows, with AC7 and AC11, to unit 40, the unit that writes the first
+  gov unit; (c) the pass lands `pins.py`'s reader, plant and witness, and both rows land in a later
+  commit of this unit once a gov unit row is tracked, the pattern of unit 43's S4, which waits on unit
+  8's AC1. (a) fails the first veto: the bar's `step-gate` leg refuses. (b) and (c) meet the same
+  criteria; (b) moves scope into a sibling's spec, which this revision does not write, an open question
+  more. RESOLVED (agent, 2026-11-08, delegated): (c), by the build method's fork rule's tie-break, fewer
+  open questions; the main loop makes the later commit and records AC7 and AC11 from it. widens: none
+  · relaxes: none
 
 ## 9. Revision log
 
@@ -363,6 +424,16 @@ New arm: tools/govkit/surface-classes.toml · covers AC7 · the step gate's arms
 - rev-3 · 2026-10-24 · §2 S3, S7, S8 (new) · §3 Edges · §4 The walk and the modes, Inventory, Rollout, Files touched · §5 risks · AC4, AC9, AC10 (new) · §8 F4 (re-resolved) · §10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 18, U3, U4 and U5: the drift is a `pins.py` verb `cmd_update` runs, whose orders it writes keyed on a `path`; the mode is read through `read_policy_value` from the target's committed policy; the landed row is filled and drained, never added. Then §2 S5 · §4 The step gate class, Files touched · AC11 (new): the `unit` class gains its `usage.toml` `[[class]]` row, shape `none` with a `why`, in the commit that registers it (TOOL-dSafePassage-13 S1, S8).
 - rev-4 · 2026-10-25 · §2 S3 · §4 Inventory · §5 risks · per `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks`, the parent audit's P3: dSafePassage unit 9's `read_policy_value` takes `rev`, so `cmd_update` reads `instructions.stale` at the target's `HEAD`, the overlay's revision, and the risk of a mode read at the landed ref goes.
 - rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-6 · 2026-11-08 · S1 S5 S7 · section 4 The mechanical classes, The walk and the modes, The step
+  gate class, Rollout · AC7 AC10 AC11 · section 7 · section 8 F5 new · section 10 · from
+  `2026-11-08-prompt-PLAY-dOrderedCharter-43-drift-fold-brief.md`: re-read at `f56f6a189`. A change record
+  holds pins, not texts, so the mark check reads both texts from the manifest's blobs; `Proof` admits
+  `tty-cli` or `none — <value>` and no signed proof yet; `write_row_order` takes a key and a whole text,
+  and `render_row_order`'s title is false for a stale edge, so the verb returns the order's whole text;
+  the class row spells its functions through `{prefix}` and carries no `rows`; the step gate refuses an
+  empty class and no unit row exists before unit 40, so the two rows land in a later commit of this unit
+  (F5); the policy kit and the step gate are in the tree, so two fixture lines are re-stated; moved
+  anchors gain their symbols, and the matrix leg's parked red is named.
 
 ## 10. Reuse audit
 
@@ -378,6 +449,14 @@ records why its classifier does not reuse it either. `reuse_lookup.py "classify 
 or semantic and flag stale pinned edges on update"` ranked `changed` (`run-gates.sh`), `classify`
 (`tools/govkit/census.py`, `tools/lexicon/subtokens.py`, `tools/memory-tree/check-arms.py`),
 `classify_outcome` and `build_stale_dossiers`; each classifies something else (a fork, a sub-token,
-an arm, an exit, a dossier), so the classifier is new.
+an arm, an exit, a dossier), so the classifier is new. Re-read at `f56f6a189`: `cmd_update` is
+`tools/govkit/govkit.py#cmd_update`, its body `_cmd_update`; govkit's inlined resolver is
+`tools/govkit/govkit.py#resolve_kit_dir`; the mode read is `tools/govkit/govkit.py#read_policy_value`,
+taking `rev`; the order writer is `tools/govkit/govkit.py#write_row_order`, keyed through
+`tools/govkit/govkit.py#render_order_slug`; the change grammar is `tools/memory-tree/build_records.py#KINDS`,
+its records read by `tools/memory-tree/build_records.py#read_changes`; the pin normaliser is
+`tools/memory-tree/design_lib.py#derive_pin_hash`, reached through
+`tools/playbook/instruction_units.py#derive_unit_pin`; the class registry's loader is
+`tools/govkit/step_gate.py`.
 
 Recall terms used: `python tools/memory-recall/query.py "how does govkit update report a changed shipped file against an adopter's edit" --terms "editorial semantic risk deviation amends supersedes pin hash update verdict re-rendered reseed-available stale"`

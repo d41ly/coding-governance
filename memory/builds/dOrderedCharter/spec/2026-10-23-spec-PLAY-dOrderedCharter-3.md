@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them
 
-**Status:** DEFERRED · rev-11 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-12 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0033@756303be whole
 
@@ -353,6 +353,24 @@ Live at landing. The leg carries the principle key `PLAY-dOrderedCharter-7` adds
 naming `P13`. The hold is live with it and outlasts this unit's close: the owner's ruling lands after
 the unit, by the hands-off edge in section 3.
 
+The pass changes the roles generator and never its outputs. `tools/roles/kit.toml` declares
+`.claude/agents` and `.claude/roles.json` as `[[generated]]` outputs of `render_agents.py`, and the
+dispatch refuses a write set declaring a generated output together with its generator. So right after
+the pass commit the main loop runs the roles render's write verb, from that script's own usage:
+
+```bash
+python tools/roles/render_agents.py --write
+```
+
+It commits the re-rendered `.claude/agents/*.md`, and `.claude/roles.json` if the render moved it,
+with the unit's records. Between the two commits the roles render's `--check` reads every agent file as
+drift, which is why AC3 and AC4 are observed after the re-render. The other declared outputs pair with
+nothing in this write set: the codebase map's `memory/map/generated/` is in it, but its generator
+`tools/codebase-map/gen_map.py` is not, and the pass only runs it; the memory-tree, policy and
+`.unattended.conf` pairs name generators this unit does not touch. `AGENTS.md` is no declared output,
+neither a `[[generated]]` row nor a `GENERATED_INDEXES` pair, so the charter's re-render stays in the
+pass beside `tools/playbook/render_playbook.py`.
+
 ### Files touched (estimate)
 
 - `tools/lib/envelope.py`
@@ -395,7 +413,8 @@ the unit, by the hands-off edge in section 3.
 - `.claude/rules/product.md`
 - the renders of the sources above, re-rendered and never edited: `AGENTS.md`, `memory/guides/*.md`
   (BUILD-METHOD's excepted, its source being untouched), `memory/TEMPLATE-SPEC.md`,
-  `memory/HYGIENE.md`, `.claude/agents/*.md`, `.claude/skills/*/SKILL.md`
+  `memory/HYGIENE.md`, `.claude/skills/*/SKILL.md`; the agent files are the roles generator's outputs,
+  which the main loop re-renders after the pass (Rollout)
 - `.governance/instructions.lock` (the charter's re-render moves it)
 
 ### Alternatives rejected
@@ -443,12 +462,13 @@ the unit, by the hands-off edge in section 3.
   empty.
   Red when: one byte of a copy is changed.
 - **AC3** — When `head -3 AGENTS.md` and the first body line of `.claude/agents/gov-builder.md` after
-  its front matter are read after a re-render, they are `[AGENTS.md · Level 0 · …]` and the same
+  its front matter are read by the main loop after its roles re-render (Rollout), they are `[AGENTS.md · Level 0 · …]` and the same
   opener naming `.claude/agents/gov-builder.md` at `Level 5`, and each file ends its body with its closer;
   and `git grep -n -F -e '[AGENTS.md · ' -e '[/AGENTS.md]' -- .claude/agents/` prints nothing.
   Red when: either renderer drops the envelope, or the roles render carries the charter's envelope lines
   into an agent file's Charter block.
-- **AC4** — When `envelopes --check --root .` runs over gov's tree after the build, it exits 0, prints a
+- **AC4** — When `envelopes --check --root .` runs over gov's tree after the main loop's roles re-render
+  (Rollout), it exits 0, prints a
   `HELD` line naming `memory/guides/BUILD-METHOD.md` with the words `NOT checked`, prints an `ALIAS` line
   naming `CLAUDE.md`, and prints a covered count equal to the number of files S6 derives less the one
   held.
@@ -638,6 +658,13 @@ New arm: tools/playbook/instruction_units.py · covers AC5 AC6 AC9 AC10 AC11 AC1
   renders no envelope and three exact-byte checks stay green, and `parse_charter` drops the envelope's
   lines so no closer rides into an agent file or handoff; section 4 records the exact-byte checks an
   envelope reaches.
+- rev-12 · 2026-11-08 · section 4 Rollout and Files touched · AC3 AC4 · from unit 3's builder hand-back
+  of rev-11, before any write: the dispatch refused the write set for declaring `.claude/agents` with
+  its generator `tools/roles/render_agents.py`. The pass changes the generator only; the agent files
+  leave the Files touched, and the main loop runs `python tools/roles/render_agents.py --write` right
+  after the pass commit and commits the agent files, and the role index if it moved, with the unit's
+  records; AC3 and AC4 are observed after that re-render. Every other declared output was checked and
+  pairs with nothing in the write set.
 
 ## 10. Reuse audit
 

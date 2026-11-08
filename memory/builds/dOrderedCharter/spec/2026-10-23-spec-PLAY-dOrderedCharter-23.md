@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-23 — a build run unattended by default from its request, said in the drive section, and the `[land]` rule read through the request's mandate
 
-**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 30 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 30 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0053@8f756a97 whole
 
@@ -19,6 +19,7 @@
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-11-02-prompt-PLAY-dOrderedCharter-23-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-23-build-brief.md) | journal | — |
 | [2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md) | research | PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-43-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-43-drift-fold-brief.md) | research | PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -35,6 +36,13 @@ a build runs unattended by default from its request, and rewrites `[land]` so th
 read the request's mandate. At this build the request's mandate is the build README the unattended
 driver authorizes at its pinned BASE (`check_authorization`, `tools/unattended/unattended.sh:3927`),
 the stand-in until a placed request exists.
+
+Re-read at `f56f6a189`. Since unit 1 the `[land]` line is the `line` of `practice.land` in
+`tools/playbook/practices.toml`, rendered into `AGENTS.md`'s practice region, and the template holds
+`{{PRACTICES}}` where the line sat; its wording is the one quoted above. The template's tools lines
+still present `/unattended` beside the attended `/build`, inside a `kit:unattended` fence. The driver's
+authorization is `tools/unattended/unattended.sh#check_authorization`. No kit descriptor holds a
+`[[drive]]` row yet: they are unit 6's, which lands before this unit.
 
 ## 2. Scope (IN)
 
@@ -56,7 +64,7 @@ the stand-in until a placed request exists.
 ## 3. Non-goals (OUT)
 
 - No change to the driver, its authorization or its modes (`AUTH_MODES`,
-  `tools/unattended/unattended.sh:1051`).
+  `tools/unattended/unattended.sh:1051`, now `tools/unattended/unattended.sh#AUTH_MODES`).
 - No `attendance` key and no attend request: dKeptSession's (`cl-dClosedLoop-0155`); the
   `step —` announcement is dWellOiledMachine's (`cl-dClosedLoop-0304`).
 - No placed request and no `run` verb: the request object arrives with the loop's later builds, and
@@ -101,7 +109,8 @@ unresolved it is 189, both under `ONE_LINE_MAX` (200, `tools/playbook/render_pla
 at writing and re-derived by the catalogue reader. "The request's mandate" is the phrase P4 uses; "the
 build README a run authorizes" names today's carrier, the README committed on the default branch
 before the run's branch existed, which `check_authorization` compares at the pinned BASE
-(`tools/unattended/unattended.sh:3910-3927`).
+(`tools/unattended/unattended.sh:3910-3927`). Both lengths were re-measured at `f56f6a189`, and the
+constant is `tools/playbook/render_playbook.py#ONE_LINE_MAX`, still 200.
 
 ### The readers left unedited
 
@@ -112,9 +121,18 @@ before the run's branch existed, which `check_authorization` compares at the pin
 | `WIRE-INTO-PROJECT.md:154` | the pointer to the one substitute for the explicit ask | yes |
 | `memory/guides/MERGE-BAR.md:88` | a committed standing mandate as the substitute | yes |
 | `tools/roles/SKILL.template.md:101` and its render `.claude/skills/build/SKILL.md:101` | landing by the owner's ask, or a mandate by its protocol | yes |
+| `memory/guides/BUILD-METHOD.md` and its kit copy `tools/memory-tree/BUILD-METHOD.template.md`, the Landing paragraph | merge and push authorization are the charter's `[land]` practice and the unattended-run protocol | yes |
+| `tools/playbook/gov_tag.py`, the `bare` and `bare-charter` plants | fixture text spelling `[land]`, no rule | yes: no wording to hold |
 
 Each still reads true, so none is rewritten (the `[yagni]` rule); the build run re-runs the grep in
 AC4 and edits any line the grep shows contradicting S3.
+
+Re-read at `f56f6a189` by AC4's grep. The five rows above the last two hold, each at the line cited
+except two: the skill's landing row now sits two lines below its cited line, in the template and its
+render alike, and the wiring guide's words naming `[land]` sit on the line after its cited one, in the
+same bullet. The last two rows are readers the grep finds that the table did not list: the build method's
+Landing paragraph, in the guide and in the memory-tree kit's copy of it, and two plants of the tag
+resolver's fixture.
 
 ### Inventory
 
@@ -185,6 +203,10 @@ Live at landing. Gov's `AGENTS.md` changes in two lines.
 
 New arm: tools/playbook/render_playbook.py · covers AC1 AC2 · a `--selftest` arm rendering a fixture with the unattended and roles descriptors and asserting the two drive lines, staged by dropping the unattended kit's row · none
 
+The `govkit acceptance matrix` leg is red at HEAD for the renderer's dependency unit 73 parked for the
+owner (its fork record's F1); this unit changes two descriptor rows and one catalogue line, adds no
+import, and leaves that red as it finds it.
+
 ## 8. Open questions
 
 - **F1 — What "the request" is at this build.** P4 names the request as the mandate, and no request
@@ -203,6 +225,12 @@ New arm: tools/playbook/render_playbook.py · covers AC1 AC2 · a `--selftest` a
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
 - rev-3 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-4 · 2026-11-08 · section 1 · section 3 · section 4 The `[land]` line, The readers left unedited ·
+  section 7 · section 10 · from `2026-11-08-prompt-PLAY-dOrderedCharter-43-drift-fold-brief.md`: re-read
+  at `f56f6a189`. The `[land]` line is `practice.land`'s row since unit 1, with the wording S3 replaces;
+  AC4's grep finds two readers the table lacked, the build method's Landing paragraph with its kit copy
+  and two tag-fixture plants, and each holds, so both join the table and none is edited; two cited lines
+  moved; moved anchors gain their symbols; the matrix leg's parked red is named.
 
 ## 10. Reuse audit
 
@@ -215,6 +243,8 @@ C, unit -23) cites the `[land]` rule at template `:30`, the `/unattended` line a
 mandate that authorizes an unattended run to land"` ranked `read`, `read_text`, `run`, `build` and
 `readme` (`tools/unattended/unattended.test.sh`), name-token matches; the probe found no seam beyond
 the driver's own check, which the recall hit `memory/map/features/unattended-mandate.md` confirms is
-the mandate's one home.
+the mandate's one home. Re-read at `f56f6a189`: the catalogue row is `practice.land` in
+`tools/playbook/practices.toml`, the driver's check is `tools/unattended/unattended.sh#check_authorization`,
+and the drive rows this unit rewrites are unit 6's, not yet in any descriptor.
 
 Recall terms used: `python tools/memory-recall/query.py "what authorizes an unattended run to merge and push" --terms "unattended mandate authorization build README BASE land practice push-main slug request"`
