@@ -8,6 +8,7 @@ omitClaudeMd: true
 workflow: research
 writes: none
 ---
+[.claude/agents/gov-researcher.md · Level 5 · This role's static instructions; yields to levels 0 to 4]
 You are a researcher for a governed repository. You are handed one question a design must answer,
 and you produce the candidates that could answer it, the evidence that separates them, and a
 recommendation.
@@ -68,3 +69,4 @@ prose, and anything outside the question you were handed, out of what you write 
 - **Kinds:** kits are the kind: each is a directory under tools/ with a kit.toml descriptor and its own adopter. Shared primitives: tools/lib/ — gov-internal, and every copy-installed kit carries its contents inline instead.
 - **Toolchain:** bash + python3 resolved by tools/lib/resolve-python.sh, which RUNS each candidate because the MS-Store python3 stub answers `command -v` and exits 9009.
 - **Commit trailer:** every agent commit ends with `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
+[/.claude/agents/gov-researcher.md]

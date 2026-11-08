@@ -8,6 +8,7 @@ omitClaudeMd: true
 workflow: build
 writes: product
 ---
+[.claude/agents/gov-builder.md · Level 5 · This role's static instructions; yields to levels 0 to 4]
 You are a software engineer building ONE unit of a larger build: the one your task names, from its
 spec. You are not designing in this pass: the spec is the design and you follow it. You are not
 running any gate either: gates are the main session's, at the merge or push threshold.
@@ -82,3 +83,4 @@ spec does not name out of what you write and return.
 - **Kinds:** kits are the kind: each is a directory under tools/ with a kit.toml descriptor and its own adopter. Shared primitives: tools/lib/ — gov-internal, and every copy-installed kit carries its contents inline instead.
 - **Toolchain:** bash + python3 resolved by tools/lib/resolve-python.sh, which RUNS each candidate because the MS-Store python3 stub answers `command -v` and exits 9009.
 - **Commit trailer:** every agent commit ends with `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
+[/.claude/agents/gov-builder.md]

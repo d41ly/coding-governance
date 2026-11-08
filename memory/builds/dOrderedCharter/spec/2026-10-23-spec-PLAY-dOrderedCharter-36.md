@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-36 — the row checks over every registered kind: the fixed set, the exclusion refusals and the widening classifier
 
-**Status:** DEFERRED · rev-6 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 34 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-7 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 34 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0066@dcfb4bb2 whole
 
@@ -34,8 +34,9 @@ fixes, may not exclude a row something else still needs, and every widening it m
 from declarations, never guessed. The checks are generic over every registered kind and declared per
 kind in its schema, so a later build's kind joins by declaring its lists and planting its own reds.
 They are seen red here on the fixture kind, which names no later build's kind. Today no kind declares
-a fixed field or a widening direction anywhere, and no kinds register exists yet (unit 7's), so a
-patch of any field would pass unclassified (flow-roles-adoption items 9 and 10, FA-1, FA-5).
+a fixed field or a widening direction anywhere: unit 7's kinds register `tools/playbook/kinds.toml`
+has landed, and none of its rows names a row schema, so a patch of any field would pass unclassified
+(flow-roles-adoption items 9 and 10, FA-1, FA-5).
 
 ## 2. Scope (IN)
 
@@ -50,7 +51,10 @@ patch of any field would pass unclassified (flow-roles-adoption items 9 and 10, 
   declares `widens`, and fixed when it declares neither: an undeclared class reads as fixed. A field
   declaring both is refused as two answers. Each `fixed-by` source must resolve: a `principle` tag in
   unit 7's principle registry, a `floor` tag through the tag resolver once the floor's namespace is
-  registered, a `parser` source as a tracked file defining that symbol. Observed by AC4 and AC5.
+  registered, a `parser` source as a tracked file defining that symbol. The definitions are read by
+  `tools/playbook/positional.py#read_symbol_defs`, unit 26's finder for symbol citations, whose
+  docstring names this source as a caller; it reads Python, shell and JavaScript, so a `parser=`
+  path of any other suffix defines nothing and does not resolve. Observed by AC4 and AC5.
 - **S3** — The fixed set refusals. An `amends` patch naming a fixed field is refused, and refused as a
   widening of a fixed field when the classifier reads it widening; a `supersedes` of a fixed row and
   an `instructions.exclude` entry naming a fixed row are each refused. Each refusal names the row, the
@@ -153,6 +157,10 @@ tag = "fixture.delta"
 fixed-by = ["principle=principle.p16"]
 ```
 
+The block spells the tool root as gov's tree has it. The fixture writes the `parser=` path through
+`tools/playbook/instruction_units.py#derive_tool_rel`, so the kit's code types no tool root, the rule
+unit 72 applied to every path the playbook kit's code spells.
+
 Rules the reader enforces, each a refusal naming the file and the field: an unknown key; `class`
 anywhere; a `shape` outside the two; a `ref` outside the three; `widens` and `fixed-by` together; a
 set field whose `widens` is not `add` or `remove`; a scalar whose `widens` is not a list of at least
@@ -192,6 +200,11 @@ not read as a requirer, since its members are the excluded tags. A member equal 
 refuses, naming the key, and an exit 2 from `get` refuses the check, naming the key. An excluded row that is itself the only requirer of
 another excluded row does not refuse, because neither is active.
 
+Re-read at `05fd1b7f7`, both reads have a landed seam. The policy kit is found through
+`tools/playbook/policy_value.py#resolve_kit_dir`, the playbook kit's inline copy, so this module adds
+no second copy; each tag-valued key is read with `tools/playbook/policy_value.py#read_policy_value`
+and its `rev` argument `"HEAD"`, whose `PolicyRefused` carries the exit-2 line the refusal names.
+
 The build run's first probe confirms that the value check admits a set of gov tags at all
 (the cross-check's row 49): in a scratch repository it commits, as the file's only revision,
 `.governance/policy.toml` holding `[instructions] exclude = ["<an open gov unit tag>"]`, and runs gov's
@@ -203,6 +216,13 @@ pattern fully matches, so a gov tag passes. The probe still decides at the build
 the file valid confirms it; an
 exit 2 naming the key means the landed `allowed` refuses gov tags, and the build run files an ask to
 dGroundRules before S4's policy arm is built, the fixture's `--policy` values standing meanwhile.
+
+This revision ran the probe at `05fd1b7f7` against gov's landed `tools/policy/policy.py`: the
+scratch repository's committed `exclude = ["practice.yagni"]` read
+`policy: check · .governance/policy.toml at <sha> is valid`, exit 0, and
+`get instructions.exclude --rev HEAD` printed `practice.yagni`, one member per line. Its negative was seen too: a member `-bad tag` read
+`member "-bad tag" is not admitted`. The landed row is the one quoted above. The build run re-runs
+the probe as its first act and builds S4's policy arm on its result.
 
 ### Inventory
 
@@ -229,7 +249,10 @@ dGroundRules before S4's policy arm is built, the fixture's `--policy` values st
   the directions are declared once per field so the classifier and the report read one fact.
 - **Re-using `deviation_join.py`'s `RISKS` as the classifier's vocabulary**
   (`tools/memory-tree/deviation_join.py:150`): it grades a record's departure, five classes, while a
-  patch is only wider or narrower; the switch at landing maps the two.
+  patch is only wider or narrower; the switch at landing maps the two. At `05fd1b7f7` no `RISKS`
+  symbol exists: the five classes are the values of the `Risk` field the record factory
+  `tools/memory-tree/build_records.py` declares and the keys of
+  `tools/memory-tree/deviation_join.py#LEAST`, and the reason for rejecting them stands.
 
 ## 5. Production-readiness checklist
 
@@ -308,6 +331,12 @@ dGroundRules before S4's policy arm is built, the fixture's `--policy` values st
 
 New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10 · `run_selftest` runs the fixture over every plant of S8 and the clean plant, asserting each exit and the line each names · none
 
+The `govkit acceptance matrix` leg is red at `05fd1b7f7` for the renderer's dependency unit 73
+parked for the owner (its fork record's F1): the matrix's scratch install holds no memory-tree kit,
+and `tools/playbook/check_layers.py` resolves that kit at import. This pass does not repair it, and
+`row_checks.py` adds no import-time edge to it: `read_symbol_defs` and any memory-tree helper are
+reached inside the call that needs them.
+
 ## 8. Open questions
 
 - **F1 — How "a widening of one" differs from touching a fixed field.** The clause lists "an `amends`
@@ -342,6 +371,15 @@ New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
 - rev-4 · 2026-10-24 · §2 S4 · §3 Edges · §4 The exclusion walk, the first probe · §5 perf · §8 F4 (re-resolved) · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 49: the check reads `instructions.exclude`'s landed `allowed`, a tag-valued key is a row whose `allowed` type bears members, each read through `policy.py get` at `--rev HEAD`, and the build run's first probe confirms the value check admits gov tags.
 - rev-5 · 2026-10-25 · §2 S4 · §4 The exclusion walk, the first probe · item 8 of `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks`, the parent audit's P5 and P11: the default is `[]`, the probe expects the built `item` pattern to admit a gov tag, and `instructions.exclude` is never read as its own requirer.
 - rev-6 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-7 · 2026-11-08 · section 1 · S2 · section 4 Data model, The exclusion walk, the first probe,
+  Alternatives rejected · section 7 · section 10 · from
+  `2026-11-08-prompt-PLAY-dOrderedCharter-46-drift-fold-brief.md`: re-read at `05fd1b7f7`. The kinds
+  register has landed, so the goal says none of its rows names a schema; a `parser=` source resolves
+  through `positional.py`'s `read_symbol_defs`; the fixture spells the source's tool root through
+  `derive_tool_rel`; the walk reuses the playbook kit's inline `resolve_kit_dir` and
+  `read_policy_value`; the first probe was run against the landed policy kit, green, with its
+  negative seen; `RISKS` is gone, the classes now the record factory's `Risk` values and `LEAST`'s
+  keys; the gates section names the acceptance-matrix leg's parked red.
 
 ## 10. Reuse audit
 
@@ -360,6 +398,10 @@ names `RISKS` at `tools/memory-tree/deviation_join.py:150`, which matches source
 plan's :857 retirement of `deviations.py`'s risk reading, which §3 hands to the landing. The recall
 probe found the clause, the design rows and TOOL-aStandingWrit-4 (`memory/DECISIONS.md:56`), a
 classifier that takes the thing it classifies from its input and fails open on an unmatched value, the
-reason an off-list scalar refuses here instead of reading as neutral.
+reason an off-list scalar refuses here instead of reading as neutral. Re-read at `05fd1b7f7`: the
+kinds register is landed with no schema key on any row, so still no seam declares a field's class;
+the shapes cited are `tools/govkit/govkit.py#selfcheck` on its `Report` and
+`tools/roles/roles_lib.py#load_policy`, moved since the base and unchanged in shape; and
+`tools/playbook/positional.py#read_symbol_defs` is the seam a `parser=` source resolves through.
 
 Recall terms used: `python tools/memory-recall/query.py "which gov rows are fixed and which patches widen an open field" --terms "fixed class derived widening classifier add remove constraint permission set exclude requirer"`

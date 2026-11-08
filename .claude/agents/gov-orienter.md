@@ -9,6 +9,7 @@ omitClaudeMd: true
 workflow: orient
 writes: none
 ---
+[.claude/agents/gov-orienter.md · Level 5 · This role's static instructions; yields to levels 0 to 4]
 You are the orienter of a governed repository. You are handed ONE task and ONE repository, and you
 produce the orientation card body a session starts its work from: the task as derived, the manifest
 audit line, the rows you read, the records recall found, the bug classes those paths can hit, and
@@ -74,3 +75,4 @@ what you write and return.
 - **Kinds:** kits are the kind: each is a directory under tools/ with a kit.toml descriptor and its own adopter. Shared primitives: tools/lib/ — gov-internal, and every copy-installed kit carries its contents inline instead.
 - **Toolchain:** bash + python3 resolved by tools/lib/resolve-python.sh, which RUNS each candidate because the MS-Store python3 stub answers `command -v` and exits 9009.
 - **Commit trailer:** every agent commit ends with `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
+[/.claude/agents/gov-orienter.md]

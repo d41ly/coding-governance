@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order
 
-**Status:** DEFERRED · rev-5 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 41 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-6 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 41 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -23,6 +23,7 @@
 | [2026-11-03-prompt-PLAY-dOrderedCharter-55-owner-speedup.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-55-owner-speedup.md) | research | — |
 | [2026-11-04-prompt-PLAY-dOrderedCharter-27-drift-sweep-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-27-drift-sweep-brief.md) | research | PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 |
 | [2026-11-05-prompt-PLAY-dOrderedCharter-55-owner-pause-land.md](../prompts/2026-11-05-prompt-PLAY-dOrderedCharter-55-owner-pause-land.md) | research | — |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-39-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-39-drift-fold-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-54 |
 | [2026-11-08-prompt-PLAY-dOrderedCharter-55-1-researcher.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-55-1-researcher.md) | journal | — |
 | [2026-11-08-prompt-PLAY-dOrderedCharter-55-own-reds-triage-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-55-own-reds-triage-brief.md) | research | — |
 | [2026-11-08-prompt-PLAY-dOrderedCharter-55-owner-resume.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-55-owner-resume.md) | research | — |
@@ -40,11 +41,8 @@ repaired spec's §3 names this unit as the hand-off for the part. Where a minor 
 too early, the item moves its observation to the pass that makes it passable, and the repaired unit's
 §3 carries that rule to its builder.
 
-The report's items and their ids, MEDIUM as M and LOW as L: M1 1 · M2 2 · M3 3 · M4 4 · M5 5, 12 ·
-M6 6 · M7 7 · M8 8 · M9 10, 22 · M10 11 · M11 14 · M12 15 · M13 16 · M14 19 · M15 20 · M16 24 · M17 26 ·
-M18 28 · M19 31 · M20 32 · M21 34 · M22 37 · M23 40 · M24 41 · L1 9 · L2 17 · L3 18 · L4 29 · L5 35.
-Scope items S1 to S31 take these ids one each, grouped by the unit they land on; each item names its
-id, and S<n>'s criterion is AC<n>.
+Scope items S1 to S31 take the report's ids one each, grouped by the unit they land on; each item
+names its id, the report's appendix mapping each id to its M or L label, and S<n>'s criterion is AC<n>.
 
 The fixes the skeptic judged unsound (ids 1, 2, 3, 4, 6, 28, 29, 31 and 32) are built from the
 skeptic's corrected fix, as the report states it.
@@ -59,15 +57,15 @@ skeptic's corrected fix, as the report states it.
   (`tools/memory-tree/tree_lib.py:328`), so it runs at unit 39's own pass after unit 31 deleted the
   directory, and reads `--card` there. Unit 39 S2's names go in unit 39's own pass trailer. The wiring
   leg's rows unit 31 removed are re-written at unit 39's pass as `PLAY-dOrderedCharter-50`'s probe
-  names them. This supersedes unit 39 S3's "Before the directory leaves" and S2's "Unit 31's
-  retirement names". Observed by AC1.
+  names them. Unit 39's S2 and S3 point here since its rev-4. Observed by AC1.
   **Readers:** by name: the adopter is unit 31's retirement, and this item reads it at D's parent; a grep
   for adopt-agent-instructions outside memory/builds and memory/backlog finds `.memory-tree.conf`,
   `tools/gate-legs.json`, `tools/govkit/registry.toml`, `tools/agent-instructions/kit.toml`,
   `tools/agent-instructions/README.md`, `tools/agent-instructions/adopt-agent-instructions.test.sh`,
   `memory/project/spawn-idiom-sites.txt`, `memory/project/testsuite-count-waivers.txt`,
   `memory/project/unarmed-branches.txt`, `memory/map/generated/symbols.json`, `.governance/install.json`'s
-  receipt row and `tools/policy/caps.toml`'s `codex-instructions` row, each unit 31's to re-point or
+  receipt row, `tools/policy/caps.toml`'s `codex-instructions` row, and since the base `.lexicon.conf`,
+  `tools/playbook/README.md` and `tools/playbook/instruction_units.py`, each unit 31's to re-point or
   delete, and `memory/project/positional-refs.txt`'s 54 rows, which key frozen records and stay ·
   by value: the adopter's options, read by `tools/gate-legs.json:296` and
   `tools/agent-instructions/kit.toml:44` (today `tools/agent-instructions/kit.toml@c7269a97:45`), which S12's
@@ -80,10 +78,9 @@ skeptic's corrected fix, as the report states it.
   OBSERVED form from the observation made at unit 49's pass, naming that pass. Unit 18 AC7, unit 26
   AC10 and unit 28 AC3 were observed at their own passes, in those units' acceptance ledgers, each
   unit CLOSED, so this item drops them. Observed by AC2.
-- **S3** — id 3. Unit 1's pass lands no `legacy` key on the `cross-os` `[[block]]` row, so unit 1's AC4
-  holds at its own pass; `PLAY-dOrderedCharter-41` S1's "Where unit 1 landed the key, this unit takes
-  it off the row" is superseded. Unit 37's AC1 and AC8 are observed at `PLAY-dOrderedCharter-40`'s
-  pass, by S2's ledger rule. Observed by AC3.
+- **S3** — id 3, met: units 1 and 41 closed with the `cross-os` `[[block]]` row carrying no `legacy`
+  key, as unit 41 S1 states at its close. Unit 37's AC1 and AC8 are observed at
+  `PLAY-dOrderedCharter-40`'s pass, by S2's ledger rule. Observed by AC3.
 - **S4** — id 4, restated at the built code. Unit 10 landed at `df39f9560`, an ancestor of unit 44's
   `757d12bfb`, and unit 19's code already keyed freshness on blob and extractor (unit 44's `Decided:`
   trailer). An index older than unit 44's stamp is rebuilt from nothing, and a newly registered
@@ -94,19 +91,15 @@ skeptic's corrected fix, as the report states it.
 
 ### One source per fact
 
-- **S5** — id 5. `PLAY-dOrderedCharter-40` AC1 filters `x.origin == 'playbook-render'`, the `id =`
-  `tools/playbook/kit.toml:7` declares, which unit 9 S2 derives as the origin. Observed by AC5.
-- **S6** — id 12. `read_units` asserts each row's `origin` equals the `id =` of the `kit.toml` beside
-  its manifest, never the directory name, and a fixture whose directory name differs from its kit id
-  shows the id. Observed by AC6.
-- **S7** — id 6, an observation only. Unit 25's spec at rev-7 builds both `--only` arms of
-  `gov_tag.py check` on unit 24's `check_edges` and unit 28's `run_resolve`
-  (`tools/playbook/edge_grammar.py#check_edges`, `tools/playbook/edge_grammar.py#run_resolve`), so no
-  `tools/playbook/edge_checks.py` is built and this pass deletes nothing. Unit 49's AC32 is observed at
-  this pass. Observed by AC7.
-  **Readers:** by name: READER NOT IN TREE — this item deletes nothing: the edge-checks module was never
-  built, git ls-files finds no file of that name at HEAD, and so no reader spells it ·
-  by value: NO VALUE READERS — both arms' verdicts are `check_edges`' and `run_resolve`'s.
+- **S5** — id 5, met in unit 40's spec at rev-3: its AC1 filters `x.origin == 'playbook-render'`, the
+  `id =` `tools/playbook/kit.toml:7` declares, which unit 9 S2 derives as the origin. Observed by AC5.
+- **S6** — id 12, met by unit 9: a row's `origin` is the `id` of the `kit.toml` beside its manifest,
+  and `tools/playbook/instruction_units.py#arm_row` reads a kit whose directory differs from its id.
+  Observed by AC6.
+- **S7** — id 6, an observation only. Unit 25 built both `--only` arms of `gov_tag.py check` on
+  `tools/playbook/edge_grammar.py#check_edges` and `tools/playbook/edge_grammar.py#run_resolve`, and
+  no unit builds an edge-checks module, so this pass has nothing to take out. Unit 49's AC32 is
+  observed at this pass. Observed by AC7.
 - **S8** — id 7. The record factory's per-kind table admits a declared-pending entry,
   `{"pending": "<unit id>"}`, for a kind whose fields a later unit owns; `new <kind>` on a pending kind
   exits 2 naming that unit, and unit 42 S2's key equality counts a pending entry. Unit 42's pass enters
@@ -124,7 +117,8 @@ skeptic's corrected fix, as the report states it.
   `memory/map/generated/MAP.md:16`, `memory/map/generated/inventories.json:9`,
   `tools/gate-legs.json:382`, `tools/govkit/registry.toml:523` (line 543 at c7269a97),
   `tools/govkit/subject-pins.tsv:16`,
-  `tools/run-gates/ceiling-evidence.txt:32` and `tools/run-gates/selftest-budgets.txt:52`, each leaving
+  `tools/run-gates/ceiling-evidence.txt:32`, `tools/run-gates/selftest-budgets.txt:52` and the leg's
+  row of `tools/playbook/core-pending.txt`, each leaving
   with the leg in unit 39's commit as unit 50's owed-rows probe names it. by value:
   `codebase-map coverage + freshness`, whose coverage join reads the baseline line.
 - **S11** — id 22. The generated map, `memory/map/generated/MAP.md` and
@@ -136,8 +130,7 @@ skeptic's corrected fix, as the report states it.
 - **S12** — id 11. Unit 39 S3's probe is keyed on behaviour: a table maps each adopter option to the
   renderer argv replacing it (`--check` to `--check-render --scope entry-files`, `--aliases` to that
   scope's alias source, `--card` to `--card`), each option either mapped or named retired, and the
-  pass trailer carries the table. This supersedes S3's "finds it among the options
-  `render_playbook.py --help` prints". Observed by AC12.
+  pass trailer carries the table. Unit 39's S3 points here since its rev-4. Observed by AC12.
   **Readers:** by name: a grep for the adopter's options finds the parser
   `tools/agent-instructions/adopt-agent-instructions.sh:37-39`, the `agent-instructions wiring` argv
   `tools/gate-legs.json:296` and the kit's argv rows `tools/agent-instructions/kit.toml:37` and
@@ -221,11 +214,10 @@ skeptic's corrected fix, as the report states it.
   `tools/memory-tree/merge-rows.py#_dominant`), the folded
   comparison deciding both "changed" and "same bytes", and a missing final terminator supplied before a
   chunk is appended. Unit 45 S4's byte identity holds modulo the terminator. Observed by AC22.
-- **S23** — id 35. `main()` (`tools/memory-tree/merge-rows.py:1498-1514`, its `try` and arms inside
-  `tools/memory-tree/merge-rows.py#main`) gains an `except
-  TableConflict` arm before the generic one, writing the body through `write_conflict_body` with the
-  label `theirs (conflicting: <keys>)` and printing the keys after the body is written, as the
-  `ViewShardRefused` arm does. Observed by AC23.
+- **S23** — id 35, met by unit 52: `main()` (`tools/memory-tree/merge-rows.py:1498-1514` at base,
+  `tools/memory-tree/merge-rows.py#main`) holds an `except TableConflict` arm before the generic one,
+  writing the body through `write_conflict_body` under `theirs (table conflict: <keys>)` and printing
+  the keys after it. Observed by AC23.
 
 ### The positional check (units 47, 48 and 53)
 
@@ -245,25 +237,25 @@ skeptic's corrected fix, as the report states it.
 
 ### This build's specs and legs
 
-- **S27** — id 24. `PLAY-dOrderedCharter-49`'s spec is brought under the live-spec cap
-  `budgets."memory/builds/*/spec/"`, 49152 bytes CR-stripped, read through `budgets.py resolve`
-  (TOOL-dGroundRules-9 S2), by a revision that cuts the items units 50 and
-  55 supersede to one-line pointers, every id, criterion and fork kept (§8 F2). Observed by AC27.
+- **S27** — id 24, met by unit 49's rev-6, the drift fold before its dispatch (§8 F2): its spec is
+  under the live-spec cap `budgets."memory/builds/*/spec/"`, read through `budgets.py resolve`
+  (TOOL-dGroundRules-9 S2), every id, criterion and fork kept. Observed by AC27.
 - **S28** — id 26. The adopter population of the moved `agent-instructions wiring` leg is recorded:
   the `playbook-render` entry's leg set gains it for every adopter, and `govkit apply` over a fixture
   target selecting `playbook-render` without `agent-instructions` shows the leg in its manifest
-  (§8 F3). This supersedes unit 39 F2's `widens: none`. Observed by AC28.
+  (§8 F3), which unit 39's F2 records since its rev-4. Observed by AC28.
 - **S29** — id 9. Unit 41 AC4 asserts on the line: the line holding "minor behind" also says "no
   reseed note", and no line of `render_playbook.py` or the charter page says a minor-older template
   gets one. Observed by AC29.
 - **S30** — id 17. `playbook render selftest`'s guard (`tools/gate-legs.json:1678-1681`, today
   `tools/gate-legs.json@c7269a97:1727-1738`, which also names `{prefix}/memory-tree/corpus_ids.py`) gains
   `{prefix}/govkit/entries/playbook.kit.toml` and `coding-governance-agents.template.md`, the inputs
-  unit 41's arm stages its failing case in. It trips eight DEFERRED specs whose Files touched name one
-  and whose leg line lacks the leg: `TOOL-dBoundRoles-25`, `TOOL-dFairHearing-15`,
-  `KICK-dKeptSession-11`, `TOOL-dLinkedLibrary-1`, `TOOL-dLinkedLibrary-3`, `TOOL-dWellOiledMachine-2`,
-  `TOOL-dWellOiledMachine-26` and `PLAY-dOrderedCharter-31`; this pass's trailer names them, and none
-  reds here (the fork record's F5). Observed by AC30.
+  unit 41's arm stages its failing case in. At 05aeb20a it trips seven DEFERRED specs whose Files
+  touched name the template and whose leg line lacks the leg: `TOOL-dBoundRoles-25`,
+  `TOOL-dFairHearing-15`, `KICK-dKeptSession-11`, `TOOL-dLinkedLibrary-1`, `TOOL-dLinkedLibrary-3`,
+  `TOOL-dWellOiledMachine-2` and `TOOL-dWellOiledMachine-26`; unit 31's leg line names the leg since
+  its rev-8. This pass's trailer names the seven, re-derived at the pass, and none reds here (the fork
+  record's F5). Observed by AC30.
 - **S31** — id 29. Unit 20's `instruction render (one renderer of record)` leg carries `--card` in
   gov's manifest, set by `PLAY-dOrderedCharter-43` S4, and checks every scope; units 43 and 39 name
   it as the leg S4 edits. Observed by AC31.
@@ -328,17 +320,15 @@ section 2. The acceptance ledger's two forms, OBSERVED and AMENDED, are
 
 ### Order
 
-Order 41, above every unit: the minors land on eleven units, the latest of them unit 49 at order 39,
-and unit 54 sits at 40. Items that change what an earlier pass does (S1, S2, S3, S8, S9, S12) reach that
-pass through the repaired spec's §3 hand-off to this unit, which its builder reads; this unit's pass
-observes them.
+Order 41, above every unit: the minors land on eleven units, the latest unit 49 at order 39, and unit
+54 sits at 40. Items that change an earlier pass (S1, S2, S8, S9, S12) reach it through the repaired
+spec's hand-off to this unit, which its builder reads; this unit's pass observes them.
 
 ### Inventory
 
 Minted: the pending entry `{"pending": "<unit id>"}`; the plants `helper-edit`, `held-open`,
 `extractor-removed`, `positional-spec-revbump` and `positional-bulk-move`; the functions
-`derive_module_closure` and `derive_index_path`; the file name `index-s<INDEX_SCHEMA>.db`; the merge
-label `theirs (conflicting: <keys>)`. Naming cells: `lexicon naming predicates` grades the
+`derive_module_closure` and `derive_index_path`; the file name `index-s<INDEX_SCHEMA>.db`. Naming cells: `lexicon naming predicates` grades the
 Python names.
 
 ### Files touched (estimate)
@@ -367,7 +357,6 @@ Python names.
 - `memory/map/generated/MAP.md`
 - `memory/map/generated/inventories.json`
 - `.gitattributes`
-- `memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md` (S27)
 
 ### Rollout
 
@@ -388,7 +377,7 @@ alone, save S27, which §8 F2 places.
 - error / empty / loading states: S8's pending kind refuses `new` naming its unit; S16's rebuild holds
   the write lock; S23 names every conflicting key.
 - observability: S13's per-version counts; S23's label.
-- risks: S27 edits a spec that is closed once unit 49 lands, which §8 F2 resolves; S28 widens the
+- risks: S28 widens the
   `playbook-render` leg set, recorded there.
 - testing: AC1 to AC31, each a probe or a plant of the repaired unit's own fixture.
 - migration: S16's file name moves every node's index once; S20 takes effect on the next merge.
@@ -405,7 +394,7 @@ alone, save S27, which §8 F2 places.
   Red when: a repaired unit observes a criterion that only unit 49 makes passable.
 - **AC3** — When `python -c "import tomllib,sys; print([b for b in tomllib.load(open(sys.argv[1],'rb'))['block'] if b.get('name')=='cross-os'])" tools/govkit/entries/playbook.kit.toml`
   runs, the row carries no `legacy` key, and `render_playbook.py --check` exits 0 over gov.
-  Red when: unit 1 lands `legacy` and unit 1's AC4 refuses.
+  Red when: the row carries a `legacy` key.
 - **AC4** — When `python gov_tag.py --fixture --plant schema` and `--plant new-extractor` run, the
   first prints `tag-index — rebuilt: schema 0 to` and the second `incremental rows equal a cold
   build's` with no `old blobs: 0`.
@@ -414,8 +403,8 @@ alone, save S27, which §8 F2 places.
 - **AC5** — When unit 40's corrected AC1 probe, filtering `x.origin == 'playbook-render'`, runs, it
   prints the four reference tags.
   Red when: the filter names a directory, not the kit id.
-- **AC6** — When `read_units` reads a fixture kit whose directory is `pbk` and whose `id` is
-  `playbook-render`, each row's `origin` is `playbook-render`.
+- **AC6** — When `python tools/playbook/instruction_units.py fixture` runs, its origin check passes
+  over a kit whose directory `alpha` differs from its id `alpha-kit`.
   Red when: origin follows the directory name.
 - **AC7** — When `git ls-files -- '*edge_checks.py'` runs, it prints nothing, and both `--only` arms red
   one planted edge as unit 28's `edges (every declared edge parses, is registered and resolves)` leg
@@ -497,16 +486,15 @@ alone, save S27, which §8 F2 places.
 
 ## 7. Gates
 
-`playbook render selftest` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `row-keyed merge driver replay` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `tags (the resolver's checks)` · `tags positional selftest`
+`playbook render selftest` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `row-keyed merge driver replay` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `tags (the resolver's checks)` · `tags positional selftest` · `instruction render (one renderer of record)`
 
-Unit 19's `tags (the resolver's checks)` and unit 26's `tags positional selftest` are legs of
-`tools/gate-legs.json` at HEAD, unguarded, so they run on every bar and stand on the line above; they
-run S16, S17 and S24 to S26 over the tree. Unit 20's `instruction render (one renderer of record)`,
-which runs S31, is still absent from the manifest, so it stays off the line.
+Unit 19's `tags (the resolver's checks)`, unit 26's `tags positional selftest` and unit 20's
+`instruction render (one renderer of record)` are unguarded legs of `tools/gate-legs.json` at HEAD, so
+each runs on every bar: the first two run S16, S17 and S24 to S26, the third S31.
 
 New arm: tools/playbook/adopt-playbook.sh · covers AC13 AC15 AC16 AC17 AC21 · the playbook-render selftest runs the index plants, each failing case staged by the repaired unit's base rule · none
 New arm: tools/playbook/positional.py · covers AC24 AC25 AC26 · `SELFTEST_ROWS` gains the rev-bump and bulk-move plants, run by `tags positional selftest`, each failing case staged by grading the bumped or edited line as grandfathered · none
-New arm: tools/memory-tree/merge-rows.test.sh · covers AC22 AC23 · the newline plants and the conflict label, staged by an unfolded comparison and the generic arm · none
+New arm: tools/memory-tree/merge-rows.test.sh · covers AC22 · the newline plants, staged by an unfolded comparison · none
 
 ## 8. Open questions
 
@@ -539,13 +527,13 @@ New arm: tools/memory-tree/merge-rows.test.sh · covers AC22 AC23 · the newline
 - **F5 — What S30's widening does to the eight DEFERRED specs it trips.** Options: (a) widen, and fold
   the leg into the eight specs' leg lines in S30's commit; (b) narrow the widening to
   `{prefix}/govkit/entries/playbook.kit.toml`, which trips unit 31 alone; (c) widen, edit no spec, and
-  name the eight in the pass trailer, each foreign spec taking the leg in its own build's fold.
+  name the tripped specs in the pass trailer, each foreign spec taking the leg in its own build's fold.
   RESOLVED (agent, 2026-11-04, delegated): (c), by the build method's fork rule. (a) lost on the
-  observation that seven of the eight belong to five other builds: a mandate reaches its own build
+  observation that the seven tripped at `05aeb20a` belong to five other builds: a mandate reaches its own build
   alone, and seven foreign revisions widen this unit's write surface past its tier; (b) lets a
   template-only change skip the arm, so AC30 fails. (c) holds AC30 with the bar green, since the guards
-  join grades LIVE specs alone (`tools/check-spec-tokens.py#check_live_header`), unit 31 is CLOSED by
-  order 36, and each foreign spec takes the leg in its own build's fold when its dispatch reports the
+  join grades LIVE specs alone (`tools/check-spec-tokens.py#check_live_header`), unit 31's leg line
+  names the leg, and each foreign spec takes the leg in its own build's fold when its dispatch reports the
   hit. widens: none · relaxes: none
 
 ## 9. Revision log
@@ -557,6 +545,10 @@ New arm: tools/memory-tree/merge-rows.test.sh · covers AC22 AC23 · the newline
 - rev-4 · 2026-11-04 · sections 2 to 4, 6 to 8 · from `2026-11-04-prompt-PLAY-dOrderedCharter-27-1-spec-writer.md`, the drift sweep's findings 55-1 to 55-15 at `c7269a97`: S7 observes only; S2 drops three criteria observed at their own passes; S4, S13, S17 and S18 restate against the built index; S15 takes its own closure (F4); S16 names its readers; S19 covers the kit; the tags legs join section 7; F2 re-resolves; F5 records the latent hits; moved citations carry stable forms.
 - rev-5 · 2026-11-08 · S1 · the Readers clause follows `PLAY-dOrderedCharter-72`'s move of the positional list from `tools/playbook/` to `memory/project/`: the same 54 rows, at the path a reader now spells.
 - 2026-11-04 · section 2 S1 S7 S10 S12 S16 S17 · from `2026-11-04-prompt-PLAY-dOrderedCharter-1-hygiene-fix-brief.md` item 2: S1's and S7's by-value halves open on one line, so the check reads them; S7's by-name half takes the not-in-tree escape with its reason; S10, S12 and S16 name each reader by its plain tracked path, the pinned lines kept in words and the functions in prose, and S16's new derive_index_path moves to the by-value half; S17 gains its Readers clause; a records fix, so the status line keeps its rev.
+- rev-6 · 2026-11-08 · sections 1 to 8 · from `2026-11-08-prompt-PLAY-dOrderedCharter-39-drift-fold-brief.md`
+  at `05aeb20a`: S3, S5 to S7, S23 and S27 observe what units 1, 41, 40, 9, 25, 52 and 49 met; S1 and
+  S10 gain today's readers; S30 trips seven specs; unit 39's rev-4 carries S1, S12 and S28; the
+  render leg joins section 7; F5 counts seven; section 1's id map, the review's fact, goes.
 
 ## 10. Reuse audit
 

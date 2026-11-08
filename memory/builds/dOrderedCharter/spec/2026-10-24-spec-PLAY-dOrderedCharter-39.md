@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-39 — the card import survives the agent-instructions kit's retirement, with the wiring leg kept by name
 
-**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,8 @@
 | [2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
 | [2026-11-02-prompt-PLAY-dOrderedCharter-39-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-39-build-brief.md) | journal | — |
 | [2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md) | research | PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-39-2-spec-writer.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-39-2-spec-writer.md) | journal | — |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-39-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-39-drift-fold-brief.md) | research | PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
 | [2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md](../reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-49 |
 
 <!-- /gen:spec-records -->
@@ -38,27 +40,40 @@ unit 31 and is built right after it. Finding 49, the same item's other half, is
   argv the renderer's `--check-render --scope entry-files`, carrying `--card` in gov's manifest as
   `PLAY-dOrderedCharter-43` S4 sets it. Its descriptor claim moves from the retired kit's `[[gate_leg]]`
   row (`tools/agent-instructions/kit.toml:51-55`) to a `[[gate_leg]]` row of the `playbook-render` entry's
-  descriptor, `tools/playbook/kit.toml`, with no `--card` there, the adopter default. Its rows in
-  `tools/govkit/subject-pins.tsv:17` and `tools/run-gates/ceiling-evidence.txt:33` stay, re-derived where
-  their generator re-derives them. Only `agent-instructions self-test` leaves, with its rows at
+  descriptor, `tools/playbook/kit.toml`, with no `--card` there, the adopter default, and
+  `subject = "repo"`, the subject its pin row and its manifest row carry, since the
+  leg-correspondence check in `tools/govkit/govkit.py#selfcheck` reds a descriptor and a manifest
+  that disagree on it. Its rows in `tools/govkit/subject-pins.tsv:17` and `tools/run-gates/ceiling-evidence.txt:33` stay, re-derived where
+  their generator re-derives them, and so do its `leg` row in `tools/playbook/core-pending.txt`, since
+  the core meta-check reds a leg with neither an `enforces` nor a pending row, and its line in
+  `memory/map/baseline.toml`. Only `agent-instructions self-test` leaves, with its rows at
   `tools/govkit/registry.toml:522-524`, `tools/govkit/subject-pins.tsv:16`,
-  `tools/run-gates/ceiling-evidence.txt:32` and `tools/run-gates/selftest-budgets.txt:52`. This
-  supersedes unit 31 S1's "its two legs leave `tools/gate-legs.json` (`:293`, `:382`)".
+  `tools/run-gates/ceiling-evidence.txt:32` and `tools/run-gates/selftest-budgets.txt:52`, its `leg` row
+  in `tools/playbook/core-pending.txt`, and its map lines, as `PLAY-dOrderedCharter-55` S10 and S11 state.
+  This supersedes unit 31 S1's "its two legs leave `tools/gate-legs.json` (`:293`, `:382`)". Unit 43 S4
+  sets `--card` on the `instruction render (one renderer of record)` leg too, which checks every scope;
+  this unit leaves that row as unit 43 lands it.
   **Readers:** by name: `tools/gate-legs.json`, `tools/govkit/registry.toml`,
   `tools/govkit/subject-pins.tsv`, `tools/run-gates/ceiling-evidence.txt` and
-  `tools/run-gates/selftest-budgets.txt`, each spelling the self-test leg's name at the base · by value:
-  NO VALUE READERS — the self-test leg's verdict feeds no other check, and each row above is keyed by
-  the name alone. Observed by AC1 and AC2.
+  `tools/run-gates/selftest-budgets.txt`, each spelling the self-test leg's name at the base, and since
+  then also `tools/playbook/core-pending.txt`, `memory/map/baseline.toml`,
+  `memory/map/generated/MAP.md` and `memory/map/generated/inventories.json` · by value:
+  `tools/playbook/core.py`, whose meta-check reds a pending row naming no leg of the manifest, and
+  `tools/codebase-map/test_codebase_map.py`, whose coverage join reds a baseline key naming no
+  inventoried leg; the leg's verdict feeds no other check. Observed by AC1 and AC2.
 - **S2** — The card import moves by name. Unit 31's retirement names, beside `CODEX_MAX`, the
   `--card` option, `check_card_import` and the `card —` line prefix as moved into
   `tools/playbook/render_playbook.py`, and the pass commit's `Decided:` trailer lists them with
   `CODEX_MAX`. This extends unit 31 S1's "`CODEX_MAX` moves into the module unit 20 absorbed the wiring
-  into". Observed by AC3.
-- **S3** — Every behaviour of the deleted kit accounted for. Before the directory leaves, a probe reads
-  each option the adopter's argument `case` accepts at the base and finds it among the options
-  `render_playbook.py --help` prints; an option it does not find is named retired in the pass
-  commit's `Decided:` trailer with its reason, and the pass is refused while one is neither. Observed by
-  AC3.
+  into". Unit 31's pass at order 36 runs first, so the adopter is gone from the tree at this pass and the
+  names go in this unit's own pass trailer, as `PLAY-dOrderedCharter-55` S1 states. Observed by AC3.
+- **S3** — Every behaviour of the deleted kit accounted for. A probe reads each option the adopter's
+  argument `case` accepts at the parent of the commit that took the adopter out of the tree, and
+  maps it to the renderer argv that replaces it or names it retired in the pass commit's `Decided:`
+  trailer with its reason; the trailer carries the table, and the pass is refused while an option is neither. That
+  read point and the behaviour-keyed table are `PLAY-dOrderedCharter-55` S1 and S12, which replace
+  this item's earlier read before the directory leaves and its match on the renderer's help output.
+  Observed by AC3.
 - **S4** — Gov's card import after the close. Gov's `CLAUDE.md` still carries the
   `@.claude/orientation-card.md` line when unit 8's AC1 was green, and the kept leg checks it.
   Observed by AC4.
@@ -91,6 +106,17 @@ F2 keeps an absorbed leg's name, citing the systems record's "A leg keeps its na
 (`memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md:262`); unit 31 S1
 deletes both legs and names `CODEX_MAX` alone as moving.
 
+Re-read at `05aeb20a`. Unit 31 is still DEFERRED and its S1 still deletes both legs, handing this
+unit the repair. Every row above is in the tree, several lower in its file, and the adopter's `case`
+arms sit a few lines below `tools/agent-instructions/adopt-agent-instructions.sh#CODEX_MAX`. Its
+`--check` already execs the renderer's `--check-render --scope entry-files` through
+`tools/agent-instructions/adopt-agent-instructions.sh#RENDERER`, so the kept leg's new argv runs the
+check the old one reached. The renderer's scopes are `tools/playbook/render_playbook.py#RENDER_SCOPES`;
+`--card` and `check_card_import` are unit 43's, still DEFERRED. A grep for either leg name outside
+`memory/builds` also finds `tools/playbook/core-pending.txt`, `memory/map/baseline.toml`, the
+generated map, and the claim arm of `tools/govkit/selftest.py`, which spells the wiring leg's name as
+its own fixture leg and reads no row of gov's, so it is untouched.
+
 ### Inventory
 
 No identifier is minted. The `[[gate_leg]]` row `agent-instructions wiring` moves descriptor.
@@ -103,6 +129,10 @@ No identifier is minted. The `[[gate_leg]]` row `agent-instructions wiring` move
 - `tools/govkit/subject-pins.tsv`
 - `tools/run-gates/ceiling-evidence.txt`
 - `tools/run-gates/selftest-budgets.txt`
+- `tools/playbook/core-pending.txt`
+- `memory/map/baseline.toml`
+- `memory/map/generated/MAP.md`
+- `memory/map/generated/inventories.json`
 
 ### Rollout
 
@@ -123,8 +153,9 @@ files.
 - perf / scale: the kept leg runs one scope of the renderer, measured against its existing ceiling row.
 - error / empty / loading states: S3's probe refuses the pass naming an unaccounted option.
 - observability: the `Decided:` trailer lists every moved and retired option.
-- risks: an adopter whose bar holds `agent-instructions wiring` keeps it, now claimed by the
-  `playbook-render` entry; one without that entry loses the leg, as the retired kit's row says.
+- risks: the leg is claimed by the `playbook-render` entry, so every adopter of that entry carries it,
+  whether or not it held the retired kit, the widening `PLAY-dOrderedCharter-55` F3 records; an
+  adopter without that entry loses the leg, as the retired kit's row says.
 - testing: AC1 to AC4 by probe at the pass.
 - migration: the claim moves with the `[[retired]]` row's successor, `playbook-render`.
 - user docs: unit 31's `help/upgrade-steps.md` section names the kept leg.
@@ -133,14 +164,16 @@ files.
 
 - **AC1** — When a probe reads `tools/gate-legs.json` after the pass, `agent-instructions wiring` is
   present with an argv running `render_playbook.py --check-render --scope entry-files`, and
-  `agent-instructions self-test` is absent.
-  Red when: the wiring leg is deleted, or the self-test leg survives its directory.
+  `agent-instructions self-test` is absent; `git grep -n "agent-instructions" -- tools/playbook/core-pending.txt`
+  prints the wiring leg's `leg` row alone.
+  Red when: the wiring leg is deleted, or the self-test leg or its pending row survives its directory.
 - **AC2** — When `git grep -n "agent-instructions wiring" -- tools/playbook/kit.toml tools/govkit/subject-pins.tsv tools/run-gates/ceiling-evidence.txt`
   runs, each file names the leg once.
   Red when: the leg is left with no descriptor claim or loses a keyed row.
-- **AC3** — When S3's probe runs before the directory leaves, every option of the adopter's argument
-  `case`, `--card` included, is printed as found in `render_playbook.py --help` or as named retired in
-  the pass's trailer, and the trailer names `--card`, `check_card_import` and `CODEX_MAX` as moved.
+- **AC3** — When S3's probe runs at the pass over the adopter read at the deleting commit's parent,
+  every option of its argument `case`, `--card` included, is printed as mapped to a renderer argv or as
+  named retired in the pass's trailer, and the trailer names `--card`, `check_card_import` and
+  `CODEX_MAX` as moved.
   Red when: an option leaves with the script and is named nowhere.
 - **AC4** — When `git show HEAD:CLAUDE.md` runs after the pass, it holds the card import line where unit
   8's AC1 was recorded green, and `--check-render --scope entry-files --card` exits 0 over the tree.
@@ -148,7 +181,7 @@ files.
 
 ## 7. Gates
 
-`agent-instructions wiring` · `playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `recall floor arms` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
+`agent-instructions wiring` · `playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `core meta-check` · `codebase-map coverage + freshness`
 
 ## 8. Open questions
 
@@ -160,13 +193,24 @@ files.
   on the renderer and claimed by `playbook-render`; (b) both legs leave and the unscoped render leg
   holds the check. Unit 20 F2 settled (a) at rung 1 from the systems record; unit 31 S1 wrote (b)
   without naming that ruling. RESOLVED (agent, 2026-10-24, delegated): (a), rung 1, the systems record
-  `[design-tags]` "A leg keeps its name". widens: none · relaxes: none
+  `[design-tags]` "A leg keeps its name". widens: the `playbook-render` entry's leg set gains
+  `agent-instructions wiring` for every adopter, recorded by `PLAY-dOrderedCharter-55` F3 · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's finding 1 (HIGH, item H1).
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 - rev-3 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-4 · 2026-11-08 · S1 S2 S3 · section 4 Evidence, Files touched · section 5 · AC1 AC3 · section 7 ·
+  F2 · from `2026-11-08-prompt-PLAY-dOrderedCharter-39-drift-fold-brief.md`: re-read at `05aeb20a`.
+  A grep for both leg names finds `tools/playbook/core-pending.txt` and the map, so S1 keeps the wiring
+  leg's pending row and baseline line, takes the self-test's out with its map lines, names them in its
+  Readers line with the two checks that compare them, and gives the descriptor row its `subject`; the
+  core meta-check, the map coverage leg and `recall floor` join the leg line. S1 names unit 43's second
+  `--card` leg. Unit 31 deletes the directory first, so S2's names go in this pass's trailer and S3
+  reads the adopter at the deleting commit's parent through a behaviour-keyed table, pointing at unit
+  55 S1 and S12; AC3 follows. The risk line and F2's `widens` record the leg-set widening unit 55 F3
+  resolved.
 
 ## 10. Reuse audit
 

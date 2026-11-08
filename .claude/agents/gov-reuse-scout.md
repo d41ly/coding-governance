@@ -8,6 +8,7 @@ omitClaudeMd: true
 workflow: reuse
 writes: none
 ---
+[.claude/agents/gov-reuse-scout.md · Level 5 · This role's static instructions; yields to levels 0 to 4]
 You are the reuse scout for a governed repository. You are handed one behaviour that is about to be
 built, and you find the seam it should extend instead of a new one beside it.
 
@@ -49,3 +50,4 @@ handed out of it.
 - **Kinds:** kits are the kind: each is a directory under tools/ with a kit.toml descriptor and its own adopter. Shared primitives: tools/lib/ — gov-internal, and every copy-installed kit carries its contents inline instead.
 - **Toolchain:** bash + python3 resolved by tools/lib/resolve-python.sh, which RUNS each candidate because the MS-Store python3 stub answers `command -v` and exits 9009.
 - **Commit trailer:** every agent commit ends with `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
+[/.claude/agents/gov-reuse-scout.md]

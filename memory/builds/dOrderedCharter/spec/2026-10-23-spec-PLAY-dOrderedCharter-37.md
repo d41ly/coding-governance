@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-37 — the help pages: reference pages rendered from each registry's rows, concept, task and tutorial pages beside them, every shown command run, each page linked to its unit by tag
 
-**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-6 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0067@90e357b7 whole
 
@@ -35,8 +35,9 @@ A reader of `help/` finds each policy key, drive row, kind and instruction unit 
 one renderer writes from the registry row that defines it, so a page can never say something its row
 does not; the concept, task and tutorial pages beside them are authored, and every command any page
 shows is run, the tutorial in an adopter fixture. P42: "every user-facing surface is documented from
-the fact that defines it", and the owner's FQ-5. Today `help/` holds two hand-written pages and an
-index (`help/README.md`), no tool renders a page from a row, and the renderer only substitutes
+the fact that defines it", and the owner's FQ-5. Today `help/` holds fourteen hand-written pages,
+PINNED at `05fd1b7f7`, and an index (`help/README.md`), no tool renders a page from a row, and,
+unit slots aside, the renderer only substitutes
 placeholders (`render()`, `tools/playbook/render_playbook.py:979-1051`). The docs leg that gates pages
 is dSafePassage's (TOOL-dSafePassage-13); this unit extends it, `tools/govkit/usage.toml` and the step
 gate's class registry `tools/govkit/surface-classes.toml` (TOOL-dSafePassage-10), never a copy of any.
@@ -50,16 +51,23 @@ gate's class registry `tools/govkit/surface-classes.toml` (TOOL-dSafePassage-10)
   `tools/policy/catalogue.toml`, `cl-dClosedLoop-0007`, TOOL-dGroundRules-1 S3), the drive table's
   (unit 6's `[[drive]]` rows), the kinds register's (unit 7's `tools/playbook/kinds.toml`) and the unit
   registry's (unit 9's `<kit>/instructions.toml` rows).
-  A later registry joins by adding its row, which its own build lands. Observed by AC1 and AC2.
+  A later registry joins by adding its row, which its own build lands. Re-read at 05fd1b7f7, only
+  the catalogue's rows carry a `summary` and a `usage`: the kinds register's 17 rows hold `tag`,
+  `owner`, `binds`, `population`, `factory` and `gate`, unit 6's `[[drive]]` rows are specced with
+  `stage`, `role`, `command` and `when` and no `tag`, and a unit row has `text` and `usage` and no
+  `summary`. This pass writes a `summary` and a `usage` onto each kinds row, and the drive and unit
+  readers map their own fields (F9). Observed by AC1 and AC2.
 - **S2** — The render. `python tools/playbook/render_playbook.py --reference` writes each declared
   page from its reader's rows: one section per row, its tag, its `summary` and its `usage`, each
   section carrying the docs leg's anchor `<!-- usage: <id> <fp8> -->` with the fingerprint the leg
   computes, and the page carrying `<!-- unit: <tag> -->` for its row's `unit`. `--reference --check`
   compares every page with its render. A row with no `summary` or no `usage` refuses the render,
-  naming the registry and the row, on every page but the policy schema's. The catalogue lands every
-  key but four with neither field, each named on the shrink-only `tools/policy/unsummarised-keys.txt`
-  until the unit that reads it fills its row (TOOL-dGroundRules-1 S6 and §3), so the policy page renders a
-  section for each row carrying both and lists the rest by name, with no anchor, under one heading
+  naming the registry and the row, on every page but the policy schema's. The catalogue landed most
+  keys with neither field, each named on the shrink-only `tools/policy/unsummarised-keys.txt`
+  until the unit that reads it fills its row; at 05fd1b7f7 it holds 270 rows, 24 carrying both and
+  246 on the list (PINNED, counted then) (TOOL-dGroundRules-1 S6 and §3), so the policy page
+  renders a section for each row carrying both and lists the rest by name, with no anchor, under
+  one heading
   `## Not yet summarised (<n>)`, `<n>` counted at the render (§8 F6). A member a page under `help/`
   other than the one rendered already anchors gets a section that links to that page and carries no
   anchor, since the leg anchors each member on exactly one page (TOOL-dSafePassage-13 S3); among
@@ -67,8 +75,10 @@ gate's class registry `tools/govkit/surface-classes.toml` (TOOL-dSafePassage-10)
   The commit that anchors a member on a reference page deletes that member's row from
   `memory/project/docs-undocumented.txt`, which reds a row naming an anchored member and may only
   shrink (its S6). Observed by AC1, AC3, AC4, AC9 and AC11.
-  **Readers:** by name: READER NOT IN TREE — the list and the docs leg that reads it land with
-  TOOL-dSafePassage-13, after this spec's base · by value: drift-audit's `derive_low_waters`
+  **Readers:** by name: `tools/govkit/docs_leg.py`, whose list path names the file and which reds a
+  row naming an anchored member, `tools/gate-legs.json`, whose `docs` row lists the file among what
+  the leg reads, and `tools/drift-audit/drift_signals.py`, which names it among the shrink-only
+  lists; each landed after this spec's base · by value: drift-audit's `derive_low_waters`
   (`tools/drift-audit/drift_report.py:781`), through which the leg reads the row count this item
   lowers (TOOL-dSafePassage-13 S6).
 - **S3** — Both ways. A declared page with no rows (an empty population) refuses, a page under
@@ -81,7 +91,9 @@ gate's class registry `tools/govkit/surface-classes.toml` (TOOL-dSafePassage-10)
   `--run` arm that runs every command a page under `help/` shows, each page's fenced `bash` and
   `console` blocks in order in a fresh scratch adopter, each command expected to exit 0 unless the block is preceded by
   `<!-- expect: <code> -->`, and a block preceded by `<!-- run: no — <reason> -->` counted and printed
-  with its reason. Observed by AC5 and AC6.
+  with its reason. Re-read at 05fd1b7f7, the leg's command check already reads each line of a
+  fenced `bash`, `sh` or `console` block, so `--run` collects the same three kinds, and the leg's
+  `--fixture --plant <case>` is the selftest its new plants join. Observed by AC5 and AC6.
 - **S5** — The classes. Each registry S1 declares is a class of `tools/govkit/usage.toml` with its
   usage shape, so the leg's stale-page and orphan arms grade the rendered anchors. A `usage.toml`
   `[[class]]` row names a class of the step gate's registry `tools/govkit/surface-classes.toml`, and
@@ -96,7 +108,13 @@ gate's class registry `tools/govkit/surface-classes.toml` (TOOL-dSafePassage-10)
   `rows` names its S1 `reader`, a row source the leg gains here, so a usage its registry states is
   never restated in `usage.toml` (TOOL-dSafePassage-13 S2). The class rows and the pages that anchor
   their members land in one commit, so no member of a new class is unanchored while the shrink-only
-  list cannot take its row. Observed by AC3 and AC10.
+  list cannot take its row. Re-read at 05fd1b7f7, the leg already reads a `rows` value spelled
+  `<path under the tool root>:<function>`, as `usage.toml`'s `policy` row names
+  `{prefix}/govkit/docs_leg.py:read_policy_usage`, which returns each member's row in the leg's
+  shape, `{<name>: {"shape": ..., <the shape's fields>}}`; so the leg gains no row source here, and
+  each new `rows` names a function returning that shape over the S1 reader's rows. Every class row
+  spells its functions through `{prefix}/`, as `surface-classes.toml`'s rows do, and the
+  `unit-usage` rows land later than this pass's commit (F8). Observed by AC3 and AC10.
 - **S6** — The authored pages: `help/concepts/instruction-layer.md` (the ladder, units, the overlay and
   composition, linking each unit's page), `help/tasks/change-a-gov-rule.md` (amend, replace, exclude and
   re-pin, with commands), and `help/tutorial/adopt-gov.md` (install gov into an empty repository, add a
@@ -104,7 +122,11 @@ gate's class registry `tools/govkit/surface-classes.toml` (TOOL-dSafePassage-10)
   AC6 and AC7.
 - **S7** — The tutorial in an adopter fixture. `--run` runs `help/tutorial/adopt-gov.md` from an empty
   scratch repository with gov's checkout at `$GOV`, in the target `build_target` (TOOL-dSafePassage-5
-  S12) builds, so the page is the install path an adopter follows. Observed by AC6.
+  S12) builds, so the page is the install path an adopter follows. That function is
+  `tools/govkit/fixture_target.py#build_target`. The page commits the install before it adds the
+  rule or renders: at 05fd1b7f7, in a repository with no commit, the write command's policy reads
+  and the charter's `charter.practices` read each refuse, the policy reader exiting 2
+  (PLAY-dOrderedCharter-46's non-goals). Observed by AC6.
 - **S8** — Each page linked to its unit by tag. Every reference, concept and task page carries one or
   more `<!-- unit: <tag> -->` lines; each tag resolves through the tag resolver (`gov tag show`, unit
   19's), and every instruction unit carrying a `usage` is named by at least one page. Observed by AC8.
@@ -158,6 +180,14 @@ may not import a sibling kit (TOOL-dGroundRules-1 §4 "### Evidence"). A reader 
 tool root by path, the way the step gate loads a class reader (TOOL-dSafePassage-10 §4 "### Data
 model"). A member id is `<class>:<name>` (the same table), so a kind's anchor names `kind:<tag>`.
 
+Re-read at `05fd1b7f7`: the inline resolver is `tools/playbook/render_playbook.py#resolve_kit_dir`;
+the kinds reader is `tools/playbook/core.py#read_toml_rows` over the register, and the unit
+registry's is `tools/playbook/instruction_units.py#read_units`, which returns `Unit` records, so the
+units page's reader adapts them to mappings. A `reader` value spells the tool root as `{prefix}/`,
+as `surface-classes.toml` and `usage.toml` spell theirs, so the example above reads
+`{prefix}/playbook/core.py:<function>` in the tree, and the rendered page's header names the
+declaration's path as the render derives it, never a typed `tools/`.
+
 The rendered page, one section per row:
 
 ```markdown
@@ -203,7 +233,8 @@ counted, never green by silence. `help.enforce` governs the verdict, as for the 
 | the `--reference` mode, `render_reference_pages` and `read_policy_reference_rows` | `tools/playbook/render_playbook.py` | the lexicon's naming predicates |
 | the class readers and plants `read_drive_members`, `write_drive_plant`, `read_kind_members`, `write_kind_plant`, `read_unit_usage_members` and `write_unit_usage_plant` | `tools/playbook/render_playbook.py` | the lexicon's naming predicates |
 | the class ids `drive`, `kind` and `unit-usage` | `tools/govkit/surface-classes.toml` | the step gate's class-row refusals (TOOL-dSafePassage-10 S5) |
-| the flags `--fingerprints` and `--run`, `run_page_commands`, and the row source naming a reference `reader` | `tools/govkit/docs_leg.py` | the lexicon's naming predicates |
+| the flags `--fingerprints` and `--run`, and `run_page_commands` | `tools/govkit/docs_leg.py` | the lexicon's naming predicates |
+| a `summary` and a `usage` key on each `[[kind]]` row (F9) | `tools/playbook/kinds.toml` | none |
 | the heading `## Not yet summarised (<n>)` | `help/reference/policy.md` | none |
 | the `doc.reference.*` tags | the `doc` namespace (unit 19's) | the tag shape check |
 | `help/reference/` and its four pages, the three authored pages | `help/` | none |
@@ -212,6 +243,7 @@ counted, never green by silence. `help.enforce` governs the verdict, as for the 
 
 - `tools/playbook/render_playbook.py` (source of the reference pages)
 - `tools/playbook/references.toml` (new)
+- `tools/playbook/kinds.toml` (each row's `summary` and `usage`, F9)
 - `tools/govkit/docs_leg.py`
 - `tools/govkit/usage.toml`
 - `tools/govkit/surface-classes.toml` (three class rows)
@@ -303,11 +335,16 @@ counted, never green by silence. `help.enforce` governs the verdict, as for the 
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `recall floor`
+`playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `recall floor` · `docs` · `step-gate` · `core kinds`
 
 The `docs` leg TOOL-dSafePassage-13 lands and the `step-gate` leg TOOL-dSafePassage-10 lands keep
 green over every page and class row this unit writes; they are named here in prose because the
-manifest at `ce13efbe` holds neither leg.
+manifest at `ce13efbe` holds neither leg. At `05fd1b7f7` the manifest holds both, unguarded, so the
+leg line names them, beside `core kinds`, which reads the register F9 adds two keys to. The
+`govkit acceptance matrix` leg is red there for the renderer's dependency unit 73 parked for the
+owner (its fork record's F1): the matrix's scratch install holds no memory-tree kit, and
+`tools/playbook/check_layers.py` resolves that kit at import. This pass does not repair it, and adds
+no import-time edge to it.
 
 New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC4 AC9 · `run_selftest` renders a fixture registry with a missing usage, an orphan page and an empty population, asserting each refusal, and a fixture catalogue with an unsummarised row and a key anchored on another page, asserting the list and the link · none
 New arm: tools/govkit/docs_leg.py · covers AC5 AC6 AC8 · its `--fixture --plant` gains a failing-command page, an unresolved unit tag and a fingerprint compare · none
@@ -357,6 +394,36 @@ New arm: tools/govkit/surface-classes.toml · covers AC10 · the step gate's arm
   may only shrink after its seed (TOOL-dSafePassage-13 S6), and (c) re-opens unit 9's schema.
   RESOLVED (agent, 2026-10-24, delegated): (a), rung 3, the one option a parent leaves that builds
   nothing outside this unit. widens: none · relaxes: none
+- **F8 — When the `unit-usage` class's rows land, given that no gov unit row exists yet.** At
+  `05fd1b7f7` no kit `instructions.toml` is tracked, and `PLAY-dOrderedCharter-40`, ordered after
+  this unit, writes the first four unit rows, each with a `usage`. `tools/govkit/step_gate.py`
+  refuses, exit 2, a class empty at the tip, so a `unit-usage` row landing with this pass reds the
+  `step-gate` leg until then. Options: (a) land both rows with the pass; (b) hand both rows, with
+  AC10's `unit-usage` line, to unit 40; (c) the pass lands the class's reader, plant and witness,
+  and its `surface-classes.toml` and `usage.toml` rows land in a later commit of this unit once unit
+  40's rows are tracked, the pattern unit 33's F5 takes for its `unit` class. (a) fails the first
+  veto, the `step-gate` leg on this spec's leg line refusing. (b) and (c) meet the same criteria,
+  and (b) moves scope into a sibling's spec, which this revision does not write, an open question
+  more. RESOLVED (agent, 2026-11-08, delegated): (c), by the build method's fork rule's tie-break,
+  fewer open questions; the main loop makes the later commit and records AC10's `unit-usage` line
+  from it. widens: none · relaxes: none
+- **F9 — What a kinds, drive or units section renders, given that none of those registries states
+  both a `summary` and a `usage`.** At `05fd1b7f7` the 17 kinds rows carry neither, 13 of them with
+  an empty `factory`; unit 6's drive rows are specced with `when` and `command` and no `tag`; a unit
+  row carries `text` and `usage`. S2 refuses a page whose row lacks either field, so as written the
+  kinds page refuses at the pass. Options: (a) this pass writes a one-line `summary` and a `usage`
+  onto each `[[kind]]` row of `tools/playbook/kinds.toml`, the `usage` the kind's factory command
+  or, with none, how a member joins its population; the drive reader returns one section per stage
+  and role, its `tag` `drive.<stage>.<role>`, its `summary` the rows' `when` clauses and its `usage`
+  their `command`s; the units reader maps a unit's `text` to `summary`; (b) every reader derives
+  both fields from what its row states, a kind's `usage` its `factory`, and a row whose derived
+  field is empty is listed unanchored, as the policy page lists its rows; (c) the kinds and drive
+  pages wait for a later build. (b) lists 13 kinds rather than refusing, so AC4's planted kinds row
+  with no `usage` no longer exits 1, and (c) leaves two of AC1's four pages unrendered: the build
+  method's first veto discards both. (a) adds two keys to a register whose reader,
+  `tools/playbook/core.py#read_toml_rows`, keeps a row's keys as written, and no surface.
+  Recommendation (a). RESOLVED (agent, 2026-11-08, delegated): (a), the one option no veto discards.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -365,6 +432,20 @@ New arm: tools/govkit/surface-classes.toml · covers AC10 · the step gate's arm
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 - rev-4 · 2026-10-24 · §1 · §2 · §3 · §4 · §5 · §6 · §7 · §8 · §10 · re-grounded on the parents' landed specs by the cross-check record `../build/2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md`, rows 21, 50 and 51 and U8: S5's classes register in `tools/govkit/surface-classes.toml` first (F5, and F7 for the units); the policy page lists unsummarised rows (F6); its reader parses the catalogue with `tomllib`; a member anchored elsewhere is linked, and an anchored member leaves `memory/project/docs-undocumented.txt`; AC9 to AC11 added.
 - rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Items 2 and 3: the leg line names `policy fixtures` and `recall floor`, whose guards §4 Files touched trips, `memory/project/docs-undocumented.txt` the latter's, the guards hits the spec-token check reads with DEFERRED as live.
+- rev-6 · 2026-11-08 · section 1 · S1 S2 S4 S5 S7 · section 4 Data model, Inventory, Files touched ·
+  section 7 · section 8 F8 and F9 new · section 10 · from
+  `2026-11-08-prompt-PLAY-dOrderedCharter-46-drift-fold-brief.md`: re-read at `05fd1b7f7`. `help/`
+  holds fourteen pages and the renderer expands unit slots; the catalogue counts are restated and
+  PINNED; S2's by-name half said no reader was in the tree, and it now names the docs leg, the leg
+  manifest and drift-audit's signal table; the leg already reads a `rows` reader, so it gains no row
+  source and the inventory drops that row; `--run` reads the leg's three block kinds; the tutorial
+  commits before it writes, since the write door and `charter.practices` refuse at an unborn HEAD;
+  `build_target` and the inline resolver are anchored by symbol, and reader values spell
+  `{prefix}/`. F8 lands the `unit-usage` rows after unit 40's, since the step gate refuses an empty
+  class; F9 has the pass write `summary` and `usage` onto the kinds rows, which carry neither, and
+  the drive and unit readers map their own fields. The leg line names `docs`, `step-gate` and
+  `core kinds`, now in the manifest, and the gates section names the acceptance-matrix leg's
+  parked red.
 
 ## 10. Reuse audit
 
@@ -386,5 +467,13 @@ seam taken. Where a record and the source disagree: scout C places `HELP_DIR` at
 recall probe returned the clause, TOOL-dSafePassage-13, and the help research's line that "the adopt
 tutorial runs in an adopter fixture, reusing the existing adopter end-to-end legs"
 (`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-research-final-help.md:118`).
+Re-read at `05fd1b7f7`, the parents are landed: `tools/govkit/docs_leg.py` with its `rows` readers
+such as `tools/govkit/docs_leg.py#read_policy_usage`, `tools/govkit/usage.toml`,
+`tools/govkit/surface-classes.toml`, `tools/govkit/step_gate.py` and
+`tools/govkit/fixture_target.py#build_target`; the seams this section cites by line have moved, the
+renderer to `tools/playbook/render_playbook.py#render`, the resolver to
+`tools/playbook/render_playbook.py#resolve_kit_dir`, the low-water reader to
+`tools/drift-audit/drift_report.py#derive_low_waters`, and `HELP_DIR` sits in the same descriptor
+block, a line lower.
 
 Recall terms used: `python tools/memory-recall/query.py "how are help pages rendered from registry rows and their commands tested" --terms "help pages reference rendered registry rows usage summary page command test tutorial adopter fixture"`

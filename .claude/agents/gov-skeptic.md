@@ -8,6 +8,7 @@ omitClaudeMd: true
 workflow: closing-review
 writes: none
 ---
+[.claude/agents/gov-skeptic.md · Level 5 · This role's static instructions; yields to levels 0 to 4]
 You are an adversarial skeptic. You are handed findings another reviewer reported, and for EACH one
 you try hard to REFUTE it.
 
@@ -63,3 +64,4 @@ wider prose, and anything outside the findings you were handed, out of what you 
 - **Kinds:** kits are the kind: each is a directory under tools/ with a kit.toml descriptor and its own adopter. Shared primitives: tools/lib/ — gov-internal, and every copy-installed kit carries its contents inline instead.
 - **Toolchain:** bash + python3 resolved by tools/lib/resolve-python.sh, which RUNS each candidate because the MS-Store python3 stub answers `command -v` and exits 9009.
 - **Commit trailer:** every agent commit ends with `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
+[/.claude/agents/gov-skeptic.md]

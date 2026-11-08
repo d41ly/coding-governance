@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-34 — composition and its report: the project block and marked parts from the overlay, budgets and harness limits at render, one composition for every harness, the delta report, and the practice census
 
-**Status:** DEFERRED · rev-6 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 35 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-7 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 35 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0064@42692e4c whole
 
@@ -64,7 +64,12 @@ units 31 and 32.
   and the render writes no file it would have to truncate. Observed by AC4 and AC5.
 - **S4** — One composition for every harness. Each harness file the wiring names is an import line, a
   symlink, or the composition's own bytes; a harness file holding anything else is refused at
-  `--check`, naming it, so no alias is a copy that drifts. Observed by AC6.
+  `--check`, naming it, so no alias is a copy that drifts. Re-read at 05fd1b7f7, unit 20 landed
+  the compare: `tools/playbook/render_playbook.py#check_entry_files`, the `entry-files` scope of
+  `--check-render`, already refuses an alias that is neither an import line, a symlink to
+  `AGENTS.md` nor its bytes, naming it, over the aliases `ALIAS_PATHS` names. This item reuses that
+  predicate and adds the write half: a copy-mode alias is re-written from the composition in the run
+  that writes `AGENTS.md`. Observed by AC6.
 - **S5** — The seeded template retired as the render's input. `resolve_template_path`
   (`tools/playbook/render_playbook.py:768-782`) reads gov's engine template and never the target's
   `playbook_path` copy; a target answer naming `playbook_path` prints one `retired` note and the
@@ -75,7 +80,16 @@ units 31 and 32.
   `tools/govkit/selftest.py`, `tools/check-placeholders.sh`,
   `tools/govkit/entries/check-microformats.kit.toml` and `WIRE-INTO-PROJECT.md` are unit 31's
   inventory · by value: `resolve_template_path` returning the target's seeded copy when `playbook_path`
-  is answered, the one value reader this item changes. Observed by AC7.
+  is answered, the one reader in product code this item changes; and, re-read at 05fd1b7f7, every
+  fixture that answers `playbook_path` to hand the renderer its own template, which the change would
+  hand gov's engine template instead: the renderer's selftest in
+  `tools/playbook/render_playbook.py`, `tools/playbook/instruction_units.py` (its slot, status and
+  lock arms), `tools/playbook/instructions_edit.py` (its re-render arm),
+  `tools/policy/check_policy.py` (the one-line rule plant), `tools/govkit/matrix.py` and
+  `tools/govkit/selftest.py`. Each names its template through the `gov_root` that
+  `tools/playbook/render_playbook.py#render` and
+  `tools/playbook/render_playbook.py#run_charter_scope` already take, never through `playbook_path`
+  (the Open questions section, F7). Observed by AC7.
 - **S6** — The delta report. At every render and every update the renderer prints one line per gov
   unit and per gov row, its state one of S22's six (§4 "### The delta report"), then one per
   repository unit, then each widening unit 36's `derive_widenings` returns, each line in
@@ -90,11 +104,22 @@ units 31 and 32.
   written by the route unit 32 lands for gov's own rules. Gov's re-rendered `AGENTS.md` still carries
   every such line, now in its project block; unit 31 writes each moved unit's change record. The
   census table is recorded in the build's census record. The per-row owner ruling the clause names is
-  relaxed to the predicate (deviation 341, §8 F4). **Readers:** by name: READER NOT IN TREE — the
-  catalogue and its `practice.<name>` tags land with unit 1 at order 17, after this spec's base, and
-  the predicate rules `ship` any row a role's `rules:` cites, so no role render loses a cited practice
-  · by value: `resolve_active_practices`, unit 1's reader of `charter.practices`, whose default set
-  shrinks by the moved rows. Observed by AC10.
+  relaxed to the predicate (deviation 341, §8 F4). Re-read at 05fd1b7f7, unit 1 has landed the
+  catalogue, and `tools/playbook/core-pending.txt` holds one `practice` row per catalogue tag, which
+  `core.py meta-check` reds once it names no practice of the tree: each moved row's pending row
+  leaves `core-pending.txt` in the same commit. The pass greps each moved tag before its commit, and
+  each hit is re-pointed, re-worded or kept, the commit's `Decided:` trailer naming every kept one.
+  **Readers:** by name: the files that spell a `practice.<name>` tag at 05fd1b7f7, among which the
+  census's moved tags fall: `tools/playbook/practices.toml`, `tools/playbook/core-pending.txt`,
+  `tools/policy/catalogue.toml` (the `charter.practices` usage line), `help/charter.md`,
+  `tools/playbook/adopt-playbook.sh`, `tools/playbook/edge_grammar.py`, `tools/playbook/gov_tag.py`,
+  `tools/playbook/instructions_edit.py`, `tools/playbook/render_playbook.py` and
+  `tools/playbook/tag_bundle.py`, the last six in their fixtures, examples or comments; the roles'
+  `rules:` lines under `tools/roles/agents/` cite short names, and the predicate rules `ship` any
+  row a role's `rules:` cites, so no role render loses a cited practice · by value:
+  `resolve_active_practices`, unit 1's reader of `charter.practices`, whose default set shrinks by
+  the moved rows, and `core.py meta-check`, which counts the pending `practice` rows. Observed by
+  AC10.
 - **S9** — The page `help/composition.md`, linked from `help/README.md`: where a repository's units
   render, how budgets and harness limits act, how to read the delta report, and what the census moved.
   Observed by AC11.
@@ -148,6 +173,19 @@ gov's text is resolved:
 The marked pair reuses the region-marker shape `REGION_OPEN` and `REGION_CLOSE` already give
 `<!-- gov:playbook -->` (`:121-123`), so the one-line and region checks read it, and
 `check_one_line_regions` (`:667`) runs over the composed text.
+
+Re-read at `05fd1b7f7`, every seam this section names is landed and moved since the base:
+`tools/playbook/render_playbook.py#render`,
+`tools/playbook/render_playbook.py#check_one_line_regions`,
+`tools/playbook/render_playbook.py#resolve_template_path` and
+`tools/playbook/render_playbook.py#read_charter_table`, `REGION_OPEN` and `REGION_CLOSE` beside
+`OPEN_RE` in that file, and in govkit `tools/govkit/govkit.py#_cmd_update`, the body `cmd_update`
+wraps, which prints the verdict line in the widths below, and
+`tools/govkit/govkit.py#run_target_argv`. The renderer now also expands unit slots
+(`tools/playbook/render_playbook.py#render_unit_slots`) and renders the practice lines
+(`tools/playbook/render_playbook.py#render_practice_lines`), so the composition step sits after
+both. The Codex announce is still the adopter's own `print_size_note`, in
+`tools/agent-instructions/adopt-agent-instructions.sh#print_size_note`; the renderer prints none.
 
 ### Budgets and harness limits
 
@@ -235,6 +273,9 @@ step converts it into overlay units.
 - `tools/playbook/fixtures/composition.py` (new)
 - `tools/govkit/govkit.py` (the relay of the composition lines at update)
 - `.governance/instructions.toml` (gov's overlay; the census's moved units, through unit 32's route)
+- `tools/playbook/core-pending.txt` (each moved practice's pending row, S8)
+- `tools/playbook/instruction_units.py`, `tools/playbook/instructions_edit.py` (fixtures naming their template through `gov_root`, F7)
+- `tools/policy/check_policy.py`, `tools/govkit/matrix.py`, `tools/govkit/selftest.py` (the same, F7)
 - `help/composition.md` (new)
 - `help/README.md`
 
@@ -322,10 +363,17 @@ step converts it into overlay units.
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `template size <=48KiB` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
+`playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `template size <=48KiB` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `core meta-check` · `instruction units selftest`
 
 New arm: tools/playbook/render_playbook.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 · `run_selftest` runs the composition fixture over every plant and asserts each exit, line and written byte · none
 New arm: tools/govkit/selftest.py · covers AC8 · a scratch adopter whose playbook regenerate prints the six state lines and one foreign line, asserting `update` relays the six and not the seventh · none
+
+`core meta-check` grades the pending list S8 edits, and `instruction units selftest` runs the fixtures
+F7 moves to `gov_root`; neither carries a guard, so both run on every bar. The
+`govkit acceptance matrix` leg is red at `05fd1b7f7` for the renderer's dependency unit 73 parked for
+the owner (its fork record's F1): the matrix's scratch install holds no memory-tree kit, and
+`tools/playbook/check_layers.py` resolves that kit at import. This pass does not repair it, and
+`practice_census.py` adds no import-time edge to it.
 
 ## 8. Open questions
 
@@ -365,6 +413,22 @@ New arm: tools/govkit/selftest.py · covers AC8 · a scratch adopter whose playb
   with each cap named as the census `tools/policy/caps.toml` names it (TOOL-dGroundRules-9 S1, S2), and
   reads `CODEX_MAX` with `budgets.py home codex-instructions`, unit 6's verb over that census's
   `codex-instructions` row. widens: none · relaxes: none
+- **F7 — How a fixture names its charter template once the render stops reading `playbook_path`.**
+  Re-read at `05fd1b7f7`, the renderer's own selftest and the fixtures of
+  `tools/playbook/instruction_units.py`, `tools/playbook/instructions_edit.py`,
+  `tools/policy/check_policy.py`, `tools/govkit/matrix.py` and `tools/govkit/selftest.py` answer
+  `playbook_path` to hand the render a template of their own; under S5 each would render gov's
+  engine template and its assertions would fail. Options: (a) a renderer flag naming the template;
+  (b) each fixture names its template through the `gov_root` that `render` and `run_charter_scope`
+  already take, the template sitting at that root under the engine template's name, or runs a
+  scratch copy of the engine whose checkout root holds it, as the policy kit's one-line rule plant
+  already copies the engine; (c) the render keeps reading `playbook_path` where the answered file
+  differs from gov's seed. (c) lets a seeded copy's bytes reach the render, which AC7 reds, so the
+  build method's first veto discards it; (a) adds a flag to a shipped command, a new public surface,
+  its second veto. (b) builds no surface and reuses the parameter which, as
+  `tools/playbook/render_playbook.py#resolve_declaration_paths` states, "stays in the signature for
+  the template". Recommendation (b). RESOLVED (agent, 2026-11-08, delegated): (b), by the build
+  method's fork rule, the one option no veto discards. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -379,6 +443,17 @@ New arm: tools/govkit/selftest.py · covers AC8 · a scratch adopter whose playb
   `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md`, the parent audit's P1: `CODEX_MAX` is read
   with `budgets.py home codex-instructions`, unit 6's verb, and this unit parses no census row.
 - rev-6 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-7 · 2026-11-08 · S4 S5 S8 · section 4 The composition, in the renderer, Files touched ·
+  section 7 · section 8 F7 new · section 10 · from
+  `2026-11-08-prompt-PLAY-dOrderedCharter-46-drift-fold-brief.md`: re-read at `05fd1b7f7`. S4 reuses
+  unit 20's landed `check_entry_files` and adds only the write half. S5's by-value readers were one
+  and are seven: every fixture that answers `playbook_path` to hand the render its template, which
+  F7 moves to the renderer's `gov_root` parameter. S8's by-name half said no reader was in the tree;
+  unit 1 has landed, so it lists the files that spell a practice tag, and each moved row's
+  `core-pending.txt` row leaves with it, since the core meta-check reds a pending row naming no
+  practice. The design section anchors its moved seams by symbol; the leg line gains the core
+  meta-check and the instruction-unit fixtures, and the gates section names the acceptance-matrix
+  leg's parked red.
 
 ## 10. Reuse audit
 
@@ -399,6 +474,10 @@ says. Where a record and the source disagree: the scout places `print_size_note`
 `:64-68`, the announce-only body ending at its `return 0`. The recall probe found the clause, the
 adopter-instructions items 12 to 17 and PLAY-aOrientedCast-3 (`memory/DECISIONS.md:12`), the owner's
 20480 ceiling for `AGENTS.md` "still 62% of the 32768 bytes Codex reads", the measured pair S3 holds
-apart.
+apart. Re-read at `05fd1b7f7`: the seams are landed and moved, each anchored by symbol in the design
+section; unit 20's `tools/playbook/render_playbook.py#check_entry_files` is the alias compare S4
+reuses; and the template seam F7 takes is the `gov_root` parameter of
+`tools/playbook/render_playbook.py#render`, kept in the signature for the template, as
+`tools/playbook/render_playbook.py#resolve_declaration_paths` says.
 
 Recall terms used: `python tools/memory-recall/query.py "how is the composed charter measured against the Codex limit and which units overflow" --terms "composition project block level-0 units budget overflow largest contributors Codex limit delta report"`

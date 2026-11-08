@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-46 — the overlay's landed revision defined, its unborn-HEAD outcome stated, and a write door rendering the rows it just wrote
 
-**Status:** DEFERRED · rev-5 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 32 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-6 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 32 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -62,7 +62,13 @@ refuses. It repairs unit 32 and is built right after it.
   (its S2), re-render with `--overlay-from` naming the overlay file they just wrote, so the render
   shows the new row in the same command; a later commit lands exactly those bytes and the render gate,
   reading `HEAD`, agrees. This supersedes unit 15 S2's "re-renders the targets unit 20's renderer
-  assigns" for the overlay's source. Observed by AC4.
+  assigns" for the overlay's source. Re-read at 05fd1b7f7, that re-render is
+  `tools/playbook/instructions_edit.py#run_render`, which
+  `tools/playbook/instructions_edit.py#write_candidate` calls after it stages the manifest and its
+  change record, running `render_playbook.main` once per `playbook:` scope `renderers.toml` assigns.
+  The flag joins those argv when the written manifest is the overlay; a write to a kit manifest
+  passes none, since `tools/playbook/instruction_units.py#read_units` reads kit manifests from the
+  working tree. Observed by AC4.
 - **S5** — The plants, through unit 32's fixture (`python tools/playbook/overlay.py --fixture --plant
   <case>`): `unborn-head`, `staged-not-landed` (a row staged and not committed), `write-then-render`,
   `check-refuses-candidate` and `policy-at-head`. Observed by AC1 to AC5.
@@ -72,7 +78,11 @@ refuses. It repairs unit 32 and is built right after it.
   the policy kit's own read of the overlay's `[[policy]]` rows (unit 32 S7) reads that commit's blob
   too. Under S2's unborn HEAD no read is made: the empty overlay selects nothing, and
   `instructions.exclude` reads its catalogue default `[]`, v2's `none`, as dGroundRules' built row
-  holds it, since no commit holds a policy file.
+  holds it, since no commit holds a policy file. The call is the playbook kit's one policy caller,
+  `tools/playbook/policy_value.py#read_policy_value`, with its `rev` argument `"HEAD"`, which it
+  passes on as `--rev HEAD`. Run at 05fd1b7f7 in a repository with no commit,
+  `policy.py get <key> --rev HEAD` exits 2 with `HEAD names no commit in this repository`, which
+  is why no read is made there.
   Observed by AC5.
 
 ## 3. Non-goals (OUT)
@@ -80,6 +90,13 @@ refuses. It repairs unit 32 and is built right after it.
 - The overlay's grammar, its `repo.` units, its policy rows and its composition: units 32, 34 and 35.
 - The write command's guard and proof: unit 15's.
 - Reading a revision other than `HEAD` (a `--rev` option): no caller needs one.
+- Any other reader's outcome at an unborn HEAD. Observed at `05fd1b7f7`, the charter render's
+  `charter.practices` read in `tools/playbook/render_playbook.py#render_practice_lines` refuses
+  there, and so do the write command's two policy reads in
+  `tools/playbook/instructions_edit.py#read_load`, each because the policy reader exits 2 with no
+  commit to read. Those are units 1's and 15's landed behaviour; S2's line is the overlay's alone,
+  and a full charter render in a repository with no commit still refuses on `charter.practices`
+  after printing it.
 
 ### Edges
 
@@ -89,7 +106,7 @@ refuses. It repairs unit 32 and is built right after it.
 - **hands-off** `PLAY-dOrderedCharter-36` — S6's `--rev HEAD` on its tag-valued key reads
 - **consumes-from** `PLAY-dOrderedCharter-15` — the write verbs and their re-render, which S4 points at the candidate
 - **hands-off** `PLAY-dOrderedCharter-31` — its adopter-rules step re-renders with the candidate read over the overlay it has just written, so update keeps the rules in the charter before any commit
-- **hands-off** `PLAY-dOrderedCharter-37` — its tutorial commits the overlay before a standalone render, or renders through a write door, and expects the unarmed line in a repository with no commit
+- **hands-off** `PLAY-dOrderedCharter-37` — its tutorial commits the install before it writes a rule or renders, since at an unborn HEAD the write door's policy reads and the charter's `charter.practices` read refuse (the non-goal above), then renders through a write door or after committing the overlay
 - **hands-off** `PLAY-dOrderedCharter-55` — round-2 ids 8 and 20: the census verb's candidate render, and `read_overlay` through `tree_lib.read_blobs_at`
 
 ## 4. Design
@@ -106,6 +123,19 @@ revision as the remote ladder's `refs/remotes/<remote>/<branch>`, else the local
 candidate a push lands" (TOOL-dGroundRules-4 S7). Unit 15 S2 writes the row, its change record
 and "re-renders the targets unit 20's renderer assigns" in one command. Unit 37 S6's tutorial is
 "install gov into an empty repository, add a repository rule, render".
+
+Re-read at `05fd1b7f7`. Unit 32's S1, as its rev-7 folds it, reads "reading the file at the landed
+revision, never the working tree" and parses the `[[unit]]` rows through unit 9's `parse_unit_rows`;
+`tools/playbook/overlay.py` is not tracked yet, so the seam is still unit 32's design. Unit 15 is built:
+its write path and re-render are as S4 states, and its would-be tree check already names a stand-in
+for unwritten bytes `candidate`, `tools/playbook/instructions_edit.py#read_tree_rows` taking
+`candidate` as a map from a manifest's path to its would-be text, which S3's keyword follows in name.
+The renderer reads no overlay at all yet: its unit slots select from
+`tools/playbook/instruction_units.py#read_units`, the kit manifests in the working tree, and unit 32
+wires the overlay in. Its two check verbs are `--check` and `--check-render`
+(`tools/playbook/render_playbook.py#main`), and a flag the parser refuses exits 2 through argparse,
+as `--scope` without `--check-render` already does, which is AC3's exit 2. dGroundRules has landed:
+`tools/policy/policy.py` is tracked, and its `get --rev` is the read S6 passes.
 
 ### Data model
 
@@ -177,6 +207,8 @@ dispatch sequences them rather than running them together (M6).
 - **AC2** — When `--plant unborn-head` runs in a fixture repository with no commit, `read_overlay`
   returns state `unarmed`, and a render prints the `overlay — unarmed:` line once and exits 0.
   Red when: the reader raises, or returns an empty overlay with nothing printed.
+  fixture: the plant's template holds a unit slot and no practice region, since the charter's
+  `charter.practices` read refuses at an unborn HEAD, a refusal this unit leaves as it is.
 - **AC3** — When `--plant check-refuses-candidate` runs `render_playbook.py --check-render
   --overlay-from <file>`, it exits 2 naming the flag; a render verb with the same flag exits 0.
   Red when: a check grades a candidate.
@@ -185,18 +217,26 @@ dispatch sequences them rather than running them together (M6).
   after the fixture commits the overlay, `--check-render` over that target exits 0.
   Red when: the render shows the old overlay, or the post-commit check reds.
   fixture: the write guard of unit 15 S4 is stubbed in the scratch tree only, as unit 15's own fixture
-  stubs it.
+  stubs it: the selftest of `tools/playbook/instructions_edit.py` declares the guard's point in the
+  scratch tree's layer register and runs the verb with standard error a terminal.
 - **AC5** — When `--plant policy-at-head` builds a fixture repository whose remote-tracking ref is one
   commit behind `HEAD`, and that `HEAD` commit sets `instructions.exclude` to an open gov unit, the
   composed document lacks the unit and its state is `excluded`.
   Red when: the composition reads a policy value at the landed ref while it reads the overlay at `HEAD`.
-  fixture: needs dGroundRules' reader landed, which the chain lands before this build run.
+  fixture: needs dGroundRules' reader landed, which the chain lands before this build run; it has,
+  and `tools/policy/policy.py` is tracked.
 
 ## 7. Gates
 
 `playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 AC4 AC5 · the playbook-render selftest runs the five overlay plants, each failing case staged by a working-tree read, or for `policy-at-head` by a policy read at the landed ref · none
+
+The `govkit acceptance matrix` leg is red at `05fd1b7f7` for the renderer's dependency unit 73
+parked for the owner (its fork record's F1): the matrix's scratch install holds no memory-tree kit,
+and `tools/playbook/check_layers.py` resolves that kit at import. This pass does not repair it, and
+adds no import-time edge to it: a read of a memory-tree helper resolves the kit inside the call, as
+`tools/playbook/instruction_units.py#derive_unit_pin` does.
 
 ## 8. Open questions
 
@@ -224,6 +264,15 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 AC4 AC5 · the p
 - rev-3 · 2026-10-24 · §2 S1, S5, S6 (new) · §3 Edges · §4 Evidence, Why HEAD and not the index, Inventory · §5 testing · AC5 (new) · §7 New arm · §8 F2 (re-resolved) · §10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 44: dGroundRules' reader defaults to the landed ref, not `HEAD`, so the overlay keeps `HEAD` and every `policy.py get` the composition makes passes `--rev HEAD`; the stale "no spec yet" evidence is replaced by its landed specs.
 - rev-4 · 2026-10-25 · §2 S6 · per `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks` item 8, the parent audit's P11: `instructions.exclude`'s default is `[]`, v2's `none`, as dGroundRules' built row holds it.
 - rev-5 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-6 · 2026-11-08 · S4 S6 · section 3 non-goals and Edges · section 4 Evidence · AC2 AC4 AC5 ·
+  section 7 · section 10 · from `2026-11-08-prompt-PLAY-dOrderedCharter-46-drift-fold-brief.md`:
+  re-read at `05fd1b7f7`. S4 names the write door's re-render as landed and passes the flag only on
+  an overlay write; S6 names `read_policy_value` and its `rev` argument, and the observed
+  unborn-HEAD refusal of `get --rev HEAD`. A new non-goal states that `charter.practices` and the
+  write command's policy reads refuse at an unborn HEAD, observed, so the hand-off to unit 37 has
+  its tutorial commit the install first; AC2's fixture template holds no practice region. Evidence
+  records what units 15 and 32 and dGroundRules landed; AC4's guard stub and AC5's fixture are
+  restated against the tree; the gates section names the acceptance-matrix leg's parked red.
 
 ## 10. Reuse audit
 
@@ -234,6 +283,9 @@ this unit defines rather than adds a second reader beside. `python tools/codebas
 which unit 19 already uses, and S1's one-path read is the same `git cat-file` call. S6 passes
 dGroundRules' `get --rev` (TOOL-dGroundRules-2 S7) rather than adding a revision reader of its own. The recall query
 returned the review's own H7 text and unit 32's S1, and TOOL-dTrueNorth-16's "one revision reader",
-which agrees that a reader of record names its revision once.
+which agrees that a reader of record names its revision once. Re-read at `05fd1b7f7`,
+`read_blobs_at` still sits where cited and is read by `tools/playbook/tag_index.py` and
+`tools/playbook/edge_grammar.py#read_text_history`; the policy read S6 pins takes its revision
+through `tools/playbook/policy_value.py#read_policy_value`, so no new reader is added for it.
 
 Recall terms used: `python tools/memory-recall/query.py "what revision does a policy or overlay reader read and what about an unborn HEAD" --terms "landed revision working tree read_policy_key unborn HEAD overlay reader git show candidate"`

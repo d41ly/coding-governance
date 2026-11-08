@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-54 — the card file's owner is live only while its transcript moves, and a dead owner's card is taken over
 
-**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 40 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 40 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-50-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-50-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-55 |
 | [2026-11-02-prompt-PLAY-dOrderedCharter-54-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-54-build-brief.md) | journal | — |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-39-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-39-drift-fold-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-55 |
 
 <!-- /gen:spec-records -->
 
@@ -36,8 +37,11 @@ printed line. It repairs unit 49 and is built right after it.
   as the card file's second line, `card-owner — <session id> · <transcript path>`. The transcript path
   is the SessionStart payload's `transcript_path`, read by `read_session_id` (`:292`) from the same
   stdin JSON as `session_id`, with JSON's `\\` unescaped. A caller that passed `--session` and no
-  payload records the literal `absent`. This supersedes unit 49 S54's unstated header shape.
-  Observed by AC1.
+  payload records the literal `absent`. Unit 8 S2 has `read_session_id` read the payload once into a
+  variable for its `cwd`, and `transcript_path` is taken from that same variable, never a second read
+  of stdin. The owner line sits between the envelope's open line and the stored card's bytes, so unit
+  8 AC3's "envelope plus the stored card's current bytes" reads, from this unit on, with the owner line
+  inside the envelope. This supersedes unit 49 S54's unstated header shape. Observed by AC1.
 - **S2** — Liveness. The owner named by an existing card file is live when its session id differs from
   the writer's, its transcript path is not `absent`, the file exists, and its modification time is
   within `CARD_OWNER_BOUND` seconds of now, a constant of the script set to 1800. Any other case is a
@@ -76,6 +80,16 @@ session transcript among them (`resolve_transcript_path`, `tools/unattended/unat
 treats a holder whose clocks stopped as stale; this unit takes the transcript term alone, since it is
 the one signal both kits read and the only one the kickoff engine holds.
 
+Re-read at `05aeb20a`. `skills/session-kickoff/manifest-check.sh#read_session_id` still takes
+`session_id` with one `sed` over stdin, skipped when `--session` is given or the verb is `--append`.
+`write_card_file` is not in the tree: unit 8, DEFERRED at order 26, adds it with the card file and its
+`card-file — skipped:` line, and unit 49 S54 its owner refusal. `tools/hooks/format-guard.js` still
+reads the payload's `transcript_path`. The unattended kit's transcript resolver and pid probe now sit
+lower in their files, at `tools/unattended/unattended.sh#resolve_transcript_path` and
+`tools/unattended/lib-unattended.sh#check_pid_alive`. The spawn-idioms lint grades every
+`skills/session-kickoff/manifest-check.sh` site against its waiver rows in
+`memory/project/spawn-idiom-sites.txt`.
+
 ### Why the transcript
 
 The CLI appends to a session's transcript on every turn, so its modification time moves exactly while
@@ -110,7 +124,8 @@ owner line and is taken over once, printing its line.
 
 - security: the transcript path is stat'ed, never read or executed; the path is the harness's own
   payload field, and the owner line lives in a git-ignored file.
-- perf / scale: one `stat` per card write.
+- perf / scale: one `stat` per card write; the clock is read with `printf -v`'s `%(%s)T`, the no-fork
+  form, so the spawn-idioms lint finds no new site.
 - error / empty / loading states: an unreadable modification time reads as a dead owner, never as
   live; the takeover always prints.
 - observability: the takeover line names the old owner and the transcript's age.
@@ -142,7 +157,7 @@ owner line and is taken over once, printing its line.
 
 ## 7. Gates
 
-`manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `shell hygiene (a fork spent on builtin work)`
 
 New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 AC4 · the five owner fixtures, each failing case staged by treating any other session id as live · none
 
@@ -162,6 +177,12 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 AC4
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-2 spec audit's finding 39 (HIGH, item H5).
+- rev-2 · 2026-11-08 · S1 · section 4 Evidence · section 5 · section 7 · from
+  `2026-11-08-prompt-PLAY-dOrderedCharter-39-drift-fold-brief.md`: re-read at `05aeb20a`. S1 reads
+  `transcript_path` from the payload unit 8 S2 already holds, and says the owner line sits inside the
+  envelope beside unit 8 AC3's equality; the evidence names the moved unattended anchors and that
+  `write_card_file` is still unit 8's to add; the clock takes the no-fork form; the leg line gains
+  `policy fixtures`, whose guard the touched script trips, and the spawn-idioms leg.
 
 ## 10. Reuse audit
 

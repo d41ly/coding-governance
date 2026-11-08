@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-40 — gov's first instruction unit rows, one per reference page, and the pages' registry tags declared
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 38 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 38 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
 | [2026-11-02-prompt-PLAY-dOrderedCharter-40-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-40-build-brief.md) | journal | — |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-39-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-39-drift-fold-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
 | [2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md](../reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-49 |
 
 <!-- /gen:spec-records -->
@@ -37,12 +38,16 @@ page's `doc.reference.*` tag from its declaring row. It repairs unit 37 and is b
   `unit.kinds-register` and `unit.unit-registry`. Each is a level-4 `directive` with one-line `text`
   naming where the registry lives and how a row joins it, a `usage` holding the command a user runs,
   a `help` line, `owner = "dOrderedCharter"` and `enforced-by` naming the leg that grades the
-  registry; none carries a `scope` (§8 F2), so no slot and no load set selects them. Observed by AC1,
-  AC2 and AC4.
+  registry; none carries a `scope` (§8 F2), so no slot and no load set selects them. Each also carries
+  a `trigger`, the condition the directive applies under, because the statement grammar reds a
+  directive without one (`tools/playbook/instruction_units.py#check_statement`). The manifest ships to
+  every adopter under the kit's `**` include and sits under the tool root, so no `text` or `usage`
+  spells a kit path: each writes the tool root as `<prefix>/`, the shipped-surface ban's drained
+  spelling (`tools/check-install-prefix.sh`). Observed by AC1, AC2 and AC4.
 - **S2** — Each row recorded through the stand-in door. The pass writes one change record per row
   through `python tools/memory-tree/build_records.py new change` (unit 15 S7), `Action add`,
-  `Mark semantic`, in this build's `build/` folder, because unit 15's command refuses every write until
-  dDeclaredLoop's guard lands (its S4). This makes this unit the writer unit 9 S5's `unarmed` line
+  `Mark semantic`, `Before none` and `After` the row's `<tag>@<hash8>` pin, in this build's `build/`
+  folder, because unit 15's command refuses every write until dDeclaredLoop's guard lands (its S4). This makes this unit the writer unit 9 S5's `unarmed` line
   names. Observed by AC2.
 - **S3** — The pages' unit tags. Each of unit 37's four `[[reference]]` rows in
   `tools/playbook/references.toml` carries its `unit` value from S1, so every page's
@@ -50,7 +55,10 @@ page's `doc.reference.*` tag from its declaring row. It repairs unit 37 and is b
 - **S4** — The pages' registry tags. Unit 19's `extract_doc` in `tools/playbook/tag_index.py` also
   reads `tools/playbook/references.toml`, minting each `[[reference]]` row's `registry` value, which
   must open `doc.reference.`, as a `doc` tag declared at that row; the `doc` namespace row's `source`
-  in `tools/playbook/namespaces.toml` names the file. Observed by AC3.
+  in `tools/playbook/namespaces.toml` names the file as `{prefix}/playbook/references.toml`, the
+  tool-root token every path of that file spells. The extractor finds the declaration in the tree it
+  indexes, as `tools/playbook/instruction_units.py#derive_kit_file` finds a kit file, never by a typed
+  kit path. Observed by AC3.
 
 ## 3. Non-goals (OUT)
 
@@ -79,6 +87,22 @@ the first rows". `git ls-files '*instructions.toml'` prints nothing at the base.
 covers the charter, `memory/guides/*.md`, `memory/HYGIENE.md` and `memory/TEMPLATE-SPEC.md`, so no
 `doc.reference.*` tag is minted. Unit 20 S1 requires `tag`, `level` and `type`, and no `scope`.
 
+Re-read at `05aeb20a`, units 9, 12, 15, 19 and 20 have landed and unit 37 has not, so
+`tools/playbook/references.toml` is not yet tracked and `git ls-files '*instructions.toml'` still
+prints nothing. `tools/playbook/instruction_units.py#read_units` reads each kit's
+`instructions.toml`, its `origin` the `id` of the `kit.toml` beside it, which for this kit is
+`playbook-render` (`tools/playbook/instruction_units.py#read_unit_rows`). The schema and grammar
+verbs each print `unarmed` naming this unit as the first writer
+(`tools/playbook/instruction_units.py#run_schema`, `tools/playbook/instruction_units.py#run_grammar`).
+The grammar reds a `directive` that opens with no modal or carries no `trigger`. The stand-in door is
+`tools/memory-tree/build_records.py#write_change`, its `new change` flags `--build`, `--unit`, `--tag`,
+`--action`, `--mark`, `--before` and `--after` all required; `tools/playbook/instructions_edit.py`
+refuses every write while no core row declares the guard's point. `tools/playbook/tag_index.py#extract_doc`
+derives the four document classes above and nothing else; unit 3, building now, adds its document
+registry's rows to that population and to the `doc` row's `source`, and S4's rows join beside them.
+Since unit 72 the shipped-surface ban grades
+every tracked file under the tool root.
+
 ### Data model
 
 ```toml
@@ -88,9 +112,10 @@ tag = "unit.kinds-register"
 level = 4
 type = "directive"
 budget = "line"
-text = "MUST add a new kind as one row of tools/playbook/kinds.toml through core.py new <kind>, never by hand."
+trigger = "When a build adds an extension kind"
+text = "MUST add a new kind as one row of <prefix>/playbook/kinds.toml through core.py new <kind>, never by hand."
 owner = "dOrderedCharter"
-usage = "python tools/playbook/core.py new <kind> <name>"
+usage = "python <prefix>/playbook/core.py new <kind> <name>"
 help = "One register of kinds keeps each kind's factory and gate findable from one row."
 enforced-by = ["core kinds"]
 ```
@@ -140,17 +165,17 @@ Live at landing, order 38, after unit 37 at order 37, so the four pages exist wh
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python -c "import sys; sys.path.insert(0,'tools/playbook'); import instruction_units as u; print(sorted(x.tag for x in u.read_units('.') if x.origin == 'playbook'))"`
-  runs after the pass, it prints the four tags, and `python instruction_units.py schema`
-  exits 0.
-  Red when: a row is missing, or fails the schema.
+- **AC1** — When `python -c "import sys; sys.path.insert(0,'tools/playbook'); import instruction_units as u; print(sorted(x.tag for x in u.read_units('.') if x.origin == 'playbook-render'))"`
+  runs after the pass, it prints the four tags, and `python tools/playbook/instruction_units.py schema one-fact`
+  and `python tools/playbook/instruction_units.py grammar` each exit 0 printing four rows.
+  Red when: a row is missing, fails the schema, or is a directive with no modal or no trigger.
   figure: PINNED, four rows, one per page unit 37 S1 declares.
-- **AC2** — When `python gov_tag.py check` runs, the `unit` namespace is no longer printed
-  `unarmed`, and `git ls-files 'memory/builds/dOrderedCharter/build/*-change-*.md'` lists one record per
-  row.
+- **AC2** — When `python tools/playbook/gov_tag.py check` runs, the `unit` namespace is no longer
+  printed `unarmed`, and `git ls-files 'memory/builds/dOrderedCharter/build/*-PLAY-dOrderedCharter-40-change-*.md'`
+  lists one record per row.
   Red when: the namespace stays empty, or a row lands with no change record.
 - **AC3** — When `python tools/playbook/render_playbook.py --reference --check` and
-  `python gov_tag.py show doc.reference.kinds` run, the check exits 0 over the four pages
+  `python tools/playbook/gov_tag.py show doc.reference.kinds` run, the check exits 0 over the four pages
   and the tag resolves to its `[[reference]]` row.
   Red when: a page's unit tag or registry tag resolves to nothing.
 - **AC4** — When `python tools/playbook/render_playbook.py --target . --check` runs, `AGENTS.md`'s region
@@ -159,7 +184,7 @@ Live at landing, order 38, after unit 37 at order 37, so the four pages exist wh
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `memory hygiene` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `memory hygiene` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)` · `instruction units (schema, one fact)` · `instruction grammar (statement types, provenance lock)` · `instruction edits (manifest checks)` · `instruction render (one renderer of record)` · `tags (the resolver's checks)` · `install-prefix (shipped surface)`
 
 ## 8. Open questions
 
@@ -182,6 +207,14 @@ Live at landing, order 38, after unit 37 at order 37, so the four pages exist wh
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's finding 2 (HIGH, item H2).
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
+- rev-3 · 2026-11-08 · S1 S2 S4 · section 4 Evidence, Data model · AC1 AC2 AC3 · section 7 · from
+  `2026-11-08-prompt-PLAY-dOrderedCharter-39-drift-fold-brief.md`: re-read at `05aeb20a` after units 9,
+  12, 15, 19, 20 and 72 landed. Each row gains the `trigger` the statement grammar requires of a
+  directive, and its `text` and `usage` spell `<prefix>/`, since the manifest ships and the
+  shipped-surface ban grades it; S2 names the door's pins; S4's source spells `{prefix}/` and its
+  extractor derives the declaration's path, beside unit 3's registry rows. AC1 filters on the descriptor id `playbook-render`, the
+  fix unit 55 S5 asked for, and runs the grammar too; the criteria's commands spell their tracked
+  paths and AC2's glob names this unit's records. The unguarded legs the rows feed join the leg line.
 
 ## 10. Reuse audit
 

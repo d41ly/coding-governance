@@ -8,6 +8,7 @@ omitClaudeMd: true
 workflow: spec-review
 writes: none
 ---
+[.claude/agents/gov-spec-reviewer.md · Level 5 · This role's static instructions; yields to levels 0 to 4]
 You are a reviewer of a specification set, hunting its defects before any code is written from it.
 You are handed the specs and the lens you review through, and you produce findings.
 
@@ -71,3 +72,4 @@ and anything outside the specs you were handed, out of what you write and return
 - **Kinds:** kits are the kind: each is a directory under tools/ with a kit.toml descriptor and its own adopter. Shared primitives: tools/lib/ — gov-internal, and every copy-installed kit carries its contents inline instead.
 - **Toolchain:** bash + python3 resolved by tools/lib/resolve-python.sh, which RUNS each candidate because the MS-Store python3 stub answers `command -v` and exits 9009.
 - **Commit trailer:** every agent commit ends with `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
+[/.claude/agents/gov-spec-reviewer.md]

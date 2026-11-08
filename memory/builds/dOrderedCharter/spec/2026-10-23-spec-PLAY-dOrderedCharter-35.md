@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-35 — the overlay's row mechanism for every registered kind: adopter-segment tags, field patches, whole-row replacements, exclusions, row pins and stale rows
 
-**Status:** DEFERRED · rev-6 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 33 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-7 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 33 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0065@35e9932a whole
 **Carries:** node:policy-key.instructions.exclude
@@ -52,7 +52,10 @@ lost at update (`gap-found-29`, closed with units 32 and 33).
   and `item.<step>.adopter.<name>` are the repository's and never collide with a gov tag. The tags
   pack's `owned` arm (unit 19's, in `tools/playbook/gov_tag.py`) admits such a tag only on an
   overlay row, refuses it on any row gov's packs ship, and refuses an overlay row of a gov kind whose
-  tag carries no `adopter` seat. Observed by AC2 and AC3.
+  tag carries no `adopter` seat. Re-read at 05fd1b7f7, the arm's predicate is
+  `tools/playbook/tag_index.py#check_owned`, which `gov_tag.py check` runs, and which reds a tag
+  minted in a namespace of a core layer by a source in a kit whose layer is optional or an
+  expansion; the new clause joins that function. Observed by AC2 and AC3.
 - **S3** — Amend, as a field patch. An overlay row carrying an `amends` edge (S6) to
   `<tag>@<hash8>` names gov's row and changes only the fields it names: a set field takes `add` and
   `remove` lists, a scalar takes a value. Every field the patch leaves alone flows from gov's row as
@@ -64,7 +67,7 @@ lost at update (`gap-found-29`, closed with units 32 and 33).
   the empty set `[]`, v2's `none` and its default, or a set of gov tags of any registered kind the
   overlay holds; each listed gov row is absent
   from the composition and its state reads `excluded`. A listed tag no registered kind holds is
-  refused. The key is read with `policy_reader("instructions.exclude")`, PLAY-dOrderedCharter-9's
+  refused. The key is read with `policy_reader("instructions.exclude")`, the playbook kit's
   callable that runs `policy.py get` as a subprocess (TOOL-dGroundRules-2 S7), passing `--rev HEAD` as
   PLAY-dOrderedCharter-46 S6 rules for every read the composition makes; `get` prints a set one member
   per line and the empty default as no line, and an exit 2 refuses the composition, naming the key and carrying the
@@ -74,12 +77,23 @@ lost at update (`gap-found-29`, closed with units 32 and 33).
   the landed row's `allowed` admits (`{ type = "set", item = ... }` with `empty = "allowed"` and
   `default = []` in dGroundRules' built catalogue), and drains the name in the same commit with
   `python <prefix>/policy/policy.py lists --write`. Which exclusions are refused is unit 36's.
-  Observed by AC6 and AC12.
+  Re-read at 05fd1b7f7: the callable is the playbook kit's one policy caller,
+  `tools/playbook/policy_value.py#read_policy_value`, which unit 19's S8 built to unit 7's design,
+  where this item had named a unit 9 callable; the composer binds it as `policy_reader`, a partial
+  over the root with `rev` `"HEAD"`, the way `tools/playbook/instructions_edit.py#read_load` binds
+  it, so the key stays the literal first argument the reader-coverage arm counts, and an exit 2
+  reaches the composer as `PolicyRefused` carrying the reader's line. The landed row and the list
+  hold the name as stated here, and a scratch repository whose committed policy sets one gov tag
+  reads it back through `get --rev HEAD`, one member per line. Observed by AC6 and AC12.
 - **S6** — Pins over a row's canonical form. A pin's `<hash8>` is S7's shared normaliser (unit 24's
   extraction of `derive_clause_hash`, `tools/memory-tree/design_lib.py:169-173`) applied to the row's
   canonical form (§4), so a reordering of keys or a re-wrap of a string is not a change. A pin missing
   its `@`, one with a malformed hash, and one matching no revision of gov's row are each refused.
-  Observed by AC7.
+  Re-read at 05fd1b7f7, unit 24 landed that normaliser as
+  `tools/memory-tree/design_lib.py#derive_pin_hash`, and `derive_clause_hash` now calls it on a
+  clause's text; the playbook kit reaches it through
+  `tools/playbook/instruction_units.py#derive_unit_pin`, which resolves the memory-tree kit inside
+  the call, and this module does the same. Observed by AC7.
 - **S7** — Change records cover rows. The change record unit 15's `instructions.edit` writes (S12, S13)
   takes a row tag of any registered kind as its subject. Its `editorial` or `semantic` mark is unit
   33's classifier run over the two canonical forms, and its `successor` (a tag, a list for a split,
@@ -102,8 +116,10 @@ lost at update (`gap-found-29`, closed with units 32 and 33).
   `tools/playbook/kinds.toml` `[[kind]]` row gains one optional key, `schema`, the path of the kind's
   row schema, written only by a kind whose rows an overlay may carry; the schema's `[kind]` table
   carries `name` and `owner-seat`, and its field declarations are unit 36's. A kind
-  with no `schema` key holds no overlay rows, and an overlay table naming it is refused. Observed by
-  AC1 and AC3.
+  with no `schema` key holds no overlay rows, and an overlay table naming it is refused. At
+  05fd1b7f7 the register holds 17 `[[kind]]` rows (PINNED, counted then), each keyed by its `tag`
+  (`kind.<name>`), none with a `schema`; `tools/playbook/core.py#read_toml_rows` returns a row's
+  keys as written, so the key joins with no change to the core's reader. Observed by AC1 and AC3.
 - **S11** — The fixture kind, `tools/playbook/fixtures/row_kind.py`. It builds a scratch tree holding
   a namespace registry row for the namespace `fixture`, a kind schema declaring one set field, one
   constraint set field and one ordered scalar, a gov pack of three rows and an overlay, plants one
@@ -199,8 +215,12 @@ text, so it is one function and never a second hash.
 The composer reads gov's packs and the overlay at the landed revision, `HEAD` (unit 46 S1), as every
 composer does (flow-roles-adoption item 11), and returns data: it writes no file. Orders return as data
 through unit 33's drift verb, whose caller `cmd_update` writes each with `write_row_order(outbox, kind,
-row, to_commit, body)` (TOOL-dSafePassage-9 S4), `kind` the row's registered kind and `row['path']`
-`.governance/instructions.toml#<overlay row tag>`, as unit 33 S7 writes a unit's; that handler iterates every kind the kinds register lists, and a register listing no
+key, text)` (TOOL-dSafePassage-9 S4; `tools/govkit/govkit.py#write_row_order`, four arguments at
+`05fd1b7f7`), `kind` the row's registered kind, `key` the order's path
+`.governance/instructions.toml#<overlay row tag>` and `text` the order the verb returned whole, its
+own title included, as unit 33 S7 writes a unit's; `tools/govkit/govkit.py#render_row_order`'s title
+says gov no longer ships the row, which is false for a stale edge, so no text is composed from it.
+That handler iterates every kind the kinds register lists, and a register listing no
 row kind prints `0 row kinds registered` rather than nothing. The `warn` journal is the stale-edge
 journal unit 33 writes for units, one line per edge, the row's tag in its subject field.
 
@@ -210,6 +230,10 @@ clause: a tag whose segment at the kind's `owner-seat` is `adopter` is owned by 
 only on a row `read_overlay_rows` returned, and a row from gov's packs carrying it reds. The segment
 check reads the seat from the kind's schema, never a typed position, and `adopter` is never a
 namespace word, so the tag grammar's first-segment rule stands (flow-roles-adoption `[renamed]`).
+At `05fd1b7f7` the arm is layer-based, `tools/playbook/tag_index.py#check_owned` reading each
+indexed definition's namespace and the layer of the kit its source sits in; the clause above is a
+second test in that function, keyed on the source's path being the overlay, and the arm's existing
+reds stand.
 
 ### Inventory
 
@@ -236,7 +260,8 @@ TOOL-dGroundRules-19 S1).
 
 - `tools/playbook/overlay_rows.py` (new)
 - `tools/playbook/fixtures/row_kind.py` (new)
-- `tools/playbook/gov_tag.py` (unit 19's module; the `owned` arm)
+- `tools/playbook/gov_tag.py` (unit 19's module; the `owned` arm's caller)
+- `tools/playbook/tag_index.py` (`check_owned`, the `owned` arm's predicate)
 - `tools/playbook/render_playbook.py` (its self-test arm)
 - `help/overlay-rows.md` (new)
 - `help/README.md`
@@ -329,7 +354,10 @@ TOOL-dGroundRules-19 S1).
   Red when: the row keeps no summary or usage, or its name stays on the shrink-only list, each of which
   `policy.py lists --check` reds; a second row is added; or the key is read in a shape the
   reader-coverage arm does not count.
-  fixture: the policy kit's paths are quoted because none is tracked until dGroundRules builds.
+  fixture: the policy kit's paths are quoted because none is tracked until dGroundRules builds. It
+  has landed, and at `05fd1b7f7` the probe prints `[]`, `dOrderedCharter`, `False`, `False` before
+  the pass, the row holding `allowed`, `empty`, `default` and `owner` alone and its name on the
+  list.
 - **AC13** — When `python row_kind.py --plant states` runs, it prints one line
   per gov row and the six lines carry `unchanged`, `amended`, `replaced`, `excluded`, `stale` and
   `orphaned`, each once.
@@ -343,6 +371,12 @@ TOOL-dGroundRules-19 S1).
 `playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10 AC11 AC13 · `run_selftest` runs the fixture over every plant of §6 and asserts each exit and line · none
+
+The `govkit acceptance matrix` leg is red at `05fd1b7f7` for the renderer's dependency unit 73
+parked for the owner (its fork record's F1): the matrix's scratch install holds no memory-tree kit,
+and `tools/playbook/check_layers.py` resolves that kit at import. This pass does not repair it, and
+its new modules add no import-time edge to it: each reaches a memory-tree helper inside the call, as
+`tools/playbook/instruction_units.py#derive_unit_pin` does.
 
 ## 8. Open questions
 
@@ -386,6 +420,16 @@ New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
 - rev-4 · 2026-10-24 · §2 S5 · §3 Edges · §4 The composer, Rollout, Files touched · AC12 · §8 F4 (re-resolved) · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` rows 18 and 45, U3 and U4: the landed `instructions.exclude` row is filled and drained, never added, and AC12's red is `policy.py lists --check`; the key is read through `policy.py get` at `--rev HEAD`; orders go through unit 33's handler, keyed on a `path`.
 - rev-5 · 2026-10-25 · §2 S5 · AC12 · item 8 of `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks`, the parent audit's P11: `instructions.exclude`'s default is `[]`, v2's `none`, as dGroundRules' built catalogue holds it.
 - rev-6 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-7 · 2026-11-08 · S2 S5 S6 S10 · section 4 The composer, The `owned` widening, Files touched ·
+  AC12 · section 7 · section 10 · from
+  `2026-11-08-prompt-PLAY-dOrderedCharter-46-drift-fold-brief.md`: re-read at `05fd1b7f7`. The
+  `owned` arm's predicate is `tag_index.py`'s `check_owned`, layer-based, so the widening lands
+  there and the file joins Files touched; the policy caller is unit 19's `read_policy_value`, bound
+  with `rev` `"HEAD"`, not a unit 9 function; the pin normaliser is `derive_pin_hash`, reached at
+  call time through `derive_unit_pin`; the kinds register is landed and keeps a row's extra keys, so
+  `schema` joins it as written; `write_row_order` takes a key and a whole text, as unit 33's rev-6
+  states; AC12's fixture line states the row before the pass; the gates section names the
+  acceptance-matrix leg's parked red; the reuse audit's grep and citations are re-read.
 
 ## 10. Reuse audit
 
@@ -404,5 +448,9 @@ patch engine; the scout's row (`memory/builds/dOrderedCharter/build/2026-10-23-b
 agrees, and its `load_policy` line number matches source. The recall probe returned the clause and its
 design rows (flow-roles-adoption items 4 to 6 and 13) and DEPL-dCarriedReceipt-8, a merge result
 stamped as gov's own and overwritten one update later, which is the loss a pinned patch exists to stop.
+Re-read at `05fd1b7f7`: the same grep now finds the landed catalogue row and its line on the
+shrink-only list, and still no reader or patch engine; the cited functions are
+`tools/govkit/govkit.py#resolve_owned_rows`, `tools/memory-tree/design_lib.py#derive_pin_hash` and
+`tools/roles/roles_lib.py#load_policy`, each moved since the base and unchanged in what it does here.
 
 Recall terms used: `python tools/memory-recall/query.py "how does an adopter patch a shipped gov row without losing the change at update" --terms "overlay amends supersedes field patch pinned hash adopter row stale update order"`
