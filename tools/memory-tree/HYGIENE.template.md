@@ -155,6 +155,9 @@ set membership rather than a `grep -qxF` per call, because that fork ran once pe
 - **`pass-order-waiver.txt`** — the unattended kit's pass-order checker reads it at this default
   path, so check 3 admits it by name wherever that kit is adopted. A registry a PROJECT adds goes in
   `PROJECT_REGISTRY_EXTRA` instead.
+- **`positional-refs.txt`** — the playbook kit's positional check reads its list at this default
+  path and reds it absent, and that kit's write mode writes it empty, so the project-registry
+  whitelist admits it by name wherever that kit is adopted. Its rows are this tree's own.
 - `project/method-carriers.txt` — every file outside the memory tree that POINTS AT
   `guides/BUILD-METHOD.md`, one `<path> · <why>` row each, read by
   `check-method-carriers.sh`. Keyed on PATH alone, never `<path>:<line>`. It is per-repo and the kit

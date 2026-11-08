@@ -129,14 +129,13 @@ def read_pending(path):
 
 
 def derive_layout(root=None):
-    """(repo root, the kit's repo-relative dir, the tool root) of this install, or of `root`'s fixture."""
-    if root is not None:
-        return pathlib.Path(root), "tools/playbook", "tools"
+    """(repo root, the kit's repo-relative dir, the tool root) of this install; with `root`, a fixture laid
+    out at this install's layout, that root beside the same kit dir and tool root (PLAY-dOrderedCharter-72)."""
     top = next((d for d in (KIT_DIR, *KIT_DIR.parents) if (d / ".git").exists()), None)
     if top is None:
         raise CoreRefused(f"no work tree above {KIT_DIR.as_posix()}")
     kit_rel = KIT_DIR.relative_to(top).as_posix()
-    return top, kit_rel, pathlib.PurePosixPath(kit_rel).parent.as_posix()
+    return (top if root is None else pathlib.Path(root)), kit_rel, pathlib.PurePosixPath(kit_rel).parent.as_posix()
 
 
 def read_value(root, key):
@@ -610,17 +609,18 @@ FX_TAGS = [f"principle.p{n}" for n in range(1, FX_N + 1)]
 
 def write_fixture(top, policy="# no key set\n"):
     """The base repository every plant mutates: 16 principles, all enforced, two conforming kinds, one
-    pending kind, one Skill and no practice catalogue, committed on main."""
+    pending kind, one Skill and no practice catalogue, committed on main, at this install's layout."""
+    _top, kit, tool = derive_layout(top)
     files = {
         ".memory-tree.conf": 'MEMORY_ROOT="memory"\nDESIGN_RECORD="memory/design.md"\n',
         "memory/design.md": "# fixture design\n\n## [principles] What binds\n\n" + "".join(
             f"- **P{n} Fixture principle {n}.** Its text.\n" for n in range(1, FX_N + 1)) + "\n## [enforcement]\n",
         "memory/builds/dFx/README.md": "# dFx\n",
-        "tools/playbook/core.py": "# the fixture's factory stand-in\n",
-        "tools/playbook/principles.toml": "".join(
+        f"{kit}/core.py": "# the fixture's factory stand-in\n",
+        f"{kit}/principles.toml": "".join(
             f'[[principle]]\ntag = "principle.p{n}"\nid = "P{n}"\nline = "Fixture principle {n}."\nclauses = []\n\n'
             for n in range(1, FX_N + 1)),
-        "tools/playbook/kinds.toml": (
+        f"{kit}/kinds.toml": (
             '[[kind]]\ntag = "kind.skill"\nowner = "dFx"\nbinds = ["principle.p15", "principle.p16"]\n'
             'population = "skills/*/SKILL.md"\nfactory = "python {prefix}/playbook/core.py new skill"\n'
             'gate = "fx skills"\n\n'
@@ -629,8 +629,8 @@ def write_fixture(top, policy="# no key set\n"):
             'factory = "python {prefix}/playbook/core.py new charter-practice"\ngate = "fx practices"\n\n'
             '[[kind]]\ntag = "kind.product-layer"\nowner = "dFx"\nbinds = ["principle.p16"]\npopulation = ""\n'
             'factory = ""\ngate = ""\n'),
-        "tools/playbook/core-pending.txt": "# fixture pending list\nkind\tkind.product-layer\tdFx\n",
-        "tools/gate-legs.json": json.dumps([
+        f"{kit}/core-pending.txt": "# fixture pending list\nkind\tkind.product-layer\tdFx\n",
+        f"{tool}/gate-legs.json": json.dumps([
             {"name": "fx meta", "argv": ["python", "x.py"], "enforces": FX_TAGS},
             {"name": "fx skills", "argv": ["python", "x.py"], "enforces": ["principle.p15", "principle.p16"]},
             {"name": "fx practices", "argv": ["python", "x.py"], "enforces": ["principle.p16"]}], indent=1) + "\n",
@@ -663,6 +663,7 @@ class Case:
 
     def __init__(self, top, out):
         self.top, self.out, self.failed = top, out, 0
+        _top, self.kit, self.tool = derive_layout(top)  # the kit dir and the tool root the fixture is laid out at
 
     def write_file(self, rel, fn):
         p = self.top / rel
@@ -679,7 +680,7 @@ class Case:
             p.write_bytes(old.encode("utf-8"))
 
     def write_legs(self, fn):
-        return self.write_file("tools/gate-legs.json", lambda t: json.dumps(fn(json.loads(t)), indent=1) + "\n")
+        return self.write_file(f"{self.tool}/gate-legs.json", lambda t: json.dumps(fn(json.loads(t)), indent=1) + "\n")
 
     def write_policy(self, text):
         self.write_file(".governance/policy.toml", lambda _t: text)
@@ -708,7 +709,7 @@ def run_practice_read(top):
     """The render's reader over the fixture's catalogue, a row it refuses an exit 1."""
     import instruction_units as iu
     try:
-        iu.read_practice_catalogue(pathlib.Path(top, "tools/playbook/practices.toml"))
+        iu.read_practice_catalogue(pathlib.Path(top, derive_layout(top)[1], "practices.toml"))
     except iu.UnitRowError as exc:
         return [str(exc)], 1
     return [f"{SAY}: the render's reader takes the catalogue"], 0
@@ -716,18 +717,18 @@ def run_practice_read(top):
 
 def arm_registry(c):
     c.check_gate("registry: the control, the ids equal the design's heads both ways", run_meta_check, 0, "16 rows against 16")
-    old = c.write_file("tools/playbook/principles.toml",
+    old = c.write_file(f"{c.kit}/principles.toml",
                  lambda t: t + '[[principle]]\ntag = "principle.p43"\nid = "P43"\nline = "Extra."\nclauses = []\n')
     c.write_legs(lambda legs: [dict(g, enforces=g["enforces"] + ["principle.p43"]) if g["name"] == "fx meta" else g
                          for g in legs])
     c.check_gate("registry: a planted extra P43 row", run_meta_check, 1, "registry row P43")
-    c.set_file("tools/playbook/principles.toml", old)
+    c.set_file(f"{c.kit}/principles.toml", old)
     c.write_legs(lambda legs: [dict(g, enforces=FX_TAGS) if g["name"] == "fx meta" else g for g in legs])
-    c.write_file("tools/playbook/principles.toml", lambda t: re.sub(
+    c.write_file(f"{c.kit}/principles.toml", lambda t: re.sub(
         r'\[\[principle\]\]\ntag = "principle\.p7"\n.*?clauses = \[\]\n\n', "", t, flags=re.S))
     c.write_legs(lambda legs: [dict(g, enforces=[t for t in g["enforces"] if t != "principle.p7"]) for g in legs])
     c.check_gate("registry: a planted missing P7 row", run_meta_check, 1, "P7 heads")
-    c.set_file("tools/playbook/principles.toml", old)
+    c.set_file(f"{c.kit}/principles.toml", old)
 
 
 def arm_unenforced(c):
@@ -736,41 +737,41 @@ def arm_unenforced(c):
     restore = c.write_legs(derive_without("principle.p5"))
     c.check_gate("unenforced: principle.p5 named by no leg, no kind and no pending row", run_meta_check, 1,
              "principle.p5: no leg's enforces")
-    c.set_file("tools/gate-legs.json", restore)
+    c.set_file(f"{c.tool}/gate-legs.json", restore)
     c.check_gate("unenforced: its enforcing leg restored", run_meta_check, 0, "meta-check · green")
     c.write_legs(lambda legs: [dict(g, enforces=g["enforces"] + ["principle.p99"]) if g["name"] == "fx meta" else g
                          for g in legs])
     c.check_gate("unenforced: an enforces naming principle.p99", run_meta_check, 1, "principle.p99: a leg enforces tag")
-    c.set_file("tools/gate-legs.json", restore)
+    c.set_file(f"{c.tool}/gate-legs.json", restore)
     c.check_gate("unenforced: principle.p99 taken out", run_meta_check, 0, "meta-check · green")
 
 
 def arm_pending(c):
     restore = c.write_legs(lambda legs: legs + [{"name": "fx bare", "argv": ["python", "x.py"]}])
     c.check_gate("pending: a leg with no enforces and no pending row", run_meta_check, 1, "leg 'fx bare' carries no enforces")
-    old = c.write_file("tools/playbook/core-pending.txt", lambda t: t + "leg\tfx bare\tdFx\n")
+    old = c.write_file(f"{c.kit}/core-pending.txt", lambda t: t + "leg\tfx bare\tdFx\n")
     c.check_gate("pending: the leg's pending row excuses it, and the counts print", run_meta_check, 0,
              "pending · principle 0 · practice 0 · leg 1 · kind 1")
-    c.set_file("tools/gate-legs.json", restore)
-    c.write_file("tools/playbook/core-pending.txt", lambda _t: old + "principle\tprinciple.p3\tdFx\n")
+    c.set_file(f"{c.tool}/gate-legs.json", restore)
+    c.write_file(f"{c.kit}/core-pending.txt", lambda _t: old + "principle\tprinciple.p3\tdFx\n")
     c.check_gate("pending: a pending row for an enforced principle", run_meta_check, 1,
              "pending principle row principle.p3 is stale", "pending · principle 1")
-    c.set_file("tools/playbook/core-pending.txt", old)
+    c.set_file(f"{c.kit}/core-pending.txt", old)
 
 
 def arm_kinds(c):
     c.check_gate("kinds: the control", run_kinds, 0, "kinds · green")
-    old = c.write_file("tools/playbook/kinds.toml", lambda t: t.replace('gate = "fx skills"', 'gate = "fx nowhere"'))
+    old = c.write_file(f"{c.kit}/kinds.toml", lambda t: t.replace('gate = "fx skills"', 'gate = "fx nowhere"'))
     c.check_gate("kinds: a kind row whose gate names no leg", run_kinds, 1, "kind.skill: its gate 'fx nowhere' names no leg")
-    c.set_file("tools/playbook/kinds.toml", old)
+    c.set_file(f"{c.kit}/kinds.toml", old)
     restore = c.write_legs(lambda legs: [dict(g, enforces=["principle.p16"]) if g["name"] == "fx skills" else g
                                    for g in legs])
     c.check_gate("kinds: a gate leg whose enforces lacks a tag of the kind's binds", run_kinds, 1,
              "does not enforce principle.p15")
-    c.set_file("tools/gate-legs.json", restore)
-    oldp = c.write_file("tools/playbook/core-pending.txt", lambda t: t + "kind\tkind.widget\tdFx\n")
+    c.set_file(f"{c.tool}/gate-legs.json", restore)
+    oldp = c.write_file(f"{c.kit}/core-pending.txt", lambda t: t + "kind\tkind.widget\tdFx\n")
     c.check_gate("kinds: a kind.widget tag no register row holds", run_kinds, 1, "kind.widget is no kind the register holds")
-    c.set_file("tools/playbook/core-pending.txt", oldp)
+    c.set_file(f"{c.kit}/core-pending.txt", oldp)
 
 
 def arm_skill(c):
@@ -790,7 +791,7 @@ def arm_practice(c):
              "appended practice.demo")
     c.check_gate("practice: the factory's row passes its gate", run_practices, 0, "practices conformance · green")
     c.check_gate("practice: the render's reader takes the factory's row", run_practice_read, 0, "takes the catalogue")
-    rel = "tools/playbook/practices.toml"
+    rel = f"{c.kit}/practices.toml"
     old = c.write_file(rel, lambda t: t + '\n[[practice]]\ntag = "practice.two"\nline = """a\nb"""\n')
     c.check_gate("practice: a two-line line", run_practices, 1, "practice.two: its line is not one line")
     c.set_file(rel, old)
@@ -855,7 +856,7 @@ def arm_instruction_unit(c):
     tree = c.top / "edit-tree"
     tree.mkdir()
     root = ie.build_tree(types.SimpleNamespace(top=tree))
-    lines, rc = derive_instruction_row(root, "tools", "factory", ["--kit", "corekit", "--type", "directive", "--level",
+    lines, rc = derive_instruction_row(root, c.tool, "factory", ["--kit", "corekit", "--type", "directive", "--level",
                                                                   "3", "--text", "MUST run the factory's command."])
     row, said = lines[0].split("\n"), lines[1]
     fill = {"<slug>": ie.FX_BUILD, "<id>": "PLAY-tEdit-1", "<editorial|semantic>": "semantic"}
@@ -877,7 +878,7 @@ def arm_instruction_unit(c):
 
 
 def arm_bypass_never(c):
-    c.write_legs(lambda legs: [dict(g, guard=["tools/playbook/"]) if g["name"] == "fx meta" else g for g in legs])
+    c.write_legs(lambda legs: [dict(g, guard=[f"{c.kit}/"]) if g["name"] == "fx meta" else g for g in legs])
     c.write_policy('core.bypass = "never"\n')
     c.check_gate("bypass-never: a core leg carrying a guard under never", run_meta_check, 1,
              "leg 'fx meta' enforces", "core.bypass is never")

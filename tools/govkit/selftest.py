@@ -7011,16 +7011,16 @@ user_skills = "/tmp/gk-fake-skills"
         import tomllib  # noqa: PLC0415
         _an = tomllib.loads((gcopy / PFX / KIT_NAMES["govkit"] / "adopters.toml").read_text(
             encoding="utf-8"))["adopter"][0]["names"][0]
-        pf = gcopy / PFX / KIT_NAMES["playbook"] / "positional-producers.txt"
+        pf = gcopy / PFX / KIT_NAMES["playbook"] / "instructions-legacy.txt"  # PLAY-dOrderedCharter-72
         pkt = gcopy / PFX / KIT_NAMES["playbook"] / "kit.toml"
         pfkeep, pktkeep = pf.read_bytes(), pkt.read_text(encoding="utf-8")
         pf.write_bytes(pfkeep + f"# {_an}\n".encode("utf-8"))
-        _named = f"'{PFX}{KIT_NAMES['playbook']}/positional-producers.txt' names the adopter"
+        _named = f"'{PFX}{KIT_NAMES['playbook']}/instructions-legacy.txt' names the adopter"
         rpo = _run_selfcheck(gcopy)
         check("[dOC-71 S3] a project-owned source naming an adopter passes the ban",
               rpo.returncode == 0 and _named not in rpo.stdout and "adopter names:" in rpo.stdout,
               (rpo.stdout + rpo.stderr)[-1500:])
-        _pkt = pktkeep.replace('"positional-producers.txt", ', "", 1)
+        _pkt = pktkeep.replace(', "instructions-legacy.txt"', "", 1)
         check("[dOC-71 S3] LIVENESS the staged descriptor really ships the planted list",
               _pkt != pktkeep, "the replace matched nothing in the playbook-render descriptor")
         pkt.write_text(_pkt, encoding="utf-8")

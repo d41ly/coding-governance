@@ -33,12 +33,13 @@ to = "{prefix}/playbook/{relpath}"
 # install. These are `root_relative` rules pointing at the REAL files rather than copies, so there is
 # one source of truth and nothing to keep in step; gov itself has no copy beside the engine and reads
 # its own tree, which is the fall-through `declaration_paths()` documents.
-# GOV'S OWN LISTS STAY HOME (PLAY-dOrderedCharter-70 S10). The positional lists, the core's pending list and
-# the legacy list name gov's own files and records, so no adopter receives them. The write mode writes an
-# empty `positional-refs.txt` and `core-pending.txt` where a target lacks them, since an absent list is a
-# red; the other two read absent as empty.
+# GOV'S OWN LISTS STAY HOME (PLAY-dOrderedCharter-70 S10). The core's pending list and the legacy list name
+# gov's own files and records, so no adopter receives them. The two positional lists live in gov's
+# `<MEMORY_ROOT>/project/`, outside this kit (PLAY-dOrderedCharter-72). The write mode writes an empty
+# `core-pending.txt` here and an empty `positional-refs.txt` in the target's memory project folder where a
+# target lacks them, since an absent list is a red; the legacy list and the producer list read absent as empty.
 [[files]]
-include = ["positional-refs.txt", "positional-producers.txt", "core-pending.txt", "instructions-legacy.txt"]
+include = ["core-pending.txt", "instructions-legacy.txt"]
 role = "project-owned"
 
 [[files]]

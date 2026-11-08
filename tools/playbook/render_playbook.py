@@ -843,13 +843,15 @@ def write_charter_lock(gov_root: Path, target: Path, charter_path: Path, units=(
 
 
 def write_empty_lists(target: Path) -> list[str]:
-    """PLAY-dOrderedCharter-70 S10: the two lists this kit withholds as project-owned and whose absence its
-    checks red, written empty under `<target>/<prefix>/<kit dir>` where that directory exists and the list
-    does not; a present file is left alone. -> the paths written, target-relative."""
+    """PLAY-dOrderedCharter-70 S10: the two lists this kit's checks red when absent, written empty where
+    the check looks and the folder exists and the list does not: the positional list under
+    `<target>/<MEMORY_ROOT>/project/` (PLAY-dOrderedCharter-72), the pending list under
+    `<target>/<prefix>/<kit dir>`. A present file is left alone. -> the paths written, target-relative."""
     iu = load_units_module()
-    home = target / iu.derive_kit_prefix() / iu.KIT_DIR.name
+    homes = (('positional-refs.txt', target / derive_memory_root(target, {}).strip('/') / 'project'),
+             ('core-pending.txt', target / iu.derive_kit_prefix() / iu.KIT_DIR.name))
     written = []
-    for name in ('positional-refs.txt', 'core-pending.txt'):
+    for name, home in homes:
         path = home / name
         if home.is_dir() and not path.exists():
             path.write_bytes(b'')

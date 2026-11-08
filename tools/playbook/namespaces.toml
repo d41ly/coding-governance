@@ -8,7 +8,8 @@
 # `purpose-source` and `owner`: `owner` names a `[[build]]` row of <MEMORY_ROOT>/project/chain.toml, and `purpose-source`
 # is `<path>` (path-only), `<path>#<field>` (each member at a .toml path carries the field on its row, a .py path
 # assigns it) or `#<field>` (each member's own file carries it, `h1` a Markdown member's first `# ` line). A source
-# not in the view yet prints `pending` and grades once it lands.
+# not in the view yet prints `pending` and grades once it lands. A path spells the tool root `{prefix}/`, which the
+# arm resolves against this registry's own tool root (PLAY-dOrderedCharter-72 S7).
 
 [[namespace]]
 ns = "doc"
@@ -34,60 +35,60 @@ join-armed-by = "dOrderedCharter"
 ns = "reader"
 owner = "dOrderedCharter"
 layer = "layer.instruction"
-source = "each [[reader]] row's tag in tools/playbook/readers.toml"
+source = "each [[reader]] row's tag in {prefix}/playbook/readers.toml"
 extractor = "tag_index:extract_reader"
 role = "selects"
-purpose-source = "tools/playbook/readers.toml#why"
+purpose-source = "{prefix}/playbook/readers.toml#why"
 join-armed-by = "dOrderedCharter"
 
 [[namespace]]
 ns = "practice"
 owner = "dOrderedCharter"
 layer = "layer.instruction"
-source = "each [[practice]] row's tag in tools/playbook/practices.toml"
+source = "each [[practice]] row's tag in {prefix}/playbook/practices.toml"
 extractor = "tag_index:extract_practice"
 role = "selects"
-purpose-source = "tools/playbook/practices.toml#line"
+purpose-source = "{prefix}/playbook/practices.toml#line"
 join-armed-by = "dOrderedCharter"
 
 [[namespace]]
 ns = "level"
 owner = "dOrderedCharter"
 layer = "layer.instruction"
-source = "LEVELS in tools/playbook/instruction_units.py, level.<name> each"
+source = "LEVELS in {prefix}/playbook/instruction_units.py, level.<name> each"
 extractor = "tag_index:extract_level"
 role = "describes"
-purpose-source = "tools/playbook/instruction_units.py#LEVELS"
+purpose-source = "{prefix}/playbook/instruction_units.py#LEVELS"
 join-armed-by = "dOrderedCharter"
 
 [[namespace]]
 ns = "layer"
 owner = "dOrderedCharter"
 layer = "layer.instruction"
-source = "each [[layer]] row's tag in tools/playbook/layers.toml"
+source = "each [[layer]] row's tag in {prefix}/playbook/layers.toml"
 extractor = "tag_index:extract_layer"
 role = "describes"
-purpose-source = "tools/playbook/layers.toml#definition"
+purpose-source = "{prefix}/playbook/layers.toml#definition"
 join-armed-by = "dOrderedCharter"
 
 [[namespace]]
 ns = "principle"
 owner = "dOrderedCharter"
 layer = "layer.instruction"
-source = "each [[principle]] row's tag in tools/playbook/principles.toml"
+source = "each [[principle]] row's tag in {prefix}/playbook/principles.toml"
 extractor = "tag_index:extract_principle"
 role = "describes"
-purpose-source = "tools/playbook/principles.toml#line"
+purpose-source = "{prefix}/playbook/principles.toml#line"
 join-armed-by = "dOrderedCharter"
 
 [[namespace]]
 ns = "kind"
 owner = "dOrderedCharter"
 layer = "layer.instruction"
-source = "each [[kind]] row's tag in tools/playbook/kinds.toml"
+source = "each [[kind]] row's tag in {prefix}/playbook/kinds.toml"
 extractor = "tag_index:extract_kind"
 role = "describes"
-purpose-source = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-foundations.md"
+purpose-source = "{prefix}/playbook/kinds.toml"
 join-armed-by = "dOrderedCharter"
 
 [[namespace]]
@@ -97,7 +98,7 @@ layer = "layer.distribution"
 source = "the top-level id of each tracked kit.toml or *.kit.toml descriptor, kit.<id> at its own line"
 extractor = "tag_index:extract_kit"
 role = "describes"
-purpose-source = "tools/govkit/registry.toml"
+purpose-source = "{prefix}/govkit/registry.toml"
 join-armed-by = "dOrderedCharter"
 
 [[namespace]]

@@ -13,8 +13,8 @@ arms over the citations outside `<MEMORY_ROOT>/builds/`, and the shape check, th
 name-check slot (PLAY-dOrderedCharter-10), and the `purpose` arm, the namespace rows' `owner` and
 `purpose-source` and the chain registry joined to the design view (PLAY-dOrderedCharter-22), and the `positional` arm, the
 tree's positional references against `positional-refs.txt` with every pinned line and symbol citation resolved
-(PLAY-dOrderedCharter-26, `positional.py`). `bundle` prints the node and every inbound edge as ranges to
-pull, and `check --only` runs one edge arm alone (PLAY-dOrderedCharter-25, `tag_bundle.py`). An address is a tag, `doc.<name>#<seg>`, or a
+(PLAY-dOrderedCharter-26, `positional.py`), the list under `<MEMORY_ROOT>/project/` (PLAY-dOrderedCharter-72).
+`bundle` prints the node and every inbound edge as ranges to pull, and `check --only` runs one edge arm alone (PLAY-dOrderedCharter-25, `tag_bundle.py`). An address is a tag, `doc.<name>#<seg>`, or a
 positional label `aliases.toml` maps. `--gc` collects the index rows of every extractor version no live
 worktree derives (PLAY-dOrderedCharter-51 S5). Every line opens `tags:`; `--json` is the index's only JSON.
 Exit 0 green, 1 red, 2 a refusal (an unreadable registry, a refused policy read, a locked index).
@@ -39,6 +39,7 @@ import types
 KIT_DIR = pathlib.Path(os.path.abspath(__file__)).parent
 sys.path.insert(0, str(KIT_DIR))
 
+import instruction_units  # noqa: E402  PLAY-dOrderedCharter-72: the fixture's kit at this install's layout
 import tag_index as ti  # noqa: E402
 from policy_value import PolicyRefused, read_policy_value  # noqa: E402
 
@@ -365,7 +366,7 @@ tag = "layer.exp"
 kind = "expansion"
 '''
 GUIDE = "# Alpha\n\n## Intro\n\nthe intro text\n\n## M5 — Recall and reuse\n\nrecall first\n"
-FIXTURE_KIT = "tools/playbook"
+FIXTURE_KIT = instruction_units.derive_tool_rel(KIT_DIR.name)  # the fixture lays its kit out at this install's layout
 #: PLAY-dOrderedCharter-68's two plants: a fence opened and never closed, then the citation it hides
 UNCLOSED = "\n```\nand [doc.nope]\n"
 PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retired", "retired-old",
@@ -405,18 +406,18 @@ SHAPE_PLANTS = {
                      {"tools/corekit/core.tags": "+a.b.c\n"}),
     "unregistered-cite": ("", {"memory/guides/ALPHA.md": "+\nsee `layer.nowhere`\n"}),
     "dead-selector": (FIXTURE_UNIT_ROW + derive_fixture_row("reader", "tag_index:extract_reader", "selects"), {
-        "tools/playbook/readers.toml": '[[reader]]\ntag = "reader.every"\n\n[[reader]]\ntag = "reader.ghost"\n',
+        f"{FIXTURE_KIT}/readers.toml": '[[reader]]\ntag = "reader.every"\n\n[[reader]]\ntag = "reader.ghost"\n',
         "tools/corekit/instructions.toml": '[[unit]]\ntag = "unit.alpha"\nscope = ["reader.every"]\n',
         "tools/corekit/core.tags": "+layer.memory.lexicon\n"}),
     "empty-ns": (derive_fixture_row("kind", "tag_index:extract_kind"),
-                 {"tools/playbook/kinds.toml": "# declares nothing yet\n",
+                 {f"{FIXTURE_KIT}/kinds.toml": "# declares nothing yet\n",
                   "memory/guides/ALPHA.md": "+\nsee `kind.x`\n"}),
     "file-name": (derive_fixture_row("kit", "tag_index:extract_kit", layer="layer.exp"),
                   {"memory/guides/ALPHA.md": "+\nedit `kit.toml`\n"}),
     # PLAY-dOrderedCharter-22: a guide with no H1 under `#h1`, and a source the fixture does not track yet
     "member-no-field": ("", {"memory/guides/BETA.md": "## Intro\n\nno title line\n"}),
     "pending-source": (derive_fixture_row("reader", "tag_index:extract_reader", "selects",
-                                          purpose="tools/playbook/readers.toml#why"), {}),
+                                          purpose="{prefix}/playbook/readers.toml#why"), {}),
 }
 #: PLAY-dOrderedCharter-22's registry plants: each edits the base registry's first row, `doc`'s
 PURPOSE_PLANTS = {
@@ -499,7 +500,7 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
     root.mkdir(parents=True)
     run_git(root, "init", "-q", "-b", "main")
     run_git(root, "config", "core.autocrlf", "false")
-    kit = "tools/playbook"
+    kit = FIXTURE_KIT
     files = {
         ".memory-tree.conf": 'MEMORY_ROOT=memory\nCHARTER="AGENTS.md"\n',
         "AGENTS.md": "# Charter\n\n## Practices\n\nthe practices\n",
@@ -513,7 +514,8 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
         "tools/expkit/kit.toml": 'id = "expkit"\nlayer = "layer.exp"\n',
         "tools/expkit/exp.tags": "",
         "memory/project/chain.toml": FIXTURE_CHAIN,
-        f"{kit}/positional-refs.txt": "",  # PLAY-dOrderedCharter-26: present and empty, so the arm is unarmed
+        # PLAY-dOrderedCharter-26: present and empty, so the arm is unarmed; under the memory root (dOC-72)
+        "memory/project/positional-refs.txt": "",
     }
     if plant in PURPOSE_PLANTS:
         old, new = PURPOSE_PLANTS[plant]
@@ -825,7 +827,7 @@ def run_plant(root, top, plant, sets) -> int:
         for where, mine, theirs in ((root, "edited in one", "edited in two"), (other, "edited in two", "edited in one")):
             con = ti.load_index(where)
             try:
-                ctx = ti.derive_context(where, where / "tools/playbook/namespaces.toml")
+                ctx = ti.derive_context(where, where / FIXTURE_KIT / "namespaces.toml")
                 ti.load_view(con, where, ctx)
                 text = "\n".join(r["text"] for r in ti.resolve_address(con, "doc.alpha#intro"))
             finally:
@@ -852,7 +854,7 @@ def run_plant(root, top, plant, sets) -> int:
     if plant in ("dead-selector", "file-name"):  # the plant's exit, then its second half's on one line
         rc = run_verb(root, "check", None, sets=sets)
         if plant == "dead-selector":
-            write_commit(root, {"tools/playbook/readers.toml": '[[reader]]\ntag = "reader.every"\n'}, "no ghost")
+            write_commit(root, {f"{FIXTURE_KIT}/readers.toml": '[[reader]]\ntag = "reader.every"\n'}, "no ghost")
             half = "without reader.ghost"
         else:
             run_git(root, "mv", "tools/corekit/kit.toml", "tools/corekit/corekit.kit.toml")
@@ -864,7 +866,8 @@ def run_plant(root, top, plant, sets) -> int:
     if plant in ("pending-source", "new-no-purpose"):  # PLAY-dOrderedCharter-22: the source lands, the row gains a purpose
         rc = run_verb(root, "check", None, sets=sets)
         if plant == "pending-source":
-            write_commit(root, {"tools/playbook/readers.toml": '[[reader]]\ntag = "reader.every"\n'}, "the source lands")
+            write_commit(root, {f"{FIXTURE_KIT}/readers.toml": '[[reader]]\ntag = "reader.every"\n'},
+                         "the source lands")
             half = "readers.toml landed with a member lacking why"
         else:
             rows = CHAIN_PLANTS[plant][:-1] + [{"slug": "dFixtureNew", "purpose": "a build the baseline does not name"}]
@@ -903,10 +906,11 @@ def write_forked_record(root, kit, record, text) -> None:
 def run_positional_plant(root, top, plant, say, check) -> int:
     """S8's seven plants, PLAY-dOrderedCharter-47's forked-before plant, PLAY-dOrderedCharter-53's three
     per-line plants and PLAY-dOrderedCharter-48's two producer plants over the fixture's own lists. `check` runs the fixture's whole `check`, whose
-    `positional` arm each plant moves; a plant of several steps returns 0 only when every step held."""
+    `positional` arm each plant moves; a plant of several steps returns 0 only when every step held. Every
+    `positional` call reads the fixture's memory root, `memory` (PLAY-dOrderedCharter-72)."""
     import positional as pos
-    kit, guide = FIXTURE_KIT, "memory/guides/ALPHA.md"
-    list_path = pos.derive_list_path(root, kit)
+    kit, guide, mem = FIXTURE_KIT, "memory/guides/ALPHA.md", "memory"
+    list_path = pos.derive_list_path(root, mem)
 
     def read_rows():
         return pos.read_list(list_path) or []
@@ -914,14 +918,14 @@ def run_positional_plant(root, top, plant, say, check) -> int:
         write_commit(root, {POS_CODE: POS_MOD, "AGENTS.md": "# Charter\n\nsee HYGIENE check 5\n",
                             guide: GUIDE + f"\nsee {derive_cite(1)}, {derive_cite('2-3')} and {derive_cite(1)} again\n",
                             "memory/guides/BETA.md": f"# Beta\n\nread BUILD-METHOD M5, and {derive_cite(1)}\n",
-                            f"{kit}/positional-refs.txt": "AGENTS.md\tHYGIENE check 5\n"}, "citations")
-        pos.run_seed(root, kit)
+                            "memory/project/positional-refs.txt": "AGENTS.md\tHYGIENE check 5\n"}, "citations")
+        pos.run_seed(root, mem)
         want = {"AGENTS.md\tHYGIENE check 5", f"{guide}\t{derive_cite(1)}", f"{guide}\t{derive_cite('2-3')}",
                 f"memory/guides/BETA.md\t{derive_cite(1)}", "memory/guides/BETA.md\tBUILD-METHOD M5"}
         got = read_rows()
         same = sorted(got) == sorted(want)
         say("seed: the list holds every expected row and no other" if same else f"seed: the list DIFFERS: {got}")
-        again = pos.run_seed(root, kit)
+        again = pos.run_seed(root, mem)
         say(f"a second seed: rc={again}")
         rc = check()
         return 0 if same and again == 1 and rc == 0 else 1
@@ -929,7 +933,7 @@ def run_positional_plant(root, top, plant, say, check) -> int:
         two = f" and {derive_cite(2)}"
         cited = GUIDE + f"\nsee {derive_cite(1)}" + (two if plant == "positional-stale" else "") + ", per BUILD-METHOD M5\n"
         write_commit(root, {POS_CODE: POS_MOD, guide: cited}, "citations")
-        pos.run_seed(root, kit)
+        pos.run_seed(root, mem)
         if plant == "positional-listed":
             return check()
         if plant == "positional-new":
@@ -943,11 +947,11 @@ def run_positional_plant(root, top, plant, say, check) -> int:
         rc1 = check()
         stale = rc1 == 1 and any(r.endswith(derive_cite(2)) for r in read_rows())
         say(f"removed: rc={rc1}, stale {'named' if stale else 'NOT named'}")
-        pos.run_shrink(root, kit)
+        pos.run_shrink(root, mem)
         after, rc2 = len(read_rows()), check()
         say(f"after shrink: {after - 1} rows, rc={rc2}")  # the M5 row aside
         write_files(root, {guide: cited.replace(two, f" and {derive_cite(3)}")})
-        pos.run_shrink(root, kit)
+        pos.run_shrink(root, mem)
         again, rc3 = len(read_rows()), check()
         say(f"a new citation planted: shrink left {again - 1} rows, rc={rc3}")
         return 0 if stale and after == before - 1 and rc2 == 0 and again == after and rc3 == 1 else 1
@@ -1000,7 +1004,8 @@ def run_positional_plant(root, top, plant, say, check) -> int:
         rc2 = check()
         write_commit(root, {after: None}, "the post-merge record removed")
         run_git(root, "checkout", "-q", "side")  # moved on its own branch, so its add is not the check's either
-        write_commit(root, {record: None, "tools/notes.md": cite.format(1)}, "the record moved outside the records")
+        write_commit(root, {record: None, instruction_units.derive_tool_rel("notes.md"): cite.format(1)},
+                     "the record moved outside the records")
         run_git(root, "checkout", "-q", "main")
         run_git(root, "merge", "-q", "--no-ff", "side", "-m", "the move merged")
         rc3 = check()
@@ -1008,15 +1013,15 @@ def run_positional_plant(root, top, plant, say, check) -> int:
             f"the pre-fork record moved under tools: rc={rc3}")
         return 0 if (rc1, rc2, rc3) == (0, 1, 1) else 1
     if plant in ("positional-producer-new", "positional-producer-stale"):  # PLAY-dOrderedCharter-48 S5
-        role = "tools/roles/agents/gov-x.agent.md"
+        role = instruction_units.derive_tool_rel("roles", "agents", "gov-x.agent.md")
         write_commit(root, {role: "# gov-x\n\n- cite it by file:line\n"}, "a role source")
         if plant == "positional-producer-new":
             rc = check()
             write_files(root, {role: "# gov-x\n\n- cite it by `path#symbol`, never by file:line\n"})
             say(f"re-pointed to a stable form: rc={check()}")
             return rc
-        seeded = pos.run_producers(root, kit, seed=True)
-        rc1, again = check(), pos.run_producers(root, kit, seed=True)
+        seeded = pos.run_producers(root, kit, mem, seed=True)
+        rc1, again = check(), pos.run_producers(root, kit, mem, seed=True)
         write_files(root, {role: "# gov-x\n\n- cite it by `path#symbol`\n"})
         rc2 = check()
         say(f"kept: rc={rc1}; a second seed: rc={again}; the kept line re-pointed: rc={rc2}")
@@ -1024,14 +1029,14 @@ def run_positional_plant(root, top, plant, say, check) -> int:
     # positional-pin: the unlisted citation re-pinned, and a file outside the repository refused
     write_commit(root, {POS_CODE: POS_MOD, guide: GUIDE + f"\nsee {derive_cite(2)}\n"}, "a citation")
     blob = run_git(root, "rev-parse", "--short=8", f"HEAD:{POS_CODE}").strip()
-    pinned = pos.run_pin(root, kit, root / guide)
+    pinned = pos.run_pin(root, mem, root / guide)
     text = (root / guide).read_text(encoding="utf-8")
     rc = check()
     ok = pinned == 0 and derive_cite(2, blob) in text and derive_cite(2) + "\n" not in text and rc == 0
     say(f"pin {'rewrote the citation to the blob at HEAD' if ok else 'did NOT rewrite the citation'}; check: rc={rc}")
     outside = top / "outside.md"
     outside.write_text(f"see {derive_cite(2)}\n", encoding="utf-8")
-    out_rc = pos.run_pin(root, kit, outside)
+    out_rc = pos.run_pin(root, mem, outside)
     kept = outside.read_text(encoding="utf-8") == f"see {derive_cite(2)}\n"
     say(f"pin outside the repository: rc={out_rc}, {'nothing written' if kept else 'the file WRITTEN'}")
     return 0 if ok and out_rc == 1 and kept else 1

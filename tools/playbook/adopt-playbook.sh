@@ -315,9 +315,9 @@ ghost-owner $_tk|1|namespace 'doc' · owner 'dGhost' names no build of memory/pr
 no-purpose-source $_tk|2|namespace row 1 lacks purpose-source
 bad-purpose-source $_tk|1|namespace 'doc' · purpose-source 'AGENTS.md#practices' reads a field in a .md file
 member-no-field $_tk|1|namespace 'doc' · member doc.beta (memory/guides/BETA.md) lacks h1
-pending-source $_tk|0|tags: purpose · pending reader · tools/playbook/readers.toml#why
+pending-source $_tk|0|tags: purpose · pending reader · {prefix}/playbook/readers.toml#why
 pending-source $_tk|0|members, 3 path-only, pending 1
-pending-source $_tk|0|member reader.every (tools/playbook/readers.toml) lacks why
+pending-source $_tk|0|/readers.toml) lacks why
 pending-source $_tk|0|readers.toml landed with a member lacking why: rc=1
 registry-ghost $_tk|1|registry row 'dGhost' names no build of the design view
 registry-missing $_tk|1|chain build 'dFixtureTwo' of the design view has no registry row

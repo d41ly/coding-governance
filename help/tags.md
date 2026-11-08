@@ -52,7 +52,7 @@ its own extractor code wrote, so switching between them re-parses nothing.
   worktree carries any more, printing `tag-index — collected: <n> rows of <m> versions`, and refuses
   when a worktree's registry cannot be read; `python tools/playbook/gov_tag.py --list-positional`
   prints one `<path>` TAB `<ref>` row per positional reference, the rows
-  `tools/playbook/positional-refs.txt` keeps; and
+  `memory/project/positional-refs.txt` keeps; and
   `python tools/playbook/gov_tag.py --fixture --plant scope` runs one planted case in a scratch
   repository. <!-- usage: script:tools/playbook/gov_tag.py 6cb6638a -->
 

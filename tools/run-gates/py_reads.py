@@ -304,7 +304,7 @@ def run_selftest():
     check("an undefined name reds", scan_unbound_names("print(planted)\n"), ["planted"])
     check("the same name defined is green", scan_unbound_names("planted = 1\nprint(planted)\n"), [])
     with tempfile.TemporaryDirectory() as tmp:
-        tools = pathlib.Path(tmp) / "tools"
+        tools = pathlib.Path(tmp) / HERE.parent.name  # the scratch tool root carries this install's name
         for rel, text in (("kit-a/suite.py", "import helper\n"), ("kit-a/helper.py", "x = 1\n"),
                           ("kit-a/reach.py", 'resolve_kit_dir("kit-b", "mod.py", ".")\nimport mod\n'),
                           ("kit-b/mod.py", "x = 1\n"), ("star.py", "from helper import *\nprint(planted)\n"),
@@ -320,11 +320,11 @@ def run_selftest():
         check("a star import reds nothing", rc, 0)
         check("a star import counts", "1 star imports skipped" in out, True)
         check("a suite import outside its guard reds", derive_gaps("kit-a/suite.py", "{prefix}/kit-a/suite.py"),
-              ["tools/kit-a/helper.py"])
+              [f"{HERE.parent.name}/kit-a/helper.py"])
         check("the same path in its guard is green",
               derive_gaps("kit-a/suite.py", "{prefix}/kit-a/suite.py", "{prefix}/kit-a/helper.py"), [])
         check("a sibling kit reached by a literal resolve reds", derive_gaps("kit-a/reach.py", "{prefix}/kit-a/"),
-              ["tools/kit-b/mod.py"])
+              [f"{HERE.parent.name}/kit-b/mod.py"])
         check("a file that does not parse refuses", run_quietly("--names", str(tools / "broken.py"))[0], 2)
     for line in failed:
         print(f"py-reads: selftest FAILED · {line}")

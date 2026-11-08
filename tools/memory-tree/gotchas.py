@@ -1150,9 +1150,10 @@ def cmd_selftest() -> int:
         # PLAY-dOrderedCharter-70 S18: run from a COPY of this kit with no memory-recall sibling, so an import that
         # regains the recall kit fails here rather than resolving against the real install beside this file.
         import shutil
-        kit_copy = os.path.join(tn, "tools", "memory-tree")
+        here = os.path.dirname(os.path.abspath(__file__))  # the copy sits at this kit's last two segments
+        kit_copy = os.path.join(tn, os.path.basename(os.path.dirname(here)), os.path.basename(here))
         # the whole kit, not its *.py alone: corpus_ids asks check-memory-hygiene.sh for its sets
-        shutil.copytree(os.path.dirname(os.path.abspath(__file__)), kit_copy,
+        shutil.copytree(here, kit_copy,
                         ignore=shutil.ignore_patterns("__pycache__"))
 
         def run_kit_copy():

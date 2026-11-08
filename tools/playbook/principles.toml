@@ -1,9 +1,8 @@
 # principles.toml — the principle registry (PLAY-dOrderedCharter-7 S1), the `principle` namespace's declaring
 # source. One [[principle]] row per v2 principle, P1 to P42: `tag` (principle.p<n>), `id` (P<n>), `line` (its
-# bold title) and `clauses` (its v2 [enforcement] row). Written once from the design record
-# memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md, sections [principles]
-# and [enforcement]. Principles are fixed: no policy key reads or writes a row, and a principle changes only by
-# an owner-ratified amendment. `python <prefix>/playbook/core.py meta-check` joins each row both ways to the
+# bold title) and `clauses` (its v2 [enforcement] row). Written once from the design record the
+# `.memory-tree.conf` key DESIGN_RECORD names, sections [principles] and [enforcement]. Principles are
+# fixed: no policy key reads or writes a row, and a principle changes only by an owner-ratified amendment. `python <prefix>/playbook/core.py meta-check` joins each row both ways to the
 # legs whose `enforces` and the kinds whose `binds` name it.
 
 [[principle]]

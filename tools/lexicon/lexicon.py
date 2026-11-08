@@ -90,6 +90,9 @@ from subtokens import (check_convention, classify, leading_verb, read_stem,  # n
 KIT_LEXICON_VERSION = "1.25"
 
 CONF_NAME = ".lexicon.conf"
+#: the playbook kit's home under the tool root, where `read_tag_words` resolves the namespace registry
+#: (PLAY-dOrderedCharter-72): the one spelling its selftest's fixture lays out at too
+PLAYBOOK_HOME = "playbook"
 WAIVER_FILES = {
     "verb": "lexicon-verb-waivers.txt",
     "suffix": "lexicon-suffix-waivers.txt",
@@ -3962,7 +3965,7 @@ def read_tag_words(here=None) -> tuple:
     (PLAY-dOrderedCharter-10 S7, §8 F2). A row outside the segment shape is dropped, never spliced.
     LookupError or ValueError when the registry does not resolve or read."""
     import tomllib
-    reg = resolve_kit_dir("playbook", "namespaces.toml", here or Path(__file__).resolve().parent) / "namespaces.toml"
+    reg = resolve_kit_dir(PLAYBOOK_HOME, "namespaces.toml", here or Path(__file__).resolve().parent) / "namespaces.toml"
     try:
         rows = tomllib.loads(reg.read_text(encoding="utf-8")).get("namespace") or []
     except (OSError, tomllib.TOMLDecodeError) as exc:

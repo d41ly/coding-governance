@@ -16990,6 +16990,11 @@
     {
       "id": "read_memory_root",
       "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "read_memory_root",
+      "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
     {
@@ -21896,6 +21901,11 @@
       "id": "resolve_prefix_token",
       "kind": "function",
       "file": "tools/playbook/check_layers.py"
+    },
+    {
+      "id": "resolve_prefix_token",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "resolve_prefix_token",

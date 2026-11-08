@@ -6018,8 +6018,8 @@ with build_tempdir() as _td:
     _tr = Path(_td)
     (_tr / ".git").mkdir()
     shutil.copytree(KIT, _tr / PFX / KIT_NAME, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
-    (_tr / PFX / "playbook").mkdir(parents=True, exist_ok=True)
-    (_tr / PFX / "playbook" / "namespaces.toml").write_text(
+    (_tr / PFX / lex.PLAYBOOK_HOME).mkdir(parents=True, exist_ok=True)
+    (_tr / PFX / lex.PLAYBOOK_HOME / "namespaces.toml").write_text(
         "".join(f'[[namespace]]\nns = "{w}"\n\n' for w in ("practice", "repo", "layer", "a.b")),
         encoding="utf-8", newline="\n")
     _tg = subprocess.run([sys.executable, str(_tr / PFX / KIT_NAME / "lexicon.py"), "--tags"],
@@ -6031,7 +6031,7 @@ check("--tags refuses `practice.repo.x` by the namespace-word rule, passes `laye
       _tg.returncode == 1
       and "lexicon: tag practice.repo.x · first segment 'repo' is a namespace word" in _tgo
       and "4 graded, 1 refused" in _tgo and "tag layer.memory" not in _tgo and "tag layer.a.b" not in _tgo
-      and f"{PFX}playbook/namespaces.toml" in _tgo, _tgo)
+      and f"{PFX}{lex.PLAYBOOK_HOME}/namespaces.toml" in _tgo, _tgo)
 
 
 if FAILURES:

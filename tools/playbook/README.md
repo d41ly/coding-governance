@@ -297,8 +297,8 @@ reached with the inline `resolve_kit_dir`, as `policy_value.py` reaches the poli
 `--rebuild`, `--gc`, `--list-positional` and `--fixture --plant <case>`. `check` grades the backticked and
 bracketed Markdown spans outside `<MEMORY_ROOT>/builds/` (`resolves`, `retired`, the bare-name rule and
 `owned`) and counts what it does not grade. `aliases.toml` maps each positional label that never moved
-to its section; `positional-refs.txt` keeps the live positional references, one `<path>` TAB `<ref>` row
-each, as `--list-positional` prints them. An unlisted file:line citation in a `<MEMORY_ROOT>/builds/`
+to its section; `positional-refs.txt`, under `<MEMORY_ROOT>/project/` and never in this kit, keeps the
+live positional references, one `<path>` TAB `<ref>` row each, as `--list-positional` prints them. An unlisted file:line citation in a `<MEMORY_ROOT>/builds/`
 record is printed `positional — grandfathered: <path>:<line>` and never red when every line holding
 it was written, as `git blame -M` over the working tree reads it, by a commit that does not descend
 from the commit that added `positional.py`, since it was written on a branch that never held the check
@@ -307,7 +307,7 @@ to an old record later, or not yet committed, is graded, and a rename keeps each
 `positional.py producers` prints every line of the directive sources (`PRODUCER_PATHSPECS`: the role and
 workflow sources, `skills/`, the charter template and the kits' `.template.` sources) spelling
 `file:line`, `path and line` or `<path>:<line>`, a render's lines carried by its `.template.` source.
-`positional-producers.txt` keeps the hits that direct no line citation, one `<path>` TAB `<line text>`
+`positional-producers.txt`, beside it, keeps the hits that direct no line citation, one `<path>` TAB `<line text>`
 row each under a `# ` reason, seeded once by `producers --seed`; the arm's `producers` limb reds a hit
 neither kept nor naming `path#symbol` or a blob-pinned line, and a kept row no hit carries
 (PLAY-dOrderedCharter-48). Every Markdown reader here, `scan_unfenced`, walks memory-tree's

@@ -8,9 +8,9 @@
 
 A file:line citation is `<path>.<ext>:<n>[-<m>]`, `<ext>` in CODE_EXTENSIONS. Every one the tree held at
 the seed is a `<citing path>\\t<path>:<n>[-<m>]` row of unit 19's keyed list `positional-refs.txt`
-beside this file, keyed by path and reference and never by the citing line; the list's `§n`, `Mn` and
-`check n` rows are those `gov_tag.py --list-positional` prints. New text cites one of the stable forms:
-a symbol, `path#symbol` as the whole text of a one-backtick span in tracked Markdown, its path's suffix
+under `<MEMORY_ROOT>/project/`, outside the kit (PLAY-dOrderedCharter-72), keyed by path and reference
+and never by the citing line; the list's `§n`, `Mn` and `check n` rows are those
+`gov_tag.py --list-positional` prints. New text cites one of the stable forms: a symbol, `path#symbol` as the whole text of a one-backtick span in tracked Markdown, its path's suffix
 in SYMBOL_EXTENSIONS, or a blob-pinned line, `<path>@<oid>:<n>[-<m>]`.
 
 `check` is the `positional` arm of `gov_tag.py check`, run alone: the tree against the list both ways,
@@ -26,9 +26,10 @@ record is graded. `seed` writes the rows
 once and refuses a list already holding a file:line row; `shrink` drops the stale rows and never adds
 one; `pin` rewrites a file's unlisted file:line citations to the blob-pinned line at `--at` (HEAD).
 `producers` prints every hit of PRODUCER_RE over PRODUCER_PATHSPECS, the directive sources, a render's
-hits carried by its `.template.` source (PLAY-dOrderedCharter-48); `--seed` writes `positional-producers.txt`
-once, a `<path>\\t<line text>` row per hit naming no stable form. The arm's `producers` limb reds a hit
-neither kept nor naming a stable form, and a kept row no hit carries.
+hits carried by its `.template.` source (PLAY-dOrderedCharter-48); `--seed` writes
+`positional-producers.txt`, beside the first list, once, a `<path>\\t<line text>` row per hit naming no
+stable form. The arm's `producers` limb reds a hit neither kept nor naming a stable form, and a kept row
+no hit carries.
 Exit 0 green, 1 red, 2 a refusal (a refused policy read, an unreadable list, a git failure).
 """
 from __future__ import annotations
@@ -64,8 +65,10 @@ SH_DEF_RE = re.compile(r"^\s*(?:function\s+([A-Za-z_][\w-]*)|([A-Za-z_][\w-]*)\s
 JS_DEF_RE = re.compile(r"\b(?:function\*?\s+|class\s+)([A-Za-z_$][\w$]*)|\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=")
 #: PLAY-dOrderedCharter-48: the directive sources a writer reads, and the spellings that tell it to cite a line
 PRODUCER_RE = r"file:line|path and line|<path>:<line>"
-PRODUCER_PATHSPECS = ("tools/roles/agents/", "tools/workflows/", "skills/", "coding-governance-agents.template.md",
-                      "tools/playbook/practices.toml", "tools/*/SKILL.template.md", "tools/*/*.template.md")
+#: `{prefix}/` is the tool root, resolved against `kit_rel`'s parent (PLAY-dOrderedCharter-72 S2)
+PRODUCER_PATHSPECS = ("{prefix}/roles/agents/", "{prefix}/workflows/", "skills/",
+                      "coding-governance-agents.template.md", "{prefix}/playbook/practices.toml",
+                      "{prefix}/*/SKILL.template.md", "{prefix}/*/*.template.md")
 PRODUCERS_NAME = "positional-producers.txt"
 #: a producer line naming a stable form, spelled as a placeholder or as a real pin, directs no line citation
 STABLE_FORM_RE = re.compile(r"#<?symbol>?|@<(?:oid|sha8?)>:|" + PINNED_RE.pattern)
@@ -83,8 +86,15 @@ def read_positional_mode(root, sets=None) -> str:
     return mode
 
 
-def derive_list_path(root, kit_rel) -> pathlib.Path:
-    return pathlib.Path(root) / kit_rel / LIST_NAME
+def read_memory_root(root) -> str:
+    """`root`'s `MEMORY_ROOT`, `memory` where its conf sets none: the folder whose `project/` holds both lists."""
+    _tree_lib, id_grammar = ti.load_memory_tree()
+    return (id_grammar.load_conf(pathlib.Path(root)).get("MEMORY_ROOT") or "memory").strip("/")
+
+
+def derive_list_path(root, memory_root, name=LIST_NAME) -> pathlib.Path:
+    """`name`, a list gov keeps and never ships, under `<root>/<memory_root>/project/` (PLAY-dOrderedCharter-72)."""
+    return pathlib.Path(root) / memory_root / "project" / name
 
 
 def read_list(path) -> list[str] | None:
@@ -106,11 +116,11 @@ def check_file_line_row(row: str) -> bool:
     return bool(FILE_LINE_RE.fullmatch(row.partition("\t")[2]))
 
 
-def read_git_grep(root, pattern, kit_rel, paths=(".",), flags=(), numbered=False) -> list[tuple]:
+def read_git_grep(root, pattern, memory_root, paths=(".",), flags=(), numbered=False) -> list[tuple]:
     """(path, line), or (path, n, line) when `numbered`, for every line of a tracked text file in the
     working tree under `paths` matching ERE `pattern`, the positional list left out of its own scan."""
     argv = ["git", "-C", str(root), "grep", "-I", "-n", "-z", *flags, "-E", pattern, "--", *paths,
-            f":!{kit_rel}/{LIST_NAME}"]
+            f":!{derive_list_path('', memory_root).as_posix()}"]
     try:
         p = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8", errors="replace")
     except OSError as exc:
@@ -125,10 +135,13 @@ def read_git_grep(root, pattern, kit_rel, paths=(".",), flags=(), numbered=False
     return hits
 
 
-def read_producers(root, kit_rel) -> list[tuple[str, int, str]]:
-    """(path, n, trimmed line) for every hit of PRODUCER_RE over PRODUCER_PATHSPECS, case-insensitive; a
-    render's hits are dropped where its `<stem>.template.<ext>` source sits beside it, which carries them."""
-    hits = read_git_grep(root, PRODUCER_RE, kit_rel, PRODUCER_PATHSPECS, ("-i",), numbered=True)
+def read_producers(root, kit_rel, memory_root) -> list[tuple[str, int, str]]:
+    """(path, n, trimmed line) for every hit of PRODUCER_RE over PRODUCER_PATHSPECS, case-insensitive, its
+    `{prefix}/` the parent of `kit_rel`; a render's hits are dropped where its `<stem>.template.<ext>`
+    source sits beside it, which carries them."""
+    troot = pathlib.PurePosixPath(kit_rel).parent.as_posix()
+    specs = [ti.resolve_prefix_token(s, troot) for s in PRODUCER_PATHSPECS]
+    hits = read_git_grep(root, PRODUCER_RE, memory_root, specs, ("-i",), numbered=True)
 
     def check_render(path):
         head, dot, ext = path.rpartition(".")
@@ -142,13 +155,13 @@ def read_producer_rows(path) -> list[str] | None:
     return None if rows is None else [r for r in rows if not r.startswith("#")]
 
 
-def check_producers(root, kit_rel, mode) -> tuple[list, list, dict]:
+def check_producers(root, kit_rel, mode, memory_root) -> tuple[list, list, dict]:
     """The `producers` limb: a hit neither kept nor naming a stable form is red, as is a kept row no hit
     carries; under `refuse` a kept hit is red too. -> (findings, lines, counts)."""
-    say, rel = "tags: positional · producer", f"{kit_rel}/{PRODUCERS_NAME}"
-    rows = read_producer_rows(pathlib.Path(root) / rel)
+    say, rel = "tags: positional · producer", derive_list_path("", memory_root, PRODUCERS_NAME).as_posix()
+    rows = read_producer_rows(derive_list_path(root, memory_root, PRODUCERS_NAME))
     kept = set(rows or ())
-    hits = read_producers(root, kit_rel)
+    hits = read_producers(root, kit_rel, memory_root)
     carried = {f"{p}\t{t}" for p, _n, t in hits}
     remedy = (f"re-point it to `path#symbol` or a blob-pinned line `<path>@<oid>:<n>`, or keep it with a "
               f"`<path>\\t<line>` row under a `# ` reason in {rel}")
@@ -166,18 +179,19 @@ def check_producers(root, kit_rel, mode) -> tuple[list, list, dict]:
                              "producers_stale": len(kept - carried)}
 
 
-def run_producers(root, kit_rel, seed=False) -> int:
+def run_producers(root, kit_rel, memory_root, seed=False) -> int:
     """`positional.py producers`: every hit as `<path>:<n>\\t<line>`. `--seed` writes the kept list once, a
     row per hit naming no stable form, and refuses a list already holding a row."""
-    hits = read_producers(root, kit_rel)
+    hits = read_producers(root, kit_rel, memory_root)
     if not seed:
         for p, n, t in hits:
             print(f"{p}:{n}\t{t}")
         return 0
-    path = pathlib.Path(root) / kit_rel / PRODUCERS_NAME
+    path = derive_list_path(root, memory_root, PRODUCERS_NAME)
     held = read_producer_rows(path) or []
     if held:
-        print(f"positional: producers seed refused · {kit_rel}/{PRODUCERS_NAME} already holds {len(held)} rows; "
+        rel = derive_list_path("", memory_root, PRODUCERS_NAME).as_posix()
+        print(f"positional: producers seed refused · {rel} already holds {len(held)} rows; "
               "the seed runs once, and the list only ever shortens after it")
         return 1
     rows = sorted({f"{p}\t{t}" for p, _n, t in hits if not STABLE_FORM_RE.search(t)})
@@ -189,10 +203,10 @@ def run_producers(root, kit_rel, seed=False) -> int:
     return 0
 
 
-def read_file_line_rows(root, kit_rel) -> set[str]:
+def read_file_line_rows(root, memory_root) -> set[str]:
     """`<citing path>\\t<path>:<n>[-<m>]` for every distinct file:line pair in a tracked text file."""
     return {f"{path}\t{m.group(1)}:{m.group(2)}"
-            for path, line in read_git_grep(root, FILE_LINE_GREP, kit_rel) for m in FILE_LINE_RE.finditer(line)}
+            for path, line in read_git_grep(root, FILE_LINE_GREP, memory_root) for m in FILE_LINE_RE.finditer(line)}
 
 
 def read_section_rows(root) -> set[str]:
@@ -288,9 +302,9 @@ def read_blob_lines(root, oids) -> dict:
     return found
 
 
-def check_pins(root, kit_rel, frozen) -> tuple[list, list, int]:
+def check_pins(root, memory_root, frozen) -> tuple[list, list, int]:
     """Every blob-pinned line against its object: -> (findings red, findings printed, pins read)."""
-    pins = [(path, m) for path, line in read_git_grep(root, PINNED_GREP, kit_rel) for m in PINNED_RE.finditer(line)]
+    pins = [(path, m) for path, line in read_git_grep(root, PINNED_GREP, memory_root) for m in PINNED_RE.finditer(line)]
     kinds = read_blob_lines(root, {m.group(2) for _p, m in pins})
     commits = {f"{m.group(2)}:{m.group(1)}" for _p, m in pins if kinds.get(m.group(2)) == "names a commit, not a blob"}
     kinds.update(read_blob_lines(root, commits))
@@ -389,12 +403,12 @@ def check_positional(root, kit_rel, mode, memory_root) -> tuple[list, list, dict
     """The `positional` arm: the tree against the list both ways over both reference kinds, then every pin
     and every symbol citation. -> (reds, the lines it prints, its counts)."""
     say = "tags: positional · "
-    rel = f"{kit_rel}/{LIST_NAME}"
-    rows = read_list(derive_list_path(root, kit_rel))
+    rel = derive_list_path("", memory_root).as_posix()
+    rows = read_list(derive_list_path(root, memory_root))
     if rows is None:
         return [f"{say}the list {rel} is absent, so no positional population is read"], [], {"absent": True}
     listed = set(rows)
-    tree = read_file_line_rows(root, kit_rel) | read_section_rows(root)
+    tree = read_file_line_rows(root, memory_root) | read_section_rows(root)
     aliases = ti.read_aliases(pathlib.Path(root) / kit_rel / "aliases.toml")
     frozen = f"{memory_root}/builds/"
 
@@ -418,10 +432,11 @@ def check_positional(root, kit_rel, mode, memory_root) -> tuple[list, list, dict
     if mode == "refuse":
         findings += [f"{say}listed · {r.replace(chr(9), ' · ')} · tags.positional is refuse; {derive_remedy(r)}"
                      for r in sorted(tree & listed)]
-    p_reds, p_printed, pins = check_pins(root, kit_rel, frozen)
+    p_reds, p_printed, pins = check_pins(root, memory_root, frozen)
     s_reds, s_printed, symbols, passed = check_symbols(root, frozen)
     findings += [f"{say}pin · {x}" for x in p_reds] + [f"{say}symbol · {x}" for x in s_reds]
-    w_reds, w_lines, w_counts = check_producers(root, kit_rel, mode)  # PLAY-dOrderedCharter-48: the producers limb
+    # PLAY-dOrderedCharter-48: the producers limb
+    w_reds, w_lines, w_counts = check_producers(root, kit_rel, mode, memory_root)
     findings += w_reds
     lines = w_lines + grandfathered + [f"{say}pin, frozen record, printed · {x}" for x in p_printed]
     lines += [f"{say}symbol, frozen record, printed · {x}" for x in s_printed]
@@ -445,19 +460,17 @@ def check_positional(root, kit_rel, mode, memory_root) -> tuple[list, list, dict
 def run_check(root, kit_rel, sets=None) -> int:
     """`positional.py check`: the arm alone, as the `tags` leg runs it inside `gov_tag.py check`."""
     root = pathlib.Path(root)
-    _tree_lib, id_grammar = ti.load_memory_tree()
-    memory_root = (id_grammar.load_conf(root).get("MEMORY_ROOT") or "memory").strip("/")
-    reds, lines, _counts = check_positional(root, kit_rel, read_positional_mode(root, sets), memory_root)
+    reds, lines, _counts = check_positional(root, kit_rel, read_positional_mode(root, sets), read_memory_root(root))
     for line in lines + reds:
         print(line)
     print(f"tags: positional · {'RED' if reds else 'green'} · {len(reds)} red")
     return 1 if reds else 0
 
 
-def run_seed(root, kit_rel) -> int:
+def run_seed(root, memory_root) -> int:
     """S2's one-time seed: every file:line pair in the tree, and every row `--list-positional` prints that
     the list lacks. Refused once the list holds a file:line row."""
-    path = derive_list_path(root, kit_rel)
+    path = derive_list_path(root, memory_root)
     rows = read_list(path) or []
     held = [r for r in rows if check_file_line_row(r)]
     if held:
@@ -465,28 +478,28 @@ def run_seed(root, kit_rel) -> int:
               f"{', '.join(r.replace(chr(9), ' ') for r in held[:3])}{' …' if len(held) > 3 else ''}; "
               "the seed runs once, and `shrink` takes rows out")
         return 1
-    fl = read_file_line_rows(root, kit_rel)
+    fl = read_file_line_rows(root, memory_root)
     joined = read_section_rows(root) - set(rows)
     write_list(path, set(rows) | fl | joined)
     print(f"positional: seeded {len(fl)} file:line rows, and joined {len(joined)} section rows the list lacked")
     return 0
 
 
-def run_shrink(root, kit_rel) -> int:
+def run_shrink(root, memory_root) -> int:
     """Drop every row whose reference is gone from the tree; the list only ever shortens."""
-    path = derive_list_path(root, kit_rel)
+    path = derive_list_path(root, memory_root)
     rows = read_list(path)
     if rows is None:
         print(f"positional: shrink refused · {path.name} is absent", file=sys.stderr)
         return 2
-    tree = read_file_line_rows(root, kit_rel) | read_section_rows(root)
+    tree = read_file_line_rows(root, memory_root) | read_section_rows(root)
     keep = [r for r in rows if r in tree]
     write_list(path, keep)
     print(f"positional: shrink dropped {len(rows) - len(keep)} stale rows, {len(set(keep))} remain")
     return 0
 
 
-def run_pin(root, kit_rel, file, rev="HEAD") -> int:
+def run_pin(root, memory_root, file, rev="HEAD") -> int:
     """S5: rewrite each unlisted file:line citation in `file` to `<path>@<oid>:<n>[-<m>]`, `<oid>` the
     blob at `rev`; a citation whose path is no blob at `rev` is refused and left, and a `file` outside
     the repository is refused with nothing written."""
@@ -496,7 +509,7 @@ def run_pin(root, kit_rel, file, rev="HEAD") -> int:
         print(f"positional: pin refused · {pathlib.Path(file).as_posix()} is no file inside {root.as_posix()}")
         return 1
     rel = target.relative_to(root).as_posix()
-    listed = {r.partition("\t")[2] for r in read_list(derive_list_path(root, kit_rel)) or [] if r.startswith(rel + "\t")}
+    listed = {r.partition("\t")[2] for r in read_list(derive_list_path(root, memory_root)) or [] if r.startswith(rel + "\t")}
     oids, refused, done = {}, [], []
 
     def read_oid(path):
@@ -536,7 +549,7 @@ def run_pin(root, kit_rel, file, rev="HEAD") -> int:
 
 #: `<plant and flags>|<exit>|<a line it must print>`: each row reads `gov_tag.py --fixture --plant <row>`'s
 #: run. `{code}` is the fixture's code file and `{x}` the forked-before plant's, so this file holds no
-#: file:line citation and no pinned line.
+#: file:line citation and no pinned line; `{prefix}` is the tool root the fixture lays its tree out at.
 SELFTEST_ROWS = """\
 none|0|tags: positional · unarmed
 positional-seed|0|seed: the list holds every expected row and no other
@@ -563,25 +576,26 @@ positional-pin|0|pin rewrote the citation to the blob at HEAD; check: rc=0
 positional-pin|0|pin outside the repository: rc=1, nothing written
 positional-forked-before|0|positional — grandfathered: memory/builds/x/build/record.md:1 {x}:1 (written in
 positional-forked-before|0|tags: positional · unlisted · memory/builds/x/build/after.md · {x}:2
-positional-forked-before|0|tags: positional · unlisted · tools/notes.md · {x}:1
+positional-forked-before|0|tags: positional · unlisted · {prefix}/notes.md · {x}:1
 positional-forked-before|0|the pre-fork record: rc=0; a record after the merge: rc=1; the pre-fork record moved under tools: rc=1
 positional-edited-after|1|positional — grandfathered: memory/builds/x/build/record.md:1 {x}:1 (written in
 positional-edited-after|1|tags: positional · unlisted · memory/builds/x/build/record.md · {x}:3
 positional-renamed-after|0|positional — grandfathered: memory/builds/x/build/moved.md:1 {x}:1 (written in
 positional-uncommitted|1|positional — grandfathered: memory/builds/x/build/record.md:1 {x}:1 (written in
 positional-uncommitted|1|tags: positional · unlisted · memory/builds/x/build/record.md · {x}:3
-positional-producer-new|1|tags: positional · producer · tools/roles/agents/gov-x.agent.md:3 · - cite it by file:line · re-point it
+positional-producer-new|1|tags: positional · producer · {prefix}/roles/agents/gov-x.agent.md:3 · - cite it by file:line · re-point it
 positional-producer-new|1|re-pointed to a stable form: rc=0
-positional-producer-stale|0|tags: positional · producer stale · tools/roles/agents/gov-x.agent.md · - cite it by file:line · no hit
+positional-producer-stale|0|tags: positional · producer stale · {prefix}/roles/agents/gov-x.agent.md · - cite it by file:line · no hit
 positional-producer-stale|0|kept: rc=0; a second seed: rc=1; the kept line re-pointed: rc=1
 """
 
 
 def run_selftest() -> int:
     """The `tags positional selftest` leg: every positional plant, red and green, each row's exit and line."""
-    failed, runs = 0, {}
-    rows = [r.replace("{code}", "tools/corekit/code.py").replace("{x}", "x.py").split("|")
-            for r in SELFTEST_ROWS.splitlines() if r.strip()]
+    import instruction_units as iu
+    failed, runs, troot = 0, {}, iu.derive_kit_prefix()
+    rows = [ti.resolve_prefix_token(r.replace("{code}", "tools/corekit/code.py").replace("{x}", "x.py"), troot)
+            .split("|") for r in SELFTEST_ROWS.splitlines() if r.strip()]
     for plant, rc, want in rows:
         if plant not in runs:  # one run per plant and flags, read by each of its rows
             runs[plant] = subprocess.run([sys.executable, str(KIT_DIR / "gov_tag.py"), "--fixture", "--plant",
@@ -618,14 +632,16 @@ def main(argv=None) -> int:
     from policy_value import PolicyRefused
     try:
         root = resolve_repo_root()
-        kit_rel = derive_kit_rel(root)
+        kit_rel, memory_root = derive_kit_rel(root), read_memory_root(root)
         if a.verb == "pin":
             if not a.file:
                 ap.error("pin takes <file>")
-            return run_pin(root, kit_rel, a.file, a.at)
+            return run_pin(root, memory_root, a.file, a.at)
         if a.verb == "producers":
-            return run_producers(root, kit_rel, a.seed)
-        return {"seed": run_seed, "shrink": run_shrink, "check": run_check}[a.verb](root, kit_rel)
+            return run_producers(root, kit_rel, memory_root, a.seed)
+        if a.verb == "check":
+            return run_check(root, kit_rel)
+        return {"seed": run_seed, "shrink": run_shrink}[a.verb](root, memory_root)
     except PolicyRefused as exc:
         print(f"tags: refused · {exc.key} · {exc.line}", file=sys.stderr)
         return 2

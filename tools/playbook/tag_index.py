@@ -67,6 +67,21 @@ KIT_DIR = pathlib.Path(os.path.abspath(__file__)).parent
 if str(KIT_DIR) not in sys.path:
     sys.path.insert(0, str(KIT_DIR))
 
+
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
+
+
 TAG_MAX_BYTES = 64
 SEG = r"[a-z0-9][a-z0-9-]*"
 TAG_RE = re.compile(rf"{SEG}(?:\.{SEG})+")
@@ -1112,8 +1127,10 @@ def check_namespace_purpose(con, ctx, chain_rows, chain_rel) -> tuple[list, dict
     source is `<path>` (tracked, printed path-only), `<path>#<field>` (each member at a `.toml` path
     carries the field on its row, a `.py` path assigns it; any other suffix is red), or `#<field>` (each
     member's own file carries it: its TOML row's key, or `h1`, a Markdown file's first `# ` line outside a
-    fence). A source not in the view, a path not served or a `#<field>` with no member, is `pending`:
-    printed and never graded. -> (reds, {"graded": {ns: members}, "path_only": [ns], "pending": [(ns, source)]})."""
+    fence). A `{prefix}/` in the source resolves first against the registry's tool root, the parent of
+    its directory (PLAY-dOrderedCharter-72 S7). A source not in the view, a path not served or a
+    `#<field>` with no member, is `pending`: printed as spelled and never graded.
+    -> (reds, {"graded": {ns: members}, "path_only": [ns], "pending": [(ns, source)]})."""
     slugs = {r["slug"] for r in chain_rows}
     served = {p for (p,) in con.execute("SELECT path FROM view_path")}
     defined = read_rows(con, DEFINE_KINDS)
@@ -1130,6 +1147,7 @@ def check_namespace_purpose(con, ctx, chain_rows, chain_rel) -> tuple[list, dict
 
     reds: list = []
     state: dict = {"graded": {}, "path_only": [], "pending": []}
+    troot = pathlib.PurePosixPath(ctx["kit"]).parent.as_posix()  # PLAY-dOrderedCharter-72 S7: the registry's tool root
     for row in ctx["namespaces"]:
         ns, src = row["ns"], row["purpose-source"]
         at = f"tags: {ctx['registry']} · purpose · namespace '{ns}'"
@@ -1137,7 +1155,7 @@ def check_namespace_purpose(con, ctx, chain_rows, chain_rel) -> tuple[list, dict
             reds.append(f"{at} · owner '{row['owner']}' names no build of {chain_rel}")
         members = [(t, p) for t, p, _n, _k, _b, ex in defined
                    if ex == row["extractor"] and "#" not in t and t.split(".")[0] == ns]
-        path, hashed, field = src.partition("#")
+        path, hashed, field = resolve_prefix_token(src, troot).partition("#")
         if hashed and not field:
             reds.append(f"{at} · purpose-source '{src}' names no field after its #")
             continue

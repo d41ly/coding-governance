@@ -104,14 +104,15 @@ LEVELS = ("charter", "card", "loop", "methods", "runbooks", "role", "task", "rec
 PLATFORM = "platform"
 """The harness's own instructions: above the ladder, holding no level."""
 
+#: `{prefix}` is the tool root, resolved in run_ladder_terms against derive_kit_prefix (PLAY-dOrderedCharter-72)
 LADDER_SOURCES = (
     "coding-governance-agents.template.md",
-    "tools/playbook/practices.toml",
-    ":(glob)tools/*.template.md",
-    ":(glob)tools/*/*.template.md",
-    ":(glob)tools/roles/agents/*.agent.md",
+    "{prefix}/playbook/practices.toml",
+    ":(glob){prefix}/*.template.md",
+    ":(glob){prefix}/*/*.template.md",
+    ":(glob){prefix}/roles/agents/*.agent.md",
     ":(glob)skills/*/SKILL.md",
-    ":(glob)tools/workflows/*.template.js",
+    ":(glob){prefix}/workflows/*.template.js",
 )
 LADDER_TERM = re.compile(r"\b(priority|rank)[ -]?[0-7]\b", re.IGNORECASE)
 
@@ -527,7 +528,9 @@ def run_practices(args) -> tuple[list, int]:
 
 def run_ladder_terms(root=".") -> tuple[list, int]:
     """S4: every tracked LADDER_SOURCES line naming a ladder place as a priority or a rank, red."""
-    paths = [p for p in run_git(root, "ls-files", "-z", "--", *LADDER_SOURCES).split("\0") if p]
+    from tag_index import resolve_prefix_token
+    specs = [resolve_prefix_token(s, derive_kit_prefix()) for s in LADDER_SOURCES]
+    paths = [p for p in run_git(root, "ls-files", "-z", "--", *specs).split("\0") if p]
     if not paths:
         return [f"{SAY}: red · ladder-terms · LADDER_SOURCES matches no tracked file"], 1
     reds = []
@@ -1047,7 +1050,7 @@ def arm_tags(c):
     c.check("the shipped module names level.charter to level.records in LEVELS order", not reds, "; ".join(reds))
     planted = re.sub(r"^LEVELS = .*$", 'LEVELS = tuple(name for name in ("charter", "card"))', shipped,
                      count=1, flags=re.M)
-    c.write_file("tools/playbook/instruction_units.py", planted)
+    c.write_file(derive_kit_rel("instruction_units.py"), planted)
     reds = check_level_tags(planted)
     c.check("a computed LEVELS names no tag and reds", bool(reds), "it passed")
 
@@ -1057,13 +1060,14 @@ def arm_priority(c):
     c.check("a tree with no tracked source reds", rc == 1 and "matches no tracked file" in lines[0],
              " | ".join(lines))
     c.write_file("skills/demo/SKILL.md", "[AGENTS.md · Priority 1 · …]\n")
-    c.write_file("tools/demo.template.md", "this sits at rank 3\n")
+    demo = derive_tool_rel("demo.template.md")
+    c.write_file(demo, "this sits at rank 3\n")
     lines, rc = run_ladder_terms(c.top)
     both = all(any(p in ln and "'level'" in ln for ln in lines)
-               for p in ("skills/demo/SKILL.md", "tools/demo.template.md"))
+               for p in ("skills/demo/SKILL.md", demo))
     c.check("ladder-terms exits 1 naming both", rc == 1 and both, " | ".join(lines))
     c.write_file("skills/demo/SKILL.md", "[AGENTS.md · Level 1 · …]\n")
-    c.write_file("tools/demo.template.md", "this sits at Level 3\n")
+    c.write_file(demo, "this sits at Level 3\n")
     lines, rc = run_ladder_terms(c.top)
     c.check("ladder-terms exits 0 once each reads Level", rc == 0, " | ".join(lines))
 
@@ -1076,7 +1080,7 @@ STATEMENT_ROWS = (
       "enforced-by": ["the guide size leg"]}, None),
     ({"tag": "fx.definition", "type": DEFINITION, "text": "pass — one unit built and committed"}, None),
     ({"tag": "fx.pointer", "type": POINTER, "text": "When a level is named, read `level.charter`."}, None),
-    ({"tag": "fx.command", "type": POINTER, "text": "Before a push, run `bash tools/push-main.sh`."}, None),
+    ({"tag": "fx.command", "type": POINTER, "text": "Before a push, run `bash {prefix}/push-main.sh`."}, None),
     ({"tag": "fx.policy", "type": POLICY_VALUE, "source": "policy:tags.slice"}, None),
     ({"tag": "fx.fact", "type": FACT, "source": "cmd:git rev-parse --abbrev-ref HEAD"}, None),
     ({"tag": "fx.unregistered", "type": FACT, "source": "cmd:git worktree list"}, "names no registered command"),
@@ -1392,7 +1396,7 @@ def arm_extractor(c):
     rows = [r[:2] for r in extract_unit({}, rel, run_git(c.top, "show", f"HEAD:{rel}"))]
     c.check("extract_unit reads the base blob's tag and selector rows, absent from the working tree",
             rows == [("unit.blob", "tag"), (EVERY, "selector")], str(rows))
-    kit = c.top / "tools" / "playbook"
+    kit = c.top / derive_tool_rel(KIT_DIR.name)
     kit.mkdir(parents=True)
     for name in ("namespaces.toml", "instruction_units.py"):
         shutil.copyfile(KIT_DIR / name, kit / name)

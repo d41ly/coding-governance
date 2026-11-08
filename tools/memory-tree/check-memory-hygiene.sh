@@ -938,6 +938,10 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   # under <M>/project/, so an adopter of that kit owns the file whether or not it lists it in
   # PROJECT_REGISTRY_EXTRA. TOOL-aRepatriatedFork-10 S4.
   F:pass-order-waiver.txt) ;;
+  # The same class: the playbook kit's positional check reads its list at this DEFAULT path under
+  # <M>/project/ and reds it absent, so the kit's write mode writes it empty at every target
+  # (PLAY-dOrderedCharter-72).
+  F:positional-refs.txt) ;;
   # The same class again: the roles kit's catalogue checker reads the owner's stand-in waivers at
   # this DEFAULT path under <M>/project/ (TOOL-aOrientedCast-19 S5).
   F:role-stand-in-waiver.txt) ;;
