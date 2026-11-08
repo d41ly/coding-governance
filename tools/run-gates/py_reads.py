@@ -312,18 +312,18 @@ def run_selftest():
             (tools / rel).parent.mkdir(parents=True, exist_ok=True)
             (tools / rel).write_text(text, encoding="utf-8")
 
-        def gaps(entry, *guard):
+        def derive_gaps(entry, *guard):
             leg = {"name": "fx", "argv": ["python", "{prefix}/" + entry], "guard": list(guard)}
             return derive_guard_gaps([leg], tools)[0][2]
 
         rc, out = run_quietly("--names", str(tools / "star.py"))
         check("a star import reds nothing", rc, 0)
         check("a star import counts", "1 star imports skipped" in out, True)
-        check("a suite import outside its guard reds", gaps("kit-a/suite.py", "{prefix}/kit-a/suite.py"),
+        check("a suite import outside its guard reds", derive_gaps("kit-a/suite.py", "{prefix}/kit-a/suite.py"),
               ["tools/kit-a/helper.py"])
         check("the same path in its guard is green",
-              gaps("kit-a/suite.py", "{prefix}/kit-a/suite.py", "{prefix}/kit-a/helper.py"), [])
-        check("a sibling kit reached by a literal resolve reds", gaps("kit-a/reach.py", "{prefix}/kit-a/"),
+              derive_gaps("kit-a/suite.py", "{prefix}/kit-a/suite.py", "{prefix}/kit-a/helper.py"), [])
+        check("a sibling kit reached by a literal resolve reds", derive_gaps("kit-a/reach.py", "{prefix}/kit-a/"),
               ["tools/kit-b/mod.py"])
         check("a file that does not parse refuses", run_quietly("--names", str(tools / "broken.py"))[0], 2)
     for line in failed:

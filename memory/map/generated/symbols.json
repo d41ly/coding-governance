@@ -6793,6 +6793,11 @@
       "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
+      "id": "check_unclosed",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "check_under",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"

@@ -85,6 +85,10 @@ tag-shaped word that is not a citation, quote it another way, with doubled backt
   `purpose-source` a member lacks; a chain registry row naming no build of the design view, a design
   build with no row, and a row with no `purpose` for a build v2's `[chain]` did not name at the
   baseline. See "Where a purpose is read" below.
+- **unclosed fence** — a Markdown file that opens a code fence and never closes it, printed as
+  `<path>:<line> · unclosed fence ·` at the line the fence opens. Every line after it is inside the
+  fence, so a citation there goes unread; close the fence. Under `memory/builds/` the file is a frozen
+  record, so it is printed as `tags: unclosed fence, frozen record, printed` and never red.
 
 A backticked span that is the file name of a tracked file, such as `` `kit.toml` ``, is a file name,
 not a citation: it is counted as `<n> file names not graded` and never red. The same span with no such

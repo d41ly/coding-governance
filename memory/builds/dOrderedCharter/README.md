@@ -144,7 +144,7 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY
 | [PLAY-dOrderedCharter-1 — the practice catalogue and `charter.practices`](spec/2026-10-23-spec-PLAY-dOrderedCharter-1.md) | 17 | 2 | CLOSED | rev-8 | 2026-11-05 |
 | [PLAY-dOrderedCharter-45 — the merge driver's TOML-table class states its whole conflict envelope and proves its output parses](spec/2026-10-24-spec-PLAY-dOrderedCharter-45.md) | 17 | 2 | CLOSED | rev-3 | 2026-11-05 |
 | [PLAY-dOrderedCharter-67 — a suite's guard holds every module it imports, and the bar reads an undefined name](spec/2026-11-05-spec-PLAY-dOrderedCharter-67.md) | 17 | 2 | CLOSED | rev-1 | 2026-11-05 |
-| [PLAY-dOrderedCharter-68 — the tag index reads Markdown through the one fence reader and reports an unclosed fence](spec/2026-11-05-spec-PLAY-dOrderedCharter-68.md) | 17 | 2 | DEFERRED | rev-1 | 2026-11-05 |
+| [PLAY-dOrderedCharter-68 — the tag index reads Markdown through the one fence reader and reports an unclosed fence](spec/2026-11-05-spec-PLAY-dOrderedCharter-68.md) | 17 | 2 | CLOSED | rev-1 | 2026-11-08 |
 | [PLAY-dOrderedCharter-69 — a playbook fixture sets the caller's git variables aside before its first git call](spec/2026-11-05-spec-PLAY-dOrderedCharter-69.md) | 17 | 2 | DEFERRED | rev-1 | 2026-11-05 |
 | [PLAY-dOrderedCharter-70 — the closing diff review's mediums and low, batched](spec/2026-11-05-spec-PLAY-dOrderedCharter-70.md) | 17 | 2 | DEFERRED | rev-1 | 2026-11-05 |
 | [PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them](spec/2026-10-23-spec-PLAY-dOrderedCharter-3.md) | 18 | 2 | DEFERRED | rev-9 | 2026-11-04 |
@@ -178,7 +178,7 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-4 | 2026-11-04 |
 <!-- /gen:build-units -->
 
-Records: 399 bound to this build, across 4 record folder(s).
+Records: 400 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -46,6 +46,7 @@ from __future__ import annotations
 
 import collections
 import fnmatch
+import functools
 import hashlib
 import importlib.util
 import os
@@ -208,19 +209,16 @@ def derive_heading_seg(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
 
 
-def scan_unfenced(text: str):
-    """(line number, line) for every line of Markdown `text` outside a ``` or ~~~ fence."""
-    fence = ""
-    for n, line in enumerate(text.splitlines(), 1):
-        s = line.lstrip()
-        if fence:
-            if s.startswith(fence):
-                fence = ""
-            continue
-        if s.startswith("```") or s.startswith("~~~"):
-            fence = s[:3]
-            continue
-        yield n, line
+def scan_unfenced(text: str, unclosed: list | None = None):
+    """(line number, line) for every line of Markdown `text` outside a fence, through memory-tree's one fence
+    reader; the line an unclosed fence opens at goes to `unclosed`, a caller that does not ask reading on.
+    Joining `str.splitlines` keeps this walker's line numbers across a form feed or a CRLF."""
+    tree_lib, _ = load_memory_tree()
+    for n, line in tree_lib.unfenced_lines("\n".join(text.splitlines())):
+        if line is not None:
+            yield n, line
+        elif unclosed is not None:
+            unclosed.append(n)
 
 
 def extract_doc(ctx, path, text=None):
@@ -359,8 +357,8 @@ def extract_citations(ctx, path, text=None):
     row carries no text: its line is where `refs` points, and the index holds a few hundred thousand."""
     if text is None:
         return "" if path.endswith(".md") else None
-    rows = []
-    for n, line in scan_unfenced(text):
+    rows, unclosed = [], []
+    for n, line in scan_unfenced(text, unclosed):
         rest = line
         for m in CODE_SPAN_RE.finditer(line):
             body = m.group(2)
@@ -372,7 +370,7 @@ def extract_citations(ctx, path, text=None):
         for m in BRACKET_RE.finditer(rest):
             if SPAN_RE.fullmatch(m.group(1)):
                 rows.append((m.group(1), "span", n, n, ""))
-    return rows
+    return rows + [("", "unclosed", n, n, "") for n in unclosed]  # PLAY-dOrderedCharter-68: `check_unclosed` reads it
 
 
 # ------------------------------------------------------------------------------------------ git and the db
@@ -409,9 +407,11 @@ def read_git(root, *args) -> str:
         raise TagError(f"`git {' '.join(args)}` failed: {detail[0] if detail else exc}") from None
 
 
+@functools.cache
 def load_memory_tree():
     """memory-tree's `tree_lib` (the one `<rev>:<path>` reader) and `id_grammar` (its conf reader); this
-    kit reaches them through its inline `resolve_kit_dir`, never a spelled sibling path."""
+    kit reaches them through its inline `resolve_kit_dir`, never a spelled sibling path. Cached: the fence
+    walker calls it once per Markdown blob, and each call reads the install receipt."""
     from policy_value import resolve_kit_dir
     try:
         mt = resolve_kit_dir("memory-tree", "tree_lib.py", KIT_DIR)
@@ -795,6 +795,18 @@ def read_view_file_names(con) -> set:
 def read_defined(con) -> set:
     return {t for (t,) in con.execute(f"SELECT DISTINCT p.tag {VIEW_JOIN} "
                                       "WHERE p.kind IN ('doc','section','tag','retired')")}
+
+
+def check_unclosed(con, ctx) -> tuple[list, list]:
+    """The view's `unclosed` rows: red outside `<MEMORY_ROOT>/builds/`, printed under it (PLAY-dOrderedCharter-68)."""
+    frozen, reds, lines = f"{ctx['memory_root']}/builds/", [], []
+    for _tag, path, line, *_ in read_rows(con, ("unclosed",)):
+        if path.startswith(frozen):
+            lines.append(f"tags: unclosed fence, frozen record, printed · {path}:{line}")
+        else:
+            reds.append(f"tags: {path}:{line} · unclosed fence · it opens here and never closes, so every "
+                        f"later line goes unread")
+    return reds, lines
 
 
 def check_resolves(con, ctx, bare_mode, armed, file_names=None) -> tuple[list, dict]:

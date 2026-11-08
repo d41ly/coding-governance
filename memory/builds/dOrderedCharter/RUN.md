@@ -19,12 +19,12 @@ mode: slug
 run-branch: refs/heads/branch/unattended-dorderedcharter-725f52
 anchor-kind: default-branch
 cli-version: 2.1.309
-lease-utc: 2026-11-02T15:36:10Z
+lease-utc: 2026-11-08T03:16:27Z
 pid-image: claude.exe
 host: compeeto-agent
-pid: 5584
+pid: 20408
 session: 0394fa33-012c-408f-a840-e6e4cfaac23f
-keepalive: a1fc4c14
+keepalive: 84c0e58e
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 8bec4cefd957d194660a8d7c2916f420b7299074
 anchor-ref: refs/heads/main
@@ -281,3 +281,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-05T03:23:19Z brief · item PLAY-dOrderedCharter-67 · reason 781325610c98 memory/builds/dOrderedCharter/prompts/2026-11-05-prompt-PLAY-dOrderedCharter-67-build-brief.md
 
 2026-11-05T03:51:22Z dispatch · item 7ae097e4 PLAY-dOrderedCharter-67 · reason memory/gotchas/INDEX.md
+
+2026-11-08T03:08:01Z brief · item PLAY-dOrderedCharter-68 · reason a0d36e5912f8 memory/builds/dOrderedCharter/prompts/2026-11-05-prompt-PLAY-dOrderedCharter-68-build-brief.md
+
+2026-11-08T03:17:39Z dispatch · item dcfdbbe8 PLAY-dOrderedCharter-68 · reason tools/playbook/tag_index.py tools/playbook/gov_tag.py tools/playbook/adopt-playbook.sh tools/playbook/README.md help/tags.md memory/gotchas/inline-fence-swallows-the-rest-of-the-file.md tools/run-gates/py_reads.py memory/builds/dOrderedCharter/spec/2026-11-05-spec-PLAY-dOrderedCharter-68.md memory/builds/dOrderedCharter/build/2026-11-05-build-PLAY-dOrderedCharter-68-ledger.md memory/builds/dOrderedCharter/build/2026-11-05-build-PLAY-dOrderedCharter-68-deviation-681.md memory/builds/dOrderedCharter/README.md memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/map/generated

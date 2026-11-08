@@ -303,7 +303,11 @@ workflow sources, `skills/`, the charter template and the kits' `.template.` sou
 `positional-producers.txt` keeps the hits that direct no line citation, one `<path>` TAB `<line text>`
 row each under a `# ` reason, seeded once by `producers --seed`; the arm's `producers` limb reds a hit
 neither kept nor naming `path#symbol` or a blob-pinned line, and a kept row no hit carries
-(PLAY-dOrderedCharter-48). The `tags` leg runs `check`; the user page is `help/tags.md`.
+(PLAY-dOrderedCharter-48). Every Markdown reader here, `scan_unfenced`, walks memory-tree's
+`tree_lib.unfenced_lines`, so the fence rule is the one the hygiene kit reads; a blob that ends inside a
+fence gets an `unclosed` row at the line the fence opens, and `check_unclosed` reds it as
+`<path>:<line> · unclosed fence ·`, or prints `unclosed fence, frozen record, printed` under
+`<MEMORY_ROOT>/builds/` (PLAY-dOrderedCharter-68). The `tags` leg runs `check`; the user page is `help/tags.md`.
 
 PLAY-dOrderedCharter-22 adds the `purpose` arm to `check`. Each registry row's `owner` names a build of
 the chain registry, `memory/project/chain.toml` (one `[[build]]` row per build, its `slug` and its

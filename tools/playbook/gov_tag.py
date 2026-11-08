@@ -249,7 +249,9 @@ def run_check(con, root, ctx, kit_rel, *, sets, base, as_json, state) -> int:
     from positional import check_positional, read_positional_mode  # PLAY-dOrderedCharter-26: the positional arm
     q_reds, q_lines, positional = check_positional(root, kit_rel, read_positional_mode(root, sets), ctx["memory_root"])
     p_lines += q_lines
-    reds += r_reds + o_reds + n_reds + p_reds + x_reds + q_reds
+    u_reds, u_lines = ti.check_unclosed(con, ctx)  # PLAY-dOrderedCharter-68: a fence that never closes
+    p_lines += u_lines
+    reds += r_reds + o_reds + n_reds + p_reds + x_reds + q_reds + u_reds
     tags = sum(counts.values())
     unread = con.execute("SELECT COUNT(*) FROM view_path WHERE path NOT LIKE '%.md'").fetchone()[0]
     summary = {
@@ -364,6 +366,8 @@ kind = "expansion"
 '''
 GUIDE = "# Alpha\n\n## Intro\n\nthe intro text\n\n## M5 — Recall and reuse\n\nrecall first\n"
 FIXTURE_KIT = "tools/playbook"
+#: PLAY-dOrderedCharter-68's two plants: a fence opened and never closed, then the citation it hides
+UNCLOSED = "\n```\nand [doc.nope]\n"
 PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retired", "retired-old",
           "retired-reminted", "bare", "bare-charter", "owned", "owned-core", "scope", "scope-guide",
           "bad-ns", "bad-seg", "long-tag", "ns-word", "unregistered-cite", "dead-selector", "empty-ns",
@@ -374,7 +378,7 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "positional-symbol", "positional-pinned", "positional-pin", "positional-forked-before",
           "positional-edited-after", "positional-renamed-after", "positional-uncommitted", "positional-producer-new", "positional-producer-stale", "bundle-manifest", "bundle-fold",
           "bundle-rows-values", "bundle-inline", "bundle-mode-values", "bundle-unregistered-type",
-          "bundle-dangling-target", "bundle-empty-sections")
+          "bundle-dangling-target", "bundle-empty-sections", "unclosed-fence", "unclosed-record")
 #: PLAY-dOrderedCharter-44's `extractor-edit`: the fixture extractor's module edited to stop yielding one tag
 EDITED_EXTRACTOR = FIXTURE_EXTRACTOR.replace("elif len(word) == 1:",
                                              'elif len(word) == 1 and word[0] != "layer.memory.recall":')
@@ -537,6 +541,10 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
             files["memory/guides/ALPHA.md"] += "\nand [doc.nope]\n"
     if plant == "two-paths":
         files["memory/guides/BETA.md"] = GUIDE
+    if plant == "unclosed-fence":
+        files["memory/guides/ALPHA.md"] = GUIDE + UNCLOSED
+    if plant == "unclosed-record":
+        files["memory/builds/x/README.md"] = UNCLOSED
     if plant == "tagless":  # a blob the extractor reads and takes no row from
         files["tools/corekit/none.tags"] = "# declares nothing\n"
     if plant in SHAPE_PLANTS:

@@ -227,8 +227,9 @@ echo "PASS — the layer check's plants"
 # THE TAG RESOLVER'S ARMS (PLAY-dOrderedCharter-19 S13, S14). Each row runs `gov_tag.py --fixture` over one
 # plant in its own scratch repository, `<plant and --set flags>|<exit>|<a line it must print>|<a line it
 # must not print>`, the last field optional; exit and lines are asserted together. Every policy key a plant
-# reads is `--set`, so no row reads a policy file. The rows from `bad-ns` on are PLAY-dOrderedCharter-10's
-# nine plants, the shape check and the joins; `dead-selector` and `file-name` print their second half's
+# reads is `--set`, so no row reads a policy file. The two `unclosed-` rows are PLAY-dOrderedCharter-68's: a
+# fence that never closes is red on a live page and printed on a frozen record. The rows from `bad-ns` on are
+# PLAY-dOrderedCharter-10's nine plants, the shape check and the joins; `dead-selector` and `file-name` print their second half's
 # exit on a `rc=` line, read here as a line. Then four are PLAY-dOrderedCharter-44's: the index's
 # freshness keyed on blob, extractor and version, and its schema stamp. Then three rows are
 # PLAY-dOrderedCharter-51's two plants: two worktrees whose extractor bytes differ keep their rows apart,
@@ -280,6 +281,8 @@ owned $_tk|1|kit expkit (layer.exp) mints layer.fixture-x in core namespace laye
 owned-core $_tk|0|tags: green · 0 red
 scope $_tk|0|tags: unarmed unit (1 not graded)|· unresolved ·
 scope-guide $_tk|1|memory/guides/ALPHA.md:13 · unresolved · \`doc.nope\` names no row
+unclosed-fence $_tk|1|· unclosed fence ·|unresolved
+unclosed-record $_tk|0|unclosed fence, frozen record, printed
 bad-ns $_tk|1|· shape · step.build · namespace 'step' is not registered
 bad-seg $_tk|1|· shape · layer.Memory · segment 'Memory' is outside
 long-tag $_tk|1|· over 64 bytes (66)
