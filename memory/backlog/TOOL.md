@@ -449,6 +449,11 @@ Cite ids, never line numbers.
 | [TOOL-dFairHearing-42](../builds/dFairHearing/BACKLOG.md) | OPEN | MED | — | 2026-11-04 | REPLAY 1 MISSED ITS BAR IN BOTH RUNS, SO R-1 IS REOPENED WITH ITS… |
 | [TOOL-dFairHearing-49](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-05 | A LIVE SPEC OF ANOTHER BUILD OWES A LEG ITS FILES NOW TRIP.… |
 | [TOOL-dFairHearing-51](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-05 | THREE POLICY KEYS HAVE NO PLANNED READER. TOOL-dFairHearing-50 moves… |
+| [TOOL-dFairHearing-52](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | A BUILDER KILLED A PROCESS IT DID NOT START. Unit 43's builder killed… |
+| [TOOL-dFairHearing-53](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | THE ARM-LABELS JOIN REDS A SPEC BEFORE ITS ARMS EXIST.… |
+| [TOOL-dFairHearing-54](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | SPEC WRITERS CANNOT RUN THE TOKEN CHECK THEY ARE GRADED BY. A spec… |
+| [TOOL-dFairHearing-55](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | THE CLOSE OBSERVES NEW ARMS WITH TOOLS IT WROTE IN SCRATCH. Observing… |
+| [TOOL-dFairHearing-56](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | A HELD SUITE'S GUARD MISSES A SIBLING KIT. The hook destinations… |
 | [TOOL-dFoldedVerdict-7](../builds/dFoldedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THREE CARRIERS WERE FOUND SITTING EXACTLY ON THEIR DECLARED CEILING IN… |
 | [TOOL-dFoldedVerdict-9](../builds/dFoldedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-02 | RETIRING ANOTHER BUILD'S UNIT LEFT TWO CONSEQUENCES ON THAT BUILD'S OWN… |
 | [TOOL-dFurnishedOrders-21](../builds/dFurnishedOrders/BACKLOG.md) | DEFERRED | MED | TOOL-dFurnishedOrders-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
