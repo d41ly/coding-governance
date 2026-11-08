@@ -75,6 +75,12 @@ as it would in the template, and a template with no such line reads neither the 
 policy kit answers, printing which. A `drop_blocks` member naming a row leaves the active set, noted
 `retired`, and still cuts the fenced text the template carries. `help/charter.md` is the adopter's page.
 
+The charter carries one line per practice and never its reach: `instruction_units.py practices
+--check-charter <path>` reds a line of a rendered charter's practices region that no catalogue row spells,
+or that repeats a practice. The reach reaches agents in work orders instead: `load_sets.py derive` lists,
+for a role reader, one unit `practice.<name>.<step>` per active practice reaching the step of its
+workflow row, and `check --reach` prints them for the roles kit's handoff (PLAY-dOrderedCharter-21).
+
 ## The re-founded charter
 
 From template v5.0 the charter reads in the front door's order, no heading numbered, its practices

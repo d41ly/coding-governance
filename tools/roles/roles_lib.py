@@ -190,11 +190,13 @@ def read_cap_answer(request, root, kit_dir):
     return held, "refuse", "%s; a breach refuses as before" % why
 
 
-def check_load_set(root, kit_dir, blocks, points=()):
+def check_load_set(root, kit_dir, blocks, points=(), reach=False):
     """`(refused, lines)` of the playbook kit's load-set check for `blocks`, `[(slot, role block bytes)]`
     (PLAY-dOrderedCharter-11 S4): ONE run of its `check` verb, each slot's reader set checked for a missing
     required unit and its block measured against its body ceiling, and each of `points`, `[(load point,
-    bytes)]`, measured against its own cap: the `code` slot's block (PLAY-dOrderedCharter-27). The kit
+    bytes)]`, measured against its own cap: the `code` slot's block (PLAY-dOrderedCharter-27). With `reach`
+    the same run also prints each reader's reach units, one `load-set — reach ·` line each, for the caller
+    to take out of the notes (PLAY-dOrderedCharter-21). The kit
     is found by `resolve_kit_dir` and run as a subprocess, since a kit imports no sibling kit; with none
     found the check is one `unarmed` line and the render proceeds. The caller places each line: a `Missing required unit:` line
     in the reader's text, a `**Load gaps:**` line in the prompt record, any other as a note."""
@@ -210,6 +212,8 @@ def check_load_set(root, kit_dir, blocks, points=()):
         argv += ["--reader", "role." + slot, "--load-point", "role.%s=%d" % (slot, size)]
     for name, size in points:
         argv += ["--load-point", "%s=%d" % (name, size)]
+    if reach:
+        argv.append("--reach")
     env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
     try:
         r = subprocess.run(argv, cwd=str(root), env=env, capture_output=True, encoding="utf-8",

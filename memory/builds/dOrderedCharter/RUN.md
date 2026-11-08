@@ -355,3 +355,9 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-08T21:29:24Z dispatch · item 191922b7 PLAY-dOrderedCharter-27 · reason tools/playbook/load_sets.py tools/playbook/adopt-playbook.sh tools/roles/handoff.py tools/roles/roles_lib.py tools/policy/caps.toml tools/policy/budgets.py tools/policy/check_policy.py help/roles.md help/size-caps.md memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-27.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-27-ledger.md memory/map/generated/symbols.json
 
 2026-11-08T21:29:29Z brief · item PLAY-dOrderedCharter-27 · reason b19297e79b4b memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-27-build-brief.md
+
+2026-11-08T22:12:17Z dispatch · item 61e38b49 PLAY-dOrderedCharter-21 · reason tools/roles/workflows.toml tools/roles/check_roles.py tools/roles/handoff.py tools/roles/roles_lib.py tools/roles/templates/work-order.template.md tools/roles/README.md tools/roles/adopt-roles.test.sh tools/playbook/load_sets.py tools/playbook/instruction_units.py tools/playbook/render_playbook.py tools/playbook/README.md help/roles.md memory/map/generated/symbols.json memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-21.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-21-ledger.md memory/builds/dOrderedCharter/build/2026-11-09-build-PLAY-dOrderedCharter-21-deviation-211.md memory/builds/dOrderedCharter/README.md memory/LIVE.md
+
+2026-11-08T22:12:25Z brief · item PLAY-dOrderedCharter-21 · reason 51b6d02a3c42 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-21-build-brief.md
+
+2026-11-08T22:30:25Z dispatch · item 61e38b49 PLAY-dOrderedCharter-21 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

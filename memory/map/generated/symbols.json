@@ -1308,6 +1308,11 @@
       "file": "tools/playbook/core.py"
     },
     {
+      "id": "arm_practices_reach",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_priority",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -4681,6 +4686,11 @@
       "id": "check_charter_budget",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "check_charter_practices",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "check_charter_shape_arms",
@@ -9541,6 +9551,11 @@
       "id": "derive_push_failure",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "derive_reach_units",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
     },
     {
       "id": "derive_readme_slot_plant",
@@ -15348,6 +15363,16 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "read_active_practices",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "read_active_rows",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
+    },
+    {
       "id": "read_adding_commits",
       "kind": "function",
       "file": "tools/memory-tree/tree_lib.py"
@@ -18118,7 +18143,17 @@
       "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
+      "id": "read_role_field",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
+    },
+    {
       "id": "read_role_rules",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
+    },
+    {
+      "id": "read_role_step",
       "kind": "function",
       "file": "tools/playbook/load_sets.py"
     },

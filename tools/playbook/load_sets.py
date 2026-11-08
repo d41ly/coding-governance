@@ -4,7 +4,8 @@ load points (PLAY-dOrderedCharter-11), and every role's `code` slot (PLAY-dOrder
     python load_sets.py derive --reader <tag> [--item <tag>] [--feature <tag>]... [--units <manifest>]
                                [--code-budget <n>k] [--root <dir>]
     python load_sets.py check [--reader <tag>]... [--item <tag>] [--units <manifest>] [--checks refuse|warn|record]
-                              [--load-point <name>[=<bytes>]]... [--budgets-enforce refuse|warn] [--root <dir>]
+                              [--load-point <name>[=<bytes>]]... [--budgets-enforce refuse|warn] [--reach]
+                              [--root <dir>]
     python load_sets.py injected [--card <path>] [--cap <name>=<bytes>]... [--root <dir>]
     python load_sets.py --fixture --plant <case> [<check flags>]
 
@@ -16,6 +17,13 @@ and the units scoped to a `feature.*` tag the caller names once a `feature` row 
 namespace no row registers as a selector selects nothing and is reported `unarmed — <ns>.*`, never empty and
 green. The registry is the target's own, under its tool root, else the one beside this module. The set keeps
 the unit registry's order.
+
+THE REACH UNITS (PLAY-dOrderedCharter-21), `derive_reach_units`: a `role.<name>` reader's step is the `step`
+of the roles kit's workflow row its `workflow:` value names; for a step other than `none`, one unit per active
+practice (`charter.practices` at the root) whose catalogue row has a reach at that step, tag
+`practice.<name>.<step>`, text the reach, derived at render and never written as a row. `derive` lists them
+after the registry's units; `check --reach` prints one `load-set — reach ·` line per unit for each reader.
+A step or an active set that does not read leaves the part `unarmed`, naming why.
 
 THE CODE SLOT (PLAY-dOrderedCharter-27), `read_code_slot`: every `role.<name>` reader's set lists a `code`
 slot, filled or not, priced by the policy key `memory.code-budget` read through `read_policy_value` at the
@@ -78,6 +86,9 @@ CODE_BUDGET_RE = re.compile(r"([1-9][0-9]*)k")
 HARNESS_READS = {"AGENTS.md": ("codex-instructions", "Codex")}
 MISSING = "Missing required unit:"
 GAPS = "**Load gaps:**"
+#: `check --reach`'s line per reach unit, `<REACH> role.<name> · practice.<name>.<step> · <reach>`, which the
+#: roles kit's handoff reads off the subprocess its load-set check already runs (PLAY-dOrderedCharter-21 S3).
+REACH = "load-set — reach ·"
 INJECTED = "injected"
 #: S5's injected load points: the name a cap is asked under, the label printed, and the globs measured.
 INJECTED_POINTS = (("agent-list", "agent list", (".claude/agents/*.md",)),
@@ -113,9 +124,9 @@ def check_selector_armed(rows, ns) -> bool:
     return any(r.get("ns") == ns and r.get("role") == "selects" for r in rows)
 
 
-def read_role_rules(name) -> tuple[list | None, str]:
-    """`(practice tags, why)`: the `rules:` value of the roles kit's agent file for role `name`, each entry
-    `practice.<tag>` with any `?` cut; None with the reason when no roles kit or no such role is found."""
+def read_role_field(name, key) -> tuple[tuple | None, str]:
+    """`((roles kit dir, value), why)`: the `key:` value of the roles kit's agent file for role `name`, ''
+    when the file has no such line; None with the reason when no roles kit or no such role is found."""
     from policy_value import resolve_kit_dir
     try:
         kit = resolve_kit_dir("roles", "check_roles.py", KIT_DIR)
@@ -126,9 +137,63 @@ def read_role_rules(name) -> tuple[list | None, str]:
         text = path.read_text(encoding="utf-8")
     except OSError:
         return None, f"no role {name} in the roles kit"
-    m = re.search(r"(?m)^rules:[ \t]*(.*)$", text.split("\n---", 1)[0])
-    tags = [t.strip().rstrip("?") for t in (m.group(1) if m else "").split(",") if t.strip()]
+    m = re.search(rf"(?m)^{re.escape(key)}:[ \t]*(.*)$", text.split("\n---", 1)[0])
+    return (kit, (m.group(1) if m else "").strip()), ""
+
+
+def read_role_rules(name) -> tuple[list | None, str]:
+    """`(practice tags, why)`: the `rules:` value of the roles kit's agent file for role `name`, each entry
+    `practice.<tag>` with any `?` cut; None with the reason when no roles kit or no such role is found."""
+    got, why = read_role_field(name, "rules")
+    if got is None:
+        return None, why
+    tags = [t.strip().rstrip("?") for t in got[1].split(",") if t.strip()]
     return [f"practice.{t}" for t in tags], ""
+
+
+def read_role_step(name) -> tuple[str | None, str]:
+    """`(step, why)`: the `step` of the roles kit's workflow row that role `name`'s `workflow:` value names
+    (PLAY-dOrderedCharter-21 S1); None with the reason when no kit, role, row or step is found."""
+    got, why = read_role_field(name, "workflow")
+    if got is None:
+        return None, why
+    kit, workflow = got
+    try:
+        rows = tomllib.loads((kit / "workflows.toml").read_text(encoding="utf-8")).get("workflow", [])
+    except (OSError, ValueError) as exc:     # ValueError: a TOML or a UTF-8 fault
+        return None, f"the roles kit's workflows.toml does not read: {exc}"
+    row = next((w for w in rows if isinstance(w, dict) and w.get("name") == workflow), None)
+    if row is None or not isinstance(row.get("step"), str):
+        return None, f"role {name}'s workflow {workflow!r} has no row with a step in workflows.toml"
+    return row["step"], ""
+
+
+@functools.lru_cache(maxsize=None)
+def read_active_rows(root) -> tuple[list, tuple]:
+    """`(active practice rows, notes)` at `root`, this kit's catalogue: one policy read per root per run."""
+    import instruction_units as iu
+    notes = []
+    rows = iu.read_active_practices(iu.read_practice_catalogue(KIT_DIR / "practices.toml"), root, notes)
+    return rows, tuple(notes)
+
+
+def derive_reach_units(name, root) -> tuple[list, str]:
+    """`([(tag, reach)], report line)`: PLAY-dOrderedCharter-21 S2, one unit per active practice at `root`
+    whose catalogue row has a reach at role `name`'s step, tag `practice.<name>.<step>`, in catalogue order.
+    Derived from the catalogue at render and never written as a row; a step of `none` derives none, and a
+    step or an active set that does not read leaves the part `unarmed`, naming why."""
+    import instruction_units as iu
+    step, why = read_role_step(name)
+    if step is None:
+        return [], f"reach — unarmed — {why}"
+    if step == "none":
+        return [], "reach — step none · 0 unit(s)"
+    try:
+        rows, notes = read_active_rows(str(root))
+    except iu.UnitRowError as exc:
+        return [], f"reach — unarmed — {exc}"
+    units = [(f"{r['tag']}.{step}", r["reach"][step]) for r in rows if step in r["reach"]]
+    return units, f"reach — step {step} · {len(units)} unit(s)" + "".join(f" · {n}" for n in notes)
 
 
 class SlotRefused(ValueError):
@@ -160,9 +225,10 @@ def read_code_slot(root, stand_in=None) -> dict:
 def derive_load_set(units, reader, item=None, features=(), namespaces=None, root=None,
                     code_budget=None) -> tuple[list, list]:
     """`(tags, report)`: the tags of the units `reader` loads, in the registry's order, and one report line per
-    part. `namespaces` is the registry's rows, this kit's own when None. A `role.<name>` reader's report lists
-    its `code` slot with the budget `read_code_slot` reads at `root`, `code_budget` standing in; a `root` of
-    None leaves the slot unread, as `check` does, which prints no set. SlotRefused when the budget refuses."""
+    part. `namespaces` is the registry's rows, this kit's own when None. A `role.<name>` reader's set ends with
+    its reach units, `derive_reach_units` at `root`, and its report lists its `code` slot with the budget
+    `read_code_slot` reads there, `code_budget` standing in; a `root` of None leaves both unread, as `check`
+    does, which prints no set. SlotRefused when the budget refuses."""
     rows = read_namespace_rows() if namespaces is None else namespaces
     picked, report = set(), []
 
@@ -200,10 +266,13 @@ def derive_load_set(units, reader, item=None, features=(), namespaces=None, root
             add_part("feature", set(features))
         else:
             add_unarmed("feature", "feature")
+    reach = []
     if ns == "role" and root is not None:
+        reach, line = derive_reach_units(name, root)
+        report.append(line)
         slot = read_code_slot(str(root), code_budget)
         report.append(f"{slot['slot']} — slot · budget {slot['budget']} · {slot['source']}")
-    return [u.tag for u in units if u.tag in picked], report
+    return [u.tag for u in units if u.tag in picked] + [tag for tag, _text in reach], report
 
 
 # ---- S2: the missing-unit refusal --------------------------------------------------------------------------
@@ -416,6 +485,10 @@ def run_check(a) -> int:
             r, lines = check_required(tags, units, reader, a.item, mode)
             refused |= r
             out += lines
+            if a.reach and reader.startswith("role."):
+                reach, line = derive_reach_units(reader[len("role."):], root)
+                out += [f"{REACH} {reader} · {tag} · {text}" for tag, text in reach]
+                out += [f"{SAY} — {reader} · {line}"] if " — unarmed — " in line else []
     points = []
     for spec in a.load_point:
         name, eq, size = spec.partition("=")
@@ -611,6 +684,7 @@ def main(argv=None) -> int:
     c.add_argument("--checks", choices=CHECK_MODES)
     c.add_argument("--load-point", action="append", default=[])
     c.add_argument("--budgets-enforce", choices=("refuse", "warn"))
+    c.add_argument("--reach", action="store_true")
     i.add_argument("--card")
     i.add_argument("--cap", action="append", default=[])
     a = ap.parse_args(argv)

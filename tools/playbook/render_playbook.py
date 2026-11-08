@@ -1237,31 +1237,8 @@ def render_practice_lines(catalogue: dict, target: Path, kits: set, cut: list, n
     not selected. A derived default, or no policy kit, takes the `foundation` set and notes it; any other
     refused read, a set value that cannot resolve and an empty result refuse."""
     iu = load_units_module()
-    from policy_value import PolicyRefused, read_policy_value
-    value = None
     try:
-        lines, _explain = read_policy_value("charter.practices", target)
-    except PolicyRefused as exc:
-        if POLICY_DERIVED_LINE in exc.line:
-            notes.append('charter.practices — the foundation set: a derived default the policy reader '
-                         'leaves to the practice catalogue')
-        elif exc.line.startswith('no policy kit found'):
-            notes.append('charter.practices — the foundation set: no policy kit in this install, so no '
-                         'set can be read')
-        else:
-            raise Refusal(f'charter.practices: {exc.line}') from None
-    else:
-        try:
-            from instructions_edit import resolve_practices  # loads the memory-tree kit, so only a set value does
-        except (LookupError, ImportError) as exc:
-            raise Refusal(f'charter.practices holds a set, and resolving it needs the memory-tree kit, '
-                          f'which this install lacks: {exc}') from None
-        try:
-            value = resolve_practices(lines)
-        except ValueError as exc:     # its UnitRowError and the git read's LevelError
-            raise Refusal(f'charter.practices: {exc}') from None
-    try:
-        rows = iu.resolve_active_practices(catalogue, value)
+        rows = iu.read_active_practices(catalogue, target, notes)
     except iu.UnitRowError as exc:
         raise Refusal(str(exc)) from None
     gone = {f'practice.{d}' for d in cut}

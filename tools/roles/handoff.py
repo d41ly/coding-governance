@@ -16,7 +16,9 @@ role where it has any (PLAY-dOrderedCharter-6); `opening`; `reads`, a block per 
 declares, in that order, then the optional `input:code` every role carries (PLAY-dOrderedCharter-27): the
 text of the file `--input code=` names, measured against `memory.code-budget` by the load-set check; and `charter-blocks`, `roles_lib.render_charter_blocks` for the role: the
 practice lines its `rules` tags cite and the charter's carried sections (TOOL-aOrientedCast-16),
-each library note printed on stderr as `handoff: note — `. A slot with nothing to fill leaves no line.
+each library note printed on stderr as `handoff: note — `; and `practices`, a `### Practices at <step>` block
+of one `- [<name>] <reach>` line per active practice reaching the step its workflow row names, the lines the
+load-set check's run prints under `--reach` (PLAY-dOrderedCharter-21). A slot with nothing to fill leaves no line.
 It writes the file under the build's `prompts/` folder, printing its repo-relative path. `--part task` prints
 the marker line, a blank line and the `## Task` section instead; `--stdout` writes nothing and prints.
 Outside `--stand-in` it prints one stderr line after the notes, `handoff: description — <name>`, the
@@ -119,6 +121,8 @@ BRIEF_HEAD_RE = re.compile(r"^## The brief[ \t]*$", re.M)
 # ponytail: the playbook's one-line region refuses a rendered rule past 200 characters; spelled
 # again because a kit file may not import a sibling kit. A drift fails closed either way.
 ROSTER_LINE_MAX = 200
+#: `load_sets.py check --reach`'s line opening, one per reach unit, then `role.<name> · <tag> · <reach>`.
+REACH_LINE = "load-set — reach · "
 #: The charter's drive section and its line, `- <stage> · <role> — <when>: `<command>``, as the playbook kit
 #: renders them; a kit imports no sibling, so the heading's opening is spelled again here.
 DRIVE_HEAD = "## Drive — "
@@ -377,9 +381,13 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     role_text = lib.render_role(KIT_DIR, role, memory_root)
     code = values.get("input:" + CODE_INPUT)
     refused, gate = lib.check_load_set(root, KIT_DIR, [(role, len(role_text.encode("utf-8")))],
-                                       [(CODE_INPUT, len(code.replace("\r", "").encode("utf-8")))] if code else [])
+                                       [(CODE_INPUT, len(code.replace("\r", "").encode("utf-8")))] if code else [],
+                                       reach=True)
     if refused:
         raise lib.RolesError("\n".join(gate))
+    # PLAY-dOrderedCharter-21 S3: the role's reach units, off the same run and out of the notes
+    reach = [ln[len(REACH_LINE):].split(" · ", 2) for ln in gate if ln.startswith(REACH_LINE)]
+    gate = [ln for ln in gate if not ln.startswith(REACH_LINE)]
     missing = [ln for ln in gate if ln.startswith("Missing required unit:")]
     gaps = [ln for ln in gate if ln.startswith("**Load gaps:**")]
     if notes is not None:
@@ -476,10 +484,12 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         opening += "\nNot supplied, optional: %s%s." % (
             ", ".join("`%s`" % k for k in absent), " — " + "; ".join(reasons) if reasons else "")
     drive = extract_drive_lines(charter_text, role)
+    practices = ("### Practices at %s\n\n" % reach[0][1].rsplit(".", 1)[1] + "\n".join(
+        "- [%s] %s" % (tag.split(".")[1], text) for _reader, tag, text in reach)) if reach else ""
     role_sec, task_sec = render_work_order({
         "role": role_text.strip("\n")
         + ("\n\n### Drive\n\n" + "\n".join(drive) if drive else ""), "opening": opening,
-        "reads": "\n\n".join(blocks), "charter-blocks": charter_blocks.rstrip("\n")})
+        "reads": "\n\n".join(blocks), "charter-blocks": charter_blocks.rstrip("\n"), "practices": practices})
     path = out_path or build_dir / "prompts" / derive_prompt_name(
         build_dir / "prompts", datetime.date.today().isoformat(), unit_id, role, tail)
     rel = path.relative_to(root).as_posix()

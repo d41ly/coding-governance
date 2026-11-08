@@ -46,6 +46,19 @@ block against its body ceiling: under `budgets.enforce = "warn"` an oversized bl
 `BUDGET WARN` note, and under `refuse` the render is refused. With no playbook kit installed, the
 render prints one `load-set — unarmed` note and proceeds.
 
+## The practices at the work order's step
+
+Each workflow names the step its work serves, under `step` in `<prefix>/roles/workflows.toml`: `entry`,
+`plan`, `design`, `build`, `test`, `deploy`, `review`, or `none`. A work order carries what each active
+practice changes at its role's step: the handoff's task section ends with a `### Practices at <step>`
+block, one `- [<name>] <reach>` line per practice that reaches that step. A builder's reads, for example,
+`- [yagni] delete rather than disable`. The charter keeps one line per practice and carries no reach.
+
+The active practices are the policy key `charter.practices`, the foundation set when unset. A step of
+`none`, a step no active practice reaches, or an install with no playbook kit renders no block.
+`python <prefix>/playbook/load_sets.py derive --reader role.<name>` lists the units as
+`practice.<name>.<step>`.
+
 ## The code input every role carries
 
 Every role's load set has a `code` slot, so a handoff can carry code ranges, the definitions with

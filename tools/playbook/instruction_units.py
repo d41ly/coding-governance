@@ -15,6 +15,7 @@ reader and its active set (PLAY-dOrderedCharter-1).
     python instruction_units.py fixture [--plant <case>]  # the plants, each in a throwaway tree
     python instruction_units.py practices --list         # the shipped catalogue's tags, in render order
     python instruction_units.py practices --check [<path>]  # a catalogue, the shipped one by default
+    python instruction_units.py practices --check-charter <path>  # a rendered charter: one line per practice
     python instruction_units.py practices --active [<tags>]  # the active set of a comma-joined value; none, the default
     python instruction_units.py envelopes --list [--root <dir>]   # the document registry's rows, resolved
     python instruction_units.py envelopes --check [--root <dir>]  # the leg: every document against its envelope
@@ -62,7 +63,9 @@ THE POPULATION. `INSTRUCTION_PATHSPECS` is the instruction files, closed. `check
 
 THE PRACTICES. `read_practice_catalogue` reads `practices.toml`: its `foundation` tags and its `[[practice]]`
 rows, each a tag, a line and a reach table, a row it refuses naming the row. `resolve_active_practices` turns
-the value of `charter.practices` into the active rows, in catalogue order.
+the value of `charter.practices` into the active rows, in catalogue order, and `read_active_practices` reads
+that value at a root first. PRACTICES --CHECK-CHARTER reds a line of a rendered charter's practices region
+that is not one practice's one line, so no reach text renders into the charter (PLAY-dOrderedCharter-21).
 
 THE ENVELOPES (PLAY-dOrderedCharter-3). `documents.toml` registers each load-bearing instruction document,
 its level and a one-line direction; `read_document_registry` is its one reader. ENVELOPES --CHECK reds a
@@ -540,9 +543,74 @@ def resolve_active_practices(catalogue, value) -> list:
     return [r for r in rows if r["tag"] in value]
 
 
+def read_active_practices(catalogue, root, notes) -> list:
+    """The active rows at `root`: `charter.practices` read through the policy reader, a set value resolved
+    through the pack table, then `resolve_active_practices`. A derived default, or no policy kit, takes the
+    `foundation` set and appends why to `notes`; any other refused read, and a set that does not resolve,
+    raise UnitRowError naming the key. The charter render and the load set's reach units both read it."""
+    from policy_value import PolicyRefused, read_policy_value
+    from render_playbook import POLICY_DERIVED_LINE
+    value = None
+    try:
+        lines, _explain = read_policy_value("charter.practices", root)
+    except PolicyRefused as exc:
+        if POLICY_DERIVED_LINE in exc.line:
+            notes.append("charter.practices — the foundation set: a derived default the policy reader "
+                         "leaves to the practice catalogue")
+        elif exc.line.startswith("no policy kit found"):
+            notes.append("charter.practices — the foundation set: no policy kit in this install, so no "
+                         "set can be read")
+        else:
+            raise UnitRowError(f"charter.practices: {exc.line}") from None
+    else:
+        try:
+            from instructions_edit import resolve_practices  # loads the memory-tree kit, so only a set value does
+        except (LookupError, ImportError) as exc:
+            raise UnitRowError(f"charter.practices holds a set, and resolving it needs the memory-tree kit, "
+                               f"which this install lacks: {exc}") from None
+        try:
+            value = resolve_practices(lines)
+        except ValueError as exc:     # its UnitRowError and the git read's LevelError
+            raise UnitRowError(f"charter.practices: {exc}") from None
+    return resolve_active_practices(catalogue, value)
+
+
+#: The charter's practices region, as the roles kit's library spells it; a kit imports no sibling kit.
+PRACTICES_OPEN, PRACTICES_CLOSE = "<!-- gov:practices -->", "<!-- /gov:practices -->"
+#: The region's own lines besides the practice lines: the one-line fence the template wraps them in.
+PRACTICES_FENCE = ("", "<!-- one-line -->", "<!-- /one-line -->")
+
+
+def check_charter_practices(catalogue, text) -> list:
+    """PLAY-dOrderedCharter-21 S4: each line of the practices region of a rendered charter `text` that is
+    not one `- [<name>] <line>` a catalogue row spells, its tokens taken as any value, or that repeats a
+    practice; a region that is absent or unclosed is one fault. A row the region lacks is no fault."""
+    lines = text.replace("\r\n", "\n").split("\n")
+    if PRACTICES_OPEN not in lines or PRACTICES_CLOSE not in lines[lines.index(PRACTICES_OPEN):]:
+        return [f"the charter carries no {PRACTICES_OPEN} region closed by {PRACTICES_CLOSE}"]
+    start = lines.index(PRACTICES_OPEN) + 1
+    region = lines[start:lines.index(PRACTICES_CLOSE, start)]
+    spelt = {}
+    for row in catalogue["practice"]:
+        name = row["tag"].split(".", 1)[1]
+        pattern = re.escape(f"- [{name}] {row['line']}")
+        spelt[name] = re.compile(re.sub(r"\\\{\\\{[A-Z_]+\\\}\\\}", ".+?", pattern))
+    faults, seen = [], set()
+    for n, line in enumerate(region, start + 1):
+        if line in PRACTICES_FENCE:
+            continue
+        name = line[3:].partition("]")[0] if line.startswith("- [") else None
+        if name not in spelt or not spelt[name].fullmatch(line):
+            faults.append(f"line {n} is no practice's one line: {line}")
+        elif name in seen:
+            faults.append(f"line {n} repeats the practice {name}: {line}")
+        seen.add(name)
+    return faults
+
+
 def run_practices(args) -> tuple[list, int]:
-    """The `practices` verbs: `--list`, `--check [<path>]` and `--active [<tags>]`, a comma-joined value, an
-    empty one the empty set."""
+    """The `practices` verbs: `--list`, `--check [<path>]`, `--check-charter <path>` and `--active [<tags>]`,
+    a comma-joined value, an empty one the empty set."""
     shipped = KIT_DIR / "practices.toml"
     if args == ["--list"]:
         return [r["tag"] for r in read_practice_catalogue(shipped)["practice"]], 0
@@ -550,6 +618,12 @@ def run_practices(args) -> tuple[list, int]:
         path = args[1] if len(args) == 2 else shipped
         rows = read_practice_catalogue(path)["practice"]
         return [f"{SAY}: practices · {path} · {len(rows)} row(s) · green"], 0
+    if args[:1] == ["--check-charter"] and len(args) == 2:
+        text = pathlib.Path(args[1]).read_text(encoding="utf-8")
+        faults = check_charter_practices(read_practice_catalogue(shipped), text)
+        if faults:
+            return [f"{SAY}: red · practices · {args[1]} · {f}" for f in faults], 1
+        return [f"{SAY}: practices · {args[1]} · one line per practice · green"], 0
     if args[:1] == ["--active"] and len(args) <= 2:
         value = [t for t in args[1].split(",") if t] if len(args) == 2 else None
         return [r["tag"] for r in resolve_active_practices(read_practice_catalogue(shipped), value)], 0
@@ -1992,6 +2066,25 @@ def arm_work_order(c):
     c.check("a template moving a slot moves the bytes", read_order(reads, rules, charter, inputs) != pinned)
 
 
+def arm_practices_reach(c):
+    """S4 of PLAY-dOrderedCharter-21: a scratch charter rendered from the shipped catalogue's untokened rows
+    checks green; a reach line planted in its practices region reds, naming the line."""
+    rows = [r for r in read_practice_catalogue(KIT_DIR / "practices.toml")["practice"] if "{{" not in r["line"]]
+    body = [f"- [{r['tag'].split('.', 1)[1]}] {r['line']}" for r in rows]
+    reach = next(f"- [{r['tag'].split('.', 1)[1]}] {v}" for r in rows for v in r["reach"].values())
+
+    def write_charter(lines):
+        c.write_file("AGENTS.md", "# fixture charter\n\n" + "\n".join(
+            [PRACTICES_OPEN, PRACTICES_FENCE[1], *lines, PRACTICES_FENCE[2], PRACTICES_CLOSE]) + "\n")
+        return run_practices(["--check-charter", str(c.top / "AGENTS.md")])
+
+    lines, rc = write_charter(body)
+    c.check("a charter of one line per practice exits 0", rc == 0, " | ".join(lines))
+    lines, rc = write_charter(body[:1] + [reach] + body[1:])
+    c.check("a reach line planted in the practices region exits 1 naming it",
+            rc == 1 and any(reach in ln for ln in lines), " | ".join(lines))
+
+
 def arm_no_renderer(c):
     from policy_value import resolve_kit_dir
     from render_playbook import resolve_bash
@@ -2361,7 +2454,8 @@ PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority, "state
           "hold-fits": arm_hold_fits, "hold-second": arm_hold_second, "hold-refused": arm_hold_refused,
           "drive-bad-role": arm_drive_bad_role, "drive-no-row": arm_drive_no_row,
           "drive-empty-command": arm_drive_empty_command, "drive-unshipped-descriptor": arm_drive_unshipped_descriptor,
-          "drive-hand-line": arm_drive_hand_line, "drive-lost-line": arm_drive_lost_line, "map-held": arm_map_held}
+          "drive-hand-line": arm_drive_hand_line, "drive-lost-line": arm_drive_lost_line, "map-held": arm_map_held,
+          "practices-reach": arm_practices_reach}
 
 
 def run_fixture(plant=None) -> tuple[list, int]:
