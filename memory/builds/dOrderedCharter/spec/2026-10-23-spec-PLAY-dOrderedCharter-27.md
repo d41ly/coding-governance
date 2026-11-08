@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-27 — each role's load set budgeting the `code` slot
 
-**Status:** DEFERRED · rev-5 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 22 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-6 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 22 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0057@ec297ae3 whole
 
@@ -24,6 +24,8 @@
 | [2026-11-04-prompt-PLAY-dOrderedCharter-27-1-spec-writer.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-27-1-spec-writer.md) | journal | — |
 | [2026-11-04-prompt-PLAY-dOrderedCharter-27-drift-fold-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-27-drift-fold-brief.md) | research | — |
 | [2026-11-04-prompt-PLAY-dOrderedCharter-27-drift-sweep-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-27-drift-sweep-brief.md) | research | PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-55 |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-27-2-spec-writer.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-27-2-spec-writer.md) | journal | — |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-27-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-27-drift-fold-brief.md) | research | PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -53,10 +55,12 @@ filler lands into a priced slot (v2:973-981 P27).
   record's `memory.item-budget` row defines the unit (`2026-10-16-build-PLAY-dClosedLoop-1-systems.md:570`),
   so the default is 16000 bytes. A value outside `<n>k` is refused naming the key, and so is a refused
   read, the reader's `PolicyRefused`, naming the line it carries too. Observed by AC1 and AC3.
-- **S3** — The handoff block. `render_handoff` (`tools/roles/handoff.py:312`) renders a supplied slot
+- **S3** — The handoff block. `render_handoff` (`tools/roles/handoff.py:312`, now
+  `tools/roles/handoff.py#render_handoff`) renders a supplied slot
   as a `### input:code` block from `--input code=<path>`, the stand-in filler until dFurnishedOrders' code
   record fills it; the heading is the one its block loop gives every key, `### <key>` (the fork record's
-  F3). `code` joins `INPUT_NAMES` and `PATH_INPUTS` (`handoff.py:98-99`), so its path is
+  F3). `code` joins `INPUT_NAMES` and `PATH_INPUTS` (`handoff.py:98-99`, now
+  `tools/roles/handoff.py#INPUT_NAMES` and `tools/roles/handoff.py#PATH_INPUTS`), so its path is
   checked as a spec path is; unlike `spec` and `prompt`, whose blocks hold the path, the `code` block
   holds the file's text, since the ranges are the payload. No role's `reads:` names `input:code`
   (Migration in section 4), so two places take it as derived. The CLI's check that refuses an input the
@@ -76,7 +80,13 @@ filler lands into a priced slot (v2:973-981 P27).
   `python <prefix>/policy/budgets.py resolve code-slot`, the cap named literally as `arm_cap_census`
   grades an enforcer (`tools/policy/check_policy.py#arm_cap_census`), for the mode alone: `refuse` under
   `budgets.enforce = "refuse"` or a `budgets.pinned` naming `code-slot`, else `warn`
-  (`tools/policy/budgets.py#resolve_caps`, whose family branch answers the mode and no value). The census
+  (`tools/policy/budgets.py#resolve_caps`, whose family branch answers the mode and no value). The
+  subprocess passes the budgets script and its verb as separate list elements, as unit 11's S3 rules for
+  the module, so the cap census reads no request on that line; its census-to-tree half still finds the
+  row's enforcer asking, because it looks for the script's name and the cap's name, each on a line that is
+  not a comment. The case's plant reaches the enforcer through
+  `tools/policy/check_policy.py#derive_enforcer_path`, as every other case does, so no line of it spells a
+  kit path, which the shipped-surface ban reds since unit 72. The census
   gains one home form for the row: `policy` joins `HOME_FORMS` (`tools/policy/budgets.py#HOME_FORMS`),
   and `read_cap_census` refuses a `policy:` home on a row whose `family` is false, where
   `budgets.<cap>` in the policy file would be a second home for the key's value.
@@ -189,8 +199,9 @@ supplies it.
   `refuse` and under `warn` with `budgets.pinned = ["code-slot"]`; with a 16000-byte file it prints no
   breach.
   Red when: the boundary is off by one either way, `warn` refuses, or a pin is not obeyed.
-- **AC4** — When `python tools/policy/budgets.py resolve code-slot` runs in gov's tree, it prints
-  `code-slot`, `-` and `warn` with a reason naming `policy:memory.code-budget`, exit 0; in a scratch copy
+- **AC4** — When `python tools/policy/budgets.py resolve --explain code-slot` runs in gov's tree, it prints
+  the row `code-slot`, `-`, `warn`, and on stderr one `budgets: code-slot` line whose reason names
+  `policy:memory.code-budget`, exit 0; in a scratch copy
   of the census whose `code-slot` row reads `family = false`, the same request exits 2 naming the row;
   and in a scratch repository whose committed policy file sets `budgets.code-slot = 9000`,
   `python tools/policy/policy.py check` exits non-zero naming `code-slot is a family cap`.
@@ -199,7 +210,7 @@ supplies it.
 
 ## 7. Gates
 
-`roles render wiring` · `roles render selftest` · `playbook render selftest` · `govkit acceptance matrix` · `policy fixtures`
+`roles render wiring` · `roles render selftest` · `playbook render selftest` · `govkit acceptance matrix` · `policy fixtures` · `build-index selftest` · `gotchas selftest` · `memory-recall kit selftest` · `recall floor` · `recall floor arms`
 
 New arm: tools/playbook/load_sets.py · covers AC1 AC3 · its selftest derives each role's set, plants a malformed budget value, a committed policy value the row refuses, and a block one byte over and at the budget · none
 New arm: tools/policy/check_policy.py · covers AC3 AC4 · the `code-slot` case of `CAP_CASES`, run by the `policy fixtures` leg, plants a block one byte over the budget under `warn` and `refuse`, and a census copy with the row's `family` false · none
@@ -244,6 +255,15 @@ New arm: tools/policy/check_policy.py · covers AC3 AC4 · the `code-slot` case 
 - rev-3 · 2026-10-24 · §2 S2 · §3 Non-goals, Edges · §5 · AC1 · §7 New arm · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 47: `memory.code-budget` is already a catalogue row, read with `policy.py get` through PLAY-dOrderedCharter-7's `read_policy_value` with no wait, a refused read refuses, and the row's summary and usage stay dFurnishedOrders' to fill.
 - rev-4 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 - rev-5 · 2026-11-04 · section 2 S2 to S4 · section 3 Non-goals, Edges · section 4 · section 5 · AC1 to AC4 · section 7 · section 8 F3, F4 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-27-1-spec-writer.md`, the drift sweep's findings 27-1 to 27-6 read at `c7269a97`: the block is `### input:code` and `code` passes the CLI's read check as a derived optional key; the slot's bytes reach the switch through a family census row `code-slot` with a `policy:` home; the policy reader is unit 19's; AC1's role part reads `unarmed`; AC2 and AC3 render as `gov-builder` with `--unit`.
+- rev-6 · 2026-11-08 · S3 S4 · AC4 · section 7 · section 10 · from
+  `2026-11-08-prompt-PLAY-dOrderedCharter-27-drift-fold-brief.md`: re-read at `eb1c90a1c`. S4 keeps the
+  budgets script and its verb apart, as unit 11's S3 now rules for the module after unit 73's cap-census
+  finding, and its plant derives the enforcer's path, as the shipped-surface ban requires since unit 72;
+  AC4 asks `--explain`, since the plain `resolve` row prints no reason; the leg line gains the five legs
+  whose guard names `tools/policy/budgets.py` since unit 67; moved handoff anchors in S3 and the reuse
+  audit gain their symbols. Re-checked unchanged: `budgets.py resolve memory.code-budget` exits 2, the
+  family branch answers the mode alone, `check_budgets` refuses a family cap's value, and no role's
+  `reads:` names `input:code`.
 
 ## 10. Reuse audit
 
@@ -251,8 +271,10 @@ The seams extended are `PLAY-dOrderedCharter-11`'s `derive_load_set` and `check_
 census and its one cap reader, `tools/policy/budgets.py#resolve_caps`, whose family branch already
 answers a mode with the value its enforcer holds, as `role-body`'s does, and whose plant
 `tools/policy/check_policy.py#derive_role_body_plant` the `code-slot` case follows; and
-`handoff.py`'s `input:` mechanism (`INPUT_NAMES`, `tools/roles/handoff.py:98`; the path check at
-`:331-334`; the optional-absent list at `:395` and its line at `:413`), which already renders a caller-supplied block and
+`handoff.py`'s `input:` mechanism (`INPUT_NAMES`, `tools/roles/handoff.py:98`, now
+`tools/roles/handoff.py#INPUT_NAMES`; the path check at
+`:331-334`; the optional-absent list at `:395` and its line at `:413`, the three now inside
+`tools/roles/handoff.py#render_handoff`), which already renders a caller-supplied block and
 names an unsupplied optional one. `python tools/codebase-map/reuse_lookup.py "budget the bytes a
 role's handoff loads"` ranked `load`, `load_conf`, `load_workflows`, `load_policy` and
 `derive_budget_cut`, name-stem matches; none budgets a handoff block, and the source's `input:` path is

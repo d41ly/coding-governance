@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-4 — the instruction map re-injected on compact and resume through the existing replay fragment
 
-**Status:** DEFERRED · rev-4 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 25 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 25 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0034@06f1afc5 whole
 
@@ -23,6 +23,7 @@
 | [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-11-02-prompt-PLAY-dOrderedCharter-4-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-4-build-brief.md) | journal | — |
 | [2026-11-04-prompt-PLAY-dOrderedCharter-27-drift-sweep-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-27-drift-sweep-brief.md) | research | PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-55 |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-27-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-27-drift-fold-brief.md) | research | PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -44,15 +45,21 @@ that already fires on `resume|compact`, and adds no third SessionStart entry.
   `python tools/playbook/instruction_units.py map` prints `render_instruction_map`'s lines, the
   function PLAY-dOrderedCharter-2 lands in that module, wrapped by S16's `render_envelope` with the
   charter's registry row (`doc.charter`, level 0) and the direction `the instruction map: rebuild the
-  hierarchy from it before acting`. Observed by AC1, AC3.
+  hierarchy from it before acting`. The helper is the playbook kit's inline copy, which unit 3's S3
+  places in `tools/playbook/render_playbook.py`; the verb imports it from that module inside the
+  function, as `tools/playbook/instruction_units.py#derive_instruction_tokens` imports that module's
+  readers. Those lines are the eight level lines, then, while a registry row carries `hold`, the one
+  `held —` line unit 2's S3 renders from it, then S2's preset line. Observed by AC1, AC3.
 - **S2** — The preset line. `render_instruction_map` gains one last line naming the active policy
   preset, foundations R2's third part of the map, so the charter's map section and the replay carry
   it alike. Until presets exist it is a constant naming the hand-over and pointing at `policy.py get <key>
   --explain`, which prints each key's source, rather than restating the resolution order. Observed by
   AC1.
 - **S3** — The bound. The verb refuses past `MAP_CAP_BYTES = 1792` (exit 2, one `instruction-map:`
-  line, no map), and each level line is cut at `MAP_LINE_BYTES = 160` with `… (+<k>)`. Observed by
-  AC2.
+  line, no map), and each level line is cut at `MAP_LINE_BYTES = 160` with `… (+<k>)`. The cap counts
+  every printed line, the `held —` line included: eight level lines at the cut, 161 bytes each with
+  their newline, and that line's 139 bytes PINNED at unit 2's `d0c16d29` leave 364 bytes for the preset
+  line and the envelope's two. Observed by AC2.
 - **S4** — `print_replay` in `skills/session-kickoff/manifest-check.sh` prints a `map —` block before
   the stored card, through a new `derive_map_block` that resolves the module as an optional sibling
   (`resolve_kit_file playbook instruction_units.py`) and bounds the call as the `overlaps —` cell
@@ -95,6 +102,7 @@ that already fires on `resume|compact`, and adds no third SessionStart entry.
 ```
 [AGENTS.md · Level 0 · the instruction map: rebuild the hierarchy from it before acting]
 <render_instruction_map's lines, one per level 0 to 7>
+<the held — line, while a registry row carries hold>
 preset — none: presets join the policy reader at dKeptSession; a key's source: policy.py get <key> --explain
 [/AGENTS.md]
 ```
@@ -107,7 +115,9 @@ preset — none: presets join the policy reader at dKeptSession; a key's source:
 - `MAP_CAP_BYTES = 1792`: a map past it exits 2 printing one `instruction-map: <bytes> over
   MAP_CAP_BYTES` line and no map, because every field is bounded and an overflow means a derivation
   went wrong, the rule `write_card` keeps (`skills/session-kickoff/manifest-check.sh:703-718`).
-- `--root <dir>` (default: the git toplevel of the working directory) names the tree whose
+- `--root <dir>` (default: the git toplevel of the working directory, read through
+  `tools/playbook/instruction_units.py#run_git`, which decodes its output as UTF-8, so the verb adds no
+  call the encoding-posture leg reds) names the tree whose
   registry is read. The verb exits 0 with the map, 2 on a refusal, never 1: it is a renderer.
 
 ### The preset line
@@ -159,7 +169,9 @@ unchanged.
 ### Rollout
 
 The replay's first line changes in every tree that takes this release. No switch: the map is
-read-only output and the fallback is today's replay plus one line.
+read-only output and the fallback is today's replay plus one line. The verb's selftest arms lay their
+scratch registry out through `tools/playbook/instruction_units.py#derive_tool_rel` and spell no kit
+path, as the shipped-surface ban requires since unit 72.
 
 ### Files touched (estimate)
 
@@ -196,7 +208,8 @@ read-only output and the fallback is today's replay plus one line.
 ## 6. Acceptance criteria
 
 - **AC1** — When `python instruction_units.py map --root <fixture>` runs over a
-  scratch tree holding a document registry with one row at level 0 and one at level 5, it prints the
+  scratch tree holding a document registry with one row at level 0 and one at level 5, neither carrying
+  `hold`, it prints the
   `[AGENTS.md · Level 0 · ` opener, `render_instruction_map`'s eight level lines in order 0 to 7, the
   `preset —` line last before the envelope's closer line (§4's form, naming `AGENTS.md`), and exits 0; the charter's map section
   rendered from the same fixture carries the same `preset —` line, which names `policy.py get <key>
@@ -263,6 +276,16 @@ New arm: tools/playbook/render_playbook.py · covers AC1 AC2 · `--selftest` arm
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §2 S2 · §3 Non-goals · §4 The verb, The preset line · AC1 · §8 F3's evidence · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 31: the preset line stops restating the resolution order, which dGroundRules' reader extends with a last-valid source and a derived-default refusal, and points at `policy.py get <key> --explain`; F3 keeps its resolution.
 - rev-4 · 2026-11-04 · section 4 The replay, Alternatives rejected · section 7 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-27-1-spec-writer.md`, the drift sweep's findings 4-1 and 4-2 read at `c7269a97`: the leg line names `policy fixtures`, whose guard `skills/session-kickoff/manifest-check.sh` trips; `resolve_kit_file` and `check_card` carry their stable forms beside their moved lines, and the reuse audit stops saying the scout's `check_card` line holds.
+- rev-5 · 2026-11-08 · S1 S3 · section 4 The verb, Rollout · AC1 · from
+  `2026-11-08-prompt-PLAY-dOrderedCharter-27-drift-fold-brief.md`: re-read at `eb1c90a1c`. Unit 2's map
+  now renders a `held —` line while a registry row carries `hold`, so S1 and the verb's form print it
+  before the preset line, S3's cap counts it, and AC1's fixture states it holds none, as unit 2's F5
+  relies on; S1 names the `render_envelope` copy the verb imports, unit 3's in
+  `tools/playbook/render_playbook.py`; the `--root` read goes through the module's UTF-8 `run_git`, after
+  unit 73's encoding finding, and the arms derive their paths since unit 72. Re-checked unchanged:
+  `print_replay` at `skills/session-kickoff/manifest-check.sh:721-725`, `derive_overlaps_line` at
+  `:555-589`, `skills/session-kickoff/manifest-check.sh#write_card` refusing an over-cap card, two card
+  fragments under `check_card`, and `LEVELS`' eight levels.
 
 ## 10. Reuse audit
 

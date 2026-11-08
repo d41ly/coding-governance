@@ -152,18 +152,18 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-72 — the positional lists leave the kit, and the kit's code derives every path it spells](spec/2026-11-08-spec-PLAY-dOrderedCharter-72.md) | 17 | 2 | CLOSED | rev-2 | 2026-11-08 |
 | [PLAY-dOrderedCharter-73 — the close bar's other code reds: encodings, shell idioms, a remote literal, and the cap census](spec/2026-11-08-spec-PLAY-dOrderedCharter-73.md) | 17 | 2 | CLOSED | rev-2 | 2026-11-08 |
 | [PLAY-dOrderedCharter-74 — the second bar's two code reds: a remote literal and a leg ceiling](spec/2026-11-08-spec-PLAY-dOrderedCharter-74.md) | 17 | 1 | CLOSED | rev-1 | 2026-11-08 |
-| [PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them](spec/2026-10-23-spec-PLAY-dOrderedCharter-3.md) | 18 | 2 | DEFERRED | rev-10 | 2026-11-08 |
+| [PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them](spec/2026-10-23-spec-PLAY-dOrderedCharter-3.md) | 18 | 2 | DEFERRED | rev-11 | 2026-11-08 |
 | [PLAY-dOrderedCharter-41 — the `cross-os` block stays live, so every v4 template renders after the practice catalogue lands](spec/2026-10-24-spec-PLAY-dOrderedCharter-41.md) | 18 | 2 | CLOSED | rev-6 | 2026-11-08 |
 | [PLAY-dOrderedCharter-52 — the TOML-table merge envelope is total: every base, ours and theirs state has a row, and an unlisted one is a conflict](spec/2026-10-24-spec-PLAY-dOrderedCharter-52.md) | 18 | 2 | DEFERRED | rev-3 | 2026-11-08 |
 | [PLAY-dOrderedCharter-6 — the drive section composed from each adopted kit's drive table, and the charter held inside 32 KiB](spec/2026-10-23-spec-PLAY-dOrderedCharter-6.md) | 19 | 2 | DEFERRED | rev-9 | 2026-11-08 |
 | [PLAY-dOrderedCharter-2 — the charter re-founded in its level-0 envelope, with the override rule and its record](spec/2026-10-23-spec-PLAY-dOrderedCharter-2.md) | 20 | 2 | DEFERRED | rev-9 | 2026-11-08 |
 | [PLAY-dOrderedCharter-11 — load sets derived per reader and item, budgeted, and refused when a required unit is missing](spec/2026-10-23-spec-PLAY-dOrderedCharter-11.md) | 21 | 2 | DEFERRED | rev-9 | 2026-11-08 |
-| [PLAY-dOrderedCharter-27 — each role's load set budgeting the `code` slot](spec/2026-10-23-spec-PLAY-dOrderedCharter-27.md) | 22 | 2 | DEFERRED | rev-5 | 2026-11-04 |
-| [PLAY-dOrderedCharter-21 — each practice's reach per step rendered as step-scoped units handed in work orders](spec/2026-10-23-spec-PLAY-dOrderedCharter-21.md) | 23 | 2 | DEFERRED | rev-3 | 2026-11-04 |
-| [PLAY-dOrderedCharter-5 — ranked envelopes in every subagent handoff, the charter carried once](spec/2026-10-23-spec-PLAY-dOrderedCharter-5.md) | 24 | 2 | DEFERRED | rev-5 | 2026-11-04 |
-| [PLAY-dOrderedCharter-4 — the instruction map re-injected on compact and resume through the existing replay fragment](spec/2026-10-23-spec-PLAY-dOrderedCharter-4.md) | 25 | 2 | DEFERRED | rev-4 | 2026-11-04 |
-| [PLAY-dOrderedCharter-8 — the build's card at level 1, through an ignored per-worktree card file the charter's entry file imports](spec/2026-10-23-spec-PLAY-dOrderedCharter-8.md) | 26 | 2 | DEFERRED | rev-2 | 2026-10-24 |
-| [PLAY-dOrderedCharter-14 — memory instructing nothing: the auto-memory index measured at session start, its directives detected, a standing directive promoted into a unit](spec/2026-10-23-spec-PLAY-dOrderedCharter-14.md) | 27 | 2 | DEFERRED | rev-3 | 2026-10-24 |
+| [PLAY-dOrderedCharter-27 — each role's load set budgeting the `code` slot](spec/2026-10-23-spec-PLAY-dOrderedCharter-27.md) | 22 | 2 | DEFERRED | rev-6 | 2026-11-08 |
+| [PLAY-dOrderedCharter-21 — each practice's reach per step rendered as step-scoped units handed in work orders](spec/2026-10-23-spec-PLAY-dOrderedCharter-21.md) | 23 | 2 | DEFERRED | rev-4 | 2026-11-08 |
+| [PLAY-dOrderedCharter-5 — ranked envelopes in every subagent handoff, the charter carried once](spec/2026-10-23-spec-PLAY-dOrderedCharter-5.md) | 24 | 2 | DEFERRED | rev-6 | 2026-11-08 |
+| [PLAY-dOrderedCharter-4 — the instruction map re-injected on compact and resume through the existing replay fragment](spec/2026-10-23-spec-PLAY-dOrderedCharter-4.md) | 25 | 2 | DEFERRED | rev-5 | 2026-11-08 |
+| [PLAY-dOrderedCharter-8 — the build's card at level 1, through an ignored per-worktree card file the charter's entry file imports](spec/2026-10-23-spec-PLAY-dOrderedCharter-8.md) | 26 | 2 | DEFERRED | rev-3 | 2026-11-08 |
+| [PLAY-dOrderedCharter-14 — memory instructing nothing: the auto-memory index measured at session start, its directives detected, a standing directive promoted into a unit](spec/2026-10-23-spec-PLAY-dOrderedCharter-14.md) | 27 | 2 | DEFERRED | rev-4 | 2026-11-08 |
 | [PLAY-dOrderedCharter-43 — the card import written and checked by the one renderer's entry-files scope, never by a second writer](spec/2026-10-24-spec-PLAY-dOrderedCharter-43.md) | 27 | 2 | DEFERRED | rev-3 | 2026-11-03 |
 | [PLAY-dOrderedCharter-30 — the portable practice: a role per language, one rule set, each rule paired with its named leg, absorbing `[cross-os]` and `[bytes]`](spec/2026-10-23-spec-PLAY-dOrderedCharter-30.md) | 28 | 2 | DEFERRED | rev-5 | 2026-11-03 |
 | [PLAY-dOrderedCharter-29 — the one writing practice's checks over records as well as units](spec/2026-10-23-spec-PLAY-dOrderedCharter-29.md) | 29 | 2 | DEFERRED | rev-3 | 2026-11-03 |
@@ -183,7 +183,7 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-5 | 2026-11-08 |
 <!-- /gen:build-units -->
 
-Records: 431 bound to this build, across 4 record folder(s).
+Records: 434 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

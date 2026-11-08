@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-5 — ranked envelopes in every subagent handoff, the charter carried once
 
-**Status:** DEFERRED · rev-5 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 24 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-6 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 24 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0035@0d7d32c8 whole
 
@@ -19,6 +19,7 @@
 | [2026-11-02-prompt-PLAY-dOrderedCharter-5-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-5-build-brief.md) | journal | — |
 | [2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md) | research | PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-11-04-prompt-PLAY-dOrderedCharter-27-drift-sweep-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-27-drift-sweep-brief.md) | research | PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-55 |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-27-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-27-drift-fold-brief.md) | research | PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -40,21 +41,40 @@ v2:953-957 P13).
   direction is the charter's registry row (`PLAY-dOrderedCharter-3`'s `doc.charter`), then the role's
   text, both inside the agent file's own level-5 envelope. The roles kit reads the document registry
   through `resolve_kit_dir`, the sibling resolver it already carries (`tools/roles/roles_lib.py:97`).
-  Observed by AC1.
-- **S2** — The handoff, ranked. `render_handoff` (`tools/roles/handoff.py:312`) wraps each block of the
+  The roles kit does not require the playbook kit (`tools/roles/kit.toml`'s `requires` names
+  `kickoff-manifest` and `memory-tree`), so with no playbook kit installed the agent file and the
+  handoff render unranked and print one `unarmed` line naming the kit, and a registry that is present
+  and does not read refuses the render naming it (the fork record's F4). Observed by AC1.
+- **S2** — The handoff, ranked. `render_handoff` (`tools/roles/handoff.py:312`, now
+  `tools/roles/handoff.py#render_handoff`) wraps each block of the
   prompt file in its envelope through the inline `render_envelope` copy in `roles_lib.py`: the
   practices-at-step block (`PLAY-dOrderedCharter-21`) at level 0, doc `<charter>#practices-at-<step>`;
   the `## Role` section at level 5, doc the agent file's path; the `## Task` section at level 6, doc the
-  prompt file's path. Blocks are emitted in level order, lowest number first. Observed by AC2.
+  prompt file's path. Each envelope opens after its section's heading line, never above it. The spawn
+  guard admits a native agent's prompt only as the marker line and the file's `## Task` section, from
+  that heading to the end of the file (`tools/hooks/agent-cap.js#extractTaskSection`), so the level-0 block
+  stays inside the `## Task` section, first, ahead of the task's level-6 envelope (the fork record's F3):
+  the `practices` slot unit 21 adds after `charter-blocks` moves to the head of the template's `## Task`
+  section.
+  Blocks are emitted in level order within each part, the role part and the task part, lowest number
+  first. Observed by AC2.
 - **S3** — The charter carried once. The charter blocks leave the task section (`handoff.py:397-407`
-  today appends them there), so the task part a native agent type receives, `--part task`, carries no
+  today appends them there; at `eb1c90a1c` they fill the `charter-blocks` slot of the work-order
+  template's `## Task` section, `tools/roles/templates/work-order.template.md`, which `render_handoff`
+  fills), so the template loses that slot and the task part a native agent type receives, `--part task`, carries no
   charter rule line and no carried section; the agent file carries them once (S1). A stand-in run is
   the main loop, which holds the whole charter at level 0, so its prompt file carries none either.
-  Observed by AC3.
-- **S4** — The check. `check_handoff` (`handoff.py:426`), the `check` verb, gains two arms after its
+  `tools/playbook/instruction_units.py#arm_work_order` pins the bytes `handoff.py` printed before the
+  template, over a tree holding the roles kit and no playbook kit: its `every slot` case in
+  `ORDER_CASES` carries the charter blocks in the task, and its slot swap names `charter-blocks`. This
+  unit re-pins that case to the bytes the unranked render prints and points the swap at the `opening`
+  and `reads` slots. Observed by AC3.
+- **S4** — The check. `check_handoff` (`handoff.py:426`, now `tools/roles/handoff.py#check_handoff`), the
+  `check` verb, gains two arms after its
   hash compare: every envelope opened in the prompt file closes, through `read_envelopes`; and the
-  envelopes' levels never decrease down the file. Each failure names the path and the envelope.
-  Observed by AC4.
+  envelopes' levels never decrease down each part, the `## Role` section and the `## Task` section, which
+  a native agent receives apart, the role part as its agent file. Each failure names the path and the
+  envelope. Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -82,24 +102,27 @@ v2:953-957 P13).
 ```text
 <!-- gov:handoff role=gov-builder build=<slug> unit=<id> path=<prompt> role-sha=<h> task-sha=<h> -->
 
+## Task
+
 [<charter>#practices-at-build · Level 0 · <the charter row's direction>]
 ### Practices at build
 …
 [/<charter>#practices-at-build]
 [<prompt path> · Level 6 · The task: this unit's goal, scope and acceptance; yields to levels 0 to 5]
-## Task
 …
 [/<prompt path>]
 ```
 
-The prompt file holds the role section at level 5 between the two. The marker stays the first line
-and `MARKER_RE` (`roles_lib.py:79`) is unchanged; the section hashes are derived over the enveloped
-sections, so `check_handoff` re-derives them as it does.
+The prompt file holds the `## Role` section above it, its body inside the level-5 envelope. The marker
+stays the first line and `MARKER_RE` (`roles_lib.py:79`) is unchanged; the section hashes are derived
+over the enveloped sections, from each heading to the next, so `check_handoff` and the spawn guard
+re-derive them as they do. A `## Task` line opens the task part, as the spawn guard's span requires,
+and every envelope of the part sits under it.
 
 ### Inventory
 
 Minted: the section doc form `<charter>#practices-at-<step>`; the level-6 task direction string; the
-two `check` arms. No new file.
+two `check` arms. No new file; the work-order template's `charter-blocks` slot leaves it.
 
 ### Migration
 
@@ -117,7 +140,9 @@ charter blocks from an agent file that also lacks them.
 - `tools/roles/handoff.py`
 - `tools/roles/render_agents.py`
 - `tools/roles/roles_lib.py`
+- `tools/roles/templates/work-order.template.md`
 - `tools/roles/README.md`
+- `tools/playbook/instruction_units.py` (the pinned bytes of `arm_work_order`)
 - `.claude/agents/*.md` (the role render, re-rendered, never edited)
 - `help/roles.md`
 
@@ -133,7 +158,8 @@ charter blocks from an agent file that also lacks them.
 - security: an envelope is rendered from the registry, never from task input; handed task text cannot
   open an envelope the check accepts, since its doc must match a block's.
 - perf / scale: no measurable change.
-- error / empty / loading states: an unreadable document registry refuses the render naming it.
+- error / empty / loading states: an unreadable document registry refuses the render naming it; an
+  absent playbook kit renders unranked with one `unarmed` line (§8 F4).
 - observability: `check` prints each envelope's level in order.
 - risks: a native spawn whose agent file was not re-rendered carries no charter; Rollout puts both in
   one commit, and the `roles render wiring` leg reds a stale agent file.
@@ -149,21 +175,24 @@ charter blocks from an agent file that also lacks them.
   and its last closer is the agent file's own level-5 closer.
   Red when: the charter blocks follow the role text or sit outside an envelope.
 - **AC2** — When `python tools/roles/handoff.py render --role gov-builder --build <fixture> --unit <id> --stdout` runs,
-  the envelopes it prints carry levels 0, 5 and 6 in that order, each opened and closed once.
-  Red when: a block is unenveloped or out of level order.
+  the envelopes it prints carry level 5 under `## Role`, then levels 0 and 6 in that order under
+  `## Task`, each opened and closed once; with `--part task` it prints the marker, the `## Task` line and
+  the levels 0 and 6.
+  Red when: a block is unenveloped, out of level order within its part, or above its section's heading.
 - **AC3** — When the same render runs with `--part task`, `grep -c "^### Charter rules"` over its output
-  prints 0, and the count of `- [verify] ` lines across the output and the fixture's builder agent file
-  is 1.
+  prints 0, and the count of lines opening `- [verify] Verify before claiming done` across the output and
+  the fixture's builder agent file is 1; the practices-at-step block's `- [verify] <its build reach>` line
+  is a different line and is not counted.
   Red when: the charter is carried twice, or not at all.
 - **AC4** — When `python tools/roles/handoff.py check <copy>` runs over a scratch copy of a rendered
-  prompt with its task envelope moved above its role envelope, and over one with a closer deleted (each
-  with the marker's hashes re-stamped), it exits 1 naming the envelope; over the unedited prompt it
-  exits 0.
+  prompt with its level-6 envelope moved above its level-0 envelope inside the `## Task` section, and
+  over one with a closer deleted (each with the marker's hashes re-stamped), it exits 1 naming the
+  envelope; over the unedited prompt it exits 0.
   Red when: either planted defect passes.
 
 ## 7. Gates
 
-`roles render wiring` · `roles render selftest` · `check-wiring self-test` · `lexicon naming predicates` · `policy fixtures`
+`roles render wiring` · `roles render selftest` · `check-wiring self-test` · `lexicon naming predicates` · `policy fixtures` · `govkit acceptance matrix` · `playbook render selftest` · `instruction units selftest`
 
 New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 AC4 · the selftest's fixture renders an agent file and a handoff and plants the reordered and the unclosed envelope · none
 
@@ -177,6 +206,30 @@ New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 AC4 · the selftest'
   charter; (b) the role's blocks in the prompt. RESOLVED (agent, 2026-10-23, delegated): (a), rung 3;
   the main loop loads `AGENTS.md` at level 0 every session, so (b) is the second copy this clause
   removes. widens: none · relaxes: none
+- **F3 — Where the level-0 block sits now that the spawn guard fixes the task part.** S2, AC2 and S4
+  read the prompt file as one run of levels 0, 5 and 6, the practices-at-step block above the role. At
+  `eb1c90a1c` the spawn guard admits an `Agent` call only when its prompt is the marker and the file's
+  `## Task` section, from that heading to the end of the file
+  (`tools/hooks/agent-cap.js#checkHandoffSpawn`), so a block above `## Task` never reaches a native
+  agent. Options: (a) the level-0 block first inside the `## Task` section, levels graded per part,
+  the role part 5 and the task part 0 then 6; (b) the guard widened to admit blocks above `## Task`;
+  (c) the block inside the `## Role` section, which a native agent receives only as its agent file.
+  RESOLVED (agent, 2026-11-08, delegated): (a), by the build method's fork rule, with AC2, AC4 and S4
+  rewritten to grade each part. (b) lost to the third veto: it widens what the spawn guard, a security
+  hook of another kit, admits as a prompt. (c) lost on the goal: the agent file is static per role, so
+  a native spawn would never receive its step's reach, and `PLAY-dOrderedCharter-21` hands reach in
+  work orders only. widens: none · relaxes: none
+- **F4 — What the roles kit renders with no document registry.** S1 reads the registry from the
+  playbook kit through `resolve_kit_dir`, and section 5 refused an unreadable one; the roles kit does
+  not require the playbook kit, and `tools/playbook/instruction_units.py#arm_work_order` renders a
+  handoff in a tree holding the roles kit alone, asserting no playbook kit is there. Options: (a) an
+  absent playbook kit renders unranked and prints one `unarmed` line naming it, a present registry that
+  does not read still refusing; (b) every render refuses without the registry; (c) the roles kit
+  requires the playbook kit. RESOLVED (agent, 2026-11-08, delegated): (a), by the build method's fork
+  rule. (c) lost to the second veto: a new `requires` edge of a shipped kit is the install question
+  unit 73's F1 parks with the owner. (b) refuses every handoff of a valid install that lacks the
+  playbook kit and reds `arm_work_order`; (a) keeps it, says the ranking is off, and ranks wherever the
+  kit is installed, as unit 11's S4 does for its load-set check. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -185,15 +238,30 @@ New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 AC4 · the selftest'
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 - rev-4 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
 - rev-5 · 2026-11-04 · AC2 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-27-1-spec-writer.md`, the drift sweep's findings 5-1 and 5-2 read at `c7269a97`: `render_charter_blocks` carries its stable form beside its moved line; AC2, and AC3 with it, render as `gov-builder` with `--unit`, since the catalogue holds no role `builder`.
+- rev-6 · 2026-11-08 · S1 to S4 · section 4 The task part, Inventory, Files touched · section 5 · AC2
+  AC3 AC4 · section 7 · section 8 new F3 F4 · section 10 · from
+  `2026-11-08-prompt-PLAY-dOrderedCharter-27-drift-fold-brief.md`: re-read at `eb1c90a1c`. The spawn guard
+  admits only the marker and the `## Task` section, so the level-0 block sits first inside it and the
+  levels are graded per part, unit 21's `practices` slot moving to the head of that section (F3); the roles kit does not require the playbook kit, so a missing registry
+  renders unranked with an `unarmed` line (F4); the charter blocks leave unit 20's template slot, and
+  `arm_work_order`'s pinned bytes and slot swap move with them, which adds its file and its legs; AC3
+  counts the charter's `[verify]` rule line, since unit 21's block carries a `[verify]` reach line too;
+  moved anchors gain their symbols. Re-checked unchanged: `render_agent_file` at
+  `tools/roles/render_agents.py:144` with `omitClaudeMd: true`, `resolve_kit_dir` and `MARKER_RE` at their
+  cited lines, and unit 3's inline `render_envelope` copy in `roles_lib.py`.
 
 ## 10. Reuse audit
 
-The seams extended: `render_handoff` (`tools/roles/handoff.py:312-423`), whose charter blocks
-(`:397-407`) and Role and Task sections (`:415-422`) this unit reorders and wraps; `render_agent_file`
+The seams extended: `render_handoff` (`tools/roles/handoff.py:312-423`, now
+`tools/roles/handoff.py#render_handoff`), whose charter blocks
+(`:397-407`) and Role and Task sections (`:415-422`), now the slots of
+`tools/roles/templates/work-order.template.md` that `tools/roles/handoff.py#render_work_order` fills, this
+unit reorders and wraps; `render_agent_file`
 (`tools/roles/render_agents.py:144-155`), which renders the same charter blocks through
 `render_charter_blocks` (`tools/roles/roles_lib.py:284`, today
-`tools/roles/roles_lib.py#render_charter_blocks`); `check_handoff` (`handoff.py:426`), the one
-verifier of a prompt file; and `PLAY-dOrderedCharter-3`'s inline `render_envelope` copy in
+`tools/roles/roles_lib.py#render_charter_blocks`); `check_handoff` (`handoff.py:426`, now
+`tools/roles/handoff.py#check_handoff`), the one verifier of a prompt file, whose task span the spawn
+guard's `tools/hooks/agent-cap.js#extractTaskSection` shares; and `PLAY-dOrderedCharter-3`'s inline `render_envelope` copy in
 `roles_lib.py`. `python tools/codebase-map/reuse_lookup.py "assemble a role handoff from the charter
 rules and the task"` ranked `parse_charter`, `render_charter_blocks`, `render_role` and `load_roles`
 from `tools/roles/roles_lib.py`, which agree with the source; it did not rank `render_handoff`, which

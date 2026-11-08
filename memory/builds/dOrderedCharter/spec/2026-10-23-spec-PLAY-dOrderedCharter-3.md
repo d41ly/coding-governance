@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them
 
-**Status:** DEFERRED · rev-10 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-11 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0033@756303be whole
 
@@ -87,8 +87,24 @@ rules on its row (S9, F5): the gate names it as not checked on every run and nev
   kit path. Observed by AC2.
 - **S4** — Emission by the Python renderers. `render()` wraps the `gov:playbook` region's body in the
   charter's envelope, inside the two region markers. `render_agent_file`
-  (`tools/roles/render_agents.py:144`) wraps each agent file's body after its front matter. Observed
-  by AC3.
+  (`tools/roles/render_agents.py:144`) wraps each agent file's body after its front matter. Each finds
+  the registry from the tree it renders, never from the module's own install: the charter's render
+  through `tools/playbook/instruction_units.py#derive_kit_file` under the target, and the roles render
+  through its inline `resolve_kit_dir`, homed at `playbook` with `documents.toml` its anchor, anchored at
+  the `kit_dir` the render is handed. Where no registry is found, or no row's path matches the file, the
+  render writes no envelope and prints nothing, so a fixture tree with no registry renders the bytes it
+  renders today. Three exact-byte checks rest on that: the pipe-in-prose arm of
+  `tools/playbook/render_playbook.py#run_selftest`, `tools/playbook/instruction_units.py#arm_slots`, and
+  arm 4 of `tools/roles/render_agents.py#run_selftest`, whose fixture kit has no playbook kit beside it.
+  `tools/roles/roles_lib.py#parse_charter` drops every line `read_envelopes` reads as an opener or a
+  closer before it cuts the region into sections. It carries the Facts section to the region's end, so
+  without the drop `[/AGENTS.md]` would ride into the Charter block of every agent file and handoff, and
+  S6 would red each as a closer naming another document. Observed by AC3.
+  **Readers:** by name: `tools/roles/roles_lib.py` defines `parse_charter`, and `tools/roles/check_roles.py`,
+  `tools/roles/handoff.py` and `tools/roles/render_agents.py` call it; no name is retired, only lines
+  from its output. by value: `tools/roles/roles_lib.py#render_charter_blocks`, which renders a role's
+  Charter block from the sections `parse_charter` returns, and `tools/roles/check_roles.py`, whose rule
+  tag checks read them; neither reads an envelope line today.
 - **S5** — Emission by every other source. A document whose renderer is not Python (the memory-tree
   and unattended kits' guide templates, the review harness's protocol template, each Skill template,
   the authored `skills/session-kickoff/SKILL.md` and `skills/deploy-governance/SKILL.md`, `MERGE-BAR.md`,
@@ -126,8 +142,10 @@ rules on its row (S9, F5): the gate names it as not checked on every run and nev
   RAISE A ROW paragraph: this unit's change takes the subject past the row, measured CR-stripped; the
   row's comment block reserves no next movement to the owner and the new value keeps any rule the block
   states; `RAISED <old> -> <new>` is argued above the row with the date, this unit, the measured figure
-  and why; and this unit's row is in `memory/DECISIONS.md`. Each crossing document's envelope lands in
-  the commit that raises its row. At `c7269a97`, CR-stripped, an envelope crosses four rows:
+  and why; and this unit's row is in `memory/DECISIONS.md` before the raise. That file is in
+  `.unattended.conf`'s `SHARED_RECORDS`, so no pass may declare it and a dispatch refuses it: the main
+  loop writes and commits the row section 4 gives before it dispatches this unit, and each `RAISED`
+  line cites it. Each crossing document's envelope lands in the commit that raises its row. At `c7269a97`, CR-stripped, an envelope crosses four rows:
   `.claude/skills/unattended/SKILL.md` (10369 of 10369) and `memory/guides/UNATTENDED-PROTOCOL.md`
   (67183 of 67183), whose blocks' rule is no headroom, so each new value is its render's measured
   figure; `skills/session-kickoff/SKILL.md` (18310 of 18432), raised only if its envelope, 84 bytes
@@ -135,11 +153,15 @@ rules on its row (S9, F5): the gate names it as not checked on every run and nev
   block reserves the row to the owner once its remainder is spent ("Spent, it is the owner's again")
   and ties it to the figure the document spells ("Change both or neither"), so the second condition
   fails and no run raises it: its envelope, 80 bytes plus its direction against 61 free, is held by S9
-  until the owner rules on that row (the fork record's F5), so this unit raises three rows and leaves that one at 30720. A
+  until the owner rules on that row (the fork record's F5). A
   registered document with no row is measured by none; this unit adds no row, a
   new row being the owner's (the same paragraph). Re-measured at `550ea807a`, CR-stripped: the kickoff
-  Skill holds 18206 of 18432, 226 free, the figure its conditional raise reads, and the other three
-  hold the figures above. Observed by AC7.
+  Skill holds 18206 of 18432, 226 free, and the other three hold the figures above. The kickoff Skill's
+  envelope is 84 bytes plus its direction, so a direction of at most 142 bytes fits and its row takes no
+  raise; its row's direction is held to that. So this unit raises two rows,
+  `memory/guides/UNATTENDED-PROTOCOL.md` and `.claude/skills/unattended/SKILL.md`, leaves the kickoff
+  row at 18432 and BUILD-METHOD's at 30720. A direction past 142 bytes would need a third raise the
+  decisions row does not name, so the pass stops and reports rather than raise it. Observed by AC7.
 
 - **S8** — The leg's own rows, written in its pass. The claiming row is an `[[exempt_leg]]` row in
   `tools/govkit/registry.toml` naming the leg, with a `why` (the fork record's F6);
@@ -230,6 +252,7 @@ rules on its row (S9, F5): the gate names it as not checked on every run and nev
 - **consumes-from** external — `tools/template-size-limits.txt`, the caps' home while dSafePassage's limits step (TOOL-dSafePassage-61) is DEFERRED: its rows and its raise conditions, which S7 raises on, and the `memory/guides/BUILD-METHOD.md` row, which S9 reads and never moves
 - **consumes-from** external — dGroundRules, landed before the build run: the cap census and `budgets.py resolve` (TOOL-dGroundRules-9 S1, S2), and `tools/policy/budgets.py#resolve_caps`, whose `rev` argument S9's cap read sets to `HEAD`
 - **hands-off** external — the owner's ruling on F5: the row's move, the envelope and the end of the hold, in the one commit S9 names
+- **consumes-from** external — the main loop's `PLAY-dOrderedCharter-3` row in `memory/DECISIONS.md`, committed before dispatch, which the two `RAISED` lines cite; the file is a shared record no pass may write
 - **consumes-from** `PLAY-dOrderedCharter-50` — the owed-rows probe: this pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its commit and writes every row it names in that commit (round-2 id 23), the rows of its envelope leg and the size rows its envelopes cross among them
 
 ## 4. Design
@@ -290,6 +313,40 @@ each an `arm_` function by the module's convention; the tags `doc.skills`,
 None for data. A seeded adopter template without the envelope lines renders without them, and the
 adopter's own gate run names each such document, which its next `govkit update` re-renders.
 
+### The decisions row the main loop writes
+
+The fourth raise term asks for this unit's row in `memory/DECISIONS.md` before or with the raise, and
+a pass may not write that file. So the main loop appends this row as the file's last line, as the
+recent rows sit, and commits it before it dispatches this unit:
+
+```markdown
+- **PLAY-dOrderedCharter-3** - **its envelopes raise two no-headroom size rows to their renders' measured bytes, `memory/guides/UNATTENDED-PROTOCOL.md` and `.claude/skills/unattended/SKILL.md`**: agent, 2026-11-08, on the limits file's four raise terms. Detail `builds/dOrderedCharter/`.
+```
+
+It is one physical line of 287 characters, under the 300 the index's entry budget allows. It names the
+two rows and the no-headroom rule, and no figure: each new value is its render's measured bytes, known
+only in the pass, and the `RAISED` line above each row carries that figure, the date, this unit and
+`(memory/DECISIONS.md, PLAY-dOrderedCharter-3)`, as the `AGENTS.md` row's raise cites its decision.
+
+### Exact-byte checks an envelope reaches
+
+Grepped at `eb1c90a1c` over the playbook, roles and govkit modules and the suites that run them, for a
+comparison of a rendered instruction file's exact bytes. Each stays green, for the reason given.
+
+| Check | Why it stays green |
+|---|---|
+| the pipe-in-prose arm of `tools/playbook/render_playbook.py#run_selftest`, `tools/playbook/instruction_units.py#arm_slots`, arm 4 of `tools/roles/render_agents.py#run_selftest` | their fixture trees hold no registry, so S4 renders no envelope |
+| `tools/playbook/render_playbook.py#check_practice_arms` and `tools/playbook/render_playbook.py#check_scope_arms` | fixture engines and targets with no registry |
+| the charter's `--check` and the lock row's `blob` for `AGENTS.md` | each compares a fresh render, which carries the envelope; the lock row moves with the re-render, and the `CLAUDE.md` row does not, F8 writing no envelope there |
+| the roles render's `--check` and `tools/roles/adopt-roles.test.sh` | a fresh render, and two renders of a fixture copy holding the roles kit alone |
+| the comparison of each dogfood guide with its template's render, and each kit adopter's `--check` over its guides and Skills | the envelope lines sit in the source (S5), so both sides carry them |
+| a handoff's `role-sha` and `task-sha`, from `tools/roles/handoff.py#derive_section_sha` | each is computed over its own file; `## Role` renders from the role's source through `tools/roles/roles_lib.py#render_role`, not from the agent file, and the Charter block keeps today's bytes once `parse_charter` drops the envelope's lines |
+| the default-apply arm of `tools/govkit/selftest.py` | it runs the target's adopter `--check`, a fresh compare, and compares no rendered body |
+
+Two readers take a position rather than bytes: the kickoff check reads its manifest by pattern, and the
+size gate's high-water record is advisory. What the grep cannot see: a comparison in a suite outside
+those kits that copies gov's rendered files in, which the bar's run at the pass is what observes.
+
 ### Rollout
 
 Live at landing. The leg carries the principle key `PLAY-dOrderedCharter-7` adds to leg rows,
@@ -308,13 +365,12 @@ the unit, by the hands-off edge in section 3.
 - `tools/roles/roles_lib.py`
 - `tools/roles/render_agents.py`
 - `tools/gate-legs.json`
-- `tools/template-size-limits.txt` (S7's three raises, one commit each; BUILD-METHOD's row stays)
+- `tools/template-size-limits.txt` (S7's two raises, one commit each; the kickoff and BUILD-METHOD rows stay)
 - `tools/playbook/namespaces.toml` (the `doc` row's `source` text)
 - `tools/govkit/registry.toml` (the `[[exempt_leg]]` row)
 - `tools/govkit/subject-pins.tsv` (regenerated)
 - `memory/map/features/playbook.md` (the dossier claim)
 - `memory/map/generated/*` (regenerated)
-- `memory/DECISIONS.md`
 - `coding-governance-agents.template.md`
 - `tools/memory-tree/HYGIENE.template.md`
 - `tools/memory-tree/SPEC-TEMPLATE.template.md`
@@ -388,8 +444,10 @@ the unit, by the hands-off edge in section 3.
   Red when: one byte of a copy is changed.
 - **AC3** — When `head -3 AGENTS.md` and the first body line of `.claude/agents/gov-builder.md` after
   its front matter are read after a re-render, they are `[AGENTS.md · Level 0 · …]` and the same
-  opener naming `.claude/agents/gov-builder.md` at `Level 5`, and each file ends its body with its closer.
-  Red when: either renderer drops the envelope.
+  opener naming `.claude/agents/gov-builder.md` at `Level 5`, and each file ends its body with its closer;
+  and `git grep -n -F -e '[AGENTS.md · ' -e '[/AGENTS.md]' -- .claude/agents/` prints nothing.
+  Red when: either renderer drops the envelope, or the roles render carries the charter's envelope lines
+  into an agent file's Charter block.
 - **AC4** — When `envelopes --check --root .` runs over gov's tree after the build, it exits 0, prints a
   `HELD` line naming `memory/guides/BUILD-METHOD.md` with the words `NOT checked`, prints an `ALIAS` line
   naming `CLAUDE.md`, and prints a covered count equal to the number of files S6 derives less the one
@@ -407,13 +465,17 @@ the unit, by the hands-off edge in section 3.
   Red when: an unregistered load-bearing document passes.
 - **AC7** — When `git grep -n -e . HEAD -- tools/template-size-limits.txt` is read after the envelopes' commits,
   each row S7 raised holds at least its document's CR-stripped bytes, equal where its block's rule is no
-  headroom, under a `RAISED <old> -> <new>` line naming this unit; once that row has landed, `python
+  headroom, under a `RAISED <old> -> <new>` line naming this unit and citing `memory/DECISIONS.md`; the
+  `skills/session-kickoff/SKILL.md` row reads 18432 and that document's CR-stripped bytes are at most
+  18432; `git grep -n -F '**PLAY-dOrderedCharter-3**' <pass base> -- memory/DECISIONS.md` prints one
+  line; once that row has landed, `python
   tools/policy/budgets.py resolve <path>` prints that value for each, the verb reading the landed
   revision; the `memory/guides/BUILD-METHOD.md` row reads 30720 under no line naming this unit; and
   `git diff <pass base> HEAD -- tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md`
   prints nothing.
-  Red when: an envelope lands with its document over its row, a row moves without its argued line, or
-  this unit moves BUILD-METHOD's row, source or render.
+  Red when: an envelope lands with its document over its row, a row moves without its argued line, the
+  kickoff row moves, the decisions row is absent at the pass base, or this unit moves BUILD-METHOD's
+  row, source or render.
 
 - **AC8** — When `git grep -n -F 'name = "instruction envelopes"' -- tools/govkit/registry.toml` runs
   after the pass, it prints one line under an `[[exempt_leg]]` header; `git grep -n -F "instruction
@@ -568,6 +630,14 @@ New arm: tools/playbook/instruction_units.py · covers AC5 AC6 AC9 AC10 AC11 AC1
   the tool root; S3's markers name no kit path; S7 re-measures the kickoff Skill; S9 states what the
   policy check reads in the plant and the cap read, as unit 73 found; moved anchors in the reuse audit
   gain their symbols.
+- rev-11 · 2026-11-08 · S4 S7 · section 3 Edges · section 4 decisions row, Files touched · AC3 AC7 ·
+  from unit 3's builder hand-back of rev-10, before any write: `memory/DECISIONS.md` is a shared record
+  no pass may declare, so the main loop commits the unit's decisions row before dispatch, section 4
+  gives its text, and it leaves the Files touched; S7 raises two rows, the kickoff Skill's direction held
+  to 142 bytes so its row takes none; S4 finds the registry from the tree it renders, so a tree with none
+  renders no envelope and three exact-byte checks stay green, and `parse_charter` drops the envelope's
+  lines so no closer rides into an agent file or handoff; section 4 records the exact-byte checks an
+  envelope reaches.
 
 ## 10. Reuse audit
 
