@@ -1,6 +1,6 @@
-# PLAY-dOrderedCharter-73 — the close bar's other code reds: encodings, shell idioms, a remote literal, the scratch matrix and the cap census
+# PLAY-dOrderedCharter-73 — the close bar's other code reds: encodings, shell idioms, a remote literal, and the cap census
 
-**Status:** DEFERRED · rev-1 · 2026-11-08 · node d · Tier-2 · base 93c4e987e · streams tooling · order 17 · advances PLAY-dOrderedCharter-38 · ratified 2026-11-08
+**Status:** DEFERRED · rev-2 · 2026-11-08 · node d · Tier-2 · base 93c4e987e · streams tooling · order 17 · advances PLAY-dOrderedCharter-38 · ratified 2026-11-08
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -16,17 +16,18 @@
 
 ## 1. Goal
 
-Six close-bar legs that are green on `origin/main` stop naming any code this build wrote: the encoding posture,
-both shell-hygiene legs, the remote-literal ban, the govkit acceptance matrix and the policy check's cap census.
-Each fix takes the cause the checker's own remedy names, and none is a waiver. The harness-arms leg's three new
-refusal sites get the pinned rows the main loop writes, because no sibling suite can stage them.
+Five close-bar legs that are green on `origin/main` stop naming any code this build wrote: the encoding posture,
+both shell-hygiene legs, the remote-literal ban and the policy check's cap census. Each fix takes the cause the
+checker's own remedy names, and none is a waiver. The harness-arms leg's three new refusal sites get the pinned rows
+the main loop writes, because no sibling suite can stage them. The govkit acceptance matrix stays red: its fix needs
+a dependency decision the Open questions section parks for the owner.
 
 ## 2. Scope (IN)
 
 Every line below was read at base `93c4e987e`. This unit builds after PLAY-dOrderedCharter-72 and reads its result
 in `tools/playbook/core.py`, `tools/playbook/instruction_units.py`, `tools/playbook/positional.py`,
-`tools/playbook/adopt-playbook.sh` and `tools/playbook/kit.toml`. The Design section holds what a one-line item
-cannot.
+and `tools/playbook/adopt-playbook.sh`. The Design section holds what a one-line item cannot. S5 and S6 left the
+scope at rev-2, and their numbers are not reused.
 
 - **S1** — Nine `subprocess.run(..., text=True)` calls gain `encoding="utf-8"`: one in
   `tools/lib/common_dir.py#read_git_stdout`, two in `tools/memory-tree/build_records.py#run_fixture`, one in
@@ -44,12 +45,6 @@ cannot.
   one `printf` with an expansion, at both of its sites. Observed by AC4 and AC5.
 - **S4** — `tools/playbook/instruction_units.py` declares `DERIVED_UNIT_KEYS = ("status", "origin")` at module
   level, and `tools/playbook/instruction_units.py#check_unit_row` tests membership against it. Observed by AC6.
-- **S5** — `tools/playbook/kit.toml` declares `requires = ["playbook", "memory-tree"]`, as the Open questions
-  section's F1 rules. Observed by AC7.
-- **S6** — The scratch install in `tools/govkit/matrix.py` installs the graded entries plus every dependency
-  `govkit.derive_unsatisfied_requires` names for them, and still grades only the legs of `SCRATCH_KITS`.
-  `tools/govkit/matrix.py#SCRATCH_EXPECT` gains the install-day verdicts of `core selftest`, `tags bundle selftest`
-  and `tags positional selftest`, each the line that leg prints in the scratch install. Observed by AC8.
 - **S7** — The four lines of `tools/run-gates/owed_rows.py` that spell the policy kit's budgets script followed by
   its `resolve` verb, in the module docstring, in `tools/run-gates/owed_rows.py#read_cap_values`'s docstring and in
   its refusal message, name the verb another way. Observed by AC9.
@@ -66,18 +61,20 @@ cannot.
   the merge with `origin/main` clears them.
 - **A sibling suite for `tools/playbook/adopt-playbook.sh`.** No such suite exists, and the plant rows are
   here-documents inside the script, so a suite could reach a failing row only by editing the script under test.
-- **Widening the matrix's graded set.** The memory-tree kit is installed in the scratch target so the graded legs
-  can run, and its own legs stay graded where they are today, by its own suites.
+- **The govkit acceptance matrix and the renderer's `requires` row.** `tools/govkit/matrix.py` and
+  `tools/playbook/kit.toml` stay as they are. F1 parks the dependency question for the owner, so the matrix leg stays
+  red until that ruling.
 - **A version line.** The kit-epoch leg reads every kit this build moved as owed at the lander.
 - **The kit-path spellings in the same files.** They are PLAY-dOrderedCharter-72's, which lands first.
 
 ### Edges
 
 - **consumes-from** `PLAY-dOrderedCharter-72` — this unit's edits to `tools/playbook/core.py`,
-  `tools/playbook/instruction_units.py`, `tools/playbook/positional.py`, `tools/playbook/adopt-playbook.sh` and
-  `tools/playbook/kit.toml` are written over that unit's result. The unencoded `subprocess.run` calls, the
-  shell-idiom fix and the `requires` row are this unit's. Built first, the two units conflict line by line in those
-  five files
+  `tools/playbook/instruction_units.py`, `tools/playbook/positional.py` and `tools/playbook/adopt-playbook.sh` are
+  written over that unit's result. The unencoded `subprocess.run` calls and the shell-idiom fix are this unit's.
+  Built first, the two units conflict line by line in those four files. The `requires` row of
+  `tools/playbook/kit.toml`, which that unit hands here, stays as it left it: its change is parked for the owner under
+  F1
 - **hands-off** external — the three pinned rows in `memory/project/unarmed-branches.txt`, the stale encoding
   registry row and the spawn-idiom row of `tools/check-wiring.test.sh`, which the main loop writes
 
@@ -130,26 +127,6 @@ default shape reads a quoted remote name as the last element of a parenthesised 
 list assigned to a name is not that shape. So the tuple moves to a module constant beside `UNIT_KEYS`, with a one-line
 comment saying the row derives these two and never carries them. The remedy text is unchanged.
 
-### The scratch matrix
-
-`tools/govkit/matrix.py` installs `SCRATCH_KITS` today and fails twice. The leg set holds three legs the table does
-not state, and `playbook render selftest` dies with a traceback in `tools/playbook/check_layers.py`, whose
-module-level `resolve_kit_dir("memory-tree", ...)` finds no memory-tree kit in the scratch target. The three unstated
-legs reach the same kit too: `tools/playbook/tag_index.py#load_memory_tree` and
-`tools/playbook/core.py#load_memory_tree` resolve it, and refuse by name where it is absent.
-
-Under F1's ruling, `tools/playbook/kit.toml` requires the memory-tree kit, and `apply` refuses a
-selection that lacks it, through `govkit.derive_unsatisfied_requires`. So the matrix reads the descriptors before it
-writes `deploy.toml`, derives the install selection as `SCRATCH_KITS` plus every dependency that function names for
-it, writes that selection into `deploy.toml` and passes it to `apply`. The leg loop still walks `SCRATCH_KITS` alone,
-so the graded set grows by the three legs and no more.
-
-The three new `SCRATCH_EXPECT` rows state the line each leg prints in that scratch install, cut before any count, as
-the table's own comment requires of `playbook render selftest`. At base the code prints
-`PASS — the positional plants,`, `PASS — the bundle plants,` and `core: fixture · green`, from `tools/playbook/positional.py#run_selftest`,
-`tools/playbook/tag_bundle.py` and `tools/playbook/core.py#run_fixture`. The builder takes each value from a scratch
-install's run of that leg, and AC8 observes the matrix printing each one where it was installed.
-
 ### The cap census
 
 `tools/policy/check_policy.py` reads a request as the budgets script's name followed by whitespace and `resolve` or
@@ -182,12 +159,16 @@ change sits inside the per-row failure branch and moves none of them.
 
 ### Migration
 
-N/A — no data shape moves. The `requires` edge reaches an adopter at its next `govkit update`, and the Open
-questions section weighs that.
+N/A — no data shape moves.
 
 ### Rollout
 
-Live at landing. AC1 to AC10 turn their legs at once, the matrix's included, F1 being ruled.
+Live at landing. AC1 to AC6, AC9 and AC10 turn their legs at once. The matrix leg stays red, as F1 records.
+
+The unit 73 builder's work-in-progress patch for the remaining items is at
+`C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dorderedcharter-725f52/0394fa33-012c-408f-a840-e6e4cfaac23f/scratchpad/play73-wip.patch`.
+It is a starting point the builder re-verifies against this revision, never a result to apply unread: it was cut
+while the scope still held the requires row and the matrix.
 
 ### Files touched (estimate)
 
@@ -198,8 +179,6 @@ Live at landing. AC1 to AC10 turn their legs at once, the matrix's included, F1 
 - `tools/memory-tree/merge-rows.test.sh`, `skills/session-kickoff/manifest-check.test.sh`,
   `tools/unattended/check-unattended.test.sh`: S3
 - `tools/playbook/adopt-playbook.sh`: S3, S8
-- `tools/playbook/kit.toml`: S5
-- `tools/govkit/matrix.py`: S6
 - `tools/run-gates/owed_rows.py`: S7
 
 ### Alternatives rejected
@@ -211,8 +190,6 @@ Live at landing. AC1 to AC10 turn their legs at once, the matrix's included, F1 
   would grow to admit code this build wrote.
 - **Building `tools/playbook/adopt-playbook.test.sh` to arm the three tallies.** The Non-goals section states why no
   suite can stage a failing plant row.
-- **Stating the four scratch verdicts as refusals.** Under F1's option (b) the scratch install still lacks the
-  memory-tree kit, so the table would state four failures as install-day verdicts. That certifies a broken install.
 
 ## 5. Production-readiness checklist
 
@@ -221,11 +198,10 @@ Live at landing. AC1 to AC10 turn their legs at once, the matrix's included, F1 
 - error / empty / loading states: an empty listing in `check_branch_carried` gives an array of one empty line, which
   the existing `""` arm of its `case` skips, as the here-string loop did.
 - observability: N/A — every message a reader greps keeps its text.
-- risks: the `requires` edge refuses an update at an adopter that deselected the memory-tree kit. The Open
-  questions section weighs it.
-- testing: AC1 to AC10, and the matrix arm the gates section declares.
+- risks: the matrix leg stays red until the owner rules F1, the cost the Open questions section records.
+- testing: AC1 to AC6, AC9 and AC10.
 - migration: N/A — no data shape moves.
-- user docs: N/A — no page under `help/` names a changed call, idiom or matrix row.
+- user docs: N/A — no page under `help/` names a changed call or idiom.
 
 ## 6. Acceptance criteria
 
@@ -254,16 +230,6 @@ Live at landing. AC1 to AC10 turn their legs at once, the matrix's included, F1 
   `grep -c DERIVED_UNIT_KEYS tools/playbook/instruction_units.py` prints `2`.
   Red when: the tuple stays inline as a call's last argument.
   permission: the command is a leg's argv, so the main loop observes it.
-- **AC7** — When `grep '^requires' tools/playbook/kit.toml` runs, it prints
-  `requires = ["playbook", "memory-tree"]`, and `python tools/govkit/govkit.py selfcheck` exits 0.
-  Red when: the descriptor still declares a renderer that runs without the kit its checks resolve.
-  permission: `selfcheck` is a leg's argv, so the main loop observes it.
-- **AC8** — When `python tools/govkit/matrix.py` runs, it prints no `FAIL` line, and prints
-  `prints its stated verdict where it was installed` for `core selftest`, `tags bundle selftest` and
-  `tags positional selftest`.
-  Red when: the table misses a declared leg, or a scratch leg dies with a traceback.
-  figure: 2 FAILED at base, PINNED from the bar's log.
-  cost: several minutes. permission: the command is a leg's argv, so the main loop observes it.
 - **AC9** — When `grep -c 'budgets.py resolve' tools/run-gates/owed_rows.py` runs, it prints `0`, and
   `python tools/run-gates/owed_rows.py --selftest` exits 0.
   Red when: a line still spells the request shape, so the census reads its words as cap names.
@@ -272,56 +238,60 @@ Live at landing. AC1 to AC10 turn their legs at once, the matrix's included, F1 
 
 ## 7. Gates
 
-`encoding posture (text IO names its encoding)` · `shell hygiene (a loop fed by a command substitution)` · `shell hygiene (a fork spent on builtin work)` · `remote literals (kit code names no remote)` · `govkit acceptance matrix` · `policy check` · `harness arms (fail branches armed or pinned)` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `policy fixtures` · `playbook render selftest` · `core selftest` · `tags positional selftest` · `instruction units selftest` · `row-keyed merge driver replay` · `manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `unattended kit gate` · `memory-hygiene self-test` · `corpus-ids selftest` · `memory-recall kit selftest` · `drift-audit selftest` · `recall floor` · `recall floor arms` · `python resolver (behaviour + inline parity + idiom ban)` · `run-gates canary`
+`encoding posture (text IO names its encoding)` · `shell hygiene (a loop fed by a command substitution)` · `shell hygiene (a fork spent on builtin work)` · `remote literals (kit code names no remote)` · `policy check` · `harness arms (fail branches armed or pinned)` · `govkit acceptance matrix` · `playbook render selftest` · `core selftest` · `tags positional selftest` · `instruction units selftest` · `row-keyed merge driver replay` · `manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `unattended kit gate` · `memory-hygiene self-test` · `corpus-ids selftest` · `memory-recall kit selftest` · `drift-audit selftest` · `recall floor` · `recall floor arms` · `python resolver (behaviour + inline parity + idiom ban)` · `run-gates canary`
 
-The first seven are the legs this unit turns or keeps. The guards join owes the next group: `{prefix}/govkit/` and
-the exact-path guards of `policy fixtures`, `{prefix}/playbook/` and `{prefix}/memory-tree/id_grammar.py` for the
-render selftest and the recall and drift-audit legs, and `skills/session-kickoff/manifest-check.test.sh` for three
-legs. `{prefix}/`, `{prefix}/lib/`, `{prefix}/memory-tree/` and `{prefix}/run-gates/` are broad under
+The first six are the legs this unit turns or keeps. The guards join owes the next group: `{prefix}/playbook/` for
+the matrix and the render selftest, `{prefix}/memory-tree/id_grammar.py` for the render selftest and the recall and
+drift-audit legs, and `skills/session-kickoff/manifest-check.test.sh` for three legs. The matrix stays red, as F1
+records. `{prefix}/`, `{prefix}/lib/`, `{prefix}/memory-tree/` and `{prefix}/run-gates/` are broad under
 `BROAD_LEG_FLOOR` 5 and excluded. The rest run the code this unit moves: the fixtures, the merge driver's cases, the
 unattended driver, the id grammar, the parity table that reads `tools/lib/common_dir.py`, and
 `owed_rows.py --selftest`, which `run-gates.test.sh` runs.
 
-New arm: tools/govkit/matrix.py · covers AC8 · three `SCRATCH_EXPECT` rows, red with any one of them absent through the table's both-directions arm · none
-
 ## 8. Open questions
 
-- **F1 — Does `playbook render selftest` fail in the scratch install because the renderer requires the
-  memory-tree kit, or because `tools/playbook/check_layers.py` resolves that kit too early?**
-  - (a) `tools/playbook/kit.toml` declares `requires = ["playbook", "memory-tree"]`, and the matrix installs the
-    dependency. The declaration then says what four of the kit's legs already do: the layer check's import walk and
-    shell lexer, the tag index's blob reader and the core's joins all live in the memory-tree kit. The memory-tree
-    kit is in the default selection and the renderer is not, so a default adopter already holds it. An adopter that
-    deselected it is refused at its next `govkit update` until it selects it, with the refusal naming the edge.
+- **F1 — What makes the playbook-render legs pass in the matrix's scratch install, and may this unit decide it?**
+  The scratch install of `tools/govkit/matrix.py` holds no memory-tree kit, so `playbook render selftest` dies with
+  a traceback in `tools/playbook/check_layers.py`, whose module-level `resolve_kit_dir("memory-tree", ...)` finds
+  nothing. `core selftest`, `tags bundle selftest` and `tags positional selftest` are declared and absent from
+  `tools/govkit/matrix.py#SCRATCH_EXPECT`.
+  - (a) `tools/playbook/kit.toml` requires the kits the legs read, and the matrix installs them. The unit 73 builder
+    measured it: with `requires = ["playbook", "memory-tree"]` the three unstated legs still refuse in the scratch
+    install with `no policy kit found`, and with `requires = ["playbook", "memory-tree", "policy"]` all three pass.
+    The policy kit is not in the registry's default selection, so (a) adds a new install requirement for adopters.
+    That trips veto 2, and the choice is the owner's.
   - (b) `tools/playbook/check_layers.py` resolves the memory-tree kit inside the function that walks imports. The
-    traceback becomes a named refusal. But the layer arms still need that kit to run, and the tag and core
-    fixtures refuse without it, so all four scratch verdicts are failures. The table would have to state them as
-    such, or the matrix would stay red.
-  - Recommendation: (a). It is the only option under which the four legs pass in a scratch install, and it
-    declares a dependency the code already has. The Design section is written for (a). Under (b), S5 becomes the
-    move of the module-level resolution in `tools/playbook/check_layers.py` into its use, S6 keeps `SCRATCH_KITS` as
-    the install selection, and the three `SCRATCH_EXPECT` rows state refusals.
-  RESOLVED (agent, 2026-11-08, delegated): (a), the main loop's ruling.
-  Veto 1 discards (b), the loser: its four install-day verdicts fail, so the matrix stays red. (a) passes veto 2:
-  memory-tree is an internal kit already in the default selection, not an external dependency, so the edge declares
-  a dependency the code already has and a default adopter's install does not change.
+    traceback becomes a named refusal, but the layer arms still need that kit, and the tag and core fixtures refuse
+    without it. Veto 1 discards it: its four install-day verdicts fail and the matrix stays red.
+  - (c) The run's interim: this unit leaves `tools/govkit/matrix.py` and `tools/playbook/kit.toml` alone, and the
+    dependency question goes to the owner. Cost: the govkit acceptance matrix leg stays red until the ruling.
+  - Known gap, whichever option the owner takes: with the policy kit installed, the builder saw the existing
+    `playbook render selftest` leg end `FAIL — 1 tag-resolver arm(s) failed` in the scratch install, while its
+    matrix substring `render_playbook.selftest OK` still matches. The matrix reads that leg as passing when one of its
+    arms fails.
+  RESOLVED (agent, 2026-11-08, delegated): (c), the run's interim — this unit leaves the matrix and the renderer's requires row alone; the dependency question is parked for the owner.
+  (b) loses on veto 1, and (a) waits on the owner because it trips veto 2. The main loop records the parked
+  question in the run record.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-08 · initial draft, by `2026-11-08-prompt-PLAY-dOrderedCharter-72-repair-brief`, every line read at
   `93c4e987e`.
+- rev-2 · 2026-11-08 · S5 · S6 · AC7 · AC8 · section 8 · the unit 73 builder handed the spec back before building,
+  having measured that the three tag and core legs also need the policy kit, a kit outside the default selection.
+  F1 is re-ruled (c), the run's interim, and the requires row, the matrix work and their criteria and arm leave
+  the scope; the builder's work-in-progress patch is named in Rollout, and the consumes-from edge says the row unit 72
+  hands here stays as it left it.
 
 ## 10. Reuse audit
 
 Every fix reuses a form the tree already carries, so no new mechanism is minted. The array drain is
 `tools/unattended/unattended.sh`'s own `mapfile -t` here-string read. The indented failure output is the
 `printf '      %s\n'` expansion of `tools/memory-tree/check-memory-hygiene.test.sh`. The tool-root prefix is the
-`_b1tr` that `tools/unattended/check-unattended.test.sh` already derives. The install selection reuses
-`govkit.derive_unsatisfied_requires`, the one predicate `apply` refuses on, so the matrix and the deployer cannot
-disagree about what a selection lacks. The `reuse_lookup.py` query ranked `resolve_kit_dir`, `scratch` and
-`kit_rel` symbols and no install-selection seam, so the requires predicate was found by reading `apply`. The recall
-query returned TOOL-aWalkedCorpus-8, that `requires` orders an install, and PLAY-dOrderedCharter-16's reuse scout,
-which lists the renderer among the memory-tree kit's `requires_if` edges, an edge in the other direction that this
-unit leaves as it is. No record weighed a plain edge from the renderer to the memory-tree kit.
+`_b1tr` that `tools/unattended/check-unattended.test.sh` already derives. The `reuse_lookup.py` query, run for the
+matrix design that F1 now parks, ranked `resolve_kit_dir`, `scratch` and `kit_rel` symbols and no install-selection
+seam. The recall query returned TOOL-aWalkedCorpus-8, that `requires` orders an install, and
+PLAY-dOrderedCharter-16's reuse scout, which lists the renderer among the memory-tree kit's `requires_if` edges. No
+record weighed a plain edge from the renderer to either kit.
 
 Recall terms used: `python tools/memory-recall/query.py "the scratch install lacks the memory-tree kit the playbook renderer resolves" --terms "SCRATCH_EXPECT SCRATCH_KITS requires memory-tree playbook-render check_layers resolve_kit_dir scratch install traceback derive_unsatisfied_requires"`, and `python tools/codebase-map/reuse_lookup.py "derive an install selection from the requires edges of the kits a scratch target installs"`

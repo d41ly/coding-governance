@@ -150,7 +150,7 @@ ids PLAY-dOrderedCharter-73 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-70 — the closing diff review's mediums and low, batched](spec/2026-11-05-spec-PLAY-dOrderedCharter-70.md) | 17 | 2 | CLOSED | rev-1 | 2026-11-08 |
 | [PLAY-dOrderedCharter-71 — the adopter-name ban reads only the roles an adopter receives](spec/2026-11-08-spec-PLAY-dOrderedCharter-71.md) | 17 | 2 | CLOSED | rev-2 | 2026-11-08 |
 | [PLAY-dOrderedCharter-72 — the positional lists leave the kit, and the kit's code derives every path it spells](spec/2026-11-08-spec-PLAY-dOrderedCharter-72.md) | 17 | 2 | CLOSED | rev-2 | 2026-11-08 |
-| [PLAY-dOrderedCharter-73 — the close bar's other code reds: encodings, shell idioms, a remote literal, the scratch matrix and the cap census](spec/2026-11-08-spec-PLAY-dOrderedCharter-73.md) | 17 | 2 | DEFERRED | rev-1 | 2026-11-08 |
+| [PLAY-dOrderedCharter-73 — the close bar's other code reds: encodings, shell idioms, a remote literal, and the cap census](spec/2026-11-08-spec-PLAY-dOrderedCharter-73.md) | 17 | 2 | DEFERRED | rev-2 | 2026-11-08 |
 | [PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them](spec/2026-10-23-spec-PLAY-dOrderedCharter-3.md) | 18 | 2 | DEFERRED | rev-9 | 2026-11-04 |
 | [PLAY-dOrderedCharter-41 — the `cross-os` block stays live, so every v4 template renders after the practice catalogue lands](spec/2026-10-24-spec-PLAY-dOrderedCharter-41.md) | 18 | 2 | DEFERRED | rev-5 | 2026-11-04 |
 | [PLAY-dOrderedCharter-52 — the TOML-table merge envelope is total: every base, ours and theirs state has a row, and an unlisted one is a conflict](spec/2026-10-24-spec-PLAY-dOrderedCharter-52.md) | 18 | 2 | DEFERRED | rev-2 | 2026-11-04 |
@@ -179,7 +179,7 @@ ids PLAY-dOrderedCharter-73 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-40 — gov's first instruction unit rows, one per reference page, and the pages' registry tags declared](spec/2026-10-24-spec-PLAY-dOrderedCharter-40.md) | 38 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [PLAY-dOrderedCharter-49 — the round-1 spec audit's 73 minors: criteria that can pass, rows a new leg owes, one reader per fact, and seams in build order](spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md) | 39 | 2 | DEFERRED | rev-5 | 2026-11-03 |
 | [PLAY-dOrderedCharter-54 — the card file's owner is live only while its transcript moves, and a dead owner's card is taken over](spec/2026-10-24-spec-PLAY-dOrderedCharter-54.md) | 40 | 2 | DEFERRED | rev-1 | 2026-10-24 |
-| [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-4 | 2026-11-04 |
+| [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-5 | 2026-11-08 |
 <!-- /gen:build-units -->
 
 Records: 420 bound to this build, across 4 record folder(s).

@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order
 
-**Status:** DEFERRED · rev-4 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 41 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 41 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -67,7 +67,7 @@ skeptic's corrected fix, as the report states it.
   `memory/project/spawn-idiom-sites.txt`, `memory/project/testsuite-count-waivers.txt`,
   `memory/project/unarmed-branches.txt`, `memory/map/generated/symbols.json`, `.governance/install.json`'s
   receipt row and `tools/policy/caps.toml`'s `codex-instructions` row, each unit 31's to re-point or
-  delete, and `tools/playbook/positional-refs.txt`'s 54 rows, which key frozen records and stay ·
+  delete, and `memory/project/positional-refs.txt`'s 54 rows, which key frozen records and stay ·
   by value: the adopter's options, read by `tools/gate-legs.json:296` and
   `tools/agent-instructions/kit.toml:44` (today `tools/agent-instructions/kit.toml@c7269a97:45`), which S12's
   table maps.
@@ -554,6 +554,7 @@ New arm: tools/memory-tree/merge-rows.test.sh · covers AC22 AC23 · the newline
 - rev-2 · 2026-10-24 · §2 · §3 · §4 · §6 · re-grounded on the parents' landed specs by the cross-check record `../build/2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md`, U1 and U7: S27 and AC27 read the `budgets."memory/builds/*/spec/"` cap through `budgets.py resolve`, and S9 is built at unit 49's pass into its census step, which `step-rows-frozen` freezes at that landing.
 - rev-3 · 2026-11-03 · §2 S23 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Items 2 and 4: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips; S23's `main()` citation, past `merge-rows.py`'s 1524 lines, re-pointed at HEAD to its `try` block and two `except` arms, `:1498-1514`.
 - rev-4 · 2026-11-04 · sections 2 to 4, 6 to 8 · from `2026-11-04-prompt-PLAY-dOrderedCharter-27-1-spec-writer.md`, the drift sweep's findings 55-1 to 55-15 at `c7269a97`: S7 observes only; S2 drops three criteria observed at their own passes; S4, S13, S17 and S18 restate against the built index; S15 takes its own closure (F4); S16 names its readers; S19 covers the kit; the tags legs join section 7; F2 re-resolves; F5 records the latent hits; moved citations carry stable forms.
+- rev-5 · 2026-11-08 · S1 · the Readers clause follows `PLAY-dOrderedCharter-72`'s move of the positional list from `tools/playbook/` to `memory/project/`: the same 54 rows, at the path a reader now spells.
 - 2026-11-04 · section 2 S1 S7 S10 S12 S16 S17 · from `2026-11-04-prompt-PLAY-dOrderedCharter-1-hygiene-fix-brief.md` item 2: S1's and S7's by-value halves open on one line, so the check reads them; S7's by-name half takes the not-in-tree escape with its reason; S10, S12 and S16 name each reader by its plain tracked path, the pinned lines kept in words and the functions in prose, and S16's new derive_index_path moves to the by-value half; S17 gains its Readers clause; a records fix, so the status line keeps its rev.
 
 ## 10. Reuse audit
