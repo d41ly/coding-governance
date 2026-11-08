@@ -1,4 +1,5 @@
 <!-- gov:kit unattended@1.113 -->
+[memory/guides/UNATTENDED-PROTOCOL.md · Level 3 · Binding for a run that merges and pushes with no owner turn; yields to levels 0 to 2]
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -734,3 +735,4 @@ Moved from the engine's Step 5b (`TOOL-aHonedRuleset-3`); the engine keeps a poi
    the most conservative reading; ACCEPTANCE or GATES unfillable → ABORT: not Ready, and an unattended
    run cannot split it.
 6. **Step 5 · the READY stop** → replaced by the hand-back, the ONLY replacement the mandate buys.
+[/memory/guides/UNATTENDED-PROTOCOL.md]
