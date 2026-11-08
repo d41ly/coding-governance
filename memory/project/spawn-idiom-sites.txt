@@ -102,7 +102,7 @@ tools/check-wiring.sh	pure-fn-subst	5	callees outside the reader set TOOL-aSpare
 tools/check-wiring.sh	var-pipe	3	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/check-wiring.test.sh	cat-file	2	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
 tools/check-wiring.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
-tools/check-wiring.test.sh	pure-fn-subst	10	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: src_of×10
+tools/check-wiring.test.sh	pure-fn-subst	9	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: src_of×9
 tools/check-wiring.test.sh	var-pipe	162	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/codebase-map/adopt-codebase-map.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/codebase-map/adopt-codebase-map.sh	var-pipe	3	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit

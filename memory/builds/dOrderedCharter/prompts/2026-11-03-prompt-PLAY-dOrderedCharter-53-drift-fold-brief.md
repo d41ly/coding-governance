@@ -1,4 +1,4 @@
-**Serves:** research PLAY-dOrderedCharter-38
+**Serves:** research PLAY-dOrderedCharter-53
 
 # Brief: fold drift sweep B into specs 53, 13, 42 and 12
 
@@ -6,7 +6,7 @@
 
 > execute keeping the build unattended
 
-— owner, 2026-11-03, approving the run's drift sweep (`prompts/2026-11-03-prompt-PLAY-dOrderedCharter-38-owner-speedup.md`). The sweep's
+— owner, 2026-11-03, approving the run's drift sweep (`prompts/2026-11-03-prompt-PLAY-dOrderedCharter-55-owner-speedup.md`). The sweep's
 reviewer read specs 53, 13, 42 and 12 against the tree at `06e612222` and returned the findings below, every one with a tree path
 and line. This pass folds them before those units dispatch, so their builders do not hand back a divergence.
 

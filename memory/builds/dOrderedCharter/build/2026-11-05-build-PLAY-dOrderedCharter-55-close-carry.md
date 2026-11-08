@@ -1,6 +1,6 @@
 # dOrderedCharter — what the partial close carries
 
-**Serves:** journal PLAY-dOrderedCharter-38
+**Serves:** journal PLAY-dOrderedCharter-55
 
 The run stopped building at 30 of 59 units, on the owner's order. These items lived in the run's scratch list. The list is here so the
 close and the next run do not depend on one session.

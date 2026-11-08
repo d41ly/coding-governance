@@ -1,4 +1,4 @@
-**Serves:** research PLAY-dOrderedCharter-38
+**Serves:** research PLAY-dOrderedCharter-27
 
 # Brief: fold drift sweep F into specs 27, 21, 5, 4 and 55
 
@@ -6,7 +6,7 @@
 
 > execute keeping the build unattended
 
-— owner, 2026-11-03, approving the run's drift sweep (`prompts/2026-11-03-prompt-PLAY-dOrderedCharter-38-owner-speedup.md`), repeated
+— owner, 2026-11-03, approving the run's drift sweep (`prompts/2026-11-03-prompt-PLAY-dOrderedCharter-55-owner-speedup.md`), repeated
 as the build advances. The sweep's reviewer read specs 27, 21, 5, 4 and 55 against the tree at `c7269a97d` and returned the
 findings below, every one with a tree path and line.
 

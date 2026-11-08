@@ -299,3 +299,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-08T06:50:15Z dispatch · item b6a0090b PLAY-dOrderedCharter-71 · reason tools/govkit/govkit.py tools/govkit/adopters.toml tools/govkit/selftest.py tools/memory-tree/merge-rows.py tools/run-gates/owed_rows.py memory/builds/dOrderedCharter/spec/2026-11-08-spec-PLAY-dOrderedCharter-71.md memory/builds/dOrderedCharter/build/2026-11-08-build-PLAY-dOrderedCharter-71-ledger.md memory/builds/dOrderedCharter/build/2026-11-08-build-PLAY-dOrderedCharter-71-deviation-711.md memory/builds/dOrderedCharter/README.md memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/map/generated
 
 2026-11-08T06:50:23Z brief · item PLAY-dOrderedCharter-71 · reason f3518386ecde memory/builds/dOrderedCharter/prompts/2026-11-08-prompt-PLAY-dOrderedCharter-71-build-brief.md
+
+2026-11-08T08:29:18Z rescope · item add PLAY-dOrderedCharter-72 · reason found at the close: gov's positional lists live under tools/ and red install-prefix, drift-audit, dead-path and method-carrier legs; move them under memory/project and fix the shipped-surface paths
+
+2026-11-08T08:29:20Z rescope · item add PLAY-dOrderedCharter-73 · reason found at the close: encoding, shell-hygiene, remote-literal, acceptance-matrix and policy-census reds the build's own units left

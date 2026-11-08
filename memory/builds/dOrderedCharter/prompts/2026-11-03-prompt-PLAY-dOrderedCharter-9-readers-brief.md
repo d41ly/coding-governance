@@ -1,4 +1,4 @@
-**Serves:** research PLAY-dOrderedCharter-38
+**Serves:** research PLAY-dOrderedCharter-9
 
 # Brief: the Readers clauses the drift fold owes specs 9, 15 and 42
 

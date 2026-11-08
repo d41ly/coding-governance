@@ -7,7 +7,7 @@
 > execute keeping the build unattended
 
 — owner, 2026-11-03, approving a read-only drift sweep of the next DEFERRED specs against the code at HEAD
-(`memory/builds/dOrderedCharter/prompts/2026-11-03-prompt-PLAY-dOrderedCharter-38-owner-speedup.md`). This is a drift
+(`memory/builds/dOrderedCharter/prompts/2026-11-03-prompt-PLAY-dOrderedCharter-55-owner-speedup.md`). This is a drift
 probe, not a spec-audit round: it records no review round and files no spec-audit record.
 
 ## The brief
