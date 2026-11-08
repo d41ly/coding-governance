@@ -962,6 +962,7 @@ adopter who unwires one keeps it unwired, and `check-wiring.sh` reports it. A de
 | `agent-cap` | `agent-cap.js` | PreToolUse | `Workflow\|Agent` |
 | `agent-cap` | `scratch-guard.js` | PreToolUse | `Bash\|PowerShell\|Edit\|Write\|MultiEdit\|NotebookEdit` |
 | `agent-cap` | `scratch-guard.js` | SubagentStart | `*` |
+| `review-harness` | `spec-audit-optin.js` | PreToolUse | `Workflow` |
 | `kickoff-manifest` | `manifest-check.sh --card --write` | SessionStart | `startup\|clear` |
 | `kickoff-manifest` | `manifest-check.sh --card --replay` | SessionStart | `resume\|compact` |
 | `check-wiring` | `check-wiring.sh --session` | SessionStart | `startup\|resume\|clear` |
@@ -984,8 +985,8 @@ is reported `not wired`, never refused. The manual steps below are for a project
     "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/agent-cap.js\"" } ] } ]
   ```
   The matcher is a LIST OF EXACT STRINGS separated by `|`, in ONE group — not a regular expression,
-  and not two blocks. `Workflow` is where the hook reads a script; `Agent` is the direct-spawn
-  modality, which carries no script. `<prefix>/check-wiring.sh` asserts
+  and not two blocks. `Workflow` is a harness call and `Agent` the direct-spawn modality; the hook
+  judges both calls and reads no script since TOOL-dFairHearing-16. `<prefix>/check-wiring.sh` asserts
   this matcher VALUE, not merely that the file mentions `agent-cap.js`: a group left at `Workflow`
   alone contains the string and used to report ok.
   The review protocol's TWO rules have two enforcers since TOOL-dGroundRules-10. How
@@ -994,8 +995,8 @@ is reported `not wired`, never refused. The manual steps below are for a project
   settings --write`, which every landing re-runs), the harness enforces them, and the hook refuses
   any call whose checkout's settings are absent or above the landed limit. Run that render once at
   install, after the policy kit, or the hook refuses every spawn. A review's verify stage spawning
-  at most the hook's `MAX_VERIFIERS` agents TOTAL is the hook's own rule, read from a `Workflow`
-  script. A `FANOUT_CAP` line in `.agent-cap.conf` lowers the limit through the policy reader and
+  at most the hook's `MAX_VERIFIERS` agents TOTAL is the review kit's `check-verifier-fanout.js`,
+  run over every committed harness by the merge bar's `verifier fan-out` gate (TOOL-dFairHearing-16). A `FANOUT_CAP` line in `.agent-cap.conf` lowers the limit through the policy reader and
   never raises it; the hook reads no conf and no environment variable. A wide fan-out trips the
   server rate
   limiter. The binding rules ship as `<prefix>/workflows/REVIEW-PROTOCOL.template.md` — install it at

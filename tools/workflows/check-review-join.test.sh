@@ -335,7 +335,7 @@ await log('hi')
 process.exit(2)
 ' > ${PFX}${HOOKS}/agent-cap.js
   git add -A && git commit -qm envrefusal --no-verify )
-cp "$GATE" "$ER/${KIT_REL}/gate.sh"
+cp "$GATE" "$ER/${KIT_REL}/gate.sh"; cp "$KIT_REL/check-review-join.js" "$ER/${KIT_REL}/"
 arm 'a predicate refusing its ENVIRONMENT is not a join report' 'is its own refusal and not a join'   bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$ER"
 
 # The false GREEN, and the reason `set -o pipefail` is now set beside `set -u`: only the hook's
@@ -355,7 +355,7 @@ await log('hi')
 # fixture ROOT and worked only because the gate hard-coded `$ROOT/<prefix>/hooks/` -- the very
 # literal this unit removes. No kit installs a workflow gate at a repository root, so the old
 # shape described a layout that has never existed in any adopter.
-cp "$GATE" "$BS/${KIT_REL}/gate.sh"
+cp "$GATE" "$BS/${KIT_REL}/gate.sh"; cp "$KIT_REL/check-review-join.js" "$BS/${KIT_REL}/"
 arm 'a status the gate cannot classify is a refusal, not a pass' 'neither clean nor a rule hit'   bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$BS"
 
 # ---- the gate cannot pass by looking at nothing --------------------------------------------------
@@ -383,7 +383,7 @@ arm 'harness: a conflicting repeat demotes to unverified' 'conflicts.add(v.id)' 
 arm 'harness: the version marker is well-formed' "version: '" grep -E "version: '[0-9]+\.[0-9]+'" "$H"
 # The bounded verifier count, asserted POSITIVELY. The absence ban proves the linear form is gone;
 # only this proves the bounded one is present. Both, or "clean" means "empty".
-arm 'harness: the verifier count is bounded' 'MAX_VERIFIERS' grep -F 'Math.ceil(allFindings.length / MAX_VERIFIERS)' "$H"
+arm 'harness: the verifier count is bounded' 'MAX_VERIFIERS' grep -F 'Math.ceil(verifyOrder.length / MAX_VERIFIERS)' "$H"
 arm 'harness: the bounded split carries the marker' 'gov:fixed-verifiers' grep -F 'gov:fixed-verifiers' "$H"
 
 # ---- THE DISCOVERY PATH ---------------------------------------------------------------------------
@@ -403,7 +403,7 @@ mkdir -p "$D/${KIT_REL}"
   printf "export const meta = { name: 'seed', description: 'a tracked workflow' }\nawait log('hi')\n" \
     > $KIT_REL/seed-workflow.js
   git add -A && git commit -qm seed --no-verify )
-mkdir -p "$D/${KIT_REL}" && cp "$GATE" "$D/${KIT_REL}/gate.sh"; cp "$SYNTAX" "$D/syntax.js"
+mkdir -p "$D/${KIT_REL}" && cp "$GATE" "$D/${KIT_REL}/gate.sh"; cp "$SYNTAX" "$D/syntax.js"; cp "$KIT_REL/check-review-join.js" "$D/${KIT_REL}/"
 # TOOL-dTieredTribunal-14 S8 - the gate DELEGATES its predicate to the hook now, so a scratch repo
 # without one meets the missing-predicate refusal instead of the verdict this arm asserts.
 mkdir -p "$D/${PFX}${HOOKS}" && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$D/${PFX}${HOOKS}/agent-cap.js"
@@ -436,10 +436,12 @@ arm 'discovery: a git-ignored file is not judged (syntax)' 'parsed clean' \
 E="$TMP/emptyrepo"; mkdir -p "$E"
 ( cd "$E" && git init -q . && git config user.email t@t.test && git config user.name t
   printf 'x\n' > README.md && git add -A && git commit -qm empty --no-verify )
-mkdir -p "$E/${KIT_REL}" && cp "$GATE" "$E/${KIT_REL}/gate.sh"
+mkdir -p "$E/${KIT_REL}" && cp "$GATE" "$E/${KIT_REL}/gate.sh"; cp "$KIT_REL/check-review-join.js" "$E/${KIT_REL}/"
 # S8 - same reason as the $D site. `$E` and not `$D`: the scratch variable is per SITE, and `E` is
 # not bound until this block, so a `$D` spelling here would judge the wrong repo.
-mkdir -p "$E/${PFX}${HOOKS}" && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$E/${PFX}${HOOKS}/agent-cap.js"
+# TOOL-dFairHearing-50 S4 - the copy sits at the `.claude/hooks/` rung, outside the population, because a
+# hook under the kit prefix is a script the gate reads, and this repo's population must stay empty.
+mkdir -p "$E/.claude/hooks" && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$E/.claude/hooks/agent-cap.js"
 arm 'discovery: an empty population is still not a pass' 'the population is empty, which is not a pass' \
   bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$E"
 
@@ -450,8 +452,18 @@ N="$TMP/nohook"; mkdir -p "$N/${KIT_REL}"
 ( cd "$N" && git init -q . && git config user.email t@t.test && git config user.name t
   printf "export const meta = { name: 'x' }\nawait log('hi')\n" > $KIT_REL/w.js
   git add -A && git commit -qm nohook --no-verify )
-cp "$GATE" "$N/${KIT_REL}/gate.sh"
+cp "$GATE" "$N/${KIT_REL}/gate.sh"; cp "$KIT_REL/check-review-join.js" "$N/${KIT_REL}/"
 arm 'the predicate being absent is a refusal, not a pass' 'a gate whose predicate is absent must say so' \
+  bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$N"
+# TOOL-dFairHearing-16 - the ban table is check-review-join.js's, so a gate copied WITHOUT it, its hook
+# beside it, refuses by name rather than scanning nothing. The same tree with the file restored is the
+# control: it reads clean, so the refusal is the missing file's and not the tree's.
+mkdir -p "$N/${PFX}${HOOKS}" && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$N/${PFX}${HOOKS}/agent-cap.js"
+rm -f "$N/${KIT_REL}/check-review-join.js"
+arm 'the ban table being absent is a refusal, not a pass' 'no check-review-join.js beside this gate' \
+  bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$N"
+cp "$KIT_REL/check-review-join.js" "$N/${KIT_REL}/"
+arm '...and restored beside it, the same tree reads clean' 'clean — no ref-keyed verdict join' \
   bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$N"
 
 # ---- TOOL-aRepatriatedFork-4: the population reaches .claude/workflows/, and only that ------------
@@ -459,11 +471,12 @@ arm 'the predicate being absent is a refusal, not a pass' 'a gate whose predicat
 # `.claude/workflows/`. The a7c78ad2 bytes answered this fixture with `no JavaScript under
 # scripts/` (observed). The hook copy under `.claude/hooks/` carries the same banned join and must
 # stay OUT: `.claude/` wholesale admits the hook ban tables.
-# Both kit segments are the DERIVED directory names, so the foreign layout types no kit name.
-WFK=${KIT_REL##*/}; HKK=${HOOKS_DIR##*/}
-H4="$TMP/harnessdir"; mkdir -p "$H4/scripts/$WFK" "$H4/scripts/$HKK" "$H4/.claude/workflows" "$H4/.claude/hooks"
-cp "$GATE" "$H4/scripts/$WFK/check-review-join.sh"
-cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$H4/scripts/$HKK/agent-cap.js"
+# The kit segment is the DERIVED directory name, so the foreign layout types no kit name. The hook the
+# gate resolves sits at the `.claude/hooks/` rung, outside the population (TOOL-dFairHearing-50 S4).
+WFK=${KIT_REL##*/}
+H4="$TMP/harnessdir"; mkdir -p "$H4/scripts/$WFK" "$H4/.claude/workflows" "$H4/.claude/hooks"
+cp "$GATE" "$H4/scripts/$WFK/check-review-join.sh"; cp "$KIT_REL/check-review-join.js" "$H4/scripts/$WFK/"
+cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$H4/.claude/hooks/agent-cap.js"
 ( cd "$H4" && git init -q . && git config user.email t@t.test && git config user.name t \
   && git add -A && git commit -qm h4 --no-verify ) >/dev/null 2>&1
 out=$(cd "$H4" && bash "scripts/$WFK/check-review-join.sh" 2>&1); rc=$?
@@ -554,7 +567,170 @@ arm 'L1: with GIT_DIR exported, the gate still finds agent-cap.js beside itself'
   bash -c 'cd "$1" && GIT_DIR="$1/.git" bash "$2"' _ "$H1R" "$ROOT/$GATE"
 rm -rf "$H1R"
 
+# ==== RULE 5'S OWN ARMS, moved from the hook's suite (TOOL-dFairHearing-16) ========================
+# Rule 5 left agent-cap.js for check-review-join.js beside the gate, and its arms came with it, each
+# keeping its label, its payload and the hook's verdict: 2 for a deny, 0 for an admit. Only the
+# helpers below are new. `run_join` is the hook's interface over the rule's new home: the payload's
+# script judged by check-review-join.js over a COPY of the hook beside scratch-guard.js, as the hook's
+# suite judged it, the home's 1 (a join) and 2 (a refusal) reading as the hook's 2. The two selector
+# arms run there too: `--only=join` named the one rule this home IS, so it passes no flag, and any
+# other selector is an argument the home refuses, exit 2, as the hook refused a member outside its set.
+# The arm that ran the hook UNFILTERED runs every script rule the hook ran, now both homes (`check_all`).
+TESTPY=$_rkd_py
+FANJS="$KIT_REL/check-verifier-fanout.js"; JOINJS="$KIT_REL/check-review-join.js"
+ARMS_HOOKS="$TMP/arms-hooks/hooks"; mkdir -p "$ARMS_HOOKS"; cp "$ROOT/$HOOKS_DIR/agent-cap.js" "$ROOT/$HOOKS_DIR/scratch-guard.js" "$ARMS_HOOKS/"
+HOOK="$ARMS_HOOKS/agent-cap.js"
+pass=0; fail=0
+# ponytail: run_home is check-verifier-fanout.test.sh's twin; one suite library is the step if a third suite needs it.
+run_home() { # <home.js> [arg...]; payload on stdin -> the hook's exit code for it; the home's stderr on stderr
+  local src rc home=$1; shift
+  src=$(node -e '
+    const fs = require("fs")
+    let d
+    try { d = JSON.parse(fs.readFileSync(0, "utf8")) } catch { process.exit(3) }
+    const ti = (d && d.tool_name === "Workflow" && d.tool_input) || {}
+    let f = ""
+    if (ti.script) { fs.writeFileSync(process.argv[1], ti.script); f = process.argv[1] } else if (ti.scriptPath) f = ti.scriptPath
+    if (!f) process.exit(4)
+    process.stdout.write((typeof d.cwd === "string" ? d.cwd : "") + "\n" + f)' "$TMP/join-arm.js") || return 0
+  ( c=${src%%$'\n'*}; if [ -n "$c" ]; then cd "$c" || exit 3; fi; node "$ROOT/$home" --hook "${ARM_HOOK:-$HOOK}" "$@" "${src#*$'\n'}" 2>"$TMP/home.err" ); rc=$?
+  cat "$TMP/home.err" >&2
+  # A 1 or 2 is the hook's deny only when the home SAID so: node's own exit 1 on a crash, a home that
+  # never loaded, is the hook's crash, which admits, so a deny arm cannot pass on it.
+  case "$rc" in 1|2) grep -qE '^(BLOCKED by agent-cap:|check-verifier-fanout:|check-review-join:)' "$TMP/home.err" && return 2 ;; esac
+  return "$rc"
+}
+run_join() { # [selector]: `--only=join` is this home's own rule, so it is dropped; any other is passed on
+  if [ "${1:-}" = --only=join ]; then shift; fi
+  run_home "$JOINJS" "$@"
+}
+check() { # name expected_exit json
+  printf '%s' "$3" | (cd "$TMP" && run_join) >/dev/null 2>"$TMP/err"; local got=$?
+  if [ "$got" = "$2" ]; then echo "ok   $1 (exit $got)"; pass=$((pass+1))
+  else echo "FAIL $1 (exit $got, want $2)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+}
+js() { # name expected_exit  (script on stdin)
+  local name=$1 want=$2
+  local payload
+  payload=$("$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","tool_input":{"script":sys.stdin.read()}}))')
+  case "$payload" in *'"script"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
+  check "$name" "$want" "$payload"
+}
+check_all() { # name expected_exit (script on stdin): the hook's unfiltered run, every script rule it ran
+  local name=$1 want=$2 payload got
+  payload=$("$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","tool_input":{"script":sys.stdin.read()}}))')
+  case "$payload" in *'"script"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
+  printf '%s' "$payload" | (cd "$TMP" && run_home "$FANJS") >/dev/null 2>"$TMP/err"; got=$?
+  if [ "$got" = 0 ]; then printf '%s' "$payload" | (cd "$TMP" && run_join) >/dev/null 2>"$TMP/err"; got=$?; fi
+  if [ "$got" = "$want" ]; then echo "ok   $name (exit $got)"; pass=$((pass+1))
+  else echo "FAIL $name (exit $got, want $want)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+}
+
+# ---- the blanked view reports an unterminated scan (TOOL-aWeldedTribunal-3) ---------------------
+# The blanked view carries its mode ACROSS lines, correctly, because a template literal spans them.
+# That is also how one unterminated backtick blanked every line below it and the two rules reading
+# that view went blind under it. Both now fall back to a PER-LINE blanked render.
+#
+# Rule 3 read the same view and retired in TOOL-dGroundRules-10 with its two arms here; rule 5's
+# remain.
+check "rule5: a ref-keyed join below an unterminated backtick → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const note = `an unterminated template\nconst m = new Map()\nm.set(f.ref, v)"}}'
+# THE NARROWING SURVIVES THE FALLBACK. `TOOL-dTieredTribunal-14 S2` chose the blanked view for rule 5
+# so a banned pattern inside a STRING would not match; falling back to a view that keeps template
+# contents would regain that false-positive class, and `runBothViews` unions the views so either one
+# denying is a denial. The fallback is the same scan reset per line, so the narrowing holds.
+check "rule5: banned text in a single-line terminated template → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const p = `we never key a map by verdictByRef here`\nawait boundedParallel(T, 5)"}}'
+# THE RESIDUAL, pinned rather than left unstated. A per-line view cannot know a line CONTINUES a
+# template opened above it, so banned text on a continuation line reads as code and denies. It needs
+# an unterminated backtick AND banned text, and it errs fail-CLOSED. Measured 0 before this unit and
+# 2 after — an arm asserting the residual is how a trade stays priced instead of becoming folklore.
+check "rule5: banned text on a continuation line → deny (stated residual)" 2 '{"tool_name":"Workflow","tool_input":{"script":"const note = `an unterminated template\nwe never key a map by verdictByRef here"}}'
+check "rule5: a legal join under a terminated multi-line literal → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const p = `line one\nline two`\nconst m = new Map()\nm.set(f.id, v)"}}'
+# ---- rule 5: the ref-keyed verdict join -----------------------------------------------------------
+# TOOL-dTieredTribunal-14's section 4 declared these ten arms as what "the failing case has been
+# observed" means for that unit, and the unit landed WITHOUT them: `git show --stat fb2d692e` never
+# touched this file, and no arm here named `join`, `.ref` or `--only`. Rule 5 was covered only
+# INDIRECTLY, through check-review-join.sh delegating to this hook — so the hook's own suite could
+# not tell whether its own rule worked. Written now, from that table, against the shipped rule.
+#
+# jso <name> <expected_exit> <flag> — like `js`, but passes a selector flag, which the three
+# selector arms need and which `check`/`js` cannot express.
+jso() { # name expected_exit flag  (script on stdin)
+  local name=$1 want=$2 flag=$3 payload got
+  payload=$("$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","tool_input":{"script":sys.stdin.read()}}))')
+  case "$payload" in *'"script"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
+  printf '%s' "$payload" | (cd "$TMP" && run_join "$flag") >/dev/null 2>"$TMP/err"; got=$?
+  if [ "$got" = "$want" ]; then echo "ok   $name (exit $got)"; pass=$((pass+1))
+  else echo "FAIL $name (exit $got, want $want)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+}
+
+# The three bans. Each fires with NO raw primitive anywhere in the fixture, which is the whole point
+# of the port: the file gate could only ever see files, and the modality where this defect actually
+# happens is an inline `script` string on a Workflow call.
+js "rule5: the bracket ban fires with no raw primitive present" 2 <<'EOF'
+const verdicts = {}
+verdicts[v.ref] = v
+EOF
+js "rule5: the Map ban fires" 2 <<'EOF'
+const m = new Map()
+m.set(f.ref, v)
+EOF
+js "rule5: the retired identifier fires" 2 <<'EOF'
+const verdictByRef = new Map()
+EOF
+
+# Prose is NOT code. This is the narrowing the port deliberately took over the awk it replaced, and
+# it is load-bearing: `<prefix>/workflows/tier2-review.js` carries a comment that necessarily spells the
+# banned expression while documenting the retired join, and a whole-file-text ban reds on it.
+js "rule5: a comment documenting the join is prose" 0 <<'EOF'
+// never key the join on m[f.ref] = v again; use the integer id
+const r = 1
+EOF
+js "rule5: a string mentioning the join is prose" 0 <<'EOF'
+const s = "do not write m[f.ref] = v"
+EOF
+js "rule5: a template mentioning the join is prose" 0 <<'EOF'
+const prompt = `Never key a verdict join on verdictByRef; use the integer id.`
+EOF
+
+# The integer-keyed join is the SANCTIONED shape, and an arm that only proves denial is satisfied by
+# a rule that denies everything.
+js "rule5: the integer-keyed join is untouched" 0 <<'EOF'
+const verdictById = new Map()
+verdictById.set(f.id, v)
+EOF
+
+# The selector, as ONE arm set of three. The eighth alone proves only that the fixture is harmless;
+# the ninth is what shows the flag actually narrowed something; the tenth is what stops the flag
+# being a silent switch that disables the cap whenever it is misspelled.
+jso "rule5: --only=join passes a rule-2 breach that carries no join" 0 --only=join <<'EOF'
+const r = await parallel(D.map((d) => () => agent(d.p)))
+EOF
+check_all "rule5: the same script unfiltered still denies" 2 <<'EOF'
+const r = await parallel(D.map((d) => () => agent(d.p)))
+EOF
+jso "rule5: an unrecognised selector refuses" 2 --only=bogus <<'EOF'
+const r = 1
+EOF
+
+# Rule 5, the ref-keyed-join ban, is defeated by the same apostrophe and nobody had named it. Both
+# of these ADMIT at the tip and deny after.
+js "mispaired quote: rule 5 join hidden by an apostrophe -> deny" 2 <<'EOF'
+const re = /won't/; m.get(f.ref); const s = 'x'
+EOF
+
+js "mispaired quote: rule 5 verdictByRef hidden by an apostrophe -> deny" 2 <<'EOF'
+const re = /won't/; const verdictByRef = {}; const s = 'x'
+EOF
+
+js "mispaired quote: rule 5 control, no apostrophe -> deny" 2 <<'EOF'
+const re = /wont/; m.get(f.ref); const s = 'x'
+EOF
+
+
 # ---- verdict, LAST -------------------------------------------------------------------------------
+# Rule 5's moved arms count on their own pair, and fail the verdict like any other arm.
+echo "---- rule 5's arms: $pass passed, $fail failed ----"
+fails=$((fails+fail))
 if [ "$fails" = 0 ]; then echo "PASS — review-join + workflow-syntax gates: all arms held"; exit 0; fi
 echo "FAIL — $fails arm(s) failed"
 exit 1

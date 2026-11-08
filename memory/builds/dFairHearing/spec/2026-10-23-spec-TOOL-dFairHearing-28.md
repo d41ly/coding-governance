@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-28 — the hook suite's census re-pinned to 59 and 14, measured by a script file whose pattern no shell can fold
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,9 +9,16 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dFairHearing-28-deviation-281.md](../build/2026-10-23-build-TOOL-dFairHearing-28-deviation-281.md) | deviation | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50 |
+| [2026-11-03-build-TOOL-dFairHearing-28-1-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-28-1-builder-return.md) | journal | — |
+| [2026-11-04-build-TOOL-dFairHearing-28-1-acceptance-ledger.md](../build/2026-11-04-build-TOOL-dFairHearing-28-1-acceptance-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-28-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-28-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md) | research | TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 |
+| [2026-11-02-prompt-TOOL-dFairHearing-28-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-28-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-16-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-16-fix-brief.md) | research | TOOL-dFairHearing-16 TOOL-dFairHearing-22 TOOL-dFairHearing-26 TOOL-dFairHearing-29 |
+| [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-27 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 | [2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md) | spec-audit | TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 |
+| [2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md](../reviews/2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md) | diff-review | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 
 <!-- /gen:spec-records -->
 
@@ -19,10 +26,11 @@
 
 The round-3 spec audit's blocker, finding id 11 (item B1, BLOCKER,
 `memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md`), is
-closed. `TOOL-dFairHearing-26` pins its census at 66 labels and a population of 54 and 14. Base
+closed. `TOOL-dFairHearing-26` pinned its census, until its rev-3, at 66 labels and a population of
+54 and 14. Base
 `3708a705` holds 71 labels and a population of 59 and 14. The 66 came from an agent shell that folded
 the regex's `\\` to `\`, which drops every label holding an escaped quote. A correct census therefore
-reds against unit 26's pin, and a census tuned to the pin leaves 5 arms unchecked. This unit re-pins
+redded against unit 26's pin, and a census tuned to the pin left 5 arms unchecked. This unit re-pins
 the totals, measures them with a script file whose pattern is built so no quoting layer can fold it,
 and runs unit 26's placement check over the whole population.
 
@@ -36,18 +44,21 @@ and runs unit 26's placement check over the whole population.
   `rule0:`, 13 `rule0/U7:`, 10 `rule0/aWardedAudit:` and 9 `rule0/aWardedAudit-6:` labels (57 rule-0)
   and 14 `rule5:` labels. With the loop labels `rule0: pair` and `rule0: fold` added, the population
   is 59 rule-0 and 14 rule-5. The script asserts 59 and 14 before it reads any suite at the tip.
-  Observed by AC1.
+  Re-counted at `8b2b995f` on 2026-11-03, the suite `TOOL-dFairHearing-16` starts its move from, by
+  the same script file over `git show 8b2b995f:tools/hooks/agent-cap.test.sh`: the same 71 labels,
+  byte for byte, and the same five tag counts, so `3708a705` stays the census's ref. Observed by
+  AC1.
 - **S3** — Placement over the whole population. At this unit's commit every rule-0 label is found in
   `tools/workflows/spec-audit-optin.test.sh` (the pack's suite), every rule-5 label in
   `tools/workflows/check-review-join.test.sh` (the join suite), and no label in
   `tools/hooks/agent-cap.test.sh` (the hook's suite). An arm the move left behind, the five
   escaped-quote arms in particular, is moved by this unit with its label, payload and verdict
   unchanged. Observed by AC2.
-- **S4** — Supersession. Unit 26's AC1 totals (66, 52, and the population of 54 and 14), §4
-  Evidence's counts (24, 10, 10 and 8) and §5's assertion of 54 and 14 are answered by this unit's S2
-  and AC1. Unit 26's AC2 is answered by this unit's AC2, over the population S2 pins. Unit 26's
-  acceptance ledger records them superseded here (`TOOL-dFairHearing-23` §8 F7's form). NOT OBSERVED
-  by a criterion of this unit: it is a ledger entry in unit 26's record, read there.
+- **S4** — Supersession. Unit 26's AC2 is answered by this unit's AC2, over the population S2 pins,
+  and unit 26's acceptance ledger records it superseded here (`TOOL-dFairHearing-23` §8 F7's form).
+  Unit 26's totals need no such entry: its rev-3 rewrote its AC1, §4 Evidence and §5 to the figures
+  S2 pins, and its AC1 reads this pin. NOT OBSERVED by a criterion of this unit: it is a ledger entry
+  in unit 26's record, read there.
 
 ## 3. Non-goals (OUT)
 
@@ -73,8 +84,14 @@ Measured at `3708a705` on 2026-10-23, PINNED, by a Python script file building t
 `rule0/U7` 13, `rule0/aWardedAudit` 10, `rule0/aWardedAudit-6` 9 and `rule5` 14. The five labels that
 hold an escaped quote sit at :874, :959, :985, :988 and :1063. The folded text, read as `grep -E`
 reads it (`[^"\]` a class, `\.` a literal dot), prints 66 labels and a population of 54 and 14, unit
-26's figures. Python refuses the folded text outright as an unterminated class, so the script's
+26's rev-2 figures. Python refuses the folded text outright as an unterminated class, so the script's
 self-check is the guard that holds under either reading.
+
+Re-measured on 2026-11-03, PINNED, by a script file of the same build over `3708a705` and
+`8b2b995f`: both print the 71 labels and the five tag counts above, the label sets are equal, and the
+literal-dot reading prints 66 and a population of 54 and 14 at both. At `8b2b995f` the five
+escaped-quote labels sit at :993, :1078, :1104, :1107 and :1182, each 119 lines below its base line;
+the census reads base's bytes through `git show`, so the move does not shift its input.
 
 ### The census script
 
@@ -152,7 +169,8 @@ Each changes only where AC2 finds an arm left behind or missing.
   and exits 0.
   Red when: the pattern loses a backslash, so the escaped-quote labels drop and the totals read 66
   and 54.
-  figure: the totals are PINNED, measured at `3708a705` on 2026-10-23.
+  figure: the totals are PINNED, measured at `3708a705` on 2026-10-23, and equal at `8b2b995f` on
+  2026-11-03 (§4 Evidence).
 - **AC2** — When `python census.py 3708a705` runs at this unit's commit with the hook's suite, the
   pack's suite and the join suite as its three paths (S3 names the files), it prints no failing line
   and exits 0.
@@ -163,7 +181,8 @@ Each changes only where AC2 finds an arm left behind or missing.
   `the pattern lost a backslash` before any `git show`. When that copy also drops the self-check, it
   prints `labels 66` and `population 54 14` and exits non-zero on the 59 and 14 assertion.
   Red when: either copy exits 0, which means the census counts whatever the pattern matched.
-  figure: 66 and 54 are PINNED, reproduced at `3708a705` on 2026-10-23 by that copy.
+  figure: 66 and 54 are PINNED, reproduced at `3708a705` on 2026-10-23 by that copy, and again at
+  `3708a705` and `8b2b995f` on 2026-11-03.
 
 ## 7. Gates
 
@@ -183,6 +202,12 @@ none
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 11 (item B1, BLOCKER) of the round-3 spec
   audit of specs 4, 14, 25, 26 and 27.
 - rev-2 · 2026-10-23 · §3 · the round-4 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-36 (six minors).
+- rev-3 · 2026-11-03 · S2 · §4 · AC1 · AC3 · the census re-counted at `8b2b995f` by a script file:
+  the same 71 labels, tag counts and folded 66, with the escaped-quote lines 119 lower, so the pins
+  stand and `3708a705` stays the ref (fix brief 2026-11-03-prompt-TOOL-dFairHearing-16-fix-brief,
+  item 5).
+- rev-3 · 2026-11-03 · §1 · S4 · unit 26's rev-3 fixed its own totals to S2's, so S4 keeps only the
+  AC2 ledger entry and the goal reads unit 26's pin in the past (same brief, item 5).
 
 ## 10. Reuse audit
 

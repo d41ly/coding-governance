@@ -1,0 +1,27 @@
+// **Serves:** research TOOL-dFairHearing-30 TOOL-dFairHearing-15 TOOL-dFairHearing-35
+{
+  "instance": "review-replay",
+  "known": "memory/builds/dTrueNorth/reviews/2026-10-22-review-TOOL-dTrueNorth-1-closing-diff-review-round1.md",
+  "arms": [
+    {"name": "selected", "base": null, "settings": {"checklist": "acquired"}, "dispatched": 4},
+    {"name": "ungated", "base": "selected", "settings": {"checklist": "ungated"}, "dispatched": 4}
+  ],
+  "candidates": [
+    {"case": "record-1", "arm": "selected", "matched": null,
+     "report": "C:/Users/DAILY-~1/AppData/Local/Temp/f1s1/reviews/2026-11-04-review-dTrueNorth-closing-diff-r1.md"},
+    {"case": "record-1", "arm": "ungated", "matched": null,
+     "report": "C:/Users/DAILY-~1/AppData/Local/Temp/f1u1/reviews/2026-11-04-review-dTrueNorth-closing-diff-round-1.md"},
+    {"case": "record-2", "arm": "selected", "matched": null,
+     "report": "C:/Users/DAILY-~1/AppData/Local/Temp/f2s2/reviews/2026-11-04-diff-review-dRenderedAnchor-round-1.md"},
+    {"case": "record-2", "arm": "ungated", "matched": null,
+     "report": "C:/Users/DAILY-~1/AppData/Local/Temp/f2u1/reviews/2026-11-04-diff-review-dRenderedAnchor-round-1.md"},
+    {"case": "record-3", "arm": "selected", "matched": null,
+     "report": "C:/Users/DAILY-~1/AppData/Local/Temp/f3s1/reviews/2026-11-04-diff-review-dRenderedAnchor-round-1.md"},
+    {"case": "record-3", "arm": "ungated", "matched": null,
+     "report": "C:/Users/DAILY-~1/AppData/Local/Temp/f3u1/reviews/2026-11-04-review-TOOL-dRenderedAnchor-6-closing-diff-round1.md"},
+    {"case": "record-4", "arm": "selected", "matched": null,
+     "report": "C:/Users/DAILY-~1/AppData/Local/Temp/f4s1/reviews/2026-11-04-review-PLAY-dClosedLoop-1-closing-diff.md"},
+    {"case": "record-4", "arm": "ungated", "matched": null,
+     "report": "C:/Users/DAILY-~1/AppData/Local/Temp/f4u1/reviews/2026-11-04-review-diff-dClosedLoop-round-1.md"}
+  ]
+}

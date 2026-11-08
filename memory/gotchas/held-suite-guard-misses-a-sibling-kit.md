@@ -33,3 +33,8 @@ files to the sibling's directory, which can tip a shared guard past `BROAD_LEG_F
 No machine gate yet: a lint that reads each held suite for the sibling kits it resolves reds scratch-guard's leg
 on arrival, so it is a build of its own. Until then this record is the checklist entry, selected by
 `gotchas.py --for-paths` for a diff touching `tools/gate-legs.json`.
+
+The `policy fixtures` leg's guard trace narrows this for one leg and no further: the guard trace joins
+what the two runners hand a child, never what a child reads, so a checker's own reads stay this
+record's question (memory/builds/dFairHearing/reviews/2026-11-05-review-TOOL-dFairHearing-43-47-diff-review.md,
+ids 3, 7, 12 and 16).

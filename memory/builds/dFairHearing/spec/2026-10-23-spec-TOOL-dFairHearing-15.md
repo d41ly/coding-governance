@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-15 — the review's bug-class checklist, selected by the pinned range and handed by the harness itself
 
-**Status:** DEFERRED · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 16 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-6 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 16 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0082@8ac81dad whole
 
@@ -9,10 +9,20 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dFairHearing-15-deviation-159.md](../build/2026-10-23-build-TOOL-dFairHearing-15-deviation-159.md) | deviation | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50 |
+| [2026-11-03-build-TOOL-dFairHearing-15-1-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-15-1-builder-return.md) | journal | — |
+| [2026-11-04-build-TOOL-dFairHearing-15-1-acceptance-ledger.md](../build/2026-11-04-build-TOOL-dFairHearing-15-1-acceptance-ledger.md) | journal | — |
+| [2026-11-04-build-TOOL-dFairHearing-25-replay-verdicts.md](../build/2026-11-04-build-TOOL-dFairHearing-25-replay-verdicts.md) | research | TOOL-dFairHearing-25 TOOL-dFairHearing-1 |
+| [2026-11-04-build-TOOL-dFairHearing-30-replay-manifest.json](../build/2026-11-04-build-TOOL-dFairHearing-30-replay-manifest.json) | research | TOOL-dFairHearing-30 TOOL-dFairHearing-35 |
+| [2026-11-04-build-TOOL-dFairHearing-30-replay-verdict.md](../build/2026-11-04-build-TOOL-dFairHearing-30-replay-verdict.md) | research | TOOL-dFairHearing-30 TOOL-dFairHearing-35 |
+| [2026-11-04-build-TOOL-dFairHearing-30-ungated.py](../build/2026-11-04-build-TOOL-dFairHearing-30-ungated.py) | research | TOOL-dFairHearing-30 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-departures-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-departures-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-3 TOOL-dFairHearing-14 TOOL-dFairHearing-16 TOOL-dFairHearing-30 TOOL-dFairHearing-32 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
+| [2026-11-02-prompt-TOOL-dFairHearing-15-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-15-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md) | research | TOOL-dFairHearing-10 TOOL-dFairHearing-22 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-1 TOOL-dFairHearing-21 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 |
 | [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
+| [2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md](../reviews/2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md) | diff-review | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 
 <!-- /gen:spec-records -->
 
@@ -31,29 +41,30 @@ NT-25). The cut of fully gated classes stays dLinkedLibrary's, once it derives e
 
 - **S1** — On the diff kind, when the caller passes no `checklist`, the harness spawns one agent in
   the `Resume` phase, labelled `resume:checklist`, before the input print
-  (`tools/workflows/tier2-review.template.js:985`) and the resume probe (:1003). It runs `python
+  (`inputPrint`, `tools/workflows/tier2-review.template.js:1210` at `9c1a2857`) and the resume probe
+  (:1229). It runs `python
   <checker> --for-diff <base>..<head>` in `repo` with a 120-second bound, the range the call pinned,
   and returns its stdout verbatim as `checklist`, or `checklistError` naming why none was produced:
   no checker tracked, a non-zero exit with its code, a timeout, or no line starting `- `
   (`no bug class selected`). The schema copies the resolver's three optional fields
-  (`tools/workflows/unattended-build.template.js:767-771`). The returned text then takes the path a
+  (`tools/workflows/unattended-build.template.js:807-811` at `9c1a2857`). The returned text then takes the path a
   caller's string takes today: `extractByDesign`, then `parseChecklist`, with their refusals
-  (:555-584), so its items keep the checker's order into the `C<n>` labels. A caller's `checklist`
+  (:724-753), so its items keep the checker's order into the `C<n>` labels. A caller's `checklist`
   wins and no agent spawns. Observed by AC1, AC2, AC3 and AC5.
 - **S2** — The checker is found at run time, never guessed: the agent asks `git -C <repo> ls-files
   --error-unmatch` for `{{TOOL_ROOT}}memory-tree/gotchas.py`, then `{{TOOL_ROOT}}gotchas.py`, the
   nested and the flat spelling in the renderer's own order, and uses the first tracked. The template
   gains the `TOOL_ROOT` token and `tools/workflows/kit.toml`'s `tier2-review.template.js` row lists it
-  beside `FANOUT_CAP` (:76-79), so the render fills it. Observed by AC6.
+  beside `FANOUT_CAP` (:81-84 at `9c1a2857`), so the render fills it. Observed by AC6.
 - **S3** — Every outcome is announced. An acquired checklist logs `checklist from --for-diff
   <base>..<head>` and RUN INTEGRITY says so; a `checklistError` or a dead agent logs a `WARNING:`
-  naming the reason, and the RUN INTEGRITY `Checklist:` line (:1808-1811) names it instead of
+  naming the reason, and the RUN INTEGRITY `Checklist:` line (:2194-2197) names it instead of
   "absent". Nothing is passed as an empty checklist. Observed by AC3.
 - **S4** — The lookup's charter line retires. The `kit:memory-tree` fence at
   `coding-governance-agents.template.md:117-119`, holding only the line
   `<prefix>/memory-tree/gotchas.py --for-diff <base>..<head>`, is taken out, and its render
   `AGENTS.md:121` goes with it; the second `kit:memory-tree` fence (:173-177) stands. The kit README's
-  `checklist` paragraph (`tools/workflows/README.md:200-218`) says the harness acquires it on the diff
+  `checklist` paragraph (`tools/workflows/README.md:261-279` at `9c1a2857`) says the harness acquires it on the diff
   kind and the caller's wins. Observed by AC7.
   **Readers:** by name: `AGENTS.md`, the charter's render, which spells the line at :121 until the
   render runs. by value: NO VALUE READERS — the line is prose an agent reads; no tool compares,
@@ -76,11 +87,11 @@ NT-25). The cut of fully gated classes stays dLinkedLibrary's, once it derives e
   unit's "ungated" is a stand-in reading (§8 F3): the replay's arm, and S6's flag only if the replay
   picks it, until dLinkedLibrary's status replaces it.
 - The spec kind. A spec audit pins blobs, not a range; `unattended-build`'s resolver already hands it
-  a `--for-paths` checklist (`tools/workflows/unattended-build.template.js:1372-1460`).
+  a `--for-paths` checklist (`tools/workflows/unattended-build.template.js:1456-1544` at `9c1a2857`).
 - BUILD-METHOD M8's "Bug classes FIRST" sentence, a governance carrier no clause of this build names;
   the harness acquiring the checklist leaves that sentence true.
 - Changing how `gotchas.py --for-diff` selects or orders: selection by range and order by anchor tier
-  are what it does today (`tools/memory-tree/gotchas.py:76-80`, :682).
+  are what it does today (`tools/memory-tree/gotchas.py:76-80`, :710 at `9c1a2857`).
 - A no-checklist control arm (§8 F2).
 
 ### Edges
@@ -119,12 +130,12 @@ resume:checklist — Resume phase, before the input print
 ```
 
 It runs before the input print because the parsed checklist joins the review key
-(`tools/workflows/README.md:218`), so the key is computed over what the lenses will sweep, and before
+(`tools/workflows/README.md:279`), so the key is computed over what the lenses will sweep, and before
 the resume probe because the probe's directory name carries that key. It sits outside the review
 shape's agent formula, as the resume probe does. What it does not check: that the agent ran the
 command it was told to and returned stdout unaltered; the by-design head-count refusal catches a
 truncated block, as the resolver's comment says of its own agent
-(`tools/workflows/unattended-build.template.js:1379-1380`).
+(`tools/workflows/unattended-build.template.js:1463-1464`).
 
 ### The known-defect corpus
 
@@ -197,9 +208,9 @@ tracked, the same review it gets today with the reason stated.
 ### Alternatives rejected
 
 - **The `MEMORY_TREE_DIR` token, as `unattended-build` uses.** The renderer skips a pair whose
-  template carries it when no `gotchas.py` is tracked (`tools/workflows/check-protocol-parity.test.sh:44-49`),
+  template carries it when no `gotchas.py` is tracked (`tools/workflows/check-protocol-parity.test.sh:45-50` at `9c1a2857`),
   so an adopter without the memory-tree kit would stop receiving `tier2-review.js` updates, a kit
-  dependency the review harness does not have today (`tools/workflows/kit.toml:9`).
+  dependency the review harness does not have today (`tools/workflows/kit.toml:10` at `9c1a2857`).
 - **Folding the acquisition into the resume probe.** The probe's directory name carries the review
   key, and the key carries the checklist, so the checklist must exist first.
 - **The harness always acquiring, overriding a caller.** `unattended-build` and a light review's caller
@@ -208,7 +219,7 @@ tracked, the same review it gets today with the reason stated.
 ## 5. Production-readiness checklist
 
 - security — one more read-only agent; its command is fixed text with the call's `base` and `head`,
-  which the harness already validates before any spawn (:203-210).
+  which the harness already validates before any spawn (:242-249 at `9c1a2857`).
 - perf / scale — one agent and one `gotchas.py` run per diff review; the replay costs about 8 review
   runs of 12 to 13 agents.
 - error / empty / loading states — every way the checklist can fail to arrive is named in the log and
@@ -267,7 +278,7 @@ tracked, the same review it gets today with the reason stated.
 
 ## 7. Gates
 
-`tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `review-replay selftest` · `charter size` · `template size <=48KiB` · `playbook parity` · `playbook render wiring` · `recall floor` · `recall floor arms` · `gotchas selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `review-replay selftest` · `policy fixtures` · `charter size` · `template size <=48KiB` · `playbook parity` · `playbook render wiring` · `recall floor` · `recall floor arms` · `gotchas selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC2 AC3 AC4 AC5 · the parent render, which spawns no acquiring agent, so every arm finds no `resume:checklist` and the AC1 items in no prompt · the suite's assertion floor, raised by the arms added
 
@@ -311,6 +322,12 @@ New arm: tools/memory-tree/gotchas.py (its selftest, only on an `ungated` win) �
   which runs this unit's replay in per-arm clones in place of TOOL-dFairHearing-25.
 - rev-5 · 2026-10-23 · §3 · the round-4 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-35, which scores
   this unit's replay and lands or leaves S6.
+- rev-6 · 2026-11-03 · §7 · the leg line adds `policy fixtures`, whose guard §4's
+  `tools/workflows/kit.toml`, `AGENTS.md` and `tools/memory-tree/gotchas.py` trip
+  (2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief, item 1).
+- rev-6 · 2026-11-03 · S1 S2 S3 S4 · §3 · §4 · §5 · every line of the harness template, the build
+  harness, the kit README, the kit descriptor, the parity suite and `gotchas.py` re-cited at
+  `9c1a2857`, where other units moved them; the input print by symbol (same brief, item 2).
 
 ## 10. Reuse audit
 

@@ -48,7 +48,7 @@
 # GIT_SSH, which the `ok` and `note` cases grade as they find it because the arm cannot tell who
 # wrote it; HTTPS remotes, which hold no ssh socket; and whether the remote's own idle timeout is
 # shorter than the silence the keepalive tolerates.
-KIT_CHECK_WIRING_VERSION=1.35   # gov:kit check-wiring@1.35 — the deployer's read
+KIT_CHECK_WIRING_VERSION=1.36   # gov:kit check-wiring@1.36 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
@@ -673,31 +673,33 @@ for home, anchor in zip(sys.argv[2::2], sys.argv[3::2]):
 # RUN each candidate again and then start a second interpreter for the resolver. A pair
 # `resolve_kit_files` answered is read back from its one start; a pair it does not list takes a start
 # of its own, so a stale list costs a start and never a wrong answer.
+# The answer is printed and also left in `_kit_file`, cleared first, the idiom `first_of` carries, so a
+# caller running it with its output discarded in this shell reads it without a fork (TOOL-dFairHearing-50 S14).
 resolve_kit_file() { # <kit-home> <file> -> <repo-relative kit dir>/<file>, or nothing
-  local d i=0
+  local d i=0; _kit_file=""
   if [ -z "${PY_OK:-}" ]; then
     echo "note     resolver  — no usable python, so the probe rung beside this checker ran in bash for $1/$2" >&2
     for d in "${KIT_REL:+$KIT_REL/}$1" "$(dirname -- "${KIT_REL:-.}")/$1"; do
       d=${d#./}
-      [ -f "$_KIT_ROOT/$d/$2" ] && { printf '%s/%s\n' "$d" "$2"; return 0; }
+      [ -f "$_KIT_ROOT/$d/$2" ] && { _kit_file=$d/$2; printf '%s\n' "$_kit_file"; return 0; }
     done
     return 0
   fi
   while [ "$i" -lt "${#_KF_KEYS[@]}" ]; do
     if [ "${_KF_KEYS[$i]}" = "$1 $2" ]; then
-      [ -n "${_KF_DIRS[$i]}" ] && printf '%s/%s\n' "${_KF_DIRS[$i]}" "$2"
+      [ -n "${_KF_DIRS[$i]}" ] && { _kit_file=${_KF_DIRS[$i]}/$2; printf '%s\n' "$_kit_file"; }
       return 0
     fi
     i=$((i+1))
   done
   d=$(resolve_kit_dir "$PY" "$_KIT_ROOT/$KIT_REL" "$1" "$2" 2>/dev/null) || return 0
   d=${d%$'\r'}
-  [ -n "$d" ] && printf '%s/%s\n' "$d" "$2"
+  [ -n "$d" ] && { _kit_file=$d/$2; printf '%s\n' "$_kit_file"; }
   return 0
 }
 # EVERY `<home> <file>` PAIR AN ARM PASSES `resolve_kit_file`, declared, one line: the self-test
 # compares it with the literal pairs this file's call sites spell, so it cannot drift without a red.
-KIT_FILE_PAIRS=(hooks agent-cap.js hooks scratch-guard.fragment.json memory-recall recall-opened.fragment.json memory-tree merge-rows.py lib pyrun.sh memory-tree adopt-memory-tree.sh roles workflows.toml)
+KIT_FILE_PAIRS=(hooks agent-cap.js hooks scratch-guard.fragment.json workflows spec-audit-optin.fragment.json memory-recall recall-opened.fragment.json memory-tree merge-rows.py lib pyrun.sh memory-tree adopt-memory-tree.sh roles workflows.toml)
 _KF_KEYS=(); _KF_DIRS=()
 # ONE python start for every declared pair, run once after the print verb's exit. Its answers reach
 # the arrays by parameter expansion, one line per pair: no loop fed by a substitution, and no IFS
@@ -990,8 +992,10 @@ check_agentcap() {
     # so no class could cross the ESCAPED quote and the match was always empty. The only declared
     # control on a bypass this same build introduced was itself a check that could not fail. Scoped
     # to the LINE now, which no quoting defeats, and the test file observes the failing case.
+    # TOOL-dFairHearing-16: the hook now REFUSES every `--only=`, exit 2, so a wired command carrying it
+    # blocks every Workflow and Agent call rather than narrowing the rules; still UNWIRED, new reason.
     if grep 'agent-cap\.js' "$(settings_json)" 2>/dev/null | grep -q -- '--only'; then
-      echo "UNWIRED  agent-cap — the wired command carries --only, which runs ONE rule and silently disables the rest. Remove the flag from $(render_settings_path)."
+      echo "UNWIRED  agent-cap — the wired command carries --only, which the hook now refuses on every call, so every Workflow and Agent call is blocked. Remove the flag from $(render_settings_path)."
       unwired=$((unwired+1))
       return
     fi
@@ -1026,7 +1030,7 @@ check_agentcap() {
 # agent-cap. A guard that is silent when unwired looks identical to a guard that is passing.
 # Advisory like every other arm: no mode rewrites settings.json.
 check_scratch_guard() {
-  local first frag smerge marker hookjs smatcher sevent found
+  local first
   # TWO RUNGS, the receipt and this checker's own prefix. A third, bare root spelling used to follow
   # them, a guess at a layout the derivation had already missed. A miss is now the skip below, which
   # names both rungs (TOOL-aRepatriatedFork-24 S8), and the same holds for the recall and merge arms.
@@ -1036,6 +1040,14 @@ check_scratch_guard() {
     echo "skip     scratch   — ${miss:-hooks kit does not ship scratch-guard.fragment.json here (no install-receipt row, and none at ${KIT_REL:+$KIT_REL/}hooks/)}"
     return
   fi
+  check_fragments "scratch  " "$first"
+}
+
+# THE PER-FRAGMENT GRADING, ONE FUNCTION both fragment arms call (TOOL-dFairHearing-16 S6, its F6): the
+# scratch arm's loop, lifted whole, so the review kit's spec-audit opt-in pack is graded exactly as the
+# hooks kit's fragments are, never by a copy that grades one fragment two ways. <label> heads each line.
+check_fragments() { # <label> <a fragment found>: every *.fragment.json in that fragment's directory
+  local label=$1 first=$2 frag smerge marker hookjs smatcher sevent found
   smerge=$SMERGE
   # EVERY FRAGMENT THE HOOKS KIT SHIPS, each against its OWN event (TOOL-aRoutedQuill-5 S8). The
   # kit ships the PreToolUse gate and its SubagentStart context as two fragments, and grading the
@@ -1047,30 +1059,30 @@ check_scratch_guard() {
     read_fragment_keys "$frag"; marker=$FRAG_MARKER; sevent=$FRAG_EVENT; smatcher=$FRAG_MATCHER
     # A REFUSED owned-hook join is UNWIRED naming its reason, never a blank path read as a bad fragment.
     if ! hookjs=$(resolve_fragment_hook "$frag" 2>&1); then
-      echo "UNWIRED  scratch   — ${hookjs##*check-wiring: }"
+      echo "UNWIRED  $label — ${hookjs##*check-wiring: }"
       unwired=$((unwired+1))
       continue
     fi
     if [ -z "$marker" ] || [ -z "$hookjs" ] || [ -z "$smatcher" ] || [ -z "$sevent" ]; then
-      echo "UNWIRED  scratch   — $frag declares no marker/matcher/event/hook_path; settings-merge.py refuses it too. Fix: restore the shipped fragment"
+      echo "UNWIRED  $label — $frag declares no marker/matcher/event/hook_path; settings-merge.py refuses it too. Fix: restore the shipped fragment"
       unwired=$((unwired+1))
       continue
     fi
     if [ ! -f "$hookjs" ]; then
       if wired "$marker" "$smatcher" "" "$sevent"; then
-        echo "UNWIRED  scratch   — settings.json dispatches the $sevent entry but $hookjs is missing; every matching call runs node against nothing. Fix: cp ${frag%/*}/$(basename "$hookjs") $hookjs"
+        echo "UNWIRED  $label — settings.json dispatches the $sevent entry but $hookjs is missing; every matching call runs node against nothing. Fix: cp ${frag%/*}/$(basename "$hookjs") $hookjs"
         unwired=$((unwired+1))
       else
-        echo "skip     scratch   — not adopted ($hookjs absent)"
+        echo "skip     $label — not adopted ($hookjs absent)"
       fi
       continue
     fi
     if wired "$marker" "$smatcher" "$hookjs" "$sevent"; then
-      echo "ok       scratch   — $sevent entry wired in $(render_settings_path) (matcher '$smatcher')"
+      echo "ok       $label — $sevent entry wired in $(render_settings_path) (matcher '$smatcher')"
       continue
     fi
     if wired "$marker" "$smatcher" "" "$sevent"; then
-      echo "UNWIRED  scratch   — settings.json dispatches a $sevent entry under '$smatcher', but not the resolved copy $hookjs. Fix: $PY $smerge --fragment $frag"
+      echo "UNWIRED  $label — settings.json dispatches a $sevent entry under '$smatcher', but not the resolved copy $hookjs. Fix: $PY $smerge --fragment $frag"
       unwired=$((unwired+1))
       continue
     fi
@@ -1078,12 +1090,31 @@ check_scratch_guard() {
     # hook plainly present in the file concludes the checker is broken. Same reasoning as agent-cap.
     found=$(matchers_of "$marker" "" "$sevent" | paste -sd, - 2>/dev/null || matchers_of "$marker" "" "$sevent" | tr '\n' ',')
     if [ -n "$found" ]; then
-      echo "UNWIRED  scratch   — the $sevent entry is wired under matcher '$found', not '$smatcher'; it never fires for the calls the fragment declares. Fix: $PY $smerge --fragment $frag"
+      echo "UNWIRED  $label — the $sevent entry is wired under matcher '$found', not '$smatcher'; it never fires for the calls the fragment declares. Fix: $PY $smerge --fragment $frag"
     else
-      echo "UNWIRED  scratch   — $hookjs present but the $sevent entry ($frag) is not in settings.json. Fix: $PY $smerge --fragment $frag"
+      echo "UNWIRED  $label — $hookjs present but the $sevent entry ($frag) is not in settings.json. Fix: $PY $smerge --fragment $frag"
     fi
     unwired=$((unwired+1))
   done
+}
+
+# --- Check P: the review kit's spec-audit opt-in pack, a PreToolUse hook on Workflow calls -------------
+# TOOL-dFairHearing-16. Rule 0 of agent-cap left the hook for the review kit's spec-audit-optin.js, which
+# ships wired with that kit through its fragment, so a present-but-unwired pack is a real UNWIRED, as
+# for scratch-guard, and graded by the same function. No fragment found is the kit not adopted here.
+# TOOL-dFairHearing-50 S14 - no fork with no receipt: each receipt call answers empty without one, so it
+# is skipped, and the lookup's answer is read from `_kit_file` in this shell.
+check_spec_audit_optin() {
+  local first rp="" miss=""
+  [ -f .governance/install.json ] && rp=$(resolve_receipt_path workflows spec-audit-optin.fragment.json)
+  resolve_kit_file workflows spec-audit-optin.fragment.json >/dev/null
+  first_of "$rp" "$_kit_file" >/dev/null; first=$_first_of
+  if [ -z "$first" ]; then
+    [ -f .governance/install.json ] && miss=$(derive_receipt_miss workflows spec-audit-optin.fragment.json)
+    echo "skip     spec-audit — ${miss:-review kit does not ship spec-audit-optin.fragment.json here (no install-receipt row, and none at ${KIT_REL:+$KIT_REL/}workflows/)}"
+    return
+  fi
+  check_fragments "spec-audit" "$first"
 }
 
 # --- Check R: recall-opened PostToolUse hook (memory-recall kit — an OPT-IN) ----------------------
@@ -2102,6 +2133,7 @@ check_backlog_stragglers() {
 check_hooks
 check_agentcap
 check_scratch_guard
+check_spec_audit_optin
 check_recall_opened
 check_card
 check_routed

@@ -68,7 +68,9 @@ To clear it, run `python tools/policy/policy.py settings --write` in that checko
 file, so a refusal naming another layer is cleared by naming that file after `--write`, or by
 removing the value from it. A branch that
 raises the key renders the raise into its own settings, and rule 7 refuses them until the raise lands,
-because it reads the landed limit, never the branch's. Remove a hand-set value from
+because it reads the landed limit, never the branch's. The limit is landed; the helper that reads it
+is not. Its location rests on the working-tree receipt, `.governance/install.json`, so a forged row
+there chooses the code this rule runs, and rule 7 cannot see that. Remove a hand-set value from
 `.claude/settings.local.json` the same way. Three layers the harness applies are layers rule 7 does
 not read, so a value there runs past the limit unrefused: a file passed with the `--settings` flag,
 the managed-policy layer an administrator installs, and an exported environment variable that sets

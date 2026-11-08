@@ -91,6 +91,7 @@ and no job is a required check.
   states plainly what a check running under the run's own uid can and cannot buy.
 
 Before theorizing about drift, run `python tools/drift-audit/drift_report.py` — seconds, no agents,
-and it answers whether this repo's records still describe it. Before a review, run
-`python tools/memory-tree/gotchas.py --for-diff <base>..<head>` — its stdout IS the bug-class
-checklist for that diff.
+and it answers whether this repo's records still describe it. The review harness acquires the
+bug-class checklist itself on the diff kind; a reader who wants it runs
+`python tools/memory-tree/gotchas.py --for-diff <base>..<head>`, whose stdout IS the checklist for
+that diff.

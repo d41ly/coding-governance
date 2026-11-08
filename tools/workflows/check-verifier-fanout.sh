@@ -1,26 +1,31 @@
 #!/usr/bin/env bash
-# check-verifier-fanout.sh — the COMMITTED workflow harnesses obey every rule agent-cap.js enforces.
-# TOOL-dTieredTribunal-14 S3: this gate pipes each harness to the hook with NO --only flag, so once
-# the hook's raw-primitive early exit was inverted it began enforcing the ref-keyed-join rule too.
-# No verdict moved — its population is a SUBSET of the join gate's and the wider set was measured
-# clean — but a header describing a one-rule gate would be a structural check reading as a
-# semantic one, which is the class the charter names. Disclosed rather than widened silently.
+# check-verifier-fanout.sh — the COMMITTED workflow harnesses obey the verify-stage TOTAL and the
+# loop markers, rule 2 of the agent-cap hook until TOOL-dFairHearing-16 moved it to this kit's
+# check-verifier-fanout.js beside this gate (the owner's NT-27). The ref-keyed-join rule, which this
+# gate also ran through the hook's `scripts` selector since TOOL-dTieredTribunal-14 S3, runs from
+# check-review-join.sh alone now, as the move says.
 #
 #   bash <prefix>/workflows/check-verifier-fanout.sh          # every workflow script git can see
 #   bash <prefix>/workflows/check-verifier-fanout.sh <file>…  # explicit files (the self-test's fixtures)
 #
-# Exit 0 = clean · 1 = a rule the hook enforces is broken · 2 = misconfigured.
+# Exit 0 = clean · 1 = the rule is broken · 2 = misconfigured, or its check refused a harness.
 #
-# THIS GATE DOES NOT IMPLEMENT THE RULE. It feeds each script to `<prefix>/hooks/agent-cap.js` — the
-# same predicate the `PreToolUse` hook applies at the `Workflow` tool call — and reports what the hook
-# says. A bash re-implementation of a node predicate is two answers to one question: they would not
-# disagree loudly, they would drift the day either side is tightened, and the gate would then bless
-# scripts the hook denies (or the reverse) with no signal at all.
+# THIS GATE DOES NOT IMPLEMENT THE RULE. It runs check-verifier-fanout.js over each script, and that
+# file reads `<prefix>/hooks/agent-cap.js`'s views through the hook's exports, so the rule's scanner is
+# the hook's one scanner. A bash re-implementation of a node predicate is two answers to one
+# question: they would not disagree loudly, they would drift the day either side is tightened, and
+# the gate would then bless scripts the rule denies (or the reverse) with no signal at all.
 #
-# WHY BOTH ENTRY POINTS EXIST. The hook is the PRIMARY one: it sees the inline `script` string of an
-# ad-hoc review, which is the modality that actually produced the violation this rule exists for, and
-# which no file-scoped gate can ever see. This gate is the second line — it covers the harnesses that
-# live in the tree and are invoked by NAME, where the hook receives no source at all.
+# ONE RULE IS NATIVE, and the hook holds no copy of it: the SLOT COUNT (TOOL-dFairHearing-13). Every
+# array literal whose opening line carries the lens-slots marker holds exactly LENS_SLOTS top-level
+# elements, counted at the foot of this file. The literals are rendered from the review kit's lens
+# catalogue, `lenses.toml`, and the renderer does not count, so this is the one answer: a sixth
+# default row renders a sixth slot and reds here. Rule 2's own array-literal allowance still
+# admits the receiver; it is not consulted for the count.
+#
+# ONE ENTRY POINT NOW. The hook was the primary one, at the inline `script` of an ad-hoc review, until
+# NT-27 retired the rule there: an inline script is bounded by the harness's own concurrency settings,
+# and this gate judges every harness that lands, the ones invoked by NAME included.
 set -u
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "verifier-fanout: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
@@ -308,30 +313,70 @@ if [ -z "$SCAN" ]; then
   exit 1
 fi
 
+# THE RULE IS check-verifier-fanout.js BESIDE THIS GATE (TOOL-dFairHearing-16): the hook's rule 2,
+# moved to the review kit by the owner's NT-27, run per harness with the hook resolved above as its
+# `--hook`, whose views and MAX_VERIFIERS it reads. The hook's `scripts` selector, which this gate used
+# to call, now refuses: once rules 2 and 5 left, the mode ran nothing and could never red. Rule 5 runs
+# from check-review-join.sh alone. Its exit 1 is a finding, and its 2 a refusal that ends this gate at
+# exit 2, as the slot count's does below (TOOL-dFairHearing-50 S8).
+FANJS="$HERE/check-verifier-fanout.js"
+[ -f "$FANJS" ] || { echo "verifier-fanout: no check-verifier-fanout.js beside this gate at $HERE — the rule lives there, so a gate without it must say so, not pass"; exit 2; }
 st=0
 n=0
 while IFS= read -r f; do
   [ -n "$f" ] || continue
   n=$((n+1))
-  # The payload is built by node itself: a JSON encoder written in shell is one more place for a
-  # backslash or a backtick in a workflow's prompt text to change the meaning of the thing being
-  # judged. `--only=scripts` asks for the rules that read a SCRIPT (TOOL-aOrientedCast-7 S11): an
-  # inline-script payload is not a tool call, and the hook's call rule refuses every one of them
-  # wherever a role index exists.
-  if ! out=$(node -e '
-      const fs = require("fs")
-      process.stdout.write(JSON.stringify({
-        tool_name: "Workflow",
-        tool_input: { script: fs.readFileSync(process.argv[1], "utf8") },
-      }))' "$f" | node "$HOOK" --only=scripts 2>&1); then
-    echo "verifier-fanout: FAILED — $f"
-    printf '%s\n' "$out" | sed 's/^/    /'
-    st=1
-  fi
+  out=$(node "$FANJS" --hook "$HOOK" "$f" 2>&1); _fr=$?
+  case "$_fr" in
+    0) ;;
+    1)
+      echo "verifier-fanout: FAILED — $f"
+      printf '%s\n' "$out" | sed 's/^/    /'
+      st=1 ;;
+    *) echo "verifier-fanout: the rule could not run on $f — $out"; exit 2 ;;
+  esac
 done <<<"$SCAN"
 
 # THE CLEAN LINE NAMES NO NUMBER (TOOL-dGroundRules-10). The verify total is the hook's MAX_VERIFIERS,
 # which the hook names in every denial, and the agent limit is the policy kit's: a number printed here
 # would be a third copy of either.
 [ "$st" = 0 ] && echo "verifier-fanout: clean — $n workflow script(s) obey the hook's verify-stage rule"
+
+# ---- THE SLOT COUNT (TOOL-dFairHearing-13; one predicate and one counter since TOOL-dFairHearing-23) ----
+# Over the same population: every array literal opened on a marker line holds exactly the lens count.
+# The marker lines are `render_lenses.py --markers`, the renderer's own anchored regex, so a comment
+# that names gov:lens-slots is no marker here either, and a gov:lens-optins literal is outside the
+# count (TOOL-dFairHearing-27 S1). check-verifier-fanout.js `--slots` counts each literal with `topLevelArgs`, rule 2's own counter, over the hook's literal-blanked view, so a comma in
+# a string, parentheses or braces is no slot and a trailing comma no element, and it holds the number,
+# its one home, and prints the verdict. With explicit files a harness carrying no marker is legal; in
+# the whole-tree mode no marked literal anywhere is a failure, because a count over nothing grades
+# nothing. The slot verdict prints on a line of its own, after the hook's clean line, which stays byte
+# for byte.
+RENDERER="$HERE/render_lenses.py"
+# A predicate that did not run is a named exit 2, never an empty marker list (TOOL-dFairHearing-27 S23):
+# no renderer beside the gate, no usable python, or `--markers` exiting non-zero, its python floor's
+# refusal included, since it shares the renderer's.
+[ -f "$RENDERER" ] || { echo "verifier-fanout: the marker predicate did not run (no render_lenses.py beside this gate at $HERE)"; exit 2; }
+[ -n "$_hk_py" ] || { echo "verifier-fanout: the marker predicate did not run (no usable python)"; exit 2; }
+locs=()
+while IFS= read -r f; do
+  [ -n "$f" ] || continue
+  _ml=$("$_hk_py" "$RENDERER" --markers "$f" 2>&1) || { echo "verifier-fanout: the marker predicate did not run (render_lenses.py --markers $f exited $?: $_ml)"; exit 2; }
+  # MSYS converts an absolute path only as a whole argument, so `<path>:<line>` reached node unconverted
+  # and unreadable. `cygpath -m` spells it for node; a relative path needs no spawn, and where cygpath
+  # is absent the path is already native (TOOL-dFairHearing-50 S5).
+  case "$f" in /*) _nf=$(cygpath -m "$f" 2>/dev/null) || _nf=$f ;; *) _nf=$f ;; esac
+  for _l in ${_ml//$'\r'/}; do locs+=("$_nf:$_l"); done
+done <<<"$SCAN"
+if [ "${#locs[@]}" -gt 0 ]; then
+  slots=$(node "$FANJS" --hook "$HOOK" --slots "${locs[@]}" 2>&1); _sr=$?
+  case "$_sr" in
+    0) printf '%s\n' "$slots" ;;
+    1) printf '%s\n' "$slots"; st=1 ;;
+    *) echo "verifier-fanout: the slot count could not run — $slots"; exit 2 ;;
+  esac
+elif [ "$EXPLICIT" = 0 ]; then
+  echo "verifier-fanout: no lens-slot literal (a line marked gov:lens-slots) in any workflow script — the slot count graded nothing, which is not a pass"
+  st=1
+fi
 exit "$st"

@@ -414,6 +414,7 @@ Cite ids, never line numbers.
 | [TOOL-dCalibratedLens-53](../builds/dCalibratedLens/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | CHECK 24 READS A SPEC TITLE'S FOREIGN ID AS A ROSTER UNIT. The… |
 | [TOOL-dCalibratedLens-54](../builds/dCalibratedLens/BACKLOG.md) | OPEN | HIGH | — | 2026-11-03 | held red: suite unattended driver selftest shard 4/8 red at 2c50ab31 on… |
 | [TOOL-dCalibratedLens-55](../builds/dCalibratedLens/BACKLOG.md) | OPEN | HIGH | — | 2026-11-03 | held red: suite unattended runlog-writer selftest red at 2c50ab31 on… |
+| [TOOL-dCalibratedLens-56](../builds/dCalibratedLens/BACKLOG.md) | OPEN | LOW | — | 2026-11-02 | run the losing test of each of the six opt-in review lenses… |
 | [TOOL-dCarriedReceipt-1](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | --review's convergence predicate is scoped to ONE run's run-state file… |
 | [TOOL-dCarriedReceipt-2](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | --review makes CONVERGED terminal for a subject (unattended.sh:3135,… |
 | [TOOL-dCarriedReceipt-3](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | a FOLD pass legitimately spans many units, and the dispatch machinery… |
@@ -454,7 +455,15 @@ Cite ids, never line numbers.
 | [TOOL-dDerivedDocket-75](../builds/dDerivedDocket/BACKLOG.md) | OPEN | LOW | — | 2026-09-30 | NODE d RUNS AN ABSOLUTE core.hooksPath FROM A WRITER NOBODY KNOWS. The… |
 | [TOOL-dDerivedDocket-76](../builds/dDerivedDocket/BACKLOG.md) | OPEN | MED | — | 2026-09-30 | THE UNATTENDED KIT'S COMPENSATING CHECK IS UNPAID FOR THIS LANDING.… |
 | [TOOL-dEasedEffort-3](../builds/dEasedEffort/BACKLOG.md) | OPEN | BLOCKER | — | 2026-11-02 | inherited red: leg recall floor arms red at 529b98a4, older than the… |
-| [TOOL-dFairHearing-19](../builds/dFairHearing/BACKLOG.md) | DEFERRED | MED | TOOL-dFairHearing-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dFairHearing-41](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-03 | A LIVE SPEC OF ANOTHER BUILD CITES tools/hooks/agent-cap.js BY LINES… |
+| [TOOL-dFairHearing-42](../builds/dFairHearing/BACKLOG.md) | OPEN | MED | — | 2026-11-04 | REPLAY 1 MISSED ITS BAR IN BOTH RUNS, SO R-1 IS REOPENED WITH ITS… |
+| [TOOL-dFairHearing-49](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-05 | A LIVE SPEC OF ANOTHER BUILD OWES A LEG ITS FILES NOW TRIP.… |
+| [TOOL-dFairHearing-51](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-05 | THREE POLICY KEYS HAVE NO PLANNED READER. TOOL-dFairHearing-50 moves… |
+| [TOOL-dFairHearing-52](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | A BUILDER KILLED A PROCESS IT DID NOT START. Unit 43's builder killed… |
+| [TOOL-dFairHearing-53](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | THE ARM-LABELS JOIN REDS A SPEC BEFORE ITS ARMS EXIST.… |
+| [TOOL-dFairHearing-54](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | SPEC WRITERS CANNOT RUN THE TOKEN CHECK THEY ARE GRADED BY. A spec… |
+| [TOOL-dFairHearing-55](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | THE CLOSE OBSERVES NEW ARMS WITH TOOLS IT WROTE IN SCRATCH. Observing… |
+| [TOOL-dFairHearing-56](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | A HELD SUITE'S GUARD MISSES A SIBLING KIT. The hook destinations… |
 | [TOOL-dFoldedVerdict-7](../builds/dFoldedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THREE CARRIERS WERE FOUND SITTING EXACTLY ON THEIR DECLARED CEILING IN… |
 | [TOOL-dFoldedVerdict-9](../builds/dFoldedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-02 | RETIRING ANOTHER BUILD'S UNIT LEFT TWO CONSEQUENCES ON THAT BUILD'S OWN… |
 | [TOOL-dFurnishedOrders-21](../builds/dFurnishedOrders/BACKLOG.md) | DEFERRED | MED | TOOL-dFurnishedOrders-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |

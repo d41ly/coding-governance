@@ -37,7 +37,11 @@
 # RENDER. A tracked file that matches, whole, a `rendered` template the registry ships is gov's own
 # render of it, which is the rendered-at-deploy-time form an adopter regenerates at its own prefix
 # (TOOL-aRepatriatedFork-29 §8 F3 (a)). The match reads each `{{TOKEN}}` as one line of any text and
-# a repeated token as the same text, so it is a re-render proved structurally, without the values.
+# a repeated token as the same text, a token alone on its line as a block of whole lines, each site
+# its own text, so it is a re-render proved structurally, without the values. A block is graded at
+# its source, the file its lines render from, and the parity leg proves the values. That is why
+# `tier2-review.js` leaves the ban: its four `tools/` spellings are `{{TOOL_ROOT}}` renders, correct
+# as they stand.
 # The TEMPLATE stays in the population, so a literal reaches a render only through a graded file,
 # and a hand edit that breaks the match puts the render straight back.
 #
@@ -493,14 +497,19 @@ def read_text(path):
 
 def build_render_rx(src):
     """<src>, a template, as one regex a render of it matches WHOLE: each `{{TOKEN}}` one line of
-    any text, a repeated token the same text as its first occurrence, the rest literal."""
+    any text, a repeated token the same text as its first occurrence, the rest literal. A token
+    alone on its line is a BLOCK: any number of whole lines, its own text at each site."""
     out, seen, pos = [], set(), 0
     for m in TOKEN.finditer(src):
         out.append(re.escape(src[pos:m.start()]))
+        pos = m.end()
+        if src[m.start() - 1:m.start()] in ("", "\n") and src[pos:pos + 1] == "\n":
+            out.append(r"(?:[^\n]*\n)*?")
+            pos += 1
+            continue
         name = m.group(1)
         out.append("(?P=%s)" % name if name in seen else "(?P<%s>[^\n]*?)" % name)
         seen.add(name)
-        pos = m.end()
     out.append(re.escape(src[pos:]))
     return re.compile("".join(out))
 

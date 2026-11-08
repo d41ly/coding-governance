@@ -1,11 +1,12 @@
 # `<prefix>/workflows/` — the review harness and the gates over it
 
-Three gates in this directory read the tree and delegate their verdict to the agent-cap hook:
+Three gates in this directory read the tree; two of them run a rule that lives beside them and reads
+the agent-cap hook's views (see "The rules that left the hook" below):
 
 | gate | what it judges |
 |---|---|
-| `check-review-join.sh` | no ref-keyed verdict join, and every agent wave a source scan can see is counted |
-| `check-verifier-fanout.sh` | the committed harnesses obey the verify-stage cap |
+| `check-review-join.sh` | no ref-keyed verdict join, through `check-review-join.js`, and every agent wave a source scan can see is counted |
+| `check-verifier-fanout.sh` | the committed harnesses obey the verify-stage cap and the loop markers, through `check-verifier-fanout.js` |
 | `check-workflow-syntax.js` | every workflow script parses, and a second pass reds a pathless `git commit` on any code line, `git -C` included, printing how many lines it graded; a zero beside the build harness render is a dead probe |
 
 `tier2-review.js` is the ready-made harness they exist to protect. It carries this directory's
@@ -20,7 +21,7 @@ argument is the leg that grades them:
 |---|---|---|
 | `<memory root>/guides/REVIEW-PROTOCOL.md` | `REVIEW-PROTOCOL.template.md` | `TOOL_ROOT` |
 | `unattended-build.js`, beside its template | `unattended-build.template.js` | `KIT_DIR`, `TOOL_ROOT`, `MEMORY_TREE_DIR`, `FANOUT_CAP` |
-| `tier2-review.js`, beside its template | `tier2-review.template.js` | `FANOUT_CAP` |
+| `tier2-review.js`, beside its template | `tier2-review.template.js` | `FANOUT_CAP`, `LENS_SLOTS` |
 | `drift-audit-code.js`, beside its template | `drift-audit-code.template.js` | `FANOUT_CAP` |
 | `drift-audit-state.js`, beside its template | `drift-audit-state.template.js` | `FANOUT_CAP` |
 
@@ -157,16 +158,62 @@ Each also accepts explicit files, which is how the suites drive their fixtures. 
 output is where the resolved predicate path is reported: the default run's bytes are pinned by an
 acceptance criterion, so diagnostics that would change them live behind the flag.
 
+## The rules that left the hook — `TOOL-dFairHearing-16`
+
+Three of the agent-cap hook's rules are this kit's since the owner's NT-27, each seen red at its new
+home before the hook stopped carrying it. The hook keeps rules 6 and 7, which judge the call, and
+exports the readers these homes share with it: its views, `runBothViews`, `MAX_VERIFIERS`, the
+writer bound, the args reader and the slug walk. Rule 2's lens-literal bound is `LENS_SLOTS` in
+`check-verifier-fanout.js`, the same number the slot count holds every marked literal to, so it has
+one home (TOOL-dFairHearing-23). Every `--only=` the hook was
+given before now refuses, exit 2, naming the two script homes.
+
+| rule | home | runs from |
+|---|---|---|
+| the verify-stage total and the loop markers (`gov:fixed-verifiers`, `gov:fixed-writers`, `gov:sequential-agents`) | `check-verifier-fanout.js` | `check-verifier-fanout.sh`, per harness |
+| the ref-keyed verdict join ban | `check-review-join.js` | `check-review-join.sh` alone, per script |
+| the spec-audit opt-in | `spec-audit-optin.js` | the `PreToolUse` wiring, on `Workflow` calls |
+
+The two script homes are CLIs as well as modules, and take the hook as `--hook`:
+
+```bash
+node <prefix>/workflows/check-verifier-fanout.js --hook <prefix>/hooks/agent-cap.js <file>…
+node <prefix>/workflows/check-review-join.js --hook <prefix>/hooks/agent-cap.js <file>…
+```
+
+Each prints a finding as the hook printed it and exits 1, exits 0 clean, and exits 2 when it cannot
+load the hook's exports or read a file. A writer split's bound is read at the working directory. An
+inline `script` on a `Workflow` call is no longer judged at the tool call: the harness's own
+concurrency settings bound it, and the gates judge every harness that lands.
+
+**The spec-audit opt-in pack** is a hook of its own, wired through its fragment beside it:
+
+```bash
+python <prefix>/settings-merge.py --fragment <prefix>/workflows/spec-audit-optin.fragment.json
+```
+
+A default install wires it through govkit, and `<prefix>/check-wiring.sh` grades it with the same
+per-fragment loop that grades the hooks kit's fragments, reporting it UNWIRED in a tree that unwired
+it. It reads `extractWorkflowArgs` and `extractBuildSlug` from the hook and `readFrontMatterKey` and
+`readConfKey` from scratch-guard.js, both in the directory its inline `resolveKitDir`, agent-cap's
+resolver, finds the hooks kit in: the install receipt's row, then the two sibling probes. A copy that
+finds no hooks kit denies a call whose args may be a spec audit, naming the three places it looked, and
+admits every other; one that cannot load a reader from there denies naming that reader. What the rule
+denies is stated in `<prefix>/hooks/README.md`.
+
 ## `tier2-review.js` — the five diff lenses, and `lensNotes`
 
 A diff review fans out over five finder lenses, in this order: `security`, `correctness`, `seams`,
 `verification` and `intent`. Since 1.17 `verification` asks whether every changed behaviour has a
 check that can fail, and `intent` whether the diff does what its commit messages and specs say; the
 old `regressions` lens is retired. A spec audit runs five lenses of its own, in this order:
-`coherence`, `grounding`, `reuse`, `blast-radius` and `failure-envelope` (TOOL-aEvidencedLens-1).
-`SPEC_LENSES` in the harness is that catalogue's one source; the method and the memory-tree README
-point at it. Five is also the most the agent-cap hook admits on that receiver, so neither set can
-grow a sixth.
+`coherence`, `grounding`, `reuse`, `blast-radius` and `failure-envelope` (TOOL-aEvidencedLens-1),
+or, under the `design-audit` preset (below), the five of `DESIGN_LENSES`, and under `whole-design` the five
+walkers of `WHOLE_DESIGN_LENSES`. Every set has one source,
+`lenses.toml`, this kit's lens catalogue (below); `DIFF_LENSES`, `SPEC_LENSES`, `DESIGN_LENSES` and `WHOLE_DESIGN_LENSES` in
+the harness are its render, and the method and the memory-tree README point at the literal. The
+fan-out leg holds each rendered literal to exactly five slots, and five is also the most the
+agent-cap hook admits on that receiver, so no set can grow a sixth.
 
 `lensNotes` appends a project addendum to one lens's brief, and to no other prompt:
 
@@ -176,7 +223,24 @@ args: { repo, base, head, reviewDir,
 ```
 
 Its keys are the lens keys of the run's own kind. A key naming no such lens, a non-object, or an
-empty note refuses before any agent spawns, with the legal keys in the message. Absent, it is
+empty note refuses before any agent spawns, with the legal keys in the message.
+
+A caller that runs more than one literal passes the notes per preset instead: an object whose every
+key is a literal name, `diff-review`, `unit-spec` or `design-audit`, each mapping to the map above.
+
+```js
+args: { kind: 'spec-audit', subjects, scratch,
+        lensNotes: { 'unit-spec': { reuse: 'the kits under tools/ are the seams' },
+                     'design-audit': { 'alternatives-and-cost': 'price a new kit against the shared library' } } }
+```
+
+The run reads only its own literal's entry, absent meaning `{}` and announced as no notes; only that
+entry is checked, and another preset's is checked when that preset runs. An object mixing literal
+names with lens keys refuses, naming both forms. The flat form keeps its meaning, and the two forms of
+the same notes derive one review key. After an `optIn` swap (below) the legal keys are the literal's
+defaults plus the opt-ins swapped in: a note keyed to a default the swap displaced is accepted and
+reported unread, in the log and in RUN INTEGRITY, as a skipped light lens's note is, and a note keyed
+to the swapped-in opt-in reaches that slot's prompt. Absent, it is
 announced: a `WARNING:` log line, and a clause in the report's RUN INTEGRITY block. The notes and a
 review-shape literal both join the review key, so a lens file written by older prompts or under
 other notes is never reused. An adopter test that counted four diff lenses sees five from 1.17.
@@ -199,9 +263,25 @@ exists; the lens that reads it reports a missing one. A run given neither `specs
 `WARNING:`, and every report's RUN INTEGRITY block says where intent came from. `specs` joins the
 review key, like `lensNotes`.
 
-`checklist` carries the project's recurring bug classes. The harness produces none; this repository
-passes the stdout of the memory-tree kit's `gotchas.py --for-diff <range>`, from wherever that kit
-is installed:
+`checklist` carries the project's recurring bug classes. On the diff kind the harness ACQUIRES it
+when the caller passes none (TOOL-dFairHearing-15): its first agent, `resume:checklist` in the
+`Resume` phase, before the input print and the resume probe, finds the memory-tree kit's checker
+at run time, the first of `<tool-root>/memory-tree/gotchas.py` and `<tool-root>/gotchas.py` that
+`git ls-files --error-unmatch` calls tracked, runs `gotchas.py --for-diff <base>..<head>` over the
+range the call pinned with a 120-second bound, and returns its stdout verbatim, which then takes
+the path a caller's string takes below. An acquired checklist logs `checklist from --for-diff
+<base>..<head>` and RUN INTEGRITY says so; no checker tracked, a non-zero exit, a timeout, stdout
+with no `- ` line (`no bug class selected`), a return that is not whole or a dead agent logs a `WARNING:`
+naming the reason, and
+RUN INTEGRITY's `Checklist:` line names it as `not acquired: <reason>`. A caller's `checklist`
+wins and no agent spawns; the spec kind never acquires, since `unattended-build.js` hands its audit
+a `--for-paths` one. A return is WHOLE (TOOL-dFairHearing-23) when it carries the checker's `# by
+design —` head and its `- ` items before that head number `n + u + k`, `n` and `u` from its `# <n>
+class(es) selected by an anchor + <u> universal` line and `k` from its `# invariants are read at <sha>;
+<k> that ...` line, 0 when absent; any other return is a `checklistError` naming the cut, so a
+tail-truncated stdout never passes as complete. A return whose head lines
+state one item or more and which holds no `- ` line is cut the same way, and one stating none stays
+`no bug class selected`. A caller passes the same stdout, or its own curated list:
 
 ```js
 args: { repo, base, head, reviewDir,
@@ -215,7 +295,7 @@ refuses rather than becoming one item, and so does any value that is neither a s
 non-empty strings. The items are split ROUND-ROBIN over the lenses of the run's kind: item `n` goes to
 lens `(n - 1) % K` in lens order, so each class is swept by exactly one finder, labelled `C<n>`, and
 a finder begins a hit's claim with that label. A lens with no share is told so; skeptics get none. The
-split is logged, and RUN INTEGRITY states it. An absent or itemless checklist logs a `WARNING:` and
+split is logged, and RUN INTEGRITY states it. An absent (on the spec kind) or itemless checklist logs a `WARNING:` and
 RUN INTEGRITY says no class was swept; a string of `# ` header lines alone is itemless, not a refusal.
 The parsed checklist joins the review key.
 
@@ -290,16 +370,244 @@ lens counts as neither live nor dead. A spec audit has no light subset, so `'lig
 value other than the two refuses on both kinds. `intensity` joins the review key. A diff that crosses a
 trust boundary is not one to review light: the `security` lens is one of the two a light run skips.
 
+`batchBy` is `'id'` or `'address'`, and absent it is `'id'`: the order the findings are sliced into
+the fixed count of skeptic batches in. `'id'` slices them in id order, lens by lens. `'address'` sorts a
+copy by `deriveAddressKey`, the file, then the line on a diff review or the first `[tag]` or section
+token of `where` on a spec audit, then lens and id, so two lenses citing one place meet one skeptic; the
+batch count and sizes are the same on both. Any other value refuses before the first agent, and the
+`<n> finding(s) -> <k> verifier(s)` log line ends `by id` or `by address`. It ships dark: nothing in this
+kit passes `'address'` until the replay records a hit. On both orders a batch is labelled
+`verify:batch-<n>` and its result file is `verify-batch-<n>.json`, carrying its member ids as `ids`,
+since the label no longer tells them; a verify file without `ids` is never reused.
+
+`addressTwins` is `'hidden'` or `'shown'`, and absent it is `'shown'`. Under `'shown'` the synthesis
+is handed two more blocks after the UNVERIFIED findings: `REFUTED findings`, one line per refuted
+finding with its claim and the skeptic's reason, and `SAME-ADDRESS PAIRS`, each confirmed and refuted
+finding that `deriveTwinPairs` reads as one address through `deriveAddressKey` and `checkSameAddress`.
+A merged duplicate is never among the refuted. The synthesis is told to flag a refuted finding that
+describes the same defect as a confirmed one and return each as `{refuted, confirmed}` in `twinFlags`,
+which its schema then requires, and RUN INTEGRITY states how many refuted findings and pairs it was
+shown. A flag notes a twin and never overturns a verdict: no verdict, grade, item or count moves. Any
+other value refuses before the first agent. It joins no review key, since the synthesis writes no keyed
+file. Its default became `'shown'` when TOOL-dFairHearing-1's replay 3 met its bar
+(`memory/builds/dFairHearing/build/2026-11-03-build-TOOL-dFairHearing-1-verdicts.md`), so every run that
+passes no `addressTwins` hands the synthesis both blocks and requires `twinFlags` of it; a caller passes
+`'hidden'` for the synthesis prompt and schema of before.
+
+`twin` is the policy key `review.twin`, passed directly as a pin argument until a policy-file trigger
+lands: `'never'`, `'design-records'`, `'design-and-landing'` or `'always'`, and absent it is `'never'`;
+any other value refuses before the first agent. It twins a run under `'always'`; under
+`'design-records'` on a design-record audit, a spec audit whose subjects are all design subjects by
+`SPEC_SUBJECT_PATH` or whose `preset` is not `'unit-spec'`; and under `'design-and-landing'` on that case
+or on any diff review, every diff review here being the closing review. A twinned run dispatches a
+second finder run, run b, over the same lens literal after run a, as a second bounded fan: run b's
+labels end `:b` (`find:<lens>:b`, so a dead one sits in `pending` that way) and its lens files are
+`find-<lens>-b.json`. Ids number run a's findings first and then run b's, so each run is one contiguous
+range; the verify stage keeps its fixed batch count over the union, and `agents`, `lensesRun`, every
+count and the review-shape line cover both runs. Each confirmed finding reaches the synthesis carrying
+`run=a` or `run=b`, under a `TWIN RUN` block listing the cross-run candidate pairs at one address by
+`deriveAddressKey` and asking for one item per defect, its ids from either run or both. The harness
+renders `review-twin runs=2 a=<first>-<last> b=<first>-<last>` (`-` for a run with no finding), which the
+synthesis copies verbatim directly below the review-shape line. The final return carries `twin`: `{a,
+b, agreed, onlyA, onlyB}`, run a's and run b's confirmed ids and three ITEM counts derived from the
+item list, `agreed` holding a confirmed id of each run; it is `null` when the tally refuses the items,
+when no synthesis ran, and on every untwinned run. A twinned run's key print gains `twin: true`, so it
+never reuses an untwinned run's files; an untwinned run's key and synthesis prompt are unchanged.
+
+`fixJudge` is `'instance'` or `'class'`, and absent it is `'class'`: how a skeptic judges a finding's
+proposed fix. Under `'instance'` it judges the fix against the instance the finding cites, and every
+skeptic prompt and the review key are as they were. Under `'class'` it asks whether the fix cures the
+defect's class, every instance of the pattern the claim names in the subject and the code or specs it
+reaches, and `FIX_VERDICTS` gains `'instance'`: the fix cures the cited instance and leaves another of
+its class standing, `fixNote` holding the class-level fix. A fix judged `'instance'` with a note gives
+way to that note in `confirmedFindings` and the synthesis's fix line, as an unsound one gives way to its
+correction, and RUN INTEGRITY counts the instance-only fixes. Under `'instance'` a skeptic answering
+`'instance'` reads as not judged. `'class'` joins the review key; any other value refuses before the
+first agent. Its default became `'class'` when TOOL-dFairHearing-1's replay 4 met its bar (the same
+verdict record). Since `'class'` joins the review key, every run that passes no `fixJudge` derives a new
+key from then on, and no lens or verify file an earlier default run wrote is reused; a caller passes
+`'instance'` for the skeptic prompts and the key of before.
+
+Every confirmed finding is given one DISPOSITION from the report step's grammar: `class:<slug>`, a
+class this run was handed; `gate:<leg>`, a leg of the leg manifest; `new:<slug>`, a slug matching
+`[a-z][a-z0-9]*(-[a-z0-9]+)*` that is no handed slug; or `none`. The handed class slugs are the
+checklist items' slugs, read by the rule `classes` reads, so a `C<n>` label with no slug is no class.
+The leg names come from `gateManifest`, the name drift-audit-state's harness gives the same input
+(TOOL-dFairHearing-23), a repo-relative path refused on the `specs` rule, defaulting to the kit root's
+`gate-legs.json` as rendered at install: the resume probe reads it and returns `legs`, the `name` of
+every object in its top-level array, beside `legCount`, the array's element count, and leaves both out
+when the file is absent or is not such an array. The list is used whole or not at all: an empty one, one
+whose length is not `legCount`, or one holding a non-string, an empty string or a duplicate reads as no
+`legs`. With no `legs`, the log and RUN INTEGRITY say no leg manifest was read, and every
+`gate:` disposition is refused. `unclassed` is the policy key `review.unclassed`, passed as a pin
+argument until a policy-file trigger lands: `'refuse'`, `'reason'` or `'owner-rules'`, and absent it is
+`'refuse'`; any other value refuses before the first agent. `none` is refused under `'refuse'`, and
+admitted under the other two with a non-empty reason. The synthesis is handed the four forms, the
+`unclassed` value, the class slugs and the leg names in a DISPOSITIONS block after RUN INTEGRITY, and
+returns `dispositions`, one `{id, disposition, reason}` per confirmed id, which its schema requires.
+The harness accepts the set only when every confirmed id has exactly one legal disposition and no other
+id has one; otherwise it refuses the set whole, and `blockers` and `highs` keep their own derivation.
+Neither `unclassed` nor `gateManifest` joins the review key.
+
+`preset` picks a spec audit's lens literal, `'unit-spec'`, `'design-audit'` or `'whole-design'` (below), and absent it is
+`'unit-spec'`, the five lenses above. Only the caller picks it, and the kind stays `spec-audit`, so
+the binding line is unchanged. `'design-audit'` runs `DESIGN_LENSES`, the `design-audit` rows of `lenses.toml`, for a design or
+architecture record, whose sections are not a unit spec's: `coherence`, `grounding`, `reuse` and
+`failure-envelope` in design briefs of their own, and `alternatives-and-cost` in place of
+`blast-radius`. Any value outside `PRESETS` refuses, and so does any `preset` on a diff review, before
+the first agent. A preset off the default is logged before the first agent and joins the review key,
+so a design-audit run never reuses a unit-spec run's lens files; a run without it keeps its key. Every
+spec audit names its preset in RUN INTEGRITY and carries `preset` on every return, beside `intensity`.
+Which preset a design record gets when nobody names one is `DESIGN_RECORD_PRESET` in `review_pin.py`
+(below), the value's one source, so this page names it and never states its value.
+
+**The whole-design walk, `preset: 'whole-design'`** (TOOL-dFairHearing-18). Five walkers, `WHOLE_DESIGN_LENSES`,
+the `walk-1` to `walk-5` rows of `lenses.toml`, walk every item of a design through every scenario. The
+preset requires a `walk` argument and every other preset refuses one, each refusal naming its field before the
+resume probe:
+
+```js
+walk: { items: [{ tag: 'plan.input', step: 's1' }, ...],        // non-empty; tag and step ^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$, tags unique
+        scenarios: [{ id: 'S1', name: '...', walks: '...' }, ...], // non-empty; id ^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$, unique
+        runs: 2,              // review.design-audit.runs: 1, 2 or 3, absent 2
+        run: 1,               // which run this invocation is, 1 to runs; required
+        seed: 'reverted-escapes', // review.design-audit.seed: reverted-escapes | synthetic | none, absent reverted-escapes
+        keySha: '<64 hex>' }  // the key's SHA-256, required unless seed is none
+```
+
+One invocation is one run: `review.pin` invokes the harness `runs` times, `run` 1 to `runs`, so no run's report
+exists while the next walks. `deriveWalkSlices` deals every cell of the item-by-scenario grid to exactly one
+walker slot: run 1 by scenario, round-robin through `deriveChecklistShares`; run 2 by contiguous step band, the
+steps in first-seen item order; run 3 diagonally, cell (i, j) to slot (i + j) mod 5. A slot with no cell is not
+dispatched, and RUN INTEGRITY names it as an idle walker slot. Each walker is told `WALK_RULES`, held once in the
+harness, its own slice, its scenarios with their `name` and `walks`, and, when seeded, the key's SHA-256 and that
+the key is never to be read. Its schema is the spec kind's plus a required `walk`, one row per cell: `item`,
+`scenario`, `actor`, `needs`, `witness`, `route`, `verdict` (`holds`, `finding` or `not-on-path`), `findings`
+(zero-based indexes into its own findings) and `reason`. `deriveWalkGaps` checks each walker's rows against its
+slice: a cell with no row or two, a row outside the slice, an empty field, a verdict outside the three, a
+`finding` with no index or one past the findings, a `not-on-path` with no reason, and a `holds` carrying an
+index are each a gap, and any gap reds the walk: the synthesis is told the count, to list each gap first, and
+that its verdict token is BLOCKED. The joined table reaches the synthesis between `<<<WALK TABLE` and
+`WALK TABLE>>>`, to be copied verbatim directly before the appendix:
+
+```
+## Walk table — run <r> of <runs>, sliced by <scenario|step|diagonal>
+walk-seed mode=<seed> key-sha256=<keySha|->
+
+| Item | Scenario | Actor | Needs | Witness | Route | Verdict |
+```
+
+A verdict reads `holds`, the finding ids `<R><w>-F<id>` (`R` is `A`, `B` or `C` for runs 1 to 3, `w` the walker
+slot), or `not on path: <reason>`. Every skeptic batch is also handed eight clean cells, drawn at an even stride
+from the `holds` cells sorted by `<item> · <scenario>`, and a walk with no finding still dispatches one cell-only
+batch, `verify:cells`, and still synthesizes. A cell a skeptic refutes becomes an UNVERIFIED finding of the lens
+`cell-sample`. A whole-design run is never twinned. Every return past the find stage carries `walkTable`, the
+joined rows; `walkGaps`, one `<item> · <scenario> — <what>` per gap; `cellsSampled` and `cellsRefuted`, `null`
+until the verify stage. The record's copy of the table is not verified; the return is the source of record.
+
+`optIn` swaps an opt-in lens into a default slot of the run's literal: `{ "<opt-in lens>": "<default
+lens it replaces>" }`, absent meaning `{}`. The literal keeps five slots, so the swapped lens runs where
+the default would have and the default does NOT run; its coverage is dropped for that run. Each default
+slot is rendered as a `deriveSlotLens('<literal>', { key, brief })` call, which returns the
+`OPTIN_LENSES` row the swap names, carrying `replaces: <default key>`, so the finder label, the lens
+file and the lens-yield row all name the opt-in. Its shape is refused before any agent, beside
+`intensity` and `preset`: not an object, or a key or value outside `^[a-z][a-z0-9-]*$`. Its membership
+is refused by name before the resume probe, in this order: an opt-in already a lens of the literal; one
+no shipped row offers for that literal; a default the literal lacks; and one default named by two
+keys. A light diff run selects its slots by each slot's default key, so a swap into a light slot runs
+there. A non-empty `optIn` joins the review key, each swap is logged before the first agent and named in
+RUN INTEGRITY, and every return carries `optIn` beside `intensity`. A lens note keyed to a replaced
+default is accepted and reported unread, since the swapped lens is the one that runs. Only an `optin = true` row of
+`lenses.toml` can be swapped in, and today none is: each opt-in row ships `optin = false` until its
+losing test is recorded.
+
+`review_pin.py`, beside the harness, is the stand-in for `review.pin`: it prints the `preset`,
+`optIn`, `twin` and `unclassed` of one spec-audit call as one JSON line, one line per run under
+`whole-design`, and runs nothing.
+
+```
+python <kit>/review_pin.py --subject <path> [--subject <path> ...]
+                           [--opt-in none|'<json>'] [--design-record-preset unit-spec|design-audit|whole-design]
+                           [--design-audit-runs 1|2|3] [--design-audit-seed reverted-escapes|synthetic|none]
+                           [--twin never|design-records|design-and-landing|always]
+                           [--unclassed refuse|reason|owner-rules]
+# defaults: runs 2, seed reverted-escapes
+# whole-design: one line per run   {"preset": "whole-design", "walk": {"runs": 3, "run": 1, "seed": "synthetic"}}
+# otherwise: one line, a key only for each flag given
+```
+
+`--design-audit-runs` and `--design-audit-seed` are `review.design-audit.runs` and
+`review.design-audit.seed` (TOOL-dFairHearing-23), checked for shape only. When the printed preset is
+`whole-design` the module prints one line per run, run 1 to `runs`, each carrying its `walk` of `runs`,
+`run` and `seed`; the caller adds the design's items, scenarios and key hash before it invokes the
+harness. Under any other preset no line carries `walk`. A `--subject` carrying `\` exits 2 first,
+naming the backslash, as the harness's `specsRule` refuses one, so a backslashed spec path is never
+classed a design record.
+
+A subject is a spec subject when the harness's own `SPEC_SUBJECT_PATH`, read from the `tier2-review.js`
+beside the module, matches it; every other subject is a design record. A set holding any spec subject
+prints `unit-spec`; a set of design records alone prints `--design-record-preset`, whose default,
+`DESIGN_RECORD_PRESET` in `review_pin.py`, is that value's one source, set by replay 1's verdict
+(the replay section below). `--opt-in` is the
+`review.opt-in` value: `none`, the default, or a JSON object keyed by literal name whose values are
+`optIn` maps, and the entry for the printed preset rides as `optIn`. It checks `--opt-in`'s shape only;
+membership is the harness's. It exits 2 naming `SPEC_SUBJECT_PATH`, `--opt-in` or `--subject` on a
+harness with no predicate line, a malformed value or no subject. `--twin` is the `review.twin` value,
+printed as `twin` when given and checked against the four values only; absent, no `twin` is printed.
+`--unclassed` is the `review.unclassed` value, printed as `unclassed` the same way and checked against
+the three values only.
+`unattended-build.js` forwards a
+caller's `optIn`, `preset`, `lensNotes`, `twin`, `unclassed`, `fixJudge` and `walk` to its audit stage's
+review call unchanged, and unchecked.
+
 Every finding carries `lens`, the key of the lens the harness dispatched, never the label the agent
 echoed back, and every finding line in a skeptic prompt, the synthesis prompt and the run log names
 it as `lens=<key>`. On a spec subject under a declared `disposal` a complete return also carries
 `addresses`, one `{ids, severity, specs}` per BLOCKER or HIGH item; with no `disposal` that list is
-empty and an item owes no `specs`. Every return carries five fields beside the counts:
+empty and an item owes no `specs`. Under `addressTwins: 'shown'` the final return also carries
+`twinPairs`, the number of same-address pairs the synthesis was handed, and `twinFlags`, each flag it
+returned whose `refuted` id stands refuted and whose `confirmed` id stands confirmed, as `{refuted,
+confirmed, sameAddress}`, with `sameAddress` true when the pair was one of those handed. A repeated flag
+is dropped, a flag naming any other id is discarded and named in a `WARNING:` line, and a dead
+synthesis returns `[]`. Under `'hidden'` neither key is present. The final return carries
+`dispositions`, the accepted `{id, disposition, reason}` list in confirmed-id order, `null` when the set
+was refused or no synthesis ran; `dispositionFault`, `''` or each failing id and why, which the `note`
+repeats; and `ownerItems`, the ids disposed `none` under `unclassed: 'owner-rules'`, else `[]`.
+
+Each round's state is the harness's own (TOOL-dFairHearing-17). Two optional arguments, checked before
+any agent beside `round`, feed it, and neither joins the review key. `roundLimit` is an integer of 1 or
+more, absent meaning no limit, which a log line says, since then neither `BOUNDED` nor `CEILING` can be
+reached. `priorCounts` is an array of integers of 0 or more, each an earlier round's `roundCount` in round
+order. With no explicit `round`, a non-empty `priorCounts` makes the round `priorCounts.length + 1`; an
+explicit `round` that disagrees with it is refused naming both. The rule, `deriveRoundState`, is the
+driver's `review_state` order: a count of 0 reads `CONVERGED`; a count no smaller than the round before's
+reads `NON-CONVERGENT`; a round past `roundLimit` reads `CEILING`, one at it `BOUNDED`, and any other
+`CONVERGING`. The suite's parity arm holds it equal to `review_state` over every sequence both can see. The
+synthesis is handed one record line between `<<<ROUND` and `ROUND>>>` and told to copy it verbatim directly
+below the review-shape line:
+`review-round round=<n> limit=<n|-> prior=<c1,c2,…|-> count=<n|-> state=<STATE|->`, a `-` standing for
+an absent value, never a `0`. The harness reports the state and never stops, re-arms or refuses a round on it.
+
+Every return carries seven fields beside the counts:
+
+- `roundCount` and `roundState` — the round's confirmed blocker and high findings by binding grade,
+  `verifiedCounts.blocker + verifiedCounts.high`, known before the synthesis, and the rule over it. Both
+  are `null` on every `deferred-platform` exit; a complete exit with no confirmed finding carries `0`
+  and the rule over `0`. `roundState` is also `null`, beside an integer `roundCount`, on a round above 1
+  with no `priorCounts`, which a `WARNING:` line names. Pass `roundCount` on as the next round's
+  `priorCounts` entry. A whole-design run whose walk table has a gap, `walkRed`, returns `blockers`, `highs`, `roundCount` and `roundState` as `null` and a `note` opening `BLOCKED: the walk table has <n> gap(s)`,
+  ranked after a dead synthesis's `DEFERRED:` and before a tally fault's `UNVERIFIED:`, and its record line reads
+  `count=- state=-` (TOOL-dFairHearing-20): a gapped walk's count is no clean reading, so no caller routing on
+  the counts may take its `0` and `CONVERGED` as one.
 
 - `shape` — one record line, also logged, in this fixed grammar:
-  `review-shape kind=<diff-review|spec-audit> round=<n> intensity=<full|light> at=<find|verify|synth> raw=<n|-> confirmed=<n|-> refuted=<n|-> unverified=<n|-> blocker=<n|-> high=<n|-> medium=<n|-> low=<n|-> agents=<n> out-tokens=<n|unknown>`.
+  `review-shape kind=<diff-review|spec-audit> round=<n> intensity=<full|light> at=<find|verify|synth> raw=<n|-> confirmed=<n|-> refuted=<n|-> merged=<n|-> unverified=<n|-> blocker=<n|-> high=<n|-> medium=<n|-> low=<n|-> agents=<n> out-tokens=<n|unknown>`.
   `at` is the stage the exit reached; a count that stage has not produced is `-`, never `0`, and the
-  every-lens-dead exit prints `raw=-`. The four severities count RAW confirmed findings by binding
+  every-lens-dead exit prints `raw=-`. `merged` counts the findings a skeptic refuted as `duplicate of
+  id=<n>` of a confirmed finding in the same batch: they leave `refuted`, count as confirmations in
+  `precision`, `(confirmed + merged) / (confirmed + merged + refuted)`, and never join the confirmed
+  set; the ledger keeps their `refuted` verdict. A duplicate whose original is not such a survivor is
+  demoted to unverified on either kind, and every return carrying `refuted` carries `merged`. The four severities count RAW confirmed findings by binding
   grade, not the synthesis's adjudicated items, which stay in `blockers` and `highs`. `agents` is the
   final return's formula through the stage reached. `out-tokens` is a `budget.spent()` DELTA from just
   before the first agent: the counter is a pool shared by the main loop and every workflow in the
@@ -311,7 +619,9 @@ empty and an item owes no `specs`. Every return carries five fields beside the c
 
 - `ledger` — one entry per finding in id order: `id`, `lens`, `ref`, `severity` (the finder's),
   `skepticSeverity`, `verdict` (`confirmed`, `refuted`, `uncertain`, or `unverified` when no verdict
-  stands), `reason`, `fixVerdict`, `claim` and `classes`. An absent optional value is `null`.
+  stands), `reason`, `fixVerdict`, `claim`, `classes` and `disposition`. An absent optional value is `null`.
+  `disposition` is the accepted disposition on a confirmed entry, and `-` on every other entry and
+  wherever no set was accepted; `confirmedFindings` carries it the same way.
   `classes` lists the checklist classes the claim's leading `C<n>` labels denote, by each item's
   slug, in order and without duplicates; a label with no slug to resolve, its item absent or not
   slug-led, is kept as `C<n>`. It is `[]` when the claim opens with no label or the run had no
@@ -319,15 +629,23 @@ empty and an item owes no `specs`. Every return carries five fields beside the c
 - `confirmedFindings` — one entry per confirmed finding: `id`, `lens`, `ref`, `claim`, `severity` (the
   binding grade), `fix` and `fixVerdict`. A fix the skeptic judged unsound is replaced by its note
   when it gave one. Pass this array as the next round's `priorFindings` rather than re-typing it.
-- `appendix` — the ledger as a markdown table under `## Appendix — every finding`, with the nine
-  columns `id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict | classes`. The
-  ninth joins the `classes` names with one space, so a class's hits can be counted across records. A
+- `appendix` — the ledger as a markdown table under `## Appendix — every finding`, with the ten
+  columns `id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict | classes | disposition`. The
+  ninth joins the `classes` names with one space, so a class's hits can be counted across records. The
+  tenth is the disposition: the synthesis is handed the table with `(synthesis)` in each confirmed row's
+  cell and `-` in every other, and told to copy it verbatim but for those cells, each written with the
+  disposition it returns, a `none` as `none — <reason>`. That cell of the record is the synthesis's own
+  text, which the harness does not encode, so the prompt asks for the reason on one line and each `|`
+  written as `\|`. The returned reason is plain text: the harness encodes the returned table, so a raw
+  `|` or a line break in it refuses nothing (TOOL-dFairHearing-43). The returned table carries the accepted
+  dispositions so, and `-` in every cell when the set was refused. A
   cell is `-` when its value is absent or empty, a `|` is escaped, and line breaks fold to a space.
 - `lensYield` — per lens, `defects` and `unique` are `null` when no item list can be trusted (see below).
   One row per lens that RAN, in dispatch order, none for a lens a light run skipped:
-  `lens`, `returned` (false for a lens that died), `raw`, `confirmed`, `refuted`, `uncertain`,
-  `unverified` (every finding neither confirmed nor refuted, the uncertain ones included), `precision`
-  (`confirmed / (confirmed + refuted)`, `null` when both are 0), `defects` (synthesis items holding a
+  `lens`, `returned` (false for a lens that died), `raw`, `confirmed`, `refuted`, `merged` (a refuted
+  row whose reason opens `duplicate of id=<n>`, out of `refuted`), `uncertain`,
+  `unverified` (every finding neither confirmed, merged nor refuted, the uncertain ones included), `precision`
+  (`(confirmed + merged) / (confirmed + merged + refuted)`, `null` when all three are 0), `defects` (synthesis items holding a
   confirmed id from this lens) and `unique` (items whose every confirmed id is this lens's). The item
   list is untrusted, and both are `null` on every row, when no synthesis ran, it died,
   or the tally fault fired. Each row is logged as a `lens yield:` line, and the counts known before
@@ -341,6 +659,52 @@ reaches a record, and the harness cannot check it was made: compare the report a
 `appendix`. A run whose every finding is refuted writes no report, so there the appendix exists in the
 return alone, and the caller writes it down if it wants one.
 
+## The lens catalogue — `lenses.toml`
+
+Every review lens is a row of `lenses.toml`, beside the harness. A workflow script has no filesystem
+when it runs, so the harness cannot read the file: `render_lenses.py` fills each lens literal of
+`tier2-review.template.js` from it, at install and in the parity leg, through the `LENS_SLOTS`
+token. A literal opts in with a marker ending its opening line,
+`const SPEC_LENSES = [ // gov:lens-slots unit-spec`, and its body is the one line `{{LENS_SLOTS}}`.
+Add or swap a lens as a row, never by an edit to either harness copy.
+
+```toml
+[[lens]]
+key = "coherence"            # ^[a-z][a-z0-9-]*$, the key lensNotes and a finding's `lens` use
+kinds = ["spec-audit"]       # the review kinds it may run under: diff-review, spec-audit
+presets = ["unit-spec"]      # every literal it may fill, by default or by a swap
+default_in = ["unit-spec"]   # the literals it fills by default, a subset of presets
+optin = false                # whether it may be swapped into a literal of presets it is no default of
+brief = "Coherence: ..."     # one line, raw text; the render escapes \ and '
+```
+
+A literal's name is what its marker declares: `diff-review` for the diff kind's literal, a
+spec-audit preset name otherwise. The set is read from the template's markers and typed nowhere
+else. A row's place in the file is its slot order. A row with `default_in = []` and `optin = false`
+is catalogued and selected by nothing. Every `optin = true` row also renders under the line
+`const OPTIN_LENSES = [ // gov:lens-optins`, whose body is the same token, as `{ key, presets, brief }`:
+the set `optIn` may swap in. The six opt-in rows, `security`, `alternatives`, `cost`, `portability`,
+`adopter-migration` and `topology`, ship `optin = false`; recording a blind-replay test a row does not
+lose flips that row and nothing else.
+
+The renderer refuses, exit 2, naming the row and the rule: a file that is not TOML or carries a key
+beside `lens`, or a python below 3.11 (rule 1); a missing, extra or mistyped field, a bad key, an
+empty or multi-line brief (2); an empty or repeating `kinds` or `presets`, an unknown kind (3); a
+`default_in` outside `presets` (4); `kinds` disagreeing with the kinds of `presets` (5); two rows
+sharing a key and a literal (6); a key equal to a literal name (7); a literal no marker declares (8);
+a marked literal no default row fills (9); an opt-in row with no literal outside its `default_in`
+(10); a marker not followed by the token, or a token with no marker (11). It does NOT count slots:
+`check-verifier-fanout.sh` holds every marked literal to exactly five, so a sixth default row
+renders and reds there. The leg finds the literals through `render_lenses.py --markers <file>`, which
+prints the line number of each line the renderer's own anchored marker regex matches, so one predicate
+finds a marked literal and a comment naming `gov:lens-slots` is no marker. A `gov:lens-optins` line is
+never printed, so an opt-in literal is outside the count; and a predicate that cannot run, with no
+renderer beside the gate, no usable python, or `--markers` exiting non-zero, its python floor shared
+with the renderer, exits the leg 2 with `the marker predicate did not run (<reason>)`, never an empty
+marker list (TOOL-dFairHearing-27); `check-verifier-fanout.js
+--slots` counts each with `topLevelArgs`, rule 2's counter, over the hook's literal-blanked view, and
+`LENS_SLOTS` there is the one home of the five (TOOL-dFairHearing-23).
+
 ## `workerType` — judges spawned as a named agent type, in all three harnesses
 
 Every agent a harness spawns loads the charter through `CLAUDE.md` before its task. A judge reads a
@@ -348,7 +712,8 @@ brief the harness wrote and lands nothing, so `workerType` lets a caller spawn t
 agent type instead. In `tier2-review.js` an absent `workerType` reads as `Plan`, the default one
 measured A/B pair set (TOOL-aMendedFleet-93's reading): its read-only judges matched the charter-loaded
 arm's precision at about half the first-turn context. The reserved literal `none` spawns every judge as
-before that default, durability instructions and review key included. In the two drift harnesses an
+`general-purpose`, the harness's `PLATFORM_TYPE` and the Agent tool's own default, durability
+instructions and review key included (TOOL-dFairHearing-11). In the two drift harnesses an
 absent `workerType` still spawns every agent as the platform default, because no pair measured them.
 
 ```js
@@ -360,9 +725,11 @@ args: { repo, base, outDir, workerType: 'Plan' }
 
 The value must match `^[A-Za-z][A-Za-z0-9_-]{0,63}$`, or the harness refuses before any agent spawns
 with a message naming `workerType`. A well-formed name the platform does not know comes back as its
-named `not found` refusal, which each harness already counts as a dead agent. The orchestrating
-agents never take the type: the tier2 resume probe reads the lens files and the synthesis writes the
-report.
+named `not found` refusal, which each harness already counts as a dead agent. `workerType` does not
+reach the tier2 orchestrating agents, each typed by its own stage instead: the resume probe, which reads
+the lens files, spawns as `Plan` unless `roles.probe` names a type, and the synthesis, which writes the
+report, as `general-purpose` unless `roles.synthesis` does. So no tier2 agent spawns untyped, and a stage
+resolving to no type is refused by name before the probe.
 
 Under a type, a tier2 judge is told to write no `find-*.json` or `verify-*.json` and to return `path`
 empty, because the read-only types hold no Write tool. One log line names the type and says the run's
@@ -420,22 +787,27 @@ harness's reserved untyped literal; an untyped stage is spelled by leaving its k
   which then governs only a judge stage no role names. A judge run under a role writes no lens or verify
   file, so a deferred-platform return whose review says `durable: false` tells the caller the re-run
   dispatches every judge again, instead of promising a reuse.
-- **The review harness's roles.** `tier2-review.js` takes four keys: `diffFinder` and `specFinder` name
-  the finders of a diff review and of a spec audit, only the running kind's key being read; `skeptic`
-  names every skeptic batch; `synthesis` names the synthesis. A key wins over `workerType` for its own
-  stage, `workerType` keeps every judge stage no key names, and the synthesis takes its key or no type;
-  the resume probe never takes one. A roled finder or skeptic is told none of the posture its role
-  carries, and keeps every stage protocol sentence: the acquire step, the rubric, the probe policy, the
-  schemas. Any judge under a type, a role or `workerType`, makes the whole run not durable, so every
-  judge writes no file and a re-run dispatches every finder and skeptic again; a synthesis role alone
-  keeps a `none` run durable and its key. A judge role joins the review key; the synthesis role does not.
+- **The review harness's roles.** `tier2-review.js` takes five keys: `probe` names the resume probe;
+  `diffFinder` and `specFinder` name the finders of a diff review and of a spec audit, only the running
+  kind's key being read; `skeptic` names every skeptic batch; `synthesis` names the synthesis. A key wins
+  over `workerType` for its own stage, `workerType` keeps every judge stage no key names, and under
+  `none` such a judge takes `general-purpose` (`PLATFORM_TYPE`); the synthesis takes its key or
+  `general-purpose`, and the resume probe its key or `Plan`, which holds no Write tool, logged as a
+  `role probe:` line beside the other three (TOOL-dFairHearing-11). Every spawn carries an explicit
+  `agentType`, from one of the four stage option constants `probeOpts`, `findOpts`, `verifyOpts` and
+  `synthOpts`, and the suite reds an `agent(` call taking none. A roled finder or skeptic is told none of
+  the posture its role carries, and keeps every stage protocol sentence: the acquire step, the rubric,
+  the probe policy, the schemas. Any judge off `general-purpose`, under a type, a role or `workerType`,
+  makes the whole run not durable, so every judge writes no file and a re-run dispatches every finder and
+  skeptic again; a synthesis or probe role alone keeps a `none` run durable and its key. A judge role
+  joins the review key; the synthesis and probe roles do not.
   Compose the object with `<prefix>/roles/handoff.py harness-args tier2-review` rather than by hand.
 - **The harnesses' efforts** (TOOL-aOrientedCast-10). Each harness takes `efforts` beside `roles`, keyed
   by the same stage keys: a level of lower-case letters, set as that stage's `agent()` `effort` option.
   It is independent of `roles`, so an untyped stage still takes its level; a stage it does not name
   passes no `effort` and runs at its agent type's level, else the session's, and each harness logs one
-  `effort <key>:` line per stage saying which. The review harness never sets it on the resume probe;
-  the build harness spawns its spec writer, spec commit and disposal at theirs, forwards the audit's three
+  `effort <key>:` line per stage saying which. The review harness sets it on the resume probe only
+  under `efforts.probe`; the build harness spawns its spec writer, spec commit and disposal at theirs, forwards the audit's three
   review keys as the review call's `efforts` and `builder` in `dispatch.args`. A malformed object, an
   unknown key or a value off the shape refuses before any spawn. The vocabulary is the roles kit's, so
   a harness grades the shape only. Compose it with `<prefix>/roles/handoff.py stage-efforts
@@ -462,7 +834,8 @@ the stage's scope.
 | `unattended-unit` | builder | `<slug> · <unitId> · build` |
 | `tier2-review` | resume probe | `<slug> · <kind> round <n> · resume:probe` |
 | | finder | `<slug> · <kind> round <n> · find:<lens>` |
-| | verify batch | `<slug> · <kind> round <n> · verify:ids-<a>-<b>` |
+| | twin run b finder | `<slug> · <kind> round <n> · find:<lens>:b` |
+| | verify batch | `<slug> · <kind> round <n> · verify:batch-<n>` |
 | | synthesis | `<slug> · <kind> round <n> · synth` |
 
 The group's unit ids are joined by single spaces in roster order, and `<n>` is the run's round. The
@@ -505,23 +878,142 @@ does a lens set or a prompt change find MORE of what a previous review proved re
   its confirmed count and how many a candidate matched.
   **Spec mode** is chosen when the known record's first non-blank line is the `**Serves:** spec-audit`
   binding. The known set is read from its appendix ONLY: with none it is refused `no-appendix`, never
-  scored as zero and never read through the legacy table. A spec ref is `<file>:<where>`, and the
-  section rule reads the first `§<n>` or `section <n>` in the address, else the first `S<n>`, `AC<n>`
-  or `F<n>` as §2, §6 or §8; an address naming none (`status header`) is UNSCORABLE. A match is the
-  same file and the same SECTION: the window is forced to 0, `--window` is ignored, and the
-  candidate line prints `address section`. The `replay: known` line carries `kind spec-audit` and the
+  scored as zero and never read through the legacy table. A spec ref is `<file>:<where>`, read by
+  `extract_tag_ref`: its key is the first lower-case `[tag]` anywhere in the address, as a
+  design-record audit addresses a finding, else the section rule: the first `§<n>` or `section <n>`,
+  else the first `S<n>`, `AC<n>` or `F<n>` as §2, §6 or §8; an address naming none (`status header`)
+  is UNSCORABLE. A match is the same file and the same key, compared by equality: the window is
+  forced to 0, `--window` is ignored, and the candidate line prints `address section`. The `replay: known` line carries `kind spec-audit` and the
   subject pins written after the binding line, or `subjects none-stated`; no range is required. A
   candidate opening with the other kind's `**Serves:**` binding is refused `kind-mismatch`, naming
   both kinds, in either direction; an unbound candidate is read in the known record's mode. Spec
   records are not listed by `--corpus`: name the known record directly.
+- `python3 {kit}/review_replay.py --known-set <src> --candidate <src> [--matched <src>]` — a candidate
+  scored against a known-set file (`TOOL-dFairHearing-1`) in place of a past record: one
+  `| tag | address | grade | escaped |` row per known defect, `address` being `<record path>:[<tag>]`,
+  `grade` `high`, `medium` or `ungraded` and `escaped` `yes` or `no`, under a
+  `**Population:** <n> · reviewed <n> · escaped <n> · high <n>` line. `parse_known_set` refuses a row
+  count or a partition count that line does not state, a repeated tag and an address `extract_tag_ref`
+  cannot read. Every confirmed candidate row `extract_tag_ref` keys at a row's record and tag prints as
+  an `address-match` line: candidates for the adjudicator, never a score. `--matched` names the
+  adjudicator's list, an `**Adjudicator:** <who>` line and a `| candidate | tag |` table of appendix
+  ids and known tags; a pair whose candidate is no confirmed row, or whose ref cites the row's `[tag]`
+  nowhere, exits 2 by name, each tag counts once, and `reviewed k/n`, `escaped k/n` and `high k/n`
+  print from those pairs alone. Every `<src>` reads as the factory's does.
 - `python3 {kit}/review_replay.py --corpus <dir> [<dir> ...] [--repo <clone>]` — which past records
   are replayable: each record whose first line is the `**Serves:** diff-review` binding, that passes
   the liveness check below and whose range resolves in this clone, with its round, range and scorable
   count. The summary line puts every scanned record in exactly one bucket. Ranges resolve through
   ONE `git cat-file --batch-check` for the whole corpus.
 - `python3 {kit}/review_replay.py --selftest` — named arms over inline fixtures, no file
-  or git access; red when an arm fails or fewer arms ran than its `ARMS_DECLARED` states. It is the held leg
-  `review-replay selftest`.
+  or git access, then the factory's runner below; red when an arm of either fails or either ran fewer
+  arms than its own `ARMS_DECLARED` states. It is the held leg `review-replay selftest`.
+
+**The replay scorer factory, `replay_scorer.py`** (`TOOL-dFairHearing-12`). The scoring core above
+lives there as its `review-replay` instance, and this file is that instance's adapter: its CLI, its
+printer, its corpus listing and its arms. The second instance, `scouted-seam`, is aScoutedSeam's
+reuse grader (`check_hit`, `check_case` and the `grade`, `compare` and `judged` readings), ported from
+its grader blob at `b0fe68f30`. Both sit in one `INSTANCES` table, and `check_instances` reds when it
+lacks either. Every population arrives as a `<src>`: a working-tree path, a 40-hex blob or
+`<rev>:<path>`, read by one `git cat-file blob`, and an object git cannot read is refused, never an
+empty arm. `derive_paired_cases` is the one place variants are paired with cases: it refuses an
+answer outside the population, a variant that answered nothing and an empty pairing, and each figure
+line opens with `paired <n> of <N> · <variant> unanswered <ids>`, in the case file's and the
+arguments' order.
+
+- `python3 {kit}/replay_scorer.py --instance scouted-seam --cases <src> --results <src> --grade <arm>`,
+  `--compare <arm> <arm> [...]` or `--judged <arm|a+b> [...]`.
+- `python3 {kit}/replay_scorer.py --instance review-replay --known <src> --candidate <src> [--window N]`
+  — the same score `review_replay.py` prints, its inputs read as `<src>`.
+- `python3 {kit}/replay_scorer.py --experiment <src> [--repo <clone>]` — an experiment declared once,
+  in a committed JSON manifest beside its raw outputs, scored under the method below.
+- `python3 {kit}/replay_scorer.py --design-recall --key <known-set file> --seed <mode> <record-run-1> [<record-run-2> ...]`
+  — a whole-design walk's recall on a seeded key (TOOL-dFairHearing-18), graded as `review.design-audit.seed`
+  says. Each record is one run's review record, read by its `## Walk table — run <r> of <runs>` heading, its
+  `walk-seed` line and its confirmed appendix rows, each ref keyed by `extract_tag_ref`; each plant is one
+  known-set row of the key, matched on the same file and key. It prints each run's and the union's hits over the
+  plants, then each missed plant's `tag`, and exits 0 when every run finds two thirds of the plants and, with two
+  runs or more, the union five sixths, 1 when one is under its bar, and 2 on a key whose SHA-256 over its bytes
+  is not every record's pin, records disagreeing on `runs`, a run missing or repeated, a record seeded another
+  way, a plant whose `escaped` disagrees with the seed (true under `reverted-escapes`, false under `synthetic`),
+  or a confirmed row with no file and key. `--seed none` prints that recall is not graded, reads no key and
+  exits 0. Making the sealed copy and its key stays the caller's.
+
+**The experiment shape, `--experiment`** (`TOOL-dFairHearing-14`). aScoutedSeam's figures held because
+of how they were measured, and `check_experiment` makes that method a rule where committed outputs
+show it and a recorded line where they cannot. The manifest, read through `read_raw_output`, names
+`instance`, `cases`, `results` and `arms`, each arm `{name, base, settings, dispatched}`, and may name
+`heldOut`, `judge {verdicts, key}` and `union {tuning, heldOut}`; the `review-replay` instance takes
+`known` and `candidates` in place of `cases` and `results`. An unknown key is refused,
+so a misspelt rule is never skipped. Every rule runs before the first figure line, and a broken one
+exits 2 naming the rule, the arm or case, and the value:
+
+- **evidence** — each instance's `case_evidence` hook: a `scouted-seam` case's `sha` and every
+  ground-truth item's `path` and `why`. A `review-replay` case is one review run of one subject record
+  (`TOOL-dFairHearing-32`): its evidence is that subject pinned in its report, a `Reviewed:` line's
+  `<path>@<blob>` or a diff review's range, and the known set it is scored against, whose every row
+  carries an address and the record it came from. A case it returns nothing for is refused by id, a
+  known row by its tag, and an instance registered without the hook fails `check_instances`.
+- **references** — `check_experiment`: arm names are unique, every `base` names another declared arm
+  and the base graph has no cycle, and every `union` member is a declared arm; each break exits 2
+  naming the arm (`TOOL-dFairHearing-32`).
+- **freeze** — `check_held_out_frozen`: `heldOut` names a working-tree file inside the repository,
+  the one line a literal `git ls-files --full-name` prints for it (a directory or a glob exits 2
+  naming the path and the line count, `TOOL-dFairHearing-32`), whose `git log` lists exactly one commit, printed first as `held-out: frozen at <sha>`, and shares
+  no id with the tuning cases. The freeze is the bytes scored: `git hash-object` of the working-tree
+  file, hashed through the checkout's filters so a CRLF checkout of an LF blob agrees, must equal the
+  freeze commit's blob, or it exits 2 naming both object ids (`TOOL-dFairHearing-21`). A shallow
+  history refuses before the history is read, since its boundary commit lists every file and so
+  cannot show a freeze. "Never read to change a prompt" is printed as recorded, not checked.
+- **one variable** — `check_one_variable`: an arm naming a `base` differs from its settings in exactly
+  one key, compared as JSON values, and prints `arm <name>: varies <key> from <base>`.
+- **parsed first** — `measure_parsed`: `parsed <arm>: <n> of <dispatched>` for every arm, `n` the
+  cases holding a parsed row; an undeclared `dispatched`, or one below `n`, is refused. Figures pair
+  the parsed rows only, so an unparsed reply is counted, never scored.
+- **blind judge** — `check_judge_rotation`: a committed `judge.key`, `{<case>: {<label>: <arm>}}`,
+  gives each arm one label per case, and with two or more of each no arm holds one label throughout.
+  With no key it prints `labels rotated — recorded, not checked: no committed key`.
+- **union** — `measure_union`, aScoutedSeam's system reading: per set, a positive case any of its arms
+  was judged on is covered when any of them covered the primary. With `heldOut` declared it prints
+  tuning, held-out and pooled, so the held-out cases join the score instead of standing beside it.
+
+**The `review-replay` manifest** (TOOL-dFairHearing-23), the terms `TOOL-dFairHearing-1`'s void rule and
+`TOOL-dFairHearing-15`'s `dispatched 4` and `paired 4 of 4` are written in:
+
+```json
+{
+  "instance": "review-replay",
+  "known": "<src>",
+  "candidates": [{"case": "<record>", "report": "<src>", "matched": "<src> or null"}],
+  "arms": [{"name": "<arm>", "base": null, "settings": {}, "dispatched": 4}]
+}
+```
+
+A CASE is one review run of one subject record, and each `candidates` entry is one case: its `report`
+and its `matched`, the adjudicated list `read_matched_list` reads, or `null`. An entry names its `arm`
+whenever the manifest declares more than one; a one-arm manifest may leave it out. `dispatched` counts
+an arm's dispatched runs, and `parsed <arm>: <n> of <dispatched>` counts the arm's runs whose report
+holds an appendix with at least one row `parse_candidates` reads, through `measure_parsed`. A parsed
+run with a `matched` list prints its known-set figures when `known` is a known set, and a parsed run
+against a review record its recall. An agent death is read from the report's `RUN INTEGRITY` lens and
+skeptic counts, never from the manifest or `parsed`. A `candidates` that is not such a list is refused
+by name.
+
+What the rules do not check: a variable nobody declared, that no prompt author read the held-out file,
+that one judge read each case, and that the evidence is right rather than present.
+
+Its runner's arms: the pairing and row refusals, the `[tag]` reading, the instance check, a proof
+that the port reproduces the grader's figures over the committed cases and results at `b0fe68f30`,
+determinism across two hash seeds, the conformance arm, and one arm per experiment rule over a
+planted manifest, the union arm's proof reading the method's own experiment at `5f8ef021d`
+(`system tuning 21/23`, `system held-out 12/12`, `system pooled 33/35`). That arm, `scan_pairing_sites`, reds on a
+second scorer: a comprehension in a tracked `*.py` at and below this kit's directory, the factory
+and any path under `memory/` excepted, so a repository-root install reaches no record folder, whose
+filter is `all()` over a second population testing the outer case against the inner variant. It
+reads Python only, and a pairing written as a `for` loop is not seen. In a tree without
+`memory/builds/aScoutedSeam/` the proof prints `SKIP`, and so does the conformance arm once its
+live-root and planted halves pass, its grader half unread, and the union arm once its fixture half passes; the count line names each skip, so an
+install outside this repo never reads a skip as a pass.
 
 **Liveness, the reason a score can be trusted at all.** Both inputs must reproduce their own stated
 confirmed count from what was extracted, or they are REFUSED with exit 2 naming both numbers — for a
@@ -550,6 +1042,105 @@ so it is listed and never counted as a false positive: there is no precision fig
 sharing a basename can match, because older records carry basename-only refs. And one replay is one
 sample of a stochastic fan — compare two harness versions by two scored runs side by side, never by
 one.
+
+### Replaying a review blind
+
+A blind replay reviews a past state of the tree in a clone that holds nothing after it, so no later
+record or object can reach a lens. The clone is made from a bundle of a transient ref,
+never `git clone --branch`, which cannot name a `refs/replay/` ref and exits 128. `<name>` and the clone
+directory are fresh per replay, the directory under `%TEMP%`, never inside the worktree. Run the
+recipe as one script from the repository, so its failure envelope holds (TOOL-dFairHearing-27 S22):
+
+```bash
+set -e
+test ! -e "$TEMP/<name>" || { echo "replay: $TEMP/<name> exists"; exit 2; }
+idx=$(mktemp -p "${SCRATCH:?}")
+trap 'rm -f "$idx"; git update-ref -d refs/replay/<name> 2>/dev/null' EXIT   # the one trap
+# the placement step, only for a <commit> the source history lacks (TOOL-dFairHearing-25 S8):
+GIT_INDEX_FILE="$idx" git read-tree <base>
+GIT_INDEX_FILE="$idx" git update-index --add --cacheinfo 100644,<blob>,<path>   # once per placed file
+tree=$(GIT_INDEX_FILE="$idx" git write-tree)
+commit=$(git commit-tree "$tree" -p <base> -m placement)   # <commit> below is then "$commit"
+# the recipe
+mkdir -p "$TEMP/<name>b"
+git update-ref refs/replay/<name> <commit>
+git bundle create "$TEMP/<name>b/h.bundle" refs/replay/<name>
+git update-ref -d refs/replay/<name>
+git init "$TEMP/<name>"
+git -C "$TEMP/<name>" fetch "$TEMP/<name>b/h.bundle" refs/replay/<name>:refs/heads/<name>
+git -C "$TEMP/<name>" checkout <name>
+test "$(git -C "$TEMP/<name>" rev-parse HEAD)" = "$(git rev-parse <commit>)"   # the liveness check
+```
+
+An existing `$TEMP/<name>` refuses with exit 2 before any ref is written, so a stale clone is never
+read as this replay's; `set -e` checks every step's exit status; and the EXIT trap, the only one,
+deletes the temporary index and the transient `refs/replay/<name>` however the script ends, a failed
+`git bundle create` included, so `git show-ref refs/replay/<name>` in the repository prints nothing
+afterwards. `$SCRATCH` is the run's scratch directory. The last line is the liveness check: a clone
+whose `HEAD` is not `<commit>` replays the wrong tree and is not scored.
+
+**The placement step** makes a `<commit>` the source history lacks: `<base>` plus the placed files,
+each a `<blob>` at a `<path>`, with the `update-index` line written once per placed file. It writes
+that tree through the temporary `GIT_INDEX_FILE` and commits it by `git commit-tree`, so the working
+tree, the index and `HEAD` of the repository never move, no branch is made, and the commit is
+reachable only from the transient ref the recipe bundles. A replay of a commit the history holds
+leaves the placement lines out.
+
+**A replayed spec audit passes the opt-in pack.** Replay 1's `<commit>` is the placement on `<base>`
+`6cfd21619` of two files, so its `update-index` line is written twice. The first is
+`memory/builds/dFairHearing/README.md` as it stands at `3708a705` (`<blob>` is
+`git rev-parse 3708a705:memory/builds/dFairHearing/README.md`), whose front matter is the
+owner-landed `spec-audit: 2026-10-21` with no `authorized-by`. The second is the runtime record's
+blob `767187aa` (`git rev-parse 6cfd21619:<record>`, `<record>` being the path
+`TOOL-dFairHearing-25`'s design names) at the placed subject path
+`memory/builds/dFairHearing/replay/<record>`.
+The call's `reviewDir` is `memory/builds/dFairHearing/reviews`, the folder that README opts in, and
+its one subject is that placed subject path at `767187aa`, with the record's own spec id and no `rev`;
+the sibling `specs` and the checklist stay on their dClosedLoop paths. The pack admits only a subject
+under `reviewDir`'s build, so the record's own path is denied, and the placed path ends with the
+record's own, so `check_same_file` in `replay_scorer.py` still matches its refs to the known set
+(TOOL-dFairHearing-25 §4). A replay that spawns agents
+directly renders each prompt as a `gov:handoff` file, all rule 6 of the agent-cap hook admits; a
+harness replay runs through `tier2-review.js`, a declared harness.
+
+**The verdict of replay 1 flips `DESIGN_RECORD_PRESET` in `review_pin.py`**, the one value it edits, never
+a template default: the harness's own `preset` default stays `unit-spec`, so only a pin over design
+records alone moves to `design-audit`.
+
+**The per-arm step, when one record is replayed under two arms** (TOOL-dFairHearing-30 S7). The
+harness writes its report under `${repo}/${reviewDir}`, so a second arm run in the first arm's clone
+reviews a tree holding the first arm's report. Each record and arm therefore takes its own clone
+`f<r><a><n>`: `<r>` the record's position in the corpus, `<a>` the arm's letter, `<n>` the attempt
+from 1. A re-run, for any cause, takes the next `<n>` and a new clone, and no clone is reused. Run
+this block per clone as one script from the repository, the recipe above in place of its comment
+line, with `$t` for `$TEMP`, `<name>` the clone's name and `<commit>` the record's range head, so
+the recipe's stale refusal reads `$c`:
+
+```bash
+test -n "$SCRATCH" || { echo "SCRATCH is empty"; exit 2; }
+test -n "$ORCH" || { echo "ORCH is empty"; exit 2; }
+t="${TEMP:-$TMPDIR}"
+test -n "$t" || { echo "no temp directory: TEMP and TMPDIR are both empty"; exit 2; }
+if command -v cygpath >/dev/null 2>&1; then t=$(cygpath -m "$t"); fi
+c="$t/f<r><a><n>"
+# the replay section's recipe over "$c" at the record's range head: stale refusal, exact-commit check
+s=$(git -C "$c" status --porcelain --untracked-files=all) || { echo "status failed: $c"; exit 2; }
+test -z "$s" || { echo "dirty: $c"; exit 2; }
+o=$(git -C "$ORCH" rev-parse --verify HEAD) || { echo "orchestrating head unreadable: $ORCH"; exit 2; }
+echo "orchestrating $o clone $c" >> "$SCRATCH/run.log"
+# the harness call, `repo` set to "$c"; its report lands under "$c/<reviewDir>"
+```
+
+`SCRATCH` is the run's scratch directory and `ORCH` this repository's root; either one empty refuses
+with exit 2 naming it, before any path is built. `TEMP` is the Windows name of the temp directory
+and `TMPDIR` the POSIX one: the clone's parent is `TEMP`, else `TMPDIR`, refused when both are empty,
+and folded to forward slashes by `cygpath -m` where `cygpath` exists. The clone's status and the
+orchestrating commit are each read as their own call with the exit checked, because a substitution
+inside `test -z` hides its exit: over an overwritten `.git/index`, `git status` exits 128 and
+`test -z "$(git status …)"` reads the tree as clean. A non-empty status refuses the call, and the arm
+takes a new attempt. The `orchestrating <sha> clone <path>` line is appended to `$SCRATCH/run.log`
+before the harness call, and the verdict record quotes those lines, which all name one sha. After the
+call, the clone's status lists one untracked path, the arm's own report.
 
 ## `orient-counterfactual.js` — one stage-2 arm per call
 

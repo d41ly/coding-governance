@@ -57,7 +57,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # and opening a sentence, in double quotes, a code span and a fence, the hit past the fence, the day
 # before, the blank key, and the waiver's hit, report line and --list row, each top-level. Counted by
 # reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=215
+# RAISED 215 -> 224 by TOOL-dFairHearing-48: its nine arm-labels arms, each top-level. Counted by reading;
+# OWED: observed at the close.
+FLOOR_ASSERTIONS=224
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -1009,12 +1011,13 @@ git -C "$d" reset -q --hard "$clean"
 #        test_recall_floor.py — the pytest `test_*.py` convention, gov-only and 12 s to 34 s in the
 #          ledger; a `test_*.py` shape would hit an adopter's single-file pytest run, which is
 #          exactly the direct check a spec may name.
-#        corpus_ids.py --selftest (ceiling 2690 s, 599 s in the ledger) and gen_build_index.py
-#          --selftest (350 s) — flag-form suites above the bound; the backlog row this round owes
-#          moves their entrypoints to a `selftest.py` file both readers already deny.
+#        corpus_ids.py --selftest (ceiling 2690 s, 599 s in the ledger), gen_build_index.py
+#          --selftest (350 s) and measure_legs.py --selftest (ceiling 500 s) — flag-form suites
+#          above the bound; the backlog row this round owes moves their entrypoints to a
+#          `selftest.py` file both readers already deny.
 LEGS="$(dirname "$LINT")/gate-legs.json"
 DIRECT_CHECK_BOUND=300
-PARITY_EXEMPT="test_recall_floor.py corpus_ids.py gen_build_index.py"
+PARITY_EXEMPT="test_recall_floor.py corpus_ids.py gen_build_index.py measure_legs.py"
 # `-c`, not `python -` with a heredoc: the Windows python launcher reads the first argument after
 # `-` as a script and runs its shebang, which is how a probe of this arm ran bash instead.
 parity=$("$PY" -c 'import importlib.util, json, sys
@@ -1932,6 +1935,51 @@ arm "TOOL-dFoldedAudit-4 the join's line prints with the text --dispatch filters
 ARM_ARGS=(--list)
 arm "TOOL-dFoldedAudit-4 --list reads the waived token as a HIT" 0 "$d" 'HIT    [supersede]' 'WAIVED [supersede]'
 ARM_ARGS=()
+
+# TOOL-dFairHearing-48 S9: the arm-labels join. The scratch tree tracks one suite spelling `FH1 AC1`, and
+# each edit appends a `New arm:` line and the bullet, then resets. Staged red by deleting the
+# scan_arm_labels call. WHAT THESE DO NOT CHECK: that the arm under a spelled label runs.
+d=$base/labels; scratch "$d"
+ls_spec=memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md
+ls_two=memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-2.md
+printf 'the FH1 AC1 arm\n' > "$d/x.test.sh"
+printf 'the FH1 AC10 arm\n' > "$d/y.test.sh"
+git -C "$d" add -A >/dev/null; git -C "$d" commit -qm labels --no-verify
+albase=$(git -C "$d" rev-parse HEAD)
+write_arm_label() {   # $1 the spec's repo-relative path · $2 the arm line's suite · $3 its covers · $4 the label
+  printf '\nNew arm: %s · covers %s · the arm · none\n\n### Inventory\n\n- The suite arm labels `%s`.\n' "$2" "$3" "$4" >> "$d/$1"
+}
+write_second_spec() {  # $1 the Status word: a second spec, so the first keeps the tree's live population whole
+  sed -e 's/TOOL-tOne-1/TOOL-tOne-2/' -e "s/^\*\*Status:\*\* OPEN/**Status:** $1/" "$d/$ls_spec" > "$d/$ls_two"
+  write_arm_label "$ls_two" x.test.sh AC1 'FH2 AC1'
+  git -C "$d" add -A >/dev/null
+}
+arm "FH48 AC9 a tree with no carrier prints a zero and refuses nothing" 0 "$d" "arm-labels join · 0 label(s) in 0 spec(s)" "[arm-labels]"
+write_arm_label "$ls_spec" '`x.test.sh`' AC1 'FH1 AC1'
+arm "FH48 AC9 a label its covering suite spells is clean" 0 "$d" "arm-labels join · 1 label(s) in 1 spec(s), every status but WONTDO, not only live spec(s) · 0 hit(s)" "[arm-labels]"
+git -C "$d" reset -q --hard "$albase"
+write_arm_label "$ls_spec" x.test.sh AC1 'FH2 AC1'
+arm "FH48 AC9 a label no suite spells REDS as [arm-labels]" 1 "$d" "[arm-labels] \`arm-labels <- $ls_spec FH2 AC1\`"
+git -C "$d" reset -q --hard "$albase"
+write_arm_label "$ls_spec" x.test.sh none 'FH1 AC1'
+arm "FH48 AC9 a spelled label with no covering arm REDS" 1 "$d" "[arm-labels] \`arm-labels <- $ls_spec FH1 AC1\`"
+git -C "$d" reset -q --hard "$albase"
+write_arm_label "$ls_spec" y.test.sh AC1 'FH1 AC1'
+arm "FH48 AC9 FH1 AC10 in the suite does not meet FH1 AC1" 1 "$d" "[arm-labels] \`arm-labels <- $ls_spec FH1 AC1\`"
+git -C "$d" reset -q --hard "$albase"
+write_second_spec CLOSED
+arm "FH48 AC9 a CLOSED carrier is graded" 1 "$d" "[arm-labels] \`arm-labels <- $ls_two FH2 AC1\`"
+git -C "$d" reset -q --hard "$albase"
+write_second_spec WONTDO
+arm "FH48 AC9 a WONTDO carrier is set apart" 0 "$d" "arm-labels join · 0 label(s) in 0 spec(s)" "[arm-labels]"
+git -C "$d" reset -q --hard "$albase"
+printf '\n```\n- The suite arm labels `FH2 AC1`.\n```\n' >> "$d/$ls_spec"
+arm "FH48 AC9 a fenced bullet is unread" 0 "$d" "arm-labels join · 0 label(s) in 0 spec(s)" "[arm-labels]"
+git -C "$d" reset -q --hard "$albase"
+write_arm_label "$ls_spec" x.test.sh AC1 'FH2 AC1'
+printf 'arm-labels <- %s FH2 AC1\tdeliberate, for this arm\n' "$ls_spec" >> "$d/memory/project/spec-token-waivers.txt"
+arm "FH48 AC9 a waiver row reaches a hit" 0 "$d" "1 label(s) in 1 spec(s)" "STALE WAIVER"
+git -C "$d" reset -q --hard "$albase"
 
 # TOOL-dGroundRules-32 S9, TOOL-dGroundRules-40: the build-order render's overlap rule is the
 # dispatcher's, and both are graded against the truth. Each OVERLAP_PAIRS row is two paths relative to

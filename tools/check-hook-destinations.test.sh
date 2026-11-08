@@ -355,6 +355,24 @@ printf '{"name": "dirkit", "event": "E", "matcher": "M", "marker": "nobody.js", 
 out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
 [ "$rc" != 0 ] && ok "a {here} fragment under a directory kit's home naming an unshipped file REDS (rc=$rc)" \
                || bad "a {here} fragment naming an unshipped file under a directory kit's home was accepted"
+# TOOL-dFairHearing-45: the review kit's id differs from its home, so its destinations are spelled at
+# the canonical `{kit}` and the in-tree path alone never joins them. RED against the gate at f4120c83,
+# whose compare printed `NO kit.toml rule ships` for the shipped file.
+WORKFLOWS_DIR=$(resolve_kit_dir "$_rkd_py" workflows spec-audit-optin.js "$HERE") || exit 2
+scratch
+printf '{"name": "fh45", "event": "E", "matcher": "M", "marker": "spec-audit-optin.js", "hook_path": "{here}/spec-audit-optin.js"}\n' \
+  > "$d/$WORKFLOWS_DIR/fh45.fragment.json"
+( cd "$d" && git add -A && git commit -q -m fh45 --no-verify ) >/dev/null 2>&1
+out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
+[ "$rc" = 0 ] && ok "FH45 AC3 a {here} fragment in a kit homed apart from its id passes at the canonical kit" \
+              || bad "FH45 AC3 a {here} fragment naming a shipped file was refused: $(printf '%s' "$out" | grep -E 'FAIL|REFUS' | head -2)"
+printf '{"name": "fh45", "event": "E", "matcher": "M", "marker": "nobody.js", "hook_path": "{here}/nobody.js"}\n' \
+  > "$d/$WORKFLOWS_DIR/fh45.fragment.json"
+( cd "$d" && git add -A && git commit -q -m fh45-unshipped --no-verify ) >/dev/null 2>&1
+out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
+case "$rc:$out" in 0:*) bad "FH45 AC3 the same fragment naming an unshipped file was accepted" ;;
+  *"NO kit.toml rule ships"*) ok "FH45 AC3 ...and the same fragment naming an unshipped file stays red" ;;
+  *) bad "FH45 AC3 the unshipped fragment's refusal names no missing rule: $(printf '%s' "$out" | grep -E 'FAIL|REFUS' | head -2)" ;; esac
 
 # ---- ARM 7: a {here} fragment under a SHARED flat home is judged at its adopter path (AC6) --------
 # `<prefix>/` is the home of several flat descriptors at once. That is not undecidable: the rule is "at
