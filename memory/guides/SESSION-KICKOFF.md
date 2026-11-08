@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-08T12:26:17+02:00 @ 559237fe1a0cc9a457290d72e21dfce08920cda4
+last-audit: 2026-11-08T13:52:22+02:00 @ 366faa588cc666e7c0d95cb4da9cb9c9942c95ea
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 201eb127cec4700c6f247978ea5c07a178181f2f
+last-body-change: 366faa588cc666e7c0d95cb4da9cb9c9942c95ea
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -141,6 +141,10 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 - 2026-08-23 · the owner's standing instruction on the kit self-test suites · `--checks` yes,
   `--selftests --serial` only when they ask. The cost is process creation, not logic:
   `memory/gotchas/process-creation-is-the-suite-cost.md` · prune when a bar runs them automatically.
+- 2026-11-08 · a build that edits `tools/run-gates/run-gates.sh` · the red attribution reads every red OWN
+  (its KF3: the run edited its own grader), so such a build cannot land itself and hands its landing to the
+  owner; run its red legs on an `origin/main` worktree early to tell its own reds apart · prune when the
+  attribution can grade a run that edits the runner.
 
 
 ### Environment traps worth front-loading
