@@ -19,12 +19,12 @@ mode: slug
 run-branch: refs/heads/branch/unattended-dfairhearing-fe4e9c
 anchor-kind: default-branch
 cli-version: 2.1.309
-lease-utc: 2026-11-02T15:36:49Z
+lease-utc: 2026-11-08T03:17:10Z
 pid-image: claude.exe
 host: compeeto-agent
-pid: 19428
+pid: 24344
 session: db957487-b5c0-4a88-ab27-88dd90bc468f
-keepalive: cf19cbfe
+keepalive: 774be844
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 8bec4cefd957d194660a8d7c2916f420b7299074
 anchor-ref: refs/heads/main
@@ -283,3 +283,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-05T01:29:52Z rescope · item add TOOL-dFairHearing-50 · reason the close's first suite baseline at 948e4141b read six of twelve suites red, arms no pass could run; memory/builds/dFairHearing/prompts/2026-11-05-prompt-TOOL-dFairHearing-50-spec-brief.md names them, with unit 48's two leftovers
 
 2026-11-05T03:09:35Z brief · item TOOL-dFairHearing-50 · reason a77d432c7363 memory/builds/dFairHearing/prompts/2026-11-05-prompt-TOOL-dFairHearing-50-build-brief.md
+
+2026-11-05T04:43:21Z dispatch · item 65ad5ac8 TOOL-dFairHearing-50 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh tools/workflows/README.md tools/workflows/check-review-join.test.sh tools/workflows/check-verifier-fanout.sh tools/workflows/check-protocol-parity.test.sh tools/workflows/unattended-build.test.sh tools/check-playbook-parity.test.sh tools/check-spec-tokens.test.sh tools/check-spec-tokens.py tools/check-wiring.sh tools/lib/resolve-python.test.sh tools/policy/catalogue.toml tools/policy/README.md memory/map/generated/symbols.json memory/builds/dFairHearing/build/2026-11-05-build-TOOL-dFairHearing-50-1-acceptance-ledger.md memory/builds/dFairHearing/spec/2026-11-05-spec-TOOL-dFairHearing-50.md memory/builds/dFairHearing/README.md memory/LIVE.md memory/backlog/TOOL.md
+
+2026-11-08T03:19:18Z dispatch · item 65ad5ac8 TOOL-dFairHearing-50 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh tools/workflows/README.md tools/workflows/check-review-join.test.sh tools/workflows/check-verifier-fanout.sh tools/workflows/check-protocol-parity.test.sh tools/workflows/unattended-build.test.sh tools/check-playbook-parity.test.sh tools/check-spec-tokens.test.sh tools/check-spec-tokens.py tools/check-wiring.sh tools/lib/resolve-python.test.sh tools/policy/catalogue.toml tools/policy/README.md memory/map/generated/symbols.json memory/builds/dFairHearing/build/2026-11-05-build-TOOL-dFairHearing-50-1-acceptance-ledger.md memory/builds/dFairHearing/spec/2026-11-05-spec-TOOL-dFairHearing-50.md memory/builds/dFairHearing/README.md memory/LIVE.md memory/backlog/TOOL.md

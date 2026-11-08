@@ -78,7 +78,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 45 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** CLOSED · 45 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14
 ids TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-19 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-24 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28
 ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-41 TOOL-dFairHearing-42
@@ -131,10 +131,10 @@ ids TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHea
 | [TOOL-dFairHearing-45 — the bar's own reds in the kits: renders the ban can read, a fragment that ships, one anchor, no-fork forms, eight renames, and the honest brief record](spec/2026-11-04-spec-TOOL-dFairHearing-45.md) | 30 | 2 | CLOSED | rev-5 | 2026-11-04 |
 | [TOOL-dFairHearing-47 — the last of the bar's own reds: two loops fed from a file, one exempt row, one guard, one cite, and the manifest's stamps](spec/2026-11-04-spec-TOOL-dFairHearing-47.md) | 31 | 1 | CLOSED | rev-1 | 2026-11-04 |
 | [TOOL-dFairHearing-48 — the nine items of the diff review of units 43 to 47](spec/2026-11-05-spec-TOOL-dFairHearing-48.md) | 32 | 2 | CLOSED | rev-1 | 2026-11-05 |
-| [TOOL-dFairHearing-50 — the reds of the close's first suite baseline](spec/2026-11-05-spec-TOOL-dFairHearing-50.md) | 33 | 2 | INPROGRESS | rev-3 | 2026-11-05 |
+| [TOOL-dFairHearing-50 — the reds of the close's first suite baseline](spec/2026-11-05-spec-TOOL-dFairHearing-50.md) | 33 | 2 | CLOSED | rev-3 | 2026-11-08 |
 <!-- /gen:build-units -->
 
-Records: 376 bound to this build, across 4 record folder(s).
+Records: 377 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

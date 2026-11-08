@@ -933,7 +933,9 @@ def read_carries_specs(root, design, cutoff, files=None, conf=None):
     `design_lib.read_spec_revisions`, the one reader the deviation population reads too (S12); its
     deletion, a revision with no text, is skipped. `statuses` maps each kept path to its status.
 
-    THE ONE HOME OF THE WONTDO FILTER (TOOL-dTrueNorth-16 S9): each status is the generator's
+    THE CARRIES JOIN'S WONTDO FILTER (TOOL-dTrueNorth-16 S9), one of two: `main` sets a WONTDO spec apart
+    for the arm-labels join with `WONTDO_STATUS`, a header regex, so a header the grammar below refuses
+    is graded there and set apart here. Each status is the generator's
     `parse_spec_text`, loaded by path from the kit beside this file, with the conf's family
     alternation, so the join and the units table read one header grammar (S11). A `WONTDO` spec is set
     apart before its history is read and counted under `wontdo`, and a spec whose header does not
@@ -992,7 +994,7 @@ def scan_carries(design, specs, exit_mode=False):
 
     Two changes from the instrument, each named: the withdrawn ids are the design's, read at its
     baseline, and the clause population is the view's. It parses NO status (TOOL-dTrueNorth-16 S9):
-    `read_carries_specs` is the WONTDO filter's one home, so a superseded unit's binding lines never
+    `read_carries_specs` is this join's WONTDO filter, so a superseded unit's binding lines never
     reach this function to carry or collide with its successor's, and `specs` is measured whole.
     Returns `{"findings", "carriers", "measured", "bindings"}`: `carriers` maps `("clause", id)` and
     `("node", key)` to `[(path, "whole" or "part k/n", hash)]`, `measured` is `{build: [path]}` over

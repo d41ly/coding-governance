@@ -7583,6 +7583,16 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "deriveStatedItems",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveStatedItems",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "deriveSubjectPair",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"

@@ -1011,12 +1011,13 @@ git -C "$d" reset -q --hard "$clean"
 #        test_recall_floor.py — the pytest `test_*.py` convention, gov-only and 12 s to 34 s in the
 #          ledger; a `test_*.py` shape would hit an adopter's single-file pytest run, which is
 #          exactly the direct check a spec may name.
-#        corpus_ids.py --selftest (ceiling 2690 s, 599 s in the ledger) and gen_build_index.py
-#          --selftest (350 s) — flag-form suites above the bound; the backlog row this round owes
-#          moves their entrypoints to a `selftest.py` file both readers already deny.
+#        corpus_ids.py --selftest (ceiling 2690 s, 599 s in the ledger), gen_build_index.py
+#          --selftest (350 s) and measure_legs.py --selftest (ceiling 500 s) — flag-form suites
+#          above the bound; the backlog row this round owes moves their entrypoints to a
+#          `selftest.py` file both readers already deny.
 LEGS="$(dirname "$LINT")/gate-legs.json"
 DIRECT_CHECK_BOUND=300
-PARITY_EXEMPT="test_recall_floor.py corpus_ids.py gen_build_index.py"
+PARITY_EXEMPT="test_recall_floor.py corpus_ids.py gen_build_index.py measure_legs.py"
 # `-c`, not `python -` with a heredoc: the Windows python launcher reads the first argument after
 # `-` as a script and runs its shebang, which is how a probe of this arm ran bash instead.
 parity=$("$PY" -c 'import importlib.util, json, sys

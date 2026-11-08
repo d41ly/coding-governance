@@ -448,7 +448,7 @@ if (alias === -1 || hStart === -1 || hEnd === -1 || hEnd <= hStart) {
   die('could not locate the args alias or the args header block — this arm would pass by finding nothing')
 }
 const hdr = src.slice(hStart, hEnd)
-const fields = [...new Set([...src.slice(alias).matchAll(/\ba\.([A-Za-z_$][\w$]*)/g)].map((m) => m[1]))].sort()
+const fields = [...new Set([...src.slice(alias).matchAll(/(?<![\w$.])a\.([A-Za-z_$][\w$]*)/g)].map((m) => m[1]))].sort()
 if (!fields.length) die('found no fields read off the args alias — this arm would pass by finding nothing')
 const missing = fields.filter((f) => !new RegExp('(^|[^\\w$])' + f + '\\s*:').test(hdr))
 ck(missing.length === 0, 'the args header documents all ' + fields.length + ' fields read off `a` as `name:` keys' + (missing.length ? ' — missing: ' + missing.join(' ') : ''))
@@ -1439,6 +1439,13 @@ async function runWholeScriptArms() {
       line.indexOf('supplied with no item') === -1 && line.indexOf('— absent') === -1,
       'FH15 AC3 ' + what + ' is warned and named in RUN INTEGRITY, never as absent or supplied: ' + (r.threw || line))
   }
+  // TOOL-dFairHearing-50 S2 - a whole return whose head lines state no class holds no item and stays a genuine zero,
+  // never a cut. Without it a fix reading any head line as a cut stays green: the fixture above has no selection line.
+  r = await runReview(DIFF, buildStubs({ 'resume:checklist': { checklist: '# recurring-bug-class checklist for b..c (1 file(s))\n' +
+    '# 0 class(es) selected by an anchor + 0 universal\n\n# by design — 0 invariant(s) this selection touches\n' } }))
+  ck(!r.threw && r.logs.some((l) => l.indexOf('WARNING: no checklist was acquired — no bug class selected') === 0),
+    'FH50 AC2 a head stating no class and no item stays no bug class selected, never a cut: ' +
+      (r.threw || r.logs.filter((l) => l.indexOf('checklist') !== -1).join(' / ')))
   r = await runReview(SPEC, buildStubs({ 'resume:checklist': { checklist: ACQ } }))
   ck(!r.threw && r.trace.length > 0 && r.scanSpawned('resume:checklist').length === 0 && r.trace.every((t) => t.prompt.indexOf('ACQONEX') === -1),
     'FH15 AC4 a spec audit with no checklist spawns no checklist agent')

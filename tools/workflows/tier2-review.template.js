@@ -1409,6 +1409,13 @@ if (unreadNotes.length)
 // the spec kind never acquires, since `unattended-build`'s resolver already hands it a `--for-paths` one.
 // WHAT THIS DOES NOT CHECK: that the agent ran the command it was told to and returned stdout unaltered;
 // the by-design head-count refusal catches a truncated block, as the resolver's comment says of its own.
+// TOOL-dFairHearing-50 S2 - the item count the head lines state, n + u + k, or null with no selection line.
+function deriveStatedItems(text) {
+  const sel = /^# (\d+) class\(es\) selected by an anchor \+ (\d+) universal/m.exec(text)
+  if (!sel) return null
+  const inv = /^# invariants are read at \S+; (\d+) that /m.exec(text)
+  return Number(sel[1]) + Number(sel[2]) + (inv ? Number(inv[1]) : 0)
+}
 // TOOL-dFairHearing-23 S36 - THE WHOLENESS CHECK, pure: '' when the `- ` items before the `# by design —` head number
 // n + u + k, `n` and `u` from the `# <n> class(es) selected by an anchor + <u> universal` line and `k` from the
 // `# invariants are read at <sha>; <k> that ...` line, 0 when it is absent; else why the return is cut.
@@ -1417,10 +1424,8 @@ function checkChecklistWhole(text) {
   const head = /^# by design —/m.exec(t)
   if (!head) return 'it carries no `# by design —` head'
   const before = t.slice(0, head.index)
-  const sel = /^# (\d+) class\(es\) selected by an anchor \+ (\d+) universal/m.exec(before)
-  if (!sel) return 'it carries no `# <n> class(es) selected by an anchor + <u> universal` line'
-  const inv = /^# invariants are read at \S+; (\d+) that /m.exec(before)
-  const want = Number(sel[1]) + Number(sel[2]) + (inv ? Number(inv[1]) : 0)
+  const want = deriveStatedItems(before)
+  if (want === null) return 'it carries no `# <n> class(es) selected by an anchor + <u> universal` line'
   const got = (before.match(/^- /gm) || []).length
   return got === want ? '' : got + ' item(s) before the `# by design —` head, where its head lines state ' + want
 }
@@ -1451,7 +1456,10 @@ if (!isSpec && a.checklist === undefined) {
   // other outcome is a reason, announced below and never passed as an empty checklist.
   // TOOL-dFairHearing-23 S36 - and only WHOLE: a return cut before its `# by design —` head, or whose items before
   // it are not the n + u + k its head lines state, is a checklistError, so a tail-truncated return is never complete.
-  const cut = res && typeof res.checklist === 'string' && /^- /m.test(res.checklist) ? checkChecklistWhole(res.checklist) : ''
+  // TOOL-dFairHearing-50 S2 - and a return holding no `- ` line whose head lines state one item or more is cut the same
+  // way, while one stating none stays `no bug class selected`.
+  const said = res && typeof res.checklist === 'string' ? res.checklist : ''
+  const cut = /^- /m.test(said) || deriveStatedItems(said) > 0 ? checkChecklistWhole(said) : ''
   if (res && typeof res.checklist === 'string' && /^- /m.test(res.checklist) && !cut) acquiredChecklist = res.checklist
   else checklistWhy = !res ? 'the checklist agent died'
     : cut ? 'checklistError: the returned checklist is cut — ' + cut

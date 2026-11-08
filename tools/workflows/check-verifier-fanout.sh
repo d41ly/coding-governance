@@ -8,7 +8,7 @@
 #   bash <prefix>/workflows/check-verifier-fanout.sh          # every workflow script git can see
 #   bash <prefix>/workflows/check-verifier-fanout.sh <file>…  # explicit files (the self-test's fixtures)
 #
-# Exit 0 = clean · 1 = the rule is broken, or its check refused a harness · 2 = misconfigured.
+# Exit 0 = clean · 1 = the rule is broken · 2 = misconfigured, or its check refused a harness.
 #
 # THIS GATE DOES NOT IMPLEMENT THE RULE. It runs check-verifier-fanout.js over each script, and that
 # file reads `<prefix>/hooks/agent-cap.js`'s views through the hook's exports, so the rule's scanner is
@@ -317,7 +317,8 @@ fi
 # moved to the review kit by the owner's NT-27, run per harness with the hook resolved above as its
 # `--hook`, whose views and MAX_VERIFIERS it reads. The hook's `scripts` selector, which this gate used
 # to call, now refuses: once rules 2 and 5 left, the mode ran nothing and could never red. Rule 5 runs
-# from check-review-join.sh alone. Its exit 1 is a finding and 2 a refusal; either fails the harness.
+# from check-review-join.sh alone. Its exit 1 is a finding, and its 2 a refusal that ends this gate at
+# exit 2, as the slot count's does below (TOOL-dFairHearing-50 S8).
 FANJS="$HERE/check-verifier-fanout.js"
 [ -f "$FANJS" ] || { echo "verifier-fanout: no check-verifier-fanout.js beside this gate at $HERE — the rule lives there, so a gate without it must say so, not pass"; exit 2; }
 st=0
@@ -325,11 +326,15 @@ n=0
 while IFS= read -r f; do
   [ -n "$f" ] || continue
   n=$((n+1))
-  if ! out=$(node "$FANJS" --hook "$HOOK" "$f" 2>&1); then
-    echo "verifier-fanout: FAILED — $f"
-    printf '%s\n' "$out" | sed 's/^/    /'
-    st=1
-  fi
+  out=$(node "$FANJS" --hook "$HOOK" "$f" 2>&1); _fr=$?
+  case "$_fr" in
+    0) ;;
+    1)
+      echo "verifier-fanout: FAILED — $f"
+      printf '%s\n' "$out" | sed 's/^/    /'
+      st=1 ;;
+    *) echo "verifier-fanout: the rule could not run on $f — $out"; exit 2 ;;
+  esac
 done <<<"$SCAN"
 
 # THE CLEAN LINE NAMES NO NUMBER (TOOL-dGroundRules-10). The verify total is the hook's MAX_VERIFIERS,
@@ -357,7 +362,11 @@ locs=()
 while IFS= read -r f; do
   [ -n "$f" ] || continue
   _ml=$("$_hk_py" "$RENDERER" --markers "$f" 2>&1) || { echo "verifier-fanout: the marker predicate did not run (render_lenses.py --markers $f exited $?: $_ml)"; exit 2; }
-  for _l in ${_ml//$'\r'/}; do locs+=("$f:$_l"); done
+  # MSYS converts an absolute path only as a whole argument, so `<path>:<line>` reached node unconverted
+  # and unreadable. `cygpath -m` spells it for node; a relative path needs no spawn, and where cygpath
+  # is absent the path is already native (TOOL-dFairHearing-50 S5).
+  case "$f" in /*) _nf=$(cygpath -m "$f" 2>/dev/null) || _nf=$f ;; *) _nf=$f ;; esac
+  for _l in ${_ml//$'\r'/}; do locs+=("$_nf:$_l"); done
 done <<<"$SCAN"
 if [ "${#locs[@]}" -gt 0 ]; then
   slots=$(node "$FANJS" --hook "$HOOK" --slots "${locs[@]}" 2>&1); _sr=$?

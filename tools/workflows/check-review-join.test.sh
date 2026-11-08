@@ -383,7 +383,7 @@ arm 'harness: a conflicting repeat demotes to unverified' 'conflicts.add(v.id)' 
 arm 'harness: the version marker is well-formed' "version: '" grep -E "version: '[0-9]+\.[0-9]+'" "$H"
 # The bounded verifier count, asserted POSITIVELY. The absence ban proves the linear form is gone;
 # only this proves the bounded one is present. Both, or "clean" means "empty".
-arm 'harness: the verifier count is bounded' 'MAX_VERIFIERS' grep -F 'Math.ceil(allFindings.length / MAX_VERIFIERS)' "$H"
+arm 'harness: the verifier count is bounded' 'MAX_VERIFIERS' grep -F 'Math.ceil(verifyOrder.length / MAX_VERIFIERS)' "$H"
 arm 'harness: the bounded split carries the marker' 'gov:fixed-verifiers' grep -F 'gov:fixed-verifiers' "$H"
 
 # ---- THE DISCOVERY PATH ---------------------------------------------------------------------------
@@ -439,7 +439,9 @@ E="$TMP/emptyrepo"; mkdir -p "$E"
 mkdir -p "$E/${KIT_REL}" && cp "$GATE" "$E/${KIT_REL}/gate.sh"; cp "$KIT_REL/check-review-join.js" "$E/${KIT_REL}/"
 # S8 - same reason as the $D site. `$E` and not `$D`: the scratch variable is per SITE, and `E` is
 # not bound until this block, so a `$D` spelling here would judge the wrong repo.
-mkdir -p "$E/${PFX}${HOOKS}" && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$E/${PFX}${HOOKS}/agent-cap.js"
+# TOOL-dFairHearing-50 S4 - the copy sits at the `.claude/hooks/` rung, outside the population, because a
+# hook under the kit prefix is a script the gate reads, and this repo's population must stay empty.
+mkdir -p "$E/.claude/hooks" && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$E/.claude/hooks/agent-cap.js"
 arm 'discovery: an empty population is still not a pass' 'the population is empty, which is not a pass' \
   bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$E"
 
@@ -469,11 +471,12 @@ arm '...and restored beside it, the same tree reads clean' 'clean — no ref-key
 # `.claude/workflows/`. The a7c78ad2 bytes answered this fixture with `no JavaScript under
 # scripts/` (observed). The hook copy under `.claude/hooks/` carries the same banned join and must
 # stay OUT: `.claude/` wholesale admits the hook ban tables.
-# Both kit segments are the DERIVED directory names, so the foreign layout types no kit name.
-WFK=${KIT_REL##*/}; HKK=${HOOKS_DIR##*/}
-H4="$TMP/harnessdir"; mkdir -p "$H4/scripts/$WFK" "$H4/scripts/$HKK" "$H4/.claude/workflows" "$H4/.claude/hooks"
+# The kit segment is the DERIVED directory name, so the foreign layout types no kit name. The hook the
+# gate resolves sits at the `.claude/hooks/` rung, outside the population (TOOL-dFairHearing-50 S4).
+WFK=${KIT_REL##*/}
+H4="$TMP/harnessdir"; mkdir -p "$H4/scripts/$WFK" "$H4/.claude/workflows" "$H4/.claude/hooks"
 cp "$GATE" "$H4/scripts/$WFK/check-review-join.sh"; cp "$KIT_REL/check-review-join.js" "$H4/scripts/$WFK/"
-cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$H4/scripts/$HKK/agent-cap.js"
+cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$H4/.claude/hooks/agent-cap.js"
 ( cd "$H4" && git init -q . && git config user.email t@t.test && git config user.name t \
   && git add -A && git commit -qm h4 --no-verify ) >/dev/null 2>&1
 out=$(cd "$H4" && bash "scripts/$WFK/check-review-join.sh" 2>&1); rc=$?

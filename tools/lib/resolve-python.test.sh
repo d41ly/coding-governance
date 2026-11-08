@@ -764,18 +764,22 @@ read_kit_block() { sed -n '/^\/\/ >>> resolveKitDir$/,/^\/\/ <<< resolveKitDir$/
 # a pin, and it has no opinion on whether a row is honest. WHAT THIS DOES NOT CHECK: the Python call sites,
 # which byte parity and row 10 stand for, or `help/agent-limit.md`, which a foreign-prefix run does not move.
 FG="$TMP/fg"
-mkdir -p "$FG/.git" "$FG/.governance" "$FG/k/hooks" "$FG/k/policy" "$FG/k/workflows" "$FG/f/policy" "$FG/f/hooks" "$FG/r/memory/builds/b/reviews"
-cp "$ROOT/$HOOKS_DIR/agent-cap.js" "$ROOT/$HOOKS_DIR/scratch-guard.js" "$FG/k/hooks/"
-cp "$ROOT/$WORKFLOWS_DIR/spec-audit-optin.js" "$FG/k/workflows/"
-printf 'module.exports = { readPolicy: () => ({ value: 7 }) }\n' > "$FG/k/policy/policy-mirror.js"
-printf 'module.exports = { readPolicy: () => ({ value: 99 }) }\n' > "$FG/f/policy/policy-mirror.js"
-printf 'console.log("FORGED agent-cap loaded"); module.exports = { extractWorkflowArgs: () => null, extractBuildSlug: () => null }\n' > "$FG/f/hooks/agent-cap.js"
-cp "$ROOT/$HOOKS_DIR/scratch-guard.js" "$FG/f/hooks/scratch-guard.js"
-printf '{"files": [{"source": "t/policy/policy-mirror.js", "path": "f/policy/policy-mirror.js"}, {"source": "t/hooks/agent-cap.js", "path": "f/hooks/agent-cap.js"}]}\n' > "$FG/.governance/install.json"
-fg_bound=$("$NODE" -e 'console.log("bound " + JSON.stringify(require(process.argv[1]).readWriterBound(process.argv[2])))' "$FG/k/hooks/agent-cap.js" "$FG" 2>&1 | tr -d '\r')
+# TOOL-dFairHearing-50 S15 - each kit segment is the suite's own derived directory name, so the arm spells no
+# kit path: these segments are the kit homes `resolveKitDir` probes, and no fixture name can stand in.
+FG_HK=${HOOKS_DIR##*/}; FG_POL=${POLICY_DIR##*/}; FG_WF=${WORKFLOWS_DIR##*/}
+mkdir -p "$FG/.git" "$FG/.governance" "$FG/k/$FG_HK" "$FG/k/$FG_POL" "$FG/k/$FG_WF" "$FG/f/$FG_POL" "$FG/f/$FG_HK" "$FG/r/memory/builds/b/reviews"
+cp "$ROOT/$HOOKS_DIR/agent-cap.js" "$ROOT/$HOOKS_DIR/scratch-guard.js" "$FG/k/$FG_HK/"
+cp "$ROOT/$WORKFLOWS_DIR/spec-audit-optin.js" "$FG/k/$FG_WF/"
+printf 'module.exports = { readPolicy: () => ({ value: 7 }) }\n' > "$FG/k/$FG_POL/policy-mirror.js"
+printf 'module.exports = { readPolicy: () => ({ value: 99 }) }\n' > "$FG/f/$FG_POL/policy-mirror.js"
+printf 'console.log("FORGED agent-cap loaded"); module.exports = { extractWorkflowArgs: () => null, extractBuildSlug: () => null }\n' > "$FG/f/$FG_HK/agent-cap.js"
+cp "$ROOT/$HOOKS_DIR/scratch-guard.js" "$FG/f/$FG_HK/scratch-guard.js"
+printf '{"files": [{"source": "t/%s/policy-mirror.js", "path": "f/%s/policy-mirror.js"}, {"source": "t/%s/agent-cap.js", "path": "f/%s/agent-cap.js"}]}\n' \
+  "$FG_POL" "$FG_POL" "$FG_HK" "$FG_HK" > "$FG/.governance/install.json"
+fg_bound=$("$NODE" -e 'console.log("bound " + JSON.stringify(require(process.argv[1]).readWriterBound(process.argv[2])))' "$FG/k/$FG_HK/agent-cap.js" "$FG" 2>&1 | tr -d '\r')
 [ "$fg_bound" = 'bound {"n":99,"key":"runtime.agents-in-flight"}' ] \
   || bad "FH48 AC1 a forged row did not choose the policy helper rule 7 loads: $fg_bound"; ok
-fg_pack=$(printf '{"tool_name":"Workflow","tool_input":{"args":{"kind":"spec-audit","repo":"%s","reviewDir":"memory/builds/b/reviews"}},"cwd":"%s"}' "$FG/r" "$FG/r" | "$NODE" "$FG/k/workflows/spec-audit-optin.js" 2>&1); fg_rc=$?
+fg_pack=$(printf '{"tool_name":"Workflow","tool_input":{"args":{"kind":"spec-audit","repo":"%s","reviewDir":"memory/builds/b/reviews"}},"cwd":"%s"}' "$FG/r" "$FG/r" | "$NODE" "$FG/k/$FG_WF/spec-audit-optin.js" 2>&1); fg_rc=$?
 [ "$fg_rc" = 0 ] && [[ $fg_pack == *"FORGED agent-cap loaded"* ]] \
   || bad "FH48 AC1 a forged row did not choose the readers the pack loads: exit $fg_rc, $fg_pack"; ok
 FG_PHRASE='rests on the working-tree receipt'

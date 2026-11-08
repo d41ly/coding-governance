@@ -486,10 +486,12 @@ arm "S2 a lost results file reds rather than reading as no-disagreement" red \
 # check-arms refuses an unarmed branch that is not written into memory/project/unarmed-branches.txt,
 
 # check 1 · the kit derivation returns an EMPTY set. Distinct from AC5, where the set is non-empty
-# and merely lost its sentinel: here coverage would be vacuously true over nothing at all.
+# and merely lost its sentinel: here coverage would be vacuously true over nothing at all. The
+# staging takes every kit the fixture's registry declares, the workflows kit too, since `arm` re-adds
+# what survives it (TOOL-dFairHearing-50 S6).
 arm "S1 an empty kit derivation reds before reporting coverage" red \
   "the kit derivation returned an empty set, so coverage would pass by checking nothing" \
-  sh -c 'git rm -q -r --cached '"${PFX%/}"' >/dev/null 2>&1; rm -rf '"${PFX}${MT_KIT}"' '"${PFX}${HOOKS}"' '"${PFX}lib"''
+  sh -c 'git rm -q -r --cached '"${PFX%/}"' >/dev/null 2>&1; rm -rf '"${PFX}${MT_KIT}"' '"${PFX}${HOOKS}"' '"${PFX}${WF}"' '"${PFX}lib"''
 
 # check 8 · a stated count that cannot be extracted at all. Without this the arithmetic block would
 # compare three empty strings and report ok — the same vacuity the pair loop guards against.

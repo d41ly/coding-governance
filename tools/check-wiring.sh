@@ -673,26 +673,28 @@ for home, anchor in zip(sys.argv[2::2], sys.argv[3::2]):
 # RUN each candidate again and then start a second interpreter for the resolver. A pair
 # `resolve_kit_files` answered is read back from its one start; a pair it does not list takes a start
 # of its own, so a stale list costs a start and never a wrong answer.
+# The answer is printed and also left in `_kit_file`, cleared first, the idiom `first_of` carries, so a
+# caller running it with its output discarded in this shell reads it without a fork (TOOL-dFairHearing-50 S14).
 resolve_kit_file() { # <kit-home> <file> -> <repo-relative kit dir>/<file>, or nothing
-  local d i=0
+  local d i=0; _kit_file=""
   if [ -z "${PY_OK:-}" ]; then
     echo "note     resolver  — no usable python, so the probe rung beside this checker ran in bash for $1/$2" >&2
     for d in "${KIT_REL:+$KIT_REL/}$1" "$(dirname -- "${KIT_REL:-.}")/$1"; do
       d=${d#./}
-      [ -f "$_KIT_ROOT/$d/$2" ] && { printf '%s/%s\n' "$d" "$2"; return 0; }
+      [ -f "$_KIT_ROOT/$d/$2" ] && { _kit_file=$d/$2; printf '%s\n' "$_kit_file"; return 0; }
     done
     return 0
   fi
   while [ "$i" -lt "${#_KF_KEYS[@]}" ]; do
     if [ "${_KF_KEYS[$i]}" = "$1 $2" ]; then
-      [ -n "${_KF_DIRS[$i]}" ] && printf '%s/%s\n' "${_KF_DIRS[$i]}" "$2"
+      [ -n "${_KF_DIRS[$i]}" ] && { _kit_file=${_KF_DIRS[$i]}/$2; printf '%s\n' "$_kit_file"; }
       return 0
     fi
     i=$((i+1))
   done
   d=$(resolve_kit_dir "$PY" "$_KIT_ROOT/$KIT_REL" "$1" "$2" 2>/dev/null) || return 0
   d=${d%$'\r'}
-  [ -n "$d" ] && printf '%s/%s\n' "$d" "$2"
+  [ -n "$d" ] && { _kit_file=$d/$2; printf '%s\n' "$_kit_file"; }
   return 0
 }
 # EVERY `<home> <file>` PAIR AN ARM PASSES `resolve_kit_file`, declared, one line: the self-test
@@ -1100,11 +1102,15 @@ check_fragments() { # <label> <a fragment found>: every *.fragment.json in that 
 # TOOL-dFairHearing-16. Rule 0 of agent-cap left the hook for the review kit's spec-audit-optin.js, which
 # ships wired with that kit through its fragment, so a present-but-unwired pack is a real UNWIRED, as
 # for scratch-guard, and graded by the same function. No fragment found is the kit not adopted here.
+# TOOL-dFairHearing-50 S14 - no fork with no receipt: each receipt call answers empty without one, so it
+# is skipped, and the lookup's answer is read from `_kit_file` in this shell.
 check_spec_audit_optin() {
-  local first
-  first_of "$(resolve_receipt_path workflows spec-audit-optin.fragment.json)" "$(resolve_kit_file workflows spec-audit-optin.fragment.json)" >/dev/null; first=$_first_of
+  local first rp="" miss=""
+  [ -f .governance/install.json ] && rp=$(resolve_receipt_path workflows spec-audit-optin.fragment.json)
+  resolve_kit_file workflows spec-audit-optin.fragment.json >/dev/null
+  first_of "$rp" "$_kit_file" >/dev/null; first=$_first_of
   if [ -z "$first" ]; then
-    local miss; miss=$(derive_receipt_miss workflows spec-audit-optin.fragment.json)
+    [ -f .governance/install.json ] && miss=$(derive_receipt_miss workflows spec-audit-optin.fragment.json)
     echo "skip     spec-audit — ${miss:-review kit does not ship spec-audit-optin.fragment.json here (no install-receipt row, and none at ${KIT_REL:+$KIT_REL/}workflows/)}"
     return
   fi

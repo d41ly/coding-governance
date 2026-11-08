@@ -279,7 +279,9 @@ a `--for-paths` one. A return is WHOLE (TOOL-dFairHearing-23) when it carries th
 design —` head and its `- ` items before that head number `n + u + k`, `n` and `u` from its `# <n>
 class(es) selected by an anchor + <u> universal` line and `k` from its `# invariants are read at <sha>;
 <k> that ...` line, 0 when absent; any other return is a `checklistError` naming the cut, so a
-tail-truncated stdout never passes as complete. A caller passes the same stdout, or its own curated list:
+tail-truncated stdout never passes as complete. A return whose head lines
+state one item or more and which holds no `- ` line is cut the same way, and one stating none stays
+`no bug class selected`. A caller passes the same stdout, or its own curated list:
 
 ```js
 args: { repo, base, head, reviewDir,

@@ -703,15 +703,17 @@ TMPD=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMPD"' EXIT
 
 # THE WRITER SPLIT, DECIDED BY THE HOOK'S OWN VERDICT (TOOL-dGroundRules-30). `unattended-build.js`
-# bounds its spec-writer split under `// gov:fixed-writers`, which a hook that predates the writer
-# marker denies, and that hook's rule 2 then refuses every `unattended-build` call. No version tells
-# the two hooks apart, because a version is minted only at the landing, so the installed hook judges
-# the candidate render through this kit's own gate, `check-verifier-fanout.sh`, in both modes. A
-# denial renders the verifier-bounded fallback `render` holds, with one stderr line naming the hook's
-# first line and the update; a hook that denies the fallback too exits 2 and nothing is written. A
-# gate exit other than 0 or 1 is no verdict: the gate could not ask the hook, which the kit
-# requires as `agent-cap`, for want of the hook, node or a checkout. The fallback would ask the same
-# gate, so the render refuses at once with the gate's own answer on stderr (TOOL-dGroundRules-83).
+# bounds its spec-writer split under `// gov:fixed-writers`, and the fan-out rule reads that bound
+# through the hook's `readWriterBound`, so a hook answering below the rendered width, or refusing,
+# denies the split (TOOL-dFairHearing-50 S8). No version tells the two hooks apart, because a
+# version is minted only at the landing, so the installed hook judges the candidate render through
+# this kit's own gate, `check-verifier-fanout.sh`, in both modes. A denial renders the
+# verifier-bounded fallback `render` holds, with one stderr line naming the hook's first line and
+# the update; a hook that denies the fallback too exits 2 and nothing is written. A gate exit other
+# than 0 or 1 is no verdict: the gate could not ask the hook, which the kit requires as
+# `agent-cap`, for want of the hook, a hook the rule can load, node or a checkout. The fallback
+# would ask the same gate, so the render refuses at once with the gate's own answer on stderr
+# (TOOL-dGroundRules-83).
 # VERIFY_TOTAL is the hook's
 # MAX_VERIFIERS as a literal it resolves, as the templates write that total; a hook whose total falls
 # below it denies the fallback. A pair the memory-tree skip leaves unrendered asks nothing.
