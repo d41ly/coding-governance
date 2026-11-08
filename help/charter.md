@@ -11,6 +11,11 @@ A template at v4.5 or later holds one `{{PRACTICES}}` line, and the render write
 line per active row there. A template seeded earlier keeps its typed lines, reads neither the catalogue
 nor the key, and renders as it always did.
 
+Only the marker's major decides how an older template is treated. One whose major is below the renderer's
+gets a note asking you to reseed it from gov, and may still carry a fence for a block the renderer has
+retired. One at the renderer's major gets no such note, a minor behind included, and a fence for a retired
+block in it stops the render.
+
 ## Read the active set
 
 Your rendered charter is the active set: its first section holds one line per active row. The catalogue,

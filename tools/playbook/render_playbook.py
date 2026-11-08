@@ -395,8 +395,10 @@ NODE_KEYS = ('primary_tree', 'worktree_root', 'variances')
 # rewrites, so the regenerate it runs (unless GOVKIT_RERENDER=0) renders a v3.x template with this
 # engine and must not roll the kit back.
 #
-# The template major version this engine ships with. An older one renders as it always did, and the
-# render notes that a newer one is available to reseed.
+# The template major version this engine ships with, and the rule is major-only (PLAY-dOrderedCharter-41
+# S3). A template whose marker major is below it renders as it always did, may carry a legacy fence,
+# and gets the note that a newer one is available to reseed. One at or above it may carry no legacy
+# fence and gets no reseed note, a minor behind included.
 TEMPLATE_MAJOR = 4
 TEMPLATE_MARKER_RE = re.compile(r'<!--\s*governance-template:\s*v([0-9]+)\.([0-9]+)\s*-->')
 # The marker's whole line and one blank line after it, which a render drops (PLAY-dOrderedCharter-12 S5).
@@ -1793,6 +1795,49 @@ def run_selftest() -> int:
             got = str(e)
     check_arm('a legacy block kept only for older' in got,
               'a current-major template carrying a legacy fence is refused', f'got {got!r}')
+    # PLAY-dOrderedCharter-41 S4: `cross-os` stays a live block, so gov's own template and a seeded
+    # previous-minor one each render against the SHIPPED declarations, with and without the member, each
+    # in a target committed on `main`. Both carry the `cross-os` fence, so a `legacy` mark on the shipped
+    # row reds every render here.
+    gov_root = here.parent.parent
+    gov_tpl, gov_dep = resolve_template_path(gov_root, here, {}), gov_root / '.governance' / 'deploy.toml'
+    seeded = (f'<!-- governance-template: v{TEMPLATE_MAJOR}.4 -->\n\n- [one] Kept.\n<!-- when:cross-os -->\n'
+              f'- [cross-os] Across operating systems.\n<!-- /when:cross-os -->\n{CROSS_OS_FENCE}')
+    halves = [('a seeded previous-minor template', seeded,
+               'kits = ["playbook"]\n\n[answers]\nplaybook_path = "TPL.md"\n')]
+    if gov_tpl.is_file() and gov_dep.is_file():
+        # Section 4 Evidence's narrowing: the two playbook kits, and answers for the probes they ask.
+        narrowed = re.sub(r'(?ms)^kits = \[.*?\]\n', 'kits = ["playbook", "playbook-render"]\n',
+                          gov_dep.read_text(encoding='utf-8'), count=1).replace(
+            '[answers]\n', '[answers]\nplaybook_path = "TPL.md"\nci_file = "none"\ngate_runner = "none"\n'
+            'id_families = "none"\nmemory_disciplines = "none"\n', 1)
+        halves.insert(0, ("gov's template", gov_tpl.read_text(encoding='utf-8'), narrowed))
+    else:
+        print(f'  unarmed: gov\'s template half — {gov_tpl.as_posix()} or {gov_dep.as_posix()} is not '
+              f'here, so this install holds no gov template above the engine')
+    was = os.environ.pop('GOV_DEFAULT_BRANCH', None)
+    try:
+        for name, tpl, dep in halves:
+            for drop in ('', 'drop_blocks = ["cross-os"]\n'):
+                with tempfile.TemporaryDirectory() as td:
+                    tgt = Path(td)
+                    (tgt / '.governance').mkdir()
+                    (tgt / '.governance' / 'deploy.toml').write_text(drop + dep, encoding='utf-8')
+                    (tgt / 'TPL.md').write_text(tpl, encoding='utf-8')
+                    read_git(tgt, 'init', '-q', '-b', 'main')
+                    read_git(tgt, 'add', '-A')
+                    read_git(tgt, '-c', 'user.name=fx', '-c', 'user.email=fx@example.invalid',
+                             '-c', 'commit.gpgsign=false', 'commit', '-qm', 'fixture')
+                    try:
+                        render(here, gov_root, tgt)
+                        got = None
+                    except Refusal as e:
+                        got = str(e)
+                check_arm(got is None, f'{name} renders {"with" if drop else "without"} drop_blocks cross-os',
+                          f'refused with {got!r}')
+    finally:
+        if was is not None:
+            os.environ['GOV_DEFAULT_BRANCH'] = was
     # TOOL-aDistilledCharter-2 rev-2 (closing review round 1, R1). A SEEDED v3.x template renders
     # under THIS engine and its SHIPPED declarations, because `update` never rewrites a seed and a
     # refusal here rolls the kit back. The declarations are the real ones beside this engine, so the

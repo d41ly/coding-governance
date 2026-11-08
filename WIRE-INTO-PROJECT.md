@@ -159,14 +159,15 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
 
 `drop_blocks` in the target's `deploy.toml` names blocks to remove that no kit governs. One exists:
 
-- `when:cross-os` — the `[cross-os]` practice and the toolchain fact. Drop it for a single-OS team.
+- `when:cross-os` — the `[cross-os]` practice and the toolchain fact. Drop it for a single-OS team; the note it prints asks for no removal, since the member still cuts the toolchain fact.
 
 v4.0 retired `node-table` and `security-outbound`: the node registry is generated from the fleet,
 and the outbound rules moved to the spec template's security checklist. A `drop_blocks` member
 naming either is printed as `retired` and ignored; delete it.
 
-Section 1, `[voice]` included, binds every adopter and is not droppable. A project that wants a
-different persona says so in a section-2 line; the facts-over-wit half binds regardless.
+The active practices, `[voice]` among them, bind the adopter: `charter.practices` names the set, the
+foundation set by default (`help/charter.md`). A project that wants a different persona says so in a
+section-2 line; while `[voice]` is active, its facts-over-wit half binds.
 
 ### Section 2 — this repository's own rules
 

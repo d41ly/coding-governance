@@ -321,3 +321,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-08T13:04:18Z dispatch · item 550ea807 PLAY-dOrderedCharter-74 · reason tools/playbook/instruction_units.py tools/gate-legs.json memory/guides/SESSION-KICKOFF.md memory/builds/dOrderedCharter/spec/2026-11-08-spec-PLAY-dOrderedCharter-74.md memory/builds/dOrderedCharter/build/2026-11-08-build-PLAY-dOrderedCharter-74-ledger.md memory/builds/dOrderedCharter/README.md memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/map/generated
 
 2026-11-08T13:04:23Z brief · item PLAY-dOrderedCharter-74 · reason 926f565e3ae5 memory/builds/dOrderedCharter/prompts/2026-11-08-prompt-PLAY-dOrderedCharter-74-build-brief.md
+
+2026-11-08T14:32:48Z dispatch · item eb1c90a1 PLAY-dOrderedCharter-41 · reason tools/playbook/render_playbook.py help/charter.md WIRE-INTO-PROJECT.md memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-41.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-41-ledger.md memory/map/generated/symbols.json
+
+2026-11-08T14:32:59Z brief · item PLAY-dOrderedCharter-41 · reason f79c92e5c5bb memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-41-build-brief.md
