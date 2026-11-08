@@ -11,8 +11,9 @@ touching nothing else, then grades as usual.
 
   R0  no `.memory-tree.conf`, no CHARTER key in it, or no file at that path; a blank or absent
       MEMORY_ROOT in it (TOOL-aOrientedCast-19); a governing doc that
-      carries neither a section 1 rule tag nor a `## §<n> — ` heading, a tagged doc lacking a
-      carried section (`## Protocols`, `## Facts`), or a tag repeated in section 1 (exit 2)
+      carries no practice rule tag, between its practices markers or under a numbered first heading,
+      and no `## §<n> — ` heading, a tagged doc lacking a carried section (`## Protocols`,
+      `## Facts`), or a practice tag repeated (exit 2)
   R1  zero role files or zero workflow entries, or a tagged charter no role's `rules` cites a tag
       of: a check that graded nothing is DEAD PROBE
   R2  a front-matter defect: unknown, indented, repeated or missing key (`rules` may be empty;
@@ -21,7 +22,7 @@ touching nothing else, then grades as usual.
       `model` absent on an agent role
   R3  a `reads` key outside the vocabulary, named twice, or `card:reuse` without `?`
   R4  a `rules` entry that is not a lowercase tag optionally ending in `?`, a tag named twice, or a
-      bare tag naming no section 1 rule of a tagged charter; an optional (`?`) tag section 1 lacks
+      bare tag naming no practice of a tagged charter; an optional (`?`) tag its practices lack
       prints one `roles: note:`. A pre-tag (v3.x) charter resolves no tag and prints one note
   R5  a body empty, over its slot's ceiling, carrying a `# `/`## ` line or a token other than
       {{MEMORY_ROOT}}, or spelling the file name of a protocol the charter's Protocols section
@@ -252,7 +253,7 @@ def check_roles(root, kit_dir, write=False):
     if not files:
         add_defect(kit_dir / "agents", "R1", "DEAD PROBE: no role file, so this check graded nothing")
     elif charter["shape"] == "tagged" and not cited & set(charter["rules"]):
-        add_defect(charter_path, "R1", "DEAD PROBE: no role's rules cites a section 1 rule tag of "
+        add_defect(charter_path, "R1", "DEAD PROBE: no role's rules cites a practice tag of "
                    "this charter, so no rule reaches any agent")
 
     table = kit_dir / "workflows.toml"

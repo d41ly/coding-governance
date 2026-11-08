@@ -212,10 +212,13 @@ into a Claude Code agent type, `.claude/agents/<name>.md` (TOOL-aOrientedCast-3)
 is the role's Claude keys, then `omitClaudeMd: true`, then the role's `workflow` and `writes` for
 the hooks to read. Its body is `render_role`'s output, then `## Charter` and
 `render_charter_blocks` for the role (TOOL-aOrientedCast-16): a `### Charter rules` block holding the
-section 1 rule lines whose tag the role's `rules` key cites, in charter order, then the charter's
+practice lines whose tag the role's `rules` key cites, in charter order, then the charter's
 `## Protocols` and `## Facts` sections whole, each under a `### ` heading — the same text a handoff
 appends to its task. `parse_charter` reads only the span between the `gov:playbook` region markers
-when the doc holds them, so an adopter's own sections around the region never reach an agent. An
+when the doc holds them, so an adopter's own sections around the region never reach an agent. Inside
+it the rule lines are those between the `<!-- gov:practices -->` and `<!-- /gov:practices -->` lines
+(PLAY-dOrderedCharter-2), so a tag resolves to its practice line whatever the headings say; a charter
+seeded before the markers is read under its numbered first heading until it is reseeded. An
 agent started with the charter omitted holds only its system prompt and its task, so a harness that
 hands it no handoff would otherwise give it no charter at all; a typed spawn that IS handed a
 handoff carries the blocks twice, which is the accepted cost. A pre-tag (v3.x) charter, with
@@ -342,7 +345,7 @@ invoking `/build`.
 
 `python check_roles.py [--root <dir>] [--write]`, run as the `roles catalogue` gate leg. It grades
 the role files, the overlays and the workflow table against each other in both directions, and every
-`rules` tag against the section 1 rule tags of the governing doc, which it locates through the
+`rules` tag against the practice tags of the governing doc, which it locates through the
 memory-tree conf's `CHARTER` key; a body or an overlay spelling a protocol's file name reds as R5 or
 R10. A role called mandatory under a workflow whose `enforced-by` names no hook script, without an
 `unenforced — <why>` clause, reds as R13, and a writer role whose `output` lacks its class's folder

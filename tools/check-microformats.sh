@@ -13,7 +13,9 @@
 # rules, so a marker-anchored selector would select the whole section. Each marker is a WHOLE line,
 # as every reader of the fence finds it: a marker inside a longer line is no marker, so it counts
 # zero and the gate cannot run. Check 9 refuses a head two definitions share, because a reader
-# keeping a head's first definition and one keeping its last would read two different shapes.
+# keeping a head's first definition and one keeping its last would read two different shapes. Check
+# 10 refuses a field whose head word is a credential word, `pw`, `pass`, `passwd`, `password`,
+# `secret`, `token` or `apikey`, in any case.
 #
 # WHAT IT DOES NOT CHECK, said here rather than implied away: it holds SYNTAX. Whether a shape's
 # FIELDS are the right fields is a design question this gate has no opinion about, and a shape that
@@ -118,6 +120,21 @@ while IFS= read -r line; do
   case "$sep" in
     *"|"*) fail 8 "a definition carries a bare ASCII pipe outside a placeholder, and the grammar admits alternation only inside <...>: $body" ;;
   esac
+  # ---- no field asks for a credential (PLAY-dOrderedCharter-2 S5). A tail field whose head word is a
+  #      credential word asks for a secret's value in chat; the shape names where it lives instead
+  #      (`up`'s `creds in <where-they-live>`). Each field is split on ' · ' with no fork.
+  rest=${body#* — }
+  while [ -n "$rest" ]; do
+    field=${rest%% · *}
+    case "$rest" in *" · "*) rest=${rest#* · } ;; *) rest= ;; esac
+    word=${field%% *}
+    shopt -s nocasematch   # bash 3.1's case-blind match, where ${word,,} needs bash 4
+    case "$word" in
+      pw|pass|passwd|password|secret|token|apikey)
+        fail 10 "a definition field asks for a credential, and a shape names where one lives, never its value: $word in $body" ;;
+    esac
+    shopt -u nocasematch
+  done
   # ---- placeholders are lowercase angle-bracket names
   while IFS= read -r ph; do
     [ -n "$ph" ] || continue

@@ -85,7 +85,14 @@ skills/session-kickoff/SKILL.md	18432
 # The agent and returned micro-formats and their rule put the charter at 16729 bytes against 16384,
 # once the role roster had left 83 free. 20 KiB leaves room for more roles and rules without another
 # owner turn soon, and keeps the whole file at 62% of the 32768 bytes a Codex agent reads.
-AGENTS.md	20480
+#
+# RAISED 20480 -> 23161 on 2026-11-08 by PLAY-dOrderedCharter-2, on this file's four raise terms
+# (memory/DECISIONS.md, PLAY-dOrderedCharter-2). The re-founded charter measured 23161 bytes, CR-stripped:
+# its front door, the override rule, the instruction map and the 42 principle lines rendered from the
+# principle registry, less the provenance paragraph and the numbered section heads it dropped. The
+# principle lines alone took 1858 of the 1283 bytes free. The new value is that measurement, no
+# headroom, and keeps the file at 71% of the 32768 bytes a Codex agent reads.
+AGENTS.md	23161
 
 # --- the build method, as rendered -------------------------------------------------------------
 # 27648 bytes = 27 KiB. SEEDED FROM THE MEASUREMENT PLUS THE WORK THIS BUILD FUNDS, 2026-09-05

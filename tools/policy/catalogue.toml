@@ -16,6 +16,8 @@ owner = "dKeptSession"
 name = "charter.override"
 allowed = ["explicit-override", "live-owner-wins", "absolute"]
 default = "explicit-override"
+summary = "Which wins when a live instruction conflicts with the charter: the charter unless the owner overrides it in so many words, the live owner instruction, or the charter always; an override taken is recorded in the build's folder."
+usage = 'charter.override = "absolute"'
 owner = "dOrderedCharter"
 
 [[key]]

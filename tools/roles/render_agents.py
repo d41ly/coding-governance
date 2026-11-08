@@ -7,7 +7,7 @@
 the repository root: the role's Claude keys, then `effort: <level>` as `roles_lib.resolve_effort`
 reads it from the kit's `house/policy.toml` (TOOL-aOrientedCast-10), then `omitClaudeMd: true`, then gov's `workflow` and
 `writes`, then a body that is `roles_lib.render_role`'s output followed, under `## Charter`, by
-`roles_lib.render_charter_blocks` for the role: the section 1 rule lines its `rules` key cites, then
+`roles_lib.render_charter_blocks` for the role: the practice lines its `rules` key cites, then
 the charter's carried sections whole (TOOL-aOrientedCast-16). A pre-tag charter renders no
 `## Charter` and prints one note. Beside them it writes the generated
 index `.claude/roles.json`: every role with its `workflow`, `writes`, `agent` and `gates`, the gate legs
@@ -95,11 +95,16 @@ FIXTURE_MISSING = "{prefix}/workflows/missing.js"
 FIXTURE_ROOT = "toolroot"
 #: Every fixture kit carries a policy, so an absent file never reads as the fixture's normal state.
 FIXTURE_POLICY = '[effort]\ndefault = "medium"\n'
-#: The fixture's governing doc: a tagged charter inside a playbook region, an authored section after it.
-FIXTURE_DOC = ("<!-- gov:playbook -->\n# Doc\n\n## 1. Practices\n\n<!-- one-line -->\n- [one] Rule one.\n"
-               "- [two] Rule two.\n<!-- /one-line -->\n\n## Protocols — read the one whose trigger holds\n\n"
+#: The fixture's governing doc: a tagged charter inside a playbook region, its practices between their
+#: markers under an unnumbered heading, a tagged micro-format rule after them, an authored section after it.
+FIXTURE_DOC = ("<!-- gov:playbook -->\n# Doc\n\n## Practices\n\n<!-- gov:practices -->\n<!-- one-line -->\n"
+               "- [one] Rule one.\n- [two] Rule two.\n<!-- /one-line -->\n<!-- /gov:practices -->\n\n"
+               "### Micro-formats\n\n- [state] A micro-format rule.\n\n"
+               "## Protocols — read the one whose trigger holds\n\n"
                "- A pass: `mem/P.md`.\n\n## Facts\n\n- **Fact:** one.\n<!-- /gov:playbook -->\n\n"
                "## Authored\n\nafter the region\n")
+#: A charter seeded before the practices markers (PLAY-dOrderedCharter-2 S6), its rules under a numbered first heading.
+LEGACY_FIXTURE_DOC = "<!-- gov:playbook -->\n# Doc\n\n## 1. Practices\n\n- [one] Rule one.\n- [two] Rule two.\n\n" + FIXTURE_DOC[FIXTURE_DOC.index("## Protocols"):]
 
 
 def derive_tool_root(script_dir):
@@ -351,6 +356,33 @@ def check_arm(state, arm, ok, what):
     state["n"] += 1
     if not ok:
         state["fail"].append("arm %d — %s" % (arm, what))
+
+
+def check_charter_shape_arms(state, roles):
+    """Arm 19 (PLAY-dOrderedCharter-2 S6): a charter seeded before the practices markers still renders a
+    role's cited rules; a tag outside the markers is no practice, so citing it refuses R4; and a charter
+    carrying neither the markers nor the numbered first heading refuses R0."""
+    pair = {s: roles[s] for s in ("r-one", "r-two")}
+    neither = FIXTURE_DOC.replace("<!-- gov:practices -->\n", "").replace("<!-- /gov:practices -->\n", "")
+    cut = dict(pair, **{"r-one": (roles["r-one"][0].replace("rules: two, one", "rules: one, state"), "")})
+    for case, doc, cast, want in (("19a", LEGACY_FIXTURE_DOC, pair, 0), ("19b", FIXTURE_DOC, cut, 2),
+                                  ("19c", neither, pair, 2)):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            kit, tool_root = build_fixture(root, cast)
+            (root / "DOC.md").write_text(doc, encoding="utf-8")
+            err = io.StringIO()
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+                rc = run_mode("write", kit, tool_root, root)
+            agent = root / ".claude" / "agents" / "r-one.md"
+            text = agent.read_text(encoding="utf-8") if agent.is_file() else ""
+            if case == "19a":
+                check_arm(state, 19, rc == 0 and "### Charter rules\n\n- [one] Rule one.\n- [two] Rule two.\n" in text,
+                          "a charter seeded before the markers exited %d without r-one's two rules" % rc)
+            else:
+                rule = "R4" if case == "19b" else "R0"
+                check_arm(state, 19, rc == want and rule in err.getvalue() and not text,
+                          "%s: exited %d without %s, or wrote r-one: %s" % (case, rc, rule, err.getvalue()))
 
 
 def run_selftest():
@@ -671,6 +703,7 @@ def run_selftest():
                           and not any(ln.startswith("render_agents: misplaced") for ln in lines),
                           "%s: a namesake at %s beside no mark of its kit exited %d under --check, or "
                           "did not read as the note alone" % (case, namesake, rc))
+    check_charter_shape_arms(state, roles)
     for line in state["fail"]:
         print("render_agents selftest: FAIL %s" % line)
     print("%s (%d assertions)" % ("FAIL" if state["fail"] else "PASS", state["n"]))

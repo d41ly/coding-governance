@@ -15,8 +15,8 @@ reference; this page is the short version.
 1. **Kickoff writes the card.** Its `## task` block carries the goal, scope, cut-line, To-do, Reuse,
    acceptance check and gates.
 2. **A role supplies the constant part.** Each role is one file under `<prefix>/roles/agents/`: its
-   instructions, the inputs it reads, the file class it may write and the charter's section 1 rule
-   tags it needs, under `rules`. It also says when the role is mandatory, under `mandatory`, and
+   instructions, the inputs it reads, the file class it may write and the tags of the charter's
+   practices it needs, under `rules`. It also says when the role is mandatory, under `mandatory`, and
    where its output goes, under `output`. Its agent carries those rule lines and the charter's
    Protocols and Facts sections whole.
 3. **The handoff renderer joins them.** `handoff.py render` writes one prompt file under the build's
@@ -24,7 +24,7 @@ reference; this page is the short version.
    any `--input` values. A required input that is missing or still a placeholder refuses by name.
 4. **The agent runs as a native type.** Each role is rendered into `.claude/agents/gov-<role>.md`,
    which starts without the full charter and at the reasoning effort the policy file sets. It
-   carries the section 1 rules its role cites and the charter's Protocols and Facts sections.
+   carries the practices its role cites and the charter's Protocols and Facts sections.
 
 ## How to use it
 

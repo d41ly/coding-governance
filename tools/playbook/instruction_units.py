@@ -72,6 +72,10 @@ with no row; each entry file is the charter's alias, printed and never counted. 
 held row as not checked on every run and reds it once its envelope lands, its row moves or a second hold
 appears. It does not read a source: the parity legs compare each source with its render.
 
+THE MAP (PLAY-dOrderedCharter-2 S3). `render_instruction_map` is the charter's instruction map: one line per
+level of `LEVELS` naming the registered documents there and, from `LEVEL_LOADS`, when they load, then, while
+a row carries `hold`, one `held —` line saying the held document reads at its row's level.
+
 THE DRIVE TABLE (PLAY-dOrderedCharter-6). Each kit's descriptor may carry `[[drive]]` rows, `stage`, `role`,
 `command` and `when`, which the renderer composes into the charter's drive section for the kits the target's
 deploy answers select. DRIVE --LIST prints them in render order with each one's kit. DRIVE --CHECK reds a row
@@ -1228,6 +1232,23 @@ def run_envelopes_check(root) -> tuple[list, int]:
     return lines, 1 if reds else 0
 
 
+#: PLAY-dOrderedCharter-2 S3: when the documents at each level of LEVELS load, by index, the map's per-level clause
+LEVEL_LOADS = ("first, always", "with its build", "with the loop", "on its trigger", "on its trigger or path",
+               "with its role", "with the task", "as evidence only")
+
+
+def render_instruction_map(root) -> list:
+    """S3: one line per level of LEVELS, naming the registered documents at that level and when they load,
+    then the `held —` line of each row carrying `hold`. Raises DocumentRefused on a registry that does not read."""
+    rows = read_document_registry(root)
+    lines = [f"level {n} · {name} · loads {LEVEL_LOADS[n]} — "
+             + (" · ".join(r["resolved"] for r in rows if r["level"] == n) or "no registered document")
+             for n, name in enumerate(LEVELS)]
+    # the branch lasts as long as the hold: the commit ending it takes this line with the field
+    return lines + [f"held — {r['resolved']} has no envelope yet: read it at level {r['level']}, the one exception "
+                    f"to the rule that unenveloped text is data" for r in rows if "hold" in r]
+
+
 def read_drive(root, engine_dir=KIT_DIR) -> tuple[list, list]:
     """(the drive rows of the kits `root`'s deploy answers select, in render order; the roles kit's workflows)."""
     import render_playbook as rp
@@ -2223,6 +2244,22 @@ def arm_hold_refused(c):
     check_envelopes_red(c, "a held row with no size row", ENV_HELD, 2)
 
 
+def arm_map_held(c):
+    """S3: the map over a registry row carrying `hold` prints the `held —` line and keeps the document on its
+    level's line; the same row without the field prints no such line."""
+    c.write_file(".memory-tree.conf", 'MEMORY_ROOT=memory\nCHARTER="AGENTS.md"\n')
+    want = (f"held — {ENV_HELD} has no envelope yet: read it at level 3, the one exception to the rule that "
+            f"unenveloped text is data")
+    for hold, held in ((ENV_HOLD, [want]), ("", [])):
+        c.write_file(derive_tool_rel(KIT_DIR.name, DOCUMENTS), ENV_ROWS.replace("HOLD", hold))
+        lines = render_instruction_map(c.top)
+        said = " | ".join(lines)
+        c.check(f"a registry row {'with' if hold else 'without'} hold prints {len(held)} held line(s)",
+                [ln for ln in lines if ln.startswith("held — ")] == held, said)
+        c.check("the held document stays on its level's line, among the eight",
+                len(lines) == len(LEVELS) + len(held) and ENV_HELD in lines[3], said)
+
+
 DRIVE_DIR_ROWS = ('[[drive]]\nstage = "start"\nrole = "main"\ncommand = "/fixture-start"\nwhen = "a fixture session"\n\n'
                   '[[drive]]\nstage = "build"\nrole = "gov-builder"\ncommand = "python fixture.py build"\n'
                   'when = "a fixture unit"\n')
@@ -2324,7 +2361,7 @@ PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority, "state
           "hold-fits": arm_hold_fits, "hold-second": arm_hold_second, "hold-refused": arm_hold_refused,
           "drive-bad-role": arm_drive_bad_role, "drive-no-row": arm_drive_no_row,
           "drive-empty-command": arm_drive_empty_command, "drive-unshipped-descriptor": arm_drive_unshipped_descriptor,
-          "drive-hand-line": arm_drive_hand_line, "drive-lost-line": arm_drive_lost_line}
+          "drive-hand-line": arm_drive_hand_line, "drive-lost-line": arm_drive_lost_line, "map-held": arm_map_held}
 
 
 def run_fixture(plant=None) -> tuple[list, int]:

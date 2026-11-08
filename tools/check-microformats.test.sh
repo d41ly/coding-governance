@@ -131,6 +131,13 @@ arm "a head defined twice reds" red \
   "a definition head is defined more than once, so a reader keeping its first definition and one keeping its last read two different shapes" \
   '/^- `gates/a\
 - `gates — RED · <leg>`'
+# PLAY-dOrderedCharter-2 S5: a field asking for a credential reds, today's `up` field among them, and a
+# field naming where the credential lives does not.
+arm "a field asking for a credential reds" red \
+  "a definition field asks for a credential, and a shape names where one lives, never its value" \
+  's/^- `gates — .*/- `up — <service> :<port> · admin <user> · pw <pw-or-where-it-lives>`/'
+arm "a field naming where a credential lives does NOT red" ok "" \
+  's/^- `gates — .*/- `up — <service> :<port> · admin <user> · creds in <where-they-live>`/'
 arm "an opener that is not a whole line is cannot-run" cannot \
   "not delimited by exactly one fence pair" 's/^<!-- microformats -->$/x <!-- microformats -->/'
 

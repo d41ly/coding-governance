@@ -29,7 +29,6 @@ card.follows
 card.pointers
 card.snapshot
 card.store
-charter.override
 commits.edge-check
 commits.squash
 context.on-full

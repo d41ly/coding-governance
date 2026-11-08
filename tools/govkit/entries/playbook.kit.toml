@@ -137,7 +137,7 @@ key = "ROLE_ROSTER"
 class = "derived"
 probe = "role_roster"
 kit = "roles"
-why = "section 3's Agent roles subsection: one `- ` line per role, printed by the roles kit's own `roster` verb so that kit stays the one reader of role files; only reachable when the roles block survives (TOOL-aOrientedCast-18)"
+why = "the Agent roles section: one `- ` line per role, printed by the roles kit's own `roster` verb so that kit stays the one reader of role files; only reachable when the roles block survives (TOOL-aOrientedCast-18)"
 
 # --- LEGACY: names a v3.x template uses and v4.0 does not. KEPT DECLARED (TOOL-aDistilledCharter-2
 # rev-2, closing review round 1, R1): an adopter's template is a SEED that `govkit update` never
@@ -275,7 +275,7 @@ why = "where a Tier-2 run is persisted as an in-repo artifact; must agree with m
 key = "ADOPTER_RULES"
 class = "defaulted"
 default = "- none — this repository adds no rules of its own"
-why = "section 2: this repository's own rules, one `- ` bullet per line, from `[charter] adopter_rules`. DEFAULTED, not asked: an asked key would refuse every adopter's next re-render until it answered, and the update would roll the kit back. The render grades each line (TOOL-aDistilledCharter-1)"
+why = "the project block, under `This repository's own rules`: this repository's own rules, one `- ` bullet per line, from `[charter] adopter_rules`. DEFAULTED, not asked: an asked key would refuse every adopter's next re-render until it answered, and the update would roll the kit back. The render grades each line (TOOL-aDistilledCharter-1)"
 
 # ---------------------------------------------------------------- the fenceable blocks
 # `when:` fences name a PROJECT PROPERTY that no kit governs, so they cannot be validated against the

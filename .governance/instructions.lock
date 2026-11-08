@@ -3,10 +3,10 @@
 
 [[target]]
 path = "AGENTS.md"
-blob = "8d655175e2d757d6192a0b484598fc327a301202"
+blob = "d5f548d33916c6a53d354ee3c51a593bf5525ffe"
 units = []
 renderer = "playbook-render@1.33"
-template = "coding-governance-agents.template.md@v4.5"
+template = "coding-governance-agents.template.md@v5.0"
 
 [[target]]
 path = "CLAUDE.md"

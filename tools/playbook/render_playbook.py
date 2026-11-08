@@ -86,6 +86,15 @@ is collected, to `render_drive_line` per `[[drive]]` row of the selected kits' d
 `read_drive_rows` order: `start` rows first, then the stage integer of the roles kit's workflow the row
 names, then kit and row order. A selection with no row drops the section, heading and region. A selected
 kit whose descriptor is found neither beside this engine nor at the registry's path refuses the render.
+
+THE RE-FOUNDED CHARTER (PLAY-dOrderedCharter-2). Four more lines expand before the placeholder set is
+collected, each only where the template carries it. `{{OVERRIDE_RULE}}` is the sentence `OVERRIDE_SENTENCES`
+holds for the value of `charter.override`, read at the target's landed revision; with no policy kit it is
+`CHARTER_OVERRIDE_DEFAULT`'s sentence and a note says so, and any other refused read refuses the render.
+`{{INSTRUCTION_MAP}}` is `instruction_units.render_instruction_map` over the target's document registry, one
+`- ` line each. `{{PRINCIPLES}}` and `{{DECISION_PRINCIPLES}}` are `principles.toml` beside this engine, one
+`- P<n> <line>` each: the decision principle, `DECISION_PRINCIPLE`, under the second and every other row under
+the first. A registry that does not read refuses the render naming it.
 """
 from __future__ import annotations
 
@@ -226,6 +235,24 @@ DRIVE_FIELDS = ('stage', 'role', 'command', 'when')
 DRIVE_START = 'start'
 # The policy kit's DERIVED_WHY, spelled again because a kit imports no sibling; the selftest runs the real reader.
 POLICY_DERIVED_LINE = 'a derived default no reader computes yet'
+# PLAY-dOrderedCharter-2: the re-founded charter's four expanded lines.
+OVERRIDE_LINE_RE = re.compile(r'^[ \t]*\{\{OVERRIDE_RULE\}\}[ \t]*$', re.M)
+MAP_LINE_RE = re.compile(r'^[ \t]*\{\{INSTRUCTION_MAP\}\}[ \t]*$', re.M)
+PRINCIPLES_LINE_RE = re.compile(r'^[ \t]*\{\{PRINCIPLES\}\}[ \t]*$', re.M)
+DECISION_LINE_RE = re.compile(r'^[ \t]*\{\{DECISION_PRINCIPLES\}\}[ \t]*$', re.M)
+# The catalogue default of `charter.override`, spelled again because a kit imports no sibling: the selftest
+# compares it with what the real `policy.py get charter.override` answers for an unset key.
+CHARTER_OVERRIDE_DEFAULT = 'explicit-override'
+OVERRIDE_SENTENCES = {
+    'explicit-override': 'the charter wins a live conflict unless the owner overrides it in so many words, and the '
+                         'agent then records it with `build_records.py new override`.',
+    'live-owner-wins': 'a live owner instruction wins, and the agent names the conflict and records it with '
+                       '`build_records.py new override`.',
+    'absolute': 'the charter outranks every live instruction, and no override is taken.',
+}
+# The principle registry beside this engine, and the one row the charter renders as its decision principle.
+PRINCIPLES_TABLE = 'principles.toml'
+DECISION_PRINCIPLE = 'principle.p18'
 
 
 class Refusal(Exception):
@@ -437,7 +464,7 @@ NODE_KEYS = ('primary_tree', 'worktree_root', 'variances')
 # S3). A template whose marker major is below it renders as it always did, may carry a legacy fence,
 # and gets the note that a newer one is available to reseed. One at or above it may carry no legacy
 # fence and gets no reseed note, a minor behind included.
-TEMPLATE_MAJOR = 4
+TEMPLATE_MAJOR = 5
 TEMPLATE_MARKER_RE = re.compile(r'<!--\s*governance-template:\s*v([0-9]+)\.([0-9]+)\s*-->')
 # The marker's whole line and one blank line after it, which a render drops (PLAY-dOrderedCharter-12 S5).
 TEMPLATE_MARKER_LINE_RE = re.compile(rf'^[ \t]*{TEMPLATE_MARKER_RE.pattern}[ \t]*\n(?:[ \t]*\n)?', re.M)
@@ -1245,6 +1272,54 @@ def render_practice_lines(catalogue: dict, target: Path, kits: set, cut: list, n
     return [f"- [{r['tag'].split('.', 1)[1]}] {r['line']}" for r in kept]
 
 
+def render_override_line(target: Path, notes: list) -> str:
+    """S2: the override rule's line for the target's `charter.override`, noting the value and its source. No
+    policy kit takes `CHARTER_OVERRIDE_DEFAULT` and notes why; any other refused read, and a value with no
+    sentence, refuse naming the key."""
+    from policy_value import PolicyRefused, read_policy_value
+    try:
+        lines, explain = read_policy_value("charter.override", target)
+    except PolicyRefused as exc:
+        if not exc.line.startswith('no policy kit found'):
+            raise Refusal(f'charter.override: {exc.line}') from None
+        value = CHARTER_OVERRIDE_DEFAULT
+        notes.append(f'charter.override — {value}: no policy kit in this install, so no value can be read')
+    else:
+        value = lines[0].strip() if len(lines) == 1 else ''
+        if value not in OVERRIDE_SENTENCES:
+            raise Refusal(f'charter.override: the reader answered {lines!r}, which no override sentence renders')
+        notes.append(f'charter.override — {value}: {explain}')
+    return f'- `charter.override` is `{value}`: {OVERRIDE_SENTENCES[value]}'
+
+
+def render_principle_lines(engine_dir: Path) -> tuple[list[str], list[str]]:
+    """S1: `(core lines, decision lines)` from the principle registry beside this engine, `- P<n> <line>`
+    each in registry order, the `DECISION_PRINCIPLE` row alone in the second. A registry that does not read,
+    a row lacking its `id` or `line`, and no decision row refuse naming the file."""
+    path = engine_dir / PRINCIPLES_TABLE
+    try:
+        rows = tomllib.loads(read_input(path, 'the principle registry')).get('principle') or []
+    except tomllib.TOMLDecodeError as exc:
+        raise Refusal(f'the principle registry {path.as_posix()} does not parse: {exc}') from None
+    if not rows or not all(isinstance(r, dict) and r.get('id') and r.get('line') for r in rows):
+        raise Refusal(f'the principle registry {path.as_posix()} holds no rows, or a row lacks its id or line')
+    core, decision = [], []
+    for r in rows:
+        (decision if r.get('tag') == DECISION_PRINCIPLE else core).append(f"- {r['id']} {r['line']}")
+    if not decision:
+        raise Refusal(f'the principle registry {path.as_posix()} holds no {DECISION_PRINCIPLE} row')
+    return core, decision
+
+
+def render_map_lines(target: Path) -> list[str]:
+    """S3: the instruction map as the charter carries it, `render_instruction_map`'s lines as `- ` items."""
+    iu = load_units_module()
+    try:
+        return [f'- {line}' for line in iu.render_instruction_map(target)]
+    except iu.DocumentRefused as exc:
+        raise Refusal(str(exc)) from None
+
+
 def resolve_kit_descriptor(engine_dir: Path, spelled: str) -> Path | None:
     """The descriptor a registry row's `descriptor` names, in this install, or None. A flat entry's, whose
     file name is not `kit.toml`, beside this engine first, where the kit's `root_relative` rules ship it; a
@@ -1378,6 +1453,15 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
         else:
             text = remove_drive_section(text)
             notes.append('drive     no selected kit declares a [[drive]] row, so the section is not rendered')
+    if OVERRIDE_LINE_RE.search(text):
+        override = render_override_line(target, notes)
+        text = OVERRIDE_LINE_RE.sub(lambda _m: override, text, count=1)
+    if MAP_LINE_RE.search(text):
+        text = MAP_LINE_RE.sub(lambda _m: '\n'.join(render_map_lines(target)), text, count=1)
+    if PRINCIPLES_LINE_RE.search(text) or DECISION_LINE_RE.search(text):
+        core, decision = render_principle_lines(engine_dir)
+        text = PRINCIPLES_LINE_RE.sub(lambda _m: '\n'.join(core), text, count=1)
+        text = DECISION_LINE_RE.sub(lambda _m: '\n'.join(decision), text, count=1)
     if marker and not current:
         notes.append(f'legacy    template v{marker.group(1)}.{marker.group(2)} at '
                      f'{template.as_posix()} — this engine ships v{TEMPLATE_MAJOR}.x; reseed the '
@@ -1535,39 +1619,40 @@ PRACTICE_REFUSALS = (('a tag outside its shape', 'practice.One', 'tag = "practic
                       '"practice.none"]'))
 
 
+def render_target(table=PRACTICE_TABLE, kits='["roles"]', tail='', tpl=PRACTICE_TEMPLATE, policy=None,
+                  branch='main') -> tuple[str, list, str | None]:
+    """-> (body, notes, refusal or None) of one fixture target committed on `branch`, the selftest's policy
+    arms' one fixture (PLAY-dOrderedCharter-1, -2)."""
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        eng, tgt = Path(td) / 'engine', Path(td) / 'target'
+        eng.mkdir()
+        (tgt / '.governance').mkdir(parents=True)
+        (eng / 'practices.toml').write_text(table, encoding='utf-8')
+        (eng / 'playbook.kit.toml').write_text(
+            '[[placeholder]]\nkey = "ANSWER"\nclass = "defaulted"\ndefault = "x"\n\n'
+            '[[block]]\nname = "cross-os"\n', encoding='utf-8')
+        (eng / 'registry.toml').write_text('[[entry]]\nid = "roles"\n\n[[entry]]\nid = "lexicon"\n',
+                                           encoding='utf-8')
+        (tgt / 'TPL.md').write_text(tpl, encoding='utf-8')
+        (tgt / '.governance' / 'deploy.toml').write_text(
+            f'kits = {kits}\n{tail}\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
+        if policy is not None:
+            (tgt / '.governance' / 'policy.toml').write_text(policy, encoding='utf-8')
+        read_git(tgt, 'init', '-q', '-b', branch)
+        read_git(tgt, 'add', '-A')
+        read_git(tgt, '-c', 'user.name=fx', '-c', 'user.email=fx@example.invalid', '-c', 'commit.gpgsign=false',
+                 'commit', '-qm', 'fixture')
+        try:
+            return (*render(eng, Path(td), tgt), None)
+        except Refusal as e:
+            return '', [], str(e)
+
+
 def check_practice_arms(check_arm) -> None:
     """PLAY-dOrderedCharter-1: `render` over a target committed on `main`: each refused catalogue, the `kit`
     field, a `drop_blocks` member with and without its fence, and, where a policy kit answers, the three policy
     cases; where none does, those print `unarmed` and the no-policy-kit note is what is asserted."""
-    import tempfile
-
-    def render_target(table=PRACTICE_TABLE, kits='["roles"]', tail='', tpl=PRACTICE_TEMPLATE, policy=None,
-                      branch='main') -> tuple[str, list, str | None]:
-        """-> (body, notes, refusal or None) of one committed fixture target."""
-        with tempfile.TemporaryDirectory() as td:
-            eng, tgt = Path(td) / 'engine', Path(td) / 'target'
-            eng.mkdir()
-            (tgt / '.governance').mkdir(parents=True)
-            (eng / 'practices.toml').write_text(table, encoding='utf-8')
-            (eng / 'playbook.kit.toml').write_text(
-                '[[placeholder]]\nkey = "ANSWER"\nclass = "defaulted"\ndefault = "x"\n\n'
-                '[[block]]\nname = "cross-os"\n', encoding='utf-8')
-            (eng / 'registry.toml').write_text('[[entry]]\nid = "roles"\n\n[[entry]]\nid = "lexicon"\n',
-                                               encoding='utf-8')
-            (tgt / 'TPL.md').write_text(tpl, encoding='utf-8')
-            (tgt / '.governance' / 'deploy.toml').write_text(
-                f'kits = {kits}\n{tail}\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
-            if policy is not None:
-                (tgt / '.governance' / 'policy.toml').write_text(policy, encoding='utf-8')
-            read_git(tgt, 'init', '-q', '-b', branch)
-            read_git(tgt, 'add', '-A')
-            read_git(tgt, '-c', 'user.name=fx', '-c', 'user.email=fx@example.invalid', '-c', 'commit.gpgsign=false',
-                     'commit', '-qm', 'fixture')
-            try:
-                return (*render(eng, Path(td), tgt), None)
-            except Refusal as e:
-                return '', [], str(e)
-
     for name, want, old, new in PRACTICE_REFUSALS:
         _b, _n, got = render_target(PRACTICE_TABLE.replace(old, new, 1))
         check_arm(got is not None and want in got, f'a catalogue with {name} refuses the render',
@@ -1609,6 +1694,59 @@ def check_practice_arms(check_arm) -> None:
         _b, _n, got = render_target(branch='master')
         check_arm(got is not None and 'charter.practices' in got and 'names no commit' in got,
                   'a repository on master with no remote refuses naming the key', f'refused with {got!r}')
+    finally:
+        if was is not None:
+            os.environ['GOV_DEFAULT_BRANCH'] = was
+
+
+OVERRIDE_TEMPLATE = f'<!-- governance-template: v{TEMPLATE_MAJOR}.0 -->\n\n{ONE_LINE_OPEN}\n{{{{OVERRIDE_RULE}}}}\n{ONE_LINE_CLOSE}\n'
+
+
+def check_override_arms(check_arm) -> None:
+    """PLAY-dOrderedCharter-2 AC2: `render` over a target committed on `main` setting each `charter.override`
+    value carries that value's sentence and no other, an unknown value refuses naming the key, an unset key
+    renders `CHARTER_OVERRIDE_DEFAULT`'s sentence as the real reader's default, and with no policy kit the
+    render takes the default and notes it. Where no policy kit answers, the value cases print `unarmed`."""
+    import policy_value
+
+    def check_sentence(body, value, what, detail):
+        others = [s for v, s in OVERRIDE_SENTENCES.items() if v != value and s in body]
+        check_arm(f'`{value}`: {OVERRIDE_SENTENCES[value]}' in body and not others, what, detail)
+
+    check_arm(all(len(f'- `charter.override` is `{v}`: {s}'.encode('utf-8')) <= ONE_LINE_MAX
+                  for v, s in OVERRIDE_SENTENCES.items()), 'every override line fits the one-line cap', '')
+    def resolve_no_kit(*_a):
+        raise LookupError('the arm hides the policy kit')
+
+    held, policy_value.resolve_kit_dir = policy_value.resolve_kit_dir, resolve_no_kit
+    try:
+        body, notes, got = render_target(tpl=OVERRIDE_TEMPLATE, policy='charter.override = "absolute"\n')
+    finally:
+        policy_value.resolve_kit_dir = held
+    check_sentence(body, CHARTER_OVERRIDE_DEFAULT, 'with no policy kit the render takes the default sentence',
+                   f'refused {got!r}: {body!r}')
+    check_arm(any(n == f'charter.override — {CHARTER_OVERRIDE_DEFAULT}: no policy kit in this install, so no value '
+                       f'can be read' for n in notes), 'with no policy kit the render notes it', f'{notes!r}')
+    try:
+        resolve_kit_dir('policy', 'policy.py', Path(__file__).resolve().parent)
+    except LookupError as exc:
+        print(f'  unarmed: the three committed values, an unknown one and the unset default need a policy kit, '
+              f'and {exc}')
+        return
+    was = os.environ.pop('GOV_DEFAULT_BRANCH', None)
+    try:
+        for value in OVERRIDE_SENTENCES:
+            body, notes, got = render_target(tpl=OVERRIDE_TEMPLATE, policy=f'charter.override = "{value}"\n')
+            check_sentence(body, value, f'a committed {value} renders its sentence and no other',
+                           f'refused {got!r}: {body!r}')
+        _b, _n, got = render_target(tpl=OVERRIDE_TEMPLATE, policy='charter.override = "nope"\n')
+        check_arm(got is not None and got.startswith('charter.override: '), 'a committed unknown value refuses '
+                  'naming the key', f'refused with {got!r}')
+        body, notes, got = render_target(tpl=OVERRIDE_TEMPLATE)
+        check_sentence(body, CHARTER_OVERRIDE_DEFAULT, 'an unset key renders CHARTER_OVERRIDE_DEFAULT, the real '
+                       "reader's default", f'refused {got!r}: {body!r}')
+        check_arm(any(n.startswith(f'charter.override — {CHARTER_OVERRIDE_DEFAULT}: ') and '· default ·' in n
+                      for n in notes), 'an unset key notes its source', f'{notes!r}')
     finally:
         if was is not None:
             os.environ['GOV_DEFAULT_BRANCH'] = was
@@ -2303,6 +2441,7 @@ def run_selftest() -> int:
               f'refused {got!r}, stderr {said!r}')
     check_scope_arms(check_arm)
     check_practice_arms(check_arm)
+    check_override_arms(check_arm)
 
     if failed:
         print(f'render_playbook.selftest FAILED — {failed} of {passed + failed} arm(s)')

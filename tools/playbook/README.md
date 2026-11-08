@@ -59,7 +59,10 @@ It never guesses. Every refusal names what the operator must supply:
 - a `drop_blocks` member that matches no fence and, where the template carries `{{PRACTICES}}`, names no
   catalogue row;
 - a template carrying `{{PRACTICES}}` with a catalogue that does not read, or an active set the policy
-  reader refuses, that cannot resolve, or that leaves no practice to render.
+  reader refuses, that cannot resolve, or that leaves no practice to render;
+- a template carrying `{{OVERRIDE_RULE}}` where the policy reader refuses `charter.override` for any reason
+  but a missing policy kit, `{{INSTRUCTION_MAP}}` over a document registry that does not read, or
+  `{{PRINCIPLES}}` or `{{DECISION_PRINCIPLES}}` over a principle registry that does not read.
 
 ## The practice catalogue
 
@@ -71,6 +74,19 @@ as it would in the template, and a template with no such line reads neither the 
 `charter.practices`, and the render takes the `foundation` set where that key is a derived default or no
 policy kit answers, printing which. A `drop_blocks` member naming a row leaves the active set, noted
 `retired`, and still cuts the fenced text the template carries. `help/charter.md` is the adopter's page.
+
+## The re-founded charter
+
+From template v5.0 the charter reads in the front door's order, no heading numbered, its practices
+between `<!-- gov:practices -->` and `<!-- /gov:practices -->`, the markers the roles kit reads its rule tags
+between (PLAY-dOrderedCharter-2). Four more lines expand before placeholders are collected, each only where
+the template carries it: `{{OVERRIDE_RULE}}`, the override rule's sentence for the value of `charter.override`
+at the landed revision, `CHARTER_OVERRIDE_DEFAULT`'s where no policy kit answers, with a note naming the
+value and its source; `{{INSTRUCTION_MAP}}`, `instruction_units.render_instruction_map`'s lines over the
+target's document registry, one level each, then a `held —` line while a row carries `hold`;
+`{{PRINCIPLES}}` and `{{DECISION_PRINCIPLES}}`, one `- P<n> <line>` per row of `principles.toml`, the
+decision principle, `principle.p18`, alone under the second. A seeded v4.x template renders as it did and
+reads no `charter.override`.
 
 ## Where a value comes from
 

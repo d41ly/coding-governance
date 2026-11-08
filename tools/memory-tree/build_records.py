@@ -26,6 +26,15 @@ while that command refuses every write. A pin is `none` or `<tag>@<hash8>`. `--t
 the file and fills `Caused-by`, and `Proof` reads `DOOR_PROOF`, no flag, so no caller of the door claims a proof.
 Two builds' same-day records of one tag order by slug, the read's known ceiling.
 
+THE OVERRIDE KIND and its stand-in door (PLAY-dOrderedCharter-2 S4): `build_records.py new override --build
+<slug> --unit <id> --rule <tag> --words <text> --session <id>` writes the next
+`<date>-build-<unit id>-override-<n>.md`, a record of the owner setting a charter rule aside in so many words,
+its fields `Rule` (the tag set aside), `Words` (the owner's words, verbatim), `Session`, `Value` (the
+`charter.override` value it was taken under, read at the tree's landed revision through the policy kit's
+`policy.py get`) and `Caused-by`. It refuses, exit 1 and writing nothing, under `absolute`, where no override
+is taken, with any field empty, and where no policy kit answers the key. It is a door the memory plan lists
+until dTotalRecall's record door adopts it.
+
 `build_records.py read <path>` prints one record's fields and every refusal: exit 0 well-formed, 1 malformed,
 2 an unreadable path or a pending kind.
 
@@ -63,6 +72,7 @@ PIN = re.compile(TAG + r"@[0-9a-f]{8}")
 CHANGE_ACTIONS = ("add", "edit", "remove", "rename", "split")   # the one list `instructions_edit.WRITE_VERBS` reads
 ENDING_ACTIONS = ("remove", "rename", "split")                   # those that end a tag and so name a `Successor`
 CHANGE_MARKS = ("editorial", "semantic")
+OVERRIDE_TAKEN = ("explicit-override", "live-owner-wins")   # the `charter.override` values an override is taken under
 PROOF = re.compile(r"tty-cli|none — \S.*")
 DOOR_PROOF = "none — stand-in door"
 
@@ -80,7 +90,10 @@ KINDS = {
         "required": ("Principle", "Excuses", "Reason", "Caused-by"),
         "closed": (),
     },
-    "override": {"pending": "PLAY-dOrderedCharter-2"},
+    "override": {
+        "required": ("Rule", "Words", "Session", "Value", "Caused-by"),
+        "closed": (("Value", OVERRIDE_TAKEN),),
+    },
     "change": {
         "required": ("Unit", "Action", "Before", "After", "Mark", "Proof", "Caused-by"),
         "closed": (("Mark", CHANGE_MARKS), ("Action", CHANGE_ACTIONS)),
@@ -89,7 +102,7 @@ KINDS = {
 if set(KINDS) != set(TYPED_RECORD_KINDS):
     raise ImportError("build_records: the kind table and tree_lib.TYPED_RECORD_KINDS differ on "
                       + ", ".join(sorted(set(KINDS) ^ set(TYPED_RECORD_KINDS))))
-DOORS = ("exception", "change")  # the kinds `new <kind>` writes; every other kind is `write_record`'s alone
+DOORS = ("exception", "change", "override")  # the kinds `new <kind>` writes; every other kind is `write_record`'s alone
 PLANTS = ("typed-kinds",)
 
 
@@ -269,6 +282,58 @@ def write_change(root, build, unit, tag, action, mark, before, after, proof, suc
     return write_record(root, build, unit, "change", f"{action} {tag}", fields, today)
 
 
+# -------------------------------------------------------------------------------- the override kind
+def check_override_fields(fields):
+    """The override kind's own field rule: `Rule` the tag of the rule set aside."""
+    rule = fields.get("Rule", "").strip("`")
+    return [("Rule", f"{fields['Rule']} is no tag")] if "Rule" in fields and not re.fullmatch(TAG, rule) else []
+
+
+def read_override(path, text):
+    """One override record: its fields under their own names, and `id`, `path`, `build`, `n` and `malformed`."""
+    fields, bad, name = read_record(path, text, "override", check_fields=check_override_fields)
+    return {**fields, "id": pathlib.PurePosixPath(path).stem, "path": path,
+            "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
+            "malformed": bad}
+
+
+def read_override_value(root):
+    """`charter.override` at `root`'s landed revision, through the policy kit's `policy.py get`, found beside
+    this kit since a kit imports no sibling. ValueError where no policy kit answers or the reader refuses."""
+    import os
+    import subprocess
+    from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
+    try:
+        kit = resolve_kit_dir("policy", "policy.py", KIT)
+    except LookupError as exc:
+        raise ValueError(f"charter.override cannot be read, so no override is recorded: {exc}") from None
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    p = subprocess.run([sys.executable, str(kit / "policy.py"), "get", "charter.override"], cwd=str(root), env=env,
+                       capture_output=True, text=True, encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL)
+    said = p.stdout.split()
+    if p.returncode != 0 or len(said) != 1:
+        why = (p.stderr or p.stdout).strip().splitlines()
+        raise ValueError(f"charter.override did not read: {why[-1] if why else f'exit {p.returncode}'}")
+    return said[0]
+
+
+def write_override(root, build, unit, rule, words, session, today=None):
+    """The stand-in door: the next override record of `build`, written under `root`'s own memory tree, its
+    `Value` the key's at the landed revision. -> its repo-relative path. Every value is validated here, the
+    write boundary; a refusal, `absolute` among them, is ValueError."""
+    for name, value in (("--words", words), ("--session", session)):
+        if not value or not value.strip() or "\n" in value or "\r" in value:
+            raise ValueError(f"{name} is one non-empty line")
+    if not re.fullmatch(TAG, rule or ""):
+        raise ValueError(f"--rule {rule!r} is no tag")
+    value = read_override_value(root)
+    if value not in OVERRIDE_TAKEN:
+        raise ValueError(f"charter.override is {value}: the charter outranks every live instruction and no "
+                         f"override is taken")
+    fields = [("Rule", rule), ("Words", words), ("Session", session), ("Value", value), ("Caused-by", unit)]
+    return write_record(root, build, unit, "override", f"{rule} set aside by the owner", fields, today)
+
+
 def write_record(root, build, unit, kind, title, fields, today=None):
     """The record writer every door shares: the next `kind` record of `build` under `root`'s own memory tree,
     headed `# <unit> <kind> <n> — <title>`, then `**Serves:** <kind> <unit>` and each `(key, value)` of
@@ -305,6 +370,8 @@ DOOR_ARGV = {
                   ["--principle", "principle.p1"]),
     "change": (["--tag", "unit.fixture", "--action", "add", "--mark", "semantic", "--before", "none",
                 "--after", "unit.fixture@0123abcd"], ["--tag", "unit.fixture"]),
+    "override": (["--rule", "practice.verify", "--words", "skip the bar on this one", "--session", "fixture"],
+                 ["--rule", "practice.verify"]),
 }
 
 
@@ -345,15 +412,26 @@ def run_fixture(plant):
             with open(spec, "w", encoding="utf-8", newline="\n") as fh:
                 fh.write(f"# {unit} — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01 · node a · Tier-2 · "
                          "base 0123abcd\n")
+            # the override door reads `charter.override` at the landed revision, so main holds a commit
+            run_git("symbolic-ref", "HEAD", "refs/heads/main")
+            run_git("add", "-A")
+            run_git("-c", "user.name=fx", "-c", "user.email=fx@example.invalid", "-c", "commit.gpgsign=false",
+                    "commit", "-qm", "the fixture build")
+            try:
+                read_override_value(root)
+                unarmed = set()
+            except ValueError as exc:
+                print(f"build-records: {plant} · unarmed · the override door needs a policy kit: {exc}")
+                unarmed = {"override"}
             for kind in TYPED_RECORD_KINDS:
-                if kind in DOORS:
+                if kind in DOORS and kind not in unarmed:
                     rc, said = run_door(root, kind, unit, DOOR_ARGV[kind][0])
                     got = re.search(r"wrote (\S+)", said)
                     if rc != 0 or not got:
                         bad.append(f"{kind}: new {kind} exited {rc}")
                         continue
                     written[kind] = got.group(1)
-                    for other in (d for d in DOORS if d != kind):
+                    for other in (d for d in DOORS if d not in (kind, *unarmed)):
                         rc, said = run_door(root, kind, unit, DOOR_ARGV[kind][0] + DOOR_ARGV[other][1])
                         if rc != 2:
                             bad.append(f"{kind}: new {kind} took {other}'s {DOOR_ARGV[other][1][0]}, exiting {rc}")
@@ -420,6 +498,8 @@ def main(argv):
         change.add_argument(flag, required=True)
     change.add_argument("--successor")
     change.add_argument("--promoted-from")
+    for flag in ("--rule", "--words", "--session"):
+        doors.choices["override"].add_argument(flag, required=True)
     read = sub.add_parser("read", help="read one record and name every refusal")
     read.add_argument("path")
     args = ap.parse_args(argv)
@@ -437,12 +517,14 @@ def main(argv):
             if args.kind == "change":
                 rel = write_change(root, args.build, args.unit, args.tag, args.action, args.mark, args.before,
                                    args.after, DOOR_PROOF, args.successor, args.promoted_from)
+            elif args.kind == "override":
+                rel = write_override(root, args.build, args.unit, args.rule, args.words, args.session)
             else:
                 rel = write_exception(root, args.build, args.unit, args.principle, args.excuses, args.reason,
                                       args.expires)
         except (ValueError, OSError) as exc:
             print(f"build-records: refused · {exc}", file=sys.stderr)
-            return 2
+            return 1 if args.kind == "override" else 2
         print(f"build-records: wrote {rel}")
         return 0
     rel = args.path.replace("\\", "/")
@@ -463,6 +545,8 @@ def main(argv):
         bad = deviation_join.read_record(rel, text)["malformed"]
     elif kind == "change":
         bad = read_change(rel, text)["malformed"]
+    elif kind == "override":
+        bad = read_override(rel, text)["malformed"]
     else:
         bad = read_exception(rel, text)["malformed"]
     for ln in text.replace("\r\n", "\n").split("\n"):

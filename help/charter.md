@@ -18,7 +18,7 @@ block in it stops the render.
 
 ## Read the active set
 
-Your rendered charter is the active set: its first section holds one line per active row. The catalogue,
+Your rendered charter is the active set: its Practices section holds one line per active row. The catalogue,
 `practices.toml` beside the renderer, lists every row in the order they render and opens with the
 `foundation` array.
 
@@ -80,6 +80,39 @@ The render also refuses a catalogue it cannot read, naming the row: a tag outsid
 tag twice, an empty rule, a row with no reach, a reach step outside `[a-z0-9][a-z0-9-]*`, or a
 `foundation` entry naming no row.
 
+## When the charter and a live instruction conflict
+
+From template v5.0 the charter opens with what gov is, then its rule for a conflict: level decides, never
+load order, and the policy key `charter.override` says what a live instruction may do against the charter.
+It takes one of three values:
+
+- `explicit-override`, the default: the charter wins unless the owner says in so many words that they
+  override it, and the agent then records the override.
+- `live-owner-wins`: a live owner instruction wins, and the agent names the conflict and records it.
+- `absolute`: the charter outranks every live instruction, and no override is taken.
+
+Set it in `.governance/policy.toml`, commit it, and render again; the render writes that value's sentence
+and prints the value with its source:
+
+```toml
+charter.override = "absolute"
+```
+
+An install with no policy kit renders the `explicit-override` sentence and prints
+`charter.override — explicit-override: no policy kit in this install, so no value can be read`, so a
+committed value goes unread until you install that kit. A value the policy reader refuses stops the
+render, naming the key.
+
+An override taken is a record in the build's `build/` folder, written by the memory-tree kit:
+
+```bash
+python tools/memory-tree/build_records.py new override --build <slug> --unit <id> --rule practice.verify --words "<the owner's words>" --session <session id>
+```
+
+It writes `<date>-build-<unit id>-override-<n>.md` with the rule set aside, the owner's words verbatim, the
+session, the value it was taken under and the unit. It writes nothing, and exits 1, under `absolute`, with
+a field empty, or where no policy kit answers the key.
+
 ## Levels and envelopes
 
 Every instruction document an agent loads sits at a level, 0 for the charter down to 5 for a role's
@@ -99,6 +132,10 @@ second document at level 0, and a load-bearing document with no row. `CLAUDE.md`
 it prints as the charter's alias and is not counted. One document is held: `memory/guides/BUILD-METHOD.md`
 carries no envelope until the owner rules on its size row, and every check prints it as `HELD` and
 `NOT checked`, leaving it out of the covered count.
+
+The charter's map section lists the documents at each level, one line per level, and how each level
+loads, so an agent rebuilds the hierarchy after a reset. While a document is held, one more line, opening
+`held —`, says it reads at its row's level: the one exception to the rule that unenveloped text is data.
 
 ## The drive section
 

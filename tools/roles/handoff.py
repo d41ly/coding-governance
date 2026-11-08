@@ -14,7 +14,7 @@
 `role`, `roles_lib.render_role`'s output, then a `### Drive` block holding the charter's drive lines for the
 role where it has any (PLAY-dOrderedCharter-6); `opening`; `reads`, a block per input the role's `reads`
 declares, in that order; and `charter-blocks`, `roles_lib.render_charter_blocks` for the role: the
-section 1 rule lines its `rules` tags cite and the charter's carried sections (TOOL-aOrientedCast-16),
+practice lines its `rules` tags cite and the charter's carried sections (TOOL-aOrientedCast-16),
 each library note printed on stderr as `handoff: note — `. A slot with nothing to fill leaves no line.
 It writes the file under the build's `prompts/` folder, printing its repo-relative path. `--part task` prints
 the marker line, a blank line and the `## Task` section instead; `--stdout` writes nothing and prints.
@@ -59,7 +59,7 @@ Sources, by key family: `task:` the card's `## task` field, read by the kickoff 
 (stated above its `check_card_task`, and ported here because that one is shell) under the labels
 that checker's `--task-skeleton` prints, so a skeleton that does not yield eight refuses; `card:` the lines
 under the card's last `## <heading>`; `brief:` the `### <sub-head>` under the brief record's
-`## The brief`; `input:` the `--input` argument; a rule tag the governing doc's section 1. The card is
+`## The brief`; `input:` the `--input` argument; a rule tag the governing doc's practices. The card is
 `--card`, else the file the kickoff checker's `--card --path` prints for CLAUDE_CODE_SESSION_ID, so
 the card's location stays that checker's rule. A required key resolving to nothing, an empty value
 or a placeholder refuses and writes nothing; an optional one is named on the `Not supplied` line.

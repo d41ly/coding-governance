@@ -1168,6 +1168,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "arm_map_held",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_merge",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -4658,6 +4663,11 @@
       "file": "tools/memory-tree/build_records.py"
     },
     {
+      "id": "check_charter_shape_arms",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
       "id": "check_child_forwarding",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
@@ -5841,6 +5851,16 @@
       "id": "check_overlap_pair",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "check_override_arms",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "check_override_fields",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "check_owed_at_lander",
@@ -17388,6 +17408,16 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_override",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
+      "id": "read_override_value",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
       "id": "read_owned_entries",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -20208,6 +20238,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "render_instruction_map",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "render_inventories_json",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -20293,6 +20328,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "render_map_lines",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "render_map_md",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -20358,6 +20398,11 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "render_override_line",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "render_path",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
@@ -20404,6 +20449,11 @@
     },
     {
       "id": "render_practice_lines",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "render_principle_lines",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
     },
@@ -20721,6 +20771,11 @@
       "id": "render_symbols_json",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "render_target",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "render_task_section",
@@ -30386,6 +30441,11 @@
       "id": "write_overlapping_dispatch",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "write_override",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "write_owned_receipt",

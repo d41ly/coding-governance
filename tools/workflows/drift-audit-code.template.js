@@ -32,7 +32,7 @@ const CAP = {{FANOUT_CAP}}
 // DERIVED, so a consumer gate can re-derive the expected sentence and byte-compare it. That is the
 // whole mechanical difference: a gate that re-derives CANNOT be satisfied by a hand-written string,
 // and relaxing it to a substring match would make it satisfiable by prose — the first class
-// AGENTS.md section 7 names.
+// the charter's `[gate]` practice names.
 //
 // THE SENTENCE IS NOW A CONTRACT (ratified F1). Changing it is a version bump like any other, and
 // the drift-audit kit's own README states the three states so a later editor knows the cost.
@@ -47,7 +47,7 @@ function deriveLiveness(c) {
 
 function renderLivenessNote(state, c) {
   if (state === 'dead') {
-    // DEAD PROBE, never a zero. AGENTS.md section 7: a probe that cannot move says so, because a
+    // DEAD PROBE, never a zero. The charter's `[gate]` practice: a probe that cannot move says so, because a
     // reassuring zero from a broken signal is indistinguishable from a clean run.
     return `DEAD PROBE: this run measured NOTHING - ${c.lensesRun} lens(es) ran, ` +
       `${c.lensesDead} died, synthesis ${c.synth ? 'returned' : 'DIED'}; the note is not a zero ` +
