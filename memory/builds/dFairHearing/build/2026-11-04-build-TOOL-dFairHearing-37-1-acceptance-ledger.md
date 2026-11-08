@@ -7,6 +7,8 @@ carries, by scratch probes under the pass's scratch directory and clones under `
 gate or bar ran in the pass: the four `New arm:` lines of spec §7 and its legs are owed to the close,
 which records each arm's RED and GREEN here under a `Pass: none` commit.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-37
 - AC1 — `git show --name-only --format= <c30>` — `<c30>` is `db0f99c71`; piped through `grep -v '^memory/' | grep -vx 'tools/workflows/README.md'` it printed nothing. `<c27>` is `e3bd1ad45` and `<c35>` is `a4fbcbf33`; `git merge-base --is-ancestor` exited 0 against each of `<c30>` and `<c35>`
 - AC2 — `attempts.py` — unit 35 §4's checker, written under the scratch directory, exited 0 over unit 30's record and printed eight `scored` lines and no `unscored` line, as the record's `## Scoring` section states: the `unscored` half is n/a: no unscored attempt, recorded and not counted as coverage. Unit 32's builder return records its AC12 as eight `scored` lines and `paired 4 of 4`, with no red on any attempt; unit 32 has no acceptance ledger at this commit

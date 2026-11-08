@@ -6,6 +6,8 @@ Built against spec rev-2 at the pass's parent `42f2a6c61`, where `tools/workflow
 
 The arm owed its RED-first observation at the close is `stated-shape`, the spec's one `New arm:` line. Before the edit, the probe's copy of the arm's first input read `liveness: 3 confirmed appendix row(s) against a stated confirmed count of 0`, which is the red that line names, but it is a probe's reading and not the arm's.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-46
 - AC1 — `tools/workflows/replay_scorer.py` — the criterion's grep printed 4 before the edit and 0 after it.
 - AC2 — `derive_proof_path` — the criterion's `git grep` printed the file with a count of 2 before the edit and nothing after it. The lifted helper resolved each of the three endings to its one record under `memory/builds/aScoutedSeam/build`, and refused `-1-99-absent.json` as 0 records and `.json` as 3. The cases and results read at `b0fe68f30` and at `5f8ef021d`, 30 cases at each, and the grade over them held `paired 19 of 30 · m1b unanswered `. Owed to the close: `ok scouted-proof` and `ok experiment-union`.

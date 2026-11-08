@@ -4,6 +4,8 @@
 
 Built in three passes: pass (a) `d3c98d523` against spec rev-5, pass (b) `8dd98d252` against rev-7, and pass (c) `7711f0e98` against rev-7, which closed the spec. The main loop drafted this ledger at the close from the four builder returns and the verdict record `2026-11-04-build-TOOL-dFairHearing-25-replay-verdicts.md`. No suite, gate or bar ran in any pass: the probes stood in for the legs, and the spec's gate legs are owed to the close. It declares no `New arm:` line.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-25
 - AC1 — `git for-each-ref refs/replay/` — it printed nothing after pass (b) and again at pass (c). Over `fhr1b`, `fhr1c` and `fhr2b` each clone's `HEAD` is its own placement commit, with one commit outside `6cfd21619`'s history, two placed paths and blob `767187aa4073f6e64cb2b2ef6b798f0a538347fd`. Pass (b) saw a second recipe run into `fhr1b` exit 2 before any fetch
 - AC2 — `node tools/workflows/spec-audit-optin.js` — the replayed payloads of `fhr1c` and `fhr2b` exited 0 on the placed subject and 2 naming `subjects` on the record's dClosedLoop path. Both reports sit under their clone's `memory/builds/dFairHearing/reviews/`, and each `Reviewed:` line names the placed path at `767187aa`

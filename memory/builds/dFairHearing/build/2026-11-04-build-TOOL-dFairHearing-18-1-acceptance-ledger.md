@@ -4,6 +4,8 @@
 
 Built against spec rev-3 and committed as the pass commit `b21501741`, whose parent is `d562f515e`. The main loop drafted this ledger at the close from the builder return `2026-11-03-build-TOOL-dFairHearing-18-1-builder-return.md`, and every observation below is that return's. No suite, gate, bar or selftest ran in the pass: the checks were scratch probes standing in for the `tier2-review self-test` leg and the `review-replay selftest` leg, and both `New arm:` lines' red-first observations and the spec's legs are owed to the close.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-18
 - AC1 — `walk` — a node probe over the render's prelude ran these three criteria, and all 29 of its checks passed. Each `walk` refusal names its field
 - AC2 — `deriveWalkSlices` — the same probe's cases for `deriveWalkSlices` passed

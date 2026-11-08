@@ -4,6 +4,8 @@
 
 Built against spec rev-4 at pass commit `be4358a01`. The main loop drafted this ledger at the close from the builder return and that commit's message. A scratch node probe, cutting the prelude as the suite does and running the whole script over stub agents, passed 30 of 30 checks over AC1 to AC6, and on the base harness it was red with `deriveAddressKey is not defined`. No suite, gate or bar ran in the pass: the `New arm:` line on `tools/workflows/tier2-review.test.sh`, with its floor raised from 418 to 439, and the spec's legs are owed to the close, which records the arm's RED and GREEN here under a `Pass: none` commit.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-4
 - AC1 — `deriveAddressKey` — the probe keyed the criterion's diff finding and its five spec `where` values as stated
 - AC2 — `checkSameAddress` — it read lines 10 and 13 as one address, 10 and 14 and two files as two, `null` as matching nothing, a section-two address equal to itself and unequal to a section-three address

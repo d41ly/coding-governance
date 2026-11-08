@@ -4,6 +4,8 @@
 
 Built against spec rev-4 in pass commit `e3bd1ad45`, whose parent is `b6115ab64`. The first dispatch wrote nothing, because the write set paired `memory/gotchas/INDEX.md` with its generator. The main loop drafted this ledger at the close from the second builder return, whose heading says each criterion in its checks list was observed failing before the change where that applied and passing after. Where a line gives no figure, the return records none. No suite, gate or bar ran in the pass: the spec's gate legs and the first-failure observations of its five `New arm:` lines are owed to the close. A line that says "not recorded" names a half of its criterion no record on disk shows.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-27
 - AC1 — `python render_lenses.py --markers "$SCRATCH/h.js"` — the gate ran over scratch files and held the zero-row opt-in literal outside the count
 - AC2 — `grep -c "never .git clone --branch" tools/workflows/README.md` — the return records this grep and its absence pair among the greps that passed

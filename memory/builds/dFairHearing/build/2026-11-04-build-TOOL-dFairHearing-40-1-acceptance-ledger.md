@@ -13,6 +13,8 @@ left in place. No suite, gate or bar ran in the pass. The `New arm:` line, the A
 `tools/workflows/tier2-review.test.sh` with its floor raised from 627 to 629, and the spec's legs are
 owed to the close.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-40
 - AC1 — `base.py` — with `GATE_BASE` unset it printed `base 8bec4cefd957d194660a8d7c2916f420b7299074 from merge-base of HEAD and origin/main`. Over that sha, `constants.py` printed `constants 20` and no `->` line and exited 0, and `markers.py` printed `files 98` and no `->` line and exited 0. This commit adds no modified path to that range and moves no `version:` line
 - AC2 — `base.py` — its sha equals `git merge-base HEAD origin/main`. Over a `git clone --depth 1 file://` of a two-commit repository, `%TEMP%/fsa` cloned to `%TEMP%/fsb`, it exited 2 printing `HEAD is not ahead of origin/main, or shares no merge-base with it (shallow or unrelated history)`. `git grep -n GATE_BASE` printed one line over each builder return of units 33 and 34, and each line says `GATE_BASE` was unset

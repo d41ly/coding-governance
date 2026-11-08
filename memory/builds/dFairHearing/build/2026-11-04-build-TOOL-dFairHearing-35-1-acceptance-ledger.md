@@ -8,6 +8,8 @@ this ledger at the close from the builder return and the `## Scoring` section th
 gate or bar ran in the pass. The spec's one `New arm:` line applies only if `ungated` wins, and
 `selected` held, so it is owed no observation. The spec's legs are owed to the close.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-35
 - AC1 — `attempts.py` — over unit 30's record at the commit it exited 0 and printed 8 `scored` lines, which the `## Scoring` section quotes, with record 2 `selected` scored at f2s2 because f2s1 is void. Each of the manifest's eight `candidates` entries names the report of the clone its `scored` line names
 - AC2 — `attempts.py` — nine scratch tables under `probe_ac2.py` each gave the output the criterion names: `scored 4 selected 3` with `unscored 4 selected 4`; `void after cap 4 selected` and exit 3; attempt 2 listed twice, exit 1; failed then completed, `scored 4 selected 2`; failed, failed, completed, `void after cap 4 selected` and exit 3; a `Completed` row, an empty last cell and a `Selected` row, each exit 1 naming line 10; and a row of a second table, not read

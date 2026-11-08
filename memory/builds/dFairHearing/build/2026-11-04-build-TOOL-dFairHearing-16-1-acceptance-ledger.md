@@ -4,6 +4,8 @@
 
 Built against spec rev-7 and committed as the pass commit `886c11fea`, whose parent is `f2750bd17`. The main loop drafted this ledger at the close from the builder return `2026-11-03-build-TOOL-dFairHearing-16-3-builder-return.md`, with the second return `2026-11-03-build-TOOL-dFairHearing-16-2-builder-return.md` where a line says so. The first two returns committed nothing and each named a divergence, which rev-6 and rev-7 answered. No suite, gate or bar ran in the pass: the checks were scratch probes standing in for the suites and legs the return names, and the six `New arm:` lines' red-first observations, the suites, the spec's legs and the bar are owed to the close.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-16
 - AC1 — `function function function function 5` — the `node -e` require printed `function function function function 5`, and the in-tree hook still refused under rule 7
 - AC2 — `tools/workflows/tier2-review.js` — the new home named the planted cases and exited 1, and exited 0 on `tools/workflows/tier2-review.js` and `tools/workflows/unattended-build.js`

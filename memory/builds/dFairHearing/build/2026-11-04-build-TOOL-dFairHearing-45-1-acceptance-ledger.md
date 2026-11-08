@@ -6,6 +6,8 @@ Built against spec rev-5. The code was written by the unit's first pass, at pare
 
 The arms owed their RED-first observation at the close are the spec's two `New arm:` lines, in `tools/check-install-prefix.test.sh` and `tools/check-hook-destinations.test.sh`. Neither suite ran in either pass.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-45
 - AC1 — `tools/check-install-prefix.sh` — the criterion's `git grep` printed 15 lines before the edits and nothing after them. The gate's counter body, exec-ed over every file under `tools/` that moved since `f4120c83` or moves here, the replay scorer aside, printed `install-prefix: clean` with 0 spellings and the harness left out as a render. Owed to the close: the leg's own run, over the whole population.
 - AC2 — `build_render_rx` — exec-ed out of the gate and called on the harness and its template, CR stripped: `fullmatch` returned no match before the edit and a match after it, and one character changed at the first and at the last literal returned no match. The new arm's fixture, through the same exec, matched its block render and refused its literal edit, and the older in-line token still refused a value spanning a newline. Owed to the close: `--list`, and the new arm.

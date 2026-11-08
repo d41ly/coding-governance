@@ -4,6 +4,8 @@
 
 Built against spec rev-5 and committed as the pass commit `3745b407a`, whose parent is `b52de5586`. The main loop drafted this ledger at the close from the builder return `2026-11-03-build-TOOL-dFairHearing-17-1-builder-return.md`, and every observation below is that return's. No suite, gate or bar ran in the pass: the checks were scratch probes standing in for the `tier2-review self-test` leg, and the `New arm:` line's red-first observation and the spec's legs are owed to the close.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-17
 - AC1 — `NON-CONVERGENT` — a node probe ran the 13 calls these three criteria specify against the render, and all matched, the flat and oscillating sequences among them
 - AC2 — `BOUNDED` — the same probe's calls matched, the sequence reaching its limit and the one past it among them

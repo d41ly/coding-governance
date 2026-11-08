@@ -4,6 +4,8 @@
 
 Built against spec rev-3 and committed as pass commit `af3831a6c`, at parent `d059e36fd`. The main loop drafted this ledger at the close from the builder return `2026-11-03-build-TOOL-dFairHearing-12-1-builder-return.md` and the pass commit's message; nothing below was observed again for it. AC7's line was observed at the close. No suite, gate or bar ran in the pass: the `review-replay selftest` leg, the `New arm:` line's RED-first observations and the spec's other legs are owed to the close.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-12
 - AC1 — `m1b` — a scratch results copy whose `m1b` row has no `seams` exited 2 naming `m1b` and `incms-decor-texture`, and a compare of two arms with no case in common exited 2 naming the empty pairing
 - AC2 — `--grade m1b` — grade, compare and judged over the `b0fe68f30` blobs matched the grader blob run in the same probe: `positives 15 solved 10`, `items 17/40`, `graded 19 of 30`; `common 19 (15 positive)`, solved 10/15 against 9/15, MUST 97 against 114; `judged common 30 (24 positive)`, `primary 17/24`, `items 39/59`

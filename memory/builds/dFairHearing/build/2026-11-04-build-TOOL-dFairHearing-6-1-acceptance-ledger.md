@@ -4,6 +4,8 @@
 
 Built against spec rev-2 at pass commit `a8546e186`. The main loop drafted this ledger at the close from the builder return and that commit's message. A scratch node runner holding the suite's `runReview`, its stubs and `runGradesArms`, over `tools/workflows/tier2-review.js`, passed 9 and failed 0, and over the parent render it passed 1 and failed 8, the pass being the repeated-id control. No suite, gate or bar ran in the pass: the `New arm:` line on `tools/workflows/tier2-review.test.sh`, with its floor raised from 451 to 460, and the spec's legs are owed to the close, which records the arm's RED and GREEN here under a `Pass: none` commit.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-6
 - AC1 — `regraded` — the mixed item read `blockers` 1, `highs` 0 and `regraded` `[]`, and the arm in `runGradesArms` also asserts no log line naming a placement off the binding grade. An id repeated in a second item read `blockers` and `highs` null
 - AC2 — `regraded` — id 2 graded `HIGH` read `highs` 1 and `regraded` `[2]`

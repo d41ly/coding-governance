@@ -4,6 +4,8 @@
 
 Built against spec rev-2 and committed as pass commit `ef757de0c`, at parent `2cf645929`. The main loop drafted this ledger at the close from the builder return `2026-11-03-build-TOOL-dFairHearing-11-1-builder-return.md` and the pass commit's message; nothing below was observed again for it. A scratch stub runner evaluated the render the way the runtime does and ran 26 checks over AC1 to AC10, and all 26 passed; each line below gives the reading the commit message itemises, and says where it itemises less than the criterion. No suite, gate or bar ran in the pass: the `New arm:` line, its floor of 498 and the spec's legs are owed to the close.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-11
 - AC1 — `roles` — `roles.probe` typed the probe, `Plan` without it, and `none` was refused naming `roles`
 - AC2 — `general-purpose` — under `none` every finder, batch and the synthesis carried it and the probe `Plan`; with no `workerType` the judges carried `Plan` and every call was typed

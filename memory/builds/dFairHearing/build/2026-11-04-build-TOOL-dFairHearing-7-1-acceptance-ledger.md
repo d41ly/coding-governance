@@ -4,6 +4,8 @@
 
 Built against spec rev-1 at pass commit `a1956d229`. The main loop drafted this ledger at the close from the builder return and that commit's message. A scratch node runner cut from the suite's own JS block, over `tools/workflows/tier2-review.js`, passed 20 and failed 0. Each line reads this unit's own commit: TOOL-dFairHearing-1's pass `2d992a209` later moved absent `addressTwins` to `shown` on its replay's hit. No suite, gate or bar ran in the pass: the `New arm:` line on `tools/workflows/tier2-review.test.sh`, with its floor raised from 460 to 473, and the spec's legs are owed to the close, which records the arm's RED and GREEN here under a `Pass: none` commit.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-7
 - AC1 — `deriveTwinPairs` — the runner read `[{confirmed: 1, refuted: 2}]` for the diff findings, and `section 2 S5` paired with the section-sign spelling of section 2 while `status header` paired with nothing
 - AC2 — `addressTwins` — absent, `'hidden'` and `'shown'` each resolved, with absent defaulting to `'hidden'`, and `'on'` and `true` were refused naming it

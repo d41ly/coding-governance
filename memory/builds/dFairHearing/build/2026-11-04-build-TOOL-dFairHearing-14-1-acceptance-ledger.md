@@ -4,6 +4,8 @@
 
 Built against spec rev-5 and committed as pass commit `c2939c9a6`, at parent `fd056f697`. The main loop drafted this ledger at the close from the builder return `2026-11-03-build-TOOL-dFairHearing-14-1-builder-return.md` and the pass commit's message; nothing below was observed again for it. AC7's line was observed at the close. No suite, gate or bar ran in the pass: the `review-replay selftest` leg, the `New arm:` line's RED-first observations and the spec's other legs are owed to the close.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-14
 - AC1 — `case_evidence` — with one case's sha blanked, `--experiment` exited 2 naming `incms-decor-texture` and `case_evidence`, and the unblanked control exited 0
 - AC2 — `--experiment` — the real held-out file's first line read `frozen at b6c828a92ee5…`. A fixture repository under `%TEMP%/fh14`, since removed, exited 2 when the file had two commits, naming both, and a held-out id copied into the tuning cases exited 2 naming `gov-h-govkit-argv-walker`

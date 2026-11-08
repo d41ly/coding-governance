@@ -4,6 +4,8 @@
 
 Built against spec rev-2 at pass commit `e21580aac`, with the follow-up `37ff1d91b` the bug-class checklist forced, both carrying `Pass: TOOL-dFairHearing-2`. The main loop drafted this ledger at the close from the builder return and those two commit messages. Every observation is a scratch probe of the pass or a grep at its commit. No suite, gate or bar ran in the pass: the `New arm:` line on `tools/workflows/tier2-review.test.sh`, with its floor raised from 372 to 387, and the spec's legs are owed to the close, which records the arm's RED and GREEN here under a `Pass: none` commit.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-2
 - AC1 — `tools/workflows/tier2-review.js` — a scratch node probe cutting the prelude as the suite cuts it let `preset: 'design-audit'` through, and refused `preset: 'whole-design'`, `preset: 7` and an empty string naming `unit-spec | design-audit`. `preset: 'unit-spec'` beside `kind: 'diff-review'` threw naming the diff kind. On base the same call threw `preset is not defined`
 - AC2 — `gov:lens-slots design-audit` — the spec's `render_lenses.py` command put the literal's five keys in order, `coherence`, `grounding`, `reuse`, `failure-envelope` and `alternatives-and-cost`, and the `key:` and brief lines of the `unit-spec` and `diff-review` literals equal base's

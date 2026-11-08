@@ -9,6 +9,8 @@ the spec's scripts, written under the pass's scratch directory. The pass before 
 refused at dispatch on AC3's spelling and committed nothing. No suite, gate or bar ran in the pass. The
 spec's legs and the RED-first observation of its two `New arm:` lines are owed to the close.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-36
 - AC1 — `python members.py 3708a705` — over the live hook and pack suites it printed 5 `member` lines and nothing else and exited 0. With the :874 arm pasted twice it printed that label's `twice` line and exited 1
 - AC2 — `census.py` — a copy expecting `(60, 14)` printed `population 59 14` and `census: the population is not 59 and 14`, and exited 1

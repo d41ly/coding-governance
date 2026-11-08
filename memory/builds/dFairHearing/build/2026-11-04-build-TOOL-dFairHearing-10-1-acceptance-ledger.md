@@ -4,6 +4,8 @@
 
 Built against spec rev-3 and committed as pass commit `59c5af433`, at parent `69930b485`. The main loop drafted this ledger at the close from the builder return `2026-11-03-build-TOOL-dFairHearing-10-2-builder-return.md` and the pass commit's message; nothing below was observed again for it. The first return, `2026-11-03-build-TOOL-dFairHearing-10-1-builder-return.md`, committed nothing and observed no criterion, and rev-3 changed no criterion's text. No suite, gate or bar ran in the pass: the spec declares no `New arm:` line, and its legs are owed to the close.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-10
 - AC1 — `lenses.toml` — the retired-lens grep printed nothing over either protocol copy, and the pointer is present in `memory/guides/REVIEW-PROTOCOL.md`
 - AC2 — `memory/guides/REVIEW-PROTOCOL.md` — the lens-count range grep printed nothing, and the default configuration says five lens slots, `LENS_SLOTS` in `check-verifier-fanout.sh`

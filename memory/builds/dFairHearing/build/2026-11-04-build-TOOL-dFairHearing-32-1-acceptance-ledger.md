@@ -11,6 +11,8 @@ gate or bar ran in the pass. The spec's Gates section's legs and the RED-first o
 AC5 was observed at the close. AC18 was not: its line says why.
 AC1, AC11, AC15 and AC17 each state the half that is still owed.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-32
 - AC1 — `git grep` — the tree-wide grep printed nothing. The stub-run half, the `resume:probe` prompt naming `verify-batch-<n>.json`, is the `tier2-review.test.sh` arm this commit adds, and no record observes it: it is owed to the close. At the tip `tools/workflows/tier2-review.js:1708` carries `verify-batch-<n>.json` in the `resume:probe` prompt
 - AC2 — `tools/workflows/tier2-review.js` — a node probe of the prelude keyed the five `where` forms to the five `at` values the criterion names. A copy whose pattern requires the space keyed the two unspaced forms to `null`

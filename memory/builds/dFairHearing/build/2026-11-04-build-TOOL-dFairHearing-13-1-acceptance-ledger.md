@@ -4,6 +4,8 @@
 
 Built against spec rev-3 and committed as pass commit `864f43d25`, at parent `4c1f75d92`. The main loop drafted this ledger at the close from the builder return `2026-11-02-build-TOOL-dFairHearing-13-2-builder-return.md` and the pass commit's message; nothing below was observed again for it. The first return, `2026-11-02-build-TOOL-dFairHearing-13-1-builder-return.md`, committed nothing, and its findings led to rev-3, which rewrote AC2 and AC4 and re-checked AC1's pin before this pass, so every line reads the rev-3 text. No suite, gate or bar ran in the pass: both `New arm:` lines, their RED-first observations, the floor of 372 and the spec's legs are owed to the close.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-13
 - AC1 — `tools/workflows/render_lenses.py` — rendering the template over the shipped catalogue gave `key:` and brief lines identical to those in `git show 3708a705:tools/workflows/tier2-review.js`
 - AC2 — `git diff -U0` — against the parent it shows no change outside `//` comment lines except the two marked opening lines, and the live copy differs from the new render only by the same token substitutions as before

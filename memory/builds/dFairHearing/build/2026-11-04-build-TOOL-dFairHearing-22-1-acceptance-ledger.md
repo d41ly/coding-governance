@@ -4,6 +4,8 @@
 
 Built against spec rev-4 and committed as the pass commit `a72758e14`, whose parent is `461ec9973`. The main loop drafted this ledger at the close from the builder return `2026-11-03-build-TOOL-dFairHearing-22-1-builder-return.md`, and every observation below is that return's. No suite, gate or bar ran in the pass: the checks were a scratch probe standing in for the `agent-cap self-test` leg, running copies of the hook and `scratch-guard.js` from a directory outside any checkout with `CLAUDE_PROJECT_DIR` unset. The `New arm:` line's red-first observation and the spec's legs are owed to the close.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-22
 - AC1 — `govkit update --kits review-harness` — the copy with no pack exited 2, and its stderr named both `spec-audit-optin.js` and `govkit update --kits review-harness`. The hook as it stood at `461ec997` let the call through with exit 0. The spec's rev-2 edge hands this remedy string to unit 27
 - AC2 — `kind: "diff-review"` — the hook exited 0 with the pack present, and 0 for a `kind: "diff-review"` call without it

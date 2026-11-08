@@ -4,6 +4,8 @@
 
 Built against spec rev-2 and committed as pass commit `c70d6a020`, at parent `15c032dc2`. The main loop drafted this ledger at the close from the builder return `2026-11-02-build-TOOL-dFairHearing-9-1-builder-return.md` and the pass commit's message; nothing below was observed again for it. No suite, gate or bar ran in the pass: both `New arm:` lines, their floors of 418 and 905, and the spec's legs are owed to the close.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-9
 - AC1 — `tools/memory-tree/gotchas.py` — `--for-paths` listed `portability-sweep` for `tools/check-wiring.sh`, `topology-sweep` for `tools/push-main.sh` and `adopter-migration-sweep` for `tools/govkit/registry.toml`, and none of the three for `tools/workflows/README.md`
 - AC2 — `build_record` — a probe over each new record and its members showed every anchor of the record an anchor of a member, every member sharing one with it, and `universal` false

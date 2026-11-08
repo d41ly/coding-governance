@@ -4,6 +4,8 @@
 
 Built against spec rev-6 in pass commit `7ff570cfa`, whose parent is `a3de6015f`. The main loop drafted this ledger at the close from the builder return and that commit's message. No suite, gate or bar ran in the pass: the scratch probes stood in for the legs, and the spec's gate legs and the RED-first observations of its five `New arm:` lines are owed to the close. A line that says "not recorded" names a half of its criterion no record on disk shows. The eight criteria that had no line were observed at the close, each at the commit it names.
 
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
 **Evidences:** TOOL-dFairHearing-23
 - AC1 — `def extract_tag_ref` — `git merge-base --is-ancestor` found the landing `af3831a6c` present in the parent. The `extract_tag_ref` probes returned the expected values, and an `ast` walk found one `def extract_tag_ref`
 - AC2 — `replay_scorer.py --experiment` — over a scratch review-replay manifest it printed 4 of 4, then 3 of 4 with one appendix cut, and an unknown key exited 2
