@@ -317,3 +317,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-08T11:43:58Z brief · item PLAY-dOrderedCharter-73 · reason 8ae2393b436a memory/builds/dOrderedCharter/prompts/2026-11-08-prompt-PLAY-dOrderedCharter-73-build-brief.md
 
 2026-11-08T12:28:55Z rescope · item add PLAY-dOrderedCharter-74 · reason found by the second full bar: unit 73's DERIVED_UNIT_KEYS still trips the remote-literal ban, and the layer-dependencies leg's ceiling falls 4s short of its evidenced margin
+
+2026-11-08T13:04:18Z dispatch · item 550ea807 PLAY-dOrderedCharter-74 · reason tools/playbook/instruction_units.py tools/gate-legs.json memory/guides/SESSION-KICKOFF.md memory/builds/dOrderedCharter/spec/2026-11-08-spec-PLAY-dOrderedCharter-74.md memory/builds/dOrderedCharter/build/2026-11-08-build-PLAY-dOrderedCharter-74-ledger.md memory/builds/dOrderedCharter/README.md memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/map/generated
+
+2026-11-08T13:04:23Z brief · item PLAY-dOrderedCharter-74 · reason 926f565e3ae5 memory/builds/dOrderedCharter/prompts/2026-11-08-prompt-PLAY-dOrderedCharter-74-build-brief.md

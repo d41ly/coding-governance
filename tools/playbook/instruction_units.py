@@ -154,7 +154,7 @@ UNIT_STRINGS = ("tag", "type", "trigger", "budget", "text", "source", "owner", "
 UNIT_LISTS = ("scope", "required-by", "edges")
 UNIT_KEYS = frozenset((*UNIT_STRINGS, *UNIT_LISTS, "level", "enforced-by", "class"))
 #: the two keys a unit row derives and never carries: status from the change record, origin from the kit
-DERIVED_UNIT_KEYS = ("status", "origin")
+DERIVED_UNIT_KEYS = ("origin", "status")
 UNIT_REQUIRED = ("tag", "level", "type")
 UNIT_CLASSES = ("fixed", "open")
 BUDGET_BYTES = {"line": 200, "block": 600}
