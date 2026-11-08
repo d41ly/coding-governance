@@ -1018,6 +1018,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_git_env",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_graded_sha",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"

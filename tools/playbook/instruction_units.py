@@ -1667,23 +1667,51 @@ def arm_no_renderer(c):
     c.check("it writes no target", not written, str(written))
 
 
+def arm_git_env(c):
+    """PLAY-dOrderedCharter-69 S4: the `statements` plant run as a child under an exported `GIT_DIR` naming a
+    linked worktree of this scratch repository acts on its own scratch, never on the repository it names."""
+    from deviation_join import set_env_aside
+    c.write_file("a.txt", "a\n")
+    run_commit(c.top, "base")
+    linked = c.top / "linked"
+    run_git(c.top, "worktree", "add", "-q", str(linked))
+    index, sentinel = c.top / ".git" / "gov" / "index.db", b"sentinel, not a database"
+    index.parent.mkdir(parents=True, exist_ok=True)
+    index.write_bytes(sentinel)
+    git_dir = run_git(linked, "rev-parse", "--absolute-git-dir").strip()
+    with set_env_aside(GIT_DIR=git_dir):
+        done = subprocess.run([sys.executable, str(pathlib.Path(__file__).resolve()), "fixture", "--plant", "statements"],
+                              cwd=linked, capture_output=True, stdin=subprocess.DEVNULL)
+    c.check("the child `statements` fixture exits 0", done.returncode == 0,
+            f"exit {done.returncode}: {(done.stdout + done.stderr).decode('utf-8', 'replace').strip()}")
+    bare = run_git(c.top, "config", "core.bare").strip()
+    c.check("core.bare reads false", bare == "false", bare)
+    c.check("the outer index is unchanged", index.read_bytes() == sentinel)
+
+
 PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority, "statements": arm_statements,
           "document": arm_document, "lock": arm_lock, "row": arm_row, "two-kits": arm_two_kits,
           "unreadable": arm_unreadable, "arms": arm_arms, "render": arm_render, "extractor": arm_extractor,
           "schema": arm_schema, "one-fact": arm_one_fact, "status": arm_status, "renderers": arm_renderers,
-          "work-order": arm_work_order, "slots": arm_slots, "legacy": arm_legacy, "no-renderer": arm_no_renderer}
+          "work-order": arm_work_order, "slots": arm_slots, "legacy": arm_legacy, "no-renderer": arm_no_renderer,
+          "git-env": arm_git_env}
 
 
 def run_fixture(plant=None) -> tuple[list, int]:
+    """Each plant in a throwaway repository, the caller's git variables aside (PLAY-dOrderedCharter-69 S1)."""
+    load_memory_tree_path()
+    from deviation_join import set_env_aside
+    from tree_lib import GIT_ENV_LEAKS
     out, failed = [], 0
     for name in [plant] if plant else list(PLANTS):
         top = pathlib.Path(tempfile.mkdtemp(prefix="ladder-fx-"))
         try:
-            run_git(top, "init", "-q")
-            case = Case(top, out)
-            out.append(f"{SAY}: fixture · plant {name}")
-            PLANTS[name](case)
-            failed += case.failed
+            with set_env_aside(GIT_ENV_LEAKS):
+                run_git(top, "init", "-q")
+                case = Case(top, out)
+                out.append(f"{SAY}: fixture · plant {name}")
+                PLANTS[name](case)
+                failed += case.failed
         finally:
             shutil.rmtree(top, ignore_errors=True)
     out.append(f"{SAY}: fixture · {'FAILED' if failed else 'green'} · {failed} expectation(s) failed")

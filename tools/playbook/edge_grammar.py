@@ -827,13 +827,17 @@ def run_fixture(plant) -> int:
     top = tempfile.mkdtemp(prefix="edges-")
     try:
         if plant in RESOLVE_PLANTS:
-            root, site, reg = build_resolve_fixture(top, plant)
-            rc = build_resolve_context(root, reg)
-            try:
-                rc_ = run_parse(site.name, site.read_text(encoding="utf-8"), reg, rc)
-            finally:
-                if rc["con"] is not None:
-                    rc["con"].close()
+            ti.load_memory_tree()  # PLAY-dOrderedCharter-69 S3: the caller's git variables aside for the plant
+            from deviation_join import set_env_aside
+            from tree_lib import GIT_ENV_LEAKS
+            with set_env_aside(GIT_ENV_LEAKS):
+                root, site, reg = build_resolve_fixture(top, plant)
+                rc = build_resolve_context(root, reg)
+                try:
+                    rc_ = run_parse(site.name, site.read_text(encoding="utf-8"), reg, rc)
+                finally:
+                    if rc["con"] is not None:
+                        rc["con"].close()
         else:
             site, reg = build_edges_fixture(top, plant)
             rc_ = run_parse(site.name, site.read_text(encoding="utf-8"), reg)

@@ -237,7 +237,8 @@ echo "PASS — the layer check's plants"
 # is never served another version's rows of a tree already built. The rows after them are
 # PLAY-dOrderedCharter-22's `purpose` arm: the namespace rows' `owner` and `purpose-source`, and the chain
 # registry joined to the fixture design's view; `pending-source` and `new-no-purpose` print their second
-# half's exit on a `rc=` line.
+# half's exit on a `rc=` line. The last row is PLAY-dOrderedCharter-69's `git-env`: the `two-versions` and the
+# edge grammar's `resolve-tag` fixtures, run as children under an exported `GIT_DIR`, touch only their scratch.
 # run_plant_rows <label> <script>: one `<plant and flags>|<exit>|<must print>|<must not print>` row per stdin
 # line, each run as `<script> --fixture --plant <plant and flags>`; every failed row adds one to `_tf`.
 run_plant_rows() {
@@ -320,6 +321,7 @@ registry-missing $_tk|1|chain build 'dFixtureTwo' of the design view has no regi
 registry-joined $_tk|0|2 registry rows joined to 2 view builds, 2 rows awaiting PM-5's review
 new-no-purpose $_tk|1|registry row 'dFixtureNew' carries no purpose, and no baseline [chain] row names it
 new-no-purpose $_tk|1|with a purpose: rc=0
+git-env|0|tags: plant git-env · both children green, core.bare false, the outer index unchanged
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf tag-resolver arm(s) failed"; exit 1; fi
 echo "PASS — the tag resolver's plants"
