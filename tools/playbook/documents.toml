@@ -1,0 +1,141 @@
+# documents.toml — the document registry (PLAY-dOrderedCharter-3 S1). Read by instruction_units.read_document_registry.
+#
+# One [[document]] row per load-bearing instruction document: `tag`, its `doc` namespace member; `path`, the
+# document, `{memory_root}` the conf's MEMORY_ROOT and one `*` segment at most, every file it matches enveloped
+# alike; `level`, its place on the ladder, 0 to 7; `direction`, one line and no `]`; `source`, the file the
+# envelope is written from, `{prefix}` the tool root. A row whose tag the `doc` namespace does not derive from its
+# file carries `h1`, the line naming what its files are. `hold`, `<unit id> F<n>`, holds one document out of its
+# envelope until the fork it names is ruled; the gate states it as not checked on every run.
+# Each envelope is `[<path> · Level <n> · <direction>]` … `[/<path>]`, whole lines, the path the file's own.
+
+[[document]]
+tag = "doc.charter"
+path = "AGENTS.md"
+level = 0
+direction = "Non-negotiable project instructions, always enforced unless the owner explicitly overrides them; the override is recorded"
+source = "coding-governance-agents.template.md"
+
+[[document]]
+tag = "doc.build-method"
+path = "{memory_root}/guides/BUILD-METHOD.md"
+level = 3
+direction = "Read whole before a build of more than one pass; yields to levels 0 to 2"
+source = "{prefix}/memory-tree/BUILD-METHOD.template.md"
+hold = "PLAY-dOrderedCharter-3 F5"
+
+[[document]]
+tag = "doc.template-spec"
+path = "{memory_root}/TEMPLATE-SPEC.md"
+level = 3
+direction = "The spec format, read before writing a spec or adding a write path; yields to levels 0 to 2"
+source = "{prefix}/memory-tree/SPEC-TEMPLATE.template.md"
+
+[[document]]
+tag = "doc.hygiene"
+path = "{memory_root}/HYGIENE.md"
+level = 3
+direction = "Read before writing any record, index or id under the memory root; yields to levels 0 to 2"
+source = "{prefix}/memory-tree/HYGIENE.template.md"
+
+[[document]]
+tag = "doc.annotation-style"
+path = "{memory_root}/guides/ANNOTATION-STYLE.md"
+level = 3
+direction = "Read before a code comment cites a record; yields to levels 0 to 2"
+source = "{prefix}/memory-tree/ANNOTATION-STYLE.template.md"
+
+[[document]]
+tag = "doc.review-protocol"
+path = "{memory_root}/guides/REVIEW-PROTOCOL.md"
+level = 3
+direction = "Read before any review or Workflow fan-out; yields to levels 0 to 2"
+source = "{prefix}/workflows/REVIEW-PROTOCOL.template.md"
+
+[[document]]
+tag = "doc.merge-bar"
+path = "{memory_root}/guides/MERGE-BAR.md"
+level = 3
+direction = "Read before running, scoping or debugging the merge bar; yields to levels 0 to 2"
+source = "{memory_root}/guides/MERGE-BAR.md"
+
+[[document]]
+tag = "doc.session-kickoff"
+path = "{memory_root}/guides/SESSION-KICKOFF.md"
+level = 3
+direction = "This repository's kickoff manifest, read at a session's kickoff; yields to levels 0 to 2"
+source = "{memory_root}/guides/SESSION-KICKOFF.md"
+
+[[document]]
+tag = "doc.unattended-protocol"
+path = "{memory_root}/guides/UNATTENDED-PROTOCOL.md"
+level = 3
+direction = "Binding for a run that merges and pushes with no owner turn; yields to levels 0 to 2"
+source = "{prefix}/unattended/PROTOCOL.template.md"
+
+[[document]]
+tag = "doc.unattended-asks"
+path = "{memory_root}/guides/UNATTENDED-ASKS.md"
+level = 3
+direction = "Binding for an unattended run pointed at filed asks; yields to levels 0 to 2"
+source = "{prefix}/unattended/ASKS.template.md"
+
+[[document]]
+tag = "doc.unattended-stops"
+path = "{memory_root}/guides/UNATTENDED-STOPS.md"
+level = 3
+direction = "Binding for an unattended run that stops without finishing; yields to levels 0 to 2"
+source = "{prefix}/unattended/STOPS.template.md"
+
+[[document]]
+tag = "doc.unattended-verbs"
+path = "{memory_root}/guides/UNATTENDED-VERBS.md"
+level = 3
+direction = "Binding with the unattended protocol, the verbs a run calls; yields to levels 0 to 2"
+source = "{prefix}/unattended/VERBS.template.md"
+
+[[document]]
+tag = "doc.playbook-template"
+path = "{memory_root}/guides/PLAYBOOK-TEMPLATE.md"
+level = 3
+direction = "Read before writing a playbook a recipe run follows; yields to levels 0 to 2"
+source = "{prefix}/unattended/PLAYBOOK-TEMPLATE.template.md"
+
+[[document]]
+tag = "doc.skills"
+path = ".claude/skills/*/SKILL.md"
+level = 4
+direction = "A Skill, followed when its trigger holds; yields to levels 0 to 3"
+source = "{prefix}/*/SKILL.template.md"
+h1 = "The rendered Skills, one per kit that ships one"
+
+[[document]]
+tag = "doc.kickoff-skill"
+path = "skills/session-kickoff/SKILL.md"
+level = 4
+direction = "The kickoff engine, followed at a session's start; yields to levels 0 to 3"
+source = "skills/session-kickoff/SKILL.md"
+h1 = "The session-kickoff Skill, the kickoff engine"
+
+[[document]]
+tag = "doc.deploy-skill"
+path = "skills/deploy-governance/SKILL.md"
+level = 4
+direction = "Followed when installing the kits into a target repository; yields to levels 0 to 3"
+source = "skills/deploy-governance/SKILL.md"
+h1 = "The deploy-governance Skill, which installs the kits into a target"
+
+[[document]]
+tag = "doc.rules"
+path = ".claude/rules/*.md"
+level = 4
+direction = "A path rule, loaded when a file it names is opened; yields to levels 0 to 3"
+source = ".claude/rules/*.md"
+h1 = "The path rules, each loaded with the files it names"
+
+[[document]]
+tag = "doc.agents"
+path = ".claude/agents/*.md"
+level = 5
+direction = "This role's static instructions; yields to levels 0 to 4"
+source = "{prefix}/roles/agents/"
+h1 = "The role agent files, one per rendered role"

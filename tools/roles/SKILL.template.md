@@ -3,6 +3,7 @@ name: build
 description: Drive an ATTENDED code build through the harness pipeline an unattended run uses - spec writers, the spec audit where the owner declared one, one builder per unit, the closing review and one bar - with every agent spawned as its rendered role. Use after /session-kickoff's READY card and the owner's go, for a build that writes product code. Do NOT use for a run that merges and pushes with no owner turn, which is /unattended, or for a change that writes no product code.
 ---
 <!-- gov:kit roles@1.12 -->
+[.claude/skills/build/SKILL.md · Level 4 · A Skill, followed when its trigger holds; yields to levels 0 to 3]
 
 # Attended builds
 
@@ -101,3 +102,4 @@ M9's derivation. Then ask before any merge or push.
 | gate-bar | the merge bar | the main loop runs it; under a mandate the run's close does |
 | wrap-up | M9 | identical |
 | landing | the charter's `[land]` rule | the owner's ask; a mandate lands by its protocol |
+[/.claude/skills/build/SKILL.md]

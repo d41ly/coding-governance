@@ -1,4 +1,5 @@
 <!-- gov:playbook -->
+[AGENTS.md · Level 0 · Non-negotiable project instructions, always enforced unless the owner explicitly overrides them; the override is recorded]
 # coding-governance — agent charter
 
 *Rendered from the coding-governance charter template, whose version is the marker below. Section 1
@@ -172,4 +173,5 @@ gate or protocol named in section 3 carries the detail.*
 - **Kinds:** kits are the kind: each is a directory under tools/ with a kit.toml descriptor and its own adopter. Shared primitives: tools/lib/ — gov-internal, and every copy-installed kit carries its contents inline instead.
 - **Toolchain:** bash + python3 resolved by tools/lib/resolve-python.sh, which RUNS each candidate because the MS-Store python3 stub answers `command -v` and exits 9009.
 - **Commit trailer:** every agent commit ends with `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
+[/AGENTS.md]
 <!-- /gov:playbook -->

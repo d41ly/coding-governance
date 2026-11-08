@@ -1,3 +1,4 @@
+[memory/guides/REVIEW-PROTOCOL.md · Level 3 · Read before any review or Workflow fan-out; yields to levels 0 to 2]
 # Review + multi-agent Workflow protocol (BINDING — part of the charter)
 
 Read this before ANY multi-agent review or `Workflow` run. Ported from adopter ic's charter
@@ -218,3 +219,4 @@ on one unescaped backslash and regenerating whole.
   `Bash|PowerShell` denied a Bash command issued from inside a sidechain.
   The cap is still enforced at the tool call rather than inside the script, but because the
   orchestrator is where the fan-out decision is MADE — not because nothing reaches a sidechain.
+[/memory/guides/REVIEW-PROTOCOL.md]

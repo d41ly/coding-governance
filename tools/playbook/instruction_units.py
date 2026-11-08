@@ -16,6 +16,8 @@ reader and its active set (PLAY-dOrderedCharter-1).
     python instruction_units.py practices --list         # the shipped catalogue's tags, in render order
     python instruction_units.py practices --check [<path>]  # a catalogue, the shipped one by default
     python instruction_units.py practices --active [<tags>]  # the active set of a comma-joined value; none, the default
+    python instruction_units.py envelopes --list [--root <dir>]   # the document registry's rows, resolved
+    python instruction_units.py envelopes --check [--root <dir>]  # the leg: every document against its envelope
 
 `LEVELS` is the one place an envelope, a unit row, a card or a map reads a level from: a tuple whose index is
 the level, so `len(LEVELS)` is the ladder's height and `LEVELS[n]` a level's name. `PLATFORM` names the
@@ -60,7 +62,15 @@ THE PRACTICES. `read_practice_catalogue` reads `practices.toml`: its `foundation
 rows, each a tag, a line and a reach table, a row it refuses naming the row. `resolve_active_practices` turns
 the value of `charter.practices` into the active rows, in catalogue order.
 
-Exit 0 green, 1 red, 2 a usage refusal.
+THE ENVELOPES (PLAY-dOrderedCharter-3). `documents.toml` registers each load-bearing instruction document,
+its level and a one-line direction; `read_document_registry` is its one reader. ENVELOPES --CHECK reds a
+registered document whose envelope is absent or differs from its row, an unpaired envelope line, a second
+document at level 0, and a load-bearing document, `INSTRUCTION_PATHSPECS` and the charter's Protocols paths,
+with no row; each entry file is the charter's alias, printed and never counted. `check_hold` states the one
+held row as not checked on every run and reds it once its envelope lands, its row moves or a second hold
+appears. It does not read a source: the parity legs compare each source with its render.
+
+Exit 0 green, 1 red, 2 a usage refusal, and for ENVELOPES a registry, population or held cap it cannot read.
 """
 from __future__ import annotations
 
@@ -83,6 +93,8 @@ sys.dont_write_bytecode = True
 KIT_DIR = pathlib.Path(os.path.abspath(__file__)).parent
 if str(KIT_DIR) not in sys.path:
     sys.path.insert(0, str(KIT_DIR))
+
+from render_playbook import read_envelopes, render_envelope  # noqa: E402  this kit's copy of the envelope helper
 
 SAY = "instruction-units"
 
@@ -1018,6 +1030,192 @@ def run_grammar(root=".", doc=None) -> tuple[list, int]:
     return lines + lock_lines, 1 if reds or found or rc else 0
 
 
+#: PLAY-dOrderedCharter-3: the document registry, its row fields, and the hold's one shape `<unit id> F<n>`
+DOCUMENTS = "documents.toml"
+DOCUMENT_REQUIRED = ("tag", "path", "level", "direction", "source")
+DOCUMENT_KEYS = frozenset((*DOCUMENT_REQUIRED, "h1", "hold"))
+HOLD_RE = re.compile(r"[A-Z]+-[A-Za-z0-9]+-\d+ F\d+")
+PROTOCOLS_HEAD = "## Protocols"
+
+
+class DocumentRefused(ValueError):
+    """A registry, a population or a held row's cap the envelope gate cannot read: exit 2, never a verdict."""
+
+
+def read_document_registry(root) -> list[dict]:
+    """S1: the registry's `[[document]]` rows, each with `resolved`, its path with `{prefix}` and `{memory_root}`
+    filled. Raises DocumentRefused on an absent or unparsable registry, no row, or a row off its shape: a
+    field missing, unknown or mistyped, a level off the ladder, a direction holding `]`, a path with two `*`
+    segments, a `hold` off `HOLD_RE`, or a `hold` on a row whose path holds a `*`."""
+    from tag_index import resolve_prefix_token
+    path = derive_kit_file(root, DOCUMENTS)
+    try:
+        rows = tomllib.loads(path.read_text(encoding="utf-8")).get("document") or []
+    except (OSError, tomllib.TOMLDecodeError) as exc:
+        raise DocumentRefused(f"the document registry {path.as_posix()} does not read: {exc}") from None
+    if not rows:
+        raise DocumentRefused(f"the document registry {path.as_posix()} holds no [[document]] row")
+    memory_root = derive_instruction_tokens(root)["memory_root"].strip("/")
+    out = []
+    for i, row in enumerate(rows, 1):
+        at = f"{path.as_posix()}: document row {i}"
+        missing = [k for k in DOCUMENT_REQUIRED if k not in row]
+        unknown = sorted(set(row) - DOCUMENT_KEYS)
+        texts = [k for k in sorted(DOCUMENT_KEYS - {"level"})
+                 if k in row and not (isinstance(row[k], str) and row[k].strip())]
+        if missing or unknown or texts:
+            why = (f"lacks {', '.join(missing)}" if missing else f"carries the unknown field {unknown[0]}"
+                   if unknown else f"`{texts[0]}` is no non-empty string")
+            raise DocumentRefused(f"{at} {why}")
+        try:
+            parse_level(row["level"])
+        except LevelError as exc:
+            raise DocumentRefused(f"{at} ({row['path']}): {exc}") from None
+        if "]" in row["direction"] or "\n" in row["direction"]:
+            raise DocumentRefused(f"{at} ({row['path']}): a direction is one line with no `]`")
+        resolved = resolve_prefix_token(row["path"], derive_kit_prefix()).replace("{memory_root}", memory_root)
+        if sum("*" in seg for seg in resolved.split("/")) > 1 or "**" in resolved:
+            raise DocumentRefused(f"{at} ({row['path']}): a path holds one `*` segment at most")
+        hold = row.get("hold")
+        if hold is not None and not HOLD_RE.fullmatch(hold):
+            raise DocumentRefused(f"{at} ({resolved}): hold {hold!r} is not `<unit id> F<n>`")
+        if hold is not None and "*" in resolved:
+            raise DocumentRefused(f"{at} ({resolved}): a hold names one document, and this path holds a `*`")
+        out.append({**row, "resolved": resolved})
+    return out
+
+
+def derive_tracked(root, pattern) -> list:
+    """The tracked files a registry path matches, `*` within one segment, sorted."""
+    return sorted(p for p in run_git(root, "ls-files", "-z", "--", ":(glob)" + pattern).split("\0") if p)
+
+
+def derive_protocol_paths(root, charter) -> list:
+    """Every `.md` path the charter's Protocols lines name in backticks, the section headed `## Protocols`."""
+    try:
+        text = (pathlib.Path(root) / charter).read_text(encoding="utf-8")
+    except OSError:
+        return []
+    found, inside = [], False
+    for line in text.splitlines():
+        if line.startswith("## "):
+            inside = line.startswith(PROTOCOLS_HEAD)
+        elif inside:
+            found += [s for s in SPAN.findall(line) if s.endswith(".md") and " " not in s]
+    return found
+
+
+def derive_document_tag(root, path):
+    """The tag the `doc` namespace derives for the file `path`, else None."""
+    from tag_index import extract_doc
+    tokens = derive_instruction_tokens(root)
+    return extract_doc({"charter": tokens["charter"], "memory_root": tokens["memory_root"].strip("/"),
+                        "kit": derive_kit_rel("").rstrip("/")}, path)
+
+
+def run_envelopes_list(root) -> tuple[list, int]:
+    """AC1: each row, its resolved path, level, the count of files it matches, its `h1` and its `hold`; red
+    a row matching no file and a row whose tag the `doc` namespace does not derive carrying no `h1`."""
+    rows, lines, reds = read_document_registry(root), [], []
+    for r in rows:
+        n = len(derive_tracked(root, r["resolved"]))
+        extra = "".join(f" · {k} {r[k]!r}" for k in ("h1", "hold") if k in r)
+        lines.append(f"{SAY}: envelopes · {r['tag']} · {r['resolved']} · level {r['level']} · {n} file(s){extra}")
+        if not n:
+            reds.append(f"{SAY}: red · {r['resolved']} · the row's path matches no tracked file")
+        if "h1" not in r and ("*" in r["resolved"] or derive_document_tag(root, r["resolved"]) != r["tag"]):
+            reds.append(f"{SAY}: red · {r['resolved']} · {r['tag']} is no tag the doc namespace derives, and the "
+                        f"row carries no `h1`")
+    return lines + reds + [f"{SAY}: envelopes --list · {len(rows)} row(s) · {len(reds)} red"], 1 if reds else 0
+
+
+def check_envelope(rel, text, row) -> list:
+    """S6's arms over one document: its envelope against its row, then every envelope line's pairing."""
+    found, stack, opened = [], [], False
+    for n, kind, doc, level, direction in read_envelopes(text):
+        if kind == "open":
+            stack.append(doc)
+            if doc == rel:
+                opened = True
+                if (level, direction) != (row["level"], row["direction"]):
+                    found.append(f"{SAY}: red · {rel} line {n} · the envelope reads level {level} and direction "
+                                 f"{direction!r}, and its row level {row['level']} and {row['direction']!r}")
+        elif not stack:
+            found.append(f"{SAY}: red · {rel} line {n} · a closer [/{doc}] with no opener")
+        elif stack[-1] != doc:
+            found.append(f"{SAY}: red · {rel} line {n} · a closer names {doc}, and the open envelope is {stack.pop()}")
+        else:
+            stack.pop()
+    found += [f"{SAY}: red · {rel} · the envelope of {doc} has no closer" for doc in stack]
+    if not opened:
+        found.append(f"{SAY}: red · {rel} · registered, and carries no envelope · remedy: its source writes "
+                     f"`{render_envelope(rel, row['level'], row['direction'], '').splitlines()[0]}` and its closer")
+    return found
+
+
+def check_hold(root, rows) -> tuple[list, list]:
+    """S9: the statement for each held row, then its three reds. -> (lines, reds); a held row's document or
+    cap that reads no value raises DocumentRefused."""
+    from policy_value import PolicyRefused, read_cap_value
+    held = [r for r in rows if "hold" in r]
+    lines = [f"{SAY}: envelopes · HELD {r['resolved']} · NOT checked · waits on {r['hold']}" for r in held]
+    if len(held) > 1:   # which hold stands is unknown, so neither held document is graded further
+        return lines, [f"{SAY}: red · {r['resolved']} · a hold beside {held[0]['resolved']}'s, and one hold stands "
+                       f"at a time (hold-second)" for r in held[1:]]
+    reds = []
+    for r in held:
+        rel = r["resolved"]
+        try:
+            text = (pathlib.Path(root) / rel).read_bytes().decode("utf-8", "replace").replace("\r", "")
+        except OSError:
+            raise DocumentRefused(f"the held document {rel} does not read") from None
+        if any(doc == rel for _n, _k, doc, _l, _d in read_envelopes(text)):
+            reds.append(f"{SAY}: red · {rel} · the held document carries an envelope line, so its hold has ended: "
+                        f"land the row, the envelope and the hold's end in one commit (hold-enveloped)")
+        try:
+            cap = read_cap_value(rel, root, "HEAD")
+        except PolicyRefused as exc:
+            raise DocumentRefused(f"the held document {rel} has no cap to read: {exc.line}") from None
+        size = len(text.encode("utf-8")) + len(render_envelope(rel, r["level"], r["direction"], "").encode("utf-8"))
+        if size <= cap:
+            reds.append(f"{SAY}: red · {rel} · it fits its row with its envelope, {size} of {cap}, so the row has "
+                        f"moved: land the envelope and end the hold (hold-fits)")
+    return lines, reds
+
+
+def run_envelopes_check(root) -> tuple[list, int]:
+    """S6 and S9: every registered document against its row, every load-bearing document against a row."""
+    root = pathlib.Path(root)
+    tokens = derive_instruction_tokens(root)
+    rows = read_document_registry(root)
+    statement = [f"{SAY}: envelopes · HELD {r['resolved']} · NOT checked · waits on {r['hold']}"
+                 for r in rows if "hold" in r]
+    try:
+        lines, reds = check_hold(root, rows)
+    except DocumentRefused as exc:
+        return statement + [f"{SAY}: refused · {exc}"], 2
+    entry = [p for r in read_renderers(root) if r["renderer"] == "playbook:entry-files" for p in r["paths"]]
+    population = set(derive_instruction_files(root)) | set(derive_protocol_paths(root, tokens["charter"]))
+    aliases = sorted(p for p in population if any(check_path_match(p, e) for e in entry))
+    population -= set(aliases)
+    if not population:
+        return lines + [f"{SAY}: refused · the load-bearing population is empty"], 2
+    lines += [f"{SAY}: envelopes · ALIAS {p} · NOT checked · the charter's entry file" for p in aliases]
+    covered = {}
+    for r in rows:
+        if "hold" not in r:
+            covered.update((p, r) for p in derive_tracked(root, r["resolved"]))
+    level0 = [p for p, r in sorted(covered.items()) if r["level"] == 0]
+    reds += [f"{SAY}: red · {p} · a second document at level 0, and the charter is the one" for p in level0[1:]]
+    held = {r["resolved"] for r in rows if "hold" in r}
+    for p in sorted(population - set(covered) - held):
+        reds.append(f"{SAY}: red · {p} · a load-bearing document with no row in the document registry")
+    for p, r in sorted(covered.items()):
+        reds += check_envelope(p, (root / p).read_bytes().decode("utf-8", "replace"), r)
+    lines += reds + [f"{SAY}: envelopes · {len(covered)} documents covered · {len(held)} held · {len(reds)} red"]
+    return lines, 1 if reds else 0
+
+
 class Case:
     def __init__(self, top, out):
         self.top, self.out, self.failed = top, out, 0
@@ -1770,12 +1968,174 @@ def arm_cmd_source(c):
         REGISTERED_COMMANDS, CMD_TIMEOUT_S = kept
 
 
+#: PLAY-dOrderedCharter-3: the envelope gate's tree, a charter, one guide, the held build method and an entry file
+ENV_GUIDE = "memory/guides/A.md"
+ENV_HELD = "memory/guides/BUILD-METHOD.md"
+ENV_DIRECTION = "Read before a fixture; yields to levels 0 to 2"
+ENV_HELD_DIRECTION = "Read whole before a build of more than one pass; yields to levels 0 to 2"
+ENV_ROWS = ('[[document]]\ntag = "doc.charter"\npath = "AGENTS.md"\nlevel = 0\ndirection = "The fixture charter"\n'
+            'source = "AGENTS.md"\n\n'
+            f'[[document]]\ntag = "doc.a"\npath = "{{memory_root}}/guides/A.md"\nlevel = 3\ndirection = "{ENV_DIRECTION}"\n'
+            'source = "{memory_root}/guides/A.md"\n\n'
+            '[[document]]\ntag = "doc.build-method"\npath = "{memory_root}/guides/BUILD-METHOD.md"\nlevel = 3\n'
+            f'direction = "{ENV_HELD_DIRECTION}"\nsource = "{{memory_root}}/guides/BUILD-METHOD.md"\nHOLD\n')
+ENV_HOLD = 'hold = "PLAY-dOrderedCharter-3 F5"'
+ENV_HELD_TEXT = "# fixture build method\n\nRead it whole.\n"
+ENV_ENTRY = '[[target]]\npaths = ["CLAUDE.md"]\nrenderer = "playbook:entry-files"\n'
+
+
+def run_envelopes(root, verb="--check") -> tuple[list, int]:
+    """`envelopes <verb>` over `root`, a refusal its exit 2, as the CLI runs it."""
+    try:
+        return (run_envelopes_list if verb == "--list" else run_envelopes_check)(root)
+    except DocumentRefused as exc:
+        return [f"{SAY}: refused · {exc}"], 2
+
+
+def write_limits_row(c, cap):
+    """The held document's row of the size limits file, at `cap`, or none at None; found through the policy
+    kit's own derivation, never by the file's name, and committed, since the cap is read at HEAD."""
+    from policy_value import load_policy_kit
+    load_policy_kit()
+    import budgets
+    c.write_file(budgets.derive_limits_rel(), "" if cap is None else f"{ENV_HELD}\t{cap}\n")
+    run_commit(c.top, f"the held row at {cap}")
+
+
+def write_envelope_tree(c, hold=ENV_HOLD):
+    """The tree the envelope gate grades green, committed on main with the held row past its document."""
+    run_git(c.top, "checkout", "-q", "-b", "main")
+    c.write_file(".memory-tree.conf", 'MEMORY_ROOT=memory\nCHARTER="AGENTS.md"\n')
+    c.write_file(derive_kit_rel(RENDERERS_TABLE), ENV_ENTRY)
+    c.write_file(derive_kit_rel(DOCUMENTS), ENV_ROWS.replace("HOLD", hold))
+    c.write_file("AGENTS.md", render_envelope("AGENTS.md", 0, "The fixture charter",
+                                              f"# fixture charter\n\n## Protocols\n\n- A guide: `{ENV_GUIDE}`.\n"))
+    c.write_file("CLAUDE.md", "@AGENTS.md\n")
+    c.write_file(ENV_GUIDE, render_envelope(ENV_GUIDE, 3, ENV_DIRECTION, "# fixture guide\n"))
+    c.write_file(ENV_HELD, ENV_HELD_TEXT)
+    write_limits_row(c, 10)
+
+
+def check_envelopes_green(c, what):
+    lines, rc = run_envelopes(c.top)
+    said = " | ".join(lines)
+    c.check(f"{what} exits 0, states the held file and leaves it out of the count",
+            rc == 0 and f"HELD {ENV_HELD} · NOT checked" in said and "ALIAS CLAUDE.md" in said
+            and "2 documents covered · 1 held" in said, said)
+
+
+def check_envelopes_red(c, what, path, rc_want=1):
+    lines, rc = run_envelopes(c.top)
+    said = " | ".join(lines)
+    c.check(f"{what} exits {rc_want} naming {path}{', and states the held file' if rc_want == 1 else ''}",
+            rc == rc_want and path in said and (rc_want != 1 or f"HELD {ENV_HELD} · NOT checked" in said), said)
+
+
+def plant_envelope_text(c, old, new):
+    """`old` swapped for `new` in the fixture guide's text."""
+    text = (c.top / ENV_GUIDE).read_text(encoding="utf-8")
+    c.write_file(ENV_GUIDE, text.replace(old, new))
+
+
+def arm_envelope_missing(c):
+    write_envelope_tree(c)
+    check_envelopes_green(c, "the enveloped tree")
+    c.write_file(ENV_GUIDE, "# fixture guide\n")
+    check_envelopes_red(c, "a registered guide with no envelope", ENV_GUIDE)
+
+
+def arm_envelope_level(c):
+    write_envelope_tree(c)
+    plant_envelope_text(c, " · Level 3 · ", " · Level 4 · ")
+    check_envelopes_red(c, "an envelope whose level differs from its row", ENV_GUIDE)
+
+
+def arm_envelope_unclosed(c):
+    write_envelope_tree(c)
+    plant_envelope_text(c, f"[/{ENV_GUIDE}]\n", "")
+    check_envelopes_red(c, "an opener with no closer", ENV_GUIDE)
+
+
+def arm_envelope_foreign_closer(c):
+    write_envelope_tree(c)
+    plant_envelope_text(c, f"[/{ENV_GUIDE}]\n", "[/AGENTS.md]\n")
+    check_envelopes_red(c, "a closer naming another document", ENV_GUIDE)
+
+
+def arm_envelope_second_charter(c):
+    write_envelope_tree(c)
+    c.write_file(derive_kit_rel(DOCUMENTS), ENV_ROWS.replace("HOLD", ENV_HOLD).replace("level = 3\ndirection = "
+                 f'"{ENV_DIRECTION}"', f'level = 0\ndirection = "{ENV_DIRECTION}"'))
+    plant_envelope_text(c, " · Level 3 · ", " · Level 0 · ")
+    check_envelopes_red(c, "a second document at level 0", ENV_GUIDE)
+
+
+def arm_envelope_unregistered(c):
+    write_envelope_tree(c)
+    new = "memory/guides/NEW.md"
+    c.write_file(new, "# a guide no row registers\n")
+    check_envelopes_red(c, "an unregistered load-bearing guide", new)
+    c.write_file(derive_kit_rel(DOCUMENTS), ENV_ROWS.replace("HOLD", ENV_HOLD) + '\n[[document]]\ntag = "doc.new"\n'
+                 'path = "{memory_root}/guides/NEW.md"\nlevel = 3\ndirection = "New"\nsource = "NEW.md"\n')
+    c.write_file(new, render_envelope(new, 3, "New", "# a guide its row registers\n"))
+    lines, rc = run_envelopes(c.top)
+    c.check("with its row and its envelope it exits 0", rc == 0 and "3 documents covered" in " | ".join(lines),
+            " | ".join(lines))
+
+
+def arm_hold_enveloped(c):
+    write_envelope_tree(c)
+    envelope = render_envelope(ENV_HELD, 3, ENV_HELD_DIRECTION, ENV_HELD_TEXT)
+    c.write_file(ENV_HELD, envelope)
+    check_envelopes_red(c, "the held document carrying its envelope", ENV_HELD)
+    c.write_file(ENV_HELD, envelope.split("\n", 1)[0] + "\n" + ENV_HELD_TEXT)
+    check_envelopes_red(c, "the held document carrying its opener alone", ENV_HELD)
+    c.write_file(ENV_HELD, ENV_HELD_TEXT)
+    check_envelopes_green(c, "the held document with neither")
+
+
+def arm_hold_fits(c):
+    write_envelope_tree(c)
+    figure = len(ENV_HELD_TEXT.encode("utf-8")) + len(render_envelope(ENV_HELD, 3, ENV_HELD_DIRECTION, "").encode("utf-8"))
+    run_git(c.top, "checkout", "-q", "-b", "moved")
+    write_limits_row(c, figure)
+    check_envelopes_red(c, f"the row moved on a side branch to {figure}, main left at 10,", ENV_HELD)
+    write_limits_row(c, figure - 1)
+    check_envelopes_green(c, f"the row one byte short at {figure - 1}")
+
+
+def arm_hold_second(c):
+    write_envelope_tree(c)
+    rows = ENV_ROWS.replace("HOLD", ENV_HOLD)
+    c.write_file(derive_kit_rel(DOCUMENTS), rows.replace('source = "{memory_root}/guides/A.md"\n',
+                                                         'source = "{memory_root}/guides/A.md"\nhold = "PLAY-x-1 F2"\n'))
+    check_envelopes_red(c, "a second row declaring a hold", ENV_GUIDE)
+    c.write_file(derive_kit_rel(DOCUMENTS), rows)
+    check_envelopes_green(c, "the field gone")
+
+
+def arm_hold_refused(c):
+    write_envelope_tree(c, 'hold = "F5"')
+    check_envelopes_red(c, "a hold of F5 alone", ENV_HELD, 2)
+    c.write_file(derive_kit_rel(DOCUMENTS), ENV_ROWS.replace("HOLD", ENV_HOLD) + '\n[[document]]\ntag = "doc.rules"\n'
+                 'path = ".claude/rules/*.md"\nlevel = 4\ndirection = "A rule"\nsource = ".claude/rules/*.md"\n'
+                 'h1 = "rules"\nhold = "PLAY-x-1 F2"\n')
+    check_envelopes_red(c, "a hold on a row whose path holds a `*`", ".claude/rules/*.md", 2)
+    c.write_file(derive_kit_rel(DOCUMENTS), ENV_ROWS.replace("HOLD", ENV_HOLD))
+    write_limits_row(c, None)
+    check_envelopes_red(c, "a held row with no size row", ENV_HELD, 2)
+
+
 PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority, "statements": arm_statements,
           "document": arm_document, "lock": arm_lock, "row": arm_row, "two-kits": arm_two_kits,
           "unreadable": arm_unreadable, "arms": arm_arms, "render": arm_render, "extractor": arm_extractor,
           "schema": arm_schema, "one-fact": arm_one_fact, "status": arm_status, "renderers": arm_renderers,
           "work-order": arm_work_order, "slots": arm_slots, "legacy": arm_legacy, "no-renderer": arm_no_renderer,
-          "git-env": arm_git_env, "cmd-source": arm_cmd_source}
+          "git-env": arm_git_env, "cmd-source": arm_cmd_source, "envelope-missing": arm_envelope_missing,
+          "envelope-level": arm_envelope_level, "envelope-unclosed": arm_envelope_unclosed,
+          "envelope-foreign-closer": arm_envelope_foreign_closer, "envelope-second-charter": arm_envelope_second_charter,
+          "envelope-unregistered": arm_envelope_unregistered, "hold-enveloped": arm_hold_enveloped,
+          "hold-fits": arm_hold_fits, "hold-second": arm_hold_second, "hold-refused": arm_hold_refused}
 
 
 def run_fixture(plant=None) -> tuple[list, int]:
@@ -1820,6 +2180,11 @@ def main(argv) -> int:
             lines, rc = check_lock(root)
         elif argv[:1] == ["practices"]:
             lines, rc = run_practices(argv[1:])
+        elif argv[:2] in (["envelopes", "--list"], ["envelopes", "--check"]) and len(argv) in (2, 4) and (
+                len(argv) == 2 or argv[2] == "--root"):
+            top = pathlib.Path(argv[3]) if len(argv) == 4 else pathlib.Path(
+                run_git(KIT_DIR, "rev-parse", "--show-toplevel").strip())
+            lines, rc = run_envelopes(top, argv[1])
         elif argv[:1] == ["fixture"] and (len(argv) == 1 or (len(argv) == 3 and argv[1] == "--plant")):
             plant = argv[2] if len(argv) == 3 else None
             if plant is not None and plant not in PLANTS:

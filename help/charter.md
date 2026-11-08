@@ -79,3 +79,23 @@ The render writes nothing, and names `charter.practices`, when:
 The render also refuses a catalogue it cannot read, naming the row: a tag outside `practice.<name>`, a
 tag twice, an empty rule, a row with no reach, a reach step outside `[a-z0-9][a-z0-9-]*`, or a
 `foundation` entry naming no row.
+
+## Levels and envelopes
+
+Every instruction document an agent loads sits at a level, 0 for the charter down to 5 for a role's
+agent file, and a lower level wins. The playbook kit's `documents.toml` registers each document with its
+level and a one-line direction, and each document carries that as its envelope: an opener line
+`[<path> · Level <n> · <direction>]` after any front matter, and a closer `[/<path>]` at its end. The
+charter render and the role agent render write it from the registry; every other document carries the
+two lines in its source. Ask what is registered, then check every document against it:
+
+```bash
+python tools/playbook/instruction_units.py envelopes --list
+python tools/playbook/instruction_units.py envelopes --check
+```
+
+The check reds a document with no envelope or one that differs from its row, an unpaired line, a
+second document at level 0, and a load-bearing document with no row. `CLAUDE.md` loads the charter, so
+it prints as the charter's alias and is not counted. One document is held: `memory/guides/BUILD-METHOD.md`
+carries no envelope until the owner rules on its size row, and every check prints it as `HELD` and
+`NOT checked`, leaving it out of the covered count.

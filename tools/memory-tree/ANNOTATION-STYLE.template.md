@@ -1,4 +1,5 @@
 <!-- gov:kit memory-tree@2.155 -->
+[{{MEMORY_ROOT}}/guides/ANNOTATION-STYLE.md · Level 3 · Read before a code comment cites a record; yields to levels 0 to 2]
 # Annotation style — what a code comment that cites a record must carry
 
 ## A1 — What this is, and what it is not
@@ -87,3 +88,4 @@ The failure mode it catches, from a real repair: a sentence stating an incident,
 parenthesised id and nothing else. The sentence was fine. The id had pointed at no record since the
 day it was written, and the block read perfectly without it — which is precisely why the dangle
 survived so long.
+[/{{MEMORY_ROOT}}/guides/ANNOTATION-STYLE.md]

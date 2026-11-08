@@ -248,7 +248,19 @@ def scan_unfenced(text: str, unclosed: list | None = None):
 
 def extract_doc(ctx, path, text=None):
     """The `doc` namespace: the charter (`doc.charter`), each `<MEMORY_ROOT>/guides/*.md`, `HYGIENE.md`
-    and `TEMPLATE-SPEC.md` (`doc.<stem lower-cased>`); each `##` heading a section `#<seg>`."""
+    and `TEMPLATE-SPEC.md` (`doc.<stem lower-cased>`); each `##` heading a section `#<seg>`. The document
+    registry beside this one adds each row whose tag no file of those derives, a class of files or a
+    Skill (PLAY-dOrderedCharter-3 S1)."""
+    if _read_kit_file(ctx, path, "documents.toml"):
+        if text is None:
+            return ""
+        try:
+            rows = tomllib.loads(text).get("document") or []
+        except tomllib.TOMLDecodeError:
+            return []
+        derived = {r.get("tag") for r in rows if isinstance(r, dict) and r.get("tag") == extract_doc(
+            ctx, str(r.get("path", "")).replace("{memory_root}", ctx["memory_root"]))}
+        return [r for r in derive_tag_rows(text, "document") if r[0] not in derived]
     if text is None:
         mr = ctx["memory_root"]
         if path == ctx["charter"]:

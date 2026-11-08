@@ -2,6 +2,7 @@
 name: drift-audit
 description: Measure whether this repo's records still describe reality, and optionally hunt dead / unwired / duplicated code. Use when the build "feels" like it is drifting, when the project's state is unclear, before a big planning session, or when you want to know whether a green gate actually means anything. Three cost tiers — Tier 0 is seconds and no agents, so run that first and always. Do NOT use for reviewing a diff; that is a code-review skill.
 ---
+[.claude/skills/drift-audit/SKILL.md · Level 4 · A Skill, followed when its trigger holds; yields to levels 0 to 3]
 
 # Drift audit
 
@@ -114,3 +115,4 @@ Say these out loud in the report rather than letting silence read as absence:
   worktrees are not.
 - **Anything in a separate repo or submodule**, which has its own ledger and its own drift.
 - **Whether a human obligation was met.** "Was the security review done?" has no oracle in the tree.
+[/.claude/skills/drift-audit/SKILL.md]

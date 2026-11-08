@@ -9,6 +9,10 @@ line. On exit 2, or with no policy kit found, it raises `PolicyRefused` carrying
 reader's own line, which each caller names in its own refusal. Every call passes its key as a string
 literal first, the shape the policy kit's reader-coverage arm counts. Units 7, 25 and 26 call this
 module and never copy it.
+
+`read_cap_value(cap, root, rev)` reads one size cap's value through the policy kit's `resolve_caps` at the
+revision `rev` names, so a row moved on a branch is read at `HEAD` (PLAY-dOrderedCharter-3 S9); a cap no
+value answers raises `PolicyRefused`.
 """
 from __future__ import annotations
 
@@ -86,3 +90,32 @@ def read_policy_value(key: str, root, rev: str | None = None) -> tuple[list[str]
     if p.returncode != 0:
         raise PolicyRefused(key, err[-1] if err else f"policy.py get exited {p.returncode}")
     return p.stdout.splitlines(), err[-1] if err else ""
+
+
+def load_policy_kit():
+    """The policy kit beside this one, put on `sys.path` so its `budgets` and `policy` import; LookupError
+    where no install holds it."""
+    kit = str(resolve_kit_dir("policy", "budgets.py", KIT_DIR))
+    if kit not in sys.path:
+        sys.path.append(kit)
+
+
+def read_cap_value(cap: str, root, rev: str | None = None) -> int:
+    """-> the value of size cap `cap` at `root`, read at revision `rev` through the policy kit's
+    `resolve_caps` (PLAY-dOrderedCharter-3 S9): a cap row moved on a branch is read at `HEAD`, never at the
+    landed revision. A cap the census does not name, a refused read, or no value at all raises
+    `PolicyRefused`, so an unread cap never reads as a figure."""
+    try:
+        load_policy_kit()
+    except LookupError as exc:
+        raise PolicyRefused(cap, f"no policy kit found: {exc}") from None
+    import budgets
+    import policy
+    refused: list = []
+    try:
+        answer = budgets.resolve_caps([cap], repo=str(root), rev=rev, refused=refused)[cap]
+    except (LookupError, policy.Refusal) as exc:
+        raise PolicyRefused(cap, str(getattr(exc, "why", exc))) from None
+    if refused or answer.value is None:
+        raise PolicyRefused(cap, refused[0] if refused else answer.reason)
+    return int(answer.value)

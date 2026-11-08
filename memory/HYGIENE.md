@@ -1,4 +1,5 @@
 <!-- gov:kit memory-tree@2.155 -->
+[memory/HYGIENE.md · Level 3 · Read before writing any record, index or id under the memory root; yields to levels 0 to 2]
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -828,3 +829,4 @@ its cap is SPLIT into two dossiers (never rotated; the map gate requires `FOUNDA
 that class is deliberately kept tighter than the index class because a split is the only remedy a
 dossier has and check 6 is the only size gate it has. The map's
 coverage/freshness enforcement is its own test file, not this script.
+[/memory/HYGIENE.md]

@@ -1,8 +1,9 @@
+[memory/guides/SESSION-KICKOFF.md · Level 3 · This repository's kickoff manifest, read at a session's kickoff; yields to levels 0 to 2]
 # Session kickoff manifest — coding-governance
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-08T15:05:20+02:00 @ 550ea807af03c2975d76fcd45785d5e484fbf485
+last-audit: 2026-11-08T18:33:32+02:00 @ 69963fd9c7059085422d24ebfcc1e63171c476b1
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 366faa588cc666e7c0d95cb4da9cb9c9942c95ea
@@ -221,3 +222,4 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
   RETIRED (`TOOL-dSpentCeiling-1`). Lesson: measure with the checker before and after, never
   estimate, and record every movement beside the number.
 - Every gate, hook and the lander resolve python through `tools/lib/resolve-python.sh`, which refuses a launcher below the floor `tools/lib/python-floor.txt` declares; `bash tools/lib/python-floor.sh preflight` names each candidate and the install command (`help/python-floor.md`, `TOOL-dSafePassage-11`).
+[/memory/guides/SESSION-KICKOFF.md]

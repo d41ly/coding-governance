@@ -113,6 +113,11 @@
       "file": "tools/memory-tree/design_lib.py"
     },
     {
+      "id": "DocumentRefused",
+      "kind": "class",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "Dossier",
       "kind": "class",
       "file": "tools/codebase-map/map_lib.py"
@@ -993,6 +998,36 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "arm_envelope_foreign_closer",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_envelope_level",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_envelope_missing",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_envelope_second_charter",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_envelope_unclosed",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_envelope_unregistered",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_evil_merge",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -1041,6 +1076,26 @@
       "id": "arm_guard",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "arm_hold_enveloped",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_hold_fits",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_hold_refused",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_hold_second",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "arm_instruction_unit",
@@ -4853,6 +4908,21 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "check_envelope",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "check_envelopes_green",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "check_envelopes_red",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "check_eol",
       "kind": "function",
       "file": "tools/check-wiring.sh"
@@ -5181,6 +5251,11 @@
       "id": "check_hit",
       "kind": "function",
       "file": "tools/unattended/stop-guard.test.sh"
+    },
+    {
+      "id": "check_hold",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "check_hold_code",
@@ -8433,6 +8508,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "derive_document_tag",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "derive_down_verdict",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -9328,6 +9408,11 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "derive_protocol_paths",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "derive_push_failure",
       "kind": "function",
       "file": "tools/push-main.sh"
@@ -10061,6 +10146,11 @@
       "id": "derive_tracked",
       "kind": "function",
       "file": "tools/playbook/check_layers.py"
+    },
+    {
+      "id": "derive_tracked",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "derive_transition",
@@ -12031,6 +12121,11 @@
       "id": "load_policy",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "load_policy_kit",
+      "kind": "function",
+      "file": "tools/playbook/policy_value.py"
     },
     {
       "id": "load_population",
@@ -14243,6 +14338,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "plant_envelope_text",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "pop_guard",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.sh"
@@ -15493,6 +15593,11 @@
       "file": "tools/memory-tree/check-memory-hygiene.sh"
     },
     {
+      "id": "read_cap_value",
+      "kind": "function",
+      "file": "tools/playbook/policy_value.py"
+    },
+    {
       "id": "read_cap_values",
       "kind": "function",
       "file": "tools/run-gates/owed_rows.py"
@@ -15953,6 +16058,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_document_registry",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "read_down_population",
       "kind": "function",
       "file": "tools/lib/python_floor.py"
@@ -15986,6 +16096,26 @@
       "id": "read_envelope",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "read_envelope_row",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "read_envelopes",
+      "kind": "function",
+      "file": "tools/lib/envelope.py"
+    },
+    {
+      "id": "read_envelopes",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "read_envelopes",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "read_events",
@@ -19793,6 +19923,11 @@
       "file": "tools/roles/roles_lib.py"
     },
     {
+      "id": "render_charter_envelope",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "render_check_report",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -19886,6 +20021,21 @@
       "id": "render_empty_spine_diagnosis",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "render_envelope",
+      "kind": "function",
+      "file": "tools/lib/envelope.py"
+    },
+    {
+      "id": "render_envelope",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "render_envelope",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "render_escape_ratio",
@@ -23541,6 +23691,21 @@
       "id": "run_entry_files",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "run_envelopes",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "run_envelopes_check",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "run_envelopes_list",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "run_exceptions",
@@ -29668,6 +29833,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "write_envelope_tree",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "write_exception",
       "kind": "function",
       "file": "tools/memory-tree/build_records.py"
@@ -30001,6 +30171,11 @@
       "id": "write_limit_stub",
       "kind": "function",
       "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
+      "id": "write_limits_row",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "write_lin_fix",

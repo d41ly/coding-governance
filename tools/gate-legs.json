@@ -1974,6 +1974,19 @@
     "enforces": ["principle.p11", "principle.p13"]
   },
   {
+    "name": "instruction envelopes",
+    "argv": [
+      "python",
+      "{prefix}/playbook/instruction_units.py",
+      "envelopes",
+      "--check"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p13"]
+  },
+  {
     "name": "instruction units selftest",
     "argv": [
       "python",

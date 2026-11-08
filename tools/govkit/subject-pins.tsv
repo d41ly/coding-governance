@@ -62,6 +62,7 @@ install-prefix (shipped surface)	repo	product
 install-prefix self-test	kit	selftests
 instruction edits (manifest checks)	repo	declarations
 instruction edits selftest	kit	selftests
+instruction envelopes	repo	product
 instruction grammar (statement types, provenance lock)	repo	product
 instruction ladder (level is the one term)	repo	product
 instruction render (one renderer of record)	repo	wiring

@@ -9,6 +9,7 @@ description: >-
   at the start of a work session. The project's CLAUDE.md and its manifest always outrank
   this skill on any conflict.
 ---
+[skills/session-kickoff/SKILL.md · Level 4 · The kickoff engine, followed at a session's start; yields to levels 0 to 3]
 
 # Session kickoff (project-agnostic engine)
 
@@ -265,3 +266,4 @@ the parked decisions). It does not merge and it does not push.
 3. **Offer separately — don't bundle:** instantiating the full governance playbook
    (`coding-governance-agents.template.md`, via `<prefix>/playbook/adopt-playbook.sh --target <repo>`) for
    projects that want the whole multi-node ruleset. The manifest is just the kickoff layer.
+[/skills/session-kickoff/SKILL.md]

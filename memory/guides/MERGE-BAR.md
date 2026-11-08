@@ -1,3 +1,4 @@
+[memory/guides/MERGE-BAR.md · Level 3 · Read before running, scoping or debugging the merge bar; yields to levels 0 to 2]
 # The merge bar — how it behaves
 
 Read this before you run, scope or debug a bar, and before a push. It is the body of `AGENTS.md`'s
@@ -94,3 +95,4 @@ Before theorizing about drift, run `python tools/drift-audit/drift_report.py` �
 and it answers whether this repo's records still describe it. Before a review, run
 `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` — its stdout IS the bug-class
 checklist for that diff.
+[/memory/guides/MERGE-BAR.md]

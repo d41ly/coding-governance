@@ -369,6 +369,7 @@ git_env_leaks_py|$ROOT/$KIT_REL/git_env_leaks.py|$KIT_REL/git_env_leaks
 resolve_bash_py|$ROOT/$KIT_REL/resolve_bash.py|$KIT_REL/resolve_bash
 coverage_join|$ROOT/$KIT_REL/coverage_join.py|$KIT_REL/coverage_join
 common_git_dir|$ROOT/$KIT_REL/common_dir.py|$KIT_REL/common_dir
+render_envelope|$ROOT/$KIT_REL/envelope.py|$KIT_REL/envelope
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -403,6 +404,8 @@ common_git_dir|$ROOT/$KIT_REL/common_dir.py|$KIT_REL/common_dir
 # moved out of the codebase-map kit so no core build imports it; its one copy is memory-tree's
 # coverage_join.py, which every codebase-map consumer imports. common_git_dir (S10) is the main
 # repository's git directory, the recall kit's query log's home and the tag index's.
+# render_envelope (PLAY-dOrderedCharter-3 S3) is a load-bearing document's envelope, its writer and
+# its reader; the charter's renderer and the roles kit each carry it inline, both kits copy-installed.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one

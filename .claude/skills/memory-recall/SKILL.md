@@ -17,6 +17,7 @@ description: >-
   While /session-kickoff is running, run the probes that skill itself asks for rather than
   pre-empting them.
 ---
+[.claude/skills/memory-recall/SKILL.md · Level 4 · A Skill, followed when its trigger holds; yields to levels 0 to 3]
 
 # Ask memory why
 
@@ -104,3 +105,4 @@ Fall back to reading the stream's `DECISIONS.md` / `BACKLOG.md` index under `mem
 directly: the decision log as it stands, and the asks, decided ones included, through
 `gen_build_index.py --asks --json --all`, or the backlog shards when its `mode` field says
 `shards`. That is the exception, not the norm.
+[/.claude/skills/memory-recall/SKILL.md]

@@ -158,6 +158,33 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
+# >>> render_envelope — canonical copy: envelope.py in the gov lib dir (byte-identical; gated)
+def render_envelope(doc, level, direction, body):
+    """`body` between the opener and the closer naming `doc`; an empty body renders the two lines alone."""
+    if body and not body.endswith("\n"):
+        body += "\n"
+    return "[%s · Level %d · %s]\n%s[/%s]\n" % (doc, level, direction, body, doc)
+
+
+def read_envelopes(text):
+    """Each whole line of `text` that is an envelope line, in order: `(line number, "open", doc, level,
+    direction)` for an opener and `(line number, "close", doc, None, None)` for a closer."""
+    import re
+    opener = re.compile(r"^\[([^\[\]/][^\[\]]*?) · Level (\d+) · ([^\]]*)\]$")
+    closer = re.compile(r"^\[/([^\[\]]+)\]$")
+    found = []
+    for n, line in enumerate(text.replace("\r\n", "\n").split("\n"), 1):
+        m = opener.match(line)
+        if m:
+            found.append((n, "open", m.group(1), int(m.group(2)), m.group(3)))
+            continue
+        m = closer.match(line)
+        if m:
+            found.append((n, "close", m.group(1), None, None))
+    return found
+# <<< render_envelope
+
+
 OPEN_RE = re.compile(r'^[ \t]*<!--\s*(kit|when):([A-Za-z0-9_-]+)\s*-->[ \t]*$')
 CLOSE_RE = re.compile(r'^[ \t]*<!--\s*/(kit|when):([A-Za-z0-9_-]+)\s*-->[ \t]*$')
 PLACEHOLDER_RE = re.compile(r'\{\{([A-Z][A-Z0-9_]*)\}\}')
@@ -1298,7 +1325,23 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
     for ns, name in sorted(set(present)):
         if (ns, name) in drop:
             notes.append(f'dropped   {ns}:{name}')
-    return text, notes
+    return render_charter_envelope(target, charter_path, text), notes
+
+
+def render_charter_envelope(target: Path, charter_path: Path | None, text: str) -> str:
+    """PLAY-dOrderedCharter-3 S4: `text` in the charter's envelope, from the row of the target's own document
+    registry whose path matches the charter. No registry in the target, no charter path, or no row matching
+    it renders `text` unchanged and says nothing; a registry that does not read refuses."""
+    iu = load_units_module()
+    if charter_path is None or not iu.derive_kit_file(target, iu.DOCUMENTS).is_file():
+        return text
+    rel = Path(os.path.relpath(charter_path, target)).as_posix()
+    try:
+        rows = iu.read_document_registry(target)
+    except iu.DocumentRefused as e:
+        raise Refusal(str(e)) from None
+    row = next((r for r in rows if 'hold' not in r and iu.check_path_match(rel, r['resolved'])), None)
+    return text if row is None else render_envelope(rel, row['level'], row['direction'], text)
 
 
 # --------------------------------------------------------------------------- the arms

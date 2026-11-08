@@ -133,6 +133,33 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
+# >>> render_envelope — canonical copy: envelope.py in the gov lib dir (byte-identical; gated)
+def render_envelope(doc, level, direction, body):
+    """`body` between the opener and the closer naming `doc`; an empty body renders the two lines alone."""
+    if body and not body.endswith("\n"):
+        body += "\n"
+    return "[%s · Level %d · %s]\n%s[/%s]\n" % (doc, level, direction, body, doc)
+
+
+def read_envelopes(text):
+    """Each whole line of `text` that is an envelope line, in order: `(line number, "open", doc, level,
+    direction)` for an opener and `(line number, "close", doc, None, None)` for a closer."""
+    import re
+    opener = re.compile(r"^\[([^\[\]/][^\[\]]*?) · Level (\d+) · ([^\]]*)\]$")
+    closer = re.compile(r"^\[/([^\[\]]+)\]$")
+    found = []
+    for n, line in enumerate(text.replace("\r\n", "\n").split("\n"), 1):
+        m = opener.match(line)
+        if m:
+            found.append((n, "open", m.group(1), int(m.group(2)), m.group(3)))
+            continue
+        m = closer.match(line)
+        if m:
+            found.append((n, "close", m.group(1), None, None))
+    return found
+# <<< render_envelope
+
+
 def read_cap_answer(request, root, kit_dir):
     """`(value, mode, rule)` the policy kit answers for ONE census cap (TOOL-dGroundRules-9), `request`
     in its CLI grammar, `<cap>[=default:<n>]`, read in the repository at `root`. The kit is found by
@@ -198,6 +225,28 @@ def resolve_charter_path(root):
     return charter
 
 
+def read_envelope_row(kit_dir, rel, memory_root):
+    """`(level, direction)` of the document registry row whose path matches the agent file `rel`, else None
+    (PLAY-dOrderedCharter-3 S4). The registry is the playbook kit's `documents.toml` beside `kit_dir`; no
+    registry, a registry that does not parse, or no matching row reads as None, so a tree without one
+    renders no envelope. A row's `*` holds within one segment, and a held row envelopes nothing."""
+    import fnmatch
+    try:
+        reg = resolve_kit_dir("playbook", "documents.toml", kit_dir) / "documents.toml"
+        rows = tomllib.loads(reg.read_text(encoding="utf-8")).get("document") or []
+    except (LookupError, OSError, tomllib.TOMLDecodeError):
+        return None
+    want = rel.split("/")
+    for row in rows:
+        path = str(row.get("path", "")).replace("{memory_root}", memory_root).split("/")
+        if "hold" not in row and len(path) == len(want) and all(
+                fnmatch.fnmatchcase(w, p) for w, p in zip(want, path)):
+            level, direction = row.get("level"), row.get("direction")
+            ok = isinstance(level, int) and not isinstance(level, bool) and isinstance(direction, str)
+            return (level, direction) if ok else None
+    return None
+
+
 def parse_charter(text, where):
     """The governing doc as `{"shape", "rules", "carried"}`; RolesError (R0) on a doc this kit cannot read.
 
@@ -213,8 +262,11 @@ def parse_charter(text, where):
     j = text.find(PLAYBOOK_CLOSE, i + len(PLAYBOOK_OPEN)) if i >= 0 else -1
     if j >= 0 and text.count(PLAYBOOK_OPEN) == 1 and text.count(PLAYBOOK_CLOSE) == 1:
         text = text[i + len(PLAYBOOK_OPEN):j]
+    # PLAY-dOrderedCharter-3 S4: an envelope's opener or closer is no section's line, so none rides into a
+    # Charter block, where the closer would read as another document's
+    enveloped = {n for n, *_ in read_envelopes(text)}
     sections = []
-    for line in text.split("\n"):
+    for line in [ln for n, ln in enumerate(text.split("\n"), 1) if n not in enveloped]:
         if line.startswith("## "):
             sections.append((line, []))
         elif sections:

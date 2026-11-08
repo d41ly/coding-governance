@@ -148,11 +148,16 @@ def render_agent_file(kit_dir, slot, role, memory_root, charter, notes, effort):
     head = ["---"] + ["%s: %s" % (k, keys[k]) for k in CLAUDE_KEYS if k in keys]
     head += ["effort: %s" % effort, "omitClaudeMd: true", "workflow: %s" % keys.get("workflow", ""),
              "writes: %s" % keys.get("writes", ""), "---"]
-    text = "\n".join(head) + "\n" + lib.render_role(kit_dir, slot, memory_root)
+    body = lib.render_role(kit_dir, slot, memory_root)
     blocks = lib.render_charter_blocks(charter, role["path"].as_posix(), keys.get("rules", ""), notes)
     if blocks:
-        text += "\n## Charter\n\n" + blocks
-    return text
+        body += "\n## Charter\n\n" + blocks
+    # PLAY-dOrderedCharter-3 S4: the body after the front matter in its envelope, where a registry row names it
+    rel = "%s/%s.md" % (AGENTS_REL, slot)
+    row = lib.read_envelope_row(kit_dir, rel, memory_root)
+    if row is not None:
+        body = lib.render_envelope(rel, row[0], row[1], body)
+    return "\n".join(head) + "\n" + body
 
 
 def derive_harness_paths(workflows, tool_root, target_root):

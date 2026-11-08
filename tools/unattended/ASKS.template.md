@@ -1,4 +1,5 @@
 <!-- gov:kit unattended@1.113 -->
+[memory/guides/UNATTENDED-ASKS.md · Level 3 · Binding for an unattended run pointed at filed asks; yields to levels 0 to 2]
 # Unattended runs — the asks
 
 *Installed beside `UNATTENDED-PROTOCOL.md` from the unattended kit, and byte-compared against the
@@ -189,3 +190,4 @@ by `ask`, then an `examined` line — reading its stdout alone:
 
 A later caller may read the working tree in shape 1's projection with no `--at`. Every call runs
 under the driver's declared bound, and a breach reads as never answered, which is not a red.
+[/memory/guides/UNATTENDED-ASKS.md]

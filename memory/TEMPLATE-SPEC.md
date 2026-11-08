@@ -1,4 +1,5 @@
 <!-- gov:kit memory-tree@2.155 -->
+[memory/TEMPLATE-SPEC.md · Level 3 · The spec format, read before writing a spec or adding a write path; yields to levels 0 to 2]
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -619,3 +620,4 @@ REPLACE both bullets. Delete this paragraph.
 - The seam, by path, or that none fits, with the evidence.
 - The retrieval arguments you actually passed, verbatim, so the next session can re-run them.
 ```
+[/memory/TEMPLATE-SPEC.md]
