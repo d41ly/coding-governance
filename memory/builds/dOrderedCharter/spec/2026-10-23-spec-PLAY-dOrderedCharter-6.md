@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-6 — the drive section composed from each adopted kit's drive table, and the charter held inside 32 KiB
 
-**Status:** DEFERRED · rev-9 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 19 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-10 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 19 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0036@3667f2f3 whole
 
@@ -26,6 +26,8 @@
 | [2026-11-02-prompt-PLAY-dOrderedCharter-6-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-6-build-brief.md) | journal | — |
 | [2026-11-04-prompt-PLAY-dOrderedCharter-52-drift-sweep-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-52-drift-sweep-brief.md) | research | PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 |
 | [2026-11-08-prompt-PLAY-dOrderedCharter-3-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-3-drift-fold-brief.md) | research | PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-6-1-spec-writer.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-6-1-spec-writer.md) | journal | — |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-6-repair-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-6-repair-brief.md) | research | — |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -47,11 +49,15 @@ F1-6, F1-7; v2:961-965 P15).
   role slot such as `gov-builder`, or `main` for the main session; `command` is the CLI command, in
   backticks when rendered; `when` is the situation, one clause. Observed by AC1.
 - **S2** — The seeded rows, in the descriptors of the kits that start or advance a stage:
-  `kickoff-manifest`, `roles`, `unattended`, `review-harness`, `run-gates`, `push-main`, `memory-tree`,
+  `kickoff-manifest`, `roles`, `unattended`, `review-harness`, `push-main`, `memory-tree`,
   `codebase-map` and `memory-recall`. Each role the roles kit renders has at least one row (F1-7 "One
   line per role"), and the `start` rows cover a new task from the owner, a resumed session, an
-  unattended run, a subagent's task and another harness without gov's hooks (foundations R3). Observed
-  by AC1 and AC3.
+  unattended run, a subagent's task and another harness without gov's hooks (foundations R3). The
+  `gate-bar` stage's row sits in `push-main`, with role `main` and the lander, `bash <prefix>/push-main.sh`,
+  as its command: that kit's pre-push hook runs the full bar and blocks a red push, and it is the
+  enforcer `tools/roles/workflows.toml` declares for the `gate-bar` workflow. The `run-gates` descriptor
+  holds no row, because gov's own selection carries no `run-gates` kit (the fork record's F7). Observed
+  by AC1, AC2 and AC3.
 - **S3** — The composition. The template gains a `## Drive — how to start and advance the loop` section
   holding one `{{DRIVE}}` line in a one-line region, and `render()`
   (`tools/playbook/render_playbook.py:979`, now `tools/playbook/render_playbook.py#render`) expands it, before it collects placeholders, into one
@@ -62,19 +68,38 @@ F1-6, F1-7; v2:961-965 P15).
   `tools/playbook/render_playbook.py#resolve_declaration_paths`) finds its own; in an adopter, a dir kit's own
   installed `kit.toml`, and a flat entry's descriptor shipped beside the engine by a `root_relative`
   `[[files]]` rule in `tools/playbook/kit.toml`, the rule that already ships `playbook.kit.toml`.
-  Observed by AC2.
+  Every flat entry ships one, whether or not it declares rows: a flat entry is a registry entry whose
+  `descriptor` file name is not `kit.toml`, twelve at 293f9408e (pinned), the playbook's own already
+  among the shipped, so eleven new rules. Each rule lands its descriptor beside the engine under its
+  own file name, where the renderer looks first, falling through to the registry's path in gov as
+  `tools/playbook/render_playbook.py#resolve_declaration_paths` does. A selected kit whose descriptor is
+  found in neither place refuses the render naming the kit, whatever its kind, and S4's check holds the
+  shipping rules against the registry (the fork record's F8). Observed by AC2 and AC3.
 - **S4** — The check both ways, `python tools/playbook/instruction_units.py drive --check`: each row's
   `stage` names a workflow or `start`, its `role` a rendered role or `main`, and its four fields are
   non-empty; every role of `tools/roles/workflows.toml`'s `roles` lists has a row; every line between
   the drive region's markers in the rendered charter is a selected kit's row; every selected kit's row
-  is a line there. Each failure names the kit and the row. Its plants are cases of unit 9's
-  `instruction_units.py fixture --plant` entry, `drive-bad-role`, `drive-no-row`, `drive-empty-command`,
-  `drive-hand-line` and `drive-lost-line`, each joining `tools/playbook/instruction_units.py#PLANTS`, so
+  is a line there; and every flat entry S3 defines has a `root_relative` `[[files]]` rule in the
+  playbook kit's own descriptor whose `include` names that entry's `descriptor` and whose `to` lands it
+  beside the engine under its own file name. The check reads that descriptor beside its own module and
+  the registry as `tools/playbook/render_playbook.py#resolve_declaration_paths` finds it, so it spells no
+  kit path. Each failure names the kit, and the row where the defect is a row's. Its plants are cases of
+  unit 9's `instruction_units.py fixture --plant` entry, `drive-bad-role`, `drive-no-row`,
+  `drive-empty-command`, `drive-unshipped-descriptor`, `drive-hand-line` and `drive-lost-line`, each
+  joining `tools/playbook/instruction_units.py#PLANTS`, so
   the `instruction units selftest` leg runs it through its bare `fixture` verb (the fork record's F6). The
   check finds `workflows.toml` through the roles kit's directory, and the plants lay their scratch tree out
   at the install's layout through `tools/playbook/instruction_units.py#derive_tool_rel` and
   `tools/playbook/instruction_units.py#derive_kit_rel`, so no line of the playbook kit spells a kit path,
-  which the shipped-surface ban reds since unit 72. Observed by AC3 and AC4.
+  which the shipped-surface ban reds since unit 72. The pass also renames unit 3's plant helper,
+  `tools/playbook/instruction_units.py#plant_envelope_text`, to `write_envelope_text`, at its definition
+  and its four callers, so the naming lexicon's check stays at or under its pin, as the build brief
+  asks. Observed by AC3 and AC4.
+  **Readers:** by name: `plant_envelope_text`, which a git grep at 293f9408e finds spelled at its
+  definition and four callers in `tools/playbook/instruction_units.py`, in the generated
+  `memory/map/generated/symbols.json`, which the pass regenerates, and in the build brief, a record
+  that stays as written · by value: `tools/lexicon/lexicon.py`, whose check counts the names whose
+  leading verb its declared table lacks against its pin, this name among them.
 - **S5** — The role line in the handoff. `render_handoff` (`tools/roles/handoff.py:312`, now
   `tools/roles/handoff.py#render_handoff`) adds the
   role's drive lines under a `### Drive` heading at the end of the `## Role` section, from the same
@@ -183,9 +208,12 @@ the template section `## Drive — how to start and advance the loop`; the place
 `drive`; the handoff heading `### Drive`; the size check's new number in `check-template-size.sh`, 8; the
 `root_relative` `[[files]]` rules in `tools/playbook/kit.toml`; the `budgets.py` verb `home`, the
 function `read_cap_home` and the case `budgets-home`; the plants `drive-bad-role`, `drive-no-row`,
-`drive-empty-command`, `drive-hand-line` and `drive-lost-line`. `python tools/lexicon/lexicon.py --suggest
+`drive-empty-command`, `drive-unshipped-descriptor`, `drive-hand-line` and `drive-lost-line`; the
+function name `write_envelope_text`, which S4's rename gives unit 3's plant helper. `python tools/lexicon/lexicon.py --suggest
 read_cap_home --as py.function` answered OK on 2026-10-25; the lexicon declares no CLI-verb cell, so
 `home` is graded by no cell, and it names what the verb prints, as `resolve` and `check` do.
+`python tools/lexicon/lexicon.py --suggest write_envelope_text --as py.function` answered OK on
+2026-11-08, its leading verb `write` declared.
 
 ### Migration
 
@@ -207,7 +235,6 @@ in its row of `tools/template-size-limits.txt`, on the four conditions that file
 - `tools/roles/kit.toml`
 - `tools/unattended/kit.toml`
 - `tools/workflows/kit.toml`
-- `tools/run-gates/kit.toml`
 - `tools/memory-tree/kit.toml`
 - `tools/codebase-map/kit.toml`
 - `tools/memory-recall/kit.toml`
@@ -242,7 +269,9 @@ in its row of `tools/template-size-limits.txt`, on the four conditions that file
 - security: no write path; a row's `command` is rendered text, never executed by the renderer.
 - perf / scale: one TOML read per selected descriptor per render.
 - error / empty / loading states: a selected kit whose descriptor cannot be found refuses the render
-  naming the kit; a selection with no rows renders no section and the check says so.
+  naming the kit, a dir kit and a flat entry alike; every flat entry ships its descriptor beside the
+  engine (S3) and the drive check reds one whose shipping rule is missing, so in an install the refusal
+  meets only a damaged one; a selection with no rows renders no section and the check says so.
 - observability: the `drive` verb prints the composed lines with each one's kit.
 - risks: the charter grows; S6 keeps its row under the harness limit.
 - testing: §6 and the `New arm:` lines of §7.
@@ -263,8 +292,9 @@ in its row of `tools/template-size-limits.txt`, on the four conditions that file
   template, and an answer for each probe that finds nothing there; unit 1 S4 refuses a target that is no
   repository, or whose default branch has no commit.
 - **AC3** — When `drive --check` runs over a scratch tree with one planted defect at a time (a row whose
-  role is `gov-nobody`, a role with no row, a row with an empty `command`), it exits 1 naming the kit
-  and the row.
+  role is `gov-nobody`, a role with no row, a row with an empty `command`, and a copy of
+  `tools/playbook/kit.toml` without the rule that ships `push-main`'s descriptor), it exits 1 naming the
+  kit, and the row for each of the first three.
   Red when: any planted defect exits 0.
 - **AC4** — When a hand-typed line is planted inside the drive region of a scratch copy of `AGENTS.md`,
   and when one rendered line is deleted, `drive --check --charter <copy>` exits 1 naming the line.
@@ -296,7 +326,7 @@ in its row of `tools/template-size-limits.txt`, on the four conditions that file
 
 New arm: tools/policy/check_policy.py --fixture · covers AC8 · the `budgets-home` case plants a `constant:` home with its assignment line and one without · none
 New arm: tools/check-template-size.test.sh · covers AC6 · a scratch repository whose committed policy file sets the charter's cap above the harness limit · none
-New arm: tools/playbook/instruction_units.py · covers AC3 AC4 · the `drive-bad-role`, `drive-no-row`, `drive-empty-command`, `drive-hand-line` and `drive-lost-line` `PLANTS` cases, over one defect of AC3 or one charter edit of AC4 in a scratch tree, under the `instruction units selftest` leg, each failing case staged by its plant · none
+New arm: tools/playbook/instruction_units.py · covers AC3 AC4 · the `drive-bad-role`, `drive-no-row`, `drive-empty-command`, `drive-unshipped-descriptor`, `drive-hand-line` and `drive-lost-line` `PLANTS` cases, over one defect of AC3 or one charter edit of AC4 in a scratch tree, under the `instruction units selftest` leg, each failing case staged by its plant · none
 
 ## 8. Open questions
 
@@ -355,6 +385,38 @@ New arm: tools/playbook/instruction_units.py · covers AC3 AC4 · the `drive-bad
   holding no roles kit has no `tools/roles/workflows.toml` for the drive cases to read. RESOLVED (agent,
   2026-11-04, delegated): (e); a new case cannot miss the leg, and `run_plant_rows` stays as it is. The
   cost: an adopter runs none of these plants. widens: none · relaxes: none
+- **F7 — Where the `gate-bar` stage's row lives, when gov selects no `run-gates` kit.** Unit 6's builder
+  handed back that AC2's gov half cannot pass: the row sat in the `run-gates` descriptor, S3 composes
+  only the selected kits' rows, and `.governance/deploy.toml` selects 22 kits at 293f9408e, none of them
+  `run-gates`. Options: (a) gov's deploy file gains `run-gates`; (b) AC2's gov half reads every seeded
+  row of a kit gov selects, and `run-gates`' rows render only where that kit is selected; (c) the row
+  sits in `push-main`, a kit gov selects, and the `run-gates` descriptor holds none. (a) trips the
+  second veto: that file's header names it the committed standing authorization for gov's render,
+  carrying every owner decision, and its kit list is one, so the edit changes a governance carrier,
+  which the delegation does not reach. (b) trips the first veto: it passes only by rewriting AC2, a
+  criterion already written. (c) passes AC2 as written, and the row is `push-main`'s own: its command
+  is the lander, `bash <prefix>/push-main.sh`, and its pre-push hook, which runs the full bar, is the
+  enforcer `tools/roles/workflows.toml` declares for `gate-bar`. RESOLVED (agent, 2026-11-08,
+  delegated): (c), the one survivor. The cost: an adopter that selects `run-gates` without `push-main`,
+  the registry's default selection among them, renders no `gate-bar` line, while its deploy answers still
+  name the bar's command; and if the owner later adds `run-gates` to gov's selection, a row in that kit
+  is a later unit's choice. widens: none · relaxes: none
+- **F8 — Which flat entries ship a descriptor beside the engine.** S3 shipped flat-entry descriptors
+  without saying which, while section 5 refuses a render whose selected kit has no findable
+  descriptor, so an adopter whose template carries the drive token and who selects `check-wiring` or
+  `settings-merge`, both in the registry's default selection, would be refused. Options: (a) every
+  flat entry ships its descriptor, one `root_relative` rule each, and the drive check reds a flat entry
+  without one; (b) only a flat entry declaring rows ships one, a selected flat entry with none beside
+  the engine contributes nothing, the refusal holds for dir kits alone, and the drive check reds a flat
+  entry with rows and no rule; (c) only `kickoff-manifest` and `push-main` ship one, the refusal kept
+  whole. No option trips a veto: each writes under `{prefix}/playbook/`, the location the engine's
+  rules already write, by the rule kind and role S3 priced. (c) refuses an adopter for a kit it may
+  select. (b) splits the refusal by kind, so the renderer needs a flat-or-dir branch, and a flat entry
+  whose descriptor an install lost renders silently empty. (a) keeps section 5's refusal whole for
+  every selected kit, reads one resolution for every kind, and lets a flat entry gain rows with no
+  second edit. RESOLVED (agent, 2026-11-08, delegated): (a), the most feature-rich survivor, through
+  the seam the playbook kit already uses for `playbook.kit.toml`. widens: the playbook-render kit's
+  install, by eleven descriptor files beside the engine · relaxes: none
 
 ## 9. Revision log
 
@@ -389,6 +451,13 @@ New arm: tools/playbook/instruction_units.py · covers AC3 AC4 · the `drive-bad
   `memory-recall kit selftest` and `recall floor`, whose guards unit 67 widened to `tools/policy/budgets.py`
   and `tools/policy/policy.py`, both in the Files touched; S4's check and plants spell no kit path, as the
   shipped-surface ban requires since unit 72; S5 names `render_handoff` by symbol, its line having moved.
+- rev-10 · 2026-11-08 · S2 S3 S4 · section 4 Inventory and Files touched · section 5 · AC3 · section 7 ·
+  the fork record's F7 and F8 · from `2026-11-08-prompt-PLAY-dOrderedCharter-6-repair-brief.md`, the
+  builder's hand-back re-read at 293f9408e: the `gate-bar` row sits in `push-main` and the `run-gates`
+  descriptor holds none, so AC2's gov half holds as written and `tools/run-gates/kit.toml` leaves the
+  Files touched (F7); every flat entry ships its descriptor beside the engine, the drive check reds one
+  that does not, and AC3 gains that plant (F8); S4 carries the build brief's rename of
+  `plant_envelope_text` to `write_envelope_text`, with its readers.
 
 ## 10. Reuse audit
 

@@ -43,7 +43,7 @@ table of its wiring stand-in and the dark switch's condition, its AC1, which thi
 
 - **S1** — The write. `python tools/playbook/render_playbook.py --render-scope entry-files --card`
   writes, in pointer mode, `CLAUDE.md` as the line `@AGENTS.md` followed by the card's import line, an at-sign
-  before the git-ignored `.claude/orientation-card.md`, and lists both files in a new `.gemini/settings.json`'s `fileName`;
+  before the git-ignored orientation card in the `.claude` folder, and lists both files in a new `.gemini/settings.json`'s `fileName`;
   copy-mode aliases and Codex print `card — not delivered: <alias> ...` as unit 8 §4 "The wiring
   stand-in" tabulates. Without `--card` every byte is what the scope writes today. Under `--card` a
   pointer alias is current only when it holds both lines, and a file holding exactly the scope's own
@@ -212,7 +212,7 @@ the main loop has recorded unit 8's AC1 green.
   `find` over the fixture lists no `AGENTS.override.md` after every run.
   Red when: any mode, with or without the switch, writes an override file.
 - **AC7** — When `git show <landing sha>:CLAUDE.md` runs at the commit that lands S4, it prints
-  `@AGENTS.md` then the card's import line, an at-sign before `.claude/orientation-card.md`, and `python tools/playbook/render_playbook.py
+  `@AGENTS.md` then the card's import line, an at-sign before the orientation card's path, and `python tools/playbook/render_playbook.py
   --check-render --scope entry-files --card` exits 0 over that commit's tree.
   Red when: gov's `CLAUDE.md` lacks the second line at that commit, or the scoped check with the switch
   reds it.
@@ -263,7 +263,7 @@ this unit adds no import to the renderer, so it leaves that red as it finds it.
   as section 4 maps them; S3 no longer takes card logic out of the script, which holds none, and so owes
   no readers clause; the scope reads a one-line pointer as current, so F3 rules how gov's render takes
   the second line; the adopter's suite gains a pass-through arm, and the matrix leg's parked red is named.
-- rev-4 · 2026-11-08 · section 2 S1, section 6 AC7 · main loop: the card's import line is spelled as an at-sign before its path in
+- rev-4 · 2026-11-08 · section 2 S1, section 6 AC7 · main loop: the card's import line is spelled in words, its git-ignored path unquoted, in
   the write's scope item and in the landing criterion, because the at-prefixed token reads as an untracked path.
 
 ## 10. Reuse audit
