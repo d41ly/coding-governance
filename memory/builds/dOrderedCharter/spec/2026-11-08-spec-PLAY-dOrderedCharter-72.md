@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-72 — the positional lists leave the kit, and the kit's code derives every path it spells
 
-**Status:** DEFERRED · rev-1 · 2026-11-08 · node d · Tier-2 · base 93c4e987e · streams tooling · order 17 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-11-08 · node d · Tier-2 · base 93c4e987e · streams tooling · order 17 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -44,12 +44,11 @@ Every line below was read at base `93c4e987e`. The Design section holds what a o
   producer pathspecs and the selftest rows spell the tool root as `{prefix}/`, resolved through the kit's
   `resolve_prefix_token`. Observed by AC2, AC3 and AC9.
 - **S3** — The readers outside the module follow. The tag fixture in `tools/playbook/gov_tag.py` writes its list
-  under its own memory root, and lays its kit out at this install's layout. `FIXTURE_KIT` retires. The write mode,
+  under its own memory root, and lays its kit out at this install's layout: `FIXTURE_KIT` keeps its name and every
+  reader, and takes a derived value. The write mode,
   `tools/playbook/render_playbook.py#write_empty_lists`, writes the empty positional list under the target's
   memory project folder and the empty pending list under the kit, each where its folder exists. Unit 71's arm in
   `tools/govkit/selftest.py` plants into `instructions-legacy.txt`. Observed by AC6, AC9 and AC10.
-  **Readers:** by name: `tools/playbook/gov_tag.py` alone spells `FIXTURE_KIT`. by value: NO VALUE READERS — the
-  constant's two uses in that file take the derived path in its place, and no other module imports it.
 - **S4** — The hygiene engine's whitelist of `<MEMORY_ROOT>/project/` names, in
   `tools/memory-tree/check-memory-hygiene.sh`, admits `positional-refs.txt` by name, beside `pass-order-waiver.txt`,
   because the playbook kit's write mode writes it at every target. `tools/memory-tree/HYGIENE.template.md` and its
@@ -182,8 +181,18 @@ resolves that kit.
 In `tools/playbook/gov_tag.py`, `tools/playbook/gov_tag.py#build_tags_fixture` writes the empty list at
 `memory/project/positional-refs.txt`, beside the fixture's `chain.toml`, and
 `tools/playbook/gov_tag.py#run_positional_plant` passes the fixture's memory root, `memory`, to every
-`positional` call. Both lay the kit out at `instruction_units.derive_tool_rel(KIT_DIR.name)`, the seam
-`tools/playbook/instructions_edit.py` already uses for the same fixtures, so `FIXTURE_KIT` has no reader left.
+`positional` call.
+
+`FIXTURE_KIT` stays, and so does every reader of it: 14 uses in `tools/playbook/gov_tag.py`, among them
+`write_chain_fixture`, `read_dump`, `run_plant`'s `run_verb` and five of its plant branches, and
+`run_positional_plant`, plus two each in `tools/playbook/edge_grammar.py#build_resolve_fixture` and
+`tools/playbook/instruction_units.py#arm_arms`, counted at `6eaaecd80`. Only its value moves, from the literal to
+`instruction_units.derive_tool_rel(KIT_DIR.name)`, the seam `tools/playbook/instructions_edit.py` already uses for
+the same fixtures. At gov it yields the same `tools/playbook`, so no reader's output moves. `gov_tag` imports
+`instruction_units` at module level for it. That module imports nothing of `gov_tag`'s at module level, so no cycle
+forms, and `derive_kit_prefix` spends one cached git call. The fixture's remaining literal kit paths in
+`tools/playbook/gov_tag.py` spell the kit through `FIXTURE_KIT` too, and `tools/playbook/edge_grammar.py` is not
+touched.
 
 Unit 71's arm in `tools/govkit/selftest.py#main` planted into `positional-producers.txt`, which leaves the kit. It
 plants into `instructions-legacy.txt`, the other `project-owned` list that `tools/playbook/instruction_units.py`
@@ -201,7 +210,7 @@ which drop the tool-root segment at a root install. A fixture lays its tree out 
 | File | Sites | Derivation |
 |---|---|---|
 | `tools/playbook/core.py` | `derive_layout`'s fixture branch, `write_fixture`, `Case.write_legs`, `run_practice_read`, `arm_registry`, `arm_unenforced`, `arm_pending`, `arm_kinds`, `arm_practice`, `arm_instruction_unit`, `arm_bypass_never` | `tools/playbook/core.py#derive_layout` with a root returns that root beside the kit path and tool root the live branch derives. `Case` carries both, and every plant spells a kit file as the kit path joined to its name and the legs file under the tool root |
-| `tools/playbook/gov_tag.py` | `FIXTURE_KIT`, `SHAPE_PLANTS`, `build_tags_fixture`, `run_plant`, `run_positional_plant` | `instruction_units.derive_tool_rel` for the kit, the notes file and the role file. The `pending-source` plant spells its purpose-source `{prefix}/playbook/readers.toml#why` |
+| `tools/playbook/gov_tag.py` | `FIXTURE_KIT`'s value, `SHAPE_PLANTS`, `build_tags_fixture`, `run_plant`, `run_positional_plant` | `FIXTURE_KIT` takes `instruction_units.derive_tool_rel(KIT_DIR.name)`, and every other kit spelling in the fixture reads `FIXTURE_KIT`. The notes file and the role file go through `derive_tool_rel` too. The `pending-source` plant spells its purpose-source `{prefix}/playbook/readers.toml#why` |
 | `tools/playbook/instruction_units.py` | `LADDER_SOURCES`, `arm_tags`, `arm_priority`, `STATEMENT_ROWS`, `arm_extractor` | `LADDER_SOURCES` spells the tool root `{prefix}/`, resolved in `run_ladder_terms` against `derive_kit_prefix()`. The plants use `derive_kit_rel` and `derive_tool_rel`. The pointer row's command reads `bash {prefix}/push-main.sh`, still a command by its whitespace |
 | `tools/playbook/positional.py` | `PRODUCER_PATHSPECS`, `SELFTEST_ROWS` | the positional-module section above |
 | `tools/playbook/adopt-playbook.sh` | two rows of the tag resolver's `PLANTS` | the `pending-source` rows expect `pending reader · {prefix}/playbook/readers.toml#why` and `/readers.toml) lacks why`. The second keeps the field and the file, and drops the kit directory the fixture derives |
@@ -368,6 +377,10 @@ none
   at `93c4e987e`. The memory home was measured in a scratch clone. TOOL-bQuiltedLantern-3 placed
   `positional-refs.txt` in the hygiene engine's project-registry whitelist rather than gov's
   `PROJECT_REGISTRY_EXTRA`, as the Alternatives record.
+- rev-2 · 2026-11-08 · S3 · section 4 · the unit 72 builder handed the spec back before writing, at `6eaaecd80`:
+  `FIXTURE_KIT` has 18 readers, two in `tools/playbook/edge_grammar.py`, which neither unit touches. It keeps its
+  name and readers and takes a derived value; S3's retirement and its Readers clause are gone. Every other symbol
+  the scope changes was re-grepped at `6eaaecd80`, and each caller sits in a file this unit touches.
 
 ## 10. Reuse audit
 

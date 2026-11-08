@@ -149,7 +149,7 @@ ids PLAY-dOrderedCharter-73 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-69 — a playbook fixture sets the caller's git variables aside before its first git call](spec/2026-11-05-spec-PLAY-dOrderedCharter-69.md) | 17 | 2 | CLOSED | rev-1 | 2026-11-08 |
 | [PLAY-dOrderedCharter-70 — the closing diff review's mediums and low, batched](spec/2026-11-05-spec-PLAY-dOrderedCharter-70.md) | 17 | 2 | CLOSED | rev-1 | 2026-11-08 |
 | [PLAY-dOrderedCharter-71 — the adopter-name ban reads only the roles an adopter receives](spec/2026-11-08-spec-PLAY-dOrderedCharter-71.md) | 17 | 2 | CLOSED | rev-2 | 2026-11-08 |
-| [PLAY-dOrderedCharter-72 — the positional lists leave the kit, and the kit's code derives every path it spells](spec/2026-11-08-spec-PLAY-dOrderedCharter-72.md) | 17 | 2 | DEFERRED | rev-1 | 2026-11-08 |
+| [PLAY-dOrderedCharter-72 — the positional lists leave the kit, and the kit's code derives every path it spells](spec/2026-11-08-spec-PLAY-dOrderedCharter-72.md) | 17 | 2 | DEFERRED | rev-2 | 2026-11-08 |
 | [PLAY-dOrderedCharter-73 — the close bar's other code reds: encodings, shell idioms, a remote literal, the scratch matrix and the cap census](spec/2026-11-08-spec-PLAY-dOrderedCharter-73.md) | 17 | 2 | DEFERRED | rev-1 | 2026-11-08 |
 | [PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them](spec/2026-10-23-spec-PLAY-dOrderedCharter-3.md) | 18 | 2 | DEFERRED | rev-9 | 2026-11-04 |
 | [PLAY-dOrderedCharter-41 — the `cross-os` block stays live, so every v4 template renders after the practice catalogue lands](spec/2026-10-24-spec-PLAY-dOrderedCharter-41.md) | 18 | 2 | DEFERRED | rev-5 | 2026-11-04 |
