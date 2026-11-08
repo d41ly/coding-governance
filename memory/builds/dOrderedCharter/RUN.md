@@ -325,3 +325,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-08T14:32:48Z dispatch · item eb1c90a1 PLAY-dOrderedCharter-41 · reason tools/playbook/render_playbook.py help/charter.md WIRE-INTO-PROJECT.md memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-41.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-41-ledger.md memory/map/generated/symbols.json
 
 2026-11-08T14:32:59Z brief · item PLAY-dOrderedCharter-41 · reason f79c92e5c5bb memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-41-build-brief.md
+
+2026-11-08T15:33:14Z dispatch · item f56f6a18 PLAY-dOrderedCharter-52 · reason tools/memory-tree/merge-rows.py tools/memory-tree/merge-rows.test.sh tools/playbook/instructions_edit.py memory/map/generated/symbols.json memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-52.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-52-ledger.md
+
+2026-11-08T15:33:21Z brief · item PLAY-dOrderedCharter-52 · reason b962f7915252 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-52-build-brief.md

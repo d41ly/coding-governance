@@ -1108,6 +1108,11 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "arm_merge_one_side",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "arm_merge_parse",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -9851,6 +9856,11 @@
       "id": "derive_short_sha",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "derive_side_state",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
     },
     {
       "id": "derive_sidecar",

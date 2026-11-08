@@ -2271,6 +2271,38 @@ check_table_case "disjoint edits over an unterminated last entry" "$MANIFEST" 0 
 { derive_fx_unit a 'MUST one.'; derive_fx_unit b; derive_fx_unit c; } > "$TMP/twant"
 check_table_case "an unterminated final chunk in ours, an add in theirs" "$MANIFEST" 0 "" red
 
+# --- 55. THE TABLE ENVELOPE IS TOTAL, AND ITS ONE-SIDED ROWS HOLD (PLAY-dOrderedCharter-52) ---------
+# Every (base, ours, theirs) over an alphabet of an absent side and three texts, one also in CRLF, is
+# classified by the driver's own `derive_side_state`; the states reached must be exactly the rows of
+# `TABLE_ENVELOPE`, fourteen of them. Red on a state with no row, on a row no state reaches, and on a
+# deleted row. What this does not check: that a row's RESULT is right; the plants' inputs below do that
+# for rows 9, 12 and 11, the three unit 45's cases left out.
+"$PY" - <<'PYEOF'
+import importlib.util, itertools, os, sys
+sys.dont_write_bytecode = True
+spec = importlib.util.spec_from_file_location("mr", os.environ["KIT_REL"] + "/" + os.environ["KIT"] + "/merge-rows.py")
+mr = importlib.util.module_from_spec(spec); spec.loader.exec_module(mr)
+sides = [None, "x\n", "x\r\n", "y\n", "z\n"]
+reached = {mr.derive_side_state(*t) for t in itertools.product(sides, repeat=3) if t != (None, None, None)}
+rows = set(mr.TABLE_ENVELOPE)
+for state in sorted(reached - rows):
+    print(f"FAIL table envelope: the state {state} has no row")
+for state in sorted(rows - reached):
+    print(f"FAIL table envelope: the row {state} is reached by no state")
+if len(reached) != 14:
+    print(f"FAIL table envelope: {len(reached)} reachable state(s), expected the fourteen")
+sys.exit(0 if reached == rows and len(reached) == 14 else 1)
+PYEOF
+[ $? = 0 ] || bad "table envelope: the mapping is not total over the reachable states"
+# The plants `merge-theirs-delete`, `merge-both-delete` and `merge-theirs-add`, each beside an ours edit
+# of another tag; a line merge gets the two deletes right, so only the add demands it fail.
+{ derive_fx_unit a; derive_fx_unit b; } > "$TMP/to"; { derive_fx_unit a; derive_fx_unit b 'MUST one.'; } > "$TMP/ta"; derive_fx_unit b > "$TMP/tb"; derive_fx_unit b 'MUST one.' > "$TMP/twant"
+check_table_case "theirs deletes a tag ours left unchanged" "$MANIFEST" 0 "" held
+{ derive_fx_unit a; derive_fx_unit b; } > "$TMP/to"; derive_fx_unit b 'MUST one.' > "$TMP/ta"; derive_fx_unit b > "$TMP/tb"; derive_fx_unit b 'MUST one.' > "$TMP/twant"
+check_table_case "both sides delete one tag" "$MANIFEST" 0 "" held
+derive_fx_unit b > "$TMP/to"; derive_fx_unit b 'MUST one.' > "$TMP/ta"; { derive_fx_unit b; derive_fx_unit a; } > "$TMP/tb"; { derive_fx_unit b 'MUST one.'; derive_fx_unit a; } > "$TMP/twant"
+check_table_case "only theirs adds a tag" "$MANIFEST" 0 "" red
+
 # The count is DERIVED from the file, not typed: a hand-maintained tally reads as a claim about
 # coverage and goes stale the first time a group is added without touching it. The floor is a
 # RATCHET — raised with the groups, never left behind, or a deleted group passes as a green run.
@@ -2281,7 +2313,7 @@ check_table_case "an unterminated final chunk in ours, an add in theirs" "$MANIF
 # driver, and the count of cases the arithmetic bar binds on.
 ngroups=$(grep -c '^# --- ' "$SELF")
 nruns=$(grep -c '^run "' "$SELF")
-[ "$ngroups" -ge 56 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 56 — a group was deleted"
+[ "$ngroups" -ge 57 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 57 — a group was deleted"
 [ "$nruns" -ge 42 ] || bad "only $nruns 'run' case(s) remain, expected at least 42 — a group was emptied while its banner stayed, which the banner count cannot see"
 [ "$NEVER_WORSE_BOUND" -ge "$NEVER_WORSE_FLOOR" ]   || bad "the arithmetic never-worse comparison bound on $NEVER_WORSE_BOUND case(s) against a grow-only floor of $NEVER_WORSE_FLOOR — a control flipped from rc 0 to rc 1 and silently left the bar"
 [ "$st" = 0 ] && echo "PASS — merge-rows: $ngroups groups / $nruns run cases held, $NEVER_WORSE_BOUND under the arithmetic never-worse bar, $ncons conservative (cap $CONSERVATIVE_CAP)"

@@ -656,6 +656,19 @@ def arm_merge_edit(c, name):
                          ours, theirs, "unit.unit.base")
 
 
+def arm_merge_one_side(c, name):
+    """Rows 9, 12 and 11 of the table envelope over one tag, each beside an ours edit of another so git runs the
+    driver: a clean merge, the tag gone where theirs or both deleted it and held once where only theirs added it."""
+    write_merge_driver(c)
+    held, other, edit = derive_fx_row("unit.base"), derive_fx_row("unit.other"), derive_fx_row("unit.other", "MUST one.")
+    base, ours, theirs, want = {"merge-theirs-delete": (held + other, held + edit, other, edit),
+                                "merge-both-delete": (held + other, edit, other, edit),
+                                "merge-theirs-add": (other, edit, other + held, edit + held)}[name]
+    rc, said, merged = run_merge_pair(c, "one", base, ours, theirs)
+    c.check(f"{name} merges clean through the driver to ours' entries and theirs' one-sided result",
+            rc == 0 and merged == want and "merge-rows: tables " in said, f"{rc} {said} {merged}")
+
+
 def arm_merge_multiline(c):
     write_merge_driver(c)
     one, two, kept = derive_fx_row("unit.one"), derive_fx_row("unit.two"), derive_fx_long("unit.kept", FX_HEADER_LINES)
@@ -1018,6 +1031,8 @@ PLANTS = {"merge": arm_merge, "merge-multiline": arm_merge_multiline, "merge-sam
           "merge-written": arm_merge_written, "root-prefix": arm_root_prefix,
           **{name: functools.partial(arm_merge_edit, name=name)
              for name in ("merge-both-edit", "merge-delete-edit", "merge-edit-delete")},
+          **{name: functools.partial(arm_merge_one_side, name=name)
+             for name in ("merge-theirs-delete", "merge-both-delete", "merge-theirs-add")},
           "propose": arm_propose, "owner-propose": arm_owner_propose, "rerender": arm_rerender,
           "command-for-all": arm_command_for_all, "flow-only": arm_flow_only, "proof-values": arm_proof_values,
           "guard": arm_guard, "checks": arm_checks, "record": arm_record, "packs": arm_packs,

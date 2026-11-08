@@ -23,8 +23,16 @@ triager produce on ordinary work. The audit line names which census ran.
 A FOURTH CLASS, THE INSTRUCTION MANIFESTS, IS NOT ROWS OF LINES (PLAY-dOrderedCharter-15, -45). A `%P` named
 `instructions.toml` goes to `resolve_tables` before anything below runs, since a `[[unit]]` table spans lines and
 no line of it is a row: each side is cut into a preamble and one chunk per array-of-tables entry, keyed by the
-array's name with the entry's `tag`, or its `key` where it has no `tag`, and merged per key against the base. A
-key both sides moved apart is a `TableConflict`, a whole-file conflict naming each key. A side whose cut does not
+array's name with the entry's `tag`, or its `key` where it has no `tag`, and merged per key against the base by
+`TABLE_ENVELOPE` (PLAY-dOrderedCharter-52), one row per reachable state of the key in the base, ours and theirs:
+
+    present: unchanged/unchanged base · changed/unchanged ours · unchanged/changed theirs · changed/changed same
+             ours · changed/changed different CONFLICT · deleted/unchanged deleted · deleted/changed CONFLICT ·
+             changed/deleted CONFLICT · unchanged/deleted deleted · deleted/deleted deleted
+    absent:  added/absent ours · absent/added theirs · added/added same ours, once · added/added different CONFLICT
+
+A state the mapping does not hold conflicts too, so a missed row fails closed. A key in conflict is a
+`TableConflict`, a whole-file conflict naming each key. A side whose cut does not
 reproduce `tomllib`'s read of it fails closed, and the written bytes are re-cut before they are returned, so they
 parse, hold each key once and hold each chunk as one side wrote it.
 
@@ -1243,18 +1251,49 @@ def read_tables(lines: list[str]) -> tuple[str, dict]:
     return preamble, tables
 
 
-def resolve_table(base: str | None, ours: str | None, theirs: str | None) -> tuple[str | None, bool]:
-    """One key's three-way, None an absent side, line endings folded: `(its text, whether it conflicts)`."""
+# PLAY-dOrderedCharter-52: the table class's envelope, one row per reachable `(base, ours, theirs[, agreement])`
+# state; a state with no row is a conflict, never a side. The driver's suite enumerates it for totality.
+TABLE_ENVELOPE = {
+    ("present", "unchanged", "unchanged"): "base",
+    ("present", "changed", "unchanged"): "ours",
+    ("present", "unchanged", "changed"): "theirs",
+    ("present", "changed", "changed", "same"): "ours",
+    ("present", "changed", "changed", "different"): "conflict",
+    ("present", "deleted", "unchanged"): "deleted",
+    ("present", "deleted", "changed"): "conflict",
+    ("present", "changed", "deleted"): "conflict",
+    ("present", "unchanged", "deleted"): "deleted",
+    ("absent", "added", "absent"): "ours",
+    ("absent", "absent", "added"): "theirs",
+    ("present", "deleted", "deleted"): "deleted",
+    ("absent", "added", "added", "same"): "ours",
+    ("absent", "added", "added", "different"): "conflict",
+}
+
+
+def derive_side_state(base: str | None, ours: str | None, theirs: str | None) -> tuple:
+    """One key's `TABLE_ENVELOPE` state, None an absent side, line endings folded before any comparison."""
     o, a, b = (t if t is None else t.replace("\r\n", "\n") for t in (base, ours, theirs))
-    if a == b == o:
-        return base, False
-    if a == b or b == o:
-        return ours, False
-    return (theirs, False) if a == o else (None, True)
+    if o is None:
+        sides = tuple("absent" if t is None else "added" for t in (a, b))
+    else:
+        sides = tuple("deleted" if t is None else "unchanged" if t == o else "changed" for t in (a, b))
+    agreement = ("same" if a == b else "different",) if sides in (("changed", "changed"), ("added", "added")) else ()
+    return ("absent" if o is None else "present", *sides, *agreement)
+
+
+def resolve_table(base: str | None, ours: str | None, theirs: str | None) -> tuple[str | None, bool]:
+    """One key's three-way from `TABLE_ENVELOPE`, None an absent side: `(its text, whether it conflicts)`. A state
+    the mapping does not hold conflicts, so a missed row fails closed."""
+    result = TABLE_ENVELOPE.get(derive_side_state(base, ours, theirs), "conflict")
+    if result == "conflict":
+        return None, True
+    return {"base": base, "ours": ours, "theirs": theirs, "deleted": None}[result], False
 
 
 def resolve_tables(o_lines, a_lines, b_lines) -> list[str]:
-    """The manifests' merge: ours' entries in ours' order, then theirs' additions in theirs'. Returned only once the
+    """The manifests' merge: ours' surviving entries in ours' order, then theirs' entries whose result is `theirs` and
+    that ours does not hold, in theirs'; a `deleted` result is emitted nowhere. Returned only once the
     written text parses, holds the merged keys each once, and holds each chunk byte for byte as one side wrote it."""
     (o_pre, O), (a_pre, A), (b_pre, B) = read_tables(o_lines), read_tables(a_lines), read_tables(b_lines)
     preamble, clash = resolve_table(o_pre, a_pre, b_pre)
