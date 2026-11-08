@@ -1,7 +1,8 @@
 """load_sets — each reader's load set, the missing-unit refusal, the render-time budgets and the injected
-load points (PLAY-dOrderedCharter-11).
+load points (PLAY-dOrderedCharter-11), and every role's `code` slot (PLAY-dOrderedCharter-27).
 
-    python load_sets.py derive --reader <tag> [--item <tag>] [--feature <tag>]... [--units <manifest>] [--root <dir>]
+    python load_sets.py derive --reader <tag> [--item <tag>] [--feature <tag>]... [--units <manifest>]
+                               [--code-budget <n>k] [--root <dir>]
     python load_sets.py check [--reader <tag>]... [--item <tag>] [--units <manifest>] [--checks refuse|warn|record]
                               [--load-point <name>[=<bytes>]]... [--budgets-enforce refuse|warn] [--root <dir>]
     python load_sets.py injected [--card <path>] [--cap <name>=<bytes>]... [--root <dir>]
@@ -15,6 +16,12 @@ and the units scoped to a `feature.*` tag the caller names once a `feature` row 
 namespace no row registers as a selector selects nothing and is reported `unarmed — <ns>.*`, never empty and
 green. The registry is the target's own, under its tool root, else the one beside this module. The set keeps
 the unit registry's order.
+
+THE CODE SLOT (PLAY-dOrderedCharter-27), `read_code_slot`: every `role.<name>` reader's set lists a `code`
+slot, filled or not, priced by the policy key `memory.code-budget` read through `read_policy_value` at the
+root, `<n>k` at 1,000 bytes a `k`. `--code-budget` stands in for the key. A value of another shape, or a
+refused read, refuses the derivation naming the key. A filled slot is the `code` load point, measured under
+the cap census row `code-slot`, a family whose value is this key's.
 
 THE REFUSAL (S2), `check_required`: every unit whose `required-by` names the reader or its item and which the
 set lacks. Its mode is the policy key `instructions.checks`, read through `policy_value.read_policy_value`:
@@ -46,6 +53,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import functools
 import os
 import pathlib
 import re
@@ -63,6 +71,9 @@ SAY = "load-set"
 EVERY = "reader.every"
 CHECK_MODES = ("refuse", "warn", "record")
 ROLE_CAP = "role-body"
+#: The code slot: its load point, its census cap, and the policy key that prices it (PLAY-dOrderedCharter-27).
+CODE_SLOT, CODE_CAP, CODE_KEY = "code", "code-slot", "memory.code-budget"
+CODE_BUDGET_RE = re.compile(r"([1-9][0-9]*)k")
 #: The files a harness reads whole, each with its limit's census row: Codex reads `AGENTS.md`, the fork record's F3.
 HARNESS_READS = {"AGENTS.md": ("codex-instructions", "Codex")}
 MISSING = "Missing required unit:"
@@ -120,9 +131,38 @@ def read_role_rules(name) -> tuple[list | None, str]:
     return [f"practice.{t}" for t in tags], ""
 
 
-def derive_load_set(units, reader, item=None, features=(), namespaces=None) -> tuple[list, list]:
+class SlotRefused(ValueError):
+    """The code slot's budget did not read: a value outside `<n>k`, or the policy reader's refusal."""
+
+
+@functools.lru_cache(maxsize=None)
+def read_code_slot(root, stand_in=None) -> dict:
+    """The `code` slot's entry, `{"slot", "budget", "source"}`: `memory.code-budget` at `root`, or `stand_in`
+    in its place, in bytes at 1,000 a `k`; the source names where the value came from. SlotRefused names the
+    key on a value of another shape and on a refused read, never deriving a default."""
+    if stand_in is None:
+        from policy_value import PolicyRefused, read_policy_value
+        try:
+            lines, explain = read_policy_value("memory.code-budget", root)
+        except PolicyRefused as exc:
+            raise SlotRefused(f"{CODE_KEY} did not read · {exc.line}") from None
+        value = lines[0].strip() if lines else ""
+        how = (explain.split(" · ") + ["", ""])[1] or "policy"
+        source = f"{CODE_KEY} {how} {value}"
+    else:
+        value, source = stand_in, f"--code-budget {stand_in}"
+    m = CODE_BUDGET_RE.fullmatch(value)
+    if not m:
+        raise SlotRefused(f"{CODE_KEY} is {value!r}, not <n>k")
+    return {"slot": CODE_SLOT, "budget": int(m[1]) * 1000, "source": source}
+
+
+def derive_load_set(units, reader, item=None, features=(), namespaces=None, root=None,
+                    code_budget=None) -> tuple[list, list]:
     """`(tags, report)`: the tags of the units `reader` loads, in the registry's order, and one report line per
-    part. `namespaces` is the registry's rows, this kit's own when None."""
+    part. `namespaces` is the registry's rows, this kit's own when None. A `role.<name>` reader's report lists
+    its `code` slot with the budget `read_code_slot` reads at `root`, `code_budget` standing in; a `root` of
+    None leaves the slot unread, as `check` does, which prints no set. SlotRefused when the budget refuses."""
     rows = read_namespace_rows() if namespaces is None else namespaces
     picked, report = set(), []
 
@@ -160,6 +200,9 @@ def derive_load_set(units, reader, item=None, features=(), namespaces=None) -> t
             add_part("feature", set(features))
         else:
             add_unarmed("feature", "feature")
+    if ns == "role" and root is not None:
+        slot = read_code_slot(str(root), code_budget)
+        report.append(f"{slot['slot']} — slot · budget {slot['budget']} · {slot['source']}")
     return [u.tag for u in units if u.tag in picked], report
 
 
@@ -228,7 +271,7 @@ def read_cap_answers(root, points) -> tuple[dict, list, bool]:
         census = {r.get("name"): r for r in tomllib.loads((kit / "caps.toml").read_text(encoding="utf-8")).get("cap", [])}
     except (LookupError, OSError, tomllib.TOMLDecodeError) as exc:
         return {}, [f"{SAY} — budgets unarmed · no policy kit found: {exc}"], False
-    asked = {p: (ROLE_CAP if p.startswith("role.") else p) for p in points}
+    asked = {p: (ROLE_CAP if p.startswith("role.") else CODE_CAP if p == CODE_SLOT else p) for p in points}
     asked = {p: c for p, c in asked.items() if c in census}
     caps: dict = {}
     if asked:
@@ -240,7 +283,12 @@ def read_cap_answers(root, points) -> tuple[dict, list, bool]:
         rows = {f[0]: f for f in (ln.split("\t") for ln in out.splitlines()) if len(f) == 4}
         for p, cap in asked.items():
             if cap in rows:
-                value = read_body_ceiling(p[5:]) if cap == ROLE_CAP else (None if rows[cap][1] == "-" else int(rows[cap][1]))
+                try:
+                    value = (read_body_ceiling(p[5:]) if cap == ROLE_CAP
+                             else read_code_slot(str(root))["budget"] if cap == CODE_CAP
+                             else None if rows[cap][1] == "-" else int(rows[cap][1]))
+                except SlotRefused as exc:
+                    return {}, [f"{SAY} — refused · {exc}"], True
                 caps.setdefault(p, []).append((cap, value, rows[cap][2], rules.get(cap, ""), False))
     for p in points:
         if p in HARNESS_READS:
@@ -395,7 +443,11 @@ def run_derive(a) -> int:
     except (OSError, ValueError, tag_index.TagError) as exc:
         print(f"{SAY} — refused · the unit registry does not read: {exc}")
         return 1
-    tags, report = derive_load_set(units, a.reader, a.item, tuple(a.feature), rows)
+    try:
+        tags, report = derive_load_set(units, a.reader, a.item, tuple(a.feature), rows, root, a.code_budget)
+    except SlotRefused as exc:
+        print(f"{SAY} — refused · {a.reader} · {exc}")
+        return 1
     named = {a.reader, a.item} - {None}
     required = sum(1 for u in units if named & set(u.required_by))
     print(f"{SAY} — {a.reader} · {len(tags)} unit(s) of {len(units)} · {required} required")
@@ -417,7 +469,11 @@ PLANT_UNITS = {
 PLANTS = {"required-away": ("required-away", "role"), "role-unregistered": ("role", None),
           "role-registered": ("role", "role"), "feature-unregistered": ("feature", None),
           "feature-registered": ("feature", "feature"), "charter-over": (None, None),
-          "role-block-over": (None, None)}
+          "role-block-over": (None, None), "code-every-role": ("role", None), "code-refused": ("role", None),
+          "code-refused-check": (None, None),
+          "code-over": (None, None), "code-at": (None, None)}
+#: The `code-refused` plant's one committed policy file: a `memory.code-budget` its catalogue row refuses.
+PLANT_POLICY = (".governance/policy.toml", '[memory]\ncode-budget = "big"\n')
 PLANT_CHARTER_BYTES, PLANT_CHARTER_CAP = 40000, 50000
 
 
@@ -437,6 +493,8 @@ def build_plant_tree(top, plant) -> tuple[pathlib.Path, pathlib.Path]:
         files[iu.derive_tool_rel("kitx", iu.MANIFEST)] = PLANT_UNITS[units]
     if plant == "charter-over":
         files[iu.derive_tool_rel("template-size-limits.txt")] = f"AGENTS.md\t{PLANT_CHARTER_CAP}\n"
+    if plant.startswith("code-refused"):
+        files[PLANT_POLICY[0]] = PLANT_POLICY[1]
     for rel, text in files.items():
         p = root / rel
         p.parent.mkdir(parents=True, exist_ok=True)
@@ -446,6 +504,27 @@ def build_plant_tree(top, plant) -> tuple[pathlib.Path, pathlib.Path]:
         if run_git_bytes(root, *args) is None:
             raise OSError(f"git {args[0]} failed in the plant tree")
     return root, root / iu.derive_tool_rel("kitx", iu.MANIFEST)
+
+
+def run_code_every_role(root, manifest) -> int:
+    """The `code-every-role` plant: each role of the roles kit derived at `root`, its code line printed; 1 when
+    a role's set lacks the slot or no role is found."""
+    import instruction_units as iu
+    from policy_value import resolve_kit_dir
+    agents = sorted((resolve_kit_dir("roles", "check_roles.py", KIT_DIR) / "agents").glob("*.agent.md"))
+    units = iu.parse_unit_rows(manifest.read_text(encoding="utf-8"), manifest.as_posix())[0]
+    rows, lacking = read_namespace_rows(root), []
+    for agent in agents:
+        reader = "role." + agent.name[:-len(".agent.md")]
+        _tags, report = derive_load_set(units, reader, None, (), rows, root)
+        got = [ln for ln in report if ln.startswith(f"{CODE_SLOT} — slot · ")]
+        print(f"{reader} · {got[0] if got else 'NO code slot'}")
+        lacking += [] if got else [reader]
+    if lacking or not agents:
+        print(f"{SAY} — code slot missing on {', '.join(lacking) or 'every role: no role found'}")
+        return 1
+    print(f"{SAY} — code slot listed for every role, {len(agents)} of {len(agents)}")
+    return 0
 
 
 def run_plant(plant, extra) -> int:
@@ -459,8 +538,16 @@ def run_plant(plant, extra) -> int:
     try:
         root, manifest = build_plant_tree(top, plant)
         base = ["--root", str(root)]
-        if plant in ("role-unregistered", "role-registered"):
+        if plant in ("role-unregistered", "role-registered", "code-refused"):
             return main(["derive", "--reader", "role.gov-builder", "--units", str(manifest), *base, *extra])
+        if plant == "code-every-role":
+            return run_code_every_role(root, manifest)
+        if plant in ("code-over", "code-at"):
+            budget = read_code_slot(str(root))["budget"]
+            size = budget + 1 if plant == "code-over" else budget
+            return main(["check", "--load-point", f"{CODE_SLOT}={size}", *base, *extra])
+        if plant == "code-refused-check":
+            return main(["check", "--load-point", f"{CODE_SLOT}=1", *base, *extra])
         if plant.startswith("feature"):
             import instruction_units as iu
             units = iu.parse_unit_rows(manifest.read_text(encoding="utf-8"), manifest.as_posix())[0]
@@ -519,6 +606,7 @@ def main(argv=None) -> int:
         p.add_argument("--item")
         p.add_argument("--units")
     d.add_argument("--feature", action="append", default=[])
+    d.add_argument("--code-budget")
     c.add_argument("--reader", action="append", default=[])
     c.add_argument("--checks", choices=CHECK_MODES)
     c.add_argument("--load-point", action="append", default=[])

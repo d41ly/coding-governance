@@ -423,6 +423,11 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "SlotRefused",
+      "kind": "class",
+      "file": "tools/playbook/load_sets.py"
+    },
+    {
       "id": "StaleHeader",
       "kind": "class",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -6033,6 +6038,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "check_policy_home_family",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "check_positional",
       "kind": "function",
       "file": "tools/playbook/positional.py"
@@ -8489,6 +8499,11 @@
     },
     {
       "id": "derive_code_files",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_code_slot_plant",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
@@ -15911,6 +15926,11 @@
       "id": "read_code_lines",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "read_code_slot",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
     },
     {
       "id": "read_command_members",
@@ -23796,6 +23816,11 @@
       "id": "run_cli",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "run_code_every_role",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
     },
     {
       "id": "run_combine",

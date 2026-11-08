@@ -75,10 +75,14 @@ No value moved: every cap keeps the value its home holds.
 - **A declaration beside its gate** holds the line-length rows and the build README's slot ceilings.
 - **A constant in the gate** holds the rest: role bodies, the one-line rule, the roster line, the
   manifest's caps and the recall export.
+- **A policy key** holds one family: `code-slot`, the code block a role's handoff carries, takes its
+  value from `memory.code-budget`, `16k` or 16,000 bytes by default. Its census home reads
+  `policy:memory.code-budget`, a form only a family row may take, so `budgets.code-slot` can never be
+  a second home for the same value; set the key instead.
 
 A cap can take a value from the policy file too, `budgets."AGENTS.md" = 21000` say, but a cap held
 both there and in its legacy home refuses rather than picking one, and a family cap (line lengths,
-README slots, role bodies, one value per subject) takes no value from the policy file at all. A
+README slots, role bodies, the code slot, one value per subject) takes no value from the policy file at all. A
 value of `0` means unchecked, as it does in every legacy home; a negative value or one that is not a
 whole number makes the file invalid.
 

@@ -3377,6 +3377,22 @@ def derive_roster_line_plant(cap):
             "refuse": "(budgets.enforce is refuse)"}
 
 
+def derive_code_slot_plant(cap):
+    """A handoff rendered from the source tree with a `code` block one byte past the budget its census home's
+    policy key defaults to, read off the catalogue (PLAY-dOrderedCharter-27). The renderer is the
+    `roster-line` row's enforcer, which measures the block through this row's, so neither path is spelled."""
+    key = cap.home.partition(":")[2]
+    default = str(policy.read_catalogue_row(policy.parse_key(key), policy.load_catalogue(policy.KIT))["default"])
+    v = int(default.rstrip("k")) * 1000  # ponytail: the load-set enforcer's unit, 1,000 bytes a `k`
+    handoff = derive_enforcer_path(budgets.read_cap_census(derive_source_top())["roster-line"])
+    return {"files": {".memory-tree.conf": ROLES_CONF, "AGENTS.md": (derive_source_top() / "AGENTS.md").read_bytes(),
+                      "memory/builds/tOne/README.md": "# tOne\n", "code.txt": "x" * v + "\n"},
+            "argv": [sys.executable, handoff, "render", "--role", "gov-skeptic", "--build", "tOne", "--unit",
+                     "TOOL-tOne-1", "--input", "code=code.txt", "--stdout"],
+            "warn": f"BUDGET WARN · code · {v + 1} bytes over {cap.name} {v} · budgets.enforce is warn",
+            "refuse": f"BUDGET REFUSE · code · {v + 1} bytes over {cap.name} {v} · budgets.enforce is refuse"}
+
+
 def derive_manifest_plant(cap, kit=True, body=None, env=None, argv_tail=()):
     """A kickoff manifest over its cap, stamped at the base commit, in a repository whose policy kit is
     TRACKED, as the checker's last rung finds it; `kit` False holds none. `body` replaces the plant."""
@@ -3496,7 +3512,7 @@ CAP_CASES = {
     "readme-bytes": derive_hygiene_plant, "readme-lines": derive_hygiene_plant, "dossier-bytes": derive_hygiene_plant,
     "dossier-lines": derive_hygiene_plant, "entry-chars": derive_hygiene_plant, "readme-entry-chars": derive_hygiene_plant,
     "readme-slot": derive_readme_slot_plant, "role-body": derive_role_body_plant, "one-line-rule": derive_one_line_rule_plant,
-    "roster-line": derive_roster_line_plant, "manifest-bytes": derive_manifest_plant, "manifest-line": derive_manifest_plant,
+    "roster-line": derive_roster_line_plant, "code-slot": derive_code_slot_plant, "manifest-bytes": derive_manifest_plant, "manifest-line": derive_manifest_plant,
     "manifest-trap": derive_manifest_plant, "universal-gotchas": derive_universal_plant, "recall-export": derive_recall_export_plant,
     "orientation-card": derive_outside_probe_plant, "cited-file-cap": derive_outside_probe_plant,
     "codex-instructions": derive_outside_probe_plant, "runlog-record": derive_outside_probe_plant,
@@ -3532,7 +3548,8 @@ def run_cap_case(name):
     family runs a third mode, `zero` (TOOL-dGroundRules-75): `derive_zero_plant` under `refuse`, which
     must exit 0 with no breach line and no awk error, a 0 read as unchecked; its modes run at once,
     each at its own path. An outside row must print the same exit and output under both, its marker in
-    it, so its two modes run in turn at ONE path; and the policy reader must refuse to answer it."""
+    it, so its two modes run in turn at ONE path; and the policy reader must refuse to answer it. A row
+    whose home is `policy:` adds `check_policy_home_family` (PLAY-dOrderedCharter-27)."""
     cap_name = name[len(CAP_CASE_PREFIX):]
     checks, seen = [], {}
     try:
@@ -3586,9 +3603,31 @@ def run_cap_case(name):
                 checks.append(("reader", "budgets.resolve_caps refuses an outside cap", False, "it answered"))
             except policy.Refusal as exc:
                 checks.append(("reader", "budgets.resolve_caps refuses an outside cap", "outside the switch" in exc.why, str(exc)))
+        if cap.home.startswith("policy:"):
+            checks.append(check_policy_home_family(t / "census", cap))
     finally:
         remove_repo(t)
     return print_checks(name, checks)
+
+
+def check_policy_home_family(t, cap):
+    """A copy of the census at `t`, at the census's own path, its `policy:` home row `cap` read `family =
+    false`: `read_cap_census` must refuse it naming the row, since `budgets.<cap>` in the policy file would
+    be a second home for the key's value (PLAY-dOrderedCharter-27). -> one check."""
+    what = "a census copy with the row's family false refuses naming the row"
+    src = (KIT / budgets.CENSUS).read_text(encoding="utf-8").replace("\r\n", "\n")
+    at = src.find(f'name = "{cap.name}"\n')
+    end = src.find("[[cap]]", at) if at >= 0 else -1
+    end = len(src) if end < 0 else end
+    row = src[at:end] if at >= 0 else ""
+    if "family = true" not in row:
+        return ("family false", what, False, f"no `family = true` line in {cap.name}'s row to plant against")
+    write_case_file(t, budgets.derive_census_rel(), src[:at] + row.replace("family = true", "family = false") + src[end:])
+    try:
+        budgets.read_cap_census(t)
+        return ("family false", what, False, "the census read")
+    except policy.Refusal as exc:
+        return ("family false", what, cap.name in exc.why and cap.home in exc.why, str(exc))
 
 
 def seed_budget_pin(cap_name, needle, row=None):

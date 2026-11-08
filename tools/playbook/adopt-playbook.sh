@@ -393,7 +393,9 @@ echo "PASS — the edge grammar's plants"
 # `role.gov-builder` selected only once a `role` row selects, and one scoped `feature.roles` only once a
 # `feature` row does, each unregistered part printed `unarmed`; a 40000-byte charter under a 50000 cap
 # refused on CODEX_MAX under `warn`; a role block ten bytes past its ceiling warned under `warn` and
-# refused under `refuse`.
+# refused under `refuse`. PLAY-dOrderedCharter-27's rows: every role's set lists its `code` slot, a stand-in
+# budget prices it, a malformed one and a committed value the catalogue row refuses each refuse naming
+# `memory.code-budget`, the derivation and the measure alike, and a code block one byte over the budget warns or refuses while one at it is quiet.
 _tf=0
 run_plant_rows load-sets "$HERE/load_sets.py" <<'PLANTS'
 required-away --checks refuse|1|handoff: no prompt file written
@@ -408,6 +410,14 @@ feature-registered|0|selected: unit.roles|unarmed — feature.*
 charter-over --budgets-enforce warn|1|over CODEX_MAX 32768
 role-block-over --budgets-enforce warn|0|BUDGET WARN · role.gov-builder
 role-block-over --budgets-enforce refuse|1|BUDGET REFUSE · role.gov-builder
+code-every-role|0|code slot listed for every role|NO code slot
+role-unregistered --code-budget 4k|0|code — slot · budget 4000 · --code-budget 4k
+role-unregistered --code-budget 16|1|memory.code-budget is '16', not <n>k
+code-refused|1|refused · role.gov-builder · memory.code-budget did not read|budget 16000
+code-refused-check|1|refused · memory.code-budget did not read|bytes of
+code-over --budgets-enforce warn|0|BUDGET WARN · code ·
+code-over --budgets-enforce refuse|1|BUDGET REFUSE · code ·
+code-at --budgets-enforce refuse|0|bytes of|BUDGET
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf load-set arm(s) failed"; exit 1; fi
 echo "PASS — the load sets' plants"

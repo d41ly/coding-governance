@@ -55,7 +55,8 @@ LIMITS_NAME = "template-size-limits.txt"
 CLASSES = ("switch", "consumer", "correctness", "exempt")
 OUTSIDE = ("consumer", "correctness", "exempt")
 UNITS = ("bytes", "lines", "chars", "count")
-HOME_FORMS = ("limits", "file", "conf", "constant")
+# `policy:<key>` names a policy key its enforcer reads, on a family row alone (PLAY-dOrderedCharter-27).
+HOME_FORMS = ("limits", "file", "conf", "constant", "policy")
 FIELDS = ("name", "class", "unit", "enforcer", "home", "family", "research")
 # The optional fields, each with the value its absence means: `ships = false` marks a row whose
 # enforcer the deployer's registry exempts, so no install holds it (TOOL-dGroundRules-17).
@@ -113,7 +114,8 @@ def derive_census_rel():
 def read_cap_census(repo="."):
     """{name: Cap} for the census `repo` holds at this kit's own path, else this kit's own, in file
     order. A census that does not parse, a row lacking a field or carrying an unknown one, a class,
-    unit or home form outside its set, a `family` or OPTIONAL `ships` that is not a boolean, a shipped
+    unit or home form outside its set, a `family` or OPTIONAL `ships` that is not a boolean, a `policy:`
+    home on a row that is not a family (PLAY-dOrderedCharter-27), a shipped
     row lacking a SHIPPED field or a `ships = false` row carrying one, a reserved name, or a name twice
     is a Refusal naming the census and the row's line."""
     rel = derive_kit_rel()
@@ -140,6 +142,9 @@ def read_cap_census(repo="."):
                else f"home {row['home']!r} opens with none of {', '.join(HOME_FORMS)}"
                if str(row["home"]).partition(":")[0] not in HOME_FORMS
                else f"{bad} {flags[bad]!r} is not a boolean" if bad
+               else f"{row['name']}'s home {row['home']} is a policy key, which only a family row may name: "
+                    f"budgets.{row['name']} would be a second home for its value"
+               if str(row["home"]).startswith("policy:") and not flags["family"]
                else f"{row['name']} ships and lacks {', '.join(lacks)}" if lacks
                else f"{row['name']} has ships = false and carries {', '.join(where)}" if where and not flags["ships"]
                else f"{row['name']} shadows budgets.{row['name']}" if row["name"] in RESERVED

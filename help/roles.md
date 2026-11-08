@@ -46,6 +46,20 @@ block against its body ceiling: under `budgets.enforce = "warn"` an oversized bl
 `BUDGET WARN` note, and under `refuse` the render is refused. With no playbook kit installed, the
 render prints one `load-set — unarmed` note and proceeds.
 
+## The code input every role carries
+
+Every role's load set has a `code` slot, so a handoff can carry code ranges, the definitions with
+their callers, callees and tests, without any role file naming it. Pass a file with
+`--input code=<path>`: the handoff gains an `### input:code` block holding that file's text. Leave it
+out and the task opening names `input:code` among the optional inputs not supplied.
+
+The slot's budget is the policy key `memory.code-budget`, `16k` by default, which is 16,000 bytes;
+`python <prefix>/playbook/load_sets.py derive --reader role.<name>` prints it as
+`code — slot · budget 16000 · memory.code-budget default 16k`. A block over it obeys the size switch
+as the role block does: `BUDGET WARN · code · <bytes> bytes over code-slot <budget>` under `warn`, a
+refused render under `refuse` or with `code-slot` in `budgets.pinned`. A value that is not `<n>k`
+refuses the render, naming the key.
+
 ## How to use it
 
 - **Run an attended build:** after kickoff's READY card and the owner's go, invoke `/build`. It walks

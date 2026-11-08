@@ -13,7 +13,8 @@
 `render` fills the work-order template, `templates/work-order.template.md` in this kit, whose slots are
 `role`, `roles_lib.render_role`'s output, then a `### Drive` block holding the charter's drive lines for the
 role where it has any (PLAY-dOrderedCharter-6); `opening`; `reads`, a block per input the role's `reads`
-declares, in that order; and `charter-blocks`, `roles_lib.render_charter_blocks` for the role: the
+declares, in that order, then the optional `input:code` every role carries (PLAY-dOrderedCharter-27): the
+text of the file `--input code=` names, measured against `memory.code-budget` by the load-set check; and `charter-blocks`, `roles_lib.render_charter_blocks` for the role: the
 practice lines its `rules` tags cite and the charter's carried sections (TOOL-aOrientedCast-16),
 each library note printed on stderr as `handoff: note — `. A slot with nothing to fill leaves no line.
 It writes the file under the build's `prompts/` folder, printing its repo-relative path. `--part task` prints
@@ -97,8 +98,11 @@ import roles_lib as lib  # noqa: E402  (the kit's own library, beside this file)
 #: each render reads them off the kickoff checker's `--task-skeleton` and zips them with these
 #: (TOOL-aOrientedCast-15 S3), so the checker that grades a card is the one source of its labels.
 TASK_FIELDS = ("title", "goal", "in", "out", "todo", "reuse", "acceptance", "gates")
-INPUT_NAMES = ("spec", "diff", "question", "prompt")
-PATH_INPUTS = ("spec", "prompt")
+INPUT_NAMES = ("spec", "diff", "question", "prompt", "code")
+PATH_INPUTS = ("spec", "prompt", "code")
+#: Every role's `code` slot (PLAY-dOrderedCharter-27): derived for each role, never written into its `reads`,
+#: so its key is read as optional and the CLI admits it for any role; its block holds the file's text.
+CODE_INPUT = "code"
 PLACEHOLDERS = ("…", "...", "tbd", "todo", "n/a", "none", "-", "?")
 KICKOFF_HOME, KICKOFF_CHECKER = "session-kickoff", "manifest-check.sh"
 CHECKER_BOUND_S = 30
@@ -359,9 +363,21 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     build_dir = root / memory_root / "builds" / slug
     if not build_dir.is_dir():
         raise lib.RolesError("the build folder %s does not exist" % build_dir.as_posix())
-    # PLAY-dOrderedCharter-11 S4: the role's load set and its block's budget, before anything is read
+    values = {}
+    for name, v in inputs.items():
+        if name in PATH_INPUTS and v:
+            p = pathlib.Path(os.path.normpath(root / v))
+            if root not in p.parents or not p.is_file():
+                raise lib.RolesError("input:%s — %s names no file inside the repository" % (name, v))
+            # the code block holds the file's text, since its ranges are the payload; spec and prompt the path
+            v = lib.load_text(p) if name == CODE_INPUT else p.relative_to(root).as_posix()
+        values["input:" + name] = v.replace("\r\n", "\n")
+    # PLAY-dOrderedCharter-11 S4: the role's load set and its block's budget, before any card or brief is read;
+    # a supplied code block is measured beside it, CR stripped (PLAY-dOrderedCharter-27 S4)
     role_text = lib.render_role(KIT_DIR, role, memory_root)
-    refused, gate = lib.check_load_set(root, KIT_DIR, [(role, len(role_text.encode("utf-8")))])
+    code = values.get("input:" + CODE_INPUT)
+    refused, gate = lib.check_load_set(root, KIT_DIR, [(role, len(role_text.encode("utf-8")))],
+                                       [(CODE_INPUT, len(code.replace("\r", "").encode("utf-8")))] if code else [])
     if refused:
         raise lib.RolesError("\n".join(gate))
     missing = [ln for ln in gate if ln.startswith("Missing required unit:")]
@@ -377,15 +393,10 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
             raise lib.RolesError("no --unit, and %s/README.md names no ids: in its front matter"
                                  % build_dir.as_posix())
         unit_id = ids.group(1)
-    values, refusals = {}, []
-    for name, v in inputs.items():
-        if name in PATH_INPUTS and v:
-            p = pathlib.Path(os.path.normpath(root / v))
-            if root not in p.parents or not p.is_file():
-                raise lib.RolesError("input:%s — %s names no file inside the repository" % (name, v))
-            v = p.relative_to(root).as_posix()
-        values["input:" + name] = v.replace("\r\n", "\n")
+    refusals = []
     reads = [x.strip() for x in keys.get("reads", "").split(",") if x.strip()]
+    if not any(k.rstrip("?") == "input:" + CODE_INPUT for k in reads):
+        reads.append("input:%s?" % CODE_INPUT)  # the derived optional key every role carries
     card = brief = None
     why, labels = {}, {}
     if any(k.startswith("task:") for k in reads):
@@ -1090,7 +1101,7 @@ def main(argv):
         keys = roles[a.role]["keys"]
         read = {x.strip().rstrip("?") for x in keys.get("reads", "").split(",")}
         for name in inputs:
-            if name != "prompt" and "input:" + name not in read:
+            if name not in ("prompt", CODE_INPUT) and "input:" + name not in read:
                 ap.error("input:%s is a key %s does not read" % (name, a.role))
         prompts = root / memory_root / "builds" / a.build / "prompts"
         out = a.out and pathlib.Path(os.path.normpath(root / a.out))
