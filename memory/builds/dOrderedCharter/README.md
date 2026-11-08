@@ -147,7 +147,7 @@ ids PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY
 | [PLAY-dOrderedCharter-68 — the tag index reads Markdown through the one fence reader and reports an unclosed fence](spec/2026-11-05-spec-PLAY-dOrderedCharter-68.md) | 17 | 2 | CLOSED | rev-1 | 2026-11-08 |
 | [PLAY-dOrderedCharter-69 — a playbook fixture sets the caller's git variables aside before its first git call](spec/2026-11-05-spec-PLAY-dOrderedCharter-69.md) | 17 | 2 | CLOSED | rev-1 | 2026-11-08 |
 | [PLAY-dOrderedCharter-70 — the closing diff review's mediums and low, batched](spec/2026-11-05-spec-PLAY-dOrderedCharter-70.md) | 17 | 2 | CLOSED | rev-1 | 2026-11-08 |
-| [PLAY-dOrderedCharter-71 — the adopter-name ban reads only the roles an adopter receives](spec/2026-11-08-spec-PLAY-dOrderedCharter-71.md) | 17 | 2 | DEFERRED | rev-1 | 2026-11-08 |
+| [PLAY-dOrderedCharter-71 — the adopter-name ban reads only the roles an adopter receives](spec/2026-11-08-spec-PLAY-dOrderedCharter-71.md) | 17 | 2 | DEFERRED | rev-2 | 2026-11-08 |
 | [PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them](spec/2026-10-23-spec-PLAY-dOrderedCharter-3.md) | 18 | 2 | DEFERRED | rev-9 | 2026-11-04 |
 | [PLAY-dOrderedCharter-41 — the `cross-os` block stays live, so every v4 template renders after the practice catalogue lands](spec/2026-10-24-spec-PLAY-dOrderedCharter-41.md) | 18 | 2 | DEFERRED | rev-5 | 2026-11-04 |
 | [PLAY-dOrderedCharter-52 — the TOML-table merge envelope is total: every base, ours and theirs state has a row, and an unlisted one is a conflict](spec/2026-10-24-spec-PLAY-dOrderedCharter-52.md) | 18 | 2 | DEFERRED | rev-2 | 2026-11-04 |
@@ -210,7 +210,7 @@ Coverage of dOrderedCharter's 37 clause(s) and 30 owned node(s), over 64 spec(s)
   `spec/2026-10-24-spec-PLAY-dOrderedCharter-50.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-PLAY-dOrderedCharter-51.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-PLAY-dOrderedCharter-52.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-PLAY-dOrderedCharter-53.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-24-spec-PLAY-dOrderedCharter-54.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md` (PLAY-dClosedLoop-2), `spec/2026-11-02-spec-PLAY-dOrderedCharter-61.md` (PLAY-dClosedLoop-2), `spec/2026-11-03-spec-PLAY-dOrderedCharter-62.md` (PLAY-dClosedLoop-2),
   `spec/2026-11-03-spec-PLAY-dOrderedCharter-63.md` (PLAY-dClosedLoop-2), `spec/2026-11-04-spec-PLAY-dOrderedCharter-64.md` (PLAY-dClosedLoop-2), `spec/2026-11-04-spec-PLAY-dOrderedCharter-65.md` (PLAY-dClosedLoop-2), `spec/2026-11-05-spec-PLAY-dOrderedCharter-67.md` (PLAY-dClosedLoop-2),
-  `spec/2026-11-05-spec-PLAY-dOrderedCharter-68.md` (PLAY-dClosedLoop-2), `spec/2026-11-05-spec-PLAY-dOrderedCharter-69.md` (PLAY-dClosedLoop-2), `spec/2026-11-05-spec-PLAY-dOrderedCharter-70.md` (PLAY-dClosedLoop-2)
+  `spec/2026-11-05-spec-PLAY-dOrderedCharter-68.md` (PLAY-dClosedLoop-2), `spec/2026-11-05-spec-PLAY-dOrderedCharter-69.md` (PLAY-dClosedLoop-2), `spec/2026-11-05-spec-PLAY-dOrderedCharter-70.md` (PLAY-dClosedLoop-2), `spec/2026-11-08-spec-PLAY-dOrderedCharter-71.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0033, cl-dClosedLoop-0034, cl-dClosedLoop-0035, cl-dClosedLoop-0038, cl-dClosedLoop-0042, cl-dClosedLoop-0043, cl-dClosedLoop-0044, cl-dClosedLoop-0050, cl-dClosedLoop-0051, cl-dClosedLoop-0067
 <!-- /gen:build-coverage -->
 

@@ -1,6 +1,8 @@
 # PLAY-dOrderedCharter-71 — the adopter-name ban reads only the roles an adopter receives
 
-**Status:** DEFERRED · rev-1 · 2026-11-08 · node d · Tier-2 · base 9f41230b5 · streams tooling · order 17 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-11-08 · node d · Tier-2 · base 9f41230b5 · streams tooling · order 17 · advances PLAY-dOrderedCharter-38
+
+**Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
@@ -30,7 +32,8 @@ Every line below was read at base `9f41230b5`. The Design section holds what a o
   source that another surviving row ships under a role in that set stays in it. Observed by AC1 and AC2.
 - **S2** — The ban's comment states why the population reads that set, and its DOES NOT CHECK line names the two
   things it now leaves unread. The sentence saying an adopter receives a `project-owned` seed as surely as an engine
-  is replaced. Observed by AC3.
+  is replaced. The header comment of `tools/govkit/adopters.toml` says the ban reads every file
+  `govkit.py shipped --epoch` lists, where it says `govkit.py shipped`. Observed by AC3.
   **Readers:** by name: `tools/govkit/govkit.py` alone spells the sentence. by value: NO VALUE READERS — a comment
   carries no value any reader compares, counts or derives from.
 - **S3** — One arm in `tools/govkit/selftest.py`, beside unit 70's source-rows arm in the `gcopy` block. A
@@ -182,6 +185,7 @@ green before any arm is provoked, which reads the same arm over a copy of this t
 ### Files touched (estimate)
 
 - `tools/govkit/govkit.py`: S1, S2
+- `tools/govkit/adopters.toml`: S2
 - `tools/govkit/selftest.py`: S3
 - `tools/memory-tree/merge-rows.py`: S4
 - `tools/run-gates/owed_rows.py`: S5
@@ -263,6 +267,8 @@ none
 
 - rev-1 · 2026-11-08 · initial draft, by `2026-11-08-prompt-PLAY-dOrderedCharter-71-repair-brief`, every line read at
   `9f41230b5`.
+- rev-2 · 2026-11-08 · S2 · §4 · added the `**Derived:**` binding line its siblings carry, and the
+  correction of `tools/govkit/adopters.toml`'s header comment to S2 and Files touched, the builder's finding.
 
 ## 10. Reuse audit
 
