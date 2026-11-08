@@ -55,6 +55,17 @@ renders on several surfaces, either one arm reads each, or the scope item names 
 criterion reads and says the others are unobserved. Each new arm counts what it reads before grading
 it, so a run that rendered nothing is red rather than vacuously green.
 
+**Checklist lines, from dOrderedCharter's closing diff review (PLAY-dOrderedCharter-70).**
+
+- A fixture must not pre-satisfy the condition its arm exists to catch: a fixture that already
+  claims every leg cannot observe an unclaimed one.
+- A rewrite turning a "hit" into a "miss" keeps an arm that still reaches the branch: the
+  rewritten line reads green whether or not the branch runs.
+- A plant asserts the message of the arm it names, never a shared failure string, or deleting the
+  check it names stays green.
+- An arm's label names only the state its setup creates: "with no recall kit" holds only where the
+  setup removed that kit.
+
 ## Related
 
 [[criterion-asserts-what-its-own-command-cannot-show]] is the criterion-level sibling: there the

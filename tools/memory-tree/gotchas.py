@@ -1147,8 +1147,21 @@ def cmd_selftest() -> int:
         # PLAY-dOrderedCharter-17 AC2: check 18's grammar is this kit's own, so a tree with no recall
         # kit still resolves ids — an undefined decision reds by name, and nothing is announced absent.
         tn, cn = build_tree("inv-norecall", {"n.md": build_invariant("n", decision="ARCH-tNone-9")})
+        # PLAY-dOrderedCharter-70 S18: run from a COPY of this kit with no memory-recall sibling, so an import that
+        # regains the recall kit fails here rather than resolving against the real install beside this file.
+        import shutil
+        kit_copy = os.path.join(tn, "tools", "memory-tree")
+        # the whole kit, not its *.py alone: corpus_ids asks check-memory-hygiene.sh for its sets
+        shutil.copytree(os.path.dirname(os.path.abspath(__file__)), kit_copy,
+                        ignore=shutil.ignore_patterns("__pycache__"))
+
+        def run_kit_copy():
+            p = subprocess.run([sys.executable, os.path.join(kit_copy, "gotchas.py"), "--check"], cwd=tn,
+                               capture_output=True, text=True, encoding="utf-8")
+            print(p.stdout + p.stderr, end="")
+            return p.returncode
         arm("with no recall kit, check 18 reds an undefined decision by name", "names decision ARCH-tNone-9, "
-            "which no record in this corpus defines", lambda: cmd_check(tn, cn))
+            "which no record in this corpus defines", run_kit_copy)
         arm("...and announces no grammar kit absent", "[rc=0]",
             lambda: 0 if load_defined_ids(tn)[1] is None else 1)
 

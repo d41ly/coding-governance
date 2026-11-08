@@ -1043,7 +1043,7 @@ check_card_citations() {
   else
     py=$(resolve_python) || { echo "MANIFEST env ERROR — no usable python launcher for the id reader $reader, so the defined-id set is unknown rather than empty; resolve_python's refusal above names every candidate it ran, and GOV_PYTHON=<launcher> is the override"; exit 2; }
     "$py" "$reader" --print-defined-ids > "$CARD_TMP/idout" 2>&1; st=$?
-    # Exit 3 is the reader's NAMED degradation — memory-tree installed without memory-recall, so
+    # Exit 3 is the reader's NAMED degradation — memory-tree installed without its id_grammar.py, so
     # no grammar and no set — and it lands on the same branch as "no reader": paths are still
     # judged and the append proceeds. Every other non-zero status is a reader that could not answer.
     if [ "$st" = 3 ]; then

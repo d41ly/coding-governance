@@ -963,6 +963,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "arm_cmd_source",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_command_for_all",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -1038,6 +1043,11 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "arm_instruction_unit",
+      "kind": "function",
+      "file": "tools/playbook/core.py"
+    },
+    {
       "id": "arm_keeps",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -1078,7 +1088,17 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "arm_merge_cut",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "arm_merge_edit",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "arm_merge_moved",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
     },
@@ -1099,6 +1119,16 @@
     },
     {
       "id": "arm_merge_same_add",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "arm_merge_unterminated",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "arm_merge_written",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
     },
@@ -1239,6 +1269,11 @@
     },
     {
       "id": "arm_retired_rows",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "arm_root_prefix",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
     },
@@ -4888,6 +4923,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "check_failed_merge",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "check_families",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -6461,6 +6501,11 @@
       "id": "check_source_mode",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_source_rows",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "check_sp_value",
@@ -8283,6 +8328,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "derive_conf_key",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "derive_conf_rel",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -9971,6 +10021,11 @@
       "id": "derive_tool_class",
       "kind": "function",
       "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "derive_tool_rel",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "derive_tool_root",
@@ -29566,6 +29621,11 @@
       "id": "write_edit",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "write_empty_lists",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "write_entry_file",

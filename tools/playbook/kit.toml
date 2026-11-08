@@ -33,6 +33,14 @@ to = "{prefix}/playbook/{relpath}"
 # install. These are `root_relative` rules pointing at the REAL files rather than copies, so there is
 # one source of truth and nothing to keep in step; gov itself has no copy beside the engine and reads
 # its own tree, which is the fall-through `declaration_paths()` documents.
+# GOV'S OWN LISTS STAY HOME (PLAY-dOrderedCharter-70 S10). The positional lists, the core's pending list and
+# the legacy list name gov's own files and records, so no adopter receives them. The write mode writes an
+# empty `positional-refs.txt` and `core-pending.txt` where a target lacks them, since an absent list is a
+# red; the other two read absent as empty.
+[[files]]
+include = ["positional-refs.txt", "positional-producers.txt", "core-pending.txt", "instructions-legacy.txt"]
+role = "project-owned"
+
 [[files]]
 include = ["{prefix}/govkit/entries/playbook.kit.toml"]
 root_relative = true
@@ -55,10 +63,11 @@ mutates_index = false
 # stale, the check redded and `update` rolled the kit back (GOVKIT_RERENDER on or off: there was no
 # block to run) -- at every adopter, on every renderer change. This kit ships no `rendered` ROW,
 # which is why the 3b-ii arm never asked it for one. The argv is the adopter's own write mode, which re-renders the gov:playbook region whatever it held.
-# `writes` names the default charter so a rollback restores it.
+# `writes` names the default charter and the lock row the same render writes beside it, so a rollback
+# restores both (PLAY-dOrderedCharter-70 S9).
 [[regenerate]]
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", "."]
-writes = ["AGENTS.md"]
+writes = ["AGENTS.md", ".governance/instructions.lock"]
 # Staged for the bar (TOOL-aPrimedIndex-1): run-gates' regen.py re-renders this before a bar
 # and proves it fresh with this kit's [check] argv; stage 1 is a render from a kit template.
 stage = 1

@@ -264,7 +264,8 @@ fail=0
 # 388 + 339 -> 401, TOOL-aSparedSpawn-34, the merge of local main: base 326, plus 62 and 13.
 # 401 -> 405, TOOL-dRedressedBar-24 S9: arm 9e2's four, outside the `HAVE_TIMEOUT` gate, counted off the arm.
 # 405 -> 407, PLAY-dOrderedCharter-50: arm 1a's `enforces` control and arm 1a-owed, neither gated.
-FLOOR_ASSERTIONS=407
+# 407 -> 410, PLAY-dOrderedCharter-70 S13: arm 13g's `filled` line and arm 13h's two, neither gated.
+FLOOR_ASSERTIONS=410
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -4049,10 +4050,17 @@ run_sc_bar GATE_SELFTESTS=1
 printf '#!/usr/bin/env bash\nexit 0\n' > "$SCR/ky/extra.sh"; write_sc_commit "a ky file no kit ships"
 run_sc_bar GATE_SELFTESTS=changed
 check_sc_line "AC6 control: with govkit reachable an unshipped ky file holds ky" '^GATE held  ky suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+check_sc_line "PLAY-dOrderedCharter-70 S13 a reachable govkit fills the deployer slot" '^run-gates: selftests changed: slot point.flow.version · filled$'
 run_sc_bar GATE_SELFTESTS=changed GOVKIT_STUB_OFF=1
 check_sc_value "AC6 the unreachable line prints once" "$(printf '%s\n' "$SC_OUT" | grep -c '^run-gates: selftests changed: govkit is not reachable .*, so every held leg selects by its guard plus its suite file$')" 1
 check_sc_line "AC6 ky selects by its guard" '^run-gates: selftests changed: ky suite runs \(ky/extra.sh moved since [0-9a-f]{8}\)$'
 check_sc_line "AC6 kx is held on diff evidence" '^GATE held  kx suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+# 13h. PLAY-dOrderedCharter-70 S13 — the stub hidden, so the resolver raises LookupError: the slot reads
+#      not-installed, and the not-reachable line follows it.
+mv "$SCR/${KIT_REL%/*}/$GK/govkit.py" "$SC/govkit.py.hidden"
+run_sc_bar GATE_SELFTESTS=changed
+check_sc_line "S13 a govkit no resolver finds reads the slot not-installed" '^run-gates: selftests changed: slot point.flow.version · not-installed: '
+check_sc_value "S13 ...and the not-reachable line follows it" "$(printf '%s\n' "$SC_OUT" | grep -A1 '^run-gates: selftests changed: slot point.flow.version · not-installed: ' | sed -n 2p | grep -c '^run-gates: selftests changed: govkit is not reachable ')" 1
 rm -rf "$SC" 2>/dev/null || true
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }

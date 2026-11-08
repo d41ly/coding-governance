@@ -392,9 +392,9 @@ upgraded bar; the grace announces itself on every run.
 
 Checks 13-15 live in `tools/memory-tree/corpus_ids.py` and are DISABLED when their pins are blank.
 Every pin is MEASURED against the adopting corpus (`corpus_ids.py --measure`), never inherited: a pin
-copied from a larger tree is either vacuous or permanently red. The id grammar comes from the
-memory-recall kit, so arming these checks requires that kit — with the pins blank it is never
-imported, and with a pin set and the kit absent the failure is NAMED, not a traceback.
+copied from a larger tree is either vacuous or permanently red. The id grammar comes from this
+kit's own `id_grammar.py`, so arming these checks requires that file — with the pins blank it is never
+imported, and with a pin set and the file absent the failure is NAMED, not a traceback.
 
 17. **catalogue index freshness** — `gotchas/INDEX.md` byte-matches a fresh render.
 18. **a class declares its resolution** — every `kind: class` record names a gate or says in as many
@@ -522,7 +522,7 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     HEAD carries is classified BY LINEAGE and never by a parent's tip — a straggler that pulled the
     new conf early has a builds-mode tip and shards-mode content — and each row it changed owes
     exactly ONE `RELOCATED` provenance row naming the id and the change commit. Delegated to
-    `transition_audit.py`, which owns the walk, and keyed through the memory-recall kit's anchor
+    `transition_audit.py`, which owns the walk, and keyed through this kit's `id_grammar.py` anchor
     grammar, so no second row grammar is spelled here. LIVE ONLY WHEN `BACKLOG_MODE` IS `builds`: on a
     shards-mode tree it prints that it is DORMANT and why, because a silent zero there reads exactly
     like a clean audit. Three DEAD PROBE refusals guard it — a shallow repository, a history whose
@@ -544,17 +544,17 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
 
 27. **a new record that RESTATES an older one names it** — every decision row and every gotcha whose
     identity is absent at the mainline merge-base is ranked against the records present there, with
-    the memory-recall kit's own index builder over each record's summary (a row's text after its id,
+    the index builder of this kit's `id_grammar.py` over each record's summary (a row's text after its id,
     a gotcha's `description`). A top hit that reaches `NEAR_MATCH_GATE`'s floor in Jaccard similarity
     AND shares a term of four or more characters is a NEAR MATCH, and the new record must name the
-    hit, name a successor the recall kit's superseded-by map holds for it, or carry `supersedes`,
+    hit, name a successor `id_grammar.py`'s superseded-by map holds for it, or carry `supersedes`,
     `coexists-with` or `disputes`. It obliges a relation and never judges one. A hit that is a row of
     the new row's own session slug is counted and not graded. Delegated to `row_grammar.py`, which
     owns the row grammar; full runs only, because it reads a commit range. `red:<floor>` fails the
     leg, `warn:<floor>` prints `WARN` lines and passes, BLANK is NOT ARMED and says so on every run,
     and the kit ships it blank: a floor measured on another corpus is not a floor for yours, so
     measure your own with `row_grammar.py --measure-relations <floor>` before arming it. An armed
-    run with no mainline base, or with no memory-recall kit installed, is a named refusal. Every
+    run with no mainline base, or with no `id_grammar.py` beside `row_grammar.py`, is a named refusal. Every
     armed run prints one summary line with its counts, red or green.
     NOT GRADED, and said out loud: a near match below the TOP hit; a paraphrase under the floor; a
     bare relation token that names no record; a row edited in place, since the added set is decided

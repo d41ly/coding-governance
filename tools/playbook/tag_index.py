@@ -10,7 +10,7 @@ rebuild. Its tables, keyed by blob or by path and blob so a later build can add 
 
   tree_path(tree, path, blob)                               the paths a built tree holds
   blob_row(blob, extractor, version, tag, kind, line, end_line, text)  what a blob holds, at any path
-  path_row(path, blob, extractor, version, tag, kind, line)  what a path names, a citation among them
+  path_row(path, blob, extractor, version, conf, tag, kind, line)  what a path names under one conf
   dirty_path(worktree, path, blob)                           a worktree's uncommitted edits to tracked files
   tree_built(tree, versions, built_at)                       the freshness key of a tree
   blob_parsed(blob, extractor, version)                      the freshness key of a blob (PLAY-dOrderedCharter-44)
@@ -27,8 +27,13 @@ can carry different extractor bytes, so a build never deletes a row of another v
 versions of one extractor over one blob sit side by side. A worktree's `{extractor: version}` map is its
 own, and every read is joined to it through the temp table `view_version`, so a worktree is served only
 rows its own extractor bytes wrote. A tree is fresh under `tree_built(tree, versions)`, `versions` the
-digest of that map (`derive_versions_digest`). `gov_tag.py --gc` collects the versions no live worktree
-derives; a plain build collects none.
+digest of that map and of the conf key (`derive_versions_digest`). `gov_tag.py --gc` collects the versions
+and conf keys no live worktree derives; a plain build collects none.
+
+THE CONF KEYS WHAT A PATH NAMES (PLAY-dOrderedCharter-70 S8). `MEMORY_ROOT` and `CHARTER` decide which
+path is `doc.charter` and which are guides, so `derive_conf_key` folds both into `path_row`'s `conf`, into
+the freshness digest, and into every read through the temp table `view_conf`: a conf edit, committed or
+not, is served the names its own conf gives. `blob_row` is keyed by text alone and needs no key.
 
 AN EXTRACTOR'S VERSION is derived, never typed: the first 12 hex of the SHA-256 of the bytes of the module
 file defining it. An extractor that imports a helper from another module does not see that helper's
@@ -75,8 +80,8 @@ CREATE INDEX IF NOT EXISTS tree_path_blob ON tree_path(blob);
 CREATE TABLE IF NOT EXISTS blob_row(blob TEXT, extractor TEXT, version TEXT NOT NULL, tag TEXT, kind TEXT,
                                     line INTEGER, end_line INTEGER, text TEXT);
 CREATE INDEX IF NOT EXISTS blob_row_key ON blob_row(blob, extractor, version);
-CREATE TABLE IF NOT EXISTS path_row(path TEXT, blob TEXT, extractor TEXT, version TEXT NOT NULL, tag TEXT,
-                                    kind TEXT, line INTEGER);
+CREATE TABLE IF NOT EXISTS path_row(path TEXT, blob TEXT, extractor TEXT, version TEXT NOT NULL,
+                                    conf TEXT NOT NULL, tag TEXT, kind TEXT, line INTEGER);
 CREATE INDEX IF NOT EXISTS path_row_key ON path_row(path, blob);
 CREATE INDEX IF NOT EXISTS path_row_tag ON path_row(tag);
 CREATE TABLE IF NOT EXISTS dirty_path(worktree TEXT, path TEXT, blob TEXT, PRIMARY KEY(worktree, path));
@@ -86,7 +91,7 @@ CREATE TABLE IF NOT EXISTS blob_parsed(blob TEXT NOT NULL, extractor TEXT NOT NU
                                        PRIMARY KEY(blob, extractor, version));
 """
 #: the index file's `PRAGMA user_version`; a file stamped otherwise is rebuilt from nothing
-INDEX_SCHEMA = 2
+INDEX_SCHEMA = 3
 #: SQLite's busy timeout, seconds: a second writer waits this long on the first, then the verb exits 2.
 BUSY_TIMEOUT = 60
 
@@ -171,10 +176,15 @@ def derive_extractor_versions(namespaces, registry_dir) -> dict:
     return out
 
 
-def derive_versions_digest(versions) -> str:
-    """The first 12 hex of the SHA-256 of a map's `extractor=version` pairs, sorted and joined by newlines:
-    the `versions` key of `tree_built` (PLAY-dOrderedCharter-51 S4)."""
-    text = "\n".join(sorted(f"{e}={v}" for e, v in versions.items()))
+def derive_conf_key(memory_root, charter) -> str:
+    """The first 12 hex of the SHA-256 of the conf's MEMORY_ROOT and CHARTER: `path_row`'s `conf` key."""
+    return hashlib.sha256(f"{memory_root}\n{charter}".encode("utf-8")).hexdigest()[:12]
+
+
+def derive_versions_digest(versions, conf) -> str:
+    """The first 12 hex of the SHA-256 of a map's `extractor=version` pairs, sorted and joined by newlines,
+    then a `conf=<key>` line: the `versions` key of `tree_built` (PLAY-dOrderedCharter-51 S4, -70 S8)."""
+    text = "\n".join(sorted(f"{e}={v}" for e, v in versions.items())) + f"\nconf={conf}"
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:12]
 
 
@@ -248,26 +258,42 @@ def extract_doc(ctx, path, text=None):
 UNIT_EXTRACTORS = ("instruction_units:extract_unit", "instruction_units:extract_repo")
 
 
+TOML_TAG_KEY = re.compile(r"^\s*tag\s*=")
+
+
 def read_toml_tags(text, table):
-    """(value, line) for each `[[table]]` row's string `tag` in TOML `text`, unfiltered: the shape
-    check, never the extractor, refuses a malformed value. A file that does not parse names nothing."""
+    """(value, line, end_line) for each `[[table]]` row's string `tag` in TOML `text`, unfiltered: the shape
+    check, never the extractor, refuses a malformed value. The nth parsed row is the nth `[[table]]` header,
+    `line` the first `tag =` key line inside its span and `end_line` the span's last non-blank line before the
+    next `[` header (PLAY-dOrderedCharter-70 S3). Where the header count is not the row count, a header inside
+    a multi-line string say, each row keeps line 1. A file that does not parse names nothing."""
     try:
         rows = tomllib.loads(text).get(table) or []
     except tomllib.TOMLDecodeError:
         return []
     lines = text.splitlines()
+    heads = [i for i, ln in enumerate(lines, 1) if ln.strip() == f"[[{table}]]"]
+    cuts = [i for i, ln in enumerate(lines, 1) if ln.lstrip().startswith("[")] + [len(lines) + 1]
     out = []
-    for row in rows:
+    for k, row in enumerate(rows):
         val = row.get("tag") if isinstance(row, dict) else None
-        if isinstance(val, str) and val:
-            n = next((i for i, ln in enumerate(lines, 1) if f'"{val}"' in ln), 1)
-            out.append((val, n))
+        if not (isinstance(val, str) and val):
+            continue
+        if len(heads) != len(rows):
+            out.append((val, 1, 1))
+            continue
+        span = range(heads[k] + 1, next(c for c in cuts if c > heads[k]))
+        line = next((i for i in span if TOML_TAG_KEY.match(lines[i - 1])), heads[k])
+        end = max((i for i in span if lines[i - 1].strip()), default=line)
+        out.append((val, line, max(end, line)))
     return out
 
 
 def derive_tag_rows(text, table):
+    """Each row's tag, its `tag =` line through its span's end, and that text, as `extract_doc` serves a section."""
     lines = text.splitlines()
-    return [(val, "tag", n, n, lines[n - 1] if lines else "") for val, n in read_toml_tags(text, table)]
+    return [(val, "tag", n, end, "\n".join(lines[n - 1:end]) if lines else "")
+            for val, n, end in read_toml_tags(text, table)]
 
 
 def _read_kit_file(ctx, path, name):
@@ -455,16 +481,19 @@ def derive_context(root, registry) -> dict:
     # validate before splice: a word outside `seg` reaches no LIKE pattern and no word set, only a red
     namespaces = [r for r in rows if SEG_RE.fullmatch(r["ns"])]
     versions = derive_extractor_versions(namespaces, pathlib.Path(registry).parent)
+    memory_root, charter = (conf.get("MEMORY_ROOT") or "memory").strip("/"), conf.get("CHARTER") or "AGENTS.md"
+    key = derive_conf_key(memory_root, charter)
     return {
         "root": pathlib.Path(root),
-        "memory_root": (conf.get("MEMORY_ROOT") or "memory").strip("/"),
-        "charter": conf.get("CHARTER") or "AGENTS.md",
+        "memory_root": memory_root,
+        "charter": charter,
+        "conf": key,
         "kit": pathlib.Path(os.path.relpath(pathlib.Path(registry).parent, root)).as_posix(),
         "registry": pathlib.Path(os.path.relpath(registry, root)).as_posix(),
         "malformed": [r["ns"] for r in rows if not SEG_RE.fullmatch(r["ns"])],
         "namespaces": namespaces,
         "versions": versions,
-        "digest": derive_versions_digest(versions),
+        "digest": derive_versions_digest(versions, key),
         "extractors": load_extractors(namespaces, pathlib.Path(registry).parent),
         "worktree": read_git(root, "rev-parse", "--show-toplevel").strip(),
     }
@@ -501,19 +530,19 @@ def _write_parsed(con, ctx, blobs: dict, read_text, stats) -> None:
     stats["parsed"] += len(todo)
 
 
-def _write_path_rows(con, pairs, versions) -> None:
+def _write_path_rows(con, pairs, versions, conf) -> None:
     """Name every (path, blob, extractor, name) no `parsed` path row of the extractor's version in
-    `versions` holds, from its blob's rows of that version."""
+    `versions` and of the conf key `conf` holds, from its blob's rows of that version."""
     for path, blob, ex, name in pairs:
         v = versions[ex]
-        if con.execute("SELECT 1 FROM path_row WHERE path=? AND blob=? AND extractor=? AND version=? "
-                       "AND kind='parsed'", (path, blob, ex, v)).fetchone():
+        if con.execute("SELECT 1 FROM path_row WHERE path=? AND blob=? AND extractor=? AND version=? AND conf=? "
+                       "AND kind='parsed'", (path, blob, ex, v, conf)).fetchone():
             continue
         rows = con.execute("SELECT tag, kind, line FROM blob_row WHERE blob=? AND extractor=? AND version=?",
                            (blob, ex, v)).fetchall()
-        con.executemany("INSERT INTO path_row VALUES (?,?,?,?,?,?,?)",
-                        [(path, blob, ex, v, name + tag if (tag == "" or tag.startswith("#")) else tag, kind, line)
-                         for tag, kind, line in rows] + [(path, blob, ex, v, "", "parsed", 0)])
+        con.executemany("INSERT INTO path_row VALUES (?,?,?,?,?,?,?,?)",
+                        [(path, blob, ex, v, conf, name + tag if (tag == "" or tag.startswith("#")) else tag, kind,
+                          line) for tag, kind, line in rows] + [(path, blob, ex, v, conf, "", "parsed", 0)])
 
 
 def _derive_applicable(ctx, entries):
@@ -559,7 +588,7 @@ def build_index(root, tree, ctx, con, stats) -> None:
             con.execute("DELETE FROM tree_path WHERE tree=?", (tree,))
             con.executemany("INSERT INTO tree_path VALUES (?,?,?)", [(tree, p, b) for p, b in entries])
             _write_parsed(con, ctx, blobs, read_text, stats)
-            _write_path_rows(con, pairs, ctx["versions"])
+            _write_path_rows(con, pairs, ctx["versions"], ctx["conf"])
             con.execute("INSERT OR REPLACE INTO tree_built VALUES (?,?,?)", (tree, ctx["digest"], time.time()))
             remove_unheld_rows(con, root, keep={tree})
     except sqlite3.OperationalError as exc:
@@ -606,7 +635,8 @@ def build_overlay(root, ctx, con, stats) -> None:
     """Record this worktree's uncommitted edits to tracked files as its own `dirty_path` rows, a deleted
     file as blob "", replacing the rows it held. Counts into `stats`."""
     wt = ctx["worktree"]
-    changed = [p for p in read_git(root, "diff", "--name-only", "-z", "HEAD").split("\0") if p]
+    # --no-renames: a staged rename is its old path deleted and its new one added (PLAY-dOrderedCharter-70 S7)
+    changed = [p for p in read_git(root, "diff", "--name-only", "--no-renames", "-z", "HEAD").split("\0") if p]
     entries = []
     for path in changed:
         f = pathlib.Path(root) / path
@@ -632,17 +662,18 @@ def build_overlay(root, ctx, con, stats) -> None:
             con.execute("DELETE FROM dirty_path WHERE worktree=?", (wt,))
             con.executemany("INSERT INTO dirty_path VALUES (?,?,?)", [(wt, p, b) for p, b in entries])
             _write_parsed(con, ctx, blobs, read_text, stats)
-            _write_path_rows(con, pairs, ctx["versions"])
+            _write_path_rows(con, pairs, ctx["versions"], ctx["conf"])
     except sqlite3.OperationalError as exc:
         raise TagError(f"the tag index is locked or unwritable: {exc}") from None
 
 
-def read_live_versions(root, kit_rel) -> tuple[set, set]:
-    """(every (extractor, version) pair, every `versions` digest) a live worktree derives: each worktree
-    `git worktree list` names, its map from its own registry and module files under `kit_rel`. A worktree
-    whose registry or a module cannot be read refuses, naming it, rather than having its versions
-    collected (PLAY-dOrderedCharter-51 S5)."""
-    pairs, digests = set(), set()
+def read_live_versions(root, kit_rel) -> tuple[set, set, set]:
+    """(every (extractor, version) pair, every `versions` digest, every conf key) a live worktree derives:
+    each worktree `git worktree list` names, its map from its own registry and module files under `kit_rel`
+    and its key from its own conf. A worktree whose registry or a module cannot be read refuses, naming it,
+    rather than having its versions collected (PLAY-dOrderedCharter-51 S5)."""
+    _tree_lib, id_grammar = load_memory_tree()
+    pairs, digests, keys = set(), set(), set()
     for top in sorted(read_worktree_trees(root)[1]):
         registry = pathlib.Path(top) / kit_rel / "namespaces.toml"
         try:
@@ -650,16 +681,19 @@ def read_live_versions(root, kit_rel) -> tuple[set, set]:
             versions = derive_extractor_versions(rows, registry.parent)
         except TagError as exc:
             raise TagError(f"--gc: worktree {top} cannot be read, so nothing is collected: {exc}") from None
+        conf = id_grammar.load_conf(pathlib.Path(top))
+        key = derive_conf_key((conf.get("MEMORY_ROOT") or "memory").strip("/"), conf.get("CHARTER") or "AGENTS.md")
         pairs |= set(versions.items())
-        digests.add(derive_versions_digest(versions))
-    return pairs, digests
+        digests.add(derive_versions_digest(versions, key))
+        keys.add(key)
+    return pairs, digests, keys
 
 
 def remove_dead_versions(con, root, kit_rel) -> tuple[int, int]:
     """`--gc` (PLAY-dOrderedCharter-51 S5): delete the blob, path and `blob_parsed` rows of every (extractor,
     version) pair no live worktree derives and the `tree_built` rows of every digest none does, then the
     rows no live tree or worktree holds, as a build's sweep does. -> (rows, versions) collected."""
-    live, digests = read_live_versions(root, kit_rel)
+    live, digests, keys = read_live_versions(root, kit_rel)
     rows = 0
     try:
         with con:
@@ -668,6 +702,9 @@ def remove_dead_versions(con, root, kit_rel) -> tuple[int, int]:
             for ex, ver in dead:
                 for table in ("blob_row", "path_row", "blob_parsed"):
                     rows += con.execute(f"DELETE FROM {table} WHERE extractor=? AND version=?", (ex, ver)).rowcount
+            for (key,) in con.execute("SELECT DISTINCT conf FROM path_row").fetchall():
+                if key not in keys:
+                    rows += con.execute("DELETE FROM path_row WHERE conf=?", (key,)).rowcount
             for (d,) in con.execute("SELECT DISTINCT versions FROM tree_built").fetchall():
                 if d not in digests:
                     rows += con.execute("DELETE FROM tree_built WHERE versions=?", (d,)).rowcount
@@ -689,6 +726,9 @@ def load_view(con, root, ctx, tree=None, overlay=True) -> dict:
     con.execute("CREATE TEMP TABLE IF NOT EXISTS view_version(extractor TEXT PRIMARY KEY, version TEXT)")
     con.execute("DELETE FROM view_version")
     con.executemany("INSERT INTO view_version VALUES (?,?)", ctx["versions"].items())
+    con.execute("CREATE TEMP TABLE IF NOT EXISTS view_conf(conf TEXT PRIMARY KEY)")
+    con.execute("DELETE FROM view_conf")
+    con.execute("INSERT INTO view_conf VALUES (?)", (ctx["conf"],))
     con.execute("CREATE TEMP TABLE IF NOT EXISTS view_path(path TEXT PRIMARY KEY, blob TEXT)")
     con.execute("DELETE FROM view_path")
     con.execute("INSERT INTO view_path SELECT path, blob FROM tree_path WHERE tree=?", (tree,))
@@ -703,8 +743,10 @@ def load_view(con, root, ctx, tree=None, overlay=True) -> dict:
 
 
 #: the path rows a worktree is served: its view's paths, at its own extractor versions (PLAY-dOrderedCharter-51 S3)
+#: and under its own conf key (PLAY-dOrderedCharter-70 S8)
 VIEW_JOIN = ("FROM path_row p JOIN view_path v ON p.path=v.path AND p.blob=v.blob "
-             "JOIN view_version w ON p.extractor=w.extractor AND p.version=w.version")
+             "JOIN view_version w ON p.extractor=w.extractor AND p.version=w.version "
+             "JOIN view_conf c ON p.conf=c.conf")
 VIEW_ROWS = "SELECT p.tag, p.path, p.line, p.kind, p.blob, p.extractor " + VIEW_JOIN
 
 
@@ -1176,7 +1218,8 @@ def read_index_rows(con, ctx, tree) -> list[str]:
     """Every row of the index the worktree of `ctx` reads at `tree`, sorted, `built_at` aside: what a build
     from nothing at its own extractor versions must reproduce (the `--dump` the plants compare). A row of
     another version is left out, and so is one only another live worktree's HEAD tree or dirty edits hold
-    (PLAY-dOrderedCharter-51 S3); a row no worktree holds stays in, so a sweep that missed it shows."""
+    (PLAY-dOrderedCharter-51 S3), and so is a path row of another conf key and a blob row only such a path row
+    reaches (PLAY-dOrderedCharter-70 S8); a row no worktree holds stays in, so a sweep that missed it shows."""
     trees, tops = read_worktree_trees(ctx["root"])
     trees.discard(tree)
     tops.discard(ctx["worktree"])
@@ -1190,16 +1233,18 @@ def read_index_rows(con, ctx, tree) -> list[str]:
     foreign = other - own
     foreign_blobs = {b for _p, b in foreign} - {b for _p, b in own}
     mine = set(ctx["versions"].items())
+    reach = read("SELECT DISTINCT blob, extractor, conf = ? FROM path_row", ctx["conf"])
+    elsewhere = {(b, ex) for b, ex, here in reach if not here} - {(b, ex) for b, ex, here in reach if here}
     rows = {
         "tree_path": [r for r in read("SELECT tree, path, blob FROM tree_path") if r[0] not in trees],
         "blob_row": [r for r in read("SELECT blob, extractor, version, tag, kind, line, end_line, text FROM blob_row")
-                     if (r[1], r[2]) in mine and r[0] not in foreign_blobs],
-        "path_row": [r for r in read("SELECT path, blob, extractor, version, tag, kind, line FROM path_row")
-                     if (r[2], r[3]) in mine and (r[0], r[1]) not in foreign],
+                     if (r[1], r[2]) in mine and r[0] not in foreign_blobs and (r[0], r[1]) not in elsewhere],
+        "path_row": [r for r in read("SELECT path, blob, extractor, version, conf, tag, kind, line FROM path_row")
+                     if (r[2], r[3]) in mine and r[4] == ctx["conf"] and (r[0], r[1]) not in foreign],
         "dirty_path": [r for r in read("SELECT worktree, path, blob FROM dirty_path") if r[0] not in tops],
         "tree_built": [r for r in read("SELECT tree, versions FROM tree_built")
                        if r[1] == ctx["digest"] and r[0] not in trees],
         "blob_parsed": [r for r in read("SELECT blob, extractor, version FROM blob_parsed")
-                        if (r[1], r[2]) in mine and r[0] not in foreign_blobs],
+                        if (r[1], r[2]) in mine and r[0] not in foreign_blobs and (r[0], r[1]) not in elsewhere],
     }
     return sorted(f"{table}\t" + "\t".join(map(str, r)) for table, got in rows.items() for r in got)

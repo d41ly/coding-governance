@@ -1420,8 +1420,19 @@ print_drift_delta() { # run-state file
     echo "drift-delta: slot point.runtime.reading · not-installed: the close prints no drift delta — no drift-audit kit holding drift_report.py resolves beside this kit"
     return 0
   fi
-  "$py" "$d/drift_report.py" --delta "$base" HEAD || true
-  echo "drift-delta: slot point.runtime.reading · filled" >&2
+  # PLAY-dOrderedCharter-70 S2: the slot's outcome is the reader's, never assumed: a failed read and a
+  # skipped one each say so. The reader always prints a line, so an empty capture cannot mean `skipped`.
+  local out rc=0
+  out=$("$py" "$d/drift_report.py" --delta "$base" HEAD) || rc=$?
+  [ -z "$out" ] || printf '%s\n' "$out"
+  if [ "$rc" != 0 ]; then
+    echo "drift-delta: the reader exited $rc, no delta read"
+    return 0
+  fi
+  case "$out" in
+    *"drift-delta: skipped"*) echo "drift-delta: slot point.runtime.reading · searched-empty" >&2 ;;
+    *) echo "drift-delta: slot point.runtime.reading · filled" >&2 ;;
+  esac
   return 0
 }
 # TOOL-dFoldedAudit-7 S2 - THE SPEC-AUDIT SWITCHES, the driver's ONE reader of the three policy keys.

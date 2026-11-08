@@ -2216,12 +2216,14 @@ derive_table_fault() {  # $1 got rc · $2 want rc · $3 what the close names, em
   sed '$d' "$TMP/a" | cmp -s - "$TMP/twhole" || { echo "%A is not the whole-file body of both sides"; return; }
   tail -1 "$TMP/a" | grep -F '>>>>>>> theirs' | grep -qF "$3" || echo "the closing label names no $3"
 }
-check_table_case() {  # $1 label · $2 %P · $3 want rc · $4 what the close names · $5 the line merge's verdict: red | held
+check_table_case() {  # $1 label · $2 %P · $3 want rc · $4 what the close names · $5 the line merge's verdict: red | held · $6 what the driver's stderr names, optional
   local rc broken
   cp "$TMP/ta" "$TMP/a"
   $DRV "$TMP/to" "$TMP/a" "$TMP/tb" "$2" >/dev/null 2>"$TMP/terr" && rc=0 || rc=$?
   broken=$(derive_table_fault "$rc" "$3" "$4")
   [ -z "$broken" ] || bad "table class, $1: $broken — stderr [$(head -1 "$TMP/terr" | cut -c1-160)]"
+  # PLAY-dOrderedCharter-70 S16: a fail-closed case names ITS postcondition, never only the string all of them share
+  [ -z "${6:-}" ] || grep -qF -- "$6" "$TMP/terr" || bad "table class, $1: the driver's stderr names no $6 — [$(head -1 "$TMP/terr" | cut -c1-160)]"
   grep -q '^merge-rows: rows ' "$TMP/terr" && bad "table class, $1: a manifest's lines reached the row plane"
   cp "$TMP/ta" "$TMP/a"
   git merge-file -q -L ours -L base -L theirs "$TMP/a" "$TMP/to" "$TMP/tb" 2>/dev/null && rc=0 || rc=$?
@@ -2252,7 +2254,21 @@ check_table_case "policy rows added on each side" "$OVERLAY" 0 "" red
 derive_fx_policy one > "$TMP/to"; derive_fx_policy one b > "$TMP/ta"; derive_fx_policy one c > "$TMP/tb"
 check_table_case "both sides edit one policy row" "$OVERLAY" 1 policy.adopter.one red
 derive_fx_unit a > "$TMP/to"; { derive_fx_unit a; printf '  [[unit]]\ntag = "unit.hidden"\n'; } > "$TMP/ta"; { derive_fx_unit a; derive_fx_unit x; } > "$TMP/tb"
-check_table_case "a side whose cut does not reproduce its parse" "$MANIFEST" 1 "merge-rows failed" red
+check_table_case "an indented header after an entry" "$MANIFEST" 1 "merge-rows failed" red "is not one array-of-tables entry"
+derive_fx_unit a > "$TMP/to"; { printf '  [[unit]]\ntag = "unit.hidden"\n'; derive_fx_unit a; } > "$TMP/ta"; { derive_fx_unit a; derive_fx_unit x; } > "$TMP/tb"
+check_table_case "an indented header in the preamble" "$MANIFEST" 1 "merge-rows failed" red "the cut does not reproduce tomllib's read"
+# PLAY-dOrderedCharter-70 S6: sides ending in an unterminated entry merge clean, each written chunk a side's bytes
+# once terminated; the merge writes the last entry terminated.
+{ derive_fx_unit a; printf "%s" "$(derive_fx_unit b)"; } > "$TMP/to"
+{ derive_fx_unit a 'MUST one.'; printf "%s" "$(derive_fx_unit b)"; } > "$TMP/ta"
+{ derive_fx_unit a; printf "%s" "$(derive_fx_unit b 'MUST two.')"; } > "$TMP/tb"
+{ derive_fx_unit a 'MUST one.'; derive_fx_unit b 'MUST two.'; } > "$TMP/twant"
+check_table_case "disjoint edits over an unterminated last entry" "$MANIFEST" 0 "" red
+{ derive_fx_unit a; printf "%s" "$(derive_fx_unit b)"; } > "$TMP/to"
+{ derive_fx_unit a 'MUST one.'; printf "%s" "$(derive_fx_unit b)"; } > "$TMP/ta"
+{ derive_fx_unit a; derive_fx_unit b; printf "%s" "$(derive_fx_unit c)"; } > "$TMP/tb"
+{ derive_fx_unit a 'MUST one.'; derive_fx_unit b; derive_fx_unit c; } > "$TMP/twant"
+check_table_case "an unterminated final chunk in ours, an add in theirs" "$MANIFEST" 0 "" red
 
 # The count is DERIVED from the file, not typed: a hand-maintained tally reads as a claim about
 # coverage and goes stale the first time a group is added without touching it. The floor is a

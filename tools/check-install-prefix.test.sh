@@ -47,7 +47,8 @@ GK=${GK_SRC%/*}; GK=${GK##*/}
 TL=tool   # gov's own prefix is "${TL}s", assembled so that this file does not spell it
 T=$(printf '\t')
 # RAISED 39 -> 40 by TOOL-aMendedFleet-111: the NONKIT liveness arm (1).
-FLOOR_ASSERTIONS=40
+# RAISED 40 -> 41 by PLAY-dOrderedCharter-70: the consumer skip's slot line (1), counted off the arm.
+FLOOR_ASSERTIONS=41
 fails=0; passed=0; GRADED=0
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 
@@ -247,6 +248,9 @@ nout=$(cd "$N/scripts" && bash "${GATE##*/}" 2>&1); nrc=$?
 [ "$nrc" = 0 ] && good "a consumer exits 0 — it ships nothing" || bad "a consumer redded (rc $nrc) on bytes it received: $nout"
 case "$nout" in *"SKIPPED — this repo is not a kit SOURCE"*) good "...and SAYS its files went ungraded" ;;
   *) bad "the consumer skip was silent — a skip that looks like a pass is indistinguishable from coverage" ;; esac
+# PLAY-dOrderedCharter-70 S13: the skip names the deployer slot's state, the line the slot declaration owes
+case "$nout" in *"install-prefix: slot point.flow.version · not-installed: "*) good "...and names the deployer slot not-installed" ;;
+  *) bad "the consumer skip printed no \`slot point.flow.version · not-installed\` line: $nout" ;; esac
 
 # NO KIT DIRECTORIES: the receipt points the resolver at a deployer outside the gate's own root, so the
 # kit-source test passes and the kit walk under the gate's directory finds nothing to enumerate.

@@ -26,6 +26,10 @@ population being `INSTRUCTION_PATHSPECS` in `instruction_units.py`; the status a
 record is red; and `instructions-legacy.txt`, one path per instruction file not yet
 rendered from units, under the policy key `instructions.legacy`. A template's `<!-- units: <selector> -->` line
 expands to the lines of the units that selector selects, each unit active, and to nothing of its own.
+A `fact` unit sourced `cmd:<command>` renders that command's one line of output, run in the target with the
+caller's git variables aside and a 30-second bound. The command must be one of `REGISTERED_COMMANDS` in
+`instruction_units.py`, a closed list a target cannot widen: any other reds the schema and refuses the
+render, and so do a second line of output, a non-zero exit and a timeout.
 
 `instruction_units.py schema` grades each unit row's fields and `one-fact` reds two active units holding one
 fact or defining one term. `python <prefix>/playbook/core.py new instruction-unit <name> --kit <kit> --type <t>
@@ -275,7 +279,10 @@ worktrees whose extractor bytes differ share the file, so `blob_row`, `path_row`
 the version, a build never deletes another version's rows, and every read is joined to the reading
 worktree's own `{extractor: version}` map, so a worktree is served only rows its own extractors wrote. A
 tree is fresh under `tree_built(tree, versions)`, `versions` the first 12 hex of the SHA-256 of that map's
-sorted `extractor=version` lines. `gov_tag.py --gc` deletes the rows of every version no worktree
+sorted `extractor=version` lines and a `conf=<key>` line. The key is the conf's `MEMORY_ROOT` and `CHARTER`
+hashed, since they decide which path is the charter and which are guides: every `path_row` carries it, every
+read joins the reading worktree's own key, and a conf edit, committed or not, is served its own names
+(PLAY-dOrderedCharter-70). `blob_row` is keyed by text alone. `gov_tag.py --gc` deletes the rows of every version and every conf key no worktree
 `git worktree list` names derives, each read from that worktree's own registry and modules, and refuses,
 exit 2, when one of them cannot be read; it prints `tag-index — collected: <n> rows of <m> versions`. A
 plain build collects nothing, and a worktree deleted without `git worktree prune` keeps its rows until it

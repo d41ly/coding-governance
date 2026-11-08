@@ -842,6 +842,21 @@ def write_charter_lock(gov_root: Path, target: Path, charter_path: Path, units=(
         f'{template.relative_to(base).as_posix()}@v{marker.group(1)}.{marker.group(2)}' if marker else '', units)
 
 
+def write_empty_lists(target: Path) -> list[str]:
+    """PLAY-dOrderedCharter-70 S10: the two lists this kit withholds as project-owned and whose absence its
+    checks red, written empty under `<target>/<prefix>/<kit dir>` where that directory exists and the list
+    does not; a present file is left alone. -> the paths written, target-relative."""
+    iu = load_units_module()
+    home = target / iu.derive_kit_prefix() / iu.KIT_DIR.name
+    written = []
+    for name in ('positional-refs.txt', 'core-pending.txt'):
+        path = home / name
+        if home.is_dir() and not path.exists():
+            path.write_bytes(b'')
+            written.append(path.relative_to(target).as_posix())
+    return written
+
+
 def build_region(charter: str | None, body: str) -> str:
     """Write `body` between the region markers. THREE states, and this reader serves all of them.
 
@@ -1138,7 +1153,7 @@ def render_unit_slots(text: str, target: Path, notes: list, slots: list | None =
         if not chosen:
             notes.append(f'unarmed   slot {selector} selects no unit')
         try:
-            lines = [iu.render_unit(u, read_key) for u in chosen]
+            lines = [iu.render_unit(u, read_key, target) for u in chosen]
         except iu.UnitRowError as e:
             raise Refusal(str(e)) from None
         if slots is not None:
@@ -2443,6 +2458,8 @@ def run_charter_scope(engine_dir: Path, gov_root: Path, target: Path, charter_pa
     write_region(charter_path, body)
     try:
         write_charter_lock(gov_root, target, charter_path, slots)
+        notes += [f"wrote {p} empty: this kit's checks read an absent list as a refusal"
+                  for p in write_empty_lists(target)]
     except (Refusal, ValueError) as e:   # ValueError: the lock module's LevelError and LockError
         print(f'render-playbook: REFUSED — the charter is written but its lock row is not: {e}',
               file=sys.stderr)

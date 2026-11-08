@@ -196,9 +196,11 @@ def derive_string_constants(tree):
             if isinstance(n, ast.Constant) and isinstance(n.value, str) and id(n) not in bare]
 
 
-def derive_edges(root, kits, rows, tracked):
+def derive_edges(root, kits, rows, tracked, unread=None):
     """-> ([(file, line, kind, source kit, target kit, allowed)], notes): every edge from a core kit's
-    shipped file to a non-core kit, sorted, and a line per shell file read line by line."""
+    shipped file to a non-core kit, sorted, and a line per shell file read line by line. A core file that
+    cannot be read or parsed lands in `unread` as `(file, why)` (PLAY-dOrderedCharter-70 S15)."""
+    unread = [] if unread is None else unread
     by_tag = {r.get("tag"): r for r in rows}
     core = lambda k: by_tag.get(k["layer"], {}).get("kind") == "core"  # noqa: E731
     homes = {}  # home basename -> (kit name, core?)
@@ -275,7 +277,8 @@ def derive_edges(root, kits, rows, tracked):
                 try:
                     rows_i = import_walk.scan_imports(str(path))
                     tree = ast.parse(path.read_text(encoding="utf-8"), filename=f)
-                except (OSError, UnicodeDecodeError, SyntaxError, ValueError):
+                except (OSError, UnicodeDecodeError, SyntaxError, ValueError) as exc:
+                    unread.append((f, f"{type(exc).__name__}: {exc}"))
                     continue
                 for name, line, kind in rows_i:
                     if kind == "dynamic" and ("/" in name or "\\" in name):
@@ -313,7 +316,8 @@ def derive_edges(root, kits, rows, tracked):
             elif f.endswith(".sh") or check_shell_file(path):
                 try:
                     body = path.read_text(encoding="utf-8")
-                except (OSError, UnicodeDecodeError):
+                except (OSError, UnicodeDecodeError) as exc:
+                    unread.append((f, f"{type(exc).__name__}: {exc}"))
                     continue
                 text, scan = body.split("\n"), check_arms.scan_shell_lines(body)
                 if scan and scan[-1] is None:
@@ -431,7 +435,10 @@ def check_layers(root, tool_root, register, listing=False):
     for d in sorted(dirs):
         if d not in covered:
             reds.append("tool directory %s is no descriptor's home, no row's homes entry and no shared entry" % d)
-    edges, lines = derive_edges(root, kits, rows, tracked)
+    unread = []
+    edges, lines = derive_edges(root, kits, rows, tracked, unread)
+    if unread:  # an unread core file is no green: exit 2 naming each, ahead of the verdict, as import_walk does
+        return ["layers: UNREADABLE %s (%s)" % (f, why) for f, why in unread], 2
     if listing:
         for r in rows:
             lines.append("layers: row %s · %s · kits: %s" % (r.get("tag"), r.get("kind"),
@@ -482,7 +489,7 @@ def write_layer_row(register, tag, kind, of, definition):
 
 PLANTS = ("import", "dynamic", "probe", "copy", "shell", "requires-if", "unslotted", "slotted",
           "ex1-pair", "no-layer", "unknown-layer", "undeclared-point", "quoted", "unshipped",
-          "flat-slotted", "flat-literal")
+          "flat-slotted", "flat-literal", "unparsable")
 
 
 def build_layers_fixture(top, plant):
@@ -508,6 +515,7 @@ def build_layers_fixture(top, plant):
         core_desc += 'requires_if = [{ kit = "expkit", why = "fixture" }]\n'
     map_layer = {"no-layer": "", "unknown-layer": 'layer = "layer.nowhere"\n'}.get(plant, 'layer = "layer.core.map"\n')
     core_py = "import os\n\n\ndef read():\n    return os.sep\n"
+    core_py += "\ndef broken(:\n" if plant == "unparsable" else ""
     core_py += {
         "import": "\n\ndef late():\n    import reader\n    return reader\n",
         "dynamic": "\n\ndef late():\n    import importlib\n    a = __import__(\"reader\")\n    return a, importlib.import_module(\"reader\")\n",

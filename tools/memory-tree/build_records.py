@@ -142,8 +142,12 @@ def read_records(root, conf, kind, reader):
     one `<n>` are each malformed, naming the other. A tracked path absent from the working tree is absent."""
     memory_root = (conf.get("MEMORY_ROOT") or "memory").strip().strip("/")
     glob = re.compile(re.escape(memory_root) + r"/builds/[^/]+/build/[^/]*-" + re.escape(kind) + r"-[^/]*\.md")
+    # PLAY-dOrderedCharter-70 S4: a typed kind selects by its own name grammar, so `<kind>-plan-<n>.md` of another
+    # kind is never read as one; the deviation kind keeps its instrument's glob, its one explicit exception.
+    named = derive_record_name(kind) if kind != "deviation" else None
+    keep = (lambda p: named.search(p)) if named else glob.fullmatch
     records = []
-    for rel in sorted(p for p in read_tracked_builds(root, memory_root) if glob.fullmatch(p)):
+    for rel in sorted(p for p in read_tracked_builds(root, memory_root) if keep(p)):
         p = pathlib.Path(root, rel)
         if p.is_file():
             records.append(reader(rel, p.read_bytes().decode("utf-8", "replace")))
@@ -355,8 +359,15 @@ def run_fixture(plant):
                 else:
                     written[kind] = write_record(root, "tKinds", unit, kind, "the typed-kinds round trip",
                                                  [("Caused-by", unit)])
+            # PLAY-dOrderedCharter-70 S4: a research record whose name holds `-change-` is no change record
+            research = "memory/builds/tKinds/build/2026-01-01-build-ARCH-tKinds-1-change-plan-2.md"
+            with open(root / research, "w", encoding="utf-8", newline="\n") as fh:
+                fh.write(f"# {unit} — a change plan\n\n**Serves:** research {unit}\n")
             run_git("add", "-A")
             tracked = [p for p in run_git("ls-files").split("\n") if p]
+            changes = [r["path"] for r in read_changes(root)]
+            if research in changes or changes != [written.get("change")]:
+                bad.append(f"read_changes selected {changes}, not the change record alone")
             binds = read_bindings(str(root), tracked, read_design_conf(root))
             for kind, rel in written.items():
                 rec = binds.get(rel) or {"state": "absent", "kind": None, "why": "not read"}

@@ -220,6 +220,7 @@ quoted|1|tools/corekit/run.sh:6 · probe · core kit corekit depends on non-core
 quoted|1|0 allowed, 1 red;
 unshipped|1|tools/corekit/core.py:9 · probe · core kit corekit depends on non-core kit mapkit
 unshipped|1|0 allowed, 1 red;
+unparsable|2|layers: UNREADABLE tools/corekit/core.py (SyntaxError
 PLANTS
 if [ "$_lf" != 0 ]; then echo "FAIL — $_lf layer-check arm(s) failed"; exit 1; fi
 echo "PASS — the layer check's plants"
@@ -237,8 +238,10 @@ echo "PASS — the layer check's plants"
 # is never served another version's rows of a tree already built. The rows after them are
 # PLAY-dOrderedCharter-22's `purpose` arm: the namespace rows' `owner` and `purpose-source`, and the chain
 # registry joined to the fixture design's view; `pending-source` and `new-no-purpose` print their second
-# half's exit on a `rc=` line. The last row is PLAY-dOrderedCharter-69's `git-env`: the `two-versions` and the
-# edge grammar's `resolve-tag` fixtures, run as children under an exported `GIT_DIR`, touch only their scratch.
+# half's exit on a `rc=` line. Then PLAY-dOrderedCharter-69's `git-env`: the `two-versions` and the edge
+# grammar's `resolve-tag` fixtures, run as children under an exported `GIT_DIR`, touch only their scratch. The
+# last six rows are PLAY-dOrderedCharter-70's: a TOML row placed on its own `tag =` line, a staged rename
+# serving the new name alone, and a charter moved by a committed and by an uncommitted conf edit.
 # run_plant_rows <label> <script>: one `<plant and flags>|<exit>|<must print>|<must not print>` row per stdin
 # line, each run as `<script> --fixture --plant <plant and flags>`; every failed row adds one to `_tf`.
 run_plant_rows() {
@@ -322,6 +325,12 @@ registry-joined $_tk|0|2 registry rows joined to 2 view builds, 2 rows awaiting 
 new-no-purpose $_tk|1|registry row 'dFixtureNew' carries no purpose, and no baseline [chain] row names it
 new-no-purpose $_tk|1|with a purpose: rc=0
 git-env|0|tags: plant git-env · both children green, core.bare false, the outer index unchanged
+toml-row|0|tags: plant toml-row · rows [('practice.a', 'tag', 4, 5), ('practice.b', 'tag', 8, 9)] on their own lines
+dirty-rename|0|doc.alpha resolves to [] and doc.beta to ['memory/guides/BETA.md']
+charter-warm|0|incremental rows equal a cold build's
+charter-warm|0|doc.charter resolves to ['CHARTER2.md']
+charter-dirty|0|incremental rows equal a cold build's
+charter-dirty|0|doc.charter resolves to ['CHARTER2.md']
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf tag-resolver arm(s) failed"; exit 1; fi
 echo "PASS — the tag resolver's plants"

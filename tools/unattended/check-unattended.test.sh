@@ -5851,6 +5851,13 @@ miss "$out" "check 37 SKIPPED for memory/builds/tRun"
 miss "$out" "RECALL_CLI is blank in this project"
 hit  "$out" "ANCHORS a record id belonging to another build"
 
+# PLAY-dOrderedCharter-70 S14: with the id grammar gone the check SKIPS, naming why, and claims no scan;
+# set_ak_pristine's reset restores the file for every arm below
+set_ak_pristine; rm -f "$_ig_dst/id_grammar.py"; out=$(run_ak_leg)
+hit  "$out" "check 37 SKIPPED for memory/builds/tRun"
+hit  "$out" "resolved through neither"
+miss "$out" "found no foreign anchor"
+
 # AC7: a LANDED record under a mandate with no freeze (its control is AC12b's record below)
 set_ak_pristine; sed -i 's/^phase: RUNNING$/phase: LANDED/' "$ak/$ak_R"; printf 'landed-anchor: local\n' >> "$ak/$ak_R"
 add_ak_commit "landed, no freeze"; out=$(run_ak_leg)

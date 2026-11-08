@@ -557,8 +557,12 @@ def derive_instruction_row(root, prefix, name, rest):
     reds = [str(f) for f in faults] + [r for u in units for r in iu.check_unit_row(u, tomllib.loads(row)["unit"][0])]
     if reds:
         raise ValueError("; ".join(reds))
-    return [row.rstrip("\n"), f"{SAY}: new · no manifest written; write it with: python {prefix}/playbook/"
-                              f"instructions_edit.py add --manifest {flags['--kit']}"], 0
+    # PLAY-dOrderedCharter-70 S17: the whole command, composed from the row it built, so running it writes this row
+    given = ["--manifest", flags["--kit"], "--tag", f"unit.{name}", "--level", flags["--level"], "--type", flags["--type"],
+             *(["--trigger", "always"] if trigger else []), "--budget", budget, "--text", flags["--text"]]
+    command = " ".join([f"python {prefix}/playbook/instructions_edit.py add", shlex.join(given),
+                        "--build <slug> --unit <id> --mark <editorial|semantic>"])
+    return [row.rstrip("\n"), f"{SAY}: new · no manifest written; write it with: {command}"], 0
 
 
 def run_new(argv, root=None):
@@ -844,6 +848,34 @@ def arm_exceptions_values(c):
     c.check_gate("exceptions-values: any-session-recorded admits it", run_meta_check, 0, "excepted · leg 'fx bare'")
 
 
+def arm_instruction_unit(c):
+    """PLAY-dOrderedCharter-70 S17: the factory's printed command parses, and `propose` derives the row it printed."""
+    import types
+    import instructions_edit as ie
+    tree = c.top / "edit-tree"
+    tree.mkdir()
+    root = ie.build_tree(types.SimpleNamespace(top=tree))
+    lines, rc = derive_instruction_row(root, "tools", "factory", ["--kit", "corekit", "--type", "directive", "--level",
+                                                                  "3", "--text", "MUST run the factory's command."])
+    row, said = lines[0].split("\n"), lines[1]
+    fill = {"<slug>": ie.FX_BUILD, "<id>": "PLAY-tEdit-1", "<editorial|semantic>": "semantic"}
+    argv = [fill.get(a, a) for a in shlex.split(said.split("write it with: ", 1)[-1])[2:]]  # after `python <path>`
+    try:
+        ie.build_parser().parse_args(argv)
+        parsed = True
+    except SystemExit:
+        parsed = False
+    prc, proposal = ie.run_cli(root, "propose", *argv)
+    added = {ln[1:] for ln in proposal.splitlines() if ln.startswith("+") and not ln.startswith("+++")}
+    missing = [ln for ln in row if ln not in added]
+    ok = rc == 0 and parsed and prc == 0 and not missing
+    c.failed += not ok
+    c.out.append(f"{SAY}: fixture · instruction-unit · the printed command parses and proposes the printed row"
+                 + ("" if ok else f" · FAILED, parsed {parsed}, propose rc={prc}, missing {missing}"))
+    if not ok:
+        c.out.extend("    " + ln for ln in (said + "\n" + proposal).splitlines())
+
+
 def arm_bypass_never(c):
     c.write_legs(lambda legs: [dict(g, guard=["tools/playbook/"]) if g["name"] == "fx meta" else g for g in legs])
     c.write_policy('core.bypass = "never"\n')
@@ -864,7 +896,8 @@ def arm_bypass_never(c):
 
 PLANTS = {"registry": arm_registry, "unenforced": arm_unenforced, "pending": arm_pending,
           "kinds": arm_kinds, "skill": arm_skill, "practice": arm_practice, "exception": arm_exception,
-          "exceptions-values": arm_exceptions_values, "bypass-never": arm_bypass_never}
+          "exceptions-values": arm_exceptions_values, "bypass-never": arm_bypass_never,
+          "instruction-unit": arm_instruction_unit}
 
 
 def run_fixture(plant=None):

@@ -145,7 +145,7 @@ def read_manifests(root) -> dict:
         except (OSError, tomllib.TOMLDecodeError):
             continue
         if isinstance(kit, str):
-            out[kit] = f"{prefix}/{desc.parent.name}/{iu.MANIFEST}"
+            out[kit] = iu.derive_tool_rel(desc.parent.name, iu.MANIFEST)
     out["overlay"] = iu.OVERLAY
     return out
 
@@ -413,7 +413,7 @@ def run_tag_check(root) -> list:
     out = io.StringIO()
     with contextlib.redirect_stdout(out):
         gov_tag.run_kit_verb(pathlib.Path(root), "check", None, sets={}, as_json=True,
-                             kit_rel=f"{iu.derive_kit_prefix()}/{KIT_DIR.name}")
+                             kit_rel=iu.derive_tool_rel(KIT_DIR.name))
     said = out.getvalue()
     return json.loads(said[said.index("{\n"):])["reds"]
 
@@ -559,7 +559,7 @@ def write_policy(root, **values):
 def write_points(root, *points):
     import gov_tag
     declares = json.dumps(list(points))
-    gov_tag.write_commit(root, {f"{iu.derive_kit_prefix()}/{KIT_DIR.name}/{LAYERS_TABLE}":
+    gov_tag.write_commit(root, {iu.derive_tool_rel(KIT_DIR.name, LAYERS_TABLE):
                                 f'[[layer]]\ntag = "layer.instruction"\nkind = "core"\ndeclares = {declares}\n\n'
                                 '[[layer]]\ntag = "layer.exp"\nkind = "expansion"\n'}, "the points")
 
@@ -569,7 +569,7 @@ def build_tree(c, *points, rows="", **policy) -> pathlib.Path:
     a renderer table, the pack catalogue, its own layer register declaring `points`, and a committed policy."""
     import gov_tag
     root = gov_tag.build_tags_fixture(c.top, "none")
-    kit = f"{iu.derive_kit_prefix()}/{KIT_DIR.name}"
+    kit = iu.derive_tool_rel(KIT_DIR.name)
     registry = (root / kit / "namespaces.toml").read_text(encoding="utf-8")
     gov_tag.write_commit(root, {f"{kit}/namespaces.toml": registry + gov_tag.FIXTURE_UNIT_ROW,
                                 f"{kit}/{iu.RENDERERS_TABLE}": FX_RENDERERS,
@@ -686,12 +686,97 @@ def arm_merge_policy(c):
                          *run_merge_pair(c, "edits", one, ours, theirs, iu.OVERLAY), ours, theirs, "policy.adopter.one")
 
 
+def check_failed_merge(c, label, name, base, ours, theirs, message):
+    """A merge the driver fails closed on: the whole-file conflict, and the driver's stderr naming `message`, the
+    postcondition this plant exists for, never the failure string every postcondition shares."""
+    rc, said, merged = run_merge_pair(c, name, base, ours, theirs)
+    check_whole_conflict(c, label, rc, said, merged, ours, theirs, "merge-rows failed")
+    c.check(f"...and the driver names its own postcondition: {message}", message in said, said)
+
+
 def arm_merge_parse(c):
     write_merge_driver(c)
     base = derive_fx_row("unit.base")
     ours, theirs = base + '  [[unit]]\ntag = "unit.hidden"\n', base + derive_fx_row("unit.theirs")
-    check_whole_conflict(c, "a side whose cut does not reproduce its parse fails closed with both sides",
-                         *run_merge_pair(c, "cut", base, ours, theirs), ours, theirs, "merge-rows failed")
+    check_failed_merge(c, "an indented header after an entry fails closed with both sides", "cut", base, ours,
+                       theirs, "is not one array-of-tables entry")
+
+
+def arm_merge_cut(c):
+    """PLAY-dOrderedCharter-70 S16: an indented header in the preamble parses, and the cut cannot rebuild it."""
+    write_merge_driver(c)
+    base = derive_fx_row("unit.base")
+    ours, theirs = '  [[unit]]\ntag = "unit.hidden"\n' + base, base + derive_fx_row("unit.theirs")
+    check_failed_merge(c, "an indented header in the preamble fails closed with both sides", "pre", base, ours,
+                       theirs, "the cut does not reproduce tomllib's read")
+
+
+def arm_merge_unterminated(c):
+    """PLAY-dOrderedCharter-70 S6: three sides ending in an unterminated entry, edited apart, merge clean."""
+    write_merge_driver(c)
+    one, two = derive_fx_row("unit.one"), derive_fx_row("unit.two").rstrip("\n")
+    edit_one, edit_two = derive_fx_row("unit.one", "MUST move."), derive_fx_row("unit.two", "MUST move.").rstrip("\n")
+    rc, said, merged = run_merge_pair(c, "unterm", one + two, edit_one + two, one + edit_two)
+    c.check("disjoint edits over an unterminated last entry merge clean", rc == 0
+            and [u["tag"] for u in tomllib.loads(merged)["unit"]] == ["unit.one", "unit.two"], f"{rc} {said}")
+    c.check("...holding both edits", edit_one in merged and edit_two in merged, merged)
+
+
+def arm_merge_moved(c):
+    """PLAY-dOrderedCharter-70 S16, its second fork: an unterminated final chunk in ours, an add in theirs."""
+    write_merge_driver(c)
+    one, two, three = derive_fx_row("unit.one"), derive_fx_row("unit.two"), derive_fx_row("unit.three").rstrip("\n")
+    edit_one = derive_fx_row("unit.one", "MUST move.")
+    rc, said, merged = run_merge_pair(c, "moved", one + two.rstrip("\n"), edit_one + two.rstrip("\n"), one + two + three)
+    c.check("an unterminated final chunk beside an add merges clean", rc == 0
+            and [u["tag"] for u in tomllib.loads(merged)["unit"]] == ["unit.one", "unit.two", "unit.three"],
+            f"{rc} {said}")
+
+
+def arm_merge_written(c):
+    """PLAY-dOrderedCharter-70 S16, its second fork: a chunk altered on the read of the written lines reaches the
+    postcondition that every written chunk is one side's bytes."""
+    import importlib.util
+    mt = resolve_kit_dir("memory-tree", "merge-rows.py", KIT_DIR)
+    spec = importlib.util.spec_from_file_location("merge_rows_fx", mt / "merge-rows.py")
+    mr = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mr)
+    real, calls = mr.read_tables, []
+
+    def read_altered(lines):
+        calls.append(1)
+        pre, tables = real(lines)
+        if len(calls) == 4:  # the written lines: one chunk altered after the merge chose it
+            key = next(iter(tables))
+            tables[key] = tables[key] + "# altered\n"
+        return pre, tables
+    mr.read_tables = read_altered
+    base = derive_fx_row("unit.base")
+    split = lambda t: t.splitlines(keepends=True)  # noqa: E731
+    try:
+        mr.resolve_tables(split(base), split(base + derive_fx_row("unit.ours")), split(base + derive_fx_row("unit.theirs")))
+        said = "merged clean"
+    except Exception as exc:  # noqa: BLE001 — the postcondition's own exception is the arm's subject
+        said = f"{type(exc).__name__}: {exc}"
+    c.check("a written chunk no side wrote fails closed by name", "byte-identical to no side's" in said, said)
+
+
+def arm_root_prefix(c):
+    """PLAY-dOrderedCharter-70 S5: at a root install the prefix is empty, and no join adds a leading `/`."""
+    c.write_file("kitx/kit.toml", 'id = "kitx"\n')
+    c.write_file("kitx/instructions.toml", derive_fx_row("unit.rooted"))
+    iu.run_commit(c.top, "a root install")
+    held = iu.derive_kit_prefix
+    iu.derive_kit_prefix = lambda: ""
+    try:
+        manifests = read_manifests(c.top)
+        units, _tables, faults = read_tree_rows(c.top)
+    finally:
+        iu.derive_kit_prefix = held
+    c.check("read_manifests answers the manifest with no leading slash", manifests.get("kitx") == "kitx/instructions.toml",
+            str(manifests))
+    c.check("...and the row is read", [u.tag for u in units] == ["unit.rooted"] and not faults,
+            f"{[u.tag for u in units]} {faults}")
 
 
 def arm_propose(c):
@@ -721,7 +806,7 @@ def arm_owner_propose(c):
 def arm_rerender(c):
     import gov_tag
     root = build_tree(c, GUARD_POINT)
-    kit = f"{iu.derive_kit_prefix()}/{KIT_DIR.name}"
+    kit = iu.derive_tool_rel(KIT_DIR.name)
     gov_tag.write_commit(root, {f"{kit}/{iu.RENDERERS_TABLE}": '[[target]]\npaths = ["AGENTS.md"]\nrenderer = "playbook:charter"\n',
                                 ".governance/deploy.toml": iu.SLOT_DEPLOY, "TPL.md": iu.SLOT_TEMPLATE.format("reader.every")},
                          "a rendered charter")
@@ -858,8 +943,8 @@ def arm_record(c):
 
 
 def arm_packs(c):
-    table = f"{iu.derive_kit_prefix()}/{KIT_DIR.name}/{PACKS_TABLE}"
-    catalogue = f"{iu.derive_kit_prefix()}/{KIT_DIR.name}/{PRACTICES_TABLE}"
+    table = iu.derive_tool_rel(KIT_DIR.name, PACKS_TABLE)
+    catalogue = iu.derive_tool_rel(KIT_DIR.name, PRACTICES_TABLE)
     shipped = (KIT_DIR / PACKS_TABLE).read_text(encoding="utf-8")
     c.write_file(table, shipped)
     lines, reds = check_packs(c.top)
@@ -884,7 +969,7 @@ def run_show(root, verb, tag, slice_="leaf") -> tuple[int, str]:
     out = io.StringIO()
     with contextlib.redirect_stdout(out), contextlib.redirect_stderr(out):
         rc = gov_tag.run_kit_verb(root, verb, tag, sets={"tags.slice": slice_},
-                                  kit_rel=f"{iu.derive_kit_prefix()}/{KIT_DIR.name}")
+                                  kit_rel=iu.derive_tool_rel(KIT_DIR.name))
     return rc, out.getvalue()
 
 
@@ -928,7 +1013,9 @@ def arm_retired_rows(c):
 
 
 PLANTS = {"merge": arm_merge, "merge-multiline": arm_merge_multiline, "merge-same-add": arm_merge_same_add,
-          "merge-policy": arm_merge_policy, "merge-parse": arm_merge_parse,
+          "merge-policy": arm_merge_policy, "merge-parse": arm_merge_parse, "merge-cut": arm_merge_cut,
+          "merge-unterminated": arm_merge_unterminated, "merge-moved": arm_merge_moved,
+          "merge-written": arm_merge_written, "root-prefix": arm_root_prefix,
           **{name: functools.partial(arm_merge_edit, name=name)
              for name in ("merge-both-edit", "merge-delete-edit", "merge-edit-delete")},
           "propose": arm_propose, "owner-propose": arm_owner_propose, "rerender": arm_rerender,

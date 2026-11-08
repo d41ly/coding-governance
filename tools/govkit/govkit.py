@@ -1582,6 +1582,32 @@ def scan_uncontained_writes(src: str) -> list[tuple[int, str, str]]:
     return sorted(out)
 
 
+def check_source_rows(root: pathlib.Path, descs: dict, r: "Report") -> None:
+    """PLAY-dOrderedCharter-70 S10: no SHIPPED ENGINE FILE holds a row citing gov's own records — a line whose
+    first tab cell starts `{memory_root}/builds/`, expanded through gov's ctx; a line with no tab is prose. Such a list is gov's alone and
+    reaches an adopter as rows naming files it does not have. DOES NOT CHECK: a record path outside the first
+    tab cell, a gov path outside the record tree, or a role other than `engine`."""
+    hits: dict[str, int] = {}
+    for eid, (d, _p) in descs.items():
+        ctx = canonical_ctx(eid)
+        builds = resolve_tokens("{memory_root}/builds/", ctx)[0]
+        for row in resolve_entry(root, d, ctx)["writes"].values():
+            src = row.get("src")
+            if not src or row["role"] != "engine" or src in hits:
+                continue
+            try:
+                text = (root / src).read_bytes().decode("utf-8", "replace")
+            except OSError:
+                continue
+            n = sum(1 for ln in text.splitlines() if "\t" in ln and ln.split("\t", 1)[0].startswith(builds))
+            if n:
+                hits[src] = n
+    for src, n in sorted(hits.items()):
+        r.fail(f"'{src}' ships as an engine file holding {n} row(s) whose first cell cites gov's own records "
+               f"under memory/builds/ — withhold it as `project-owned`, or drop the rows")
+    r.note(f"source rows: {len(hits)} shipped engine file(s) citing gov's records")
+
+
 def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int:
     reg = load_registry(root)
     if fix:
@@ -3518,6 +3544,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                f"`{_akey[_nm]}` instead")
     r.note(f"adopter names: {len(_anames)} from {len(_adopters)} adopters.toml row(s) over "
            f"{len(_shipped)} shipped file(s) · {sum(_measured.values())} site(s)")
+    check_source_rows(root, descs, r)
 
     # ---- 11: TOOL-dSafePassage-6. EVERY FORWARDER IS ITS RENDER, AND NONE CLOSES BEFORE ITS WINDOW.
     #          `shims.py`'s parity over `shims.toml` (each open row's forwarder equals its render,

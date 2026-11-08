@@ -3179,7 +3179,7 @@ if check_selected 27; then
 # 27 — a decision row or gotcha ADDED since the mainline merge-base that ranks as a near match of an
 # older record must name it, or carry a relation token. Delegated to row_grammar.py, the row
 # grammar's owner, for the reason 20 and 24 are (TOOL-cSpliceWarden-6), and ranked with the
-# memory-recall kit's own index builder (TOOL-aGraftedHelix-9). Full runs only: it reads a commit
+# index builder of this kit's id_grammar.py (TOOL-aGraftedHelix-9). Full runs only: it reads a commit
 # range, which a staged selection has no use for. The capture is printed on a GREEN run too, because
 # its summary line, or its NOT ARMED line, is the only evidence the check graded anything.
 if [ "$STAGED" = 0 ]; then

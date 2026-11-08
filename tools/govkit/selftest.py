@@ -1652,7 +1652,7 @@ def check_halved_install_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
           "hole 'directives-floor': its discharge probe exits 0 in an EMPTY directory")
     pr = f"{PFX}{KIT_NAMES['playbook']}/kit.toml"
     check_staged(pr, '[[regenerate]]\nargv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", "."]\n'
-              'writes = ["AGENTS.md"]\n', "",
+              'writes = ["AGENTS.md", ".governance/instructions.lock"]\n', "",
           "[aHI-3 AC6] 3b-iii: an adopter with its [[regenerate]] stripped",
           "entry 'playbook-render' declares an [adopt] argv and neither")
     rg = f"{PFX}{KIT_NAMES['run-gates']}/kit.toml"
@@ -1780,10 +1780,12 @@ def check_update_safety(tmp: pathlib.Path) -> None:
               '[check]\nargv = ["bash", "{kit}/check.sh"]\n\n'
               '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
               '[[files]]\ninclude = ["tpl.md"]\nrole = "rendered"\nto = "docs/out.md"\n\n'
-              '[[regenerate]]\nargv = ["bash", "{kit}/gen.sh"]\nwrites = ["docs/declared.txt"]\n\n'
+              '[[regenerate]]\nargv = ["bash", "{kit}/gen.sh"]\n'
+              'writes = ["docs/declared.txt", ".governance/instructions.lock"]\n\n'
               '[adopt]\nargv = ["bash", "{kit}/gen.sh"]\nmutates_index = false\n')
     gen = ('d="$(dirname "$0")"\nmkdir -p docs\n'
-           'for f in out.md declared.txt stray.txt; do cat "$d/eng.txt" > "docs/$f"; done\n')
+           'for f in out.md declared.txt stray.txt; do cat "$d/eng.txt" > "docs/$f"; done\n'
+           'cat "$d/eng.txt" > .governance/instructions.lock\n')
     g, _a = build_gov17("rb", kit_rb, {"eng.txt": "v1\n", "gen.sh": gen,
                                        "check.sh": "grep -q v1 docs/out.md\n", "tpl.md": "tpl\n"})
     t = build_target17(g, "rb")
@@ -1791,6 +1793,7 @@ def check_update_safety(tmp: pathlib.Path) -> None:
           read_bytes17(t / "docs" / "out.md") == b"v1\n"
           and read_row17(t, "docs/out.md").get("role") == "rendered", str(read_row17(t, "docs/out.md")))
     _rb_before = dict(read_row17(t, "docs/out.md"))
+    _rb_lock = read_bytes17(t / ".governance" / "instructions.lock")
     write_gov17(g, kit_rb, {"eng.txt": "v2\n"}, "B")
     p = run_gov17(g, "update", "--target", str(t), "--write")
     order = read_bytes17(t / ".governance" / "outbox" / "update-rollback-demo.md").decode("utf-8")
@@ -1807,6 +1810,9 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     check("[aRF-17 S1] a path the `writes` list declares is reverted and named apart",
           read_bytes17(t / "docs" / "declared.txt") == b"v1\n"
           and "reverted  docs/declared.txt" in order, order)
+    check("[dOC-70 S9] a lock the `writes` list declares holds its snapshot's bytes after the rollback",
+          _rb_lock == b"v1\n" and read_bytes17(t / ".governance" / "instructions.lock") == _rb_lock,
+          repr(_rb_lock) + repr(read_bytes17(t / ".governance" / "instructions.lock")))
     check("[aRF-17 AC2] an undeclared regenerate write is NAMED as still differing",
           read_bytes17(t / "docs" / "stray.txt") == b"v2\n"
           and "still differs after the rollback: docs/stray.txt" in p.stdout
@@ -6992,6 +6998,15 @@ user_skills = "/tmp/gk-fake-skills"
 
         check_halved_install_arms(gcopy, _run_selfcheck)
         check_benched_probe_arms(gcopy, _run_selfcheck)
+        # --- PLAY-dOrderedCharter-70 S10: a shipped engine file planted with one row citing gov's records.
+        rf = gcopy / PFX / KIT_NAMES["playbook"] / "README.md"
+        rkeep = rf.read_bytes()
+        rf.write_bytes(rkeep + b"memory/builds/x/build/y.md\tfixture\n")
+        rsr = _run_selfcheck(gcopy)
+        check("[dOC-70 S10] selfcheck reds a shipped engine file holding a row that cites gov's records",
+              rsr.returncode != 0 and f"'{PFX}{KIT_NAMES['playbook']}/README.md' ships as an engine file holding "
+              "1 row(s)" in rsr.stdout + rsr.stderr, (rsr.stdout + rsr.stderr)[-1500:])
+        rf.write_bytes(rkeep)
         # --- TOOL-aWindowedPass-4 AC5: check 6c, a `[[generated]]` row whose generator the kit does
         #     not ship. Staged in the copy and restored, so the arm is observed red and green both.
         gk = gcopy / PFX / KIT_NAMES["codebase-map"] / "kit.toml"

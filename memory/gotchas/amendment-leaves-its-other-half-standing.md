@@ -130,6 +130,11 @@ consumes-from edge naming that function**, and restates each consumer's expectat
 kept, or changed with the consumer's code in the same unit. The earlier unit's edge is the other half,
 and it reads fine until both are built.
 
+**Checklist line: a spec that removes a dependency greps its shipped text for the removed kit's name
+in the same pass.** dOrderedCharter moved the id grammar from the recall kit into memory-tree's own
+id_grammar.py and left the hygiene guide, the conf example, the kit README and three shell comments
+saying the recall kit must be installed; its closing review found them (PLAY-dOrderedCharter-70).
+
 There is **no machine gate** for this class today, and the two arms above are filed as
 `TOOL-dTieredTribunal-24` rather than built here. Saying so plainly matters more than usual for this
 particular record: a class whose whole subject is a half-finished edit would be a poor place to leave

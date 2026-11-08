@@ -13458,8 +13458,8 @@ reset_tree
 _da_home=drift-audit
 _da_rel=$(resolve_kit_dir "$_rkd_py" "$_da_home" drift_report.py "$HERE" 2>/dev/null) || _da_rel=""
 if [ -z "$_da_rel" ]; then
-  n=$((n+2))   # COUNTED EITHER WAY, so the floor grades this suite and not which kits sit beside it
-  echo "  SKIP slot point.runtime.reading · not-installed: the drift-delta close arm skips, no drift-audit kit resolving beside this one, so nothing prints the delta; its 2 assertions are counted, not run"
+  n=$((n+7))   # COUNTED EITHER WAY, so the floor grades this suite and not which kits sit beside it
+  echo "  SKIP slot point.runtime.reading · not-installed: the drift-delta close arm skips, no drift-audit kit resolving beside this one, so nothing prints the delta; its 7 assertions are counted, not run"
 else
   build_hold_fixture
   mkdir -p dk/u "dk/$_da_home"
@@ -13473,7 +13473,17 @@ else
   out=$(bash dk/u/unattended.sh --close tRun 2>&1)
   hit "$out" "unattended: drift delta, report only"
   hit "$out" "drift-delta:   moved 7 -> 2"
+  hit "$out" "drift-delta: slot point.runtime.reading · filled"
+  # PLAY-dOrderedCharter-70 S2: an empty history is a skipped read, never `filled`, and a reader that
+  # fails says so on its own line, never `filled` either.
   rm -f "$_dh"
+  out=$(bash dk/u/unattended.sh --close tRun 2>&1)
+  hit  "$out" "drift-delta: slot point.runtime.reading · searched-empty"
+  miss "$out" "point.runtime.reading · filled"
+  printf 'import sys\nsys.exit(1)\n' > "dk/$_da_home/drift_report.py"
+  out=$(bash dk/u/unattended.sh --close tRun 2>&1)
+  hit  "$out" "drift-delta: the reader exited 1, no delta read"
+  miss "$out" "point.runtime.reading · filled"
   reset_tree
 fi
 

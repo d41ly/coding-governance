@@ -378,7 +378,11 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "positional-symbol", "positional-pinned", "positional-pin", "positional-forked-before",
           "positional-edited-after", "positional-renamed-after", "positional-uncommitted", "positional-producer-new", "positional-producer-stale", "bundle-manifest", "bundle-fold",
           "bundle-rows-values", "bundle-inline", "bundle-mode-values", "bundle-unregistered-type",
-          "bundle-dangling-target", "bundle-empty-sections", "unclosed-fence", "unclosed-record", "git-env")
+          "bundle-dangling-target", "bundle-empty-sections", "unclosed-fence", "unclosed-record", "git-env",
+          "toml-row", "dirty-rename", "charter-warm", "charter-dirty")
+#: PLAY-dOrderedCharter-70 S3's `toml-row`: a list naming a tag above the row that carries it
+TOML_ROWS = ('foundation = ["practice.b"]\n\n[[practice]]\ntag = "practice.a"\nline = "a"\n\n'
+             '[[practice]]\ntag = "practice.b"\nline = "b"\n\n[practice.reach]\nbuild = "b"\n')
 #: PLAY-dOrderedCharter-44's `extractor-edit`: the fixture extractor's module edited to stop yielding one tag
 EDITED_EXTRACTOR = FIXTURE_EXTRACTOR.replace("elif len(word) == 1:",
                                              'elif len(word) == 1 and word[0] != "layer.memory.recall":')
@@ -760,6 +764,43 @@ def run_plant(root, top, plant, sets) -> int:
         say(f"two parsed {parsed[0]} blobs on the tree one built; served {served[0]} rows of one's version,",
             f"and one serves {served[1]}")
         return 0 if parsed[0] and not served[0] and served[1] else 1
+    # PLAY-dOrderedCharter-70's four: a TOML row placed on its own line, a staged rename, and a conf edit
+    if plant == "toml-row":
+        rows = [r[:4] for r in ti.derive_tag_rows(TOML_ROWS, "practice")]
+        want = [("practice.a", "tag", 4, 5), ("practice.b", "tag", 8, 9)]
+        say(f"rows {rows}", "on their own lines" if rows == want else f"NOT on their own lines, wanted {want}")
+        return 0 if rows == want else 1
+
+    def read_paths(where, address):  # the paths `address` resolves to in `where`'s view, overlay included
+        con = ti.load_index(where)
+        try:
+            ti.load_view(con, where, ti.derive_context(where, where / FIXTURE_KIT / "namespaces.toml"))
+            return sorted({r["path"] for r in ti.resolve_address(con, address)})
+        finally:
+            con.close()
+    if plant == "dirty-rename":
+        run_verb(root, "rebuild", None, sets=sets)
+        run_git(root, "mv", "memory/guides/ALPHA.md", "memory/guides/BETA.md")
+        alpha, beta = read_paths(root, "doc.alpha"), read_paths(root, "doc.beta")
+        say(f"after a staged rename doc.alpha resolves to {alpha} and doc.beta to {beta}")
+        return 0 if not alpha and beta == ["memory/guides/BETA.md"] else 1
+    if plant in ("charter-warm", "charter-dirty"):
+        run_verb(root, "rebuild", None, sets=sets)
+        conf = {".memory-tree.conf": 'MEMORY_ROOT=memory\nCHARTER="CHARTER2.md"\n',
+                "CHARTER2.md": "# Charter two\n\n## Practices\n\nthe second charter\n"}
+        if plant == "charter-warm":
+            write_commit(root, conf, "the charter moves")
+            run_verb(root, "rebuild", None, sets=sets)
+            same = print_equal(read_dump(root), read_cold_dump())
+        else:
+            write_commit(root, {"CHARTER2.md": conf["CHARTER2.md"]}, "a second charter, not yet named")
+            run_verb(root, "rebuild", None, sets=sets)
+            write_files(root, {".memory-tree.conf": conf[".memory-tree.conf"]})
+            run_verb(root, "rebuild", None, sets=sets)
+            same = print_equal(read_dump(root), read_cold_dump())
+        paths = read_paths(root, "doc.charter")
+        say(f"doc.charter resolves to {paths}")
+        return 0 if same and paths == ["CHARTER2.md"] else 1
     if plant == "rebuild":
         run_verb(root, "rebuild", None, sets=sets)
         first = read_dump(root)

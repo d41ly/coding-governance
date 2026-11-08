@@ -177,6 +177,10 @@ INSTRUCTION_PATHSPECS = (
 """Every instruction file, closed; `{charter}` the conf's CHARTER and `{memory_root}` its MEMORY_ROOT."""
 RENDERERS_TABLE = "renderers.toml"
 LEGACY_LIST = "instructions-legacy.txt"
+#: the closed set of commands a `cmd:` source may run (PLAY-dOrderedCharter-70 S1); a target's manifest cannot widen it
+REGISTERED_COMMANDS = ("git rev-parse --abbrev-ref HEAD",)
+#: seconds a registered command may run before its render is refused
+CMD_TIMEOUT_S = 30
 RENDERERS = ("playbook:charter", "playbook:entry-files", "kit-adopter", "hand")
 
 
@@ -411,9 +415,10 @@ def derive_unit_selection(units, selector) -> list:
                   key=lambda u: (len(LEVELS) if u.level is None else u.level, u.path, u.index))
 
 
-def render_unit(unit, policy_reader) -> str:
+def render_unit(unit, policy_reader, root=None) -> str:
     """S4: the line a unit loads as: its `text` when typed; a `policy:<key>` source's value lines through
-    `policy_reader(key)`, one member per line; a `cmd:<command>` source's output, never typed text. A
+    `policy_reader(key)`, one member per line; a `cmd:<command>` source's one line of output, never typed
+    text, the command one of REGISTERED_COMMANDS run in `root` with the caller's git variables aside. A
     refused read refuses the render, a UnitRowError naming the unit, the key and the reader's line."""
     from policy_value import PolicyRefused
     if unit.type not in (POLICY_VALUE, FACT):
@@ -426,22 +431,31 @@ def render_unit(unit, policy_reader) -> str:
         except PolicyRefused as exc:
             raise UnitRowError(f"{where} · the render is refused: policy {exc.key}: {exc.line}") from None
     if kind == "cmd":
+        if arg not in REGISTERED_COMMANDS:
+            raise UnitRowError(f"{where} · the render is refused: `{arg}` is no registered command, one of "
+                               f"{REGISTERED_COMMANDS}")
+        load_memory_tree_path()
+        from tree_lib import GIT_ENV_LEAKS
         try:
-            done = subprocess.run(shlex.split(arg), capture_output=True, text=True, encoding="utf-8",
-                                  errors="replace", stdin=subprocess.DEVNULL)
-        except (OSError, ValueError) as exc:
+            done = subprocess.run(shlex.split(arg), capture_output=True, text=True, encoding="utf-8", errors="replace",
+                                  stdin=subprocess.DEVNULL, cwd=root, timeout=CMD_TIMEOUT_S,
+                                  env={k: v for k, v in os.environ.items() if k not in GIT_ENV_LEAKS})
+        except (OSError, ValueError, subprocess.TimeoutExpired) as exc:
             raise UnitRowError(f"{where} · the render is refused: `{arg}` did not run: {exc}") from None
         if done.returncode:
             raise UnitRowError(f"{where} · the render is refused: `{arg}` exited {done.returncode}")
-        return done.stdout.rstrip("\n")
+        out = done.stdout.strip()
+        if "\n" in out:
+            raise UnitRowError(f"{where} · the render is refused: `{arg}` printed more than one line")
+        return out
     # ponytail: no probe registry exists, so a `probe:<name>` source refuses; its runner lands with the registry
     raise UnitRowError(f"{where} · the render is refused: source {unit.source!r} names no policy key and "
                        f"no command")
 
 
-def render_units(units, policy_reader) -> str:
+def render_units(units, policy_reader, root=None) -> str:
     """S4: the units' rendered lines joined, one line per unit."""
-    return "\n".join(render_unit(u, policy_reader) for u in units)
+    return "\n".join(render_unit(u, policy_reader, root) for u in units)
 
 
 def read_practice_catalogue(path) -> dict:
@@ -599,6 +613,9 @@ def check_statement(row, resolve=None) -> list[str]:
             add_red(f"a {kind} carries source {source!r}", "source it as policy:<key>")
         if kind == FACT and not source:
             add_red(f"a {kind} carries no source", "source it from a policy, probe or command, or delete it")
+        if kind == FACT and source.startswith("cmd:") and source[4:] not in REGISTERED_COMMANDS:
+            add_red(f"source {source!r} names no registered command",
+                    f"source it as cmd:<one of {REGISTERED_COMMANDS}>, or from a policy")
         return found
     if not text:
         add_red(f"a {kind} carries no text", f"type the {kind}'s one line")
@@ -1061,7 +1078,8 @@ STATEMENT_ROWS = (
     ({"tag": "fx.pointer", "type": POINTER, "text": "When a level is named, read `level.charter`."}, None),
     ({"tag": "fx.command", "type": POINTER, "text": "Before a push, run `bash tools/push-main.sh`."}, None),
     ({"tag": "fx.policy", "type": POLICY_VALUE, "source": "policy:tags.slice"}, None),
-    ({"tag": "fx.fact", "type": FACT, "source": "cmd:git worktree list"}, None),
+    ({"tag": "fx.fact", "type": FACT, "source": "cmd:git rev-parse --abbrev-ref HEAD"}, None),
+    ({"tag": "fx.unregistered", "type": FACT, "source": "cmd:git worktree list"}, "names no registered command"),
     ({"tag": "fx.no-modal", "type": DIRECTIVE, "text": "Land through the lander.", "trigger": "always"},
      "opens with no modal"),
     ({"tag": "fx.no-enforcer", "type": CONSTRAINT, "text": "A guide is at most 30720 bytes."},
@@ -1462,9 +1480,15 @@ def run_render(top, *args) -> tuple[int, str]:
     return rc, out.getvalue()
 
 
+def derive_tool_rel(*parts) -> str:
+    """`parts` under the tool root, tree-relative; a root install's empty prefix adds no segment
+    (PLAY-dOrderedCharter-70 S5)."""
+    return "/".join(p for p in (derive_kit_prefix(), *parts) if p)
+
+
 def derive_kit_rel(name) -> str:
     """`name` of this kit, tree-relative: the render gate's two tables as a fixture tree holds them."""
-    return f"{derive_kit_prefix()}/{KIT_DIR.name}/{name}"
+    return derive_tool_rel(KIT_DIR.name, name)
 
 
 def write_gate_tree(c, legacy=GATE_LEGACY, **files):
@@ -1472,7 +1496,7 @@ def write_gate_tree(c, legacy=GATE_LEGACY, **files):
     run_git(c.top, "checkout", "-q", "-b", "main")
     c.write_file(derive_kit_rel(RENDERERS_TABLE), GATE_TABLE)
     c.write_file(derive_kit_rel(LEGACY_LIST), legacy)
-    c.write_file(f"{derive_kit_prefix()}/check-playbook-parity.sh", "exit 0\n")
+    c.write_file(derive_tool_rel("check-playbook-parity.sh"), "exit 0\n")
     for rel, text in {**GATE_FILES, **{k.replace("__", "/"): v for k, v in files.items()}}.items():
         c.write_file(rel, text)
     run_commit(c.top, "the gate's tree")
@@ -1689,12 +1713,63 @@ def arm_git_env(c):
     c.check("the outer index is unchanged", index.read_bytes() == sentinel)
 
 
+def arm_cmd_source(c):
+    """PLAY-dOrderedCharter-70 S1: a `cmd:` source runs only a registered command, in the target, on one line."""
+    global REGISTERED_COMMANDS, CMD_TIMEOUT_S
+    py = shlex.quote(pathlib.Path(sys.executable).as_posix())
+    sentinel = c.top / "sentinel.txt"
+
+    def derive_unit(arg):
+        row = f'[[unit]]\ntag = "unit.cmd"\nlevel = 3\ntype = "{FACT}"\nsource = {json.dumps("cmd:" + arg)}\n'
+        return parse_unit_rows(row, "tools/alpha/instructions.toml")[0][0]
+
+    def read_render(arg, root=None):
+        try:
+            return render_unit(derive_unit(arg), None, root)
+        except UnitRowError as exc:
+            return f"refused: {exc}"
+    planted = f'{py} -c "open(\'{sentinel.as_posix()}\', \'w\').write(\'x\')"'
+    reds = check_statement({"tag": "fx.cmd", "type": FACT, "source": "cmd:" + planted})
+    c.check("an unregistered command reds naming the source and the registry",
+            any(repr("cmd:" + planted) in r and "names no registered command" in r and REGISTERED_COMMANDS[0] in r for r in reds),
+            " | ".join(reds))
+    said = read_render(planted)
+    c.check("an unregistered render refuses before any spawn", said.startswith("refused:")
+            and "no registered command" in said and not sentinel.exists(), said)
+    c.write_file("a.txt", "a\n")
+    run_commit(c.top, "base")
+    run_git(c.top, "checkout", "-q", "-b", "cmd-root")
+    other = c.top / "caller"
+    other.mkdir()
+    run_git(other, "init", "-q")
+    run_git(other, "checkout", "-q", "-b", "caller")
+    run_git(other, "-c", "user.name=f", "-c", "user.email=f@f", "commit", "-q", "--allow-empty", "-m", "caller")
+    here = os.getcwd()
+    try:
+        os.chdir(other)
+        said = read_render(REGISTERED_COMMANDS[0], c.top)
+    finally:
+        os.chdir(here)
+    c.check("the registered command answers from the target, not the caller's cwd", said == "cmd-root", said)
+    kept = REGISTERED_COMMANDS, CMD_TIMEOUT_S
+    two, slow = f'{py} -c "print(1); print(2)"', f'{py} -c "import time; time.sleep(5)"'
+    try:
+        REGISTERED_COMMANDS, CMD_TIMEOUT_S = (two, slow), 1
+        said = read_render(two, c.top)
+        c.check("a command printing two lines is refused", "more than one line" in said, said)
+        said = read_render(slow, c.top)
+        c.check("a command outliving the timeout is refused", said.startswith("refused:") and "did not run" in said,
+                said)
+    finally:
+        REGISTERED_COMMANDS, CMD_TIMEOUT_S = kept
+
+
 PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority, "statements": arm_statements,
           "document": arm_document, "lock": arm_lock, "row": arm_row, "two-kits": arm_two_kits,
           "unreadable": arm_unreadable, "arms": arm_arms, "render": arm_render, "extractor": arm_extractor,
           "schema": arm_schema, "one-fact": arm_one_fact, "status": arm_status, "renderers": arm_renderers,
           "work-order": arm_work_order, "slots": arm_slots, "legacy": arm_legacy, "no-renderer": arm_no_renderer,
-          "git-env": arm_git_env}
+          "git-env": arm_git_env, "cmd-source": arm_cmd_source}
 
 
 def run_fixture(plant=None) -> tuple[list, int]:
