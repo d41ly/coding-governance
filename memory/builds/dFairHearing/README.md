@@ -134,7 +134,7 @@ ids TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHea
 | [TOOL-dFairHearing-50 — the reds of the close's first suite baseline](spec/2026-11-05-spec-TOOL-dFairHearing-50.md) | 33 | 2 | CLOSED | rev-3 | 2026-11-08 |
 <!-- /gen:build-units -->
 
-Records: 381 bound to this build, across 4 record folder(s).
+Records: 382 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
