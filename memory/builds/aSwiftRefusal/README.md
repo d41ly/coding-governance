@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-10
 streams: tooling
 roster: TOOL
-ids: TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 TOOL-aSwiftRefusal-3
+ids: TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 TOOL-aSwiftRefusal-3 TOOL-aSwiftRefusal-4
 ---
 
 # aSwiftRefusal — `--dispatch` refuses cheaply first, and a deferral stops blocking
@@ -49,11 +49,12 @@ None.
 | 1 | `TOOL-aSwiftRefusal-1` | `verb_dispatch` runs the spec-token check after every refusal decidable from the run-state file and the spec headers |
 | 2 | `TOOL-aSwiftRefusal-2` | the order gate lets an earlier-order unit pass when the deferral predicate holds for it |
 | 3 | `TOOL-aSwiftRefusal-3` | `read_open_passes` leaves out every key of a deferred unit, naming each on stderr |
+| 4 | `TOOL-aSwiftRefusal-4` | promoted from the closing review: round 1's four mediums and three lows, batched — check 23 and `--rescope` read the deferral through the one predicate, the floors, the `--audit` arm, the positive control and the contract text |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 3 unit(s) · node a · opened 2026-11-10 · streams tooling
-ids TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 TOOL-aSwiftRefusal-3
+ids TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 TOOL-aSwiftRefusal-3 TOOL-aSwiftRefusal-4
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -63,7 +64,7 @@ ids TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 TOOL-aSwiftRefusal-3
 | [TOOL-aSwiftRefusal-3 — `read_open_passes` leaves out every key of a deferred unit, naming each on stderr](spec/2026-11-10-spec-TOOL-aSwiftRefusal-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 2 record folder(s).
+Records: 7 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

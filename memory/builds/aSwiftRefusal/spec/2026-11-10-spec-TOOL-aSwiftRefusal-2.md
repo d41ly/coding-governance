@@ -9,6 +9,7 @@
 | [2026-11-10-prompt-TOOL-aSwiftRefusal-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-1-brief.md) | research | TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-3 |
 | [2026-11-10-prompt-TOOL-aSwiftRefusal-1-token-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-1-token-fix-brief.md) | research | TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-3 |
 | [2026-11-10-prompt-TOOL-aSwiftRefusal-2-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-2-1-spec-writer.md) | journal | — |
+| [2026-11-10-review-TOOL-aSwiftRefusal-1-3-closing-diff-round1.md](../reviews/2026-11-10-review-TOOL-aSwiftRefusal-1-3-closing-diff-round1.md) | diff-review | TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-3 |
 
 <!-- /gen:spec-records -->
 
