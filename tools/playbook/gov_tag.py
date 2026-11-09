@@ -227,20 +227,23 @@ def run_check(con, root, ctx, kit_rel, *, sets, base, as_json, state) -> int:
     j_reds, j_lines = ti.check_namespace_joins(con, ctx, file_names)
     s_reds, c = ti.check_resolves(con, ctx, bare_mode, armed, file_names)
     reds += j_reds + s_reds
-    base_spans, base_why = None, ""
-    if con.execute(ti.VIEW_ROWS + " WHERE p.kind='retired' LIMIT 1").fetchone():
-        if base is None:
-            from_mt = ti.load_memory_tree()  # noqa: F841 - puts memory-tree on sys.path
-            from coverage_join import resolve_compare_base
-            base, base_why = resolve_compare_base(root)
-        if base:
-            base_tree = ti.read_git(root, "rev-parse", f"{base}^{{tree}}").strip()
-            ti.load_view(con, root, ctx, tree=base_tree, overlay=False)
+    base_spans, base_sections, base_why = None, None, ""
+    has_retired = con.execute(ti.VIEW_ROWS + " WHERE p.kind='retired' LIMIT 1").fetchone()
+    if base is None:  # PLAY-dOrderedCharter-29 S8: the base's section rows are read on every run
+        from_mt = ti.load_memory_tree()  # noqa: F841 - puts memory-tree on sys.path
+        from coverage_join import resolve_compare_base
+        base, base_why = resolve_compare_base(root)
+    if base:
+        base_tree = ti.read_git(root, "rev-parse", f"{base}^{{tree}}").strip()
+        ti.load_view(con, root, ctx, tree=base_tree, overlay=False)
+        if has_retired:
             base_spans = {(p, t) for t, p, *_ in ti.read_rows(con, ("span",))}
-            ti.load_view(con, root, ctx)
-        else:
-            print(f"tags: retired: no base ({base_why}), so every citation reads as new")
-    r_reds, warns, cited = ti.check_retired(con, ctx, retired_mode, base_spans, armed)
+        base_sections = {t for t, *_ in ti.read_rows(con, ("section",))}
+        ti.load_view(con, root, ctx)
+    else:
+        print(f"tags: retired: no base ({base_why}), so every citation reads as new and no section as vanished")
+    aliases = ti.read_aliases(root / kit_rel / "aliases.toml")
+    r_reds, warns, cited = ti.check_retired(con, ctx, retired_mode, base_spans, armed, base_sections, aliases)
     o_reds = ti.check_owned(con, ctx, root / kit_rel / "layers.toml")
     n_reds, slot = run_name_check(root, shaped)
     p_reds, p_lines, purpose = run_purpose_check(con, root, ctx)
@@ -365,6 +368,7 @@ kind = "core"
 tag = "layer.exp"
 kind = "expansion"
 '''
+ALIASES = '[[alias]]\nref = "ALPHA M5"\ntarget = "doc.alpha#m5-recall-and-reuse"\n'
 GUIDE = "# Alpha\n\n## Intro\n\nthe intro text\n\n## M5 — Recall and reuse\n\nrecall first\n"
 FIXTURE_KIT = instruction_units.derive_tool_rel(KIT_DIR.name)  # the fixture lays its kit out at this install's layout
 #: PLAY-dOrderedCharter-68's two plants: a fence opened and never closed, then the citation it hides
@@ -380,7 +384,8 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "positional-edited-after", "positional-renamed-after", "positional-uncommitted", "positional-producer-new", "positional-producer-stale", "bundle-manifest", "bundle-fold",
           "bundle-rows-values", "bundle-inline", "bundle-mode-values", "bundle-unregistered-type",
           "bundle-dangling-target", "bundle-empty-sections", "unclosed-fence", "unclosed-record", "git-env",
-          "toml-row", "dirty-rename", "charter-warm", "charter-dirty")
+          "toml-row", "dirty-rename", "charter-warm", "charter-dirty", "retired-section",
+          "retired-section-aliased", "retired-section-reminted")
 #: PLAY-dOrderedCharter-70 S3's `toml-row`: a list naming a tag above the row that carries it
 TOML_ROWS = ('foundation = ["practice.b"]\n\n[[practice]]\ntag = "practice.a"\nline = "a"\n\n'
              '[[practice]]\ntag = "practice.b"\nline = "b"\n\n[practice.reach]\nbuild = "b"\n')
@@ -508,7 +513,7 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
         f"{kit}/namespaces.toml": FIXTURE_REGISTRY + (FIXTURE_UNIT_ROW if plant.startswith("scope") else ""),
         f"{kit}/fixture_tags.py": FIXTURE_EXTRACTOR,
         f"{kit}/layers.toml": FIXTURE_LAYERS,
-        f"{kit}/aliases.toml": '[[alias]]\nref = "ALPHA M5"\ntarget = "doc.alpha#m5-recall-and-reuse"\n',
+        f"{kit}/aliases.toml": ALIASES,
         "tools/corekit/kit.toml": 'id = "corekit"\nlayer = "layer.instruction"\n',
         "tools/corekit/core.tags": "practice.land\npractice.memory\nlayer.memory\nlayer.memory.recall\n",
         "tools/expkit/kit.toml": 'id = "expkit"\nlayer = "layer.exp"\n',
@@ -848,6 +853,16 @@ def run_plant(root, top, plant, sets) -> int:
     if plant == "retired":
         base = run_git(root, "rev-parse", "HEAD").strip()
         write_commit(root, {"memory/guides/ALPHA.md": GUIDE + "\nsee `practice.old`\n"}, "cite a retired tag")
+        return run_verb(root, "check", None, sets=sets, base=base)
+    if plant.startswith("retired-section"):  # PLAY-dOrderedCharter-29 S8: `## Intro` gone between base and tip
+        base = run_git(root, "rev-parse", "HEAD").strip()
+        reminted = plant.endswith("reminted")
+        guide = GUIDE.replace("## Intro\n", "") + ("\n## Intro.\n\nthe slug minted again\n" if reminted else "")
+        files = {"memory/guides/ALPHA.md": guide}
+        if plant != "retired-section":
+            files[f"{FIXTURE_KIT}/aliases.toml"] = (
+                ALIASES + '\n[[alias]]\nref = "doc.alpha#intro"\ntarget = "doc.alpha#m5-recall-and-reuse"\n')
+        write_commit(root, files, "a section retired")
         return run_verb(root, "check", None, sets=sets, base=base)
     if plant in ("retired-old", "retired-reminted"):
         return run_verb(root, "check", None, sets=sets, base=run_git(root, "rev-parse", "HEAD").strip())

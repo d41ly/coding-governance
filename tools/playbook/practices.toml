@@ -332,3 +332,12 @@ line = "Test first: write the failing test that states the behaviour, make it pa
 plan = "state each behaviour as a test the unit must turn green"
 build = "no production code without a failing test"
 test = "watch the test fail before it passes"
+
+[[practice]]
+tag = "practice.writing"
+line = "Write a record section and an instruction unit alike: a tag, one subject, typed edges, pinned facts, one door, one owner, rationale apart, retired never reused."
+rules = ["address", "one-subject", "typed-relations", "pinned-facts", "one-door", "rationale-apart", "one-owner", "retirement"]
+[practice.reach]
+design = "every relation a typed edge declared at the site that owns its fact"
+build = "a quoted count or size carries its pin on its line"
+review = "an unpinned fact, a second door or a reused retired name is a finding"

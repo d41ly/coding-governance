@@ -93,6 +93,7 @@ method carriers (every pointer declared)	repo	declarations
 method-carriers self-test	kit	selftests
 micro-format definitions	repo	product
 micro-format gate selftest	kit	selftests
+one-owner	repo	declarations
 pass-order history	repo	declarations
 placeholder-catalogue self-test	kit	selftests
 playbook parity	repo	product
@@ -177,3 +178,4 @@ verdict-epoch self-test	kit	selftests
 verifier fan-out	repo	declarations
 verifier fan-out self-test	kit	selftests
 workflow script syntax	repo	wiring
+writing practice (records and units)	repo	declarations

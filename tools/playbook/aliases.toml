@@ -5,6 +5,10 @@
 # each name their own `##` section; the hygiene checks are numbered items of one section, the check
 # catalog, so each check names that section. The live positional references are kept by key in
 # positional-refs.txt under <MEMORY_ROOT>/project/, never as a count.
+#
+# A row whose `ref` is a `doc.<name>#<seg>` retires that section (PLAY-dOrderedCharter-29 S8): the
+# resolver's `retired` check reds a section the compare base holds and the tip lacks with no row here,
+# and a retired section's slug minted again, so `target` names where the section went.
 
 [[alias]]
 ref = "BUILD-METHOD M1"
@@ -169,3 +173,15 @@ target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hy
 [[alias]]
 ref = "HYGIENE check 30"
 target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "doc.charter#1-governing-practices"
+target = "doc.charter#practices-follow-each-one"
+
+[[alias]]
+ref = "doc.charter#2-this-repository"
+target = "doc.charter#this-repository-s-own-rules"
+
+[[alias]]
+ref = "doc.charter#3-generated"
+target = "doc.charter#node-registry"

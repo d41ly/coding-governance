@@ -217,10 +217,8 @@ leg	roles render wiring	dWitnessedBar
 leg	roles render selftest	dWitnessedBar
 leg	roles adopter self-test	dWitnessedBar
 leg	policy check	dWitnessedBar
-leg	tags (the resolver's checks)	dWitnessedBar
 leg	tags positional selftest	dWitnessedBar
 leg	tags bundle selftest	dWitnessedBar
-leg	edges (every declared edge parses, is registered and resolves)	dWitnessedBar
 leg	policy fixtures	dWitnessedBar
 leg	leg ceilings clear their evidenced maximum	dWitnessedBar
 leg	every held leg is budgeted, every budget row resolves	dWitnessedBar

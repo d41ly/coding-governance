@@ -86,6 +86,7 @@
       "method-carriers self-test",
       "micro-format definitions",
       "micro-format gate selftest",
+      "one-owner",
       "pass-order history",
       "placeholder-catalogue self-test",
       "playbook parity",
@@ -169,7 +170,8 @@
       "verdict-epoch self-test",
       "verifier fan-out",
       "verifier fan-out self-test",
-      "workflow script syntax"
+      "workflow script syntax",
+      "writing practice (records and units)"
     ],
     "kits": [
       "agent-instructions",

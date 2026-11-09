@@ -360,6 +360,11 @@
     {
       "id": "Refused",
       "kind": "class",
+      "file": "tools/playbook/writing_practice.py"
+    },
+    {
+      "id": "Refused",
+      "kind": "class",
       "file": "tools/run-gates/owed_rows.py"
     },
     {
@@ -5223,6 +5228,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "check_frozen",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
+    },
+    {
       "id": "check_gate_admits",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -5898,6 +5908,11 @@
       "file": "tools/branch-reconcile/adopt-branch-reconcile.sh"
     },
     {
+      "id": "check_one_door",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
+    },
+    {
       "id": "check_one_fact",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -5913,9 +5928,19 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "check_one_owner",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
+    },
+    {
       "id": "check_one_probe",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "check_one_subject",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
     },
     {
       "id": "check_operand",
@@ -6071,6 +6096,11 @@
       "id": "check_pid_alive",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "check_pinned_facts",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
     },
     {
       "id": "check_pinned_handle",
@@ -6236,6 +6266,11 @@
       "id": "check_ranked_arms",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "check_rationale_apart",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
     },
     {
       "id": "check_reaches",
@@ -8643,6 +8678,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "derive_counts",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
+    },
+    {
       "id": "derive_coverage",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -8808,6 +8848,16 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "derive_facts",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
+    },
+    {
+      "id": "derive_facts_path",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
+    },
+    {
       "id": "derive_fail_tail",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -8841,6 +8891,11 @@
       "id": "derive_first_write",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
+      "id": "derive_fixture_files",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
     },
     {
       "id": "derive_fixture_row",
@@ -9913,6 +9968,11 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "derive_sections",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
+    },
+    {
       "id": "derive_self_rel",
       "kind": "function",
       "file": "tools/check-agent-cap-restatement.test.sh"
@@ -10346,6 +10406,11 @@
       "id": "derive_template_size_plant",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_text_lines",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
     },
     {
       "id": "derive_tick_readings",
@@ -12946,6 +13011,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
     },
     {
       "id": "main",
@@ -16388,6 +16458,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "read_doors",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
+    },
+    {
       "id": "read_down_population",
       "kind": "function",
       "file": "tools/lib/python_floor.py"
@@ -16496,6 +16571,11 @@
       "id": "read_fact_counts",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_fact_rows",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
     },
     {
       "id": "read_fact_slots",
@@ -17928,6 +18008,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "read_populations",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
+    },
+    {
       "id": "read_porcelain",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -18101,6 +18186,11 @@
       "id": "read_records",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "read_records",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
     },
     {
       "id": "read_records",
@@ -23710,6 +23800,11 @@
     {
       "id": "run_arm",
       "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
+    },
+    {
+      "id": "run_arm",
+      "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
     {
@@ -23986,6 +24081,11 @@
       "id": "run_check",
       "kind": "function",
       "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "run_check",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
     },
     {
       "id": "run_check_render",
@@ -24291,6 +24391,11 @@
       "id": "run_fixture",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
     },
     {
       "id": "run_fixture",
@@ -25051,6 +25156,11 @@
       "id": "run_plant",
       "kind": "function",
       "file": "tools/playbook/load_sets.py"
+    },
+    {
+      "id": "run_plant",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
     },
     {
       "id": "run_plant_arms",
@@ -30458,9 +30568,19 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "write_finding",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
+    },
+    {
       "id": "write_fixture",
       "kind": "function",
       "file": "tools/playbook/core.py"
+    },
+    {
+      "id": "write_fixture",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
     },
     {
       "id": "write_fixture",

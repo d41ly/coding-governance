@@ -924,14 +924,27 @@ def check_resolves(con, ctx, bare_mode, armed, file_names=None) -> tuple[list, d
     return reds, counts
 
 
-def check_retired(con, ctx, mode, base_spans, armed) -> tuple[list, list, int]:
+def check_retired(con, ctx, mode, base_spans, armed, base_sections=None, aliases=None) -> tuple[list, list, int]:
     """S7 `retired`: a retired name minted again is red under every value; a graded citation of a retired
     tag that `base_spans` (the base tree's (path, tag) citations, None for no base) lacks is new text, red
-    under `refuse-new`, a WARN line under `warn`, silent under `allow`. -> (reds, warns, cited)."""
+    under `refuse-new`, a WARN line under `warn`, silent under `allow`. -> (reds, warns, cited).
+    PLAY-dOrderedCharter-29 S8, over sections: a `doc.<name>#<seg>` of `base_sections` (the compare base's
+    section rows, None for no base) gone at the tip with no `[[alias]]` row is red, and a section an alias
+    row retires minted again at the tip is red, under every value."""
     retired = {}
     for tag, path, line, *_ in read_rows(con, ("retired",)):
         retired.setdefault(tag, (path, line))
     reds, warns, cited = [], [], 0
+    aliases = aliases or {}
+    tip = {}
+    for tag, path, line, *_ in read_rows(con, ("section",)):
+        tip.setdefault(tag, (path, line))
+    for tag in sorted(set(base_sections or ()) - set(tip) - set(aliases)):
+        reds.append(f"tags: retired section · {tag} is at the compare base and gone at the tip with no [[alias]] "
+                    "row: add one in aliases.toml naming where it went")
+    for ref in sorted(r for r in aliases if r in tip):
+        reds.append(f"tags: {tip[ref][0]}:{tip[ref][1]} · retired section minted again · {ref} (an [[alias]] row "
+                    f"retires it to {aliases[ref]})")
     if not retired:
         return reds, warns, cited
     for tag, path, line, *_ in read_rows(con, DEFINE_KINDS):

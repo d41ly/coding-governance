@@ -2036,7 +2036,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 180,
-    "pack": "tags"
+    "pack": "tags",
+    "enforces": ["practice.writing.address", "practice.writing.retirement"]
   },
   {
     "name": "tags positional selftest",
@@ -2072,7 +2073,36 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 180,
-    "pack": "tags"
+    "pack": "tags",
+    "enforces": ["practice.writing.typed-relations"]
+  },
+  {
+    "name": "writing practice (records and units)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/writing_practice.py",
+      "check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 180,
+    "pack": "tags",
+    "enforces": ["practice.writing.one-subject", "practice.writing.pinned-facts", "practice.writing.one-door",
+                 "practice.writing.rationale-apart"]
+  },
+  {
+    "name": "one-owner",
+    "argv": [
+      "python",
+      "{prefix}/playbook/writing_practice.py",
+      "check",
+      "one-owner"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 180,
+    "pack": "tags",
+    "enforces": ["practice.writing.one-owner"]
   },
   {
     "name": "policy fixtures",

@@ -5,7 +5,10 @@
 its reach: what the practice changes at each step it touches. The policy key `charter.practices` says <!-- usage: policy:charter.practices e867acb6 -->
 which rows your charter carries. Left unset, it carries the catalogue's `foundation` set, which is
 today's governance practices. The catalogue also ships rows outside that set, such as `practice.solid`,
-`practice.dry` and `practice.tdd`, which reach a charter only when you name them.
+`practice.dry` and `practice.tdd`, which reach a charter only when you name them. One of them,
+`practice.writing`, says a record section and an instruction unit are written alike: a tag, one
+subject, typed edges, pinned facts, one door, one owner, rationale apart, and a retired name never
+reused. Each of its eight rules names the gate leg that checks it, through that leg's `enforces` key.
 
 A template at v4.5 or later holds one `{{PRACTICES}}` line, and the render writes one `- [<name>] <rule>`
 line per active row there. A template seeded earlier keeps its typed lines, reads neither the catalogue
