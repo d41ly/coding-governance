@@ -21,8 +21,7 @@ writes: none
 - [docs] A user-facing change is not done until its page under `help/` is current.
 - [security] Security first: validate once at the write boundary, deny by default, give automation the narrowest grant, and keep secrets out of files, memory and chat.
 - [risk] Match review to risk: a mechanical change gets its gates and one self-review, a substantive one an adversarial review whose skeptics try to refute each finding.
-- [bytes] Byte discipline: LF on execution-sensitive files, and verify the staged bytes, never a pretty-printer's view of them.
-- [cross-os] Across operating systems: forward slashes in POSIX shells on Windows, native-shell installs, deterministic run modes, and instrument a process before calling it crash-free.
+- [portable] Python for logic, shell as a thin shim, JavaScript for the harness; encoding, line endings, paths, launch, temps, the interpreter floor and quoting each have a leg.
 
 ### Protocols — read the one whose trigger holds
 

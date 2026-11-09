@@ -22,9 +22,8 @@ writes: product
 - [gate] A gate never seen red is not a gate: observe its failing case, state what it does not check, and never read a skip, an unmovable probe, an exemption or an empty population as coverage.
 - [docs] A user-facing change is not done until its page under `help/` is current.
 - [security] Security first: validate once at the write boundary, deny by default, give automation the narrowest grant, and keep secrets out of files, memory and chat.
-- [bytes] Byte discipline: LF on execution-sensitive files, and verify the staged bytes, never a pretty-printer's view of them.
-- [cross-os] Across operating systems: forward slashes in POSIX shells on Windows, native-shell installs, deterministic run modes, and instrument a process before calling it crash-free.
-- [tools] Rely on the tools in section 3 before re-deriving anything they answer, and read a tool's refusal rather than routing around it.
+- [portable] Python for logic, shell as a thin shim, JavaScript for the harness; encoding, line endings, paths, launch, temps, the interpreter floor and quoting each have a leg.
+- [tools] Rely on the tools under this charter's 'Tools to rely on' before re-deriving anything they answer, and read a tool's refusal rather than routing around it.
 
 ### Protocols — read the one whose trigger holds
 
