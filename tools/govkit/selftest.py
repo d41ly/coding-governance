@@ -19799,6 +19799,18 @@ user_skills = "/tmp/gk-fake-skills"
                   and (_rc == 1) == ("MISS" in _p.stdout),
                   f"exit {_p.returncode}, expected {_rc}: {_p.stdout[-1200:]}{_p.stderr[-400:]}")
 
+    # ---- PLAY-dOrderedCharter-33 AC9. `update` runs the playbook kit's drift verb under the target's
+    # ---- committed `instructions.stale`: `order` prints the stale line and writes one order, `refuse`
+    # ---- exits 1 writing nothing; each staged red by removing the handler call.
+    for _pl, _st, _rc in (("order", None, 0), ("refuse", None, 0), ("order", "no-handler", 1),
+                          ("refuse", "no-handler", 1)):
+        _p = subprocess.run([sys.executable, str(HERE / "fixtures" / "stale_edges.py"), "--plant", _pl,
+                             *(["--stub", _st] if _st else [])], capture_output=True, text=True,
+                            encoding="utf-8", errors="replace")
+        check(f"[dOrderedCharter-33 AC9] plant {_pl}" + (f" --stub {_st} stages its red" if _st else " matches its case"),
+              _p.returncode == _rc and "observation(s) matched" in _p.stdout and (_rc == 1) == ("MISS" in _p.stdout),
+              f"exit {_p.returncode}, expected {_rc}: {_p.stdout[-1200:]}{_p.stderr[-400:]}")
+
     # ---- TOOL-dSafePassage-13 AC1, AC3-AC8. THE DOCS LEG, through its own fixture: every plant exits
     # ---- as section 4's table says and prints the line its criterion names, and `stale-page` under
     # ---- `warn` exits 0 with a WARN line and under `off` prints one line naming the key.

@@ -72,7 +72,6 @@ install.guards
 install.steps
 instructions.exclude
 instructions.slices
-instructions.stale
 instructions.task-charter
 integrations.tracker
 kickoff.runs

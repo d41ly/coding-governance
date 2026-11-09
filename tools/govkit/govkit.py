@@ -9318,6 +9318,39 @@ def read_retired_edits_mode(target: pathlib.Path) -> str:
     return value
 
 
+def read_unit_drift(root: pathlib.Path, target: pathlib.Path, from_rev: str | None, to_rev: str,
+                    write: bool) -> tuple[dict, str]:
+    """PLAY-dOrderedCharter-33 S3, S7: the playbook kit's `drift` verb over the target's pinned edges,
+    run as a subprocess since govkit imports no kit, under the target's committed
+    `instructions.stale` at its HEAD. -> (the verb's report, the mode). A mode outside the three, a
+    reader refusal, no playbook kit or a report that does not parse is a Refusal naming the key."""
+    try:
+        value, source, reason = read_policy_value("instructions.stale", target, rev="HEAD")
+    except (LookupError, Refusal) as exc:
+        raise Refusal(f"instructions.stale could not be read: {exc}") from None
+    if value not in ("order", "refuse", "warn"):
+        raise Refusal(f"instructions.stale = {value!r} is none of order, refuse, warn ({source}: {reason})")
+    try:
+        kit = resolve_kit_dir("playbook", "pins.py", GOVKIT_DIR)
+    except LookupError as exc:
+        raise Refusal(f"instructions.stale = {value}, and the drift verb is not found: {exc}") from None
+    argv = [sys.executable, str(kit / "pins.py"), "drift", "--target", str(target), "--gov", str(root),
+            "--to", to_rev, "--stale", value, *(["--from", from_rev] if from_rev else []),
+            *(["--write"] if write else [])]
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    p = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8", errors="replace",
+                       stdin=subprocess.DEVNULL, env=env)
+    try:
+        report = json.loads(p.stdout)
+    except ValueError:
+        report = None
+    if p.returncode not in (0, 1) or not isinstance(report, dict):
+        why = (p.stderr or p.stdout).strip().splitlines()
+        raise Refusal(f"instructions.stale = {value}: the drift verb exited {p.returncode}: "
+                      f"{why[-1] if why else 'it printed nothing'}")
+    return report, value
+
+
 def render_row_order_key(kind: str, path: str) -> str:
     """THE ONE SPELLING of a row-keyed order's name, `update-<kind>-<slug>`, the slug
     `render_order_slug` of a row's path or a step's id (TOOL-dSafePassage-35 S39): `write_row_order`
@@ -10418,6 +10451,32 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 print(f"govkit update — mode-carry {row['path']} · {_ment[0]} -> {_mto} · "
                       f"gov at {to_commit[:8]}")
 
+    # PLAY-dOrderedCharter-33 S3, S7. THE UNIT DRIFT, after the per-file verdicts and before the write
+    # loop: the playbook kit's drift verb walks each pinned edge of the target's overlay under its
+    # committed `instructions.stale`. Its lines join the verdicts and the tally, its orders are written
+    # once the outbox exists, and `refuse` holds the whole update below, before any write.
+    _unit_orders: list[dict] = []
+    _unit_refuse = False
+    if "playbook" in (kits or claimed):
+        try:
+            _drift, _stale_mode = read_unit_drift(root, target, base_commit, to_commit, write)
+        except Refusal as _ud_err:
+            r.fail(f"the unit drift is refused — {_ud_err}")
+            _add_held("playbook", ".governance/instructions.toml")
+            _drift, _stale_mode = {}, None
+        for _ln in _drift.get("lines") or []:
+            print(_ln)
+            if not _ln.lstrip().startswith("held"):
+                _uv = f"unit:{_ln.split()[0]}"
+                tally[_uv] = tally.get(_uv, 0) + 1
+        for _red in _drift.get("reds") or []:
+            r.fail(f"the unit drift is red — {_red}")
+            _add_held("playbook", ".governance/instructions.toml")
+        if _drift:
+            print(f"govkit update — unit drift: {_drift.get('rows')} · instructions.stale = {_stale_mode}")
+        _unit_orders = _drift.get("orders") or []
+        _unit_refuse = bool(_drift.get("refuse"))
+
     for line in (f"  available (not installed): {e}" for e in available):
         print(line)
     if available:
@@ -10425,6 +10484,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               "`update` does not install them: widening a target's governance surface is an owner "
               "decision, and `--add-kits` is the flag that would")
     print("govkit update — " + " · ".join(f"{k} {v}" for k, v in sorted(tally.items())))
+    if _unit_refuse:
+        # hold-exempt: `refuse` holds the whole update, which returns here before any write
+        r.fail("instructions.stale = refuse holds this update: re-pin or re-point each edge held above "
+               "through instructions.edit, then re-run. NOTHING was written")
+        return r.emit()
     if tally.get("adopter-owned"):
         for _ln in derive_parity_lines(target, receipt, descs, r):
             print(f"govkit update — {_ln}")
@@ -10701,6 +10765,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
 
     outbox = target / ".governance" / "outbox"
     outbox.mkdir(parents=True, exist_ok=True)
+    # PLAY-dOrderedCharter-33 S7: each order the drift verb returned, keyed on its overlay row's path,
+    # its text the verb's whole order, title included.
+    for _uo in _unit_orders:
+        _uop = write_row_order(outbox, "unit", _uo["path"], _uo["body"])
+        print(f"  {'ordered':<18} [{'unit':<13}] {_uo['path']} · order {_uop.relative_to(target).as_posix()}")
     # The target-code switch, read once ABOVE the write loop (TOOL-dSafePassage-9 S1), so the
     # withdrawn arm's unwire and the re-render and wiring steps below read the one value.
     _rerender_on = os.environ.get("GOVKIT_RERENDER") != "0"

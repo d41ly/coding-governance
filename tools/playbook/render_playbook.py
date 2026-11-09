@@ -2514,6 +2514,14 @@ def run_selftest() -> int:
     check_arm(done.returncode == 0, 'the overlay composes, refuses and writes as its plants say',
               done.stdout[-2000:] + done.stderr[-500:])
 
+    # PLAY-dOrderedCharter-33 — pins and drift: each plant stages its own failing case in a throwaway
+    # repository: the mark's classes, the ruling's proof, the walk, the three stale modes and the orphans.
+    done = subprocess.run([sys.executable, str(Path(__file__).resolve().parent / 'pins.py'), '--fixture'],
+                          capture_output=True, text=True, encoding='utf-8', errors='replace',
+                          stdin=subprocess.DEVNULL, timeout=600)
+    check_arm(done.returncode == 0 and 'pins: fixture · green' in done.stdout,
+              'pins mark, walk and drift as their plants say', done.stdout[-2000:] + done.stderr[-500:])
+
     # TOOL-aRepatriatedFork-42 — `--answers` states what `render` would use, and grades `kits` alike.
     with tempfile.TemporaryDirectory() as td:
         eng, tgt = _write_fixture(Path(td), ok_kits, ok_var)

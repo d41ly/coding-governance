@@ -1,0 +1,10 @@
+# spelling-map.toml — the declared spelling map (PLAY-dOrderedCharter-33 S1, F1).
+#
+# One [[spelling]] row per respelling gov's owner declares mechanical: `from`, the word as gov's text
+# spelled it, and `to`, the word it is respelled as, whole words only. `pins.py` reads a change whose
+# only difference is a declared respelling, once punctuation is stripped, as `editorial`, so a pin behind
+# it stands. A row is gov's owner's to add; the map is empty at landing.
+#
+# [[spelling]]
+# from = "colour"
+# to = "color"

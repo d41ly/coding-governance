@@ -64,6 +64,41 @@ usage = "set [adopter] release-train in .governance/policy.toml"
 Changing the overlay stales the policy mirror `.governance/policy.json`, since it records the overlay's
 blob; the landing regenerates it.
 
+## When gov changes a unit you pinned
+
+Every change gov makes to a unit carries a change record marked `editorial` or `semantic`. `editorial`
+is admitted only where the change is mechanical: whitespace, punctuation, or a respelling gov's
+`spelling-map.toml` declares, or where the record carries the owner's ruling with its proof. A record
+marked `editorial` over a change of meaning is refused, naming the record, the unit and the first word
+that differs. At each `update` your pinned edges are walked from the pin to gov's current text:
+
+- behind editorial records only, the edge stands and nothing is said beyond its `amended` or
+  `replaced` line;
+- behind a `semantic` record, the edge is `stale`;
+- a unit gov renamed re-points your edge to the new tag, its pin kept;
+- a unit gov split or retired orphans your edge: an orphaned `amends` stops rendering, an orphaned
+  `supersedes` renders alone as your unit.
+
+What a stale edge does is yours to choose with `instructions.stale` in `.governance/policy.toml`, read
+at your HEAD:
+
+```toml
+[instructions]
+stale = "warn"
+```
+
+- `order`, the default: gov's new text and your unit both render, and `update --write` writes an order
+  `.governance/outbox/update-unit-<slug>.md` naming the edge, gov's old and new text, and the command
+  that re-pins it.
+- `refuse`: the update writes nothing and exits 1, naming each stale or orphaned edge, until you re-pin.
+- `warn`: both render, the edge is printed, and `update --write` appends one line to
+  `.governance/journal/stale-edges.tsv` with no order.
+
+An orphaned edge files an order under `order` and `warn` alike. The update also lists, as `new-beside`,
+each unit gov added at a level and a selection one of your units holds, so you can see whether yours
+still says something gov does not. Re-pin an edge through `instructions_edit.py edit --manifest overlay
+--tag <your tag> --edges amends=<gov tag>@<hash8>`.
+
 ## Check it
 
 `python tools/playbook/overlay.py check` prints each gov unit's class, each of your keys with its tag

@@ -680,6 +680,8 @@ owner = "dOrderedCharter"
 name = "instructions.stale"
 allowed = ["order", "refuse", "warn"]
 default = "order"
+summary = "What update does when gov changed the meaning of a unit your overlay pins: render both texts and write an outbox order, hold the update until you re-pin, or render both and journal the edge with no order."
+usage = 'instructions.stale = "warn"'
 owner = "dOrderedCharter"
 
 [[key]]
