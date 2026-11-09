@@ -77,6 +77,11 @@ usage = "synopsis"
 rows = "{prefix}/playbook/render_playbook.py:read_kind_reference_rows"
 why = "a kind is its summary and its usage, which its kinds register row states; help/reference/kinds.md renders them (PLAY-dOrderedCharter-37)"
 
+[[class]]
+class = "unit"
+usage = "none"
+why = "a gov unit is loaded text, used by no verb, key, hook, leg or page; units carrying a usage field are the unit-usage class"
+
 [[usage]]
 id = "command:build"
 shape = "verb"

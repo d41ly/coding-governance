@@ -373,7 +373,11 @@ def write_unit_plant(clone) -> str:
     u = units[0]
     path = pathlib.Path(clone) / u.path
     text = path.read_bytes().decode("utf-8")
-    path.write_bytes(text.replace(u.body, "", 1).encode("utf-8"))
+    # ponytail: `read_units` reads with universal newlines, so a CRLF checkout holds the row as CRLF.
+    body = u.body.replace("\n", "\r\n") if "\r\n" in text else u.body
+    if body not in text:
+        raise ValueError(f"the unit plant found no row {u.tag} in the bytes of {u.path}")
+    path.write_bytes(text.replace(body, "", 1).encode("utf-8"))
     iu.run_git(clone, "add", "--", u.path)
     return f"unit:{u.tag}"
 

@@ -26,3 +26,13 @@ arm running `pins.py --fixture` over every plant, the deployer's self-test arm r
 both plants with and without the `no-handler` stub, and the step gate's `unit` class row's arm, which arms only
 at F5's later commit. That later commit lands the `unit` row in `surface-classes.toml` and the `usage.toml`
 row, and records AC7 and AC11 from it.
+
+**The later commit (F5).** Each line below is a probe the later-commit pass of PLAY-dOrderedCharter-33 ran, with
+the `unit` rows applied over the tree that tracks unit 40's gov unit rows (c91c26904). No leg, suite or bar ran.
+
+**Evidences:** PLAY-dOrderedCharter-33
+- AC7 — later commit — `step_gate.py --list` over the worktree printed `unit · 4 members` beside the other classes; in a scratch clone carrying the rows committed, `step_gate.py --fixture --plant unit` exited 1 naming `unit:unit.policy-schema`, and a sparse clone with the same plant and then a change record ending `unit.policy-schema` with `Successor: none` committed exited 0, `1 vanished · 1 witnessed`, the witness reading that tag. Before the plant fix of deviation 336 the same fixture exited 0 with nothing vanished, because the plant matched no bytes in a CRLF checkout.
+- AC11 — later commit — `git grep -n -A3 -F 'class = "unit"' -- tools/govkit/usage.toml` printed the one `[[class]]` row with `usage = "none"` and its `why`, and `git grep -n -F 'id = "unit"' -- tools/govkit/surface-classes.toml` printed the registered class it joins.
+
+**Owed to the close.** The step gate's `unit` class row's `New arm:` RED-first observation, the `step-gate` and
+docs legs over the two rows, and the bar.
