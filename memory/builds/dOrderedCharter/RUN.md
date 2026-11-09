@@ -435,3 +435,11 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-09T12:32:46Z dispatch · item cb020dc1 PLAY-dOrderedCharter-36 · reason tools/playbook/row_checks.py tools/playbook/overlay_rows.py tools/playbook/policy_value.py tools/playbook/fixtures/row_kind.py tools/playbook/render_playbook.py help/overlay-rows.md memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-36.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-36-ledger.md memory/map/generated/symbols.json memory/builds/dOrderedCharter/README.md
 
 2026-11-09T12:33:14Z brief · item PLAY-dOrderedCharter-36 · reason 16607aef6153 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-36-build-brief.md
+
+2026-11-09T15:37:03Z dispatch · item fc6a0546 PLAY-dOrderedCharter-34 · reason tools/playbook/render_playbook.py tools/playbook/practice_census.py tools/playbook/fixtures/composition.py tools/playbook/kit.toml tools/playbook/instruction_units.py tools/playbook/instructions_edit.py tools/playbook/overlay.py tools/policy/check_policy.py tools/govkit/govkit.py tools/govkit/selftest.py tools/playbook/README.md help/charter.md help/roles.md help/composition.md help/README.md AGENTS.md .governance/instructions.lock memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-34.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-34-ledger.md memory/builds/dOrderedCharter/build/2026-11-09-build-PLAY-dOrderedCharter-34-census.md memory/builds/dOrderedCharter/README.md memory/map/generated/symbols.json memory/LIVE.md
+
+2026-11-09T15:37:13Z brief · item PLAY-dOrderedCharter-34 · reason 2b3d7fb98248 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-34-build-brief.md
+
+2026-11-09T16:03:02Z dispatch · item fc6a0546 PLAY-dOrderedCharter-34 · reason memory/builds/dOrderedCharter/build/2026-11-09-build-PLAY-dOrderedCharter-34-deviation-347.md memory/builds/dOrderedCharter/build/2026-11-09-build-PLAY-dOrderedCharter-34-deviation-348.md
+
+2026-11-09T16:15:06Z dispatch · item fc6a0546 PLAY-dOrderedCharter-34 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

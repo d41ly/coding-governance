@@ -52,12 +52,14 @@ cannot write one (`resolve_selection` refuses an empty selection), so it can onl
 WHERE THE INPUTS COME FROM, AND WHY IT IS NOT `__file__`'s GRANDPARENT. This engine ships into a
 target at `{prefix}/playbook/`, so its grandparent there is the TARGET's repo root — which holds
 neither `<prefix>/govkit/entries/playbook.kit.toml` (a registry exemption that never lands in a target)
-nor a repo-root charter template (the deployer lands it at the operator-chosen `playbook_path`).
-Resolving from the grandparent worked in gov and died in every adopter with an uncaught
-FileNotFoundError, straight past `main`'s `except Refusal`. So: the DECLARATIONS are read from beside
-the engine when the kit shipped them there and from gov's own tree otherwise, the TEMPLATE from the
-target's `playbook_path` answer when it has one, and every one of those reads REFUSES naming the path
-it wanted. A missing input is a stated reason, never a traceback.
+nor gov's repo-root charter template. Resolving from the grandparent worked in gov and died in every
+adopter with an uncaught FileNotFoundError, straight past `main`'s `except Refusal`. So: the DECLARATIONS
+are read from beside the engine when the kit shipped them there and from gov's own tree otherwise, the
+TEMPLATE from the renderer kit's own copy in the tree it renders, which this kit's `root_relative` rule
+lands beside the engine, then from gov's root (PLAY-dOrderedCharter-34 S5). A target's `playbook_path`
+answer is no input: the seeded copy it names is retired as the render's input and noted `retired`. Every
+one of those reads REFUSES naming the paths it wanted. A missing input is a stated reason, never a
+traceback.
 
 THE REGION READER IS THIS FILE'S OWN. The memory-tree kit's region helper RAISES when no marker pair
 is present, so it serves neither the absent-charter nor the charter-without-a-region state. This
@@ -97,6 +99,16 @@ holds for the value of `charter.override`, read at the target's landed revision;
 `- ` line each. `{{PRINCIPLES}}` and `{{DECISION_PRINCIPLES}}` are `principles.toml` beside this engine, one
 `- P<n> <line>` each: the decision principle, `DECISION_PRINCIPLE`, under the second and every other row under
 the first. A registry that does not read refuses the render naming it.
+
+THE COMPOSITION (PLAY-dOrderedCharter-34). `{{ADOPTER_RULES}}` is the project block: the `[charter]
+adopter_rules` lines, then one `- <text>` line per level-0 unit of the repository's overlay whose `scope` and
+`trigger` hold, in overlay order; the declared default bullet stands only where neither supplies a line. In a
+unit slot's output each run of repository units sits between `<!-- gov:repo -->` and `<!-- /gov:repo -->`,
+and a level-3 to level-5 repository unit no slot of the render places is noted `unplaced`. The budget lines
+name each origin's bytes, largest first, and a harness limit refuses under any `budgets.enforce`. A write
+re-writes each alias still holding the charter's previous bytes, and the charter's check reds an alias
+holding anything but an import line, a link or the composition. A write prints the delta report: each gov
+unit's and gov row's state, each repository unit's, then each widening, in `govkit update`'s verdict widths.
 """
 from __future__ import annotations
 
@@ -208,6 +220,14 @@ PLACEHOLDER_RE = re.compile(r'\{\{([A-Z][A-Z0-9_]*)\}\}')
 REGION_OPEN = '<!-- gov:playbook -->'
 REGION_CLOSE = '<!-- /gov:playbook -->'
 REGION_MARKER_RE = re.compile(r'<!--\s*/?gov:playbook\s*-->')
+# PLAY-dOrderedCharter-34: the repository's part of a unit slot's output, in the region-marker shape above.
+REPO_OPEN = '<!-- gov:repo -->'
+REPO_CLOSE = '<!-- /gov:repo -->'
+TEMPLATE_NAME = 'coding-governance-agents.template.md'
+PROJECT_BLOCK = 'ADOPTER_RULES'
+REPO_LEVELS = (3, 4, 5)
+DELTA_STATES = ('unchanged', 'amended', 'replaced', 'excluded', 'stale', 'orphaned')
+WIDENING = 'widening'
 # TOOL-aDistilledCharter-1. A ONE-LINE REGION holds rules a reader takes in at a glance: every line
 # a `- ` bullet, none past ONE_LINE_MAX characters, no continuation. Graded AFTER substitution, which
 # is the only moment an adopter's own section 2 exists. The markers survive into the charter.
@@ -855,7 +875,7 @@ def check_one_line_regions(text: str, cap: tuple | None = None) -> list:
                 raise Refusal(f'line {n}: a one-line region closes with none open')
             inside = 0
             continue
-        if not inside or not bare:
+        if not inside or not bare or bare in (REPO_OPEN, REPO_CLOSE):   # the marked pair, as a blank line
             continue
         quoted = line.strip()[:60]
         if not re.match(r'- \S', line):
@@ -907,7 +927,7 @@ def write_charter_lock(gov_root: Path, target: Path, charter_path: Path, units=(
     is this kit at KIT_PLAYBOOK_RENDER_VERSION, `template` the template's path and its version marker,
     the provenance the rendered text no longer carries, and `units` each `(tag, line)` a slot expanded to.
     `instruction_units.write_lock_row` writes it."""
-    template = resolve_template_path(gov_root, target, read_deploy(target)[2]).resolve()
+    template = resolve_template_path(gov_root, target).resolve()
     marker = TEMPLATE_MARKER_RE.search(read_input(template, 'the charter template'))
     base = target if template.is_relative_to(target) else gov_root.resolve()
     load_units_module().write_lock_row(
@@ -988,21 +1008,20 @@ def resolve_declaration_paths(engine_dir: Path, gov_root: Path) -> tuple[Path, P
             reg if reg.is_file() else derive_one(f'*/{reg.name}', reg))
 
 
-def resolve_template_path(gov_root: Path, target: Path, answers: dict) -> Path:
-    """The charter TEMPLATE this render reads.
-
-    The deployer lands it at the operator-chosen `playbook_path`, so that answer is authoritative
-    when a target has one — and when it names a file that is not there, the read REFUSES rather than
-    silently falling back to gov's copy, which would render somebody else's template.
-
-    `playbook_path` names the TEMPLATE here, never the charter; the charter is `--charter`. When the
-    two are one file `render` refuses (S3), because the render would append a region into its own
-    template and the next render would read that region back as template text.
-    """
-    p = answers.get('playbook_path')
-    if isinstance(p, str) and p:
-        return target / p
-    return gov_root / 'coding-governance-agents.template.md'
+def resolve_template_path(gov_root: Path, target: Path) -> Path:
+    """The charter TEMPLATE this render reads (PLAY-dOrderedCharter-34 S5): the renderer kit's own copy in
+    the tree it renders, `derive_kit_file` over the target, which this kit's `root_relative` rule lands
+    beside the engine in an install; then gov's at `gov_root`. The kit's copy comes first because in an
+    install `gov_root` is the target's own root, which can hold a seed. Neither a file refuses naming both.
+    A target's `playbook_path` copy is never read. When the template and `--charter` are one file `render`
+    refuses, because the render would append a region into its own template."""
+    kit = load_units_module().derive_kit_file(target, TEMPLATE_NAME)
+    root = Path(gov_root) / TEMPLATE_NAME
+    hit = next((p for p in (kit, root) if p.is_file()), None)
+    if hit is None:
+        raise Refusal(f'the charter template is at neither {kit.as_posix()} nor {root.as_posix()}. The renderer '
+                      f'kit ships it beside its engine; re-install or update the kit')
+    return hit
 
 
 def load_declarations(desc_path: Path, reg_path: Path) -> tuple[dict, list[dict], set[str]]:
@@ -1200,13 +1219,15 @@ def resolve_answers(engine_dir: Path, gov_root: Path, target: Path,
 
 
 def render_unit_slots(text: str, target: Path, notes: list, slots: list | None = None,
-                      overlay_from: Path | None = None) -> str:
+                      overlay_from: Path | None = None, parts: dict | None = None) -> str:
     """Each `<!-- units: <selector> -->` line replaced by the lines of the units its selector selects, and
     nothing of its own, the units composed with the repository's overlay by `overlay.derive_slot_units`
     (PLAY-dOrderedCharter-32 S4). A selector no namespace registers, a selected unit whose change records retired it
     and an unreadable manifest each refuse; a slot selecting nothing is noted `unarmed`. Each `(tag, line)`
     lands in `slots`, what the lock's row records. `overlay_from` is a write verb's candidate overlay, read in
-    place of the blob at HEAD (PLAY-dOrderedCharter-46 S3); an unborn HEAD is noted in the overlay's line."""
+    place of the blob at HEAD (PLAY-dOrderedCharter-46 S3); an unborn HEAD is noted in the overlay's line. Each
+    run of repository units sits between REPO_OPEN and REPO_CLOSE, and `parts` gains each origin's bytes
+    (PLAY-dOrderedCharter-34 S2, S3)."""
     if not UNIT_SLOT_RE.search(text):
         return text
     iu = load_units_module()
@@ -1251,9 +1272,195 @@ def render_unit_slots(text: str, target: Path, notes: list, slots: list | None =
             raise Refusal(str(e)) from None
         if slots is not None:
             slots.extend((u.tag, line) for u, line in zip(chosen, lines))
-        return '\n'.join(lines)
+        # PLAY-dOrderedCharter-34 S2: each run of consecutive repository units between the marked pair.
+        out, run = [], []
+        for u, line in zip(chosen, lines):
+            origin = 'repository' if u.origin == overlay.ORIGIN else f'gov:{u.origin}'
+            if parts is not None:
+                parts[origin] = parts.get(origin, 0) + len(line.encode('utf-8')) + 1
+            if origin == 'repository':
+                run.append(line)
+                continue
+            out += [REPO_OPEN, *run, REPO_CLOSE] if run else []
+            run = []
+            out.append(line)
+        out += [REPO_OPEN, *run, REPO_CLOSE] if run else []
+        return '\n'.join(out)
 
     return UNIT_SLOT_RE.sub(render_slot, text)
+
+
+# --------------------------------------------------------------------------- the composition
+def read_repo_units(target: Path, overlay_from: Path | None = None) -> tuple:
+    """PLAY-dOrderedCharter-34: the overlay's units whose `trigger` holds, through `overlay.read_overlay` at HEAD
+    or `overlay_from`'s text in its place; () where HEAD holds no overlay, so an engine copy carrying no overlay
+    module renders a tree that has none. A refused read, a unit at level 1, 6 or 7 among them, refuses."""
+    iu = load_units_module()
+    if overlay_from is None:
+        held = subprocess.run(['git', '-C', str(target), 'ls-tree', '--name-only', 'HEAD', '--', iu.OVERLAY],
+                              capture_output=True)
+        if held.returncode or not held.stdout.strip():
+            return ()
+    import overlay
+    try:
+        repo = overlay.read_overlay(target, None if overlay_from is None else overlay_from.read_bytes().decode('utf-8'))
+        reader = overlay.derive_policy_reader(target)
+        return tuple(u for u in repo.units if overlay.check_when(u, reader))
+    except (ValueError, OSError) as e:   # OverlayRefused, an unreadable candidate
+        raise Refusal(f'the overlay is unreadable: {e}') from None
+
+
+def build_project_block(row: dict, charter: dict, answers: dict, target: Path, engine_dir: Path, units: tuple,
+                        parts: dict) -> tuple[str, str]:
+    """S1: the project block, `{{ADOPTER_RULES}}`'s value and note: the `[charter] adopter_rules` lines, then
+    `- <text>` per level-0 unit of `units` every reader selects, in overlay order; the declared default only
+    where neither supplies a line. A unit line carrying `{{` or a region marker refuses naming the unit."""
+    iu = load_units_module()
+    from policy_value import read_policy_value
+    read_key = functools.partial(read_policy_value, root=target)
+    lines = []
+    for u in iu.derive_unit_selection([u for u in units if u.level == 0], iu.EVERY):
+        try:
+            text = iu.render_unit(u, read_key, target)
+        except iu.UnitRowError as e:
+            raise Refusal(str(e)) from None
+        if '{{' in text or any(m in text for m in (REGION_OPEN, REGION_CLOSE, ONE_LINE_OPEN, ONE_LINE_CLOSE,
+                                                    REPO_OPEN, REPO_CLOSE)):
+            raise Refusal(f'{u.tag}: a level-0 unit carries `{{{{` or a region marker, which would escape the '
+                          f'project block')
+        lines.append(f'- {text}')
+    given = charter.get(row['key'].lower()) or answers.get(row['key'].lower())
+    if not given and not lines:
+        return resolve_placeholder_value(row, charter, answers, target, engine_dir)
+    val, note = (resolve_placeholder_value(row, charter, answers, target, engine_dir) if given
+                 else ('', f'units     {row["key"]} — no [charter] adopter_rules'))
+    body = '\n'.join(x for x in (val, *lines) if x)
+    parts['repository'] = parts.get('repository', 0) + len(body.encode('utf-8')) + 1
+    return body, note + (f' · {len(lines)} level-0 unit(s) after it' if lines else '')
+
+
+def build_document(text: str, target: Path, notes: list, slots: list | None, overlay_from: Path | None,
+                   units: tuple, parts: dict) -> str:
+    """S2, step 3: `text`'s unit slots expanded, each run of repository units marked, then each level-3 to
+    level-5 repository unit of `units` no slot placed noted `unplaced`, read against the `(tag, line)` pairs
+    the slots append to `slots`, a list of the step's own where the caller passes none."""
+    placed = [] if slots is None else slots
+    text = render_unit_slots(text, target, notes, placed, overlay_from, parts)
+    held = {tag for tag, _line in placed}
+    notes += [f'unplaced   {u.tag} · level {u.level} · no unit slot of this render selects it'
+              for u in units if u.level in REPO_LEVELS and u.tag not in held]
+    return text
+
+
+def measure_contributors(total: int, parts: dict) -> list[tuple[str, int]]:
+    """S3, step 4: `(origin, bytes)` per origin, largest first; `gov:playbook`, the template's, holds what no
+    other origin contributed of the `total` measured."""
+    rest = total - sum(parts.values())
+    got = {**parts, 'gov:playbook': parts.get('gov:playbook', 0) + max(rest, 0)}
+    return sorted(((o, n) for o, n in got.items() if n), key=lambda p: -p[1])
+
+
+def render_delta_line(state: str, origin: str, what: str) -> str:
+    """One delta line in `govkit update`'s verdict widths."""
+    return f'  {state:<18} [{origin:<13}] {what}'
+
+
+def read_kind_rows(target: Path, exclude: set, records: list) -> list[tuple[str, dict, list]]:
+    """`(kind, {gov tag: state}, widenings)` per row kind the target's kinds register lists with a schema, its
+    gov rows read at HEAD from the namespace row's `source`, composed through `overlay_rows`."""
+    import overlay_rows
+    import pins
+    import row_checks
+    from policy_value import read_tag_policy
+    from tag_index import resolve_prefix_token
+    iu, out = load_units_module(), []
+    for k in pins.read_row_kinds(target):
+        kind = str(k.get('tag', '')).partition('.')[2]
+        schema = overlay_rows.read_kind_schema(target, kind)
+        names = tomllib.loads(read_input(iu.derive_kit_file(target, 'namespaces.toml'), 'the namespace registry'))
+        source = next((r.get('source') for r in names.get('namespace') or [] if r.get('ns') == kind), None)
+        text = iu.run_git(target, 'show', f'HEAD:{resolve_prefix_token(source, iu.derive_kit_prefix())}') if source else ''
+        gov = [{**r, 'origin': kind, 'source': source} for r in tomllib.loads(text).get(kind, [])]
+        policy = read_tag_policy(target, 'HEAD') if exclude else {}
+        _rows, states, *_rest, checks = overlay_rows.derive_row_composition(
+            kind, schema, gov, overlay_rows.read_overlay_rows(target).get(kind, []), exclude, 'order', records, policy)
+        out.append((kind, states, row_checks.derive_widenings(checks)))
+    return out
+
+
+def render_delta_report(target: Path) -> list[str]:
+    """S6: one line per gov unit and per gov row, its state one of DELTA_STATES, then one per repository unit,
+    then each widening, each in `govkit update`'s verdict widths. A pinned edge's `stale` or `orphaned` state
+    is its target's; a repository unit takes the state it gives its target, `unchanged` with no edge. A tree
+    holding no unit, no overlay and no kinds register, or outside git, reports nothing; a refused read refuses
+    the render. Change records are read only where an edge or a row kind needs them."""
+    iu = load_units_module()
+    if subprocess.run(['git', '-C', str(target), 'rev-parse', '--is-inside-work-tree'], capture_output=True).returncode:
+        return []
+    try:
+        units, repo = iu.read_units(target), read_repo_units(target)
+    except ValueError as e:   # UnitRowError, LevelError
+        raise Refusal(f'the delta report is unreadable: {e}') from None
+    if not units and not repo and not iu.derive_kit_file(target, 'kinds.toml').is_file():
+        return []
+    import overlay
+    import pins
+    from policy_value import PolicyRefused
+    try:
+        exclude = overlay.read_excluded_tags(target)
+        edged = any(pins.derive_edge_pins(o) for o in repo) or bool(pins.read_row_kinds(target))
+        records = iu.read_change_records(target) if edged else []
+        states = {u.tag: 'excluded' if u.tag in exclude else 'unchanged' for u in units}
+        by_tag, given = {u.tag: u for u in units}, {}
+        for o in repo:
+            for kind, gtag, pin in pins.derive_edge_pins(o):
+                state, detail, _walked = pins.derive_pin_state(gtag, pin, records, by_tag)
+                tag = detail if state == 'renamed' else gtag
+                word = state if state in DELTA_STATES else 'replaced' if kind == 'supersedes' else 'amended'
+                states[tag] = word
+                given.setdefault(o.tag, word)
+        lines = [render_delta_line(states[u.tag], f'gov:{u.origin}', u.tag) for u in units]
+        lines += [render_delta_line(s, 'gov:unit', t) for t, s in states.items() if t not in by_tag]
+        rows = read_kind_rows(target, exclude, records)
+    except (ValueError, OSError, PolicyRefused) as e:   # OverlayRefused, UnitRowError, LevelError, a TOML fault
+        raise Refusal(f'the delta report is unreadable: {e}') from None
+    for kind, row_states, _w in rows:
+        lines += [render_delta_line(s, f'gov:{kind}', t) for t, s in row_states.items()]
+    lines += [render_delta_line(given.get(o.tag, 'unchanged'), 'repository', o.tag) for o in repo]
+    shown = (lambda v: ', '.join(map(str, v)) if isinstance(v, list) else str(v))
+    lines += [render_delta_line(WIDENING, 'repository', f"{w['row']} on {w['tag']} · {w['field']} {w['op']} "
+                                                      f"{shown(w['value'])} (gov: {shown(w['gov'])})")
+              for _k, _s, widenings in rows for w in widenings]
+    return lines
+
+
+def check_alias_copies(target: Path, want: str) -> list[str]:
+    """S4: each harness alias present on disk that is no symlink and no `@AGENTS.md` import line, and whose
+    bytes, CR stripped, are not `want`, the composition: one red each, naming the file."""
+    reds = []
+    for rel in ALIAS_PATHS.values():
+        path = target / rel
+        if path.is_symlink() or not path.is_file() or check_import_line(path):
+            continue
+        if path.read_bytes().replace(b'\r', b'') != want.replace('\r', '').encode('utf-8'):
+            reds.append(f'render-playbook: ALIAS — {rel} is neither an import line, a link to {CANON} nor the '
+                        f'composition; re-render, or re-wire it with the entry-files scope')
+    return reds
+
+
+def write_alias_copies(target: Path, before: bytes | None) -> list[str]:
+    """S4's write half: each alias holding `before`, the charter's bytes ahead of this write, re-written as the
+    charter's new bytes in the same run. -> the paths re-written. An alias holding anything else is left alone."""
+    now = (target / CANON).read_bytes()
+    if before is None or before == now:
+        return []
+    out = []
+    for rel in ALIAS_PATHS.values():
+        path = target / rel
+        if not path.is_symlink() and path.is_file() and path.read_bytes() == before:
+            path.write_bytes(now)
+            out.append(rel)
+    return out
 
 
 def render_practice_lines(catalogue: dict, target: Path, kits: set, cut: list, notes: list) -> list[str]:
@@ -1384,7 +1591,7 @@ def remove_drive_section(text: str) -> str:
 
 def render(engine_dir: Path, gov_root: Path, target: Path,
            charter_path: Path | None = None, slots: list | None = None,
-           overlay_from: Path | None = None) -> tuple[str, list[str]]:
+           overlay_from: Path | None = None, parts: dict | None = None) -> tuple[str, list[str]]:
     desc, blocks, entries = load_declarations(*resolve_declaration_paths(engine_dir, gov_root))
     dep, cfg, answers = read_deploy(target)
     rows = desc.get('placeholder', [])
@@ -1398,14 +1605,15 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
             raise Refusal(f'drop_blocks names `{d}`, which the descriptor declares nowhere. A member '
                           f'that drops nothing is a typo or a block that has already gone')
 
-    template = resolve_template_path(gov_root, target, answers)
+    template = resolve_template_path(gov_root, target)
     if (charter_path is not None and template.is_file() and charter_path.is_file()
             and os.path.samefile(template, charter_path)):
         raise Refusal(f'the template {template.as_posix()} and the charter '
                       f'{charter_path.as_posix()} are one file, so the render would append a '
-                      f'region into its own template. `playbook_path` names the TEMPLATE; point it '
-                      f'at the installed template, or pass a different --charter')
+                      f'region into its own template. Pass a different --charter')
     text = read_input(template, 'the charter template')
+    parts = {} if parts is None else parts
+    units = read_repo_units(target, overlay_from)
     present = check_fences(text, entries, declared_blocks)
     marker = TEMPLATE_MARKER_RE.search(text)
     current = bool(marker) and int(marker.group(1)) >= TEMPLATE_MAJOR
@@ -1445,6 +1653,9 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
     text = TEMPLATE_MARKER_LINE_RE.sub('', text)
 
     notes = [f'retired   drop_blocks {d} — {legacy[d]}; remove it from deploy.toml' for d in retired]
+    if answers.get('playbook_path'):   # PLAY-dOrderedCharter-34 S5: the seeded copy is no input of the render
+        notes.append(f'retired   playbook_path — {answers["playbook_path"]} is no input of the render, which '
+                     f'reads {template.as_posix()}')
     notes += [f'retired   drop_blocks {d} — practice.{d} leaves the active set; charter.practices names the '
               f'set directly' for d in cut]
     notes += [f'retired   drop_blocks {d} — practice.{d} is replaced by {successors[f"practice.{d}"]}, which stays '
@@ -1484,32 +1695,40 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
             raise Refusal(f'the template is v{marker.group(1)}.{marker.group(2)} and carries '
                           f'{{{{{key}}}}}, a legacy {row["legacy"]} placeholder kept only for older '
                           f'seeded templates')
-        val, note = resolve_placeholder_value(row, charter, answers, target, engine_dir)
+        if key == PROJECT_BLOCK:
+            val, note = build_project_block(row, charter, answers, target, engine_dir, units, parts)
+        else:
+            val, note = resolve_placeholder_value(row, charter, answers, target, engine_dir)
         notes.append(note)
         # A TOML multi-line string ends in a newline, and the template line holding the token ends in
         # one too; without the strip every multi-line answer adds a blank line after itself.
         text = build_substitution(text, key, str(val).rstrip('\n'))
-    text = render_unit_slots(text, target, notes, slots, overlay_from)
+    text = build_document(text, target, notes, slots, overlay_from, units, parts)
     notes += check_one_line_regions(text, read_one_line_cap(target) if ONE_LINE_OPEN in text else None)
     for ns, name in sorted(set(present)):
         if (ns, name) in drop:
             notes.append(f'dropped   {ns}:{name}')
     text = render_charter_envelope(target, charter_path, text)
     if charter_path is not None:
-        notes += check_charter_budget(target, charter_path, text)
+        notes += check_charter_budget(target, charter_path, text, parts)
     return text, notes
 
 
-def check_charter_budget(target: Path, charter_path: Path, body: str) -> list[str]:
+def check_charter_budget(target: Path, charter_path: Path, body: str, parts: dict | None = None) -> list[str]:
     """PLAY-dOrderedCharter-11 S4: the charter this render would write, CR stripped, against its caps through
-    the load-set budget check; a refusal raises, every other line returns as a `budget` note."""
+    the load-set budget check; a refusal raises, every other line returns as a `budget` note. Each overflow
+    line names the load point's own cap by its key and the largest contributors by origin, each with its
+    bytes (PLAY-dOrderedCharter-34 S3); a refusal leads with its refusing lines, and nothing is written."""
     import load_sets
     cur = charter_path.read_text(encoding='utf-8') if charter_path.is_file() else None
     size = len(build_region(cur, body).replace('\r', '').encode('utf-8'))
     rel = Path(os.path.relpath(charter_path, target)).as_posix()
     refused, lines = load_sets.run_budget_check(target, [(rel, size)])
+    largest = ' · '.join(f'{o} {n}' for o, n in measure_contributors(size, parts or {}))
+    lines = [ln + (f' · key budgets."{rel}"' if f' over {rel} ' in ln else '') + f' · largest: {largest}'
+             if ' BUDGET ' in ln else ln for ln in lines]
     if refused:
-        raise Refusal('\n'.join(lines))
+        raise Refusal('\n'.join(sorted(lines, key=lambda ln: 'BUDGET REFUSE' not in ln)))
     return [f'budget    {ln}' for ln in lines]
 
 
@@ -1553,6 +1772,15 @@ the codebase-map ruleset
 '''
 
 
+def write_template(tgt: Path, text: str, encoding: str = 'utf-8') -> Path:
+    """PLAY-dOrderedCharter-34 F7: a fixture's charter template where the reader looks first, its tree's
+    renderer-kit directory, spelled through `derive_kit_rel` as its renderer table is. -> its path."""
+    path = tgt / load_units_module().derive_kit_rel(TEMPLATE_NAME)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding=encoding)
+    return path
+
+
 def _write_fixture(tmp: Path, kits: str, variances: str) -> tuple[Path, Path]:
     """Write a scratch engine dir + target and return both. `kits` is TOML array source."""
     eng, tgt = tmp / 'engine', tmp / 'target'
@@ -1560,9 +1788,9 @@ def _write_fixture(tmp: Path, kits: str, variances: str) -> tuple[Path, Path]:
     (tgt / '.governance').mkdir(parents=True, exist_ok=True)
     (eng / 'playbook.kit.toml').write_text(DESC_FIXTURE, encoding='utf-8')
     (eng / 'registry.toml').write_text(REG_FIXTURE, encoding='utf-8')
-    (tgt / 'CHARTER.md').write_text(TPL_FIXTURE, encoding='utf-8')
+    write_template(tgt, TPL_FIXTURE, encoding='utf-8')
     (tgt / '.governance' / 'deploy.toml').write_text(
-        f'kits = {kits}\n\n[answers]\nplaybook_path = "CHARTER.md"\n'
+        f'kits = {kits}\n\n[answers]\n'
         f'variances_a = {variances}\n', encoding='utf-8')
     return eng, tgt
 
@@ -1585,8 +1813,8 @@ def check_scope_arms(check_arm) -> None:
         read_git(tgt, 'init', '-q')
         (tgt / '.governance').mkdir()
         (tgt / '.governance' / 'deploy.toml').write_text(
-            'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
-        (tgt / 'TPL.md').write_text('# fixture charter\n\n- MUST land.\n', encoding='utf-8')
+            'kits = ["lexicon"]\n\n[answers]\n', encoding='utf-8')
+        write_template(tgt, '# fixture charter\n\n- MUST land.\n', encoding='utf-8')
         rc, said = run_main('--render-scope', 'charter', '--target', tgt)
         check_arm(rc == 0 and '- MUST land.' in (tgt / CANON).read_text(encoding='utf-8'),
                   'the charter scope writes its region', said)
@@ -1690,9 +1918,9 @@ def write_render_target(td: Path, table=PRACTICE_TABLE, kits='["roles"]', tail='
         '[[block]]\nname = "cross-os"\n', encoding='utf-8')
     (eng / 'registry.toml').write_text('[[entry]]\nid = "roles"\n\n[[entry]]\nid = "lexicon"\n',
                                        encoding='utf-8')
-    (tgt / 'TPL.md').write_text(tpl, encoding='utf-8')
+    write_template(tgt, tpl, encoding='utf-8')
     (tgt / '.governance' / 'deploy.toml').write_text(
-        f'kits = {kits}\n{tail}\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
+        f'kits = {kits}\n{tail}\n[answers]\n', encoding='utf-8')
     if policy is not None:
         (tgt / '.governance' / 'policy.toml').write_text(policy, encoding='utf-8')
     for rel, text in (files or {}).items():
@@ -2044,7 +2272,7 @@ def run_selftest() -> int:
     # The escape is per OCCURRENCE: prose must not gain a backslash.
     with tempfile.TemporaryDirectory() as td:
         eng, tgt = _write_fixture(Path(td), ok_kits, '"a | pipe"')
-        (tgt / 'CHARTER.md').write_text('prose {{VARIANCES_A}} here\n', encoding='utf-8')
+        write_template(tgt, 'prose {{VARIANCES_A}} here\n', encoding='utf-8')
         body, _ = render(eng, Path(td), tgt)
         if body.strip() == 'prose a | pipe here':
             passed += 1
@@ -2087,7 +2315,7 @@ def run_selftest() -> int:
             (tgt / '.governance').mkdir(parents=True)
             (eng / 'playbook.kit.toml').write_text(desc, encoding='utf-8')
             (eng / 'registry.toml').write_text(REG_FIXTURE, encoding='utf-8')
-            (tgt / 'CHARTER.md').write_text(tpl, encoding='utf-8')
+            write_template(tgt, tpl, encoding='utf-8')
             (tgt / '.governance' / 'deploy.toml').write_text(
                 'kits = ["lexicon"]\n\n' + deploy, encoding='utf-8')
             try:
@@ -2113,18 +2341,18 @@ def run_selftest() -> int:
     # so the probe derives `memory`; the answer says `records`, and the answer must win.
     arm_fixture('an answer outranks a derived probe that answers too', probe_desc,
          'root {{MEMORY_ROOT}}\n',
-         '[answers]\nplaybook_path = "CHARTER.md"\nmemory_root = "records"\n',
+         '[answers]\nmemory_root = "records"\n',
          in_body='root records', in_notes='(probe would derive memory)')
     # F2 — an answer equal to the probe is a note, never a refusal.
     arm_fixture('an answer equal to its probe is noted as redundant', probe_desc,
          'root {{MEMORY_ROOT}}\n',
-         '[answers]\nplaybook_path = "CHARTER.md"\nmemory_root = "memory"\n',
+         '[answers]\nmemory_root = "memory"\n',
          in_body='root memory', in_notes='redundant: the probe derives the same value')
     # S5 — [charter] outranks [answers], for a derived key too (F3).
     arm_fixture('a [charter] value outranks an [answers] value', probe_desc,
          'root {{MEMORY_ROOT}}\n',
          '[charter]\nmemory_root = "ledger"\n\n'
-         '[answers]\nplaybook_path = "CHARTER.md"\nmemory_root = "records"\n',
+         '[answers]\nmemory_root = "records"\n',
          in_body='root ledger', in_notes='answered  MEMORY_ROOT = ledger')
 
     # AC9 — the mandated trailer, which [answers] cannot carry, rides [charter] byte-exact.
@@ -2132,11 +2360,11 @@ def run_selftest() -> int:
     trailer = 'Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>'
     arm_fixture('[charter] carries the commit trailer byte-exact', trailer_desc,
          'end with `{{COMMIT_TRAILER}}`\n',
-         f'[charter]\ncommit_trailer = "{trailer}"\n\n[answers]\nplaybook_path = "CHARTER.md"\n',
+         f'[charter]\ncommit_trailer = "{trailer}"\n\n[answers]\n',
          in_body=f'end with `{trailer}`', in_notes='answered  COMMIT_TRAILER')
 
     # AC10 — four hostile [charter] shapes, each refused naming the key.
-    ans = '\n\n[answers]\nplaybook_path = "CHARTER.md"\n'
+    ans = '\n\n[answers]\n'
     arm_fixture('a [charter] value carrying the {{ opener is refused', trailer_desc,
          '{{COMMIT_TRAILER}}\n', '[charter]\ncommit_trailer = "a {{MACHINE_A}} b"' + ans,
          want='[charter] commit_trailer carries `{{`')
@@ -2196,9 +2424,9 @@ def run_selftest() -> int:
                 encoding='utf-8')
             (eng / 'registry.toml').write_text(REG_FIXTURE, encoding='utf-8')
             (eng / FLEET_NAME).write_text(fleet, encoding='utf-8')
-            (tgt / 'CHARTER.md').write_text('## Node registry\n\n{{NODE_TABLE}}\n', encoding='utf-8')
+            write_template(tgt, '## Node registry\n\n{{NODE_TABLE}}\n', encoding='utf-8')
             (tgt / '.governance' / 'deploy.toml').write_text(
-                'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "CHARTER.md"\n'
+                'kits = ["lexicon"]\n\n[answers]\n'
                 + (f'project_name = "{name}"\n' if name else '') + tail, encoding='utf-8')
             try:
                 return render(eng, Path(td), tgt)[0], None
@@ -2284,11 +2512,11 @@ def run_selftest() -> int:
     with tempfile.TemporaryDirectory() as td:
         tgt = Path(td)
         (tgt / '.governance').mkdir()
-        (tgt / 'TPL.md').write_text(f'<!-- governance-template: v{TEMPLATE_MAJOR}.0 -->\n'
+        write_template(tgt, f'<!-- governance-template: v{TEMPLATE_MAJOR}.0 -->\n'
                                     '<!-- when:node-table -->\nrow\n<!-- /when:node-table -->\n',
                                     encoding='utf-8')
         (tgt / '.governance' / 'deploy.toml').write_text(
-            'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
+            'kits = ["lexicon"]\n\n[answers]\n', encoding='utf-8')
         here = Path(__file__).resolve().parent
         try:
             render(here, here.parent.parent, tgt)
@@ -2302,16 +2530,20 @@ def run_selftest() -> int:
     # in a target committed on `main`. Both carry the `cross-os` fence, so a `legacy` mark on the shipped
     # row reds every render here.
     gov_root = here.parent.parent
-    gov_tpl, gov_dep = resolve_template_path(gov_root, here, {}), gov_root / '.governance' / 'deploy.toml'
+    try:
+        gov_tpl = resolve_template_path(gov_root, gov_root)
+    except Refusal:
+        gov_tpl = gov_root / TEMPLATE_NAME
+    gov_dep = gov_root / '.governance' / 'deploy.toml'
     seeded = (f'<!-- governance-template: v{TEMPLATE_MAJOR}.4 -->\n\n- [one] Kept.\n<!-- when:cross-os -->\n'
               f'- [cross-os] Across operating systems.\n<!-- /when:cross-os -->\n{CROSS_OS_FENCE}')
     halves = [('a seeded previous-minor template', seeded,
-               'kits = ["playbook"]\n\n[answers]\nplaybook_path = "TPL.md"\n')]
+               'kits = ["playbook"]\n\n[answers]\n')]
     if gov_tpl.is_file() and gov_dep.is_file():
         # Section 4 Evidence's narrowing: the two playbook kits, and answers for the probes they ask.
         narrowed = re.sub(r'(?ms)^kits = \[.*?\]\n', 'kits = ["playbook", "playbook-render"]\n',
                           gov_dep.read_text(encoding='utf-8'), count=1).replace(
-            '[answers]\n', '[answers]\nplaybook_path = "TPL.md"\nci_file = "none"\ngate_runner = "none"\n'
+            '[answers]\n', '[answers]\nci_file = "none"\ngate_runner = "none"\n'
             'id_families = "none"\nmemory_disciplines = "none"\n', 1)
         halves.insert(0, ("gov's template", gov_tpl.read_text(encoding='utf-8'), narrowed))
     else:
@@ -2325,7 +2557,7 @@ def run_selftest() -> int:
                     tgt = Path(td)
                     (tgt / '.governance').mkdir()
                     (tgt / '.governance' / 'deploy.toml').write_text(drop + dep, encoding='utf-8')
-                    (tgt / 'TPL.md').write_text(tpl, encoding='utf-8')
+                    write_template(tgt, tpl, encoding='utf-8')
                     read_git(tgt, 'init', '-q', '-b', 'main')
                     read_git(tgt, 'add', '-A')
                     read_git(tgt, '-c', 'user.name=fx', '-c', 'user.email=fx@example.invalid',
@@ -2370,9 +2602,9 @@ def run_selftest() -> int:
         with tempfile.TemporaryDirectory() as td:
             tgt = Path(td)
             (tgt / '.governance').mkdir()
-            (tgt / 'TPL.md').write_text(v3, encoding='utf-8')
+            write_template(tgt, v3, encoding='utf-8')
             (tgt / '.governance' / 'deploy.toml').write_text(
-                'kits = ["lexicon"]\n' + drops + '\n[answers]\nplaybook_path = "TPL.md"\n'
+                'kits = ["lexicon"]\n' + drops + '\n[answers]\n'
                 'machine_a = "u"\nprimary_tree_a = "C:/p/x"\nworktree_root_a = "C:/p/x/w"\n'
                 'variances_a = "none"\n', encoding='utf-8')
             try:
@@ -2392,8 +2624,8 @@ def run_selftest() -> int:
             tgt = Path(td)
             (tgt / '.governance').mkdir()
             (tgt / '.governance' / 'deploy.toml').write_text(
-                'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
-            (tgt / 'TPL.md').write_text('x\n', encoding='utf-8')
+                'kits = ["lexicon"]\n\n[answers]\n', encoding='utf-8')
+            write_template(tgt, 'x\n', encoding='utf-8')
             (tgt / 'AGENTS.md').write_text(f'{outside}{REGION_OPEN}\nx\n{REGION_CLOSE}\n',
                                            encoding='utf-8')
             out = io.StringIO()
@@ -2413,10 +2645,10 @@ def run_selftest() -> int:
         with tempfile.TemporaryDirectory() as td:
             tgt = Path(td)
             (tgt / '.governance').mkdir()
-            (tgt / 'TPL.md').write_text(f'<!-- governance-template: {marker_v} -->\n'
+            write_template(tgt, f'<!-- governance-template: {marker_v} -->\n'
                                         f'tag {{{{TAG_A}}}}\n', encoding='utf-8')
             (tgt / '.governance' / 'deploy.toml').write_text(
-                'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
+                'kits = ["lexicon"]\n\n[answers]\n', encoding='utf-8')
             with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
                 main(['--target', str(tgt)])   # write mode first; its notes are not the observation
             out, err_out = io.StringIO(), io.StringIO()
@@ -2483,13 +2715,12 @@ def run_selftest() -> int:
     with tempfile.TemporaryDirectory() as td:
         tgt = Path(td)
         (tgt / '.governance').mkdir()
-        (tgt / '.governance' / 'deploy.toml').write_text(
-            'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "AGENTS.md"\n', encoding='utf-8')
-        (tgt / 'AGENTS.md').write_text('{{PROJECT_NAME}}\n', encoding='utf-8')
+        (tgt / '.governance' / 'deploy.toml').write_text('kits = ["lexicon"]\n', encoding='utf-8')
+        own = write_template(tgt, '{{PROJECT_NAME}}\n')   # PLAY-dOrderedCharter-34 F7: --charter at the template
         err = io.StringIO()
         with contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()):
-            rc = main(['--target', str(tgt)])
-        left = (tgt / 'AGENTS.md').read_text(encoding='utf-8')
+            rc = main(['--target', str(tgt), '--charter', str(own.relative_to(tgt))])
+        left = own.read_text(encoding='utf-8')
         if rc == 1 and 'are one file' in err.getvalue() and left == '{{PROJECT_NAME}}\n':
             passed += 1
         else:
@@ -2504,15 +2735,16 @@ def run_selftest() -> int:
         tgt = Path(td)
         (tgt / '.governance').mkdir()
         (tgt / '.governance' / 'deploy.toml').write_text(
-            'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
-        (tgt / 'TPL.md').write_text(f'<!-- governance-template: v{TEMPLATE_MAJOR}.4 -->\n\nplain\n',
+            'kits = ["lexicon"]\n\n[answers]\n', encoding='utf-8')
+        write_template(tgt, f'<!-- governance-template: v{TEMPLATE_MAJOR}.4 -->\n\nplain\n',
                                     encoding='utf-8')
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             rc = main(['--target', str(tgt)])
         left = (tgt / 'AGENTS.md').read_text(encoding='utf-8') if rc == 0 else ''
         rows = instruction_units.read_lock(tgt) if rc == 0 else []
     check_arm(rc == 0 and 'plain' in left and not TEMPLATE_MARKER_RE.search(left)
-              and [r.get('template') for r in rows] == [f'TPL.md@v{TEMPLATE_MAJOR}.4'],
+              and [r.get('template') for r in rows]
+              == [f'{load_units_module().derive_kit_rel(TEMPLATE_NAME)}@v{TEMPLATE_MAJOR}.4'],
               'the rendered charter carries no version marker and the lock row carries it',
               f'rc {rc}, charter {left!r}, lock rows {rows!r}')
 
@@ -2615,6 +2847,28 @@ def run_selftest() -> int:
         check_arm(ok, f'the row kind composes as `--plant {" ".join(argv)}` says, exit {want}',
                   f'rc {done.returncode} · {said[-1500:]}')
 
+    # PLAY-dOrderedCharter-34 — the composition: each plant in its own throwaway repository, its own
+    # expectations asserted inside it (each exit, line and written byte), and the line it must print here.
+    composition = Path(__file__).resolve().parent / 'fixtures' / 'composition.py'
+    for argv, needles in [
+            (['project-block'], ["the key's lines, then the level-0 units'"]),
+            (['marked-part'], ['no second pair']),
+            (['unplaced'], ['one unplaced note']),
+            (['level-6'], ['naming it and its level']),
+            (['over-budget', '--enforce', 'warn'], ['key budgets."AGENTS.md" · largest: gov:playbook']),
+            (['over-budget', '--enforce', 'refuse'], ['no file written']),
+            (['over-codex', '--enforce', 'warn'], ['33210 bytes over CODEX_MAX 32768']),
+            (['alias-copy'], ['naming it', 'in the same run']),
+            (['seeded-template'], ['one retired note names playbook_path']),
+            (['installed-template'], ['naming both paths']),
+            (['delta'], ['widening           [repository   ]'])]:
+        done = subprocess.run([sys.executable, str(composition), '--plant', *argv], capture_output=True, text=True,
+                              encoding='utf-8', errors='replace', stdin=subprocess.DEVNULL, timeout=600)
+        said = done.stdout + done.stderr
+        check_arm(done.returncode == 0 and 'composition: green' in said and 'FAILED' not in said
+                  and all(n in said for n in needles), f'the composition holds as `--plant {" ".join(argv)}` says',
+                  f'rc {done.returncode} · {said[-1500:]}')
+
     # TOOL-aRepatriatedFork-42 — `--answers` states what `render` would use, and grades `kits` alike.
     with tempfile.TemporaryDirectory() as td:
         eng, tgt = _write_fixture(Path(td), ok_kits, ok_var)
@@ -2651,7 +2905,7 @@ def run_selftest() -> int:
             'probe = "gate_runner"\n', encoding='utf-8')
         (tgt / '.governance' / 'deploy.toml').write_text(
             'gov_source = "../gov"\nkits = ' + ok_kits + '\n\n[answers]\n'
-            'playbook_path = "CHARTER.md"\nvariances_a = "plain"\nGate_Runner = "bash g.sh"\n'
+            'variances_a = "plain"\nGate_Runner = "bash g.sh"\n'
             'manifest_path = "m.md"\n\n[kit.kickoff-manifest]\nManifest_Path = "x.md"\n',
             encoding='utf-8')
         keys = ['gate_runner', 'GATE_RUNNER', 'KITS', 'Manifest_Path', 'GOV_SOURCE',
@@ -2742,9 +2996,9 @@ def run_selftest() -> int:
             f'kit = "{home}"\n', encoding='utf-8')
         (eng / 'registry.toml').write_text(f'[[entry]]\nid = "{home}"\n\n[[entry]]\nid = "lexicon"\n',
                                            encoding='utf-8')
-        (tgt / 'CHARTER.md').write_text(tpl, encoding='utf-8')
+        write_template(tgt, tpl, encoding='utf-8')
         (tgt / '.governance' / 'deploy.toml').write_text(
-            f'kits = ["{kit}"]\n\n[answers]\nplaybook_path = "CHARTER.md"\n'
+            f'kits = ["{kit}"]\n\n[answers]\n'
             + ('role_roster = "- answered"\n' if answered else ''), encoding='utf-8')
         kd = td / home
         if stub:
@@ -3164,10 +3418,14 @@ def run_charter_scope(engine_dir: Path, gov_root: Path, target: Path, charter_pa
             print(f'render-playbook: SURVIVING PLACEHOLDER in the render: '
                   f'{", ".join(sorted(set(survived)))}', file=sys.stderr)
             rc = 1
+        if charter_path == target / CANON:   # PLAY-dOrderedCharter-34 S4: no alias is a copy that drifts
+            for red in check_alias_copies(target, want):
+                print(red, file=sys.stderr)
+                rc = 1
         # N5: the two notes an adopter must act on print here too. `govkit update` runs the
         # regenerate (unless GOVKIT_RERENDER=0) with its output captured, so `--check` is where they are seen.
         for n in notes:
-            if n.startswith(('legacy', 'retired', 'budget', 'overlay — unarmed')):
+            if n.startswith(('legacy', 'retired', 'budget', 'overlay — unarmed', 'unplaced')):
                 print(f'  {n}')
         if rc == 0:
             print(f'render-playbook OK — region matches a fresh render, no placeholder survived')
@@ -3177,7 +3435,16 @@ def run_charter_scope(engine_dir: Path, gov_root: Path, target: Path, charter_pa
         print(f'render-playbook: REFUSED — placeholders survived the render: '
               f'{", ".join(sorted(set(survived)))}', file=sys.stderr)
         return 1
+    try:
+        delta = render_delta_report(target)
+    except Refusal as e:
+        print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
+        return 1
+    before = charter_path.read_bytes() if charter_path.is_file() else None
     write_region(charter_path, body)
+    if charter_path == target / CANON:
+        notes += [f'rewrote   {rel} — the alias held the charter\'s previous bytes'
+                  for rel in write_alias_copies(target, before)]
     try:
         write_charter_lock(gov_root, target, charter_path, slots)
         notes += [f"wrote {p} empty: this kit's checks read an absent list as a refusal"
@@ -3188,6 +3455,9 @@ def run_charter_scope(engine_dir: Path, gov_root: Path, target: Path, charter_pa
         return 1
     for n in notes:
         print(f'  {n}')
+    print(f'render-playbook — composition: {len(delta)} line(s)')
+    for line in delta:
+        print(line)
     print(f'render-playbook — wrote the gov:playbook region into {charter_path.as_posix()}, its '
           f'provenance into .governance/instructions.lock')
     return 0

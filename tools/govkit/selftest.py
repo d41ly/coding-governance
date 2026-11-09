@@ -1839,6 +1839,30 @@ def check_update_safety(tmp: pathlib.Path) -> None:
           p.returncode != 0 and "gen: REFUSED, the sibling it asks is too old" in line,
           (p.stdout + p.stderr)[-1500:])
 
+    # ---- PLAY-dOrderedCharter-34 S6 — AC8. A regenerate printing the composition's six state lines, one
+    # ---- widening and one foreign line: `update` relays the seven under its heading, never the foreign one.
+    kit_cp = (SAFE_HEAD + 'version_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n'
+              '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+              '[[files]]\ninclude = ["tpl.md"]\nrole = "rendered"\nto = "docs/out.md"\n\n'
+              '[[regenerate]]\nargv = ["bash", "{kit}/gen.sh"]\n\n'
+              '[adopt]\nargv = ["bash", "{kit}/gen.sh"]\nmutates_index = false\n')
+    _cp_lines = [f"  {s:<18} [{'gov:demo':<13}] demo.{s}"
+                 for s in ("unchanged", "amended", "replaced", "excluded", "stale", "orphaned")]
+    _cp_lines.append(f"  {'widening':<18} [{'repository':<13}] demo.adopter.x on demo.a - grants add write (gov: read)")
+    _cp_foreign = f"  {'injected':<18} [{'repository':<13}] a line no state word owns"
+    gen_cp = ('d="$(dirname "$0")"\nmkdir -p docs\ncat "$d/eng.txt" > docs/out.md\n'
+              + "".join(f"printf '%s\\n' '{ln}'\n" for ln in _cp_lines + [_cp_foreign]))
+    g, _a = build_gov17("cp", kit_cp, {"eng.txt": "v1\n", "gen.sh": gen_cp, "tpl.md": "tpl\n"})
+    t = build_target17(g, "cp")
+    write_gov17(g, kit_cp, {"eng.txt": "v2\n"}, "B")
+    p = run_gov17(g, "update", "--target", str(t), "--write")
+    _cp_out = p.stdout.splitlines()
+    _cp_at = next((i for i, ln in enumerate(_cp_out) if ln.startswith("govkit update — composition: 7 line(s)")), -1)
+    check("[dOC-34 AC8] update relays the regenerate's six state lines and its widening under the composition heading",
+          _cp_at >= 0 and _cp_out[_cp_at + 1:_cp_at + 8] == _cp_lines, p.stdout[-2000:])
+    check("[dOC-34 AC8] a regenerate line whose state word is outside the set is not relayed",
+          _cp_foreign not in _cp_out, p.stdout[-2000:])
+
     # ---- DEPL-aHalvedInstall-1 AC1-AC4. A kit DECLARING a required render key and a hole. `update`
     # ---- names both before its regenerate runs; `check` names the key by state; `defaults` exempts.
     kit_cg = (SAFE_HEAD + 'version_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n'

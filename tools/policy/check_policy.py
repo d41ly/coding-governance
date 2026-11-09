@@ -3357,14 +3357,21 @@ def derive_role_body_plant(cap):
 
 def derive_one_line_rule_plant(cap):
     """A copy of the render engine beside a copy of the policy kit, a template whose one-line region
-    holds a rule one character past the engine's cap, and the smallest descriptor and registry."""
+    holds a rule one character past the engine's cap, and the smallest descriptor and registry. The
+    template sits beside the engine copy, where the render reads it first, with the modules its render
+    imports and the file holding `CODEX_MAX`, which its charter budget reads (PLAY-dOrderedCharter-34 F7)."""
     rel = derive_enforcer_rel(cap)
     v = read_source_number(rel, "ONE_LINE_MAX")
     eng = posixpath.dirname(rel)
+    codex = budgets.resolve_prefix_token(budgets.read_cap_census(derive_source_top())["codex-instructions"].home
+                                         .split(":")[1], budgets.derive_tool_root())
+    carried = {f"{eng}/{m}": (derive_source_top() / eng / m).read_bytes()
+               for m in ("instruction_units.py", "load_sets.py", "policy_value.py")}
+    carried[codex] = (derive_source_top() / codex).read_bytes()
     return {"files": {rel: (derive_source_top() / rel).read_bytes(), f"{eng}/playbook.kit.toml": "",
                       f"{eng}/registry.toml": '[[entry]]\nid = "lexicon"\n',
-                      ".governance/deploy.toml": 'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "CHARTER.md"\n',
-                      "CHARTER.md": f"<!-- one-line -->\n- {'x' * v}\n<!-- /one-line -->\nend\n"},
+                      ".governance/deploy.toml": 'kits = ["lexicon"]\n', **carried,
+                      f"{eng}/coding-governance-agents.template.md": f"<!-- one-line -->\n- {'x' * v}\n<!-- /one-line -->\nend\n"},
             "copies": (budgets.derive_kit_rel().rstrip("/"),), "argv": [sys.executable, rel, "--target", "{repo}"],
             "warn": "BUDGET WARN — one-line-rule", "refuse": f"past the {v} a one-line rule may take"}
 

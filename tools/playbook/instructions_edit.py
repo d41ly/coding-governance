@@ -840,7 +840,7 @@ def arm_rerender(c):
     root = build_tree(c, GUARD_POINT)
     kit = iu.derive_tool_rel(KIT_DIR.name)
     gov_tag.write_commit(root, {f"{kit}/{iu.RENDERERS_TABLE}": '[[target]]\npaths = ["AGENTS.md"]\nrenderer = "playbook:charter"\n',
-                                ".governance/deploy.toml": iu.SLOT_DEPLOY, "TPL.md": iu.SLOT_TEMPLATE.format("reader.every")},
+                                ".governance/deploy.toml": iu.SLOT_DEPLOY, iu.derive_template_rel(): iu.SLOT_TEMPLATE.format("reader.every")},
                          "a rendered charter")
     rc, said = run_cli(root, "add", *FX_ROW, "--scope", "reader.every", *FX_RECORD, tty=True)
     charter = (root / "AGENTS.md").read_text(encoding="utf-8")

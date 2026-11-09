@@ -1201,6 +1201,18 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
     return derive_install_order(sorted(dk), descs)
 
 
+#: PLAY-dOrderedCharter-34 S6: the state words of the composition's delta report, S22's six and `widening`.
+COMPOSITION_STATES = ("unchanged", "amended", "replaced", "excluded", "stale", "orphaned", "widening")
+COMPOSITION_LINE_RE = re.compile(r"^  (" + "|".join(COMPOSITION_STATES) + r") +\[[^\]]*\] \S.*$")
+
+
+def derive_composition_lines(stdout: str | None) -> list[str]:
+    """The lines of a regenerate's stdout in the composition's delta-report shape, `{state:<18} [{origin:<13}]
+    <what>` indented two, whose state word is one of COMPOSITION_STATES; every other line is dropped, so an
+    adopter's regenerate cannot put arbitrary text into update's output (PLAY-dOrderedCharter-34 S6)."""
+    return [ln for ln in (stdout or "").splitlines() if COMPOSITION_LINE_RE.match(ln)]
+
+
 def run_target_argv(argv: list[str] | tuple[str, ...],
                     target: pathlib.Path) -> subprocess.CompletedProcess:
     """Run a kit's resolved target-side argv in `target`, its output captured and decoded as UTF-8
@@ -11906,6 +11918,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # runs it — and the mitigation is that the target never supplies the argv, not that the uid is
     # trusted.
     _rr_ran: list[str] = []
+    _rr_composition: list[str] = []   # PLAY-dOrderedCharter-34 S6: the delta lines the regenerates print
     _rr_declined: list[tuple[str, str]] = []
     # DEPL-cMendedVintage-1 S1. A STRICT SUBSET OF `_rr_declined`, and the subset is the point: it
     # holds ONLY the declines that are about a render going stale, because those are the ones whose
@@ -12041,6 +12054,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                     continue
                 _res = [resolve_tokens(a, _ctx_rr)[0] for a in _argv]
                 _out = run_target_argv(_res, target)
+                _rr_composition += derive_composition_lines(_out.stdout)
                 # THE EXIT CODE GOES THROUGH THE DECLARED PROBE, exactly as `_cmd_apply`'s
                 # CONFIGURE step does, and NOT through `rc != 0`. Writing the naive test here
                 # would have failed every update that touched `memory-tree`, whose adopter
@@ -12103,6 +12117,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"{len(_rr_declined)} declined")
         for _line in _rr_ran:
             print(f"govkit update —   ran {_line}")
+        print(f"govkit update — composition: {len(_rr_composition)} line(s)")
+        for _line in _rr_composition:
+            print(_line)
     # DEPL-cMendedVintage-1 S4 — THE DECLINES ARE NOT GATED, and this SUPERSEDES half of
     # DEPL-dRetiredFork-3's AC6, which asked for output byte-identical to the pre-change run while
     # the flag is off. That criterion bought a safe dark landing for a step that printed nothing and

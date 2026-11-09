@@ -11,8 +11,9 @@ subject, typed edges, pinned facts, one door, one owner, rationale apart, and a 
 reused. Each of its eight rules names the gate leg that checks it, through that leg's `enforces` key.
 
 A template at v4.5 or later holds one `{{PRACTICES}}` line, and the render writes one `- [<name>] <rule>`
-line per active row there. A template seeded earlier keeps its typed lines, reads neither the catalogue
-nor the key, and renders as it always did.
+line per active row there. The render reads the template the renderer kit ships beside its engine, so an
+update brings each new line; a copy seeded earlier at `playbook_path` is no longer read, and the render notes
+it `retired`.
 
 Only the marker's major decides how an older template is treated. One whose major is below the renderer's
 gets a note asking you to reseed it from gov, and may still carry a fence for a block the renderer has

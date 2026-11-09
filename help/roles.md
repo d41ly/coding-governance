@@ -199,7 +199,7 @@ needs the kickoff and memory-tree kits.
   A harness its kit ships with no template, `unattended-unit.js`, is marked by `kit.toml` alone. A
   file of its name beside neither mark is not counted as its kit's, and reads as the note.
   check-wiring's note names `adopt-roles.sh --check` as the command that says which.
-- The `[roles]` rule and the Agent roles section ship with template v4.4. A template seeded earlier
-  keeps rendering without them: merge the `[roles]` rule, the shortened Tools bullet and the Agent
-  roles section from gov's template into yours, then re-render. Without the playbook renderer,
+- The `[roles]` rule and the Agent roles section ship with template v4.4. The render reads the
+  template the renderer kit ships beside its engine, so an update brings them; a copy seeded earlier
+  at `playbook_path` is no longer read. Without the playbook renderer,
   fill `{{ROLE_ROSTER}}` from `python <prefix>/roles/handoff.py roster`. <!-- usage: script:tools/roles/handoff.py#roster 739c5825 -->

@@ -1671,8 +1671,8 @@ def arm_lock(c):
     import contextlib
     import io
     import render_playbook
-    c.write_file(".governance/deploy.toml", 'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "TPL.md"\n')
-    c.write_file("TPL.md", FX_TEMPLATE)
+    c.write_file(".governance/deploy.toml", 'kits = ["lexicon"]\n')
+    c.write_file(derive_template_rel(), FX_TEMPLATE)
     lock = c.top / LOCK
     seen = []
     for _ in range(2):
@@ -1688,7 +1688,7 @@ def arm_lock(c):
     c.check("the row's blob is git hash-object of the rendered file", row.get("blob") == blob, f"{row} vs {blob}")
     c.check("the row's renderer and template carry the provenance",
             row.get("renderer") == f"playbook-render@{render_playbook.KIT_PLAYBOOK_RENDER_VERSION}"
-            and row.get("template") == "TPL.md@v4.4" and row.get("units") == [], str(row))
+            and row.get("template") == f"{derive_template_rel()}@v4.4" and row.get("units") == [], str(row))
     charter = (c.top / "AGENTS.md").read_text(encoding="utf-8")
     c.check("the rendered charter carries no version marker", "governance-template" not in charter, charter)
     run_git(c.top, "add", "--", "AGENTS.md", LOCK)
@@ -1948,7 +1948,7 @@ SLOT_ROWS = ('[[unit]]\ntag = "unit.sub"\nlevel = 3\ntype = "directive"\nscope =
              'trigger = "always"\ntext = "MUST answer the subagent."\n\n'
              '[[unit]]\ntag = "unit.driver"\nlevel = 3\ntype = "directive"\nscope = ["reader.driver"]\n'
              'trigger = "always"\ntext = "MUST stay out of a subagent\'s slot."\n')
-SLOT_DEPLOY = 'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "TPL.md"\n'
+SLOT_DEPLOY = 'kits = ["lexicon"]\n'
 SLOT_TEMPLATE = "<!-- governance-template: v4.4 -->\n\n# fixture — agent charter\n\n<!-- units: {} -->\n"
 SLOT_CHARTER = ("<!-- gov:playbook -->\n# fixture — agent charter\n\nMUST answer the subagent.\n"
                 "<!-- /gov:playbook -->\n")
@@ -2001,6 +2001,13 @@ def derive_kit_rel(name) -> str:
     return derive_tool_rel(KIT_DIR.name, name)
 
 
+def derive_template_rel() -> str:
+    """The charter template as a fixture tree plants it, where the render reads first: this kit's directory
+    (PLAY-dOrderedCharter-34 F7)."""
+    from render_playbook import TEMPLATE_NAME
+    return derive_kit_rel(TEMPLATE_NAME)
+
+
 def write_gate_tree(c, legacy=GATE_LEGACY, **files):
     """The tree the render gate grades green, `GATE_FILES` with `files` over them, one commit on main."""
     run_git(c.top, "checkout", "-q", "-b", "main")
@@ -2047,7 +2054,7 @@ def arm_status(c):
         got = derive_status("unit.a", records)
         c.check(f"derive_status is {want} over {records}", got == want, got)
     write_gate_tree(c, GATE_LEGACY.replace("AGENTS.md\n", "", 1), **{
-        ".governance__deploy.toml": SLOT_DEPLOY, "TPL.md": SLOT_TEMPLATE.format("reader.subagent")})
+        ".governance__deploy.toml": SLOT_DEPLOY, derive_template_rel(): SLOT_TEMPLATE.format("reader.subagent")})
     write_kits(c, SLOT_ROWS +'\n[[unit]]\ntag = "unit.typed"\nlevel = 3\ntype = "directive"\ntext = "MUST x."\n'
                'status = "active"\n')
     lines, rc = run_schema(c.top)
@@ -2103,7 +2110,7 @@ def arm_slots(c):
     run_git(c.top, "checkout", "-q", "-b", "main")
     write_kits(c, SLOT_ROWS)
     c.write_file(".governance/deploy.toml", SLOT_DEPLOY)
-    c.write_file("TPL.md", SLOT_TEMPLATE.format("reader.subagent"))
+    c.write_file(derive_template_rel(), SLOT_TEMPLATE.format("reader.subagent"))
     rc, said = run_render(c.top)
     charter = (c.top / "AGENTS.md").read_text(encoding="utf-8")
     c.check("the slot expands to the selected unit's line and nothing of its own",
@@ -2111,7 +2118,7 @@ def arm_slots(c):
     rows = read_lock(c.top)
     c.check("the lock's row lists the unit the slot rendered",
             [r.get("units") for r in rows] == [[f"unit.sub@{derive_unit_pin('MUST answer the subagent.')}"]], str(rows))
-    c.write_file("TPL.md", SLOT_TEMPLATE.format("nosuch.reader"))
+    c.write_file(derive_template_rel(), SLOT_TEMPLATE.format("nosuch.reader"))
     rc, said = run_render(c.top)
     c.check("a selector no namespace registers refuses the render", rc == 1 and "no namespace registers" in said, said)
 

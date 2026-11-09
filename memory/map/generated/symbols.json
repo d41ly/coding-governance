@@ -50,6 +50,11 @@
     {
       "id": "CensusRefused",
       "kind": "class",
+      "file": "tools/playbook/practice_census.py"
+    },
+    {
+      "id": "CensusRefused",
+      "kind": "class",
       "file": "tools/process-monitor/census.py"
     },
     {
@@ -968,6 +973,11 @@
       "file": "tools/playbook/overlay.py"
     },
     {
+      "id": "arm_alias_copy",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/composition.py"
+    },
+    {
       "id": "arm_amends",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
@@ -1046,6 +1056,11 @@
       "id": "arm_default_names",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_delta",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/composition.py"
     },
     {
       "id": "arm_direction",
@@ -1223,6 +1238,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "arm_installed_template",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/composition.py"
+    },
+    {
       "id": "arm_instruction_unit",
       "kind": "function",
       "file": "tools/playbook/core.py"
@@ -1258,6 +1278,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "arm_level_6",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/composition.py"
+    },
+    {
       "id": "arm_lock",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -1266,6 +1291,11 @@
       "id": "arm_map_held",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_marked_part",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/composition.py"
     },
     {
       "id": "arm_meaning_editorial",
@@ -1373,6 +1403,16 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "arm_over_budget",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/composition.py"
+    },
+    {
+      "id": "arm_over_codex",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/composition.py"
+    },
+    {
       "id": "arm_owner_propose",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -1436,6 +1476,11 @@
       "id": "arm_probe_negative",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_project_block",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/composition.py"
     },
     {
       "id": "arm_proof_values",
@@ -1548,6 +1593,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "arm_seeded_template",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/composition.py"
+    },
+    {
       "id": "arm_semantic_behind",
       "kind": "function",
       "file": "tools/playbook/pins.py"
@@ -1651,6 +1701,11 @@
       "id": "arm_unit_class",
       "kind": "function",
       "file": "tools/playbook/pins.py"
+    },
+    {
+      "id": "arm_unplaced",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/composition.py"
     },
     {
       "id": "arm_unread",
@@ -2568,6 +2623,11 @@
       "file": "tools/run-gates/run-gates.turnstile.test.sh"
     },
     {
+      "id": "build_document",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "build_drift_gov",
       "kind": "function",
       "file": "tools/playbook/pins.py"
@@ -3298,6 +3358,11 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "build_project_block",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "build_projects",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -3673,6 +3738,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "build_sized",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/composition.py"
+    },
+    {
       "id": "build_skill_fixture",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -3896,6 +3966,11 @@
       "id": "build_traced_runner",
       "kind": "function",
       "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
+      "id": "build_tree",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/composition.py"
     },
     {
       "id": "build_tree",
@@ -4591,6 +4666,11 @@
       "id": "check_agentcap",
       "kind": "function",
       "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "check_alias_copies",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "check_ancestor",
@@ -8933,6 +9013,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "derive_composition_lines",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "derive_conf_key",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
@@ -9868,6 +9953,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "derive_named_paths",
+      "kind": "function",
+      "file": "tools/playbook/practice_census.py"
+    },
+    {
       "id": "derive_names",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -10318,6 +10408,11 @@
       "file": "tools/run-gates/owed_rows.py"
     },
     {
+      "id": "derive_ruling",
+      "kind": "function",
+      "file": "tools/playbook/practice_census.py"
+    },
+    {
       "id": "derive_run_eras",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -10623,6 +10718,11 @@
       "file": "tools/govkit/shims.py"
     },
     {
+      "id": "derive_shipper",
+      "kind": "function",
+      "file": "tools/playbook/practice_census.py"
+    },
+    {
       "id": "derive_short_sha",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -10801,6 +10901,11 @@
       "id": "derive_temp_path",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "derive_template_rel",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "derive_template_size_plant",
@@ -13405,6 +13510,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/playbook/fixtures/composition.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/playbook/fixtures/row_kind.py"
     },
     {
@@ -13446,6 +13556,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/playbook/practice_census.py"
     },
     {
       "id": "main",
@@ -13726,6 +13841,11 @@
       "id": "measure_contract_parity",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "measure_contributors",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "measure_conventions",
@@ -16298,6 +16418,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "read_block",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/composition.py"
+    },
+    {
       "id": "read_body_ceiling",
       "kind": "function",
       "file": "tools/playbook/load_sets.py"
@@ -16456,6 +16581,11 @@
       "id": "read_cell",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "read_census_tree",
+      "kind": "function",
+      "file": "tools/playbook/practice_census.py"
     },
     {
       "id": "read_chain_clauses",
@@ -17658,6 +17788,11 @@
       "file": "tools/playbook/core.py"
     },
     {
+      "id": "read_kind_rows",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "read_kind_schema",
       "kind": "function",
       "file": "tools/playbook/overlay_rows.py"
@@ -18791,6 +18926,11 @@
       "id": "read_repo_root",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "id": "read_repo_units",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "read_report",
@@ -20933,6 +21073,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "render_census",
+      "kind": "function",
+      "file": "tools/playbook/practice_census.py"
+    },
+    {
       "id": "render_census_row",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -20991,6 +21136,16 @@
       "id": "render_date",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "render_delta_line",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "render_delta_report",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "render_dirt",
@@ -25776,6 +25931,11 @@
       "id": "run_plant",
       "kind": "function",
       "file": "tools/playbook/load_sets.py"
+    },
+    {
+      "id": "run_plant",
+      "kind": "function",
+      "file": "tools/playbook/practice_census.py"
     },
     {
       "id": "run_plant",
@@ -30798,6 +30958,11 @@
       "file": "tools/govkit/step_gate.py"
     },
     {
+      "id": "write_alias_copies",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "write_alias_fixture",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -32196,6 +32361,11 @@
       "id": "write_temp_manifest",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "write_template",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "write_text",

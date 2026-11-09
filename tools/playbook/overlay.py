@@ -605,7 +605,7 @@ LOCAL_ROW = render_fx_row("repo.local", text="MUST mind the local rule.")
 def write_slot_files(c):
     """Staged, not committed: gov's kit and a charter template holding one unit slot and no practice region."""
     for rel, text in {f"{FX_KIT}/kit.toml": 'id = "alpha"\n', FX_MANIFEST: derive_gov_rows(),
-                      ".governance/deploy.toml": iu.SLOT_DEPLOY, "TPL.md": iu.SLOT_TEMPLATE.format("reader.every")}.items():
+                      ".governance/deploy.toml": iu.SLOT_DEPLOY, iu.derive_template_rel(): iu.SLOT_TEMPLATE.format("reader.every")}.items():
         c.write_file(rel, text)
 
 
@@ -659,7 +659,7 @@ def arm_write_then_render(c):
     root = ie.build_tree(c, ie.GUARD_POINT)
     gov_tag.write_commit(root, {iu.derive_tool_rel(KIT_DIR.name, iu.RENDERERS_TABLE): '[[target]]\npaths = ["AGENTS.md"]\n'
                                 'renderer = "playbook:charter"\n', ".governance/deploy.toml": iu.SLOT_DEPLOY,
-                                "TPL.md": iu.SLOT_TEMPLATE.format("reader.every")}, "a rendered charter")
+                                iu.derive_template_rel(): iu.SLOT_TEMPLATE.format("reader.every")}, "a rendered charter")
     rc, said = ie.run_cli(root, "add", "--manifest", "overlay", "--tag", "repo.local", "--type", "directive", "--level",
                           "3", "--trigger", "always", "--scope", "reader.every", "--text", "MUST mind the local rule.",
                           *ie.FX_RECORD, tty=True)

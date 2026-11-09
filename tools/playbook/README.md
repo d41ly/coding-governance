@@ -52,7 +52,7 @@ It never guesses. Every refusal names what the operator must supply:
 - a `derived` placeholder whose probe returned nothing and that nothing answers — it does NOT fall
   back to a default it never declared, because a probe quietly returning the empty string is how a
   charter ships with a blank where a branch name belongs;
-- a template that is its own charter: `playbook_path` resolving to the `--charter` file;
+- a template that is its own charter: the template the render reads resolving to the `--charter` file;
 - a `[charter]` entry that fails its grading (below);
 - a `kit:` fence naming something that is not a registry entry;
 - a `when:` fence naming a block the descriptor does not declare;
@@ -91,8 +91,8 @@ at the landed revision, `CHARTER_OVERRIDE_DEFAULT`'s where no policy kit answers
 value and its source; `{{INSTRUCTION_MAP}}`, `instruction_units.render_instruction_map`'s lines over the
 target's document registry, one level each, then a `held —` line while a row carries `hold`, then the `preset —` line;
 `{{PRINCIPLES}}` and `{{DECISION_PRINCIPLES}}`, one `- P<n> <line>` per row of `principles.toml`, the
-decision principle, `principle.p18`, alone under the second. A seeded v4.x template renders as it did and
-reads no `charter.override`.
+decision principle, `principle.p18`, alone under the second. An older v4.x template, which only a fixture
+plants now, renders as it did and reads no `charter.override`.
 
 ## Where a value comes from
 
@@ -104,11 +104,14 @@ failure.
 
 ## `playbook_path` has two modes
 
-With `playbook-render` selected, `playbook_path` is where the TEMPLATE lives, and the render writes
-the charter named by `--charter` (default `AGENTS.md`). The two may not be one file. Without
-`playbook-render`, `playbook_path` is the copied charter itself, and the `playbook-placeholders`
-hole probes it for a surviving `{{`. In render mode that hole stands down, because the template
-always carries placeholders and `--check` already reports one that survives.
+With `playbook-render` selected, the render reads the template this kit ships beside its engine, at
+`<prefix>/playbook/coding-governance-agents.template.md` in an install and at gov's root in gov, and
+writes the charter named by `--charter` (default `AGENTS.md`). The two may not be one file. The copy at
+`playbook_path` is no input of the render: an answer naming it prints one `retired` note, and nothing
+of its bytes reaches the charter (PLAY-dOrderedCharter-34). Without `playbook-render`, `playbook_path`
+is the copied charter itself, and the `playbook-placeholders` hole probes it for a surviving `{{`. In
+render mode that hole stands down, because the template always carries placeholders and `--check`
+already reports one that survives.
 
 ## The `[charter]` table
 
