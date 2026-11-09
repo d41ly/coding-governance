@@ -1413,6 +1413,31 @@ case "$sg_last" in
   *) echo "FAIL S-AC5 the last line does not name the card and the $sg_left route lines left out: $sg_last"; fail=$((fail+1)) ;;
 esac
 
+# ---- S-AC8: the card file's envelope wraps the context (PLAY-dOrderedCharter-8 S6) ---------------
+# The session tree's `.claude/orientation-card.md`, as the card engine renders it: its first and last
+# lines open and close the text, which is otherwise byte-identical; within the cap on the padded route;
+# and with the file gone, the text is the bare one again. The lines are planted here, so a hook typing
+# its own envelope reds the first arm.
+SG_CF="$SG_TOP_WT/.claude/orientation-card.md"
+SG_CF_OPEN='[.claude/orientation-card.md · Level 1 · a fixture direction]'
+run_sub "S-AC8 setup: the bare context with no card file" json session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+cp "$TMP/ctx" "$TMP/ctx-bare"
+mkdir -p "$SG_TOP_WT/.claude"
+printf '%s\n## route\n- build: bx\n[/.claude/orientation-card.md]\n' "$SG_CF_OPEN" > "$SG_CF"
+run_sub "S-AC8 a card file in the session tree -> the SubagentStart JSON" json session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+{ printf '%s\n' "$SG_CF_OPEN"; cat "$TMP/ctx-bare"; printf '\n[/.claude/orientation-card.md]'; } > "$TMP/ctx-want"
+if cmp -s "$TMP/ctx-want" "$TMP/ctx"; then echo "ok   S-AC8 the file's first and last lines wrap the bare context, byte for byte"; pass=$((pass+1))
+else echo "FAIL S-AC8 the file's first and last lines wrap the bare context, byte for byte"; diff "$TMP/ctx-want" "$TMP/ctx" | head -8 | sed 's/^/     /'; fail=$((fail+1)); fi
+run_sub "S-AC8 the padded route with a card file -> the SubagentStart JSON" json session_id=sgtest-s5 "cwd=$SG_CWD_WT"
+sg_chars=$(node -p "require('fs').readFileSync(process.argv[1],'utf8').length" "$TMP/ctx")
+if [ "$sg_chars" -le "$SG_CAP" ] && [ "$(head -n 1 "$TMP/ctx")" = "$SG_CF_OPEN" ] && [ "$(tail -n 1 "$TMP/ctx")" = '[/.claude/orientation-card.md]' ]; then
+  echo "ok   S-AC8 the enveloped padded route is $sg_chars characters, within the cap $SG_CAP"; pass=$((pass+1))
+else echo "FAIL S-AC8 the enveloped padded route is $sg_chars characters against the cap $SG_CAP, or lost its envelope"; fail=$((fail+1)); fi
+rm -f "$SG_CF"
+run_sub "S-AC8 the card file removed -> the SubagentStart JSON" json session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+cmp -s "$TMP/ctx-bare" "$TMP/ctx" && { echo "ok   S-AC8 with no card file the context is byte-identical to the bare one"; pass=$((pass+1)); } \
+  || { echo "FAIL S-AC8 with no card file the context is byte-identical to the bare one"; fail=$((fail+1)); }
+
 # ---- AC7: the branch never surfaces an error: a cwd that is not a string, no CLAUDE_PROJECT_DIR --
 SG_PROJECT=""
 run_sub_hook '{"hook_event_name":"SubagentStart","session_id":"sgtest-r1","cwd":5,"agent_id":"sub-1"}'

@@ -375,3 +375,11 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-09T00:14:04Z brief · item PLAY-dOrderedCharter-4 · reason b978bd86852e memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-4-build-brief.md
 
 2026-11-09T00:32:20Z dispatch · item 5edd24e7 PLAY-dOrderedCharter-4 · reason tools/playbook/instruction_units.py tools/playbook/render_playbook.py tools/playbook/README.md skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh AGENTS.md .governance/instructions.lock help/charter.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-4.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-4-ledger.md memory/builds/dOrderedCharter/README.md memory/builds/dOrderedCharter/build/2026-11-09-build-PLAY-dOrderedCharter-4-deviation-703.md
+
+2026-11-09T01:00:12Z dispatch · item 829d257b PLAY-dOrderedCharter-8 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/card-compaction.fixture.sh tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/roles/handoff.py tools/lib/envelope.sh tools/lib/resolve-python.test.sh tools/playbook/documents.toml tools/playbook/instruction_units.py AGENTS.md .governance/instructions.lock memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-8.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-8-ledger.md memory/builds/dOrderedCharter/build/2026-11-09-build-PLAY-dOrderedCharter-8-deviation-82.md memory/builds/dOrderedCharter/README.md memory/LIVE.md
+
+2026-11-09T01:00:18Z brief · item PLAY-dOrderedCharter-8 · reason 8bc6ac82b10f memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-8-build-brief.md
+
+2026-11-09T01:21:49Z dispatch · item 829d257b PLAY-dOrderedCharter-8 · reason memory/builds/dOrderedCharter/build/2026-11-09-build-PLAY-dOrderedCharter-8-deviation-83.md
+
+2026-11-09T01:33:01Z dispatch · item 829d257b PLAY-dOrderedCharter-8 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

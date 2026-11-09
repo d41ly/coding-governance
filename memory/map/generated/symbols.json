@@ -953,6 +953,21 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "arm_card_absent",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_card_level",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_card_tracked",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_census",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -1506,6 +1521,11 @@
       "id": "as_posix_p",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "ask",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-compaction.fixture.sh"
     },
     {
       "id": "ask",
@@ -4596,6 +4616,11 @@
       "id": "check_card_citations",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "check_card_file",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
       "id": "check_card_route",
@@ -10393,6 +10418,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "derive_untracked_files",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "derive_usage_fingerprint",
       "kind": "function",
       "file": "tools/govkit/docs_leg.py"
@@ -15189,6 +15219,11 @@
     },
     {
       "id": "readCard",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "readCardEnvelope",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
@@ -20013,6 +20048,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "renderRouteText",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "renderSettingsDeny",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -20173,6 +20213,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "render_card_block",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "render_cards_md",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -20331,6 +20376,16 @@
       "id": "render_envelope",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "render_envelope_sh",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "render_envelope_sh",
+      "kind": "function",
+      "file": "tools/lib/envelope.sh"
     },
     {
       "id": "render_escape_ratio",
@@ -23756,6 +23811,11 @@
       "id": "run_card",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
+      "id": "run_card_file",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
       "id": "run_case",
@@ -29990,12 +30050,32 @@
     {
       "id": "write_card",
       "kind": "function",
+      "file": "skills/session-kickoff/card-compaction.fixture.sh"
+    },
+    {
+      "id": "write_card",
+      "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "write_card",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
+      "id": "write_card_file",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "write_card_plant",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "write_card_tree",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "write_carries_spec",

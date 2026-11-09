@@ -138,6 +138,8 @@ LEAD_SLOTS = ("practices",)
 PRACTICES_DOC = "%s#practices-at-%s"
 TASK_LEVEL = 6
 TASK_DIRECTION = "The task: this unit's goal, scope and acceptance; yields to levels 0 to 5"
+#: PLAY-dOrderedCharter-8 S7: the card file the kickoff checker renders into each session tree, at level 1
+CARD_FILE_REL = ".claude/orientation-card.md"
 #: The charter's drive section and its line, `- <stage> · <role> — <when>: `<command>``, as the playbook kit
 #: renders them; a kit imports no sibling, so the heading's opening is spelled again here.
 DRIVE_HEAD = "## Drive — "
@@ -383,6 +385,18 @@ def extract_drive_lines(text, role):
     return out
 
 
+def render_card_block(root):
+    """PLAY-dOrderedCharter-8 S7: `## Card`, holding the card file's first line, the `## route` section of
+    what that line opens and its last line, the file's own envelope copied and never typed here; "" when
+    `<root>/.claude/orientation-card.md` is absent or carries no route."""
+    path = root / CARD_FILE_REL
+    if not path.is_file():
+        return ""
+    lines = lib.load_text(path).rstrip("\n").split("\n")
+    route = extract_card_section("\n".join(lines[1:-1]), "route") if len(lines) > 2 else None
+    return "## Card\n\n%s\n%s\n%s" % (lines[0], route, lines[-1]) if route else ""
+
+
 def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card_arg, inputs, out_path,
                    notes=None, tail=""):
     """`(path, text, task_part)` of the prompt file; raises RolesError naming every key that refused.
@@ -532,6 +546,10 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         row = lib.read_envelope_row(rows, doc, memory_root)
         if practices and row is not None:
             practices = lib.render_envelope(PRACTICES_DOC % (doc, step), row[0], row[1], practices)
+    # PLAY-dOrderedCharter-8 S7: the card's level-1 block leads the task part after the level-0 practices
+    card_block = render_card_block(root)
+    if card_block:
+        practices = practices.rstrip("\n") + "\n\n" + card_block if practices else card_block
     role_sec, task_sec = render_work_order({
         "role": role_text.strip("\n")
         + ("\n\n### Drive\n\n" + "\n".join(drive) if drive else ""), "opening": opening,

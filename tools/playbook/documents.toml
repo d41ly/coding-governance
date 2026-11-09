@@ -5,7 +5,9 @@
 # alike; `level`, its place on the ladder, 0 to 7; `direction`, one line and no `]`; `source`, the file the
 # envelope is written from, `{prefix}` the tool root. A row whose tag the `doc` namespace does not derive from its
 # file carries `h1`, the line naming what its files are. `hold`, `<unit id> F<n>`, holds one document out of its
-# envelope until the fork it names is ruled; the gate states it as not checked on every run.
+# envelope until the fork it names is ruled; the gate states it as not checked on every run. `untracked = true`
+# (absent reads false) is a per-worktree file no clone tracks: the gate checks its envelope wherever it exists,
+# never reds its absence, and reds a tracked file at its path (PLAY-dOrderedCharter-8 S9).
 # Each envelope is `[<path> · Level <n> · <direction>]` … `[/<path>]`, whole lines, the path the file's own.
 
 [[document]]
@@ -14,6 +16,15 @@ path = "AGENTS.md"
 level = 0
 direction = "Non-negotiable project instructions, always enforced unless the owner explicitly overrides them; the override is recorded"
 source = "coding-governance-agents.template.md"
+
+[[document]]
+tag = "doc.orientation-card"
+path = ".claude/orientation-card.md"
+level = 1
+direction = "the build's card: where this session stands; level 0 outranks it"
+source = "skills/session-kickoff/manifest-check.sh"
+h1 = "The session's orientation card, rendered into its tree at every session start"
+untracked = true
 
 [[document]]
 tag = "doc.build-method"

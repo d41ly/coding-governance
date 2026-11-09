@@ -29,7 +29,9 @@
 #     its spec and the brief must RESOLVE, or nothing is appended (KICK-aRoutedQuill-1).
 #     The card verbs run NO manifest check: the session id comes from the SessionStart hook's JSON
 #     on stdin, else --session (--append: --session alone, stdin is the body); the card lives at
-#     <git-common-dir>/orientation/<sid>.md, shared by every worktree; the `node —` cell resolves
+#     <git-common-dir>/orientation/<sid>.md, shared by every worktree, and --write, --replay and
+#     --append re-render it, enveloped, into the session tree's ignored .claude/orientation-card.md
+#     (PLAY-dOrderedCharter-8: the payload `cwd`'s toplevel, else this tree); the `node —` cell resolves
 #     through the manifest audit block's `registry:` key. The append and the check do NOT judge
 #     relevance, scope, tier, or the truth of a claim at the line it cites — existence only.
 #
@@ -292,10 +294,16 @@ add_health_event() {
 # the `sed` below blocks forever, including for a caller that had already answered by flag.
 # Neither channel is a refusal naming both, never a card under a guessed id; a separator, `..` or
 # any byte outside [A-Za-z0-9._-] is refused before it can be joined into a path. `--append` never
-# reads stdin here — stdin is the body it stores — so it takes `--session` alone.
+# reads stdin here — stdin is the body it stores — so it takes `--session` alone. The payload is read
+# ONCE, and its `cwd` kept in CARD_CWD for the card file's tree (PLAY-dOrderedCharter-8 S2); JSON's
+# escaped backslash reads as `/`, the spelling git accepts on every host.
+CARD_CWD=""
 read_session_id() {
-  local sid=""
-  [ "$CARD_VERB" = append ] || [ -n "$CARD_SID" ] || [ -t 0 ] || sid=$(sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+  local sid="" payload="" re_sid='"session_id"[[:space:]]*:[[:space:]]*"([^"]*)"' re_cwd='"cwd"[[:space:]]*:[[:space:]]*"([^"]*)"'
+  [ "$CARD_VERB" = append ] || [ -n "$CARD_SID" ] || [ -t 0 ] || payload=$(cat)
+  [[ $payload =~ $re_sid ]] && sid=${BASH_REMATCH[1]}
+  # ponytail: a POSIX directory whose name holds a backslash reads wrong here, and the tree falls back to $ROOT
+  [[ $payload =~ $re_cwd ]] && CARD_CWD=${BASH_REMATCH[1]//\\\\//}
   [ -n "$sid" ] || sid="$CARD_SID"
   if [ -z "$sid" ] && [ "$CARD_VERB" = append ]; then
     echo "MANIFEST env ERROR — --card --append has no session id: stdin is the body, so pass --session <sid>"; exit 2
@@ -318,6 +326,11 @@ if [ -n "$CARD" ]; then
   read_session_id
   CARD_FILE="$CARD_DIR/$CARD_SID.md"
   [ "$CARD_VERB" = path ] && { printf '%s\n' "$CARD_FILE"; exit 0; }
+  # The session's own tree, resolved once: the payload's `cwd` when git places it in a repository.
+  CARD_TREE=$ROOT
+  if [ -n "$CARD_CWD" ] && _ct=$(unset GIT_DIR GIT_WORK_TREE; git -C "$CARD_CWD" rev-parse --show-toplevel 2>/dev/null) && [ -n "$_ct" ]; then
+    CARD_TREE=${_ct%$'\r'}
+  fi
 fi
 
 STAGED=0; MF=""
@@ -779,6 +792,58 @@ print_replay() {
   if [ -f "$CARD_FILE" ]; then cat "$CARD_FILE"; else write_card replay; fi
   derive_head_state
   printf 'now — HEAD %s · %s · %s\n' "$HEAD_SHA" "$HEAD_BRANCH" "$HEAD_DIRTY"
+}
+
+# >>> envelope_sh — canonical copy: envelope.sh in the gov lib dir (byte-identical; gated)
+# `render_envelope_sh <path> <level> <direction> [<body-file>]` prints the opener, the body file's
+# bytes with a final newline added where it lacks one, and the closer: `render_envelope` of the Python
+# twin byte for byte. No body file, or an empty one, renders the two lines alone. A level that is no
+# unsigned integer returns 2 printing nothing; a body file that does not read returns 1.
+render_envelope_sh() {
+  case "${2:-}" in ''|*[!0-9]*) return 2 ;; esac
+  printf '[%s · Level %s · %s]\n' "$1" "$((10#$2))" "$3"
+  if [ -n "${4:-}" ] && [ -s "$4" ]; then
+    cat -- "$4" || return 1
+    [ -z "$(tail -c 1 -- "$4")" ] || printf '\n'
+  fi
+  printf '[/%s]\n' "$1"
+}
+# <<< envelope_sh
+
+# The card file (PLAY-dOrderedCharter-8 S2, S3): the stored card rendered into `<CARD_TREE>/.claude/
+# orientation-card.md` inside its level-1 envelope, the values of the playbook kit's `doc.orientation-card`
+# registry row, through a temp beside it renamed into place, so a reader never sees half a card. The
+# file is ignored before it is first written: a `check-ignore` miss appends the one exclude line to the
+# clone's `info/exclude`, which covers every worktree, and a second miss writes nothing. Silent when
+# written; any failure prints ONE `card-file — skipped:` line and returns 0, so it never changes a verb's
+# exit: the stored card is the record and this file its render. WHAT THIS DOES NOT DO: load the file;
+# nothing imports it until the charter's entry file does (PLAY-dOrderedCharter-43).
+CARD_FILE_REL=.claude/orientation-card.md
+CARD_FILE_DIRECTION="the build's card: where this session stands; level 0 outranks it"
+write_card_file() {
+  local dest="$CARD_TREE/$CARD_FILE_REL" common tmp
+  if ! git -C "$CARD_TREE" check-ignore -q "$CARD_FILE_REL" 2>/dev/null; then
+    common=$(git -C "$CARD_TREE" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) && common=${common%$'\r'} && [ -n "$common" ] \
+      || { printf 'card-file — skipped: no git common dir resolves for %s\n' "$CARD_TREE"; return 0; }
+    # A line already there is not appended again: a tracked file at the path misses the probe either way.
+    grep -qxF "/$CARD_FILE_REL" "$common/info/exclude" 2>/dev/null \
+      || { mkdir -p "$common/info" \
+        && { [ ! -s "$common/info/exclude" ] || [ -z "$(tail -c 1 "$common/info/exclude")" ] || printf '\n'; } >> "$common/info/exclude" \
+        && printf '/%s\n' "$CARD_FILE_REL" >> "$common/info/exclude"; } 2>/dev/null \
+      || { printf 'card-file — skipped: the ignore line could not be appended to %s/info/exclude\n' "$common"; return 0; }
+    git -C "$CARD_TREE" check-ignore -q "$CARD_FILE_REL" 2>/dev/null \
+      || { printf 'card-file — skipped: %s is not ignored after the exclude line, so no file was written\n' "$CARD_FILE_REL"; return 0; }
+  fi
+  [ ! -d "$dest" ] || { printf 'card-file — skipped: %s is a directory\n' "$dest"; return 0; }
+  mkdir -p "$CARD_TREE/.claude" 2>/dev/null || { printf 'card-file — skipped: cannot create %s/.claude\n' "$CARD_TREE"; return 0; }
+  tmp=$(mktemp "$dest.XXXXXXXX" 2>/dev/null) || { printf 'card-file — skipped: no temp beside %s\n' "$dest"; return 0; }
+  if render_envelope_sh "$CARD_FILE_REL" 1 "$CARD_FILE_DIRECTION" "$CARD_FILE" > "$tmp" 2>/dev/null \
+      && mv -f "$tmp" "$dest" 2>/dev/null; then
+    return 0
+  fi
+  rm -f "$tmp" 2>/dev/null
+  printf 'card-file — skipped: cannot write %s\n' "$dest"
+  return 0
 }
 
 # ---- the append and the citation check (KICK-aReplayedCard-2) -------------------------------------
@@ -1394,12 +1459,12 @@ check_card() {
 
 if [ -n "$CARD" ]; then
   case "$CARD_VERB" in
-    write)  write_card write ;;
-    replay) print_replay ;;
+    write)  write_card write; write_card_file ;;
+    replay) print_replay; write_card_file ;;
     append|check)
       CARD_TMP=$(mktemp -d "${TMPDIR:-/tmp}/mfcard.XXXXXX") || { echo "MANIFEST env ERROR — cannot create a scratch dir under ${TMPDIR:-/tmp}"; exit 2; }
       trap 'rm -rf "$CARD_TMP"' EXIT
-      if [ "$CARD_VERB" = append ]; then add_card_body; else check_card; fi ;;
+      if [ "$CARD_VERB" = append ]; then add_card_body; write_card_file; else check_card; fi ;;
   esac
   exit 0
 fi

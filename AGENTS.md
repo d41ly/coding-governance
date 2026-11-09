@@ -21,7 +21,7 @@
 
 - After a context reset, rebuild the instruction hierarchy from this map before acting: the smaller level number wins a conflict.
 - level 0 · charter · loads first, always — AGENTS.md
-- level 1 · card · loads with its build — no registered document
+- level 1 · card · loads with its build — .claude/orientation-card.md
 - level 2 · loop · loads with the loop — no registered document
 - level 3 · methods · loads on its trigger — memory/guides/BUILD-METHOD.md · memory/TEMPLATE-SPEC.md · memory/HYGIENE.md · memory/guides/ANNOTATION-STYLE.md · memory/guides/REVIEW-PROTOCOL.md · memory/guides/MERGE-BAR.md · memory/guides/SESSION-KICKOFF.md · memory/guides/UNATTENDED-PROTOCOL.md · memory/guides/UNATTENDED-ASKS.md · memory/guides/UNATTENDED-STOPS.md · memory/guides/UNATTENDED-VERBS.md · memory/guides/PLAYBOOK-TEMPLATE.md
 - level 4 · runbooks · loads on its trigger or path — .claude/skills/*/SKILL.md · skills/session-kickoff/SKILL.md · skills/deploy-governance/SKILL.md · .claude/rules/*.md

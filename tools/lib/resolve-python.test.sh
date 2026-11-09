@@ -370,6 +370,7 @@ resolve_bash_py|$ROOT/$KIT_REL/resolve_bash.py|$KIT_REL/resolve_bash
 coverage_join|$ROOT/$KIT_REL/coverage_join.py|$KIT_REL/coverage_join
 common_git_dir|$ROOT/$KIT_REL/common_dir.py|$KIT_REL/common_dir
 render_envelope|$ROOT/$KIT_REL/envelope.py|$KIT_REL/envelope
+envelope_sh|$ROOT/$KIT_REL/envelope.sh|$KIT_REL/envelope
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -406,6 +407,9 @@ render_envelope|$ROOT/$KIT_REL/envelope.py|$KIT_REL/envelope
 # repository's git directory, the recall kit's query log's home and the tag index's.
 # render_envelope (PLAY-dOrderedCharter-3 S3) is a load-bearing document's envelope, its writer and
 # its reader; the charter's renderer and the roles kit each carry it inline, both kits copy-installed.
+# envelope_sh (PLAY-dOrderedCharter-8 S8) is its shell twin, the card engine's copy, and part 2k below holds
+# the two canonicals to one byte form. Its stem is not `render_envelope_sh`: the copy grep matches a
+# stem by prefix, so the row above would read a block of that name as one of its own copies.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
@@ -698,6 +702,28 @@ print(";".join(c.replace(root, "F").replace(os.sep, "/").replace(".EXE", ".exe")
   || bad "the JS resolveBash order left the one TOOL-dGroundRules-81 states: $rb_js"; ok
 [ "$rb_py" = "GB;F/D1/$RB_B;$RB_TAIL" ] \
   || bad "the canonical resolve_bash order left the one TOOL-dGroundRules-81 states: $rb_py"; ok
+
+# ---- 2k. THE ENVELOPE, ONE BYTE FORM IN TWO LANGUAGES (PLAY-dOrderedCharter-8 S8) ------------------
+# Parity holds each inline copy to its canonical; this holds envelope.sh to envelope.py's
+# render_envelope, run as each is run, over the card's own triple around an empty body and around a
+# body lacking its final newline. Then the row boundary: no `render_envelope` block sits in the card
+# engine, so that row counts no copy there and the shell copy is graded by `envelope_sh` alone. WHAT
+# THIS DOES NOT CHECK: a level past one digit, a direction holding `%`, or any copy's call site.
+ENV_DIR="the build's card: where this session stands; level 0 outranks it"
+printf 'a\nb' > "$TMP/env.body"
+for env_body in "" "$TMP/env.body"; do
+  env_sh=$(bash "$HERE/envelope.sh" .claude/orientation-card.md 1 "$ENV_DIR" ${env_body:+"$env_body"} | od -An -tx1)
+  env_py=$("$REALPY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); from envelope import render_envelope
+body = open(sys.argv[3], encoding="utf-8").read() if sys.argv[3] else ""
+sys.stdout.buffer.write(render_envelope(".claude/orientation-card.md", 1, sys.argv[2], body).encode("utf-8"))' \
+    "$HERE" "$ENV_DIR" "$env_body" | od -An -tx1)
+  [ -n "$env_sh" ] && [ "$env_sh" = "$env_py" ] \
+    || bad "envelope.sh and envelope.py render different bytes around ${env_body:-an empty body}"; ok
+done
+env_rows=$(cd "$ROOT" && git grep -l "^# >>> render_envelope" -- skills/session-kickoff/manifest-check.sh || true)
+[ -z "$env_rows" ] || bad "the render_envelope row counts a copy in the card engine: $env_rows"; ok
+[ "$(cd "$ROOT" && git grep -c "^# >>> envelope_sh" -- skills/session-kickoff/manifest-check.sh | cut -d: -f2)" = 1 ] \
+  || bad "the card engine carries no envelope_sh block, so its envelope is graded by no row"; ok
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver

@@ -1454,6 +1454,8 @@ function checkRoleGate(cmd, data, env) {
 
 /** The harness's cap on a hook's additionalContext, in characters (Claude Code's documentation). */
 const ROUTE_CONTEXT_CAP = 10000
+/** The card file the card engine renders into each session tree, ignored by every clone (PLAY-dOrderedCharter-8). */
+const CARD_FILE_REL = '.claude/orientation-card.md'
 const WRITE_TOOLS_PROSE = 'an Edit, Write, MultiEdit or NotebookEdit'
 
 /**
@@ -1466,9 +1468,10 @@ const WRITE_TOOLS_PROSE = 'an Edit, Write, MultiEdit or NotebookEdit'
  *     line, the ROUTED_PATHS value and what the gate refuses — route lines cut at a line boundary
  *     to ROUTE_CONTEXT_CAP, a cut unit line taking its verdict with it, and a closing count line
  * The card is located as checkRouted locates it, so the context and the gate read one card.
+ * When the session tree holds the card file, every text from step 3 on is wrapped in that file's first
+ * and last lines, its level-1 envelope (PLAY-dOrderedCharter-8 S6), counted inside ROUTE_CONTEXT_CAP.
  */
 function renderRouteContext(data, env) {
-  const fs = require('fs')
   const path = require('path')
   const start = env.CLAUDE_PROJECT_DIR || (typeof data.cwd === 'string' ? data.cwd : '')
   if (!start) return ''
@@ -1476,6 +1479,35 @@ function renderRouteContext(data, env) {
   const common = hit && resolveCommonDir(hit)
   if (!common) return ''
   const top = hit.toplevel
+  const envelope = readCardEnvelope(top)
+  const text = renderRouteText(data, top, common, envelope ? envelope.length + 2 : 0)
+  if (!envelope || !text) return text
+  const wrapped = `${envelope.open}\n${text}\n${envelope.close}`
+  // ponytail: a pair too long for the cap leaves the text bare rather than cut; the file is the engine's render
+  return wrapped.length <= ROUTE_CONTEXT_CAP ? wrapped : text
+}
+
+/** The card file's envelope, `{ open, close, length }`, its first and last non-empty lines copied and never
+ *  typed here; null when `<top>/.claude/orientation-card.md` is absent, unreadable or holds one line. */
+function readCardEnvelope(top) {
+  const fs = require('fs')
+  const path = require('path')
+  let lines
+  try {
+    lines = fs.readFileSync(path.join(top, CARD_FILE_REL), 'utf8').split(/\r?\n/).filter((l) => l !== '')
+  } catch {
+    return null
+  }
+  if (lines.length < 2) return null
+  const open = lines[0]
+  const close = lines[lines.length - 1]
+  return { open, close, length: open.length + close.length }
+}
+
+/** renderRouteContext's text before its envelope, `reserve` characters of the cap held back for it. */
+function renderRouteText(data, top, common, reserve) {
+  const fs = require('fs')
+  const path = require('path')
   const confShown = buildComparablePath(path.join(top, ROUTE_CONF))
   let confBytes
   try {
@@ -1510,7 +1542,7 @@ function renderRouteContext(data, env) {
   }
   const renderClosing = (n) => `${n} more route lines of ${card.shown} are left out of this context, which is capped at ${ROUTE_CONTEXT_CAP} characters.`
   // Budgeted with the closing line at its longest, so whatever count it ends up naming still fits.
-  let budget = ROUTE_CONTEXT_CAP - head.length - tail.reduce((s, l) => s + l.length + 1, 0) - (renderClosing(route.lines.length).length + 1)
+  let budget = ROUTE_CONTEXT_CAP - reserve - head.length - tail.reduce((s, l) => s + l.length + 1, 0) - (renderClosing(route.lines.length).length + 1)
   const kept = []
   const verdicts = []
   for (const l of route.lines) {

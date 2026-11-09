@@ -1078,6 +1078,47 @@ grep -q "^orientation — $NONCE-t5 · written .* · by manifest-check.sh --card
 check_eq "AC5 the replay-written card resolves the node cell" "node — q · $CUSER" "$(read_cell node "$NONCE-t5")"
 check_eq "AC5 the replay-written card is followed by one now — line" "1" "$(grep -c '^now — ' "$CARD_OUT")"
 
+# ---- the card file (PLAY-dOrderedCharter-8 S2, S3) -------------------------------------------------
+# The stored card rendered, inside its level-1 envelope, into the tree of the SessionStart payload's
+# `cwd`: run from the clone's primary tree with the second worktree as `cwd`, so a file landing in the
+# tree the verb ran in is a red. The envelope lines are spelled here, not derived: this suite ships
+# beside the checker, and the lib dir their canonical lives in travels to nobody.
+CF_REL=.claude/orientation-card.md
+CF_SID="$NONCE-cf1"
+CF_PAYLOAD=$(printf '{"session_id":"%s","cwd":"%s","hook_event_name":"SessionStart"}' "$CF_SID" "$CWT2")
+check_card_file() {   # $1=name: the second worktree's file is the opener, the stored card's bytes, the closer
+  { printf '[%s · Level 1 · %s]\n' "$CF_REL" "the build's card: where this session stands; level 0 outranks it"
+    cat "$CARD_HOME/$CF_SID.md"; printf '[/%s]\n' "$CF_REL"; } > "$TMP/cf.want"
+  cmp -s "$TMP/cf.want" "$CWT2/$CF_REL" && { echo "ok   $1"; pass=$((pass+1)); } \
+    || { echo "FAIL $1"; diff "$TMP/cf.want" "$CWT2/$CF_REL" 2>&1 | sed 's/^/    /'; fail=$((fail+1)); }
+}
+run_card_file() {   # $1=verb: the verb from the primary tree with the payload on stdin; exit to $got
+  (cd "$CCLONE" && printf '%s\n' "$CF_PAYLOAD" | bash "$CHECK" --card "--$1" > "$CARD_OUT" 2>&1); got=$?
+}
+run_card_file write
+check_eq "card file AC2: --card --write with a payload exits 0" "0" "$got"
+check_card_file "card file AC2: the payload's worktree holds the envelope around the stored card"
+[ ! -e "$CCLONE/$CF_REL" ] && { echo "ok   card file AC2: the primary tree, where the verb ran, holds no card file"; pass=$((pass+1)); } \
+  || { echo "FAIL card file AC2: the primary tree, where the verb ran, holds no card file"; fail=$((fail+1)); }
+check_eq "card file AC4: git status lists no card file" "" "$(git -C "$CWT2" status --porcelain --untracked-files=all | grep orientation-card)"
+run_card_file write
+check_eq "card file AC4: the clone's exclude carries the line once after two writes" "1" "$(grep -cxF "/$CF_REL" "$CCLONE/.git/info/exclude")"
+run_card_file replay
+check_card_file "card file AC3: the replay re-renders it"
+(cd "$CWT2" && printf -- '- TOOL-zCardFixture-10\n' | bash "$CHECK" --card --append --session "$CF_SID" > "$CARD_OUT" 2>&1); got=$?
+check_eq "card file AC3: the append, in the worktree, exits 0" "0" "$got"
+check_card_file "card file AC3: the append re-renders it"
+check_eq "card file AC3: the re-rendered file carries the appended line" "1" "$(grep -cx -- '- TOOL-zCardFixture-10' "$CWT2/$CF_REL")"
+# Unwritable: the path a directory. Each verb keeps its exit and prints one skipped: line.
+rm -f "$CWT2/$CF_REL"; mkdir "$CWT2/$CF_REL"
+for cf_verb in write replay; do
+  run_card_file "$cf_verb"
+  check_eq "card file AC3: --$cf_verb over an unwritable card file exits 0 with one skipped: line" "0 1" "$got $(grep -c '^card-file — skipped: ' "$CARD_OUT")"
+done
+(cd "$CWT2" && printf -- '- TOOL-zCardFixture-10\n' | bash "$CHECK" --card --append --session "$CF_SID" > "$CARD_OUT" 2>&1); got=$?
+check_eq "card file AC3: --append over an unwritable card file exits 0 with one skipped: line" "0 1" "$got $(grep -c '^card-file — skipped: ' "$CARD_OUT")"
+rmdir "$CWT2/$CF_REL"
+
 # AC6 — --path prints one line and touches nothing.
 run_card "AC6 --card --path prints the card's path" "$CWT" 0 "/orientation/$NONCE-t6.md" --card --path --session "$NONCE-t6"
 check_eq "AC6 --card --path prints exactly one line" "1" "$(wc -l < "$CARD_OUT" | tr -d '[:space:]')"

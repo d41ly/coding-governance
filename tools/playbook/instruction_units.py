@@ -74,7 +74,9 @@ registered document whose envelope is absent or differs from its row, an unpaire
 document at level 0, and a load-bearing document, `INSTRUCTION_PATHSPECS` and the charter's Protocols paths,
 with no row; each entry file is the charter's alias, printed and never counted. `check_hold` states the one
 held row as not checked on every run and reds it once its envelope lands, its row moves or a second hold
-appears. It does not read a source: the parity legs compare each source with its render.
+appears. A row carrying `untracked = true`, the per-worktree card file (PLAY-dOrderedCharter-8), is checked
+wherever its file exists on disk, never red for its absence, and red when a file at its path is tracked. It
+does not read a source: the parity legs compare each source with its render.
 
 THE MAP (PLAY-dOrderedCharter-2 S3). `render_instruction_map` is the charter's instruction map: one line per
 level of `LEVELS` naming the registered documents there and, from `LEVEL_LOADS`, when they load, then, while
@@ -1127,7 +1129,9 @@ def run_grammar(root=".", doc=None) -> tuple[list, int]:
 #: PLAY-dOrderedCharter-3: the document registry, its row fields, and the hold's one shape `<unit id> F<n>`
 DOCUMENTS = "documents.toml"
 DOCUMENT_REQUIRED = ("tag", "path", "level", "direction", "source")
-DOCUMENT_KEYS = frozenset((*DOCUMENT_REQUIRED, "h1", "hold"))
+#: PLAY-dOrderedCharter-8 S9: `untracked`, a boolean, absent read as false, marks a per-worktree file no clone tracks
+DOCUMENT_FLAGS = ("untracked",)
+DOCUMENT_KEYS = frozenset((*DOCUMENT_REQUIRED, "h1", "hold", *DOCUMENT_FLAGS))
 HOLD_RE = re.compile(r"[A-Z]+-[A-Za-z0-9]+-\d+ F\d+")
 PROTOCOLS_HEAD = "## Protocols"
 
@@ -1140,7 +1144,8 @@ def read_document_registry(root) -> list[dict]:
     """S1: the registry's `[[document]]` rows, each with `resolved`, its path with `{prefix}` and `{memory_root}`
     filled. Raises DocumentRefused on an absent or unparsable registry, no row, or a row off its shape: a
     field missing, unknown or mistyped, a level off the ladder, a direction holding `]`, a path with two `*`
-    segments, a `hold` off `HOLD_RE`, or a `hold` on a row whose path holds a `*`."""
+    segments, a `hold` off `HOLD_RE`, a `hold` on a row whose path holds a `*`, or an `untracked` that is no
+    boolean. A row with no `untracked` reads it as false."""
     from tag_index import resolve_prefix_token
     path = derive_kit_file(root, DOCUMENTS)
     try:
@@ -1155,11 +1160,12 @@ def read_document_registry(root) -> list[dict]:
         at = f"{path.as_posix()}: document row {i}"
         missing = [k for k in DOCUMENT_REQUIRED if k not in row]
         unknown = sorted(set(row) - DOCUMENT_KEYS)
-        texts = [k for k in sorted(DOCUMENT_KEYS - {"level"})
+        texts = [k for k in sorted(DOCUMENT_KEYS - {"level", *DOCUMENT_FLAGS})
                  if k in row and not (isinstance(row[k], str) and row[k].strip())]
-        if missing or unknown or texts:
+        flags = [k for k in DOCUMENT_FLAGS if k in row and not isinstance(row[k], bool)]
+        if missing or unknown or texts or flags:
             why = (f"lacks {', '.join(missing)}" if missing else f"carries the unknown field {unknown[0]}"
-                   if unknown else f"`{texts[0]}` is no non-empty string")
+                   if unknown else f"`{texts[0]}` is no non-empty string" if texts else f"`{flags[0]}` is no boolean")
             raise DocumentRefused(f"{at} {why}")
         try:
             parse_level(row["level"])
@@ -1175,13 +1181,20 @@ def read_document_registry(root) -> list[dict]:
             raise DocumentRefused(f"{at} ({resolved}): hold {hold!r} is not `<unit id> F<n>`")
         if hold is not None and "*" in resolved:
             raise DocumentRefused(f"{at} ({resolved}): a hold names one document, and this path holds a `*`")
-        out.append({**row, "resolved": resolved})
+        out.append({**row, "resolved": resolved, "untracked": row.get("untracked", False)})
     return out
 
 
 def derive_tracked(root, pattern) -> list:
     """The tracked files a registry path matches, `*` within one segment, sorted."""
     return sorted(p for p in run_git(root, "ls-files", "-z", "--", ":(glob)" + pattern).split("\0") if p)
+
+
+def derive_untracked_files(root, pattern) -> list:
+    """The files on disk a registry path matches, `*` within one segment, sorted: an `untracked` row's
+    population, which `git ls-files` never lists (PLAY-dOrderedCharter-8 S9)."""
+    root = pathlib.Path(root)
+    return sorted(p.relative_to(root).as_posix() for p in root.glob(pattern) if p.is_file())
 
 
 def derive_protocol_paths(root, charter) -> list:
@@ -1209,13 +1222,14 @@ def derive_document_tag(root, path):
 
 def run_envelopes_list(root) -> tuple[list, int]:
     """AC1: each row, its resolved path, level, the count of files it matches, its `h1` and its `hold`; red
-    a row matching no file and a row whose tag the `doc` namespace does not derive carrying no `h1`."""
+    a row matching no file and a row whose tag the `doc` namespace does not derive carrying no `h1`. An
+    `untracked` row counts the files on disk and is never red for matching none (PLAY-dOrderedCharter-8 S9)."""
     rows, lines, reds = read_document_registry(root), [], []
     for r in rows:
-        n = len(derive_tracked(root, r["resolved"]))
-        extra = "".join(f" · {k} {r[k]!r}" for k in ("h1", "hold") if k in r)
+        n = len((derive_untracked_files if r["untracked"] else derive_tracked)(root, r["resolved"]))
+        extra = "".join(f" · {k} {r[k]!r}" for k in ("h1", "hold") if k in r) + (" · untracked" if r["untracked"] else "")
         lines.append(f"{SAY}: envelopes · {r['tag']} · {r['resolved']} · level {r['level']} · {n} file(s){extra}")
-        if not n:
+        if not n and not r["untracked"]:
             reds.append(f"{SAY}: red · {r['resolved']} · the row's path matches no tracked file")
         if "h1" not in r and ("*" in r["resolved"] or derive_document_tag(root, r["resolved"]) != r["tag"]):
             reds.append(f"{SAY}: red · {r['resolved']} · {r['tag']} is no tag the doc namespace derives, and the "
@@ -1278,7 +1292,9 @@ def check_hold(root, rows) -> tuple[list, list]:
 
 
 def run_envelopes_check(root) -> tuple[list, int]:
-    """S6 and S9: every registered document against its row, every load-bearing document against a row."""
+    """S6 and S9: every registered document against its row, every load-bearing document against a row. An
+    `untracked` row's files are checked wherever they exist on disk, its absence is no red, and a tracked
+    file at its path is one (PLAY-dOrderedCharter-8 S9)."""
     root = pathlib.Path(root)
     tokens = derive_instruction_tokens(root)
     rows = read_document_registry(root)
@@ -1297,7 +1313,12 @@ def run_envelopes_check(root) -> tuple[list, int]:
     lines += [f"{SAY}: envelopes · ALIAS {p} · NOT checked · the charter's entry file" for p in aliases]
     covered = {}
     for r in rows:
-        if "hold" not in r:
+        if r["untracked"]:
+            tracked = derive_tracked(root, r["resolved"])
+            reds += [f"{SAY}: red · {p} · tracked, and its row {r['tag']} is untracked: a per-worktree file no "
+                     f"clone commits · remedy: git rm --cached {p}" for p in tracked]
+            covered.update((p, r) for p in derive_untracked_files(root, r["resolved"]) if p not in tracked)
+        elif "hold" not in r:
             covered.update((p, r) for p in derive_tracked(root, r["resolved"]))
     level0 = [p for p, r in sorted(covered.items()) if r["level"] == 0]
     reds += [f"{SAY}: red · {p} · a second document at level 0, and the charter is the one" for p in level0[1:]]
@@ -2384,6 +2405,64 @@ def arm_hold_refused(c):
     check_envelopes_red(c, "a held row with no size row", ENV_HELD, 2)
 
 
+#: PLAY-dOrderedCharter-8 S9: the card's `untracked` row, joined to the envelope gate's tree
+ENV_CARD = ".claude/orientation-card.md"
+ENV_CARD_DIRECTION = "The fixture card"
+ENV_CARD_ROW = (f'\n[[document]]\ntag = "doc.orientation-card"\npath = "{ENV_CARD}"\nlevel = 1\n'
+                f'direction = "{ENV_CARD_DIRECTION}"\nsource = "fixture.sh"\nh1 = "The fixture card"\nuntracked = true\n')
+
+
+def write_card_tree(c):
+    """The envelope gate's green tree with the card's row committed, and no card file."""
+    write_envelope_tree(c)
+    c.write_file(derive_kit_rel(DOCUMENTS), ENV_ROWS.replace("HOLD", ENV_HOLD) + ENV_CARD_ROW)
+    run_commit(c.top, "the card's row")
+
+
+def write_card_plant(c, level):
+    """The card file in its envelope at `level`, on disk and outside the index, as the card engine leaves it."""
+    path = c.top / ENV_CARD
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(render_envelope(ENV_CARD, level, ENV_CARD_DIRECTION, "## route\n- build: x\n"),
+                    encoding="utf-8", newline="")
+
+
+def arm_card_absent(c):
+    write_card_tree(c)
+    check_envelopes_green(c, "a tree whose untracked card file is absent")
+    lines, rc = run_envelopes(c.top, "--list")
+    said = " | ".join(lines)
+    c.check("--list counts the absent card's files as none and does not red its row",
+            rc == 0 and f"{ENV_CARD} · level 1 · 0 file(s) · h1 'The fixture card' · untracked" in said, said)
+    c.write_file(derive_kit_rel(DOCUMENTS), ENV_ROWS.replace("HOLD", ENV_HOLD)
+                 + ENV_CARD_ROW.replace("untracked = true", 'untracked = "yes"'))
+    lines, rc = run_envelopes(c.top)
+    said = " | ".join(lines)
+    c.check("an `untracked` that is no boolean refuses the registry, exit 2",
+            rc == 2 and "`untracked` is no boolean" in said, said)
+
+
+def arm_card_level(c):
+    write_card_tree(c)
+    write_card_plant(c, 2)
+    check_envelopes_red(c, "a card file whose opener names level 2", ENV_CARD)
+    write_card_plant(c, 1)
+    lines, rc = run_envelopes(c.top)
+    said = " | ".join(lines)
+    c.check("the card file at its row's level is checked and green",
+            rc == 0 and "3 documents covered · 1 held · 0 red" in said, said)
+
+
+def arm_card_tracked(c):
+    write_card_tree(c)
+    write_card_plant(c, 1)
+    run_git(c.top, "add", "-f", "--", ENV_CARD)
+    lines, rc = run_envelopes(c.top)
+    said = " | ".join(lines)
+    c.check(f"a card file force-added to the index exits 1 naming {ENV_CARD} as tracked",
+            rc == 1 and f"red · {ENV_CARD} · tracked" in said, said)
+
+
 def arm_map_held(c):
     """S3: the map over a registry row carrying `hold` prints the `held —` line and keeps the document on its
     level's line; the same row without the field prints no such line."""
@@ -2503,7 +2582,8 @@ PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority, "state
           "drive-bad-role": arm_drive_bad_role, "drive-no-row": arm_drive_no_row,
           "drive-empty-command": arm_drive_empty_command, "drive-unshipped-descriptor": arm_drive_unshipped_descriptor,
           "drive-hand-line": arm_drive_hand_line, "drive-lost-line": arm_drive_lost_line, "map-held": arm_map_held,
-          "practices-reach": arm_practices_reach}
+          "practices-reach": arm_practices_reach, "card-absent": arm_card_absent, "card-level": arm_card_level,
+          "card-tracked": arm_card_tracked}
 
 
 def run_fixture(plant=None) -> tuple[list, int]:
