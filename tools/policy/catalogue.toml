@@ -674,6 +674,8 @@ name = "instructions.exclude"
 allowed = { type = "set", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "gov tags of any kind the overlay holds, a fixed one, one another active row needs, names as its actor or grants, and one a policy value names refused, each refusal naming the requirer or the key" }
 empty = "allowed"
 default = []
+summary = "Which of gov's instruction units and registered rows your repository leaves out: each listed gov tag is absent from the composition and its state reads excluded; a tag no unit or row of gov's holds is refused."
+usage = 'instructions.exclude = ["unit.push-after-review"]'
 owner = "dOrderedCharter"
 
 [[key]]

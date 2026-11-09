@@ -2583,6 +2583,11 @@
       "file": "tools/playbook/edge_grammar.py"
     },
     {
+      "id": "build_ending_plant",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
       "id": "build_entry",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -3103,6 +3108,11 @@
       "file": "tools/lexicon/lexicon_conf.py"
     },
     {
+      "id": "build_next",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
       "id": "build_no_progress_model",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -3378,6 +3388,16 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "build_renamed_plant",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
+      "id": "build_reordered_plant",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
       "id": "build_replaced_line",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -3608,6 +3628,11 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
+      "id": "build_semantic_plant",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
       "id": "build_sentinel_model",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -3753,6 +3778,11 @@
       "file": "tools/govkit/fixtures/stale_edges.py"
     },
     {
+      "id": "build_states_plant",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
       "id": "build_status_sheet",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -3861,6 +3891,11 @@
       "id": "build_traced_runner",
       "kind": "function",
       "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
+      "id": "build_tree",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
     },
     {
       "id": "build_tree",
@@ -6573,6 +6608,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "check_reds",
+      "kind": "function",
+      "file": "tools/playbook/overlay_rows.py"
+    },
+    {
       "id": "check_ref",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -6771,6 +6811,11 @@
       "id": "check_row_on_default",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_row_owners",
+      "kind": "function",
+      "file": "tools/playbook/overlay_rows.py"
     },
     {
       "id": "check_rows",
@@ -9923,6 +9968,11 @@
       "file": "tools/govkit/fixtures/stale_edges.py"
     },
     {
+      "id": "derive_pin",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
       "id": "derive_pin_hash",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
@@ -10188,6 +10238,16 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "derive_row_canon",
+      "kind": "function",
+      "file": "tools/playbook/overlay_rows.py"
+    },
+    {
+      "id": "derive_row_composition",
+      "kind": "function",
+      "file": "tools/playbook/overlay_rows.py"
+    },
+    {
       "id": "derive_row_identity",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -10246,6 +10306,11 @@
       "id": "derive_runner_verbs",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "derive_schema",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
     },
     {
       "id": "derive_scope",
@@ -13296,6 +13361,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
     },
     {
       "id": "main",
@@ -17543,6 +17613,11 @@
       "file": "tools/playbook/core.py"
     },
     {
+      "id": "read_kind_schema",
+      "kind": "function",
+      "file": "tools/playbook/overlay_rows.py"
+    },
+    {
       "id": "read_kinds",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -18101,6 +18176,11 @@
       "id": "read_overlay_policies",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "read_overlay_rows",
+      "kind": "function",
+      "file": "tools/playbook/overlay_rows.py"
     },
     {
       "id": "read_override",
@@ -20703,6 +20783,11 @@
       "file": "tools/memory-tree/adopt-memory-tree.sh"
     },
     {
+      "id": "render_amend",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
       "id": "render_argv",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
@@ -21213,6 +21298,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "render_patch",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
       "id": "render_path",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
@@ -21358,6 +21448,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "render_replace",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
       "id": "render_report",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -21405,6 +21500,11 @@
     {
       "id": "render_rows",
       "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
+      "id": "render_rows",
+      "kind": "function",
       "file": "tools/process-monitor/census.py"
     },
     {
@@ -21426,6 +21526,11 @@
       "id": "render_scaffold",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "render_schema",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
     },
     {
       "id": "render_scope_row",
@@ -21661,6 +21766,11 @@
       "id": "render_units",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "render_value",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
     },
     {
       "id": "render_view",
@@ -25605,6 +25715,11 @@
     {
       "id": "run_plant",
       "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
+      "id": "run_plant",
+      "kind": "function",
       "file": "tools/playbook/gov_tag.py"
     },
     {
@@ -27771,6 +27886,11 @@
       "id": "set_row_block",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "set_row_patch",
+      "kind": "function",
+      "file": "tools/playbook/overlay_rows.py"
     },
     {
       "id": "set_runstate_fact",
@@ -30818,6 +30938,11 @@
       "file": "tools/memory-tree/build_records.py"
     },
     {
+      "id": "write_change",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
       "id": "write_change_fx",
       "kind": "function",
       "file": "tools/playbook/pins.py"
@@ -31041,6 +31166,11 @@
       "id": "write_file_plant",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "write_files",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
     },
     {
       "id": "write_files",

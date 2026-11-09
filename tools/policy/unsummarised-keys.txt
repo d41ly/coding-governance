@@ -70,7 +70,6 @@ hooks.bypass
 install.from
 install.guards
 install.steps
-instructions.exclude
 instructions.slices
 instructions.task-charter
 integrations.tracker

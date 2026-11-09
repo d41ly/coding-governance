@@ -46,7 +46,7 @@ import subprocess
 import sys
 import tempfile
 import tomllib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 sys.dont_write_bytecode = True
 
@@ -80,10 +80,12 @@ class OverlayRefused(ValueError):
 @dataclass(frozen=True)
 class Overlay:
     """The overlay at HEAD: its `Unit`s, each `origin` the repository, `(key, tag)` per `[[policy]]` row, and
-    its `state`: `landed`, `absent`, `unarmed` or `candidate`."""
+    its `state`: `landed`, `absent`, `unarmed` or `candidate`. `tables` is each other top-level key with its
+    value from the one parse, the row tables `overlay_rows.read_overlay_rows` reads (PLAY-dOrderedCharter-35 S1)."""
     units: tuple
     policies: tuple
     state: str
+    tables: dict = field(default_factory=dict, hash=False)
 
 
 def check_born(root) -> bool:
@@ -131,7 +133,7 @@ def read_overlay(root, candidate: str | None = None) -> Overlay:
             policies.append((key, f"policy.{key}"))
     if reds:
         raise OverlayRefused(1, "\n".join(reds))
-    return Overlay(tuple(units), tuple(policies), state)
+    return Overlay(tuple(units), tuple(policies), state, {k: v for k, v in doc.items() if k not in ("unit", "policy")})
 
 
 def derive_policy_reader(root):

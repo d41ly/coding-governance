@@ -2532,6 +2532,61 @@ def run_selftest() -> int:
     check_arm(done.returncode == 0 and 'pins: fixture · green' in done.stdout,
               'pins mark, walk and drift as their plants say', done.stdout[-2000:] + done.stderr[-500:])
 
+    # PLAY-dOrderedCharter-35 — the overlay's rows on the fixture kind: each plant composes in its own
+    # throwaway repository, and each row is (argv, exit, every needle its stdout and stderr hold).
+    row_kind = Path(__file__).resolve().parent / 'fixtures' / 'row_kind.py'
+    alpha = 'row fixture.alpha · {"ceiling": '
+    for argv, want, needles in [
+            (['add'], 0, ['state fixture.alpha · unchanged', 'state fixture.beta · unchanged',
+                          'state fixture.gamma · unchanged', '"origin": "repository", "tag": "fixture.adopter.extra"']),
+            (['typed-origin'], 1, ['fixture.adopter.extra', 'types `origin`']),
+            (['adopter-tag'], 0, ['row fixture.adopter.extra']),
+            (['gov-adopter'], 1, ['owned · fixture.adopter.x']),
+            (['no-seat'], 1, ['owned · fixture.extra']),
+            (['amends'], 0, [alpha + '"high", "grants": ["read", "write"], "needs": ["fixture.gamma"], "origin": '
+                             '"fixture", "tag": "fixture.alpha"}', 'state fixture.alpha · amended']),
+            (['amends-undeclared'], 1, ['`add` names `colour`']),
+            (['amends-scalar'], 1, ['`remove` names `ceiling`']),
+            (['schema-shape'], 1, ['field grants', "shape 'list'"]),
+            (['supersedes'], 0, ['row fixture.gamma · {"ceiling": "low", "grants": ["read"], "needs": [], "origin": '
+                                 '"repository"', 'state fixture.gamma · replaced', '"fixture.beta", "fixture.gamma"']),
+            (['exclude', '--exclude', 'fixture.beta'], 0, ['state fixture.beta · excluded']),
+            (['exclude', '--exclude', 'fixture.nowhere'], 1, ['lists fixture.nowhere']),
+            (['pin-reordered'], 0, ['state fixture.alpha · amended']),
+            (['pin-no-at'], 1, ['edge `amends=fixture.alpha`', 'names no pin']),
+            (['pin-bad-hash'], 1, ['edge `amends=fixture.alpha@XYZ`']),
+            (['pin-unknown'], 1, ['edge `amends=fixture.alpha@00000000`', 'matches no revision']),
+            (['renamed'], 0, ['state fixture.alpha2 · amended', '"tag": "fixture.alpha2"']),
+            (['split'], 0, ['state fixture.alpha · orphaned', 'state fixture.gamma · orphaned', 'held out',
+                            'row fixture.adopter.gamma-own', 'adopter.alpha-tuned · # ', 'adopter.gamma-own · # ']),
+            (['ended'], 0, ['state fixture.alpha · orphaned', 'successor none · held out', 'composes alone',
+                            'adopter.alpha-tuned · # ', 'adopter.gamma-own · # ']),
+            (['semantic', '--stale', 'order'], 0, ['state fixture.alpha · stale', '"grants": ["read", "list", "write"]',
+                                                   "edge on fixture.alpha is stale"]),
+            (['semantic', '--stale', 'warn'], 0, ['row-kind: warn ', 'row-kind: journal ', 'fixture.adopter.alpha-tuned\t']),
+            (['semantic', '--stale', 'refuse'], 1, ['instructions.stale = refuse', 'fixture.alpha@']),
+            (['vanished-field', '--stale', 'warn'], 0, ['ships no `ceiling`', 'row fixture.alpha · {"grants": ["read"], "needs": ["fixture.beta"']),
+            (['vanished-field', '--stale', 'order'], 0, ['ships no `ceiling`', 'The patch is held']),
+            (['editorial'], 0, ['state fixture.alpha · amended']),
+            (['states'], 0, [f'· {s}\n' for s in ('unchanged', 'amended', 'replaced', 'excluded', 'stale', 'orphaned')])]:
+        done = subprocess.run([sys.executable, str(row_kind), '--plant', *argv], capture_output=True, text=True,
+                              encoding='utf-8', errors='replace', stdin=subprocess.DEVNULL, timeout=600)
+        said = done.stdout + done.stderr
+        ok = done.returncode == want and all(n in said for n in needles)
+        if argv == ['semantic', '--stale', 'warn']:
+            ok = ok and done.stderr.count('row-kind: warn ') == 1 and said.count('row-kind: journal ') == 1 \
+                and 'row-kind: order ' not in said
+        if argv in (['split'], ['ended']):
+            ok = ok and said.count('row-kind: order ') == 2 and 'row fixture.alpha ·' not in said
+        if argv == ['states']:
+            ok = ok and len(re.findall(r'^row-kind: state ', done.stdout, re.M)) == 6 and all(
+                done.stdout.count(f'· {s}\n') == 1 for s in ('unchanged', 'amended', 'replaced', 'excluded',
+                                                             'stale', 'orphaned'))
+        if argv[0] == 'pin-reordered' or argv[0] == 'editorial':
+            ok = ok and 'row-kind: stale ' not in said
+        check_arm(ok, f'the row kind composes as `--plant {" ".join(argv)}` says, exit {want}',
+                  f'rc {done.returncode} · {said[-1500:]}')
+
     # TOOL-aRepatriatedFork-42 — `--answers` states what `render` would use, and grades `kits` alike.
     with tempfile.TemporaryDirectory() as td:
         eng, tgt = _write_fixture(Path(td), ok_kits, ok_var)
