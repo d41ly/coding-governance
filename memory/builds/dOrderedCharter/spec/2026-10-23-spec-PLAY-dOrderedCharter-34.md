@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-34 — composition and its report: the project block and marked parts from the overlay, budgets and harness limits at render, one composition for every harness, the delta report, and the practice census
 
-**Status:** DEFERRED · rev-9 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 35 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-10 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 35 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0064@42692e4c whole
 
@@ -26,6 +26,8 @@
 | [2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md) | research | PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-11-08-prompt-PLAY-dOrderedCharter-46-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-46-drift-fold-brief.md) | research | PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 | [2026-11-09-prompt-PLAY-dOrderedCharter-34-1-spec-writer.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-34-1-spec-writer.md) | journal | — |
+| [2026-11-09-prompt-PLAY-dOrderedCharter-34-2-spec-writer.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-34-2-spec-writer.md) | journal | — |
+| [2026-11-09-prompt-PLAY-dOrderedCharter-34-repair-2-brief.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-34-repair-2-brief.md) | research | — |
 | [2026-11-09-prompt-PLAY-dOrderedCharter-34-repair-brief.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-34-repair-brief.md) | research | — |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
@@ -89,27 +91,43 @@ units 31 and 32.
   `AGENTS.md` nor its bytes, naming it, over the aliases `ALIAS_PATHS` names. This item reuses that
   predicate and adds the write half: a copy-mode alias is re-written from the composition in the run
   that writes `AGENTS.md`. Observed by AC6.
-- **S5** — The seeded template retired as the render's input. `resolve_template_path`
-  (`tools/playbook/render_playbook.py:768-782`) reads gov's engine template and never the target's
-  `playbook_path` copy; a target answer naming `playbook_path` prints one `retired` note and the
-  composition reads nothing from it. **Readers:** by name: `tools/playbook/render_playbook.py`, whose
-  `resolve_template_path` is the one render-time reader, and `tools/playbook/README.md`, which says the
-  render reads the seeded copy; the seed rule and its hole probe in
-  `tools/govkit/entries/playbook.kit.toml`, and `tools/govkit/govkit.py`, `tools/govkit/matrix.py`,
-  `tools/govkit/selftest.py`, `tools/check-placeholders.sh`,
-  `tools/govkit/entries/check-microformats.kit.toml`, `WIRE-INTO-PROJECT.md` and, re-grepped at HEAD
-  5c7f520b8 with a fixed-string git grep for the key, `tools/govkit/fixtures/release-0/deploy.toml`, the
-  pinned release's answers, are unit 31's inventory · by value: `resolve_template_path` returning the target's seeded copy when `playbook_path`
-  is answered, the one reader in product code this item changes; and, re-read at 05fd1b7f7, every
-  fixture that answers `playbook_path` to hand the renderer its own template, which the change would
-  hand gov's engine template instead: the renderer's selftest in
-  `tools/playbook/render_playbook.py`, `tools/playbook/instruction_units.py` (its slot, status and
-  lock arms), `tools/playbook/instructions_edit.py` (its re-render arm),
-  `tools/policy/check_policy.py` (the one-line rule plant), `tools/govkit/matrix.py` and
-  `tools/govkit/selftest.py`. Each names its template through the `gov_root` that
-  `tools/playbook/render_playbook.py#render` and
-  `tools/playbook/render_playbook.py#run_charter_scope` already take, never through `playbook_path`
-  (the Open questions section, F7). Observed by AC7.
+- **S5** — The seeded template retired as the render's input, and the template an install reads
+  shipped with the renderer. `resolve_template_path` (`tools/playbook/render_playbook.py:768-782`)
+  drops its `answers` parameter and reads the renderer kit's own template in the tree it renders,
+  `tools/playbook/instruction_units.py#derive_kit_file` over the target and the template's name, then
+  gov's at `gov_root`, and where neither is a file it refuses naming both paths; it never reads the
+  target's `playbook_path` copy, and a target answer naming `playbook_path` prints one `retired` note
+  and the composition reads nothing from it. The renderer kit's descriptor `tools/playbook/kit.toml`
+  gains one `root_relative` `[[files]]` rule, role `engine`, landing the root's
+  `coding-governance-agents.template.md` at `{prefix}/playbook/coding-governance-agents.template.md`,
+  beside the engine where its declarations already land, so every install and update writes the
+  template the render reads; gov holds no copy beside its engine and reads its own root's (section 8,
+  F12). **Readers:** by name: at HEAD f91d3b28a, `tools/playbook/render_playbook.py`, whose
+  `resolve_template_path` is the one render-time reader and whose module docstring and
+  template-is-charter refusal name `playbook_path`, `tools/playbook/README.md`, whose two-modes
+  section says the render reads the seeded copy, and `help/charter.md` and `help/roles.md`, which say
+  a template seeded earlier keeps rendering as it was, each re-worded here; the seed rule and its hole
+  probe in `tools/govkit/entries/playbook.kit.toml`, and `tools/govkit/govkit.py`,
+  `tools/govkit/matrix.py`, `tools/govkit/selftest.py`, `tools/check-placeholders.sh`,
+  `tools/govkit/entries/check-microformats.kit.toml`, `WIRE-INTO-PROJECT.md` and
+  `tools/govkit/fixtures/release-0/deploy.toml`, which spell the key for the seed, its copy mode or a
+  pinned release's answers, are unit 31's inventory, and the matrix's scratch install, which selects
+  the renderer, then receives the template from the new rule, the bytes its seed lands · by value: the
+  three callers of `resolve_template_path`, `tools/playbook/render_playbook.py#render`,
+  `tools/playbook/render_playbook.py#write_charter_lock`, whose lock row's `template` then names the kit's path in an install and the
+  root's in gov, as gov's row does today, and the selftest's read of gov's template; the fixtures that
+  hand the render a template through `playbook_path`: the renderer's selftest in
+  `tools/playbook/render_playbook.py`, `tools/playbook/instruction_units.py` (its slot and status arms
+  through `SLOT_DEPLOY`, and its lock arm, which also asserts the row's `template`),
+  `tools/playbook/instructions_edit.py` (its re-render arm, through `SLOT_DEPLOY`),
+  `tools/playbook/overlay.py` (its unborn-head, check-refuses-candidate and write-then-render arms,
+  through `SLOT_DEPLOY` and four render calls) and `tools/policy/check_policy.py` (the one-line rule
+  plant), each planting its template where the new reader looks first (section 8, F7); the render's
+  reseed note and legacy branches, read against `TEMPLATE_MAJOR`, which an install's template, the
+  kit's own copy, never trips, kept for the fixtures that plant an older one (section 5); and
+  `LADDER_SOURCES` in `tools/playbook/instruction_units.py`, whose `{prefix}/*/*.template.md`
+  pathspec matches the installed copy in an adopter's tree, the bytes its root entry reads in gov.
+  Observed by AC7.
 - **S6** — The delta report. At every render and every update the renderer prints one line per gov
   unit and per gov row, its state one of S22's six (§4 "### The delta report"), then one per
   repository unit, then each widening unit 36's `derive_widenings` returns, each line in
@@ -187,7 +205,7 @@ units 31 and 32.
 - **consumes-from** `PLAY-dOrderedCharter-33` — each gov unit's state behind a pin
 - **consumes-from** `PLAY-dOrderedCharter-35` — each gov row's state from the composer
 - **consumes-from** `PLAY-dOrderedCharter-36` — the widening list
-- **hands-off** `PLAY-dOrderedCharter-31` — the seeded template's `[[retired]]` row and the readers of `playbook_path`, the change records of the census's moved units, and `CODEX_MAX`'s new home when the agent-instructions kit leaves
+- **hands-off** `PLAY-dOrderedCharter-31` — the seeded template's `[[retired]]` row and the readers of `playbook_path`, the change records of the census's moved units, and `CODEX_MAX`'s new home when the agent-instructions kit leaves; and the template the renderer kit ships beside its engine (S5), which the render reads once that unit's step takes the seed rule out
 - **consumes-from** external — dGroundRules, landed before the build run: `budgets.*` and `budgets.enforce` (v2:1346-1347), read with `budgets.py resolve`, and the cap census whose `codex-instructions` row names `CODEX_MAX`'s home (TOOL-dGroundRules-9 S1, S2)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 6, 10, 21 and 29, which that batch unit corrects after this unit lands, each by the item its report id names
 - **hands-off** `PLAY-dOrderedCharter-55` — AC11's pathspec, which unit 49 S24 corrects, is observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
@@ -234,6 +252,23 @@ wraps, which prints the verdict line in the widths below, and
 (`tools/playbook/render_playbook.py#render_practice_lines`), so the composition step sits after
 both. The Codex announce is still the adopter's own `print_size_note`, in
 `tools/agent-instructions/adopt-agent-instructions.sh#print_size_note`; the renderer prints none.
+
+### The template input
+
+`tools/playbook/render_playbook.py#resolve_template_path`, called with `gov_root` and the target,
+returns the first file of two: `tools/playbook/instruction_units.py#derive_kit_file` over the target
+and `coding-governance-agents.template.md`, and that name under `gov_root`. `derive_kit_file` joins
+the target to the prefix of the kit's own directory, so in an install the first file sits in the
+engine's own directory, where the kit's new `root_relative` rule lands it; in gov it is absent and the
+second is gov's root template, the file gov's lock row already names; in a fixture tree it is the
+path the fixture plants, beside the renderer table it already plants there. The kit's copy comes
+first because in an install `gov_root` is the target's own root, which can hold a seed. Where neither
+is a file the render refuses naming both. `tools/playbook/render_playbook.py#render`'s
+template-is-charter refusal keeps its check, its message naming the template's path and no answer
+key. The first lookup imports `instruction_units` through
+`tools/playbook/render_playbook.py#load_units_module`, as
+`tools/playbook/render_playbook.py#render_charter_envelope` already does on every render, so a lone
+engine copy carries that module beside it (section 8, F7).
 
 ### Budgets and harness limits
 
@@ -352,8 +387,14 @@ key's lines alone until a unit lands.
 - `.governance/instructions.toml` (gov's overlay; the census's moved units, through unit 32's route,
   where the build run's census prints a `moves` or `moves, row kept` row)
 - `tools/playbook/core-pending.txt` (each `moves` row's pending rows, S8)
-- `tools/playbook/instruction_units.py`, `tools/playbook/instructions_edit.py` (fixtures naming their template through `gov_root`, F7)
-- `tools/policy/check_policy.py`, `tools/govkit/matrix.py`, `tools/govkit/selftest.py` (the same, F7)
+- `tools/playbook/kit.toml` (the template's `root_relative` rule, S5; its `requires` comment's
+  template reason re-worded, the declarations reason kept)
+- `tools/playbook/instruction_units.py`, `tools/playbook/instructions_edit.py`,
+  `tools/playbook/overlay.py` (fixtures planting their template at their tree's renderer-kit
+  directory, F7)
+- `tools/policy/check_policy.py` (the one-line rule plant: its template beside its engine copy, with
+  `instruction_units.py`, F7)
+- `tools/playbook/README.md`, `help/charter.md`, `help/roles.md` (the template input, S5)
 - `help/composition.md` (new)
 - `help/README.md`
 
@@ -384,7 +425,13 @@ key's lines alone until a unit lands.
 - risks: the census predicate rules a row `gov-only` that an adopter relied on by default
   (deviation 341); the owner's walk of the departures report is the turn that reverses it. A
   `moves, row kept` row's line sits twice, as the row's `line` and its unit's `text`, and no check
-  compares the two; none takes that disposition at HEAD 5c7f520b8 (section 4, Applying a ruling). Edits to
+  compares the two; none takes that disposition at HEAD 5c7f520b8 (section 4, Applying a ruling). An
+  install whose kit copy of the template was deleted by hand falls through to its own root, where a
+  seed answered under the template's own name would be read; the kit lands the engine and the
+  template in one install, so no install or update leaves that state. The render's reseed note and
+  legacy branches then fire only on a fixture's older template, an install's being the kit's own;
+  their removal is a follow-up this unit's close files, the descriptor's LEGACY rows being the seed
+  entry's. Edits to
   `render()` share one long function with the template path (`a-new-local-collides-in-a-long-function`,
   `memory/gotchas/a-new-local-collides-in-a-long-function.md`).
 - testing: the fixture plants of §6, and the self-test arm of §7.
@@ -426,8 +473,13 @@ key's lines alone until a unit lands.
   Red when: a copy-mode alias drifts from the composition and `--check` passes.
 - **AC7** — When `python composition.py --plant seeded-template` runs (a target
   answering `playbook_path` with an edited seeded copy), the composition is byte-identical to the same
-  target without the answer, and one `retired` note names `playbook_path`.
-  Red when: any byte of the seeded copy reaches the render.
+  target without the answer, and one `retired` note names `playbook_path`; its `--plant
+  installed-template` case (the template only at the fixture tree's renderer-kit directory, the
+  render's `gov_root` an empty directory) renders from that copy, and with the copy removed exits 1
+  naming both paths; and `git grep -n -F -e "coding-governance-agents.template.md" --
+  tools/playbook/kit.toml` finds the `[[files]]` rule landing it beside the engine.
+  Red when: any byte of the seeded copy reaches the render, an install's render finds no template, or
+  a missing template refuses naming one path.
 - **AC8** — When `python composition.py --plant delta` runs, it prints six state
   lines, one per S22 state, and one `widening` line, each in the `{v:<18} [{role:<13}]` widths; and when
   `python tools/govkit/govkit.py update --target <scratch adopter>` runs on the fixture's scratch adopter, its output carries the
@@ -464,7 +516,13 @@ New arm: tools/playbook/render_playbook.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8
 New arm: tools/govkit/selftest.py · covers AC8 · a scratch adopter whose playbook regenerate prints the six state lines and one foreign line, asserting `update` relays the six and not the seventh · none
 
 `core meta-check` grades the pending list S8 edits, and `instruction units selftest` runs the fixtures
-F7 moves to `gov_root`; neither carries a guard, so both run on every bar. The
+F7 moves to their tree's renderer-kit directory; neither carries a guard, so both run on every bar.
+Run at HEAD f91d3b28a, the one-line rule plant of `policy fixtures` exits 1 under `warn` with a
+`ModuleNotFoundError` for `instruction_units`, raised from
+`tools/playbook/render_playbook.py#render_charter_envelope`, its engine copy carrying no such module,
+and exits 1 under `refuse` with the length refusal (PINNED: the plant's two runs through
+`tools/policy/check_policy.py#run_cap_mode`, 2026-11-09); F7 gives that copy the module, and the
+plant's two exits are observed at this pass's close. The
 `govkit acceptance matrix` leg is red at `05fd1b7f7` for the renderer's dependency unit 73 parked for
 the owner (its fork record's F1): the matrix's scratch install holds no memory-tree kit, and
 `tools/playbook/check_layers.py` resolves that kit at import. This pass does not repair it, and
@@ -509,21 +567,31 @@ the owner (its fork record's F1): the matrix's scratch install holds no memory-t
   reads `CODEX_MAX` with `budgets.py home codex-instructions`, unit 6's verb over that census's
   `codex-instructions` row. widens: none · relaxes: none
 - **F7 — How a fixture names its charter template once the render stops reading `playbook_path`.**
-  Re-read at `05fd1b7f7`, the renderer's own selftest and the fixtures of
+  Re-read at HEAD f91d3b28a, the renderer's own selftest and the fixtures of
   `tools/playbook/instruction_units.py`, `tools/playbook/instructions_edit.py`,
-  `tools/policy/check_policy.py`, `tools/govkit/matrix.py` and `tools/govkit/selftest.py` answer
-  `playbook_path` to hand the render a template of their own; under S5 each would render gov's
-  engine template and its assertions would fail. Options: (a) a renderer flag naming the template;
-  (b) each fixture names its template through the `gov_root` that `render` and `run_charter_scope`
-  already take, the template sitting at that root under the engine template's name, or runs a
-  scratch copy of the engine whose checkout root holds it, as the policy kit's one-line rule plant
-  already copies the engine; (c) the render keeps reading `playbook_path` where the answered file
-  differs from gov's seed. (c) lets a seeded copy's bytes reach the render, which AC7 reds, so the
-  build method's first veto discards it; (a) adds a flag to a shipped command, a new public surface,
-  its second veto. (b) builds no surface and reuses the parameter which, as
-  `tools/playbook/render_playbook.py#resolve_declaration_paths` states, "stays in the signature for
-  the template". Recommendation (b). RESOLVED (agent, 2026-11-08, delegated): (b), by the build
-  method's fork rule, the one option no veto discards. widens: none · relaxes: none
+  `tools/playbook/overlay.py` and `tools/policy/check_policy.py` answer `playbook_path` to hand the
+  render a template of their own; under S5 each would render gov's template and its assertions would
+  fail. `tools/govkit/matrix.py` and `tools/govkit/selftest.py` answer it for the seed rule and its
+  hole, never as a template a render of theirs reads, and the matrix's scratch install, which selects
+  the renderer, receives the template from F12's rule, the bytes its seed lands. Options: (a) a
+  renderer flag naming the template; (b) each fixture names its template through the `gov_root` that
+  `render` and `run_charter_scope` take; (c) the render keeps reading `playbook_path` where the
+  answered file differs from gov's seed; (d) each fixture plants its template where F12's reader
+  looks first, its tree's renderer-kit directory, spelled through
+  `tools/playbook/instruction_units.py#derive_kit_rel` as its renderer table is, and stops answering
+  `playbook_path`, the lock arm's expected `template` naming that path and the renderer selftest's
+  template-is-charter arm passing `--charter` at that path; a lone engine copy, the
+  one-line rule plant, plants it beside the copy and carries `instruction_units.py` there, which the
+  reader imports. (c) lets a seeded copy's bytes reach the render, which AC7 reds, so the build
+  method's first veto discards it; (a) adds a flag to a shipped command, a new public surface, its
+  second veto. (b) fails every fixture that reaches the render through `main`, which takes no
+  `gov_root` and derives it from the engine's own place: `tools/playbook/instruction_units.py#run_render`,
+  the edit verb's own re-render `tools/playbook/instructions_edit.py#run_render`, and
+  `tools/playbook/overlay.py#run_render_cli`, so their arms red, the first veto. (d) builds no
+  surface and reuses the tree-relative seam the render already reads its document registry through.
+  Recommendation (d). RESOLVED (agent, 2026-11-09, delegated): (d), the one option no veto discards,
+  replacing the 2026-11-08 pick of (b) that the second repair brief's item 2 showed fails those arms.
+  widens: none · relaxes: none
 - **F8 — How the census reads "a leg names its tag in `enforces`".** A catalogue row's `rules` name the
   rule tags `<tag>.<rule>` a leg's `enforces` pairs with (the header of
   `tools/playbook/practices.toml`), and `tools/playbook/core.py#run_meta_check` counts a row enforced
@@ -582,6 +650,32 @@ the owner (its fork record's F1): the matrix's scratch install holds no memory-t
   builds no surface and places a unit once, where its scope selects it. Recommendation (a).
   RESOLVED (agent, 2026-11-09, delegated): (a), the one option no veto discards; a slot in a level-3
   to level-5 template is the owning kit's (section 3). widens: none · relaxes: none
+- **F12 — Which template an install's render reads once the seeded copy is retired.** Re-read at HEAD
+  f91d3b28a, `tools/playbook/render_playbook.py#main` derives `gov_root` as the engine's parent's
+  parent, the target's own root in an install; the playbook entry seeds the template only to
+  `{playbook_path}` (`tools/govkit/entries/playbook.kit.toml`), the renderer kit's descriptor
+  `tools/playbook/kit.toml` ships none, and PLAY-dOrderedCharter-31's S5 takes the seed rule out. A
+  reader of `gov_root` alone would refuse every install, update and check of the renderer, and a
+  template planted at a fixture's root by hand would hide that. Options: (a) the renderer kit ships
+  the template through a `root_relative` `[[files]]` rule to `{prefix}/playbook/`, and the reader
+  looks in the rendered tree's renderer-kit directory first, through
+  `tools/playbook/instruction_units.py#derive_kit_file`, and at `gov_root` second, as
+  `tools/playbook/render_playbook.py#resolve_declaration_paths` reads a descriptor beside the engine
+  first and gov's tree second; (b) S5, AC7 and F7 leave this unit for PLAY-dOrderedCharter-31, so
+  the input's retirement and the seed rule's exit land together, the edge mirrored on that spec;
+  (c) as (a), its first lookup the engine's own directory rather than the tree's; (d) S5 waits for
+  PLAY-dOrderedCharter-31 and the render keeps reading `playbook_path`. (d) lets a seeded copy's
+  bytes reach the render, which AC7 reds, so the first veto discards it. (b) moves the retirement
+  into a unit whose section 3 names dropping the seeded template as the render's input this unit's,
+  a non-goal of that spec, and leaves it the same replacement to build, so the first veto discards
+  it. (a) and (c) add one file inside the kit's existing install home, where its `root_relative`
+  rules already land the descriptors the render reads, through govkit's existing engine-file write:
+  no new install location, public surface or governance carrier, and no write surface beyond the
+  files the kit already writes. (c) leaves each fixture reaching the render through `main` to run a
+  scratch copy of the whole kit as its own process, since `main` derives the engine's directory from
+  its own file (F7); (a) serves those fixtures through a seam the render already reads. Recommendation
+  (a), on the tie-break's reuse of a found seam. RESOLVED (agent, 2026-11-09, delegated): (a), the
+  survivor reusing `derive_kit_file`. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -619,6 +713,17 @@ the owner (its fork record's F1): the matrix's scratch install holds no memory-t
   (F10; AC1). Level-3 to level-5 units reuse the unit slots through `derive_slot_units`, each run of
   them marked, every unit no slot selects named `unplaced`, and a slot in such a template is the
   owning kit's (F11; S2, step 3, AC2, a non-goal). S8's and S5's readers are re-grepped at HEAD.
+- rev-10 · 2026-11-09 · S5 · section 3 · section 4 The template input, Files touched · section 5 ·
+  AC7 · section 7 · section 8 F7 F12 new · section 10 · from
+  `2026-11-09-prompt-PLAY-dOrderedCharter-34-repair-2-brief.md`, the builder's second hand-back,
+  re-read at HEAD f91d3b28a. The renderer kit ships the template beside its engine and the reader
+  takes the rendered tree's kit copy first and gov's root second, so no install reads a template
+  nothing ships (F12; S5, AC7, the edge to PLAY-dOrderedCharter-31). Fixtures reaching the render
+  through `main` take no `gov_root`, so F7 moves every fixture's template to its tree's renderer-kit
+  directory; `tools/playbook/overlay.py` joins S5's by-value readers and Files touched, and the
+  matrix and govkit selftest leave Files touched, since they answer the key for the seed and the
+  matrix's install receives the template from the rule. S5's Readers gain the help pages and the reseed branches, section 5 the fall-through and the
+  reseed follow-up, and section 7 the one-line plant's run at HEAD.
 
 ## 10. Reuse audit
 
@@ -651,6 +756,16 @@ through `tools/playbook/render_playbook.py#render_unit_slots`, and the level-1, 
 `reuse_lookup.py "place a repository instruction unit into the document slot its scope selects"` and
 `"which legs enforce a practice row through its rule tags"` ranked name-token hits only
 (`parse_unit_rows`, `read_units`, test-script functions); read at source, the two seams above are the
-ones that place and join.
+ones that place and join. Re-read at HEAD f91d3b28a for the second repair brief: the template read
+reuses `tools/playbook/instruction_units.py#derive_kit_file`, "the tree's own table rather than this
+module's", which `tools/playbook/render_playbook.py#render_charter_envelope` already reads the
+document registry through, and the shipping reuses the renderer kit's `root_relative` rules, the
+seam `tools/playbook/render_playbook.py#resolve_declaration_paths` reads its descriptor from.
+`reuse_lookup.py "read a file the kit ships beside the installed engine, falling back to the source
+checkout"` ranked `resolve_kit_dir`, which finds another kit's directory from the install receipt,
+and name-token hits (`read_text`, `read`, `kit_rel`); read at source, none names this kit's own file
+in the rendered tree. S5's readers are the hits outside the memory tree of fixed-string greps for
+`playbook_path`, `resolve_template_path`, `SLOT_DEPLOY`, `TPL.md`, `reseed` and the template's name
+at that HEAD, each read at source.
 
-Recall terms used: `python tools/memory-recall/query.py "how is the composed charter measured against the Codex limit and which units overflow" --terms "composition project block level-0 units budget overflow largest contributors Codex limit delta report"` · `python tools/memory-recall/query.py "where does a repository instruction unit at level 3 render and how does a moved practice keep its rule tags" --terms "unit slot derive_slot_units marked part rule tags enforces meta-check adopter_rules project block"`
+Recall terms used: `python tools/memory-recall/query.py "how is the composed charter measured against the Codex limit and which units overflow" --terms "composition project block level-0 units budget overflow largest contributors Codex limit delta report"` · `python tools/memory-recall/query.py "where does a repository instruction unit at level 3 render and how does a moved practice keep its rule tags" --terms "unit slot derive_slot_units marked part rule tags enforces meta-check adopter_rules project block"` · `python tools/memory-recall/query.py "where does an installed charter renderer read its template once the seeded copy is retired" --terms "template seeded playbook_path resolve_template_path root_relative engine beside install renderer kit"`

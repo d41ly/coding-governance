@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-31 — this build's own upgrade steps: the agent-instructions wiring to the one renderer, adopter rules into the overlay, the seeded template's succession row, the census's change records and the `map_lib` deprecation
 
-**Status:** DEFERRED · rev-8 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 36 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
+**Status:** DEFERRED · rev-9 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 36 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
 
 **Carries:** cl-dClosedLoop-0061@bf1a53b5 whole
 
@@ -150,7 +150,8 @@ what an adopter can see ships its successor with an upgrade step that runs up an
   `tools/govkit/fixtures/release-0/deploy.toml`, the release-0 adopter's answer, kept, and
   `tools/playbook/instruction_units.py`, `tools/playbook/render_playbook.py` and
   `tools/policy/check_policy.py`, whose fixtures answer it to hand the render a template, which unit
-  34's F7 moves to the renderer's `gov_root` · by value: the seed row's
+  34's F7 moves to each fixture tree's renderer-kit directory, the render then reading the template
+  the renderer kit ships beside its engine (PLAY-dOrderedCharter-34, S5) · by value: the seed row's
   `reseed-available` grade (`tools/govkit/govkit.py:9989-9990`), which no longer has a row to grade.
   At 05fd1b7f7 that grade sits in `tools/govkit/govkit.py#_cmd_update`, the body `cmd_update`
   wraps. Observed by AC8 and AC9.
@@ -181,7 +182,7 @@ what an adopter can see ships its successor with an upgrade step that runs up an
 - **consumes-from** external — TOOL-dSafePassage-9's 2026-10-25 revision (`2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md`, Item 5): a retired seed row routed through its `retired-edited` arm, an edited copy reading `retired-edited` with one order and an unedited one `withdrawn`, which AC9 expects; without it the seed override grades the edited copy `patched`
 - **consumes-from** `PLAY-dOrderedCharter-20` — the renderer that absorbed the agent-instructions wiring, which the kit's successor ships
 - **consumes-from** `PLAY-dOrderedCharter-32` — the overlay file and the level-0 `repo.` unit grammar the adopter-rules step writes, through `write_overlay_units`
-- **consumes-from** `PLAY-dOrderedCharter-34` — the seeded template no longer read and the census's moved units
+- **consumes-from** `PLAY-dOrderedCharter-34` — the seeded template no longer read and the census's moved units; and the template the renderer kit ships beside its engine, which the render reads once S5 takes the seed rule out
 - **consumes-from** `PLAY-dOrderedCharter-15` — the change record kind S6 writes
 - **consumes-from** `PLAY-dOrderedCharter-33` — the step gate's gov unit-tag class, witnessed by the change record
 - **consumes-from** `PLAY-dOrderedCharter-19` — the join factory's move and `map_lib`'s re-export
@@ -545,6 +546,12 @@ New arm: tools/govkit/surface-classes.toml · covers AC4 AC7 · the step gate's 
   usage rows carry no `rows` key, as the landed rows show. The leg line gains the six dSafePassage
   and dGroundRules legs now in the manifest, `playbook render selftest` and the four unguarded legs
   S1's rows feed; the reuse audit records the landed seams.
+- rev-9 · 2026-11-09 · S5 · section 3 · from
+  `2026-11-09-prompt-PLAY-dOrderedCharter-34-repair-2-brief.md` Item 1: PLAY-dOrderedCharter-34 now
+  ships the template beside the renderer's engine and reads it there, so the consumes-from edge to it
+  names that template, which the render reads once S5 takes the seed rule out, and S5's Readers line
+  says its F7 moves its fixtures' templates to their tree's renderer-kit directory rather than to
+  `gov_root`.
 
 ## 10. Reuse audit
 
