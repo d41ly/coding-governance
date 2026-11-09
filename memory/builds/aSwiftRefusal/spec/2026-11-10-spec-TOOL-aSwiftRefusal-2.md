@@ -1,6 +1,6 @@
 # TOOL-aSwiftRefusal-2 — the order gate lets a deferred earlier-order unit pass
 
-**Status:** SPECCED · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 2 · closes TOOL-aRoutedQuill-13
+**Status:** CLOSED · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 2 · closes TOOL-aRoutedQuill-13
 
 <!-- gen:spec-records -->
 

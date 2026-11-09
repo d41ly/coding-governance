@@ -7677,6 +7677,30 @@ sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI="'"${PFX}swift-stub.py"'"|' .unatt
 o=$(run --dispatch tRun --pass ARCH-tRun-5 --writes ${PFX}swift.sh)
 hit "$o" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint: ${PFX}swift.sh also in"
 miss "$o" "--dispatch refuses: the declared spec-token checker reds over the live tree"
+# ---- TOOL-aSwiftRefusal-2 - A DEFERRED EARLIER-ORDER SIBLING DOES NOT HOLD BACK THE ORDER GATE, on
+# ---- the same pair. ARCH-tRun-4 passes only when its spec reads DEFERRED AND its last row is a
+# ---- `rescope · item defer` row, so the arm asserts both blockers beside the admission: a gate
+# ---- admitting every DEFERRED sibling, or every defer row, passes the admission alone. The edge
+# ---- refusal is not given the deferral, so a consumer of ARCH-tRun-4 stays refused. RED-first: the
+# ---- driver at ae6735c1 refused the admission case with the order gate's blocker text.
+sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI=""|' .unattended.conf
+run_swift_case() { # ARCH-tRun-4's status · defer row (1 or empty) -> the ARCH-tRun-5 dispatch's output
+  cp "$TMP/swift-runmd" memory/builds/tRun/RUN.md
+  sed -i "s/^\*\*Status:\*\* [A-Z]* /**Status:** $1 /" memory/builds/tRun/spec/swift4.md
+  [ -n "$2" ] && printf '\n2026-11-10T00:00:01Z rescope · item defer ARCH-tRun-4 · reason set aside\n' >> memory/builds/tRun/RUN.md
+  git add memory/builds/tRun/spec/swift4.md memory/builds/tRun/spec/swift5.md memory/builds/tRun/RUN.md >/dev/null 2>&1
+  run --dispatch tRun --pass ARCH-tRun-5 --writes ${PFX}swift.sh
+}
+o=$(run_swift_case DEFERRED 1)
+hit "$o" "unattended: dispatch — ARCH-tRun-4 (order 1) is DEFERRED with no dispatch after its defer row, so it does not hold back ARCH-tRun-5"
+hit "$o" "dispatch declared"
+o=$(run_swift_case INPROGRESS 1)
+hit "$o" "and an earlier step still holds a unit that is neither terminal nor dispatched: ARCH-tRun-4 (order 1, INPROGRESS)"
+o=$(run_swift_case DEFERRED "")
+hit "$o" "and an earlier step still holds a unit that is neither terminal nor dispatched: ARCH-tRun-4 (order 1, DEFERRED)"
+sed -i 's/^## 6\. Acceptance criteria$/## 3. Non-goals (OUT)\n\n- none\n\n### Edges\n\n- **consumes-from** `ARCH-tRun-4` — the code it builds on\n\n&/' memory/builds/tRun/spec/swift5.md
+o=$(run_swift_case DEFERRED 1)
+hit "$o" "consumes from a unit of its own build that is neither CLOSED nor WONTDO, so the consumer would build against code its producer has not landed: ARCH-tRun-5 consumes-from ARCH-tRun-4 (DEFERRED)"
 sed -i '/^SPEC_TOKENS_CLI=/d' .unattended.conf
 git rm -q --cached memory/builds/tRun/spec/swift4.md memory/builds/tRun/spec/swift5.md >/dev/null 2>&1
 rm -f memory/builds/tRun/spec/swift4.md memory/builds/tRun/spec/swift5.md ${PFX}swift-stub.py

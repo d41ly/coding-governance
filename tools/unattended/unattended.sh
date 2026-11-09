@@ -14146,6 +14146,22 @@ check_pass_open() { # grp · unit · run-state file · declared set (space-separ
   return 0
 }
 
+# A UNIT SET ASIDE WITH `--rescope --act defer` (TOOL-aSwiftRefusal-2): its spec reads DEFERRED AND
+# its last row among its `dispatch` rows and its `rescope · item defer` rows is a defer row. Both
+# halves, because a DEFERRED status with no defer row is a hand edit the close's carry-forward
+# refuses, and a dispatch after the defer row re-takes the unit (dOrderedCharter's unit 31). The id
+# is read only in the item field, anchored at line start and on ` · reason `, as the order gate's
+# dispatch-row grep reads it: `id_rows` matches an id anywhere, a reason field included. The status
+# is passed in because every caller already holds it. An unreadable file answers 2 (awk's exit),
+# so a failed read keeps the unit blocking, never admits it.
+check_unit_deferred() { # run-state file · unit · spec status -> 0 deferred, 1 not
+  [ "$3" = DEFERRED ] || return 1
+  awk -v u="$2" '
+    $0 ~ ("^[0-9][0-9-]*T[0-9:]*Z dispatch · item [0-9a-f]+ " u " · reason ") { k = "d" }
+    $0 ~ ("^[0-9][0-9-]*T[0-9:]*Z rescope · item defer " u " · reason ")      { k = "f" }
+    END { exit (k == "f") ? 0 : 1 }' "$1" 2>/dev/null
+}
+
 # --check-commit (TOOL-aWindowedPass-3): CHECK 23 AT THE ONE MOMENT ITS FINDING IS STILL REPAIRABLE.
 # A pass may widen its declaration with `--dispatch` until it commits and never after, so a close that
 # finds an undeclared write hours later can only count it. Run from the `commit-msg` hook, this reads
@@ -14341,6 +14357,12 @@ verb_dispatch() { # slug · unit · writes...
       [ "$_o_ord" -lt "$_d_ord" ] 2>/dev/null || continue
       _o_st="${SPEC_ST[$_o_spec]:-}"
       case "$_o_st" in CLOSED|WONTDO) continue ;; esac
+      # A DEFERRED SIBLING IS SET ASIDE, NOT AN UNFINISHED STEP (TOOL-aSwiftRefusal-2). Only here:
+      # the edge refusal below never asks, so a consumer of a deferred unit stays refused.
+      if check_unit_deferred "$rel" "$_o_id" "$_o_st"; then
+        echo "unattended: dispatch — $_o_id (order $_o_ord) is DEFERRED with no dispatch after its defer row, so it does not hold back $unit" >&2
+        continue
+      fi
       # THE DISPATCH ROW'S `item` FIELD IS `<anchor-sha> <unit-id>`, not the id alone, so a match on
       # the id with a space either side finds nothing and every dispatched sibling reads as still
       # blocking. Anchored on ` · reason ` at the tail, which makes the id a WHOLE token: without it
