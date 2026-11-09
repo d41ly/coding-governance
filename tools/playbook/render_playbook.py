@@ -72,7 +72,9 @@ and with no `--aliases` the ones `renderers.toml` assigns it. `claims`, check on
 until the charter's stated values render from sourced fact units. `--check-render` with no scope is the
 render gate: every scope, then `renderers.toml` (each instruction file has exactly one renderer of record),
 the status arm, and the legacy list under the policy key `instructions.legacy`. A template's
-`<!-- units: <selector> -->` line expands to the selected units' lines, one per unit.
+`<!-- units: <selector> -->` line expands to the selected units' lines, one per unit, composed with the
+repository's overlay at HEAD; a render verb's `--overlay-from <file>` reads that file in its place, and
+`--check` and `--check-render` refuse it, exit 2 (PLAY-dOrderedCharter-46).
 
 THE PRACTICE LINES (PLAY-dOrderedCharter-1). A template's `{{PRACTICES}}` line expands to `- [<name>] <line>`
 per active row of `practices.toml` beside this engine, before the placeholder set is collected, so a token
@@ -1197,12 +1199,14 @@ def resolve_answers(engine_dir: Path, gov_root: Path, target: Path,
     return out
 
 
-def render_unit_slots(text: str, target: Path, notes: list, slots: list | None = None) -> str:
+def render_unit_slots(text: str, target: Path, notes: list, slots: list | None = None,
+                      overlay_from: Path | None = None) -> str:
     """Each `<!-- units: <selector> -->` line replaced by the lines of the units its selector selects, and
     nothing of its own, the units composed with the repository's overlay by `overlay.derive_slot_units`
     (PLAY-dOrderedCharter-32 S4). A selector no namespace registers, a selected unit whose change records retired it
     and an unreadable manifest each refuse; a slot selecting nothing is noted `unarmed`. Each `(tag, line)`
-    lands in `slots`, what the lock's row records."""
+    lands in `slots`, what the lock's row records. `overlay_from` is a write verb's candidate overlay, read in
+    place of the blob at HEAD (PLAY-dOrderedCharter-46 S3); an unborn HEAD is noted in the overlay's line."""
     if not UNIT_SLOT_RE.search(text):
         return text
     iu = load_units_module()
@@ -1213,12 +1217,17 @@ def render_unit_slots(text: str, target: Path, notes: list, slots: list | None =
         units, records = iu.read_units(target), iu.read_change_records(target)
         # PLAY-dOrderedCharter-32 S4: the repository's overlay composes into each slot; the whole tree's
         # composition first, so a dangling or fixed target refuses whichever slot it would land in
-        repo, policy_reader = overlay.read_overlay(target), overlay.derive_policy_reader(target)
+        candidate = None if overlay_from is None else overlay_from.read_bytes().decode('utf-8')
+        repo, policy_reader = overlay.read_overlay(target, candidate), overlay.derive_policy_reader(target)
         exclude = overlay.read_excluded_tags(target) if units else set()
         fixed = overlay.derive_fixed_units(units, target)
         overlay.derive_unit_composition(units, repo.units, exclude, fixed=fixed, policy_reader=policy_reader)
-    except ValueError as e:    # UnitRowError, the git reader's LevelError and OverlayRefused
+    except (ValueError, OSError) as e:    # UnitRowError, LevelError, OverlayRefused, an unreadable candidate
         raise Refusal(f'the units a slot selects are unreadable: {e}') from None
+    if repo.state == 'unarmed':
+        notes.append(overlay.UNARMED_LINE)
+    elif repo.state == 'candidate':
+        notes.append(f'{overlay.SAY} — candidate: {overlay_from.as_posix()}')
 
     def render_slot(match) -> str:
         selector = match.group(1)
@@ -1374,7 +1383,8 @@ def remove_drive_section(text: str) -> str:
 
 
 def render(engine_dir: Path, gov_root: Path, target: Path,
-           charter_path: Path | None = None, slots: list | None = None) -> tuple[str, list[str]]:
+           charter_path: Path | None = None, slots: list | None = None,
+           overlay_from: Path | None = None) -> tuple[str, list[str]]:
     desc, blocks, entries = load_declarations(*resolve_declaration_paths(engine_dir, gov_root))
     dep, cfg, answers = read_deploy(target)
     rows = desc.get('placeholder', [])
@@ -1479,7 +1489,7 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
         # A TOML multi-line string ends in a newline, and the template line holding the token ends in
         # one too; without the strip every multi-line answer adds a blank line after itself.
         text = build_substitution(text, key, str(val).rstrip('\n'))
-    text = render_unit_slots(text, target, notes, slots)
+    text = render_unit_slots(text, target, notes, slots, overlay_from)
     notes += check_one_line_regions(text, read_one_line_cap(target) if ONE_LINE_OPEN in text else None)
     for ns, name in sorted(set(present)):
         if (ns, name) in drop:
@@ -2966,9 +2976,14 @@ def main(argv: list[str]) -> int:
     ap.add_argument('--force', action='store_true')
     # PLAY-dOrderedCharter-43: the entry-files scope imports the orientation card too, and its check asks for it.
     ap.add_argument('--card', action='store_true')
+    # PLAY-dOrderedCharter-46 S3: a write verb's render reads the overlay it just wrote; a check never does.
+    ap.add_argument('--overlay-from', type=Path)
     a = ap.parse_args(argv)
     if a.scope and not a.check_render:
         ap.error('--scope names what --check-render compares')
+    if a.overlay_from and (a.check or a.check_render):
+        ap.error('--overlay-from names a candidate overlay, which a render verb reads and every check refuses: '
+                 'a check grades the overlay at HEAD')
 
     if a.selftest:
         return run_selftest()
@@ -3009,12 +3024,13 @@ def main(argv: list[str]) -> int:
     except (Refusal, ValueError, OSError) as e:   # ValueError: the lock module's LevelError, LockError, UnitRowError
         print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
         return 1
-    return run_charter_scope(engine_dir, gov_root, target, charter_path, a.check or a.check_render)
+    return run_charter_scope(engine_dir, gov_root, target, charter_path, a.check or a.check_render, a.overlay_from)
 
 
-def run_charter_scope(engine_dir: Path, gov_root: Path, target: Path, charter_path: Path, check: bool) -> int:
+def run_charter_scope(engine_dir: Path, gov_root: Path, target: Path, charter_path: Path, check: bool,
+                      overlay_from: Path | None = None) -> int:
     """The `charter` scope: write the region and its lock row, or with `check` compare it. `--check` and
-    `--check-render --scope charter` are one check."""
+    `--check-render --scope charter` are one check; `overlay_from` reaches a write only."""
     # NOT ADOPTED is exit 0, and only in --check. A wiring leg runs unguarded against a tree that
     # has not run intake yet — gov's own, until its charter is rendered — and a leg that refuses
     # there is red for a reason that is not drift. It says so explicitly rather than passing
@@ -3027,7 +3043,7 @@ def run_charter_scope(engine_dir: Path, gov_root: Path, target: Path, charter_pa
 
     slots: list = []
     try:
-        body, notes = render(engine_dir, gov_root, target, charter_path, slots)
+        body, notes = render(engine_dir, gov_root, target, charter_path, slots, overlay_from)
     except Refusal as e:
         print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
         return 1
@@ -3068,7 +3084,7 @@ def run_charter_scope(engine_dir: Path, gov_root: Path, target: Path, charter_pa
         # N5: the two notes an adopter must act on print here too. `govkit update` runs the
         # regenerate (unless GOVKIT_RERENDER=0) with its output captured, so `--check` is where they are seen.
         for n in notes:
-            if n.startswith(('legacy', 'retired', 'budget')):
+            if n.startswith(('legacy', 'retired', 'budget', 'overlay — unarmed')):
                 print(f'  {n}')
         if rc == 0:
             print(f'render-playbook OK — region matches a fresh render, no placeholder survived')

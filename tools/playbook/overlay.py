@@ -5,8 +5,11 @@
     python overlay.py --fixture [--plant <case>]  # the plants, each in a throwaway repository
 
 THE HOME. The overlay holds the repository's own `[[unit]]` rows, in the kit manifests' row grammar, and its
-`[[policy]]` rows. `read_overlay` is the composers' one reader of it: the file at HEAD, never the working
-tree, through `parse_unit_rows`; an absent file, or a HEAD not born yet, is an empty overlay. Every unit it
+`[[policy]]` rows. `read_overlay` is the composers' one reader of it: the blob `HEAD:<overlay>` through
+`git cat-file`, never the index and never the working tree, through `parse_unit_rows` (PLAY-dOrderedCharter-46
+S1). Its `state` says which: `landed`; `absent`, a commit holding no such file, the empty overlay; `unarmed`,
+no commit at all, the empty overlay each render names in `UNARMED_LINE`; `candidate`, text a write verb's
+render passes in place of the blob, which every check verb refuses. Every unit it
 returns carries `origin = "repository"`. It refuses a row the schema check reds in the `repo` namespace, a
 typed origin and a typed `fixed` class among them, a unit at level 1, 6 or 7, and a `[[policy]]` key
 outside `adopter.`, whose tag `policy.adopter.<name>` it derives from the key.
@@ -63,6 +66,7 @@ FIXED_TYPES = ("principle", "floor", "parser")
 ADOPTER_WHEN = "policy.adopter."
 ADOPTER_KEY = "adopter."
 UNDECLARED = "its undeclared class"
+UNARMED_LINE = f"{SAY} — unarmed: no commit yet, so there is no landed revision to read"
 
 
 class OverlayRefused(ValueError):
@@ -75,30 +79,38 @@ class OverlayRefused(ValueError):
 
 @dataclass(frozen=True)
 class Overlay:
-    """The overlay at HEAD: its `Unit`s, each `origin` the repository, and `(key, tag)` per `[[policy]]` row."""
+    """The overlay at HEAD: its `Unit`s, each `origin` the repository, `(key, tag)` per `[[policy]]` row, and
+    its `state`: `landed`, `absent`, `unarmed` or `candidate`."""
     units: tuple
     policies: tuple
+    state: str
 
 
 def check_born(root) -> bool:
-    """Whether HEAD names a commit at `root`. ponytail: an unborn HEAD reads as an empty overlay and the
-    default exclusion set; PLAY-dOrderedCharter-46 owns that outcome."""
+    """Whether HEAD names a commit at `root`: an unborn HEAD reads as the `unarmed` overlay and the default
+    exclusion set, since no commit holds a policy file (PLAY-dOrderedCharter-46 S2, S6)."""
     return not subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "-q", "HEAD"],
                               capture_output=True).returncode
 
 
 def read_landed_text(root) -> str | None:
-    """The overlay's text at HEAD, None where HEAD holds no such file or is not born yet."""
-    if not check_born(root) or not iu.run_git(root, "ls-tree", "--name-only", "HEAD", "--", iu.OVERLAY).strip():
+    """The overlay's blob at HEAD through `git cat-file`, None where HEAD holds no such file."""
+    if not iu.run_git(root, "ls-tree", "--name-only", "HEAD", "--", iu.OVERLAY).strip():
         return None
-    return iu.run_git(root, "show", f"HEAD:{iu.OVERLAY}")
+    return iu.run_git(root, "cat-file", "blob", f"HEAD:{iu.OVERLAY}")
 
 
-def read_overlay(root) -> Overlay:
-    """S1: the overlay at HEAD; every red of its rows raises one OverlayRefused naming each row."""
-    text = read_landed_text(root)
+def read_overlay(root, candidate: str | None = None) -> Overlay:
+    """S1 to S3 of PLAY-dOrderedCharter-46: the overlay at HEAD, or `candidate`'s text in its place; every red
+    of its rows raises one OverlayRefused naming each row."""
+    if candidate is not None:
+        text, state = candidate, "candidate"
+    elif not check_born(root):
+        return Overlay((), (), "unarmed")
+    else:
+        text, state = read_landed_text(root), "landed"
     if text is None:
-        return Overlay((), ())
+        return Overlay((), (), "absent")
     units, faults = iu.parse_unit_rows(text, iu.OVERLAY, ORIGIN)
     reds = [f"{SAY}: red · {f}" for f in faults]
     doc = {} if faults and not units else tomllib.loads(text)
@@ -119,7 +131,7 @@ def read_overlay(root) -> Overlay:
             policies.append((key, f"policy.{key}"))
     if reds:
         raise OverlayRefused(1, "\n".join(reds))
-    return Overlay(tuple(units), tuple(policies))
+    return Overlay(tuple(units), tuple(policies), state)
 
 
 def derive_policy_reader(root):
@@ -585,6 +597,94 @@ def arm_write_order(c):
             str(code))
 
 
+LOCAL_ROW = render_fx_row("repo.local", text="MUST mind the local rule.")
+
+
+def write_slot_files(c):
+    """Staged, not committed: gov's kit and a charter template holding one unit slot and no practice region."""
+    for rel, text in {f"{FX_KIT}/kit.toml": 'id = "alpha"\n', FX_MANIFEST: derive_gov_rows(),
+                      ".governance/deploy.toml": iu.SLOT_DEPLOY, "TPL.md": iu.SLOT_TEMPLATE.format("reader.every")}.items():
+        c.write_file(rel, text)
+
+
+def run_render_cli(c, *argv) -> tuple[int, str]:
+    """The renderer as its own process over the fixture, so an argparse refusal is an exit, not a raise."""
+    done = subprocess.run([sys.executable, str(KIT_DIR / "render_playbook.py"), "--target", str(c.top), *argv],
+                          capture_output=True, text=True, encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL)
+    return done.returncode, done.stdout + done.stderr
+
+
+def arm_staged_not_landed(c):
+    build_fixture(c)
+    c.write_file(iu.OVERLAY, LOCAL_ROW)
+    got = read_overlay(c.top)
+    c.check("a row staged and not committed is absent", got.units == () and got.state == "absent", str(got))
+    iu.run_commit(c.top, "the overlay")
+    got = read_overlay(c.top)
+    c.check("the row is read once committed", [u.tag for u in got.units] == ["repo.local"] and got.state == "landed",
+            str(got))
+
+
+def arm_unborn_head(c):
+    write_slot_files(c)
+    got = read_overlay(c.top)
+    c.check("an unborn HEAD reads the unarmed overlay", got.units == () and got.state == "unarmed", str(got))
+    rc, said = iu.run_render(c.top)
+    c.check("a render prints the unarmed line once and exits 0", rc == 0 and said.count(UNARMED_LINE) == 1, said)
+
+
+def arm_check_refuses_candidate(c):
+    write_slot_files(c)
+    iu.run_commit(c.top, "the charter's inputs")
+    candidate = c.top.parent / f"{c.top.name}-candidate.toml"
+    candidate.write_bytes(LOCAL_ROW.encode("utf-8"))
+    try:
+        for verb in (["--check-render", "--scope", "charter"], ["--check-render"], ["--check"]):
+            rc, said = run_render_cli(c, *verb, "--overlay-from", str(candidate))
+            c.check(f"{' '.join(verb)} refuses a candidate, exit 2 naming the flag", rc == 2 and "--overlay-from" in said,
+                    f"rc {rc} · {said}")
+        rc, said = run_render_cli(c, "--overlay-from", str(candidate))
+        charter = (c.top / "AGENTS.md").read_text(encoding="utf-8") if rc == 0 else ""
+        c.check("a render verb reads the candidate, exit 0, naming it", rc == 0 and "MUST mind the local rule." in charter
+                and f"{SAY} — candidate:" in said, f"rc {rc} · {said} · {charter}")
+    finally:
+        candidate.unlink(missing_ok=True)
+
+
+def arm_write_then_render(c):
+    import gov_tag
+    import instructions_edit as ie
+    root = ie.build_tree(c, ie.GUARD_POINT)
+    gov_tag.write_commit(root, {iu.derive_tool_rel(KIT_DIR.name, iu.RENDERERS_TABLE): '[[target]]\npaths = ["AGENTS.md"]\n'
+                                'renderer = "playbook:charter"\n', ".governance/deploy.toml": iu.SLOT_DEPLOY,
+                                "TPL.md": iu.SLOT_TEMPLATE.format("reader.every")}, "a rendered charter")
+    rc, said = ie.run_cli(root, "add", "--manifest", "overlay", "--tag", "repo.local", "--type", "directive", "--level",
+                          "3", "--trigger", "always", "--scope", "reader.every", "--text", "MUST mind the local rule.",
+                          *ie.FX_RECORD, tty=True)
+    charter = (root / "AGENTS.md").read_text(encoding="utf-8") if (root / "AGENTS.md").is_file() else ""
+    c.check("the write's render holds the new overlay row in the same command",
+            rc == 0 and "MUST mind the local rule." in charter, f"rc {rc} · {said} · {charter}")
+    iu.run_git(root, "add", "-A")
+    iu.run_commit(root, "the write")
+    rc, said = iu.run_render(root, "--check-render", "--scope", "charter")
+    c.check("once the overlay is committed the render gate agrees", rc == 0, said)
+
+
+def arm_policy_at_head(c):
+    iu.run_git(c.top, "checkout", "-q", "-b", "main")
+    build_fixture(c)
+    iu.run_git(c.top, "remote", "add", "origin", "https://example.invalid/fixture.git")
+    iu.run_git(c.top, "update-ref", "refs/remotes/origin/main", "HEAD")
+    iu.run_git(c.top, "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/main")
+    build_fixture(c, policy=f'[instructions]\nexclude = ["{FX_OPEN}"]\n')
+    landed = read_policy_value("instructions.exclude", c.top)[0]
+    c.check("the landed ref is one commit behind and lacks the exclusion", FX_OPEN not in landed, str(landed))
+    units, states = derive_fx_composition(c, read_excluded_tags(c.top))
+    c.check("the composition reads the policy at HEAD: the unit is absent, state excluded",
+            FX_OPEN not in [u.tag for u in units] and states[FX_OPEN] == "excluded", f"{units} {states}")
+    c.check("the composed document lacks the unit", "MUST open." not in render_fx_slot(c), render_fx_slot(c))
+
+
 PLANTS = {"typed-origin": arm_typed_origin, "foreign-tag": arm_foreign_tag, "repo-in-gov": arm_repo_in_gov,
           "add-level-3": arm_add_level_3, "add-level-1": arm_add_level_1, "amends": arm_amends,
           "supersedes": arm_supersedes, "exclude": arm_exclude, "parsed-open": arm_parsed_open,
@@ -596,7 +696,10 @@ PLANTS = {"typed-origin": arm_typed_origin, "foreign-tag": arm_foreign_tag, "rep
           "fixed-amend": functools.partial(arm_fixed_target, kind="amends"),
           "fixed-supersede": functools.partial(arm_fixed_target, kind="supersedes"),
           "fixed-exclude": functools.partial(arm_fixed_target, kind="exclude"),
-          "adopter-key": arm_adopter_key, "gov-reads-adopter": arm_gov_reads_adopter, "write-order": arm_write_order}
+          "adopter-key": arm_adopter_key, "gov-reads-adopter": arm_gov_reads_adopter, "write-order": arm_write_order,
+          "unborn-head": arm_unborn_head, "staged-not-landed": arm_staged_not_landed,
+          "write-then-render": arm_write_then_render, "check-refuses-candidate": arm_check_refuses_candidate,
+          "policy-at-head": arm_policy_at_head}
 
 
 def run_fixture(plant=None) -> tuple[list, int]:

@@ -325,7 +325,9 @@ def write_candidate(root, rel, candidate, verb, args, proof) -> tuple[list, int]
         raise Refused(2, f"{SAY}: refused · {exc} · nothing written") from None
     iu.run_git(root, "add", "--", rel, record)
     dirty = read_dirty(root)
-    lines, rc = run_render(root)
+    # PLAY-dOrderedCharter-46 S4: the overlay renders from the bytes just written; kit manifests are read
+    # from the working tree already
+    lines, rc = run_render(root, path if rel == iu.OVERLAY else None)
     # ponytail: a target dirty before the render prints nothing; a per-file snapshot would name it
     wrote = [rel, record, *sorted(p[3:] for p in read_dirty(root) - dirty)]
     return [f"{SAY}: wrote {p}" for p in wrote] + (lines if rc else []), rc
@@ -335,17 +337,20 @@ def read_dirty(root) -> set:
     return {p for p in iu.run_git(root, "status", "--porcelain", "-z").split("\0") if p}
 
 
-def run_render(root) -> tuple[list, int]:
-    """Every scope of the renderer of record `renderers.toml` assigns a target."""
+def run_render(root, overlay_from=None) -> tuple[list, int]:
+    """Every scope of the renderer of record `renderers.toml` assigns a target, the overlay read from
+    `overlay_from` where a write verb just wrote it."""
     import render_playbook
     charter = iu.derive_instruction_tokens(root)["charter"]
     scopes = sorted({r["renderer"].partition(":")[2] for r in iu.read_renderers(root)
                      if r["renderer"].startswith("playbook:")})
+    given = [] if overlay_from is None else ["--overlay-from", str(overlay_from)]
     lines, rc = [], 0
     for scope in scopes:
         out = io.StringIO()
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(out):
-            rc = max(rc, render_playbook.main(["--target", str(root), "--charter", charter, "--render-scope", scope]))
+            rc = max(rc, render_playbook.main(["--target", str(root), "--charter", charter, "--render-scope", scope,
+                                               *given]))
         lines += out.getvalue().splitlines()
     return lines + [f"{SAY}: render · {len(scopes)} scope(s)"], rc
 

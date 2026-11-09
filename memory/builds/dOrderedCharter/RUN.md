@@ -423,3 +423,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-09T08:36:30Z dispatch · item 879d0feb PLAY-dOrderedCharter-33 · reason tools/playbook/pins.py tools/playbook/spelling-map.toml tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/fixtures/stale_edges.py tools/playbook/render_playbook.py help/overlay.md tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt .governance/policy.json tools/govkit/surface-classes.toml tools/govkit/usage.toml memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-33.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-33-ledger.md memory/builds/dOrderedCharter/build/2026-11-09-build-PLAY-dOrderedCharter-33-deviation-335.md memory/map/generated/symbols.json
 
 2026-11-09T08:36:37Z brief · item PLAY-dOrderedCharter-33 · reason cf3b462c6dac memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-33-build-brief.md
+
+2026-11-09T09:18:06Z dispatch · item b922daed PLAY-dOrderedCharter-46 · reason tools/playbook/overlay.py tools/playbook/render_playbook.py tools/playbook/instructions_edit.py help/overlay.md memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-46.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-46-ledger.md memory/map/generated/symbols.json
+
+2026-11-09T09:18:12Z brief · item PLAY-dOrderedCharter-46 · reason af656bc89373 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-46-build-brief.md

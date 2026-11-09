@@ -1013,6 +1013,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "arm_check_refuses_candidate",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "arm_checks",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -1403,6 +1408,11 @@
       "file": "tools/playbook/core.py"
     },
     {
+      "id": "arm_policy_at_head",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "arm_portable_orphan",
       "kind": "function",
       "file": "tools/playbook/core.py"
@@ -1573,6 +1583,11 @@
       "file": "tools/playbook/pins.py"
     },
     {
+      "id": "arm_staged_not_landed",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "arm_stash",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -1623,6 +1638,11 @@
       "file": "tools/playbook/overlay.py"
     },
     {
+      "id": "arm_unborn_head",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "arm_unenforced",
       "kind": "function",
       "file": "tools/playbook/core.py"
@@ -1659,6 +1679,11 @@
     },
     {
       "id": "arm_write_order",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "arm_write_then_render",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
     },
@@ -25803,6 +25828,11 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "run_render_cli",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "run_render_helper",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -31866,6 +31896,11 @@
       "id": "write_skill",
       "kind": "function",
       "file": "tools/playbook/core.py"
+    },
+    {
+      "id": "write_slot_files",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
     },
     {
       "id": "write_sparse_checkout",

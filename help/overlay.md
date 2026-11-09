@@ -99,6 +99,20 @@ each unit gov added at a level and a selection one of your units holds, so you c
 still says something gov does not. Re-pin an edge through `instructions_edit.py edit --manifest overlay
 --tag <your tag> --edges amends=<gov tag>@<hash8>`.
 
+## Which revision is read
+
+The overlay is read from your last commit, `HEAD`, never from the index or your working tree: a row
+you have written or staged renders only once you commit it. Every policy value the overlay selects by
+(`instructions.exclude`, an `adopter.` key in a `trigger`) is read at `HEAD` too, so a render reflects
+your own commits before they reach the remote. In a repository with no commit yet, the render prints
+`overlay — unarmed: no commit yet, so there is no landed revision to read` and renders gov's units
+alone. Commit the install before you add a rule.
+
+`instructions_edit.py`'s write verbs re-render from the overlay they just wrote, through the
+renderer's `--overlay-from <file>`, so the new row shows in the same command; commit the overlay and
+the charter together and the render check agrees. `--check` and `--check-render` refuse
+`--overlay-from`, exit 2: a check grades only what is committed.
+
 ## Check it
 
 `python tools/playbook/overlay.py check` prints each gov unit's class, each of your keys with its tag
