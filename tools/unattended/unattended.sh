@@ -14089,13 +14089,18 @@ RESCOPED
 # scratch guard refuses its writes under `ROUTED_PATHS` until the spec reads INPROGRESS again, which
 # brings its keys back. Before this, a key whose first attributed commit wrote outside its set — which
 # `pass_commit` never closes — held its paths against every later pass for the rest of the run.
-# Openness is asked first, so each key the status skip RELEASES is named on stderr and none silently.
+# A DEFERRED UNIT RESERVES NOTHING EITHER (TOOL-aSwiftRefusal-3): set aside with `--rescope --act
+# defer`, it commits against none of its keys, so they held its paths until a commit carrying its
+# `Pass:` trailer landed. `check_unit_deferred`, the order gate's one predicate, decides it, and every
+# key of the unit goes, older anchors included; a dispatch row after the defer row makes the
+# predicate false, so a unit dispatched again re-takes every key it declared.
+# Openness is asked first, so each key a status skip RELEASES is named on stderr and none silently.
 # The maps are the CALLER's: each verb's load is a probe with its own failure handling, and a unit
 # with no status read is not terminal, so a failed read keeps every open key reserved.
 # WHAT IT DOES NOT SEE: a follow-up pass dispatched for a unit already terminal reserves nothing from
 # its declaration on (`--dispatch` says so), and a spec flipped before its pass commit releases the
 # pass early, because status is read from the working tree, as the order gate and the guard read it.
-read_open_passes() { # run-state file · [current] -> the open keys of units whose spec is not terminal
+read_open_passes() { # run-state file · [current] -> the open keys of units neither terminal nor deferred
   local _r _i _g _u _decl _sp _st
   read_pass_declarations "$1" ${2:+"$2"} | while IFS= read -r _r; do
       [ -n "$_r" ] || continue
@@ -14108,6 +14113,10 @@ read_open_passes() { # run-state file · [current] -> the open keys of units who
         printf 'unattended: %s %s left out as terminal (%s), so its declared paths reserve nothing: %s\n' "$_g" "$_u" "$_st" "$_decl" >&2
         continue ;;
       esac
+      if check_unit_deferred "$1" "$_u" "$_st"; then
+        printf 'unattended: %s %s left out as deferred, so its declared paths reserve nothing until it is dispatched again: %s\n' "$_g" "$_u" "$_decl" >&2
+        continue
+      fi
       printf '%s\n' "$_r"
     done
 }

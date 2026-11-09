@@ -1,6 +1,6 @@
 # TOOL-aSwiftRefusal-3 — `read_open_passes` leaves out every key of a deferred unit, naming each on stderr
 
-**Status:** SPECCED · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 

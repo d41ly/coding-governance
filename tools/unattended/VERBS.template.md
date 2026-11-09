@@ -229,7 +229,7 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   several pass kinds per unit, and a later row is read the same way whichever it is. What the verb
   REFUSES is overlap with a SIBLING pass still open, the disjointness question it exists for and the
   one thing here that is unchanged; a unit's own rows are never siblings of each other.
-  A pass of a unit whose spec is CLOSED or WONTDO is not a sibling: it reserves nothing, and a later pass for such a unit reserves its paths only once its spec is set back to INPROGRESS.
+  A pass of a unit whose spec is CLOSED or WONTDO is not a sibling: it reserves nothing, and a later pass for such a unit reserves its paths only once its spec is set back to INPROGRESS. A pass of a deferred unit, whose spec reads DEFERRED and whose latest rescope defer row follows every dispatch row naming it, is not a sibling either, until the unit is dispatched again.
   A pass's COMMIT is the one whose `Pass: <unit-id>` trailer names it; a commit with no trailer falls back to
   its subject, and `Pass: none` names no unit. After every cheap refusal and before the claim read it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
   live tree and refuses the dispatch when it exits non-zero: the checker's bar join grades LIVE specs,

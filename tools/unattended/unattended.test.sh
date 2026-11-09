@@ -9102,6 +9102,29 @@ out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/other)
 hit "$out" "ARCH-tRun-1 is CLOSED, so this declaration reserves nothing against a sibling"
 hit "$out" "dispatch declared"
 
+# ---- TOOL-aSwiftRefusal-3: A DEFERRED UNIT RESERVES NOTHING. The first unit declares a path, gets a
+# ---- `rescope · item defer` row in `park`'s grammar and a DEFERRED spec, and the second unit's claim
+# ---- on the same path is admitted with the released key named. RED-first: the driver at ae6735c1
+# ---- refused it under condition 1. The defer row alone does not release it (INPROGRESS), and a
+# ---- dispatch after the defer row re-takes the unit's OLDER key too. Ten assertions, three `mutate`s.
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/held >/dev/null 2>&1
+printf '2026-11-10T00:00:09Z rescope · item defer ARCH-tRun-1 · reason set aside\n' >> memory/builds/tRun/RUN.md
+mutate memory/builds/tRun/spec/u1.md 's/^\*\*Status:\*\* SPECCED/**Status:** DEFERRED/'
+git add -A && git commit -q -m "chore: defer the first spec" --no-verify
+out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/held)
+hit "$out" "dispatch declared"
+hit "$out" "ARCH-tRun-1 left out as deferred, so its declared paths reserve nothing until it is dispatched again: work/held"
+mutate memory/builds/tRun/spec/u1.md 's/^\*\*Status:\*\* DEFERRED/**Status:** INPROGRESS/'
+out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/held)
+hit  "$out" "two passes claiming one file are not disjoint: work/held also in"
+miss "$out" "left out as deferred"
+mutate memory/builds/tRun/spec/u1.md 's/^\*\*Status:\*\* INPROGRESS/**Status:** DEFERRED/'
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/other)" "dispatch declared"
+out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/held)
+hit  "$out" "two passes claiming one file are not disjoint: work/held also in"
+miss "$out" "left out as deferred"
+
 # ---- M1: the generated-index/generator pairing, armed. The `covers` to `overlaps` change at this
 # ---- site reverted with the whole suite still green, which is a repair nothing was holding.
 build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
@@ -19143,7 +19166,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # a terminal record 6, the four chain reasons 10, the live set 5 and the waiver guard 3, and 5 in region two
 # for the fifth field, so FLOOR_SHARD_1 and FLOOR_SHARD_2 carry those. COUNTED off the block's own lines,
 # helpers' assertions included; no suite ran, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=3256
+# RAISED 3256 -> 3266 by TOOL-aSwiftRefusal-3: the deferred-unit sibling arm in region four after the
+# terminal-unit one, three `mutate`s and seven `hit`/`miss` lines, every one unconditional, counted off
+# the block's own lines; no suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3266
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -19352,7 +19378,8 @@ FLOOR_SHARD_2=223
 FLOOR_SHARD_3=405
 # RAISED 373 -> 382 by TOOL-dGroundRules-66: the same 9 region-four terminal-unit assertions, see FLOOR_ASSERTIONS.
 # RAISED 382 -> 383 by TOOL-dGroundRules-70: the same 1 region-four reader assertion, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_4=383
+# RAISED 383 -> 393 by TOOL-aSwiftRefusal-3: the same 10 region-four deferred-unit assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_4=393
 FLOOR_SHARD_5=297
 FLOOR_SHARD_6=127
 FLOOR_SHARD_7=311

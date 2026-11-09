@@ -52,7 +52,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 3 unit(s) · node a · opened 2026-11-10 · streams tooling
+**Build status:** CLOSED · 3 unit(s) · node a · opened 2026-11-10 · streams tooling
 ids TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 TOOL-aSwiftRefusal-3
 
 <!-- gen:build-units -->
@@ -60,7 +60,7 @@ ids TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 TOOL-aSwiftRefusal-3
 |---|---|---|---|---|---|
 | [TOOL-aSwiftRefusal-1 — `--dispatch` runs the spec-token check after every cheap refusal](spec/2026-11-10-spec-TOOL-aSwiftRefusal-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-11-10 |
 | [TOOL-aSwiftRefusal-2 — the order gate lets a deferred earlier-order unit pass](spec/2026-11-10-spec-TOOL-aSwiftRefusal-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-11-10 |
-| [TOOL-aSwiftRefusal-3 — `read_open_passes` leaves out every key of a deferred unit, naming each on stderr](spec/2026-11-10-spec-TOOL-aSwiftRefusal-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-11-10 |
+| [TOOL-aSwiftRefusal-3 — `read_open_passes` leaves out every key of a deferred unit, naming each on stderr](spec/2026-11-10-spec-TOOL-aSwiftRefusal-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-10 |
 <!-- /gen:build-units -->
 
 Records: 5 bound to this build, across 2 record folder(s).
