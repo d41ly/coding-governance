@@ -443,3 +443,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-09T16:03:02Z dispatch · item fc6a0546 PLAY-dOrderedCharter-34 · reason memory/builds/dOrderedCharter/build/2026-11-09-build-PLAY-dOrderedCharter-34-deviation-347.md memory/builds/dOrderedCharter/build/2026-11-09-build-PLAY-dOrderedCharter-34-deviation-348.md
 
 2026-11-09T16:15:06Z dispatch · item fc6a0546 PLAY-dOrderedCharter-34 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-09T17:12:50Z decision · item PLAY-dOrderedCharter-31 F8: the step-gate red the carried clause asks for the adopter-rules conversion, which takes no member away · reason options: a class over gov's own deploy answers (reads the file the step writes, the class rule refuses), retiring the key as a render input (a public surface and a new unit, second veto), or the owner restating the clause; the run builds surfaces = [] and the red stays owed
+
+2026-11-09T17:12:53Z decision · item PLAY-dOrderedCharter-31 F9: AC9's retired-edited order for an edited seeded template, while gov still holds the root template unit 34's kit ships · reason options: one predicate in this unit where the update re-resolves a row's role (writer's recommendation, F7 discarded it and the owner has not picked it), an ask to dSafePassage (external dependency, second veto), or restating AC9 to HEAD (drops the clause's order, first veto); the run builds the rest and AC9 stays owed
