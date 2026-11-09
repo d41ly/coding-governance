@@ -17,6 +17,7 @@
 | [2026-11-09-build-PLAY-dOrderedCharter-40-change-3.md](../build/2026-11-09-build-PLAY-dOrderedCharter-40-change-3.md) | change | — |
 | [2026-11-09-build-PLAY-dOrderedCharter-40-change-4.md](../build/2026-11-09-build-PLAY-dOrderedCharter-40-change-4.md) | change | — |
 | [2026-11-09-build-PLAY-dOrderedCharter-40-deviation-402.md](../build/2026-11-09-build-PLAY-dOrderedCharter-40-deviation-402.md) | deviation | — |
+| [2026-11-10-build-PLAY-dOrderedCharter-40-1-builder-return.md](../build/2026-11-10-build-PLAY-dOrderedCharter-40-1-builder-return.md) | journal | — |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
 | [2026-11-02-prompt-PLAY-dOrderedCharter-40-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-40-build-brief.md) | journal | — |
 | [2026-11-08-prompt-PLAY-dOrderedCharter-39-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-39-drift-fold-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
