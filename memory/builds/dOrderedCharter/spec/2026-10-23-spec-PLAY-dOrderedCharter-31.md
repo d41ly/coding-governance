@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-31 — this build's own upgrade steps: the agent-instructions wiring to the one renderer, adopter rules into the overlay, the seeded template's succession row, the census's change records and the `map_lib` deprecation
 
-**Status:** DEFERRED · rev-11 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 36 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
+**Status:** DEFERRED · rev-12 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 36 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
 
 **Carries:** cl-dClosedLoop-0061@bf1a53b5 whole
 
@@ -699,6 +699,47 @@ New arm: tools/policy/check_policy.py · covers AC13 · the `budgets-cap-codex-i
   the update already re-resolves a row's role, and F7's premise, that the seed's source leaves gov,
   stopped holding when PLAY-dOrderedCharter-34 shipped the template from the same root path. OPEN
   for the owner; AC9 waits on it, and every other criterion builds without it.
+- **F10 — The agent-instructions entry leaves while gov's own deploy still selects it.** Found by the
+  third hand-back (`memory/builds/dOrderedCharter/RUN.md`, the `decision` line of
+  2026-11-09T18:39:19Z) and read at f988ae3a1. S1 takes the kit's `[[entry]]` out of
+  `tools/govkit/registry.toml`, and gov's `.governance/deploy.toml` names `agent-instructions` in
+  its `kits`. `tools/govkit/govkit.py#resolve_selection` refuses a target's `kits` naming an id that
+  is not a registry entry and reads no `[[retired]]` row. Gov's own selection reaches it through
+  `tools/govkit/govkit.py#read_plan_destinations`, which `tools/govkit/govkit.py#_cmd_update`'s
+  source mode calls before it walks a step and `tools/govkit/step_gate.py#read_file_members` calls
+  for the `file` class, so `update` on gov and AC1's step gate both refuse at the pass's tip. Only
+  `tools/govkit/govkit.py#cmd_check` routes an id that left through
+  `tools/govkit/upgrade_steps.py#resolve_claim`, and it reads the receipt's claims, not `kits`.
+  `.governance/deploy.toml` is a line of `tools/policy/guarded-paths.txt`, so
+  `tools/policy/guard.py` refuses an agent commit that changes it. F4 does not answer this: it rules
+  that `update` in the lander's prepared merge writes gov's `deploy.toml` when the adopter-rules step
+  runs, but that step edits only the `[charter]` key, never `kits`, and the refusal comes before the
+  walk. The same refusal meets any adopter whose `kits` names the id at `plan`, `apply` and `adopt`
+  (DERIVED from `tools/govkit/govkit.py#resolve_selection`), as the release-0 fixture's `kits` does
+  (`tools/govkit/fixtures/release-0/deploy.toml`). Options: (a) the owner drops `agent-instructions`
+  from gov's deploy kits before or with the pass; (b) the selection resolver reads a retired id
+  through its `[[retired]]` row, a new mechanism; (c) the entry leaves only at the landing. (a)
+  answers gov alone and leaves an adopter that selects the id refused. (b) widens the scope of this
+  unit into the resolver, and it is the one option that answers every target the class holds,
+  reusing the claim resolver `cmd_check` already calls. (c) leaves S1 unbuilt at the pass's tip,
+  where AC1 observes it. Recommendation (b). OPEN for the owner: (a) is an owner edit to a guarded
+  file, and (b) and (c) change the unit's scope.
+- **F11 — `check-microformats` requires `playbook-render`, which the default selection lacks.** Found
+  by the same hand-back and read at f988ae3a1. At HEAD
+  `tools/govkit/entries/check-microformats.kit.toml` declares `requires = ["playbook"]`, and S5 moves
+  it to `playbook-render`, the entry that lands the template the leg then grades. The registry's
+  `[selection] default` (`tools/govkit/registry.toml`) holds `check-microformats` and `playbook` and
+  not `playbook-render`, and `tools/govkit/govkit.py#_cmd_apply` refuses a selection with a
+  requirement neither selected nor claimed (`tools/govkit/govkit.py#derive_unsatisfied_requires`),
+  never widening it, so every default install refuses once S5 lands. Options: (a) add
+  `playbook-render` to the default selection; (b) drop `check-microformats` from it; (c) change the
+  leg's subject. Each changes what every adopter installs by default. (b) ships the default charter
+  with its micro-format grammar unchecked. (c) needs a subject a default install holds without
+  `playbook-render`, and S5 takes away the seeded copy at `{playbook_path}`, the only charter file
+  the `playbook` entry lands. Recommendation (a): the default install keeps its gate and gains the
+  kit that lands what the gate grades. OPEN for the owner. The builder's finished step program and
+  its partial patch are kept outside the tree, in the run's scratch u31 folder (the same RUN.md
+  line), for the pass that resumes once F10 and F11 are answered.
 
 ## 9. Revision log
 
@@ -763,6 +804,11 @@ New arm: tools/policy/check_policy.py · covers AC13 · the `budgets-cap-codex-i
   line and an overlay level-0 unit sorting below the converted tags, each of which would change the
   block; AC7 gains the scope and reorder plants, AC6 the two refusals. Item 3's five confirmations
   stand as written, and S4's Readers line gains the selector and the writer; F8 and F9 stay parked.
+- rev-12 · 2026-11-09 · section 8 F10 F11 · from
+  `2026-11-09-prompt-PLAY-dOrderedCharter-31-park-record-brief.md`, read at f988ae3a1: the third
+  hand-back's two blockers, the agent-instructions entry leaving while gov's own deploy selects it
+  and `check-microformats` requiring `playbook-render` outside the default selection, are recorded
+  as forks OPEN for the owner; no design text moved, and the unit stays DEFERRED.
 
 ## 10. Reuse audit
 
