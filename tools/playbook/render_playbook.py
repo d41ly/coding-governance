@@ -2568,7 +2568,28 @@ def run_selftest() -> int:
             (['vanished-field', '--stale', 'warn'], 0, ['ships no `ceiling`', 'row fixture.alpha · {"grants": ["read"], "needs": ["fixture.beta"']),
             (['vanished-field', '--stale', 'order'], 0, ['ships no `ceiling`', 'The patch is held']),
             (['editorial'], 0, ['state fixture.alpha · amended']),
-            (['states'], 0, [f'· {s}\n' for s in ('unchanged', 'amended', 'replaced', 'excluded', 'stale', 'orphaned')])]:
+            (['states'], 0, [f'· {s}\n' for s in ('unchanged', 'amended', 'replaced', 'excluded', 'stale', 'orphaned')]),
+            # PLAY-dOrderedCharter-36 — the row checks: the fixed set, the exclusion refusals, the classifier.
+            (['amends-fixed'], 1, ['amends fixture.alpha · field witness · fixed by parser=', '#render_rows']),
+            (['widen-fixed'], 1, ['the fixed row fixture.epsilon · a widening']),
+            (['supersedes-fixed'], 1, ['supersedes the fixed row fixture.epsilon', 'principle=principle.p16']),
+            (['exclude-fixed'], 1, ['lists the fixed row fixture.epsilon', 'principle=principle.p16']),
+            (['undeclared'], 1, ['field note · fixed by its undeclared class']),
+            (['typed-class'], 1, ['field ceiling · key `class`']),
+            (['source-unresolved'], 1, ["'principle=principle.nowhere' names no [[principle]] row"]),
+            (['both-declared'], 1, ['field witness · declares both']),
+            (['exclude-needed', '--exclude', 'fixture.beta'], 1, ['which fixture.alpha still holds in its needs field']),
+            (['exclude-actor'], 1, ['which fixture.adopter.actor still holds in its actor field']),
+            (['exclude-granted'], 1, ['which fixture.adopter.granter still holds in its grants field']),
+            (['exclude-policy', '--policy', 'fixture.pick=fixture.beta'], 1, ['the policy key fixture.pick names']),
+            (['exclude-instance'], 1, ['the policy key roles.harness.builder names']),
+            (['classify'], 0, ['grants add widens', 'needs remove widens', 'needs add narrows', 'ceiling low->high widens',
+                               'ceiling low by default->mid widens']),
+            (['scalar-off-list'], 1, ['field ceiling', "value 'extreme' is outside its order"]),
+            (['no-direction'], 1, ['field ceiling · widens [] declares no direction']),
+            (['widenings'], 0, ['widening fixture.adopter.alpha-tuned -> fixture.alpha · field grants · add ["write"] · '
+                                'gov ["read"]', 'field ceiling · set "high" · gov "low by default"']),
+            (['clean'], 0, ['needs add narrows'])]:
         done = subprocess.run([sys.executable, str(row_kind), '--plant', *argv], capture_output=True, text=True,
                               encoding='utf-8', errors='replace', stdin=subprocess.DEVNULL, timeout=600)
         said = done.stdout + done.stderr
@@ -2584,6 +2605,13 @@ def run_selftest() -> int:
                                                              'stale', 'orphaned'))
         if argv[0] == 'pin-reordered' or argv[0] == 'editorial':
             ok = ok and 'row-kind: stale ' not in said
+        if argv == ['classify']:
+            ok = ok and len(re.findall(r'^row-kind: patch ', done.stdout, re.M)) == 5
+        if argv == ['widenings']:
+            ok = ok and len(re.findall(r'^row-kind: widening ', done.stdout, re.M)) == 2
+        if argv == ['clean']:
+            counts = re.findall(r'^row-kind: check (\w+) · read (\d+)$', done.stdout, re.M)
+            ok = ok and len(counts) == 4 and all(int(n) > 0 for _, n in counts)
         check_arm(ok, f'the row kind composes as `--plant {" ".join(argv)}` says, exit {want}',
                   f'rc {done.returncode} · {said[-1500:]}')
 

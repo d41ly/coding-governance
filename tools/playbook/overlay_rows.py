@@ -9,7 +9,9 @@ no array of tables.
 
 THE SCHEMA. `read_kind_schema` finds a kind's schema through `pins.read_row_kinds`, its `schema` path
 `{prefix}`-relative, and reads the `[kind]` table's `name` and `owner-seat` and each `[[field]]` row's
-`name` and `shape` (`set` or `scalar`). Every other schema key is PLAY-dOrderedCharter-36's, added here.
+`name` and `shape` (`set` or `scalar`). PLAY-dOrderedCharter-36 adds each field's `ref`, `fixed-by` and
+`widens` and the `[[fixed-row]]` table, refusing an unknown key, a typed `class`, both class keys on one
+field, a field whose `widens` declares no direction and every `fixed-by` source `check_fixed_sources` reds.
 
 THE COMPOSITION. `derive_row_composition` runs `check_row_owners` (a tag holding `adopter` at the kind's
 owner seat is the repository's: legal only on an overlay row, and an overlay row needs it), then:
@@ -20,7 +22,8 @@ answers to gov's tag (`replaced`); an `amends=<tag>@<hash8>` row patches gov's r
 is `stale` and `instructions.stale` acts, `order` and `warn` applying the patch over gov's new row,
 `refuse` holding the composition; a renamed target re-points the edge, a split or ended one orphans it
 (`orphaned`), the amendment held out and the replacement composing on its own. Rows with no edge join as
-the repository's own. It returns data and writes nothing.
+the repository's own. After the edge loop `row_checks.check_rows` reads every edge and the composed rows,
+and its reds refuse before a `refuse` hold. It returns data and writes nothing.
 """
 from __future__ import annotations
 
@@ -41,10 +44,15 @@ if str(KIT_DIR) not in sys.path:
 import instruction_units as iu  # noqa: E402
 import overlay as ov  # noqa: E402
 import pins  # noqa: E402
+import row_checks as rc  # noqa: E402
 
 SAY = "overlay-rows"
 ADOPTER = "adopter"
 SHAPES = ("set", "scalar")
+TOP_KEYS = ("kind", "field", "fixed-row")
+KIND_KEYS = ("name", "owner-seat")
+FIELD_KEYS = ("name", "shape", "ref", "fixed-by", "widens")
+FIXED_ROW_KEYS = ("tag", "fixed-by")
 PATCH_KEYS = ("add", "remove")
 EDGE_KEYS = ("edges", *PATCH_KEYS)
 DERIVED_KEYS = ("origin", "source")
@@ -58,9 +66,46 @@ def check_reds(reds):
         raise ov.OverlayRefused(1, "\n".join(reds))
 
 
+def check_schema_keys(where, table, allowed) -> list:
+    """One red per key of `table` outside `allowed`, a typed `class` named as the derived class it is."""
+    return [f"{where} · key `class` is derived from `fixed-by` and `widens`, never typed · remedy: drop it"
+            if k == "class" else f"{where} · key `{k}` is no schema key here: {', '.join(allowed)}"
+            for k in table if k not in allowed]
+
+
+def check_schema_sources(where, sources, root) -> list:
+    """PLAY-dOrderedCharter-36 S2: a `fixed-by` list's reds, `overlay.check_fixed_sources`'s for it."""
+    if sources is not None and not isinstance(sources, list):
+        return [f"{where} · fixed-by {sources!r} is no list of sources"]
+    return [f"{where} · {r.split(' · ', 1)[1]}" for r in ov.check_fixed_sources(sources or [], root)]
+
+
+def read_field_decl(where, shape, field, root) -> tuple:
+    """PLAY-dOrderedCharter-36 S1, S2, S5: `(decl, reds)`, the field's `ref`, `fixed-by` and `widens`. A
+    `ref` outside the three roles, both class keys, a set's `widens` not `add` or `remove`, a scalar's not
+    an order of two or more distinct values, and every `fixed-by` red refuse, naming `where`."""
+    ref, by, widens = field.get("ref"), field.get("fixed-by"), field.get("widens")
+    reds = check_schema_keys(where, field, FIELD_KEYS)
+    if ref is not None and ref not in rc.REF_ROLES:
+        reds.append(f"{where} · ref {ref!r} is none of {', '.join(rc.REF_ROLES)}")
+    if by is not None and widens is not None:
+        reds.append(f"{where} · declares both `fixed-by` and `widens`, two answers to its class · remedy: keep one")
+    elif widens is not None and shape == "set" and widens not in PATCH_KEYS:
+        reds.append(f"{where} · widens {widens!r} declares no direction: a set widens by add or remove")
+    elif widens is not None and shape == "scalar" and (not isinstance(widens, list) or len(widens) < 2
+                                                       or len({json.dumps(v) for v in widens}) != len(widens)):
+        reds.append(f"{where} · widens {widens!r} declares no direction: a scalar widens along an order of at "
+                    f"least two distinct values")
+    elif by is not None:
+        reds += check_schema_sources(where, by, root)
+    return {"ref": ref, "fixed-by": by, "widens": widens}, reds
+
+
 def read_kind_schema(root, kind) -> dict:
-    """S10: `{name, owner-seat, fields: {name: shape}, path}` of `kind`'s row schema, found through the kinds
-    register under `root`; one OverlayRefused naming the schema file and each fault."""
+    """S10: `{name, owner-seat, fields: {name: shape}, decl, fixed-rows, path}` of `kind`'s row schema,
+    found through the kinds register under `root`, `decl` `{field: {ref, fixed-by, widens}}` and
+    `fixed-rows` `{tag: [source]}` (PLAY-dOrderedCharter-36); one OverlayRefused naming the schema file and
+    each fault."""
     from tag_index import resolve_prefix_token
     row = next((r for r in pins.read_row_kinds(root) if r.get("tag") == f"kind.{kind}"), None)
     if row is None:
@@ -71,7 +116,9 @@ def read_kind_schema(root, kind) -> dict:
         doc = tomllib.loads(path.read_text(encoding="utf-8"))
     except (OSError, tomllib.TOMLDecodeError) as exc:
         check_reds([f"{SAY}: red · {rel} · the schema of {kind} is unreadable: {exc}"])
-    head, reds, fields = doc.get("kind"), [], {}
+    head, fields, decl, fixed_rows = doc.get("kind"), {}, {}, {}
+    reds = check_schema_keys(f"{SAY}: red · {rel}", doc, TOP_KEYS)
+    reds += check_schema_keys(f"{SAY}: red · {rel} · [kind]", head, KIND_KEYS) if isinstance(head, dict) else []
     seat = head.get("owner-seat") if isinstance(head, dict) else None
     if not isinstance(head, dict):
         reds.append(f"{SAY}: red · {rel} · [kind] · the table is missing")
@@ -91,8 +138,23 @@ def read_kind_schema(root, kind) -> dict:
             reds.append(f"{SAY}: red · {rel} · field {name} · shape {shape!r} is neither set nor scalar")
         else:
             fields[name] = shape
+            decl[name], more = read_field_decl(f"{SAY}: red · {rel} · field {name}", shape, f, root)
+            reds += more
+    pinned = doc.get("fixed-row") or []
+    for i, r in enumerate(pinned if isinstance(pinned, list) else [pinned], 1):
+        tag = r.get("tag") if isinstance(r, dict) else None
+        where = f"{SAY}: red · {rel} · [[fixed-row]] {tag or i}"
+        if not isinstance(tag, str) or not tag:
+            reds.append(f"{where} · names no row tag")
+        elif tag in fixed_rows:
+            reds.append(f"{where} · is declared twice")
+        else:
+            reds += check_schema_keys(where, r, FIXED_ROW_KEYS)
+            more = check_schema_sources(where, r.get("fixed-by"), root)
+            reds += more
+            fixed_rows[tag] = [] if more else list(r["fixed-by"])
     check_reds(reds)
-    return {"name": kind, "owner-seat": seat, "fields": fields, "path": rel}
+    return {"name": kind, "owner-seat": seat, "fields": fields, "decl": decl, "fixed-rows": fixed_rows, "path": rel}
 
 
 def read_overlay_rows(root) -> dict:
@@ -166,10 +228,12 @@ def set_row_patch(schema, gov_row, patch) -> tuple:
     return out, None
 
 
-def derive_row_composition(kind, schema, gov_rows, overlay_rows, exclude, stale_mode, records) -> tuple:
-    """`(rows, states, held, stale, orders)` of `kind`: the composed rows, `{gov tag: state}` from STATES,
-    the held patches' lines, the stale edges' lines and `[{kind, path, body}]` per order. One
-    OverlayRefused names every refusal, and every stale edge under `refuse`."""
+def derive_row_composition(kind, schema, gov_rows, overlay_rows, exclude, stale_mode, records, policy) -> tuple:
+    """`(rows, states, held, stale, orders, checks)` of `kind`: the composed rows, `{gov tag: state}` from
+    STATES, the held patches' lines, the stale edges' lines, `[{kind, path, body}]` per order, and
+    `row_checks.check_rows`'s `checks` over the edges and the composed rows, `policy` the tag-valued policy
+    keys' members its caller read once (PLAY-dOrderedCharter-36). One OverlayRefused names every refusal,
+    every red of the row checks, and every stale edge under `refuse`."""
     if stale_mode not in pins.STALE_MODES:
         check_reds([f"{SAY}: red · instructions.stale {stale_mode!r} is none of {', '.join(pins.STALE_MODES)}"])
     fields, gov = schema["fields"], {r["tag"]: r for r in gov_rows}
@@ -214,7 +278,7 @@ def derive_row_composition(kind, schema, gov_rows, overlay_rows, exclude, stale_
     check_reds(reds)
     rows = {t: r for t, r in gov.items() if t not in exclude}
     states = {t: "excluded" if t in exclude else "unchanged" for t in gov}
-    held, stale, orders, replaced = [], [], [], set()
+    held, stale, orders, replaced, entries = [], [], [], set(), []
     for row, etype, gtag, pin in edges:
         state, detail, walked = pins.derive_pin_state(gtag, pin, records, current)
         line = f"  {state:<10} [{kind}] {gtag}@{pin} <- {row['tag']}"
@@ -236,6 +300,7 @@ def derive_row_composition(kind, schema, gov_rows, overlay_rows, exclude, stale_
             names = ", ".join(r.get("id", "?") for r in detail) or "no record reaches the pin"
             stale.append(f"{line} · semantic since {pin} · {names}")
             if stale_mode == "refuse":
+                entries.append((row, etype, gov[target], False))
                 continue
         if etype == "supersedes":
             if target in replaced:
@@ -246,13 +311,17 @@ def derive_row_composition(kind, schema, gov_rows, overlay_rows, exclude, stale_
             rows[target], why = set_row_patch(schema, rows[target], row)
             if why:
                 held.append(f"{line} · held, gov's row composes as shipped: {why}")
+        entries.append((row, etype, gov[target], not why))
         states[target] = "stale" if state == "stale" else "replaced" if etype == "supersedes" else "amended"
         if state == "stale" and stale_mode == "order":
             orders.append({"kind": kind, "path": f"{iu.OVERLAY}#{row['tag']}",
                            "body": f"# {row['tag']}'s {etype} edge on {gtag} is stale\n\n{stale[-1].strip()}\n\n"
                                    + (f"The patch is held: {why}.\n\n" if why else "The patch is applied over gov's "
                                       "new row.\n\n") + "Re-pin it with instructions.edit once it reads right.\n"})
+    composed = list(rows.values()) + own
+    reds, checks = rc.check_rows(schema, entries, composed, exclude, policy)
+    check_reds(reds)
     if stale_mode == "refuse" and stale:
         check_reds([f"{SAY}: red · instructions.stale = refuse · the update is held until instructions.edit re-pins:",
                 *stale])
-    return list(rows.values()) + own, states, held, stale, orders
+    return composed, states, held, stale, orders, checks

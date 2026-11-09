@@ -6,8 +6,8 @@ way you change a unit (see [the instruction overlay](overlay.md)): from your own
 `.governance/instructions.toml`, never by editing gov's row, which the next update overwrites.
 
 No real kind registers a schema yet; the mechanism ships dark, proven on a fixture kind, and each kind's
-own build arms it. The examples use a kind `fixture` whose schema declares the set fields `grants` and
-`needs`, the scalar `ceiling`, and its owner seat at segment 1.
+own build arms it. The examples use a kind `fixture` whose schema declares the open set fields `grants`
+and `needs`, the open scalar `ceiling`, and its owner seat at segment 1.
 
 ## Your own tag
 
@@ -84,3 +84,33 @@ Under `order` and `warn`, a patch that no longer applies (gov's new row lacks a 
 and gov's row runs as shipped, the order or the warning naming the field.
 
 Each gov row's state is one of `unchanged`, `amended`, `replaced`, `excluded`, `stale` and `orphaned`.
+
+## What you may not change, and how a widening is reported
+
+A kind's schema says, field by field, what your rows may touch. A field is **open** when it declares
+`widens`, the direction that widens it: `add` on a permission set such as `grants`, `remove` on a
+constraint set such as `needs`, or an ordered list on a scalar such as `ceiling = ["low", "mid", "high"]`,
+where a later value is wider. Every other field is **fixed**: one whose `fixed-by` names what fixes it (a
+principle, a floor item, or a parser of gov's tools), and one that declares neither, which reads fixed
+by default. A schema may also list whole fixed rows under `[[fixed-row]]`. Nobody types the class: a
+schema writing `class` is refused.
+
+Update refuses the composition, naming the row, the field and what fixes it, when your overlay:
+
+- amends a fixed field, whether or not gov's row ships it;
+- amends or supersedes a fixed row, the refusal saying `a widening` when the patch would widen it;
+- supersedes a row with a fixed field changed or dropped;
+- excludes a fixed row;
+- sets an ordered scalar to a value outside its order.
+
+An exclusion is also refused while something still relies on the excluded tag: another active row of any
+kind holding it in a field whose schema `ref` role is `needs`, `actor` or `grants` (the refusal names the
+row and the field), or a tag-valued policy key naming it, such as `roles.harness.builder` (the refusal
+names the key). Take the tag from that row or key first, for example with an `amends` whose `remove`
+drops it from `needs`.
+
+Every patch operation the composition applies is classified `widens` or `narrows` from the field's
+declared direction alone; a value equal to gov's is no operation. Where gov's own value sits outside
+the field's order, any listed value reads `widens`. The composition lists each widening with its row,
+field, operation and gov's value, the one list the update's delta report prints, so what your
+repository widened is never a guess.

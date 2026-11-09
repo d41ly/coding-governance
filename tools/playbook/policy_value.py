@@ -13,6 +13,9 @@ module and never copy it.
 `read_cap_value(cap, root, rev)` reads one size cap's value through the policy kit's `resolve_caps` at the
 revision `rev` names, so a row moved on a branch is read at `HEAD` (PLAY-dOrderedCharter-3 S9); a cap no
 value answers raises `PolicyRefused`.
+
+`read_tag_policy(root, rev)` reads every tag-valued key's members in process through the policy kit's
+mirror render, the row checks' policy walk (PLAY-dOrderedCharter-36 S4).
 """
 from __future__ import annotations
 
@@ -119,3 +122,34 @@ def read_cap_value(cap: str, root, rev: str | None = None) -> int:
     if refused or answer.value is None:
         raise PolicyRefused(cap, refused[0] if refused else answer.reason)
     return int(answer.value)
+
+
+TAG_TYPES = ("set", "list", "name")
+
+
+def read_tag_policy(root, rev: str = "HEAD") -> dict:
+    """-> `{key: [member]}` of every tag-valued policy key `rev` resolves at `root`, a scalar as its one
+    member (PLAY-dOrderedCharter-36 S4). In process: the policy kit's `render_mirror` gives every key the
+    revision resolves, placeholder rows by the keys the file sets and derived defaults left out, and
+    `read_catalogue_row` over `parse_key` gives each key's row; a key is tag-valued when its `allowed` is a
+    table whose `type` is `set`, `list` or `name`. No kit, or a Refusal of either read, raises
+    `PolicyRefused` carrying the reader's own line."""
+    import json
+    key = f"the mirror render at {rev}"
+    try:
+        load_policy_kit()
+    except LookupError as exc:
+        raise PolicyRefused(key, f"no policy kit found: {exc}") from None
+    import policy
+    out = {}
+    try:
+        keys = json.loads(policy.render_mirror(str(root), rev))["keys"]
+        rows = policy.read_revision(str(root), rev)["rows"]
+        for key, hit in sorted(keys.items()):
+            allowed = policy.read_catalogue_row(policy.parse_key(key), rows).get("allowed")
+            if isinstance(allowed, dict) and allowed.get("type") in TAG_TYPES and hit["value"] is not None:
+                value = hit["value"]
+                out[key] = [str(v) for v in value] if isinstance(value, list) else [str(value)]
+    except policy.Refusal as exc:
+        raise PolicyRefused(key, str(exc)) from None
+    return out

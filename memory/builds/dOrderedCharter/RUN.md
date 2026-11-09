@@ -431,3 +431,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-09T10:48:22Z dispatch · item 8f1a4c9c PLAY-dOrderedCharter-35 · reason tools/playbook/overlay_rows.py tools/playbook/fixtures/row_kind.py tools/playbook/overlay.py tools/playbook/render_playbook.py help/overlay-rows.md help/README.md tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt .governance/policy.json memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-35.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-35-ledger.md memory/map/generated/symbols.json
 
 2026-11-09T10:50:14Z brief · item PLAY-dOrderedCharter-35 · reason ecc14e461eb0 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-35-build-brief.md
+
+2026-11-09T12:32:46Z dispatch · item cb020dc1 PLAY-dOrderedCharter-36 · reason tools/playbook/row_checks.py tools/playbook/overlay_rows.py tools/playbook/policy_value.py tools/playbook/fixtures/row_kind.py tools/playbook/render_playbook.py help/overlay-rows.md memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-36.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-36-ledger.md memory/map/generated/symbols.json memory/builds/dOrderedCharter/README.md
+
+2026-11-09T12:33:14Z brief · item PLAY-dOrderedCharter-36 · reason 16607aef6153 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-36-build-brief.md

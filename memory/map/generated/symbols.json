@@ -2603,6 +2603,11 @@
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
+      "id": "build_exclude_plant",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
       "id": "build_feat",
       "kind": "function",
       "file": "tools/push-main.test.sh"
@@ -6823,6 +6828,11 @@
       "file": "tools/playbook/check_layers.py"
     },
     {
+      "id": "check_rows",
+      "kind": "function",
+      "file": "tools/playbook/row_checks.py"
+    },
+    {
       "id": "check_rule_tags",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -6906,6 +6916,16 @@
       "id": "check_sc_value",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "check_schema_keys",
+      "kind": "function",
+      "file": "tools/playbook/overlay_rows.py"
+    },
+    {
+      "id": "check_schema_sources",
+      "kind": "function",
+      "file": "tools/playbook/overlay_rows.py"
     },
     {
       "id": "check_scope_arms",
@@ -9088,6 +9108,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_entry_ops",
+      "kind": "function",
+      "file": "tools/playbook/row_checks.py"
+    },
+    {
       "id": "derive_env_digest",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -9938,6 +9963,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "derive_patch_class",
+      "kind": "function",
+      "file": "tools/playbook/row_checks.py"
+    },
+    {
       "id": "derive_path_key",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -10583,6 +10613,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "derive_set_value",
+      "kind": "function",
+      "file": "tools/playbook/row_checks.py"
+    },
+    {
       "id": "derive_shim_window",
       "kind": "function",
       "file": "tools/govkit/shims.py"
@@ -10971,6 +11006,11 @@
       "id": "derive_watched",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "derive_widenings",
+      "kind": "function",
+      "file": "tools/playbook/row_checks.py"
     },
     {
       "id": "derive_width",
@@ -17028,6 +17068,11 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "read_field_decl",
+      "kind": "function",
+      "file": "tools/playbook/overlay_rows.py"
+    },
+    {
       "id": "read_field_fa12",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
@@ -19401,6 +19446,11 @@
       "id": "read_tables",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "read_tag_policy",
+      "kind": "function",
+      "file": "tools/playbook/policy_value.py"
     },
     {
       "id": "read_tag_rows",
