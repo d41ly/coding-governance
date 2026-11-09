@@ -103,7 +103,7 @@
 - [cost] Cost is a verdict: every suite declares a wall-clock ceiling and reds on a breach, because a check nobody can afford to run is never run.
 - [small] Work in small units, one stream each, merged to local main often; risky behaviour lands dark behind a default-off switch.
 - [isolate] Isolate work and runtime: main lives in one tree, and every unit in its own worktree with its own ports and databases.
-- [land] Land on local main as a `--no-ff` merge, gate it, then push; the shared merge and the push each need an explicit ask or the unattended protocol.
+- [land] Land on local main as a `--no-ff` merge, gate it, then push; the merge and the push need the request's mandate: an explicit ask, or the build README a run authorizes.
 - [post-merge] A scoped landing needs a full bar declared to run after the merge, and its red forces the full bar on every later landing until a full green descends from it.
 - [reconcile] Reconcile shared records additively and diff a merge against both parents; a generated index is re-rendered, never merged.
 - [migrations] Migrations are reversible, tested up, down and up again, and two forks of one parent reconcile through a merge revision, never a rebase.
@@ -198,7 +198,8 @@
 - start · main — a new task from the owner: `/session-kickoff`
 - start · main — a resumed or compacted session, which re-reads its card before it acts: `/session-kickoff`
 - start · main — another harness without gov's hooks, which writes no card, so the kickoff runs by hand: `/session-kickoff`
-- start · main — a run that merges and pushes with no owner turn, started or resumed: `/unattended`
+- start · main — a build is requested: it runs unattended by default, its committed README at BASE being the mandate: `/unattended <slug>`
+- start · main — only when the owner asks to attend a build: `/build`
 - start · gov-session — a subagent's task, handed over as a prompt file: `python <prefix>/roles/handoff.py check <file>`
 - bookkeeping · main — a record, an index or the run state changed: `python <prefix>/memory-tree/gen_build_index.py --write`
 - research · gov-researcher — a design choosing between candidates no seam decides: `python <prefix>/memory-recall/query.py "<question>" --terms "<8-14 words>"`

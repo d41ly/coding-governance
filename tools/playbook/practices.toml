@@ -174,7 +174,7 @@ test = "each unit runs on its own ports and databases"
 
 [[practice]]
 tag = "practice.land"
-line = "Land on local {{DEFAULT_BRANCH}} as a `--no-ff` merge, gate it, then push; the shared merge and the push each need an explicit ask or the unattended protocol."
+line = "Land on local {{DEFAULT_BRANCH}} as a `--no-ff` merge, gate it, then push; the merge and the push need the request's mandate: an explicit ask, or the build README a run authorizes."
 [practice.reach]
 deploy = "land as a no-fast-forward merge, gate it, then push on an explicit ask"
 

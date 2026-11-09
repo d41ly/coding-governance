@@ -2319,6 +2319,23 @@ def run_selftest() -> int:
     finally:
         if was is not None:
             os.environ['GOV_DEFAULT_BRANCH'] = was
+    # PLAY-dOrderedCharter-23: a build runs unattended by default and the attended route is its stated
+    # exception, so the SHIPPED unattended and roles descriptors render the unattended start line once with
+    # the `/build` line directly under it. Dropping either row, or reordering the two, reds this arm.
+    if gov_tpl.is_file():
+        try:
+            drive, got = [render_drive_line(r) for r in read_drive_rows(here, ['unattended', 'roles'])], None
+        except Refusal as e:
+            drive, got = [], str(e)
+        unattended = ('- start · main — a build is requested: it runs unattended by default, its committed '
+                      'README at BASE being the mandate: `/unattended <slug>`')
+        attended = '- start · main — only when the owner asks to attend a build: `/build`'
+        check_arm(got is None and drive.count(unattended) == drive.count(attended) == 1
+                  and drive.index(attended) == drive.index(unattended) + 1,
+                  'the unattended start line renders once, with the attended /build line directly under it',
+                  f'refused with {got!r}' if got else f'drive lines {drive!r}')
+    else:
+        print('  unarmed: the default-route drive lines — this install holds no gov template above the engine')
     # TOOL-aDistilledCharter-2 rev-2 (closing review round 1, R1). A SEEDED v3.x template renders
     # under THIS engine and its SHIPPED declarations, because `update` never rewrites a seed and a
     # refusal here rolls the kit back. The declarations are the real ones beside this engine, so the

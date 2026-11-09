@@ -420,5 +420,5 @@ why = "a rendered artifact its own gate byte-compares"
 [[drive]]
 stage = "start"
 role = "main"
-command = "/unattended"
-when = "a run that merges and pushes with no owner turn, started or resumed"
+command = "/unattended <slug>"
+when = "a build is requested: it runs unattended by default, its committed README at BASE being the mandate"

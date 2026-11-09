@@ -153,6 +153,12 @@ why = "a rendered artifact its own gate byte-compares"
 
 [[drive]]
 stage = "start"
+role = "main"
+command = "/build"
+when = "only when the owner asks to attend a build"
+
+[[drive]]
+stage = "start"
 role = "gov-session"
 command = "python <prefix>/roles/handoff.py check <file>"
 when = "a subagent's task, handed over as a prompt file"
