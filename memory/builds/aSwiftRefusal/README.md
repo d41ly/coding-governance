@@ -5,7 +5,6 @@ opened: 2026-11-10
 streams: tooling
 roster: TOOL
 ids: TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 TOOL-aSwiftRefusal-3
-status: OPEN
 ---
 
 # aSwiftRefusal — `--dispatch` refuses cheaply first, and a deferral stops blocking
@@ -53,25 +52,33 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-11-10 · streams tooling
+**Build status:** SPECCED · 3 unit(s) · node a · opened 2026-11-10 · streams tooling
 ids TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 TOOL-aSwiftRefusal-3
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aSwiftRefusal-1 — `--dispatch` runs the spec-token check after every cheap refusal](spec/2026-11-10-spec-TOOL-aSwiftRefusal-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-11-10 |
+| [TOOL-aSwiftRefusal-2 — the order gate lets a deferred earlier-order unit pass](spec/2026-11-10-spec-TOOL-aSwiftRefusal-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-11-10 |
+| [TOOL-aSwiftRefusal-3 — `read_open_passes` leaves out every key of a deferred unit, naming each on stderr](spec/2026-11-10-spec-TOOL-aSwiftRefusal-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 5 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 TOOL-aSwiftRefusal-3.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aSwiftRefusal-1` | no |
+| 2 | `TOOL-aSwiftRefusal-2` | no |
+| 3 | `TOOL-aSwiftRefusal-3` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
