@@ -461,3 +461,11 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-09T20:09:47Z brief · item PLAY-dOrderedCharter-37 · reason 00ecf77caa7e memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-37-build-brief.md
 
 2026-11-09T20:38:32Z dispatch · item cee53246 PLAY-dOrderedCharter-37 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-09T21:20:58Z rescope · item defer PLAY-dOrderedCharter-39 · reason consumes PLAY-dOrderedCharter-31, parked for the owner's F8 to F11 in this run; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-09T21:21:00Z rescope · item defer PLAY-dOrderedCharter-49 · reason consumes PLAY-dOrderedCharter-31, parked for the owner's F8 to F11 in this run; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-09T21:21:01Z rescope · item defer PLAY-dOrderedCharter-54 · reason consumes PLAY-dOrderedCharter-31 through PLAY-dOrderedCharter-49, parked for the owner's F8 to F11 in this run; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-09T21:21:03Z rescope · item defer PLAY-dOrderedCharter-55 · reason consumes PLAY-dOrderedCharter-31, parked for the owner's F8 to F11 in this run; carried forward against ask PLAY-dOrderedCharter-38
