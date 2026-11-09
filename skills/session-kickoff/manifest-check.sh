@@ -219,6 +219,9 @@ CARD_CAP_BYTES=${CARD_CAP_BYTES:-8192}
 # does; neither is an adopter knob.
 CARD_OVERLAP_BOUND=${CARD_OVERLAP_BOUND:-10}
 CARD_OVERLAP_ROWS=5
+# The replay's `map —` block's bound in seconds (PLAY-dOrderedCharter-4); the env override exists for
+# the self-test's slow-stub arm and is not an adopter knob.
+CARD_MAP_BOUND=${CARD_MAP_BOUND:-5}
 # The `cli —` cell's bound on `claude --version`, in seconds (KICK-aMendedFleet-4); the env override
 # exists for the self-test's slow-stub arm and is not an adopter knob.
 CARD_CLI_BOUND=${CARD_CLI_BOUND:-5}
@@ -739,9 +742,40 @@ derive_injected_breaches() {
   return 0
 }
 
-# The stored card, unchanged, then ONE `now —` line computed here and never stored — a second replay
-# must print one, not two. A missing card is written fresh under the replay's own name in its header.
+# The replay's `map —` block (PLAY-dOrderedCharter-4): the playbook kit's instruction map, its `map`
+# verb's lines verbatim, found as every sibling is by `resolve_kit_file` and bounded as the `overlaps —`
+# cell bounds its read: a kill into a scratch file under the card dir, never a `$( )` capture, stdin
+# /dev/null. Every failure is one `map — skipped:` line; the replay's exit and the card file are never
+# touched. WHAT THIS DOES NOT CHECK: the map's content, which is the verb's to derive and bound.
+derive_map_block() {
+  local iu py sf rc
+  iu=$(resolve_kit_file playbook instruction_units.py)
+  [ -n "$iu" ] || { printf 'map — skipped: no playbook instruction map resolves in this tree\n'; return 0; }
+  py=$(resolve_python 2>/dev/null) || { printf 'map — skipped: no Python resolves on this node\n'; return 0; }
+  timeout -k 1 5 true </dev/null >/dev/null 2>&1 \
+    || { printf 'map — skipped: this node has no working timeout -k, so the read would be unbounded and none ran\n'; return 0; }
+  sf=$(mkdir -p "$CARD_DIR" && mktemp "$CARD_DIR/.map.XXXXXX") \
+    || { printf 'map — skipped: no scratch file under %s to capture the map in\n' "$CARD_DIR"; return 0; }
+  timeout -k 2 "$CARD_MAP_BOUND" "$py" "$iu" map --root "$ROOT" </dev/null >"$sf" 2>/dev/null; rc=$?
+  case "$rc" in
+    0) tr -d '\r' < "$sf" ;;
+    124|137) printf 'map — skipped: the map did not answer within %ss\n' "$CARD_MAP_BOUND" ;;
+    *)
+      LC_ALL=C awk -v rc="$rc" '{ sub(/\r$/, "") }
+        NF && f == "" { f = $0 }
+        END { if (f == "") f = "the map exited " rc " and printed nothing"
+              if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
+              print "map — skipped: " f }' "$sf" ;;
+  esac
+  rm -f "$sf" 2>/dev/null
+  return 0
+}
+
+# The instruction map first, so the harness's cut of a hook's output takes a card's tail and never the
+# map; then the stored card, unchanged, then ONE `now —` line computed here and never stored — a second
+# replay must print one, not two. A missing card is written fresh under the replay's own name in its header.
 print_replay() {
+  derive_map_block
   if [ -f "$CARD_FILE" ]; then cat "$CARD_FILE"; else write_card replay; fi
   derive_head_state
   printf 'now — HEAD %s · %s · %s\n' "$HEAD_SHA" "$HEAD_BRANCH" "$HEAD_DIRTY"

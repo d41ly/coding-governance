@@ -89,7 +89,7 @@ between (PLAY-dOrderedCharter-2). Four more lines expand before placeholders are
 the template carries it: `{{OVERRIDE_RULE}}`, the override rule's sentence for the value of `charter.override`
 at the landed revision, `CHARTER_OVERRIDE_DEFAULT`'s where no policy kit answers, with a note naming the
 value and its source; `{{INSTRUCTION_MAP}}`, `instruction_units.render_instruction_map`'s lines over the
-target's document registry, one level each, then a `held —` line while a row carries `hold`;
+target's document registry, one level each, then a `held —` line while a row carries `hold`, then the `preset —` line;
 `{{PRINCIPLES}}` and `{{DECISION_PRINCIPLES}}`, one `- P<n> <line>` per row of `principles.toml`, the
 decision principle, `principle.p18`, alone under the second. A seeded v4.x template renders as it did and
 reads no `charter.override`.

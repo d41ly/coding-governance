@@ -1058,12 +1058,14 @@ write_manifest "$CWT" "$wt_head" "AGENTS.md" "AGENTS.md"
 run_card "AC4 --card --write with no registry key" "$CWT" 0 - --card --write --session "$NONCE-t4d"
 check_eq "AC4 node — an absent registry key is UNKNOWN: no registry" "node — UNKNOWN: no registry" "$(read_cell node "$NONCE-t4d")"
 
-# AC5 — replay: the stored bytes, one `now —` line, the file untouched; a missing card is written
-# fresh under the replay's own name, node cell resolved.
+# AC5 — replay: the playbook kit's instruction map (PLAY-dOrderedCharter-4), the stored bytes, one
+# `now —` line, the file untouched; a missing card is written fresh under the replay's own name, node
+# cell resolved. The map is the clone's own `map` verb, found as the checker finds it.
 cp "$CARD_HOME/$NONCE-t1.md" "$TMP/t1.before"
+cwt_map=$(ROOT="$CWT" MC_DIR="$(dirname "$CHECK")" resolve_kit_file playbook instruction_units.py)
 run_card "AC5 --card --replay prints the stored card" "$CWT" 0 "orientation — $NONCE-t1 · written " --card --replay --session "$NONCE-t1"
-check_eq "AC5 replay = the stored bytes then exactly one now — line" \
-  "$(cat "$TMP/t1.before"; printf 'now — HEAD %s · card-wt · dirty %s\n' "$wt_head" "$(git -C "$CWT" status --porcelain | wc -l | tr -d '[:space:]')")" "$(cat "$CARD_OUT")"
+check_eq "AC5 replay = the instruction map, the stored bytes, then exactly one now — line" \
+  "$("$MC_PY" "$cwt_map" map --root "$CWT" </dev/null | tr -d '\r'; cat "$TMP/t1.before"; printf 'now — HEAD %s · card-wt · dirty %s\n' "$wt_head" "$(git -C "$CWT" status --porcelain | wc -l | tr -d '[:space:]')")" "$(cat "$CARD_OUT")"
 cmp -s "$TMP/t1.before" "$CARD_HOME/$NONCE-t1.md" && { echo "ok   AC5 the file on disk is byte-identical after the replay"; pass=$((pass+1)); } \
   || { echo "FAIL AC5 the file on disk is byte-identical after the replay"; fail=$((fail+1)); }
 run_card "AC5 a second replay" "$CWT" 0 - --card --replay --session "$NONCE-t1"
@@ -1163,6 +1165,43 @@ printf '#!/usr/bin/env bash\nsleep 5\n' > "$ov_drv"
 export CARD_OVERLAP_BOUND=1
 run_card "overlaps cell: a driver past the bound is unknown, not none" "$R" 0 "overlaps — skipped: --overlaps did not answer within 1s" --card --write --session "$NONCE-t77d"
 unset CARD_OVERLAP_BOUND
+
+# PLAY-dOrderedCharter-4 — the replay's `map —` block over a stub instruction map the resolver finds as
+# the repo's one tracked `instruction_units.py`: no module, a map of two known lines (an envelope pair),
+# a refusal, and a map that outlives a one-second bound. Each replay is the block, the stored card's
+# bytes, then one `now —` line; the startup writer prints no map. Staged red by moving the
+# `derive_map_block` call after the card in `print_replay`.
+# check_replay <name> <session> <want first lines> — $CARD_OUT against the stored card, one now — line.
+check_replay() {
+  local n; n=$(printf '%s\n' "$3" | wc -l | tr -d '[:space:]')
+  check_eq "$1: the map's lines come first" "$3" "$(head -n "$n" "$CARD_OUT")"
+  check_eq "$1: then the stored card's bytes, then one now — line" \
+    "$(cat "$R/.git/orientation/$NONCE-$2.md")|1|now" \
+    "$(sed -n "$((n + 1)),\$p" "$CARD_OUT" | sed '$d')|$(grep -c '^now — ' "$CARD_OUT")|$(tail -1 "$CARD_OUT" | cut -c1-3)"
+}
+mkrepo mapnone
+run_card "map block: setup, a card with no playbook module" "$R" 0 - --card --write --session "$NONCE-t79a"
+run_card "map block: no module replays at exit 0" "$R" 0 - --card --replay --session "$NONCE-t79a"
+check_replay "map block: no module" t79a "map — skipped: no playbook instruction map resolves in this tree"
+mkrepo mapcell; mp_kit=playbook; mp_mod="$R/$mp_kit/instruction_units.py"; mkdir -p "$R/$mp_kit"
+mp_two=$'[AGENTS.md · Level 0 · a stub map]\n[/AGENTS.md]'
+printf 'print("[AGENTS.md · Level 0 · a stub map]")\nprint("[/AGENTS.md]")\n' > "$mp_mod"
+commit_all "$R" "the stub instruction map"
+run_card "map block: the startup writer over a stub map" "$R" 0 - --card --write --session "$NONCE-t79b"
+check_eq "map block: the startup writer prints no map — line and no envelope line" "0" "$(grep -cE '^(map — |\[)' "$CARD_OUT")"
+cp "$R/.git/orientation/$NONCE-t79b.md" "$TMP/t79b.before"
+run_card "map block: a replay over a stub map" "$R" 0 - --card --replay --session "$NONCE-t79b"
+check_replay "map block: a stub map" t79b "$mp_two"
+cmp -s "$TMP/t79b.before" "$R/.git/orientation/$NONCE-t79b.md" && { echo "ok   map block: the stored card is byte-identical after the replay"; pass=$((pass+1)); } \
+  || { echo "FAIL map block: the stored card is byte-identical after the replay"; fail=$((fail+1)); }
+printf 'import sys\nprint("boom")\nsys.exit(3)\n' > "$mp_mod"
+run_card "map block: a refusing map replays at exit 0" "$R" 0 - --card --replay --session "$NONCE-t79b"
+check_replay "map block: a refusing map" t79b "map — skipped: boom"
+printf 'import time\ntime.sleep(5)\n' > "$mp_mod"
+export CARD_MAP_BOUND=1
+run_card "map block: a map past the bound replays at exit 0" "$R" 0 - --card --replay --session "$NONCE-t79b"
+check_replay "map block: a map past the bound" t79b "map — skipped: the map did not answer within 1s"
+unset CARD_MAP_BOUND
 
 # PLAY-dOrderedCharter-11 S5 — the injected load points measured at a card write: the playbook kit's
 # load_sets.py, found in gov as the checker finds every sibling and copied beside the fixture's root, over
@@ -2036,7 +2075,9 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # 310 = the base 279 + aSparedSpawn's 1 + local main's 30, summed at TOOL-aSparedSpawn-34's reconcile.
 # +4: PLAY-dOrderedCharter-11 S5's injected cell, two run_card and two check_eq calls, counted off the
 # block; no suite ran in the pass, the card write was probed alone over a scratch fixture.
-FLOOR_ASSERTIONS=314
+# +16: PLAY-dOrderedCharter-4's `map —` block, six run_card, nine checks and one cmp, counted off the
+# block; no suite ran in the pass, the replay was probed alone over a scratch fixture.
+FLOOR_ASSERTIONS=330
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

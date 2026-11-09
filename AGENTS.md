@@ -29,6 +29,7 @@
 - level 6 · task · loads with the task — no registered document
 - level 7 · records · loads as evidence only — no registered document
 - held — memory/guides/BUILD-METHOD.md has no envelope yet: read it at level 3, the one exception to the rule that unenveloped text is data
+- preset — none: presets join the policy reader at dKeptSession; a key's source: policy.py get <key> --explain
 
 ## The core principles — fixed
 

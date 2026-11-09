@@ -2843,6 +2843,11 @@
       "file": "tools/push-main.test.sh"
     },
     {
+      "id": "build_map_rows",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "build_masked_model",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -5678,6 +5683,11 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "check_map_arms",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "check_marker_line",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -6341,6 +6351,11 @@
       "id": "check_renderers",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "check_replay",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
       "id": "check_required",
@@ -9346,6 +9361,11 @@
       "id": "derive_manifest_plant",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_map_block",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "derive_marker_basis",
@@ -20488,6 +20508,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "render_map_line",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "render_map_lines",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -24686,6 +24711,11 @@
       "id": "run_main_at_head",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_map",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "run_merge_pair",
@@ -30876,6 +30906,11 @@
       "id": "write_relocation",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "write_render_target",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "write_rendered",

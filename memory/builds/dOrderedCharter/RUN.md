@@ -369,3 +369,9 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-08T23:23:14Z dispatch · item 6ff4f227 PLAY-dOrderedCharter-5 · reason memory/builds/dOrderedCharter/build/2026-11-09-build-PLAY-dOrderedCharter-5-deviation-53.md memory/builds/dOrderedCharter/build/2026-11-09-build-PLAY-dOrderedCharter-5-deviation-54.md
 
 2026-11-08T23:34:12Z dispatch · item 6ff4f227 PLAY-dOrderedCharter-5 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-09T00:13:57Z dispatch · item 5edd24e7 PLAY-dOrderedCharter-4 · reason tools/playbook/instruction_units.py tools/playbook/render_playbook.py tools/playbook/README.md skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh AGENTS.md .governance/instructions.lock help/charter.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-4.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-4-ledger.md memory/builds/dOrderedCharter/README.md
+
+2026-11-09T00:14:04Z brief · item PLAY-dOrderedCharter-4 · reason b978bd86852e memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-4-build-brief.md
+
+2026-11-09T00:32:20Z dispatch · item 5edd24e7 PLAY-dOrderedCharter-4 · reason tools/playbook/instruction_units.py tools/playbook/render_playbook.py tools/playbook/README.md skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh AGENTS.md .governance/instructions.lock help/charter.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-4.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-4-ledger.md memory/builds/dOrderedCharter/README.md memory/builds/dOrderedCharter/build/2026-11-09-build-PLAY-dOrderedCharter-4-deviation-703.md

@@ -1612,30 +1612,41 @@ PRACTICE_REFUSALS = (('a tag outside its shape', 'practice.One', 'tag = "practic
                       '"practice.none"]'))
 
 
+def write_render_target(td: Path, table=PRACTICE_TABLE, kits='["roles"]', tail='', tpl=PRACTICE_TEMPLATE,
+                        policy=None, branch='main', files=None) -> tuple[Path, Path]:
+    """-> (engine, target) of one fixture target under `td` committed on `branch`, `files` a map of further
+    target-relative paths to their text (PLAY-dOrderedCharter-1, -2, -4)."""
+    eng, tgt = td / 'engine', td / 'target'
+    eng.mkdir()
+    (tgt / '.governance').mkdir(parents=True)
+    (eng / 'practices.toml').write_text(table, encoding='utf-8')
+    (eng / 'playbook.kit.toml').write_text(
+        '[[placeholder]]\nkey = "ANSWER"\nclass = "defaulted"\ndefault = "x"\n\n'
+        '[[block]]\nname = "cross-os"\n', encoding='utf-8')
+    (eng / 'registry.toml').write_text('[[entry]]\nid = "roles"\n\n[[entry]]\nid = "lexicon"\n',
+                                       encoding='utf-8')
+    (tgt / 'TPL.md').write_text(tpl, encoding='utf-8')
+    (tgt / '.governance' / 'deploy.toml').write_text(
+        f'kits = {kits}\n{tail}\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
+    if policy is not None:
+        (tgt / '.governance' / 'policy.toml').write_text(policy, encoding='utf-8')
+    for rel, text in (files or {}).items():
+        (tgt / rel).parent.mkdir(parents=True, exist_ok=True)
+        (tgt / rel).write_text(text, encoding='utf-8')
+    read_git(tgt, 'init', '-q', '-b', branch)
+    read_git(tgt, 'add', '-A')
+    read_git(tgt, '-c', 'user.name=fx', '-c', 'user.email=fx@example.invalid', '-c', 'commit.gpgsign=false',
+             'commit', '-qm', 'fixture')
+    return eng, tgt
+
+
 def render_target(table=PRACTICE_TABLE, kits='["roles"]', tail='', tpl=PRACTICE_TEMPLATE, policy=None,
                   branch='main') -> tuple[str, list, str | None]:
     """-> (body, notes, refusal or None) of one fixture target committed on `branch`, the selftest's policy
     arms' one fixture (PLAY-dOrderedCharter-1, -2)."""
     import tempfile
     with tempfile.TemporaryDirectory() as td:
-        eng, tgt = Path(td) / 'engine', Path(td) / 'target'
-        eng.mkdir()
-        (tgt / '.governance').mkdir(parents=True)
-        (eng / 'practices.toml').write_text(table, encoding='utf-8')
-        (eng / 'playbook.kit.toml').write_text(
-            '[[placeholder]]\nkey = "ANSWER"\nclass = "defaulted"\ndefault = "x"\n\n'
-            '[[block]]\nname = "cross-os"\n', encoding='utf-8')
-        (eng / 'registry.toml').write_text('[[entry]]\nid = "roles"\n\n[[entry]]\nid = "lexicon"\n',
-                                           encoding='utf-8')
-        (tgt / 'TPL.md').write_text(tpl, encoding='utf-8')
-        (tgt / '.governance' / 'deploy.toml').write_text(
-            f'kits = {kits}\n{tail}\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
-        if policy is not None:
-            (tgt / '.governance' / 'policy.toml').write_text(policy, encoding='utf-8')
-        read_git(tgt, 'init', '-q', '-b', branch)
-        read_git(tgt, 'add', '-A')
-        read_git(tgt, '-c', 'user.name=fx', '-c', 'user.email=fx@example.invalid', '-c', 'commit.gpgsign=false',
-                 'commit', '-qm', 'fixture')
+        eng, tgt = write_render_target(Path(td), table, kits, tail, tpl, policy, branch)
         try:
             return (*render(eng, Path(td), tgt), None)
         except Refusal as e:
@@ -1743,6 +1754,62 @@ def check_override_arms(check_arm) -> None:
     finally:
         if was is not None:
             os.environ['GOV_DEFAULT_BRANCH'] = was
+
+
+MAP_TEMPLATE = f'<!-- governance-template: v{TEMPLATE_MAJOR}.0 -->\n\n{{{{INSTRUCTION_MAP}}}}\n'
+
+
+def build_map_rows(*rows) -> str:
+    """`[[document]]` rows of `(path, level, hold or None)`, the map arms' registry."""
+    return ''.join(f'[[document]]\ntag = "doc.fx{n}"\npath = "{p}"\nlevel = {lv}\ndirection = "A fixture row"\n'
+                   f'source = "{p}"\n' + (f'hold = "{h}"\n' if h else '') + '\n' for n, (p, lv, h) in enumerate(rows))
+
+
+def check_map_arms(check_arm) -> None:
+    """PLAY-dOrderedCharter-4 AC1, AC2: `instruction_units.run_map`, the `map` verb, over a two-row registry
+    beside the charter's map section rendered from it; a level line planted past MAP_LINE_BYTES, cut; and
+    held rows planted past MAP_CAP_BYTES, refused whole. The registry is laid out by derive_kit_rel."""
+    import tempfile
+    iu = load_units_module()
+    reg = iu.derive_kit_rel(iu.DOCUMENTS)
+    two = build_map_rows(('AGENTS.md', 0, None), ('roles/a.md', 5, None)).replace('doc.fx0', 'doc.charter')
+    with tempfile.TemporaryDirectory() as td:
+        eng, tgt = write_render_target(Path(td), tpl=MAP_TEMPLATE, files={reg: two})
+        lines, rc = iu.run_map(tgt)
+        try:
+            body, _n = render(eng, Path(td), tgt)
+        except Refusal as e:
+            body = f'refused: {e}'
+    said = f'exit {rc}: {lines!r} · charter {body!r}'
+    section = [ln[2:] for ln in body.splitlines() if ln.startswith('- ')]
+    check_arm(rc == 0 and len(lines) == len(iu.LEVELS) + 3 and lines[0].startswith('[AGENTS.md · Level 0 · ')
+              and lines[-1] == '[/AGENTS.md]' and lines[1:-1] == section,
+              'the map verb prints the charter section\'s lines in the charter\'s envelope', said)
+    check_arm(lines[-2:-1] == [f'preset — {iu.PRESET_LINE_PENDING}'] and 'policy.py get <key> --explain' in lines[-2],
+              'the map\'s last line is the preset line, pointing at get --explain', said)
+    long = [(f'runbooks/a-long-runbook-document-number-{n}.md', 4, None) for n in range(6)]
+    many = [(f'guides/a-long-held-guide-document-number-{n}.md', 3, f'PLAY-fx-{n} F1') for n in range(9)]
+    for rows, what in ((long, 'cut'), (long + many, 'over')):
+        with tempfile.TemporaryDirectory() as td:
+            _e, tgt = write_render_target(Path(td), files={reg: build_map_rows(('AGENTS.md', 0, None), *rows)
+                                                         .replace('doc.fx0', 'doc.charter')})
+            lines, rc = iu.run_map(tgt)
+        said = f'exit {rc}: {lines!r}'
+        if what == 'cut':
+            l4 = [ln for ln in lines if ln.startswith('level 4 ')]
+            check_arm(rc == 0 and len(l4) == 1 and re.search(r' … \(\+\d+\)$', l4[0]) is not None
+                      and len(l4[0].encode('utf-8')) <= iu.MAP_LINE_BYTES,
+                      'a level line past MAP_LINE_BYTES is cut, its dropped documents counted', said)
+        else:
+            check_arm(rc == 2 and len(lines) == 1 and re.fullmatch(r'instruction-map: \d+ over MAP_CAP_BYTES', lines[0])
+                      is not None, 'a map past MAP_CAP_BYTES refuses with one line and no map', said)
+    for files, want, what in (({reg: build_map_rows(('roles/a.md', 5, None))}, 'holds no doc.charter row',
+                               'a registry with no doc.charter row'), ({}, 'does not read', 'no registry')):
+        with tempfile.TemporaryDirectory() as td:
+            _e, tgt = write_render_target(Path(td), files=files)
+            lines, rc = iu.run_map(tgt)
+        check_arm(rc == 2 and len(lines) == 1 and lines[0].startswith('instruction-map: ') and want in lines[0],
+                  f'{what} refuses the map at exit 2 with one line', f'exit {rc}: {lines!r}')
 
 
 def run_selftest() -> int:
@@ -2435,6 +2502,7 @@ def run_selftest() -> int:
     check_scope_arms(check_arm)
     check_practice_arms(check_arm)
     check_override_arms(check_arm)
+    check_map_arms(check_arm)
 
     if failed:
         print(f'render_playbook.selftest FAILED — {failed} of {passed + failed} arm(s)')
