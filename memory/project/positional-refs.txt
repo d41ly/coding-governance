@@ -25495,10 +25495,6 @@ memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-36.md	to
 memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-36.md	tools/memory-tree/deviation_join.py:150
 memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-36.md	tools/roles/roles_lib.py:373
 memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-37.md	entries/playbook.kit.toml:251-255
-memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-37.md	tools/drift-audit/drift_report.py:781
-memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-37.md	tools/govkit/entries/playbook.kit.toml:251-255
-memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-37.md	tools/playbook/render_playbook.py:78-79
-memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-37.md	tools/playbook/render_playbook.py:979-1051
 memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-4.md	skills/session-kickoff/manifest-check.sh:703-718
 memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-4.md	skills/session-kickoff/manifest-check.sh:721-725
 memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-4.md	tools/check-wiring.sh:1044
