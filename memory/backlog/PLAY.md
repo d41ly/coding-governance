@@ -39,5 +39,5 @@ Cite ids, never line numbers.
 | [PLAY-dClosedLoop-37](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | A SPEC RUN'S CLOSE OWES TWO STEPS THE CLOSE SECTION DOES NOT STATE. A… |
 | [PLAY-dClosedLoop-38](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE PACKET OWNS NO TRANSPORT POINT. cl-dClosedLoop-0333 names a lease… |
 | [PLAY-dConvergedCharter-24](../builds/dConvergedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
-| [PLAY-dOrderedCharter-38](../builds/dOrderedCharter/BACKLOG.md) | DEFERRED | MED | PLAY-dOrderedCharter-14 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [PLAY-dOrderedCharter-38](../builds/dOrderedCharter/BACKLOG.md) | DEFERRED | MED | PLAY-dOrderedCharter-23 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [PLAY-dOrderedCharter-66](../builds/dOrderedCharter/BACKLOG.md) | OPEN | MED | — | 2026-11-04 | BUILD-METHOD HOLDS NO ENVELOPE. PLAY-dOrderedCharter-3's interim keeps… |

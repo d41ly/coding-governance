@@ -944,6 +944,11 @@ _NOT_A_PATH = set("<>{}*?$|\"'\\")
 _LINE_SUFFIX = re.compile(r":\d+$")
 
 
+# >>> auto_memory -- canonical copy: auto_memory.py in the gov lib dir (byte-identical; gated)
+#: the harness's location of a project's auto-memory; one constant, so a layout change is one edit
+AUTO_MEMORY_TEMPLATE = "~/.claude/projects/{checkout}/memory"
+
+
 def resolve_auto_memory_dir(root: pathlib.Path, declared: str) -> pathlib.Path | None:
     """Expand an AUTO_MEMORY_DIR declaration; None when it is blank (NOT ASKED).
 
@@ -964,6 +969,7 @@ def resolve_auto_memory_dir(root: pathlib.Path, declared: str) -> pathlib.Path |
             key = re.sub(r"[^A-Za-z0-9-]", "-", str(pathlib.Path(common).parent))
             declared = declared.replace("{checkout}", key)
     return root / pathlib.Path(declared).expanduser()
+# <<< auto_memory
 
 
 def signal_dangling_pointers(ctx) -> dict:

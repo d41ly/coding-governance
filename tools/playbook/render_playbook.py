@@ -1812,6 +1812,101 @@ def check_map_arms(check_arm) -> None:
                   f'{what} refuses the map at exit 2 with one line', f'exit {rc}: {lines!r}')
 
 
+def write_memory_fixture(td: Path, policy=None) -> tuple:
+    """-> (memory_index, target, home, memory dir) of PLAY-dOrderedCharter-14's fixture: a target committed on
+    `main`, and under a scratch home an index of 9000 bytes linking three entries, two of them `type: feedback`
+    (the second under `metadata:`, carrying `promoted-to:`) and one `type: project`."""
+    import memory_index as mi
+    _e, tgt = write_render_target(td, policy=policy)
+    home = td / 'home'
+    d = mi.derive_index_dir(tgt, home)
+    d.mkdir(parents=True)
+    entries = {'fx-rule': 'name: fx-rule\ndescription: "MUST keep the fixture rule"\ntype: feedback\n',
+               'fx-done': 'name: fx-done\ndescription: a promoted rule\nmetadata:\n  type: feedback\npromoted-to: repo.done\n',
+               'fx-fact': 'name: fx-fact\ndescription: a project fact\ntype: project\n'}
+    for name, head in entries.items():
+        (d / f'{name}.md').write_text(f'---\n{head}---\nbody\n', encoding='utf-8', newline='')
+    links = ''.join(f'- [{n}]({n}.md) — an entry\n' for n in entries)
+    (d / 'MEMORY.md').write_text(links + 'x' * (9000 - len(links.encode('utf-8')) - 1) + '\n', encoding='utf-8', newline='')
+    return mi, tgt, home, d
+
+
+def check_memory_arms(check_arm) -> None:
+    """PLAY-dOrderedCharter-14 AC2, AC3, AC6, AC7: `memory_index` over write_memory_fixture's index: the measure
+    over and within its budget, and a committed budget the policy row refuses; the directives, a link planted
+    outside the memory directory skipped and named; a promotion through a stub that refuses and one that
+    succeeds; and four refused inputs that call no command. Where no policy kit answers, the budget arms
+    print `unarmed`."""
+    import tempfile
+    was = os.environ.pop('GOV_DEFAULT_BRANCH', None)
+    try:
+        try:
+            resolve_kit_dir('policy', 'policy.py', Path(__file__).resolve().parent)
+            armed = True
+        except LookupError as exc:
+            print(f'  unarmed: the memory measure reads its budget through a policy kit, and {exc}')
+            armed = False
+        with tempfile.TemporaryDirectory() as td:
+            mi, tgt, home, d = write_memory_fixture(Path(td))
+            if armed:
+                line = mi.render_memory_line(mi.measure_index(tgt, home))
+                check_arm('9000 B over its 8000 B budget' in line and '1 standing directives unpromoted' in line
+                          and len(line.encode('utf-8')) <= mi.LINE_MAX,
+                          'the measure counts the one unpromoted feedback entry against the 8000 B default', line)
+                (d / 'MEMORY.md').write_bytes((d / 'MEMORY.md').read_bytes()[:3999] + b'\n')
+                line = mi.render_memory_line(mi.measure_index(tgt, home))
+                check_arm('4000 B within its 8000 B budget' in line, 'an index cut to 4000 B reads within its budget',
+                          line)
+            lines, rc = mi.run_directives(tgt, home)
+            check_arm(rc == 0 and lines[:-1] == ['fx-rule — MUST keep the fixture rule'],
+                      'directives prints the one unpromoted feedback entry, its name then its description',
+                      f'exit {rc}: {lines!r}')
+            (d.parent / 'outside.md').write_text('---\nname: outside\ntype: feedback\n---\n', encoding='utf-8')
+            with open(d / 'MEMORY.md', 'a', encoding='utf-8', newline='') as fh:
+                fh.write('- [outside](../outside.md) — planted\n')
+            lines, rc = mi.run_directives(tgt, home)
+            check_arm(rc == 0 and lines[:-1] == ['fx-rule — MUST keep the fixture rule']
+                      and '1 links outside the memory directory skipped: ../outside.md' in lines[-1],
+                      'a link outside the memory directory is skipped and named in the count line',
+                      f'exit {rc}: {lines!r}')
+            log = Path(td) / 'calls.log'
+            stubs = {}
+            for rc_want, said in ((1, 'instructions-edit: refused · a stub refusal'), (0, 'instructions-edit: wrote')):
+                stubs[rc_want] = Path(td) / f'stub{rc_want}.py'
+                stubs[rc_want].write_text(f'import sys\nopen({str(log)!r}, "a", encoding="utf-8").write(" ".join(sys.argv[1:]) + "\\n")\n'
+                                          f'print({said!r})\nsys.exit({rc_want})\n', encoding='utf-8')
+            for level, tag, name, what in (('1', 'repo.fixture-rule', 'fx-rule', '--level 1'),
+                                           ('9', 'repo.fixture-rule', 'fx-rule', '--level 9'),
+                                           ('3', 'repo.fixture-rule', 'fx-none', "'fx-none'"),
+                                           ('3', 'practice.repo.x', 'fx-rule', 'practice.repo.x')):
+                lines, rc = mi.run_promote(tgt, name, level, tag, home, command=stubs[0])
+                check_arm(rc == 2 and what in lines[0] and not log.exists(),
+                          f'promote refuses {what} at exit 2 and calls no command', f'exit {rc}: {lines!r}')
+            entry = d / 'fx-rule.md'
+            before = entry.read_bytes()
+            lines, rc = mi.run_promote(tgt, 'fx-rule', '3', 'repo.fixture-rule', home, command=stubs[1])
+            check_arm(rc == 1 and 'tag = "repo.fixture-rule"' in lines and 'type = "directive"' in lines
+                      and 'instructions-edit: refused · a stub refusal' in lines and entry.read_bytes() == before
+                      and '--promoted-from auto-memory fx-rule' in log.read_text(encoding='utf-8'),
+                      'a refused promotion prints the row and the refusal, exits 1 and leaves the entry\'s bytes',
+                      f'exit {rc}: {lines!r}')
+            lines, rc = mi.run_promote(tgt, 'fx-rule', '3', 'repo.fixture-rule', home, command=stubs[0])
+            text = entry.read_text(encoding='utf-8')
+            check_arm(rc == 0 and text.count('promoted-to: repo.fixture-rule\n') == 1
+                      and not mi.scan_directives(tgt, home)['directives'],
+                      'a promotion the command takes marks the entry once and the scan no longer counts it',
+                      f'exit {rc}: {lines!r} · {text!r}')
+        if armed:
+            with tempfile.TemporaryDirectory() as td:
+                mi, tgt, home, _d = write_memory_fixture(Path(td), policy='memory.load-budget = "9k"\n')
+                line = mi.render_memory_line(mi.measure_index(tgt, home))
+            check_arm(line.startswith('memory — skipped: ') and 'memory.load-budget' in line,
+                      'a committed budget the row refuses is one skipped: line, compared against nothing', line)
+    finally:
+        if was is not None:
+            os.environ['GOV_DEFAULT_BRANCH'] = was
+
+
 def run_selftest() -> int:
     import tempfile
     passed, failed = 0, 0
@@ -2503,6 +2598,7 @@ def run_selftest() -> int:
     check_practice_arms(check_arm)
     check_override_arms(check_arm)
     check_map_arms(check_arm)
+    check_memory_arms(check_arm)
 
     if failed:
         print(f'render_playbook.selftest FAILED — {failed} of {passed + failed} arm(s)')

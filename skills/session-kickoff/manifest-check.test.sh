@@ -1260,6 +1260,32 @@ check_eq "injected cell: the breach line is appended to the stored card" "1" "$(
 CARD_INJECTED_CAPS="agent-list=5000" run_card "injected cell: a cap above it writes the card" "$R" 0 - --card --write --session "$NONCE-t78b"
 check_eq "injected cell: no breach line under the cap" "0" "$(grep -c '^injected — ' "$R/.git/orientation/$NONCE-t78b.md")"
 
+# PLAY-dOrderedCharter-14 AC4, AC5 — the `memory —` cell: gov's playbook `memory_index.py` and its policy
+# reader, found as the checker finds every sibling and copied beside the fixture's root, over a scratch
+# HOME holding an index where the module's own `derive_index_dir` puts it, so the card spells no project
+# key. No module, no memory directory, and a stub past a one-second bound are each one `memory — skipped:`
+# line at exit 0. Staged red by moving the `derive_memory_line` call after `derive_claims_line`.
+mkrepo memnone
+run_card "memory cell: no playbook module is a skipped: line at exit 0" "$R" 0 "memory — skipped: no playbook memory_index.py resolves in this tree" --card --write --session "$NONCE-t80a"
+mkrepo memcell; mm_home="$TMP/memhome"; mkdir -p "$R/playbook" "$mm_home"
+mm_src=$(ROOT="$GOVROOT" MC_DIR="$(dirname "$CHECK")" resolve_kit_file playbook memory_index.py)
+{ cp "$mm_src" "$R/playbook/memory_index.py" && cp "$(dirname "$mm_src")/policy_value.py" "$R/playbook/policy_value.py"; } \
+  || { echo "FAIL memory cell: no memory_index.py resolves from $GOVROOT"; fail=$((fail+1)); }
+commit_all "$R" "the index measure and its policy reader"
+mm_dir=$("$MC_PY" -c 'import pathlib, sys; sys.path.insert(0, sys.argv[1]); import memory_index as m; print(m.derive_index_dir(sys.argv[2], sys.argv[3]).as_posix())' "$R/playbook" "$R" "$mm_home" | tr -d '\r')
+mkdir -p "$mm_dir" && printf -- '- [a rule](a-rule.md) — one rule\n' > "$mm_dir/MEMORY.md"
+printf -- '---\nname: a-rule\ndescription: one rule\ntype: feedback\n---\nbody\n' > "$mm_dir/a-rule.md"
+HOME="$mm_home" run_card "memory cell: --card --write over a HOME holding an index" "$R" 0 - --card --write --session "$NONCE-t80b"
+check_eq "memory cell: one line, which reached the index and read its budget" "1|memory.load-budget" \
+  "$(grep -c '^memory — ' "$R/.git/orientation/$NONCE-t80b.md")|$(grep -m1 '^memory — ' "$R/.git/orientation/$NONCE-t80b.md" | grep -o 'memory\.load-budget' | head -1)"
+check_eq "memory cell: sits after live — and before claims —" "live memory claims" \
+  "$(grep -oE '^(live|memory|claims) — ' "$R/.git/orientation/$NONCE-t80b.md" | cut -d' ' -f1 | tr '\n' ' ' | sed 's/ $//')"
+HOME="$TMP/memempty" run_card "memory cell: no memory directory is a skipped: line at exit 0" "$R" 0 "memory — skipped: no auto-memory index at" --card --write --session "$NONCE-t80c"
+printf 'import time\ntime.sleep(5)\n' > "$R/playbook/memory_index.py"
+export CARD_MEMORY_BOUND=1
+run_card "memory cell: a measure past the bound is a skipped: line at exit 0" "$R" 0 "memory — skipped: the measure did not answer within 1s" --card --write --session "$NONCE-t80d"
+unset CARD_MEMORY_BOUND
+
 # TOOL-aSparedSpawn-11 S6, AC9 — a card write OUTSIDE the `cli —` block starts no `claude`. A stub that
 # appends to a log stands first on PATH for one write; the log must not exist after it. Staged red by
 # deleting the prologue's `unset AI_AGENT`, which this arm can observe only when the runner set
@@ -2118,7 +2144,9 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # block; no suite ran in the pass, the card write was probed alone over a scratch fixture.
 # +16: PLAY-dOrderedCharter-4's `map —` block, six run_card, nine checks and one cmp, counted off the
 # block; no suite ran in the pass, the replay was probed alone over a scratch fixture.
-FLOOR_ASSERTIONS=330
+# +7: PLAY-dOrderedCharter-14's `memory —` cell, five run_card and two check_eq calls, counted off the
+# block; no suite ran in the pass, the card write was probed alone over a scratch fixture.
+FLOOR_ASSERTIONS=337
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

@@ -2983,6 +2983,11 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "build_parser",
+      "kind": "function",
+      "file": "tools/playbook/memory_index.py"
+    },
+    {
       "id": "build_partition",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
@@ -5728,6 +5733,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "check_memory_arms",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "check_merge_arm",
       "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
@@ -8418,6 +8428,11 @@
       "file": "tools/playbook/gov_tag.py"
     },
     {
+      "id": "derive_byte_cut",
+      "kind": "function",
+      "file": "tools/playbook/memory_index.py"
+    },
+    {
       "id": "derive_cache_key",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -9038,6 +9053,11 @@
       "file": "tools/memory-tree/import_walk.py"
     },
     {
+      "id": "derive_index_dir",
+      "kind": "function",
+      "file": "tools/playbook/memory_index.py"
+    },
+    {
       "id": "derive_index_repair",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -9416,6 +9436,11 @@
       "id": "derive_memory_disciplines",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_memory_line",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "derive_memory_root",
@@ -10266,6 +10291,11 @@
       "id": "derive_table_fault",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.test.sh"
+    },
+    {
+      "id": "derive_tag_fault",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "derive_tag_reds",
@@ -12890,6 +12920,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/playbook/memory_index.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/playbook/positional.py"
     },
     {
@@ -13256,6 +13291,11 @@
       "id": "measure_hook_entries",
       "kind": "function",
       "file": "tools/process-monitor/adopt-process-monitor.sh"
+    },
+    {
+      "id": "measure_index",
+      "kind": "function",
+      "file": "tools/playbook/memory_index.py"
     },
     {
       "id": "measure_injected",
@@ -16626,6 +16666,11 @@
       "id": "read_front_matter",
       "kind": "function",
       "file": "tools/playbook/core.py"
+    },
+    {
+      "id": "read_front_matter",
+      "kind": "function",
+      "file": "tools/playbook/memory_index.py"
     },
     {
       "id": "read_function_bodies",
@@ -20593,6 +20638,11 @@
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
+      "id": "render_memory_line",
+      "kind": "function",
+      "file": "tools/playbook/memory_index.py"
+    },
+    {
       "id": "render_mirror",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -21371,6 +21421,16 @@
       "id": "resolve_auto_memory_dir",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "resolve_auto_memory_dir",
+      "kind": "function",
+      "file": "tools/lib/auto_memory.py"
+    },
+    {
+      "id": "resolve_auto_memory_dir",
+      "kind": "function",
+      "file": "tools/playbook/memory_index.py"
     },
     {
       "id": "resolve_backend",
@@ -23068,6 +23128,11 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "resolve_root",
+      "kind": "function",
+      "file": "tools/playbook/memory_index.py"
+    },
+    {
       "id": "resolve_row_docs",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -24021,6 +24086,11 @@
       "id": "run_detached",
       "kind": "function",
       "file": "tools/unattended/resume-tick.sh"
+    },
+    {
+      "id": "run_directives",
+      "kind": "function",
+      "file": "tools/playbook/memory_index.py"
     },
     {
       "id": "run_dispatch_gap",
@@ -25068,6 +25138,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "run_promote",
+      "kind": "function",
+      "file": "tools/playbook/memory_index.py"
+    },
+    {
       "id": "run_propose",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -26071,6 +26146,11 @@
       "id": "scan_descendants",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "scan_directives",
+      "kind": "function",
+      "file": "tools/playbook/memory_index.py"
     },
     {
       "id": "scan_dirty_paths",
@@ -30703,6 +30783,11 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "write_memory_fixture",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "write_merge_driver",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -30866,6 +30951,11 @@
       "id": "write_proc_record",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_promoted_to",
+      "kind": "function",
+      "file": "tools/playbook/memory_index.py"
     },
     {
       "id": "write_prose_scenario",

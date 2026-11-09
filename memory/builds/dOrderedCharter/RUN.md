@@ -383,3 +383,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-09T01:21:49Z dispatch · item 829d257b PLAY-dOrderedCharter-8 · reason memory/builds/dOrderedCharter/build/2026-11-09-build-PLAY-dOrderedCharter-8-deviation-83.md
 
 2026-11-09T01:33:01Z dispatch · item 829d257b PLAY-dOrderedCharter-8 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-09T02:03:40Z dispatch · item 82758bae PLAY-dOrderedCharter-14 · reason tools/lib/auto_memory.py tools/playbook/memory_index.py tools/drift-audit/drift_report.py tools/lib/resolve-python.test.sh skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh tools/playbook/render_playbook.py tools/playbook/tag_index.py memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-14.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-14-ledger.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/map/generated/inventories.json memory/map/generated/MAP.md memory/map/generated/CARDS.md
+
+2026-11-09T02:04:07Z brief · item PLAY-dOrderedCharter-14 · reason 0b8afb26f2df memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-14-build-brief.md

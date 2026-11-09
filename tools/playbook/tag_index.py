@@ -995,6 +995,23 @@ def check_owned(con, ctx, layers_path) -> list:
     return reds
 
 
+def derive_tag_fault(head: str, words) -> str | None:
+    """S3's rule for one tag `head`, no `#<seg>`, against the registry's namespace `words`: the rule it
+    breaks, or None. The shape check and the memory index's promotion both grade through it."""
+    ns, _, rest = head.partition(".")
+    segs = rest.split(".") if rest else []
+    bad = next((s for s in segs if not SEG_RE.fullmatch(s)), None)
+    if ns not in words:
+        return f"namespace '{ns}' is not registered"
+    if not segs or bad is not None:
+        return f"segment '{bad or ''}' is outside {SEG}"
+    if len(head.encode("utf-8")) > TAG_MAX_BYTES:
+        return f"over {TAG_MAX_BYTES} bytes ({len(head.encode('utf-8'))})"
+    if segs[0] in words:
+        return f"first segment '{segs[0]}' is a namespace word"
+    return None
+
+
 def check_tag_shape(con, ctx) -> tuple[list, list]:
     """S3, the shape check, over every defining row and every unit row's selector value: each graded
     before any `#<seg>`, against the registry's words, a word outside `seg` a red naming its row and
@@ -1005,18 +1022,7 @@ def check_tag_shape(con, ctx) -> tuple[list, list]:
     graded = []
     for tag, path, line, *_ in read_rows(con, DEFINE_KINDS + ("selector",)):
         head = tag.split("#")[0]
-        ns, _, rest = head.partition(".")
-        segs = rest.split(".") if rest else []
-        bad = next((s for s in segs if not SEG_RE.fullmatch(s)), None)
-        reason = None
-        if ns not in words:
-            reason = f"namespace '{ns}' is not registered"
-        elif not segs or bad is not None:
-            reason = f"segment '{bad or ''}' is outside {SEG}"
-        elif len(head.encode("utf-8")) > TAG_MAX_BYTES:
-            reason = f"over {TAG_MAX_BYTES} bytes ({len(head.encode('utf-8'))})"
-        elif segs[0] in words:
-            reason = f"first segment '{segs[0]}' is a namespace word"
+        reason = derive_tag_fault(head, words)
         if reason:
             reds.append(f"tags: {path}:{line} · shape · {head} · {reason}")
         graded.append(head)

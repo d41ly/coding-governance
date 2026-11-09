@@ -227,6 +227,9 @@ CARD_MAP_BOUND=${CARD_MAP_BOUND:-5}
 # The `cli —` cell's bound on `claude --version`, in seconds (KICK-aMendedFleet-4); the env override
 # exists for the self-test's slow-stub arm and is not an adopter knob.
 CARD_CLI_BOUND=${CARD_CLI_BOUND:-5}
+# The `memory —` cell's bound on the playbook kit's index measure, in seconds (PLAY-dOrderedCharter-14);
+# the env override exists for the self-test's slow-stub arm and is not an adopter knob.
+CARD_MEMORY_BOUND=${CARD_MEMORY_BOUND:-5}
 # The `claims —` cell's three constants (TOOL-aGraftedHelix-2): the read's bound in seconds, the
 # second clock's hide age, and the row cap. The bound's env override exists for the self-test's
 # slow-driver arm, as CARD_CAP_BYTES's does; none of the three is an adopter knob.
@@ -511,7 +514,7 @@ derive_drift_line() {
 # `drift —` cell and before `live —`, is `derive_overlaps_line`: the unattended driver's
 # `--overlaps`, which reads local remote-tracking refs and never the network. The `claims —` cell,
 # after `live —`, is `derive_claims_line`, and the `health —` cell after it, above `recent —`, is
-# `render_health_cell`.
+# `render_health_cell`. The `memory —` cell, between `live —` and `claims —`, is `derive_memory_line`.
 derive_head_state() {   # → HEAD_BRANCH HEAD_SHA HEAD_DIRTY, read once by the card and once by the `now —` line
   local n
   HEAD_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null) || HEAD_BRANCH=HEAD
@@ -553,6 +556,7 @@ render_card() {
   derive_drift_line
   derive_overlaps_line
   printf '%s\n' "$live"
+  derive_memory_line
   derive_claims_line "$verb"
   render_health_cell
   printf 'recent —\n'
@@ -599,6 +603,38 @@ derive_overlaps_line() {
         END { if (f == "") f = "--overlaps exited " rc " and printed nothing"
               if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
               print "overlaps — skipped: " f }' "$sf" ;;
+  esac
+  rm -f "$sf" 2>/dev/null
+  return 0
+}
+
+# The `memory —` cell (PLAY-dOrderedCharter-14): the harness's auto-memory index measured against
+# `memory.load-budget` and its standing directives counted, by the playbook kit's `memory_index.py
+# measure`, found as every sibling is by `resolve_kit_file` and bounded as the `overlaps —` cell bounds
+# its read: a kill into a scratch file under the card dir, never a `$( )` capture, stdin /dev/null. The
+# measure derives the index's place itself, so this script spells no second project key; `--home` hands
+# it this shell's `~`. Its first line prints on exit 0, and every failure is one `memory — skipped:` line.
+# WHAT THIS DOES NOT CHECK: the line's figures, which are the measure's to derive and bound.
+derive_memory_line() {
+  local mi py sf rc
+  mi=$(resolve_kit_file playbook memory_index.py)
+  [ -n "$mi" ] || { printf 'memory — skipped: no playbook memory_index.py resolves in this tree\n'; return 0; }
+  py=$(resolve_python 2>/dev/null) || { printf 'memory — skipped: no Python resolves on this node\n'; return 0; }
+  timeout -k 1 5 true </dev/null >/dev/null 2>&1 \
+    || { printf 'memory — skipped: this node has no working timeout -k, so the read would be unbounded and none ran\n'; return 0; }
+  sf=$(mkdir -p "$CARD_DIR" && mktemp "$CARD_DIR/.memory.XXXXXX") \
+    || { printf 'memory — skipped: no scratch file under %s to capture the measure in\n' "$CARD_DIR"; return 0; }
+  timeout -k 2 "$CARD_MEMORY_BOUND" "$py" "$mi" measure ${HOME:+--home "$HOME"} </dev/null >"$sf" 2>/dev/null; rc=$?
+  case "$rc" in
+    0) LC_ALL=C awk '{ sub(/\r$/, "") } NR == 1 { print; f = 1 }
+         END { if (!f) print "memory — skipped: the measure exited 0 and printed nothing" }' "$sf" ;;
+    124|137) printf 'memory — skipped: the measure did not answer within %ss\n' "$CARD_MEMORY_BOUND" ;;
+    *)
+      LC_ALL=C awk -v rc="$rc" '{ sub(/\r$/, "") }
+        NF && f == "" { f = $0 }
+        END { if (f == "") f = "the measure exited " rc " and printed nothing"
+              if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
+              print "memory — skipped: " f }' "$sf" ;;
   esac
   rm -f "$sf" 2>/dev/null
   return 0

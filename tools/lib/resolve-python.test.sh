@@ -371,6 +371,7 @@ coverage_join|$ROOT/$KIT_REL/coverage_join.py|$KIT_REL/coverage_join
 common_git_dir|$ROOT/$KIT_REL/common_dir.py|$KIT_REL/common_dir
 render_envelope|$ROOT/$KIT_REL/envelope.py|$KIT_REL/envelope
 envelope_sh|$ROOT/$KIT_REL/envelope.sh|$KIT_REL/envelope
+auto_memory|$ROOT/$KIT_REL/auto_memory.py|$KIT_REL/auto_memory
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -410,6 +411,8 @@ envelope_sh|$ROOT/$KIT_REL/envelope.sh|$KIT_REL/envelope
 # envelope_sh (PLAY-dOrderedCharter-8 S8) is its shell twin, the card engine's copy, and part 2k below holds
 # the two canonicals to one byte form. Its stem is not `render_envelope_sh`: the copy grep matches a
 # stem by prefix, so the row above would read a block of that name as one of its own copies.
+# auto_memory (PLAY-dOrderedCharter-14 S1) is the harness's auto-memory location, its template and its
+# resolver: drift-audit's dangling-pointer signal and the playbook kit's index measure each carry it inline.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
