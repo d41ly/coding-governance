@@ -385,7 +385,10 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "bundle-rows-values", "bundle-inline", "bundle-mode-values", "bundle-unregistered-type",
           "bundle-dangling-target", "bundle-empty-sections", "unclosed-fence", "unclosed-record", "git-env",
           "toml-row", "dirty-rename", "charter-warm", "charter-dirty", "retired-section",
-          "retired-section-aliased", "retired-section-reminted")
+          "retired-section-aliased", "retired-section-reminted", "reference-row", "reference-no-h1")
+#: PLAY-dOrderedCharter-40's two plants: a fixture reference row, with its `h1` and without
+REFERENCE_ROW = ('[[reference]]\nregistry = "doc.reference.fixture"\nh1 = "The fixture\'s reference page"\n'
+                 'page = "help/reference/fixture.md"\n')
 #: PLAY-dOrderedCharter-70 S3's `toml-row`: a list naming a tag above the row that carries it
 TOML_ROWS = ('foundation = ["practice.b"]\n\n[[practice]]\ntag = "practice.a"\nline = "a"\n\n'
              '[[practice]]\ntag = "practice.b"\nline = "b"\n\n[practice.reach]\nbuild = "b"\n')
@@ -423,6 +426,10 @@ SHAPE_PLANTS = {
     "member-no-field": ("", {"memory/guides/BETA.md": "## Intro\n\nno title line\n"}),
     "pending-source": (derive_fixture_row("reader", "tag_index:extract_reader", "selects",
                                           purpose="{prefix}/playbook/readers.toml#why"), {}),
+    # PLAY-dOrderedCharter-40: a reference row's registry tag, graded by `doc`'s `#h1` on its own row
+    "reference-row": ("", {f"{FIXTURE_KIT}/references.toml": REFERENCE_ROW}),
+    "reference-no-h1": ("", {f"{FIXTURE_KIT}/references.toml": REFERENCE_ROW.replace(
+        'h1 = "The fixture\'s reference page"\n', "")}),
 }
 #: PLAY-dOrderedCharter-22's registry plants: each edits the base registry's first row, `doc`'s
 PURPOSE_PLANTS = {
@@ -431,6 +438,8 @@ PURPOSE_PLANTS = {
     "no-purpose-source": ('purpose-source = "AGENTS.md"', 'purpose-source = ""'),
     "bad-purpose-source": ('purpose-source = "AGENTS.md"', 'purpose-source = "AGENTS.md#practices"'),
     "member-no-field": ('purpose-source = "AGENTS.md"', 'purpose-source = "#h1"'),
+    "reference-row": ('purpose-source = "AGENTS.md"', 'purpose-source = "#h1"'),
+    "reference-no-h1": ('purpose-source = "AGENTS.md"', 'purpose-source = "#h1"'),
 }
 #: PLAY-dOrderedCharter-22's chain plants: the fixture design's two builds, and each plant's registry rows
 DESIGN_BUILDS = ("dFixtureOne", "dFixtureTwo")
@@ -878,6 +887,11 @@ def run_plant(root, top, plant, sets) -> int:
             half = "no tracked kit.toml"
         say(f"{half}: rc={run_verb(root, 'check', None, sets=sets)}")
         return rc
+    if plant == "reference-row":  # PLAY-dOrderedCharter-40: the registry tag resolves to its row, the arm green
+        rc = run_verb(root, "show", "doc.reference.fixture", sets=sets)
+        checked = run_verb(root, "check", None, sets=sets)
+        say(f"show: rc={rc}, check: rc={checked}")
+        return 1 if rc or checked else 0
     if plant in ("pending-source", "new-no-purpose"):  # PLAY-dOrderedCharter-22: the source lands, the row gains a purpose
         rc = run_verb(root, "check", None, sets=sets)
         if plant == "pending-source":

@@ -250,7 +250,12 @@ def extract_doc(ctx, path, text=None):
     """The `doc` namespace: the charter (`doc.charter`), each `<MEMORY_ROOT>/guides/*.md`, `HYGIENE.md`
     and `TEMPLATE-SPEC.md` (`doc.<stem lower-cased>`); each `##` heading a section `#<seg>`. The document
     registry beside this one adds each row whose tag no file of those derives, a class of files or a
-    Skill (PLAY-dOrderedCharter-3 S1)."""
+    Skill (PLAY-dOrderedCharter-3 S1). The reference declaration beside it adds each `[[reference]]` row's
+    `registry` that opens `doc.reference.`, declared at that row (PLAY-dOrderedCharter-40 S4)."""
+    if _read_kit_file(ctx, path, "references.toml"):
+        if text is None:
+            return ""
+        return [r for r in derive_tag_rows(text, "reference") if r[0].startswith("doc.reference.")]
     if _read_kit_file(ctx, path, "documents.toml"):
         if text is None:
             return ""
@@ -285,11 +290,14 @@ def extract_doc(ctx, path, text=None):
 UNIT_EXTRACTORS = ("instruction_units:extract_unit", "instruction_units:extract_repo")
 
 
-TOML_TAG_KEY = re.compile(r"^\s*tag\s*=")
+#: the one table-to-key map both TOML row readers read: a table absent here keys its rows on `tag`
+#: (PLAY-dOrderedCharter-40 S4, its section 8 F4)
+ROW_TAG_KEYS = {"reference": "registry"}
 
 
 def read_toml_tags(text, table):
-    """(value, line, end_line) for each `[[table]]` row's string `tag` in TOML `text`, unfiltered: the shape
+    """(value, line, end_line) for each `[[table]]` row's string tag in TOML `text`, read under the table's
+    ROW_TAG_KEYS key, else `tag`, unfiltered: the shape
     check, never the extractor, refuses a malformed value. The nth parsed row is the nth `[[table]]` header,
     `line` the first `tag =` key line inside its span and `end_line` the span's last non-blank line before the
     next `[` header (PLAY-dOrderedCharter-70 S3). Where the header count is not the row count, a header inside
@@ -299,18 +307,20 @@ def read_toml_tags(text, table):
     except tomllib.TOMLDecodeError:
         return []
     lines = text.splitlines()
+    key = ROW_TAG_KEYS.get(table, "tag")
+    key_line = re.compile(rf"^\s*{re.escape(key)}\s*=")
     heads = [i for i, ln in enumerate(lines, 1) if ln.strip() == f"[[{table}]]"]
     cuts = [i for i, ln in enumerate(lines, 1) if ln.lstrip().startswith("[")] + [len(lines) + 1]
     out = []
     for k, row in enumerate(rows):
-        val = row.get("tag") if isinstance(row, dict) else None
+        val = row.get(key) if isinstance(row, dict) else None
         if not (isinstance(val, str) and val):
             continue
         if len(heads) != len(rows):
             out.append((val, 1, 1))
             continue
         span = range(heads[k] + 1, next(c for c in cuts if c > heads[k]))
-        line = next((i for i in span if TOML_TAG_KEY.match(lines[i - 1])), heads[k])
+        line = next((i for i in span if key_line.match(lines[i - 1])), heads[k])
         end = max((i for i in span if lines[i - 1].strip()), default=line)
         out.append((val, line, max(end, line)))
     return out
@@ -1127,14 +1137,15 @@ def read_chain_registry(path) -> list[dict]:
 
 
 def read_toml_field(text, tag, field):
-    """The non-empty string `field` of the TOML array-of-tables row whose `tag` is `tag`, else None."""
+    """The non-empty string `field` of the TOML array-of-tables row whose tag is `tag`, keyed as ROW_TAG_KEYS
+    keys its table, else None."""
     try:
         data = tomllib.loads(text)
     except tomllib.TOMLDecodeError:
         return None
-    for rows in data.values():
+    for table, rows in data.items():
         for row in rows if isinstance(rows, list) else ():
-            if isinstance(row, dict) and row.get("tag") == tag:
+            if isinstance(row, dict) and row.get(ROW_TAG_KEYS.get(table, "tag")) == tag:
                 val = row.get(field)
                 return val if isinstance(val, str) and val.strip() else None
     return None

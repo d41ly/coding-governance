@@ -25,7 +25,9 @@ The harness's own instructions sit above the ladder and hold no level.
 
 A unit is one `[[unit]]` row of a kit's `instructions.toml`: its tag, its level, its type, the documents
 its `scope` selects, its `trigger`, its `text`, and a `usage` where a user acts on it. Gov's units ship
-in each kit and are overwritten at every update. A kind of extension, such as a unit, a Skill or a
+in each kit and are overwritten at every update. The first are the playbook kit's, one per reference
+page, each naming where its registry lives and how a row joins it: `unit.policy-schema`,
+`unit.drive-table`, `unit.kinds-register` and `unit.unit-registry`. A kind of extension, such as a unit, a Skill or a
 charter practice, is a row of the kinds register; [the kinds page](../reference/kinds.md) lists each kind
 and how a member of it is made.
 
@@ -53,7 +55,9 @@ defines what it documents, so a page cannot say something its row does not. In g
 `python tools/playbook/render_playbook.py --reference --check` exits 1 naming each page that differs from
 its render. <!-- usage: script:tools/playbook/render_playbook.py 915d9434 -->
 
-Each page is declared by one row of `tools/playbook/references.toml`, naming the registry, the reader
-that returns its rows and the page. A row lacking a summary or a usage stops the render, but on the
+Each page is declared by one row of `tools/playbook/references.toml`, naming the registry, an `h1` line
+saying what the page documents, the reader that returns its rows and the page. The row's `registry` is
+the page's tag, so `doc.reference.kinds` resolves to the kinds page's row and its `h1`, as described in
+[tags](../tags.md). A row lacking a summary or a usage stops the render, but on the
 policy page, which lists such keys under `Not yet summarised`. To change a reference page, change the
 registry row and render again.

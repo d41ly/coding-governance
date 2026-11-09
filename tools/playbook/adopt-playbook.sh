@@ -331,6 +331,10 @@ charter-warm|0|incremental rows equal a cold build's
 charter-warm|0|doc.charter resolves to ['CHARTER2.md']
 charter-dirty|0|incremental rows equal a cold build's
 charter-dirty|0|doc.charter resolves to ['CHARTER2.md']
+reference-row $_tk|0|h1 = "The fixture's reference page"|lacks h1
+reference-row $_tk|0|show: rc=0, check: rc=0
+reference-no-h1 $_tk|1|member doc.reference.fixture (|resolves to no row
+reference-no-h1 $_tk|1|/references.toml) lacks h1
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf tag-resolver arm(s) failed"; exit 1; fi
 echo "PASS — the tag resolver's plants"

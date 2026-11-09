@@ -7,7 +7,7 @@ namespaces are registered today, each read from the file that declares its membe
 
 | Namespace | Its members come from |
 |---|---|
-| `doc` | the charter, each guide under `memory/guides/`, `memory/HYGIENE.md` and `memory/TEMPLATE-SPEC.md`, one section per `##` heading |
+| `doc` | the charter, each guide under `memory/guides/`, `memory/HYGIENE.md` and `memory/TEMPLATE-SPEC.md`, one section per `##` heading; each `[[document]]` row of `tools/playbook/documents.toml` none of those already names; and each reference page's `registry` tag, such as `doc.reference.kinds`, declared at its row of `tools/playbook/references.toml` |
 | `unit` | each `[[unit]]` row of a kit's `instructions.toml` |
 | `reader` | `tools/playbook/readers.toml`: `reader.every`, `reader.driver` and `reader.subagent` |
 | `practice` | `tools/playbook/practices.toml` |

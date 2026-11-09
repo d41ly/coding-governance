@@ -15,7 +15,7 @@
 ns = "doc"
 owner = "dOrderedCharter"
 layer = "layer.instruction"
-source = "the CHARTER path, memory/guides/*.md, memory/HYGIENE.md, memory/TEMPLATE-SPEC.md, and each [[document]] row of {prefix}/playbook/documents.toml whose tag none of those derives"
+source = "the CHARTER path, memory/guides/*.md, memory/HYGIENE.md, memory/TEMPLATE-SPEC.md, and each [[document]] row of {prefix}/playbook/documents.toml whose tag none of those derives, and each [[reference]] row's registry of {prefix}/playbook/references.toml that opens doc.reference."
 extractor = "tag_index:extract_doc"
 role = "describes"
 purpose-source = "#h1"
