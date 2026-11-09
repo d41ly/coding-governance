@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-40 — gov's first instruction unit rows, one per reference page, and the pages' registry tags declared
 
-**Status:** DEFERRED · rev-4 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 38 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,7 +15,9 @@
 | [2026-11-02-prompt-PLAY-dOrderedCharter-40-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-40-build-brief.md) | journal | — |
 | [2026-11-08-prompt-PLAY-dOrderedCharter-39-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-39-drift-fold-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
 | [2026-11-09-prompt-PLAY-dOrderedCharter-40-1-spec-writer.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-40-1-spec-writer.md) | journal | — |
+| [2026-11-09-prompt-PLAY-dOrderedCharter-40-2-spec-writer.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-40-2-spec-writer.md) | journal | — |
 | [2026-11-09-prompt-PLAY-dOrderedCharter-40-precheck-fold-brief.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-40-precheck-fold-brief.md) | research | — |
+| [2026-11-09-prompt-PLAY-dOrderedCharter-40-reorder-brief.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-40-reorder-brief.md) | research | — |
 | [2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md](../reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-49 |
 
 <!-- /gen:spec-records -->
@@ -222,7 +224,7 @@ Minted: the tags `unit.policy-schema`, `unit.drive-table`, `unit.kinds-register`
 
 ### Rollout
 
-Live at landing, order 38, after unit 37 at order 37, so the four pages exist when their rows land.
+Live at landing, order 37, after unit 37 in the same order, so the four pages exist when their rows land.
 Unit 37's pass lands three of them; this pass follows; the main loop's commit of unit 33's two class
 rows comes right after it (section 8 F5); and unit 37's later commit then lands the units page and
 each row's `unit` naming S1's tags.
@@ -347,7 +349,7 @@ New arm: tools/playbook/gov_tag.py · covers AC3 · its `--fixture --plant` gain
   the tip (`tools/govkit/step_gate.py`) does not fire, and the class's plant,
   `tools/playbook/pins.py#write_unit_plant`, takes out this manifest's first row; unit 33's AC7 is
   observed by its step gate arm and AC11 by its two greps. Section 3 carries no edge to unit 33: its
-  order 32 precedes this unit's 38, which a hands-off may not run against, and that CLOSED spec
+  order 32 precedes this unit's 37, which a hands-off may not run against, and that CLOSED spec
   declares no edge back. widens: none · relaxes: none
 
 ## 9. Revision log
@@ -378,6 +380,9 @@ New arm: tools/playbook/gov_tag.py · covers AC3 · its `--fixture --plant` gain
   AC2 observes the armed namespace by `show` in place of the tags leg; the data model's example
   `text` no longer says a kind row is made by `core.py new`; the leg line gains the writing
   practice's two legs, and a new plant arm covers AC3.
+- rev-5 · 2026-11-09 · Status line, section 4 Rollout, section 8 F5 · from
+  `2026-11-09-prompt-PLAY-dOrderedCharter-40-reorder-brief.md`: the build order moves from 38 to 37,
+  beside units 37 and 39, and each stated order follows it; no design text moved.
 
 ## 10. Reuse audit
 
