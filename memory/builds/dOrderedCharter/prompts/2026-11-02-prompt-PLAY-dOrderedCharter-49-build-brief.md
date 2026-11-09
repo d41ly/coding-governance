@@ -69,3 +69,6 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Your spec header's `advances PLAY-dOrderedCharter-38` stays `advances` when you flip it to `CLOSED`; you are not the last unit.
 - The unattended kit's own self-test suites are WAIVED for this build's landing (README, "Build-level rules"); a
   criterion they would observe is named as owed with PLAY-dClosedLoop-12, never run.
+- Unit 33 left two names over the naming lexicon's pin in `tools/playbook/pins.py`, which your pass edits: `fold_text` and
+  `strip_text`, whose leading verbs the declared table lacks. Rename them `derive_folded_text` and `derive_stripped_text` at their
+  definitions and every caller, and name the renames in your return.
