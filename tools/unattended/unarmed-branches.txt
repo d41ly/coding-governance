@@ -43,15 +43,11 @@ check-unattended.sh	16	18	the Skill's non-overridable paragraph names an item th
 # git itself failing, so there is no constructible fixture. Pinned rather than armed with a
 # synthetic break, which proves the mechanism for the synthetic value and not the real one.
 unattended.sh	49	8	cannot hash the brief, so the row would carry no join
-# The order-gate blocker message needs TWO rostered units carrying `order` verbs, and the tRun
-# fixture's units region emits one row. A second rostered unit changes a fixture shared by this
-# whole suite, which the standing instruction on this node forbids running. TOOL-dBriefedPass-6
-# carries the separate fixture; TOOL-dBriefedPass-3 rev-5 DECLARES the branch unexercised.
-unattended.sh	49	22	and an earlier step still holds a unit that is neither terminal nor dispatched
-# The SIBLING malformed-order refusal sits inside the same sibling loop, so it needs the same two
-# rostered units the blocker message does and is unarmable from the shared fixture for the same
-# reason. TOOL-dBriefedPass-6 arms both together.
-unattended.sh	49	21	a sibling spec status header carries something shaped like the build-order verb that does not conform, so this build's order cannot be sequenced against it
+# The SIBLING malformed-order refusal sits inside the order gate's sibling loop, so it needs two
+# rostered units carrying `order` verbs. The order-gate blocker message beside it was pinned for the
+# same reason until TOOL-aSwiftRefusal-1 armed it with a two-unit fixture that restores itself; this
+# one stays pinned, and arming it on that fixture is a follow-up.
+unattended.sh	49	18	a sibling spec status header carries something shaped like the build-order verb that does not conform, so this build's order cannot be sequenced against it
 # THEY MOVED AGAIN, 22 -> 27, 21 -> 26 and 18 -> 23, at aWindowedPass: `--check-commit`'s five `fail 49`
 # refusals landed above verb_dispatch, the same insertion-point class; re-keyed, never re-waived.
 # THE ORDINALS ABOVE MOVED 19 -> 22 and 18 -> 21 at aDeferredBar's closing round 2 (R1): three
@@ -63,4 +59,7 @@ unattended.sh	49	21	a sibling spec status header carries something shaped like t
 # RE-KEYED 11 -> 8, 27 -> 22, 26 -> 21 and 23 -> 18 at TOOL-aSparedSpawn-14: five `fail 49` refusals
 # above them left check 49 for the shared run-state and required-flag readers; re-keyed, never
 # re-waived.
-unattended.sh	49	18	--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run
+# RE-KEYED 21 -> 18 and 18 -> 38 at TOOL-aSwiftRefusal-1: the spec-token block's three `fail 49`
+# refusals moved from above the order gate to below condition 1, so the twenty sites between shift
+# up three and the block's own take 37 to 39; the order-gate row at 22 is armed now and taken out.
+unattended.sh	49	38	--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run

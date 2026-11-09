@@ -14309,36 +14309,6 @@ verb_dispatch() { # slug · unit · writes...
   case "$_d_state" in
     THIN) fail 49 "--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it: $unit ($_d_spec)"; return 1 ;;
   esac
-  # ------------------------------------------------- aDeferredBar closing review F3 (unit 2)
-  # THE SPEC-TOKEN CHECKER, RUN OVER THE LIVE TREE BEFORE THE DISPATCH IS ADMITTED. The memory
-  # kit's `bar` join grades LIVE specs, and under this harness every unit spec is CLOSED in its own
-  # build commit, so by the first bar that could grade it the population that join was built for is
-  # empty by construction. This verb is the one point that sees every live spec before its unit
-  # builds, and the checker is a direct check in seconds that the gate-guard hook admits. DECLARED,
-  # never spelled — `SPEC_TOKENS_CLI` is repo-relative in the conf, in RECALL_CLI's register — and
-  # BLANK or absent means the kit is not adopted, which is ANNOUNCED rather than passed over.
-  # The launcher is the inline resolver's answer and nothing else (closing round 2, R2 and R8):
-  # the first cut EXECUTED a bare `python3` on the adopter layout, which on Windows is the stub the
-  # resolver exists to refuse, and every --dispatch there was then refused with a diagnosis
-  # blaming the tree. `resolve_python` cannot be made to fail from the driver suite's fixture
-  # without hiding every launcher from PATH, so that branch is pinned rather than armed.
-  if [ -n "${SPEC_TOKENS_CLI:-}" ]; then
-    [ -f "$ROOT/$SPEC_TOKENS_CLI" ] || { fail 49 "--dispatch: SPEC_TOKENS_CLI names a file that is not there, so the spec-token check would pass by running nothing: $SPEC_TOKENS_CLI"; return 1; }
-    local _stpy _strc _sttail
-    _stpy=$(resolve_python) || { fail 49 "--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run: $SPEC_TOKENS_CLI"; return 1; }
-    run_bounded "$_stpy" "$SPEC_TOKENS_CLI"; _strc=$?
-    if [ "$_strc" != 0 ]; then
-      # A checker that GRADED leaves `spec-tokens:` lines; one that never ran leaves none, and the
-      # tail then names the rc and the first line it did print, so a launcher or import failure is
-      # not read as a spec that reds.
-      _sttail=$(printf '%s\n' "$RB_OUT" | grep -E '^spec-tokens: ' | grep -vE 'live spec\(s\) ·|bar join ·|Gates heading' | head -3 | tr '\n' ' ')
-      [ -n "$_sttail" ] || _sttail="the checker printed no spec-tokens: line, so it did not grade — first line: $(printf '%s\n' "$RB_OUT" | head -1)"
-      fail 49 "--dispatch refuses: the declared spec-token checker reds over the live tree, so a live spec names a bar, a suite or a token that does not resolve and the unit would build against it ($SPEC_TOKENS_CLI exited $_strc in ${RB_TOOK}s): $_sttail"
-      return 1
-    fi
-  else
-    echo "unattended: dispatch — SPEC_TOKENS_CLI is blank or undeclared, so no spec-token check ran over the live tree before this dispatch: an announced skip, not a pass"
-  fi
   # ------------------------------------------------------------------------------ THE ORDER GATE
   # A unit may not be dispatched while an EARLIER step still holds a unit that is neither terminal
   # nor already dispatched. Units sharing an `order` value are the parallel group and do not block
@@ -14635,6 +14605,39 @@ verb_dispatch() { # slug · unit · writes...
   done <<SIBS
 $sibrows
 SIBS
+  # ------------------------------------------------- aDeferredBar closing review F3 (unit 2)
+  # THE SPEC-TOKEN CHECKER, RUN OVER THE LIVE TREE BEFORE THE DISPATCH IS ADMITTED. The memory
+  # kit's `bar` join grades LIVE specs, and under this harness every unit spec is CLOSED in its own
+  # build commit, so by the first bar that could grade it the population that join was built for is
+  # empty by construction. This verb is the one point that sees every live spec before its unit
+  # builds, and the checker is a direct check in seconds that the gate-guard hook admits. DECLARED,
+  # never spelled — `SPEC_TOKENS_CLI` is repo-relative in the conf, in RECALL_CLI's register — and
+  # BLANK or absent means the kit is not adopted, which is ANNOUNCED rather than passed over.
+  # IT RUNS LAST AMONG THE LOCAL REFUSALS (TOOL-aSwiftRefusal-1): it is the one that costs a tree-wide
+  # scan, and every refusal above it is decided from the run-state file, the spec headers or `git` in
+  # seconds, so an out-of-order or overlapping dispatch is refused before the checker runs at all.
+  # The launcher is the inline resolver's answer and nothing else (closing round 2, R2 and R8):
+  # the first cut EXECUTED a bare `python3` on the adopter layout, which on Windows is the stub the
+  # resolver exists to refuse, and every --dispatch there was then refused with a diagnosis
+  # blaming the tree. `resolve_python` cannot be made to fail from the driver suite's fixture
+  # without hiding every launcher from PATH, so that branch is pinned rather than armed.
+  if [ -n "${SPEC_TOKENS_CLI:-}" ]; then
+    [ -f "$ROOT/$SPEC_TOKENS_CLI" ] || { fail 49 "--dispatch: SPEC_TOKENS_CLI names a file that is not there, so the spec-token check would pass by running nothing: $SPEC_TOKENS_CLI"; return 1; }
+    local _stpy _strc _sttail
+    _stpy=$(resolve_python) || { fail 49 "--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run: $SPEC_TOKENS_CLI"; return 1; }
+    run_bounded "$_stpy" "$SPEC_TOKENS_CLI"; _strc=$?
+    if [ "$_strc" != 0 ]; then
+      # A checker that GRADED leaves `spec-tokens:` lines; one that never ran leaves none, and the
+      # tail then names the rc and the first line it did print, so a launcher or import failure is
+      # not read as a spec that reds.
+      _sttail=$(printf '%s\n' "$RB_OUT" | grep -E '^spec-tokens: ' | grep -vE 'live spec\(s\) ·|bar join ·|Gates heading' | head -3 | tr '\n' ' ')
+      [ -n "$_sttail" ] || _sttail="the checker printed no spec-tokens: line, so it did not grade — first line: $(printf '%s\n' "$RB_OUT" | head -1)"
+      fail 49 "--dispatch refuses: the declared spec-token checker reds over the live tree, so a live spec names a bar, a suite or a token that does not resolve and the unit would build against it ($SPEC_TOKENS_CLI exited $_strc in ${RB_TOOK}s): $_sttail"
+      return 1
+    fi
+  else
+    echo "unattended: dispatch — SPEC_TOKENS_CLI is blank or undeclared, so no spec-token check ran over the live tree before this dispatch: an announced skip, not a pass"
+  fi
   # PARKED NORMALISED. Every refusal above asks its question through `normpath`; recording the raw
   # spelling meant the guards judged one path and the leg graded another, and `work/sub/` sailed
   # through the driver and then redded the leg permanently.

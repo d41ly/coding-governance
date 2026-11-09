@@ -7368,6 +7368,10 @@ same "duplicate title: the FIRST occurrence binds, so an empty first section is 
 fkspec 'none'
 same "tier-2 control: the canonical ordinals still grade READY" "$(plan_state "$TMP/fk.md")" "READY"
 
+fi   # ---- region 3 continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 3; then
+
 echo "MARK brief-and-dispatch-arms" >&2
 # ---------------------------------------------------------------------------------------------
 # ---- TOOL-dBriefedPass-2 and -3 - THE REFUSAL ARMS, asserting each branch's OWN longest literal
@@ -7646,6 +7650,38 @@ else
   # construction.
   echo "skip dispatch: the spec-token checker is not beside this kit at $STC, and govkit's registry exempts check-spec-tokens.py from every adopter ([[exempt]]), so the F3 arms have no subject in this tree and run in gov's"
 fi
+# ---- TOOL-aSwiftRefusal-1 - THE SPEC-TOKEN CHECKER RUNS AFTER EVERY CHEAP REFUSAL. It costs a
+# ---- tree-wide scan, while the order gate and condition 1 are decided from the run-state file and
+# ---- the spec headers in seconds, so each answers first with the checker still declared. A STUB
+# ---- exiting 1 stands in for it: these arms prove refusal ORDER, so they run where the real checker
+# ---- is absent too, and the F3 group above keeps the real checker's case. ARCH-tRun-5 at order 2 is
+# ---- the order gate's while ARCH-tRun-4 at order 1 is undispatched; once ARCH-tRun-4 is dispatched
+# ---- under a blank key, ARCH-tRun-5 declaring its path is condition 1's. RED-first: the driver at
+# ---- ae6735c1 answered both with the spec-token refusal. The units, the README and RUN.md restore.
+mkdir -p "./${PFX}"
+cp memory/builds/tRun/README.md "$TMP/swift-readme"; cp memory/builds/tRun/RUN.md "$TMP/swift-runmd"
+for _u in 4 5; do
+  printf '# ARCH-tRun-%s — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd · order %s\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' "$_u" "$((_u - 3))" > "memory/builds/tRun/spec/swift$_u.md"
+  sed -i 's#^<!-- /gen:build-units -->$#| [ARCH-tRun-'"$_u"' — u](spec/swift'"$_u"'.md) | SPECCED | rev-1 | 2026-08-20 |\n&#' memory/builds/tRun/README.md
+done
+printf 'import sys\nsys.exit(1)\n' > ${PFX}swift-stub.py
+printf 'SPEC_TOKENS_CLI="'"${PFX}swift-stub.py"'"\n' >> .unattended.conf
+git add memory/builds/tRun/spec/swift4.md memory/builds/tRun/spec/swift5.md memory/builds/tRun/README.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-5 --writes ${PFX}swift.sh)
+hit "$o" "and an earlier step still holds a unit that is neither terminal nor dispatched: ARCH-tRun-4 (order 1, SPECCED)"
+miss "$o" "--dispatch refuses: the declared spec-token checker reds over the live tree"
+sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI=""|' .unattended.conf
+o=$(run --dispatch tRun --pass ARCH-tRun-4 --writes ${PFX}swift.sh)
+hit "$o" "dispatch declared"
+sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI="'"${PFX}swift-stub.py"'"|' .unattended.conf
+o=$(run --dispatch tRun --pass ARCH-tRun-5 --writes ${PFX}swift.sh)
+hit "$o" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint: ${PFX}swift.sh also in"
+miss "$o" "--dispatch refuses: the declared spec-token checker reds over the live tree"
+sed -i '/^SPEC_TOKENS_CLI=/d' .unattended.conf
+git rm -q --cached memory/builds/tRun/spec/swift4.md memory/builds/tRun/spec/swift5.md >/dev/null 2>&1
+rm -f memory/builds/tRun/spec/swift4.md memory/builds/tRun/spec/swift5.md ${PFX}swift-stub.py
+cp "$TMP/swift-readme" memory/builds/tRun/README.md; cp "$TMP/swift-runmd" memory/builds/tRun/RUN.md
+git add memory/builds/tRun/README.md memory/builds/tRun/RUN.md >/dev/null 2>&1
 # ---- region 3 ends HERE rather than at the old seam above the spec-token arm group: that group runs
 # ---- over the dispatch fixture the arms before it left, so it cannot open a region (TOOL-aGraftedHelix-41).
 fi   # ---- end REGION 3 ------------------------------------------------------------------------

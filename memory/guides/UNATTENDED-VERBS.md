@@ -231,10 +231,12 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   one thing here that is unchanged; a unit's own rows are never siblings of each other.
   A pass of a unit whose spec is CLOSED or WONTDO is not a sibling: it reserves nothing, and a later pass for such a unit reserves its paths only once its spec is set back to INPROGRESS.
   A pass's COMMIT is the one whose `Pass: <unit-id>` trailer names it; a commit with no trailer falls back to
-  its subject, and `Pass: none` names no unit. Before any of that it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
+  its subject, and `Pass: none` names no unit. After every cheap refusal and before the claim read it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
   live tree and refuses the dispatch when it exits non-zero: the checker's bar join grades LIVE specs,
   an unattended build closes each unit spec in its own build commit, and this verb is the one point
-  that sees a spec before its unit builds. A blank or absent key is an ANNOUNCED skip on stdout,
+  that sees a spec before its unit builds. It runs last because it costs a tree-wide scan, and every
+  refusal above it — the order gate, the edge and hold gates, the path and shared-record refusals,
+  condition 1 — is decided from the run-state file, the spec headers or `git` in seconds. A blank or absent key is an ANNOUNCED skip on stdout,
   never a silent pass. Where `RUN_CLAIMS` is `on` it reads the run's claim as the holder after every
   local refusal and before the row: another session's claim is check 108 and no row is written.
 - `--review` — records ONE review round for a subject and reports what the loop is doing:
