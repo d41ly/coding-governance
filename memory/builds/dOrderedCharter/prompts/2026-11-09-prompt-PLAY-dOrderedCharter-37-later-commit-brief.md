@@ -14,6 +14,19 @@ this pass lands only what waited for PLAY-dOrderedCharter-40's unit rows to be t
 - The `unit-usage` class's `[[class]]` rows in `tools/govkit/surface-classes.toml` and `tools/govkit/usage.toml` (F8).
 - Observe AC1's four-page half, AC8 and AC10's `unit-usage` half, and append them to unit 37's acceptance ledger,
   `memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-37-ledger.md`, as lines naming this pass.
+- Clear the three reds unit 37's first pass left, which the main loop observed after `19648821f`: the layers check reds the
+  renderer's probe of the docs leg (`tools/playbook/render_playbook.py#read_fingerprint_lines`), since core kit `playbook-render`
+  depends on non-core kit `govkit` with no optional descriptor row naming the file; and the core meta-check reds the legs `help
+  reference pages` and `help page commands`, which carry no `enforces` and no pending row. Name the principles each leg enforces,
+  or a pending row with its arming build, and resolve the layer edge within the kit descriptors' own grammar. Record each as a
+  deviation.
+- Fix `tools/playbook/render_playbook.py#write_unit_usage_plant` before registering its class: it removes a row with
+  `replace(u.body, ...)`, but `read_units` yields LF bodies while the step gate's fixture clone checks out CRLF, so the plant removes
+  nothing and the gate reads 0 vanished. PLAY-dOrderedCharter-33's later commit `4dd011712` fixed the same defect in
+  `tools/playbook/pins.py#write_unit_plant` (its deviation 336): match the body in the file's own line endings and raise naming the tag
+  when it is not found. Record it as a deviation.
+- Bring `help/step-gate.md`'s class table current: it lists neither `unit` (unit 33's later commit), nor `drive` and `kind` (unit 37's
+  first pass), nor the `unit-usage` class this pass registers.
 
 ## What the main loop needs from your commit
 

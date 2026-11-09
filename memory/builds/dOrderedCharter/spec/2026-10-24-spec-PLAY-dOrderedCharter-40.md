@@ -25,6 +25,8 @@
 | [2026-11-09-prompt-PLAY-dOrderedCharter-40-2-spec-writer.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-40-2-spec-writer.md) | journal | — |
 | [2026-11-09-prompt-PLAY-dOrderedCharter-40-precheck-fold-brief.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-40-precheck-fold-brief.md) | research | — |
 | [2026-11-09-prompt-PLAY-dOrderedCharter-40-reorder-brief.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-40-reorder-brief.md) | research | — |
+| [2026-11-10-prompt-PLAY-dOrderedCharter-40-3-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-40-3-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-PLAY-dOrderedCharter-40-repair-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-40-repair-brief.md) | research | — |
 | [2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md](../reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-49 |
 
 <!-- /gen:spec-records -->
