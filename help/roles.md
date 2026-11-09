@@ -86,6 +86,7 @@ refuses the render, naming the key.
   the workflows in stage order and calls the same harnesses `/unattended` uses.
 - **Hand one task to one agent:**
 
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and placeholders -->
   ```bash
   python tools/roles/handoff.py render --role gov-builder --build <slug> --unit <unit-id> --part task
   ```

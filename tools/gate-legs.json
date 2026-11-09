@@ -1508,6 +1508,30 @@
     "doc_reads": ["help/", "memory/project/docs-undocumented.txt"]
   },
   {
+    "name": "help reference pages",
+    "argv": [
+      "python",
+      "{prefix}/playbook/render_playbook.py",
+      "--reference",
+      "--check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 130
+  },
+  {
+    "name": "help page commands",
+    "argv": [
+      "python",
+      "{prefix}/govkit/docs_leg.py",
+      "--run"
+    ],
+    "reads": {"history": "it reads help.enforce at the landed revision through govkit's read_policy_value, and installs gov at this checkout's HEAD into one scratch adopter per page holding a runnable block (PLAY-dOrderedCharter-37)."},
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 600
+  },
+  {
     "name": "upgrade-walk",
     "argv": [
       "python",

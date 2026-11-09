@@ -64,3 +64,15 @@ id = "entry"
 reader = "{prefix}/govkit/step_gate.py:read_entry_members"
 plant = "{prefix}/govkit/step_gate.py:write_entry_plant"
 summary = "each registry [[entry]] row's id"
+
+[[class]]
+id = "drive"
+reader = "{prefix}/playbook/render_playbook.py:read_drive_members"
+plant = "{prefix}/playbook/render_playbook.py:write_drive_plant"
+summary = "each stage and role of the drive rows gov's deploy selects, as drive.<stage>.<role> (PLAY-dOrderedCharter-37)"
+
+[[class]]
+id = "kind"
+reader = "{prefix}/playbook/render_playbook.py:read_kind_members"
+plant = "{prefix}/playbook/render_playbook.py:write_kind_plant"
+summary = "each [[kind]] tag of the kinds register (PLAY-dOrderedCharter-37)"

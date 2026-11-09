@@ -6348,6 +6348,11 @@
       "file": "tools/govkit/docs_leg.py"
     },
     {
+      "id": "check_page_runs",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
+    },
+    {
       "id": "check_pair",
       "kind": "function",
       "file": "tools/runlog/prose.py"
@@ -6701,6 +6706,11 @@
       "id": "check_ref",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_reference_arms",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "check_references",
@@ -10038,6 +10048,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_page_link",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "derive_parallel_step",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -13011,6 +13026,11 @@
       "id": "load_records_at",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "load_reference_reader",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "load_registry",
@@ -17058,6 +17078,16 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "read_drive_members",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "read_drive_reference_rows",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "read_drive_rows",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -17241,6 +17271,16 @@
       "id": "read_files_touched",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_fingerprint_lines",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "read_fingerprint_rows",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
     },
     {
       "id": "read_first_column",
@@ -17781,6 +17821,16 @@
       "id": "read_key",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
+    },
+    {
+      "id": "read_kind_members",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "read_kind_reference_rows",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "read_kind_row",
@@ -18393,6 +18443,11 @@
       "file": "tools/govkit/docs_leg.py"
     },
     {
+      "id": "read_page_blocks",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
+    },
+    {
       "id": "read_page_commands",
       "kind": "function",
       "file": "tools/govkit/docs_leg.py"
@@ -18596,6 +18651,11 @@
       "id": "read_policy_members",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "read_policy_reference_rows",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "read_policy_text",
@@ -19923,9 +19983,19 @@
       "file": "tools/govkit/fixtures/stale_edges.py"
     },
     {
+      "id": "read_unit_reference_rows",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "read_unit_rows",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "read_unit_usage_members",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "read_units",
@@ -21631,6 +21701,16 @@
       "id": "render_redacted_config",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "render_reference_page",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "render_reference_pages",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "render_refusal_recipe",
@@ -24118,6 +24198,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "resolve_tree_engine_dir",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "resolve_turnstile_dir",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -25851,6 +25936,11 @@
       "id": "run_owned_bar",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "run_page_commands",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
     },
     {
       "id": "run_parity_plant",
@@ -31303,6 +31393,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "write_drive_plant",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "write_drive_tree",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -31616,6 +31711,11 @@
       "id": "write_journals",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "write_kind_plant",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "write_kit_restore",
@@ -32391,6 +32491,11 @@
       "id": "write_unit_spec",
       "kind": "function",
       "file": "tools/push-main.test.sh"
+    },
+    {
+      "id": "write_unit_usage_plant",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "write_untracked_snapshot",

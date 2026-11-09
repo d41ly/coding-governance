@@ -109,6 +109,16 @@ name each origin's bytes, largest first, and a harness limit refuses under any `
 re-writes each alias still holding the charter's previous bytes, and the charter's check reds an alias
 holding anything but an import line, a link or the composition. A write prints the delta report: each gov
 unit's and gov row's state, each repository unit's, then each widening, in `govkit update`'s verdict widths.
+
+THE REFERENCE PAGES (PLAY-dOrderedCharter-37). `--reference` writes each page `references.toml` beside this
+engine declares, one `[[reference]]` row per registry, from its `reader`'s rows: one section per row, its tag,
+its `summary` and its `usage` in a `text` fence, `{prefix}/` shown as `<prefix>/`, under the docs leg's anchor,
+whose fingerprint the leg's `--fingerprints` prints in a child process. `--reference --check` compares each
+page with its render. A row lacking either field refuses, but on the policy schema's page, which lists those
+under `## Not yet summarised (<n>)`; a member another page under `help/` anchors is a link to that page. A
+declared registry with no rows, a page under `help/reference/` no row declares and a reader that will not
+load each refuse, exit 1, before any page is written. The drive, kind and unit-usage adapters are also the
+step gate's class readers and plants and the docs leg's `synopsis` rows, each reading the tree it is handed.
 """
 from __future__ import annotations
 
@@ -279,6 +289,11 @@ OVERRIDE_SENTENCES = {
 # The principle registry beside this engine, and the one row the charter renders as its decision principle.
 PRINCIPLES_TABLE = 'principles.toml'
 DECISION_PRINCIPLE = 'principle.p18'
+# PLAY-dOrderedCharter-37: the reference pages' declaration beside this engine, the folder its pages sit in,
+# and the heading the policy schema's page lists its unsummarised keys under.
+REFERENCES_TABLE = 'references.toml'
+REFERENCE_DIR = 'help/reference'
+UNSUMMARISED_HEADING = 'Not yet summarised'
 
 
 class Refusal(Exception):
@@ -2222,6 +2237,73 @@ def check_memory_arms(check_arm) -> None:
             os.environ['GOV_DEFAULT_BRANCH'] = was
 
 
+REFERENCE_FX_ROWS = '''def read_fx_rows(root):
+    return {"fx.a": {"summary": "A", "usage": "run {prefix}/a"}, "fx.b": {"summary": "B"}}
+
+
+def read_fx_empty(root):
+    return {}
+
+
+def read_policy_reference_rows(root):
+    return {"k.one": {"summary": "one", "usage": "set it"}, "k.two": {"summary": "two"},
+            "k.three": {"summary": "three", "usage": "u"}}
+'''
+
+
+def check_reference_arms(check_arm) -> None:
+    """PLAY-dOrderedCharter-37 AC1, AC2, AC4, AC9: the reference render over a fixture declaration, fingerprints
+    handed in: a row with no usage, an orphan page and an empty population each refuse, writing no page; a
+    policy-shaped page lists its unsummarised row and links a key another page anchors; its check reds a page
+    edited after the render."""
+    import contextlib
+    import io
+    import tempfile
+    fps = {'fx:fx.a': ('aaaaaaaa', []), 'pol:k.one': ('11111111', []),
+           'pol:k.three': ('33333333', ['help/other.md'])}
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        eng = root / 'eng'
+        eng.mkdir()
+        (root / load_units_module().derive_kit_prefix() / 'fx').mkdir(parents=True)
+        (root / load_units_module().derive_kit_prefix() / 'fx' / 'rows.py').write_text(REFERENCE_FX_ROWS, encoding='utf-8')
+
+        def run_reference(readers: list[tuple[str, str]], check: bool = False) -> tuple[int | None, str]:
+            (eng / REFERENCES_TABLE).write_text(''.join(
+                f'[[reference]]\nregistry = "doc.reference.{fn}"\nreader = "{{prefix}}/fx/rows.py:{fn}"\npage = "{page}"\n\n'
+                for fn, page in readers), encoding='utf-8')
+            try:
+                with contextlib.redirect_stdout(io.StringIO()):
+                    return render_reference_pages(eng, root, check, fps), ''
+            except Refusal as e:
+                return None, str(e)
+        rc, why = run_reference([('read_fx_rows', 'help/reference/fx.md')])
+        check_arm(rc is None and 'row fx.b: no usage' in why and not (root / 'help/reference/fx.md').exists(),
+                  'a reference row with no usage refuses the render, naming the registry and the row, and writes no page',
+                  f'rc {rc}, refusal {why!r}')
+        (root / REFERENCE_DIR).mkdir(parents=True)
+        (root / REFERENCE_DIR / 'orphan.md').write_text('x\n', encoding='utf-8')
+        rc, why = run_reference([('read_policy_reference_rows', 'help/reference/policy.md')], check=True)
+        check_arm(rc is None and 'help/reference/orphan.md' in why and 'no [[reference]] row' in why,
+                  'a page under help/reference/ that no row declares refuses the check, naming it', f'rc {rc}, refusal {why!r}')
+        (root / REFERENCE_DIR / 'orphan.md').unlink()
+        rc, why = run_reference([('read_fx_empty', 'help/reference/empty.md')])
+        check_arm(rc is None and 'empty population' in why and 'doc.reference.read_fx_empty' in why,
+                  'a declared registry with no rows refuses, naming the registry', f'rc {rc}, refusal {why!r}')
+        rc, why = run_reference([('read_policy_reference_rows', 'help/reference/policy.md')])
+        page = (root / 'help/reference/policy.md').read_text(encoding='utf-8') if rc == 0 else ''
+        check_arm(rc == 0 and f'## {UNSUMMARISED_HEADING} (1)\n- `k.two`' in page
+                  and '<!-- usage: pol:k.one 11111111 -->' in page and 'pol:k.three' not in page
+                  and 'Documented on [help/other.md](../other.md).' in page and '```text\nset it\n```' in page,
+                  'the policy page lists its unsummarised row, anchors a summarised one and links one another page anchors',
+                  f'rc {rc}, refusal {why!r}, page {page!r}')
+        clean, _ = run_reference([('read_policy_reference_rows', 'help/reference/policy.md')], check=True)
+        (root / 'help/reference/policy.md').write_text(page.replace('one', 'uno', 1), encoding='utf-8')
+        drift, _ = run_reference([('read_policy_reference_rows', 'help/reference/policy.md')], check=True)
+        check_arm(clean == 0 and drift == 1, 'the reference check passes its own render and reds an edited page',
+                  f'clean {clean}, edited {drift}')
+
+
 def run_selftest() -> int:
     import tempfile
     passed, failed = 0, 0
@@ -3056,6 +3138,7 @@ def run_selftest() -> int:
     check_override_arms(check_arm)
     check_map_arms(check_arm)
     check_memory_arms(check_arm)
+    check_reference_arms(check_arm)
 
     if failed:
         print(f'render_playbook.selftest FAILED — {failed} of {passed + failed} arm(s)')
@@ -3290,6 +3373,256 @@ def run_check_render(engine_dir: Path, gov_root: Path, target: Path, charter_pat
     return rc or (1 if reds else 0)
 
 
+# ------------------------------------------------------------------------- the reference pages
+def resolve_tree_engine_dir(root) -> Path:
+    """This kit's directory in the tree at `root`: the tool root `derive_kit_prefix` names, then this engine's
+    own directory name. Every adapter reads the tree it is handed, never this engine's own."""
+    return Path(root) / load_units_module().derive_kit_prefix() / Path(__file__).resolve().parent.name
+
+
+def read_policy_reference_rows(root) -> dict:
+    """Every `[[key]]` row of the policy catalogue in the tree at `root`, by `name`, with the `summary` and the
+    `usage` it carries, a field the row lacks absent. The kit is found through `resolve_kit_dir`, and the
+    catalogue parsed here: a kit never imports a sibling kit. No policy kit answers no row."""
+    try:
+        kit = resolve_kit_dir('policy', 'catalogue.toml', resolve_tree_engine_dir(root))
+    except LookupError:
+        return {}
+    rows = tomllib.loads((kit / 'catalogue.toml').read_text(encoding='utf-8')).get('key', [])
+    return {r['name']: {k: r[k] for k in ('summary', 'usage') if r.get(k)}
+            for r in rows if isinstance(r, dict) and isinstance(r.get('name'), str) and r['name']}
+
+
+def read_drive_reference_rows(root) -> dict:
+    """One `synopsis` row per stage and role of the drive rows the deploy at `root` selects, in render order:
+    its tag `drive.<stage>.<role>`, its `summary` the rows' `when` clauses joined by `; `, its `usage` their
+    distinct commands, one per line. `read_drive` is handed that tree's kit, so each side reads its own
+    descriptors; a tree with no deploy answers no row."""
+    if not (Path(root) / '.governance' / 'deploy.toml').is_file():
+        return {}
+    rows, _workflows = load_units_module().read_drive(Path(root), resolve_tree_engine_dir(root))
+    groups: dict = {}
+    for r in rows:
+        g = groups.setdefault(f"drive.{r.get('stage', '')}.{r.get('role', '')}", {'when': [], 'command': []})
+        g['when'] += [r['when']] if r.get('when') else []
+        g['command'] += [r['command']] if r.get('command') and r['command'] not in g['command'] else []
+    return {tag: {'shape': 'synopsis', **({'summary': '; '.join(g['when'])} if g['when'] else {}),
+                  **({'usage': '\n'.join(g['command'])} if g['command'] else {})} for tag, g in groups.items()}
+
+
+def read_kind_reference_rows(root) -> dict:
+    """Each `[[kind]]` row of the kinds register in the tree at `root`, by `tag`, as a `synopsis` row with the
+    `summary` and the `usage` it carries (section 8 F9), a field the row lacks absent."""
+    load_units_module()
+    import core
+    rows = core.read_toml_rows(resolve_tree_engine_dir(root) / 'kinds.toml', 'kind') or []
+    return {r['tag']: {'shape': 'synopsis', **{k: r[k] for k in ('summary', 'usage') if r.get(k)}}
+            for r in rows if isinstance(r.get('tag'), str) and r['tag']}
+
+
+def read_unit_reference_rows(root) -> dict:
+    """Each gov unit in the tree at `root` carrying a `usage`, by `tag`, as a `synopsis` row: its `text` the
+    `summary`, its `usage` the usage."""
+    return {u.tag: {'shape': 'synopsis', **({'summary': u.text} if u.text else {}), 'usage': u.usage}
+            for u in load_units_module().read_units(Path(root)) if u.tag and u.usage}
+
+
+def read_drive_members(root) -> set:
+    """The step gate's `drive` class: each stage and role's tag `read_drive_reference_rows` returns."""
+    return set(read_drive_reference_rows(root))
+
+
+def read_kind_members(root) -> set:
+    """The step gate's `kind` class: each kind's tag in the register at `root`."""
+    return set(read_kind_reference_rows(root))
+
+
+def read_unit_usage_members(root) -> set:
+    """The step gate's `unit-usage` class: each gov unit tag carrying a `usage` at `root`."""
+    return set(read_unit_reference_rows(root))
+
+
+def write_drive_plant(clone) -> str:
+    """The `drive` class's plant: the `[[drive]]` table of the first stage and role, in render order, that holds
+    one row across the selected kits, taken out of its descriptor and staged. -> its member id."""
+    clone = Path(clone)
+    eng = resolve_tree_engine_dir(clone)
+    iu = load_units_module()
+    rows, _workflows = iu.read_drive(clone, eng)
+    tags = [f"drive.{r.get('stage', '')}.{r.get('role', '')}" for r in rows]
+    pick = next((i for i, t in enumerate(tags) if tags.count(t) == 1), None)
+    if pick is None:
+        raise ValueError('the drive plant found no stage and role holding one drive row')
+    reg = tomllib.loads(read_input(resolve_declaration_paths(eng, eng)[1], 'the govkit registry'))
+    spelled = {e.get('id'): e.get('descriptor', '') for e in reg.get('entry', [])}
+    path = resolve_kit_descriptor(eng, spelled.get(rows[pick]['kit'], ''))
+    lines = path.read_bytes().decode('utf-8').splitlines(keepends=True)
+    i = [n for n, ln in enumerate(lines) if ln.strip() == '[[drive]]'][rows[pick]['row'] - 1]
+    j = next((n for n in range(i + 1, len(lines)) if lines[n].startswith('[')), len(lines))
+    path.write_bytes(''.join(lines[:i] + lines[j:]).encode('utf-8'))
+    iu.run_git(clone, 'add', '-u')
+    return f'drive:{tags[pick]}'
+
+
+def write_kind_plant(clone) -> str:
+    """The `kind` class's plant: the register's last `[[kind]]` table taken out and staged. -> its member id."""
+    path = resolve_tree_engine_dir(clone) / 'kinds.toml'
+    lines = path.read_bytes().decode('utf-8').splitlines(keepends=True)
+    heads = [n for n, ln in enumerate(lines) if ln.strip() == '[[kind]]']
+    if not heads:
+        raise ValueError('the kind plant found no [[kind]] table in the register')
+    tag = tomllib.loads(''.join(lines[heads[-1]:]))['kind'][0]['tag']
+    path.write_bytes(''.join(lines[:heads[-1]]).encode('utf-8'))
+    load_units_module().run_git(clone, 'add', '-u')
+    return f'kind:{tag}'
+
+
+def write_unit_usage_plant(clone) -> str:
+    """The `unit-usage` class's plant: the first gov unit row carrying a `usage` taken out of its manifest and
+    staged, as `pins.write_unit_plant` takes out the `unit` class's first. -> its member id."""
+    iu = load_units_module()
+    u = next((u for u in iu.read_units(Path(clone)) if u.tag and u.usage), None)
+    if u is None:
+        raise ValueError('the unit-usage plant found no gov unit row carrying a usage')
+    path = Path(clone) / u.path
+    path.write_bytes(path.read_bytes().decode('utf-8').replace(u.body, '', 1).encode('utf-8'))
+    iu.run_git(clone, 'add', '--', u.path)
+    return f'unit-usage:{u.tag}'
+
+
+def read_fingerprint_lines(engine_dir: Path, root: Path) -> dict:
+    """{member id: (fingerprint, [page, ...])} as the docs leg's `--fingerprints` prints them over `root`, run in
+    a child process, so the fingerprint and the anchor read each have one computation (section 8 F2)."""
+    try:
+        leg = resolve_kit_dir('govkit', 'docs_leg.py', engine_dir) / 'docs_leg.py'
+    except LookupError as e:
+        raise Refusal(f'the reference pages take their fingerprints from the docs leg, and {e}') from None
+    p = subprocess.run([sys.executable, str(leg), '--fingerprints'], cwd=str(root), capture_output=True,
+                       text=True, encoding='utf-8', errors='replace')
+    if p.returncode != 0:
+        raise Refusal(f'docs_leg.py --fingerprints exited {p.returncode}: {(p.stdout + p.stderr).strip()[-400:]}')
+    out = {}
+    for ln in p.stdout.splitlines():
+        parts = ln.split('\t')
+        if len(parts) == 3:
+            out[parts[0]] = (parts[1], [] if parts[2] == '-' else parts[2].split(','))
+    return out
+
+
+def load_reference_reader(root: Path, spelled: str, at: str):
+    """The function a `reader` value `<path under the tool root>:<function>` names, loaded from `root`'s tree by
+    path, this engine answering its own path with its own module."""
+    import importlib.util
+    path_s, _sep, fn = str(spelled).rpartition(':')
+    if not path_s or not fn:
+        raise Refusal(f"{at}: '{spelled}' is not `<path>:<function>`")
+    path = (root / path_s.replace('{prefix}', load_units_module().derive_kit_prefix() or '.')).resolve()
+    try:
+        if path == Path(__file__).resolve():
+            mod = sys.modules[__name__]
+        else:
+            spec = importlib.util.spec_from_file_location(f'reference_reader_{path.stem}', path)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+    except Exception as e:  # any failure to import is "will not load", named
+        raise Refusal(f"{at}: '{spelled}' will not load: {type(e).__name__}: {e}") from None
+    f = getattr(mod, fn, None)
+    if not callable(f):
+        raise Refusal(f"{at}: '{spelled}' names no function {fn}")
+    return f
+
+
+def render_reference_page(decl_rel: str, ref: dict, rows: dict, fps: dict, policy: bool) -> str:
+    """One reference page: a section per row, its tag, its `summary`, its `usage` in a `text` fence under the
+    docs leg's anchor; a member another page anchors is a link there. A row lacking a field refuses, but on the
+    policy schema's page, which lists those by name under one counted heading."""
+    page = ref['page']
+    out = [f"<!-- gov:rendered from {decl_rel} {ref['registry']}; edit the registry, not this page -->"]
+    out += [f"<!-- unit: {ref['unit']} -->"] if ref.get('unit') else []
+    out += [f'# {Path(page).stem.capitalize()}', '']
+    missing = []
+    for tag, row in rows.items():
+        lack = [k for k in ('summary', 'usage') if not row.get(k)]
+        if lack and policy:
+            missing.append(tag)
+            continue
+        if lack:
+            raise Refusal(f"{ref['registry']} row {tag}: no {lack[0]}, so its section on {page} cannot render")
+        hits = [(mid, v) for mid, v in fps.items() if mid.split(':', 1)[-1] == tag]
+        if len(hits) != 1:
+            raise Refusal(f"{ref['registry']} row {tag}: the docs leg's --fingerprints prints "
+                          f"{'no' if not hits else len(hits)} member line(s) for it, so its anchor has no one fingerprint")
+        mid, (fp, pages) = hits[0]
+        elsewhere = [p for p in pages if p != page]
+        out.append(f'## `{tag}`')
+        if elsewhere:
+            out += [f'Documented on [{elsewhere[0]}]({derive_page_link(elsewhere[0], page)}).', '']
+            continue
+        usage = str(row['usage']).replace('{prefix}/', '<prefix>/')
+        out += [f'<!-- usage: {mid} {fp} -->', str(row['summary']), '', '```text', usage, '```', '']
+    if missing:
+        out += [f'## {UNSUMMARISED_HEADING} ({len(missing)})', *[f'- `{t}`' for t in missing], '']
+    return '\n'.join(out).rstrip('\n') + '\n'
+
+
+def derive_page_link(dest: str, page: str) -> str:
+    """`dest`, a repository path, as a link relative to the folder `page` sits in."""
+    import posixpath
+    return posixpath.relpath(dest, posixpath.dirname(page))
+
+
+def render_reference_pages(engine_dir: Path, root: Path, check: bool, fps: dict | None = None) -> int:
+    """`--reference`: each page `references.toml` beside `engine_dir` declares, rendered from its reader over
+    `root` and written, or with `check` compared, exit 1 naming each page that differs. An orphan page under
+    `help/reference/`, a declared registry with no rows and a reader that will not load refuse first."""
+    decl = engine_dir / REFERENCES_TABLE
+    decl_rel = Path(os.path.relpath(decl, root)).as_posix()
+    try:
+        refs = tomllib.loads(read_input(decl, 'the reference declaration')).get('reference', [])
+    except tomllib.TOMLDecodeError as e:
+        raise Refusal(f'{decl_rel} does not parse: {e}') from None
+    declared = {}
+    for n, ref in enumerate(refs, 1):
+        miss = [k for k in ('registry', 'reader', 'page') if not isinstance(ref.get(k), str) or not ref[k]]
+        if miss:
+            raise Refusal(f'{decl_rel} [[reference]] row {n}: needs a `{miss[0]}`')
+        if not ref['page'].startswith(REFERENCE_DIR + '/') or '..' in ref['page'].split('/'):
+            raise Refusal(f"{decl_rel} [[reference]] row {n}: page {ref['page']} is not under {REFERENCE_DIR}/")
+        declared[ref['page']] = ref
+    folder = root / REFERENCE_DIR
+    orphans = sorted(p.relative_to(root).as_posix() for p in folder.rglob('*.md')) if folder.is_dir() else []
+    orphans = [p for p in orphans if p not in declared]
+    if orphans:
+        raise Refusal(f'{orphans[0]}: a page under {REFERENCE_DIR}/ that no [[reference]] row of {decl_rel} declares')
+    if not declared:
+        raise Refusal(f'{decl_rel} declares no [[reference]] row, so no page is rendered')
+    fps = read_fingerprint_lines(engine_dir, root) if fps is None else fps
+    want = {}
+    for page, ref in declared.items():
+        at = f"{decl_rel} {ref['registry']} reader"
+        fn = load_reference_reader(root, ref['reader'], at)
+        try:
+            rows = fn(root)
+        except Exception as e:  # a reader that raises is the registry's, named, never a traceback
+            raise Refusal(f"{at} '{ref['reader']}' raised {type(e).__name__}: {e}") from None
+        if not rows:
+            raise Refusal(f"{ref['registry']}: its reader returned no row, so {page} would document an empty population")
+        want[page] = render_reference_page(decl_rel, ref, rows, fps, fn.__name__ == 'read_policy_reference_rows')
+    if check:
+        drift = [p for p, text in want.items() if not (root / p).is_file()
+                 or (root / p).read_text(encoding='utf-8').replace('\r\n', '\n') != text]
+        for p in drift:
+            print(f'render-playbook: reference · DRIFT {p}: the page differs from a render of its registry; '
+                  f'run --reference')
+        print(f'render-playbook: reference · {len(want)} page(s) checked · {len(drift)} drifted')
+        return 1 if drift else 0
+    for p, text in want.items():
+        (root / p).parent.mkdir(parents=True, exist_ok=True)
+        (root / p).write_text(text, encoding='utf-8', newline='\n')
+    print(f'render-playbook: reference · wrote {len(want)} page(s): {", ".join(want)}')
+    return 0
+
+
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument('--target')
@@ -3315,6 +3648,8 @@ def main(argv: list[str]) -> int:
     ap.add_argument('--card', action='store_true')
     # PLAY-dOrderedCharter-46 S3: a write verb's render reads the overlay it just wrote; a check never does.
     ap.add_argument('--overlay-from', type=Path)
+    # PLAY-dOrderedCharter-37: the reference pages of the repository this engine sits in; no --target.
+    ap.add_argument('--reference', action='store_true')
     a = ap.parse_args(argv)
     if a.scope and not a.check_render:
         ap.error('--scope names what --check-render compares')
@@ -3324,6 +3659,15 @@ def main(argv: list[str]) -> int:
 
     if a.selftest:
         return run_selftest()
+    if a.reference:
+        if a.target or a.render_scope or a.check_render:
+            ap.error('--reference renders the repository this engine sits in and takes only --check')
+        engine = Path(__file__).resolve().parent
+        try:
+            return render_reference_pages(engine, Path(read_git(engine, 'rev-parse', '--show-toplevel')), a.check)
+        except Refusal as e:
+            print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
+            return 1
     if a.claim_node:
         try:
             tag = write_fleet_claim(Path(__file__).resolve().parent, a.user, a.host,

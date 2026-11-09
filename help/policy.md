@@ -247,6 +247,7 @@ the list is not yours to write.
 
 ## Example
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```bash
 python tools/policy/check_policy.py
 # policy-check: arm_schema · 0 finding(s) · 4 key(s) of .governance/policy.toml against 267 row(s)

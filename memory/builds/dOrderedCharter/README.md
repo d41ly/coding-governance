@@ -175,7 +175,7 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-36 — the row checks over every registered kind: the fixed set, the exclusion refusals and the widening classifier](spec/2026-10-23-spec-PLAY-dOrderedCharter-36.md) | 34 | 2 | CLOSED | rev-10 | 2026-11-09 |
 | [PLAY-dOrderedCharter-34 — composition and its report: the project block and marked parts from the overlay, budgets and harness limits at render, one composition for every harness, the delta report, and the practice census](spec/2026-10-23-spec-PLAY-dOrderedCharter-34.md) | 35 | 2 | CLOSED | rev-10 | 2026-11-09 |
 | [PLAY-dOrderedCharter-31 — this build's own upgrade steps: the agent-instructions wiring to the one renderer, adopter rules into the overlay, the seeded template's succession row, the census's change records and the `map_lib` deprecation](spec/2026-10-23-spec-PLAY-dOrderedCharter-31.md) | 36 | 2 | DEFERRED | rev-12 | 2026-11-09 |
-| [PLAY-dOrderedCharter-37 — the help pages: reference pages rendered from each registry's rows, concept, task and tutorial pages beside them, every shown command run, each page linked to its unit by tag](spec/2026-10-23-spec-PLAY-dOrderedCharter-37.md) | 37 | 2 | DEFERRED | rev-7 | 2026-11-09 |
+| [PLAY-dOrderedCharter-37 — the help pages: reference pages rendered from each registry's rows, concept, task and tutorial pages beside them, every shown command run, each page linked to its unit by tag](spec/2026-10-23-spec-PLAY-dOrderedCharter-37.md) | 37 | 2 | CLOSED | rev-7 | 2026-11-09 |
 | [PLAY-dOrderedCharter-39 — the card import survives the agent-instructions kit's retirement, with the wiring leg kept by name](spec/2026-10-24-spec-PLAY-dOrderedCharter-39.md) | 37 | 2 | DEFERRED | rev-4 | 2026-11-08 |
 | [PLAY-dOrderedCharter-40 — gov's first instruction unit rows, one per reference page, and the pages' registry tags declared](spec/2026-10-24-spec-PLAY-dOrderedCharter-40.md) | 38 | 2 | DEFERRED | rev-4 | 2026-11-09 |
 | [PLAY-dOrderedCharter-49 — the round-1 spec audit's 73 minors: criteria that can pass, rows a new leg owes, one reader per fact, and seams in build order](spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md) | 39 | 2 | DEFERRED | rev-7 | 2026-11-09 |
@@ -183,7 +183,7 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-6 | 2026-11-08 |
 <!-- /gen:build-units -->
 
-Records: 524 bound to this build, across 4 record folder(s).
+Records: 528 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

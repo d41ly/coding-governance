@@ -13,6 +13,7 @@ the row, and a row the default branch has not landed reads `unlanded`. A kit tha
 
 - **See every step, in the order they run:**
 
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
   ```sh
   python tools/govkit/upgrade_steps.py list
   ```
@@ -150,6 +151,7 @@ gov runs it beside planted hooks and modules in a scratch copy and reads one ver
 
 To see the contract hold on this machine: <!-- usage: script:tools/govkit/upgrade_steps.py#fixture 8e855cf3 -->
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```sh
 python tools/govkit/upgrade_steps.py fixture isolation                  # exit 0
 python tools/govkit/upgrade_steps.py fixture isolation --plant hook     # hook canary: absent
@@ -190,6 +192,7 @@ that step's re-read of the receipt shows schema 4, like any other row. A row is 
 receipt whose `schema` is a number of 4 or more and whose `steps` is a list; anything else is
 refused. `update --write` walks this step like any other; to run it by hand outside a walk: <!-- usage: script:tools/govkit/steps/receipt_schema_4.py#up 051ba178 --> <!-- usage: script:tools/govkit/steps/receipt_schema_4.py#witness f462d008 --> <!-- usage: script:tools/govkit/steps/receipt_schema_4.py#down a555ef91 -->
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and a <repo> or <rev> placeholder -->
 ```sh
 python tools/govkit/steps/receipt_schema_4.py up <repo>       # schema 3 -> 4
 python tools/govkit/steps/receipt_schema_4.py witness <repo>  # exit 0 at schema 4
@@ -269,6 +272,7 @@ put back before the first step, so a kill leaves that kit at the bytes it had be
 
 To see it on this machine:
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```sh
 python tools/govkit/upgrade_steps.py fixture walk                       # s1 to s4 applied, in order
 python tools/govkit/upgrade_steps.py fixture walk --plant kill-step     # killed, re-run, converges
@@ -283,6 +287,7 @@ When you do mean to go back, ask for it by name. A step's down may name that `--
 `{to}`, which resolves in a rollback's down and nowhere else; a row spelling `{to}` in any other
 argv is refused when it is read: <!-- usage: verb:govkit.py:update c276c2e7 -->
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and a <repo> or <rev> placeholder -->
 ```sh
 python tools/govkit/govkit.py update --target <repo> --rollback --to <rev>          # preview
 python tools/govkit/govkit.py update --target <repo> --rollback --to <rev> --write  # perform
@@ -348,6 +353,7 @@ python tools/govkit/govkit.py update --target <repo> --rollback --to <rev> --wri
 
 To see it on this machine:
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```sh
 python tools/govkit/upgrade_steps.py fixture rollback                         # s4 to s1 rolled back
 python tools/govkit/upgrade_steps.py fixture rollback --plant down-fails      # stops at s3, resumes
@@ -385,6 +391,7 @@ back byte-for-byte.
 `update --write` runs it as one of its steps; to run it by hand, from this checkout, against a
 repository whose `.agent-cap.conf` and policy file are committed: <!-- usage: script:tools/govkit/steps/fanout_cap.py#up 4f94983b --> <!-- usage: script:tools/govkit/steps/fanout_cap.py#witness 052d667f --> <!-- usage: script:tools/govkit/steps/fanout_cap.py#down 3f5f9500 -->
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and a <repo> or <rev> placeholder -->
 ```sh
 python tools/govkit/steps/fanout_cap.py up <repo>       # exit 1, writing nothing, on a bad value
 python tools/govkit/steps/fanout_cap.py witness <repo>  # exit 0 once no FANOUT_CAP is left
@@ -405,6 +412,7 @@ declared step over that tree the way it would over yours. Every compare reads th
 and `.governance/outbox/`, with the index, and reads the receipt's re-measured fields the way the
 records that own them declare. Run it from this checkout: <!-- usage: script:tools/govkit/upgrade_walk.py 0cfca8d3 -->
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```sh
 python tools/govkit/upgrade_walk.py                           # every case, then every arm
 python tools/govkit/upgrade_walk.py --list                    # the pin, the steps in walk order, the rows

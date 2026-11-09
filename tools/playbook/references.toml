@@ -1,0 +1,21 @@
+# references.toml — the reference pages under help/reference/, one [[reference]] row per registry
+# (PLAY-dOrderedCharter-37), read by `python <prefix>/playbook/render_playbook.py --reference` beside this file.
+# `registry`, the page's `doc.` tag; `reader`, `<path under the tool root>:<function>` returning the
+# registry's rows as `{<tag>: {"summary": ..., "usage": ...}}`; `page`, a path under help/reference/.
+# A page under help/reference/ no row declares refuses the render, and so does a registry with no rows.
+# A later registry joins by adding its row, which its own build lands.
+
+[[reference]]
+registry = "doc.reference.policy"
+reader = "{prefix}/playbook/render_playbook.py:read_policy_reference_rows"
+page = "help/reference/policy.md"
+
+[[reference]]
+registry = "doc.reference.drive"
+reader = "{prefix}/playbook/render_playbook.py:read_drive_reference_rows"
+page = "help/reference/drive.md"
+
+[[reference]]
+registry = "doc.reference.kinds"
+reader = "{prefix}/playbook/render_playbook.py:read_kind_reference_rows"
+page = "help/reference/kinds.md"

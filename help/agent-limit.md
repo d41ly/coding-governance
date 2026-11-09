@@ -23,6 +23,7 @@ agent-cap hook's `MAX_VERIFIERS`, unchanged by this key: see the review protocol
 
   Then render the harness's settings from it and commit them with the policy write:
 
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
   ```sh
   python tools/policy/policy.py settings --write   # both variables at the limit HEAD resolves
   python tools/policy/policy.py settings --check   # exit 1 naming each variable that differs

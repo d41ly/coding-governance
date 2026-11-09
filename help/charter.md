@@ -28,6 +28,7 @@ Your rendered charter is the active set: its Practices section holds one line pe
 
 Ask the policy reader what this repository chose:
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```bash
 python tools/policy/policy.py get charter.practices --explain
 ```
@@ -78,6 +79,7 @@ The render writes nothing, and names `charter.practices`, when:
   This is a repository whose default branch is not `main` and which has no remote to ask, or a
   directory that is no git repository. Tell it the branch, then render again:
 
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries a placeholder the shell reads as a redirect -->
   ```bash
   export GOV_DEFAULT_BRANCH=<branch>
   ```
@@ -113,6 +115,7 @@ render, naming the key.
 
 An override taken is a record in the build's `build/` folder, written by the memory-tree kit:
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries a placeholder the shell reads as a redirect -->
 ```bash
 python tools/memory-tree/build_records.py new override --build <slug> --unit <id> --rule practice.verify --words "<the owner's words>" --session <session id>
 ```
@@ -130,6 +133,7 @@ level and a one-line direction, and each document carries that as its envelope: 
 charter render and the role agent render write it from the registry; every other document carries the
 two lines in its source. Ask what is registered, then check every document against it:
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```bash
 python tools/playbook/instruction_units.py envelopes --list
 python tools/playbook/instruction_units.py envelopes --check
@@ -172,6 +176,7 @@ lines under `### Drive`, so it holds the line the main session does.
 
 Read your own rows, each with its kit, then check them against the rendered charter:
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```bash
 python tools/playbook/instruction_units.py drive --list
 python tools/playbook/instruction_units.py drive --check

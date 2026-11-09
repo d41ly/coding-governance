@@ -5,10 +5,13 @@ under `help/` that documents it, under the policy key `help.enforce` (TOOL-dSafe
     python <prefix>/govkit/docs_leg.py                                          # the `docs` leg
     python <prefix>/govkit/docs_leg.py --list [--undocumented]                  # every row and its page
     python <prefix>/govkit/docs_leg.py --fixture --plant <case> [--enforce refuse|warn|off]
+    python <prefix>/govkit/docs_leg.py --fingerprints                           # <id> <fp8> <pages> per row
+    python <prefix>/govkit/docs_leg.py --run [--page <path>]                    # every page command, run
 
 THE ROWS. `usage.toml` beside this file holds one `[[class]]` row per class of the step gate's class
-registry (`surface-classes.toml`): its `usage` shape (`verb`, `key`, `hook`, `leg`, `page` or
-`none`), its `rows` and a `why`. `rows` is where the class's usage rows come from: a reader spelled
+registry (`surface-classes.toml`): its `usage` shape (`verb`, `key`, `hook`, `leg`, `synopsis`,
+`page` or `none`), its `rows` and a `why`. A `synopsis` row is a reference page's `summary` and
+`usage`, as its registry states them (PLAY-dOrderedCharter-37). `rows` is where the class's usage rows come from: a reader spelled
 `<path under the tool root>:<function>` returning each member's row from the registry that already
 states it, or `usage.toml`, its `[[usage]]` rows. A `page` or `none` class carries no `rows`. A
 `[[usage]]` row also declares a `script:<path>[#<verb>]` a page shows that no class holds.
@@ -28,8 +31,17 @@ THE MODE. `help.enforce`, read once through govkit's `read_policy_value` at the 
 `refuse` exits 1 on any finding, `warn` prints each as a WARN line and exits 0, `off` prints one
 line and reads nothing else. `--enforce` is honoured under `--fixture` only.
 
+THE RUN ARM (PLAY-dOrderedCharter-37). `--run` runs every command a page under `help/` shows, or the
+one `--page` names: each fenced `bash`, `sh` and `console` block in order, in one fresh scratch adopter
+per page `fixture_target.build_target` makes, `GOV` exported as this checkout, each command through
+the bash govkit resolves with the adopter its working directory. A command exits 0, or the code an
+`<!-- expect: <code> -->` line above its block states; a block under `<!-- run: no — <reason> -->` is
+printed with its reason and counted, never run. No runnable command at all is not a verdict.
+`--fingerprints` prints `<id>`, `<fp8>` and `<pages>` per row, tab-separated, the pages anchoring it comma-joined or `-`.
+
 WHAT IT DOES NOT CHECK. Prose: an anchor whose fingerprint is current over a wrong paragraph passes.
-It runs no page command and fetches no external link. The `file` and `installable` classes carry
+The default run runs no page command, `--run` runs no block marked `run: no`, and neither fetches an
+external link. The `file` and `installable` classes carry
 no usage shape, and an `agent` or `entry` member is graded for presence only.
 
 Exit 0 green, 1 a finding under `refuse`, 2 not a verdict: a shaped class with no member, pages whose
@@ -61,8 +73,8 @@ Refusal = gk.Refusal
 USAGE_FILE = "usage.toml"
 LIST_REL = "memory/project/docs-undocumented.txt"
 MODES = ("refuse", "warn", "off")
-SHAPES = ("verb", "key", "hook", "leg", "page", "none")
-FIELDED = ("verb", "key", "hook", "leg")
+SHAPES = ("verb", "key", "hook", "leg", "synopsis", "page", "none")
+FIELDED = ("verb", "key", "hook", "leg", "synopsis")
 CLASS_KEYS = ("class", "usage", "rows", "why")
 USAGE_KEYS = ("id", "shape", "entry", "verb", "flags", "values", "default")
 ANCHOR_RE = re.compile(r"<!--\s*usage:\s*(?P<id>.+?)(?:\s+(?P<fp>[0-9a-f]{8}))?\s*-->")
@@ -77,7 +89,13 @@ INTERPRETERS = ("python", "python3", "bash", "sh")
 PLANTS = ("none", "stale-page", "bad-flag", "bad-verb", "unrowed", "broken-link", "broken-fragment",
           "external-link", "undocumented", "drained-row", "grown-list", "orphan-anchor", "restated-row",
           "reader-rows", "none-rows", "leg-row", "unclassed", "empty-class", "untested",
-          "console-prompt", "continued-flag", "unbalanced-quote", "comment-apostrophe", "scripts-prefix")
+          "console-prompt", "continued-flag", "unbalanced-quote", "comment-apostrophe", "scripts-prefix",
+          "synopsis-stale", "failing-command")
+# PLAY-dOrderedCharter-37: the run arm's two markers, each the last non-blank line above a block's fence,
+# and the bound on one page command.
+RUN_NO_RE = re.compile(r"^\s*<!--\s*run:\s*no\s*[—-]+\s*(?P<why>.+?)\s*-->\s*$")
+EXPECT_RE = re.compile(r"^\s*<!--\s*expect:\s*(?P<code>\d+)\s*-->\s*$")
+RUN_TIMEOUT = 600
 
 
 def derive_usage_fingerprint(row: dict) -> str:
@@ -487,6 +505,118 @@ def check_docs(root, class_ids: list[str], population: set[str], mode: str, sour
     return 2 if s["states"] else 1 if s["found"] and mode == "refuse" else 0
 
 
+# ------------------------------------------------------------------- the fingerprints and the run
+def read_fingerprint_rows(root, class_ids: list[str], population: set[str]) -> list[tuple[str, str, list[str]]]:
+    """(id, fingerprint, the pages under `help/` anchoring it) for every row the classes' readers and the
+    `[[usage]]` rows declare, sorted by id: the one computation `--fingerprints` prints and the reference
+    render reads."""
+    root = pathlib.Path(root)
+    rows, _found = read_usage_rows(root, read_usage_classes(root, class_ids)[0], population)
+    at: dict = {}
+    for p in sorted((root / "help").rglob("*.md")) if (root / "help").is_dir() else []:
+        for rel, _n, aid, _fp in read_page_anchors(p, p.relative_to(root).as_posix()):
+            if rel not in at.setdefault(aid, []):
+                at[aid].append(rel)
+    return [(i, derive_usage_fingerprint(r), at.get(i, [])) for i, r in sorted(rows.items())]
+
+
+def read_page_blocks(page) -> list[dict]:
+    """Each fenced `bash`, `sh` or `console` block of `page`, through `read_page_lines`: its fence's line,
+    its marker (the last non-blank line above the fence) and its commands, (line, text) each, a `console`
+    line's the text after its `$ ` or `> ` prompt, a trailing backslash joining the next line, a `#` line none."""
+    text = page.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    blocks: list[dict] = []
+    last, pending, start = None, "", 0
+    for n, ln, lang in read_page_lines(text):
+        if lang not in COMMAND_LANGS:
+            last = None
+            continue
+        if last is None or n != last + 1:
+            above = next((x for x in reversed(lines[:n - 2]) if x.strip()), "")
+            blocks.append({"line": n - 1, "marker": above, "commands": []})
+            pending = ""
+        last = n
+        body = ln.strip()
+        if lang == "console" and not pending:
+            body = body[2:] if body.startswith(("$ ", "> ")) else ""
+        if body.endswith("\\"):
+            start = start if pending else n
+            pending += body[:-1] + " "
+            continue
+        body, at, pending = pending + body, start if pending else n, ""
+        if body and not body.startswith("#"):
+            blocks[-1]["commands"].append((at, body))
+    return blocks
+
+
+def run_page_commands(root, rels: list[str]) -> tuple[dict, list[str]]:
+    """({pages, ran, marked, adopters}, findings): every runnable block of each page in `rels` run in order in
+    one scratch adopter per page, `GOV` this checkout, each command `[resolve_bash(), "-c", <command>]` in the
+    adopter, bounded by `RUN_TIMEOUT`; a `run: no` block is printed with its reason and counted, never run."""
+    import subprocess
+    import fixture_target
+    root = pathlib.Path(root)
+    counts, found = {"pages": len(rels), "ran": 0, "marked": 0, "adopters": 0}, []
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    env["GOV"] = root.as_posix()
+    for rel in rels:
+        blocks = read_page_blocks(root / rel)
+        runnable = []
+        for b in blocks:
+            m = RUN_NO_RE.match(b["marker"])
+            if m:
+                counts["marked"] += 1
+                print(f"docs: run · {rel}:{b['line']} run: no — {m['why']}")
+            elif b["commands"]:
+                e = EXPECT_RE.match(b["marker"])
+                runnable.append((b, int(e["code"]) if e else 0))
+        if not runnable:
+            if blocks:
+                print(f"docs: run · {rel}: every block is marked run: no, so no adopter is built")
+            continue
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="dr-"))
+        try:
+            target = fixture_target.build_target(tmp, None)
+            counts["adopters"] += 1
+            bash = gk.resolve_bash()
+            for b, want in runnable:
+                failed = None
+                for n, cmd in b["commands"]:
+                    counts["ran"] += 1
+                    try:
+                        p = subprocess.run([bash, "-c", cmd], cwd=str(target), env=env, capture_output=True, text=True,
+                                           encoding="utf-8", errors="replace", timeout=RUN_TIMEOUT, stdin=subprocess.DEVNULL)
+                        rc, err = p.returncode, (p.stderr.strip().splitlines() or p.stdout.strip().splitlines() or [""])[-1]
+                    except subprocess.TimeoutExpired:
+                        rc, err = None, f"no exit within {RUN_TIMEOUT} s"
+                    if rc != want:
+                        failed = f"RUN {rel}:{n} {cmd}: exited {rc}, the block declares {want}: {err}"
+                        break
+                if failed:
+                    found.append(failed)
+                    break
+        finally:
+            sg.remove_scratch_tree(tmp)
+    return counts, found
+
+
+def check_page_runs(root, rels: list[str], mode: str, source: str) -> int:
+    """`--run`: one mode line, each marker and finding, one summary; a run with no runnable command is 2."""
+    print(f"docs: help.enforce = {mode} · {source}")
+    if mode == "off":
+        return 0
+    counts, found = run_page_commands(root, rels)
+    print(f"docs: run · {counts['pages']} pages · {counts['adopters']} adopters · {counts['ran']} commands run · "
+          f"{counts['marked']} blocks marked run: no · {len(found)} findings")
+    for f in found:
+        print(f"docs: {'WARN ' if mode == 'warn' else ''}{f}")
+    if not counts["ran"]:
+        print("docs: REFUSED · no page shows a runnable command, so the run arm ran nothing")
+        return 2
+    return 1 if found and mode == "refuse" else 0
+
+
 # -------------------------------------------------------------------------------- the fixture
 FIXTURE_USAGE = '''[[class]]
 class = "fx-verb"
@@ -650,6 +780,19 @@ def build_docs_fixture(tmp, plant: str) -> tuple[pathlib.Path, list[str], set[st
         write_edit(more, "## The hook\n", f"## The hook\n\n<!-- usage: fx-mod:thing {derive_usage_fingerprint(FIXTURE_MOD_ROW)} -->\n")
         class_ids.append("fx-mod")
         population.add("fx-mod:thing")
+    elif plant == "synopsis-stale":
+        # PLAY-dOrderedCharter-37: a `synopsis` class read from a registry module, its page anchored at the
+        # row's fingerprint, then the registry's usage moved and the page left alone.
+        syn = {"shape": "synopsis", "summary": "a fixture thing", "usage": "fx go"}
+        (root / pre / "fx/syn.py").write_text(f"def read_fx_synopsis(root):\n    return {{'thing': {dict(syn, usage='fx go --now')!r}}}\n",
+                                               encoding="utf-8", newline="\n")
+        write_edit(usage, "[[usage]]\n", '[[class]]\nclass = "fx-syn"\nusage = "synopsis"\nrows = "{prefix}/fx/syn.py:read_fx_synopsis"\n'
+                                   'why = "a reference registry\'s summary and usage"\n\n[[usage]]\n')
+        write_edit(more, "## The hook\n", f"## The hook\n\n<!-- usage: fx-syn:thing {derive_usage_fingerprint(syn)} -->\n")
+        class_ids.append("fx-syn")
+        population.add("fx-syn:thing")
+    elif plant == "failing-command":
+        (root / "help/fail.md").write_text("# Fail\n\n```bash\nexit 3\n```\n", encoding="utf-8", newline="\n")
     elif plant == "none-rows":
         write_edit(usage, 'usage = "none"\n', 'usage = "none"\nrows = "usage.toml"\n')
     elif plant == "leg-row":
@@ -694,6 +837,8 @@ def run_docs_fixture(plant: str, mode: str) -> int:
     try:
         root, class_ids, population = build_docs_fixture(tmp, plant)
         print(f"docs: fixture · plant {plant}")
+        if plant == "failing-command":
+            return check_page_runs(root, ["help/fail.md"], mode, "the fixture's default")
         return check_docs(root, class_ids, population, mode, "--enforce" if mode != "refuse" else "the fixture's default")
     finally:
         sg.remove_scratch_tree(tmp)
@@ -722,7 +867,14 @@ def main(argv: list[str]) -> int:
                 where = ", ".join(s["anchors"].get(i, [])) or ("listed" if i in s["listed"] else "undocumented")
                 print(f"docs: {i} · {shape}{' · ' + fields if fields else ''} · {where}")
             return 0
-        if not argv:
+        if argv == ["--fingerprints"]:
+            classes = sg.read_surface_classes(root)
+            for i, fp, pages in read_fingerprint_rows(root, [c["id"] for c in classes],
+                                                      sg.read_surface_population(root, classes)):
+                print(f"{i}\t{fp}\t{','.join(pages) or '-'}")
+            return 0
+        run = argv[:1] == ["--run"] and (len(argv) == 1 or (len(argv) == 3 and argv[1] == "--page"))
+        if not argv or run:
             try:
                 value, source, reason = gk.read_policy_value("help.enforce", root)
             except LookupError as e:
@@ -731,11 +883,18 @@ def main(argv: list[str]) -> int:
             if value not in MODES:
                 print(f"docs: REFUSED · help.enforce reads '{value}', not one of {', '.join(MODES)}")
                 return 2
+            if run:
+                rels = [argv[2]] if len(argv) == 3 else sorted(p.relative_to(root).as_posix()
+                                                              for p in (root / "help").rglob("*.md"))
+                bad = [r for r in rels if not r.startswith("help/") or ".." in r.split("/") or not (root / r).is_file()]
+                if bad:
+                    raise Refusal(f"--page {bad[0]}: no page under help/")
+                return check_page_runs(root, rels, value, f"{source} · {reason}")
             classes = sg.read_surface_classes(root)
             return check_docs(root, [c["id"] for c in classes], sg.read_surface_population(root, classes),
                               value, f"{source} · {reason}")
-        sys.stderr.write("usage: python docs_leg.py | --list [--undocumented] | "
-                         "--fixture --plant <case> [--enforce refuse|warn|off]\n")
+        sys.stderr.write("usage: python docs_leg.py | --list [--undocumented] | --fingerprints | "
+                         "--run [--page <path>] | --fixture --plant <case> [--enforce refuse|warn|off]\n")
         return 2
     except Refusal as e:
         print(f"docs: REFUSED · {e}")

@@ -89,7 +89,7 @@ govkit — a declared kit population, and the selfcheck that keeps it honest
 
 - status `building` · streams `deployer`, `tooling` · dossier `memory/map/features/govkit.md`
 - decisions 0
-- gate-legs 10: `govkit selfcheck`, `govkit selftest`, `govkit refusal join`, `govkit acceptance matrix`, `govkit runbook parity`, `kit epoch (shipped bytes move, the version moves)`, `step-rows-frozen`, `step-gate`, `docs`, `upgrade-walk`
+- gate-legs 11: `govkit selfcheck`, `govkit selftest`, `govkit refusal join`, `govkit acceptance matrix`, `govkit runbook parity`, `kit epoch (shipped bytes move, the version moves)`, `step-rows-frozen`, `step-gate`, `docs`, `help page commands`, `upgrade-walk`
 - kits 1: `govkit`
 - skill-engines 1: `deploy-governance`
 - gotcha-classes 4: `fixture-lacks-a-gate-the-consumer-has.md`, `a-new-local-collides-in-a-long-function.md`, `guard-above-a-fold-makes-its-fallback-dead.md`, `verdict-printed-before-the-step-that-reverts-it.md`
@@ -179,9 +179,9 @@ The governance playbook — the shipped template + companions, and the gates ove
 
 - status `shipped` · streams `playbook`, `tooling` · dossier `memory/map/features/playbook.md`
 - decisions 1: `TOOL-aSiftedPlaybook-1`
-- gate-legs 30: `template size gate selftest`, `playbook parity`, `playbook parity selftest`, `playbook render wiring`, `playbook render selftest`, `charter size`, `micro-format definitions`, `micro-format gate selftest`, `line length`, `line-length gate selftest`, `layer dependencies (the core never depends on an expansion)`, `instruction units (schema, one fact)`, `instruction render (one renderer of record)`, `instruction units selftest`, `instruction edits (manifest checks)`, `instruction edits selftest`, `tags (the resolver's checks)`, `tags positional selftest`, `tags bundle selftest`, `edges (every declared edge parses, is registered and resolves)`
+- gate-legs 31: `template size gate selftest`, `playbook parity`, `playbook parity selftest`, `playbook render wiring`, `playbook render selftest`, `charter size`, `micro-format definitions`, `micro-format gate selftest`, `line length`, `line-length gate selftest`, `layer dependencies (the core never depends on an expansion)`, `instruction units (schema, one fact)`, `instruction render (one renderer of record)`, `help reference pages`, `instruction units selftest`, `instruction edits (manifest checks)`, `instruction edits selftest`, `tags (the resolver's checks)`, `tags positional selftest`, `tags bundle selftest`
 - kits 1: `playbook`
-- globs 8
+- globs 8: `tools/check-template-size.sh`
 - cut 18 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## playbook-mode

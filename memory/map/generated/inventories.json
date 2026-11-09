@@ -49,6 +49,8 @@
       "govkit selftest",
       "harness arms (fail branches armed or pinned)",
       "held-halves selftest",
+      "help page commands",
+      "help reference pages",
       "hook destinations (every declared hook path ships)",
       "hook destinations self-test",
       "install-prefix (shipped surface)",
