@@ -19,6 +19,7 @@
 | [2026-10-25-build-PLAY-dOrderedCharter-34-deviation-345.md](../build/2026-10-25-build-PLAY-dOrderedCharter-34-deviation-345.md) | deviation | — |
 | [2026-10-25-build-PLAY-dOrderedCharter-34-deviation-346.md](../build/2026-10-25-build-PLAY-dOrderedCharter-34-deviation-346.md) | deviation | — |
 | [2026-11-02-build-PLAY-dOrderedCharter-34-ledger.md](../build/2026-11-02-build-PLAY-dOrderedCharter-34-ledger.md) | journal | — |
+| [2026-11-09-build-PLAY-dOrderedCharter-34-1-builder-return.md](../build/2026-11-09-build-PLAY-dOrderedCharter-34-1-builder-return.md) | journal | — |
 | [2026-11-09-build-PLAY-dOrderedCharter-34-census.md](../build/2026-11-09-build-PLAY-dOrderedCharter-34-census.md) | research | — |
 | [2026-11-09-build-PLAY-dOrderedCharter-34-deviation-347.md](../build/2026-11-09-build-PLAY-dOrderedCharter-34-deviation-347.md) | deviation | — |
 | [2026-11-09-build-PLAY-dOrderedCharter-34-deviation-348.md](../build/2026-11-09-build-PLAY-dOrderedCharter-34-deviation-348.md) | deviation | — |
