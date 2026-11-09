@@ -12,7 +12,7 @@
 paths = ["{charter}"]
 renderer = "playbook:charter"
 
-[[target]]
+[[target]]   # under `--card` the scope's pointer also imports the session's orientation card
 paths = ["CLAUDE.md"]
 renderer = "playbook:entry-files"
 

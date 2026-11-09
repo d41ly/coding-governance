@@ -4628,6 +4628,11 @@
       "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
+      "id": "check_card_import",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "check_card_route",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"

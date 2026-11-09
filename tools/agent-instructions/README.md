@@ -52,6 +52,12 @@ this kit requires that kit and a python at its floor. The adopter installs the c
 its render and its `--check`, and keeps no fallback: with no renderer it exits 2 naming `playbook-render` and
 writes nothing.
 
+`--card`, off by default, is passed straight to the renderer: its `entry-files` scope then writes, in pointer
+mode, `CLAUDE.md` as `@AGENTS.md` and a second import of the session's ignored `.claude/` card file, lists that
+file beside `AGENTS.md` in a new `.gemini/settings.json`, and prints a `card — not delivered:` line for each
+alias with no native import and for Codex. `--check --card` fails naming a pointer or settings file without it.
+Without `--card` every byte is what the scope wrote before.
+
 ## Modes (`--mode`)
 
 - **pointer** (default) — uses each tool's native indirection where one exists, so **no symlinks are

@@ -10,7 +10,7 @@
 # A canonical over CODEX_MAX bytes is announced (Codex reads only that much by default); exit unchanged.
 #
 #   adopt-agent-instructions.sh [--source <file>] [--aliases "claude gemini copilot cursor windsurf"]
-#       [--mode symlink|pointer|copy] [--check] [--force]
+#       [--mode symlink|pointer|copy] [--check] [--force] [--card]
 #
 # --source   file whose CONTENT becomes AGENTS.md (default: reuse an existing AGENTS.md; error if neither).
 # --aliases  which tool files to wire (default: "claude gemini copilot"). Names: claude gemini copilot cursor windsurf.
@@ -20,6 +20,7 @@
 #            copy: real duplicate files kept honest by --check (drift needs --force to re-sync).
 # --check    verify wiring only (symlinks resolve / pointers intact / copies match AGENTS.md); exit 1 on drift.
 # --force    overwrite an existing alias (file OR symlink) that isn't already correct wiring.
+# --card     passed to the renderer, whose entry-files scope then imports the session's card too.
 #
 # THE ALIASES ARE THE RENDERER'S (PLAY-dOrderedCharter-20): this adopter installs the canonical and calls
 # the playbook-render kit's `entry-files` scope, which writes them and records each one's lock row. It keeps
@@ -35,7 +36,7 @@ cd "$ROOT" || { echo "AGENT-INSTR env ERROR — cannot enter repo root"; exit 2;
 
 CANON="AGENTS.md"
 CODEX_MAX=32768   # Codex's default project_doc_max_bytes (32 KiB); a file of exactly this size is read whole
-SOURCE=""; ALIASES="claude gemini copilot"; MODE="pointer"; CHECK=0; FORCE=0
+SOURCE=""; ALIASES="claude gemini copilot"; MODE="pointer"; CHECK=0; FORCE=0; CARD=""
 need_val() { [ "$1" -ge 2 ] || { echo "AGENT-INSTR env ERROR — $2 needs a value"; exit 2; }; }
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -44,6 +45,7 @@ while [ $# -gt 0 ]; do
     --mode)    need_val $# --mode;    MODE=$2; shift 2;;
     --check)   CHECK=1; shift;;
     --force)   FORCE=1; shift;;
+    --card)    CARD=--card; shift;;
     *) echo "AGENT-INSTR env ERROR — unknown arg: $1"; exit 2;;
   esac
 done
@@ -267,7 +269,7 @@ print_size_note() {
 if [ "$CHECK" = 1 ]; then
   [ -f "$CANON" ] || { echo "AGENT-INSTR CHECK FAILED — no canonical $CANON"; exit 1; }
   print_size_note
-  exec "$PY" "$RENDERER" --check-render --scope entry-files --target "$ROOT" --aliases "$ALIASES"
+  exec "$PY" "$RENDERER" --check-render --scope entry-files --target "$ROOT" --aliases "$ALIASES" ${CARD:+"$CARD"}
 fi
 
 # ---- install the canonical ---------------------------------------------
@@ -283,4 +285,4 @@ fi
 echo "canonical: $CANON ($(wc -c < "$CANON") bytes) · mode: $MODE · aliases: $ALIASES"
 print_size_note
 if [ "$FORCE" = 1 ]; then set -- --force; else set --; fi
-exec "$PY" "$RENDERER" --render-scope entry-files --target "$ROOT" --aliases "$ALIASES" --mode "$MODE" "$@"
+exec "$PY" "$RENDERER" --render-scope entry-files --target "$ROOT" --aliases "$ALIASES" --mode "$MODE" ${CARD:+"$CARD"} "$@"

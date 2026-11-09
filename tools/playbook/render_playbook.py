@@ -226,6 +226,10 @@ ALIAS_PATHS = {'claude': 'CLAUDE.md', 'gemini': 'GEMINI.md', 'copilot': '.github
 GEMINI_SETTINGS = '.gemini/settings.json'
 GEMINI_CONFIGURED_RE = re.compile(rf'"fileName"[^\S\n]*:[^\S\n]*(\[[^\S\n]*)?"{re.escape(CANON)}"')
 IMPORT_LINE_RE = re.compile(rf'^@\.*/?([^/\n]*/)*{re.escape(CANON)}[^\S\n]*$', re.M)
+# PLAY-dOrderedCharter-43: `--card` imports the session's ignored orientation card beside the charter.
+CARD = '.claude/orientation-card.md'
+CARD_IMPORT_RE = re.compile(rf'^@{re.escape(CARD)}[^\S\n]*$', re.M)
+CARD_LISTED_RE = re.compile(rf'"fileName"[^\S\n]*:[^\S\n]*\[[^\]]*"{re.escape(CARD)}"')
 PARITY_GATE = 'check-playbook-parity.sh'
 PRACTICES_LINE_RE = re.compile(r'^[ \t]*\{\{PRACTICES\}\}[ \t]*$', re.M)
 # PLAY-dOrderedCharter-6: the drive section, one line per `[[drive]]` row of the selected kits' descriptors.
@@ -1581,6 +1585,28 @@ def check_scope_arms(check_arm) -> None:
         rc, said = run_main('--check-render', '--scope', 'entry-files', '--target', tgt, '--aliases', 'claude copilot')
         check_arm(rc == 1 and 'stale copy' in said, 'one byte off reds the entry-files scope', said)
 
+        # PLAY-dOrderedCharter-43: `--card` rewrites the scope's own one-line pointer, both checks carry it.
+        (tgt / ALIAS_PATHS['copilot']).write_bytes(rendered)
+        rc, said = run_main('--render-scope', 'entry-files', '--target', tgt, '--aliases', 'claude copilot', '--card')
+        check_arm(rc == 0 and (tgt / 'CLAUDE.md').read_bytes() == f'@{CANON}\n@{CARD}\n'.encode('utf-8')
+                  and 'card — not delivered: copilot has no native import' in said,
+                  'under --card the one-line pointer gains the card import without --force', said)
+        for scoped in (('--scope', 'entry-files'), ()):
+            rc, said = run_main('--check-render', *scoped, '--target', tgt, '--aliases', 'claude copilot', '--card')
+            check_arm('lacks the card import' not in said and (rc == 0 or not scoped),
+                      f'the {"scoped" if scoped else "unscoped"} check reads the card import green', said)
+        (tgt / 'CLAUDE.md').write_bytes(f'@{CANON}\n'.encode('utf-8'))
+        for scoped in (('--scope', 'entry-files'), ()):
+            rc, said = run_main('--check-render', *scoped, '--target', tgt, '--aliases', 'claude copilot', '--card')
+            check_arm(rc == 1 and 'CLAUDE.md lacks the card import' in said,
+                      f'the {"scoped" if scoped else "unscoped"} check reds a pointer without the card import', said)
+        for mode in ('symlink', 'pointer', 'copy'):
+            for card in ((), ('--card',)):
+                run_main('--render-scope', 'entry-files', '--target', tgt, '--aliases', 'claude copilot',
+                         '--mode', mode, '--force', *card)
+                check_arm(not (tgt / 'AGENTS.override.md').exists(),
+                          f'no override file under --mode {mode} {" ".join(card)}', mode)
+
         gate = tgt / load_units_module().derive_kit_prefix() / PARITY_GATE
         rc, said = run_main('--check-render', '--scope', 'claims', '--target', tgt)
         check_arm(rc == 1 and PARITY_GATE in said, 'the claims scope reds a tree holding no gate', said)
@@ -2664,53 +2690,94 @@ def check_entry_files(target: Path, aliases: list[str]) -> int:
     return 1 if reds else 0
 
 
-def write_pointer_or_copy(target: Path, name: str, rel: str, back: str) -> None:
-    """A claude alias's `@<canonical>` import, any other alias's copy of the canonical's bytes."""
+def check_card_import(target: Path, aliases: list[str]) -> int:
+    """`--card`'s compare: a claude pointer carries the card's import line and gemini's settings list it;
+    every other alias, and Codex, is named as not delivered. A missing or unknown alias is the entry-files
+    compare's red, not this one's."""
+    reds = []
+    for name in aliases:
+        rel = ALIAS_PATHS.get(name)
+        path = target / rel if rel else None
+        if path is None:
+            continue
+        if name == 'gemini' and not os.path.lexists(path):
+            settings = target / GEMINI_SETTINGS
+            if check_gemini_configured(target) and not CARD_LISTED_RE.search(
+                    settings.read_text(encoding='utf-8', errors='replace')):
+                reds.append(f'{GEMINI_SETTINGS} context.fileName does not list {CARD}')
+        elif not os.path.lexists(path):
+            continue
+        elif name == 'claude' and not path.is_symlink() and path.is_file() and check_import_line(path):
+            if not CARD_IMPORT_RE.search(path.read_text(encoding='utf-8', errors='replace')):
+                reds.append(f'{rel} lacks the card import line @{CARD}')
+        else:
+            print(f'card — not delivered: {name} has no native import')
+    print('card — not delivered: codex has no import, and an override file would replace the charter')
+    for why in reds:
+        print(f'AGENT-INSTR CHECK FAILED — {why}')
+    return 1 if reds else 0
+
+
+def write_pointer_or_copy(target: Path, name: str, rel: str, back: str, card: bool = False) -> None:
+    """A claude alias's `@<canonical>` import, then under `card` the card's, and any other alias's copy of
+    the canonical's bytes."""
     path = target / rel
     path.unlink(missing_ok=True)
     if name == 'claude':
-        path.write_bytes(f'@{back}\n'.encode('utf-8'))
-        print(f'  + {rel} (@{back} import)')
+        path.write_bytes((f'@{back}\n' + (f'@{CARD}\n' if card else '')).encode('utf-8'))
+        print(f'  + {rel} (@{back} import{" and the card" if card else ""})')
     else:
         shutil.copyfile(target / CANON, path)
         print(f'  + {rel} (copy — no native pointer; drift re-syncs with --force)')
 
 
-def write_entry_file(target: Path, name: str, mode: str, force: bool) -> str | None:
-    """One alias wired, or found wired, returning the file its lock row names; None on a refusal it printed."""
+def write_entry_file(target: Path, name: str, mode: str, force: bool, card: bool = False) -> str | None:
+    """One alias wired, or found wired, returning the file its lock row names; None on a refusal it printed.
+    Under `card` a pointer is current only holding the card's import too, and gemini's settings listing it."""
     def print_refusal(why: str) -> None:
         print(f'AGENT-INSTR wire FAILED — {why}')
 
     rel = ALIAS_PATHS.get(name)
     if rel is None:
         return print_refusal(f"unknown alias '{name}'")
+    # ponytail: the card rides pointer mode only; a symlink mode's pointer fallback is the one-line pointer,
+    # which `check_card_import` then reds.
+    card = card and mode == 'pointer'
     path = target / rel
     held = os.path.lexists(path)
-    if name == 'gemini' and not held and check_gemini_configured(target):
+    back = '../' * rel.count('/') + CANON
+    settings = target / GEMINI_SETTINGS
+    if name == 'gemini' and not held and check_gemini_configured(target) and not (
+            card and not CARD_LISTED_RE.search(settings.read_text(encoding='utf-8', errors='replace'))):
         print(f'  = {GEMINI_SETTINGS} (context.fileName, current)')
         return GEMINI_SETTINGS
+    one_line = False
     if path.is_symlink():
         if path.exists() and check_link_target(path):
             print(f'  = {rel} (symlink, current)')
             return rel
-    elif path.is_file() and check_import_line(path):
+    elif path.is_file() and check_import_line(path) and not (
+            card and not CARD_IMPORT_RE.search(path.read_text(encoding='utf-8', errors='replace'))):
         print(f'  = {rel} (pointer, current)')
         return rel
     elif path.is_file() and check_same_bytes(target, path):
         print(f'  = {rel} (copy, current)')
         return rel
-    if held and not force:
+    elif card and path.is_file():
+        # the fork record's F3: the scope's own one-line pointer is rewritten without --force, nothing wider
+        one_line = path.read_bytes() == f'@{back}\n'.encode('utf-8')
+    if held and not force and not one_line:
         return print_refusal(f'{rel} exists and is not {CANON} wiring — pass --force to replace it')
     path.parent.mkdir(parents=True, exist_ok=True)
-    back = '../' * rel.count('/') + CANON
     if name == 'gemini' and mode == 'pointer':
-        settings = target / GEMINI_SETTINGS
+        names = f'["{CANON}", "{CARD}"]' if card else f'"{CANON}"'
+        shown = names if card else CANON
         if settings.is_file():
-            return print_refusal(f'gemini: {GEMINI_SETTINGS} exists without context.fileName={CANON} — merge '
-                                 f'"context":{{"fileName":"{CANON}"}} in by hand (JSON can\'t be safely auto-merged)')
+            return print_refusal(f'gemini: {GEMINI_SETTINGS} exists without context.fileName={shown} — merge '
+                                 f'"context":{{"fileName":{names}}} in by hand (JSON can\'t be safely auto-merged)')
         settings.parent.mkdir(parents=True, exist_ok=True)
-        settings.write_bytes(f'{{\n  "context": {{\n    "fileName": "{CANON}"\n  }}\n}}\n'.encode('utf-8'))
-        print(f'  + {GEMINI_SETTINGS} (context.fileName={CANON})')
+        settings.write_bytes(f'{{\n  "context": {{\n    "fileName": {names}\n  }}\n}}\n'.encode('utf-8'))
+        print(f'  + {GEMINI_SETTINGS} (context.fileName={shown})')
         return GEMINI_SETTINGS
     if mode == 'symlink':
         path.unlink(missing_ok=True)
@@ -2729,22 +2796,23 @@ def write_entry_file(target: Path, name: str, mode: str, force: bool) -> str | N
         shutil.copyfile(target / CANON, path)
         print(f'  + {rel} (copy — drift re-syncs with --force)')
     else:
-        write_pointer_or_copy(target, name, rel, back)
+        write_pointer_or_copy(target, name, rel, back, card)
     return rel
 
 
-def run_entry_files(target: Path, aliases: list[str], mode: str, force: bool) -> int:
-    """The `entry-files` scope's write: each alias wired, its lock row recorded; 1 when one refused."""
+def run_entry_files(target: Path, aliases: list[str], mode: str, force: bool, card: bool = False) -> int:
+    """The `entry-files` scope's write: each alias wired, its lock row recorded; 1 when one refused. Under
+    `card` the card's compare runs last, naming each alias left out."""
     if not (target / CANON).is_file():
         raise Refusal(f'no {CANON} to wire: render the charter, or give the adopter a --source')
     iu, rc = load_units_module(), 0
     for name in aliases:
-        rel = write_entry_file(target, name, mode, force)
+        rel = write_entry_file(target, name, mode, force, card)
         if rel is None:
             rc = 1
         else:
             iu.write_lock_row(target, rel, derive_renderer_label(), '')
-    return rc
+    return max(rc, check_card_import(target, aliases)) if card else rc
 
 
 def run_claims_scope(target: Path) -> int:
@@ -2760,17 +2828,21 @@ def run_claims_scope(target: Path) -> int:
 
 
 def run_check_render(engine_dir: Path, gov_root: Path, target: Path, charter_path: Path,
-                     scope: str | None, aliases: str | None) -> int:
+                     scope: str | None, aliases: str | None, card: bool = False) -> int:
     """`--check-render`: one scope's compare, or with no scope the render gate: every scope, each instruction
     file's one renderer of record, the status arm, and the legacy list under `instructions.legacy`."""
+    def check_entry_scope() -> int:
+        entry = derive_entry_aliases(target, aliases)
+        return max(check_entry_files(target, entry), check_card_import(target, entry) if card else 0)
+
     if scope == 'entry-files':
-        return check_entry_files(target, derive_entry_aliases(target, aliases))
+        return check_entry_scope()
     if scope == 'claims':
         return run_claims_scope(target)
     iu = load_units_module()
     from policy_value import PolicyRefused, read_policy_value
     rc = max(run_charter_scope(engine_dir, gov_root, target, charter_path, True),
-             check_entry_files(target, derive_entry_aliases(target, aliases)), run_claims_scope(target))
+             check_entry_scope(), run_claims_scope(target))
     reds = iu.check_renderers(target)
     try:
         iu.read_change_records(target)
@@ -2808,6 +2880,8 @@ def main(argv: list[str]) -> int:
     ap.add_argument('--aliases')
     ap.add_argument('--mode', choices=('symlink', 'pointer', 'copy'), default='pointer')
     ap.add_argument('--force', action='store_true')
+    # PLAY-dOrderedCharter-43: the entry-files scope imports the orientation card too, and its check asks for it.
+    ap.add_argument('--card', action='store_true')
     a = ap.parse_args(argv)
     if a.scope and not a.check_render:
         ap.error('--scope names what --check-render compares')
@@ -2845,9 +2919,9 @@ def main(argv: list[str]) -> int:
 
     try:
         if a.check_render and a.scope != 'charter':
-            return run_check_render(engine_dir, gov_root, target, charter_path, a.scope, a.aliases)
+            return run_check_render(engine_dir, gov_root, target, charter_path, a.scope, a.aliases, a.card)
         if a.render_scope == 'entry-files':
-            return run_entry_files(target, derive_entry_aliases(target, a.aliases), a.mode, a.force)
+            return run_entry_files(target, derive_entry_aliases(target, a.aliases), a.mode, a.force, a.card)
     except (Refusal, ValueError, OSError) as e:   # ValueError: the lock module's LevelError, LockError, UnitRowError
         print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
         return 1

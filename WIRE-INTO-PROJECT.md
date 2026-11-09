@@ -130,7 +130,10 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
   the worktree.
 - **One canonical instruction file** (`agent-instructions/` kit): agents do not all read the same
   filename, and Claude Code does not read `AGENTS.md` natively. Drop it only if exactly one agent
-  tool reads this repo; with two, this kit is what stops the second reading a stale copy.
+  tool reads this repo; with two, this kit is what stops the second reading a stale copy. Its
+  `--card` switch, off by default, is the renderer's `render_playbook.py --render-scope entry-files
+  --card`: `CLAUDE.md` imports the session's orientation card beside `AGENTS.md`, and
+  `--check-render --card` reds a pointer without it.
 - **Parallel-test guardrails** (`pytest-parallel-guardrails/` kit): drop it if the project is not
   Python or does not run `pytest -n auto`. The charter's one line on the bug classes it fixes is
   that kit's tools line, so a selection without the kit carries no line on them.
