@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-36 — the row checks over every registered kind: the fixed set, the exclusion refusals and the widening classifier
 
-**Status:** DEFERRED · rev-8 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 34 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-9 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 34 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0066@dcfb4bb2 whole
 
@@ -41,12 +41,15 @@ has landed, and none of its rows names a row schema, so a patch of any field wou
 ## 2. Scope (IN)
 
 - **S1** — The schema declarations each kind carries, in the row schema unit 35's optional `schema`
-  key on a `[[kind]]` row of unit 7's kinds register `tools/playbook/kinds.toml` names. Per
-  field, its `shape` (`set` or `scalar`), an optional `ref` role (`needs`, `actor` or `grants`), and
-  either `fixed-by` or `widens`; per row, `[[fixed-row]]` with a tag and `fixed-by`. `fixed-by` is a
-  non-empty list of sources from IA-4's three: `principle=<tag>`, `floor=<tag>` and
-  `parser=<path#symbol>`. A typed `class` key is refused, so the class is derived and never typed. One
-  reader, `read_kind_schema` in `tools/playbook/row_checks.py`. Observed by AC4 and AC5.
+  key on a `[[kind]]` row of unit 7's kinds register `tools/playbook/kinds.toml` names. Per field,
+  beside the `name` and `shape` (`set` or `scalar`) PLAY-dOrderedCharter-35 reads, an optional `ref`
+  role (`needs`, `actor` or `grants`), and either `fixed-by` or `widens`; per row, `[[fixed-row]]`
+  with a tag and `fixed-by`. `fixed-by` is a non-empty list of sources from IA-4's three:
+  `principle=<tag>`, `floor=<tag>` and `parser=<path#symbol>`. A typed `class` key is refused, so
+  the class is derived and never typed. The one reader is PLAY-dOrderedCharter-35's
+  `read_kind_schema` in `tools/playbook/overlay_rows.py`, which reads the `[kind]` table and each
+  field's `name` and `shape`; this unit adds these keys and the refusals of section 4 to it, and
+  writes no second reader (PLAY-dOrderedCharter-35's section 8 F10). Observed by AC4 and AC5.
 - **S2** — The derived class. A field or row is fixed when its `fixed-by` resolves, open when it
   declares `widens`, and fixed when it declares neither: an undeclared class reads as fixed. A field
   declaring both is refused as two answers. Each `fixed-by` source must resolve: a `principle` tag in
@@ -78,8 +81,8 @@ has landed, and none of its rows names a row schema, so a patch of any field wou
   reads `widens`, each with its row, field, operation and gov's value; unit 34's delta report prints it
   and is its one source. Observed by AC9.
 - **S7** — The checks run on the composition, never on the overlay text: `check_rows(kind, schema,
-  composition, exclude, policy)` is called by unit 35's `compose_rows` after it composes, and a
-  finding refuses the composition. Observed by AC1 to AC8 and AC10.
+  composition, exclude, policy)` is called by PLAY-dOrderedCharter-35's `derive_row_composition`
+  after it composes, and a finding refuses the composition. Observed by AC1 to AC8 and AC10.
 - **S8** — The fixture kind's planted reds, added to `tools/playbook/fixtures/row_kind.py`: its schema
   gains a fixed field, a fixed row, an undeclared field and a reference field of each `ref` role, and
   each refusal of S3 to S5 is one plant. No plant names a later build's kind. Observed by AC1 to AC8,
@@ -104,7 +107,7 @@ has landed, and none of its rows names a row schema, so a patch of any field wou
 
 ### Edges
 
-- **consumes-from** `PLAY-dOrderedCharter-35` — the composer `compose_rows` this unit's checks run inside, and the fixture kind `tools/playbook/fixtures/row_kind.py` its plants extend
+- **consumes-from** `PLAY-dOrderedCharter-35` — the composer `derive_row_composition` this unit's checks run inside, the fixture kind `tools/playbook/fixtures/row_kind.py` its plants extend, and `read_kind_schema`, the one schema reader, reading the `[kind]` table and each field's `name` and `shape`, to which this unit adds every other schema key and the refusal of an unknown key
 - **consumes-from** `PLAY-dOrderedCharter-7` — the kinds register a kind's schema is found through, and the principle registry `principle=` sources resolve against
 - **consumes-from** `PLAY-dOrderedCharter-26` — the `path#symbol` form a `parser=` source is written in
 - **consumes-from** `PLAY-dOrderedCharter-32` — the `fixed-by` source grammar and its resolver `check_fixed_sources`, which the schema reader calls for each field's and row's sources; without it a source is unresolved
@@ -166,11 +169,13 @@ The block spells the tool root as gov's tree has it. The fixture writes the `par
 `tools/playbook/instruction_units.py#derive_tool_rel`, so the kit's code types no tool root, the rule
 unit 72 applied to every path the playbook kit's code spells.
 
-Rules the reader enforces, each a refusal naming the file and the field: an unknown key; `class`
-anywhere; a `shape` outside the two; a `ref` outside the three; `widens` and `fixed-by` together; a
-set field whose `widens` is not `add` or `remove`; a scalar whose `widens` is not a list of at least
-two distinct values; an empty `fixed-by`; a source whose type is not one of the three. The last two,
-and every unresolved source, are the reds unit 32's `check_fixed_sources` returns for the list.
+Rules this unit adds to PLAY-dOrderedCharter-35's reader, each a refusal naming the file and the
+field: an unknown key; `class` anywhere; a `ref` outside the three; `widens` and `fixed-by`
+together; a set field whose `widens` is not `add` or `remove`; a scalar whose `widens` is not a list
+of at least two distinct values; an empty `fixed-by`; a source whose type is not one of the three.
+The last two, and every unresolved source, are the reds PLAY-dOrderedCharter-32's
+`check_fixed_sources` returns for the list. A `shape` outside the two is PLAY-dOrderedCharter-35's
+refusal, already in the reader.
 
 **Resolution of `fixed-by`.** Each rule below is unit 32's `check_fixed_sources`, called here with
 the list as written. `principle=<tag>` resolves when the tag is a `[[principle]]` row of unit
@@ -236,14 +241,15 @@ the probe as its first act and builds S4's policy arm on its result.
 | Minted | Where | Cell |
 |---|---|---|
 | `tools/playbook/row_checks.py` (module) | playbook kit | the lexicon's naming predicates |
-| `read_kind_schema`, `check_rows`, `classify_patch`, `derive_widenings` | that module | the lexicon's naming predicates |
-| the schema keys `shape`, `ref`, `fixed-by`, `widens` and the `[[fixed-row]]` table | each kind's schema | none |
+| `check_rows`, `classify_patch`, `derive_widenings` | that module | the lexicon's naming predicates |
+| the schema keys `ref`, `fixed-by`, `widens` and the `[[fixed-row]]` table, beside PLAY-dOrderedCharter-35's `name`, `owner-seat` and `shape` | each kind's schema | none |
 | the plants of S8 | `tools/playbook/fixtures/row_kind.py` | none |
 
 ### Files touched (estimate)
 
 - `tools/playbook/row_checks.py` (new)
-- `tools/playbook/overlay_rows.py` (the call from `compose_rows`)
+- `tools/playbook/overlay_rows.py` (the call from `derive_row_composition`, and the keys and
+  refusals this unit adds to `read_kind_schema`)
 - `tools/playbook/fixtures/row_kind.py` (its schema and plants)
 - `tools/playbook/render_playbook.py` (its self-test arm)
 - `help/overlay-rows.md`
@@ -391,6 +397,13 @@ reached inside the call that needs them.
   `fixed-by` · section 10 · from `2026-11-09-prompt-PLAY-dOrderedCharter-32-repair-brief.md` item 2: unit 32
   builds first and lands the `fixed-by` grammar and its resolver `check_fixed_sources` (its section 8
   F8), so this unit consumes it for fields and rows instead of declaring a second.
+- rev-9 · 2026-11-09 · S1 S7 · section 3 Edges · section 4 Data model's reader rules, Inventory,
+  Files touched · from `2026-11-09-prompt-PLAY-dOrderedCharter-35-repair-brief.md` items 1, 3 and 5:
+  PLAY-dOrderedCharter-35's composer is `derive_row_composition`, and `read_kind_schema` is
+  PLAY-dOrderedCharter-35's, in `overlay_rows.py`, reading the `[kind]` table and each field's
+  `name` and `shape`, so this unit extends that one reader with its keys and refusals, the shape
+  refusal PLAY-dOrderedCharter-35's, and mints it no longer; the edge to PLAY-dOrderedCharter-35
+  mirrors the one PLAY-dOrderedCharter-35 hands off.
 
 ## 10. Reuse audit
 

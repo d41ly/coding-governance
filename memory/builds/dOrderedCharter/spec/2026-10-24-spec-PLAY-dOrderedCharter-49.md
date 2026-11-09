@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-49 — the round-1 spec audit's 73 minors: criteria that can pass, rows a new leg owes, one reader per fact, and seams in build order
 
-**Status:** DEFERRED · rev-6 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 39 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-7 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 39 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -160,8 +160,8 @@ corrected fix.
 - **S45** — id 59. One `resolve_fixed_by(source)` in `tools/playbook/instruction_units.py`, on unit 26's
   symbol finder, serves unit 32's `derive_unit_class` and unit 36's row checks (§8 F8). Observed by
   AC36.
-- **S46** — id 60. Unit 33's `derive_pin_state` takes a canonicaliser, and unit 35's `compose_rows`
-  calls it for steps 4 and 5, as unit 35's §10 says. Observed by AC37.
+- **S46** — id 60. Unit 33's `derive_pin_state` takes a canonicaliser, and unit 35's
+  `derive_row_composition` calls it for steps 4 and 5, as unit 35's §10 says. Observed by AC37.
 - **S47** — id 68, met at HEAD: `tools/memory-tree/id_grammar.py#git` names its encoding, and the
   `extract.py` row at `memory/project/encoding-posture-sites.txt:29` is gone. Observed by AC38.
 - **S48** — id 69. The adopter docs say the grammar ships in memory-tree's `id_grammar.py`:
@@ -601,6 +601,9 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC8 AC10 AC41 AC42 AC49 · t
   at `05aeb20a`: S31 reads enveloped files, not registry rows; the items unit 2's or 3's spec, the
   tree or their own pass met are observations, ids and criteria kept; S1 maps unit 37 F9's fields;
   units 54 and 55 follow this one.
+- rev-7 · 2026-11-09 · S46 · from `2026-11-09-prompt-PLAY-dOrderedCharter-35-repair-brief.md` item
+  1: PLAY-dOrderedCharter-35's composer is `derive_row_composition`, the name the naming lexicon
+  passes, and S46 spells it.
 
 ## 10. Reuse audit
 
