@@ -189,7 +189,7 @@ ENFORCED_NONE = "none — "
 #: S1's string fields and list fields, in their row spelling; `level`, `enforced-by` and `class` read apart
 UNIT_STRINGS = ("tag", "type", "trigger", "budget", "text", "source", "owner", "usage", "help")
 UNIT_LISTS = ("scope", "required-by", "edges")
-UNIT_KEYS = frozenset((*UNIT_STRINGS, *UNIT_LISTS, "level", "enforced-by", "class"))
+UNIT_KEYS = frozenset((*UNIT_STRINGS, *UNIT_LISTS, "level", "enforced-by", "class", "fixed-by"))
 #: the two keys a unit row derives and never carries: status from the change record, origin from the kit
 DERIVED_UNIT_KEYS = ("origin", "status")
 UNIT_REQUIRED = ("tag", "level", "type")
@@ -279,6 +279,7 @@ class Unit:
     index: int
     line: int
     body: str
+    fixed_by: tuple | None = None   # PLAY-dOrderedCharter-32 S5: None where the row declares no `fixed-by`
 
 
 @functools.lru_cache(maxsize=None)
@@ -356,6 +357,9 @@ def parse_unit_rows(text, path, origin=None) -> tuple[list, list]:
         klass = row.get("class", "fixed")
         if not isinstance(klass, str):
             bad.append("`class` is no string")
+        fixed_by = row.get("fixed-by")
+        if fixed_by is not None and not (isinstance(fixed_by, list) and all(isinstance(x, str) for x in fixed_by)):
+            bad.append("`fixed-by` is no list of strings")
         if bad:
             add_fault(i, tag, "; ".join(bad))
             continue
@@ -364,7 +368,8 @@ def parse_unit_rows(text, path, origin=None) -> tuple[list, list]:
                           trigger=vals["trigger"], budget=vals["budget"], text=vals["text"],
                           source=vals["source"], origin=origin, owner=vals["owner"], usage=vals["usage"],
                           help=vals["help"], required_by=vals["required-by"], enforced_by=enforced,
-                          klass=klass, edges=vals["edges"], path=path, index=i, line=line, body=body))
+                          klass=klass, edges=vals["edges"], path=path, index=i, line=line, body=body,
+                          fixed_by=None if fixed_by is None else tuple(fixed_by)))
     return units, faults
 
 
@@ -880,6 +885,16 @@ def check_tag_entry(value) -> str | None:
     return None if word in read_namespace_words() else f"opens with `{word}`, which no namespace registers"
 
 
+def check_declared_class(row) -> tuple[str, str] | None:
+    """PLAY-dOrderedCharter-32 S5: `(why, remedy)` where a row declares a class other than `open`, the one
+    value a row may type, since `fixed` is derived; None where it declares `open` or nothing."""
+    if "class" not in row or row["class"] == "open":
+        return None
+    if row["class"] == "fixed":
+        return "`fixed` is typed, and a fixed class is derived", "delete it: an undeclared class reads fixed"
+    return f"{row['class']!r} is no class", f"declare `open` or nothing; the classes are {', '.join(UNIT_CLASSES)}"
+
+
 def check_unit_row(unit, row, ns="unit") -> list[str]:
     """S1: one row's fields, `row` the table as TOML reads it; each red names the manifest, the tag and the
     field. A row with no `budget` is held to `line`, the smaller; `ns` is its manifest's namespace."""
@@ -909,8 +924,9 @@ def check_unit_row(unit, row, ns="unit") -> list[str]:
         add_red("text", f"a {unit.type} carries no text", f"type the {unit.type}'s line")
     if unit.type in (POLICY_VALUE, FACT) and not unit.source:
         add_red("source", f"a {unit.type} carries no source", "source it from a policy key or a command")
-    if unit.klass not in UNIT_CLASSES:
-        add_red("class", f"{unit.klass!r} is no class", f"use one of {', '.join(UNIT_CLASSES)}")
+    fault = check_declared_class(row)
+    if fault:
+        add_red("class", *fault)
     for key, values in (("scope", unit.scope), ("required-by", unit.required_by)):
         for value in values:
             fault = check_tag_entry(value)

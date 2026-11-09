@@ -1199,17 +1199,25 @@ def resolve_answers(engine_dir: Path, gov_root: Path, target: Path,
 
 def render_unit_slots(text: str, target: Path, notes: list, slots: list | None = None) -> str:
     """Each `<!-- units: <selector> -->` line replaced by the lines of the units its selector selects, and
-    nothing of its own. A selector no namespace registers, a selected unit whose change records retired it
+    nothing of its own, the units composed with the repository's overlay by `overlay.derive_slot_units`
+    (PLAY-dOrderedCharter-32 S4). A selector no namespace registers, a selected unit whose change records retired it
     and an unreadable manifest each refuse; a slot selecting nothing is noted `unarmed`. Each `(tag, line)`
     lands in `slots`, what the lock's row records."""
     if not UNIT_SLOT_RE.search(text):
         return text
     iu = load_units_module()
+    import overlay
     from policy_value import read_policy_value
     read_key = functools.partial(read_policy_value, root=target)
     try:
         units, records = iu.read_units(target), iu.read_change_records(target)
-    except ValueError as e:    # UnitRowError and the git reader's LevelError
+        # PLAY-dOrderedCharter-32 S4: the repository's overlay composes into each slot; the whole tree's
+        # composition first, so a dangling or fixed target refuses whichever slot it would land in
+        repo, policy_reader = overlay.read_overlay(target), overlay.derive_policy_reader(target)
+        exclude = overlay.read_excluded_tags(target) if units else set()
+        fixed = overlay.derive_fixed_units(units, target)
+        overlay.derive_unit_composition(units, repo.units, exclude, fixed=fixed, policy_reader=policy_reader)
+    except ValueError as e:    # UnitRowError, the git reader's LevelError and OverlayRefused
         raise Refusal(f'the units a slot selects are unreadable: {e}') from None
 
     def render_slot(match) -> str:
@@ -1217,7 +1225,10 @@ def render_unit_slots(text: str, target: Path, notes: list, slots: list | None =
         fault = iu.check_tag_entry(selector)
         if fault:
             raise Refusal(f'the slot `{selector}` {fault}')
-        chosen = iu.derive_unit_selection(units, selector)
+        try:
+            chosen = overlay.derive_slot_units(units, repo.units, selector, exclude, fixed, policy_reader)[0]
+        except overlay.OverlayRefused as e:
+            raise Refusal(str(e)) from None
         for u in chosen:
             status = iu.derive_status(u.tag, records)
             if status != 'active':
@@ -2494,6 +2505,14 @@ def run_selftest() -> int:
               and [r.get('template') for r in rows] == [f'TPL.md@v{TEMPLATE_MAJOR}.4'],
               'the rendered charter carries no version marker and the lock row carries it',
               f'rc {rc}, charter {left!r}, lock rows {rows!r}')
+
+    # PLAY-dOrderedCharter-32 — the overlay's plants, each staging its own failing case in a throwaway
+    # repository: add, amend, replace, exclude, the derived class, the repository keys and the writer.
+    done = subprocess.run([sys.executable, str(Path(__file__).resolve().parent / 'overlay.py'), '--fixture'],
+                          capture_output=True, text=True, encoding='utf-8', errors='replace',
+                          stdin=subprocess.DEVNULL, timeout=600)
+    check_arm(done.returncode == 0, 'the overlay composes, refuses and writes as its plants say',
+              done.stdout[-2000:] + done.stderr[-500:])
 
     # TOOL-aRepatriatedFork-42 — `--answers` states what `render` would use, and grades `kits` alike.
     with tempfile.TemporaryDirectory() as td:

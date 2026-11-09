@@ -248,6 +248,16 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "Overlay",
+      "kind": "class",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "OverlayRefused",
+      "kind": "class",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "ParsedRow",
       "kind": "class",
       "file": "tools/memory-tree/row_grammar.py"
@@ -943,6 +953,26 @@
       "file": "tools/workflows/check-verifier-fanout.test.sh"
     },
     {
+      "id": "arm_add_level_1",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "arm_add_level_3",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "arm_adopter_key",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "arm_amends",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "arm_arms",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -1098,9 +1128,24 @@
       "file": "tools/playbook/core.py"
     },
     {
+      "id": "arm_exclude",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "arm_extractor",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_fixed_by",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "arm_fixed_target",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
     },
     {
       "id": "arm_flow_only",
@@ -1113,9 +1158,19 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_foreign_tag",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "arm_git_env",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_gov_reads_adopter",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
     },
     {
       "id": "arm_graded_sha",
@@ -1308,6 +1363,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "arm_parsed_open",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "arm_patch",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -1391,6 +1451,11 @@
       "id": "arm_renderers",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_repo_in_gov",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
     },
     {
       "id": "arm_rerender",
@@ -1478,6 +1543,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "arm_supersedes",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "arm_tags",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -1486,6 +1556,16 @@
       "id": "arm_two_kits",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_typed_fixed",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "arm_typed_origin",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
     },
     {
       "id": "arm_unenforced",
@@ -1516,6 +1596,11 @@
       "id": "arm_write",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_write_order",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
     },
     {
       "id": "armed",
@@ -2446,6 +2531,11 @@
       "id": "build_fixture",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
+      "id": "build_fixture",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
     },
     {
       "id": "build_fixture",
@@ -4528,6 +4618,11 @@
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
+      "id": "check_born",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "check_branch",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -4928,6 +5023,11 @@
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
+      "id": "check_declared_class",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "check_derived",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -5188,6 +5288,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_fixed_sources",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "check_fixture_target",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -5291,6 +5396,11 @@
       "id": "check_gov_first",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "check_gov_units",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
     },
     {
       "id": "check_graders",
@@ -6353,6 +6463,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "check_red",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "check_red_at",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -7236,6 +7351,11 @@
       "id": "check_watched",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "check_when",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
     },
     {
       "id": "check_when",
@@ -8768,6 +8888,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "derive_edge_targets",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "derive_edges",
       "kind": "function",
       "file": "tools/playbook/check_layers.py"
@@ -8893,6 +9018,16 @@
       "file": "tools/govkit/upgrade_walk.py"
     },
     {
+      "id": "derive_fixed_units",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "derive_fixing_sources",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "derive_fixture_files",
       "kind": "function",
       "file": "tools/playbook/writing_practice.py"
@@ -8926,6 +9061,11 @@
       "id": "derive_foreign",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "derive_fx_composition",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
     },
     {
       "id": "derive_fx_long",
@@ -8976,6 +9116,11 @@
       "id": "derive_gov_root",
       "kind": "function",
       "file": "tools/lib/python_floor.py"
+    },
+    {
+      "id": "derive_gov_rows",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
     },
     {
       "id": "derive_governed_paths",
@@ -9588,6 +9733,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "derive_overlay_text",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "derive_owed_rows",
       "kind": "function",
       "file": "tools/run-gates/owed_rows.py"
@@ -9651,6 +9801,11 @@
       "id": "derive_policy_adopter",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
+      "id": "derive_policy_reader",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
     },
     {
       "id": "derive_predictor_verdict",
@@ -10253,6 +10408,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "derive_slot_units",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "derive_source_paths",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -10486,6 +10646,16 @@
       "id": "derive_turnstile_wait",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "derive_unit_class",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "derive_unit_composition",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
     },
     {
       "id": "derive_unit_key",
@@ -13005,6 +13175,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/playbook/positional.py"
     },
     {
@@ -14481,6 +14656,11 @@
       "id": "parse_observed",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
+      "id": "parse_overlay_policies",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "parse_pin",
@@ -16558,6 +16738,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "read_excluded_tags",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "read_expand_rows",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -17263,6 +17448,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_landed_text",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
       "id": "read_landed_unclosed",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -17741,6 +17931,16 @@
       "id": "read_over_cap_findings",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_overlay",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "read_overlay_policies",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "read_override",
@@ -20566,6 +20766,16 @@
       "id": "render_fixture_row",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "render_fx_row",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "render_fx_slot",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
     },
     {
       "id": "render_gate_line",
@@ -24080,6 +24290,11 @@
     {
       "id": "run_check",
       "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "run_check",
+      "kind": "function",
       "file": "tools/playbook/positional.py"
     },
     {
@@ -24395,6 +24610,11 @@
     {
       "id": "run_fixture",
       "kind": "function",
+      "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
       "file": "tools/playbook/writing_practice.py"
     },
     {
@@ -24476,6 +24696,11 @@
       "id": "run_fusion",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "run_fx_check",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
     },
     {
       "id": "run_gate",
@@ -25191,6 +25416,11 @@
       "id": "run_pm_decide",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "run_policy_cli",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
     },
     {
       "id": "run_positional_plant",
@@ -30966,6 +31196,11 @@
       "id": "write_overlapping_dispatch",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "write_overlay_units",
+      "kind": "function",
+      "file": "tools/playbook/overlay.py"
     },
     {
       "id": "write_override",

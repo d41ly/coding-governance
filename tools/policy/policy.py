@@ -19,7 +19,10 @@ calls, is `budgets.py` beside this file (TOOL-dGroundRules-9).
 The catalogue, `catalogue.toml` beside this file, is the schema: one row per policy key. A file key
 is matched to a row as a tuple of SEGMENTS, never as a joined string, because a quoted TOML segment
 such as `budgets."AGENTS.md"` carries a dot. An exact name outranks a placeholder (`<word>`) or a
-final `*`, each matching exactly one segment, and fewer placeholders outrank more.
+final `*`, each matching exactly one segment, and fewer placeholders outrank more. A repository's own
+keys, `adopter.<name>`, are rows too: `read_overlay_policies` reads the `[[policy]]` tables of the
+instruction overlay `.governance/instructions.toml` at the revision read, and `read_revision` joins
+them to the catalogue's, so the matcher, `validate` and the mirror see them (PLAY-dOrderedCharter-32).
 
 THE READER reads `.governance/policy.toml` as committed at the landed revision, never from the
 working tree, and parses it with tomllib, never by sourcing it: `read_policy_key`'s contract in the
@@ -61,6 +64,9 @@ KIT_POLICY_VERSION = "1.4"
 KIT = Path(__file__).resolve().parent
 CATALOGUE = "catalogue.toml"
 POLICY_REL = ".governance/policy.toml"
+OVERLAY_REL = ".governance/instructions.toml"   # the instruction overlay, whose `[[policy]]` rows join the catalogue's
+ADOPTER = "adopter"                             # the one top segment a repository's own key sits under
+REPOSITORY_OWNER = "repository"
 # The git variables every git call here drops, INLINED byte-identically from the canonical copy named
 # on its marker line and gated by the resolve-python self-test (TOOL-dGroundRules-21 S9): a reader
 # started inside a hook or a fixture reads the repository it was pointed at, never the one the
@@ -600,11 +606,49 @@ def validate(text, rows=None, census=None):
     return out + budgets.check_budgets(doc, text, census)
 
 
+def parse_overlay_policies(text):
+    """The `[[policy]]` tables of the instruction overlay's text, None for an absent file, as catalogue
+    rows whose `owner` is the repository (PLAY-dOrderedCharter-32 S7): `key` the row's `name`, `values`
+    its closed `allowed` list, `default`, `summary` and `usage`. A key outside `adopter.<name>`, so a
+    catalogue key redeclared, and a row whose `values` is no list holding its `default`, are a Refusal
+    naming the row; text that is not TOML is one too. The playbook kit reads the `[[unit]]` rows."""
+    if text is None:
+        return []
+    try:
+        tables = tomllib.loads(derive_bomless_text(text)).get("policy") or []
+    except tomllib.TOMLDecodeError as exc:
+        raise Refusal(OVERLAY_REL, 0, f"does not parse: {exc}") from None
+    rows = []
+    for i, row in enumerate(tables if isinstance(tables, list) else [tables], 1):
+        key = row.get("key") if isinstance(row, dict) else None
+        segs = str(key).split(".")
+        where = f"[[policy]] row {i} ({key})"
+        if not isinstance(key, str) or len(segs) != 2 or segs[0] != ADOPTER or not BARE.fullmatch(segs[1]):
+            raise Refusal(OVERLAY_REL, 0, f"{where} is outside adopter.<name>: the overlay never declares a catalogue key")
+        values = row.get("values")
+        if not isinstance(values, list) or not values or not check_member(row.get("default"), values):
+            raise Refusal(OVERLAY_REL, 0, f"{where} carries no `values` list holding its `default`")
+        rows.append({"name": key, "allowed": values, "default": row["default"], "owner": REPOSITORY_OWNER,
+                     **{f: row[f] for f in ("summary", "usage") if f in row}})
+    return rows
+
+
+def read_overlay_policies(repo, sha):
+    """`parse_overlay_policies` over the overlay's blob in the commit `sha` names, through `read_blob_at`."""
+    try:
+        return parse_overlay_policies(read_blob_at(repo, sha, OVERLAY_REL))
+    except UnicodeDecodeError as exc:
+        raise Refusal(OVERLAY_REL, 0, f"not UTF-8: {exc}") from None
+
+
 def read_checked_text(repo, sha, rows=None):
     """(the policy file's text in the commit `sha` names, `validate`'s problems over it): None and []
     for an absent file. Text that is not UTF-8, as a PowerShell redirect writes it, is decoded inside
     the handler and handed on as one problem keyed "" with why opening `not UTF-8:`, which the
-    invalid branch reads as it reads text that is not TOML (TOOL-dGroundRules-21 S10)."""
+    invalid branch reads as it reads text that is not TOML (TOOL-dGroundRules-21 S10). `rows` defaults
+    to the catalogue's joined with the overlay's `[[policy]]` rows at `sha`, one revision answering
+    both a value and its row (PLAY-dOrderedCharter-32 S7)."""
+    rows = load_catalogue(KIT) + read_overlay_policies(repo, sha) if rows is None else rows
     try:
         text = read_policy_text(repo, sha)
     except UnicodeDecodeError as exc:
@@ -730,10 +774,11 @@ def read_revision(repo, rev=None, rows=None):
     spelling of the revision read that every reason names (TOOL-dGroundRules-65); `render_mirror` sets
     it to `{rev}`."""
     sha, how = derive_landed_revision(repo) if rev is None else (resolve_commit(repo, rev), f"--rev {rev}")
+    rows = (load_catalogue(KIT) if rows is None else list(rows)) + read_overlay_policies(repo, sha)
     text, problems = read_checked_text(repo, sha, rows)
     table = None if text is None or problems else parse_policy(text)
     return {"repo": repo, "sha": sha, "how": how, "rev_phrase": f"{sha[:8]}, {how}", "text": text,
-            "problems": problems, "table": table}
+            "problems": problems, "table": table, "rows": rows}
 
 
 def resolve_read(path, row, read):
@@ -753,8 +798,8 @@ def resolve(key, repo=".", rev=None):
     """-> Resolution for `key`: its path and catalogue row, then `resolve_read` over the revision's
     read, `rev` resolved to a full sha, else the landed revision."""
     path = parse_key(key)
-    rows = load_catalogue(KIT)
-    return resolve_read(path, read_catalogue_row(path, rows), read_revision(repo, rev, rows))
+    read = read_revision(repo, rev)
+    return resolve_read(path, read_catalogue_row(path, read["rows"]), read)
 
 
 # ---- the agent limit's legacy home (TOOL-dGroundRules-10) ----------------------------------------
@@ -809,8 +854,9 @@ def derive_lowered_limit(hit, read):
 MIRROR_REL = ".governance/policy.json"
 # Each legacy input the resolution reads, by its path at the revision read: the mirror records its
 # blob id under `legacy_blobs`, and the helper reads a mirror whose ids differ at L as STALE. A unit
-# adding a resolution input adds its path here (TOOL-dGroundRules-21 S17).
-LEGACY_INPUTS = (LEGACY_FANOUT,)
+# adding a resolution input adds its path here (TOOL-dGroundRules-21 S17). The instruction overlay is
+# one: its `[[policy]]` rows are the `adopter.` keys' rows (PLAY-dOrderedCharter-32 S7).
+LEGACY_INPUTS = (LEGACY_FANOUT, OVERLAY_REL)
 
 
 def check_json_value(key, value):
@@ -851,8 +897,8 @@ def render_mirror(repo, rev="HEAD"):
     byte-identical mirrors. The read's `rev_phrase` is the placeholder `{rev}`, so no reason names the
     rendered commit, which the lander's commit-tree rewrite replaces; `policy-mirror.js` fills it with
     the landed revision it read."""
-    rows = load_catalogue(KIT)
-    read = read_revision(repo, rev, rows)
+    read = read_revision(repo, rev)
+    rows = read["rows"]   # the catalogue's and the overlay's `adopter.` rows at the revision rendered
     read["rev_phrase"] = "{rev}"
     paths = {tuple(str(r["name"]).split(".")) for r in rows if r.get("name") and not check_pattern_name(r["name"])}
     keys = {}

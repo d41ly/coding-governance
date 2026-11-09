@@ -80,7 +80,7 @@ PRACTICES_TABLE = "practices.toml"
 PACK_KINDS = ("methodology", "governance", "language")
 PACK_ALL = "all"
 ROW_ORDER = ("tag", "level", "type", "scope", "trigger", "budget", "text", "source", "owner", "usage", "help",
-             "required-by", "enforced-by", "class", "edges")
+             "required-by", "enforced-by", "class", "fixed-by", "edges")
 OPPOSED = re.compile(r"(MUST|NEVER)\s+(\S.*)", re.S)
 #: the flags a write's change record is made from, each with the placeholder a proposal prints
 RECORD_FLAGS = (("build", "--build", "<slug>"), ("unit", "--unit", "<id>"), ("mark", "--mark", "<editorial|semantic>"))
@@ -211,6 +211,12 @@ def derive_candidate(text, rel, verb, args) -> Candidate:
         raise Refused(1, *[f"{SAY}: red · {f}" for f in faults])
     if verb == "add":
         row = derive_row(args)
+        if rel == iu.OVERLAY:   # PLAY-dOrderedCharter-32 S8: the overlay's rows by level then tag
+            import overlay
+            try:
+                return Candidate(overlay.derive_overlay_text(text, [row]), "none", derive_row_pin(row["tag"], row))
+            except overlay.OverlayRefused as exc:
+                raise Refused(exc.code, str(exc)) from None
         lead = text.rstrip("\r\n") + "\n\n" if text.strip() else ""
         return Candidate(lead + render_row(row), "none", derive_row_pin(row["tag"], row))
     held = {u.tag: u for u in units}
@@ -302,7 +308,11 @@ def write_candidate(root, rel, candidate, verb, args, proof) -> tuple[list, int]
     path = pathlib.Path(root, rel)
     held = path.read_bytes() if path.is_file() else None
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(candidate.text.encode("utf-8"))
+    if rel == iu.OVERLAY and verb == "add":   # the overlay's one adder, writing the bytes `derive_candidate` checked
+        import overlay
+        overlay.write_overlay_units(path, [derive_row(args)])
+    else:
+        path.write_bytes(candidate.text.encode("utf-8"))
     successor = args.successor if verb in ("rename", "split") else "none" if verb == "remove" else None
     try:
         record = build_records.write_change(root, args.build, args.unit, args.tag, verb, args.mark, candidate.before,

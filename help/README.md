@@ -15,4 +15,5 @@ One task-oriented page per user-facing feature: what it is, how to use it, a sho
 - [The docs leg](docs-leg.md) — the `docs` leg: how a page under `help/` is kept current with the usage it documents, what `docs_leg.py` reds, how to answer a stale page, what `help.enforce` does, and how a later class joins.
 - [Spec-audit chains](spec-audit.md) — how a spec audit's round disposes its findings, how `--record-round` and `--chain-verdict` record a round and answer CONTINUE, STOP or HOLD, and what `review.spec-audit.disposal`, `.chain-stop` and `.chain-ceiling` do.
 - [The charter's practices](charter.md) — what the practice catalogue is, how to read the active set, how `charter.practices` chooses it, and what stops a render.
+- [The instruction overlay](overlay.md) — how a repository adds, amends, replaces and excludes an instruction unit in `.governance/instructions.toml`, which units are fixed, and how it declares a policy key of its own under `adopter.`.
 - [Tags and the resolver](tags.md) — what a tag and a citation are, how to find, read and cite one with `gov_tag.py`, what `check` reds, and what `tags.slice`, `tags.retired-cites` and `tags.bare-refs` do.

@@ -231,10 +231,17 @@ def arm_schema(repo, kit):
     key no row matches (TOOL-dGroundRules-4 re-points this arm through the one judge), and the
     `[budgets]` table's rule over the cap census `repo` holds at this kit's path (TOOL-dGroundRules-9).
     A census that does not read, or a file that is not UTF-8, is the one finding. No policy file, or
-    one setting no key, is a population of 0, which this arm announces (TOOL-dGroundRules-21 S5)."""
+    one setting no key, is a population of 0, which this arm announces (TOOL-dGroundRules-21 S5). The
+    rows are the catalogue's joined with the working tree's overlay `[[policy]]` rows, so an `adopter.`
+    key is judged against its row (PLAY-dOrderedCharter-32 S7)."""
     rows, bad = load_rows(kit)
     if bad:
         return 0, "the catalogue did not parse", [bad]
+    overlay = Path(repo, policy.OVERLAY_REL)
+    try:
+        rows = rows + policy.parse_overlay_policies(overlay.read_text(encoding="utf-8") if overlay.is_file() else None)
+    except (policy.Refusal, UnicodeDecodeError) as exc:
+        return 0, f"{policy.OVERLAY_REL} did not read", [(policy.OVERLAY_REL, str(exc))]
     path = Path(repo, *POLICY_FILE)
     if not path.is_file():
         return 0, f"{POLICY_REL} is absent, so no key was graded", []
@@ -2414,8 +2421,8 @@ def run_guard_case(name):
             extra = policy.LEGACY_FANOUT
             if name == "guard-mirror-inputs-join":
                 extra = ".zz-recorded.conf"
-                write_edit(kit / "policy.py", lambda t: t.replace("LEGACY_INPUTS = (LEGACY_FANOUT,)",
-                                                                  f"LEGACY_INPUTS = (LEGACY_FANOUT, {extra!r})"))
+                write_edit(kit / "policy.py", lambda t: t.replace("LEGACY_INPUTS = (LEGACY_FANOUT, OVERLAY_REL)",
+                                                                  f"LEGACY_INPUTS = (LEGACY_FANOUT, OVERLAY_REL, {extra!r})"))
                 run_fixture_git(repo, "add", "-A")
                 run_fixture_git(repo, "commit", "-q", "-m", "a render recording one more input")
             checks.append(check_get("HEAD", repo, ["--write"], lambda rc, o, e: rc == 0
