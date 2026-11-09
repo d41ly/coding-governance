@@ -437,7 +437,8 @@ def read_packs(root=None) -> list:
 
 def resolve_practices(value, root=None) -> list:
     """S8: a `charter.practices` value, pack names and practice tags, as practice tags in first-named order, a
-    pack's `all` every catalogue tag. No catalogue, or a name it lacks, raises UnitRowError."""
+    pack's `all` every catalogue tag. No catalogue, or a name it lacks, raises UnitRowError, naming the row a
+    retired tag's `replaces` points at."""
     root = root or resolve_root()
     packs, catalogue = {p.get("name"): p for p in read_packs(root)}, read_practice_tags(root)
     if catalogue is None:
@@ -448,7 +449,10 @@ def resolve_practices(value, root=None) -> list:
         members = catalogue if members == PACK_ALL else members
         unknown = [m for m in members if m not in catalogue]
         if unknown:
-            raise iu.UnitRowError(f"`{name}` names {', '.join(unknown)}, which the practice catalogue lacks")
+            path = iu.derive_kit_file(root, PRACTICES_TABLE)
+            successors = iu.derive_successors(tomllib.loads(path.read_text(encoding="utf-8")).get("practice") or [])
+            raise iu.UnitRowError(f"`{name}` names {', '.join(unknown)}, which the practice catalogue lacks"
+                                  + "".join(f"; {t} is replaced by {successors[t]}" for t in unknown if t in successors))
         tags += [t for t in members if t not in tags]
     return tags
 

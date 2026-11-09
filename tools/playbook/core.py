@@ -18,7 +18,9 @@ principle no leg's `enforces` and no kind's `binds` names is red, a tag no regis
 carrying no `enforces` is red, each excused only by a pending row, and a pending row whose item is enforced
 is red as stale. The registry is read against the `P<n>` heads of the design record's `[principles]`, the
 conf's `DESIGN_RECORD`, both ways. Under `core.bypass` `never`, a leg whose `enforces` is non-empty and which
-carries a `guard` is red, so no leg guard can skip a core check. Every run prints each pending count.
+carries a `guard` is red, so no leg guard can skip a core check. Every run prints each pending count. A practice
+row's `rules` join the practice population as `<tag>.<rule>` tags, the row enforced once each rule is enforced or
+pending, and a row's pending rules print by name.
 
 KINDS reds a kind row outside the `kind` namespace, a `binds` tag no registry row holds, a pending row naming
 a kind the register lacks, and, for a kind off the pending list, a factory naming no file or a gate naming no
@@ -303,7 +305,18 @@ def run_meta_check(root=None):
         lines.append(f"{SAY}: practice · unarmed: {kit_rel}/practices.toml is absent, so no practice is joined")
         owners = {o: {"principle": c["principle"]} for o, c in owners.items()}
     else:
-        inventories["practice"] = sorted(r["tag"] for r in practices if isinstance(r.get("tag"), str))
+        # PLAY-dOrderedCharter-30 S4: a row's `rules` join the population as `<tag>.<rule>`, and the row counts as
+        # enforced once each rule is enforced or pending. A malformed `rules` is read_practice_catalogue's refusal.
+        rules = {r["tag"]: [f"{r['tag']}.{n}" for n in r["rules"] if isinstance(n, str)] for r in practices
+                 if isinstance(r.get("tag"), str) and isinstance(r.get("rules"), list) and r["rules"]}
+        inventories["practice"] = sorted({r["tag"] for r in practices if isinstance(r.get("tag"), str)}
+                                         | {t for ts in rules.values() for t in ts})
+        covered = enforced.get("practice", set()) | set(pending["practice"])
+        owners["rules enforced"] = {"practice": tuple(sorted(t for t, ts in rules.items() if set(ts) <= covered))}
+        for tag, ts in rules.items():
+            waiting = [t for t in ts if t in pending["practice"]]
+            if waiting:
+                lines.append(f"{SAY}: pending rules · {tag} · {len(waiting)} · " + ", ".join(waiting))
     inventories["leg"] = sorted({leg["name"] for leg in legs})
     owners["leg enforces"]["leg"] = tuple(sorted(leg["name"] for leg in legs if leg.get("enforces")))
     baseline = {k: tuple(sorted(pending[k])) for k in ("principle", "practice", "leg")}
@@ -895,10 +908,35 @@ def arm_bypass_never(c):
         shutil.rmtree(bad, ignore_errors=True)
 
 
+def arm_portable_orphan(c):
+    """PLAY-dOrderedCharter-30 AC3, AC4: a row's `rules` joined both ways, one rule enforced and one pending."""
+    c.write_file(f"{c.kit}/practices.toml", lambda _t: ('[[practice]]\ntag = "practice.portable"\nline = "x"\n'
+                                                       'rules = ["encoding", "quoting"]\n[practice.reach]\nbuild = "x"\n'))
+    pending = c.write_file(f"{c.kit}/core-pending.txt", lambda t: t + "practice\tpractice.portable.quoting\tdFx\n")
+    pending += "practice\tpractice.portable.quoting\tdFx\n"
+    c.write_legs(lambda legs: legs + [{"name": "fx encoding", "argv": ["python", "x.py"],
+                                       "enforces": ["practice.portable.encoding"]}])
+    c.check_gate("portable-orphan: the control, one rule enforced and one pending", run_meta_check, 0,
+                 "pending rules · practice.portable · 1 · practice.portable.quoting", "meta-check · green")
+    held = c.write_legs(lambda legs: [dict(g, enforces=["principle.p16"]) if g["name"] == "fx encoding" else g
+                                      for g in legs])
+    c.check_gate("portable-orphan: the encoding rule's enforces tag removed", run_meta_check, 1,
+                 "practice.portable.encoding: no leg's enforces", "practice.portable: no leg's enforces")
+    c.set_file(f"{c.tool}/gate-legs.json", held)
+    c.write_legs(lambda legs: [dict(g, enforces=g["enforces"] + ["practice.portable.spelling"])
+                               if g["name"] == "fx encoding" else g for g in legs])
+    c.check_gate("portable-orphan: a leg enforcing a rule no row declares", run_meta_check, 1,
+                 "practice.portable.spelling: a leg enforces tag no practice row holds")
+    c.set_file(f"{c.tool}/gate-legs.json", held)
+    c.write_file(f"{c.kit}/core-pending.txt", lambda _t: pending + "practice\tpractice.portable.encoding\tdFx\n")
+    c.check_gate("portable-orphan: a pending row for a rule a leg enforces", run_meta_check, 1,
+                 "pending practice row practice.portable.encoding is stale")
+
+
 PLANTS = {"registry": arm_registry, "unenforced": arm_unenforced, "pending": arm_pending,
           "kinds": arm_kinds, "skill": arm_skill, "practice": arm_practice, "exception": arm_exception,
           "exceptions-values": arm_exceptions_values, "bypass-never": arm_bypass_never,
-          "instruction-unit": arm_instruction_unit}
+          "instruction-unit": arm_instruction_unit, "portable-orphan": arm_portable_orphan}
 
 
 def run_fixture(plant=None):

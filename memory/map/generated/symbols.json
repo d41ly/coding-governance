@@ -1318,6 +1318,11 @@
       "file": "tools/playbook/core.py"
     },
     {
+      "id": "arm_portable_orphan",
+      "kind": "function",
+      "file": "tools/playbook/core.py"
+    },
+    {
       "id": "arm_practice",
       "kind": "function",
       "file": "tools/playbook/core.py"
@@ -10276,6 +10281,11 @@
       "id": "derive_string_constants",
       "kind": "function",
       "file": "tools/playbook/check_layers.py"
+    },
+    {
+      "id": "derive_successors",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "derive_supersession_map",

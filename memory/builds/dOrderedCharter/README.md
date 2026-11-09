@@ -165,7 +165,7 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-8 — the build's card at level 1, through an ignored per-worktree card file the charter's entry file imports](spec/2026-10-23-spec-PLAY-dOrderedCharter-8.md) | 26 | 2 | CLOSED | rev-3 | 2026-11-09 |
 | [PLAY-dOrderedCharter-14 — memory instructing nothing: the auto-memory index measured at session start, its directives detected, a standing directive promoted into a unit](spec/2026-10-23-spec-PLAY-dOrderedCharter-14.md) | 27 | 2 | CLOSED | rev-4 | 2026-11-09 |
 | [PLAY-dOrderedCharter-43 — the card import written and checked by the one renderer's entry-files scope, never by a second writer](spec/2026-10-24-spec-PLAY-dOrderedCharter-43.md) | 27 | 2 | CLOSED | rev-4 | 2026-11-09 |
-| [PLAY-dOrderedCharter-30 — the portable practice: a role per language, one rule set, each rule paired with its named leg, absorbing `[cross-os]` and `[bytes]`](spec/2026-10-23-spec-PLAY-dOrderedCharter-30.md) | 28 | 2 | DEFERRED | rev-6 | 2026-11-08 |
+| [PLAY-dOrderedCharter-30 — the portable practice: a role per language, one rule set, each rule paired with its named leg, absorbing `[cross-os]` and `[bytes]`](spec/2026-10-23-spec-PLAY-dOrderedCharter-30.md) | 28 | 2 | CLOSED | rev-6 | 2026-11-09 |
 | [PLAY-dOrderedCharter-29 — the one writing practice's checks over records as well as units](spec/2026-10-23-spec-PLAY-dOrderedCharter-29.md) | 29 | 2 | DEFERRED | rev-4 | 2026-11-08 |
 | [PLAY-dOrderedCharter-23 — a build run unattended by default from its request, said in the drive section, and the `[land]` rule read through the request's mandate](spec/2026-10-23-spec-PLAY-dOrderedCharter-23.md) | 30 | 2 | DEFERRED | rev-4 | 2026-11-08 |
 | [PLAY-dOrderedCharter-32 — the repository's instruction overlay: `.governance/instructions.toml`, its `repo.` units, pinned edges into gov's units, derived classes and the repository's own policy keys](spec/2026-10-23-spec-PLAY-dOrderedCharter-32.md) | 31 | 2 | DEFERRED | rev-7 | 2026-11-08 |
@@ -183,7 +183,7 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-6 | 2026-11-08 |
 <!-- /gen:build-units -->
 
-Records: 474 bound to this build, across 4 record folder(s).
+Records: 477 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

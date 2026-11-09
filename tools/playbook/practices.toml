@@ -1,7 +1,9 @@
 # practices.toml — the practice catalogue, the `practice` namespace's declaring source (PLAY-dOrderedCharter-1).
 #
 # One [[practice]] row per practice, in render order: `tag`, `practice.` and its name; `line`, the rule
-# text after `[<name>] `, whose tokens resolve at render; an optional `kit`, the kit a line needs; and a
+# text after `[<name>] `, whose tokens resolve at render; an optional `kit`, the kit a line needs; an
+# optional `rules`, rule names each read as the tag `<tag>.<rule>` a leg's `enforces` pairs; an optional
+# `replaces`, retired practice tags this row succeeds; and a
 # reach table saying what the practice changes at each step it touches. `foundation` lists the tags the
 # policy key `charter.practices` defaults to. instruction_units.py's read_practice_catalogue reads it.
 
@@ -33,8 +35,7 @@ foundation = [
   "practice.security",
   "practice.risk",
   "practice.bound",
-  "practice.bytes",
-  "practice.cross-os",
+  "practice.portable",
   "practice.tokens",
   "practice.tools",
   "practice.roles",
@@ -251,18 +252,14 @@ design = "a fan-out declares its bound"
 review = "batching grows the batch, never the agent count"
 
 [[practice]]
-tag = "practice.bytes"
-line = "Byte discipline: LF on execution-sensitive files, and verify the staged bytes, never a pretty-printer's view of them."
+tag = "practice.portable"
+line = "Python for logic, shell as a thin shim, JavaScript for the harness; encoding, line endings, paths, launch, temps, the interpreter floor and quoting each have a leg."
+rules = ["encoding", "line-endings", "paths", "launch", "temp-files", "interpreter-floor", "quoting", "language-roles"]
+replaces = ["practice.bytes", "practice.cross-os"]
 [practice.reach]
-build = "keep execution-sensitive files on LF"
+build = "text IO names its encoding, LF on execution-sensitive files, temps unpredictable, interpreters through the resolver"
 test = "verify the staged bytes, never a pretty-printer's view of them"
-
-[[practice]]
-tag = "practice.cross-os"
-line = "Across operating systems: forward slashes in POSIX shells on Windows, native-shell installs, deterministic run modes, and instrument a process before calling it crash-free."
-[practice.reach]
-build = "forward slashes in POSIX shells on Windows, native-shell installs"
-test = "deterministic run modes, and instrument a process before calling it crash-free"
+review = "a portability rule broken while its leg stays green is a finding against the leg"
 
 [[practice]]
 tag = "practice.tokens"
@@ -274,7 +271,7 @@ review = "pin a diff base to a sha, and stop once verified"
 
 [[practice]]
 tag = "practice.tools"
-line = "Rely on the tools in section 3 before re-deriving anything they answer, and read a tool's refusal rather than routing around it."
+line = "Rely on the tools under this charter's 'Tools to rely on' before re-deriving anything they answer, and read a tool's refusal rather than routing around it."
 [practice.reach]
 plan = "ask the shipped tools before re-deriving what they answer"
 build = "read a tool's refusal rather than routing around it"

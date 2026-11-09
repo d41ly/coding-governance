@@ -1401,7 +1401,7 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
     retired = [d for d in drop_names if d in legacy and ('when', d) not in present]
     drop_names = [d for d in drop_names if d not in retired]
     # PLAY-dOrderedCharter-1 S6: a member naming a catalogue row leaves the active set, fence or none.
-    catalogue, cut = None, []
+    catalogue, cut, successors = None, [], {}
     if PRACTICES_LINE_RE.search(text):
         iu = load_units_module()
         try:
@@ -1410,8 +1410,10 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
             raise Refusal(str(e)) from None
         tags = {r['tag'] for r in catalogue['practice']}
         cut = [d for d in drop_names if f'practice.{d}' in tags]
+        successors = iu.derive_successors(catalogue['practice'])  # PLAY-dOrderedCharter-30 F5
+    replaced = [d for d in drop_names if f'practice.{d}' in successors]
     for d in drop_names:
-        if ('when', d) not in present and d not in cut:
+        if ('when', d) not in present and d not in cut and d not in replaced:
             raise Refusal(f'drop_blocks names `{d}` but no when fence in the template carries it')
 
     drop = {('kit', name) for ns, name in present if ns == 'kit' and name not in kits}
@@ -1424,6 +1426,8 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
     notes = [f'retired   drop_blocks {d} — {legacy[d]}; remove it from deploy.toml' for d in retired]
     notes += [f'retired   drop_blocks {d} — practice.{d} leaves the active set; charter.practices names the '
               f'set directly' for d in cut]
+    notes += [f'retired   drop_blocks {d} — practice.{d} is replaced by {successors[f"practice.{d}"]}, which stays '
+              f'active; charter.practices names the set directly' for d in replaced]
     if catalogue:
         text = PRACTICES_LINE_RE.sub(
             lambda _m: '\n'.join(render_practice_lines(catalogue, target, kits, cut, notes)), text, count=1)
@@ -1636,6 +1640,20 @@ PRACTICE_REFUSALS = (('a tag outside its shape', 'practice.One', 'tag = "practic
                       PRACTICE_TABLE[PRACTICE_TABLE.index('\n[[practice]]'):], 'practice = ["x"]\n'),
                      ('a foundation entry naming no row', 'names practice.none', '"practice.roles"]',
                       '"practice.none"]'))
+# PLAY-dOrderedCharter-30: a row carrying `rules` and `replaces`, the retired `practice.cross-os` its successor's.
+PORTABLE_TABLE = ('foundation = ["practice.one", "practice.portable"]\n'
+                  + PRACTICE_ROW.format('one', '', 'Rule one for {{ANSWER}}.')
+                  + PRACTICE_ROW.format('portable', 'rules = ["encoding", "quoting"]\nreplaces = ["practice.cross-os"]\n',
+                                        'Rule two.'))
+PORTABLE_REFUSALS = (('a rule named twice', 'rule `quoting` is named twice', '"quoting"]', '"quoting", "quoting"]'),
+                     ('a rule outside its shape', 'rule `Quoting`', '"quoting"]', '"Quoting"]'),
+                     ('a replaced tag a row holds', 'replaces `practice.one`, which a row holds',
+                      '["practice.cross-os"]', '["practice.one"]'),
+                     ('a tag two rows replace', 'practice row 2 (practice.portable) · replaces `practice.cross-os`, '
+                      'which practice row 1 (practice.one) replaces too', 'tag = "practice.one"\n',
+                      'tag = "practice.one"\nreplaces = ["practice.cross-os"]\n'))
+PORTABLE_NOTE = ('retired   drop_blocks cross-os — practice.cross-os is replaced by practice.portable, which stays '
+                 'active; charter.practices names the set directly')
 
 
 def write_render_target(td: Path, table=PRACTICE_TABLE, kits='["roles"]', tail='', tpl=PRACTICE_TEMPLATE,
@@ -1704,6 +1722,25 @@ def check_practice_arms(check_arm) -> None:
     check_arm(got is None and '- [one] Kept.' in body and 'the toolchain section' not in body
               and not any(n.startswith(note) for n in notes), 'a template with no practices line renders as before',
               f'refused {got!r}: {notes!r}')
+    for name, want, old, new in PORTABLE_REFUSALS:
+        _b, _n, got = render_target(PORTABLE_TABLE.replace(old, new, 1))
+        check_arm(got is not None and want in got, f'a catalogue with {name} refuses the render', f'refused with {got!r}')
+    for name, tpl in (('with its fence', PRACTICE_TEMPLATE + CROSS_OS_FENCE), ('with no fence', PRACTICE_TEMPLATE)):
+        body, notes, got = render_target(PORTABLE_TABLE, tail='drop_blocks = ["cross-os"]', tpl=tpl)
+        check_arm(got is None and '- [portable] Rule two.' in body and 'the toolchain section' not in body
+                  and PORTABLE_NOTE in notes, f'a drop_blocks member a row replaces, {name}, keeps its successor '
+                  'and notes it', f'refused {got!r}: {body!r} {notes!r}')
+    iu = load_units_module()
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        (Path(td) / 'practices.toml').write_text(PORTABLE_TABLE, encoding='utf-8')
+        try:
+            iu.resolve_active_practices(iu.read_practice_catalogue(Path(td) / 'practices.toml'), ['practice.cross-os'])
+            got = None
+        except iu.UnitRowError as e:
+            got = str(e)
+    check_arm(got is not None and 'practice.cross-os is replaced by practice.portable' in got,
+              'a set naming a replaced tag refuses naming its successor', f'refused with {got!r}')
     was = os.environ.pop('GOV_DEFAULT_BRANCH', None)
     try:
         _b, notes, got = render_target()
@@ -1724,6 +1761,9 @@ def check_practice_arms(check_arm) -> None:
         _b, _n, got = render_target(branch='master')
         check_arm(got is not None and 'charter.practices' in got and 'names no commit' in got,
                   'a repository on master with no remote refuses naming the key', f'refused with {got!r}')
+        _b, _n, got = render_target(PORTABLE_TABLE, policy='charter.practices = ["practice.cross-os"]\n')
+        check_arm(got is not None and 'practice.cross-os is replaced by practice.portable' in got,
+                  'a committed set naming a replaced tag refuses naming its successor', f'refused with {got!r}')
     finally:
         if was is not None:
             os.environ['GOV_DEFAULT_BRANCH'] = was

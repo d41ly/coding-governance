@@ -529,15 +529,43 @@ def read_practice_catalogue(path) -> dict:
             continue
         faults += [f"{where} · reach key `{step}` is outside [a-z0-9][a-z0-9-]*" for step in reach
                    if not tag_index.SEG_RE.fullmatch(step)]
+    # PLAY-dOrderedCharter-30 S2: `rules`, each read as the tag `<tag>.<rule>`, and `replaces`, the retired
+    # tags a row succeeds; an absent field is none.
+    replaced = {}
+    for i, row in enumerate(rows, 1):
+        where = f"{path}: practice row {i} ({row.get('tag')})"
+        for field in ("rules", "replaces"):
+            if not isinstance(row.get(field, []), list):
+                faults.append(f"{where} · `{field}` is no list")
+                row[field] = []
+        names = [str(r) for r in row.get("rules", [])]
+        faults += [f"{where} · rule `{r}` is outside [a-z0-9][a-z0-9-]*" for r in names
+                   if not tag_index.SEG_RE.fullmatch(r)]
+        faults += [f"{where} · rule `{r}` is named twice" for r in sorted(set(names)) if names.count(r) > 1]
+        for old in map(str, row.get("replaces", [])):
+            if not old.startswith("practice.") or not tag_index.SEG_RE.fullmatch(old.partition("practice.")[2]):
+                faults.append(f"{where} · replaces `{old}`, which is no practice.<name> tag")
+            elif old in seen:
+                faults.append(f"{where} · replaces `{old}`, which a row holds")
+            elif old in replaced:
+                faults.append(f"{where} · replaces `{old}`, which {replaced[old]} replaces too")
+            else:
+                replaced[old] = f"practice row {i} ({row.get('tag')})"
     faults += [f"{path}: `foundation` names {tag}, which no row holds" for tag in foundation if tag not in seen]
     if faults:
         raise UnitRowError("\n".join(faults))
     return {"foundation": foundation, "practice": rows}
 
 
+def derive_successors(rows) -> dict:
+    """PLAY-dOrderedCharter-30 F5: {retired practice tag: the tag of the row whose `replaces` names it}."""
+    return {old: r.get("tag") for r in rows for old in (r.get("replaces") or ()) if isinstance(old, str)}
+
+
 def resolve_active_practices(catalogue, value) -> list:
     """S4: the active rows in catalogue order, `value` the set `charter.practices` holds or None for the
-    `foundation` set. An empty set and a tag in no row raise UnitRowError naming it."""
+    `foundation` set. An empty set and a tag in no row raise UnitRowError naming it, and its successor where
+    a row replaces it."""
     rows = catalogue["practice"]
     if value is None:
         value = catalogue["foundation"]
@@ -545,7 +573,9 @@ def resolve_active_practices(catalogue, value) -> list:
         raise UnitRowError("charter.practices is the empty set: name a practice, or leave the key unset")
     unknown = sorted(set(value) - {r["tag"] for r in rows})
     if unknown:
-        raise UnitRowError(f"charter.practices names {', '.join(unknown)}, which no practice row holds")
+        successors = derive_successors(rows)
+        raise UnitRowError(f"charter.practices names {', '.join(unknown)}, which no practice row holds"
+                           + "".join(f"; {t} is replaced by {successors[t]}" for t in unknown if t in successors))
     return [r for r in rows if r["tag"] in value]
 
 

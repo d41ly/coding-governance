@@ -120,7 +120,7 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
   dead key, so its claimed keys cannot rot into fiction; path globs and dossier prose are not gated.
   `map_diff` renders any git range as a feature-level
   changelog. Zero CI changes — the gate rides the existing suite. Keeping it selected keeps its
-  tools line in the charter's section 3.
+  tools line in the charter's "Tools to rely on" section.
 - **A records-vs-reality audit** (`drift-audit/` kit): asks whether this repo's RECORD of its own
   state still matches the tree — stale claims, closed specs with no product commit, hand-kept
   inventories disagreeing with what they describe. Stdlib and git, seconds, no agents. Drop it if the
@@ -162,7 +162,9 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
 
 `drop_blocks` in the target's `deploy.toml` names blocks to remove that no kit governs. One exists:
 
-- `when:cross-os` — the `[cross-os]` practice and the toolchain fact. Drop it for a single-OS team; the note it prints asks for no removal, since the member still cuts the toolchain fact.
+- `when:cross-os` — the toolchain fact. Drop it for a single-OS team; the `[portable]` practice,
+  which replaced the cross-OS one, stays active, and the note the member prints asks for no removal,
+  since it still cuts the toolchain fact.
 
 v4.0 retired `node-table` and `security-outbound`: the node registry is generated from the fleet,
 and the outbound rules moved to the spec template's security checklist. A `drop_blocks` member

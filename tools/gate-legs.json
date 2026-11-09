@@ -184,7 +184,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "enforces": ["practice.portable.paths"]
   },
   {
     "name": "shell hygiene (a fork spent on builtin work)",
@@ -214,7 +215,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "enforces": ["practice.portable.temp-files"]
   },
   {
     "name": "spawn budget (forks per hot entrypoint)",
@@ -254,7 +256,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "enforces": ["practice.portable.encoding"]
   },
   {
     "name": "kit version markers",
@@ -332,7 +335,8 @@
     ],
     "chunk": "wiring",
     "subject": "kit",
-    "ceiling": 350
+    "ceiling": 350,
+    "enforces": ["practice.portable.launch", "practice.portable.interpreter-floor"]
   },
   {
     "name": "agent-cap self-test",

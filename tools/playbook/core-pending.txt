@@ -69,8 +69,9 @@ practice	practice.docs	dWitnessedBar
 practice	practice.security	dWitnessedBar
 practice	practice.risk	dWitnessedBar
 practice	practice.bound	dWitnessedBar
-practice	practice.bytes	dWitnessedBar
-practice	practice.cross-os	dWitnessedBar
+practice	practice.portable.line-endings	dWitnessedBar
+practice	practice.portable.quoting	dWitnessedBar
+practice	practice.portable.language-roles	dWitnessedBar
 practice	practice.tokens	dWitnessedBar
 practice	practice.tools	dWitnessedBar
 practice	practice.roles	dWitnessedBar
@@ -96,18 +97,14 @@ leg	unattended protocol size	dWitnessedBar
 leg	unattended skill size	dWitnessedBar
 leg	kickoff engine size <=18KiB	dWitnessedBar
 leg	shell hygiene (a loop fed by a command substitution)	dWitnessedBar
-leg	shell hygiene (a location probe asked from a moved directory)	dWitnessedBar
 leg	shell hygiene (a fork spent on builtin work)	dWitnessedBar
-leg	shell hygiene (a fixed-name temp renamed into place)	dWitnessedBar
 leg	spawn budget (forks per hot entrypoint)	dWitnessedBar
 leg	shell-hygiene selftest	dWitnessedBar
-leg	encoding posture (text IO names its encoding)	dWitnessedBar
 leg	kit version markers	dWitnessedBar
 leg	verdict epoch (kit version dates the engine)	dWitnessedBar
 leg	verdict-epoch self-test	dWitnessedBar
 leg	agent-instructions wiring	dWitnessedBar
 leg	manifest-check self-test	dWitnessedBar
-leg	python resolver (behaviour + inline parity + idiom ban)	dWitnessedBar
 leg	agent-cap self-test	dWitnessedBar
 leg	scratch-guard self-test	dWitnessedBar
 leg	format-guard self-test	dWitnessedBar

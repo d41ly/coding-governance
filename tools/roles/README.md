@@ -288,11 +288,12 @@ memory-tree kit, whose `.memory-tree.conf` names the memory root and, by `CHARTE
 doc the roles' rule tags resolve against.
 
 **A role's `rules` tags.** A tag every v4.x charter template carries outside any `when:` or `kit:`
-block is cited bare. A tag a target's charter may lack is cited with a trailing `?` — `cross-os`,
-fenced by `when:cross-os`, and `spec`, which v4.0 and the first v4.1 template lack — so a charter
-without it prints a note instead of refusing. Write the tags in charter order, and name a protocol
-in a body by its name ("the build method's M6"), never by its file: the checker refuses the file
-name of any protocol the charter's Protocols section lists.
+block is cited bare. A tag a target's charter may lack is cited with a trailing `?` — `spec`, which v4.0
+and the first v4.1 template lack — so a charter without it prints a note instead of refusing. `portable`
+is cited bare: a `drop_blocks` member `cross-os` cuts only the toolchain section and leaves it
+active. Write the tags in charter order, and name a protocol in a body by its name ("the build
+method's M6"), never by its file: the checker refuses the file name of any protocol the charter's
+Protocols section lists.
 
 - The base role files, the workflow table, the library, the checker, the renderers, the adopter and
   this README are the kit's, overwritten on every update.
@@ -395,8 +396,8 @@ else; the check compares the two on every run.
 
 | role | workflow | writes | reads | rules | agent | returns |
 |---|---|---|---|---|---|---|
-| `gov-builder` | build | product | input:spec, card:route?, brief:non-goals? | yagni, reuse, core, derive, verify, gate, docs, security, bytes, cross-os?, tools | true | whether the unit was committed, the commit, why when it was not, and which check ran for which gate |
-| `gov-diff-reviewer` | closing-review | none | input:diff, input:spec? | verify, gate, class, docs, left-shift, security, risk, bytes, cross-os? | true | concrete findings, each with its file and line, the input that reaches it, the consequence and a proposed fix |
+| `gov-builder` | build | product | input:spec, card:route?, brief:non-goals? | yagni, reuse, core, derive, verify, gate, docs, security, portable, tools | true | whether the unit was committed, the commit, why when it was not, and which check ran for which gate |
+| `gov-diff-reviewer` | closing-review | none | input:diff, input:spec? | verify, gate, class, docs, left-shift, security, risk, portable | true | concrete findings, each with its file and line, the input that reaches it, the consequence and a proposed fix |
 | `gov-orienter` | orient | none | input:question, input:prompt? | small, ids, memory, tokens, tools | true | the orientation card body: the derived task, the manifest audit line, the rows read, the records found, the bug classes and the open rows |
 | `gov-researcher` | research | none | input:question, brief:goal?, brief:non-goals? | reuse, verify, class, memory | true | the candidates, each with its mechanism, the smallest test that would make it lose and that test's result, then the pick and its reason |
 | `gov-reuse-scout` | reuse | none | input:question, task:in?, card:reuse? | reuse | true | the seam to extend, cited by path, or "no existing seam fits" with the evidence |

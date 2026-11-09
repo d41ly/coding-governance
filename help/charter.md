@@ -53,9 +53,11 @@ whatever order you name them in, and a row needing a kit you did not select stay
 renders only with the `roles` kit.
 
 To take one practice out whatever the set says, name it in `drop_blocks` in `.governance/deploy.toml`.
-`drop_blocks = ["cross-os"]` leaves `practice.cross-os` out, cuts the text the template fences with
-`when:cross-os`, and prints a `retired` note pointing at `charter.practices`, which names a set
-directly. Keep the member while you want the fenced text gone.
+`drop_blocks = ["cross-os"]` cuts the text the template fences with `when:cross-os`, the toolchain
+section, and leaves `practice.portable` active: that row replaced the retired cross-OS and byte
+practices, practice.cross-os and practice.bytes. The member prints a `retired` note naming
+`practice.portable` and pointing at `charter.practices`, which names a set directly. Keep the member
+while you want the fenced text gone.
 
 ## What stops a render
 
@@ -63,6 +65,8 @@ The render writes nothing, and names `charter.practices`, when:
 
 - the set is empty. `charter.practices = []` refuses with the reader's `this set is never empty`.
 - a value names something the catalogue lacks, such as `` `practice.nope` ``. Name a row or a pack.
+- a value names a retired practice, such as practice.bytes. The refusal names the row that
+  replaced it, `practice.portable`; name that instead.
 - the set leaves no row to render once the kit and `drop_blocks` cuts are made.
 - a set is committed and the memory-tree kit, which resolves it, is gone. Reinstall that kit.
 - the reader cannot name your landed revision, and prints
