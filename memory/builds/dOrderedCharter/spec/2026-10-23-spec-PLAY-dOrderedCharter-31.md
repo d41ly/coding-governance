@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-31 — this build's own upgrade steps: the agent-instructions wiring to the one renderer, adopter rules into the overlay, the seeded template's succession row, the census's change records and the `map_lib` deprecation
 
-**Status:** DEFERRED · rev-10 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 36 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
+**Status:** DEFERRED · rev-11 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 36 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
 
 **Carries:** cl-dClosedLoop-0061@bf1a53b5 whole
 
@@ -29,6 +29,8 @@
 | [2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md) | research | PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-11-08-prompt-PLAY-dOrderedCharter-46-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-46-drift-fold-brief.md) | research | PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-37 |
 | [2026-11-09-prompt-PLAY-dOrderedCharter-31-1-spec-writer.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-31-1-spec-writer.md) | journal | — |
+| [2026-11-09-prompt-PLAY-dOrderedCharter-31-2-spec-writer.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-31-2-spec-writer.md) | journal | — |
+| [2026-11-09-prompt-PLAY-dOrderedCharter-31-repair-2-brief.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-31-repair-2-brief.md) | research | — |
 | [2026-11-09-prompt-PLAY-dOrderedCharter-31-repair-brief.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-31-repair-brief.md) | research | — |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-37 |
 
@@ -157,13 +159,22 @@ input (section 8, F8), and the census moves no practice (PLAY-dOrderedCharter-34
   takes the row's key and its default bullet, the one route a level-0 unit renders through; and
   `tools/playbook/render_playbook.py#read_charter_table` refuses a `[charter]` key no row declares,
   which an adopter that has not yet run the step still answers. The block renders the key's lines
-  and then the units, so the step's up leaves the rendered rules and their order as they were. The
+  and then the units, so the step's up leaves the rendered rules and their order as they were. That
+  holds through two properties of the rows the step writes. The block renders the level-0 units
+  `tools/playbook/instruction_units.py#derive_unit_selection` keeps under its every-reader selector,
+  which keeps a unit only when its `scope` holds the selector or `reader.every`, so each converted
+  row carries `scope = ["reader.every"]`. It renders them in overlay row order, and
+  `tools/playbook/overlay.py#derive_overlay_text`, which `write_overlay_units` calls, places each new
+  row by level then tag. So each converted row's tag carries an ordinal segment that sorts in rule
+  order, `repo.rule-<NN>-<seg>`, whose grammar section 4 "The adopter-rules step" states. The
   key keeps every reader it has. **Readers:** by name: `tools/playbook/render_playbook.py`,
   `tools/playbook/fixtures/composition.py`, `tools/playbook/README.md`, `help/composition.md`,
   `tools/govkit/entries/playbook.kit.toml`, `WIRE-INTO-PROJECT.md`, `.claude/rules/product.md` and
   `.governance/deploy.toml` · by value: `read_charter_table`
   (`tools/playbook/render_playbook.py:809`) and the project block, which render the key's lines
-  ahead of the overlay's level-0 units. Observed by AC5, AC6 and AC7.
+  ahead of the overlay's level-0 units; `tools/playbook/instruction_units.py#derive_unit_selection`,
+  which keeps a converted row by its `scope`; and `tools/playbook/overlay.py#derive_overlay_text`,
+  which orders the converted rows by their tags. Observed by AC5, AC6 and AC7.
 - **S5** — The seeded charter template's succession row. A `[[retired]]` row in
   `tools/govkit/registry.toml`, `id = "playbook/seeded-template"`, `successor = "none"`, `surfaces` the
   members the step gate lists for the seed rule at the base, and the seed's `[[files]]` rule
@@ -341,17 +352,39 @@ overlay row:
 
 ```toml
 [[unit]]
-tag = "repo.<seg>"        # seg: the line lowercased, every run outside [a-z0-9] folded to "-", cut at 40 bytes, "-2" etc. on a collision
+tag = "repo.rule-<NN>-<seg>"   # NN: the line's ordinal in the key; seg: the line's text folded; both below
 level = 0
 type = "directive"
+scope = ["reader.every"]       # the block renders only what the every-reader selector keeps
 text = "<the line, its leading '- ' cut>"
 ```
 
 in S10's row grammar, validated by unit 32's overlay reader before it is written, and it then takes the
 `adopter_rules` key out of `deploy.toml` by a line edit that leaves every other byte in place. A line
-over the one-line cap or failing the reader refuses with exit 1 and writes nothing. The down restores
-both files from the before-image under its refusal rule: a file whose bytes are neither the image's
-before nor its after is named and left.
+over the one-line cap or failing the reader refuses with exit 1 and writes nothing.
+
+The tag's grammar. `<NN>` is the line's 1-based ordinal among the key's lines, zero-padded to two
+digits; a key holding 100 lines or more pads every ordinal to its line count's digit count. One up (DERIVED from the tag grammar)
+converts the whole key, so every tag one run writes has one width, and the tags' byte order is the
+rules' order, which is the order `tools/playbook/overlay.py#derive_overlay_text` places them in.
+`<seg>` is the rule's text folded by `tools/playbook/tag_index.py#derive_heading_seg`, cut at 40
+bytes, its trailing `-` trimmed; a rule whose fold is empty takes the tag `repo.rule-<NN>`. The
+longest tag is 51 bytes plus the ordinal's width, under `tools/playbook/tag_index.py#TAG_MAX_BYTES` (DERIVED from the tag grammar)
+(64) for any width up to 13 digits. The ordinal makes each tag unique within the key, so no
+collision suffix is minted. A tag the overlay already holds is the writer's own refusal, exit 2, and
+the step has then changed neither file. Gov's own key holds nine rules, so its tags run
+`repo.rule-01-` to `repo.rule-09-`, the longest 53 bytes and each matching the tag grammar (PINNED,
+derived at bb432ee2f by folding gov's key under this grammar).
+
+The up refuses, exit 1 and nothing written, on two more inputs whose conversion would change the
+block. The first is a key line that is not a `- ` line, since the block renders a unit only as
+`- <text>`. The second is an overlay already holding a level-0 unit whose tag sorts below the last
+converted tag: the block rendered that unit after the key's lines, and the writer would place it
+among or ahead of them. Gov's own key holds only `- ` lines, and gov holds no overlay at
+bb432ee2f (PINNED, read then).
+
+The down restores both files from the before-image under its refusal rule: a file whose bytes are
+neither the image's before nor its after is named and left.
 
 **Who writes.** The step writes the overlay and `deploy.toml` as `update` runs it, which is the write
 the clause names ("by a step whose down restores it"), not an agent's edit through unit 15's command.
@@ -437,8 +470,9 @@ CODEX_MAX, whose name the move keeps, and S1's Readers line lists them.
   containment, and validates every row through unit 32's reader before writing; nothing it writes runs.
 - perf / scale: one TOML read and two file writes per adopter; the queries are two `git grep` runs.
 - error / empty / loading states: no `adopter_rules` key, the step is a no-op with exit 0; a line the
-  reader refuses fails the up with nothing written; a down over a later edit names the file and leaves
-  it.
+  reader refuses fails the up with nothing written, as do a key line that is not a `- ` line and an
+  overlay level-0 unit whose tag sorts below the converted rules'; a down over a later edit names the
+  file and leaves it.
 - observability: the walk prints each step's id and outcome; the step gate prints each member and the
   row that witnesses it.
 - risks: an adopter whose `CLAUDE.md` holds more than the import line keeps it, and the render's
@@ -480,15 +514,24 @@ CODEX_MAX, whose name the move keeps, and S1's Readers line lists them.
   again reproduces the first result byte for byte.
   Red when: the down leaves a byte different, or a rule is lost or doubled.
 - **AC6** — When the same program's `up` runs on a target with no `adopter_rules` key, it exits 0 and
-  writes nothing; on a target whose rule exceeds the one-line cap it exits 1 and writes nothing.
-  Red when: a refused rule leaves a half-written overlay.
+  writes nothing; on a target whose rule exceeds the one-line cap it exits 1 and writes nothing, and
+  so it does on a target whose key holds a line that is not a `- ` line, and on one whose overlay
+  already holds a level-0 unit tagged `repo.a`.
+  Red when: a refused rule leaves a half-written overlay, or the up converts a key whose lines or
+  order the block would not render as they were.
 - **AC7** — When `python tools/playbook/render_playbook.py --target <scratch>` has written the charter
-  of a scratch clone of the pass's tip whose `deploy.toml` holds three rules, and the step's `up` has
+  of a scratch clone of the pass's tip whose `deploy.toml` holds three rules, written so their texts
+  sort in the reverse of their order (`- Zeta`, `- Mid`, `- Alpha`), and the step's `up` has
   run there and been committed, `python tools/playbook/render_playbook.py --target <scratch> --check`
-  exits 0, the project block holding the same lines in the same order; and
+  exits 0, the project block holding the same lines in the same order, each overlay row the up wrote
+  holding `scope = ["reader.every"]` and a tag from `repo.rule-01-` to `repo.rule-03-`; and
   `python tools/govkit/upgrade_steps.py list` prints the step's row.
   Red when: the up loses, doubles or reorders a rule in the rendered charter, or the render refuses
   a token or a `[charter]` key once the step has run.
+  fixture: two plants on the same clone, each committed, under which the same `--check` exits 1:
+  the scope plant takes `scope` out of the three rows, so the block drops them; the reorder plant
+  writes the three rows into an empty overlay through the overlay writer with tags folded from their
+  text alone (`repo.zeta`, `repo.mid`, `repo.alpha`), so the writer places them `Alpha`, `Mid`, `Zeta`.
 - **AC8** — When `python step_gate.py --base ce13efbe` runs on a scratch clone with the
   `playbook/seeded-template` row taken out, it exits 1 naming each seed member; with it, 0.
   Red when: the seed rule leaves with no succession row and the gate stays green.
@@ -710,6 +753,16 @@ New arm: tools/policy/check_policy.py · covers AC13 · the `budgets-cap-codex-i
   hole, the `[charter]` arm answers `manifest_path`, and the micro-format leg grades the template
   beside the engine (AC15); AC9 waits on F9, gov keeping the seed's source; S1's and S5's Readers
   lines are re-grepped.
+- rev-11 · 2026-11-09 · S4 · section 4 The adopter-rules step · section 5 · AC6 AC7 · section 10 ·
+  from `2026-11-09-prompt-PLAY-dOrderedCharter-31-repair-2-brief.md`, re-read at bb432ee2f: each
+  converted row carries `scope = ["reader.every"]`, since the project block renders only what the
+  every-reader selector keeps (Item 1), and its tag is `repo.rule-<NN>-<seg>`, a zero-padded ordinal
+  two digits wide, wider only past 99 lines, its seg the `doc` namespace's fold and its collision (DERIVED from the tag grammar)
+  suffix dropped, so the overlay writer's level-then-tag placement keeps
+  rule order (Item 2, the main loop's ruling); the up also refuses a key line that is not a `- `
+  line and an overlay level-0 unit sorting below the converted tags, each of which would change the
+  block; AC7 gains the scope and reorder plants, AC6 the two refusals. Item 3's five confirmations
+  stand as written, and S4's Readers line gains the selector and the writer; F8 and F9 stay parked.
 
 ## 10. Reuse audit
 
@@ -747,5 +800,10 @@ into one factory at its second instance; the `playbook` entry's `version_from` t
 `tools/govkit/govkit.py#needed_answers`; the micro-format leg grades the template the renderer kit
 already lands; and the conversion step's `surfaces = []` is the step grammar's own declared absence
 (`tools/govkit/upgrade_steps.py#check_surfaces`), so no class is minted for it.
+Re-read at bb432ee2f for rev-11, the converted tag's fold is the `doc` namespace's own,
+`tools/playbook/tag_index.py#derive_heading_seg`, which `tools/playbook/writing_practice.py` already
+calls, so no second fold is written; the rows go in through
+`tools/playbook/overlay.py#write_overlay_units`, unit 32's one writer, whose level-then-tag placement
+the ordinal segment meets rather than a writer of the step's own.
 
 Recall terms used: `python tools/memory-recall/query.py "how does gov ship its own upgrade step that retires the seeded charter template" --terms "upgrade step retired row seeded template adopter_rules overlay down restores successor change record"`
