@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-34 — composition and its report: the project block and marked parts from the overlay, budgets and harness limits at render, one composition for every harness, the delta report, and the practice census
 
-**Status:** DEFERRED · rev-7 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 35 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-8 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 35 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0064@42692e4c whole
 
@@ -252,7 +252,7 @@ class, and the ruling.
 | Minted | Where | Cell |
 |---|---|---|
 | `tools/playbook/practice_census.py` (CLI) | playbook kit | the lexicon's naming predicates |
-| `compose_document`, `measure_contributors`, `render_delta_report` | `tools/playbook/render_playbook.py` | the lexicon's naming predicates |
+| `build_document`, `measure_contributors`, `render_delta_report` | `tools/playbook/render_playbook.py` | the lexicon's naming predicates |
 | the marked pair `<!-- gov:repo -->` and `<!-- /gov:repo -->` | every level-3 to level-5 document holding a repository unit | none |
 | `tools/playbook/fixtures/composition.py` (fixture) | playbook kit | the lexicon's naming predicates |
 | `help/composition.md` | `help/` | none |
@@ -454,6 +454,7 @@ the owner (its fork record's F1): the matrix's scratch install holds no memory-t
   practice. The design section anchors its moved seams by symbol; the leg line gains the core
   meta-check and the instruction-unit fixtures, and the gates section names the acceptance-matrix
   leg's parked red.
+- rev-8 · 2026-11-09 · section 4 Inventory · main loop: the minted `compose_document` is renamed `build_document`, since the naming lexicon declares no `compose` verb, as spec 35's composer was.
 
 ## 10. Reuse audit
 
