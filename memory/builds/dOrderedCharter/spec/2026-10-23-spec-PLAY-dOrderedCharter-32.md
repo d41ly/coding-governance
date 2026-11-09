@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-32 — the repository's instruction overlay: `.governance/instructions.toml`, its `repo.` units, pinned edges into gov's units, derived classes and the repository's own policy keys
 
-**Status:** DEFERRED · rev-7 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 31 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-8 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 31 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0062@fe903e93 whole
 
@@ -26,6 +26,8 @@
 | [2026-11-02-prompt-PLAY-dOrderedCharter-32-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-32-build-brief.md) | journal | — |
 | [2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md) | research | PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-11-08-prompt-PLAY-dOrderedCharter-43-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-43-drift-fold-brief.md) | research | PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-33 |
+| [2026-11-09-prompt-PLAY-dOrderedCharter-32-1-spec-writer.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-32-1-spec-writer.md) | journal | — |
+| [2026-11-09-prompt-PLAY-dOrderedCharter-32-repair-brief.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-32-repair-brief.md) | research | — |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -69,12 +71,25 @@ and a fixed unit refuses all three; and where the repository declares its own po
   lists is absent. The pin's `<hash8>` is `derive_pin_hash` (S7, `tools/memory-tree/design_lib.py`)
   over gov's unit text, whitespace-normalised, the same `<tag>@<hash8>` unit 15's command writes on a
   change record. The renderer of record (S11) takes its unit list from `derive_unit_composition` at
-  its unit slots. Observed by AC4, AC5.
+  its unit slots. The `exclude` it takes is read by `read_excluded_tags(root)` in
+  `tools/playbook/overlay.py`, the key's one reader: `policy_reader("instructions.exclude")`, where
+  `policy_reader` binds `tools/playbook/policy_value.py#read_policy_value` over the root with `rev`
+  `"HEAD"`, as `tools/playbook/instructions_edit.py#read_load` binds it, so the key stays the literal
+  first argument the policy kit's reader-coverage arm counts. `get` prints one member per line and the
+  landed row's default `[]` as no line, and a `PolicyRefused` refuses the composition, naming the key
+  and carrying the reader's line. The row it reads is the landed `instructions.exclude` row of
+  `tools/policy/catalogue.toml`, a set whose `item` pattern admits a gov tag (read at 33bf8791c);
+  PLAY-dOrderedCharter-35's composer reads the set through this function too (section 8 F9).
+  Observed by AC4, AC5.
 - **S5** — The derived class. `derive_unit_class(unit, sources)` returns `fixed` or `open`: fixed when
   the unit is a `principle.` unit (PLAY-dOrderedCharter-7's registry), when its `fixed-by` names a
-  `floor=<tag>` or a `parser=<path#symbol>` that resolves, the source grammar PLAY-dOrderedCharter-36
-  declares for rows; open only when the unit declares `class = "open"` and nothing fixes it; fixed
-  when it declares nothing. A unit typing `class = "fixed"` is refused, since a fixed class is derived;
+  `floor=<tag>` or a `parser=<path#symbol>` that resolves; open only when the unit declares
+  `class = "open"` and nothing fixes it; fixed when it declares nothing. The source grammar is this
+  unit's: `check_fixed_sources(entries, root)` in `tools/playbook/overlay.py` returns one red per
+  entry, naming it, for an empty list, a type outside `principle`, `floor` and `parser`, or a source
+  that does not resolve, and PLAY-dOrderedCharter-36's schema reader calls it for its fields' and
+  rows' sources (section 8 F8). A unit whose `fixed-by` holds a red is refused, naming the source.
+  A unit typing `class = "fixed"` is refused, since a fixed class is derived;
   a unit declaring `open` that a source fixes is red, naming the source. Unit 9's row grammar already
   carries `class`, read as `fixed` when absent, and its schema check admits `fixed` and `open`: this
   item narrows the declared value to `open` in that one check, and `fixed-by` joins the row's field set
@@ -84,7 +99,9 @@ and a fixed unit refuses all three; and where the repository declares its own po
   source that fixes it. Observed by AC7.
 - **S7** — The repository's own policy keys. A `[[policy]]` row declares `key` (`adopter.<seg>`),
   `values`, `default`, `summary` and `usage`; its value is set under `[adopter]` in
-  `.governance/policy.toml` and its tag is `policy.adopter.<seg>`. This unit owns the row's grammar,
+  `.governance/policy.toml` and its tag is `policy.adopter.<seg>`, a string `read_overlay` derives
+  from the key and no namespace row registers: the `policy` word is dDeclaredLoop's (section 8 F7),
+  so this unit adds no row to `tools/playbook/namespaces.toml`. This unit owns the row's grammar,
   and the policy kit parses it: inside `tools/policy/policy.py`, `read_overlay_policies(repo, sha)`
   reads the `[[policy]]` tables of `.governance/instructions.toml`'s blob at the revision the reader is
   reading, through the kit's own `read_blob_at` (TOOL-dGroundRules-21 S11) and `tomllib`, never
@@ -93,10 +110,17 @@ and a fixed unit refuses all three; and where the repository declares its own po
   `read_catalogue_row`, so `get` resolves an `adopter.` key (TOOL-dGroundRules-2 S4); `validate` and
   `arm_schema`, so an `adopter.` value is judged against its row and an `adopter.` key no row declares
   is the unknown-leaf problem (TOOL-dGroundRules-4 S1, S2); and the mirror, which renders each
-  `adopter.` key beside the catalogue's and records the overlay blob's id in its staleness key beside
-  the policy file's and the catalogue's (TOOL-dGroundRules-5 S1), while the guard's mirror shape also
-  requires `.governance/instructions.toml`'s staged blob to equal HEAD's (TOOL-dGroundRules-19 S1;
-  §8 F6). A `[[policy]]` key outside `adopter.`
+  `adopter.` key beside the catalogue's (TOOL-dGroundRules-5 S1). The overlay's path joins
+  `tools/policy/policy.py#LEGACY_INPUTS`, the list a unit adding a resolution input extends
+  (TOOL-dGroundRules-21 S17), and that one entry does the rest: the mirror records the overlay's blob
+  id under `legacy_blobs` (`tools/policy/policy.py#render_mirror`), `mirror` refuses while the working
+  tree's overlay differs from HEAD's (`tools/policy/policy.py#cmd_mirror`), the guard's mirror shape
+  requires its staged blob to equal HEAD's, reading the inputs from the staged mirror's own record
+  (`tools/policy/guard.py#check_mirror_render`, TOOL-dGroundRules-19 S1), and the hooks' reader reads
+  a mirror whose recorded id differs as stale (`tools/policy/policy-mirror.js#readMirrorAt`). The
+  guard's code is not edited (section 8 F6, F10). The policy fixtures' `guard-mirror-inputs-join` case
+  edits the list's line by its literal text (`tools/policy/check_policy.py#run_guard_case`), so that
+  case's edit is kept matching the line as this item leaves it. A `[[policy]]` key outside `adopter.`
   is refused, so the overlay never redeclares a catalogue key, and `adopter.` keys stay outside the
   presets' completeness check. Only repository units read them: a gov unit whose `when` names a
   `policy.adopter.` tag is refused. Observed by AC8, AC9.
@@ -121,8 +145,11 @@ and a fixed unit refuses all three; and where the repository declares its own po
   budgets and the delta report: PLAY-dOrderedCharter-34's.
 - The step that converts `[charter] adopter_rules` into level-0 `repo.` units and its down:
   PLAY-dOrderedCharter-31's; this unit lands the home it writes into and the function it writes with.
-- The row mechanism for every other kind, the summary and usage of `instructions.exclude`'s landed
-  catalogue row, and its reader: PLAY-dOrderedCharter-35's. The exclusion refusals beyond a fixed unit: PLAY-dOrderedCharter-36's.
+- The row mechanism for every other kind, and the summary and usage of `instructions.exclude`'s landed
+  catalogue row: PLAY-dOrderedCharter-35's; the key's one reader is this unit's (S4). The exclusion refusals beyond a fixed unit: PLAY-dOrderedCharter-36's.
+- The `policy` namespace's row and extractor, and whether `policy.adopter.<seg>` becomes a member
+  `gov_tag.py show` resolves: dDeclaredLoop's TOOL-dDeclaredLoop-18, whose extractor reads the
+  catalogue's rows alone (its S3).
 - Stale pins, editorial and semantic marks, successors and orphans: PLAY-dOrderedCharter-33's.
 - The pinned address forms' own checks (a missing `@`, a malformed hash, a hash in no revision):
   PLAY-dOrderedCharter-28's edge checks.
@@ -141,8 +168,10 @@ and a fixed unit refuses all three; and where the repository declares its own po
 - **hands-off** `PLAY-dOrderedCharter-31` — the step that writes gov's and every adopter's `[charter] adopter_rules` into the overlay through `write_overlay_units`
 - **hands-off** `PLAY-dOrderedCharter-33` — stale pins and successors behind `amends` and `supersedes`
 - **hands-off** `PLAY-dOrderedCharter-34` — composing the level-0 units as the project block, through `read_overlay`
-- **hands-off** `PLAY-dOrderedCharter-35` — the same mechanism over every registered kind's rows, through `read_overlay`
-- **consumes-from** external — dGroundRules, built before this build run: the policy kit's `read_blob_at`, key-to-row matcher, `validate`, `arm_schema` and mirror, which S7 extends inside `tools/policy/` (TOOL-dGroundRules-21 S11, -2 S4, -4 S1 and S2, -1 S4, -5 S1), `policy.py get` (TOOL-dGroundRules-2 S7), and its minimal guard on the file (TOOL-dGroundRules-6 S1)
+- **hands-off** `PLAY-dOrderedCharter-35` — the same mechanism over every registered kind's rows, through `read_overlay`, and the excluded set through `read_excluded_tags`, the one reader of `instructions.exclude`
+- **hands-off** `PLAY-dOrderedCharter-36` — the `fixed-by` source grammar and its resolver `check_fixed_sources`, which 36's schema reader calls for each field's and row's sources
+- **hands-off** external — dDeclaredLoop's TOOL-dDeclaredLoop-18 registers the `policy` namespace; whether its extractor yields the overlay's `adopter.` keys as `policy.adopter.<seg>` members is that build's
+- **consumes-from** external — dGroundRules, built before this build run: the policy kit's `read_blob_at`, key-to-row matcher, `validate`, `arm_schema` and mirror, which S7 extends inside `tools/policy/` (TOOL-dGroundRules-21 S11, -2 S4, -4 S1 and S2, -1 S4, -5 S1), the mirror's resolution-input list (-21 S17), `policy.py get` (TOOL-dGroundRules-2 S7), and its minimal guard on the file (TOOL-dGroundRules-6 S1)
 - **hands-off** `PLAY-dOrderedCharter-46` — S1's landed revision defined as HEAD, its unborn-HEAD outcome and the candidate read for write doors (finding 80), and the `--rev HEAD` every `policy.py get` of the composition passes
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 6, 7, 9, 45 and 59, which that batch unit corrects after this unit lands, each by the item its report id names
 
@@ -194,6 +223,9 @@ manifest and no overlay is tracked yet: `PLAY-dOrderedCharter-40` writes the fir
 | S4 | the pin, `tools/playbook/instructions_edit.py#derive_row_pin` over `tools/playbook/instruction_units.py#derive_unit_pin`; the unit slots of `tools/playbook/render_playbook.py#render_unit_slots`, which select from `read_units` | `derive_unit_composition`, and the slots taking their list from it |
 | S5 | `class`, defaulting to `fixed`, its values `tools/playbook/instruction_units.py#UNIT_CLASSES` | the narrowing to `open`, `fixed-by` and `derive_unit_class` |
 | S8 | the command's overlay write, `tools/playbook/instructions_edit.py#derive_candidate`, appending an added row | `write_overlay_units`, which the command's overlay `add` calls |
+| S4 | at 33bf8791c no code reads `instructions.exclude`: `git grep -n "instructions.exclude" -- tools/` finds the catalogue row and its line on `tools/policy/unsummarised-keys.txt` alone | `read_excluded_tags`, the key's first and one reader |
+| S5 | at 33bf8791c no `fixed-by` grammar exists: `git grep -n "fixed-by" -- tools/` finds nothing, and `tools/playbook/namespaces.toml` registers no `floor` word | `check_fixed_sources`, over `tools/playbook/core.py#read_toml_rows` and `tools/playbook/positional.py#read_symbol_defs` |
+| S7 | `tools/policy/policy.py#LEGACY_INPUTS`, whose blobs the mirror records and its guard and the hooks' reader compare | the overlay's path in it |
 
 The readers of the narrowed `class` value are the schema check's class arm, the command's row order
 `tools/playbook/instructions_edit.py#ROW_ORDER`, and the registry selftest's case that a row declaring no
@@ -213,15 +245,25 @@ class reads `fixed`, which still holds. The renderer reads kit units from the wo
 Repository units with no edge are placed by `level`, `select` and `when` after gov's units of the
 same placement. A target tag that names no gov unit is refused here unless PLAY-dOrderedCharter-33's
 successor walk re-points it. The function returns `(units, states)` and writes nothing.
-`instructions.exclude` is read through PLAY-dOrderedCharter-35's reader of that key.
+`instructions.exclude` is read through `read_excluded_tags` (S4), which PLAY-dOrderedCharter-35's
+composer calls for its rows too.
 
 ### The derived class
 
-The `fixed-by` sources are the three PLAY-dOrderedCharter-36 declares for rows, one grammar for both:
-`principle=<tag>`, `floor=<tag>`, `parser=<path#symbol>`. A `principle.` unit is fixed without a
-`fixed-by`, since its namespace says so. A `floor=` source is refused until the floor's namespace is
-registered, as unit 36 refuses it. A `parser=` source resolves when the path is tracked and defines the
-symbol, unit 26's form. Applying `derive_unit_class` to every gov unit in every kit's
+The `fixed-by` sources are IA-4's three, one grammar for units and rows, landed here and called by
+PLAY-dOrderedCharter-36 for rows: `principle=<tag>`, `floor=<tag>`, `parser=<path#symbol>`. A
+`principle.` unit is fixed without a `fixed-by`, since its namespace says so. `check_fixed_sources`
+resolves each entry: a `principle=` tag is a `[[principle]]` row's `tag` in
+`tools/playbook/principles.toml`, read through `tools/playbook/core.py#read_toml_rows`; a `floor=`
+source is refused, naming the namespace, while
+`tools/playbook/instruction_units.py#read_namespace_words` holds no `floor` word, none at 33bf8791c
+(PINNED); a `parser=` source resolves when the path is tracked and
+`tools/playbook/positional.py#read_symbol_defs` finds the symbol in its text, unit 26's form, so a
+path whose suffix that finder does not read defines nothing. Every red names the entry, and the
+function reads no row field but the list it is handed, so unit 36 passes a schema field's or a
+`[[fixed-row]]`'s list as it passes a unit's.
+
+Applying `derive_unit_class` to every gov unit in every kit's
 `instructions.toml` is part of `overlay.py check`, so a parsed unit declared `open` reds on gov's own
 tree, not only in an adopter's.
 
@@ -250,10 +292,12 @@ the owner applies it.
 ### Inventory
 
 New: `.governance/instructions.toml`; `tools/playbook/overlay.py` with `read_overlay`,
-`derive_unit_composition`, `derive_unit_class` and `write_overlay_units`, its verb `check` and its
+`derive_unit_composition`, `derive_unit_class`, `write_overlay_units`, `read_excluded_tags` and
+`check_fixed_sources`, its verb `check` and its
 `--fixture --plant`; `read_overlay_policies` in `tools/policy/policy.py`; the `[[policy]]` row and its
 five fields; the `[adopter]` table of
-`.governance/policy.toml`; the tag forms `repo.<seg>` and `policy.adopter.<seg>`; the unit field
+`.governance/policy.toml`; the tag forms `repo.<seg>` and `policy.adopter.<seg>`, the second a derived
+string no namespace row registers (section 8 F7); the unit field
 `fixed-by`; the states `unchanged`, `amended`, `replaced`, `excluded` (S22's, which
 PLAY-dOrderedCharter-34 reports). Naming cells: unit 10's tag shape check grades the tags, and
 `lexicon naming predicates` the Python names.
@@ -273,9 +317,9 @@ Live at landing. Nothing changes in a render until an overlay holds units.
 - `tools/playbook/render_playbook.py` (the unit list taken from `derive_unit_composition`; its self-test arm)
 - `tools/playbook/instruction_units.py` (`fixed-by` read on S10 rows, and the class arm narrowed, S5)
 - `tools/playbook/instructions_edit.py` (`fixed-by` in the row order, S5; the overlay `add` through `write_overlay_units`, S8)
-- `tools/policy/policy.py` (`read_overlay_policies`, its rows joined at the matcher, `validate` and the mirror, S7)
-- `tools/policy/check_policy.py` (`arm_schema` over the joined rows, S7)
-- `tools/policy/guard.py` (the mirror shape compares the overlay with HEAD, S7)
+- `tools/policy/policy.py` (`read_overlay_policies`, its rows joined at the matcher, `validate` and the mirror, and the overlay's path in `LEGACY_INPUTS`, S7)
+- `tools/policy/check_policy.py` (`arm_schema` over the joined rows, and the `guard-mirror-inputs-join` case's edit kept matching the `LEGACY_INPUTS` line, S7)
+- `tools/policy/README.md` (the `legacy_blobs` paragraph names the overlay beside `.agent-cap.conf`, S7)
 - `help/overlay.md` (new)
 - `help/README.md`
 
@@ -300,7 +344,8 @@ terminal.
 - perf / scale: one TOML read per render; composition is linear in the units.
 - error / empty / loading states: an absent overlay is empty; every refusal names the row and the
   rule.
-- observability: `overlay.py check` prints each unit's state and class.
+- observability: `overlay.py check` prints each unit's state and class, and each `[[policy]]` row's
+  key with its derived tag on its own line.
 - risks: an amendment to an unpinned target would ride gov's later changes unseen; the pin is
   mandatory on both edge types. A commit that drops a `[[policy]]` row while `[adopter]` still sets its
   key makes the policy file invalid at that revision, so the whole file falls back to its last valid
@@ -328,14 +373,22 @@ terminal.
   for gov's unit, the composed document holds gov's unit and then the repository's, state `amended`;
   `--plant supersedes` holds the repository's unit alone in gov's place, state `replaced`.
   Red when: an amendment replaces gov's text, or a replacement renders beside it.
-- **AC5** — When `--plant exclude` lists an open gov unit in `instructions.exclude`, the composed
-  document lacks it and its state is `excluded`.
-  Red when: an excluded unit renders.
+- **AC5** — When `--plant exclude` lists an open gov unit in `instructions.exclude`, committed in the
+  fixture's policy file and read back at HEAD, the composed document lacks it and its state is
+  `excluded`; with no `[instructions]` table committed every gov unit composes, the default `[]`
+  excluding nothing; and `git grep -n -F 'policy_reader("instructions.exclude"' -- tools/playbook/`
+  finds one line, the overlay module's read.
+  Red when: an excluded unit renders, the default excludes a unit, or the key is read in a shape the
+  reader-coverage arm does not count.
+  fixture: each case commits its files, since the reader reads revisions only.
 - **AC6** — When `--plant parsed-open` gives a fixture gov unit `fixed-by = ["parser=<fixture>#parse_grammar"]`
   and `class = "open"`, `overlay.py check` exits 1 naming the unit and the parser; `--plant typed-fixed`
-  typing `class = "fixed"` exits 1; a unit declaring neither reads `fixed`; and `overlay.py check` over
+  typing `class = "fixed"` exits 1; a unit declaring neither reads `fixed`; `--plant fixed-by-unresolved`
+  (`principle=principle.nowhere`), `--plant fixed-by-floor` (`floor=floor.any`) and
+  `--plant fixed-by-empty` (`fixed-by = []`) each exit 1 naming the entry; and `overlay.py check` over
   gov's tree exits 0.
-  Red when: a parsed unit is read open, an undeclared class reads open, or a typed fixed class passes.
+  Red when: a parsed unit is read open, an undeclared class reads open, a typed fixed class passes, or
+  a source that resolves to nothing, an unregistered floor or an empty list is admitted.
 - **AC7** — When `--plant fixed-amend`, `--plant fixed-supersede` and `--plant fixed-exclude` each target
   a `principle.` unit, each exits 1 naming the target and `principle` as the source.
   Red when: any of the three operations is admitted on a fixed unit.
@@ -345,10 +398,12 @@ terminal.
   policy file's only revision, `get` exits 2 with the problem's line naming the key; a `[[policy]]` row
   keyed `budgets.enforce` exits 2 naming the row; after a commit that changes only the overlay,
   `policy.py mirror --check` exits 1 until `mirror --write`, and `python "tools/policy/guard.py" --staged`
-  refuses a staged mirror while the overlay file S1 declares, unit 31 writing gov's own, differs from HEAD; and a `repo.release-train` unit beside
-  `policy.adopter.release-train` both resolve through `python gov_tag.py show`.
+  refuses a staged mirror while the overlay file S1 declares, unit 31 writing gov's own, differs from HEAD; and,
+  with a `repo.release-train` unit beside the row, `python overlay.py check` prints the row's key
+  `adopter.release-train` with its tag `policy.adopter.release-train` on a line apart from the unit's,
+  and `python gov_tag.py show repo.release-train`, run in the plant's repository, resolves the unit.
   Red when: an out-of-set or undeclared repository key is read, the overlay redeclares a catalogue key,
-  or the two same-named tags collide.
+  or the row's tag is read as a unit's.
   fixture: needs dGroundRules' reader landed, which the chain lands before this build run; each case
   commits its files, since the reader reads revisions only.
 - **AC9** — When `--plant gov-reads-adopter` gives a fixture gov unit the `when` tag `policy.adopter.release-train.weekly`,
@@ -429,6 +484,45 @@ resolves that kit inside the call, so the new module adds no import-time edge to
   cannot read them. (b) leaves a hook unable to read a key the policy file holds. Recommendation (a).
   RESOLVED (agent, 2026-10-25, delegated): (a), rung 1, v2's `[policies]` (v2:1127): every key in
   `.governance/policy.toml` is mirrored to JSON for the hooks. widens: none · relaxes: none
+- **F7 — What AC8 observes of a `[[policy]]` row's tag while no `policy` namespace is registered.**
+  At 33bf8791c `tools/playbook/namespaces.toml` registers ten words and no `policy` (DERIVED, its `ns`
+  lines), and `python gov_tag.py show policy.adopter.release-train` exits 1, "resolves to no row".
+  The word is dDeclaredLoop's (PLAY-dOrderedCharter-10 S5), and TOOL-dDeclaredLoop-18's
+  `extract_policy` yields one member per row of `tools/policy/catalogue.toml` alone (its S3), so even
+  its landing leaves an overlay key unresolved. Options: (a) AC8 observes only that `read_overlay`
+  reads the row's key for its derived tag, printed by `overlay.py check` apart from the unit's, and a
+  hands-off names the namespace as dDeclaredLoop's; (b) a consumes-from edge on TOOL-dDeclaredLoop-18
+  with the clause owed until it lands; (c) this unit registers the `policy` row. (c) registers a word
+  another build owns and this spec does not design, a public surface (veto 2). (b) leaves the clause
+  owed past that unit's landing, since its extractor reads no overlay, so AC8 would hold a clause no
+  pass can observe (veto 1). RESOLVED (agent, 2026-11-09, delegated): (a), the one survivor; the
+  collision AC8 guarded is kept as the row's tag never read as a unit's. widens: none · relaxes: none
+- **F8 — Where the `fixed-by` source grammar lands.** S5 reused the grammar PLAY-dOrderedCharter-36
+  declares, but unit 36 builds after this unit (order 34 against 31), and it consumes
+  PLAY-dOrderedCharter-35, which consumes this unit's reader, so this unit consuming 36 is a cycle.
+  Options: (a) this unit lands the grammar and its resolver, `check_fixed_sources`, and hands it to
+  36, which calls it for fields and rows; (b) S5 moves after 36, as a new unit split from this one.
+  (b) adds a unit and an order to the plan for the same code, and leaves `fixed-by` unread on units
+  until it builds. RESOLVED (agent, 2026-11-09, delegated): (a), rung 3, fewer open questions and one
+  resolver for units and rows; F2's pick of a `fixed-by` field stands, the grammar's home moving here.
+  widens: none · relaxes: none
+- **F9 — How this unit reads `instructions.exclude` before PLAY-dOrderedCharter-35 lands.** At
+  33bf8791c no code reads the key (DERIVED, `git grep -n "instructions.exclude" -- tools/`), and its
+  row is landed. Options: (a) this unit lands the key's one reader, `read_excluded_tags`, through
+  `read_policy_value` at `rev` `"HEAD"`, and 35's composer calls it; (b) this unit reads the key
+  through `read_policy_value` now and 35 lands its own reader and re-points this one; (c) the
+  composition takes the set as an argument only, its read left to 35. (c) leaves AC5 observing a set
+  the policy file never held. (b) builds a read twice and moves it once. RESOLVED (agent, 2026-11-09,
+  delegated): (a), rung 1, one reader per key, the binding `read_load` already uses. widens: none ·
+  relaxes: none
+- **F10 — FACT-QUESTION · Whether S7 owes an edit to the policy guard.** F6's (a) had the guard's
+  mirror shape compare the overlay with HEAD. Probe: read `tools/policy/guard.py#check_mirror_render`.
+  It compares the policy file, the catalogue and every key of the staged mirror's own `legacy_blobs`,
+  read from the mirror so an input the render adds needs no guard edit (its docstring, TOOL-dGroundRules-25
+  S19, S21), and `tools/policy/policy-mirror.js#readMirrorAt` reads every `legacy_blobs` path the same
+  way. RESOLVED (agent, 2026-11-09, delegated): no guard edit; the overlay's path in
+  `tools/policy/policy.py#LEGACY_INPUTS` carries F6's (a) to the mirror, the guard and the hooks'
+  reader. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -447,6 +541,14 @@ resolves that kit inside the call, so the new module adds no import-time edge to
   and `tools/playbook/instructions_edit.py` joins Files touched. The data model spells `scope` and a list
   `edges`, as the landed reader does; the leg line gains the five legs unit 67 put `policy.py` under; the
   matrix leg's parked red is named.
+- rev-8 · 2026-11-09 · S4 S5 S7 · section 3 non-goals, Edges · section 4 the table of what the tree
+  already does, Composition of prose units, The derived class, Inventory, Files touched · AC5 AC6 AC8 ·
+  section 8 F7 to F10 (new) · section 10 · from `2026-11-09-prompt-PLAY-dOrderedCharter-32-repair-brief.md`,
+  the builder's hand-back on three unlanded seams, re-read at 33bf8791c: AC8 no longer asks
+  `gov_tag.py show` for a `policy.` tag no row registers; the `fixed-by` grammar and its resolver
+  land here and are handed to PLAY-dOrderedCharter-36; `instructions.exclude`'s one reader lands here
+  and is handed to PLAY-dOrderedCharter-35; the overlay joins the mirror's resolution-input list, so
+  `tools/policy/guard.py` leaves Files touched and `tools/policy/README.md` joins it.
 
 ## 10. Reuse audit
 
@@ -455,8 +557,7 @@ The seams extended: the `.governance/` home and its reader shape (`load_deploy`,
 (`read_charter_table`, `tools/playbook/render_playbook.py:809`) and the roles' house overlay
 (`render_role`, `tools/roles/roles_lib.py:579-591`, appended under `## House rules`), both left for
 PLAY-dOrderedCharter-31 and -34 to re-point; `derive_pin_hash`, PLAY-dOrderedCharter-24's extraction of
-`derive_clause_hash` (`tools/memory-tree/design_lib.py:169-173`); PLAY-dOrderedCharter-36's `fixed-by`
-source grammar; dGroundRules' policy kit, whose `read_blob_at` and key-to-row matcher S7 extends in
+`derive_clause_hash` (`tools/memory-tree/design_lib.py:169-173`); dGroundRules' policy kit, whose `read_blob_at` and key-to-row matcher S7 extends in
 place (TOOL-dGroundRules-21 S11, TOOL-dGroundRules-2 S4). The scout row (reuse scout C, unit -32) is verified: no
 `instructions.toml` exists anywhere at base, and the three shell copies of `read_policy_key`
 (`tools/push-main.sh:404`, `tools/run-gates/post-merge.sh:171`, `tools/unattended/unattended.sh:9517`)
@@ -469,6 +570,16 @@ section 2, and agrees with `read_charter_table` at source. Re-read at `f56f6a189
 `instructions.toml` anywhere" no longer holds as a statement about code, since units 9, 10 and 15
 landed the manifest grammar, the `repo` extractor and the write command, though no manifest file is
 tracked yet; the seams this unit extends are the ones the design's table of what the tree already does
-names, and `derive_pin_hash` is now `tools/memory-tree/design_lib.py#derive_pin_hash`.
+names, and `derive_pin_hash` is now `tools/memory-tree/design_lib.py#derive_pin_hash`. Re-read at
+33bf8791c: no `fixed-by` grammar exists in any tool, so `check_fixed_sources` is minted here over two
+landed seams, `tools/playbook/core.py#read_toml_rows` for the principle registry and
+`tools/playbook/positional.py#read_symbol_defs` for a `parser=` source, and PLAY-dOrderedCharter-36 calls it rather
+than declaring a second; the key read reuses `tools/playbook/policy_value.py#read_policy_value` as
+`tools/playbook/instructions_edit.py#read_load` binds it; and the mirror's input list
+`tools/policy/policy.py#LEGACY_INPUTS` is the seam S7 extends for the overlay's blob, read by
+`tools/policy/guard.py#check_mirror_render` and `tools/policy/policy-mirror.js#readMirrorAt` from the
+mirror's own record. `reuse_lookup.py "resolve a fixed-by source principle floor parser path symbol"`
+and the greps for `fixed-by`, `instructions.exclude` and `LEGACY_INPUTS` over `tools/` are the probes;
+the lookup ranked name-token hits only (`parse`, `resolve`, `resolve_kit_dir`), none a source resolver.
 
 Recall terms used: `python tools/memory-recall/query.py "how does an adopter add its own rules to the charter and roles" --terms "adopter_rules deploy.toml charter project block house overlay roles house rules own implements"`

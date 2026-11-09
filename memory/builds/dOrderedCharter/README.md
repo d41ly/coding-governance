@@ -168,11 +168,11 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-30 — the portable practice: a role per language, one rule set, each rule paired with its named leg, absorbing `[cross-os]` and `[bytes]`](spec/2026-10-23-spec-PLAY-dOrderedCharter-30.md) | 28 | 2 | CLOSED | rev-6 | 2026-11-09 |
 | [PLAY-dOrderedCharter-29 — the one writing practice's checks over records as well as units](spec/2026-10-23-spec-PLAY-dOrderedCharter-29.md) | 29 | 2 | CLOSED | rev-4 | 2026-11-09 |
 | [PLAY-dOrderedCharter-23 — a build run unattended by default from its request, said in the drive section, and the `[land]` rule read through the request's mandate](spec/2026-10-23-spec-PLAY-dOrderedCharter-23.md) | 30 | 2 | CLOSED | rev-5 | 2026-11-09 |
-| [PLAY-dOrderedCharter-32 — the repository's instruction overlay: `.governance/instructions.toml`, its `repo.` units, pinned edges into gov's units, derived classes and the repository's own policy keys](spec/2026-10-23-spec-PLAY-dOrderedCharter-32.md) | 31 | 2 | DEFERRED | rev-7 | 2026-11-08 |
+| [PLAY-dOrderedCharter-32 — the repository's instruction overlay: `.governance/instructions.toml`, its `repo.` units, pinned edges into gov's units, derived classes and the repository's own policy keys](spec/2026-10-23-spec-PLAY-dOrderedCharter-32.md) | 31 | 2 | DEFERRED | rev-8 | 2026-11-09 |
 | [PLAY-dOrderedCharter-33 — pins and drift: each gov change record marked `editorial` or `semantic`, a stale pin acting as `instructions.stale` says, successors re-pointing or orphaning an edge](spec/2026-10-23-spec-PLAY-dOrderedCharter-33.md) | 32 | 2 | DEFERRED | rev-6 | 2026-11-08 |
 | [PLAY-dOrderedCharter-46 — the overlay's landed revision defined, its unborn-HEAD outcome stated, and a write door rendering the rows it just wrote](spec/2026-10-24-spec-PLAY-dOrderedCharter-46.md) | 32 | 2 | DEFERRED | rev-6 | 2026-11-08 |
-| [PLAY-dOrderedCharter-35 — the overlay's row mechanism for every registered kind: adopter-segment tags, field patches, whole-row replacements, exclusions, row pins and stale rows](spec/2026-10-23-spec-PLAY-dOrderedCharter-35.md) | 33 | 2 | DEFERRED | rev-7 | 2026-11-08 |
-| [PLAY-dOrderedCharter-36 — the row checks over every registered kind: the fixed set, the exclusion refusals and the widening classifier](spec/2026-10-23-spec-PLAY-dOrderedCharter-36.md) | 34 | 2 | DEFERRED | rev-7 | 2026-11-08 |
+| [PLAY-dOrderedCharter-35 — the overlay's row mechanism for every registered kind: adopter-segment tags, field patches, whole-row replacements, exclusions, row pins and stale rows](spec/2026-10-23-spec-PLAY-dOrderedCharter-35.md) | 33 | 2 | DEFERRED | rev-8 | 2026-11-09 |
+| [PLAY-dOrderedCharter-36 — the row checks over every registered kind: the fixed set, the exclusion refusals and the widening classifier](spec/2026-10-23-spec-PLAY-dOrderedCharter-36.md) | 34 | 2 | DEFERRED | rev-8 | 2026-11-09 |
 | [PLAY-dOrderedCharter-34 — composition and its report: the project block and marked parts from the overlay, budgets and harness limits at render, one composition for every harness, the delta report, and the practice census](spec/2026-10-23-spec-PLAY-dOrderedCharter-34.md) | 35 | 2 | DEFERRED | rev-7 | 2026-11-08 |
 | [PLAY-dOrderedCharter-31 — this build's own upgrade steps: the agent-instructions wiring to the one renderer, adopter rules into the overlay, the seeded template's succession row, the census's change records and the `map_lib` deprecation](spec/2026-10-23-spec-PLAY-dOrderedCharter-31.md) | 36 | 2 | DEFERRED | rev-8 | 2026-11-08 |
 | [PLAY-dOrderedCharter-37 — the help pages: reference pages rendered from each registry's rows, concept, task and tutorial pages beside them, every shown command run, each page linked to its unit by tag](spec/2026-10-23-spec-PLAY-dOrderedCharter-37.md) | 37 | 2 | DEFERRED | rev-6 | 2026-11-08 |
@@ -183,7 +183,7 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-6 | 2026-11-08 |
 <!-- /gen:build-units -->
 
-Records: 486 bound to this build, across 4 record folder(s).
+Records: 488 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

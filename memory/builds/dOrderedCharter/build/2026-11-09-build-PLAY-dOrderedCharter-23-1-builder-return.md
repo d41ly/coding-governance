@@ -15,6 +15,6 @@ Runs wf_1a7fc0f7-fb3 and wf_9ae30a7c-039, summarized from their returns.
 - Observed by probe: AC1 to AC4, and the new arm's condition true on the tree and false with the unattended rows filtered out.
 - The main loop marked five facts the pinned-facts arm read as unpinned, four in the ledger and one in the spec's gates section, as derived
   at their commits, and read the arm green.
-- The spec pins the `/build` drive line at 73 bytes where it measures 72. The charter grew by the spec's measured amount and stays over its
+- The spec pins the `/build` drive line at 73 bytes where it measures 72 (DERIVED at `33e7b5945`). The charter grew by the spec's measured amount and stays over its
   size row.
 - Owed at the close: RED then GREEN for the new arm; the section-7 legs; the tags leg.

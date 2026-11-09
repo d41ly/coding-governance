@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-35 — the overlay's row mechanism for every registered kind: adopter-segment tags, field patches, whole-row replacements, exclusions, row pins and stale rows
 
-**Status:** DEFERRED · rev-7 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 33 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-8 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 33 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0065@35e9932a whole
 **Carries:** node:policy-key.instructions.exclude
@@ -67,7 +67,9 @@ lost at update (`gap-found-29`, closed with units 32 and 33).
   the empty set `[]`, v2's `none` and its default, or a set of gov tags of any registered kind the
   overlay holds; each listed gov row is absent
   from the composition and its state reads `excluded`. A listed tag no registered kind holds is
-  refused. The key is read with `policy_reader("instructions.exclude")`, the playbook kit's
+  refused. The key is read through unit 32's `read_excluded_tags(root)` in
+  `tools/playbook/overlay.py`, the key's one reader, which unit 32 lands first and this composer
+  calls, writing no second read; it calls `policy_reader("instructions.exclude")`, the playbook kit's
   callable that runs `policy.py get` as a subprocess (TOOL-dGroundRules-2 S7), passing `--rev HEAD` as
   PLAY-dOrderedCharter-46 S6 rules for every read the composition makes; `get` prints a set one member
   per line and the empty default as no line, and an exit 2 refuses the composition, naming the key and carrying the
@@ -79,7 +81,7 @@ lost at update (`gap-found-29`, closed with units 32 and 33).
   `python <prefix>/policy/policy.py lists --write`. Which exclusions are refused is unit 36's.
   Re-read at 05fd1b7f7: the callable is the playbook kit's one policy caller,
   `tools/playbook/policy_value.py#read_policy_value`, which unit 19's S8 built to unit 7's design,
-  where this item had named a unit 9 callable; the composer binds it as `policy_reader`, a partial
+  where this item had named a unit 9 callable; unit 32's reader binds it as `policy_reader`, a partial
   over the root with `rev` `"HEAD"`, the way `tools/playbook/instructions_edit.py#read_load` binds
   it, so the key stays the literal first argument the reader-coverage arm counts, and an exit 2
   reaches the composer as `PolicyRefused` carrying the reader's line. The landed row and the list
@@ -146,7 +148,7 @@ lost at update (`gap-found-29`, closed with units 32 and 33).
 
 ### Edges
 
-- **consumes-from** `PLAY-dOrderedCharter-32` — the overlay file `.governance/instructions.toml` and its one reader; without it there is no home for a repository row
+- **consumes-from** `PLAY-dOrderedCharter-32` — the overlay file `.governance/instructions.toml` and its one reader, and `read_excluded_tags`, the one reader of `instructions.exclude`; without it there is no home for a repository row and no excluded set
 - **consumes-from** `PLAY-dOrderedCharter-33` — the `editorial`/`semantic` classifier and the unit-level `instructions.stale` arms this unit runs over rows
 - **consumes-from** `PLAY-dOrderedCharter-15` — the change record and `instructions.edit`, the one door that writes and re-pins an overlay row
 - **consumes-from** `PLAY-dOrderedCharter-19` — the tag grammar, the namespace registry and the tags pack's `owned` arm this unit widens
@@ -350,10 +352,11 @@ TOOL-dGroundRules-19 S1).
 - **AC12** — When `python -c "import tomllib; print([(r['default'], r['owner'], bool(r.get('summary')), bool(r.get('usage'))) for r in tomllib.load(open( 'tools/policy/catalogue.toml' , 'rb'))['key'] if r['name'] == 'instructions.exclude'])"`
   runs after the pass, it prints one row, `[]` (v2's `none`), `dOrderedCharter`, `True`, `True`;
   `python "tools/policy/policy.py" lists --check` exits 0; and
-  `git grep -n -F 'policy_reader("instructions.exclude"' -- tools/playbook/` finds the read.
+  `git grep -n -F 'policy_reader("instructions.exclude"' -- tools/playbook/` finds one line, unit 32's
+  read.
   Red when: the row keeps no summary or usage, or its name stays on the shrink-only list, each of which
-  `policy.py lists --check` reds; a second row is added; or the key is read in a shape the
-  reader-coverage arm does not count.
+  `policy.py lists --check` reds; a second row is added; the key is read in a shape the
+  reader-coverage arm does not count; or a second read of the key is added beside unit 32's.
   fixture: the policy kit's paths are quoted because none is tracked until dGroundRules builds. It
   has landed, and at `05fd1b7f7` the probe prints `[]`, `dOrderedCharter`, `False`, `False` before
   the pass, the row holding `allowed`, `empty`, `default` and `owner` alone and its name on the
@@ -430,6 +433,10 @@ its new modules add no import-time edge to it: each reaches a memory-tree helper
   `schema` joins it as written; `write_row_order` takes a key and a whole text, as unit 33's rev-6
   states; AC12's fixture line states the row before the pass; the gates section names the
   acceptance-matrix leg's parked red; the reuse audit's grep and citations are re-read.
+- rev-8 · 2026-11-09 · S5 · section 3 Edges · AC12 · from
+  `2026-11-09-prompt-PLAY-dOrderedCharter-32-repair-brief.md` item 3: unit 32 builds first and lands
+  `instructions.exclude`'s one reader, `read_excluded_tags` (its section 8 F9), so this unit's composer
+  calls it and adds no second read, and AC12's grep finds that one line.
 
 ## 10. Reuse audit
 

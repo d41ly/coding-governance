@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-36 — the row checks over every registered kind: the fixed set, the exclusion refusals and the widening classifier
 
-**Status:** DEFERRED · rev-7 · 2026-11-08 · node d · Tier-2 · base ce13efbe · streams playbook · order 34 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-8 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 34 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0066@dcfb4bb2 whole
 
@@ -51,10 +51,14 @@ has landed, and none of its rows names a row schema, so a patch of any field wou
   declares `widens`, and fixed when it declares neither: an undeclared class reads as fixed. A field
   declaring both is refused as two answers. Each `fixed-by` source must resolve: a `principle` tag in
   unit 7's principle registry, a `floor` tag through the tag resolver once the floor's namespace is
-  registered, a `parser` source as a tracked file defining that symbol. The definitions are read by
-  `tools/playbook/positional.py#read_symbol_defs`, unit 26's finder for symbol citations, whose
-  docstring names this source as a caller; it reads Python, shell and JavaScript, so a `parser=`
-  path of any other suffix defines nothing and does not resolve. Observed by AC4 and AC5.
+  registered, a `parser` source as a tracked file defining that symbol. The grammar and its resolution
+  are unit 32's: each field's and each `[[fixed-row]]`'s list is handed to
+  `check_fixed_sources(entries, root)` in `tools/playbook/overlay.py`, which unit 32 lands for its
+  units' `fixed-by`, and its reds are this reader's refusals for that list; this unit writes no second
+  resolver. That function reads definitions through
+  `tools/playbook/positional.py#read_symbol_defs`, unit 26's finder for symbol citations, which reads
+  Python, shell and JavaScript, so a `parser=` path of any other suffix defines nothing and does not
+  resolve. Observed by AC4 and AC5.
 - **S3** — The fixed set refusals. An `amends` patch naming a fixed field is refused, and refused as a
   widening of a fixed field when the classifier reads it widening; a `supersedes` of a fixed row and
   an `instructions.exclude` entry naming a fixed row are each refused. Each refusal names the row, the
@@ -103,6 +107,7 @@ has landed, and none of its rows names a row schema, so a patch of any field wou
 - **consumes-from** `PLAY-dOrderedCharter-35` — the composer `compose_rows` this unit's checks run inside, and the fixture kind `tools/playbook/fixtures/row_kind.py` its plants extend
 - **consumes-from** `PLAY-dOrderedCharter-7` — the kinds register a kind's schema is found through, and the principle registry `principle=` sources resolve against
 - **consumes-from** `PLAY-dOrderedCharter-26` — the `path#symbol` form a `parser=` source is written in
+- **consumes-from** `PLAY-dOrderedCharter-32` — the `fixed-by` source grammar and its resolver `check_fixed_sources`, which the schema reader calls for each field's and row's sources; without it a source is unresolved
 - **hands-off** `PLAY-dOrderedCharter-34` — printing the widening list `derive_widenings` returns in the update's delta report
 - **consumes-from** external — dGroundRules, built before this build run: the catalogue's `allowed` grammar, read with `tomllib` (TOOL-dGroundRules-1 S3 and §4, `cl-dClosedLoop-0007`), `policy.py get` for tag-valued keys (TOOL-dGroundRules-2 S7, `cl-dClosedLoop-0008`) and `policy.py check --rev` for the first probe (TOOL-dGroundRules-4 S7); the fixture passes values with `--policy`
 - **consumes-from** `PLAY-dOrderedCharter-46` — the `--rev HEAD` every `policy.py get` of the composition passes (its S6)
@@ -164,9 +169,11 @@ unit 72 applied to every path the playbook kit's code spells.
 Rules the reader enforces, each a refusal naming the file and the field: an unknown key; `class`
 anywhere; a `shape` outside the two; a `ref` outside the three; `widens` and `fixed-by` together; a
 set field whose `widens` is not `add` or `remove`; a scalar whose `widens` is not a list of at least
-two distinct values; an empty `fixed-by`; a source whose type is not one of the three.
+two distinct values; an empty `fixed-by`; a source whose type is not one of the three. The last two,
+and every unresolved source, are the reds unit 32's `check_fixed_sources` returns for the list.
 
-**Resolution of `fixed-by`.** `principle=<tag>` resolves when the tag is a `[[principle]]` row of unit
+**Resolution of `fixed-by`.** Each rule below is unit 32's `check_fixed_sources`, called here with
+the list as written. `principle=<tag>` resolves when the tag is a `[[principle]]` row of unit
 7's principle registry `tools/playbook/principles.toml` (its example row is `principle.p16`, "The core
 cannot be built around."); the fixture's scratch tree reads gov's own registry, read-only. `floor=<tag>` resolves through the tag resolver (`gov tag show`, S5) once the floor's
 namespace is registered; before it registers, the source is refused naming the namespace, so no kind
@@ -380,6 +387,10 @@ reached inside the call that needs them.
   `read_policy_value`; the first probe was run against the landed policy kit, green, with its
   negative seen; `RISKS` is gone, the classes now the record factory's `Risk` values and `LEAST`'s
   keys; the gates section names the acceptance-matrix leg's parked red.
+- rev-8 · 2026-11-09 · S2 · section 3 Edges · section 4 Data model's reader rules, Resolution of
+  `fixed-by` · section 10 · from `2026-11-09-prompt-PLAY-dOrderedCharter-32-repair-brief.md` item 2: unit 32
+  builds first and lands the `fixed-by` grammar and its resolver `check_fixed_sources` (its section 8
+  F8), so this unit consumes it for fields and rows instead of declaring a second.
 
 ## 10. Reuse audit
 
@@ -402,6 +413,7 @@ reason an off-list scalar refuses here instead of reading as neutral. Re-read at
 kinds register is landed with no schema key on any row, so still no seam declares a field's class;
 the shapes cited are `tools/govkit/govkit.py#selfcheck` on its `Report` and
 `tools/roles/roles_lib.py#load_policy`, moved since the base and unchanged in shape; and
-`tools/playbook/positional.py#read_symbol_defs` is the seam a `parser=` source resolves through.
+`tools/playbook/positional.py#read_symbol_defs` is the seam a `parser=` source resolves through,
+reached by unit 32's `check_fixed_sources`, the one resolver of a `fixed-by` list, which this unit calls.
 
 Recall terms used: `python tools/memory-recall/query.py "which gov rows are fixed and which patches widen an open field" --terms "fixed class derived widening classifier add remove constraint permission set exclude requirer"`
