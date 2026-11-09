@@ -469,3 +469,5 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-09T21:21:01Z rescope · item defer PLAY-dOrderedCharter-54 · reason consumes PLAY-dOrderedCharter-31 through PLAY-dOrderedCharter-49, parked for the owner's F8 to F11 in this run; carried forward against ask PLAY-dOrderedCharter-38
 
 2026-11-09T21:21:03Z rescope · item defer PLAY-dOrderedCharter-55 · reason consumes PLAY-dOrderedCharter-31, parked for the owner's F8 to F11 in this run; carried forward against ask PLAY-dOrderedCharter-38
+
+2026-11-09T21:50:44Z brief · item PLAY-dOrderedCharter-40 · reason c1b532b17d03 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-40-build-brief.md
