@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-10-prompt-TOOL-aProfiledEffort-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-1-brief.md) | research | TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-3 |
+| [2026-11-10-prompt-TOOL-aProfiledEffort-2-build-brief.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-2-build-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
