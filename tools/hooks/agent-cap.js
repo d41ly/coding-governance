@@ -916,6 +916,8 @@ function main() {
 module.exports = {
   MAX_VERIFIERS, readWriterBound, runBothViews, renderCodeView, renderStrippedView,
   renderBlankedLiterals, resolveHarnessName, extractWorkflowArgs, extractBuildSlug,
+  // TOOL-dPavedRoad-2 S5: format-guard.js finds the roles kit and reads the handoff marker through these.
+  resolveKitDir, extractHandoffMarker,
 }
 if (require.main === module) main()
 

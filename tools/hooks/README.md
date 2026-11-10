@@ -499,6 +499,18 @@ as such. The reason then quotes both definitions and says to paste the lines `ha
 prints. This arm runs only when the fence defines both shapes; otherwise a turn holding an agent
 writes one witness line and requires nothing.
 
+**The refusal prints the lines it asks for** (`TOOL-dPavedRoad-2`). A blocking reason adds, after the
+definitions, the lines this message owes, derived for it and ready to paste: a `committed` line per
+unreported commit, rendered through the charter's own shape from the sha, the worktree's branch and
+the subject, a ` · ` inside a value folded to `, `; then each missing `agent` or `returned` line as
+`handoff.py agents` prints it. The hook runs that verb with no shell and never with `--write`, using
+the selector the turn already names: `--run <run-id>` for a harness agent, `--handoff <path>` from
+the `gov:handoff` marker of a direct agent's prompt, an absolute or climbing path refused. The roles
+kit is found by `agent-cap.js`'s `resolveKitDir`, and every spawn of one stop shares a 20 s bound.
+A line off its derived shape is withheld. An agent with no marker, no script, no launcher, a failing
+verb or a spent bound keeps the sentence naming the verb, with one witness line; a derivation never
+turns a block into an allow, and an allowing stop spawns nothing.
+
 **How the turn's agents are read.** From the transcript the payload's `transcript_path` names, read
 once and parsed from the end. The turn opens at the earliest of the last run of typed `user` records,
 the rule `runlog.py prose` uses, with two exceptions since `TOOL-aOrientedCast-24`: a compaction

@@ -7518,6 +7518,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "deriveOwedLines",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "deriveReadRev",
       "kind": "function",
       "file": "tools/workflows/unattended-build.js"
@@ -14238,6 +14243,21 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "readHandoffLines",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
+      "id": "readHandoffVia",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
+      "id": "readHeadBranch",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "readHeadRef",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
@@ -18536,6 +18556,11 @@
       "id": "renderSettingsDeny",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderShapeLine",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
     },
     {
       "id": "renderShapeLine",

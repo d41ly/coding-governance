@@ -109,8 +109,9 @@ until an owner writes its first row.
   on a specced unit. The main loop may still flip a spec's `**Status:**` line.
 - A role agent running the bar, the self-test runner or any suite, beyond what `[gates]` allows.
 - In a session routed to a live build, a final message that leaves out the `agent` or `returned`
-  line of an agent its turn dispatched or received. It is refused once per turn end, and
-  `handoff.py agents` prints the lines to paste. This one switches on with the route, not with
+  line of an agent its turn dispatched or received. It is refused once per turn end, and the
+  refusal prints the lines to paste, derived for it by `handoff.py agents`; where it cannot derive
+  one, it names that verb instead. This one switches on with the route, not with
   `roles.json`, and only where the governing doc's micro-formats define both lines.
 
 All of these switch on only where `.claude/roles.json` exists. They do not see writes made through

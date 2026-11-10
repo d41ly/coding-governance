@@ -1,6 +1,6 @@
 # TOOL-dPavedRoad-2 — format-guard's block message carries the lines it asks for
 
-**Status:** INPROGRESS · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
