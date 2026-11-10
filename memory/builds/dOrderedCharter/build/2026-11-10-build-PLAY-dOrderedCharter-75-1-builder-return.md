@@ -16,4 +16,4 @@ Runs wf_6dd260c0-c46, wf_dda81470-7b0 and wf_accda91f-6da, summarized from their
 - Observed by probe: the plant reds with the old arm restored and passes with the new one; the `dead-selector` plant still reds.
 - Observed by the main loop after the pass, AC1: `python tools/playbook/gov_tag.py check` exits 0 over the tree, printing the `reader`
   and `practice` joins unarmed and no selector red (DERIVED at 8198bad3f).
-- Owed at the close: RED then GREEN for the `unscoped-unit` adopter row, and the section 7 legs.
+- Owed at the close: RED then GREEN for the `unscoped-unit` adopter row, and the legs its gates section lists.
