@@ -1,6 +1,6 @@
 # TOOL-aSmoothedDispatch-18 — the three bar legs this build turned red: unit 4's loop read off a one-name local, four test lines respelled off kit paths, and `--help` anchored on a help page
 
-**Status:** INPROGRESS · rev-2 · 2026-11-10 · node a · Tier-1 · base ae6735c1 · streams tooling · order 10 · ratified 2026-11-10
+**Status:** CLOSED · rev-2 · 2026-11-10 · node a · Tier-1 · base ae6735c1 · streams tooling · order 10 · ratified 2026-11-10
 
 <!-- gen:spec-records -->
 

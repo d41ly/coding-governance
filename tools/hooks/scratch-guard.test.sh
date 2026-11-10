@@ -1177,7 +1177,7 @@ write_route_card sgtest-q1 write "TOOL-x-30=$SG_SPECS/2026-10-09-spec-TOOL-x-30.
 # write_run_state <unit>... — a run-state file holding one driver dispatch row per unit; none → no row.
 write_run_state() {
   { printf '# RUN — bx\n\n## Run facts\nphase: BUILDING\n\n## Log\n'
-    for u in "$@"; do printf '2026-11-10T04:00:00Z dispatch · item 0123abcd %s · reason tools/a.js\n' "$u"; done; } > "$SG_RUNMD"
+    for u in "$@"; do printf '2026-11-10T04:00:00Z dispatch · item 0123abcd %s · reason %s/a.js\n' "$u" "$SGP"; done; } > "$SG_RUNMD"
 }
 # check_no_runstate <name> — the last refusal carries no run-state file line.
 check_no_runstate() {

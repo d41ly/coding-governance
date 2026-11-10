@@ -7649,10 +7649,13 @@ if [ -f "$STC" ]; then
   # ---- the inline block refused the first dispatch with check 49 and ran the checker on both calls.
   sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI="'"${PFX}check-spec-tokens.py"'"|' .unattended.conf
   printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md
-  mkdir -p memory/builds/tOther/spec "./${PFX}run-gates"
+  # The run-gates kit's <home> is held once and resolved, so no line spells a kit path (install-prefix).
+  _sd_home=run-gates
+  _sd_rel=$(resolve_kit_dir "$_rkd_py" "$_sd_home" gate-fingerprint.sh "$HERE" 2>/dev/null) || _sd_rel=""
+  mkdir -p memory/builds/tOther/spec "./${PFX}$_sd_home"
   printf '# ARCH-tOther-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 `GATE_SELFTESTS=1 bash run-gates.sh` is green.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tOther/spec/2026-08-20-spec-ARCH-tOther-1.md
   git add memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md memory/builds/tOther/spec/2026-08-20-spec-ARCH-tOther-1.md >/dev/null 2>&1
-  cp "$HERE/../run-gates/gate-fingerprint.sh" "./${PFX}run-gates/"
+  cp "${HERE%/"$KIT_REL"}/$_sd_rel/gate-fingerprint.sh" "./${PFX}$_sd_home/"
   o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
   hit "$o" "the spec-token checker reds only in other builds' specs, which the bar's whole-tree leg still grades, so this dispatch is admitted: 1 hit(s), first: spec-tokens: memory/builds/tOther/"
   hit "$o" "dispatch declared"
@@ -7704,7 +7707,7 @@ if [ -f "$STC" ]; then
   miss "$o" "spec-token check skipped"
   printf '%s\n' "$sd_clean" > "$sd_spec"
   # TOOL-aSmoothedDispatch-8 AC4 step f: no fingerprint, no key: the cache is off on both calls.
-  rm -f .git/unattended/spec-tokens.tRun.key "./${PFX}run-gates/gate-fingerprint.sh"
+  rm -f .git/unattended/spec-tokens.tRun.key "./${PFX}$_sd_home/gate-fingerprint.sh"
   o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")
   hit "$o" "spec-token cache off"
   o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")
@@ -7736,7 +7739,7 @@ if [ -f "$STC" ]; then
   rm -f .git/unattended/spec-tokens.tRun.key
   hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")" "$sd_refuse"
   # TOOL-aSmoothedDispatch-8 AC3 unattributed: a counted hit under no build's folder refuses.
-  printf "import sys\nsys.stdout.write('''%s\n''')\nsys.exit(1)\n" 'spec-tokens: tools/x.md [packet] `tRun` - w'$'\n''spec-tokens: 1 unwaived hit(s), 0 stale row(s)' > ${PFX}stub-tokens.py
+  printf "import sys\nsys.stdout.write('''%s\n''')\nsys.exit(1)\n" 'spec-tokens: x.md [packet] `tRun` - w'$'\n''spec-tokens: 1 unwaived hit(s), 0 stale row(s)' > ${PFX}stub-tokens.py
   rm -f .git/unattended/spec-tokens.tRun.key
   hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")" "$sd_refuse"
   # TOOL-aSmoothedDispatch-8 AC3 nosummary: a foreign hit with no summary line refuses.
@@ -7744,7 +7747,7 @@ if [ -f "$STC" ]; then
   rm -f .git/unattended/spec-tokens.tRun.key
   hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")" "$sd_refuse"
   git rm -q --cached memory/builds/tOther/spec/2026-08-20-spec-ARCH-tOther-1.md >/dev/null 2>&1
-  rm -rf memory/builds/tOther "./${PFX}run-gates" .git/unattended/spec-tokens.tRun.key
+  rm -rf memory/builds/tOther "./${PFX}$_sd_home" .git/unattended/spec-tokens.tRun.key
   # Restore the fixture the brief arms below read: the undated spec name, no extras.
   sed -i '/^SPEC_TOKENS_CLI=/d' .unattended.conf
   git mv memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md memory/builds/tRun/spec/one.md

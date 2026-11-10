@@ -14297,7 +14297,8 @@ remove_run_state_writes() { # run-state file · writes... -> _rw_keep (array) ·
 # red did before. The trailing slash on the own prefix keeps `tA` from claiming `tAB`. The output is
 # a named local so the moved `head -1` read stays the spelling the spawn registry counts.
 check_spec_token_hits() { # slug · checker status · checker output -> 0 admits, 1 refuses; stdout the lines to quote, at most three
-  local own="$MEMORY_ROOT/builds/$1/" far="$MEMORY_ROOT/builds/" out="$3" line tail n="" m="" nfar=0
+  local own="$MEMORY_ROOT/builds/$1/" far="$MEMORY_ROOT/builds/" line tail n="" m="" nfar=0
+  local out="$3"
   local hitre='^spec-tokens: ([^ ]+) \[[a-z-]+\] ' sumre='^spec-tokens: ([0-9]+) unwaived hit\(s\), ([0-9]+) stale row\(s\)$'
   local ownq=() farq=()
   [ "$2" = 0 ] && return 0

@@ -54,6 +54,14 @@ is a new unit on top. The round records `--folded` and `--promoted`.
 `SPEC_FOLD_CUTOFF` is a date in `.unattended.conf`. A spec exit before it is disposed the old way,
 every confirmed finding promoted.
 
+## Listing the driver's verbs
+
+`--help` prints every verb the unattended driver takes and the guide that states each verb's contract, then the driver's usage header, and exits 0. `-h` is the same. <!-- usage: verb:unattended.sh:--help 965e3eb2 -->
+
+```bash
+bash tools/unattended/unattended.sh --help
+```
+
 ## Recording a round
 
 `--record-round` appends one spec-audit round to the build's chain record. <!-- usage: verb:unattended.sh:--record-round 60847ce3 -->
