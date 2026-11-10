@@ -8,14 +8,18 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 |
+| [2026-11-10-build-PLAY-dOrderedCharter-77-1-builder-return.md](../build/2026-11-10-build-PLAY-dOrderedCharter-77-1-builder-return.md) | journal | — |
 | [2026-11-10-build-PLAY-dOrderedCharter-77-deviation-771.md](../build/2026-11-10-build-PLAY-dOrderedCharter-77-deviation-771.md) | deviation | — |
 | [2026-11-10-build-PLAY-dOrderedCharter-77-deviation-772.md](../build/2026-11-10-build-PLAY-dOrderedCharter-77-deviation-772.md) | deviation | — |
 | [2026-11-10-build-PLAY-dOrderedCharter-77-ledger.md](../build/2026-11-10-build-PLAY-dOrderedCharter-77-ledger.md) | journal | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-77-1-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-1-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-77-2-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-2-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-77-3-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-3-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-PLAY-dOrderedCharter-77-4-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-4-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-77-build-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-build-brief.md) | journal | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-77-pin-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-pin-brief.md) | research | — |
+| [2026-11-10-prompt-PLAY-dOrderedCharter-77-pin-lines-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-pin-lines-brief.md) | research | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-77-spec-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-spec-brief.md) | research | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-77-tokens-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-tokens-brief.md) | research | — |
 
@@ -106,10 +110,10 @@ CLOSED units still owe.
   where the kit's own `policy_value.resolve_kit_dir` finds the kit. Each of its four plant blocks first
   checks the kits its arms reach, and where one does not resolve prints
   `UNARMED — the <block> plants: no <home> kit in this install` and runs none of that block's arms. At
-  HEAD the reaches are: the layer block, `memory-tree` (`tools/playbook/check_layers.py:106`, at import);
-  the tag block, `memory-tree` (`tools/playbook/tag_index.py:479`); the edge block, `roles`
-  (`tools/playbook/edge_grammar.py:372`); the load-set block, `roles` and `policy`
-  (`tools/playbook/load_sets.py:132`, `tools/playbook/load_sets.py:339`). Observed by AC11 and AC9.
+  HEAD the reaches are: the layer block, `memory-tree` (`tools/playbook/check_layers.py@b68f9e5c:106`, at import);
+  the tag block, `memory-tree` (`tools/playbook/tag_index.py@0fea0fdf:479`); the edge block, `roles`
+  (`tools/playbook/edge_grammar.py@82484637:372`); the load-set block, `roles` and `policy`
+  (`tools/playbook/load_sets.py@ddcdb92d:132`, `tools/playbook/load_sets.py@ddcdb92d:339`). Observed by AC11 and AC9.
 - **S12** — Docs. `tools/govkit/usage.toml` gains four `[[usage]]` rows of shape `verb`:
   `build_records.py#new`, `instruction_units.py#envelopes`, `instruction_units.py#drive` and
   `load_sets.py#derive`, each `id` `script:{prefix}/<kit>/<file>#<verb>` with its `entry`, `verb` and
@@ -197,39 +201,39 @@ records, so every code offender below stands at HEAD.
 - Install prefix: 23 kit-path spellings on 22 lines (PINNED, the leg's log), every one S2 or S3 names.
   The counter at `tools/check-install-prefix.sh` lines 461 to 472 splits a rule-3 operand on
   whitespace, either quote, a backtick, `=`, `(` and `:`, and its comment there names the Skill dir as the case the dot-dir test exempts. The
-  same literal `.claude/skills/lexicon/SKILL.md` at `tools/lexicon/kit.toml:75` and
-  `tools/lexicon/adopt-lexicon.sh:246` is not counted; only the envelope's `[` lead is.
-- Harness arms: `tools/check-template-size.sh:347`'s `fail 8` carries the remedy text, and A25 at
-  `tools/check-template-size.test.sh:240` asserts only its first clause.
+  same literal `.claude/skills/lexicon/SKILL.md` at `tools/lexicon/kit.toml@c6ba7bc3:75` and
+  `tools/lexicon/adopt-lexicon.sh@ff7c3635:246` is not counted; only the envelope's `[` lead is.
+- Harness arms: `tools/check-template-size.sh@acbcf7c3:347`'s `fail 8` carries the remedy text, and A25 at
+  `tools/check-template-size.test.sh@4fdc7fd0:240` asserts only its first clause.
 - Dead paths: the eight carriers S5 lists are the leg's whole hit list (PINNED, its log). The file's
   header calls it shrink-only; `92e3bab9e` added two rows for fixture literals the same way.
-- Remote literals: `tools/playbook/overlay.py:679` and `tools/playbook/overlay.py:680` (the leg's log).
+- Remote literals: `tools/playbook/overlay.py@7d5aa983:679` and `tools/playbook/overlay.py@7d5aa983:680` (the leg's log).
 - Govkit selfcheck: two problems, the unclaimed fixture and the adopter's name at
-  `tools/govkit/entries/push-main.kit.toml:93`, which the playbook kit now ships as
+  `tools/govkit/entries/push-main.kit.toml@9250ba5c:93`, which the playbook kit now ships as
   `tools/playbook/push-main.kit.toml` (a scratch install at 51cd8b402 holds it).
 - Matrix, reproduced by this writer in a scratch install shaped as `tools/govkit/matrix.py`'s shape 5:
   `apply` exits 1 with `render-playbook: REFUSED — line 104`, a rule in a one-line region at 201
   characters, quoting the `[land]` line under the 30-character stub (PINNED). The narrowed text the
   cross-os arm builds from that install's `deploy.toml` fails `tomllib.loads` at line 11, column 43, the
   matrix log's exact error, and at line 4, column 17 with `drop_blocks` prepended.
-  `tools/govkit/registry.toml:743` and `:755` hold `instruction edits selftest` and
+  `tools/govkit/registry.toml@77d73836:743` and `:755` hold `instruction edits selftest` and
   `instruction units selftest` as `[[exempt_leg]]` rows whose `why` reads "a descriptor row naming a leg
   the target cannot carry is what reds the deployer". PLAY-dOrderedCharter-65's Migration section
   records the core's legs as gov-only, and `tags (the resolver's checks)` is `[[exempt_leg]]` at
-  `tools/govkit/registry.toml:711`.
+  `tools/govkit/registry.toml@77d73836:711`.
 - Docs: seven `UNROWED` lines, five on `help/charter.md` and two on `help/roles.md` (PINNED, the leg's
   log). `tools/govkit/docs_leg.py#read_docs_state` counts a `script:` row as graded, so each new row
   owes an anchor or reds `UNDOCUMENTED`.
 - Lexicon: `verb offenders 1212 over pin 1209` (PINNED, the leg's log); `.lexicon.conf` sets
-  `VERB_OFFENDER_PIN="1209"`. `tools/playbook/overlay_rows.py:203` calls `pins.fold_text`.
+  `VERB_OFFENDER_PIN="1209"`. `tools/playbook/overlay_rows.py@50335e34:203` calls `pins.fold_text`.
 - Ceilings: the margin row is `120 1.0`, and `derive-ceilings.py --check` requires a ceiling at the
   reading plus `max(120, 1.0 x reading)`. The tags leg is absent from `tools/gate-legs.json` at the
   merge base `8bec4cefd` and arrives at `9cb93347d`.
-- Check 23: `altoks(line)` per physical line at `tools/memory-tree/check-memory-hygiene.sh:3441` and
+- Check 23: `altoks(line)` per physical line at `tools/memory-tree/check-memory-hygiene.sh@66a9fc27:3441` and
   `:3442`. PLAY-dOrderedCharter-13 AC5 opens a backticked command on one line and closes it on the next,
   so the extractor pairs the closing backtick with the next span's opening one and yields two prose
   fragments, neither sharing anything with the ledger's `tools/govkit/registry.toml`.
-- Docs refusal: `tools/govkit/docs_leg.py:437` returns the refused state; no plant of `PLANTS` stages
+- Docs refusal: `tools/govkit/docs_leg.py@2d99fa99:437` returns the refused state; no plant of `PLANTS` stages
   it and no `_docs_cases` row expects exit 2.
 
 ### The three install-day fixes, together
@@ -470,7 +474,7 @@ may not run it. Each scratch clone is `git clone -q --shared . <tmp>`, run with 
   records commit, it names none of `PLAY-dOrderedCharter-18/AC3`, `PLAY-dOrderedCharter-65/AC3` and
   `PLAY-dOrderedCharter-72/AC6`; and the unit-18 line in
   `memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-18-ledger.md` names
-  `backlog.py:1808` and both keep rows its query printed.
+  `tools/memory-tree/backlog.py@ce13efbe:1808` and both keep rows its query printed.
   Red when: an owed criterion stays unrecorded, or a line claims a result its run did not print.
   permission: each of the three runs is the main loop's, as each criterion's own permission line says.
 
@@ -548,11 +552,17 @@ New arm: tools/govkit/selftest.py · covers AC17 · a `_docs_cases` row on the `
   `2026-11-10-prompt-PLAY-dOrderedCharter-77-3-spec-writer.md`: the three criteria observe each leg's
   checker and name no suite, and the leg line gains the guarded leg the ledgers trip; no design text
   moved.
+- rev-2 · 2026-11-10 · section 4's Evidence · S11 · AC18 · section 10 · from
+  `2026-11-10-prompt-PLAY-dOrderedCharter-77-pin-lines-brief.md`: each unlisted file:line citation is
+  a blob-pinned line, written by `python tools/playbook/positional.py pin --at 51cd8b402`, the base, and
+  each pinned line read back as the line its prose names. AC18's bare backlog line, which the tool
+  refuses as no path, is spelled `tools/memory-tree/backlog.py@ce13efbe:1808`, the form the unit-18
+  ledger line it observes holds. Citation form only: no design text moved, and the rev stays.
 
 ## 10. Reuse audit
 
 Every fix extends a seam the tree already holds, and no new mechanism is minted. The registry's
-`[[exempt_leg]]` rule for a leg a target cannot carry, at `tools/govkit/registry.toml:743` and `:755`,
+`[[exempt_leg]]` rule for a leg a target cannot carry, at `tools/govkit/registry.toml@77d73836:743` and `:755`,
 is S8's. The install-prefix counter's own Skill-dir homonym rule is S3's. The playbook kit's inline
 `resolve_kit_dir` in `tools/playbook/policy_value.py`, reached as `tools/playbook/load_sets.py` reaches
 it, is S2's and S11's, and `tools/playbook/render_playbook.py#resolve_declaration_paths` is S2's
