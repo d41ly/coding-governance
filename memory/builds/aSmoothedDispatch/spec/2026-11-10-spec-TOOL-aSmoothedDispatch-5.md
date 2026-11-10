@@ -1,6 +1,6 @@
 # TOOL-aSmoothedDispatch-5 — the spec-token checker grades one named spec, so a spec writer can run it over its own
 
-**Status:** CLOSED · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 5 · advances TOOL-dFairHearing-54
+**Status:** CLOSED · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 5 · advances TOOL-dFairHearing-54
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,8 @@
 |---|---|---|
 | [2026-11-10-build-TOOL-aSmoothedDispatch-1-1-acceptance-ledger.md](../build/2026-11-10-build-TOOL-aSmoothedDispatch-1-1-acceptance-ledger.md) | journal | TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-6 TOOL-aSmoothedDispatch-7 TOOL-aSmoothedDispatch-8 TOOL-aSmoothedDispatch-9 |
 | [2026-11-10-prompt-TOOL-aSmoothedDispatch-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-1-brief.md) | research | TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-6 |
+| [2026-11-10-prompt-TOOL-aSmoothedDispatch-5-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-5-1-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-TOOL-aSmoothedDispatch-5-edge.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-5-edge.md) | research | — |
 | [2026-11-10-review-TOOL-aSmoothedDispatch-1-closing-diff-round1.md](../reviews/2026-11-10-review-TOOL-aSmoothedDispatch-1-closing-diff-round1.md) | diff-review | TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-6 TOOL-aSmoothedDispatch-7 |
 
 <!-- /gen:spec-records -->
@@ -60,6 +62,9 @@ pins both verdicts in the hook's suite.
 
 ### Edges
 
+- **hands-off** `TOOL-aSmoothedDispatch-7` — the checker's one-spec `--spec <path>` mode, which unit 7's
+  `gov-spec-writer` house overlay tells the writer to run over each spec before it returns. This unit
+  builds the mode and unit 7 tells the writer to use it.
 - **hands-off** external — the prompt line telling `gov-spec-writer` to run
   `python tools/check-spec-tokens.py --spec <its spec>` before it returns, in the writer's role prompt
   and the SPEC stage of `tools/workflows/unattended-build.js` (open ask TOOL-aDeferredBar-6). Without it
@@ -233,6 +238,10 @@ none
   `2026-11-10-prompt-TOOL-aSmoothedDispatch-1-brief`, item 5, grounded at `ae6735c1`. The hook probe
   found the role-gate arm already admits a scoped run, so the mechanism moves to the checker's scope.
   The roster's wording for this unit names scratch-guard, and the hook's change is its suite rows.
+- rev-2 · 2026-11-10 · §3 · the `### Edges` block gains the **hands-off** `TOOL-aSmoothedDispatch-7`
+  edge that mirrors unit 7's **consumes-from** back, per the revision brief
+  `2026-11-10-prompt-TOOL-aSmoothedDispatch-5-edge`. It records an edge the built checker already
+  honours, and moves no design, scope or criterion.
 
 ## 10. Reuse audit
 

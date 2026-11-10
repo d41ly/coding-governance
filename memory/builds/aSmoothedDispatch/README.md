@@ -69,14 +69,14 @@ ids TOOL-aSmoothedDispatch-12 TOOL-aSmoothedDispatch-13 TOOL-aSmoothedDispatch-1
 | [TOOL-aSmoothedDispatch-2 — `--dispatch` removes the run-state file from its declared writes with a note instead of refusing](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-2.md) | 2 | 2 | CLOSED | rev-3 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-3 — `unattended.sh --help` prints the verb list and exits 0](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-4 — `--dispatch`'s spec-token check grades the dispatching build's specs, and skips when its inputs match the last admitted check](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-4.md) | 4 | 2 | CLOSED | rev-1 | 2026-11-10 |
-| [TOOL-aSmoothedDispatch-5 — the spec-token checker grades one named spec, so a spec writer can run it over its own](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-5.md) | 5 | 2 | CLOSED | rev-1 | 2026-11-10 |
+| [TOOL-aSmoothedDispatch-5 — the spec-token checker grades one named spec, so a spec writer can run it over its own](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-5.md) | 5 | 2 | CLOSED | rev-2 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-6 — a dispatched unit counts as routed, so its builder's product writes are not refused on a stale card route](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-6.md) | 6 | 2 | CLOSED | rev-1 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-7 — the `gov-spec-writer` house overlay has the writer run the spec-token checker's one-spec mode over each spec before it returns](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-7.md) | 7 | 2 | CLOSED | rev-1 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-8 — the closing review's mediums and lows: the writer's row shape, an arm per admit clause and cache key, the no-field `--writes` arms, the context's step-9b read, and the hook leg's driver guard](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-8.md) | 8 | 2 | CLOSED | rev-1 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-9 — the three driver-suite arms unit 1's split left red: the stale `--dispatch` hostile-value exemption, and two carriage-return arms whose byte the substitution drops](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-9.md) | 9 | 1 | CLOSED | rev-2 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 14 bound to this build, across 4 record folder(s).
+Records: 16 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
