@@ -1,6 +1,6 @@
 # TOOL-aProfiledEffort-2 — the handoff verbs answer a role's and a stage's level for a named model
 
-**Status:** SPECCED · rev-1 · 2026-11-10 · node a · Tier-2 · base 7c896db6 · streams tooling · order 2
+**Status:** INPROGRESS · rev-1 · 2026-11-10 · node a · Tier-2 · base 7c896db6 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
