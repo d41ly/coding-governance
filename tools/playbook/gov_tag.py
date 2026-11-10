@@ -375,8 +375,8 @@ FIXTURE_KIT = instruction_units.derive_tool_rel(KIT_DIR.name)  # the fixture lay
 UNCLOSED = "\n```\nand [doc.nope]\n"
 PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retired", "retired-old",
           "retired-reminted", "bare", "bare-charter", "owned", "owned-core", "scope", "scope-guide",
-          "bad-ns", "bad-seg", "long-tag", "ns-word", "unregistered-cite", "dead-selector", "empty-ns",
-          "escaped-word", "file-name", "new-extractor", "extractor-edit", "tagless", "schema",
+          "bad-ns", "bad-seg", "long-tag", "ns-word", "unregistered-cite", "dead-selector", "unscoped-unit",
+          "empty-ns", "escaped-word", "file-name", "new-extractor", "extractor-edit", "tagless", "schema",
           "no-owner", "ghost-owner", "no-purpose-source", "bad-purpose-source", "member-no-field", "pending-source",
           "registry-ghost", "registry-missing", "registry-joined", "new-no-purpose", "two-versions",
           "served-across", "positional-seed", "positional-new", "positional-stale", "positional-listed",
@@ -417,6 +417,10 @@ SHAPE_PLANTS = {
         f"{FIXTURE_KIT}/readers.toml": '[[reader]]\ntag = "reader.every"\n\n[[reader]]\ntag = "reader.ghost"\n',
         "tools/corekit/instructions.toml": '[[unit]]\ntag = "unit.alpha"\nscope = ["reader.every"]\n',
         "tools/corekit/core.tags": "+layer.memory.lexicon\n"}),
+    # PLAY-dOrderedCharter-75: a unit row with no `scope` leaves the `reader` join unarmed
+    "unscoped-unit": (FIXTURE_UNIT_ROW + derive_fixture_row("reader", "tag_index:extract_reader", "selects"), {
+        f"{FIXTURE_KIT}/readers.toml": '[[reader]]\ntag = "reader.every"\n',
+        "tools/corekit/instructions.toml": '[[unit]]\ntag = "unit.alpha"\n'}),
     "empty-ns": (derive_fixture_row("kind", "tag_index:extract_kind"),
                  {f"{FIXTURE_KIT}/kinds.toml": "# declares nothing yet\n",
                   "memory/guides/ALPHA.md": "+\nsee `kind.x`\n"}),

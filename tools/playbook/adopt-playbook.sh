@@ -231,7 +231,8 @@ echo "PASS — the layer check's plants"
 # reads is `--set`, so no row reads a policy file. The two `unclosed-` rows are PLAY-dOrderedCharter-68's: a
 # fence that never closes is red on a live page and printed on a frozen record. The rows from `bad-ns` on are
 # PLAY-dOrderedCharter-10's nine plants, the shape check and the joins; `dead-selector` and `file-name` print their second half's
-# exit on a `rc=` line, read here as a line. Then four are PLAY-dOrderedCharter-44's: the index's
+# exit on a `rc=` line, read here as a line. PLAY-dOrderedCharter-75's `unscoped-unit`, beside them, leaves
+# the `reader` join unarmed under a unit row with no `scope`. Then four are PLAY-dOrderedCharter-44's: the index's
 # freshness keyed on blob, extractor and version, and its schema stamp. Then three rows are
 # PLAY-dOrderedCharter-51's two plants: two worktrees whose extractor bytes differ keep their rows apart,
 # re-parse nothing on a second alternating round, and `--gc` collects the pruned one's version; a worktree
@@ -298,6 +299,7 @@ unregistered-cite $_tk|1|\`layer.nowhere\` is cited and undeclared in layer
 dead-selector $_tk|1|\`reader.ghost\` is declared and selects no unit
 dead-selector $_tk|1|unused, a descriptor (not red): layer.memory layer.memory.lexicon
 dead-selector $_tk|1|without reader.ghost: rc=0
+unscoped-unit $_tk|0|tags: join reader · selects · unarmed|is declared and selects no unit
 empty-ns $_tk|0|tags: join kind · unarmed|\`kind.x\`
 file-name $_tk|0|1 file names not graded
 file-name $_tk|0|· unresolved · \`kit.toml\` names no row

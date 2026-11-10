@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-75 — the selects join arms per namespace, so gov's first unit rows leave the tags leg green
 
-**Status:** DEFERRED · rev-2 · 2026-11-10 · node a · Tier-2 · base 0ec67531d · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
+**Status:** CLOSED · rev-2 · 2026-11-10 · node a · Tier-2 · base 0ec67531d · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-10-build-PLAY-dOrderedCharter-75-ledger.md](../build/2026-11-10-build-PLAY-dOrderedCharter-75-ledger.md) | journal | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-75-1-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-75-1-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-75-2-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-75-2-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-75-build-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-75-build-brief.md) | journal | — |

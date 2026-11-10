@@ -483,3 +483,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-09T23:54:06Z rescope · item add PLAY-dOrderedCharter-75 · reason found after unit 40's pass: its four unit rows arm the tags leg's selects join, which reds 42 declared practice and reader selectors no unit selects yet; spec 40 is CLOSED, so the correction is a unit on top
 
 2026-11-09T23:54:09Z rescope · item add PLAY-dOrderedCharter-76 · reason unit 37's later commit, refused at dispatch because reopening CLOSED spec 37 made its AC12 token live; its F8, F10 and F11 scope and unit 37's three lint reds move to a unit of their own
+
+2026-11-10T01:47:54Z brief · item PLAY-dOrderedCharter-75 · reason 4be396566eb0 memory/builds/dOrderedCharter/prompts/2026-11-10-prompt-PLAY-dOrderedCharter-75-build-brief.md
+
+2026-11-10T02:00:20Z dispatch · item a7d937b2 PLAY-dOrderedCharter-75 · reason tools/playbook/tag_index.py tools/playbook/gov_tag.py tools/playbook/adopt-playbook.sh tools/playbook/README.md help/tags.md memory/builds/dOrderedCharter/spec/2026-11-10-spec-PLAY-dOrderedCharter-75.md memory/builds/dOrderedCharter/build/2026-11-10-build-PLAY-dOrderedCharter-75-ledger.md memory/builds/dOrderedCharter/build/2026-11-10-build-PLAY-dOrderedCharter-75-deviation-751.md memory/map/generated/symbols.json memory/builds/dOrderedCharter/README.md memory/LIVE.md

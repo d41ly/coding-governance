@@ -1055,8 +1055,9 @@ def check_tag_shape(con, ctx) -> tuple[list, list]:
 def check_namespace_joins(con, ctx, file_names=None) -> tuple[list, list]:
     """S4, each namespace joined both ways through `compute_coverage`: every graded citation into it is a
     member (a retired one included, the `retired` arm's question), file names aside; and, for a `selects`
-    namespace whose members are not units, every member selects a unit. An empty population prints
-    `unarmed` and grades nothing; a descriptor's unused members are printed, never red. -> (reds, lines)."""
+    namespace whose members are not units, every member selects a unit, graded once some unit's `scope`
+    names a tag of the namespace (PLAY-dOrderedCharter-75). An empty population prints `unarmed` and
+    grades nothing; a descriptor's unused members are printed, never red. -> (reds, lines)."""
     load_memory_tree()
     from coverage_join import compute_coverage
     if file_names is None:
@@ -1092,8 +1093,9 @@ def check_namespace_joins(con, ctx, file_names=None) -> tuple[list, list]:
             continue
         sel = selected.get(ns, {})
         if row["role"] == "selects":
-            if not units:
-                lines.append(f"tags: join {ns} · selects · unarmed: no unit row, so no member is graded as selecting")
+            if not sel:
+                lines.append(f"tags: join {ns} · selects · unarmed: no unit's scope names a {ns} tag, "
+                             "so no member is graded as selecting")
                 continue
             dec = declared.get(ns, {})
             cov = compute_coverage({ns: sorted(dec)}, {"units": {ns: tuple(sel)}}, {ns: ()})
