@@ -27,7 +27,7 @@ Each unit's own probe: (1) a spec holding a known false-positive token reds unde
 No change to what any check grades on the full run; no change to the spec-audit policy, the dispatch order gate, the packet regen or the manifest ratchet; no new role.
 
 ### Limitations
-`--staged` must stay cheap: the corpus-wide check 23 cost 16 minutes, which is why it is held. Writers' token runs must stay inside the spec-writer role's write boundary.
+`--staged` must stay cheap: the corpus-wide check 23 cost 16 minutes, which is why it is held. Writers' token runs must stay inside the spec-writer role's write boundary. Check 12's joins are held under `--staged` today because "the selection is the staged set, so one end of a correctly declared pair would report the other as missing" (the hygiene script's own message): unit 4 grades each STAGED spec's edges against its partners as they stand in the tree, and each staged ledger's lines against its spec in the tree, never the staged set alone.
 
 ### Reuse
 Each unit extends its own file's existing seam: check-spec-tokens' live-spec walk, format-guard's defect list, handoff's `extract_task_fields`, and the hygiene script's `--staged` selection. Recall returned no record ruling against any of the four.

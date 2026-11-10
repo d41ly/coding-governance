@@ -4,7 +4,6 @@ node: a
 opened: 2026-11-10
 streams: tooling
 roster: TOOL
-status: OPEN
 ids: TOOL-dPavedRoad-1 TOOL-dPavedRoad-2 TOOL-dPavedRoad-3 TOOL-dPavedRoad-4
 ---
 
@@ -49,25 +48,35 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-11-10 · streams tooling
+**Build status:** OPEN · 4 unit(s) · node a · opened 2026-11-10 · streams tooling
 ids TOOL-dPavedRoad-1 TOOL-dPavedRoad-2 TOOL-dPavedRoad-3 TOOL-dPavedRoad-4
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dPavedRoad-1 — a spec writer grades its own spec: `check-spec-tokens.py --spec` reads the named spec whatever its status, and the writer's role may run it](spec/2026-11-10-spec-TOOL-dPavedRoad-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-11-10 |
+| [TOOL-dPavedRoad-2 — format-guard's block message carries the lines it asks for](spec/2026-11-10-spec-TOOL-dPavedRoad-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-10 |
+| [TOOL-dPavedRoad-3 — the handoff carries the brief's prompt as a `brief:prompt` block](spec/2026-11-10-spec-TOOL-dPavedRoad-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-11-10 |
+| [TOOL-dPavedRoad-4 — `--staged` grades the edge joins and the ledger joins for what it stages](spec/2026-11-10-spec-TOOL-dPavedRoad-4.md) | 4 | 2 | OPEN | rev-1 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dPavedRoad-1 TOOL-dPavedRoad-2 TOOL-dPavedRoad-3 TOOL-dPavedRoad-4.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-dPavedRoad-1` | no |
+| 2 | `TOOL-dPavedRoad-2` | no |
+| 3 | `TOOL-dPavedRoad-3` | no |
+| 4 | `TOOL-dPavedRoad-4` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
