@@ -1,6 +1,6 @@
 # TOOL-aSwiftRefusal-3 — `read_open_passes` leaves out every key of a deferred unit, naming each on stderr
 
-**Status:** CLOSED · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 3
+**Status:** CLOSED · rev-3 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-11-10-build-TOOL-aSwiftRefusal-3-1-acceptance-ledger.md](../build/2026-11-10-build-TOOL-aSwiftRefusal-3-1-acceptance-ledger.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aSwiftRefusal-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-1-brief.md) | research | TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 |
 | [2026-11-10-prompt-TOOL-aSwiftRefusal-1-token-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-1-token-fix-brief.md) | research | TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 |
+| [2026-11-10-prompt-TOOL-aSwiftRefusal-2-edge-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-2-edge-fix-brief.md) | research | TOOL-aSwiftRefusal-2 |
 | [2026-11-10-prompt-TOOL-aSwiftRefusal-3-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-3-1-spec-writer.md) | journal | — |
 | [2026-11-10-review-TOOL-aSwiftRefusal-1-3-closing-diff-round1.md](../reviews/2026-11-10-review-TOOL-aSwiftRefusal-1-3-closing-diff-round1.md) | diff-review | TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 |
 
@@ -62,6 +63,7 @@ by the build's one deferral predicate, and name each released key on stderr.
 
 - **consumes-from** `TOOL-aSwiftRefusal-2` — `check_unit_deferred <run-state file> <unit> <spec status>`, as that unit's §4 "The predicate" defines it; without it this unit has nothing to call, and a second reading of the defer rows here would break the build rule of one predicate
 - **consumes-from** external — `check_pass_open`, `read_pass_declarations` and the caller-loaded `SPEC_PATH` and `SPEC_ST` maps as they stand at base `ae6735c1`; this unit changes none of them
+- **hands-off** `TOOL-aSwiftRefusal-4` — the deferred skip in `read_open_passes`, whose release question that unit's check 23 asks and whose `--audit` half its M3 block arms
 
 ## 4. Design
 
@@ -257,6 +259,10 @@ none
   the two `[path]` hits on AC6's `diff` command, where each process substitution's `)` sat on the
   path's word. A space now parts each `)` from its path, so the command runs unchanged. Nothing else
   moves.
+- rev-3 · 2026-11-10 · §3 Edges · mirrors `TOOL-aSwiftRefusal-4`'s `consumes-from` as `hands-off`,
+  which check 12's reciprocity arm reported missing; from
+  `memory/builds/aSwiftRefusal/prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-2-edge-fix-brief.md`
+  item 2. Nothing else moves.
 
 ## 10. Reuse audit
 

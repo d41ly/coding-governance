@@ -1,6 +1,6 @@
 # TOOL-aSwiftRefusal-2 — the order gate lets a deferred earlier-order unit pass
 
-**Status:** CLOSED · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 2 · closes TOOL-aRoutedQuill-13
+**Status:** CLOSED · rev-3 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 2 · closes TOOL-aRoutedQuill-13
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,8 @@
 | [2026-11-10-prompt-TOOL-aSwiftRefusal-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-1-brief.md) | research | TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-3 |
 | [2026-11-10-prompt-TOOL-aSwiftRefusal-1-token-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-1-token-fix-brief.md) | research | TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-3 |
 | [2026-11-10-prompt-TOOL-aSwiftRefusal-2-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-2-1-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-TOOL-aSwiftRefusal-2-2-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-2-2-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-TOOL-aSwiftRefusal-2-edge-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-2-edge-fix-brief.md) | research | TOOL-aSwiftRefusal-3 |
 | [2026-11-10-review-TOOL-aSwiftRefusal-1-3-closing-diff-round1.md](../reviews/2026-11-10-review-TOOL-aSwiftRefusal-1-3-closing-diff-round1.md) | diff-review | TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-3 |
 
 <!-- /gen:spec-records -->
@@ -53,6 +55,9 @@ run that defers one unit cannot dispatch anything ordered after it without re-or
 
 - **hands-off** `TOOL-aSwiftRefusal-3` — `check_unit_deferred`, which that unit's `read_open_passes`
   change calls rather than defining a second deferral predicate (README build-level rule 2).
+- **hands-off** `TOOL-aSwiftRefusal-4` — `check_unit_deferred <run-state file> <unit> <spec status>`,
+  which that unit moves into the kit library and calls from `--rescope` and check 23, changing no
+  line of its body.
 
 ## 4. Design
 
@@ -229,6 +234,10 @@ none
 - rev-2 · 2026-11-10 · the spec-token `[bar]` hit on AC6's backticked suite path folded: AC6 greps
   the suite file the §7 `New arm:` line names, which now names the suite alone; the criterion is
   unchanged.
+- rev-3 · 2026-11-10 · §3 Edges · mirrors `TOOL-aSwiftRefusal-4`'s `consumes-from` as `hands-off`,
+  which check 12's reciprocity arm reported missing; from
+  `memory/builds/aSwiftRefusal/prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-2-edge-fix-brief.md`
+  item 1. Nothing else moves.
 
 ## 10. Reuse audit
 
