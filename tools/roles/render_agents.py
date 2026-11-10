@@ -5,7 +5,9 @@
 
 `--write` renders one agent type per role whose `agent` is true, at `.claude/agents/<name>.md` under
 the repository root: the role's Claude keys, then `effort: <level>` as `roles_lib.resolve_effort`
-reads it from the kit's `house/policy.toml` (TOOL-aOrientedCast-10), then `omitClaudeMd: true`, then gov's `workflow` and
+reads it from the kit's `house/policy.toml` (TOOL-aOrientedCast-10) with no model named, so a type
+carries the default tables' level and never a profile's (TOOL-aProfiledEffort-1), then
+`omitClaudeMd: true`, then gov's `workflow` and
 `writes`, then a body that is `roles_lib.render_role`'s output followed, under `## Charter`, by
 `roles_lib.render_charter_blocks` for the role: the section 1 rule lines its `rules` key cites, then
 the charter's carried sections whole (TOOL-aOrientedCast-16). A pre-tag charter renders no
@@ -666,6 +668,81 @@ def run_selftest():
                           and not any(ln.startswith("render_agents: misplaced") for ln in lines),
                           "%s: a namesake at %s beside no mark of its kit exited %d under --check, or "
                           "did not read as the note alone" % (case, namesake, rc))
+    # Arm 19 (TOOL-aProfiledEffort-1): a profile table per model family. 19b, a type carries the
+    # default tables' level; 19a, 19c, 19d and 19f, the levels a model resolves under each policy;
+    # 19e, every profile defect refuses the render under its own dotted key and writes nothing.
+    # The rows also hold (TOOL-aProfiledEffort-4): a default-table stage override, `k2`, that a
+    # matched profile does not inherit; a model id in mixed case; and a `match` of two words, on
+    # the resolve side by its second word and on the defect side by a second word `fam` holds.
+    with tempfile.TemporaryDirectory() as tmp:
+        root = pathlib.Path(tmp)
+        base = ('[effort]\ndefault = "low"\n\n[effort.roles]\nr-one = "high"\n\n'
+                '[effort.stages.w5]\nk2 = "high"\n')
+        fam = base + ('\n[effort.profiles.fam]\nmatch = ["fam"]\ndefault = "max"\n\n'
+                      '[effort.profiles.fam.roles]\nr-two = "xhigh"\n\n'
+                      '[effort.profiles.fam.stages.w5]\nk1 = "medium"\n')
+        ven = fam + '\n[effort.profiles.ven]\nmatch = ["vendor", "vend2"]\ndefault = "medium"\n'
+        kit, tool_root = build_fixture(root, roles, fam)
+        with open(kit / "workflows.toml", "a", encoding="utf-8") as fh:
+            fh.write('\n[[workflow]]\nname = "w5"\ndriver = "workflow"\nharness = "%s"\n'
+                     'stages = { k1 = "r-one", k2 = "r-two" }\n' % FIXTURE_HARNESS)
+        w5 = lib.load_workflows(kit)[-1]
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            rc = run_mode("write", kit, tool_root, root)
+        before = {p: p.read_bytes() for p in (root / ".claude").rglob("*") if p.is_file()}
+        for slot, level in (("r-one", "high"), ("r-two", "low")):
+            p = root / ".claude" / "agents" / (slot + ".md")
+            check_arm(state, 19, rc == 0 and p in before and "effort: %s" % level in before[p].decode(
+                "utf-8").split("\n"), "19b: %s does not carry the default tables' effort: %s" % (slot, level))
+        plain = ("high", "low", {"k1": "high", "k2": "high"})
+        for row, text, model, want in (
+                ("19a", base, "vendor-fam-9", plain), ("19a", base, None, plain),
+                ("19c", fam, "vendor-fam-9", ("max", "xhigh", {"k1": "medium", "k2": "xhigh"})),
+                ("19c", fam, "Vendor-FAM-9", ("max", "xhigh", {"k1": "medium", "k2": "xhigh"})),
+                ("19d", fam, "vendor-other-9", plain), ("19d", fam, "affam-9", plain), ("19d", fam, None, plain),
+                ("19f", ven, "vendor-other-9", ("medium", "medium", {"k1": "medium", "k2": "medium"})),
+                ("19f", ven, "vend2-other-9", ("medium", "medium", {"k1": "medium", "k2": "medium"})),
+                ("19f", ven, "vendor-fam-9", None)):
+            (kit / "house" / "policy.toml").write_text(text, encoding="utf-8")
+            try:
+                policy = load_catalogue(kit, root)["policy"]
+                got = (lib.resolve_effort(policy, "r-one", model), lib.resolve_effort(policy, "r-two", model),
+                       lib.resolve_stage_efforts(policy, w5, model))
+            except lib.RolesError as e:
+                got = str(e)
+            if want is None:   # the model two profiles match: a refusal naming it and both `match` keys
+                check_arm(state, 19, isinstance(got, str) and all(s in got for s in (
+                    model, "effort.profiles.fam.match", "effort.profiles.ven.match")),
+                    "19f: a model two profiles match read %r, not a refusal naming both match keys" % (got,))
+                continue
+            check_arm(state, 19, got == want, "%s: the model %r read %r, not %r" % (row, model, got, want))
+        for lines, key in (
+                ('match = ["x"]\ndefault = "low"\nextra = 1\n', "x.extra"),
+                ('match = ["x"]\ndefault = "extra"\n', "x.default"),
+                ('match = ["x"]\n', "x.default"),
+                ('match = ["x"]\ndefault = "low"\n\n[effort.profiles.x.roles]\nr-nobody = "low"\n', "x.roles.r-nobody"),
+                ('match = ["x"]\ndefault = "low"\n\n[effort.profiles.x.roles]\nr-off = "low"\n', "x.roles.r-off"),
+                ('match = ["x"]\ndefault = "low"\n\n[effort.profiles.x.stages.w5]\nk9 = "low"\n', "x.stages.w5.k9"),
+                ('match = ["x"]\ndefault = "low"\n\n[effort.profiles.x.stages.w3]\nk1 = "low"\n', "x.stages.w3"),
+                ('default = "low"\n', "x.match"),
+                ('match = "x"\ndefault = "low"\n', "x.match"),
+                ('match = []\ndefault = "low"\n', "x.match"),
+                ('match = ["vendor-x"]\ndefault = "low"\n', "x.match"),
+                ('match = ["fam"]\ndefault = "low"\n', "x.match"),
+                ('match = ["x", "fam"]\ndefault = "low"\n', "x.match"),
+                (None, "x")):
+            row = '\n[effort.profiles]\nx = "low"\n' if lines is None else "\n[effort.profiles.x]\n" + lines
+            (kit / "house" / "policy.toml").write_text(fam + row, encoding="utf-8")
+            err = io.StringIO()
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+                rc = run_mode("write", kit, tool_root, root)
+            said = [ln for ln in err.getvalue().splitlines() if " R12 " in ln]
+            check_arm(state, 19, rc == 2 and len(said) == 1 and " — effort.profiles.%s — " % key in said[0],
+                      "19e: a profile holding %r exited %d saying %r, not 2 with one line under "
+                      "effort.profiles.%s" % (lines, rc, said, key))
+            check_arm(state, 19, bool(before) and before == {
+                p: p.read_bytes() for p in (root / ".claude").rglob("*") if p.is_file()},
+                "19e: a refused profile holding %r moved a file under .claude" % (lines,))
     for line in state["fail"]:
         print("render_agents selftest: FAIL %s" % line)
     print("%s (%d assertions)" % ("FAIL" if state["fail"] else "PASS", state["n"]))

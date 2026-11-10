@@ -13938,6 +13938,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "print_role_efforts",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "print_roster",
       "kind": "function",
       "file": "tools/roles/handoff.py"
@@ -20841,6 +20846,11 @@
       "id": "resolve_procs_path",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "resolve_profile",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "resolve_projects_root",
@@ -28436,6 +28446,11 @@
       "id": "write_journals",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "write_json_line",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "write_kit_restore",

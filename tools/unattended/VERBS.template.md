@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.114 -->
+<!-- gov:kit unattended@1.115 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -795,8 +795,12 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   `scriptPath`. **Every harness call also carries `roles`**: the JSON the roles kit's
   `handoff.py harness-args <harness>` prints, `<harness>` being `unattended-build`, `unattended-unit`
   or, for the closing review M8 composes, `tier2-review`. **It also carries `efforts`**: the JSON
-  `handoff.py stage-efforts <workflow>` prints for the workflow that call runs — `spec-write` for
-  the build harness, `build` for the unit harness, `closing-review` for the closing review. With no
+  `handoff.py stage-efforts <workflow> --model <id>` prints for the workflow that call runs —
+  `spec-write` for the build harness, `build` for the unit harness, `closing-review` for the closing
+  review. `<id>` is the model in use: the session's own model id, exactly as the session's
+  environment states it, read again at each call. A direct role spawn's `Agent` call carries `effort`
+  too, its role's value in the JSON `handoff.py role-efforts --model <id>` prints; the roles kit's
+  README states the limits. With no
   `.claude/roles.json` the roles kit is not installed: pass no `roles` and no `efforts`, and each
   harness logs its per-stage fallback. A session started
   before the rendered agent types existed cannot spawn them: it passes none too, and once the spawn
