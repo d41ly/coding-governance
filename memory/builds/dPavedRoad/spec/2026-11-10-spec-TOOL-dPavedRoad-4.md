@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-10-build-TOOL-dPavedRoad-4-ledger.md](../build/2026-11-10-build-TOOL-dPavedRoad-4-ledger.md) | journal | — |
 | [2026-11-10-prompt-TOOL-dPavedRoad-1-brief.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-1-brief.md) | research | TOOL-dPavedRoad-1 TOOL-dPavedRoad-2 TOOL-dPavedRoad-3 |
+| [2026-11-10-prompt-TOOL-dPavedRoad-4-bar-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-4-bar-fix-brief.md) | research | — |
 | [2026-11-10-review-TOOL-dPavedRoad-1-closing-diff-round1.md](../reviews/2026-11-10-review-TOOL-dPavedRoad-1-closing-diff-round1.md) | diff-review | TOOL-dPavedRoad-1 TOOL-dPavedRoad-2 TOOL-dPavedRoad-3 |
 
 <!-- /gen:spec-records -->
