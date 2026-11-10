@@ -59,7 +59,7 @@ ids TOOL-aShelvedLeg-1 TOOL-aShelvedLeg-2
 | [TOOL-aShelvedLeg-2 — the closing review's minors on the held kit gate, batched](spec/2026-11-10-spec-TOOL-aShelvedLeg-2.md) | — | 2 | CLOSED | rev-1 | 2026-11-11 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 4 record folder(s).
+Records: 9 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

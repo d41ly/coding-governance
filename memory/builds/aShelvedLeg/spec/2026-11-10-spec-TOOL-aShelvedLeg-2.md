@@ -6,7 +6,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-10-build-TOOL-aShelvedLeg-1-agent-ledger.md](../build/2026-11-10-build-TOOL-aShelvedLeg-1-agent-ledger.md) | journal | TOOL-aShelvedLeg-1 |
 | [2026-11-10-prompt-TOOL-aShelvedLeg-2-brief.md](../prompts/2026-11-10-prompt-TOOL-aShelvedLeg-2-brief.md) | research | — |
+| [2026-11-11-review-TOOL-aShelvedLeg-2-closing-diff-round1.md](../reviews/2026-11-11-review-TOOL-aShelvedLeg-2-closing-diff-round1.md) | diff-review | TOOL-aShelvedLeg-1 |
 
 <!-- /gen:spec-records -->
 
