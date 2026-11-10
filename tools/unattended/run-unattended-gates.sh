@@ -5,7 +5,8 @@
 # have different subjects:
 #
 #   * the RECORD AND WIRING checks read the REPOSITORY — run-state records, the shipped skill's
-#     wiring. They can go stale without anyone editing this kit, so they stay merge-bar legs.
+#     wiring. They can go stale without anyone editing this kit, so they are bar legs, except the
+#     kit gate, held off every automatic bar by owner ruling 2026-11-10 (TOOL-aShelvedLeg-1).
 #     WHICH ones is the `checks` rows below and nothing else: the three names that used to be typed
 #     here had already fallen behind by one leg before this line was rewritten, which is what a
 #     hand-kept list of a machine-readable population always does. Nothing here replaces them and
@@ -416,7 +417,8 @@ case "$1" in
     echo "               in a timeout below that - a killed suite prints no PASS and no FAIL, and"
     echo "               greping for a verdict then reads a kill as silence. This script reads the"
     echo "               EXIT CODE for that reason."
-    echo "  --checks     the record/wiring checks, which are ALSO merge-bar legs. Their own"
+    echo "  --checks     the record/wiring checks, bar legs too except the kit gate, which the"
+    echo "               bar holds and only this or GATE_SELFTESTS=1 runs. Their own"
     echo "               ceilings are in the same BUDGET_* block; no wall figure is typed here,"
     echo "               because the one that was is what round 8 filed. Takes no mode."
     echo "  --all        both, and it REFUSES without a mode exactly as --selftests does"
@@ -556,7 +558,7 @@ run_one "brief-recorded"            checks bash "$HERE/check-brief-recorded.sh"
 # `<prefix>/run-gates/selftest-budgets.txt` alongside every other kit's, and one runner executes them
 # all -- which is what the 2026-08-23 ruling always implied and what this file could only do for one
 # kit. Their budgets travelled with them; the `--checks` half above keeps its own, because those four
-# are REPOSITORY checks that stay on the merge bar and are not this delegation's business.
+# are REPOSITORY checks, bar legs but for the held kit gate, and are not this delegation's business.
 #
 # WHY THEY WERE THE HARD CASE, recorded because it is why the population is declared rather than
 # derived: the ruling removed all six from `<prefix>/gate-legs.json` AND from `<prefix>/unattended/kit.toml`,

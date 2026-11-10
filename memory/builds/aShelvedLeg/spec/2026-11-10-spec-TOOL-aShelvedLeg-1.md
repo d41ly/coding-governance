@@ -1,6 +1,6 @@
 # TOOL-aShelvedLeg-1 — the `unattended kit gate` leg is `subject = "kit"`, off every automatic bar
 
-**Status:** SPECCED · rev-2 · 2026-11-10 · node a · Tier-2 · base b904a0f9 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-11-10 · node a · Tier-2 · base b904a0f9 · streams tooling
 
 <!-- gen:spec-records -->
 
