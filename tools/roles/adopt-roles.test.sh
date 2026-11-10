@@ -300,7 +300,7 @@ for w in staged:
 print("\n".join(bad))
 sys.exit(1 if bad else 0)' "$FXN" "$KREL" 2>&1); rc=$?
   check_arm "arm 6 the rendered effort tables are what stage-efforts prints, with and without the profiled model, and each unset level its slot's agent file's" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
-  [ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
+  [ "$rc" = 0 ] || printf '    %s\n' "${out//$'\n'/$'\n'    }"
   msha=$(tr -d '\r' < "$TMP_ROOT/a6.task" | sed -n '1s/.* task-sha=\([0-9a-f]\{12\}\) -->$/\1/p')
   out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" check "$A6P" 2>&1); rc=$?; out=${out//$'\r'/}
   check_arm "arm 6 check re-derives the marker's task-sha" \
