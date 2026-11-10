@@ -6,10 +6,12 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-10-build-TOOL-aGuardedEffort-1-agent-ledger.md](../build/2026-11-10-build-TOOL-aGuardedEffort-1-agent-ledger.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aGuardedEffort-1-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aGuardedEffort-1-1-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aGuardedEffort-1-2-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aGuardedEffort-1-2-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aGuardedEffort-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aGuardedEffort-1-brief.md) | research | — |
 | [2026-11-10-prompt-TOOL-aGuardedEffort-1-observation-revision-brief.md](../prompts/2026-11-10-prompt-TOOL-aGuardedEffort-1-observation-revision-brief.md) | research | — |
+| [2026-11-10-review-TOOL-aGuardedEffort-1-diff-review-round1.md](../reviews/2026-11-10-review-TOOL-aGuardedEffort-1-diff-review-round1.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
 

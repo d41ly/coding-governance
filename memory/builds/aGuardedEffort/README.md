@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-10
 streams: tooling
 roster: TOOL
-ids: TOOL-aGuardedEffort-1
+ids: TOOL-aGuardedEffort-1 TOOL-aGuardedEffort-2
 ---
 
 # aGuardedEffort — the spawn guard refuses a role spawn or a harness call at a level the session model's profile does not give
@@ -46,11 +46,12 @@ None.
 | # | Unit | Mechanism |
 |---|---|---|
 | 1 | `TOOL-aGuardedEffort-1` | the spawn guard compares an `Agent` call's `effort` and a `Workflow` call's `efforts` with the levels the session model's profile gives, and refuses a difference |
+| 2 | `TOOL-aGuardedEffort-2` | promoted from the closing review: round 1's two highs, five mediums and two lows, batched |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node a · opened 2026-11-10 · streams tooling
-ids TOOL-aGuardedEffort-1
+ids TOOL-aGuardedEffort-1 TOOL-aGuardedEffort-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -58,7 +59,7 @@ ids TOOL-aGuardedEffort-1
 | [TOOL-aGuardedEffort-1 — the spawn guard refuses a role spawn or a harness call at a level the model's effort profile does not give](spec/2026-11-10-spec-TOOL-aGuardedEffort-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 2 record folder(s).
+Records: 7 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
