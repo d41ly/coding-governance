@@ -11772,6 +11772,8 @@ memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	10
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	190 bytes
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	35 units
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-54.md	1800 seconds
+memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-54.md	3600 seconds
+memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-54.md	5400 seconds
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	1524 lines
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	49505 bytes
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	54 rows
