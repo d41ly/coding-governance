@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-49 — the round-1 spec audit's 73 minors: criteria that can pass, rows a new leg owes, one reader per fact, and seams in build order
 
-**Status:** DEFERRED · rev-7 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 39 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-9 · 2026-11-10 · node d · Tier-2 · base ce13efbe · streams playbook · order 39 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,7 +11,7 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 |
 | [2026-10-24-build-PLAY-dOrderedCharter-49-deviation-491.md](../build/2026-10-24-build-PLAY-dOrderedCharter-49-deviation-491.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-49-deviation-492.md](../build/2026-10-24-build-PLAY-dOrderedCharter-49-deviation-492.md) | deviation | — |
-| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77 PLAY-dOrderedCharter-78 |
 | [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-49-deviation-493.md](../build/2026-10-25-build-PLAY-dOrderedCharter-49-deviation-493.md) | deviation | — |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
@@ -39,205 +39,190 @@ Each §2 item names one report id and its criterion, in the report's order; MEDI
 L<n>'s AC<45+n>, and merged ids share one. Ids 12, 28, 41, 50 and 86 are built from the skeptic's
 corrected fix.
 
+At `974700af5` every repaired unit is CLOSED but unit 31, which builds first: a CLOSED unit's
+criterion is observed here in its corrected form, never edited into its frozen spec (unit 55 S2).
+
 ## 2. Scope (IN)
 
-- **S1** — id 3. Each `[[reference]]` row of `tools/playbook/references.toml` gains `summary-from`
-  and `usage-from`, naming the field of its reader's rows unit 37's render reads (`summary` and `usage`
-  for the kinds and drive readers, the unit registry's `text` and `usage`, as unit 37 F9 maps them);
-  an absent field refuses, or on the policy page is listed, as unit 37 S2 says, superseding its fixed
-  names and settling its S5 (§8 F2). Observed by AC1.
-- **S2** — id 4, met at HEAD: both key sets of `tools/run-gates/run-gates.test.sh` (`:244`, `:580` at
-  base) carry `enforces`. Observed by AC2.
-- **S3** — id 66. `enforces` never reaches a target's manifest, as govkit's leg writer builds each row
-  from named keys (`tools/govkit/govkit.py:4422`), so no `ENFORCES_FLOOR_RUN_GATES` is owed beside
-  `SUBJECT_FLOOR_RUN_GATES` (`:6010`). Observed by AC2.
-- **S4** — id 5. Every leg units 3, 7, 12, 13, 15, 20, 25 and 26 add to `tools/gate-legs.json`, DERIVED
-  as the names absent at `ce13efbe`, gets its `tools/govkit/subject-pins.tsv` row (`govkit selfcheck
-  --write`) and a measured `tools/run-gates/ceiling-evidence.txt` row. Observed by AC3.
-- **S5** — id 67. Each such leg has a descriptor `[[gate_leg]]` or a `tools/govkit/registry.toml`
-  `[[exempt_leg]]` row, as check 7h requires (`tools/govkit/govkit.py:2944-2946`), and a line in its
-  kit's dossier under `memory/map/features/`; unit 16 S8's owed-rows sentence is the rule. Observed by
-  AC3.
-- **S6** — id 6. The placement fields are `scope` and `trigger`, never `select` and `when`, in unit 28
-  S5's adapter, unit 32 S3, data model and AC9, unit 33 S6 and unit 34 S1 and §4 step 1, as unit 9 S1
-  and unit 20 S1 name them; unit 32 F1 alone maps the clause's wording. Observed by AC4.
-- **S7** — id 7. `edges` is a TOML list of S6 strings, `edges = ["amends=<tag>@<hash8>"]`, in unit 32's
-  and unit 35's data models and readers, as unit 9 and unit 24 S2 write it. Observed by AC4.
-- **S8** — id 45. Unit 32's level-0 example row is a `directive` with typed `text`, never a typed
-  `fact`, which unit 12 S2 reds. Observed by AC4.
-- **S9** — id 8, met by unit 28: `tools/playbook/edge_grammar.py#read_unit_edges` reads rows through
-  unit 9's `parse_unit_rows`, so no second parser of `instructions.toml` exists. Observed by AC5.
-- **S10** — id 9. Unit 32's reads of later units are wired here: its S4 reads `instructions.exclude`
-  through unit 35's reader, its S5 resolves `fixed-by` through S45. Observed by AC6.
-- **S11** — id 10. Unit 34's S8 census writes and its AC1 and AC10 happen here, after unit 31's step
-  creates gov's overlay: `write_overlay_units` (unit 32 S8) writes them from the up of its own step
-  `playbook/census-to-overlay`, program `tools/govkit/steps/census_to_overlay.py`, run in gov's
-  prepared merge, a no-op where the receipt is not `"mode": "source"` (TOOL-dSafePassage-8 S1), and
-  carrying unit 55 S9's re-render before its landing freezes it (§8 F3). Observed by AC7.
-- **S12** — id 11. Unit 19 S14's `owned` arm judges a tag by its namespace row's declaring extractor and
-  registry location, never its minting file, so an optional kit's `kit.<id>` never reds the core
-  `kit` namespace. Observed by AC8.
-- **S13** — id 12. `role` and `item` stay unregistered (unit 10 S5): units 9 and 11 keep role-scoped
-  and `required-by` rows fixture-only, gov's first rows (unit 40) carry no scope, and unit 20's schema
-  check reds a gov-tree row scoped `role.gov-builder` (§8 F4). Observed by AC9.
-- **S14** — id 13, met by unit 22's built grammar, stated in the header of
-  `tools/playbook/namespaces.toml`: a purpose source is a path, a path and a field, or a field alone,
-  `#h1` a Markdown member's first heading, which the `doc` row reads. Observed by AC10.
-- **S15** — id 14. Unit 15's `foundation` pack resolves to unit 1's `foundation` array (`practices =
-  "foundation"`), never `all`, which unit 15 AC10 asserts. Observed by AC11.
-- **S16** — id 16. Unit 18 AC1's grep is scoped `-- tools/memory-recall tools/memory-tree`. Observed by
-  AC12.
-- **S17** — id 34. The namesakes `def repo_root()` at `tools/codebase-map/map_lib.py:114`,
-  `tools/drift-audit/drift_report.py:109` and `tools/govkit/govkit.py:126` stay, named in unit 18's §4.
+Met marks an item the built code or a landed spec already holds at `974700af5`; its criterion
+observes it at this pass.
+
+- **S1** — id 3, met by unit 37: each `[[reference]]` row names a `reader` mapping its registry's own
+  fields onto `summary` and `usage`, as `tools/playbook/render_playbook.py#read_unit_reference_rows`
+  maps `text`; no `summary-from` key is minted (section 8 F2). Observed by AC1.
+- **S2** — id 4, met: both `KNOWN` sets of `tools/run-gates/run-gates.test.sh` carry `enforces`.
+  Observed by AC2.
+- **S3** — id 66, met: `tools/govkit/govkit.py#write_gate_legs` builds rows from named keys and writes
+  no `enforces`. Observed by AC2.
+- **S4** — id 5, met: unit 50's `tools/run-gates/owed_rows.py` finds every new leg's pin row, and its
+  ceiling row is the close's measured bar run's to write. Observed by AC3.
+- **S5** — id 67, met: the same probe finds each new leg's `[[gate_leg]]` or `[[exempt_leg]]` row and
+  dossier claim. Observed by AC3.
+- **S6** — id 6, met: rows read `scope` and `trigger`
+  (`tools/playbook/instruction_units.py#UNIT_STRINGS`), never `select` or `when`. Observed by AC4.
+- **S7** — id 7, met: `edges` is a list in `tools/playbook/instruction_units.py#UNIT_LISTS`. Observed
+  by AC4.
+- **S8** — id 45, met in unit 31's rev-13: its level-0 rows are `directive` rows. Observed by AC4.
+- **S9** — id 8, met: `tools/playbook/edge_grammar.py#read_unit_edges` reads through
+  `parse_unit_rows`. Observed by AC5.
+- **S10** — id 9, met: `tools/playbook/overlay.py#read_excluded_tags` and
+  `tools/playbook/overlay.py#check_fixed_sources` are unit 32's late reads. Observed by AC6.
+- **S11** — id 10: `tools/playbook/practice_census.py` moves no unit (PINNED at `974700af5`), as
+  unit 31 rev-13's S6 states, so no census step or program is minted (section 8 F3); a census moving
+  a unit at the pass is a hand-back. Observed by AC7.
+- **S12** — id 11, met: the `kit` row sits at `layer.distribution`, an expansion layer, which
+  `tools/playbook/tag_index.py#check_owned` never grades. Observed by AC8.
+- **S13** — id 12, met: no `role` or `item` namespace is registered, gov's unit rows carry no `scope`,
+  and the schema check reds an unregistered one. Observed by AC9.
+- **S14** — id 13, met by unit 22: `tools/playbook/namespaces.toml`'s header states the
+  purpose-source grammar, `#h1` the `doc` row's. Observed by AC10.
+- **S15** — id 14. `tools/playbook/packs.toml`'s `foundation` pack reads `practices = "foundation"`,
+  which `tools/playbook/instructions_edit.py#resolve_practices` resolves to the catalogue's
+  `foundation` array and `tools/playbook/instructions_edit.py#check_packs` admits; at `974700af5` the
+  array holds 35 of 39 rows (PINNED). Observed by AC11.
+- **S16** — id 16. Unit 18 AC1 is observed here scoped `-- tools/memory-recall tools/memory-tree`.
   Observed by AC12.
-- **S18** — id 70. Within that scope every hit is in `tools/memory-tree/id_grammar.py`, as unit 18 AC1
-  says. Observed by AC12.
-- **S19** — id 17. Unit 18 AC3 reads "every hit is a keep row of §4's table or a history comment named
-  in the pass's `Decided:` trailer", as its AC2 does, naming the keep rows
-  `tools/codebase-map/scen-adversarial.json:180` and `tools/govkit/selftest.py:9330`. Observed by AC13.
-- **S20** — id 33. Unit 18 AC7 is an `ast` walk of every `*.py` under `tools/memory-tree/` finding no
-  `recall_conf` import and no `KIT_MEMORY_RECALL_VERSION` attribute. Observed by AC13.
-- **S21** — id 18. Unit 1 AC1 compares the 36 `foundation` tags with section 1's one-line region before
-  `### Micro-formats`, never every `RULE_LINE_RE` match (46). Observed by AC14.
-- **S22** — id 19. Unit 5 AC3 counts `- [verify] ` lines inside `### Charter rules` only, never unit
-  21's `### Practices at build` line. Observed by AC15.
-- **S23** — id 20. Unit 30 AC6 greps `\[bytes\]`, `\[cross-os\]`, `practice.bytes`,
-  `practice.cross-os` and the `rules:` values `bytes` and `cross-os?` over
-  `tools/playbook/practices.toml` and the role sources, never `-w bytes`. Observed by AC16.
-- **S24** — id 21. Every criterion pathspec the report lists is rooted:
-  `tools/playbook/fixtures/row_kind.py` (unit 36 AC11), `help/overlay-rows.md` (unit 36 AC12, unit 35
-  AC14), `help/charter.md` (units 1, 2 and 6, AC7), `help/upgrade-steps.md` (unit 31 AC12), `help/composition.md` (unit 34 AC11); unit 35 AC14 greps
-  `help/README.md` for the link. Observed by AC17.
-- **S25** — id 22, met in unit 3's spec: its S5 names the sources of `.claude/skills/cleanup/SKILL.md`
-  and `skills/deploy-governance/SKILL.md`, and its write set holds both. Observed by AC18.
-- **S26** — id 32. Unit 28's commit site reads only id-shaped `Pass:` values as `serves` edges and
-  counts `none` or prose as unread; `Decided:` stays the `decides` edge to its own commit unit 28
-  built (`tools/playbook/edge_grammar.py#read_trailer_edges`). Observed by AC19.
-- **S27** — id 35, met at HEAD: `tools/memory-recall/recall_conf.py` and `tools/memory-recall/bench.py`
-  each carry the canonical `resolve_kit_dir` block and reach `id_grammar` through it, never through
-  `extract.py` (`tools/memory-recall/extract.py:60`). Observed by AC20.
-- **S28** — id 36. `KIT_MEMORY_RECALL_VERSION` joins `query.py`'s cache manifest beside `conf_digest`,
-  so a recall-only bump rebuilds a warm cache once `Conf.digest` hashes `id_grammar.py` (unit 18 S4).
-  Observed by AC21.
-- **S29** — id 37. Unit 18 AC5 gains a limb in a scratch tree with no `.memory-tree.conf`:
-  `python -c "import sys; sys.path.insert(0,'tools/memory-tree'); import id_grammar, corpus_ids, gotchas"`
-  exits 0. Observed by AC22.
-- **S30** — id 38, met in unit 3's spec: its S7 and AC7 name `.claude/skills/unattended/SKILL.md`
-  and raise its row. Observed by AC23.
-- **S31** — id 65. The crossed set is DERIVED at the pass from the files `read_envelopes` finds an
-  envelope in, each against its cap, never from registry rows, so unit 3 S9's held guide is never
-  crossed; each crossed cap's leg is on unit 3's leg line. Observed by AC23.
-- **S32** — id 39. Unit 12's `lock --check` compares a row's blob with `git hash-object --path=<path>
-  <file>`, so a CRLF checkout of an LF blob stays green. Observed by AC24.
-- **S33** — id 83. `.gitattributes` routes `.governance/instructions.lock` to `merge=ours`, and the
-  prepared merge's re-render rewrites every lock row, so a merged lock is never kept (§8 F5). Observed
-  by AC24.
-- **S34** — id 40. One reader of a Skill's `description`, folded scalars included, lifted from
-  `tools/runlog/selftest.py:8172` into `tools/playbook/core.py`, serves unit 7 S6's gate and unit 11
-  S5's measure; kind.skill's population is every tracked `SKILL.md` and `SKILL.template.md`. Observed
-  by AC25.
-- **S35** — id 41. `render_handoff` (`tools/roles/handoff.py:312`)
-  appends a `### input:code` block of the file's text, whatever the role's `reads`, after the read
-  blocks and before the charter blocks; an unsupplied slot joins the `Not supplied, optional` line
-  (`:412-414`); unit 27's §10 calls it new code. Observed by AC26.
-- **S36** — id 42. `read_units(root)` finds manifests under `root`'s install prefix, never `__file__`'s
-  kit parent. Observed by AC27.
-- **S37** — id 43. Unit 16's `import` detector resolves a module through the importer's `sys.path`;
-  failing that, a name also in a core home or beside the importer is no non-core edge
-  (`tools/run-gates/measure_legs.py:1001-1006` imports process-monitor's `census`). Observed by AC28.
-- **S39** — id 46. Unit 37's run arm spawns through govkit's `resolve_bash()`
-  (`tools/govkit/govkit.py:1144`), never a bare `bash`. Observed by AC30.
-- **S40** — id 51. Unit 24's `tools/playbook/edges.toml` registers `consumes-from` and `hands-off` as
-  inverses sited in a spec's `### Edges` block, which check 12
-  (`tools/memory-tree/check-memory-hygiene.sh:2474`, `:2714`) and `HANDOFF_BULLET`
-  (`tools/check-spec-tokens.py:376`) keep parsing. Observed by AC31.
-- **S41** — id 52, met by unit 25: no edge-checks module exists, and both `--only` arms call
-  `check_edges` and `run_resolve`, as unit 28's `edges` leg does (§8 F6). Observed by AC32.
-- **S42** — id 53. Unit 1's `read_practice_catalogue` refuses only what it cannot parse; a line's shape
-  and size are unit 7's gate's, on the rendered line via `render_playbook.py`'s one-line check.
-  Observed by AC33.
-- **S43** — id 54. Unit 29's `one-owner` calls unit 22's owner predicate, which reads
-  `memory/project/chain.toml`, for namespace, unit and kind rows, never `memory/builds/` (§8 F7).
-  Observed by AC34.
-- **S44** — id 55. Unit 29's `one-subject` and S8's retirement arm slug headings with unit 19's slug
-  function from `tools/playbook/tag_index.py`. Observed by AC35.
-- **S45** — id 59. One `resolve_fixed_by(source)` in `tools/playbook/instruction_units.py`, on unit 26's
-  symbol finder, serves unit 32's `derive_unit_class` and unit 36's row checks (§8 F8). Observed by
-  AC36.
-- **S46** — id 60. Unit 33's `derive_pin_state` takes a canonicaliser, and unit 35's
-  `derive_row_composition` calls it for steps 4 and 5, as unit 35's §10 says. Observed by AC37.
-- **S47** — id 68, met at HEAD: `tools/memory-tree/id_grammar.py#git` names its encoding, and the
-  `extract.py` row at `memory/project/encoding-posture-sites.txt:29` is gone. Observed by AC38.
-- **S48** — id 69. The adopter docs say the grammar ships in memory-tree's `id_grammar.py`:
-  `tools/memory-tree/HYGIENE.template.md` (rendered into `memory/HYGIENE.md`), `WIRE-INTO-PROJECT.md` (SIBLINGS) and `tools/memory-tree/README.md`. Observed by AC39.
-- **S49** — id 71. Unit 31 S1's Readers add `memory/project/spawn-idiom-sites.txt`,
-  `memory/project/testsuite-count-waivers.txt` and `memory/project/unarmed-branches.txt`, whose
-  `tools/agent-instructions/` rows leave with the directory; the `shell hygiene`, `testsuite counts` and
-  `harness arms` legs join unit 31's gates. Observed by AC40.
-- **S50** — id 77. Each resolver call replaces the worktree's dirty rows with the current dirty set
-  keyed by blob, and drops rows of a worktree `git worktree list` no longer names. Observed by AC41.
-- **S51** — id 78. `extract_doc` skips fenced headings by CommonMark's rules, numbers a duplicate slug
-  `-2`, `-3`, and reds a `#<seg>` over the 64-byte `TAG_MAX_BYTES`. Observed by AC42.
-- **S52** — id 84. Unit 37's run arm runs one fenced block, indented ones included, as one script; a
-  `<…>` placeholder is a finding unless its block is marked `<!-- run: no — placeholder -->`, which
-  `help/measure-legs.md:79-80` and `help/roles.md:35-37` take. Observed by AC43.
-- **S53** — id 85. Each value the record factory writes into a `**Key:**` line is one line: CR, LF and a
-  value opening `**<Word>:**` refuse, `Words` is one escaped string, unit 2's `--rule` is checked
-  against the catalogue, and a refusal leaves no file. Observed by AC44.
-- **S54** — id 86. `write_card_file` records the owning session id in
-  the card's header and refuses a card another live session owns, printing
-  `card-file — skipped: another live session <sid> owns this tree`. Observed by AC45.
-- **S55** — id 15. Unit 29's rule-to-check row for `practice.writing.address` names
-  `tags positional selftest`, unit 26 S7's leg. Observed by AC46.
-- **S56** — id 23. Unit 25 S5 follows unit 24 S4: a declared `cites` is graded; the arms are S41's. Observed by AC47.
-- **S57** — id 24. `one-owner` reads the owner set from unit 22's chain registry, plus layers only for
-  row kinds admitting a layer owner. Observed by AC48.
-- **S58** — id 25. Unit 10's `repo` row has role `describes`, so S4's "two selector namespaces" holds;
-  an `empty-ns` plant covers `repo`. Observed by AC49.
-- **S59** — id 26. Unit 23's §4 table adds `memory/guides/BUILD-METHOD.md:286` and its source
-  `tools/memory-tree/BUILD-METHOD.template.md:286`. Observed by AC50.
-- **S60** — id 27, met at HEAD: `STATEMENT_TYPES` has one definition, in
-  `tools/playbook/instruction_units.py`, the closed set unit 12 AC1 asserts. Observed by AC51.
-- **S61** — id 28, met at unit 26's pass, whose ledger observed its AC10 (unit 55 S2). Observed by
-  AC52.
-- **S62** — id 29. Unit 33's `run_unit_drift` is the one printer of stale and orphaned units at
-  `update`; unit 34's relay filters them out. Observed by AC53.
-- **S63** — id 47. Unit 2 S6's re-point list is a grep at the pass, re-pointing
-  `WIRE-INTO-PROJECT.md:122`, `tools/roles/roles_lib.py:202`, `tools/roles/check_roles.py:15` and
-  `tools/unattended/unattended.sh:655` and `:8447`, kept hits named in the `Decided:` trailer.
+- **S17** — id 34. The namesakes `tools/codebase-map/map_lib.py#repo_root`,
+  `tools/drift-audit/drift_report.py#repo_root` and `tools/govkit/govkit.py#repo_root` stay. Observed
+  by AC12.
+- **S18** — id 70. Within that scope every hit is in `tools/memory-tree/id_grammar.py`. Observed by
+  AC12.
+- **S19** — id 17. Unit 18 AC3 is observed here as "every hit is a keep row or a trailer-named
+  history comment": `tools/codebase-map/scen-adversarial.json@974700af5:180` and
+  `tools/govkit/selftest.py@974700af5:12089`. Observed by AC13.
+- **S20** — id 33, met: unit 18 AC7's grep prints nothing, comments included, so no `ast` walk is
+  owed. Observed by AC13.
+- **S21** — id 18. Unit 1 AC1 is observed here against the one-line region of the charter's
+  `## Practices`, never every `RULE_LINE_RE` match: 35 tags each, in order (PINNED at `974700af5`).
+  Observed by AC14.
+- **S22** — id 19. Unit 5 AC3 is observed here counting `- [verify] ` inside `### Charter rules`
+  only. Observed by AC15.
+- **S23** — id 20, met in unit 30's rev-6. Observed by AC16.
+- **S24** — id 21. The report's pathspecs are observed here rooted: `tools/playbook/fixtures/row_kind.py`
+  (unit 36 AC11), `help/overlay-rows.md` (unit 36 AC12; unit 35 AC14, with `help/README.md`),
+  `help/charter.md` (units 1, 2 and 6, AC7), `help/upgrade-steps.md` (unit 31 AC12),
+  `help/composition.md` (unit 34 AC11). Unit 35 AC14's rooted grep finds both lines at `974700af5`.
+  Observed by AC17.
+- **S25** — id 22, met in unit 3's spec. Observed by AC18.
+- **S26** — id 32. `tools/playbook/edge_grammar.py#read_trailer_edges` reads a `serves` value as edges
+  only when `tools/playbook/edge_grammar.py#derive_target_fault` passes every target; prose or `none`
+  is counted unread, never an edge or a refusal, and `--check` prints the count. Observed by AC19.
+- **S27** — id 35, met: `tools/memory-recall/recall_conf.py` and `tools/memory-recall/bench.py` reach
+  `id_grammar` through the `resolve_kit_dir` block. Observed by AC20.
+- **S28** — id 36. `tools/memory-recall/query.py` writes `KIT_MEMORY_RECALL_VERSION` into its cache
+  manifest, and `tools/memory-recall/query.py#ensure_cache` yields a clause comparing it. Observed by
+  AC21.
+- **S29** — id 37. Unit 18 AC5 is observed here with one limb more: with no `.memory-tree.conf`,
+  importing `id_grammar`, `corpus_ids` and `gotchas` exits 0. Observed by AC22.
+- **S30** — id 38, met in unit 3's spec. Observed by AC23.
+- **S31** — id 65, met at unit 3's pass, its leg line naming `unattended skill size`. Observed by AC23.
+- **S32** — id 39, met: `tools/playbook/instruction_units.py#check_lock` hashes with
+  `git hash-object -- <path>`, whose clean filter folds a CRLF checkout to its LF blob (probed at
+  `974700af5`). Observed by AC24.
+- **S33** — id 83. `.gitattributes` routes `.governance/instructions.lock` to `merge=ours`; the
+  lander's `regen.py --write` re-renders it through the playbook `[[regenerate]]` row (section 8 F5).
+  Observed by AC24.
+- **S34** — id 40. `tools/playbook/core.py#read_front_matter` is the one `description` reader, which
+  `tools/playbook/load_sets.py` reads through, its `tools/playbook/load_sets.py#extract_description`
+  deleted. `kind.skill`'s `population` in `tools/playbook/kinds.toml` becomes `*skills/*/SKILL.md`,
+  read through `git ls-files` by `tools/playbook/core.py#run_skills` and by the measure's Skill list
+  (section 8 F10); it grades `.claude/skills/memory-recall/SKILL.md`, 1275 characters against 1024
+  (PINNED at `974700af5`), so `tools/memory-recall/SKILL.template.md` is cut under the cap and
+  re-rendered. Observed by AC25. **Readers:** by name: `tools/playbook/load_sets.py` · by value:
+  NO VALUE READERS — the measure reads the same text through the kept reader.
+- **S35** — id 41, met by unit 27: `tools/roles/handoff.py#render_handoff` carries `input:code`.
+  Observed by AC26.
+- **S36** — id 42, met: `tools/playbook/instruction_units.py#read_unit_rows` lists manifests under
+  `root`. Observed by AC27.
+- **S37** — id 43, met: `tools/playbook/check_layers.py#derive_edges` counts no edge for a module beside
+  the importer or in a core home. Observed by AC28.
+- **S39** — id 46, met: `tools/govkit/docs_leg.py#run_page_commands` spawns through `resolve_bash`.
+  Observed by AC30.
+- **S40** — id 51. `tools/playbook/edges.toml` registers `consumes-from` and `hands-off`, declared
+  types from `family-id` to `family-id` sited in a spec's `### Edges` block, with inverses
+  `consumed-by` and `receives-from` (section 8 F11); the hygiene gate and
+  `tools/check-spec-tokens.py#scan_handoffs` keep parsing the block. Observed by AC31.
+- **S41** — id 52, met by unit 25: no edge-checks module exists (section 8 F6). Observed by AC32.
+- **S42** — id 53, met: `tools/playbook/instruction_units.py#read_practice_catalogue` grades no line
+  length. Observed by AC33.
+- **S43** — id 54. `tools/playbook/writing_practice.py#check_one_owner` reads its owner set through
+  `tools/playbook/tag_index.py#read_chain_registry`, never `memory/builds/` (section 8 F7). Observed
+  by AC34.
+- **S44** — id 55, met: `one-subject` slugs with `tools/playbook/tag_index.py#derive_heading_seg`.
+  Observed by AC35.
+- **S45** — id 59, met: `tools/playbook/overlay.py#check_fixed_sources` is the one `fixed-by`
+  resolver, which `tools/playbook/overlay_rows.py` imports (section 8 F8). Observed by AC36.
+- **S46** — id 60, met: `tools/playbook/overlay_rows.py#derive_row_composition` walks pins through
+  `tools/playbook/pins.py#derive_pin_state`. Observed by AC37.
+- **S47** — id 68, met: `tools/memory-tree/id_grammar.py#git` names its encoding. Observed by AC38.
+- **S48** — id 69. `WIRE-INTO-PROJECT.md`'s memory-recall step says the grammar ships in
+  memory-tree's `id_grammar.py`, not that the kits must be SIBLINGS; the other two docs already do.
+  Observed by AC39.
+- **S49** — id 71, met in unit 31's rev-13, whose S1 Readers name the three registries; a row naming
+  `tools/agent-instructions/` after its pass is a hand-back. Observed by AC40.
+- **S50** — id 77, met: `tools/playbook/tag_index.py#build_overlay` swaps a worktree's dirty rows on
+  every call, and `tools/playbook/tag_index.py#remove_unheld_rows` clears a gone worktree's. Observed
+  by AC41.
+- **S51** — id 78, met for fences: `tools/playbook/tag_index.py#extract_doc` reads through the one
+  fence reader; its docstring states the limits section 8 F12 and F13 keep. Observed by AC42.
+- **S52** — id 84. `tools/govkit/docs_leg.py#run_page_commands` runs a block's commands as one script,
+  and a runnable block holding a `<word>` placeholder is a `RUN` finding; `help/docs-leg.md` says
+  both. Observed by AC43.
+- **S53** — id 85. `tools/memory-tree/build_records.py#write_record` refuses a value holding CR or LF
+  or opening `**<Word>:**`, before any write, in place of each door's own check, and
+  `tools/memory-tree/build_records.py#write_override` refuses a `--rule` the practice catalogue lacks.
+  Observed by AC44.
+- **S54** — id 86. `skills/session-kickoff/manifest-check.sh#write_card_file` writes
+  `card-owner — <session id>` as the card file's second line and skips a card another session owns,
+  printing `card-file — skipped: another live session <sid> owns this tree`. Observed by AC45.
+- **S55** — id 15, met: `tags (the resolver's checks)` enforces `practice.writing.address`. Observed
+  by AC46.
+- **S56** — id 23, met: `tools/playbook/edge_grammar.py#check_edges` reds a declared `cites`.
+  Observed by AC47.
+- **S57** — id 24. `one-owner` reads no layer set: no registry header admits a layer owner at
+  `974700af5`. Observed by AC48.
+- **S58** — id 25, met: the selects join skips `tools/playbook/tag_index.py#UNIT_EXTRACTORS`, `repo`'s
+  among them, so it grades two selector namespaces. Observed by AC49.
+- **S59** — id 26, met in unit 23's rev-5, whose table holds the Landing paragraph; its `/build` line
+  still reads in `coding-governance-agents.template.md` at `974700af5`. Observed by AC50.
+- **S60** — id 27, met: `tools/playbook/instruction_units.py#STATEMENT_TYPES` has one definition;
+  unit 12 AC1 is observed here by it. Observed by AC51.
+- **S61** — id 28, met at unit 26's pass (unit 55 S2). Observed by AC52.
+- **S62** — id 29. `govkit update` prints a gov unit's `stale` or `orphaned` line once: the relay omits
+  a line of `tools/govkit/govkit.py#derive_composition_lines` naming a tag
+  `tools/govkit/govkit.py#read_unit_drift`'s report printed. Observed by AC53.
+- **S63** — id 47. A charter-section citation stating where a rule lives names its tag or heading, a
+  history comment kept and named in the `Decided:` trailer: `WIRE-INTO-PROJECT.md@974700af5:728`,
+  `tools/unattended/unattended.sh@974700af5:794` and `tools/unattended/unattended.sh@974700af5:8625`.
   Observed by AC54.
-- **S64** — id 50. Unit 20 §10 names `[[regenerate]].writes`
-  (`tools/playbook/kit.toml:53-55`), and every `writes` instruction file falls under a
-  `tools/playbook/renderers.toml` row of the same kit's renderer. Observed by AC55.
-- **S65** — id 57, met in unit 3's spec: its S6 reads `INSTRUCTION_PATHSPECS` (unit 20 S4) and
-  types no population. Observed by AC56.
-- **S66** — id 61, met at HEAD: `tools/playbook/core.py` reaches memory-tree's `coverage_join`
-  through `resolve_kit_dir`, with no copy. Observed by AC57.
-- **S67** — id 63. Unit 16's descriptor reader extends `read_descriptors`
-  (`tools/run-gates/regen.py:108`) for `tools/govkit/entries/*.kit.toml`, minting no glob reader (§8
-  F9). Observed by AC58.
-- **S68** — id 64. Unit 14's `resolve_auto_memory_dir` calls `common_git_dir`
-  (`tools/lib/common_dir.py`, unit 19 S10) in one parity group, never its own
-  `git rev-parse --git-common-dir`. Observed by AC59.
-- **S69** — id 72. Unit 18 AC7's comment hits are S20's code check. Observed by AC60.
-- **S70** — id 73. Unit 18's write set names `tools/memory-tree/check-verdict-epoch.test.sh`, and its
-  gates the verdict-epoch, merge-rows, memory-hygiene, corpus-ids, row-grammar, gotchas, check-wiring
-  and memory-recall legs whose suites its S9 rewrites. Observed by AC61.
-- **S71** — id 74. Unit 12 AC5 and its lock example derive the marker with
-  `sed -n 's/.*governance-template: \(v[0-9.]*\).*/\1/p' coding-governance-agents.template.md`, and
-  its S5 Readers add `memory/map/features/session-kickoff.md:153`. Observed by AC62.
-- **S72** — id 75, met in unit 2's spec: its Inventory names `TEMPLATE_MAJOR = 5`
-  (`tools/playbook/render_playbook.py:343`) beside v5.0 and the pair at
-  `tools/check-playbook-parity.sh:273`, and its Migration reads v4.x as a major behind. Observed by AC63.
-- **S73** — id 87. Unit 4's replay passes `--root "$CARD_TREE"` to `instruction_units.py map`, the tree
-  unit 8 resolves from the payload's `cwd`. Observed by AC64.
+- **S64** — id 50. `tools/playbook/instruction_units.py#check_renderers` reds a playbook
+  `[[regenerate]]` `writes` path in `INSTRUCTION_PATHSPECS` that no `playbook:` row of
+  `tools/playbook/renderers.toml` claims. Observed by AC55.
+- **S65** — id 57, met: the envelope gate reads
+  `tools/playbook/instruction_units.py#derive_instruction_files`. Observed by AC56.
+- **S66** — id 61, met: `tools/playbook/core.py` reaches `coverage_join` through `resolve_kit_dir`.
+  Observed by AC57.
+- **S67** — id 63, met: `tools/playbook/check_layers.py#read_descriptors` reads tracked files
+  (section 8 F9). Observed by AC58.
+- **S68** — id 64. The `auto_memory` block calls `tools/lib/common_dir.py#common_git_dir`, never its
+  own `rev-parse`, in `tools/lib/auto_memory.py` and its copies in `tools/drift-audit/drift_report.py`
+  and `tools/playbook/memory_index.py`, each beside that block. Observed by AC59.
+- **S69** — id 72, met by S20. Observed by AC60.
+- **S70** — id 73, met in unit 18's spec. Observed by AC61.
+- **S71** — id 74. Unit 12 AC5 is observed here with its marker derived by
+  `sed -n 's/.*governance-template: \(v[0-9.]*\).*/\1/p' coding-governance-agents.template.md`.
+  Observed by AC62.
+- **S72** — id 75, met: `tools/playbook/render_playbook.py#TEMPLATE_MAJOR` is 5 beside the template's
+  v5.0. Observed by AC63.
+- **S73** — id 87. `skills/session-kickoff/manifest-check.sh#derive_map_block` passes
+  `--root "$CARD_TREE"`. Observed by AC64.
 
 ## 3. Non-goals (OUT)
 
 - Any high of the same audit: units 39 to 48.
-- Re-ordering any unit: it is order 39, after every unit whose code an item edits, and a seam in the
-  wrong order (S10, S11) is built here; units 54 and 55 follow it.
-- Changing a repaired unit's clause or carries line.
+- Re-ordering any unit: it is order 39, after every unit whose code an item edits; units 54 and 55
+  follow it.
+- Changing a repaired unit's clause or carries line, or the text of a CLOSED unit's spec.
 
 ### Edges
 
@@ -269,7 +254,7 @@ corrected fix.
 - **consumes-from** `PLAY-dOrderedCharter-28` — S6, S9, S26, S41
 - **consumes-from** `PLAY-dOrderedCharter-29` — S43, S44, S55, S57
 - **consumes-from** `PLAY-dOrderedCharter-30` — S23
-- **consumes-from** `PLAY-dOrderedCharter-31` — S49, S11
+- **consumes-from** `PLAY-dOrderedCharter-31` — S49, S11, S8
 - **consumes-from** `PLAY-dOrderedCharter-32` — S6 to S8, S10
 - **consumes-from** `PLAY-dOrderedCharter-33` — S46, S62
 - **consumes-from** `PLAY-dOrderedCharter-34` — S11, S62
@@ -278,77 +263,42 @@ corrected fix.
 - **consumes-from** `PLAY-dOrderedCharter-37` — S1, S39, S52
 - **consumes-from** `PLAY-dOrderedCharter-50` — S2 to S5, S30, S31, S49 (round-2 id 23)
 - **hands-off** `PLAY-dOrderedCharter-54` — S54's owner liveness and takeover (round-2 id 39)
-- **hands-off** `PLAY-dOrderedCharter-55` — round-2 ids 2, 6, 8, 16, 24, 40 and 41, that unit's S2, S7, S9, S14, S20, S21 and S27
+- **hands-off** `PLAY-dOrderedCharter-55` — round-2 ids 2, 6, 8, 16, 24, 40 and 41, that unit's S2, S7, S9, S14, S20, S21 and S27; its S9 finds no census step, since S11 mints none while the census moves no unit
 
 ## 4. Design
 
 ### Evidence
 
-Read at `ce13efbe`: each finding's appendix row, every §2 citation re-read there, and govkit's floors (`tools/govkit/govkit.py:6010-6017`), `render_handoff`'s
-read loop (`tools/roles/handoff.py:382-396`), `git()` (`tools/memory-recall/extract.py:282`) and govkit's
-descriptor reader (`:13238`).
+Re-read at `974700af5`: each citation, the owed-rows probe, the census, each Skill's description,
+`git hash-object` under `core.autocrlf=true`, and the `--legs-for` query over Files touched.
 
 ### Inventory
 
-Minted: the `[[reference]]` fields `summary-from` and `usage-from`; `resolve_fixed_by`; the
-`description` reader in `tools/playbook/core.py`; the step `playbook/census-to-overlay` and its program;
-the `.gitattributes` line for `.governance/instructions.lock`; the plant names each criterion stages.
-Naming cells: `lexicon naming predicates` grades the Python names.
+Minted: S33's attribute line, S15's `foundation` value, S40's two types and inverses, S28's manifest
+key, S54's owner line, and the plants the New arm lines name; no Python name. Naming cells:
+`lexicon naming predicates`.
 
 ### Files touched (estimate)
 
-- `tools/playbook/references.toml`
-- `tools/playbook/render_playbook.py`
-- `tools/playbook/instruction_units.py`
-- `tools/playbook/overlay.py`
-- `tools/playbook/overlay_rows.py`
-- `tools/playbook/row_checks.py`
-- `tools/playbook/pins.py`
-- `tools/playbook/edge_grammar.py`
-- `tools/playbook/edges.toml`
-- `tools/playbook/gov_tag.py`
-- `tools/playbook/tag_index.py`
-- `tools/playbook/namespaces.toml`
-- `tools/playbook/packs.toml`
-- `tools/playbook/core.py`
-- `tools/playbook/check_layers.py`
-- `tools/playbook/writing_practice.py`
-- `tools/playbook/positional.py`
-- `tools/playbook/load_sets.py`
-- `tools/playbook/kit.toml`
-- `tools/playbook/renderers.toml`
-- `tools/gate-legs.json`
-- `tools/govkit/registry.toml`
-- `tools/govkit/subject-pins.tsv`
-- `tools/govkit/govkit.py`
-- `tools/govkit/docs_leg.py`
-- `tools/govkit/steps/census_to_overlay.py` (new)
-- `tools/govkit/entries/playbook.kit.toml`
-- `tools/run-gates/ceiling-evidence.txt`
-- `memory/map/features/playbook.md`
-- `tools/memory-tree/build_records.py`
-- `tools/memory-tree/HYGIENE.template.md`
-- `tools/memory-tree/README.md`
-- `memory/HYGIENE.md` (its render)
-- `tools/memory-recall/query.py`
-- `tools/lib/auto_memory.py`
-- `tools/roles/handoff.py`
-- `skills/session-kickoff/manifest-check.sh`
-- `memory/project/spawn-idiom-sites.txt`
-- `memory/project/testsuite-count-waivers.txt`
-- `memory/project/unarmed-branches.txt`
-- `.gitattributes`
-- `.governance/instructions.toml` (by S11's step)
-- `WIRE-INTO-PROJECT.md`
-- `help/measure-legs.md`
-- `help/roles.md`
-- `tools/roles/roles_lib.py`
-- `tools/roles/check_roles.py`
-- `tools/unattended/unattended.sh`
+- `tools/playbook/packs.toml`, `tools/playbook/instructions_edit.py` (S15)
+- `tools/playbook/edge_grammar.py`, `tools/playbook/edges.toml`, `help/tags.md` (S26, S40)
+- `tools/memory-recall/query.py` (S28)
+- `.gitattributes` (S33)
+- `tools/playbook/core.py`, `tools/playbook/load_sets.py`, `tools/playbook/kinds.toml`, `tools/memory-recall/SKILL.template.md`, `.claude/skills/memory-recall/SKILL.md` (S34)
+- `tools/playbook/writing_practice.py` (S43, S57)
+- `WIRE-INTO-PROJECT.md` (S48, S63), `tools/unattended/unattended.sh` (S63)
+- `tools/playbook/tag_index.py`, `tools/playbook/gov_tag.py`, `tools/playbook/adopt-playbook.sh` (S51, AC41)
+- `tools/govkit/docs_leg.py`, `help/docs-leg.md` (S52)
+- `tools/memory-tree/build_records.py` (S53)
+- `skills/session-kickoff/manifest-check.sh`, `skills/session-kickoff/manifest-check.test.sh` (S54, S73)
+- `tools/govkit/govkit.py`, `tools/govkit/fixtures/stale_edges.py` (S62)
+- `tools/playbook/instruction_units.py` (S64)
+- `tools/lib/auto_memory.py`, `tools/drift-audit/drift_report.py`, `tools/playbook/memory_index.py` (S68)
 
 ### Rollout
 
-Live at landing, alone, at order 39 (§3).
+Live at landing, alone, at order 39, after units 31 and 78 (orders 36 and 37), whose edits to the
+shared files are this pass's base.
 
 ### Alternatives rejected
 
@@ -357,241 +307,244 @@ Live at landing, alone, at order 39 (§3).
 
 ## 5. Production-readiness checklist
 
-- security: S53 holds the factory to one-line values; S39 drops a shell resolving elsewhere; nothing
-  widens.
-- perf / scale: S50 adds one `git worktree list` per resolver call; the rest are reads.
-- error / empty / loading states: each item keeps its unit's refusals; S11's step writes nothing when
-  no row moved.
-- observability: S26 prints unread trailers by count; S54 prints its skip line.
-- risks: built after its units, it carries each repaired unit's late half and re-observes it.
-- testing: AC1 to AC64, probes or plants of each repaired unit's fixture.
+- security: S53 holds record values to one line at the write boundary; nothing widens.
+- perf / scale: S28 adds a manifest key; S34 one `git ls-files` per Skill gate run.
+- error / empty / loading states: each item keeps its unit's refusals.
+- observability: S26 prints unread trailer values by count; S54 its skip line.
+- risks: S34's widened gate reds a live Skill, which this pass fixes.
+- testing: AC1 to AC64, probes or plants.
 - migration: S33's attribute takes effect on the next merge.
-- user docs: S48's three adopter docs; S24's page paths.
+- user docs: `help/docs-leg.md` (S52), `help/tags.md` (S26, S40), `WIRE-INTO-PROJECT.md` (S48).
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python tools/playbook/render_playbook.py --reference --check` runs, it exits 0 over
-  the four pages, and a non-policy row planted without its `usage-from` refuses naming the registry.
+- **AC1** — When `python tools/playbook/render_playbook.py --reference --check` runs, it exits 0.
   Red when: a registry with no `summary` field refuses a correct build.
-- **AC2** — When `git grep -n '"enforces"' -- tools/run-gates/run-gates.test.sh` runs, both key sets
-  carry it, and a probe of `govkit apply` over a fixture target shows no `enforces` key in its manifest.
-  Red when: a leg carrying `enforces` reds the canary, or the key reaches a target.
-- **AC3** — When a probe lists the legs in `tools/gate-legs.json` absent at `ce13efbe`, each is named in
-  S4's two files, an S5 row and a dossier under `memory/map/features/`.
-  Red when: a new leg misses one of the four.
+- **AC2** — When `git grep -n "^KNOWN = .*enforces" -- tools/run-gates/run-gates.test.sh` runs, it
+  prints two lines, and `git grep -n -F 'row["enforces"]' -- tools/govkit/govkit.py` prints nothing.
+  Red when: a key set lacks `enforces`, or the leg writer copies it to a target.
+- **AC3** — When `python tools/run-gates/owed_rows.py --base ce13efbe` runs, it prints no `owed —` line.
+  Red when: a new leg misses a row it owes.
   figure: DERIVED, the population read at the pass.
-- **AC4** — When a probe parses every TOML data-model block of units 28, 32, 33, 34 and 35 through
-  `read_units` or `read_overlay`, each parses, and `git grep -n -e "select =" -e "when =" -- tools/playbook/`
-  prints no row field.
-  Red when: a spec's example row fails its reader.
-- **AC5** — When `git -C tools/playbook grep -n "instructions.toml" -- edge_grammar.py` runs, it prints no
-  parse of the file, and the unit site's adapter reads rows through unit 9's reader.
+- **AC4** — When `git grep -n -E "^(select|when) =" -- tools/playbook/` runs, it prints nothing.
+  Red when: a row field is spelled `select` or `when`.
+- **AC5** — When `git grep -n "parse_unit_rows" -- tools/playbook/edge_grammar.py` runs, the unit
+  adapter's import prints.
   Red when: a second parser of the manifest exists.
-- **AC6** — When unit 32's `--plant` cases for its AC5 and AC6 run after units 35 and 36, both pass.
-  Red when: either late read is unwired.
-- **AC7** — When gov's prepared merge runs S11's step, gov's overlay holds one level-0
-  `repo.` unit per moved row, and unit 34's AC1 and AC10 hold over gov's tree.
-  Red when: a moved line is lost from gov's charter.
-- **AC8** — When `python gov_tag.py check` runs over gov's tree, the `kit` namespace reads
-  clean with its full membership.
+- **AC6** — When `python tools/playbook/overlay.py --fixture --plant exclude` runs, it passes.
+  Red when: a late read is unwired.
+- **AC7** — When `python tools/playbook/practice_census.py` runs at the pass, its summary reads
+  `moves 0 · moves, row kept 0`.
+  Red when: the census moves a unit and the pass writes it nowhere.
+- **AC8** — When `git grep -n -A3 '^ns = "kit"' -- tools/playbook/namespaces.toml` runs, it prints
+  `layer.distribution`, an `expansion` row of `tools/playbook/layers.toml`.
   Red when: an optional kit's `kit.<id>` reds `owned`.
-- **AC9** — When `python instruction_units.py schema` runs over a fixture row scoped
-  `role.gov-builder`, it reds naming the unregistered `role`, and over gov's tree exits 0.
+- **AC9** — When `python tools/playbook/instruction_units.py schema` runs over gov's tree, it exits 0.
   Red when: a gov-tree row relies on an unregistered namespace.
-- **AC10** — When unit 22's purpose arm runs over gov's ten namespace rows, it exits 0, and a planted
-  `doc` row spelled as a section anchor reds.
+- **AC10** — When `python tools/playbook/gov_tag.py --fixture --plant bad-purpose-source` runs, it
+  exits 1 naming the `doc` row.
   Red when: a declared purpose source fails the grammar.
-- **AC11** — When `python instructions_edit.py fixture --plant packs` resolves
-  `foundation`, the result equals unit 1's `foundation` array.
+- **AC11** — When `python tools/playbook/instructions_edit.py fixture --plant packs` runs, the
+  `foundation` pack resolves to the fixture's narrower `foundation` array.
   Red when: the pack and the array differ.
 - **AC12** — When `git grep -n -E "def (repo_root|grammar_for|anchor_at)" -- tools/memory-recall tools/memory-tree`
-  runs, every hit is in `id_grammar.py`, and S17's three namesakes are unchanged.
+  runs, every hit is in `tools/memory-tree/id_grammar.py`, and the three namesakes still define it.
   Red when: a namesake is moved, or a moved name keeps a second definition.
-- **AC13** — When unit 18's second query runs, every hit is a keep row or a trailer-named comment,
-  and S20's walk finds no `recall_conf` import.
+- **AC13** — When unit 18's second query runs at the pass, every hit is a keep row or a comment a
+  `Decided:` trailer names.
   Red when: a criterion demands empty output from a population the rule keeps.
-- **AC14** — When unit 1's `practices --list` runs, its 36 `foundation` tags equal S21's one-line tags
-  in `AGENTS.md`.
+- **AC14** — When `python tools/playbook/instruction_units.py practices --list` runs, its `foundation`
+  tags equal the `## Practices` one-line region's of `AGENTS.md`, in order.
   Red when: the comparison reads the micro-format tags.
-- **AC15** — When unit 5's AC3 counts `- [verify] ` as S22 says, it reads 1 with unit 21's reach line present.
-  Red when: the reach line is counted.
-- **AC16** — When unit 30's corrected grep runs over `practices.toml`, it prints no
-  retired spelling.
+  figure: DERIVED by the probe at the pass.
+- **AC15** — When unit 5's AC3 counts `- [verify] Verify before claiming done` inside
+  `### Charter rules` only, it reads 1.
+  Red when: the practices-at-step line is counted.
+- **AC16** — When unit 30's AC6 grep runs at the pass, it prints the one line of
+  `tools/playbook/practices.toml` it names.
   Red when: the grep hits prose or matches nothing for want of a path.
-- **AC17** — When `git ls-files` runs over S24's five paths after the pass, each is listed, and every
-  corrected criterion names it so.
+- **AC17** — When `git grep -n -e "instructions.stale" -- help/overlay-rows.md help/README.md` runs,
+  it finds the section and the index line, and `git ls-files` lists S24's other paths.
   Red when: a criterion's pathspec matches no file.
-- **AC18** — When unit 3's `envelopes --check` runs, it exits 0 with both Skills enveloped.
-  Red when: a population member's source is outside the write set.
-- **AC19** — When unit 28's `edges` leg runs over `ce13efbe..HEAD`, it exits 0 and prints the count of
-  unread trailers.
+- **AC18** — When `python tools/playbook/instruction_units.py envelopes --check` runs, it exits 0.
+  Red when: a population member's source is outside unit 3's write set.
+- **AC19** — When `python tools/playbook/edge_grammar.py --check --base ce13efbe` runs, it exits 0 and
+  prints the count of unread trailer values.
   Red when: a prose `Pass:` value reds or is read as an edge.
-- **AC20** — When `git grep -n "resolve_kit_dir — canonical copy"` runs over S27's two files, each file carries the gated block, and importing both in a scratch tree raises no cycle.
-  Red when: a re-exporter reaches the grammar through `extract.py`.
+- **AC20** — When `git grep -n "resolve_kit_dir — canonical copy" -- tools/memory-recall/recall_conf.py tools/memory-recall/bench.py`
+  runs, each file carries the block.
+  Red when: a re-exporter reaches the grammar through the extractor.
 - **AC21** — When a probe bumps only `KIT_MEMORY_RECALL_VERSION` in a scratch copy, `ensure_cache`
-  rebuilds naming the cause.
+  rebuilds naming that cause.
   Red when: a warm cache is served after a recall-only bump.
-- **AC22** — When S29's limb runs in a scratch tree with no `.memory-tree.conf`, it exits 0; with a
-  module-level `resolve()` planted in `id_grammar.py`, it fails.
+- **AC22** — When S29's imports run in a scratch tree with no `.memory-tree.conf`, they exit 0, and
+  fail with a module-level `resolve()` planted.
   Red when: the no-conf import is unobserved.
-- **AC23** — When the pass derives the crossed set, it holds `.claude/skills/unattended/SKILL.md`
-  and not `memory/guides/BUILD-METHOD.md`, and unit 3's leg line names `unattended skill size`.
-  Red when: a crossed file is missed, or the held file is reported crossed.
-  figure: DERIVED at the pass.
-- **AC24** — When unit 12's fixture plants a CRLF checkout of an LF target, `lock --check` stays green,
-  a one-byte change reds, and `git check-attr merge` on the lock prints `ours`.
+- **AC23** — When `git grep -n "unattended skill size" -- memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-3.md`
+  runs, unit 3's leg line prints.
+  Red when: a crossed file's cap leg is off that line.
+- **AC24** — When a `core.autocrlf=true` scratch repository checks an LF lock target out CRLF,
+  `check_lock` stays green, and `git check-attr merge -- .governance/instructions.lock` prints `ours`.
   Red when: line endings red a clean tree, or a merged lock is kept unrendered.
-- **AC25** — When `core.py fixture --plant skill-folded` plants a folded `description` over 1024 bytes,
-  the Skill gate reds it.
-  Red when: a folded description reads as two bytes.
-- **AC26** — When `python tools/roles/handoff.py render --role gov-builder --input code=<file> --stdout`
-  runs, the output carries S35's `### input:code` block; without the input the `Not supplied,
-  optional` line names `input:code`.
+- **AC25** — When `python tools/playbook/core.py fixture --plant skill` runs, a `.claude/skills/`
+  member whose folded description runs past the cap reds.
+  Red when: a folded description reads short, or a rendered Skill is ungraded.
+- **AC26** — When `python tools/roles/handoff.py render --role gov-builder --build dOrderedCharter --unit PLAY-dOrderedCharter-49 --input spec=$(git ls-files memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md ) --input prompt=$(git ls-files memory/builds/dOrderedCharter/prompts/2026-11-10-prompt-PLAY-dOrderedCharter-49-precheck-brief.md ) --input code=AGENTS.md --stdout`
+  runs from the repository root, it exits 0 and its output carries `### input:code`; the same command
+  without `--input code=AGENTS.md` prints the `Not supplied, optional` line naming `input:code`.
   Red when: the code input is dropped silently.
-- **AC27** — When `read_units(fixture_root)` runs from gov's checkout, it returns only the fixture's rows.
+- **AC27** — When `read_units` runs from gov's checkout on a fixture root, it returns only the
+  fixture's rows.
   Red when: gov's manifests are read instead.
-- **AC28** — When unit 16's leg runs with a same-name plant (`census` in a core and a non-core home), it
-  reports no edge for `measure_legs.py`'s import.
+- **AC28** — When `python tools/playbook/check_layers.py` runs, it reports no edge for the measure's
+  `census` import.
   Red when: a namesake becomes a non-core edge.
-- **AC30** — When the run arm runs with a PATH whose first `bash` is a planted stub, the stub is never
-  called.
+- **AC30** — When `git grep -n "resolve_bash()" -- tools/govkit/docs_leg.py` runs, the spawn names it.
   Red when: a bare `bash` is spawned.
-- **AC31** — When `python edge_grammar.py --list` runs, `consumes-from` and `hands-off`
-  print as mutual inverses with the spec Edges block as their site.
+- **AC31** — When `python tools/playbook/edge_grammar.py --list` runs, `consumes-from` and `hands-off`
+  print with their inverses.
   Red when: the vocabulary stays outside the closed set.
-- **AC32** — When `git ls-files -- '*edge_checks.py'` runs, it prints nothing, and both `--only`
-  arms red the same planted edge as unit 28's leg.
+- **AC32** — When `git ls-files -- '*edge_checks.py'` runs, it prints nothing.
   Red when: two checkers of one predicate exist.
-- **AC33** — When `read_practice_catalogue` reads a planted row whose raw line is 190 bytes, it accepts
-  it, and unit 7's gate decides on the rendered line.
+- **AC33** — When `read_practice_catalogue` reads a planted row whose line runs past the one-line
+  cap, it accepts it.
   Red when: the reader and the gate disagree on size.
-- **AC34** — When a namespace row owned by a layer is checked, `one-owner` and unit 22 give one verdict.
-  Red when: the two legs disagree.
-- **AC35** — When `one-subject` runs over `memory/guides/BUILD-METHOD.md`, it slugs `## M5 — Recall
-  and reuse` as unit 19 does, `m5-recall-and-reuse`.
+- **AC34** — When `python tools/playbook/writing_practice.py --fixture --plant owner-faults` runs, a
+  row naming a build folder no registry row holds reds.
+  Red when: `one-owner` and unit 22 give two verdicts.
+- **AC35** — When `one-subject` slugs `M5 — Recall and reuse`, it yields `m5-recall-and-reuse`.
   Red when: GitHub's slug is used.
-- **AC36** — When `git grep -n "def resolve_fixed_by" -- tools/playbook/` runs, it prints one line, and a
-  row and a unit with one source resolve alike.
+- **AC36** — When `git grep -n -e "def resolve_fixed_by" -e "def check_fixed_sources" -- tools/playbook/`
+  runs, it prints one line.
   Red when: a second resolver exists.
-- **AC37** — When unit 35's composer runs, a probe records `derive_pin_state` called for each pinned row.
+- **AC37** — When `git grep -n "derive_pin_state" -- tools/playbook/overlay_rows.py` runs, it prints
+  the composer's call.
   Red when: the walk is restated.
-- **AC38** — When the encoding-posture scanner runs, it prints no site for `id_grammar.py`, and the
-  registry's set equality holds.
-  Red when: the moved `git()` names no encoding.
-- **AC39** — When `git grep -n -e "requires that kit" -e "SIBLINGS"` runs over S48's three docs, it
+- **AC38** — When `git grep -n "extract.py" -- memory/project/encoding-posture-sites.txt` runs, it
   prints nothing.
+  Red when: the moved `git()` names no encoding.
+- **AC39** — When `git grep -n -e "requires that kit" -e "SIBLINGS" -- WIRE-INTO-PROJECT.md tools/memory-tree/README.md`
+  runs after the pass, it prints nothing.
   Red when: a doc still says memory-tree needs memory-recall.
-- **AC40** — When unit 31's first query runs after the pass, no row of the three registries names
-  `tools/agent-instructions/`.
+- **AC40** — When `git grep -n "tools/agent-instructions/" -- memory/project/spawn-idiom-sites.txt memory/project/unarmed-branches.txt memory/project/testsuite-count-waivers.txt`
+  runs after unit 31's pass, it prints nothing.
   Red when: a registry row outlives its directory.
-- **AC41** — When `gov_tag.py --fixture --plant dirty-revert` and `--plant worktree-recreate` run,
-  `show` serves the reverted text and a re-created worktree inherits no row.
-  Red when: a dirty row outlives its edit.
-- **AC42** — When `extract_doc` runs over `memory/TEMPLATE-SPEC.md`, no row comes from a fenced
-  heading, and a planted duplicate heading yields `-2`.
-  Red when: a fenced or duplicate heading mints a row.
-- **AC43** — When `docs_leg.py --run --page help/roles.md` runs, the placeholder block is counted as
-  `run: no` with its reason, and a planted unmarked placeholder is a finding.
-  Red when: a placeholder runs or is silently skipped.
-- **AC44** — When the factory's `new exception --reason $'a\nExpires: 2099-01-01'` runs, it exits 1 and
-  writes no file.
+- **AC41** — When `python tools/playbook/gov_tag.py --fixture --plant dirty-revert` and
+  `--plant worktree-recreate` run, each passes.
+  Red when: a dirty row outlives its edit, or a re-created worktree inherits one.
+- **AC42** — When `python tools/playbook/gov_tag.py show doc.template-spec#1-goal` runs, it serves no
+  row.
+  Red when: a fenced heading mints a row.
+- **AC43** — When `python tools/govkit/docs_leg.py --fixture --plant run-placeholder` and
+  `--plant run-one-script` run, each passes.
+  Red when: a placeholder runs, or a block's lines run apart.
+- **AC44** — When `python tools/memory-tree/build_records.py new exception --build dOrderedCharter --unit PLAY-dOrderedCharter-49 --principle principle.p1 --excuses x --reason $'a\nExpires: 2099-01-01'`
+  runs, it exits 1 and writes no file.
   Red when: a newline forges a field.
-- **AC45** — When `write_card_file` runs for two live sessions in one fixture tree, the first's card
+- **AC45** — When `write_card_file` runs for two session ids in one scratch tree, the first's card
   survives and S54's skip line prints.
   Red when: a second session overwrites the first's card.
-- **AC46** — When `git -C tools/playbook grep -n "tags positional selftest" -- writing_practice.py` runs, the
-  row names the leg unit 26 mints.
-  Red when: the row names a leg no unit mints.
-- **AC47** — When a declared `cites` edge is planted, unit 25's arm and unit 24's `check_edges` give one
-  verdict.
-  Red when: the two disagree on `cites`.
-- **AC48** — When `one-owner` checks a namespace row, its owner set equals the builds of unit 22's
-  `chain.toml`.
-  Red when: `memory/builds/` is read as the owner set.
-- **AC49** — When `gov_tag.py --fixture --plant empty-ns` runs over `repo`, it prints `unarmed`, and
-  `repo`'s row has role `describes`.
-  Red when: the prose count and the table disagree.
-- **AC50** — When unit 23's AC4 grep runs, every hit is a row of its table, S59's `:286` lines among them.
-  Red when: the two BUILD-METHOD lines are unlisted.
+- **AC46** — When `git grep -n "practice.writing.address" -- tools/gate-legs.json` runs, it prints the
+  resolver leg's `enforces` line.
+  Red when: the rule names a leg no unit mints.
+- **AC47** — When `python tools/playbook/edge_grammar.py --fixture --plant declared-cites` runs, it
+  reds.
+  Red when: unit 25's arm and `check_edges` disagree on `cites`.
+- **AC48** — When `python tools/playbook/writing_practice.py check one-owner` runs, it exits 0.
+  Red when: `memory/builds/` or a layer is read as an owner.
+- **AC49** — When `git grep -n "^UNIT_EXTRACTORS" -- tools/playbook/tag_index.py` runs, it names
+  `extract_repo`.
+  Red when: the prose count and the join disagree.
+- **AC50** — When unit 23's AC4 grep, for `explicit ask or the unattended protocol` and `[land]`,
+  runs at the pass, every hit is a row of its table.
+  Red when: a Landing line is unlisted.
 - **AC51** — When `git grep -n "STATEMENT_TYPES *=" -- tools` runs, it prints one line.
   Red when: a fixture literal counts as a definition.
-- **AC52** — When `python tools/playbook/positional.py check` runs at the pass, it exits 0 with no
-  unlisted and no stale row.
+- **AC52** — When `python tools/playbook/positional.py check` runs at the pass, it exits 0.
   Red when: the list and the tree's citations differ.
-- **AC53** — When `govkit update` runs over a fixture with one stale unit, the stale line prints once.
+- **AC53** — When `python tools/govkit/fixtures/stale_edges.py --plant order` runs, it passes with the
+  `stale` line printed once.
   Red when: two sources print it.
-- **AC54** — When `git grep -n -i -E "charter's section [0-9]|section 1"` runs over S63's four files
-  after the pass, every hit is re-pointed or named in the trailer.
+- **AC54** — When `git grep -n -i -E "charter'?s? section [0-9]|section 1 rule" -- WIRE-INTO-PROJECT.md tools/unattended/unattended.sh`
+  runs after the pass, every hit is named in the trailer.
   Red when: a charter-section citation is missed.
-- **AC55** — When the render gate runs with a planted `writes` path no `renderers.toml` row claims, it
-  reds naming the path.
+- **AC55** — When `python tools/playbook/instruction_units.py fixture --plant regenerate-unclaimed`
+  runs, it passes.
   Red when: an instruction file's writer is declared twice with no join.
-- **AC56** — When `git grep -n "INSTRUCTION_PATHSPECS" -- tools/playbook/` runs, unit 3's envelope gate is
-  among the readers, and no typed population remains there.
+- **AC56** — When `git grep -n "derive_instruction_files(" -- tools/playbook/instruction_units.py`
+  runs, the envelope check is a caller.
   Red when: two populations of instruction files exist.
-- **AC57** — When `git -C tools/playbook grep -n "def compute_coverage" -- core.py` runs, it prints nothing.
+- **AC57** — When `git grep -n "def compute_coverage" -- tools/playbook/core.py` runs, it prints nothing.
   Red when: an ungated third copy exists.
-- **AC58** — When `git grep -n "def read_descriptors" -- tools/playbook/` runs, it prints nothing, and
-  the layer check reads through `regen.py`'s reader.
-  Red when: a third reader of one population is minted.
-- **AC59** — When `git -C tools/lib grep -n "git-common-dir" -- auto_memory.py` runs, it prints nothing.
+- **AC58** — When `git grep -n "ls-files" -- tools/playbook/check_layers.py` runs, the read prints.
+  Red when: a reader of untracked descriptors is minted.
+- **AC59** — When `git grep -n -e "--path-format=absolute" -- tools/lib/auto_memory.py tools/playbook/memory_index.py`
+  runs, it prints nothing.
   Red when: a second common-dir derivation exists.
-- **AC60** — When S20's `ast` walk runs over `tools/memory-tree/`, comment lines are not counted.
+- **AC60** — When S20's grep, `git grep -nE "recall_conf|KIT_MEMORY_RECALL_VERSION" -- tools/memory-tree/`,
+  runs, it prints nothing.
   Red when: a history comment reds the criterion.
-- **AC61** — When `git grep -n "check-verdict-epoch.test"` runs over unit 18's spec, the suite is
-  named under its Files touched.
+- **AC61** — When `git grep -n "check-verdict-epoch.test" -- memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-18.md`
+  runs, it prints the suite.
   Red when: a new arm's suite is outside the write set.
-- **AC62** — When unit 12's AC5 derives its marker with S71's `sed`, it matches after units 1 and 2
-  move the marker.
+- **AC62** — When unit 12's AC5 derives its marker with S71's `sed`, it matches the lock's `template`.
   Red when: a literal version pins the criterion.
-- **AC63** — When a probe reads S72's `TEMPLATE_MAJOR` and the template's marker, the two majors agree.
+- **AC63** — When `sed -n 's/^TEMPLATE_MAJOR = \([0-9]*\).*/\1/p' tools/playbook/render_playbook.py`
+  runs, it prints the template marker's major.
   Red when: the marker moves alone.
-- **AC64** — When unit 4's replay runs with a payload `cwd` in a fixture worktree with its own
+- **AC64** — When unit 4's replay runs with a payload `cwd` in a fixture worktree holding its own
   registry row, the map names that row.
   Red when: the replay reads the hook's working directory.
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `playbook parity` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `codebase-map coverage + freshness` · `memory hygiene` · `memory-hygiene self-test` · `encoding posture (text IO names its encoding)` · `python resolver (behaviour + inline parity + idiom ban)` · `memory-recall kit selftest` · `recall floor` · `recall floor arms` · `roles render selftest` · `roles render wiring` · `unattended skill size` · `lexicon naming predicates` · `verdict epoch (kit version dates the engine)` · `kit epoch (shipped bytes move, the version moves)` · `kit/dogfood doc parity` · `manifest-check self-test` · `scratch-guard self-test` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
+`playbook render selftest` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `run-gates canary` · `codebase-map coverage + freshness` · `memory hygiene` · `encoding posture (text IO names its encoding)` · `python resolver (behaviour + inline parity + idiom ban)` · `memory-recall kit selftest` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `verdict epoch (kit version dates the engine)` · `kit epoch (shipped bytes move, the version moves)` · `kit/dogfood doc parity` · `manifest-check self-test` · `scratch-guard self-test` · `check-wiring self-test` · `drift-audit selftest` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `tags (the resolver's checks)` · `edges (every declared edge parses, is registered and resolves)` · `one-owner` · `writing practice (records and units)` · `instruction units (schema, one fact)` · `instruction render (one renderer of record)` · `instruction edits (manifest checks)` · `core skills conformance` · `docs` · `help page commands`
 
-New arm: tools/playbook/adopt-playbook.sh · covers AC8 AC10 AC41 AC42 AC49 · the playbook-render selftest's tree-level tag probes and index plants, each staged by the repaired unit's base rule · none
+New arm: tools/playbook/adopt-playbook.sh · covers AC41 · plants `dirty-revert` and `worktree-recreate` · none
+New arm: tools/playbook/instructions_edit.py · covers AC11 · the `packs` plant's narrower `foundation` array · none
+New arm: tools/playbook/core.py · covers AC25 · the `skill` plant's rendered member over the cap · none
+New arm: tools/playbook/edge_grammar.py · covers AC19 · a plant commit whose `Pass:` is prose · none
+New arm: tools/govkit/docs_leg.py · covers AC43 · the `run-placeholder` and `run-one-script` plants · none
+New arm: tools/govkit/fixtures/stale_edges.py · covers AC53 · the `order` plant's one `stale` line · none
+New arm: tools/playbook/instruction_units.py · covers AC55 · the `regenerate-unclaimed` plant · none
+New arm: skills/session-kickoff/manifest-check.test.sh · covers AC45 · two session ids, one card file · none
+New arm: tools/playbook/writing_practice.py · covers AC34 · the `owner-faults` plant · none
 
 ## 8. Open questions
 
-- **F1 — Which binding line does a unit the spec audit promoted carry?** Options: (a) `**Derived:**`
-  naming `PLAY-dClosedLoop-2`, as the tree's promoted specs do; (b) none; (c) parts of 35 units'
-  clauses. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none · relaxes: none
+- **F1 — Which binding line does a promoted unit carry?** Options: (a) `**Derived:**` naming
+  `PLAY-dClosedLoop-2`; (b) none; (c) parts of 35 units' clauses. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none · relaxes: none
 - **F2 — How a reference page reads `summary` and `usage` (id 3).** Options: (a) a per-registry field
-  map in `references.toml`; (b) the two fields in four owners' schemas, one a dGroundRules catalogue
-  this build does not own. RESOLVED (agent, 2026-10-24, delegated): (a),
-  rung 3. widens: none · relaxes: none
-- **F3 — Which door writes the census units into gov's overlay (id 10).** Options: (a) a `census` verb
-  of unit 31's step program; (b) unit 15's command after dDeclaredLoop's guard; (c) an agent's edit;
-  (d) its own step. (a) edits bytes `step-rows-frozen` freezes (TOOL-dSafePassage-1 S9), and the walk
-  runs declared steps alone (TOOL-dSafePassage-8 S1); (b) leaves gov's charter short until later; the
-  guard refuses (c). RESOLVED (agent, 2026-10-24, delegated): (d), rung 1, re-resolved from (a) on
-  those parents. widens: none · relaxes: none
-- **F4 — Do `role` and `item` register now (id 12).** Options: (a) keep them unregistered and the
-  feature fixture-only, as unit 10 S5 rules; (b) register `role` here with the roster as its source.
-  (b) re-opens unit 10's settled scope. RESOLVED (agent, 2026-10-24, delegated): (a), rung 1, unit 10
-  S5. widens: none · relaxes: none
-- **F5 — How the whole-file lock merges (id 83).** Options: (a) `merge=ours` plus the prepared merge's
-  re-render; (b) a regenerating merge driver, which `merge-rows.py`'s docstring withdraws. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3.
-  widens: none · relaxes: none
-- **F6 — Who owns the two edge arms (id 52).** Options: (a) unit 28's leg owns both, `gov_tag.py check
-  --only` calls the same functions; (b) unit 25's module owns them. (b) is the duplicate. RESOLVED
-  (agent, 2026-10-24, delegated): (a), rung 3. widens: none · relaxes: none
-- **F7 — Which owner set `one-owner` reads (id 54).** Options: (a) unit 22's predicate over
-  `memory/project/chain.toml`, extended to unit and kind rows; (b) `memory/builds/` plus layers. (b) is
-  the second answer. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none · relaxes: none
-- **F8 — Where `resolve_fixed_by` lives (id 59).** Options: (a) `tools/playbook/instruction_units.py`,
-  which both callers import; (b) `tools/playbook/overlay.py`. (b) makes the row checks import the
-  overlay for a grammar.
-  RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none · relaxes: none
-- **F9 — Unit 16's descriptor reader (id 63).** Options: (a) extend `regen.py`'s tracked-file reader
-  for `tools/govkit/entries/*.kit.toml`; (b) keep a glob reader under another name. (a) reads tracked
-  files, the population the gates grade. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens:
-  none · relaxes: none
+  map in `references.toml`; (b) the fields in four owners' schemas; (c) the `reader` adapter unit 37
+  built per registry. (a) would be a second map beside (c). RESOLVED (agent, 2026-11-10, delegated): (c), rung 2, re-resolved from (a). widens: none · relaxes: none
+- **F3 — Which door writes the census units into gov's overlay (id 10).** Options: (a) a verb of
+  unit 31's step; (b) unit 15's command; (c) an agent's edit; (d) its own step; (e) none while the
+  census moves no unit. At `974700af5` (d) is a program with nothing to write. RESOLVED (agent, 2026-11-10, delegated): (e), rung 1, re-resolved from (d). widens: none · relaxes: none
+- **F4 — Do `role` and `item` register now (id 12).** Options: (a) no, as unit 10 S5 rules; (b)
+  register `role`. RESOLVED (agent, 2026-10-24, delegated): (a), rung 1. widens: none · relaxes: none
+- **F5 — How the whole-file lock merges (id 83).** Options: (a) `merge=ours` plus the re-render; (b) a
+  regenerating driver, which `merge-rows.py` withdraws. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none · relaxes: none
+- **F6 — Who owns the two edge arms (id 52).** Options: (a) unit 28's leg; (b) unit 25's module, the
+  duplicate. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none · relaxes: none
+- **F7 — Which owner set `one-owner` reads (id 54).** Options: (a) unit 22's registry; (b)
+  `memory/builds/` plus layers, a second answer. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none · relaxes: none
+- **F8 — Where the `fixed-by` resolver lives (id 59).** Options: (a) a new `resolve_fixed_by` in
+  `instruction_units.py`; (b) `overlay.py`; (c) the `check_fixed_sources` unit 32 built there, which
+  the row checks import. (a) is a second resolver. RESOLVED (agent, 2026-11-10, delegated): (c), rung 2, re-resolved from (a). widens: none · relaxes: none
+- **F9 — Unit 16's descriptor reader (id 63).** Options: (a) extend `regen.py`'s reader; (b) a glob
+  reader; (c) unit 16's reader of the tracked files. (c) reads (a)'s population without the playbook
+  kit importing run-gates. RESOLVED (agent, 2026-11-10, delegated): (c), rung 2, re-resolved from (a). widens: none · relaxes: none
+- **F10 — Which Skills the Skill gate grades (id 40).** Options: (a) every tracked `SKILL.md` under a
+  `skills/` directory, the measure's population too; (b) those plus each `SKILL.template.md`; (c)
+  `skills/*/SKILL.md`. (b) grades unrendered tokens; (c) leaves a live Skill over the cap ungraded. RESOLVED (agent, 2026-11-10, delegated): (a), rung 3. widens: none · relaxes: none
+- **F11 — How the Edges verbs join the closed set (id 51).** Options: (a) two types, each its own
+  inverse; (b) one mutual-inverse pair; (c) no rows. The grammar declares no inverse at a site, and
+  the hygiene gate wants both ends declared, so (b) reds every pair. RESOLVED (agent, 2026-11-10, delegated): (a), rung 3. widens: none · relaxes: none
+- **F12 — Does a duplicate heading slug get a `-2` row (id 78).** Options: (a) yes; (b) no, since
+  `one-subject` reds a duplicate in every document `extract_doc` reads. RESOLVED (agent, 2026-11-10, delegated): (b), rung 1. widens: none · relaxes: none
+- **F13 — Is a section's `#<seg>` held to the tag cap (id 78).** Options: (a) red it, renaming the
+  live headings over it; (b) cap the tag head alone and say so. Eight live headings fold past it,
+  the charter's among them (DERIVED at `974700af5`). RESOLVED (agent, 2026-11-10, delegated): (b), rung 1. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -608,10 +561,25 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC8 AC10 AC41 AC42 AC49 · t
 - rev-7 · 2026-11-09 · S46 · from `2026-11-09-prompt-PLAY-dOrderedCharter-35-repair-brief.md` item
   1: PLAY-dOrderedCharter-35's composer is `derive_row_composition`, the name the naming lexicon
   passes, and S46 spells it.
+- rev-8 · 2026-11-10 · sections 1 to 8 · S1 to S73 · AC1 to AC64 · F2 F3 F8 F9, new F10 to F13 · from
+  `2026-11-10-prompt-PLAY-dOrderedCharter-49-precheck-brief.md`, pre-checked at `974700af5`: a
+  correction to a CLOSED spec is observed here; the items met by built code or a landed spec say so;
+  S11 mints no census step; S34 widens the Skill gate and fixes the Skill it reds; S40, S51 per F11 to
+  F13; S48, S53, S63 and S68 cut to what HEAD lacks; citations are symbols or pinned lines;
+  `tools/playbook/pins.py` leaves Files touched, unit 77 having renamed its two names at `26eda4214`;
+  the leg line follows `--legs-for`; spec 23's `/build` line and spec 35's rooted AC14 confirmed (S59, S24).
+- rev-9 · 2026-11-10 · AC26 · from `2026-11-10-prompt-PLAY-dOrderedCharter-49-ac26-brief.md`, observed
+  at `8a9c55b65`: AC26's command passed no `--input spec=`, so the render refused before it could carry
+  `input:code`; it now names the spec and the pre-check brief, each through `git ls-files` so every
+  path is a tracked word of its own, and it renders over HEAD.
+- 2026-11-10 · section 2 S34 · AC13 AC50 AC60 · from `2026-11-10-prompt-PLAY-dOrderedCharter-55-hygiene-fix-brief.md` item 2: S34's
+  by-value escape opens on one line, so the check reads it; AC13 names the `Decided:` trailer, AC50
+  unit 23's AC4 patterns and AC60 S20's grep, each the witness it already observed; a records fix,
+  so the status line keeps its rev.
 
 ## 10. Reuse audit
 
-Each item extends the seam its finding names, cited in §2 and §4.
+Each item extends the seam its finding names, cited in section 2.
 `python tools/codebase-map/reuse_lookup.py "one reader of a fact that two checks read twice"` ranked
 `read`, `read_text` and `check` by name stem, no seam; the batch mints no reader a finding did not ask
 for. The recall query returned TOOL-aDistilledCharter-7, TOOL-aGraftedHelix-32 and
