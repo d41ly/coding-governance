@@ -8,6 +8,7 @@ missing mark; rev-2 moved no design text. No leg, suite or bar ran in the pass: 
 resolver's own fixture, and the prose readers by `git grep`. This record cites no code line.
 
 **Evidences:** PLAY-dOrderedCharter-75
+- AC1 — `python tools/playbook/gov_tag.py check` — run by the main loop over the tree after the pass, it exited 0 printing `tags: join reader · selects · unarmed` and `tags: join practice · selects · unarmed` and no line holding `is declared and selects no unit` (DERIVED at 8198bad3f).
 - AC2 — with the `unscoped-unit` plant added and the join's arm put back to its any-unit-row test in a scratch break, restored after, `gov_tag.py --fixture --plant unscoped-unit` exited 1 printing `` `reader.every` is declared and selects no unit``. After S1 the same command exited 0 printing `tags: join reader · selects · unarmed: no unit's scope names a reader tag, so no member is graded as selecting` and no line holding `is declared and selects no unit`; `--plant dead-selector` still exited 1 printing `` `reader.ghost` is declared and selects no unit``, and its second half `without reader.ghost: rc=0`.
 - AC3 — `git grep -l "names a tag of"` over `help/tags.md`, `tools/playbook/README.md` and `tools/playbook/tag_index.py` listed all three files, and `git grep -n "unit rows exist"` over the two prose files printed nothing.
 
