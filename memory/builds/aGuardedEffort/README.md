@@ -50,22 +50,23 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-11-10 · streams tooling
+**Build status:** SPECCED · 2 unit(s) · node a · opened 2026-11-10 · streams tooling
 ids TOOL-aGuardedEffort-1 TOOL-aGuardedEffort-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aGuardedEffort-1 — the spawn guard refuses a role spawn or a harness call at a level the model's effort profile does not give](spec/2026-11-10-spec-TOOL-aGuardedEffort-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-11-10 |
+| [TOOL-aGuardedEffort-2 — rule 8 grades an unset stage at the level of the role the call names, and the closing review's arms land](spec/2026-11-10-spec-TOOL-aGuardedEffort-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 4 record folder(s).
+Records: 8 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aGuardedEffort-1.
+Ids no `spec-audit` record has ever named: TOOL-aGuardedEffort-1 TOOL-aGuardedEffort-2.
 
-Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -73,6 +74,7 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aGuardedEffort-1` | no |
+| 2 | `TOOL-aGuardedEffort-2` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
