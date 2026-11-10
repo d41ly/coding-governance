@@ -7640,6 +7640,31 @@ if [ -f "$STC" ]; then
   o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
   hit "$o" "--dispatch refuses: the declared spec-token checker reds over the live tree"
   hit "$o" "first line: TOKENS-DIED-ON-STDERR"
+  # ---- TOOL-aSmoothedDispatch-4 AC1 and AC4 - A RED ONLY IN ANOTHER BUILD'S SPEC IS NOTED AND
+  # ---- ADMITTED, and a re-dispatch over an unchanged tree SKIPS the checker. The REAL checker again:
+  # ---- tRun's spec is clean and a second build tOther's live spec names the flagged bar. The two
+  # ---- glob `--writes` calls are refused by a check that runs AFTER the spec-token one, so they write
+  # ---- no row and the tree does not move between them; the first re-runs the checker (the declared
+  # ---- dispatch moved the run-state file) and records the key, the second reads it. The run-gates
+  # ---- fingerprint is copied where the driver resolves it, or the cache is announced off. RED-first:
+  # ---- the inline block refused the first dispatch with check 49 and ran the checker on both calls.
+  sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI="'"${PFX}check-spec-tokens.py"'"|' .unattended.conf
+  printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md
+  mkdir -p memory/builds/tOther/spec "./${PFX}run-gates"
+  printf '# ARCH-tOther-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 `GATE_SELFTESTS=1 bash run-gates.sh` is green.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tOther/spec/2026-08-20-spec-ARCH-tOther-1.md
+  git add memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md memory/builds/tOther/spec/2026-08-20-spec-ARCH-tOther-1.md >/dev/null 2>&1
+  cp "$HERE/../run-gates/gate-fingerprint.sh" "./${PFX}run-gates/"
+  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
+  hit "$o" "the spec-token checker reds only in other builds' specs, which the bar's whole-tree leg still grades, so this dispatch is admitted: 1 hit(s), first: spec-tokens: memory/builds/tOther/"
+  hit "$o" "dispatch declared"
+  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")
+  hit "$o" "--dispatch was given a --writes path carrying a glob metacharacter"
+  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")
+  hit "$o" "spec-token check skipped: its inputs match the check last admitted for tRun"
+  miss "$o" "spec-tokens: "
+  hit "$o" "--dispatch was given a --writes path carrying a glob metacharacter"
+  git rm -q --cached memory/builds/tOther/spec/2026-08-20-spec-ARCH-tOther-1.md >/dev/null 2>&1
+  rm -rf memory/builds/tOther "./${PFX}run-gates" .git/unattended/spec-tokens.tRun.key
   # Restore the fixture the brief arms below read: the undated spec name, no extras.
   sed -i '/^SPEC_TOKENS_CLI=/d' .unattended.conf
   git mv memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md memory/builds/tRun/spec/one.md
@@ -19115,7 +19140,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3259 -> 3265 by TOOL-aSmoothedDispatch-3 on 2026-11-10: 6 region-two --help and -h assertions
 # (2 `same`, 3 `hit`, 1 `miss`), so FLOOR_SHARD_2 carries the same 6.
 # COUNTED off the block's own lines; no suite ran, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=3265
+# RAISED 3265 -> 3271 by TOOL-aSmoothedDispatch-4 on 2026-11-10: 6 region-three spec-token scope and cache
+# assertions (5 `hit`, 1 `miss`), so FLOOR_SHARD_3 carries the same 6.
+# COUNTED off the block's own lines; no suite ran, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=3271
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -19322,7 +19350,8 @@ FLOOR_SHARD_2=229
 # 3 by 25, 4 by 17, 5 by 7, 6 by 2, 7 by 1 and 8 by 12.
 # RAISED 270 -> 304 by TOOL-aBriskPreflight-4: the same 34 region-five overlapped-probe and handle assertions, see FLOOR_ASSERTIONS.
 # Region five MERGED at TOOL-aSparedSpawn-34's reconcile: the shared 270, less 7, plus 34 = 297.
-FLOOR_SHARD_3=405
+# RAISED 405 -> 411 by TOOL-aSmoothedDispatch-4 on 2026-11-10: the same 6 region-three spec-token assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=411
 # RAISED 373 -> 382 by TOOL-dGroundRules-66: the same 9 region-four terminal-unit assertions, see FLOOR_ASSERTIONS.
 # RAISED 382 -> 383 by TOOL-dGroundRules-70: the same 1 region-four reader assertion, see FLOOR_ASSERTIONS.
 # RAISED 383 -> 386 by TOOL-aSmoothedDispatch-1 on 2026-11-10: the same net 3 region-four --writes split assertions, see FLOOR_ASSERTIONS.

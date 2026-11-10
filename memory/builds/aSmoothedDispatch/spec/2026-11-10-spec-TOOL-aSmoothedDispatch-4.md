@@ -1,6 +1,6 @@
 # TOOL-aSmoothedDispatch-4 — `--dispatch`'s spec-token check grades the dispatching build's specs, and skips when its inputs match the last admitted check
 
-**Status:** SPECCED · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 4
+**Status:** CLOSED · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 

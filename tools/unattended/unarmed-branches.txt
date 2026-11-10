@@ -62,5 +62,7 @@ unattended.sh	49	21	a sibling spec status header carries something shaped like t
 # without hiding every python launcher from PATH, which the suite's own arms need on it.
 # RE-KEYED 11 -> 8, 27 -> 22, 26 -> 21 and 23 -> 18 at TOOL-aSparedSpawn-14: five `fail 49` refusals
 # above them left check 49 for the shared run-state and required-flag readers; re-keyed, never
-# re-waived.
-unattended.sh	49	18	--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run
+# re-waived. RE-KEYED 18 -> 15 at TOOL-aSmoothedDispatch-4: the spec-token block moved out of
+# `verb_dispatch` into `run_spec_token_check`, defined above it, so its three refusals now precede
+# the verb's id-shape, MISSING and THIN ones; same branch, same text.
+unattended.sh	49	15	--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run
