@@ -1,6 +1,6 @@
 # TOOL-aSmoothedDispatch-21 — the reconcile merge with aSwiftRefusal on local main: one spec-token check, through `run_spec_token_check`, after every cheap refusal
 
-**Status:** SPECCED · rev-1 · 2026-11-11 · node a · Tier-2 · base b904a0f9 · streams tooling · order 11
+**Status:** INPROGRESS · rev-1 · 2026-11-11 · node a · Tier-2 · base b904a0f9 · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
