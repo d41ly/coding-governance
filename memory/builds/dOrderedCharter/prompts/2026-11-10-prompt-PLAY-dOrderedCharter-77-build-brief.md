@@ -8,12 +8,15 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 
 - This is dOrderedCharter's close. The full bar over `3c63fe888` failed sixteen legs; fifteen were this build's own, and the main loop
   fixed the record-only ones at `de36424bf` and `51cd8b402`. This unit carries every remaining fix under `tools/` and `skills/`.
-- The main loop measured the five held self-test legs over the tree at `51cd8b402`, each run alone: `core selftest` 38 s green,
-  `instruction edits selftest` 103 s green, `tags positional selftest` 108 s pass, `tags bundle selftest` 22 s pass, and
-  `instruction units selftest` 161 s with one expectation red on `database is locked`, because another session's suite held the
-  shared `.git/gov/index.db` at that moment. Use these walls for the budget rows; the main loop re-runs the last one with the index
-  quiet and reports any real red.
-- The tags leg ran 210 s alone over the tree at `de36424bf`, green.
+- The main loop measured the five held self-test legs over the tree, each run alone:
+  - `core selftest` 38 s, green (DERIVED at 51cd8b402);
+  - `instruction edits selftest` 103 s, green (DERIVED at 51cd8b402);
+  - `tags positional selftest` 108 s, pass (DERIVED at 51cd8b402);
+  - `tags bundle selftest` 22 s, pass (DERIVED at 51cd8b402);
+  - `instruction units selftest` 161 s (DERIVED at 51cd8b402), one expectation red on `database is locked`, because another
+    session's suite held the shared `.git/gov/index.db` at that moment.
+- Use these walls for the budget rows; the main loop re-runs the last one with the index quiet and reports any real red.
+- The tags leg ran 210 s alone over the tree, green (DERIVED at de36424bf).
 - PLAY-dOrderedCharter-31 is parked and will not land in this run; nothing you build may rest on it.
 
 ## What the main loop needs from your commit

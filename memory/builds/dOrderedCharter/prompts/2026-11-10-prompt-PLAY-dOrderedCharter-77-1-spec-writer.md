@@ -2,7 +2,7 @@
 
 # gov-spec-writer handoff — PLAY-dOrderedCharter-77
 
-<!-- gov:handoff role=gov-spec-writer build=dOrderedCharter unit=PLAY-dOrderedCharter-77 path=memory/builds/dOrderedCharter/prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-1-spec-writer.md role-sha=90b89c43f238 task-sha=f306dcfef6ec -->
+<!-- gov:handoff role=gov-spec-writer build=dOrderedCharter unit=PLAY-dOrderedCharter-77 path=memory/builds/dOrderedCharter/prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-1-spec-writer.md role-sha=90b89c43f238 task-sha=3dd3c4bfc32b -->
 
 ## Role
 
@@ -112,7 +112,7 @@ demand.
    - held legs budgeted: rows in `tools/run-gates/selftest-budgets.txt` for `core selftest`, `instruction units selftest`,
      `instruction edits selftest`, `tags positional selftest` and `tags bundle selftest`, from the main loop's measured walls, which it
      hands the builder.
-   - tags ceiling: the leg's ceiling evidence, measured by the main loop at 210 s alone over the tree at `de36424bf` against its 180 s
+   - tags ceiling: the leg's ceiling evidence, measured by the main loop alone over the tree at 210 s (DERIVED at de36424bf), against its 180 s (PINNED)
      ceiling, in the evidence file the ceilings derive from.
    - check 23 tokenizer: `tools/memory-tree/check-memory-hygiene.sh` extracts a criterion's backticked tokens one physical line at a
      time, so a span that wraps a line pairs the wrong backticks and no honest ledger token can match (PLAY-dOrderedCharter-13 AC5).

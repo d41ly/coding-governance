@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-77 — the close bar's own product reds, each leg left green by the narrowest fix that leg demands
 
-**Status:** DEFERRED · rev-1 · 2026-11-10 · node a · Tier-2 · base 51cd8b402 · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-11-10 · node a · Tier-2 · base 51cd8b402 · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,8 +9,12 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-10-prompt-PLAY-dOrderedCharter-77-1-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-1-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-PLAY-dOrderedCharter-77-2-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-2-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-PLAY-dOrderedCharter-77-3-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-3-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-77-build-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-build-brief.md) | journal | — |
+| [2026-11-10-prompt-PLAY-dOrderedCharter-77-pin-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-pin-brief.md) | research | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-77-spec-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-spec-brief.md) | research | — |
+| [2026-11-10-prompt-PLAY-dOrderedCharter-77-tokens-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-tokens-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -124,7 +128,7 @@ CLOSED units still owe.
   and `tags bundle selftest`: the leg, its budget, an empty argv field, and a reason naming the reading.
   The budget is the worst reading the main loop measured and hands the builder, times 1.5, floored at 60,
   the file's own calibration rule. Observed by AC14.
-- **S15** — The tags leg's ceiling. The main loop's reading, 210 s alone over the tree at `de36424bf`
+- **S15** — The tags leg's ceiling. The main loop's reading, 210 s (DERIVED at de36424bf) alone over the tree at `de36424bf`
   (PINNED), enters `tools/run-gates/ceiling-evidence.txt` through
   `python tools/run-gates/derive-ceilings.py --write --observed` with its `--how`, never by hand. The
   leg's `ceiling` in `tools/gate-legs.json` rises from 180 to 420, the reading plus the margin's
@@ -360,16 +364,14 @@ may not run it. Each scratch clone is `git clone -q --shared . <tmp>`, run with 
 
 - **AC1** — When the `shell hygiene (a fork spent on builtin work)` leg's argv, as
   `tools/gate-legs.json` declares it, runs over the tree after the pass, `tools/gate-lint/sh_hygiene.py`
-  exits 0, and no line holding `the scan measures` names `skills/session-kickoff/manifest-check.test.sh`,
-  `tools/agent-instructions/adopt-agent-instructions.test.sh` or `tools/check-template-size.test.sh`; and
+  exits 0, and no line holding `the scan measures` names any of the three files S1 converts; and
   `git diff 51cd8b402 -- memory/project/spawn-idiom-sites.txt` prints nothing.
   Red when: an added site keeps its fork, or a registry count rises to meet it.
   figure: PINNED, nine sites over the declared counts in the bar's log over 3c63fe888.
 - **AC2** — When `bash tools/check-install-prefix.sh` runs after the pass, it exits 0; and
   `bash tools/check-install-prefix.sh --list` prints no hit naming `tools/playbook/overlay.py`,
-  `tools/playbook/pins.py`, `tools/playbook/practice_census.py`, `tools/playbook/render_playbook.py`,
-  `tools/roles/render_agents.py`, `skills/session-kickoff/manifest-check.test.sh` or
-  `tools/check-template-size.test.sh`.
+  `tools/playbook/pins.py`, `tools/playbook/practice_census.py`, `tools/playbook/render_playbook.py`
+  or `tools/roles/render_agents.py`, nor either of the two test files S2 lists.
   Red when: a kit path stays spelled, or a waiver of any shape lets one stand.
   figure: PINNED, 23 spellings on 22 lines in the bar's log over 3c63fe888.
 - **AC3** — When `bash tools/check-install-prefix.sh --list` runs after the pass, it prints no line
@@ -437,8 +439,9 @@ may not run it. Each scratch clone is `git clone -q --shared . <tmp>`, run with 
   with `OK`.
   Red when: a renamed function keeps an undeclared verb, or a call site still spells the old name.
   figure: DERIVED, the offender count at observation against the pin `.lexicon.conf` holds.
-- **AC14** — When `bash tools/run-gates/run-selftests.sh --check` runs after the pass, it exits 0 and
-  prints no line holding `carry no budget row`; and
+- **AC14** — When the `every held leg is budgeted, every budget row resolves` leg's argv, as
+  `tools/gate-legs.json` declares it, runs over the tree after the pass, it exits 0 and prints no line
+  holding `carry no budget row`; and
   `git grep -cE "^(core|instruction units|instruction edits|tags positional|tags bundle) selftest" -- tools/run-gates/selftest-budgets.txt`
   counts 5.
   Red when: a held leg's cost stays undeclared.
@@ -446,7 +449,7 @@ may not run it. Each scratch clone is `git clone -q --shared . <tmp>`, run with 
 - **AC15** — When `python tools/run-gates/derive-ceilings.py --check` runs after the pass, it exits 0;
   `git grep -n "^tags (the resolver's checks)" -- tools/run-gates/ceiling-evidence.txt` prints one row
   whose maximum is 210.0 and whose source is the `--how` text; and `python tools/playbook/gov_tag.py check`
-  completes over the tree inside its 420 s ceiling.
+  completes over the tree inside its 420 s ceiling (DERIVED, the value `tools/run-gates/ceiling-margin.txt` requires).
   Red when: the leg is killed at its bound, or its ceiling does not clear the evidenced maximum.
   figure: PINNED, 210 s measured by the main loop alone over the tree at de36424bf.
   permission: the main loop runs the tags leg at the close.
@@ -470,10 +473,10 @@ may not run it. Each scratch clone is `git clone -q --shared . <tmp>`, run with 
 
 ## 7. Gates
 
-`shell hygiene (a fork spent on builtin work)` · `install-prefix (shipped surface)` · `install-prefix self-test` · `harness arms (fail branches armed or pinned)` · `dead-path carriers (deleted files still named)` · `remote literals (kit code names no remote)` · `govkit selfcheck` · `govkit acceptance matrix` · `govkit selftest` · `govkit refusal join` · `docs` · `help page commands` · `lexicon naming predicates` · `every held leg is budgeted, every budget row resolves` · `leg ceilings clear their evidenced maximum` · `tags (the resolver's checks)` · `memory hygiene` · `memory-hygiene self-test` · `template size gate selftest` · `playbook render selftest` · `playbook render wiring` · `roles render selftest` · `agent-instructions self-test` · `manifest-check self-test` · `scratch-guard self-test` · `policy fixtures` · `recall floor arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `spec tokens (a spec's own names resolve)`
+`shell hygiene (a fork spent on builtin work)` · `install-prefix (shipped surface)` · `install-prefix self-test` · `harness arms (fail branches armed or pinned)` · `dead-path carriers (deleted files still named)` · `remote literals (kit code names no remote)` · `govkit selfcheck` · `govkit acceptance matrix` · `govkit selftest` · `govkit refusal join` · `docs` · `help page commands` · `lexicon naming predicates` · `every held leg is budgeted, every budget row resolves` · `leg ceilings clear their evidenced maximum` · `tags (the resolver's checks)` · `memory hygiene` · `memory-hygiene self-test` · `template size gate selftest` · `playbook render selftest` · `playbook render wiring` · `roles render selftest` · `agent-instructions self-test` · `manifest-check self-test` · `scratch-guard self-test` · `policy fixtures` · `recall floor arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `spec tokens (a spec's own names resolve)` · `recall floor`
 
 The guarded legs on the line are those the files touched trip: the govkit legs and `recall floor arms`
-for `tools/govkit/`, `policy fixtures` for the playbook, roles, govkit and hygiene files, the kickoff
+for `tools/govkit/`, `recall floor` for the three ledgers under `memory/`, `policy fixtures` for the playbook, roles, govkit and hygiene files, the kickoff
 legs and the lexicon for `skills/session-kickoff/`, and the run-gates legs and `measure-legs selftest`
 for `tools/gate-legs.json`.
 
@@ -512,7 +515,7 @@ New arm: tools/govkit/selftest.py · covers AC17 · a `_docs_cases` row on the `
   survivor, fewest follow-ups, and the registry's own seam. widens: none · relaxes: an adopter's
   manifest, which receives three selftest legs fewer; the render selftest's four plant blocks, unarmed
   at an install lacking their kit
-- **F3 — Whether this unit may raise the tags leg's ceiling.** The main loop's reading is 210 s against
+- **F3 — Whether this unit may raise the tags leg's ceiling.** The main loop's reading is 210 s (DERIVED at de36424bf) against
   the 180 s bound (PINNED), so recording it alone reds `leg ceilings clear their evidenced maximum`
   and leaves the leg killed. Options: (a) the evidence row and a ceiling of 420, the reading plus the
   declared margin; (b) the evidence row alone; (c) a faster `gov_tag.py check`. (b) fails AC15. (c) is a
@@ -536,6 +539,12 @@ New arm: tools/govkit/selftest.py · covers AC17 · a `_docs_cases` row on the `
   every offender re-read at `51cd8b402` against the bar's logs over `3c63fe888`. The matrix's apply and
   decode failures were reproduced in a scratch install; the brief's two options for the policy lookups
   are F2's (a) and (b), and F2 takes a third.
+- rev-2 · 2026-11-10 · S15 · AC15 · F3 · from `2026-11-10-prompt-PLAY-dOrderedCharter-77-pin-brief.md`:
+  the tags leg's measured wall and its new ceiling each carry their provenance on their own line; no
+  design text moved. AC1 · AC2 · AC14 · section 7 · from
+  `2026-11-10-prompt-PLAY-dOrderedCharter-77-3-spec-writer.md`: the three criteria observe each leg's
+  checker and name no suite, and the leg line gains the guarded leg the ledgers trip; no design text
+  moved.
 
 ## 10. Reuse audit
 
