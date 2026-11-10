@@ -1165,6 +1165,51 @@ run_edit "R-AC4 an index naming no spec role: gov-builder's product write -> all
 write_roles absent
 
 # ==================================================================================================
+# ---- the DISPATCH FALLBACK (TOOL-aSmoothedDispatch-6): a unit the build's run-state file records -
+# ---- as dispatched counts as routed when its spec is buildable -----------------------------------
+# The card routes a CLOSED unit, as a card does once the driver has dispatched the next one. Against
+# the hook at ae6735c1 the D-AC1, D-AC4 and D-AC6 rows read RED (it reads the card alone and exports
+# no RUN_STATE_FILE); the D-AC2 and D-AC3 rows are staged RED by a fallback that admits any unit a
+# dispatch row names.
+SG_RUNMD="$SGWT/mem/builds/bx/RUN.md"
+write_spec "$SG_SPECS/2026-10-09-spec-TOOL-x-30.md" TOOL-x-30 CLOSED Tier-2
+write_route_card sgtest-q1 write "TOOL-x-30=$SG_SPECS/2026-10-09-spec-TOOL-x-30.md"
+# write_run_state <unit>... — a run-state file holding one driver dispatch row per unit; none → no row.
+write_run_state() {
+  { printf '# RUN — bx\n\n## Run facts\nphase: BUILDING\n\n## Log\n'
+    for u in "$@"; do printf '2026-11-10T04:00:00Z dispatch · item 0123abcd %s · reason tools/a.js\n' "$u"; done; } > "$SG_RUNMD"
+}
+# check_no_runstate <name> — the last refusal carries no run-state file line.
+check_no_runstate() {
+  if grep -q 'run-state file' "$TMP/err"; then echo "FAIL $1"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+  else echo "ok   $1"; pass=$((pass+1)); fi
+}
+write_run_state TOOL-x-1
+run_write "D-AC1 a CLOSED card unit, a dispatch row for the INPROGRESS TOOL-x-1 -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+rm -f "$SG_RUNMD"
+run_write "D-AC2 the same card, no run-state file -> deny naming the CLOSED unit" 2 "any;;TOOL-x-30;;Tier-2 at CLOSED" Write "$SG_T" session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+check_no_runstate "D-AC2 no run-state file: the refusal carries no run-state file line"
+write_run_state
+run_write "D-AC2 the same card, a run-state file with no dispatch row -> deny naming the CLOSED unit" 2 "any;;TOOL-x-30;;Tier-2 at CLOSED" Write "$SG_T" session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+check_no_runstate "D-AC2 a row-less run-state file: the refusal carries no run-state file line"
+write_run_state TOOL-x-2 TOOL-x-6
+run_write "D-AC3 dispatch rows for a SPECCED Tier-2 unit and one whose spec is another build's -> deny naming the file and the count" 2 "any;;TOOL-x-30;;the run-state file;;2 unit(s)" Write "$SG_T" session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+write_run_state TOOL-x-1
+write_roles ok
+run_edit "D-AC4 gov-builder under the dispatch fallback -> allow, stderr EMPTY" 0 empty Write "$SG_T" - session_id=sgtest-q1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
+run_edit "D-AC4 the main loop under the dispatch fallback -> deny naming gov-builder" 2 "any;;gov-builder;;$SG_ROLES_SHOWN" Write "$SG_T" - session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+write_roles absent
+rm -f "$SG_RUNMD"
+# D-AC6: the hook's run-state file name is the basename the driver's runmd_of spells, both DERIVED.
+sg_runmd_driver=$(sed -n 's/^runmd_of() { _runmd="[^"]*\/\([^/"]*\)".*/\1/p' "$ROOT/$sg_driver" 2>/dev/null | head -1)
+sg_runmd_hook=$(node -p "require(process.argv[1]).RUN_STATE_FILE" "$HOOK" 2>/dev/null)
+if [ -n "$sg_runmd_driver" ] && [ "$sg_runmd_driver" = "$sg_runmd_hook" ]; then
+  echo "ok   D-AC6 the hook's RUN_STATE_FILE equals the driver's runmd_of basename ($sg_runmd_hook)"; pass=$((pass+1))
+else
+  echo "FAIL D-AC6 the hook's RUN_STATE_FILE is '$sg_runmd_hook' and the driver's runmd_of basename is '$sg_runmd_driver'"; fail=$((fail+1))
+fi
+
+# ==================================================================================================
 # ---- the ROLE-GATE ARM (TOOL-aOrientedCast-11): a role agent runs no gate its allowlist does not --
 # ---- name; the main loop is never refused -------------------------------------------------------
 # Over the linked worktree of the orientation fixture, with a role index carrying `gates` and a gate
@@ -1349,6 +1394,15 @@ check_ctx "S-AC1 the Tier-2 SPECCED unit is named not buildable, with INPROGRESS
 # context calls buildable, and the one it refuses is the one called not buildable.
 run_write "S-AC1 agreement: the gate admits a Write under sgtest-r1's route" 0 empty Write "$SG_T" session_id=sgtest-r1 "cwd=$SG_CWD_WT"
 run_write "S-AC1 agreement: the gate refuses a Write under sgtest-r3's route" 2 "any;;TOOL-x-2;;INPROGRESS" Write "$SG_T" session_id=sgtest-r3 "cwd=$SG_CWD_WT"
+# TOOL-aSmoothedDispatch-6 AC5: the dispatched unit the gate admits is named buildable, through its row.
+write_run_state TOOL-x-1
+run_sub "D-AC5 a CLOSED card unit and a dispatch row for TOOL-x-1 -> the SubagentStart JSON" json session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+check_ctx "D-AC5 the dispatched unit is named buildable through its dispatch row" has 'TOOL-x-1 is buildable' 'dispatch row'
+rm -f "$SG_RUNMD"
+run_sub "D-AC5 the same card, no run-state file -> the SubagentStart JSON" json session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+if grep -Fq 'TOOL-x-1 is buildable' "$TMP/ctx" || grep -Fq 'dispatch row' "$TMP/ctx"; then
+  echo "FAIL D-AC5 no run-state file: the context still names TOOL-x-1 buildable or a dispatch row"; sed 's/^/     /' "$TMP/ctx" | head -8; fail=$((fail+1))
+else echo "ok   D-AC5 no run-state file: the context names neither TOOL-x-1 buildable nor a dispatch row"; pass=$((pass+1)); fi
 
 # ---- AC2: no card, or a card with no ## route, is ONE line naming the card and ROUTED_PATHS ------
 run_sub "S-AC2 no card for the session -> the SubagentStart JSON" json session_id=sgtest-s0 "cwd=$SG_CWD_WT"
@@ -1441,8 +1495,11 @@ n=$((pass+fail))
 # loop confirms the executed count at the close.
 # 309 = 292 + the 17 run_role_bash rows TOOL-aOrientedCast-14 added (9 for AC1, 5 for AC2 and 3 for
 # AC3), counted by hand under the same rule.
+# 325 = 309 + the 3 gov-spec-writer rows TOOL-aSmoothedDispatch-5 added without raising the pin + the
+# 13 dispatch-fallback rows TOOL-aSmoothedDispatch-6 added (1 for AC1, 4 for AC2, 1 for AC3, 2 for
+# AC4, 4 for AC5 and 1 for AC6), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=309
+FLOOR_ASSERTIONS=325
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

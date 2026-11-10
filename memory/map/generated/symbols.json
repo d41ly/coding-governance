@@ -3728,6 +3728,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkUnitWrite",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkUnwalkableTarget",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -5296,6 +5301,11 @@
       "id": "check_needs_target",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "check_no_runstate",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "check_node_merge_arm",
@@ -14228,6 +14238,11 @@
       "file": "tools/unattended/run-lease.js"
     },
     {
+      "id": "readDispatchedUnits",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "readFact",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
@@ -14361,6 +14376,11 @@
       "id": "readSpecAuditDefault",
       "kind": "function",
       "file": "tools/workflows/spec-audit-optin.js"
+    },
+    {
+      "id": "readSpecH1Id",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "readStatusCells",
@@ -23893,6 +23913,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "scanSpecs",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "scanTurnRecords",
       "kind": "function",
       "file": "tools/hooks/format-guard.js"
@@ -28916,6 +28941,11 @@
       "id": "write_run_record",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_run_state",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "write_runlog_end",
