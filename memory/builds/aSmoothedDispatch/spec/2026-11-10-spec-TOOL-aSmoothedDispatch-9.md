@@ -1,6 +1,6 @@
 # TOOL-aSmoothedDispatch-9 — the three driver-suite arms unit 1's split left red: the stale `--dispatch` hostile-value exemption, and two carriage-return arms whose byte the substitution drops
 
-**Status:** INPROGRESS · rev-2 · 2026-11-10 · node a · Tier-1 · base ae6735c1 · streams tooling · order 9
+**Status:** CLOSED · rev-2 · 2026-11-10 · node a · Tier-1 · base ae6735c1 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 

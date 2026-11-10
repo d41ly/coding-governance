@@ -4519,8 +4519,7 @@ done
 # ---- the list below names the verb and the reason it refuses the value ITSELF, and a listed verb that
 # ---- accepted the form reds too, so the list cannot go stale. Its members were MEASURED on a slice of
 # ---- this block, not typed from the spec.
-_rf_exempt='brief|check 49: the value is the --path, and a path that is not a file in the tree has nothing to hash
-dispatch|check 49: the value is a --writes path, and the form carries a space, whitespace the declaration cannot carry'
+_rf_exempt='brief|check 49: the value is the --path, and a path that is not a file in the tree has nothing to hash'
 _rf_exempt_verbs=$(printf '%s\n' "$_rf_exempt" | cut -d'|' -f1)
 for _rf_v in $_rf_matrix; do
   _rf_rc=$(printf '%s\n' $_rf_oneline | sed -n "s/^$_rf_v=//p")
@@ -9199,7 +9198,10 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes '')" "--dispatch was give
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes --writes ${PFX}a.sh)" "--dispatch was given an empty --writes path, and an empty declaration is not a narrow one:"  # TOOL-aSmoothedDispatch-8 AC5 flag next
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh --writes)" "--dispatch was given an empty --writes path, and an empty declaration is not a narrow one:"  # TOOL-aSmoothedDispatch-8 AC5 end of argv
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes '  ' --writes ${PFX}a.sh)" "--dispatch was given an empty --writes path, and an empty declaration is not a narrow one:"  # TOOL-aSmoothedDispatch-8 AC5 whitespace only
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes $'spells\r·\rseparator.sh')" "--dispatch was given a --writes path containing whitespace"  # TOOL-aSmoothedDispatch-8 AC5 carriage return
+# The carriage returns ride variables: spelled as `$'\r'` inside the `$(run ...)` substitution, this
+# node's bash drops the byte, and the verb would declare `twowords/x.sh` (TOOL-aSmoothedDispatch-9).
+_cr_sep=$'spells\r·\rseparator.sh'; _cr_two=$'two\rwords/x.sh'
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes "$_cr_sep")" "--dispatch was given a --writes path containing whitespace"  # TOOL-aSmoothedDispatch-8 AC5 carriage return · TOOL-aSmoothedDispatch-9 AC3
 # ---- TOOL-aSmoothedDispatch-1: one --writes takes every path up to the next flag, and splits a
 # ---- whitespace-joined value; a carriage return is not split and still meets the refusal.
 build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
@@ -9209,7 +9211,7 @@ miss "$out" "unknown argument"
 out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes "work/four work/five")
 hit  "$out" "ARCH-tRun-1 · work/four work/five"
 miss "$out" "containing whitespace"
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes $'two\rwords/x.sh')" "--dispatch was given a --writes path containing whitespace, which the declaration's own field separator cannot carry, so the leg would split it into paths nobody declared:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes "$_cr_two")" "--dispatch was given a --writes path containing whitespace, which the declaration's own field separator cannot carry, so the leg would split it into paths nobody declared:"  # TOOL-aSmoothedDispatch-9 AC3
 
 # ...and the HEAD branch, which is reachable ONLY in a repo with no commits — the one place a
 # hand-made run-state file can exist while `rev-parse HEAD` has nothing to answer with. Armed rather

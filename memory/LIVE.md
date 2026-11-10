@@ -11,7 +11,6 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | Build | Status | Node | Opened | Streams | Ids (n) | Last record | Activity | Landed-unclosed |
 |---|---|---|---|---|---|---|---|---|
 | [aOrientedCast](builds/aOrientedCast/README.md) | OPEN | a | 2026-10-11 | tooling+kickoff+playbook | 33 | 2026-11-10 | active | 0 |
-| [aSmoothedDispatch](builds/aSmoothedDispatch/README.md) | INPROGRESS | a | 2026-11-10 | tooling | 9 | 2026-11-10 | active | 0 |
 | [dBoundRoles](builds/dBoundRoles/README.md) | DEFERRED | d | 2026-10-21 | tooling | 75 | 2026-11-05 | active | 0 |
 | [dCalibratedLens](builds/dCalibratedLens/README.md) | DEFERRED | d | 2026-10-21 | tooling | 56 | 2026-11-04 | active | 0 |
 | [dClosedLoop](builds/dClosedLoop/README.md) | INPROGRESS | d | 2026-10-14 | playbook+kickoff+tooling+deployer | 39 | 2026-10-26 | active | 0 |
