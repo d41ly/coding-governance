@@ -7,6 +7,9 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-10-prompt-TOOL-dPavedRoad-1-brief.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-1-brief.md) | research | TOOL-dPavedRoad-1 TOOL-dPavedRoad-3 TOOL-dPavedRoad-4 |
+| [2026-11-10-prompt-TOOL-dPavedRoad-2-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-2-1-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-TOOL-dPavedRoad-2-2-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-2-2-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-TOOL-dPavedRoad-2-token-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-2-token-fix-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -280,8 +283,13 @@ does not do it.
 The probes run from the repository root. Each node probe is saved under the run's scratch directory
 before it runs.
 
-- **AC1** — When `node -e "const g=require('./tools/hooks/format-guard.js'); const {shapes}=g.readCharterShapes('.'); const l=g.renderShapeLine(shapes.committed.def,{sha:'0123abcde',branch:'main',subject:'a · b'}); console.log(l, shapes.committed.re.test(l))"`
-  runs, it prints `- committed — 0123abcde · main · a, b true`.
+- **AC1** — When this probe of `tools/hooks/format-guard.js` runs:
+
+  ```bash
+  node -e "const g=require('./tools/hooks/format-guard.js'); const {shapes}=g.readCharterShapes('.'); const l=g.renderShapeLine(shapes.committed.def,{sha:'0123abcde',branch:'main',subject:'a · b'}); console.log(l, shapes.committed.re.test(l))"
+  ```
+
+  it prints `- committed — 0123abcde · main · a, b true`.
   Red when: the ` · ` in the subject is kept, so the line holds four fields and prints `false`.
 - **AC2** — When a probe writes a stub script that logs its argv and environment and prints two
   lines, then calls `readHandoffLines` with the selector `{ run: 'wf_x' }`, the result's `lines` are
@@ -307,11 +315,21 @@ before it runs.
   empty `owed` list it holds that sentence.
   Red when: the sentence is dropped while an agent has no derived line, or the line is wrapped or
   quoted.
-- **AC7** — When `node -e "const a=require('./tools/hooks/agent-cap.js'); console.log(a.resolveKitDir('roles','handoff.py',require('path').resolve('tools/hooks')), typeof a.extractHandoffMarker)"`
-  runs, it prints a path ending `tools/roles` and `function`.
+- **AC7** — When this probe of `tools/hooks/agent-cap.js` runs:
+
+  ```bash
+  node -e "const a=require('./tools/hooks/agent-cap.js'); console.log(a.resolveKitDir('roles','handoff.py',require('path').resolve('tools/hooks')), typeof a.extractHandoffMarker)"
+  ```
+
+  it prints a path ending `tools/roles` and `function`.
   Red when: either export is missing and the probe throws or prints `undefined`.
-- **AC8** — When `python -c "import json; l=[x for x in json.load(open('tools/gate-legs.json',encoding='utf-8')) if x['name']=='format-guard self-test'][0]; print('{prefix}/hooks/agent-cap.js' in l['guard'])"`
-  runs, it prints `True`.
+- **AC8** — When this probe of `tools/gate-legs.json` runs:
+
+  ```bash
+  python -c "import json; l=[x for x in json.load(open('tools/gate-legs.json',encoding='utf-8')) if x['name']=='format-guard self-test'][0]; print('{prefix}/hooks/agent-cap.js' in l['guard'])"
+  ```
+
+  it prints `True`.
   Red when: the guard omits the module, so an edit to it alone skips the leg.
 - **AC9** — When `grep -n "derived for it\|prints the lines" tools/hooks/README.md help/roles.md`
   runs, each file shows a line saying the refusal prints the lines.
