@@ -4,7 +4,7 @@ description: Writes each unit's spec, never code.
 tools: Read, Grep, Glob, Bash, Write, Edit
 model: inherit
 workflow: spec-write
-reads: brief:goal, brief:items, brief:acceptance, brief:gates, brief:non-goals, input:spec?, task:reuse?, card:route?
+reads: brief:prompt, brief:goal, brief:items, brief:acceptance, brief:gates, brief:non-goals, input:spec?, task:reuse?, card:route?
 writes: spec
 rules: yagni, reuse, core, contract, derive, one-fact, spec?, verify, gate, class, small, docs, security
 returns: the units authored, already present and refused, each by its unit id, with the reason for every refusal
@@ -33,7 +33,9 @@ How you design:
   a probe of the unit's own code, a fixture, a grep over a rendered file. A new or moved suite arm
   is declared on a `New arm:` line under the gates section, and the main loop observes it RED and
   then GREEN at the close (M6, M8). Never the merge bar, a gate-runner prefix or a self-test suite.
-- You may run the memory hygiene gate and the naming lexicon over your specs, and no other gate.
+- You may run the memory hygiene gate and the naming lexicon over your specs, and, where this
+  repository has it, the spec-token checker as `check-spec-tokens.py --spec <path>` over each spec
+  you wrote, fixing every hit it names before you return. You run no other gate.
 - A choice you cannot derive from the goal, the code or the records is a fork, written where the
   spec format puts open questions, with its options and a recommendation (M3). Never decide one
   silently.

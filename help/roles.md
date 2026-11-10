@@ -21,7 +21,9 @@ reference; this page is the short version.
    Protocols and Facts sections whole.
 3. **The handoff renderer joins them.** `handoff.py render` writes one prompt file under the build's
    `prompts/` folder, with `## Role` and then `## Task`, filled from the card, the build's brief and
-   any `--input` values. A required input that is missing or still a placeholder refuses by name.
+   any `--input` values. A spec writer's task also carries the brief's `## The prompt`, the owner's
+   own words, as its `brief:prompt` block. A required input that is missing or still a placeholder
+   refuses by name.
 4. **The agent runs as a native type.** Each role is rendered into `.claude/agents/gov-<role>.md`,
    which starts without the full charter and at the reasoning effort the policy file sets. It
    carries the section 1 rules its role cites and the charter's Protocols and Facts sections.
@@ -128,8 +130,9 @@ until an owner writes its first row.
   on a specced unit. The main loop may still flip a spec's `**Status:**` line.
 - A role agent running the bar, the self-test runner or any suite, beyond what `[gates]` allows.
 - In a session routed to a live build, a final message that leaves out the `agent` or `returned`
-  line of an agent its turn dispatched or received. It is refused once per turn end, and
-  `handoff.py agents` prints the lines to paste. This one switches on with the route, not with
+  line of an agent its turn dispatched or received. It is refused once per turn end, and the
+  refusal prints the lines to paste, derived for it by `handoff.py agents`; where it cannot derive
+  one, it names that verb instead. This one switches on with the route, not with
   `roles.json`, and only where the governing doc's micro-formats define both lines.
 
 All of these switch on only where `.claude/roles.json` exists. They do not see writes made through

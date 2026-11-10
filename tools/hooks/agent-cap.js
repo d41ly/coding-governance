@@ -93,7 +93,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.44' // gov:kit agent-cap@1.44 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.45' // gov:kit agent-cap@1.45 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 
 // The review harness a deny message points at, DERIVED (TOOL-aRepatriatedFork-2 S6): found by
 // `resolveKitDir` in the workflows kit (TOOL-dFairHearing-32 S25), and the bare name when it refuses,
@@ -1105,6 +1105,8 @@ module.exports = {
   MAX_VERIFIERS, readWriterBound, runBothViews, renderCodeView, renderStrippedView,
   renderBlankedLiterals, resolveHarnessName, extractWorkflowArgs, extractBuildSlug,
   resolveModelProfile, checkEffortLevel, // rule 8's, for the roles kit's parity arm and a probe of the rule alone
+  // TOOL-dPavedRoad-2 S5: format-guard.js finds the roles kit and reads the handoff marker through these.
+  resolveKitDir, extractHandoffMarker,
 }
 if (require.main === module) main()
 

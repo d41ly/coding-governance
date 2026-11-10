@@ -34,7 +34,8 @@
 # matches, an empty or whitespace-only one, and one a second profile also matches (arm 19); one list
 # of model ids read by `resolve_profile` and by the spawn guard's `resolveModelProfile` over the index
 # rendered from arm 19's policy (arm 20, which SKIPs out loud as arm 6 does); and a profile level
-# edited with no re-render, which the adopter's check names as a drifted index (arm 21). Every arm is a self-contained block below the prologue, so a
+# edited with no re-render, which the adopter's check names as a drifted index (arm 21); and the spec writer's handoff carrying the brief's `## The prompt`
+# as its `brief:prompt` block, an empty prompt refusing by name (arm 22). Every arm is a self-contained block below the prologue, so a
 # slice of the prologue and one block runs that arm alone; arm 20 reads arm 19's fixture.
 #
 # WHAT THIS DOES NOT CHECK: what the rendered Skill or an agent type SAYS beyond the citation paths
@@ -91,7 +92,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +1 for arm 9 and +1 for arm 19 (TOOL-aProfiledEffort-4).
 # +2 for arm 21 (TOOL-aGuardedEffort-1); arm 20 and arm 6's added payload are out of the floor.
 # +0 for arm 6's harness calls and rendered tables (TOOL-aGuardedEffort-2): on its SKIP path, out of the floor.
-FLOOR_ASSERTIONS=59
+# +2 for arm 22 (TOOL-dPavedRoad-3).
+FLOOR_ASSERTIONS=61
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 FX=""; FXK="$KREL"
@@ -960,6 +962,42 @@ sed -i 's/^default = "low"   # a21$/default = "max"/' "$FX/$KREL/house/policy.to
 out=$(run_adopter --check); rc=$?
 check_arm "arm 21 a profile level edited with no re-render is a drifted index, named" \
    "$([ "$rc" = 1 ] && [[ $out == *'drift .claude/roles.json'* ]] && [[ $out != *'drift .claude/agents/'* ]] && echo 1 || echo 0)"
+
+# ---- arm 22 (TOOL-dPavedRoad-3 AC2): the spec writer's handoff carries the brief's `## The prompt`
+# ---- as its `brief:prompt` block, and an empty prompt refuses that key by name. The keys are the
+# ---- fixture kit's gov-spec-writer reads filtered to the `brief:` family, so the shipped role is
+# ---- what is proved; `task:` needs the kickoff checker, which a roles-kit fixture does not hold.
+# ---- The failing case, observed at the close and not by the pass that wrote this: the dispatch
+# ---- reverted so `brief:prompt` reads a `### prompt` sub-head, which renders no block and passes
+# ---- the empty one.
+build_fixture; _rc22=$?
+A22=$("$PY" -B -c 'import pathlib, sys
+fx, kit = pathlib.Path(sys.argv[1]).resolve(), pathlib.Path(sys.argv[2]).resolve()
+sys.path.insert(0, str(kit))
+import handoff, roles_lib as lib
+reads = lib.load_roles(handoff.KIT_DIR)["gov-spec-writer"]["keys"]["reads"].split(", ")
+keys = {"reads": ", ".join(k for k in reads if k.startswith("brief:"))}
+brief = fx / sys.argv[3] / "builds" / "bx" / "prompts" / "2026-11-10-prompt-TOOL-bx-1-brief.md"
+brief.parent.mkdir(parents=True, exist_ok=True)
+heads = ("Goal", "Items", "Acceptance", "Gates", "Non-goals")
+body = "".join("### %s\n\n%s text\n\n" % (h, h) for h in heads)
+lines = "> owner words, verbatim\n— owner, 2026-11-10\n"
+for prompt in (lines, ""):
+    text = "# Brief\n\n## The prompt\n\n%s\n## The brief\n\n%s" % (prompt, body)
+    brief.write_text(text, encoding="utf-8")
+    try:
+        task = handoff.render_handoff(fx, sys.argv[3], lib.resolve_charter_path(fx),
+                                      "gov-spec-writer", keys, "bx", "TOOL-bx-1", None, {}, None)[2]
+        print("rendered %d" % ("### brief:prompt\n\n" + lines + "\n### brief:goal\n" in task))
+    except lib.RolesError as e:
+        print("refused %d" % str(e).split("\n")[0].startswith("brief:prompt — "))
+' "$FX" "$FX/$KREL" "$MR" 2>&1)
+A22=${A22//$'\r'/}
+check_arm "arm 22 the spec writer's handoff carries the brief's prompt verbatim" \
+   "$([ "$_rc22" = 0 ] && [ "${A22%%$'\n'*}" = 'rendered 1' ] && echo 1 || echo 0)"
+check_arm "arm 22 an empty prompt refuses by name" \
+   "$([ "${A22#*$'\n'}" = 'refused 1' ] && echo 1 || echo 0)"
+[ "$A22" = $'rendered 1\nrefused 1' ] || printf '    %s\n' "${A22//$'\n'/$'\n'    }"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
