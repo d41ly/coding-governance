@@ -1,6 +1,6 @@
 # TOOL-aProfiledEffort-3 — every dispatch route names the session's model and spawns at the level the resolver returns
 
-**Status:** SPECCED · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 3
+**Status:** INPROGRESS · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 

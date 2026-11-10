@@ -55,7 +55,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 3 unit(s) · node a · opened 2026-11-10 · streams tooling
+**Build status:** INPROGRESS · 3 unit(s) · node a · opened 2026-11-10 · streams tooling
 ids TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3
 
 <!-- gen:build-units -->
@@ -63,7 +63,7 @@ ids TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3
 |---|---|---|---|---|---|
 | [TOOL-aProfiledEffort-1 — the effort policy takes a profile table per model family, validated and resolved by model, with `fable` seeded at medium](spec/2026-11-10-spec-TOOL-aProfiledEffort-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-10 |
 | [TOOL-aProfiledEffort-2 — the handoff verbs answer a role's and a stage's level for a named model](spec/2026-11-10-spec-TOOL-aProfiledEffort-2.md) | 2 | 2 | CLOSED | rev-1 | 2026-11-10 |
-| [TOOL-aProfiledEffort-3 — every dispatch route names the session's model and spawns at the level the resolver returns](spec/2026-11-10-spec-TOOL-aProfiledEffort-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-11-10 |
+| [TOOL-aProfiledEffort-3 — every dispatch route names the session's model and spawns at the level the resolver returns](spec/2026-11-10-spec-TOOL-aProfiledEffort-3.md) | 3 | 2 | INPROGRESS | rev-2 | 2026-11-10 |
 <!-- /gen:build-units -->
 
 Records: 8 bound to this build, across 3 record folder(s).
