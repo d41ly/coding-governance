@@ -57,7 +57,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 8 unit(s) · node a · opened 2026-11-10 · streams tooling
+**Build status:** SPECCED · 9 unit(s) · node a · opened 2026-11-10 · streams tooling
 ids TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 TOOL-aSmoothedDispatch-7 TOOL-aSmoothedDispatch-8 TOOL-aSmoothedDispatch-9
 
 <!-- gen:build-units -->
@@ -71,15 +71,16 @@ ids TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 T
 | [TOOL-aSmoothedDispatch-6 — a dispatched unit counts as routed, so its builder's product writes are not refused on a stale card route](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-6.md) | 6 | 2 | CLOSED | rev-1 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-7 — the `gov-spec-writer` house overlay has the writer run the spec-token checker's one-spec mode over each spec before it returns](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-7.md) | 7 | 2 | CLOSED | rev-1 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-8 — the closing review's mediums and lows: the writer's row shape, an arm per admit clause and cache key, the no-field `--writes` arms, the context's step-9b read, and the hook leg's driver guard](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-8.md) | 8 | 2 | CLOSED | rev-1 | 2026-11-10 |
+| [TOOL-aSmoothedDispatch-9 — the three driver-suite arms unit 1's split left red: the stale `--dispatch` hostile-value exemption, and two carriage-return arms whose byte the substitution drops](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-9.md) | 9 | 1 | SPECCED | rev-1 | 2026-11-10 |
 <!-- /gen:build-units -->
 
 Records: 11 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 TOOL-aSmoothedDispatch-7 TOOL-aSmoothedDispatch-8.
+Ids no `spec-audit` record has ever named: TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 TOOL-aSmoothedDispatch-7 TOOL-aSmoothedDispatch-8 TOOL-aSmoothedDispatch-9.
 
-Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 9 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -94,6 +95,7 @@ Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry
 | 6 | `TOOL-aSmoothedDispatch-6` | no |
 | 7 | `TOOL-aSmoothedDispatch-7` | no |
 | 8 | `TOOL-aSmoothedDispatch-8` | no |
+| 9 | `TOOL-aSmoothedDispatch-9` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
