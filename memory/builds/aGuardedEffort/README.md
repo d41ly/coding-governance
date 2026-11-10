@@ -4,7 +4,6 @@ node: a
 opened: 2026-11-10
 streams: tooling
 roster: TOOL
-status: OPEN
 ids: TOOL-aGuardedEffort-1
 ---
 
@@ -50,25 +49,29 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-11-10 · streams tooling
+**Build status:** SPECCED · 1 unit(s) · node a · opened 2026-11-10 · streams tooling
 ids TOOL-aGuardedEffort-1
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aGuardedEffort-1 — the spawn guard refuses a role spawn or a harness call at a level the model's effort profile does not give](spec/2026-11-10-spec-TOOL-aGuardedEffort-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 2 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aGuardedEffort-1.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aGuardedEffort-1` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
