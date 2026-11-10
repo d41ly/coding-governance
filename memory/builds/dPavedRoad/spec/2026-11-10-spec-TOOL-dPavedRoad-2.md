@@ -1,6 +1,6 @@
 # TOOL-dPavedRoad-2 — format-guard's block message carries the lines it asks for
 
-**Status:** SPECCED · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 2
+**Status:** INPROGRESS · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,8 @@
 | [2026-11-10-prompt-TOOL-dPavedRoad-1-brief.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-1-brief.md) | research | TOOL-dPavedRoad-1 TOOL-dPavedRoad-3 TOOL-dPavedRoad-4 |
 | [2026-11-10-prompt-TOOL-dPavedRoad-2-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-2-1-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-TOOL-dPavedRoad-2-2-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-2-2-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-TOOL-dPavedRoad-2-3-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-2-3-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-TOOL-dPavedRoad-2-revision-brief.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-2-revision-brief.md) | research | — |
 | [2026-11-10-prompt-TOOL-dPavedRoad-2-token-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-2-token-fix-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -21,7 +23,8 @@ ends were refused for those lines, and each cost a re-send that had to run `hand
 
 ## 2. Scope (IN)
 
-Line numbers are read at `ae6735c1`. The worktree's tip differs from it in records only.
+Line numbers are read at `ae6735c1`. The worktree's tip differs from it in records and in
+TOOL-dPavedRoad-1's build, which touches no file this spec cites by line.
 
 - **S1** — For each `agent` or `returned` defect, the reason prints the line `handoff.py agents`
   derives for that agent, unchanged. The hook runs the verb with the selector the turn already
@@ -41,7 +44,9 @@ Line numbers are read at `ae6735c1`. The worktree's tip differs from it in recor
 - **S5** — `tools/hooks/agent-cap.js` exports `resolveKitDir` and `extractHandoffMarker`, so the hook
   finds the roles kit and reads the marker through the hooks kit's one copy of each. Observed by AC7.
 - **S6** — The `format-guard self-test` leg's guard in `tools/gate-legs.json` gains
-  `{prefix}/hooks/agent-cap.js`, the module the hook now requires. Observed by AC8.
+  `{prefix}/hooks/agent-cap.js`, the module the hook now requires. That file is a path the kickoff
+  manifest watches, so the commit that carries the edit also carries the manifest's `last-audit`
+  re-stamp. Observed by AC8 and AC13.
 - **S7** — `tools/hooks/README.md` and `help/roles.md` say the refusal prints the lines. Observed by
   AC9.
 
@@ -228,6 +233,8 @@ confirms from a real run.
 - `tools/gate-legs.json`
 - `help/roles.md`
 - `memory/map/generated/symbols.json`
+- `memory/guides/SESSION-KICKOFF.md`
+- `memory/builds/dPavedRoad/README.md`
 
 ### Rollout
 
@@ -239,9 +246,33 @@ verb's; an agent with no marker; and a derivation cut by the bound.
 says the refusal prints the lines when it can derive them, and names the verb otherwise.
 
 `python tools/codebase-map/gen_map.py --write` renders `memory/map/generated/symbols.json` for the
-new functions. `tools/gate-legs.json` is a path the kickoff manifest watches
-(`memory/guides/SESSION-KICKOFF.md:6`), so its re-audit falls to the main loop at the close. This pass
-does not do it.
+new functions.
+
+`tools/gate-legs.json` is a path the kickoff manifest watches (`memory/guides/SESSION-KICKOFF.md:6`).
+The pre-commit's staged leg of check 5 refuses a commit that stages a watched path unless the staged
+manifest's `last-audit` differs from HEAD's, and its comment calls that bundle the only green path
+(`skills/session-kickoff/manifest-check.sh:1775-1790`). So the pass that commits S6 re-audits in the
+same commit, as the manifest's ratchet asks of a unit that touches a watched path
+(`memory/guides/SESSION-KICKOFF.md:20-23`):
+
+1. It re-reads the two Orientation lines that `tools/gate-legs.json` feeds:
+   `memory/guides/SESSION-KICKOFF.md:90` names it as the leg list's one source, and :94 says
+   `GATE_FULL=1` ignores every leg guard. Neither states any one leg's guard set, so S6 makes
+   neither stale. A line found stale anyway is corrected in the same commit, and `last-body-change`
+   then advances with it.
+2. It sets `last-audit` (:5) to the current ISO datetime `@` the full sha of `HEAD`, the stamp rule
+   at :23. With no body line changed, `last-body-change` does not move.
+3. The commit message carries one `manifest-audit:` line naming the delta, in the shape
+   `af1d9fa91` used for its own guard edit: `manifest-audit: delta tools/gate-legs.json adds
+   agent-cap.js to the format-guard self-test guard; no Orientation claim found stale; last-audit
+   advanced to <sha8>`.
+
+This obeys the ratchet and changes nothing it checks, so the brief's Non-goal on the manifest
+ratchet holds.
+
+The same commit flips this spec's status, and the build README's unit table is generated from spec
+headers. `python tools/memory-tree/gen_build_index.py --write` re-renders
+`memory/builds/dPavedRoad/README.md` after the flip is written, and the README is staged with it.
 
 `help/roles.md` may also be in a sibling unit's write set. If so, `order` sequences the two.
 
@@ -347,6 +378,17 @@ before it runs.
 - **AC12** — When that fixture takes a message that passes every check, the stub's log stays empty,
   and `format-guard.js` allows.
   Red when: an allowing stop spawns `handoff.py`.
+- **AC13** — When the pass has staged its build commit, this probe of the staged kickoff manifest runs:
+
+  ```bash
+  git diff --cached -U0 -- memory/guides/SESSION-KICKOFF.md | grep '^[-+][^-+]'; git rev-parse HEAD
+  ```
+
+  it prints exactly one removed and one added `last-audit:` line, and no other changed line unless
+  step 1 of "Rollout" found a stale Orientation line. The added line's sha equals the printed `HEAD`,
+  and its datetime is later than the removed line's.
+  Red when: `tools/gate-legs.json` is staged and the `last-audit` line is unchanged, or names a sha
+  other than `HEAD`.
 
 ## 7. Gates
 
@@ -364,6 +406,11 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-10 · initial draft.
+- rev-2 · 2026-11-10 · S6 · §2 · §4 · AC13 · the build commit bundles the kickoff manifest's
+  `last-audit` re-stamp with the `tools/gate-legs.json` edit, since check 5's staged leg refuses the
+  edit alone; the manifest and the build README join Files touched, and the README is re-rendered
+  after the status flip. The tip-differs sentence now names TOOL-dPavedRoad-1's build. From the
+  builder's divergence, `2026-11-10-prompt-TOOL-dPavedRoad-2-revision-brief`.
 
 ## 10. Reuse audit
 
