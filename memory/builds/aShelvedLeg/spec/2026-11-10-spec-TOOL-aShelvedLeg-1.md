@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-10-build-TOOL-aShelvedLeg-1-agent-ledger.md](../build/2026-11-10-build-TOOL-aShelvedLeg-1-agent-ledger.md) | journal | TOOL-aShelvedLeg-2 |
+| [2026-11-11-build-TOOL-aShelvedLeg-1-1-acceptance-ledger.md](../build/2026-11-11-build-TOOL-aShelvedLeg-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aShelvedLeg-1-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aShelvedLeg-1-1-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aShelvedLeg-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aShelvedLeg-1-brief.md) | research | — |
 | [2026-11-10-prompt-TOOL-aShelvedLeg-1-round1-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-aShelvedLeg-1-round1-fix-brief.md) | research | — |
