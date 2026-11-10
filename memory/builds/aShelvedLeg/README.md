@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-10
 streams: tooling
 roster: TOOL
-ids: TOOL-aShelvedLeg-1
+ids: TOOL-aShelvedLeg-1 TOOL-aShelvedLeg-2
 ---
 
 # aShelvedLeg — the unattended kit gate runs only on demand
@@ -30,6 +30,7 @@ it only on demand. The prompt is in `prompts/`.
 
 - **Classification (M2)**: one unit, MISSING at open, Tier-2: the leg's `subject` is part of the
   unattended kit's descriptor, so every adopter's bar holds it at its next `govkit update`.
+- Unit 2 is the closing review's minors, promoted by M4 as one batch.
 - The hold is the bar's existing one, `subject = "kit"`; no new switch.
 - The price is TOOL-aBoundedCeiling-10: a held leg cannot notice its own drift. The owner chose it.
 - Kit versions move through the lander's `mint`, never by hand.
@@ -44,25 +45,27 @@ None.
 | # | Unit | Mechanism |
 |---|---|---|
 | 1 | `TOOL-aShelvedLeg-1` | the `unattended kit gate` leg declares `subject = "kit"`, so run-gates holds it off every bar that does not set `GATE_SELFTESTS` |
+| 2 | `TOOL-aShelvedLeg-2` | the closing review's minors, batched: the kit's merge-bar wording, a typed count, the changed-mode skip, the budget row's spelling, the rc-only reading |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-11-10 · streams tooling
-ids TOOL-aShelvedLeg-1
+**Build status:** SPECCED · 2 unit(s) · node a · opened 2026-11-10 · streams tooling
+ids TOOL-aShelvedLeg-1 TOOL-aShelvedLeg-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aShelvedLeg-1 — the `unattended kit gate` leg is `subject = "kit"`, off every automatic bar](spec/2026-11-10-spec-TOOL-aShelvedLeg-1.md) | — | 2 | CLOSED | rev-2 | 2026-11-10 |
+| [TOOL-aShelvedLeg-2 — the closing review's minors on the held kit gate, batched](spec/2026-11-10-spec-TOOL-aShelvedLeg-2.md) | — | 2 | SPECCED | rev-1 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 4 record folder(s).
+Records: 8 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aShelvedLeg-1.
+Ids no `spec-audit` record has ever named: TOOL-aShelvedLeg-1 TOOL-aShelvedLeg-2.
 
-Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
