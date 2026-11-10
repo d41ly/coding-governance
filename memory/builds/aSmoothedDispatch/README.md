@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-10
 streams: tooling
 roster: TOOL
-ids: TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 TOOL-aSmoothedDispatch-7 TOOL-aSmoothedDispatch-8 TOOL-aSmoothedDispatch-9 TOOL-aSmoothedDispatch-10 TOOL-aSmoothedDispatch-11 TOOL-aSmoothedDispatch-12 TOOL-aSmoothedDispatch-13 TOOL-aSmoothedDispatch-14 TOOL-aSmoothedDispatch-15 TOOL-aSmoothedDispatch-16 TOOL-aSmoothedDispatch-17 TOOL-aSmoothedDispatch-18
+ids: TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 TOOL-aSmoothedDispatch-7 TOOL-aSmoothedDispatch-8 TOOL-aSmoothedDispatch-9 TOOL-aSmoothedDispatch-10 TOOL-aSmoothedDispatch-11 TOOL-aSmoothedDispatch-12 TOOL-aSmoothedDispatch-13 TOOL-aSmoothedDispatch-14 TOOL-aSmoothedDispatch-15 TOOL-aSmoothedDispatch-16 TOOL-aSmoothedDispatch-17 TOOL-aSmoothedDispatch-18 TOOL-aSmoothedDispatch-19
 ---
 
 # aSmoothedDispatch — five mechanical refusals that cost every unattended run turns and re-dispatches
@@ -61,7 +61,7 @@ None.
 <!-- gen:build-index -->
 **Build status:** CLOSED · 10 unit(s) · node a · opened 2026-11-10 · streams tooling
 ids TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 TOOL-aSmoothedDispatch-7 TOOL-aSmoothedDispatch-8 TOOL-aSmoothedDispatch-9 TOOL-aSmoothedDispatch-10 TOOL-aSmoothedDispatch-11
-ids TOOL-aSmoothedDispatch-12 TOOL-aSmoothedDispatch-13 TOOL-aSmoothedDispatch-14 TOOL-aSmoothedDispatch-15 TOOL-aSmoothedDispatch-16 TOOL-aSmoothedDispatch-17 TOOL-aSmoothedDispatch-18
+ids TOOL-aSmoothedDispatch-12 TOOL-aSmoothedDispatch-13 TOOL-aSmoothedDispatch-14 TOOL-aSmoothedDispatch-15 TOOL-aSmoothedDispatch-16 TOOL-aSmoothedDispatch-17 TOOL-aSmoothedDispatch-18 TOOL-aSmoothedDispatch-19
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
