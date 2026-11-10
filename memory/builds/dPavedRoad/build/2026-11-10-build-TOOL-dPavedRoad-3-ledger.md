@@ -21,3 +21,10 @@ and the section 7 legs.
 - AC3 — the same probe printed as its first line `vocabulary True, first read brief:prompt`, and as its third a `refused brief:prompt` line naming the brief record.
 - AC4 — `grep -c 'spec | brief:prompt, brief:goal' tools/roles/README.md` printed 1.
 - AC5 — `grep -c 'brief:prompt' help/roles.md tools/roles/handoff.py` counted 1 in each file.
+
+## New arm, observed at the close
+
+In clones of `6681cdc80` under `%TEMP%/dpr`, by the main loop, `bash tools/roles/adopt-roles.test.sh`.
+RED: with the dispatch reverted so `brief:prompt` reads a `### prompt` sub-head, it exited 1 in 83 s
+with one failure, `arm 19 the spec writer's handoff carries the brief's prompt verbatim`. GREEN: at
+`6681cdc80` it exited 0 in 101 s, `PASS (65 assertions)`, above the floor of 53.

@@ -25,3 +25,10 @@ Owed at the close: the RED-first observation of the PR1 arms in `tools/check-spe
 - AC5 — after `python tools/roles/render_agents.py --write`, `.claude/roles.json` lists the leg under `gov-spec-writer`'s gates, and `render_agents.py --check` exited 0.
 - AC6 — Bash PreToolUse payloads piped to `node tools/hooks/scratch-guard.js`: `gov-spec-writer` running the bare checker exited 0; `gov-builder` running it exited 2 with the "a role agent runs no gate" line; the `--spec` form exited 0 for both roles.
 - AC7 — the `grep -c` the criterion names counted 1 in each of its two files.
+
+## New arm, observed at the close
+
+In clones of `6681cdc80` under `%TEMP%/dpr`, by the main loop. RED: with `tools/check-spec-tokens.py`
+restored to base `14320c985`, which has no `--spec`, `bash tools/check-spec-tokens.test.sh` exited 1
+in 338 s with exactly the six PR1 arms failing (AC1, AC2 twice, AC3, AC4 twice) and every other arm
+passing. GREEN: at `6681cdc80` it exited 0 in 386 s, `PASS (236 assertions)`, above the floor of 231.

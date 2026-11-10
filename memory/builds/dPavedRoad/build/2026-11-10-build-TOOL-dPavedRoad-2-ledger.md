@@ -31,3 +31,12 @@ Owed at the close: the RED-first observation of the new arm in `tools/hooks/form
 - AC11 — `pr2-fixture.sh`: a commit whose subject holds ` · ` blocked with its derived `committed` line reading `PR2 a, b`, and pasting that line allowed.
 - AC12 — `pr2-fixture.sh`: a message passing every check left the stub's log empty, and `format-guard.js` allowed.
 - AC13 — the staged diff of `memory/guides/SESSION-KICKOFF.md` showed one removed and one added `last-audit:` line; the new sha equals `9116f5753`, HEAD at staging, and the new datetime is later than the old.
+
+## New arm, observed at the close
+
+In clones of `6681cdc80` under `%TEMP%/dpr`, by the main loop, `bash tools/hooks/format-guard.test.sh`.
+RED, break one: with `deriveOwedLines` staged to return no line, it exited 1 in 48 s, 140 passed and
+9 failed, every failure a PR2 arm (the derived agent, left-out agent and committed lines missing from
+the reason, and the stub never called). RED, break two: with the stop staged to derive on an allow,
+it exited 1 in 51 s, 147 passed and 2 failed, `PR2 an allowing stop spawns no handoff.py` among them.
+GREEN: at `6681cdc80` it exited 0 in 45 s, `PASS (149 assertions)`, the floor exactly.

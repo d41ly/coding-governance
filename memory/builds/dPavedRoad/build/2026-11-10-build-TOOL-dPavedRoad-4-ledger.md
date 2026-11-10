@@ -30,3 +30,15 @@ arms`, `spec tokens (a spec's own names resolve)`.
 - AC4 — neither run of AC3 named `ARCH-tPair-10/AC9` or `ARCH-tPair-9/AC8` or printed `check 23 HELD under --staged`, and each printed `memory-hygiene: check 23 graded 1 unit(s)` that a staged spec or journal record names.
 - AC5 — with nothing staged, `bash tools/memory-tree/check-memory-hygiene.sh` in full from this unit's tree and from a `git clone --shared` checked out at `ae6735c1` in `%TEMP%/pr4b`, each repository path replaced by one token, gave a `diff` that printed nothing; both named the one-way edges of specs 1 and 6, spec 8's missing Edges block, and `ARCH-tPair-3/AC2`, `ARCH-tPair-9/AC8`, `ARCH-tPair-9/AC9` and `ARCH-tPair-10/AC9`. The clone's FIRST run differed in one line only, check 26's `cache hits 0` against `cache hits 4`, a cold cache; its second run diffed empty.
 - AC6 — `grep -cF 'are JOINS and are HELD'` over `memory/TEMPLATE-SPEC.md` and `tools/memory-tree/SPEC-TEMPLATE.template.md`, and `grep -cF 'JOINS are held there'` over `memory/HYGIENE.md` and `tools/memory-tree/HYGIENE.template.md`, each printed 0; each section 4 replacement sentence counted 1 in each of the four; `grep -nF '23 and 26'` over `tools/memory-tree/check-memory-hygiene.sh` printed nothing.
+
+## New arm, observed at the close
+
+In clones of `6681cdc80` under `%TEMP%/dpr`, by the main loop,
+`bash tools/memory-tree/check-memory-hygiene.test.sh`. RED: with
+`tools/memory-tree/check-memory-hygiene.sh` restored to base `14320c985`, which holds both joins, it
+exited 1 in 2405 s with the ten section 4 arms failing (`--staged still holds the edge joins`,
+`--staged still holds check 23` and their siblings). GREEN: at `6681cdc80` every section 4 arm passed
+and the run exited 1 in 2409 s on two inherited failures, both also failing in the RED run with
+the base script: the conf example not declaring `OSTYPE`, which the engine read at base line 603
+already, and the scoped-run partition differing only in check 26's `cache hits` count on a cold
+clone, the same cold-cache line the pass saw.
