@@ -19871,7 +19871,9 @@ user_skills = "/tmp/gk-fake-skills"
                    # PLAY-dOrderedCharter-76 AC3: one plant reds each unit-line finding.
                    (["unit-lines"], 1, r"^docs: UNIT help/concepts/fx\.md:1 unit\.nowhere: names no gov unit$"),
                    (["unit-lines"], 1, r"^docs: UNLINKED help/tasks/fx\.md: a page under help/reference/, help/concepts/ or help/tasks/ with no unit line$"),
-                   (["unit-lines"], 1, r"^docs: UNPAGED unit-usage:unit\.fx: no page's unit line names it$")]
+                   (["unit-lines"], 1, r"^docs: UNPAGED unit-usage:unit\.fx: no page's unit line names it$"),
+                   # PLAY-dOrderedCharter-77 S17: `unit-usage` registered without `unit` is the refused state.
+                   (["unit-usage-alone"], 2, r"^docs: REFUSED · class unit-usage is registered and class unit is not, so no unit line can resolve$")]
 
     def _run_docs_case(case):
         return case, subprocess.run([sys.executable, str(HERE / "docs_leg.py"), "--fixture", "--plant", *case[0]],

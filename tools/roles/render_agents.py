@@ -432,19 +432,20 @@ def check_ranked_arms(state, roles):
     with tempfile.TemporaryDirectory() as tmp:
         root = pathlib.Path(tmp)
         kit, tool_root = build_fixture(root, {"r-one": roles["r-one"]})
+        pb_home = "playbook"   # the fixture's playbook home under its tool root, joined through this one name
         out = io.StringIO()
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
             run_mode("write", kit, tool_root, root)
         check_arm(state, 20, sum(lib.UNRANKED_NOTE.split(":")[0] in ln for ln in out.getvalue().splitlines()) == 1,
                   "no playbook kit printed no single unarmed line")
-        (tool_root / "playbook").mkdir()
-        (tool_root / "playbook" / "documents.toml").write_text("[[document]\n", encoding="utf-8")
+        (tool_root / pb_home).mkdir()
+        (tool_root / pb_home / "documents.toml").write_text("[[document]\n", encoding="utf-8")
         err = io.StringIO()
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
             rc = run_mode("write", kit, tool_root, root)
         check_arm(state, 20, rc == 2 and "documents.toml: the document registry does not read" in err.getvalue(),
                   "a registry that does not read exited %d without naming it: %s" % (rc, err.getvalue()))
-        (tool_root / "playbook" / "documents.toml").write_text(FIXTURE_REGISTRY, encoding="utf-8")
+        (tool_root / pb_home / "documents.toml").write_text(FIXTURE_REGISTRY, encoding="utf-8")
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             rc = run_mode("write", kit, tool_root, root)
         agent = (root / AGENTS_REL / "r-one.md").read_text(encoding="utf-8")

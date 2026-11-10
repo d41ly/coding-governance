@@ -79,11 +79,11 @@ out=$(run --check 2>&1); rc=$?
 # 13 — PLAY-dOrderedCharter-43: --card reaches the renderer's render and its check; the script holds no card logic
 mkrepo t13; run --source src.md --aliases claude --card >/dev/null 2>&1
 { [ "$(sed -n 1p "$R/CLAUDE.md")" = "@AGENTS.md" ] && sed -n 2p "$R/CLAUDE.md" | grep -q '^@\.claude/orientation' \
-  && [ "$(wc -l < "$R/CLAUDE.md")" = 2 ]; } && ok "13 --card render writes the card import line" || bad "13" "CLAUDE.md=$(cat "$R/CLAUDE.md")"
+  && [ "$(wc -l < "$R/CLAUDE.md")" = 2 ]; } && ok "13 --card render writes the card import line" || bad "13" "CLAUDE.md=$(<"$R/CLAUDE.md")"
 run --check --aliases claude --card >/dev/null 2>&1 && ok "13 --check --card passes the two-line pointer" || bad "13" "check --card red on its own render"
 printf '@AGENTS.md\n' > "$R/CLAUDE.md"
 out=$(run --check --aliases claude --card 2>&1); rc=$?
-{ [ "$rc" = 1 ] && echo "$out" | grep -q 'CLAUDE.md lacks the card import'; } && ok "13 --check --card reds a pointer without the card" || bad "13" "rc=$rc out=$out"
+{ [ "$rc" = 1 ] && [[ $out == *'CLAUDE.md lacks the card import'* ]]; } && ok "13 --check --card reds a pointer without the card" || bad "13" "rc=$rc out=$out"
 
 echo "==== $pass passed, $fail failed ===="
 [ "$fail" = 0 ]

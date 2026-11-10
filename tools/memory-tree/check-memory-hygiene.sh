@@ -3438,8 +3438,8 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
           lab = line
           sub(/^[ \t]*(-|\*)?[ \t]*(\*\*)?/, "", lab); sub(/[^A-Za-z0-9].*$/, "", lab)
           labs[++nlab] = lab
-          labt[nlab] = altoks(line)
-        } else if (nlab > 0 && line !~ /^[ \t]*$/) labt[nlab] = labt[nlab] altoks(line)
+          labx[nlab] = line
+        } else if (nlab > 0 && line !~ /^[ \t]*$/) { t = line; sub(/^[ \t]+/, "", t); labx[nlab] = labx[nlab] " " t }
       }
       close(f)
       if (hdr !~ / CLOSED /) next
@@ -3452,14 +3452,24 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
       labera = (lcut != "" && substr(base, 1, 10) >= lcut) ? 1 : 0
       tokera = (tcut != "" && substr(base, 1, 10) >= tcut) ? 1 : 0
       print "U\t" seq "\t" uid "\t" labera "\t" tokera
-      for (i = 1; i <= nlab; i++) print "L\t" seq "\t" uid "\t" labs[i] "\t" labt[i]
+      for (i = 1; i <= nlab; i++) print "L\t" seq "\t" uid "\t" labs[i] "\t" altoks(labx[i])   # S16: a bullet joined, a wrapped span one token
     }
-    function altoks(s,   r, t) {
+    # PLAY-dOrderedCharter-77 S16: read over a JOINED bullet, so a span is closed as Markdown closes it, by
+    # a run of as many backticks as opened it; an unclosed run is literal text. Per line, a double-backtick
+    # span paired wrong and the line end reset the error; joined, it would shift every later pair. A
+    # backtick inside a span becomes a space, so the backtick stays a safe separator.
+    function altoks(s,   r, t, n, rest, k) {
       r = ""
-      while (match(s, /`[^`]+`/)) {
-        t = substr(s, RSTART + 1, RLENGTH - 2)
-        r = r t "`"
-        s = substr(s, RSTART + RLENGTH)
+      while (match(s, /`+/)) {
+        n = RLENGTH; rest = substr(s, RSTART + n); s = rest; t = ""; k = 0
+        while (match(rest, /`+/)) {
+          if (RLENGTH == n) { k = 1; t = t substr(rest, 1, RSTART - 1); break }
+          t = t substr(rest, 1, RSTART + RLENGTH - 1); rest = substr(rest, RSTART + RLENGTH)
+        }
+        if (!k) continue
+        s = substr(rest, RSTART + n)
+        gsub(/`/, " ", t)
+        if (t != "") r = r t "`"
       }
       return r
     }')

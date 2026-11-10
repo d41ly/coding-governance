@@ -1062,7 +1062,7 @@ check_eq "AC4 node — an absent registry key is UNKNOWN: no registry" "node —
 # `now —` line, the file untouched; a missing card is written fresh under the replay's own name, node
 # cell resolved. The map is the clone's own `map` verb, found as the checker finds it.
 cp "$CARD_HOME/$NONCE-t1.md" "$TMP/t1.before"
-cwt_map=$(ROOT="$CWT" MC_DIR="$(dirname "$CHECK")" resolve_kit_file playbook instruction_units.py)
+cwt_map=$(ROOT="$CWT" MC_DIR="${CHECK%/*}" resolve_kit_file playbook instruction_units.py)
 run_card "AC5 --card --replay prints the stored card" "$CWT" 0 "orientation — $NONCE-t1 · written " --card --replay --session "$NONCE-t1"
 check_eq "AC5 replay = the instruction map, the stored bytes, then exactly one now — line" \
   "$("$MC_PY" "$cwt_map" map --root "$CWT" </dev/null | tr -d '\r'; cat "$TMP/t1.before"; printf 'now — HEAD %s · card-wt · dirty %s\n' "$wt_head" "$(git -C "$CWT" status --porcelain | wc -l | tr -d '[:space:]')")" "$(cat "$CARD_OUT")"
@@ -1085,7 +1085,7 @@ check_eq "AC5 the replay-written card is followed by one now — line" "1" "$(gr
 # beside the checker, and the lib dir their canonical lives in travels to nobody.
 CF_REL=.claude/orientation-card.md
 CF_SID="$NONCE-cf1"
-CF_PAYLOAD=$(printf '{"session_id":"%s","cwd":"%s","hook_event_name":"SessionStart"}' "$CF_SID" "$CWT2")
+printf -v CF_PAYLOAD '{"session_id":"%s","cwd":"%s","hook_event_name":"SessionStart"}' "$CF_SID" "$CWT2"
 check_card_file() {   # $1=name: the second worktree's file is the opener, the stored card's bytes, the closer
   { printf '[%s · Level 1 · %s]\n' "$CF_REL" "the build's card: where this session stands; level 0 outranks it"
     cat "$CARD_HOME/$CF_SID.md"; printf '[/%s]\n' "$CF_REL"; } > "$TMP/cf.want"
@@ -1217,7 +1217,7 @@ check_replay() {
   local n; n=$(printf '%s\n' "$3" | wc -l | tr -d '[:space:]')
   check_eq "$1: the map's lines come first" "$3" "$(head -n "$n" "$CARD_OUT")"
   check_eq "$1: then the stored card's bytes, then one now — line" \
-    "$(cat "$R/.git/orientation/$NONCE-$2.md")|1|now" \
+    "$(<"$R/.git/orientation/$NONCE-$2.md")|1|now" \
     "$(sed -n "$((n + 1)),\$p" "$CARD_OUT" | sed '$d')|$(grep -c '^now — ' "$CARD_OUT")|$(tail -1 "$CARD_OUT" | cut -c1-3)"
 }
 mkrepo mapnone
@@ -1249,9 +1249,9 @@ unset CARD_MAP_BOUND
 # one agent file, with a scratch cap below the agent list's bytes and then one above it. Staged red by
 # deleting the `derive_injected_breaches` call in `write_card`.
 mkrepo injcell
-ij_src=$(ROOT="$GOVROOT" MC_DIR="$(dirname "$CHECK")" resolve_kit_file playbook load_sets.py)
-mkdir -p "$R/playbook" "$R/.claude/agents"
-cp "$ij_src" "$R/playbook/load_sets.py" \
+ij_src=$(ROOT="$GOVROOT" MC_DIR="${CHECK%/*}" resolve_kit_file playbook load_sets.py); ij_kit=playbook
+mkdir -p "$R/$ij_kit" "$R/.claude/agents"
+cp "$ij_src" "$R/$ij_kit/load_sets.py" \
   || { echo "FAIL injected cell: no load_sets.py resolves from $GOVROOT"; fail=$((fail+1)); }
 printf -- '---\nname: a\ndescription: An agent that does one thing well.\n---\nbody\n' > "$R/.claude/agents/a.md"
 commit_all "$R" "the load-set module and one agent file"
@@ -1267,9 +1267,9 @@ check_eq "injected cell: no breach line under the cap" "0" "$(grep -c '^injected
 # line at exit 0. Staged red by moving the `derive_memory_line` call after `derive_claims_line`.
 mkrepo memnone
 run_card "memory cell: no playbook module is a skipped: line at exit 0" "$R" 0 "memory — skipped: no playbook memory_index.py resolves in this tree" --card --write --session "$NONCE-t80a"
-mkrepo memcell; mm_home="$TMP/memhome"; mkdir -p "$R/playbook" "$mm_home"
-mm_src=$(ROOT="$GOVROOT" MC_DIR="$(dirname "$CHECK")" resolve_kit_file playbook memory_index.py)
-{ cp "$mm_src" "$R/playbook/memory_index.py" && cp "$(dirname "$mm_src")/policy_value.py" "$R/playbook/policy_value.py"; } \
+mkrepo memcell; mm_home="$TMP/memhome"; mm_kit=playbook; mkdir -p "$R/$mm_kit" "$mm_home"
+mm_src=$(ROOT="$GOVROOT" MC_DIR="${CHECK%/*}" resolve_kit_file playbook memory_index.py)
+{ cp "$mm_src" "$R/$mm_kit/memory_index.py" && cp "${mm_src%/*}/policy_value.py" "$R/$mm_kit/policy_value.py"; } \
   || { echo "FAIL memory cell: no memory_index.py resolves from $GOVROOT"; fail=$((fail+1)); }
 commit_all "$R" "the index measure and its policy reader"
 mm_dir=$("$MC_PY" -c 'import pathlib, sys; sys.path.insert(0, sys.argv[1]); import memory_index as m; print(m.derive_index_dir(sys.argv[2], sys.argv[3]).as_posix())' "$R/playbook" "$R" "$mm_home" | tr -d '\r')
@@ -1281,7 +1281,7 @@ check_eq "memory cell: one line, which reached the index and read its budget" "1
 check_eq "memory cell: sits after live — and before claims —" "live memory claims" \
   "$(grep -oE '^(live|memory|claims) — ' "$R/.git/orientation/$NONCE-t80b.md" | cut -d' ' -f1 | tr '\n' ' ' | sed 's/ $//')"
 HOME="$TMP/memempty" run_card "memory cell: no memory directory is a skipped: line at exit 0" "$R" 0 "memory — skipped: no auto-memory index at" --card --write --session "$NONCE-t80c"
-printf 'import time\ntime.sleep(5)\n' > "$R/playbook/memory_index.py"
+printf 'import time\ntime.sleep(5)\n' > "$R/$mm_kit/memory_index.py"
 export CARD_MEMORY_BOUND=1
 run_card "memory cell: a measure past the bound is a skipped: line at exit 0" "$R" 0 "memory — skipped: the measure did not answer within 1s" --card --write --session "$NONCE-t80d"
 unset CARD_MEMORY_BOUND

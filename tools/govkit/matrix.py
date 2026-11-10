@@ -816,9 +816,9 @@ def main() -> int:
         pdesc = govkit.load_toml(ROOT / PFX / KIT_NAMES["govkit"] / "entries" / "playbook.kit.toml")
         # A placeholder whose declared default is a `- ` bullet fills a one-line region the render
         # grades (aDistilledCharter), so its stub takes the default's shape: derived, not listed.
-        ans = {r["key"].lower(): ("- stated for the scratch install"
+        ans = {r["key"].lower(): ("- stated"
                                   if str(r.get("default", "")).startswith("- ")
-                                  else "stated for the scratch install")
+                                  else "stated")
                for r in pdesc.get("placeholder", [])}
         ans["playbook_path"] = "docs/PARALLEL.md"
         (g / ".governance").mkdir(exist_ok=True)

@@ -200,7 +200,7 @@ def derive_row_canon(schema, row) -> str:
     normaliser's whitespace rule, the edge and patch keys and the derived ones left out."""
     def derive_folded_value(value, shape):
         if isinstance(value, str):
-            return pins.fold_text(value)
+            return pins.derive_folded_text(value)
         if isinstance(value, list):
             got = [derive_folded_value(v, None) for v in value]
             return sorted(got, key=json.dumps) if shape == "set" else got

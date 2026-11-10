@@ -186,9 +186,23 @@ case " $* " in
 esac
 "$PY_BIN" "$HERE/render_playbook.py" "$@" || exit $?
 
+# THE SIBLING KITS EACH PLANT BLOCK REACHES (PLAY-dOrderedCharter-77 S11). A block's arms reach a kit this
+# one does not carry: the layer and tag blocks `memory-tree`, the edge block `roles`, the load-set block
+# `roles` and `policy`. Where one does not resolve, as at a `playbook-render` install without it, the
+# block prints `UNARMED — the <block> plants: no <home> kit in this install` and runs none of its arms;
+# at gov every kit resolves and every arm runs. What this does not check: a block whose arms reach a kit
+# only on some plants is unarmed whole where that kit is absent.
+# check_sibling_kit <home> <anchor>: 0 where this kit's own policy_value.resolve_kit_dir finds the kit.
+check_sibling_kit() {
+  "$PY_BIN" -I -c 'import sys; sys.path.insert(0, sys.argv[1]); from policy_value import resolve_kit_dir
+resolve_kit_dir(sys.argv[2], sys.argv[3], sys.argv[1])' "$HERE" "$1" "$2" >/dev/null 2>&1
+}
+
 # THE LAYER CHECK'S ARMS (PLAY-dOrderedCharter-16 S9). Each row plants one case into the check's own
 # scratch tree, `<plant>|<exit>|<a line it must print>`; the exit and the named line are asserted
 # together, so a check turned into a printer reds here. `none` is the control, green with no edge.
+_uk=; check_sibling_kit memory-tree import_walk.py || _uk=memory-tree
+if [ -n "$_uk" ]; then echo "UNARMED — the layer check's plants: no $_uk kit in this install"; else
 _lf=0
 while IFS='|' read -r _lp _lrc _lwant; do
   [ -n "$_lp" ] || continue
@@ -224,6 +238,7 @@ unparsable|2|layers: UNREADABLE tools/corekit/core.py (SyntaxError
 PLANTS
 if [ "$_lf" != 0 ]; then echo "FAIL — $_lf layer-check arm(s) failed"; exit 1; fi
 echo "PASS — the layer check's plants"
+fi
 
 # THE TAG RESOLVER'S ARMS (PLAY-dOrderedCharter-19 S13, S14). Each row runs `gov_tag.py --fixture` over one
 # plant in its own scratch repository, `<plant and --set flags>|<exit>|<a line it must print>|<a line it
@@ -261,6 +276,8 @@ run_plant_rows() {
     esac
   done
 }
+_uk=; check_sibling_kit memory-tree tree_lib.py || _uk=memory-tree
+if [ -n "$_uk" ]; then echo "UNARMED — the tag resolver's plants: no $_uk kit in this install"; else
 _tk="--set tags.bare-refs=charter-only --set tags.retired-cites=refuse-new"
 _tf=0
 run_plant_rows tags "$HERE/gov_tag.py" <<PLANTS
@@ -340,6 +357,7 @@ reference-no-h1 $_tk|1|/references.toml) lacks h1
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf tag-resolver arm(s) failed"; exit 1; fi
 echo "PASS — the tag resolver's plants"
+fi
 
 # THE EDGE GRAMMAR'S ARMS (PLAY-dOrderedCharter-24 §4). Each row runs `edge_grammar.py --fixture` over one
 # plant, the same row shape as the tag resolver's: the two-line block and a fenced line green, each
@@ -348,6 +366,8 @@ echo "PASS — the tag resolver's plants"
 # PLAY-dOrderedCharter-28's §4 plants: the one-writer type, the pin reds, and each address form resolved
 # over a scratch repository whose unit and clause texts moved under a second commit, beside the malformed
 # section, block and note refs segment.
+_uk=; check_sibling_kit roles roles_lib.py || _uk=roles
+if [ -n "$_uk" ]; then echo "UNARMED — the edge grammar's plants: no $_uk kit in this install"; else
 _tf=0
 run_plant_rows edges "$HERE/edge_grammar.py" <<'PLANTS'
 good-block|0|edges: site.md:6 · tests · kit.y, kit.z
@@ -391,6 +411,7 @@ bad-note-refs|1|site.py:1: `# gov:note layer.memory — x → y refs=a b` refs s
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf edge-grammar arm(s) failed"; exit 1; fi
 echo "PASS — the edge grammar's plants"
+fi
 
 # THE LOAD SETS' ARMS (PLAY-dOrderedCharter-11, its New arm line). Each row runs `load_sets.py --fixture` over one plant in
 # its own scratch repository, the same row shape: a unit required by the builder and scoped only to the
@@ -402,6 +423,9 @@ echo "PASS — the edge grammar's plants"
 # refused under `refuse`. PLAY-dOrderedCharter-27's rows: every role's set lists its `code` slot, a stand-in
 # budget prices it, a malformed one and a committed value the catalogue row refuses each refuse naming
 # `memory.code-budget`, the derivation and the measure alike, and a code block one byte over the budget warns or refuses while one at it is quiet.
+_uk=; check_sibling_kit roles check_roles.py || _uk=roles
+check_sibling_kit policy budgets.py || _uk=${_uk:-policy}
+if [ -n "$_uk" ]; then echo "UNARMED — the load sets' plants: no $_uk kit in this install"; else
 _tf=0
 run_plant_rows load-sets "$HERE/load_sets.py" <<'PLANTS'
 required-away --checks refuse|1|handoff: no prompt file written
@@ -427,3 +451,4 @@ code-at --budgets-enforce refuse|0|bytes of|BUDGET
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf load-set arm(s) failed"; exit 1; fi
 echo "PASS — the load sets' plants"
+fi

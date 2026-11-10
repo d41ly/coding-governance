@@ -113,7 +113,7 @@ An install with no policy kit renders the `explicit-override` sentence and print
 committed value goes unread until you install that kit. A value the policy reader refuses stops the
 render, naming the key.
 
-An override taken is a record in the build's `build/` folder, written by the memory-tree kit:
+An override taken is a record in the build's `build/` folder, written by the memory-tree kit: <!-- usage: script:tools/memory-tree/build_records.py#new f857b30a -->
 
 <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries a placeholder the shell reads as a redirect -->
 ```bash
@@ -131,7 +131,7 @@ agent file, and a lower level wins. The playbook kit's `documents.toml` register
 level and a one-line direction, and each document carries that as its envelope: an opener line
 `[<path> · Level <n> · <direction>]` after any front matter, and a closer `[/<path>]` at its end. The
 charter render and the role agent render write it from the registry; every other document carries the
-two lines in its source. Ask what is registered, then check every document against it:
+two lines in its source. Ask what is registered, then check every document against it: <!-- usage: script:tools/playbook/instruction_units.py#envelopes c6453a7f -->
 
 <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```bash
@@ -174,7 +174,7 @@ does, the render writes one line per row of the kits your `.governance/deploy.to
 nothing, and a selection with no rows renders no section. A subagent's handoff carries its own role's
 lines under `### Drive`, so it holds the line the main session does.
 
-Read your own rows, each with its kit, then check them against the rendered charter:
+Read your own rows, each with its kit, then check them against the rendered charter: <!-- usage: script:tools/playbook/instruction_units.py#drive eff33d3e -->
 
 <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```bash

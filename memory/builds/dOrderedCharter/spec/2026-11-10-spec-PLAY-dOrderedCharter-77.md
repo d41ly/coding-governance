@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-77 — the close bar's own product reds, each leg left green by the narrowest fix that leg demands
 
-**Status:** DEFERRED · rev-2 · 2026-11-10 · node a · Tier-2 · base 51cd8b402 · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
+**Status:** CLOSED · rev-2 · 2026-11-10 · node a · Tier-2 · base 51cd8b402 · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-10-build-PLAY-dOrderedCharter-77-deviation-771.md](../build/2026-11-10-build-PLAY-dOrderedCharter-77-deviation-771.md) | deviation | — |
+| [2026-11-10-build-PLAY-dOrderedCharter-77-deviation-772.md](../build/2026-11-10-build-PLAY-dOrderedCharter-77-deviation-772.md) | deviation | — |
+| [2026-11-10-build-PLAY-dOrderedCharter-77-ledger.md](../build/2026-11-10-build-PLAY-dOrderedCharter-77-ledger.md) | journal | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-77-1-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-1-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-77-2-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-2-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-77-3-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-77-3-spec-writer.md) | journal | — |

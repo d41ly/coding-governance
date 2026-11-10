@@ -1765,11 +1765,6 @@
     {
       "id": "ask",
       "kind": "function",
-      "file": "skills/session-kickoff/card-compaction.fixture.sh"
-    },
-    {
-      "id": "ask",
-      "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
     {
@@ -7128,6 +7123,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "check_sibling_kit",
+      "kind": "function",
+      "file": "tools/playbook/adopt-playbook.sh"
+    },
+    {
       "id": "check_signature_shape",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -9353,6 +9353,11 @@
       "file": "tools/playbook/tag_bundle.py"
     },
     {
+      "id": "derive_folded_text",
+      "kind": "function",
+      "file": "tools/playbook/pins.py"
+    },
+    {
       "id": "derive_folds",
       "kind": "function",
       "file": "tools/playbook/tag_bundle.py"
@@ -10868,6 +10873,11 @@
       "file": "tools/playbook/check_layers.py"
     },
     {
+      "id": "derive_stripped_text",
+      "kind": "function",
+      "file": "tools/playbook/pins.py"
+    },
+    {
       "id": "derive_successors",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -12056,11 +12066,6 @@
       "id": "fnmatchcase_path",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
-    },
-    {
-      "id": "fold_text",
-      "kind": "function",
-      "file": "tools/playbook/pins.py"
     },
     {
       "id": "foreign_kit_present",
@@ -24953,6 +24958,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "run_claude",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-compaction.fixture.sh"
+    },
+    {
       "id": "run_clean_hook",
       "kind": "function",
       "file": "tools/process-monitor/adopt-process-monitor.test.sh"
@@ -28451,11 +28461,6 @@
       "id": "step",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
-    },
-    {
-      "id": "strip_text",
-      "kind": "function",
-      "file": "tools/playbook/pins.py"
     },
     {
       "id": "structure_identity",

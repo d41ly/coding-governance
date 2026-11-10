@@ -192,6 +192,22 @@ for _n in 2 3; do
     *) bad "DGR84 ...the HEAD: operand on line $_n passed unnamed" ;; esac
 done
 
+# ==================== PLAY-dOrderedCharter-77 S3 — rule 3's operand splits on `[` too ============
+# A tracked template's Skill envelope opens `[` ahead of the Skill dir, which is no path segment, so it
+# counts nothing; a `[` ahead of a literal directory and a kit still counts. Staged red by taking `[`
+# back out of the split.
+E="$TMP/envelope"; build_source_fixture "$E" 'A qdemo kit.'
+{
+  printf '%s\n' '[.claude/skills/qdemo/SKILL.md · Level 4 · x]'
+  printf '%s\n' '[x/qdemo/a.py'
+} > "$E/${PFX}qdemo/SKILL.template.md"
+git -C "$E" add -A >/dev/null 2>&1
+read_gate "$E"; _ec=$?
+if [ "$_ec" = 1 ] && [[ $LAST_OUT != *"  ${PFX}qdemo/SKILL.template.md:1  "* ]]; then good "DOC77 a Skill envelope opened by [ counts nothing"
+else bad "DOC77 a Skill envelope opened by [ counted, or the gate exited $_ec, wanted 1"; fi
+case "$LAST_OUT" in *"  ${PFX}qdemo/SKILL.template.md:2  qdemo"*) good "DOC77 ...and a [ ahead of a literal directory and a kit still counts" ;;
+  *) bad "DOC77 ...the [-led literal directory on line 2 passed unnamed" ;; esac
+
 # ==================== the POPULATION is every tracked file, shipped or not =====================
 P1="$TMP/population"; build_source_fixture "$P1" 'A qdemo kit.'
 mkdir -p "$P1/${PFX}notes"

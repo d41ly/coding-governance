@@ -63,7 +63,7 @@ block, one `- [<name>] <reach>` line per practice that reaches that step. A buil
 
 The active practices are the policy key `charter.practices`, the foundation set when unset. A step of
 `none`, a step no active practice reaches, or an install with no playbook kit renders no block.
-`python <prefix>/playbook/load_sets.py derive --reader role.<name>` lists the units as
+`python <prefix>/playbook/load_sets.py derive --reader role.<name>` lists the units as <!-- usage: script:tools/playbook/load_sets.py#derive c95f3b73 -->
 `practice.<name>.<step>`.
 
 ## The code input every role carries

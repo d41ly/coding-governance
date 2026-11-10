@@ -898,6 +898,15 @@ ledspec 144 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observe
 #       `form` does not reach the spec side at all, so this one needs no head token.
 ledspec 146 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed at length
   by `alpha.sh`, which is named only here.'
+# 147 — PLAY-dOrderedCharter-77 S16: the CRITERION's backticked command opens on its head line and closes
+#       on its wrap, and its answer names the path it closes on. Read per line, the closing backtick
+#       paired with the next span's opener and the criterion shared nothing with its answer: red.
+#       Joined, the command is one token holding the path: silent. 148 is its control, an answer
+#       sharing nothing, red either way.
+ledspec 147 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — when `bash alpha.sh
+  --list etc/beta.toml` runs, `gamma` prints nothing.'
+ledspec 148 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — when `bash alpha.sh
+  --list etc/beta.toml` runs, `gamma` prints nothing.'
 
 # ---- TOOL-aJoinedCanon-8: the four §3 EDGE arms. SPEC_EDGES_CUTOFF is 2026-08-20 in the shared
 # ---- conf. These are Tier-2 by construction: the arm sits BELOW the `hdr ~ /Tier-1/ next` cut,
@@ -1024,6 +1033,18 @@ write_rows_spec 182 10 '- security
 - AC1 — `alpha.sh` — observed.
 '
 } > "$D/build/2026-08-20-build-ARCH-tFixture-140-1-ledger.md"
+# PLAY-dOrderedCharter-77 S16: 147's answer names the path its criterion's wrapped command closes on; 148's
+# names nothing the criterion holds.
+printf '# ledger three
+
+**Serves:** journal ARCH-tFixture-147 ARCH-tFixture-148
+
+**Evidences:** ARCH-tFixture-147
+- AC1 — `etc/beta.toml` — observed.
+
+**Evidences:** ARCH-tFixture-148
+- AC1 — `zulu.py` — observed.
+' > "$D/build/2026-08-20-build-ARCH-tFixture-147-1-ledger.md"
 # CHECK 22's FIXTURES SIT ABOVE THE COMMIT, and that is load-bearing rather than tidy: the hygiene
 # engine selects its population with `git ls-files`, so a fixture written after this commit is
 # UNTRACKED and invisible to it. Written below, all six were ignored, check 22 graded nothing, and
@@ -1302,6 +1323,8 @@ hit  'ARCH-tFixture-142/AC1'                   # labels agree, content shares no
 miss 'ARCH-tFixture-143/AC1'                   # the shared token is on the answer continuation line
 hit  'ARCH-tFixture-144/AC1'                   # ...and deleting that continuation token reds it
 miss 'ARCH-tFixture-146/AC1'                   # the CRITERION names its token in its own wrap
+miss 'ARCH-tFixture-147/AC1'                   # a wrapped span is one token, joined (PLAY-dOrderedCharter-77 S16)
+hit  'ARCH-tFixture-148/AC1'                   # ...and its control, sharing nothing, still reds
 
 # ---- TOOL-aJoinedCanon-8: the four §3 edge arms and the three `fail 12` branches the joins add.
 hit  'tFixture-160.md (§3 carries no `### Edges` block'

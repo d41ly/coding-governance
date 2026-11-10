@@ -180,13 +180,13 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY
 | [PLAY-dOrderedCharter-40 — gov's first instruction unit rows, one per reference page, and the pages' registry tags declared](spec/2026-10-24-spec-PLAY-dOrderedCharter-40.md) | 37 | 2 | CLOSED | rev-5 | 2026-11-10 |
 | [PLAY-dOrderedCharter-75 — the selects join arms per namespace, so gov's first unit rows leave the tags leg green](spec/2026-11-10-spec-PLAY-dOrderedCharter-75.md) | 37 | 2 | CLOSED | rev-2 | 2026-11-10 |
 | [PLAY-dOrderedCharter-76 — the units reference page, each page's unit line and its check, the unit-usage class, and the reds PLAY-dOrderedCharter-37's pass left](spec/2026-11-10-spec-PLAY-dOrderedCharter-76.md) | 37 | 2 | CLOSED | rev-1 | 2026-11-10 |
-| [PLAY-dOrderedCharter-77 — the close bar's own product reds, each leg left green by the narrowest fix that leg demands](spec/2026-11-10-spec-PLAY-dOrderedCharter-77.md) | 37 | 2 | DEFERRED | rev-2 | 2026-11-10 |
+| [PLAY-dOrderedCharter-77 — the close bar's own product reds, each leg left green by the narrowest fix that leg demands](spec/2026-11-10-spec-PLAY-dOrderedCharter-77.md) | 37 | 2 | CLOSED | rev-2 | 2026-11-10 |
 | [PLAY-dOrderedCharter-49 — the round-1 spec audit's 73 minors: criteria that can pass, rows a new leg owes, one reader per fact, and seams in build order](spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md) | 39 | 2 | DEFERRED | rev-7 | 2026-11-09 |
 | [PLAY-dOrderedCharter-54 — the card file's owner is live only while its transcript moves, and a dead owner's card is taken over](spec/2026-10-24-spec-PLAY-dOrderedCharter-54.md) | 40 | 2 | DEFERRED | rev-2 | 2026-11-08 |
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-6 | 2026-11-08 |
 <!-- /gen:build-units -->
 
-Records: 565 bound to this build, across 4 record folder(s).
+Records: 568 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

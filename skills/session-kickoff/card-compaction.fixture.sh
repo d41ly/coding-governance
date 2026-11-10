@@ -46,23 +46,23 @@ write_card() {   # $1=tree $2=nonce: the card file in its level-1 envelope, as t
   && write_card "$P" "$NP" && write_card "$W" "$NW"; } >/dev/null 2>&1 \
   || { echo "card-compaction: the fixture repository under $D could not be built"; exit 2; }
 
-ask() {   # $1=tree, the rest claude's arguments: its stdout, bounded; never fails the script
+run_claude() {   # $1=tree, the rest claude's arguments: its stdout, bounded; never fails the script
   (cd "$1" && timeout -k 5 "$BOUND" claude "${@:2}" </dev/null 2>/dev/null) || true
 }
 re_sid='"session_id"[[:space:]]*:[[:space:]]*"([^"]*)"'
-out=$(ask "$P" -p "Run \`cd $W\` with the Bash tool, then reply with the single word moved." \
+out=$(run_claude "$P" -p "Run \`cd $W\` with the Bash tool, then reply with the single word moved." \
   --allowedTools Bash --add-dir "$W" --output-format json)
 [[ $out =~ $re_sid ]] || { echo "card-compaction: FAILED limb A1 — session A printed no session_id: ${out:0:200}"; exit 1; }
 SID=${BASH_REMATCH[1]}
-ask "$P" -p --resume "$SID" --add-dir "$W" "/compact" >/dev/null
-answer=$(ask "$P" -p --resume "$SID" --add-dir "$W" \
+run_claude "$P" -p --resume "$SID" --add-dir "$W" "/compact" >/dev/null
+answer=$(run_claude "$P" -p --resume "$SID" --add-dir "$W" \
   "Which nonce does the orientation card file loaded in your instructions carry? Reply with that nonce alone.")
 case "$answer" in
   *"$NP"*) echo "card-compaction: FAILED limb A — session A names the primary's nonce $NP: ${answer:0:200}"; exit 1 ;;
   *"$NW"*) ;;
   *) echo "card-compaction: FAILED limb A — session A names neither $NW nor $NP: ${answer:0:200}"; exit 1 ;;
 esac
-okb=$(ask "$B" -p "Reply with the single word ok.")
+okb=$(run_claude "$B" -p "Reply with the single word ok.")
 case "$okb" in
   *ok*|*OK*|*Ok*) ;;
   *) echo "card-compaction: FAILED limb B — the session in a tree with no card file did not print ok: ${okb:0:200}"; exit 1 ;;

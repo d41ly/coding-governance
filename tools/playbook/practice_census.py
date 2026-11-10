@@ -57,13 +57,16 @@ def read_census_tree(root) -> dict:
     the registry's exempt legs, exempt paths, each entry's home and claims, the tracked paths and the short
     names the roles' `rules:` lines cite."""
     import core
+    from policy_value import resolve_kit_dir
+    from render_playbook import resolve_declaration_paths
     from tag_index import resolve_prefix_token
     root, prefix = pathlib.Path(root), iu.derive_kit_prefix()
     try:
         cat = tomllib.loads((root / prefix / KIT_DIR.name / "practices.toml").read_text(encoding="utf-8"))
-        reg = tomllib.loads((root / prefix / "govkit" / "registry.toml").read_text(encoding="utf-8"))
+        reg = tomllib.loads(resolve_declaration_paths(KIT_DIR, root)[1].read_text(encoding="utf-8"))
         legs = core.read_legs(root, prefix) or []
-    except (OSError, tomllib.TOMLDecodeError, core.CoreRefused) as exc:
+        agents = resolve_kit_dir("roles", "check_roles.py", KIT_DIR) / "agents"
+    except (OSError, LookupError, tomllib.TOMLDecodeError, core.CoreRefused) as exc:
         raise CensusRefused(f"an input is unreadable: {exc}") from None
     homes, claims = {}, {}
     for entry in reg.get("entry") or []:
@@ -79,7 +82,7 @@ def read_census_tree(root) -> dict:
             for spelled in rule.get("claims") or []:
                 claims[resolve_prefix_token(spelled, prefix)] = entry["id"]
     cited = set()
-    for agent in sorted((root / prefix / "roles" / "agents").glob("*.agent.md")):
+    for agent in sorted(agents.glob("*.agent.md")):
         m = re.search(r"^rules:[ \t]*(.*)$", agent.read_text(encoding="utf-8"), re.M)
         cited |= {n.strip().rstrip("?") for n in (m.group(1).split(",") if m else []) if n.strip()}
     return {"rows": [r for r in cat.get("practice") or [] if isinstance(r, dict)],
@@ -150,13 +153,13 @@ def render_census(rulings, tree) -> list:
 
 #: Each plant's one-row tree: `(row, in foundation, paths it tracks, legs, exempt legs)`, and what it expects.
 PLANTS = {
-    "gov-only": (({"tag": "practice.fx", "line": "Keep `tools/gov-only.txt` current."}, True,
-                  {"tools/gov-only.txt"}, [], set()), (GOV_ONLY, MOVES)),
+    "gov-only": (({"tag": "practice.fx", "line": "Keep `fx/gov-only.txt` current."}, True,
+                  {"fx/gov-only.txt"}, [], set()), (GOV_ONLY, MOVES)),
     "no-evidence": (({"tag": "practice.fx", "line": "Say it plainly."}, True, set(), [], set()), (SHIP, None)),
     "row-kept": (({"tag": "practice.fx", "rules": ["one"], "line": "Say it plainly."}, True, set(),
                   [("fixture leg", ["practice.fx.one"])], {"fixture leg"}), (GOV_ONLY, ROW_KEPT)),
-    "outside-foundation": (({"tag": "practice.fx", "line": "Keep `tools/gov-only.txt` current."}, False,
-                            {"tools/gov-only.txt"}, [], set()), (GOV_ONLY, STAYS)),
+    "outside-foundation": (({"tag": "practice.fx", "line": "Keep `fx/gov-only.txt` current."}, False,
+                            {"fx/gov-only.txt"}, [], set()), (GOV_ONLY, STAYS)),
 }
 
 

@@ -65,14 +65,14 @@ ROLE = "unit"
 
 # ------------------------------------------------------------------------------------------ the mark
 
-def fold_text(text) -> str:
+def derive_folded_text(text) -> str:
     """The pin normaliser's whitespace rule: each whitespace run one space, the ends stripped."""
     return re.sub(r"\s+", " ", text or "").strip()
 
 
-def strip_text(text) -> str:
+def derive_stripped_text(text) -> str:
     """The punctuation class's transform: every character outside letters, digits and spaces removed."""
-    return fold_text("".join(ch for ch in fold_text(text) if ch.isalnum() or ch == " "))
+    return derive_folded_text("".join(ch for ch in derive_folded_text(text) if ch.isalnum() or ch == " "))
 
 
 def derive_change_mark(before, after, spelling, ruling) -> str:
@@ -80,16 +80,16 @@ def derive_change_mark(before, after, spelling, ruling) -> str:
     `before`, or where an admitted owner's `ruling` says so; `semantic` otherwise."""
     if ruling:
         return "editorial"
-    b, a = fold_text(before), fold_text(after)
-    if b == a or strip_text(b) == strip_text(a):
+    b, a = derive_folded_text(before), derive_folded_text(after)
+    if b == a or derive_stripped_text(b) == derive_stripped_text(a):
         return "editorial"
     respelled = re.sub(r"\w+", lambda m: (spelling or {}).get(m[0], m[0]), b)
-    return "editorial" if strip_text(respelled) == strip_text(a) else "semantic"
+    return "editorial" if derive_stripped_text(respelled) == derive_stripped_text(a) else "semantic"
 
 
 def derive_first_difference(before, after) -> str:
     """The first word at which the two texts, punctuation stripped, differ: `before`'s, else `after`'s."""
-    b, a = strip_text(before).split(), strip_text(after).split()
+    b, a = derive_stripped_text(before).split(), derive_stripped_text(after).split()
     for x, y in zip(b, a):
         if x != y:
             return x
@@ -448,7 +448,7 @@ def arm_spelling(c):
     report, rc = run_fx_drift(c)
     c.check("an undeclared respelling marked editorial exits 1", rc == 1 and "`colour`" in "\n".join(report["reds"]),
             f"{rc} {report}")
-    c.write_file(f"tools/playbook/{SPELLING_MAP}", '[[spelling]]\nfrom = "colour"\nto = "color"\n')
+    c.write_file(iu.derive_kit_rel(SPELLING_MAP), '[[spelling]]\nfrom = "colour"\nto = "color"\n')
     iu.run_commit(c.top, "the spelling row")
     report, rc = run_fx_drift(c)
     c.check("a declared respelling marked editorial exits 0", rc == 0 and not report["reds"], f"{rc} {report}")

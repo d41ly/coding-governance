@@ -136,7 +136,7 @@ shell-hygiene selftest	0.9	2	a	2026-09-24	runner
 spec tokens (a spec's own names resolve)	465.2	1	a	2026-10-28	taken by the main loop, the leg alone at ce91bfc2 on node a, rc 0, its packet join over 1 live chain run, real 465.2s; host free at its start but for an idle run-gates.sh orphan from Oct 23 and an idle python one-off from Oct 26, and a foreign spec-tokens of dSafePassage's dispatch overlapped its last ~20 s; killed at its 390 s ceiling under the close's bar at 10ab2148 in the pool, the pool's tail and its serial retry, and 512 s beside routed commits at ec8ad036
 spec-tokens self-test	156.8	1	a	2026-09-24	runner
 step-gate	4.4	1	d	2026-10-26	step_gate.py --base HEAD timed by bash time over a scratch clone of the branch carrying a source receipt, 4.4s wall, build pass of TOOL-dSafePassage-10
-tags (the resolver's checks)	35.5	1	d	2026-11-03	gov_tag.py check on the worktree at 20cb62fa with the pass staged and the index deleted first, a cold build of 10303 blobs, timed by bash time, 35.5s wall, build pass of PLAY-dOrderedCharter-19
+tags (the resolver's checks)	210.0	1	a	2026-11-10	gov_tag.py check run alone over the tree at de36424bf by the main loop at the dOrderedCharter close, 210s wall, recorded by PLAY-dOrderedCharter-77 S15
 template size <=48KiB	5.1	1	a	2026-09-06	runner
 template size gate selftest	74.8	2	a	2026-09-24	runner
 testsuite counts (every bar self-test prints one)	26.4	1	a	2026-09-06	runner

@@ -121,6 +121,34 @@ entry = "{prefix}/playbook/adopt-playbook.sh"
 flags = ["--target=", "--check", "--selftest"]
 
 [[usage]]
+id = "script:{prefix}/memory-tree/build_records.py#new"
+shape = "verb"
+entry = "{prefix}/memory-tree/build_records.py"
+verb = "new"
+flags = ["--build=", "--unit=", "--root=", "--principle=", "--excuses=", "--reason=", "--expires=", "--tag=", "--action=", "--mark=", "--before=", "--after=", "--successor=", "--promoted-from=", "--rule=", "--words=", "--session="]
+
+[[usage]]
+id = "script:{prefix}/playbook/instruction_units.py#envelopes"
+shape = "verb"
+entry = "{prefix}/playbook/instruction_units.py"
+verb = "envelopes"
+flags = ["--list", "--check", "--root="]
+
+[[usage]]
+id = "script:{prefix}/playbook/instruction_units.py#drive"
+shape = "verb"
+entry = "{prefix}/playbook/instruction_units.py"
+verb = "drive"
+flags = ["--list", "--check", "--root=", "--charter="]
+
+[[usage]]
+id = "script:{prefix}/playbook/load_sets.py#derive"
+shape = "verb"
+entry = "{prefix}/playbook/load_sets.py"
+verb = "derive"
+flags = ["--root=", "--reader=", "--item=", "--units=", "--feature=", "--code-budget="]
+
+[[usage]]
 id = "script:{prefix}/playbook/gov_tag.py#show"
 shape = "verb"
 entry = "{prefix}/playbook/gov_tag.py"

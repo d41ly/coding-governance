@@ -221,13 +221,13 @@ expect_out "A2p a pinned subject refuses under warn, naming budgets.pinned" \
 # `codex-instructions` homes CODEX_MAX in, this repository's charter, a limits file with no AGENTS.md row
 # and a committed policy file setting the cap. The gate is the scratch copy, run by its own path, so the
 # limit is the scratch policy kit's answer; at 40960 it refuses naming CODEX_MAX, at 20480 it passes.
-S2="$TMP/charter-cap"
-_hl=$(awk '/^name = "codex-instructions"/{f=1} f && /^home = /{print; exit}' "${PFX}policy/caps.toml")
+S2="$TMP/charter-cap"; _pk=${PFX}policy   # the policy kit's home, joined through this one variable
+_hl=$(awk '/^name = "codex-instructions"/{f=1} f && /^home = /{print; exit}' "$_pk/caps.toml")
 _hp=${_hl#*constant:}; _hp=${_hp%:CODEX_MAX\"}; _hp=${_hp/\{prefix\}\//$PFX}
 build_cap_repo() {
   rm -rf "$S2"
-  mkdir -p "$S2/${PFX}policy" "$S2/$(dirname "$_hp")" "$S2/.governance" || exit 2
-  cp -R "${PFX}policy/." "$S2/${PFX}policy/" && tr -d '\r' < "$GATE" > "$S2/$GATE" && cp "$_hp" "$S2/$_hp" \
+  mkdir -p "$S2/$_pk" "$S2/${_hp%/*}" "$S2/.governance" || exit 2
+  cp -R "$_pk/." "$S2/$_pk/" && tr -d '\r' < "$GATE" > "$S2/$GATE" && cp "$_hp" "$S2/$_hp" \
     && tr -d '\r' < AGENTS.md > "$S2/AGENTS.md" || { printf 'harness FAILED — could not copy the charter-cap repository\n'; exit 2; }
   printf '# no AGENTS.md row\n' > "$S2/${PFX}template-size-limits.txt"
   printf '[budgets]\nenforce = "warn"\n"AGENTS.md" = %s\n' "$1" > "$S2/.governance/policy.toml"
@@ -239,6 +239,8 @@ run_cap_gate() { (cd "$S2" && bash "$S2/$GATE" "$S2/AGENTS.md"); }
 build_cap_repo 40960
 expect_out "A25 a charter cap of 40960 under warn refuses naming CODEX_MAX" \
   "the rendered charter's cap is not held inside the smallest harness's limit, CODEX_MAX" 1 run_cap_gate
+expect_out "A25r ...and its refusal carries check 8 branch 1's remedy sentence whole" \
+  "Lower the cap to CODEX_MAX or under; a harness reading less than the charter drops its tail." 1 run_cap_gate
 build_cap_repo 20480
 expect_out "A25b a charter cap of 20480 passes, the charter measured within it" "/ 20480 bytes" 0 run_cap_gate
 

@@ -96,7 +96,7 @@ PLANTS = ("none", "stale-page", "bad-flag", "bad-verb", "unrowed", "broken-link"
           "external-link", "undocumented", "drained-row", "grown-list", "orphan-anchor", "restated-row",
           "reader-rows", "none-rows", "leg-row", "unclassed", "empty-class", "untested",
           "console-prompt", "continued-flag", "unbalanced-quote", "comment-apostrophe", "scripts-prefix",
-          "synopsis-stale", "failing-command", "unit-lines")
+          "synopsis-stale", "failing-command", "unit-lines", "unit-usage-alone")
 # PLAY-dOrderedCharter-37: the run arm's two markers, each the last non-blank line above a block's fence,
 # and the bound on one page command.
 RUN_NO_RE = re.compile(r"^\s*<!--\s*run:\s*no\s*[—-]+\s*(?P<why>.+?)\s*-->\s*$")
@@ -865,6 +865,11 @@ def build_docs_fixture(tmp, plant: str) -> tuple[pathlib.Path, list[str], set[st
         for rel, text in (("help/concepts/fx.md", "<!-- unit: unit.nowhere -->\n# Fx\n"), ("help/tasks/fx.md", "# Fx\n")):
             (root / rel).parent.mkdir(parents=True, exist_ok=True)
             (root / rel).write_text(text, encoding="utf-8", newline="\n")
+    elif plant == "unit-usage-alone":
+        # PLAY-dOrderedCharter-77: `unit-usage` registered and `unit` not, so no unit line can resolve: exit 2.
+        write_edit(usage, "[[usage]]\n", '[[class]]\nclass = "unit-usage"\nusage = "none"\n'
+                   'why = "fixture units carrying a usage"\n\n[[usage]]\n')
+        class_ids.append("unit-usage")
     elif plant == "untested":
         text = (root / usage).read_text(encoding="utf-8")
         (root / usage).write_text(text[:text.index("[[usage]]\nid = \"fx-verb:tool\"")] +

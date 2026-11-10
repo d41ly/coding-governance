@@ -373,7 +373,7 @@ FX_KIT = "tools/alpha"
 FX_MANIFEST = f"{FX_KIT}/instructions.toml"
 FX_GRAMMAR = f"{FX_KIT}/grammar.py"
 FX_POLICY = ".governance/policy.toml"
-FX_GUARDED = "tools/policy/guarded-paths.txt"
+FX_REMOTE = "ori" "gin"   # the fixture's remote, assembled as the remote-literals gate assembles its own
 FX_OPEN, FX_FIXED, FX_PRINCIPLE = "unit.open-rule", "unit.fixed-rule", "principle.p1"
 FX_WHEN = "policy.adopter.release-train.weekly"
 FX_KEY_ROW = ('[[policy]]\nkey = "adopter.release-train"\nvalues = ["weekly", "monthly"]\ndefault = "weekly"\n'
@@ -449,7 +449,8 @@ def arm_add_level_3(c):
     build_fixture(c, overlay=render_fx_row("repo.local", text="MUST mind the local rule."))
     lines = render_fx_slot(c).splitlines()
     c.check("the level-3 repository unit renders after gov's level-3 units",
-            lines == ["MUST keep the principle.", "MUST open.", "MUST stay.", "MUST mind the local rule."], str(lines))
+            lines == ["MUST keep the principle.", "MUST open.", "MUST stay.", "<!-- gov:repo -->",
+                      "MUST mind the local rule.", "<!-- /gov:repo -->"], str(lines))
 
 
 def arm_add_level_1(c):
@@ -526,9 +527,13 @@ def run_policy_cli(c, *argv) -> tuple[int, str]:
 
 
 def arm_adopter_key(c):
+    from policy_value import resolve_kit_dir
+    kit = resolve_kit_dir("policy", "guard.py", KIT_DIR)
+    # The guarded list where the guard reads it: its own directory's prefix, as `read_guarded_paths` derives it.
+    guarded = iu.run_git(kit, "rev-parse", "--show-prefix").strip() + "guarded-paths.txt"
     unit = render_fx_row("repo.release-train", text="MUST cut the release on Monday.", trigger=FX_WHEN)
     build_fixture(c, overlay=unit + FX_KEY_ROW, policy='[adopter]\nrelease-train = "monthly"\n',
-                  extra={FX_GUARDED: ".governance/policy.json\n"})
+                  extra={guarded: ".governance/policy.json\n"})
     got = read_policy_value("adopter.release-train", c.top, "HEAD")[0]
     c.check("get reads the committed repository key", got == ["monthly"], str(got))
     rc, said = run_fx_check(c)
@@ -547,8 +552,7 @@ def arm_adopter_key(c):
     c.check("mirror --write makes it fresh", rc == 0 and rc2 == 0, f"{said} {said2}")
     c.write_file(iu.OVERLAY, unit + FX_KEY_ROW)
     c.write_file(".governance/policy.json", (c.top / ".governance/policy.json").read_text(encoding="utf-8"))
-    from policy_value import resolve_kit_dir
-    guard = resolve_kit_dir("policy", "guard.py", KIT_DIR) / "guard.py"
+    guard = kit / "guard.py"
     done = subprocess.run([sys.executable, str(guard), "--staged"], cwd=c.top, capture_output=True, text=True,
                           encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL)
     c.check("the guard refuses a staged mirror while the overlay differs from HEAD", done.returncode == 1 and
@@ -675,9 +679,9 @@ def arm_write_then_render(c):
 def arm_policy_at_head(c):
     iu.run_git(c.top, "checkout", "-q", "-b", "main")
     build_fixture(c)
-    iu.run_git(c.top, "remote", "add", "origin", "https://example.invalid/fixture.git")
-    iu.run_git(c.top, "update-ref", "refs/remotes/origin/main", "HEAD")
-    iu.run_git(c.top, "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/main")
+    iu.run_git(c.top, "remote", "add", FX_REMOTE, "https://example.invalid/fixture.git")
+    iu.run_git(c.top, "update-ref", f"refs/remotes/{FX_REMOTE}/main", "HEAD")
+    iu.run_git(c.top, "symbolic-ref", f"refs/remotes/{FX_REMOTE}/HEAD", f"refs/remotes/{FX_REMOTE}/main")
     build_fixture(c, policy=f'[instructions]\nexclude = ["{FX_OPEN}"]\n')
     landed = read_policy_value("instructions.exclude", c.top)[0]
     c.check("the landed ref is one commit behind and lacks the exclusion", FX_OPEN not in landed, str(landed))

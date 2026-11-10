@@ -2103,7 +2103,7 @@ def check_map_arms(check_arm) -> None:
     import tempfile
     iu = load_units_module()
     reg = iu.derive_kit_rel(iu.DOCUMENTS)
-    two = build_map_rows(('AGENTS.md', 0, None), ('roles/a.md', 5, None)).replace('doc.fx0', 'doc.charter')
+    two = build_map_rows(('AGENTS.md', 0, None), ('agents/a.md', 5, None)).replace('doc.fx0', 'doc.charter')
     with tempfile.TemporaryDirectory() as td:
         eng, tgt = write_render_target(Path(td), tpl=MAP_TEMPLATE, files={reg: two})
         lines, rc = iu.run_map(tgt)
@@ -2134,7 +2134,7 @@ def check_map_arms(check_arm) -> None:
         else:
             check_arm(rc == 2 and len(lines) == 1 and re.fullmatch(r'instruction-map: \d+ over MAP_CAP_BYTES', lines[0])
                       is not None, 'a map past MAP_CAP_BYTES refuses with one line and no map', said)
-    for files, want, what in (({reg: build_map_rows(('roles/a.md', 5, None))}, 'holds no doc.charter row',
+    for files, want, what in (({reg: build_map_rows(('agents/a.md', 5, None))}, 'holds no doc.charter row',
                                'a registry with no doc.charter row'), ({}, 'does not read', 'no registry')):
         with tempfile.TemporaryDirectory() as td:
             _e, tgt = write_render_target(Path(td), files=files)
@@ -2623,9 +2623,13 @@ def run_selftest() -> int:
     halves = [('a seeded previous-minor template', seeded,
                'kits = ["playbook"]\n\n[answers]\n')]
     if gov_tpl.is_file() and gov_dep.is_file():
-        # Section 4 Evidence's narrowing: the two playbook kits, and answers for the probes they ask.
+        # Section 4 Evidence's narrowing: the two playbook kits, and answers for the probes they ask. Each key
+        # the narrowing or the loop below sets is first taken out, so a target's own `deploy.toml` setting one
+        # (the matrix's scratch install does) parses once narrowed (PLAY-dOrderedCharter-77 S10).
+        own = re.sub(r'(?ms)^(?:drop_blocks|ci_file|gate_runner|id_families|memory_disciplines)[ \t]*=[ \t]*'
+                     r'(?:\[[^\]]*\])?[^\n]*\n', '', gov_dep.read_text(encoding='utf-8'))
         narrowed = re.sub(r'(?ms)^kits = \[.*?\]\n', 'kits = ["playbook", "playbook-render"]\n',
-                          gov_dep.read_text(encoding='utf-8'), count=1).replace(
+                          own, count=1).replace(
             '[answers]\n', '[answers]\nci_file = "none"\ngate_runner = "none"\n'
             'id_families = "none"\nmemory_disciplines = "none"\n', 1)
         halves.insert(0, ("gov's template", gov_tpl.read_text(encoding='utf-8'), narrowed))
