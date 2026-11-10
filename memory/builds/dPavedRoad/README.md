@@ -60,7 +60,7 @@ ids TOOL-dPavedRoad-1 TOOL-dPavedRoad-2 TOOL-dPavedRoad-3 TOOL-dPavedRoad-4
 | [TOOL-dPavedRoad-4 — `--staged` grades the edge joins and the ledger joins for what it stages](spec/2026-11-10-spec-TOOL-dPavedRoad-4.md) | 4 | 2 | CLOSED | rev-1 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 3 record folder(s).
+Records: 11 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

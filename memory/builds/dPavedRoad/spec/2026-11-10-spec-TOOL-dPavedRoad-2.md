@@ -6,12 +6,14 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-10-build-TOOL-dPavedRoad-2-ledger.md](../build/2026-11-10-build-TOOL-dPavedRoad-2-ledger.md) | journal | — |
 | [2026-11-10-prompt-TOOL-dPavedRoad-1-brief.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-1-brief.md) | research | TOOL-dPavedRoad-1 TOOL-dPavedRoad-3 TOOL-dPavedRoad-4 |
 | [2026-11-10-prompt-TOOL-dPavedRoad-2-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-2-1-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-TOOL-dPavedRoad-2-2-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-2-2-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-TOOL-dPavedRoad-2-3-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-2-3-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-TOOL-dPavedRoad-2-revision-brief.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-2-revision-brief.md) | research | — |
 | [2026-11-10-prompt-TOOL-dPavedRoad-2-token-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-2-token-fix-brief.md) | research | — |
+| [2026-11-10-review-TOOL-dPavedRoad-1-closing-diff-round1.md](../reviews/2026-11-10-review-TOOL-dPavedRoad-1-closing-diff-round1.md) | diff-review | TOOL-dPavedRoad-1 TOOL-dPavedRoad-3 TOOL-dPavedRoad-4 |
 
 <!-- /gen:spec-records -->
 
