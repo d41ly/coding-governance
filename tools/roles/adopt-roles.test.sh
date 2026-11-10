@@ -26,9 +26,11 @@
 # there, and a citation extending a held one, which keeps its own plain path (arm 14); a decoy at the
 # repository root for each citation that is no harness, which the Skill never names, and a receipt
 # row placing the first of them, which it does (arm 15); a root install whose repository has a
-# sibling directory holding each cited harness, which the citation pass lists nowhere (arm 16); and
+# sibling directory holding each cited harness, which the citation pass lists nowhere (arm 16);
 # a harness held only in the directory above the tool root with no receipt, which the Skill and the
-# role index both name there (arm 17). Every arm is a self-contained block below the prologue, so a
+# role index both name there (arm 17); and the handoff verbs `stage-efforts` and `role-efforts` over
+# a policy that gains one profile, with no model, a model id no profile matches, one that profile
+# matches, and an empty one (arm 19). Every arm is a self-contained block below the prologue, so a
 # slice of the prologue and one block runs that arm alone.
 #
 # WHAT THIS DOES NOT CHECK: what the rendered Skill or an agent type SAYS beyond the citation paths
@@ -44,7 +46,8 @@
 # Arm 11 does not compare a refusal's wording, any marker field beyond the whole line, or any
 # micro-format head but `agent` and `returned`. Arm 13 does not check which rule refused: any
 # non-zero exit of the agent render takes the same branch, so it grades the adopter's handling of a
-# refusal, and R10 only as the trigger.
+# refusal, and R10 only as the trigger. Arm 19 does not check any profile the policy file seeds, nor
+# the resolver's order inside a profile.
 #
 # Withheld from the payload by the kit's descriptor (`project-owned`): its subject is the adopter in
 # this directory, so it has a job only where that source changes.
@@ -79,7 +82,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +2 for arm 13 (TOOL-dRedressedBar-6). +3 for arm 14 (TOOL-dRenderedAnchor-2). +1 for arm 14, +3
 # for arm 15 and +2 for arm 16 (TOOL-dRenderedAnchor-3). +1 for arm 17 (TOOL-dRenderedAnchor-4).
 # +1 for arm 18 (TOOL-dFoldedAudit-15).
-FLOOR_ASSERTIONS=51
+# +4 for arm 19 (TOOL-aProfiledEffort-2).
+FLOOR_ASSERTIONS=55
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 FX=""; FXK="$KREL"
@@ -727,6 +731,56 @@ _v18=$(! grep -qF 'the one driver verb used' "$SK17" \
    && grep -qF 'so this run is ATTENDED: the driver verbs used are' "$SK17" \
    && grep -qF -- 'plus `--record-round` and `--chain-verdict` where a' "$SK17" && echo 1 || echo 0)
 check_arm "arm 18 the render's ATTENDED bullet names the chain's two verbs" "$_v18"
+
+# ---- arm 19 (TOOL-aProfiledEffort-2 AC9): `handoff.py stage-efforts` and `role-efforts` hand a named
+# ---- model to the resolver. ONE profile, `tfam`, is appended to the fixture's policy after the
+# ---- scaffold: it answers the model id `vendor-tfam-9`, and no profile answers `vendor-other-9`.
+# ---- 19a's expected bytes come from A19P, an inline program that imports nothing from the kit and
+# ---- reads the fixture's `[effort]` tables, its workflow table and the scaffolded role index, so
+# ---- the guard shares no code with the verbs it guards. The arm reads no git revision. 19c's last
+# ---- clause reds the arm where a default table already gives its two literals, which would
+# ---- otherwise pass by finding nothing. The failing cases, observed at the close and not by the
+# ---- pass that wrote this: the two verbs' resolver calls passing None for the model, which reds
+# ---- 19c, and the shared JSON writer without its `separators`, which reds 19a and 19c.
+A19P='import json, pathlib, sys, tomllib
+kit, index, what = pathlib.Path(sys.argv[1]), sys.argv[2], sys.argv[3]
+with open(kit / "house" / "policy.toml", "rb") as fh:
+    effort = tomllib.load(fh)["effort"]
+def level(slot):
+    return effort.get("roles", {}).get(slot, effort["default"])
+if what == "roles":
+    with open(index, encoding="utf-8") as fh:
+        out = {s: level(s) for s, r in json.load(fh)["roles"].items() if r["agent"]}
+else:
+    with open(kit / "workflows.toml", "rb") as fh:
+        stages = next(w["stages"] for w in tomllib.load(fh)["workflow"] if w["name"] == what)
+    over = effort.get("stages", {}).get(what, {})
+    out = {k: over.get(k, level(s)) for k, s in stages.items()}
+sys.stdout.buffer.write((json.dumps(out, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8"))'
+build_fixture; _rc19=$?
+printf '%s\n' '' '[effort.profiles.tfam]' 'match = ["tfam"]' 'default = "low"' '' \
+   '[effort.profiles.tfam.roles]' 'gov-builder = "max"' '' \
+   '[effort.profiles.tfam.stages.closing-review]' 'synthesis = "xhigh"' >> "$FX/$KREL/house/policy.toml"
+_a19=1; _b19=1; _c19=1; _d19=1; [ "$_rc19" = 0 ] || _a19=0
+for _w in spec-write closing-review roles; do
+  _q=(stage-efforts "$_w"); [ "$_w" = roles ] && _q=(role-efforts)
+  _f="$TMP_ROOT/a19.$_w"
+  (cd "$FX" && "$PY" -B "$KREL/handoff.py" "${_q[@]}") > "$_f.plain" 2>/dev/null || _a19=0
+  "$PY" -B -c "$A19P" "$FX/$KREL" "$FX/.claude/roles.json" "$_w" > "$_f.want" 2>/dev/null || _a19=0
+  cmp -s "$_f.plain" "$_f.want" || _a19=0
+  (cd "$FX" && "$PY" -B "$KREL/handoff.py" "${_q[@]}" --model vendor-other-9) > "$_f.other" 2>/dev/null || _b19=0
+  cmp -s "$_f.plain" "$_f.other" || _b19=0
+  (cd "$FX" && "$PY" -B "$KREL/handoff.py" "${_q[@]}" --model vendor-tfam-9) > "$_f.tfam" 2>/dev/null || _c19=0
+  out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" "${_q[@]}" --model "" 2>&1 >/dev/null); rc=$?
+  [ "$rc" = 2 ] && [[ $out == *'--model is empty'* ]] || _d19=0
+done
+grep -qF '"gov-builder":"max"' "$TMP_ROOT/a19.roles.tfam" && grep -qF '"synthesis":"xhigh"' "$TMP_ROOT/a19.closing-review.tfam" \
+   && ! cmp -s "$TMP_ROOT/a19.roles.plain" "$TMP_ROOT/a19.roles.tfam" \
+   && ! cmp -s "$TMP_ROOT/a19.closing-review.plain" "$TMP_ROOT/a19.closing-review.tfam" || _c19=0
+check_arm "arm 19 with no model both verbs print the default tables' levels, re-derived inline" "$_a19"
+check_arm "arm 19 a model id no profile matches prints the no-flag bytes" "$_b19"
+check_arm "arm 19 a model id the appended profile matches prints that profile's levels" "$_c19"
+check_arm "arm 19 an empty --model refuses with exit 2, naming the flag" "$_d19"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

@@ -1,11 +1,12 @@
 # TOOL-aProfiledEffort-2 — the handoff verbs answer a role's and a stage's level for a named model
 
-**Status:** INPROGRESS · rev-1 · 2026-11-10 · node a · Tier-2 · base 7c896db6 · streams tooling · order 2
+**Status:** CLOSED · rev-1 · 2026-11-10 · node a · Tier-2 · base 7c896db6 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-10-build-TOOL-aProfiledEffort-2-1-acceptance-ledger.md](../build/2026-11-10-build-TOOL-aProfiledEffort-2-1-acceptance-ledger.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aProfiledEffort-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-1-brief.md) | research | TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-3 |
 | [2026-11-10-prompt-TOOL-aProfiledEffort-2-build-brief.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-2-build-brief.md) | research | — |
 
