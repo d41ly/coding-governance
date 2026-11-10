@@ -1,6 +1,6 @@
 # TOOL-aSmoothedDispatch-7 — the `gov-spec-writer` house overlay has the writer run the spec-token checker's one-spec mode over each spec before it returns
 
-**Status:** SPECCED · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 7 · advances TOOL-aDeferredBar-6 TOOL-dFairHearing-54
+**Status:** CLOSED · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 7 · advances TOOL-aDeferredBar-6 TOOL-dFairHearing-54
 
 <!-- gen:spec-records -->
 
