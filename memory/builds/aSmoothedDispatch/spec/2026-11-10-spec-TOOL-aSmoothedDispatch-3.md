@@ -1,6 +1,6 @@
 # TOOL-aSmoothedDispatch-3 — `unattended.sh --help` prints the verb list and exits 0
 
-**Status:** SPECCED · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 

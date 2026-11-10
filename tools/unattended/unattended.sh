@@ -34,6 +34,7 @@
 #   unattended.sh --claims                                         # every run claim on the remote: slug, node, status, beat-age-s, verdict
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
 #   unattended.sh --version                                        # the kit version, then exit
+#   unattended.sh --help                                           # the verb list, the verb carrier's path and this text, then exit 0; -h is the same
 #   unattended.sh --overlaps                                       # the overlap probe against the LOCAL default-branch tracking ref, no network
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
@@ -15220,6 +15221,8 @@ while [ $# -gt 0 ]; do
     --claims)       refuse_waive_unless_preflight --claims || { RUNLOG_CLEAN=1; exit 1; }
                     print_claims; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; RUNLOG_CLEAN=1; exit 0 ;;
+    --help|-h)      echo "unattended: the verbs are $(verb_list); each verb's contract is $MEMORY_ROOT/guides/UNATTENDED-VERBS.md"
+                    usage; RUNLOG_CLEAN=1; exit 0 ;;
     --overlaps)     print_overlaps; RUNLOG_CLEAN=1; exit 0 ;;
     # THE SET IS THE DISPATCH. A slug-taking verb is recognised by membership in VERBS_SLUG rather
     # than by an alternation typed here, so the declaration is load-bearing: a verb absent from it

@@ -3950,6 +3950,15 @@ miss "$out" "unattended-plan-open:"
 same "--version prints the kit version the driver declares" "$(run --version)" \
   "unattended $(sed -n 's/^KIT_UNATTENDED_VERSION=\([0-9.]*\).*/\1/p' "$SCRIPT")"
 run --version >/dev/null; same "--version exits 0" "$?" "0"
+# ---- TOOL-aSmoothedDispatch-3: `--help` and `-h` print the derived verb list, the verb carrier's
+# ---- path and the usage text, then exit 0, where both used to reach refusal 14.
+out=$(run --help); rc=$?
+same "--help exits 0" "$rc" "0"
+hit  "$out" "unattended: the verbs are --preflight, "
+miss "$out" "the verbs are ;"
+hit  "$out" "memory/guides/UNATTENDED-VERBS.md"
+hit  "$out" "unattended.sh --help"
+same "-h prints what --help prints" "$(run -h)" "$out"
 # TOOL-dFoldedAudit-15 AC16: the fifth field is the header's own, so a bumped spec prints its rev and keeps
 # its path, and the padded table takes neither. The failing case, observed at the close and not by the
 # pass that wrote this: `plan_row` printing four fields reds these and the field counts above.
@@ -19103,7 +19112,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3256 -> 3259 by TOOL-aSmoothedDispatch-1 on 2026-11-10: 5 region-four --writes split assertions
 # (3 `hit`, 2 `miss`) less the 2 space-holding whitespace arms they replace, so FLOOR_SHARD_4 carries the
 # same net 3. COUNTED off the block's own lines; no suite ran, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=3259
+# RAISED 3259 -> 3265 by TOOL-aSmoothedDispatch-3 on 2026-11-10: 6 region-two --help and -h assertions
+# (2 `same`, 3 `hit`, 1 `miss`), so FLOOR_SHARD_2 carries the same 6.
+# COUNTED off the block's own lines; no suite ran, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=3265
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -19296,7 +19308,8 @@ FLOOR_SHARD_1=734
 # lines above are region two's history.
 # 222 -> 218 by TOOL-aSparedSpawn-14's retired arms, see FLOOR_ASSERTIONS.
 # RAISED 218 -> 223 by TOOL-dFoldedAudit-15: the same 5 region-two fifth-field assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=223
+# RAISED 223 -> 229 by TOOL-aSmoothedDispatch-3 on 2026-11-10: the same 6 region-two --help assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=229
 # RAISED 255 -> 279 by TOOL-aQuotedBrief-1: the same 24 region-three prompt-record assertions, see FLOOR_ASSERTIONS.
 # RAISED 279 -> 295 by TOOL-aQuotedBrief-2: the same 16 region-three carried-branch assertions, see FLOOR_ASSERTIONS.
 # RAISED 295 -> 323 by TOOL-aQuotedBrief-3: the same 28 region-three brief-item assertions, see FLOOR_ASSERTIONS.
