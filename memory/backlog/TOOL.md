@@ -226,6 +226,8 @@ Cite ids, never line numbers.
 | [TOOL-aProbedUnit-15](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | unattended adopter e2e ran 137 s against its declared 60 s and the… |
 | [TOOL-aProbedUnit-16](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tier2-review.js and the two drift-audit workflows hand their agents no… |
 | [TOOL-aProbedUnit-17](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | the closing review's round-3 mediums and lows stand unfolded: clusters… |
+| [TOOL-aProfiledEffort-5](../builds/aProfiledEffort/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | the build harness's committer stage and the review harness's probe… |
+| [TOOL-aProfiledEffort-6](../builds/aProfiledEffort/BACKLOG.md) | OPEN | MED | — | 2026-11-10 | nothing refuses a role spawn at a level its model's profile does not… |
 | [TOOL-aPromptedMandate-7](../builds/aPromptedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | the leg's SOURCE-level no-write arm (check-unattended.test.sh) greps… |
 | [TOOL-aPromptedMandate-9](../builds/aPromptedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | nothing in the driver's precondition chain has a timeout and the… |
 | [TOOL-aPromptedMandate-14](../builds/aPromptedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-19 | marker-contract.test.sh gates the four readers of the generated… |
@@ -262,7 +264,6 @@ Cite ids, never line numbers.
 | [TOOL-aResumedRelay-1](../builds/aResumedRelay/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | the lexicon VERB table needs a CURATION PASS over the deployer's… |
 | [TOOL-aRootedPrefix-3](../builds/aRootedPrefix/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-09 | hygiene checks 6/7 measure RAW working-tree bytes, so an adopter… |
 | [TOOL-aRoutedQuill-8](../builds/aRoutedQuill/BACKLOG.md) | DEFERRED | MED | TOOL-aRoutedQuill-6 | 2026-10-10 | run the routed-against-raw trial TOOL-aRoutedQuill-6 specifies, in an… |
-| [TOOL-aRoutedQuill-13](../builds/aRoutedQuill/BACKLOG.md) | OPEN | LOW | — | 2026-10-10 | the --dispatch order gate (check 49) counts a sibling whose spec reads… |
 | [TOOL-aScannedThrottle-3](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | ZERO Defender exclusions are confirmed on node a (Get-MpPreference… |
 | [TOOL-aScannedThrottle-4](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | HVCI/VBS is ON and ENFORCING on node a (Win32_DeviceGuard… |
 | [TOOL-aScannedThrottle-5](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | run-gates canary (466-587s in-bar, 317s standalone, 10-11% of… |

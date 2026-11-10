@@ -25,6 +25,9 @@ reference; this page is the short version.
 4. **The agent runs as a native type.** Each role is rendered into `.claude/agents/gov-<role>.md`,
    which starts without the full charter and at the reasoning effort the policy file sets. It
    carries the section 1 rules its role cites and the charter's Protocols and Facts sections.
+   The dispatcher passes the level for the model in use: a harness call carries `efforts`, the JSON
+   `handoff.py stage-efforts <workflow> --model <id>` prints, where `<id>` is the session's own
+   model id as its environment states it.
 
 ## How to use it
 
@@ -39,11 +42,19 @@ reference; this page is the short version.
   Pass that output, unchanged, as the prompt of an `Agent` call whose `subagent_type` is <!-- usage: script:tools/roles/handoff.py#render 57cac9a7 -->
   `gov-builder`. An edited prompt is refused. Pass the name it prints on stderr after
   `handoff: description — ` as the call's `description`; any other name is refused.
+  That `Agent` call also carries `effort`: the role's value in the JSON
+  `handoff.py role-efforts --model <id>` prints.
 - **Change how a role behaves:** edit `<prefix>/roles/house/<role>.md`, never the file under
   `agents/`. Your overlay is appended under `## House rules`, and updates never overwrite it.
 - **Change a role's effort, or the gates a role may run:** edit `<prefix>/roles/house/policy.toml`.
   Its `[effort]` tables set levels per role and per harness stage; its `[gates]` table lists the
   only gate legs a role agent may run.
+- **Give a model its own levels:** add one `[effort.profiles.<name>]` table to the same file, with
+  `match`, the words of the model id it answers, and `default`; `roles` and `stages.<workflow>`
+  tables under it are optional. No code changes. The seeded `[effort.profiles.fable]` runs every
+  role, and every stage a workflow's `stages` table keys, at `medium` on any Claude Fable version. A profile reaches an agent only through
+  the two calls above, never through its rendered agent type, so it takes effect on the next call
+  with no re-render and no new session.
 - **Render in this order.** After changing a role file, re-render the charter first with
   `bash tools/playbook/adopt-playbook.sh --target .`, because its Agent roles section is generated <!-- usage: script:tools/playbook/adopt-playbook.sh 814e2edf -->
   from the role files. After changing a role, an overlay, the policy or a charter rule, run

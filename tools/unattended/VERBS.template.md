@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.114 -->
+<!-- gov:kit unattended@1.116 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -128,7 +128,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   sidecar line, whatever its phase, when the record names a keepalive id and that line exists. The
   line stays ONE line: a field joins it or does not print, and the suite arms that.
 - `--audit` — one line per unit whose dispatch rows at their newest anchor, taken together, are still
-  open and whose spec is not terminal: how long the TREE has been idle (newest write, newest commit) and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
+  open and whose spec is neither terminal nor deferred (DEFERRED, with its latest rescope defer row
+  after every dispatch row naming it): how long the TREE has been idle (newest write, newest commit)
+  and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
   `STALLED` line followed by one remedy line. Read-only; the idle-wake runs it. It cannot see what
   the unit is doing or whether a process is stuck — its figures are properties of the tree. After
   the units it prints one line per open REGISTERED task: its heartbeat path, `last-beat <s>s ago`
@@ -230,16 +232,18 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   several pass kinds per unit, and a later row is read the same way whichever it is. What the verb
   REFUSES is overlap with a SIBLING pass still open, the disjointness question it exists for and the
   one thing here that is unchanged; a unit's own rows are never siblings of each other.
-  A pass of a unit whose spec is CLOSED or WONTDO is not a sibling: it reserves nothing, and a later pass for such a unit reserves its paths only once its spec is set back to INPROGRESS.
+  A pass of a unit whose spec is CLOSED or WONTDO is not a sibling: it reserves nothing, and a later pass for such a unit reserves its paths only once its spec is set back to INPROGRESS. A pass of a deferred unit, whose spec reads DEFERRED and whose latest rescope defer row follows every dispatch row naming it, is not a sibling either, until the unit is dispatched again.
   A pass's COMMIT is the one whose `Pass: <unit-id>` trailer names it; a commit with no trailer falls back to
-  its subject, and `Pass: none` names no unit. Before any of that it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
+  its subject, and `Pass: none` names no unit. After every cheap refusal and before the claim read it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
   live tree: the checker's bar join grades LIVE specs, an unattended build closes each unit spec in its
-  own build commit, and this verb is the one point that sees a spec before its unit builds. It refuses
-  on any red but a hit in another build's spec, which it notes and admits, because the bar's
-  whole-tree leg still grades that build. It skips the run when its inputs match the last check it
-  admitted for this build, keyed on the slug, the checker, the launcher, HEAD and the run-gates
-  working-tree fingerprint, recorded under the sidecar root; with no fingerprint it announces that
-  the cache is off and runs the checker. A blank or absent key is an ANNOUNCED skip on stdout,
+  own build commit, and this verb is the one point that sees a spec before its unit builds. It runs
+  last because it costs a tree-wide scan, and every refusal above it — the order gate, the edge and
+  hold gates, the path and shared-record refusals, condition 1 — is decided from the run-state file,
+  the spec headers or `git` in seconds. It refuses on any red but a hit in another build's spec,
+  which it notes and admits, because the bar's whole-tree leg still grades that build.
+  It skips the run when its inputs match the last check it admitted for this build, keyed on the
+  slug, the checker, the launcher, HEAD and the run-gates working-tree fingerprint, recorded under
+  the sidecar root; with no fingerprint it announces that the cache is off and runs the checker. A blank or absent key is an ANNOUNCED skip on stdout,
   never a silent pass. Where `RUN_CLAIMS` is `on` it reads the run's claim as the holder after every
   local refusal and before the row: another session's claim is check 108 and no row is written.
 - `--review` — records ONE review round for a subject and reports what the loop is doing:
@@ -799,8 +803,12 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   `scriptPath`. **Every harness call also carries `roles`**: the JSON the roles kit's
   `handoff.py harness-args <harness>` prints, `<harness>` being `unattended-build`, `unattended-unit`
   or, for the closing review M8 composes, `tier2-review`. **It also carries `efforts`**: the JSON
-  `handoff.py stage-efforts <workflow>` prints for the workflow that call runs — `spec-write` for
-  the build harness, `build` for the unit harness, `closing-review` for the closing review. With no
+  `handoff.py stage-efforts <workflow> --model <id>` prints for the workflow that call runs —
+  `spec-write` for the build harness, `build` for the unit harness, `closing-review` for the closing
+  review. `<id>` is the model in use: the session's own model id, exactly as the session's
+  environment states it, read again at each call. A direct role spawn's `Agent` call carries `effort`
+  too, its role's value in the JSON `handoff.py role-efforts --model <id>` prints; the roles kit's
+  README states the limits. With no
   `.claude/roles.json` the roles kit is not installed: pass no `roles` and no `efforts`, and each
   harness logs its per-stage fallback. A session started
   before the rendered agent types existed cannot spawn them: it passes none too, and once the spawn

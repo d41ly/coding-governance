@@ -66,7 +66,7 @@ set -u
 if [ -n "${EPOCHREALTIME:-}" ]; then DRIVER_T0_US=${EPOCHREALTIME//[!0-9]/}
 else printf -v DRIVER_T0_US '%(%s)T' -1; DRIVER_T0_US="${DRIVER_T0_US}000000"; fi
 readonly DRIVER_T0_US
-KIT_UNATTENDED_VERSION=1.114 # gov:kit unattended@1.114 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.116 # gov:kit unattended@1.116 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -14000,6 +14000,10 @@ verb_rescope() { # slug · act · unit · successor · reason
   want="$want · reason $reason"
   while IFS= read -r pl; do
     [ "$pl" = "$want" ] || continue
+    # A DEFER IS RECORDED ONLY WHILE IT IS IN FORCE (TOOL-aSwiftRefusal-4): a dispatch row after the
+    # matching defer row re-took the unit, so the same reason is a new deferral and is appended. The
+    # literal DEFERRED satisfies the predicate's status half, so its answer is the row half alone.
+    [ "$act" = defer ] && ! check_unit_deferred "$rel" "$unit" DEFERRED && break
     echo "unattended: amendment already recorded, unchanged — $act $unit"
     return 0
   done <<RESCOPED
@@ -14090,13 +14094,18 @@ RESCOPED
 # scratch guard refuses its writes under `ROUTED_PATHS` until the spec reads INPROGRESS again, which
 # brings its keys back. Before this, a key whose first attributed commit wrote outside its set — which
 # `pass_commit` never closes — held its paths against every later pass for the rest of the run.
-# Openness is asked first, so each key the status skip RELEASES is named on stderr and none silently.
+# A DEFERRED UNIT RESERVES NOTHING EITHER (TOOL-aSwiftRefusal-3): set aside with `--rescope --act
+# defer`, it commits against none of its keys, so they held its paths until a commit carrying its
+# `Pass:` trailer landed. `check_unit_deferred`, the order gate's one predicate, decides it, and every
+# key of the unit goes, older anchors included; a dispatch row after the defer row makes the
+# predicate false, so a unit dispatched again re-takes every key it declared.
+# Openness is asked first, so each key a status skip RELEASES is named on stderr and none silently.
 # The maps are the CALLER's: each verb's load is a probe with its own failure handling, and a unit
 # with no status read is not terminal, so a failed read keeps every open key reserved.
 # WHAT IT DOES NOT SEE: a follow-up pass dispatched for a unit already terminal reserves nothing from
 # its declaration on (`--dispatch` says so), and a spec flipped before its pass commit releases the
 # pass early, because status is read from the working tree, as the order gate and the guard read it.
-read_open_passes() { # run-state file · [current] -> the open keys of units whose spec is not terminal
+read_open_passes() { # run-state file · [current] -> the open keys of units neither terminal nor deferred
   local _r _i _g _u _decl _sp _st
   read_pass_declarations "$1" ${2:+"$2"} | while IFS= read -r _r; do
       [ -n "$_r" ] || continue
@@ -14109,6 +14118,10 @@ read_open_passes() { # run-state file · [current] -> the open keys of units who
         printf 'unattended: %s %s left out as terminal (%s), so its declared paths reserve nothing: %s\n' "$_g" "$_u" "$_st" "$_decl" >&2
         continue ;;
       esac
+      if check_unit_deferred "$1" "$_u" "$_st"; then
+        printf 'unattended: %s %s left out as deferred, so its declared paths reserve nothing until it is dispatched again: %s\n' "$_g" "$_u" "$_decl" >&2
+        continue
+      fi
       printf '%s\n' "$_r"
     done
 }
@@ -14146,6 +14159,9 @@ check_pass_open() { # grp · unit · run-state file · declared set (space-separ
   [ -n "$_hit" ] && return 1
   return 0
 }
+
+# `check_unit_deferred` USED TO BE DEFINED HERE, and moved to `lib-unattended.sh` (TOOL-aSwiftRefusal-4)
+# so check 23 asks the release question the order gate and `read_open_passes` ask, from one definition.
 
 # --check-commit (TOOL-aWindowedPass-3): CHECK 23 AT THE ONE MOMENT ITS FINDING IS STILL REPAIRABLE.
 # A pass may widen its declaration with `--dispatch` until it commits and never after, so a close that
@@ -14190,7 +14206,10 @@ check_commit_message() { # commit message file
   # check_pass_open alone, without the terminal-status skip `read_open_passes` adds for those two
   # (TOOL-dGroundRules-66): a pass commit flips its own spec to CLOSED in the commit being made, so
   # the skip would read that pass as closed, `pass_commit` does not name HEAD either, and every pass
-  # commit would be refused as having no open dispatched pass. This verb answers which declaration
+  # commit would be refused as having no open dispatched pass. It leaves out the deferred skip too, on
+  # purpose: a `Pass:` trailer naming a deferred unit is still graded against the declaration it
+  # carries, and a unit dispatched again after its defer row commits against the key it re-took
+  # (TOOL-aSwiftRefusal-4). This verb answers which declaration
   # grades this commit, not which paths are reserved. A key it calls
   # closed BECAUSE ITS PASS COMMIT IS HEAD is kept apart (`O`): that is `git commit --amend` on the
   # pass commit, whose HEAD is the commit being replaced (closing review r1, M4). Only a trailer naming
@@ -14434,8 +14453,6 @@ verb_dispatch() { # slug · unit · writes...
   case "$_d_state" in
     THIN) fail 49 "--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it: $unit ($_d_spec)"; return 1 ;;
   esac
-  # The spec-token check (aDeferredBar F3), scoped and cached by TOOL-aSmoothedDispatch-4: its header.
-  run_spec_token_check "$slug" || return 1
   # ------------------------------------------------------------------------------ THE ORDER GATE
   # A unit may not be dispatched while an EARLIER step still holds a unit that is neither terminal
   # nor already dispatched. Units sharing an `order` value are the parallel group and do not block
@@ -14468,6 +14485,12 @@ verb_dispatch() { # slug · unit · writes...
       [ "$_o_ord" -lt "$_d_ord" ] 2>/dev/null || continue
       _o_st="${SPEC_ST[$_o_spec]:-}"
       case "$_o_st" in CLOSED|WONTDO) continue ;; esac
+      # A DEFERRED SIBLING IS SET ASIDE, NOT AN UNFINISHED STEP (TOOL-aSwiftRefusal-2). Only here:
+      # the edge refusal below never asks, so a consumer of a deferred unit stays refused.
+      if check_unit_deferred "$rel" "$_o_id" "$_o_st"; then
+        echo "unattended: dispatch — $_o_id (order $_o_ord) is DEFERRED with no dispatch after its defer row, so it does not hold back $unit" >&2
+        continue
+      fi
       # THE DISPATCH ROW'S `item` FIELD IS `<anchor-sha> <unit-id>`, not the id alone, so a match on
       # the id with a space either side finds nothing and every dispatched sibling reads as still
       # blocking. Anchored on ` · reason ` at the tail, which makes the id a WHOLE token: without it
@@ -14738,6 +14761,12 @@ verb_dispatch() { # slug · unit · writes...
   done <<SIBS
 $sibrows
 SIBS
+  # ------------------------------------------------- aDeferredBar closing review F3 (unit 2)
+  # THE SPEC-TOKEN CHECK, `run_spec_token_check`: its header says what it runs, scopes and caches.
+  # IT RUNS LAST AMONG THE LOCAL REFUSALS (TOOL-aSwiftRefusal-1): it is the one that costs a tree-wide
+  # scan, and every refusal above it is decided from the run-state file, the spec headers or `git` in
+  # seconds, so an out-of-order or overlapping dispatch is refused before the checker runs at all.
+  run_spec_token_check "$slug" || return 1
   # PARKED NORMALISED. Every refusal above asks its question through `normpath`; recording the raw
   # spelling meant the guards judged one path and the leg graded another, and `work/sub/` sailed
   # through the driver and then redded the leg permanently.

@@ -1129,6 +1129,22 @@ read_pass_declarations() {  # run-state file · [current]
             print at[k] " dispatch · item " k " · reason " ps[k] } }' "$1" 2>/dev/null || :
 }
 
+# A UNIT SET ASIDE WITH `--rescope --act defer` (TOOL-aSwiftRefusal-2): its spec reads DEFERRED AND
+# its last row among its `dispatch` rows and its `rescope · item defer` rows is a defer row. Both
+# halves, because a DEFERRED status with no defer row is a hand edit the close's carry-forward
+# refuses, and a dispatch after the defer row re-takes the unit (dOrderedCharter's unit 31). The id
+# is read only in the item field, anchored at line start and on ` · reason `, as the order gate's
+# dispatch-row grep reads it: `id_rows` matches an id anywhere, a reason field included. The status
+# is passed in because every caller already holds it. An unreadable file answers 2 (awk's exit),
+# so a failed read keeps the unit blocking, never admits it.
+check_unit_deferred() { # run-state file · unit · spec status -> 0 deferred, 1 not
+  [ "$3" = DEFERRED ] || return 1
+  awk -v u="$2" '
+    $0 ~ ("^[0-9][0-9-]*T[0-9:]*Z dispatch · item [0-9a-f]+ " u " · reason ") { k = "d" }
+    $0 ~ ("^[0-9][0-9-]*T[0-9:]*Z rescope · item defer " u " · reason ")      { k = "f" }
+    END { exit (k == "f") ? 0 : 1 }' "$1" 2>/dev/null
+}
+
 # ONE ANSWER TO "did this change touch only gen regions" (TOOL-aWindowedPass-3). Check 23 asks it of a
 # commit against its parent, `--check-commit` of the index against HEAD; two copies of the strip would
 # let the close forgive what the commit-time step refused. Regions NEST, the build README's unit table

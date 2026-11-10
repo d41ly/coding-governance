@@ -1,5 +1,7 @@
 # policy.toml — this repository's own settings for its role agents. Seeded: yours to edit.
-# A changed value reaches an agent after `render_agents.py --write` and a new session.
+# A changed `[effort.roles]` or `default` value reaches an agent type after
+# `render_agents.py --write` and a new session.
+# A stage or profile value applies at the next dispatch.
 # Read through roles_lib.py's `load_policy` only; levels are low, medium, high, xhigh and max.
 
 [effort]
@@ -21,6 +23,13 @@ synthesis = "medium"
 [effort.stages.spec-write]
 skeptic = "medium"
 synthesis = "medium"
+
+[effort.profiles.fable]       # a table per model family; an unmatched model takes the tables above
+match = ["fable"]             # one word of the model id, any version, as in claude-fable-5-2
+default = "medium"            # every role, and every stage key of a workflow's `stages` table
+# [effort.profiles.<name>.roles] and [effort.profiles.<name>.stages.<workflow>] take the keys of the
+# tables above. A profile reaches an agent at dispatch, never through its rendered agent type, and
+# gives no level to a harness stage that no `stages` table keys.
 
 [gates]                       # the gate legs a role may run, by manifest name; every other role runs none
 # A trailing `?` marks a leg whose kit a target may not install: absent from the manifest, it is a note.
