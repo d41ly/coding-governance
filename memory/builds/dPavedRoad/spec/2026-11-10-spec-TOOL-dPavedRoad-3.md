@@ -36,7 +36,7 @@ Line numbers are read at `ae6735c1`.
 - **S5** — Three documents say where `brief:prompt` comes from: the module docstring of
   `tools/roles/handoff.py`, the renderer prose of `tools/roles/README.md` and step 3 of
   `help/roles.md`. Observed by AC5.
-- **S6** — `tools/roles/adopt-roles.test.sh` gains arm 19, and `FLOOR_ASSERTIONS` moves from 51 to
+- **S6** — `tools/roles/adopt-roles.test.sh` gains arm 22, and `FLOOR_ASSERTIONS` moves from 51 to
   53. NOT OBSERVED by a pass: it is a suite arm, declared on a `New arm:` line, which the main loop
   observes RED and then GREEN at the close.
 
@@ -146,12 +146,12 @@ read through `roles_lib.load_roles` and filtered to the `brief:` family, so the 
 shipped role and not a typed key set. The filter exists because the `task:` family needs the kickoff
 checker, which a roles-kit fixture does not hold. Two assertions:
 
-- `arm 19 the spec writer's handoff carries the brief's prompt verbatim`: the task part holds
+- `arm 22 the spec writer's handoff carries the brief's prompt verbatim`: the task part holds
   `### brief:prompt`, a blank line, then both prompt lines exactly, before `### brief:goal`.
-- `arm 19 an empty prompt refuses by name`: with the prompt section emptied, `render_handoff`
+- `arm 22 an empty prompt refuses by name`: with the prompt section emptied, `render_handoff`
   raises, and the first line opens `brief:prompt — `.
 
-The floor comment gains `+2 for arm 19 (TOOL-dPavedRoad-3)`, and `FLOOR_ASSERTIONS` moves from 51
+The floor comment gains `+2 for arm 22 (TOOL-dPavedRoad-3)`, and `FLOOR_ASSERTIONS` moves from 51
 to 53 (`tools/roles/adopt-roles.test.sh:82`, PINNED at `ae6735c1`).
 
 ### The two probes
@@ -201,7 +201,7 @@ Run at `ae6735c1`, it printed `vocabulary False, first read brief:goal`, then
 ### Inventory
 
 No new function, type or module. The arm's shell locals take the `19` suffix the suite's arms use,
-as `_v18` does, and no naming cell grades a suite local. The arm label opens `arm 19`.
+as `_v18` does, and no naming cell grades a suite local. The arm label opens `arm 22`.
 
 ### Files touched (estimate)
 
@@ -246,7 +246,7 @@ handoff rendered before this unit still checks clean, since `check` hashes the f
 - risks — a prompt holding a column-0 `READY — ` line is cut there, because `extract_card_section`
   stops at one. None of the 383 records holds one. A prompt left as the skeleton's `> <...>` line
   passes as filled, because the placeholder test matches only a bare `<slot>`.
-- testing — arm 19, observed RED then GREEN at the close, and the probes of the acceptance criteria.
+- testing — arm 22, observed RED then GREEN at the close, and the probes of the acceptance criteria.
 - migration — none. A brief record needs no change, and a role that does not read the key renders
   as before.
 - user docs — `help/roles.md` step 3 names the block (S5).
@@ -282,7 +282,7 @@ Each probe is the Design section's fenced block of that name. No probe runs a ga
 
 `policy fixtures` · `roles catalogue` · `roles adopter self-test` · `roles render wiring` · `docs` · `memory hygiene`
 
-New arm: tools/roles/adopt-roles.test.sh · covers AC2 · arm 19, staged by reverting the dispatch so `brief:prompt` reads a `### prompt` sub-head, which renders no block and lets the empty prompt pass · `FLOOR_ASSERTIONS` 51 to 53
+New arm: tools/roles/adopt-roles.test.sh · covers AC2 · arm 22, staged by reverting the dispatch so `brief:prompt` reads a `### prompt` sub-head, which renders no block and lets the empty prompt pass · `FLOOR_ASSERTIONS` 51 to 53
 
 `policy fixtures` is owed because its guard names `tools/roles/handoff.py` and
 `tools/roles/roles_lib.py`. The guards on `{prefix}/` are broad and excluded. `roles catalogue`

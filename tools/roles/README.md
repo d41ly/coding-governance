@@ -1,4 +1,4 @@
-<!-- gov:kit roles@1.13 -->
+<!-- gov:kit roles@1.15 -->
 # roles — the role catalogue: one agent definition per role, the workflow table, and the checker
 
 A governed session runs its LLM work through ten declared WORKFLOWS — `orient`, `research`, `reuse`,
@@ -64,10 +64,22 @@ after its notes: the spawn's name, `<build> · <unit> · <workflow>` with the ro
 `workflow`, or `<build> · <workflow>` with no `--unit`. The `Agent` call passes it as `description`,
 and the hooks kit's spawn guard derives the same name from the marker and the role index and refuses
 a call carrying any other (TOOL-aOrientedCast-27). stdout does not change in any mode.
+That `Agent` call also carries `effort` (TOOL-aProfiledEffort-3): its role's value in the JSON
+`python handoff.py role-efforts --model <id>` prints, one line mapping every role whose `agent` is
+true to its level. The rule is the same for every model: where no profile matches the id, the value
+equals the agent type's own `effort:` line, so passing it changes nothing. The spawn guard refuses a
+call whose level is not the one this verb prints for the model in use (TOOL-aGuardedEffort-1): it
+reads the model from the call's `model`, else from the session's transcript, and the levels from
+the `effort` key `render_agents.py` writes into the role index. It does not check the agents a
+harness spawns itself, the `committer` and `probe` stages, which workflow a call to a harness
+serving two runs, a model no transcript names or two profiles match, an `Agent` call where
+`CLAUDE_CODE_EFFORT_LEVEL` is set, a configured default subagent model, an effort ceiling in
+settings, or a hand-edited index.
 `python handoff.py harness-args <harness>` prints the `roles` object a harness takes: the
 union of the `stages` tables of every workflow whose harness is that script, as one line of JSON.
-`python handoff.py stage-efforts <workflow>` prints the `efforts` object a harness call takes for one
-workflow, as the next section states.
+`python handoff.py stage-efforts <workflow> --model <id>` prints the `efforts` object a harness call
+takes for one workflow. What `<id>` is, and what each verb prints without the flag, is the next
+section's.
 Exit 0, 1 on a refusal, 2 on usage or an unarmed tree; the script's header states what it does not
 check.
 
@@ -106,7 +118,7 @@ of its return.
 | Field | From | When nothing answers |
 |---|---|---|
 | role | the agent's meta `agentType`; for a direct spawn, else the marker's `role` | `unknown` |
-| effort | the agent transcript's last `effort`; else the agent type's `effort:` line | `unknown` |
+| effort | the agent transcript's last `effort` | `unknown` |
 | model | the transcript's last `message.model`; for a direct spawn, else the call's `resolvedModel` | `unknown` |
 | unit or label | the marker's `unit`, else the meta's `description`; for a harness agent, the one unit id its journal label names, else the label | `unknown` |
 | prompt | the handoff and its marker's `path`; for a harness agent, the call's `briefPath`, else its `scriptPath` | `unknown` |
@@ -180,9 +192,37 @@ R12 and every render refuses it with exit 2, so no level falls back silently.
 - `[effort.roles]` holds one entry per role slot whose `agent` is true. `render_agents.py` writes the
   resolved level into that agent type as `effort: <level>`, the line before `omitClaudeMd: true`.
 - `[effort.stages.<workflow>]` overrides a stage of one workflow, keyed by that workflow's `stages`
-  keys. `handoff.py stage-efforts <workflow>` prints each stage's level, its entry here else its
-  slot's, and a harness call passes that JSON as `efforts`, which wins over the agent type's level.
-  That is how `gov-synthesizer` runs at `medium` in spec review and `high` in closing review.
+  keys. `handoff.py stage-efforts <workflow> --model <id>` prints each stage's level, its entry here
+  else its slot's, and a harness call passes that JSON as `efforts`, which wins over the agent
+  type's level. That is how `gov-synthesizer` runs at `medium` in spec review and `high` in closing
+  review on a model no profile matches.
+- `[effort.profiles.<name>]` is a profile for one model family (TOOL-aProfiledEffort-1). It holds
+  `match` and `default`, and optionally `[effort.profiles.<name>.roles]` and
+  `[effort.profiles.<name>.stages.<workflow>]` in the grammar of the tables above. The seeded
+  `[effort.profiles.fable]` names no role and no stage, so every role and every stage key of a
+  workflow's `stages` table runs at `medium` on any Claude Fable version. Adding a profile is adding one such table: no code changes, and
+  `check_roles.py` grades it as R12. A matched profile is read ALONE: the role and stage entries of
+  the tables above do not reach a model a profile matches.
+
+**How a profile reaches an agent.** At dispatch, and only there: a harness call's `efforts` from
+`handoff.py stage-efforts <workflow> --model <id>`, or a direct spawn's `effort` from
+`handoff.py role-efforts --model <id>`. It never reaches an agent type's `effort:` line, which
+`render_agents.py` resolves with no model, so a profile takes effect on the next call, with no
+re-render and no new session. `<id>` is the model in use: the session's own model id, exactly as
+the session's environment states it, read again at each call and never remembered from an earlier
+one. Every agent type declares `model: inherit` and no harness passes a model, so the session's id
+is the agent's. An id is matched by its words, so a provider prefix or a version suffix changes no
+answer.
+
+**The limits.** The script does not check the id a caller types. A session that cannot name its
+model leaves the flag off, never passes an empty one, which exits 2, and gets the tables above. A
+spawn that is passed no level runs at its agent type's level, else the session's: a harness stage
+the workflow table gives no key, which today is
+`committer` and `probe`: `committer` of `unattended-build.js` and `probe` of `tier2-review.js`; and
+a direct spawn from a session whose `Agent` tool offers no `effort` parameter. Nothing refuses a
+call made without the flag or under a misnamed model; the `agent` line, under "The agent lines",
+prints the effort and the model each agent's transcript records, and `unknown` for an effort it
+does not record.
 
 The levels are `low`, `medium`, `high`, `xhigh` and `max`, the names Claude Code 2.1.292 reads on both
 an agent type and a `Workflow` `agent()` call; the integer form only the agent loader takes is
@@ -304,7 +344,7 @@ and the owner's go (KICK-aOrientedCast-2). It walks this catalogue's workflows i
 points at the carriers `/unattended` already follows (the build method, the verbs guide, the two
 build harnesses' attended mode, the review harness) instead of restating them; every agent it orders
 is spawned from a `handoff.py render` and every harness call carries `handoff.py harness-args` and
-`handoff.py stage-efforts`.
+`handoff.py stage-efforts <workflow> --model <id>`.
 
 The render substitutes three tokens literally: `{{KIT_DIR}}` and `{{TOOL_ROOT}}`, derived by the
 same `.git` walk the unattended adopter uses, and `{{MEMORY_ROOT}}`, read from `.memory-tree.conf`.

@@ -161,7 +161,7 @@ acceptance criterion, so diagnostics that would change them live behind the flag
 ## The rules that left the hook — `TOOL-dFairHearing-16`
 
 Three of the agent-cap hook's rules are this kit's since the owner's NT-27, each seen red at its new
-home before the hook stopped carrying it. The hook keeps rules 6 and 7, which judge the call, and
+home before the hook stopped carrying it. The hook keeps rules 6, 8 and 7, which judge the call, and
 exports the readers these homes share with it: its views, `runBothViews`, `MAX_VERIFIERS`, the
 writer bound, the args reader and the slug walk. Rule 2's lens-literal bound is `LENS_SLOTS` in
 `check-verifier-fanout.js`, the same number the slot count holds every marked literal to, so it has
@@ -810,9 +810,10 @@ harness's reserved untyped literal; an untyped stage is spelled by leaving its k
   under `efforts.probe`; the build harness spawns its spec writer, spec commit and disposal at theirs, forwards the audit's three
   review keys as the review call's `efforts` and `builder` in `dispatch.args`. A malformed object, an
   unknown key or a value off the shape refuses before any spawn. The vocabulary is the roles kit's, so
-  a harness grades the shape only. Compose it with `<prefix>/roles/handoff.py stage-efforts
-  <workflow>`, keyed by WORKFLOW: the review harness serves spec review and closing review, which run
-  one role at two levels.
+  a harness grades the shape only. Compose it with
+  `<prefix>/roles/handoff.py stage-efforts <workflow> --model <id>`, keyed by WORKFLOW: the review
+  harness serves spec review and closing review, which run one role at two levels. What `<id>` is,
+  the roles README's "The effort policy" says.
 - **The parity arm.** A workflow script cannot import, so each harness that tests an agent type keeps its
   own copy of the shape. The protocol-parity leg's agent-type shape arm compares every copy in this kit
   with the one `tier2-review.template.js` owns, and reds on a difference or on an owner yielding none.

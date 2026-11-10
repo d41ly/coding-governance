@@ -1,0 +1,17 @@
+# Acceptance ledger — TOOL-aProfiledEffort-4
+
+**Serves:** journal TOOL-aProfiledEffort-4
+
+Built against spec rev-2 at the pass's parent `8f6ac1e94`. The diff is the patch a previous pass of this unit made against rev-1, applied whole: rev-2 anchored AC4's grep and put that pass's three comment edits in scope, and every hunk still matches the spec. Each line below is a probe of the changed code, made in this pass with the names of the spec's section 6 set. The archive of `c1d1e19f4` under `u4/was` and the kit copy `u4/kit` sat in the run's scratch directory and are not tracked. No suite, self-test, gate leg or bar ran in the pass, so neither arm's new code has executed. Owed to the main loop at the close: the legs of the spec's Gates section, AC9 and AC10, and both `New arm:` lines observed RED under each of the staged breaks B1 to B8 and GREEN restored, recorded here under a `Pass: none` commit.
+
+**Evidences:** TOOL-aProfiledEffort-4
+- AC1 — `grep -c 'EFFORT_LINE_RE' $H` — the five commands printed `0`, `0`, `1`, `0` and `1`, in the criterion's order.
+- AC2 — `python -B -c "$P_ROWS" $R` — printed `high low [('k1', 'high'), ('k2', 'high')]`, then `max xhigh [('k1', 'medium'), ('k2', 'xhigh')]` twice, then `medium medium [('k1', 'medium'), ('k2', 'medium')]`.
+- AC3 — `grep -c '"Vendor-FAM-9"' $A` — it and the four other counts each printed `1`, and the `ast.parse` command exited 0 over the self-test's file, as it did over the script and the library.
+- AC4 — `None None None low` — the criterion's command printed exactly this with no traceback, and `grep -c '^    if not words:' $L` printed `1`.
+- AC5 — `grep -c 'every one runs at medium' $T` — the six commands printed `0`, `1`, `1`, `0`, `1` and `0`, in the criterion's order.
+- AC6 — `['effort', 'gates'] ['fable']` — the load printed exactly this, after the two counts printed `0` and `1`.
+- AC7 — `bash -n "$S"` — exited 0; the counts printed `8`, `5`, `1`, `2` and `2`, and the floor's rise against the pass's start printed `2`, from 55 to 57.
+- AC8 — `--model is empty` — the compare loop printed nothing for no model and for `--model claude-fable-5-2`. Over the kit copy with the `tfam` and `tven` profiles appended, `role-efforts --model ' '` printed the usage block and a stderr line carrying it, then `2`; `stage-efforts build --model vendor-tfam-9` and `role-efforts --model vendor-tfam-9` each printed one stderr line carrying `R12`, `effort.profiles.tfam.match` and `effort.profiles.tven.match`, then `1`, with no traceback.
+- AC9 — `tools/roles/handoff.py` — the suite did not run in the pass, so no `ok   arm 9` line, no `ok   arm 19` line and no `PASS` line has been seen, and none of B6, B7 and B8 has been applied. What the pass observed in its place: the calls of the widened 19d and of 19e are the calls AC8 made over the kit copy, with the exits and stderr the arm asserts. Arm 9's new assertion was not executed by any probe. The arm's run, RED and then GREEN, is the main loop's.
+- AC10 — `tools/roles/roles_lib.py` — the self-test did not run in the pass, so no `PASS` line has been seen and none of B1 to B5 has been applied. What the pass observed in its place: AC2 resolved four of the arm's rows through the library, the new mixed-case and second-word rows among them, and AC4 resolved a profile holding no `match` with no model and saw no `Traceback`. The two-word defect row was not executed by any probe. The arm's run, RED and then GREEN, is the main loop's.

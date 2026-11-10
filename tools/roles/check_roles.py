@@ -42,7 +42,11 @@ touching nothing else, then grades as usual.
   R12 a `house/policy.toml` defect, one line per line of `roles_lib.load_policy`'s refusal: the file
       absent or not TOML, an unknown key, no `default`, a level outside the five, a role entry
       naming no role file or an `agent: false` role, a stages table naming no workflow or a
-      workflow with no stages, or a stage key that workflow does not hold; under `[gates]`, a key
+      workflow with no stages, or a stage key that workflow does not hold; under
+      `effort.profiles`, a profile that is not a table, any of those defects in its own `default`,
+      `roles` and `stages`, or a `match` that is absent, not a list of strings, empty, holding an
+      entry that is not one word, or holding a word an earlier profile holds
+      (TOOL-aProfiledEffort-1); under `[gates]`, a key
       naming no role file or an `agent: false` role, a value that is not a list of strings, or a
       leg name the tool root's gate manifest does not hold, checked only when that manifest reads
       and a `roles: note:` otherwise (TOOL-aOrientedCast-11); a name ending in `?` is optional, so

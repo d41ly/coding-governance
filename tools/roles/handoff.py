@@ -5,7 +5,8 @@
                              [--input <key>=<value>]... [--out <path> | --stdout | --stand-in]
                              [--part full|task]
     python handoff.py harness-args <harness>
-    python handoff.py stage-efforts <workflow>
+    python handoff.py stage-efforts <workflow> [--model <id>]
+    python handoff.py role-efforts [--model <id>]
     python handoff.py check <file>
     python handoff.py roster
     python handoff.py agents (--handoff <path> | --run <run-id>) [--session <file>] [--write]
@@ -32,7 +33,12 @@ of the file. `check` re-derives both and compares the marker's `path` with the f
 `harness-args` prints, as one line of sorted JSON, the union of the `stages` tables of every
 workflow whose harness names that script. `stage-efforts` prints, the same way, the reasoning effort
 `house/policy.toml` resolves for every stage key of ONE workflow's `stages` table: a harness call
-passes it as its `efforts` argument (TOOL-aOrientedCast-10). `roster` prints the charter's roles
+passes it as its `efforts` argument (TOOL-aOrientedCast-10). `role-efforts` prints, the same way,
+the level of every role whose `agent` is true, and a direct spawn passes its role's value. With
+`--model <id>` the two verbs resolve the levels the policy's profiles give that model id; without
+the flag, or for an id no profile matches, they resolve the default tables, so `stage-efforts`
+with no flag prints what it printed before the flag existed, and each `role-efforts` value is that
+role's rendered `effort:` line (TOOL-aProfiledEffort-2). `roster` prints the charter's roles
 section, one line per role, ``- `<slot>`: <description> <when>. Output: <output>.``, where `<when>`
 is `Optional` for a `mandatory` of `no`, `Optional, <text>` for `no — <text>`, else `Mandatory
 <value>`, `{{MEMORY_ROOT}}` is the conf's value, and the order is the workflow table's; a line past
@@ -41,7 +47,7 @@ charter (TOOL-aOrientedCast-17).
 
 `agents` prints the governing doc's `agent` line for each agent its selector names, then its
 `returned` line once it has returned, each shape read from the doc's micro-format fence and filled
-by placeholder name from the session's own records, the role index and the agent types; a field
+by placeholder name from the session's own records and the role index; a field
 nothing answers prints `unknown` (TOOL-aOrientedCast-20). `--handoff` names a direct spawn, every
 `Agent` call whose prompt opens with the file's marker line as the hooks kit's spawn guard reads it,
 through `roles_lib.extract_prompt_marker` (TOOL-aOrientedCast-25); `--run` a harness run, one agent
@@ -74,9 +80,13 @@ single and not a placeholder is copied verbatim; whether a rendered role is curr
 catalogue, since `check` hashes the file's own bytes and nothing more; and whether a secret sits in
 a card or a brief, which the charter's `[security]` rule guards and this script does not. For
 `agents`: the transcript format is no contract, so a renamed field reads as `unknown`; an `effort`
-or a `model` is what the transcript records, not proved to be what the API applied; a file written
+or a `model` is what the transcript records, not proved to be what the API applied; an effort no
+transcript record carries prints `unknown`, never the agent type's `effort:` line, which is the
+default tables' level and not the level a profile dispatched (TOOL-aProfiledEffort-4); a file written
 through Bash is not counted as written; the session read may not be the one the build ran in; and
 a ledger line edited by hand passes, since nothing re-derives the ledger.
+For `--model`: the id is not checked to be the model the session or the spawned agent runs, since
+the caller types it, and an id no profile matches answers the default levels with no note.
 """
 import argparse
 import datetime
@@ -118,10 +128,9 @@ LEDGER_TAIL = "-agent-ledger.md"
 UNKNOWN = "unknown"
 WRITE_TOOLS = ("Write", "Edit", "MultiEdit", "NotebookEdit")
 SESSION_ID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
-#: A run id or an agent id reaches a path only in this shape; so does a role naming an agent type.
+#: A run id or an agent id reaches a path only in this shape.
 PATH_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
 LABEL_UNIT_RE = re.compile(r"[A-Z]+-[A-Za-z]+-[0-9]+")
-EFFORT_LINE_RE = re.compile(r"^effort:[ \t]*(\S+)$", re.M)
 SHAPE_FIELD_RE = re.compile(r"<([^<>]+)>")
 NOTIFICATION_RE = re.compile(r"<task-notification>(.*?)</task-notification>", re.S)
 #: The session file's lines worth parsing: every other line is skipped unparsed, by its bytes.
@@ -456,6 +465,12 @@ def check_handoff(root, path):
     return not bad, bad or ["%s role-sha=%s task-sha=%s" % (rel, role_sha, task_sha)]
 
 
+def write_json_line(obj):
+    """One line of sorted, compact JSON on stdout: the shape a harness argument takes."""
+    sys.stdout.buffer.write((json.dumps(obj, sort_keys=True, separators=(",", ":"),
+                                        ensure_ascii=False) + "\n").encode("utf-8"))
+
+
 def print_harness_args(harness):
     """Print the union of the `stages` tables of every workflow whose harness path ends in the script
     `harness` (its file name without extension) as one line of sorted JSON; RolesError when no
@@ -473,15 +488,15 @@ def print_harness_args(harness):
             union[key] = slot
     if not hit:
         raise lib.RolesError("no workflow's harness is the script %s" % harness)
-    sys.stdout.buffer.write((json.dumps(union, sort_keys=True, separators=(",", ":"),
-                                        ensure_ascii=False) + "\n").encode("utf-8"))
+    write_json_line(union)
 
 
-def print_stage_efforts(workflow):
+def print_stage_efforts(workflow, model=None):
     """Print the resolved level of every stage key of one workflow's `stages` table as one line of
     sorted JSON (TOOL-aOrientedCast-10); RolesError on an unknown name, a workflow with no `stages`
     table, or a policy defect. Keyed by workflow, not harness: a harness serving two workflows runs
-    one role at two levels, which a union cannot carry."""
+    one role at two levels, which a union cannot carry. `model` goes to the resolver unchanged
+    (TOOL-aProfiledEffort-2)."""
     workflows = lib.load_workflows(KIT_DIR)
     policy = lib.load_policy(KIT_DIR, lib.load_roles(KIT_DIR), workflows)
     entry = next((w for w in workflows if w.get("name") == workflow), None)
@@ -490,8 +505,16 @@ def print_stage_efforts(workflow):
     if not isinstance(entry.get("stages"), dict):
         raise lib.RolesError("the workflow %s has no stages table, so no harness stage takes a level"
                              % workflow)
-    sys.stdout.buffer.write((json.dumps(lib.resolve_stage_efforts(policy, entry), sort_keys=True,
-                                        separators=(",", ":"), ensure_ascii=False) + "\n").encode("utf-8"))
+    write_json_line(lib.resolve_stage_efforts(policy, entry, model))
+
+
+def print_role_efforts(model=None):
+    """Print the resolved level of every role whose `agent` is true as one line of sorted JSON
+    (TOOL-aProfiledEffort-2); RolesError on a policy defect."""
+    roles = lib.load_roles(KIT_DIR)
+    policy = lib.load_policy(KIT_DIR, roles, lib.load_workflows(KIT_DIR))
+    write_json_line({slot: lib.resolve_effort(policy, slot, model) for slot, role in roles.items()
+                     if role["keys"].get("agent", "true") == "true"})
 
 
 def print_roster(memory_root):
@@ -813,11 +836,11 @@ def write_agent_ledger(root, memory_root, build, lines):
 
 def print_agent_lines(root, memory_root, charter_path, session, handoff_arg, run_id, write=False):
     """Print the governing doc's `agent` line for each agent the selector names, then its `returned`
-    line once it has returned, filled by name from the session's records, the role index and the
-    agent types (TOOL-aOrientedCast-20). When `write` is true, add each line holding no UNKNOWN
+    line once it has returned, filled by name from the session's records and the role index
+    (TOOL-aOrientedCast-20). When `write` is true, add each line holding no UNKNOWN
     field to the build's agent ledger; else write nothing and note the held lines and `--write`
     (TOOL-aOrientedCast-25). RolesError on a refusal, with nothing printed."""
-    from render_agents import AGENTS_REL, INDEX_REL  # the renderer's two paths, as print_roster imports the checker's
+    from render_agents import INDEX_REL  # the renderer's index path, as print_roster imports the checker's
     doc = charter_path.relative_to(root).as_posix() if root in charter_path.parents else charter_path.as_posix()
     shapes = lib.extract_microformat_shapes(lib.load_text(charter_path))
     for head in ("agent", "returned"):
@@ -906,10 +929,6 @@ def print_agent_lines(root, memory_root, charter_path, session, handoff_arg, run
     for aid, tr, role_fallback, unit, (name, path), model_fallback, returned, outcome in agents:
         role = tr["type"] or role_fallback
         level = tr["effort"]
-        if level is None and role and PATH_ID_RE.match(role) and (root / AGENTS_REL / (role + ".md")).is_file():
-            fm = lib.FRONT_MATTER_RE.match(lib.load_text(root / AGENTS_REL / (role + ".md")))
-            hit = EFFORT_LINE_RE.search(fm.group(1)) if fm else None
-            level = hit.group(1) if hit else None
         entry = held.get(role) if isinstance(held.get(role), dict) else {}
         gates = entry.get("gates") if isinstance(entry.get("gates"), list) else []
         fields = {"role": role, "level": level, "model": tr["model"] or model_fallback, "unit-id|label": unit,
@@ -957,7 +976,10 @@ def main(argv):
     dest.add_argument("--stand-in", action="store_true")
     r.add_argument("--part", choices=("full", "task"), default="full")
     sub.add_parser("harness-args").add_argument("harness")
-    sub.add_parser("stage-efforts").add_argument("workflow")
+    se = sub.add_parser("stage-efforts")
+    se.add_argument("workflow")
+    se.add_argument("--model")
+    sub.add_parser("role-efforts").add_argument("--model")
     sub.add_parser("check").add_argument("file")
     sub.add_parser("roster")
     ag = sub.add_parser("agents")
@@ -969,12 +991,16 @@ def main(argv):
     a = ap.parse_args(argv)
     if a.verb == "agents" and a.run is not None and not PATH_ID_RE.match(a.run):
         ap.error("--run '%s' is not a run id of letters, digits, '_' and '-'" % a.run)
-    if a.verb in ("harness-args", "stage-efforts"):
+    if getattr(a, "model", None) is not None and not a.model.strip():
+        ap.error("--model is empty: name the model id in use, or leave the flag off for the default levels")
+    if a.verb in ("harness-args", "stage-efforts", "role-efforts"):
         try:
             if a.verb == "harness-args":
                 print_harness_args(a.harness)
+            elif a.verb == "stage-efforts":
+                print_stage_efforts(a.workflow, a.model)
             else:
-                print_stage_efforts(a.workflow)
+                print_role_efforts(a.model)
             return 0
         except lib.RolesError as e:
             print("handoff: %s" % e, file=sys.stderr)

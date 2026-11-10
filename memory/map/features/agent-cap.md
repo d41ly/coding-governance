@@ -210,7 +210,11 @@ scripts the join ban judges. A closed `--only=` set (`join`, `scripts`) lets fil
 predicate; a WIRED command never carries it (`tools/check-wiring.sh`).
 
 Rule 6 (`TOOL-aOrientedCast-7`) admits an `Agent` call only as a rendered handoff and a `Workflow`
-call only as a declared harness, per `.claude/roles.json`. `format-guard.js` reads agents
+call only as a declared harness, per `.claude/roles.json`. Rule 8 (`TOOL-aGuardedEffort-1`) then
+refuses a call whose effort level is not the one that index's `effort` key gives its model; not
+checked: a harness's own spawns, the unkeyed stages, a two-workflow harness's workflow, an unread
+or twice-matched model, an `Agent` call under `CLAUDE_CODE_EFFORT_LEVEL`, a default subagent model,
+a settings ceiling, a hand-edited index. `format-guard.js` reads agents
 from the transcript, never the agent ledger (`TOOL-aOrientedCast-21`).
 
 ## Gaps

@@ -28,3 +28,11 @@ In clones of `6681cdc80` under `%TEMP%/dpr`, by the main loop, `bash tools/roles
 RED: with the dispatch reverted so `brief:prompt` reads a `### prompt` sub-head, it exited 1 in 83 s
 with one failure, `arm 19 the spec writer's handoff carries the brief's prompt verbatim`. GREEN: at
 `6681cdc80` it exited 0 in 101 s, `PASS (65 assertions)`, above the floor of 53.
+
+## Renumbered at the landing reconcile
+
+Reconciling onto origin/main at `1fef61174`, `tools/roles/adopt-roles.test.sh` already held an arm 19
+from TOOL-aProfiledEffort-2 and arms 20 and 21 from TOOL-aGuardedEffort-1. This unit's arm moved
+below them as arm 22, unchanged but for its label and locals, the spec's references followed it, and
+`FLOOR_ASSERTIONS` became 61: main's 59 plus this arm's two. The RED and GREEN observations above
+were made under the old label, arm 19.
