@@ -1,6 +1,6 @@
 # TOOL-aSmoothedDispatch-1 — `--writes` takes every path up to the next flag, and splits a whitespace-joined value
 
-**Status:** SPECCED · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

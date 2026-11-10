@@ -61,7 +61,7 @@ ids TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 T
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aSmoothedDispatch-1 — `--writes` takes every path up to the next flag, and splits a whitespace-joined value](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-11-10 |
+| [TOOL-aSmoothedDispatch-1 — `--writes` takes every path up to the next flag, and splits a whitespace-joined value](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-2 — `--dispatch` removes the run-state file from its declared writes with a note instead of refusing](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-2.md) | 2 | 2 | SPECCED | rev-3 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-3 — `unattended.sh --help` prints the verb list and exits 0](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-4 — `--dispatch`'s spec-token check grades the dispatching build's specs, and skips when its inputs match the last admitted check](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-11-10 |

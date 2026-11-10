@@ -217,7 +217,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   rather than in enforced ordering: the pair catches an amendment made with NO record, never a
   truthful-looking row attached to a different edit.
 - `--dispatch` — records the WRITE-SET DECLARATION a concurrent dispatch owes: `--pass <unit-id>`
-  and a REPEATABLE `--writes <path>`, one path per occurrence. The build method requires two path
+  and `--writes`, which takes every path up to the next flag: a whitespace-joined value splits into
+  its paths, and the flag may repeat. The build method requires two path
   lists written down before two passes run together, and until this verb nothing read one. It decides
   two of that condition's three clauses — the intersection test, and the shared-record refusal in
   BOTH halves, so a generated index alone is accepted and only the index TOGETHER WITH its generator
@@ -762,7 +763,8 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   `supersede` and `defer` are surfaced-class rows your `parked-decisions-surfaced` attestation must
   cover; `add` stays history.
 - **Before dispatching a pass, DECLARE its write set** (M6): `--dispatch <slug> --pass <unit-id>
-  --writes <path> --writes <path>`, one path per `--writes`. It refuses two passes claiming one file
+  --writes <path> <path>`. `--writes` takes every path up to the next flag: a whitespace-joined
+  value splits into its paths, and the flag may repeat. It refuses two passes claiming one file
   and a pass claiming a shared mutable record; a generated index alone is fine and only the index
   WITH its generator is refused. Whether a file is a contract the sibling reads is a judgement no verb
   makes. A pass needing another file declares again BEFORE the commit, naming only the paths it

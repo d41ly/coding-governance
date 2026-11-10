@@ -17,7 +17,7 @@
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
 #   unattended.sh --propose <slug> --item <text> --step <s> --reason <text>  # amend a playbook LATER
 #   unattended.sh --rescope <slug> --act <retire|supersede|add|defer> --item <id> [--successor <id>] --reason <text>
-#   unattended.sh --dispatch <slug> --pass <id> --writes <path> [--writes <path> ...]
+#   unattended.sh --dispatch <slug> --pass <id> --writes <path> [<path> ...] [--writes <path> ...]
 #   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
 #   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--highs <N> --minors <N>] [--folded <N> --promoted <N>] [--disposition fold|promote]
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
@@ -14497,8 +14497,8 @@ verb_dispatch() { # slug · unit · writes...
       return 1
     fi
   fi
-  # EACH --writes IS ONE PATH. A space-joined value cannot carry the whitespace refusal below: the
-  # path has already become two tokens by the time this verb sees it, and nothing recovers that.
+  # THE ARGUMENT LOOP SPLITS SPACE, TAB AND NEWLINE into separate paths before this verb sees them, so
+  # the whitespace refusal below catches the rest: a carriage return, a vertical tab, a form feed.
   for p in "$@"; do
     case "$p" in
       "") fail 49 "--dispatch was given an empty --writes path, and an empty declaration is not a narrow one: $unit"; return 1 ;;
@@ -15088,7 +15088,15 @@ while [ $# -gt 0 ]; do
     --pass)         PK_ITEM="${2:-}"; shift 2 || shift ;;
     --task)         TK_NAME="${2:-}"; shift 2 || shift ;;
     --heartbeat)    TK_BEAT="${2:-}"; shift 2 || shift ;;
-    --writes)       DP_WRITES+=("${2:-}"); shift 2 || shift ;;
+    # TAKES EVERY PATH UP TO THE NEXT FLAG, each value split on space/tab/newline unglobbed; no field is one empty path.
+    --writes)       shift; _dw_n=0
+                    while [ $# -gt 0 ]; do
+                      case "$1" in --*) break ;; esac
+                      _dw=(); IFS=$' \t\n' read -r -d '' -a _dw <<<"$1" || :
+                      if [ ${#_dw[@]} -eq 0 ]; then DP_WRITES+=(""); else DP_WRITES+=("${_dw[@]}"); fi
+                      _dw_n=$((_dw_n+1)); shift
+                    done
+                    [ "$_dw_n" -gt 0 ] || DP_WRITES+=("") ;;
     --act)          RS_ACT="${2:-}"; shift 2 || shift ;;
     --successor)    RS_SUCC="${2:-}"; shift 2 || shift ;;
     --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;

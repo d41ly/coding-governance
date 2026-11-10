@@ -9069,9 +9069,17 @@ rm -rf "$_nolib"
 hit "$(run --dispatch tRun --pass notanid --writes ${PFX}a.sh)" "--dispatch was given a --pass value that is not id-shaped by the driver's own spelling, and the leg joins a declaration to a commit through that id:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes /etc/passwd)" "--dispatch was given an absolute --writes path, and a declaration is repo-relative or it names a file no comparison can find:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ../outside.sh)" "--dispatch was given a --writes path that escapes the repository, which no pass may declare and no comparison can bound:"
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes 'two words/x.sh')" "--dispatch was given a --writes path containing whitespace, which the declaration's own field separator cannot carry, so the leg would split it into paths nobody declared:"
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes 'spells · separator.sh')" "--dispatch was given a --writes path containing whitespace, which the declaration's own field separator cannot carry, so the leg would split it into paths nobody declared:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes '')" "--dispatch was given an empty --writes path, and an empty declaration is not a narrow one:"
+# ---- TOOL-aSmoothedDispatch-1: one --writes takes every path up to the next flag, and splits a
+# ---- whitespace-joined value; a carriage return is not split and still meets the refusal.
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/one work/two work/three)
+hit  "$out" "ARCH-tRun-1 · work/one work/two work/three"
+miss "$out" "unknown argument"
+out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes "work/four work/five")
+hit  "$out" "ARCH-tRun-1 · work/four work/five"
+miss "$out" "containing whitespace"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes $'two\rwords/x.sh')" "--dispatch was given a --writes path containing whitespace, which the declaration's own field separator cannot carry, so the leg would split it into paths nobody declared:"
 
 # ...and the HEAD branch, which is reachable ONLY in a repo with no commits — the one place a
 # hand-made run-state file can exist while `rev-parse HEAD` has nothing to answer with. Armed rather
@@ -19083,7 +19091,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # a terminal record 6, the four chain reasons 10, the live set 5 and the waiver guard 3, and 5 in region two
 # for the fifth field, so FLOOR_SHARD_1 and FLOOR_SHARD_2 carry those. COUNTED off the block's own lines,
 # helpers' assertions included; no suite ran, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=3256
+# RAISED 3256 -> 3259 by TOOL-aSmoothedDispatch-1 on 2026-11-10: 5 region-four --writes split assertions
+# (3 `hit`, 2 `miss`) less the 2 space-holding whitespace arms they replace, so FLOOR_SHARD_4 carries the
+# same net 3. COUNTED off the block's own lines; no suite ran, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=3259
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -19292,7 +19303,8 @@ FLOOR_SHARD_2=223
 FLOOR_SHARD_3=405
 # RAISED 373 -> 382 by TOOL-dGroundRules-66: the same 9 region-four terminal-unit assertions, see FLOOR_ASSERTIONS.
 # RAISED 382 -> 383 by TOOL-dGroundRules-70: the same 1 region-four reader assertion, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_4=383
+# RAISED 383 -> 386 by TOOL-aSmoothedDispatch-1 on 2026-11-10: the same net 3 region-four --writes split assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_4=386
 FLOOR_SHARD_5=297
 FLOOR_SHARD_6=127
 FLOOR_SHARD_7=311
