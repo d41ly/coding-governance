@@ -1,13 +1,15 @@
 # TOOL-aGuardedEffort-1 — the spawn guard refuses a role spawn or a harness call at a level the model's effort profile does not give
 
-**Status:** INPROGRESS · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 1 · closes TOOL-aProfiledEffort-6 · ratified 2026-11-10
+**Status:** INPROGRESS · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 1 · closes TOOL-aProfiledEffort-6 · ratified 2026-11-10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-10-prompt-TOOL-aGuardedEffort-1-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aGuardedEffort-1-1-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-TOOL-aGuardedEffort-1-2-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aGuardedEffort-1-2-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aGuardedEffort-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aGuardedEffort-1-brief.md) | research | — |
+| [2026-11-10-prompt-TOOL-aGuardedEffort-1-observation-revision-brief.md](../prompts/2026-11-10-prompt-TOOL-aGuardedEffort-1-observation-revision-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -255,15 +257,24 @@ call under a set `CLAUDE_CODE_EFFORT_LEVEL`, a configured default subagent model
 ### The observation
 
 Run from the worktree root after S1 to S9. It calls rule 8 alone, over the tree's own index, so
-rules 6 and 7 do not decide. It prints one line per case.
+rules 6 and 7 do not decide. It prints one line per case, and a refusal's whole text is on that
+line: `say` trims it and joins its lines with ` | `, so the remedy line and each per-workflow line
+of "The texts" are read by the criteria beside the first clause.
+
+The caller names the scratch directory in `EFFORT_PROBE_DIR`, an existing directory it owns. The
+observation and the parity probe both stop with that name when it is unset, and neither reads
+`TMPDIR` or asks the platform for a temporary directory. The name is the two probes' own: no file
+in the tree reads it. The transcripts stay in that directory, so AC9 pipes its payload with
+`fable.jsonl` from there.
 
 ```bash
 node -e '
-const fs = require("fs"), os = require("os"), path = require("path")
+const fs = require("fs"), path = require("path")
 const cap = require("./tools/hooks/agent-cap.js")
 const index = require("./tools/hooks/scratch-guard.js").loadRoleIndex(process.cwd())
 delete process.env.CLAUDE_CODE_EFFORT_LEVEL
-const dir = fs.mkdtempSync(path.join(os.tmpdir(), "ge-"))
+const dir = process.env.EFFORT_PROBE_DIR
+if (!dir) throw new Error("set EFFORT_PROBE_DIR to an existing scratch directory")
 const put = (name, rows) => { const p = path.join(dir, name); fs.writeFileSync(p, rows.map((r) => JSON.stringify(r) + "\n").join("")); return p }
 const said = (model) => ({ type: "assistant", message: { model } })
 const fable = put("fable.jsonl", [said("claude-fable-5-2"), said("<synthetic>")])
@@ -278,7 +289,7 @@ const cases = {
   "m-fable": agent(other, { model: "fable" }), "m-fable-medium": agent(other, { model: "fable", effort: "medium" }), "m-opus": agent(fable, { model: "opus" }),
   "n-path": agent(undefined, {}), "n-unreadable": agent(path.join(dir, "absent.jsonl"), {}), "n-empty": agent(empty, {}),
 }
-const say = (name, v) => console.log(name + " -> " + (v === null ? "admit" : v.deny ? "deny: " + v.deny.split("\n")[0] : "note: " + v.note))
+const say = (name, v) => console.log(name + " -> " + (v === null ? "admit" : v.deny ? "deny: " + v.deny.trim().split(/\r?\n/).join(" | ") : "note: " + v.note))
 for (const [name, data] of Object.entries(cases)) say(name, cap.checkEffortLevel(data, index, process.cwd()))
 say("x-no-key", cap.checkEffortLevel(cases["a-none"], Object.assign({}, index, { effort: null }), process.cwd()))
 const two = Object.assign({}, index.effort.profiles, { second: Object.assign({}, index.effort.profiles.fable, { match: ["claude"] }) })
@@ -296,18 +307,19 @@ suite arms use their own fixtures, so a policy edit moves these lines and no arm
 ### The parity probe
 
 ```bash
+: "${EFFORT_PROBE_DIR:?set EFFORT_PROBE_DIR to an existing scratch directory}"
 IDS="claude-fable-5-2 fable FABLE-5 affable-1 fable5 claude-opus-5 us.vendor/claude-fable-5-2:0 ---"
 python -c '
 import sys; sys.path.insert(0, "tools/roles"); import roles_lib as l
 p = l.load_policy("tools/roles", l.load_roles("tools/roles"), l.load_workflows("tools/roles"))
 for m in sys.argv[1:]:
     try: print(m, l.resolve_profile(p, m) or "-")
-    except l.RolesError: print(m, "!")' $IDS > "$TMPDIR/ge.py.txt"
+    except l.RolesError: print(m, "!")' $IDS > "$EFFORT_PROBE_DIR/ge.py.txt"
 node -e '
 const cap = require("./tools/hooks/agent-cap.js")
 const e = require("./tools/hooks/scratch-guard.js").loadRoleIndex(process.cwd()).effort
-for (const m of process.argv.slice(1)) { const n = cap.resolveModelProfile(e.profiles, m); console.log(m, n.length > 1 ? "!" : n[0] || "-") }' $IDS > "$TMPDIR/ge.js.txt"
-diff <(tr -d '\r' < "$TMPDIR/ge.py.txt") <(tr -d '\r' < "$TMPDIR/ge.js.txt"); grep affable "$TMPDIR/ge.js.txt"
+for (const m of process.argv.slice(1)) { const n = cap.resolveModelProfile(e.profiles, m); console.log(m, n.length > 1 ? "!" : n[0] || "-") }' $IDS > "$EFFORT_PROBE_DIR/ge.js.txt"
+diff <(tr -d '\r' < "$EFFORT_PROBE_DIR/ge.py.txt") <(tr -d '\r' < "$EFFORT_PROBE_DIR/ge.js.txt"); grep affable "$EFFORT_PROBE_DIR/ge.js.txt"
 ```
 
 The tree's policy holds one profile, so this probe never prints `!`. The arm of §7 runs the same
@@ -478,6 +490,15 @@ call runs, and that a session's `Agent` tool offers `effort` at all.
 - rev-1 · 2026-11-10 · initial draft, from the brief and the code read at `4dca62ad`. The owner
   resolved F1 and F2 on 2026-11-10, before the first commit, and both are folded in as S12, AC11
   and the first arm of §7.
+- rev-2 · 2026-11-10 · §4 · repair of a divergence the builder reported, per
+  `2026-11-10-prompt-TOOL-aGuardedEffort-1-observation-revision-brief`. "The observation" printed
+  only the first line of a refusal while AC1 and AC3 read tokens "The texts" puts on later lines;
+  its `say` helper now trims the refusal and joins its lines with ` | `. "The observation" and
+  "The parity probe" take their scratch directory from the caller's `EFFORT_PROBE_DIR` and no
+  longer read `TMPDIR` or `os.tmpdir()`. "The texts", every criterion and every arm are unmoved.
+  The transcript read stays the whole file, as §3 says: the build brief's Limitations sentence
+  that the hook reads the transcript's tail is superseded by this spec, and §5 names the tail read
+  as the upgrade if a call is measured slow.
 
 ## 10. Reuse audit
 

@@ -55,10 +55,10 @@ ids TOOL-aGuardedEffort-1
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aGuardedEffort-1 — the spawn guard refuses a role spawn or a harness call at a level the model's effort profile does not give](spec/2026-11-10-spec-TOOL-aGuardedEffort-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-11-10 |
+| [TOOL-aGuardedEffort-1 — the spawn guard refuses a role spawn or a harness call at a level the model's effort profile does not give](spec/2026-11-10-spec-TOOL-aGuardedEffort-1.md) | 1 | 2 | INPROGRESS | rev-2 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 2 record folder(s).
+Records: 4 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
