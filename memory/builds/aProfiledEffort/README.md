@@ -56,7 +56,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 3 unit(s) · node a · opened 2026-11-10 · streams tooling
+**Build status:** INPROGRESS · 4 unit(s) · node a · opened 2026-11-10 · streams tooling
 ids TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 TOOL-aProfiledEffort-4
 
 <!-- gen:build-units -->
@@ -65,15 +65,16 @@ ids TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 TOOL-aP
 | [TOOL-aProfiledEffort-1 — the effort policy takes a profile table per model family, validated and resolved by model, with `fable` seeded at medium](spec/2026-11-10-spec-TOOL-aProfiledEffort-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-10 |
 | [TOOL-aProfiledEffort-2 — the handoff verbs answer a role's and a stage's level for a named model](spec/2026-11-10-spec-TOOL-aProfiledEffort-2.md) | 2 | 2 | CLOSED | rev-1 | 2026-11-10 |
 | [TOOL-aProfiledEffort-3 — every dispatch route names the session's model and spawns at the level the resolver returns](spec/2026-11-10-spec-TOOL-aProfiledEffort-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-10 |
+| [TOOL-aProfiledEffort-4 — the closing review's seven confirmed items are closed, and arm 19 fails by its own FAIL lines](spec/2026-11-10-spec-TOOL-aProfiledEffort-4.md) | 4 | 2 | INPROGRESS | rev-1 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 11 bound to this build, across 4 record folder(s).
+Records: 13 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3.
+Ids no `spec-audit` record has ever named: TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 TOOL-aProfiledEffort-4.
 
-Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -83,6 +84,7 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 | 1 | `TOOL-aProfiledEffort-1` | no |
 | 2 | `TOOL-aProfiledEffort-2` | no |
 | 3 | `TOOL-aProfiledEffort-3` | no |
+| 4 | `TOOL-aProfiledEffort-4` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
