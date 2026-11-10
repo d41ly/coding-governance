@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-10-build-TOOL-aProfiledEffort-1-1-acceptance-ledger.md](../build/2026-11-10-build-TOOL-aProfiledEffort-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-10-build-TOOL-aProfiledEffort-1-agent-ledger.md](../build/2026-11-10-build-TOOL-aProfiledEffort-1-agent-ledger.md) | journal | TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 TOOL-aProfiledEffort-4 |
+| [2026-11-10-build-TOOL-aProfiledEffort-1-runlog-dfd5c0c4.md](../build/2026-11-10-build-TOOL-aProfiledEffort-1-runlog-dfd5c0c4.md) | journal | TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 TOOL-aProfiledEffort-4 |
 | [2026-11-10-prompt-TOOL-aProfiledEffort-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-1-brief.md) | research | TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 |
 | [2026-11-10-prompt-TOOL-aProfiledEffort-1-build-brief.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-1-build-brief.md) | research | — |
 | [2026-11-10-review-TOOL-aProfiledEffort-1-closing-diff-round1.md](../reviews/2026-11-10-review-TOOL-aProfiledEffort-1-closing-diff-round1.md) | diff-review | TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 |

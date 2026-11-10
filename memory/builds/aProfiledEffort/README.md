@@ -68,7 +68,7 @@ ids TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 TOOL-aP
 | [TOOL-aProfiledEffort-4 — the closing review's seven confirmed items are closed, and arm 19 fails by its own FAIL lines](spec/2026-11-10-spec-TOOL-aProfiledEffort-4.md) | 4 | 2 | CLOSED | rev-2 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 17 bound to this build, across 4 record folder(s).
+Records: 18 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
