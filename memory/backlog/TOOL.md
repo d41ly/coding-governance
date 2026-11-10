@@ -58,7 +58,7 @@ Cite ids, never line numbers.
 | [TOOL-aDeclaredBound-6](../builds/aDeclaredBound/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | tools/workflows/tier2-review.js describes its own find phase twice and… |
 | [TOOL-aDeferredBar-4](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | A *.test.sh UNDER A KIT DIRECTORY WITH A BUDGET ROW AND NO… |
 | [TOOL-aDeferredBar-5](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | HYGIENE CHECK 12'S ACCEPTANCE-WITNESS ARM ACCEPTS A *.test.sh-SHAPED… |
-| [TOOL-aDeferredBar-6](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | THE SPEC-STAGE WRITER IS NOT TOLD TO RUN THE SPEC-TOKEN CHECKER BEFORE… |
+| [TOOL-aDeferredBar-6](../builds/aDeferredBar/BACKLOG.md) | SPECCED | — | TOOL-aSmoothedDispatch-7 | 2026-09-14 | THE SPEC-STAGE WRITER IS NOT TOLD TO RUN THE SPEC-TOKEN CHECKER BEFORE… |
 | [TOOL-aDeferredBar-7](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/check-wiring.sh HAS NO ARM FOR… |
 | [TOOL-aDeferredBar-9](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/unattended/adopt-unattended.test.sh CARRIES NO ASSERTION FLOOR… |
 | [TOOL-aDeferredBar-10](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | AN ACCEPTANCE-LEDGER LINE CAN ASSERT A LEG'S EXIT FOR A TREE THAT MOVED… |
