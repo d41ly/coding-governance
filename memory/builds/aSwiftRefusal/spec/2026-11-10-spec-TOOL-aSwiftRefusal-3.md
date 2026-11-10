@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-10-build-TOOL-aSwiftRefusal-1-agent-ledger.md](../build/2026-11-10-build-TOOL-aSwiftRefusal-1-agent-ledger.md) | journal | TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 TOOL-aSwiftRefusal-4 |
 | [2026-11-10-prompt-TOOL-aSwiftRefusal-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-1-brief.md) | research | TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 |
 | [2026-11-10-prompt-TOOL-aSwiftRefusal-1-token-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-1-token-fix-brief.md) | research | TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 |
 | [2026-11-10-prompt-TOOL-aSwiftRefusal-3-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-3-1-spec-writer.md) | journal | — |
