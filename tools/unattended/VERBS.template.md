@@ -766,9 +766,11 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   --writes <path> <path>`. `--writes` takes every path up to the next flag: a whitespace-joined
   value splits into its paths, and the flag may repeat. It refuses two passes claiming one file
   and a pass claiming a shared mutable record; a generated index alone is fine and only the index
-  WITH its generator is refused. Whether a file is a contract the sibling reads is a judgement no verb
-  makes. A pass needing another file declares again BEFORE the commit, naming only the paths it
-  adds: every row at one anchor stands and the pass may write their union, which `--dispatch` prints
+  WITH its generator is refused. A `--writes` naming the run's own run-state file is removed from
+  the declaration with a note, because every pass commit carries that file, and a path containing it
+  is still refused. Whether a file is a contract the sibling reads is a judgement no verb makes. A
+  pass needing another file declares again BEFORE the commit, naming only the paths it adds: every
+  row at one anchor stands and the pass may write their union, which `--dispatch` prints
   as `dispatch effective`. A narrower row is accepted and frees nothing, and a row at a LATER anchor
   is a new pass, graded on its own. **End the pass commit's message with a `Pass: <unit-id>` trailer**,
   and a commit naming a unit but no pass with `Pass: none`. Where the `commit-msg` hook runs

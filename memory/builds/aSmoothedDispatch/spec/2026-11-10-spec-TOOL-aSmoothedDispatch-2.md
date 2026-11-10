@@ -1,6 +1,6 @@
 # TOOL-aSmoothedDispatch-2 — `--dispatch` removes the run-state file from its declared writes with a note instead of refusing
 
-**Status:** SPECCED · rev-3 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 2
+**Status:** CLOSED · rev-3 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 

@@ -8783,7 +8783,16 @@ rm -rf "$NR"
 build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/DECISIONS.md)" "--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/backlog/TOOL.md)" "--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/builds/tRun/RUN.md)" "--dispatch declares the run-state file, or a path containing it, and every pass in the run shares that file, so two passes declaring it are not disjoint by construction:"
+# TOOL-aSmoothedDispatch-2: the run-state file ITSELF is removed from the declaration with a note, and
+# the other paths park; named alone it refuses, since a row naming no path never closes; a directory
+# CONTAINING it is still the containment refusal.
+rs_out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/builds/tRun/RUN.md --writes ${PFX}alpha.sh)
+hit "$rs_out" "dispatch declared"
+hit "$rs_out" "is removed from this declaration rather than declared"
+same "the parked row names the kept path and not the run-state file" "$(grep -c " dispatch · item .* ARCH-tRun-1 · reason ${PFX}alpha.sh\$" memory/builds/tRun/RUN.md)" "1"
+same "no parked row names the run-state file" "$(grep -c ' dispatch · item .* · reason .*RUN\.md' memory/builds/tRun/RUN.md)" "0"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/builds/tRun/RUN.md)" "--dispatch was given no --writes path except the run's run-state file, which is never declared, so the declaration would name no path:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/builds/tRun)" "--dispatch declares a path containing the run-state file, and every pass in the run shares that file, so two passes declaring it are not disjoint by construction:"
 
 # ---- CONDITION 3, CONDITIONAL HALF. A generated index ALONE is ACCEPTED — every pass changes a spec
 # ---- header the index is rendered from, and refusing that was the VACUOUS reading M6 retracted. The
@@ -8850,7 +8859,7 @@ build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 # The two refusal texts, named once: an arm carrying half a signature passes on a message that
 # no longer says what it used to, which `check-arms` exists to catch.
 SHARED_MSG="--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
-RELF_MSG="--dispatch declares the run-state file, or a path containing it, and every pass in the run shares that file, so two passes declaring it are not disjoint by construction:"
+RELF_MSG="--dispatch declares a path containing the run-state file, and every pass in the run shares that file, so two passes declaring it are not disjoint by construction:"
 # ---- CONTAINMENT IS SYMMETRIC, and the refusals tested only one direction of it: "is the declared
 # ---- path UNDER the protected one". So the NARROW declarations were refused and the one claiming
 # ---- EVERYTHING sailed through — the widest possible declaration passing while the exact one was

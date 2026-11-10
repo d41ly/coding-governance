@@ -14273,6 +14273,21 @@ check_commit_message() { # commit message file
   return 0
 }
 
+# TOOL-aSmoothedDispatch-2: THE RUN-STATE FILE ITSELF IS REMOVED FROM A DECLARATION, never refused.
+# Every pass commit carries it, and --check-commit and check 23 already leave it out, so a pass that
+# names it has declared nothing a comparison reads. EQUALITY ONLY, over `normpath`: a path CONTAINING
+# the file stays in the set and the containment refusal in verb_dispatch still answers it.
+remove_run_state_writes() { # run-state file · writes... -> _rw_keep (array) · _rw_removed (1 when one was)
+  local _rs _p
+  normpath "$1" >/dev/null; _rs=$_np; shift
+  _rw_keep=(); _rw_removed=""
+  for _p in "$@"; do
+    normpath "$_p" >/dev/null
+    [ "$_np" = "$_rs" ] && { _rw_removed=1; continue; }
+    _rw_keep+=("$_p")
+  done
+}
+
 verb_dispatch() { # slug · unit · writes...
   local slug="$1" unit="$2"; shift 2
   local rel shaped grp p q sib sibpaths want cur curpaths gen idx pair _dk
@@ -14523,6 +14538,12 @@ verb_dispatch() { # slug · unit · writes...
     fi
   done
   refuse_if_terminal "$rel" --dispatch || return 1
+  remove_run_state_writes "$rel" "$@"
+  if [ -n "$_rw_removed" ]; then
+    echo "unattended: dispatch — $rel is this run's run-state file, which every pass commit carries and --check-commit and check 23 already leave out, so it is removed from this declaration rather than declared: $unit" >&2
+    [ "${#_rw_keep[@]}" -gt 0 ] || { fail 49 "--dispatch was given no --writes path except the run's run-state file, which is never declared, so the declaration would name no path: $unit"; return 1; }
+    set -- "${_rw_keep[@]}"
+  fi
   # CONDITION 3, FLAT HALF. The run-state file is DERIVED rather than declared - it is the one member
   # the kit already knows how to locate - and the rest come from the project's own declaration, so an
   # adopter whose layout differs gets refusals about THEIR paths and not this repo's.
@@ -14532,7 +14553,7 @@ verb_dispatch() { # slug · unit · writes...
   # narrow declarations get refused and the one that claims everything sails through.
   for p in "$@"; do
     if overlaps "$p" "$rel"; then
-      fail 49 "--dispatch declares the run-state file, or a path containing it, and every pass in the run shares that file, so two passes declaring it are not disjoint by construction: $p"; return 1
+      fail 49 "--dispatch declares a path containing the run-state file, and every pass in the run shares that file, so two passes declaring it are not disjoint by construction: $p"; return 1
     fi
     for q in ${SHARED_RECORDS:-}; do
       if overlaps "$p" "$q"; then
