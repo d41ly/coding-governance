@@ -65,10 +65,10 @@ ids TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 TOOL-aP
 | [TOOL-aProfiledEffort-1 — the effort policy takes a profile table per model family, validated and resolved by model, with `fable` seeded at medium](spec/2026-11-10-spec-TOOL-aProfiledEffort-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-10 |
 | [TOOL-aProfiledEffort-2 — the handoff verbs answer a role's and a stage's level for a named model](spec/2026-11-10-spec-TOOL-aProfiledEffort-2.md) | 2 | 2 | CLOSED | rev-1 | 2026-11-10 |
 | [TOOL-aProfiledEffort-3 — every dispatch route names the session's model and spawns at the level the resolver returns](spec/2026-11-10-spec-TOOL-aProfiledEffort-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-10 |
-| [TOOL-aProfiledEffort-4 — the closing review's seven confirmed items are closed, and arm 19 fails by its own FAIL lines](spec/2026-11-10-spec-TOOL-aProfiledEffort-4.md) | 4 | 2 | INPROGRESS | rev-1 | 2026-11-10 |
+| [TOOL-aProfiledEffort-4 — the closing review's seven confirmed items are closed, and arm 19 fails by its own FAIL lines](spec/2026-11-10-spec-TOOL-aProfiledEffort-4.md) | 4 | 2 | INPROGRESS | rev-2 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 13 bound to this build, across 4 record folder(s).
+Records: 15 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

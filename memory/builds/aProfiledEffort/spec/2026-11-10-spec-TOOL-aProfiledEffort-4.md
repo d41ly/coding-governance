@@ -1,12 +1,14 @@
 # TOOL-aProfiledEffort-4 — the closing review's seven confirmed items are closed, and arm 19 fails by its own FAIL lines
 
-**Status:** INPROGRESS · rev-1 · 2026-11-10 · node a · Tier-2 · base 7c896db6 · streams tooling · order 4
+**Status:** INPROGRESS · rev-2 · 2026-11-10 · node a · Tier-2 · base 7c896db6 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-10-prompt-TOOL-aProfiledEffort-4-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-4-1-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-TOOL-aProfiledEffort-4-2-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-4-2-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-TOOL-aProfiledEffort-4-ac4-revision-brief.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-4-ac4-revision-brief.md) | research | — |
 | [2026-11-10-prompt-TOOL-aProfiledEffort-4-build-brief.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-4-build-brief.md) | research | — |
 | [2026-11-10-prompt-TOOL-aProfiledEffort-4-round1-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-4-round1-fix-brief.md) | research | — |
 
@@ -32,7 +34,10 @@ item names the review item it closes.
 - **S1** — Review item 1. The `agents` verb prints `unknown` for an effort the agent's transcript
   does not record, and no longer reads the agent type's file for one. The fallback, its regular
   expression `EFFORT_LINE_RE` and the `AGENTS_REL` import that served it are deleted, and the
-  script's header and the roles README say what the line now holds. Observed by AC1 and AC9.
+  script's header and the roles README say what the line now holds. The docstring of
+  `print_agent_lines` and the comment above `PATH_ID_RE` each drop the clause the deletion makes
+  false. Observed by AC1 and AC9; the two clauses are NOT OBSERVED by a count, since no leg reads a
+  comment's wording.
   **Readers:**
   by name: `tools/roles/handoff.py` spells `EFFORT_LINE_RE` at its definition and at the one use
   this item deletes, and no other tracked file outside the build records spells it, by a grep at
@@ -154,6 +159,14 @@ session's own records and the role index, with no mention of the agent types. Th
 opens `WHAT THIS DOES NOT CHECK` gains one clause in its `agents` sentence: an effort no transcript
 record carries prints `unknown`, never the agent type's `effort:` line, which is the default
 tables' level and not the level a profile dispatched (TOOL-aProfiledEffort-4).
+
+Two comments in the script follow the deletion, and both are in scope. The docstring of
+`print_agent_lines` says the lines are filled from the session's records and the role index, and no
+longer names the agent types, because the fallback was the function's one read of them. The comment
+above `PATH_ID_RE` keeps its sentence on a run id and an agent id and drops the clause on a role
+naming an agent type, because the fallback was the one place a role was matched against the
+pattern. Its other two readers match an agent id and a run id. No other comment in the script
+moves.
 
 `tools/roles/README.md` moves in two places. The field table's effort row reads
 ``| effort | the agent transcript's last `effort` | `unknown` |``. The last sentence of the limits
@@ -279,7 +292,9 @@ In `tools/roles/README.md` the seeded-profile sentence says the profile names no
 stage, so every role and every stage key of a workflow's `stages` table runs at `medium` on any
 Claude Fable version. In the limits paragraph, the clause on a harness stage the workflow table
 gives no key gains the two instances, with the words `` `committer` and `probe` `` on one line:
-`committer` of `unattended-build.js` and `probe` of `tier2-review.js`. In `help/roles.md` the
+`committer` of `unattended-build.js` and `probe` of `tier2-review.js`. The words that join the two
+names to the clause are the builder's, and an introduction such as "which today is" is in scope.
+AC5 holds the two names on one line and nothing else of the sentence. In `help/roles.md` the
 seeded-profile sentence says the profile runs every role, and every stage a workflow's `stages`
 table keys, at `medium`. `tools/roles/workflows.toml` does not move.
 
@@ -419,9 +434,13 @@ print(lib.resolve_profile(p, None), lib.resolve_profile(p, ""), lib.resolve_prof
   second-word row, the two-word profile or the two-word defect row.
   figure: the five counts are all `0` at `bd0a3808`, PINNED 2026-11-10.
 - **AC4** — When `python -B -c "$P_NONE" $R` runs, it prints `None None None low` and no traceback,
-  and `grep -c 'if not words:' $L` prints `1`.
+  and `grep -c '^    if not words:' $L` prints `1`. The pattern is anchored at four spaces, the
+  guard's own indent in `resolve_profile`.
   Red when: `resolve_profile` reads a profile's `match` for a model that holds no word. At
   `bd0a3808` the command dies with `KeyError: 'match'`.
+  figure: the count is `0` at `5b7edfe1c`, PINNED 2026-11-10. The unanchored `if not words:` counts
+  `1` there, the `elif not words:` at eight spaces in the profile loop of `load_policy`, and `2`
+  after the build, so it is not the pattern.
 - **AC5** — When these run over the three texts, they print the counts shown:
   `grep -c 'every one runs at medium' $T` prints `0`, `grep -c "stage key of a workflow's" $T`
   prints `1`, `grep -c 'no .stages. table keys' $T` prints `1`,
@@ -496,6 +515,12 @@ none
 - rev-1 · 2026-11-10 · initial draft, from the round 1 closing review's seven items and the
   brief's item 8, with the script, the library, the self-test, the suite and the three texts read
   at `bd0a3808`.
+- rev-2 · 2026-11-10 · AC4 · S1 · §4 · AC4's grep is anchored to the guard's line, with its figure
+  pinned at `5b7edfe1c`: the unanchored pattern also counted the `elif` of `load_policy`, so it read
+  1 before the build and 2 after it. S1 and section 4 now put three edits the builder made in
+  scope: the `print_agent_lines` docstring, the `PATH_ID_RE` comment, and the joining words of the
+  README's limits clause. No other criterion and no mechanism moved. From the divergence record
+  `2026-11-10-prompt-TOOL-aProfiledEffort-4-ac4-revision-brief`.
 
 ## 10. Reuse audit
 
