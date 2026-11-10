@@ -36,3 +36,9 @@ separate unit.
 There is no machine gate for this. No check over `tools/gate-legs.json` flags a kit-subject leg that
 declares `doc_reads`; that arm was deferred as an ask. A reviewer holding a leg whose verdict reads
 records checks that its declaration states the changed-mode skip.
+
+## Related
+
+- It coexists-with `held-suite-guard-misses-a-sibling-kit`: both leave a held leg unselected while
+  its verdict moves, but there the missed input is a sibling kit's file outside the leg's `guard`,
+  and here it is the records the leg's `doc_reads` names, which changed mode never reads.
