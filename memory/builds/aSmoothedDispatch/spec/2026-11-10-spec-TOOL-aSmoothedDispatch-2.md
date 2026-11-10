@@ -1,6 +1,6 @@
 # TOOL-aSmoothedDispatch-2 — `--dispatch` removes the run-state file from its declared writes with a note instead of refusing
 
-**Status:** SPECCED · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,8 @@
 | [2026-11-10-prompt-TOOL-aSmoothedDispatch-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-1-brief.md) | research | TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 |
 | [2026-11-10-prompt-TOOL-aSmoothedDispatch-1-token-fix.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-1-token-fix.md) | research | TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-3 |
 | [2026-11-10-prompt-TOOL-aSmoothedDispatch-2-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-2-1-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-TOOL-aSmoothedDispatch-2-2-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-2-2-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-TOOL-aSmoothedDispatch-2-orphan-id.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-2-orphan-id.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -66,7 +68,8 @@ none
 :1540 spells `$M/builds/<slug>/RUN.md`). The condition-3 flat-half loop at :14533-14536 refuses any
 `--writes` path that `overlaps` `rel`, which is `covers` both ways (`tools/unattended/lib-unattended.sh:746-751`).
 So the exact file and every directory above it get one message. The containment direction is the
-fix TOOL-dUnstalledConvoy-21 made, and the suite pins it at
+fix held in `memory/builds/dUnstalledConvoy/reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md`,
+and the suite pins it at
 `tools/unattended/unattended.test.sh:8848-8849` (`--writes memory`, `--writes memory/builds`).
 The exact-file arm is :8786.
 
@@ -278,6 +281,9 @@ none
   graded as untracked paths, and AC1's expected output, moved from inline backticks into an
   indented fenced block inside its bullet; no criterion's meaning, command or output changed
   (2026-11-10-prompt-TOOL-aSmoothedDispatch-1-token-fix).
+- rev-3 · 2026-11-10 · §2 · §10 · the fix's record is named by its review path instead of an id no
+  spec defines, so the build index writes no orphan; nothing else changed
+  (2026-11-10-prompt-TOOL-aSmoothedDispatch-2-orphan-id).
 
 ## 10. Reuse audit
 
@@ -287,7 +293,7 @@ kit already goes through. The exemption it copies is the one `--check-commit` ma
 23 at `tools/unattended/check-unattended.sh:4587`. `python tools/codebase-map/reuse_lookup.py "dispatch
 refuses declared write path that is the run-state file"` ranked generic name stems only (`run`,
 `write`, `declares`), so no existing seam fits beyond the loop being extended. The recall query
-returned the dUnstalledConvoy lib-fix review, the TOOL-dUnstalledConvoy-21 containment arms and a
+returned the dUnstalledConvoy lib-fix review, the containment arms that review's fix added and a
 dFairHearing builder return confirming the hygiene leg's write-set comparison leaves the run-state file
 out. No record argues for refusing the exact path. `gen_build_index.py --asks --path
 tools/unattended/unattended.sh` named no ask on this refusal.
