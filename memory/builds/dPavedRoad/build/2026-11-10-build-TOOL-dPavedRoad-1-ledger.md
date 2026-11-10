@@ -32,3 +32,21 @@ In clones of `6681cdc80` under `%TEMP%/dpr`, by the main loop. RED: with `tools/
 restored to base `14320c985`, which has no `--spec`, `bash tools/check-spec-tokens.test.sh` exited 1
 in 338 s with exactly the six PR1 arms failing (AC1, AC2 twice, AC3, AC4 twice) and every other arm
 passing. GREEN: at `6681cdc80` it exited 0 in 386 s, `PASS (236 assertions)`, above the floor of 231.
+
+## Fix pass — the install-prefix red
+
+The bar at `d08106d4d` red on `install-prefix (shipped surface)`: the role text this unit added
+spelled the kit path `tools/check-spec-tokens.py` at `tools/roles/agents/gov-spec-writer.agent.md:37`,
+which resolves to nothing at an adopter installed at another prefix. The sentence now names the
+spec-token checker as `check-spec-tokens.py --spec <path>`, with no prefix, and keeps its meaning;
+`render_agents.py --write` re-rendered `.claude/agents/gov-spec-writer.md` to the same bytes. The
+section 4 role-text block spells the `python tools/` form; the respelling drops only that prefix, and
+AC7's phrase is unchanged. No change to `--spec`, the policy grant or any other role's text.
+
+Observed by probe in the pass, no gate run: `grep -n 'tools/check-spec-tokens'` over both files
+printed nothing (exit 1), and a `python -c` scan with the leg's own `tools/` lookbehind found no
+match in the source role file. Owed at the close: the `install-prefix (shipped surface)` leg itself.
+
+**Evidences:** TOOL-dPavedRoad-1
+- AC5 — re-observed: `python tools/roles/render_agents.py --write` wrote the one changed agent type, `.claude/roles.json` still lists `spec tokens (a spec's own names resolve)` in `gov-spec-writer`'s gates, and `render_agents.py --check` exited 0 with 9 agent types and 1 index graded.
+- AC7 — re-observed: the `grep -c "check-spec-tokens.py --spec"` the criterion names counted 1 in each of its two files.
