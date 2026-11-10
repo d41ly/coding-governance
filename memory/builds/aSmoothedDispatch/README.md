@@ -32,7 +32,8 @@ a turn, a spec rewrite or a fresh builder. The analysis is in the brief under `p
 ## Build-level rules
 
 - **Classification (M2)**: six units, each MISSING at open, Tier-2: each changes a shipped kit's contract.
-- Units 1, 2, 3, 4 and 6 edit `tools/unattended/unattended.sh`, so they build one at a time; units 5 and 7 are disjoint from them and from each other.
+- Units 1 to 4 edit `tools/unattended/unattended.sh`, unit 6 went into `tools/hooks/scratch-guard.js`, and every pass re-renders this README's index, so all units built one at a time (M6 clause 3).
+- Units 8 and 9 were PROMOTED at the close: 8 batches the closing review's mediums and lows, 9 the three suite arms unit 1's split left red.
 - Unit 7 was ADDED at spec time (M2): unit 5's writer found the hook already admits a one-spec run, so the writer's prompt must ask for it.
 - Kit versions move through the lander's `mint`, never by hand.
 - No spec audit: the owner declined one.
