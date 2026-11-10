@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 149 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 159 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 149 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 162 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -287,6 +287,7 @@ Inventories: gate-legs: 149 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `borrowed-seed-inherits-its-head-state.md` | unattended |
 | `bounded-through-a-pipe-is-unbounded.md` | run-gates, unattended |
 | `canary-waits-on-a-rendezvous-not-a-clock.md` | run-gates |
+| `changed-mode-selection-ignores-doc-reads.md` | UNCLAIMED |
 | `check-format-grades-two-populations.md` | build-readme-surface |
 | `check-grades-one-layer-of-a-layered-config.md` | policy |
 | `comment-claims-a-check-the-case-does-not-run.md` | memory-tree-hygiene |
@@ -301,6 +302,7 @@ Inventories: gate-legs: 149 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `destructive-step-before-its-precondition.md` | unattended |
 | `doc-names-an-argument-the-code-never-reads.md` | memory-tree-hygiene |
 | `empty-field-collapses-unless-it-is-last.md` | run-gates |
+| `fail-count-reads-a-pattern-the-row-never-prints.md` | UNCLAIMED |
 | `fallback-drain-strands-its-witnesses.md` | build-method |
 | `fallback-fabricates-the-passing-value.md` | unattended |
 | `fixed-sleep-does-not-place-a-signal.md` | runlog |
@@ -319,6 +321,7 @@ Inventories: gate-legs: 149 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `guard-above-a-fold-makes-its-fallback-dead.md` | govkit |
 | `guard-fed-the-value-it-supersedes.md` | unattended |
 | `hand-named-gate-list-green-while-the-bar-reds.md` | build-method |
+| `hand-typed-count-of-an-enumerated-population.md` | UNCLAIMED |
 | `held-suite-guard-misses-a-sibling-kit.md` | agent-cap |
 | `helper-whose-only-caller-is-its-selftest.md` | memory-tree-hygiene |
 | `heredoc-escape-reaches-the-regex.md` | baseline |
