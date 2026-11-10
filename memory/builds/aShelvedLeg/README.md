@@ -49,14 +49,14 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 2 unit(s) · node a · opened 2026-11-10 · streams tooling
+**Build status:** CLOSED · 2 unit(s) · node a · opened 2026-11-10 · streams tooling
 ids TOOL-aShelvedLeg-1 TOOL-aShelvedLeg-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aShelvedLeg-1 — the `unattended kit gate` leg is `subject = "kit"`, off every automatic bar](spec/2026-11-10-spec-TOOL-aShelvedLeg-1.md) | — | 2 | CLOSED | rev-2 | 2026-11-10 |
-| [TOOL-aShelvedLeg-2 — the closing review's minors on the held kit gate, batched](spec/2026-11-10-spec-TOOL-aShelvedLeg-2.md) | — | 2 | SPECCED | rev-1 | 2026-11-10 |
+| [TOOL-aShelvedLeg-2 — the closing review's minors on the held kit gate, batched](spec/2026-11-10-spec-TOOL-aShelvedLeg-2.md) | — | 2 | CLOSED | rev-1 | 2026-11-11 |
 <!-- /gen:build-units -->
 
 Records: 8 bound to this build, across 4 record folder(s).

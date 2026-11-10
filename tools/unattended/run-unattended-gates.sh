@@ -44,7 +44,7 @@
 # self-test half, which is where those suites live, and composes with `--serial` alone: the pooled
 # route answers the same question another way, as parity against the runner's calibrated evidence,
 # and the runner refuses a baseline there. The `--checks` half is NOT attributed, because those are
-# repository checks and merge-bar legs.
+# repository checks, run here on demand; the kit gate among them is held off every automatic bar.
 #
 # WHAT THIS DOES NOT CHECK: whether an unattended run was HONEST. These read records and stage
 # fixtures; §9 of the protocol says what a check running under the run's own uid can and cannot buy,
@@ -431,7 +431,8 @@ case "$1" in
     echo "               L-side OVER BUDGET red it, an inherited failure never does. --pooled"
     echo "               takes no baseline: its parity against the calibrated evidence is the"
     echo "               same question asked another way. The --checks half is NOT attributed:"
-    echo "               those are repository checks and merge-bar legs."
+    echo "               those are repository checks, run here on demand; the kit gate"
+    echo "               among them is held off every automatic bar."
     echo ""
     echo "The gate selftest and the driver suite are each declared as --shard rows, one per region;"
     echo "a --shard run is evidence about its region and nothing else, and the whole-suite claim"
@@ -557,8 +558,9 @@ run_one "brief-recorded"            checks bash "$HERE/check-brief-recorded.sh"
 # THE SELF-TEST HALF IS DELEGATED. TOOL-aQuenchedHarness-4 S7. These six suites are now rows in
 # `<prefix>/run-gates/selftest-budgets.txt` alongside every other kit's, and one runner executes them
 # all -- which is what the 2026-08-23 ruling always implied and what this file could only do for one
-# kit. Their budgets travelled with them; the `--checks` half above keeps its own, because those four
-# are REPOSITORY checks, bar legs but for the held kit gate, and are not this delegation's business.
+# kit. Their budgets travelled with them; the `--checks` half above keeps its own, because the
+# `run_one ... checks` rows above are REPOSITORY checks, bar legs but for the held kit gate, and are
+# not this delegation's business.
 #
 # WHY THEY WERE THE HARD CASE, recorded because it is why the population is declared rather than
 # derived: the ruling removed all six from `<prefix>/gate-legs.json` AND from `<prefix>/unattended/kit.toml`,

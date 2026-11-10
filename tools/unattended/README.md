@@ -421,4 +421,6 @@ manifest and this kit's own `kit.toml`, and adopters stop receiving them too. Th
 subject is the *repository* stayed on the bar, because those go stale with nobody editing the kit;
 `<prefix>/gate-legs.json` names which. The kit gate is the exception: it is held off every automatic
 bar by owner ruling (2026-11-10) for its cost, and runs only through `run-unattended-gates.sh --checks`
-or a bar run with `GATE_SELFTESTS=1`.
+or a bar run with `GATE_SELFTESTS=1`. `GATE_SELFTESTS=changed` selects it by this kit's shipped
+sources only, never by the records its `doc_reads` names, so a change that moves only those records
+leaves it held: run it with the variable at `1`, or through `--checks`, after such a change.

@@ -19,7 +19,9 @@
 # completion: `check-brief-recorded.test.sh` and `check-pass-order.test.sh` exit `$st` with no
 # `PASS (` line, so a completed exit from either is a reading of rc plus ^FAIL count only, and the
 # calibrate prints that gap on the row rather than being silent about it. `check-unattended.sh`, a
-# checker rather than a suite (TOOL-aShelvedLeg-1), likewise exits on its status with no `PASS (` line.
+# checker rather than a suite (TOOL-aShelvedLeg-1), exits on its status with no `PASS (` line, and
+# its row's reading is rc only: the checker prints each failure as `UNATTENDED check <n> FAILED`,
+# never as a ^FAIL line, so the row's FAIL column is always 0 and two different red runs read alike.
 # no-trailer: unattended brief-recorded selftest
 # no-trailer: unattended pass-order selftest
 # no-trailer: unattended kit gate

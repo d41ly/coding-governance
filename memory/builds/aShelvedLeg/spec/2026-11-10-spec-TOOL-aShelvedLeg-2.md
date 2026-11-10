@@ -1,6 +1,6 @@
 # TOOL-aShelvedLeg-2 — the closing review's minors on the held kit gate, batched
 
-**Status:** SPECCED · rev-1 · 2026-11-10 · node a · Tier-2 · base 5f066b0a · streams tooling
+**Status:** CLOSED · rev-1 · 2026-11-11 · node a · Tier-2 · base 5f066b0a · streams tooling
 
 <!-- gen:spec-records -->
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# check-unattended.sh - the merge-bar leg for the unattended-run kit. The check COUNT is written in no
+# check-unattended.sh - the unattended-run kit's repository gate leg, held off every automatic bar by
+# the 2026-11-10 ruling (TOOL-aShelvedLeg-1). The check COUNT is written in no
 # prose here, because it has now been wrong twice and a cross-build merge left this header stating two
 # different totals at once. Derive it with
 # `grep -oE 'fail [0-9]+' <prefix>/unattended/check-unattended.sh | grep -oE '[0-9]+' | sort -un` -
@@ -34,7 +35,7 @@
 # undeclared-write count and never fails the leg (TOOL-dUnstuckLanding-17, TOOL-aMendedFleet-92). They are not skips. An exclusion is a positive
 # finding that CHANGED THE VERDICT — a record the check stopped counting — and the reader of a green
 # run is entitled to know which one and on what evidence. Routing them through REPORT was the first
-# implementation and it made the exclusion invisible on every bar run, which is the check-quietly-
+# implementation and it made the exclusion invisible on every run, which is the check-quietly-
 # deleted shape unit 4 exists to prevent; routing them to stdout without amending this paragraph
 # would leave the header asserting something the code disproves. TOOL-aPrimedKeepalive-4.
 #
@@ -43,7 +44,7 @@
 # landing shape and the declared self-test surface, and those decide WHICH COMMIT the landing bar
 # graded and whether a kit-work landing is ever told the flagged bar is owed. A reader of a green bar
 # is entitled to both without setting an environment variable, and routing them through REPORT would
-# make them invisible on every bar run. TOOL-dDerivedDocket-3.
+# make them invisible on every run. TOOL-dDerivedDocket-3.
 #
 # FOUR: under ANY `--only`, one LIVENESS line on the default channel,
 # `check-unattended: --only <sel> ran checks <ran>; skipped <the rest>`, naming what the scoped run
@@ -68,9 +69,9 @@ KIT_UNATTENDED_VERSION=1.116 # gov:kit unattended@1.116 — must match unattende
 # NOT interchangeable - only GIT_GRAFT_FILE stops the graft.
 #
 # The driver additionally refuses a run whose ENVIRONMENT supplies git config. This leg deliberately
-# does NOT. It runs on the bar, the bar runs under the pre-push hook, and which GIT_* variables git
-# exports to a hook varies by git version - measured unset for pre-push on this node, but a leg that
-# reds on another node's git is a false positive on the merge bar. The levers that matter are pinned
+# does NOT. It can run under the pre-push hook when a pusher sets the self-test variable, and which
+# GIT_* variables git exports to a hook varies by git version - measured unset for pre-push on this
+# node, but a leg that reds on another node's git is a false positive there. The levers that matter are pinned
 # below rather than detected.
 export GIT_GRAFT_FILE=/dev/null
 # THE KIT LIBRARY, sourced before anything reads history. It holds every predicate this script and
@@ -315,7 +316,7 @@ fi
 status=0
 fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; }
 # <ids…> -> 0 when the run is unscoped or any id is selected, and then EVERY id is recorded as ran,
-# because the block runs whole. Unscoped it is one builtin test, so the merge-bar run's spawn count
+# because the block runs whole. Unscoped it is one builtin test, so an unscoped run's spawn count
 # does not move. Called once per guarded block and never in a loop: a loop over an empty population
 # would never register its check, and the exit-2 refusal at the end of this file reads `RAN`.
 # TOOL-aSparedSpawn-7.
@@ -432,7 +433,7 @@ while IFS= read -r -d '' _ck; do
     # plausible declarations made checks 1, 2, 16, 26, 28 and 31 grade the decoy while the real
     # driver enforced something else. `SCOPE="skip28"` deleted the whole 28 region including 28c's
     # pinned-git-read enforcement. `.unattended.conf` is a tracked file an unattended run commits
-    # itself, and this is an unguarded merge-bar leg. The two sibling importers - check-pass-order
+    # itself, and this is an unguarded leg in every adopter's manifest. The two sibling importers - check-pass-order
     # and check-brief-recorded - already close it. `check-brief-recorded.sh`'s own comment names a
     # sibling that sets DRIVER above its import and evals a classifier out of it: that is
     # `check-pass-order.sh`, not this leg, which evals nothing but its own import assignment and, inside
@@ -2826,7 +2827,7 @@ while IFS= read -r f; do
       [ -n "$dmode" ] || dmode=slug
 
       # ---- 29: THE SECOND ANCHOR IS ADMISSIBLE PER MODE. The driver refuses this at preflight; this
-      # ---- is the merge bar's own opinion of the same question, and it is DERIVED rather than read
+      # ---- is this leg's own opinion of the same question, and it is DERIVED rather than read
       # ---- back. `anchor-kind` is recorded in the very file under inspection, so reading it would
       # ---- be asking the subject to grade itself - the rule this leg already keeps for the base.
       # ----
@@ -3806,7 +3807,7 @@ tmpl="$HERE/SKILL.template.md"
 # its own rationale promised core-only. An adopter declaring the documented `DIRECTIVES_EXTRA`
 # knob then got a permanent `fail 16` on a rendered carrier they cannot edit, because the
 # memory-tree kit ships BUILD-METHOD.md with `role = "rendered"` and the doc-parity leg
-# byte-compares it. No route to green, on an unguarded merge-bar leg. Closing-review F3.
+# byte-compares it. No route to green, on an unguarded leg. Closing-review F3.
 # The three lists are split ABOVE the core guard now (TOOL-aSparedSpawn-7): check 31 reads `core`.
 if [ ! -f "$tmpl" ]; then
   fail 16 "the kit ships no SKILL.template.md, so the directive table an agent reads cannot be joined to the registry it is supposed to mirror; a shipped kit always has one, so this is a broken install rather than a project choice"
@@ -6010,9 +6011,9 @@ fi
 
 fi
 if check_selected 31; then
-# ---- check 31 - the adopter whose ROUTE does not resolve is TOLD, on every bar. TOOL-aHoistedPass-9,
+# ---- check 31 - the adopter whose ROUTE does not resolve is TOLD, on every run of this leg. TOOL-aHoistedPass-9,
 # the gate-time half of ruling D4: `govkit apply` refuses the same gap at the act that CREATES it and
-# only for installs made after it lands, while this runs on every bar of every adopter forever -
+# only for installs made after it lands, while this tells it on every run of this leg, in every adopter that runs it, forever -
 # including the whole population that arm can never reach. Neither subsumes the other.
 #
 # THE SECTION COMES OUT OF THE REGISTRY, never typed here. `passes-harnessed` names its carrier

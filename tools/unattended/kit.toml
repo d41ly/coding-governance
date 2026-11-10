@@ -260,6 +260,9 @@ means = "render-failed-half-stamped"
 # adopter. The price is TOOL-aBoundedCeiling-10: a held leg cannot notice its own drift, and this
 # one sat red on main for weeks in August 2026 (TOOL-aBoundedCeiling-9). It still runs on demand,
 # by either route: `bash {kit}/run-unattended-gates.sh --checks`, or a bar run with GATE_SELFTESTS=1.
+# GATE_SELFTESTS=changed selects it by this kit's shipped sources only, never by the records its
+# `doc_reads` names, so a change that moves only those records leaves it held: run it with the
+# variable at 1, or through `--checks`, after such a change.
 [[gate_leg]]
 name = "unattended kit gate"
 subject = "kit"
