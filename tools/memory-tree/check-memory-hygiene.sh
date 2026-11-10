@@ -17,9 +17,10 @@
 # `--offenders` and the print modes each grade or print something `--only` does not select.
 #
 # `--staged` is NOT the full check with a narrower file list. Several checks whose population is the
-# CORPUS rather than the diff are HELD: 13-16, 17-19, 21, the row-grammar arm, 23 and 26 (whose
+# CORPUS rather than the diff are HELD: 13-16, 17-19, 21, the row-grammar arm and 26 (whose
 # population is the commit GRAPH) all skip, and the full run at the push boundary is where they
-# bind. Checks 29 and 30 are not held by this file: each passes `--staged` through and its verb decides on the
+# bind. Check 23 and check 12's edge joins are NARROWED instead: each grades what the commit stages
+# against the staged files' own build folders, as their block comments say (TOOL-dPavedRoad-4). Checks 29 and 30 are not held by this file: each passes `--staged` through and its verb decides on the
 # render's trigger, `check_index_input`, plus the carries checker for check 29 and DESIGN_RECORD and
 # DESIGN_VIEW for check 30 (TOOL-dTrueNorth-16 S21, TOOL-dTrueNorth-20 S20). That rule is stated once, in the
 # block comments of checks 29 and 30 below, and this header points at them rather than restating it.
@@ -2047,11 +2048,25 @@ SPEC_CANON10="$SPEC_CANON
 # needs no canon records in the driver and therefore has no TAB-truncation hazard to guard against.
 c12_all=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/spec/(.+/)?[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-(($FAM_ALT)-)?[A-Za-z0-9]+-[0-9]+$REC_TAIL\.md$" || true)
 [ "$STAGED" = 1 ] || pop_guard 12 "no spec file under $M/builds/*/spec/" "$(printf '%s\n' "$c12_all" | grep -c . || true)" "$PRE_SPEC"
+# TOOL-dPavedRoad-4: `J` = a sibling read for its EDGES only, so the joins see both ends of a pair.
+# The build set is the staged SPECS' folders, never FILES, which is the whole listing when the conf
+# is staged. Empty in full mode, where every spec is `P`.
+declare -A _C12B=()
+if [ "$STAGED" = 1 ] && [ -n "$SPEC_EDGES_CUTOFF" ]; then
+  while IFS= read -r _cf; do
+    [ -n "$_cf" ] && [ -n "${STAGED_SET[$_cf]+x}" ] || continue
+    _b=${_cf#"$M"/builds/}; _C12B["${_b%%/*}"]=1
+  done <<<"$c12_all"
+fi
 c12_sel=$(printf '%s\n' "$c12_all" | grep . | while IFS= read -r f; do
   base=${f##*/}; d=${base:0:10}      # spawn-free date extract — this loop sees every spec file
   [ "$d" \< "$SPEC_FORMAT_CUTOFF" ] && continue
-  in_scope "$f" || continue          # no-op in full mode; decides the WHOLE selection under --staged
-  if [ -f "$f" ]; then printf 'P\t%s\n' "$f"; else printf 'M\t%s\n' "$f"; fi
+  if in_scope "$f"; then             # no-op in full mode; decides the GRADED selection under --staged
+    if [ -f "$f" ]; then printf 'P\t%s\n' "$f"; else printf 'M\t%s\n' "$f"; fi
+  else
+    _b=${f#"$M"/builds/}
+    [ -n "${_C12B[${_b%%/*}]+x}" ] && [ -f "$f" ] && printf 'J\t%s\n' "$f"
+  fi
 done)
 bad12_raw=""
 if [ -n "$c12_sel" ]; then
@@ -2116,8 +2131,69 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     for (i = 1; i <= rd_nk; i++) if (index(lc, rd_k[i]) > 0) return 1
     return 0
   }
+  # ---- TOOL-dPavedRoad-4: the edge extraction as ONE function, so a `J` sibling read under
+  # ---- --staged leaves the same E and U records a `P` spec does, its last field 0 rather than 1.
+  # ---- It reads the globals the pass holds (f, body, n, hdr, fdate) and leaves its counters global,
+  # ---- so the `P` call site prints the shape findings from them. Returns 1 when the arm is live.
+  function extract_edges(mark,    i, L) {
+    if (!(edgecut != "" && fdate != "" && fdate >= edgecut)) return 0
+    # Four values, all read from what this pass already holds. Nothing re-reads a file.
+    eg_slug = f; sub(/\/spec\/.*$/, "", eg_slug); sub(/^.*\//, "", eg_slug)
+    eg_uid = ""
+    for (i = 1; i <= n; i++) if (body[i] ~ /^# [A-Z][A-Za-z0-9-]* /) {
+      eg_uid = body[i]; sub(/^# /, "", eg_uid); sub(/ .*$/, "", eg_uid); break
+    }
+    # A header carrying something order-shaped that does not conform reads as UNORDERED here, and
+    # that is safe rather than silent: gen_build_index.py REFUSES such a value and hygiene check 9
+    # runs it, so the tree cannot carry one past the bar.
+    eg_ord = ""; eg_p = index(hdr, "· order ")
+    if (eg_p > 0) {
+      eg_ord = substr(hdr, eg_p + length("· order "))
+      sub(/[^0-9].*$/, "", eg_ord)
+    }
+    eg_in3 = 0; eg_ined = 0; eg_has = 0; eg_n = 0; eg_bad = ""; eg_nb = 0; eg_none = 0
+    for (i = 1; i <= n; i++) {
+      L = body[i]
+      if (L ~ /^## /) { eg_in3 = (L ~ /^## [0-9]+[.] Non-goals/); eg_ined = 0; continue }
+      if (!eg_in3) continue
+      if (L ~ /^### /) { eg_ined = (L ~ /^### Edges[ 	]*$/); if (eg_ined) eg_has = 1; continue }
+      if (!eg_ined) continue
+      if (L ~ /^[ 	]*$/) continue
+      if (L ~ /^none[.]?[ 	]*$/) { eg_none = 1; continue }
+      if (L !~ /^(-|\*)[ 	]/) continue
+      eg_n++
+      # The two verbs, and nothing else. A bullet whose head is neither is a finding rather than
+      # a silent skip: a mis-spelled verb is exactly how a declared edge stops being declared.
+      if (L !~ /^(-|\*)[ 	]*\*\*(consumes-from|hands-off)\*\*[ 	]/) {
+        eg_nb++; eg_h = L; sub(/^(-|\*)[ 	]*/, "", eg_h); sub(/[ 	].*$/, "", eg_h)
+        eg_bad = (eg_nb == 1) ? eg_h : eg_bad ", " eg_h
+        continue
+      }
+      eg_v = L; sub(/^(-|\*)[ 	]*\*\*/, "", eg_v); sub(/\*\*.*$/, "", eg_v)
+      eg_t = L; sub(/^[^*]*\*\*[^*]*\*\*[ 	]*/, "", eg_t)
+      if (eg_t ~ /^`/) { sub(/^`/, "", eg_t); sub(/`.*$/, "", eg_t) }
+      else { sub(/[^A-Za-z0-9_-].*$/, "", eg_t) }
+      # ONE sentinel byte for all three join classes, with the class name as the first tab field.
+      # \001 is the canon-diff excerpt request and \002 is claimed by a sibling; three bytes would
+      # be three routes to write and nothing to buy.
+      # The bullet PROSE rides along, backtick-joined, so the external-payload arm can ask whether
+      # a bullet that says `external` names a sibling in its own words. Two of the four criteria in
+      # the measured case never spelled the verb they rested on, which is why that is a real shape.
+      eg_pr = ""; eg_rest = L
+      while (match(eg_rest, /`[^`]+`/)) {
+        eg_pr = eg_pr substr(eg_rest, RSTART + 1, RLENGTH - 2) "`"
+        eg_rest = substr(eg_rest, RSTART + RLENGTH)
+      }
+      print "\003\tE\t" eg_slug "\t" eg_uid "\t" eg_ord "\t" eg_v "\t" eg_t "\t" f "\t" eg_pr "\t" mark
+    }
+    # The pass REGISTERS this spec, so the joins below can tell "the sibling refused the edge" from
+    # "the sibling was never graded" — a Tier-1 spec is `next`-ed above and a grandfathered one
+    # never reaches here, and both are legitimate absences rather than disagreements.
+    print "\003\tU\t" eg_slug "\t" eg_uid "\t" eg_ord "\t\t\t" f "\t" mark
+    return 1
+  }
   $1 == "M" { print $2 " (tracked but missing from worktree)"; next }
-  $1 != "P" { next }
+  $1 != "P" && $1 != "J" { next }
   {
     f = $2
     # ---- the _unfenced fence machine, verbatim: CR strip, marker-matched fences ----
@@ -2143,13 +2219,10 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     hdr = ""; lim = (n < 5) ? n : 5
     for (i = 1; i <= lim; i++) if (body[i] ~ /^\*\*Status:\*\* /) { hdr = body[i]; break }
     if (hdr !~ /^\*\*Status:\*\* (OPEN|SPECCED|INPROGRESS|BLOCKED|DEFERRED|CLOSED|WONTDO) · rev-[0-9]+ · [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] · node [a-z] · Tier-[12] · base [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]/) {
+      if ($1 == "J") next   # a sibling read for its edges only: the full run grades its shape
       print f " (missing/invalid **Status:** header in lines 1-5)"
       next      # header unparseable — the per-field assertions below have no anchor
     }
-    # ---- `<fill:` is the slot opener `gen_build_index.py --new-spec` writes (TOOL-aMendedFleet-20).
-    for (i = 1; i <= n; i++) if (body[i] ~ /<FAMILY-slug-seq>|YYYY-MM-DD|<fill:/) { print f " (unfilled skeleton placeholder)"; break }
-    if (hdr ~ /^\*\*Status:\*\* WONTDO/ && hdr !~ /base [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]* · ./)
-      print f " (WONTDO needs a successor id or reason pointer in the header tail)"
     # ---- the FILENAME date, computed once. Not the first date in the PATH: a build folder used to
     # ---- be date-named itself, and matching the whole path grandfathered by the wrong date. Both
     # ---- the streams ratchet and the section canon read this, and BOTH tiers need the streams one,
@@ -2157,6 +2230,12 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     fbase = f; sub(/^.*\//, "", fbase)
     fdate = ""
     if (match(fbase, /[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/)) fdate = substr(fbase, RSTART, RLENGTH)
+    # ---- TOOL-dPavedRoad-4: a `J` sibling leaves its E and U records, marked 0, and nothing else.
+    if ($1 == "J") { if (hdr !~ /Tier-1/) extract_edges(0); next }
+    # ---- `<fill:` is the slot opener `gen_build_index.py --new-spec` writes (TOOL-aMendedFleet-20).
+    for (i = 1; i <= n; i++) if (body[i] ~ /<FAMILY-slug-seq>|YYYY-MM-DD|<fill:/) { print f " (unfilled skeleton placeholder)"; break }
+    if (hdr ~ /^\*\*Status:\*\* WONTDO/ && hdr !~ /base [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]* · ./)
+      print f " (WONTDO needs a successor id or reason pointer in the header tail)"
     # ---- streams: the discipline is a SIGNAL, not a directory (1.5). Validated whenever present, on
     # ---- either tier; REQUIRED once the filename date reaches STREAMS_CUTOFF. `streams ` is matched
     # ---- as 8 ASCII bytes rather than by offsetting past the middot separator, whose length in
@@ -2658,66 +2737,13 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     # ---- on the path: it carries its own edgecut liveness test and inherits no neighbour.
     # ---- The marker bytes are ASCII on purpose: a multibyte dash crosses the writing tool, the
     # ---- shell and the awk regex parser, and only the last has an opinion about encoding.
-    if (edgecut != "" && fdate != "" && fdate >= edgecut) {
-      # Four values, all read from what this pass already holds. Nothing re-reads a file.
-      eg_slug = f; sub(/\/spec\/.*$/, "", eg_slug); sub(/^.*\//, "", eg_slug)
-      eg_uid = ""
-      for (i = 1; i <= n; i++) if (body[i] ~ /^# [A-Z][A-Za-z0-9-]* /) {
-        eg_uid = body[i]; sub(/^# /, "", eg_uid); sub(/ .*$/, "", eg_uid); break
-      }
-      # A header carrying something order-shaped that does not conform reads as UNORDERED here, and
-      # that is safe rather than silent: gen_build_index.py REFUSES such a value and hygiene check 9
-      # runs it, so the tree cannot carry one past the bar.
-      eg_ord = ""; eg_p = index(hdr, "· order ")
-      if (eg_p > 0) {
-        eg_ord = substr(hdr, eg_p + length("· order "))
-        sub(/[^0-9].*$/, "", eg_ord)
-      }
-      eg_in3 = 0; eg_ined = 0; eg_has = 0; eg_n = 0; eg_bad = ""; eg_nb = 0; eg_none = 0
-      for (i = 1; i <= n; i++) {
-        L = body[i]
-        if (L ~ /^## /) { eg_in3 = (L ~ /^## [0-9]+[.] Non-goals/); eg_ined = 0; continue }
-        if (!eg_in3) continue
-        if (L ~ /^### /) { eg_ined = (L ~ /^### Edges[ 	]*$/); if (eg_ined) eg_has = 1; continue }
-        if (!eg_ined) continue
-        if (L ~ /^[ 	]*$/) continue
-        if (L ~ /^none[.]?[ 	]*$/) { eg_none = 1; continue }
-        if (L !~ /^(-|\*)[ 	]/) continue
-        eg_n++
-        # The two verbs, and nothing else. A bullet whose head is neither is a finding rather than
-        # a silent skip: a mis-spelled verb is exactly how a declared edge stops being declared.
-        if (L !~ /^(-|\*)[ 	]*\*\*(consumes-from|hands-off)\*\*[ 	]/) {
-          eg_nb++; eg_h = L; sub(/^(-|\*)[ 	]*/, "", eg_h); sub(/[ 	].*$/, "", eg_h)
-          eg_bad = (eg_nb == 1) ? eg_h : eg_bad ", " eg_h
-          continue
-        }
-        eg_v = L; sub(/^(-|\*)[ 	]*\*\*/, "", eg_v); sub(/\*\*.*$/, "", eg_v)
-        eg_t = L; sub(/^[^*]*\*\*[^*]*\*\*[ 	]*/, "", eg_t)
-        if (eg_t ~ /^`/) { sub(/^`/, "", eg_t); sub(/`.*$/, "", eg_t) }
-        else { sub(/[^A-Za-z0-9_-].*$/, "", eg_t) }
-        # ONE sentinel byte for all three join classes, with the class name as the first tab field.
-        # \001 is the canon-diff excerpt request and \002 is claimed by a sibling; three bytes would
-        # be three routes to write and nothing to buy.
-        # The bullet PROSE rides along, backtick-joined, so the external-payload arm can ask whether
-        # a bullet that says `external` names a sibling in its own words. Two of the four criteria in
-        # the measured case never spelled the verb they rested on, which is why that is a real shape.
-        eg_pr = ""; eg_rest = L
-        while (match(eg_rest, /`[^`]+`/)) {
-          eg_pr = eg_pr substr(eg_rest, RSTART + 1, RLENGTH - 2) "`"
-          eg_rest = substr(eg_rest, RSTART + RLENGTH)
-        }
-        if (stg == 0) print "\003\tE\t" eg_slug "\t" eg_uid "\t" eg_ord "\t" eg_v "\t" eg_t "\t" f "\t" eg_pr
-      }
+    if (extract_edges(1)) {
       if (!eg_has)
         print f " (§3 carries no `### Edges` block, required at/after SPEC_EDGES_CUTOFF " edgecut "; write `none` when there are no edges)"
       else if (eg_n == 0 && !eg_none)
         print f " (§3 `### Edges` is empty; write `none` when there are no edges, so an absent declaration and a declared absence are different bytes)"
       if (eg_nb > 0)
         print f " (§3 `### Edges` bullets whose head is neither **consumes-from** nor **hands-off**): " eg_bad
-      # The pass REGISTERS this spec, so the joins below can tell "the sibling refused the edge" from
-      # "the sibling was never graded" — a Tier-1 spec is `next`-ed above and a grandfathered one
-      # never reaches here, and both are legitimate absences rather than disagreements.
-      if (stg == 0) print "\003\tU\t" eg_slug "\t" eg_uid "\t" eg_ord "\t\t\t" f
     }
     # ---- TOOL-aJoinedCanon-9: every DECLARED §5 row appears in the body. The row set is a
     # ---- `|`-separated conf declaration rather than ten literals in the skeleton, so a project that
@@ -2863,9 +2889,12 @@ case "$bad12_raw" in
   *) bad12=$bad12_raw ;;
 esac
 # ---- TOOL-aJoinedCanon-8: the three EDGE JOINS, routed out of the \003 sentinel records the pass
-# ---- above emits. They are HELD under --staged and say so: c12_sel is the STAGED set there, so a
-# ---- developer committing one spec of a correctly declared pair would see the other end reported
-# ---- missing — a red on honest work. The per-file shape arm stays live under --staged, because a
+# ---- above emits. Under --staged they read each staged spec's WHOLE build (TOOL-dPavedRoad-4): its
+# ---- siblings ride in as `J` records, so the unstaged end of a correct pair is read rather than
+# ---- reported missing, which was the red on honest work that once held these joins. The last field
+# ---- of each E and U record says whether its spec is staged, and a finding is reported when the
+# ---- commit can have caused it: a reciprocity or order finding when either end of its edge is staged,
+# ---- a payload finding when its own file is. The shape arm grades only the staged specs, because a
 # ---- truncated corpus cannot change its answer about the one file it reads.
 # ---- TOOL-aJoinedCanon-11: resolve every emitted `base` sha in ONE batch. A `git cat-file -e` per
 # ---- spec would be one fork per live spec forever, which is the shape this batched awk exists to
@@ -2900,16 +2929,20 @@ edge12=""; [ -z "$bad12_raw" ] || edge12=$(printf '%s\n' "$bad12_raw" | grep $'^
 rd25=""; [ -z "$bad12_raw" ] || rd25=$(printf '%s\n' "$bad12_raw" | grep $'^\004\t' || true)
 [ -z "$bad12" ] || bad12=$(printf '%s\n' "$bad12" | grep -v $'^\004\t' || true)
 if [ "$STAGED" = 1 ] && [ -n "$SPEC_EDGES_CUTOFF" ]; then
-  echo "memory-hygiene: the §3 edge JOINS are held under --staged — the selection is the staged set, so one end of a correctly declared pair would report the other as missing. The shape arm still ran; the push-boundary run is where the joins bind."
-elif [ -n "$edge12" ]; then
-  edgebad=$(printf '%s\n' "$edge12" | awk -F'\t' '
-    $2 == "U" { pop[$3 SUBSEP $4] = 1; ord[$3 SUBSEP $4] = $5; file[$3 SUBSEP $4] = $8; next }
+  echo "memory-hygiene: the §3 edge JOINS grade each staged spec against its own build's specs as they stand in the worktree, and report an edge when either end of it is staged; the push-boundary run grades every edge"
+fi
+if [ -n "$edge12" ]; then
+  edgebad=$(printf '%s\n' "$edge12" | awk -F'\t' -v stg="$STAGED" '
+    $2 == "U" { pop[$3 SUBSEP $4] = 1; ord[$3 SUBSEP $4] = $5; file[$3 SUBSEP $4] = $8; staged[$3 SUBSEP $4] = $9; next }
     $2 == "E" { k = ++ne; eslug[k] = $3; euid[k] = $4; eord[k] = $5; everb[k] = $6; etgt[k] = $7; efile[k] = $8
-                eprose[k] = $9
+                eprose[k] = $9; estaged[k] = $10
                 seen[$3 SUBSEP $4 SUBSEP $6 SUBSEP $7] = 1 }
     END {
       for (k = 1; k <= ne; k++) {
         s = eslug[k]; u = euid[k]; v = everb[k]; t = etgt[k]
+        # TOOL-dPavedRoad-4: under --staged a payload finding needs the declaring file staged, and
+        # an edge finding either end of the edge. Full mode skips the test: every spec is graded.
+        own = (stg != 1 || estaged[k] == 1); either = (own || staged[s SUBSEP t] == 1)
         # EXTERNAL payload: legal, and the only check is that it is not a SIBLING wearing the wrong
         # payload. An id in this build reached by `external` is a declared edge nobody can join, and
         # both joins below would skip it silently — which is the shape this arm exists to refuse.
@@ -2917,15 +2950,15 @@ elif [ -n "$edge12" ]; then
           np = split(eprose[k], pr, "`")
           for (pi = 1; pi <= np; pi++) {
             if (pr[pi] == "" || pr[pi] == u) continue
-            if ((s SUBSEP pr[pi]) in pop)
+            if (own && ((s SUBSEP pr[pi]) in pop))
               print "\003X\t" efile[k] " (§3 **" v "** external, and its prose names the sibling `" pr[pi] "` in this build; use **" v "** `" pr[pi] "` so the edge can be joined)"
           }
           continue
         }
-        if (t == "") { print "\003E\t" efile[k] " (§3 `### Edges` bullet with no payload: name a sibling unit id in backticks, or the bare word `external`)"; continue }
+        if (t == "") { if (own) print "\003E\t" efile[k] " (§3 `### Edges` bullet with no payload: name a sibling unit id in backticks, or the bare word `external`)"; continue }
         # ABSENCE IS NOT DISAGREEMENT. A target outside the registered population is a Tier-1
         # sibling or a grandfathered spec, and both are legitimate. Silent, and declared as such.
-        if (!((s SUBSEP t) in pop)) continue
+        if (!((s SUBSEP t) in pop) || !either) continue
         mirror = (v == "hands-off") ? "consumes-from" : "hands-off"
         if (!((s SUBSEP t SUBSEP mirror SUBSEP u) in seen))
           print "\003R\t" efile[k] " (§3 declares **" v "** `" t "` and that unit declares no matching **" mirror "** `" u "` back)"
@@ -3332,11 +3365,20 @@ alcut="${ACCEPTANCE_LEDGER_CUTOFF:-}"
 # ---- line — which is the class the paragraph above exists to refuse. `TOOL-aThawedCorpus-2`
 # ---- was retired to keep `memory hygiene` guardless in <prefix>/gate-legs.json, which is what
 # ---- makes the push-boundary compensating control above actually hold on BOTH pre-push arms.
-if [ "$STAGED" = 1 ] && [ -n "$alcut" ]; then
-  printf 'memory-hygiene: check 23 HELD under --staged — a corpus-wide join over every closed Tier-2 unit; the push-boundary run is where they bind
-'
-fi
-if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
+# ----
+# ---- NARROWED, NO LONGER HELD (TOOL-dPavedRoad-4). Under `--staged` both listings keep only the
+# ---- build folders a staged path sits in (`_SBUILD`), and the units graded are those whose spec is
+# ---- staged or whose id a staged journal record's `**Evidences:**` line names, each against every
+# ---- record in its own build folder, as the full run grades it. A unit the commit names nowhere stays
+# ---- silent, and a record in another build evidencing a graded unit is read only by the full run.
+# ---- The announce line counts the graded units, so an empty selection reads 0 rather than a pass.
+_al_sbuild() {   # the listing on stdin, kept to the staged build folders; full mode passes it whole
+  if [ "$STAGED" = 1 ]; then
+    awk -v pre="$M/builds/" -v keep=" ${!_SBUILD[*]} " \
+      '{ r = substr($0, length(pre) + 1); sub(/\/.*$/, "", r); if (index(keep, " " r " ") > 0) print }'
+  else cat; fi
+}
+if [ -n "$alcut" ]; then
   # The ledger, flattened ONCE to `<unit> <label> <form>` triples across every tracked record. A
   # record may carry several `**Evidences:**` blocks; a block ends at the next one or at a heading.
   #
@@ -3347,7 +3389,7 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
   # aborts the entire pass, where the retired per-file loop skipped that path and continued — and
   # `git ls-files` enumerates the INDEX, so a tracked-but-absent path is a real input. An empty
   # operand list would also make awk read stdin; an empty stream is a no-op. TOOL-aThawedCorpus-4.
-  alledger=$(git ls-files "$M/builds/*/build/*.md" "$M/builds/*/reviews/*.md" 2>/dev/null | awk '
+  alledger=$(git ls-files "$M/builds/*/build/*.md" "$M/builds/*/reviews/*.md" 2>/dev/null | _al_sbuild | awk '
     { f = $0; if (f == "") next
       j = 0; u = ""; pu = ""; plab = ""; pform = ""; ptok = ""   # per-RECORD reset
       while ((getline line < f) > 0) {    # from a fresh process per file, and losing it would
@@ -3387,7 +3429,7 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
       return r
     }')
   alpop=0; algap=""; albad=""; alnolab=""
-  alspecs=$(git ls-files "$M/builds/*/spec/*.md" 2>/dev/null || true)
+  alspecs=$(git ls-files "$M/builds/*/spec/*.md" 2>/dev/null | _al_sbuild || true)
   # The LISTING, guarded, not the post-cutoff population: a tree whose closed Tier-2 specs all
   # predate the cutoff is a real empty and says so below, but a listing that comes back empty
   # while spec files exist is a broken selector, and it reds. That distinction is the whole
@@ -3407,9 +3449,29 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
   # cutoff date with one that closed after. Back-filling another build's ledger is not this build's
   # to do — a build's own folder owns its own prose — so the exemption is declared, auditable and
   # shrink-only, with its reason beside it in the conf.
+  #
+  # TOOL-dPavedRoad-4: under --staged the units a commit NAMES — a staged spec's path, in `sfiles`,
+  # or an id a staged record's `**Evidences:**` line carries, in `only` — and no other.
+  _alonly=""; _alsfiles=""
+  if [ "$STAGED" = 1 ]; then
+    while IFS= read -r _l; do
+      case "$_l" in "$M"/builds/*/spec/*.md) _alsfiles+="$_l " ;; esac
+    done <<<"$STAGED_MD"
+    [ -z "$STAGED_MD" ] || _alonly=$(printf '%s\n' "$STAGED_MD" | awk -v pre="$M/builds/" '
+      index($0, pre) == 1 && substr($0, length(pre) + 1) ~ /^[^\/]+\/(build|reviews)\/.*\.md$/ {
+        f = $0
+        while ((getline line < f) > 0) {
+          sub(/\r$/, "", line)
+          if (line ~ /^\*\*Evidences:\*\* / && split(line, w, " ") >= 2) ids = ids " " w[2]
+        }
+        close(f)
+      }
+      END { print ids }')
+  fi
   alsel=$(printf '%s\n' "$alspecs" | grep . | awk -v cut="$alcut" \
       -v lcut="$LEDGER_LABEL_CUTOFF" -v tcut="$LEDGER_TOKEN_CUTOFF" \
-      -v grand=" ${ACCEPTANCE_LEDGER_GRANDFATHER:-} " '
+      -v grand=" ${ACCEPTANCE_LEDGER_GRANDFATHER:-} " \
+      -v stg="$STAGED" -v sfiles=" $_alsfiles" -v only="$_alonly " '
     { f = $0; seq++
       base = f; sub(/^.*\//, "", base)
       if (base !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-/) next
@@ -3440,6 +3502,7 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
       if (hdr !~ /Tier-2/) next
       if (!hasac) next
       if (uid == "") next
+      if (stg == 1 && index(sfiles, " " f " ") == 0 && index(only, " " uid " ") == 0) next
       if (index(grand, " " uid " ") > 0) next    # grandfathered leaves the COUNT too, as it did
       # TOOL-aJoinedCanon-6: the two ERA flags ride the U row rather than the filename date, so the
       # date comparison stays in awk beside the one alcut already does and bash reads booleans.
@@ -3544,6 +3607,9 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
   [ -z "$alnolab" ] || fail 23 "a CLOSED Tier-2 spec carries an acceptance-criteria section that numbers no criterion, so every claim about its coverage is vacuously true:$alnolab"
   [ -z "$alorph" ] || fail 23 "a journal record evidences a criterion label its own spec does not number, so the answer satisfies nothing and reads as coverage:$alorph"
   [ -z "$altokbad" ] || fail 23 "a ledger answer shares no backticked token with the criterion it claims to answer, so the two are joined by label alone and may describe different things:$altokbad"
+  if [ "$STAGED" = 1 ]; then
+    printf 'memory-hygiene: check 23 graded %s unit(s) that a staged spec or journal record names, against the records of their own build folders; the push-boundary run grades every closed unit\n' "$alpop"
+  else
   [ "$alpop" -gt 0 ] || printf 'memory-hygiene: check 23 measured NO unit — every closed Tier-2 spec predates ACCEPTANCE_LEDGER_CUTOFF, so a green verdict here is coverage of nothing\n'
   # TOOL-aJoinedCanon-6: each new arm announces its OWN empty population. Both cutoffs ship ahead of
   # the fleet, so on the landing commit each grades nothing, and a skip that looks like a pass is
@@ -3556,6 +3622,7 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
     _tgn=0; for _tk in "${!ALTOKERA[@]}"; do [ "${ALTOKERA[$_tk]}" = 1 ] && _tgn=$((_tgn+1)); done
     [ "$_tgn" -gt 0 ] || printf 'memory-hygiene: the ledger-TOKEN arm graded NO unit — LEDGER_TOKEN_CUTOFF is %s and every closed Tier-2 spec predates it. Its coverage is its self-test fixtures, not this corpus.\n' "$LEDGER_TOKEN_CUTOFF"
   fi
+  fi   # the three zero-population notices above are full-mode only (TOOL-dPavedRoad-4)
 fi
 
 fi

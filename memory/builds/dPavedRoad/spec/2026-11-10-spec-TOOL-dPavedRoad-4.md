@@ -1,11 +1,12 @@
 # TOOL-dPavedRoad-4 — `--staged` grades the edge joins and the ledger joins for what it stages
 
-**Status:** OPEN · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 4
+**Status:** CLOSED · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-10-build-TOOL-dPavedRoad-4-ledger.md](../build/2026-11-10-build-TOOL-dPavedRoad-4-ledger.md) | journal | — |
 | [2026-11-10-prompt-TOOL-dPavedRoad-1-brief.md](../prompts/2026-11-10-prompt-TOOL-dPavedRoad-1-brief.md) | research | TOOL-dPavedRoad-1 TOOL-dPavedRoad-2 TOOL-dPavedRoad-3 |
 
 <!-- /gen:spec-records -->

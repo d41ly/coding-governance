@@ -4422,8 +4422,86 @@ if [ -f "$HERE/../check-spec-tokens.py" ]; then
   hit "memory-hygiene: check 30: as-built held under --staged"
   git -C "$C29" reset -q --hard
 else
-  echo "skip check 29 and check 30 through the engine: no check-spec-tokens.py in this kit directory's parent, so their 24 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+24))
+  echo "skip check 29 and check 30 through the engine: no check-spec-tokens.py in this kit directory's parent, so their 24 arms are UNEXERCISEDhere"; n_skip=$((${n_skip:-0}+24))
 fi
+
+# ---- TOOL-dPavedRoad-4 — THE STAGED JOINS, in a tree of its own so no verdict above moves. Under
+# ---- --staged check 12's edge joins read each staged spec's whole build and report an edge either
+# ---- of whose ends is staged, and check 23 grades the units a staged spec or journal record names,
+# ---- against their own build folders. Ten specs in build tPair: 1 hands-off 2 one-way, 4 and 5 a
+# ---- conforming pair, 6 hands-off 7 one-way, 8 with no Edges block, and 3, 9 and 10 CLOSED with
+# ---- ledgers; build tOther holds a record evidencing ARCH-tPair-9 with an AC8 its spec never numbers.
+PR4=$TMP/pr4
+mkdir -p "$PR4" && git -C "$PR4" init -q --template= .
+PR4S=memory/builds/tPair/spec; PR4B=memory/builds/tPair/build
+mkdir -p "$PR4/$PR4S" "$PR4/$PR4B" "$PR4/memory/builds/tOther/build"
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSPEC_EDGES_CUTOFF="2026-09-08"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-20"\nLEDGER_LABEL_CUTOFF="2026-09-08"\n' > "$PR4/.memory-tree.conf"
+pr4_spec() { # <n> <status> <order or ""> <Edges body or "-" for no block> <criterion labels>
+  local a
+  {
+    printf '# ARCH-tPair-%s — fixture\n**Status:** %s · rev-1 · 2026-11-10 · node a · Tier-2 · base 0123abcd%s\n\n' "$1" "$2" "${3:+ · order $3}"
+    printf '## 1. Goal\n\nx\n\n## 2. Scope (IN)\n\nx\n\n## 3. Non-goals (OUT)\n\nx\n\n'
+    [ "$4" = - ] || printf '### Edges\n\n%s\n\n' "$4"
+    printf '## 4. Design\n\nx\n\n## 5. Production-readiness checklist\n\nx\n\n## 6. Acceptance criteria\n\nx\n'
+    for a in $5; do printf -- '- **%s** — `x` holds.\n' "$a"; done
+    printf '\n## 7. Gates\n\nx\n\n## 8. Open questions\n\n%s\n\n' "$( [ "$2" = CLOSED ] && echo none || echo x )"
+    printf '## 9. Revision log\n\n- rev-1 · 2026-11-10 · initial draft.\n\n## 10. Reuse audit\n\nx\n'
+  } > "$PR4/$PR4S/2026-11-10-spec-ARCH-tPair-$1.md"
+}
+pr4_ledger() { # <build dir> <unit id> <criterion labels>
+  local a
+  { printf '**Serves:** journal %s\n\n**Evidences:** %s\n' "$2" "$2"
+    for a in $3; do printf -- '- %s — `x` — seen.\n' "$a"; done; } > "$PR4/$1/2026-11-10-build-$2-1-acceptance-ledger.md"
+}
+pr4_spec 1 OPEN 1 '- **hands-off** `ARCH-tPair-2`' ""
+pr4_spec 2 OPEN 2 none ""
+pr4_spec 3 CLOSED "" none "AC1 AC2"
+pr4_spec 4 OPEN "" '- **hands-off** `ARCH-tPair-5`' ""
+pr4_spec 5 OPEN "" '- **consumes-from** `ARCH-tPair-4`' ""
+pr4_spec 6 OPEN "" '- **hands-off** `ARCH-tPair-7`' ""
+pr4_spec 7 OPEN "" none ""
+pr4_spec 8 OPEN "" - ""
+pr4_spec 9 CLOSED "" none "AC1"
+pr4_spec 10 CLOSED "" none "AC1"
+pr4_ledger "$PR4B" ARCH-tPair-3 "AC1"
+pr4_ledger "$PR4B" ARCH-tPair-9 "AC1 AC9"
+pr4_ledger "$PR4B" ARCH-tPair-10 "AC1 AC9"
+pr4_ledger memory/builds/tOther/build ARCH-tPair-9 "AC8"
+( cd "$PR4" && git add -A && git -c user.email=f@x -c user.name=f commit -q --no-verify -m pr4 ) >/dev/null 2>&1
+pr4_run() { # stages a one-line append to each path, runs --staged, and resets
+  local p
+  for p in "$@"; do printf 'y\n' >> "$PR4/$p"; git -C "$PR4" add -- "$p"; done
+  out=$(cd "$PR4" && bash "$SCRIPT" --staged 2>/dev/null)
+  git -C "$PR4" reset -q --hard
+}
+PR4R='2026-11-10-spec-ARCH-tPair-1.md (§3 declares **hands-off** `ARCH-tPair-2` and that unit declares no matching **consumes-from**'
+# AC1 — the one-way edge reds from EITHER end: staging only its target is the commit that can fix it.
+pr4_run "$PR4S/2026-11-10-spec-ARCH-tPair-2.md"
+n=$((n+1)); { grep -qF 'HYGIENE check 12' <<<"$out" && grep -qF "$PR4R" <<<"$out"; } \
+  || { echo "FAIL --staged did not report a one-way edge whose TARGET alone is staged"; st=1; }
+pr4_run "$PR4S/2026-11-10-spec-ARCH-tPair-1.md"
+n=$((n+1)); grep -qF "$PR4R" <<<"$out" || { echo "FAIL --staged did not report a one-way edge whose declaring spec is staged"; st=1; }
+# AC2 — a sibling read for its edges reports nothing of its own, and the conforming pair stays green.
+pr4_run "$PR4S/2026-11-10-spec-ARCH-tPair-2.md" "$PR4S/2026-11-10-spec-ARCH-tPair-5.md"
+n=$((n+1)); grep -qE 'ARCH-tPair-4`|ARCH-tPair-5`' <<<"$out" && { echo "FAIL --staged reported an edge of the conforming pair 4 and 5"; st=1; }
+n=$((n+1)); grep -qF '2026-11-10-spec-ARCH-tPair-6.md (' <<<"$out" && { echo "FAIL --staged reported a one-way edge neither end of which is staged"; st=1; }
+n=$((n+1)); grep -qF '2026-11-10-spec-ARCH-tPair-8.md (' <<<"$out" && { echo "FAIL --staged reported an UNSTAGED sibling's own shape finding"; st=1; }
+n=$((n+1)); grep -qF "memory-hygiene: the §3 edge JOINS grade each staged spec against its own build's specs as they stand in the worktree" <<<"$out" \
+  || { echo "FAIL --staged did not announce what the edge joins read"; st=1; }
+n=$((n+1)); grep -qF 'the §3 edge JOINS are held under --staged' <<<"$out" && { echo "FAIL --staged still holds the edge joins"; st=1; }
+# AC3 and AC4 — check 23 grades the unit a staged spec or a staged record names, and no other.
+pr4_run "$PR4S/2026-11-10-spec-ARCH-tPair-3.md"; pr4o3=$out
+n=$((n+1)); grep -F 'HYGIENE check 23' <<<"$pr4o3" | grep -F 'a CLOSED unit numbers an acceptance criterion that no journal record evidences' | grep -qF 'ARCH-tPair-3/AC2' \
+  || { echo "FAIL --staged did not grade check 23 for a staged CLOSED spec"; st=1; }
+pr4_run "$PR4B/2026-11-10-build-ARCH-tPair-9-1-acceptance-ledger.md"; pr4o9=$out
+n=$((n+1)); grep -F 'HYGIENE check 23' <<<"$pr4o9" | grep -F 'a journal record evidences a criterion label its own spec does not number' | grep -qF 'ARCH-tPair-9/AC9' \
+  || { echo "FAIL --staged did not grade check 23 for the unit a staged ledger record evidences"; st=1; }
+for out in "$pr4o3" "$pr4o9"; do
+  n=$((n+1)); grep -qE 'ARCH-tPair-10/AC9|ARCH-tPair-9/AC8' <<<"$out" \
+    && { echo "FAIL --staged check 23 reported an unstaged unit, or read a record outside the staged build folders"; st=1; }
+  n=$((n+1)); grep -qF 'check 23 HELD under --staged' <<<"$out" && { echo "FAIL --staged still holds check 23"; st=1; }
+  n=$((n+1)); grep -qF 'memory-hygiene: check 23 graded 1 unit(s)' <<<"$out" || { echo "FAIL --staged check 23 did not announce one graded unit"; st=1; }
+done
 
 # THE HIGHER OF THE TWO PINS, not the merge's arithmetic. This branch carried 224 and main carried
 # 235; the merged suite measures 251, so 235 is satisfied and 224 would be a silent LOWERING of a
@@ -4507,7 +4585,9 @@ fi
 # skipped aloud with that block's others. Counted by reading; OWED: observed at the close.
 # RAISED 668 -> 670 by TOOL-dGroundRules-25 S35: its two no-launcher assertions, exit 2 and the line,
 # each top-level and never skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=670
+# RAISED 670 -> 685 by TOOL-dPavedRoad-4: its fifteen staged-joins arms, nine top-level and six in a
+# two-pass loop, none skipped. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=685
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

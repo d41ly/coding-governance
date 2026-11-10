@@ -48,7 +48,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 4 unit(s) · node a · opened 2026-11-10 · streams tooling
+**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-11-10 · streams tooling
 ids TOOL-dPavedRoad-1 TOOL-dPavedRoad-2 TOOL-dPavedRoad-3 TOOL-dPavedRoad-4
 
 <!-- gen:build-units -->
@@ -57,10 +57,10 @@ ids TOOL-dPavedRoad-1 TOOL-dPavedRoad-2 TOOL-dPavedRoad-3 TOOL-dPavedRoad-4
 | [TOOL-dPavedRoad-1 — a spec writer grades its own spec: `check-spec-tokens.py --spec` reads the named spec whatever its status, and the writer's role may run it](spec/2026-11-10-spec-TOOL-dPavedRoad-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-10 |
 | [TOOL-dPavedRoad-2 — format-guard's block message carries the lines it asks for](spec/2026-11-10-spec-TOOL-dPavedRoad-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-11-10 |
 | [TOOL-dPavedRoad-3 — the handoff carries the brief's prompt as a `brief:prompt` block](spec/2026-11-10-spec-TOOL-dPavedRoad-3.md) | 3 | 2 | CLOSED | rev-1 | 2026-11-10 |
-| [TOOL-dPavedRoad-4 — `--staged` grades the edge joins and the ledger joins for what it stages](spec/2026-11-10-spec-TOOL-dPavedRoad-4.md) | 4 | 2 | OPEN | rev-1 | 2026-11-10 |
+| [TOOL-dPavedRoad-4 — `--staged` grades the edge joins and the ledger joins for what it stages](spec/2026-11-10-spec-TOOL-dPavedRoad-4.md) | 4 | 2 | CLOSED | rev-1 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 6 bound to this build, across 2 record folder(s).
+Records: 7 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
