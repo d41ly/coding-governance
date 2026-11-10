@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-75 — the selects join arms per namespace, so gov's first unit rows leave the tags leg green
 
-**Status:** DEFERRED · rev-1 · 2026-11-10 · node a · Tier-2 · base 0ec67531d · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-11-10 · node a · Tier-2 · base 0ec67531d · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,7 +9,9 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-10-prompt-PLAY-dOrderedCharter-75-1-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-75-1-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-PLAY-dOrderedCharter-75-2-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-75-2-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-75-build-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-75-build-brief.md) | journal | — |
+| [2026-11-10-prompt-PLAY-dOrderedCharter-75-repair-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-75-repair-brief.md) | research | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-75-spec-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-75-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -177,7 +179,7 @@ Section 8 F1 weighs the four ways to leave the leg green; this table names the v
 | Option | Why not |
 |---|---|
 | Scope the four rows to every declared reader | Loads them into reader load sets, which PLAY-dOrderedCharter-40's F2 rules out, and leaves `practice` red |
-| A pending or waiver row per declared selector | 42 rows typed beside the members they waive, each a follow-up, and an exemption that reads green |
+| A pending or waiver row per declared selector | 42 rows (DERIVED, section 4 Evidence) typed beside the members they waive, each a follow-up, and an exemption that reads green |
 | Re-role `reader` and `practice` to `describes` | An `instructs` edge runs from a unit to a `selects` namespace only, the ground PLAY-dOrderedCharter-1's F5 discarded it on |
 
 ## 5. Production-readiness checklist
@@ -288,6 +290,8 @@ New arm: tools/playbook/gov_tag.py · covers AC2 · `--fixture --plant unscoped-
   and
   `**consumes-from** PLAY-dOrderedCharter-10 — S4's selects join in tools/playbook/tag_index.py, whose arm S1 changes`,
   each id backticked, with a hands-off mirror in each target.
+  RESOLVED (agent, 2026-11-10, delegated): (b), the recommendation, as section 3 carries it: both
+  dependencies named in prose and the edges written `none`.
 
 ## 9. Revision log
 
@@ -297,6 +301,9 @@ New arm: tools/playbook/gov_tag.py · covers AC2 · `--fixture --plant unscoped-
   here, its F6 is F1, its AC5 and AC6 are AC1 and AC2, and AC3 is new, observing the prose readers by
   grep. F2 is new: the brief's two edges would red check 12's reciprocity arm against two CLOSED
   specs.
+- rev-2 · 2026-11-10 · from `2026-11-10-prompt-PLAY-dOrderedCharter-75-repair-brief.md`: F2 marked
+  resolved for (b), the recommendation section 3 already carried, and the alternatives table's
+  count pinned as DERIVED. No design text moved.
 
 ## 10. Reuse audit
 
