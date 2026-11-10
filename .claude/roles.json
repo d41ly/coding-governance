@@ -62,7 +62,8 @@
       "agent": true,
       "gates": [
         "memory hygiene",
-        "lexicon naming predicates"
+        "lexicon naming predicates",
+        "spec tokens (a spec's own names resolve)"
       ],
       "workflow": "spec-write",
       "writes": "spec"

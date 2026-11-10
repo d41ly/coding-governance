@@ -1,6 +1,6 @@
 # TOOL-dPavedRoad-1 — a spec writer grades its own spec: `check-spec-tokens.py --spec` reads the named spec whatever its status, and the writer's role may run it
 
-**Status:** SPECCED · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 1 · closes TOOL-dFairHearing-54 TOOL-aDeferredBar-6
+**Status:** CLOSED · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 1 · closes TOOL-dFairHearing-54 TOOL-aDeferredBar-6
 
 <!-- gen:spec-records -->
 

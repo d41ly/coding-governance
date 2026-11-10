@@ -16183,6 +16183,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_named_specs",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "read_new_build_args",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
