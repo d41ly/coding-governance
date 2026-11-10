@@ -1,6 +1,6 @@
 # Promotion brief — aSmoothedDispatch: three bar legs this build turned red
 
-**Serves:** research TOOL-aSmoothedDispatch-10
+**Serves:** research TOOL-aSmoothedDispatch-18
 
 ## The brief
 
