@@ -1,6 +1,6 @@
 # TOOL-aSmoothedDispatch-5 — the spec-token checker grades one named spec, so a spec writer can run it over its own
 
-**Status:** OPEN · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 5 · advances TOOL-dFairHearing-54
+**Status:** CLOSED · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 5 · advances TOOL-dFairHearing-54
 
 <!-- gen:spec-records -->
 

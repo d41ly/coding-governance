@@ -6113,6 +6113,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_spec_token_hits",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_ssh_keepalive",
       "kind": "function",
       "file": "tools/check-wiring.sh"
@@ -9306,6 +9311,11 @@
       "id": "derive_spec_class_plant",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_spec_token_key",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "derive_spec_unit",
@@ -17988,6 +17998,11 @@
       "file": "tools/unattended/check-unattended.sh"
     },
     {
+      "id": "remove_run_state_writes",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "remove_scratch",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
@@ -23436,6 +23451,11 @@
       "id": "run_spec_commit_block",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
+      "id": "run_spec_token_check",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "run_sr",

@@ -1172,10 +1172,10 @@ write_roles absent
 # without `gates`, so the arm was absent or its leg row unarmed there. Against the base hook every
 # exit-2 arm below exits 0 (2026-10-12, node a, a hand probe of the spec's payloads over the
 # repository's own index); the exit-0 arms are their near-misses and the main loop's controls.
-# write_gate_manifest — five legs in the manifest's shape, one of them repo-relative with no {prefix}.
+# write_gate_manifest — six legs in the manifest's shape, one of them repo-relative with no {prefix}.
 write_gate_manifest() {
   mkdir -p "$SGWT/kit"
-  printf '[{"name":"memory hygiene","argv":["bash","{prefix}/memory-tree/check-memory-hygiene.sh"]},{"name":"lexicon naming predicates","argv":["python","{prefix}/lexicon/lexicon.py"]},{"name":"roles catalogue","argv":["python","{prefix}/roles/check_roles.py"]},{"name":"gotchas selftest","argv":["python3","{prefix}/memory-tree/gotchas.py","--selftest"]},{"name":"kickoff-manifest ratchet","argv":["bash","skills/session-kickoff/manifest-check.sh"]}]\n' > "$SGWT/kit/gate-legs.json"
+  printf '[{"name":"memory hygiene","argv":["bash","{prefix}/memory-tree/check-memory-hygiene.sh"]},{"name":"lexicon naming predicates","argv":["python","{prefix}/lexicon/lexicon.py"]},{"name":"roles catalogue","argv":["python","{prefix}/roles/check_roles.py"]},{"name":"gotchas selftest","argv":["python3","{prefix}/memory-tree/gotchas.py","--selftest"]},{"name":"kickoff-manifest ratchet","argv":["bash","skills/session-kickoff/manifest-check.sh"]},{"name":"spec tokens (a spec'"'"'s own names resolve)","argv":["python","{prefix}/check-spec-tokens.py"]}]\n' > "$SGWT/kit/gate-legs.json"
   mkdir -p "$SGWT/.claude"
   printf '{"gates":{"manifest":"%s"},"harnesses":[],"roles":{"gov-builder":{"agent":true,"gates":["lexicon naming predicates"],"workflow":"build","writes":"product"},"gov-orienter":{"agent":true,"gates":[],"workflow":"orient","writes":"none"},"gov-skeptic":{"agent":true,"gates":[],"workflow":"closing-review","writes":"none"},"gov-spec-writer":{"agent":true,"gates":["memory hygiene","lexicon naming predicates"],"workflow":"spec-write","writes":"spec"}}}\n' "$1" > "$SG_ROLES"
 }
@@ -1226,9 +1226,14 @@ run_role_bash "G-AC1 workflow-subagent runs memory hygiene -> deny naming the le
 run_role_bash "G-AC1 gov-builder runs the lexicon -> allow, stderr EMPTY" 0 empty gov-builder Bash "python kit/$SG_K_LEXICON/lexicon.py"
 run_role_bash "G-AC1 gov-spec-writer runs the lexicon -> allow, stderr EMPTY" 0 empty gov-spec-writer Bash "python kit/$SG_K_LEXICON/lexicon.py"
 run_role_bash "G-AC1 gov-skeptic runs the lexicon -> deny naming the leg" 2 "any;;G1 leg;;lexicon naming predicates" gov-skeptic Bash "python kit/$SG_K_LEXICON/lexicon.py"
+# TOOL-aSmoothedDispatch-5 AC7: the spec-token leg is not on gov-spec-writer's allowlist, so its bare
+# run and its suite stay refused while the --spec run below is admitted.
+run_role_bash "G-AC1 gov-spec-writer runs the bare spec-token leg -> deny naming the leg" 2 "any;;G1 leg;;spec tokens (a spec's own names resolve)" gov-spec-writer Bash "python kit/check-spec-tokens.py"
+run_role_bash "G-AC1 gov-spec-writer runs the spec-token suite -> deny naming G3" 2 "any;;G3 suite" gov-spec-writer Bash "bash kit/check-spec-tokens.test.sh"
 # ---- AC2: the NEAR-MISSES — a mention, a scoped variant or a render is not a gate run --------------
 run_role_bash "G-AC2 gotchas.py --for-diff -> allow, stderr EMPTY" 0 empty gov-builder Bash "python3 kit/$SG_K_MEMORY_TREE/gotchas.py --for-diff HEAD~1..HEAD"
 run_role_bash "G-AC2 lexicon.py --suggest -> allow, stderr EMPTY" 0 empty gov-builder Bash "python3 kit/$SG_K_LEXICON/lexicon.py --suggest checkRoleGate --as js.function"
+run_role_bash "G-AC2 gov-spec-writer runs the spec-token checker with --spec -> allow, stderr EMPTY" 0 empty gov-spec-writer Bash "python kit/check-spec-tokens.py --spec memory/builds/x/spec/y.md"
 run_role_bash "G-AC2 a *.test.sh carrying --render -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash kit/$SG_K_WORKFLOWS/check-protocol-parity.test.sh --render"
 run_role_bash "G-AC2 bash -n on a suite -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash -n kit/$SG_K_HOOKS/agent-cap.test.sh"
 run_role_bash "G-AC2 git log naming a suite -> allow, stderr EMPTY" 0 empty gov-builder Bash "git log --oneline -- kit/$SG_K_HOOKS/agent-cap.test.sh"

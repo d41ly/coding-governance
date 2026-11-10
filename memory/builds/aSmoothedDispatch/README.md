@@ -55,7 +55,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 7 unit(s) · node a · opened 2026-11-10 · streams tooling
+**Build status:** SPECCED · 7 unit(s) · node a · opened 2026-11-10 · streams tooling
 ids TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 TOOL-aSmoothedDispatch-7
 
 <!-- gen:build-units -->
@@ -65,7 +65,7 @@ ids TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 T
 | [TOOL-aSmoothedDispatch-2 — `--dispatch` removes the run-state file from its declared writes with a note instead of refusing](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-2.md) | 2 | 2 | CLOSED | rev-3 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-3 — `unattended.sh --help` prints the verb list and exits 0](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-4 — `--dispatch`'s spec-token check grades the dispatching build's specs, and skips when its inputs match the last admitted check](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-4.md) | 4 | 2 | CLOSED | rev-1 | 2026-11-10 |
-| [TOOL-aSmoothedDispatch-5 — the spec-token checker grades one named spec, so a spec writer can run it over its own](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-5.md) | 5 | 2 | OPEN | rev-1 | 2026-11-10 |
+| [TOOL-aSmoothedDispatch-5 — the spec-token checker grades one named spec, so a spec writer can run it over its own](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-5.md) | 5 | 2 | CLOSED | rev-1 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-6 — a dispatched unit counts as routed, so its builder's product writes are not refused on a stale card route](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-6.md) | 6 | 2 | SPECCED | rev-1 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-7 — the `gov-spec-writer` house overlay has the writer run the spec-token checker's one-spec mode over each spec before it returns](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-7.md) | 7 | 2 | SPECCED | rev-1 | 2026-11-10 |
 <!-- /gen:build-units -->

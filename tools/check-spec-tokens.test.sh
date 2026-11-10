@@ -59,7 +59,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # reading; OWED: observed at the close.
 # RAISED 215 -> 224 by TOOL-dFairHearing-48: its nine arm-labels arms, each top-level. Counted by reading;
 # OWED: observed at the close.
-FLOOR_ASSERTIONS=224
+# RAISED 224 -> 236 by TOOL-aSmoothedDispatch-5: its twelve --spec arms, one for AC1, two each for AC2,
+# AC4 and AC5, four for AC3 and one for AC6, each top-level. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=236
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -1980,6 +1982,46 @@ write_arm_label "$ls_spec" x.test.sh AC1 'FH2 AC1'
 printf 'arm-labels <- %s FH2 AC1\tdeliberate, for this arm\n' "$ls_spec" >> "$d/memory/project/spec-token-waivers.txt"
 arm "FH48 AC9 a waiver row reaches a hit" 0 "$d" "1 label(s) in 1 spec(s)" "STALE WAIVER"
 git -C "$d" reset -q --hard "$albase"
+
+# ---- TOOL-aSmoothedDispatch-5: the --spec scope. Twelve arms over three scratch repos. The scoped
+#      specs are written and NEVER added, since grading a spec git does not track is the point. Each
+#      `Red when:` is the checker at ae6735c1, which ignores the flag and grades the tracked tree.
+sc_spec="$SPECDIR/$HCUT-spec-TOOL-tOne-7.md"
+d=$base/scope; scratch "$d"
+write_handoff_spec "$d" "$sc_spec" TOOL-tOne-7 OPEN '## 7. Gates' '' '`imaginary leg`.'
+ARM_ARGS=(--spec "$sc_spec")
+arm "SD5 AC1 --spec grades an UNTRACKED spec and REDS on its leg" 1 "$d" "$sc_spec [leg]"
+write_handoff_spec "$d" "$sc_spec" TOOL-tOne-7 OPEN '## 7. Gates' '' '`real leg`.'
+sed -i 's|^`real leg`\.|`imaginary leg`.|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+arm "SD5 AC2 a hit only in the tracked spec is not reported under --spec" 0 "$d" "scope · --spec $sc_spec · untracked · not run: carries, packet" "2026-09-02-spec-TOOL-tOne-1.md"
+arm "SD5 AC2 the carries and packet joins print that they did not run" 0 "$d" "carries join · skipped under --spec"
+ARM_ARGS=(--spec)
+arm "SD5 AC3 --spec with no value REFUSES with exit 2" 2 "$d" "REFUSING — --spec (no value)"
+ARM_ARGS=(--spec memory/project/spec-token-waivers.txt)
+arm "SD5 AC3 --spec outside the builds' spec folders REFUSES with exit 2" 2 "$d" "REFUSING — --spec memory/project/spec-token-waivers.txt: not a .md file"
+ARM_ARGS=(--spec "$SPECDIR/nope.md")
+arm "SD5 AC3 --spec naming no file REFUSES with exit 2" 2 "$d" "REFUSING — --spec $SPECDIR/nope.md: no file there"
+write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-TOOL-tOne-8.md" TOOL-tOne-8 CLOSED '## 7. Gates' '' '`real leg`.'
+ARM_ARGS=(--spec "$SPECDIR/$HCUT-spec-TOOL-tOne-8.md")
+arm "SD5 AC3 --spec naming a CLOSED spec REFUSES with exit 2" 2 "$d" "not a live spec"
+sed -i 's|^`imaginary leg`\.|`real leg`.|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+printf 'no-spec-makes-this\tdeliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+ARM_ARGS=()
+arm "SD5 AC5 a waiver row no spec produces is STALE on the unscoped run" 1 "$d" "STALE WAIVER"
+ARM_ARGS=(--spec "$sc_spec")
+arm "SD5 AC5 the same row is not reported under --spec" 0 "$d" "1 live spec(s)" "STALE"
+d=$base/scopeho; scratch "$d"
+printf 'SPEC_HANDOFF_CUTOFF="%s"\n' "$HCUT" > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null
+write_handoff_spec "$d" "$sc_spec" TOOL-tOne-7 OPEN '## 3. Non-goals (OUT)' '' '### Edges' '' \
+  '- **hands-off** `TOOL-tOne-9` — it reads `--frob` from this unit.'
+write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-TOOL-tOne-9.md" TOOL-tOne-9 OPEN '## 4. Design' '' 'It reads the flag.'
+arm "SD5 AC4 a hand-off to an UNTRACKED sibling joins under --spec and REDS" 1 "$d" '[handoff] `TOOL-tOne-7>TOOL-tOne-9:--frob`'
+sed -i 's|It reads the flag|It reads `--frob`|' "$d/$SPECDIR/$HCUT-spec-TOOL-tOne-9.md"
+arm "SD5 AC4 the same hand-off is green once the sibling names the token" 0 "$d" "1 bullet(s) graded in live spec(s) · 1 payload token(s)"
+ARM_ARGS=()
+d=$base/scopeoff; scratch "$d"
+arm "SD5 AC6 a run with no --spec prints no scope line and grades the tracked spec" 0 "$d" "1 live spec(s) · 0 terminal spec(s)" "scope ·"
 
 # TOOL-dGroundRules-32 S9, TOOL-dGroundRules-40: the build-order render's overlap rule is the
 # dispatcher's, and both are graded against the truth. Each OVERLAP_PAIRS row is two paths relative to
