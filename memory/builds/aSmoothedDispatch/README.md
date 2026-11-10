@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-10
 streams: tooling
 roster: TOOL
-ids: TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 TOOL-aSmoothedDispatch-7 TOOL-aSmoothedDispatch-8
+ids: TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 TOOL-aSmoothedDispatch-7 TOOL-aSmoothedDispatch-8 TOOL-aSmoothedDispatch-9
 ---
 
 # aSmoothedDispatch — five mechanical refusals that cost every unattended run turns and re-dispatches
@@ -53,11 +53,12 @@ None.
 | 6 | `TOOL-aSmoothedDispatch-6` | a dispatched unit counts as routed, so its builder's product writes are not refused on a stale card route |
 | 7 | `TOOL-aSmoothedDispatch-7` | the `gov-spec-writer` role prompt has the writer run the spec-token checker's one-spec mode over its spec before returning |
 | 8 | `TOOL-aSmoothedDispatch-8` | promoted from the closing review: round 1's three mediums and two lows, batched with the carried scratch-guard leg guard gap |
+| 9 | `TOOL-aSmoothedDispatch-9` | the three driver-suite arms unit 1's split left red at the close: the stale `--dispatch` hostile-value exemption, and two carriage-return arms moved to a vertical tab |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 8 unit(s) · node a · opened 2026-11-10 · streams tooling
-ids TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 TOOL-aSmoothedDispatch-7 TOOL-aSmoothedDispatch-8
+ids TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 TOOL-aSmoothedDispatch-7 TOOL-aSmoothedDispatch-8 TOOL-aSmoothedDispatch-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -72,7 +73,7 @@ ids TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 T
 | [TOOL-aSmoothedDispatch-8 — the closing review's mediums and lows: the writer's row shape, an arm per admit clause and cache key, the no-field `--writes` arms, the context's step-9b read, and the hook leg's driver guard](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-8.md) | 8 | 2 | CLOSED | rev-1 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 3 record folder(s).
+Records: 11 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
