@@ -43,13 +43,17 @@
  * the payload's `transcript_path`, read whole, `<synthetic>` skipped. Its profile is the one whose
  * `match` holds a word of the id, else the default tables. An `Agent` call is refused unless its
  * `effort`, or with none its agent type's level, is the level that table gives its role. A `Workflow`
- * call is refused unless, for at least one workflow its harness runs, every stage key's level, the
- * `args.efforts` value or with none the stage's agent type's level, is the table's. A refusal names
+ * call is refused unless, for at least one workflow its harness runs, every stage key's level is the
+ * table's. The stage level is the `args.efforts` value, or with none the level of the agent type the
+ * call's `roles` names for the stage, and a stage neither names counts as differing
+ * (TOOL-aGuardedEffort-2). A workflow's stage keys are those the index's `unset` and the matched
+ * table's `stages` both hold for it. A refusal names
  * the role or stage, both levels, the model and where it was read, and the `handoff.py role-efforts`
  * or `stage-efforts` call that prints the right value. A level it cannot check is admitted with one
  * stderr line saying why: no `transcript_path`, an unreadable transcript, no entry naming a model, a
- * model two profiles match, and an `Agent` call where `CLAUDE_CODE_EFFORT_LEVEL` is set, since that
- * session's tool offers no `effort`. A throw inside it refuses, naming a re-render.
+ * model two profiles match, a harness whose workflows hold no stage key, and an `Agent` call where
+ * `CLAUDE_CODE_EFFORT_LEVEL` is set, since that session's tool offers no `effort`. A throw inside it,
+ * tables that disagree on a stage key among them, refuses, naming a re-render.
  * WHAT IT DOES NOT CHECK: the agents a running harness spawns through its own `agent()`; the
  * `committer` and `probe` stages, which no `stages` table keys; which workflow a call to a harness
  * serving two runs, so a call right for one is admitted for both; a configured default subagent
@@ -72,7 +76,7 @@
  *     "hooks": [ { "type": "command",
  *       "command": "node \"${CLAUDE_PROJECT_DIR}/<path>/agent-cap.js\"" } ] } ] }
  * The matcher is a LIST OF EXACT STRINGS separated by `|`, in ONE group — not a regular expression.
- * `Workflow` is a harness call rules 6 and 7 judge; `Agent` is a direct spawn they judge too.
+ * `Workflow` is a harness call rules 6, 8 and 7 judge; `Agent` is a direct spawn they judge too.
  * main() exits 0 on any other tool_name.
  * Blocks via exit 2 + stderr (version-robust; no JSON-schema dependency).
  *
@@ -834,7 +838,8 @@ function renderEffortDeny(tool, why, remedy) {
 
 // Rule 8 on a call rule 6 admitted: null when it was graded and admitted, or when the index carries
 // no `effort`; `{ deny }` with the refusal text; `{ note }` with the one line saying the level was not
-// checked and why. A role, harness or stage the index's tables do not hold throws, and `main()` refuses.
+// checked and why. A role or harness the index's tables do not hold, and a stage key they disagree
+// on, throws, and `main()` refuses. A harness none of whose workflows has a stage key is a note.
 function checkEffortLevel(data, index, root) {
   const e = index.effort
   if (!e) return null
@@ -885,23 +890,48 @@ function checkEffortLevel(data, index, root) {
   }
   // A harness serving two workflows: the hook cannot tell which one a call runs, so the call is
   // admitted when the levels of at least ONE whole workflow are its own, and never key by key.
+  // A stage's level is the call's `efforts` value, or with none the level of the agent type the
+  // call's `roles` names for the stage, and a stage neither names counts as differing: it would
+  // spawn untyped at the session's level, which no table holds (TOOL-aGuardedEffort-2 S1). A
+  // workflow's stage keys are those of `unset` joined with those of the matched table's `stages`,
+  // and a key one side lacks throws; a workflow with no key adds no line and never admits (S2).
   const lines = []
+  const keyed = []
   for (const w of workflows) {
-    const stages = (table.stages && table.stages[w]) || {}
+    const stages = (checkOwn(table.stages, w) && table.stages[w]) || {}
+    const unset = (checkOwn(e.unset, w) && e.unset[w]) || {}
+    const keys = [...new Set([...Object.keys(unset), ...Object.keys(stages)])].sort()
+    for (const key of keys) {
+      if (!checkOwn(unset, key) || !checkOwn(stages, key)) throw new Error(`the effort tables of ${index.shown} disagree on stage ${key} of ${w}`)
+    }
+    if (!keys.length) continue
+    keyed.push(w)
     const differing = []
-    for (const key of Object.keys(stages).sort()) {
-      const own = checkOwn(efforts, key)
-      if (!own && !checkOwn(e.unset[w], key)) throw new Error(`the effort tables of ${index.shown} hold no unset level for stage ${key} of ${w}`)
-      const seen = own ? efforts[key] : e.unset[w][key]
+    for (const key of keys) {
+      let seen
+      let how
+      if (checkOwn(efforts, key)) {
+        seen = efforts[key]
+        how = `the call's own \`efforts.${key}\``
+      } else if (checkOwn(a.roles, key)) {
+        const role = a.roles[key]
+        if (!checkOwn(e.default.roles, role)) throw new Error(`the effort tables of ${index.shown} hold no level for the role ${renderLevel(role)}`)
+        seen = e.default.roles[role]
+        how = `${role}, its agent type's level; the call's \`efforts\` names no ${key}`
+      } else {
+        differing.push(`stage ${key} would run untyped at the session's level (the call's \`roles\` and \`efforts\` name no ${key}), expected ${stages[key]}`)
+        continue
+      }
       if (seen === stages[key]) continue
-      differing.push(`stage ${key} would run at ${renderLevel(seen)} (${own ? `the call's own \`efforts.${key}\`` : `its agent type's level; the call's \`efforts\` names no ${key}`}), expected ${stages[key]}`)
+      differing.push(`stage ${key} would run at ${renderLevel(seen)} (${how}), expected ${stages[key]}`)
     }
     if (!differing.length) return null
     lines.push(`${w}: ${differing.join('; ')}`)
   }
+  if (!keyed.length) return renderNote(`the effort tables of ${index.shown} hold no stage key for ${workflows.join(' and ')}, which the harness ${entry} runs`)
   return { deny: renderEffortDeny('Workflow',
     `the harness ${entry} would run a stage at another level than ${giver} ${where}.\n${lines.join('\n')}`,
-    `Pass \`efforts\` as ${workflows.map((w) => `\`handoff.py stage-efforts ${w} --model ${renderShown(model)}\``).join(' or ')} prints it, for the workflow this call runs.`) }
+    `Pass \`efforts\` as ${keyed.map((w) => `\`handoff.py stage-efforts ${w} --model ${renderShown(model)}\``).join(' or ')} prints it, for the workflow this call runs.`) }
 }
 
 // RULE 7 (TOOL-dGroundRules-10) — the settings in force. The agent limit is the harness's to enforce,
@@ -985,7 +1015,7 @@ function main() {
       `agent-cap: ${onlyArg} is refused — this hook runs no script rule since TOOL-dFairHearing-16. ` +
         `The verifier total and the loop markers run from the review kit's check-verifier-fanout.js, ` +
         `and the ref-keyed join ban from its check-review-join.js, each given this hook as --hook. ` +
-        `Omit the flag to run this hook's rules 6 and 7.\n`,
+        `Omit the flag to run this hook's rules 6, 8 and 7.\n`,
     )
     process.exit(2)
   }
@@ -1111,7 +1141,7 @@ function readSettingsLayers(root) {
   })
 }
 
-// TOOL-dFairHearing-22 — THE OPT-IN PACK'S PRESENCE, after rules 6 and 7. The spec-audit opt-in left
+// TOOL-dFairHearing-22 — THE OPT-IN PACK'S PRESENCE, after rules 6, 8 and 7. The spec-audit opt-in left
 // this hook for the review kit's spec-audit-optin.js (TOOL-dFairHearing-16), and a partial update
 // that names this kit alone lands the hook without it: the hooks kit cannot require the review kit,
 // which requires it back, a cycle govkit refuses. So a Workflow call carrying the opt-in's own

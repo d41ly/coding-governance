@@ -234,7 +234,7 @@ rule above ships at `<prefix>/workflows/tier2-review.js`.
 
 `TOOL-dFairHearing-22`. The hook carries no opt-in rule, only a presence check: whether a build
 declared `spec-audit:` is judged by the review kit's `spec-audit-optin.js` pack alone, the opt-in's
-one home. Last, after rules 6 and 7, a `Workflow` call whose structured `args` carry
+one home. Last, after rules 6, 8 and 7, a `Workflow` call whose structured `args` carry
 `kind: "spec-audit"` or a `specAudit` key, the pack's own trigger, is refused, exit 2, unless the
 pack is found by `resolveKitDir`, the hook's port of the sibling-kit resolver `resolve_kit_dir`, rung
 for rung (`TOOL-dFairHearing-32`): first a row of the install receipt, `.governance/install.json` at
@@ -310,17 +310,21 @@ skipped. Its profile is the one whose `match` holds a word of the id, else the d
   that table gives its role. Pass the role's value in what `handoff.py role-efforts --model <id>`
   prints.
 - A `Workflow` call is refused unless, for at least one workflow its harness runs, every stage key's
-  level is the table's: the `args.efforts` value, or with none the stage's agent type's level. Pass
-  what `handoff.py stage-efforts <workflow> --model <id>` prints as `efforts`.
+  level is the table's. The stage level is the `args.efforts` value, or with none the level of the
+  agent type the call's `roles` names for the stage, and a stage neither names counts as differing
+  (`TOOL-aGuardedEffort-2`). A workflow's stage keys are those the index's `unset` and the matched
+  table's `stages` both hold for it. Pass what `handoff.py stage-efforts <workflow> --model <id>`
+  prints as `efforts`.
 
 A refusal names the role or stage, both levels, the model and where it was read, and the call that
 prints the right value. A level it cannot check is admitted with one stderr line,
 `agent-cap: rule 8 did not check this <tool> call's effort level — <why>`: no `transcript_path`, an
-unreadable transcript, no entry naming a model, a model two profiles match, and an `Agent` call
-where `CLAUDE_CODE_EFFORT_LEVEL` is set, since that session's tool offers no `effort`.
+unreadable transcript, no entry naming a model, a model two profiles match, a harness whose
+workflows hold no stage key, and an `Agent` call where `CLAUDE_CODE_EFFORT_LEVEL` is set, since that
+session's tool offers no `effort`.
 
-ORDER: after rule 6 admits, before rule 7. A throw inside the rule refuses, naming a re-render of
-the index.
+ORDER: after rule 6 admits, before rule 7. A throw inside the rule, tables that disagree on a stage
+key among them, refuses, naming a re-render of the index.
 
 **What it does not check**: the agents a running harness spawns through its own `agent()`; the
 `committer` and `probe` stages, which no `stages` table keys; which workflow a call to a harness

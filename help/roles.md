@@ -28,7 +28,8 @@ reference; this page is the short version.
    The dispatcher passes the level for the model in use: a harness call carries `efforts`, the JSON
    `handoff.py stage-efforts <workflow> --model <id>` prints, where `<id>` is the session's own
    model id as its environment states it. A harness call at another level is refused by the spawn
-   guard, which names the stage, both levels and that command; pass what it prints.
+   guard, which names the stage, both levels and that command; pass what it prints. A stage that
+   neither `roles` nor `efforts` names is refused too.
 
 ## How to use it
 

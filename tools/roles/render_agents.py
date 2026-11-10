@@ -211,19 +211,20 @@ def resolve_gate_manifest(tool_root, target_root):
 def derive_effort_index(policy, roles, workflows, tool_root, target_root):
     """The index's `effort` value (TOOL-aGuardedEffort-1), every level resolved here so the spawn
     guard only looks up: `default` and each `profiles.<name>` hold `roles`, every `agent`-true
-    role's level, and `stages`, each stage key's level for every `workflow`-driver workflow with a
-    `stages` table, a profile's read with its first `match` word as the model and its `match`
-    beside them; `harnesses` maps each listed harness, spelled as `derive_harness_paths` spells it,
-    to the sorted names of the workflows it runs; `unset` holds the level a stage runs at when a
-    call names none, its slot's rendered level."""
+    role's level, and `stages`, each stage key's level for every `workflow`-driver workflow, a
+    profile's read with its first `match` word as the model and its `match` beside them;
+    `harnesses` maps each listed harness, spelled as `derive_harness_paths` spells it, to the
+    sorted names of the workflows it runs; `unset` holds each stage key's slot's rendered level.
+    A driven workflow with no `stages` table keeps its harness and reads `{}` in every `stages`
+    map and in `unset` (TOOL-aGuardedEffort-2 S3): the spawn guard holds the maps to one
+    population of stage keys, and a missing entry is a broken index to it."""
     slots = [s for s, r in roles.items() if r["keys"].get("agent", "true") == "true"]
     driven = [w for w in workflows if w.get("driver") == "workflow"]
-    staged = [w for w in driven if isinstance(w.get("stages"), dict)]
     tables = {}
     profiles = policy["effort"].get("profiles", {})
     for name, model in [(None, None)] + [(n, p["match"][0]) for n, p in profiles.items()]:
         tables[name] = {"roles": {s: lib.resolve_effort(policy, s, model) for s in slots},
-                        "stages": {w["name"]: lib.resolve_stage_efforts(policy, w, model) for w in staged}}
+                        "stages": {w["name"]: lib.resolve_stage_efforts(policy, w, model) for w in driven}}
     runs = {}
     for w in driven:
         path, _held = lib.resolve_harness_path(tool_root, w.get("harness"))
@@ -232,8 +233,8 @@ def derive_effort_index(policy, roles, workflows, tool_root, target_root):
     return {"default": tables[None],
             "profiles": {n: dict(tables[n], match=list(p["match"])) for n, p in profiles.items()},
             "harnesses": {rel: sorted(names) for rel, names in runs.items()},
-            "unset": {w["name"]: {key: lib.resolve_effort(policy, slot) for key, slot in w["stages"].items()}
-                      for w in staged}}
+            "unset": {w["name"]: {key: lib.resolve_effort(policy, slot)
+                                  for key, slot in (w.get("stages") or {}).items()} for w in driven}}
 
 
 def render_roles_index(roles, harnesses, policy, manifest, effort):
@@ -471,6 +472,13 @@ def run_selftest():
                   "an absent harness is not listed in harnesses at the resolver's path")
         check_arm(state, 10, all((agents / (s + ".md")).is_file() for s in ("r-one", "r-two")),
                   "a write noting an absent harness did not write every type")
+        # Arm 20 (TOOL-aGuardedEffort-2 S3): `w5` above is a driven workflow with no `stages` table.
+        effort = index.get("effort", {})
+        check_arm(state, 20, "w5" in effort.get("harnesses", {}).get(missing, []),
+                  "a stageless driven workflow left effort.harnesses")
+        check_arm(state, 20, effort.get("default", {}).get("stages", {}).get("w5") == {}
+                  and effort.get("unset", {}).get("w5") == {},
+                  "a stageless driven workflow is not {} in effort.default.stages and effort.unset")
     with tempfile.TemporaryDirectory() as tmp:
         kit, tool_root = build_fixture(tmp, {})
         for mode in ("write", "check"):

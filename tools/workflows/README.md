@@ -161,7 +161,7 @@ acceptance criterion, so diagnostics that would change them live behind the flag
 ## The rules that left the hook — `TOOL-dFairHearing-16`
 
 Three of the agent-cap hook's rules are this kit's since the owner's NT-27, each seen red at its new
-home before the hook stopped carrying it. The hook keeps rules 6 and 7, which judge the call, and
+home before the hook stopped carrying it. The hook keeps rules 6, 8 and 7, which judge the call, and
 exports the readers these homes share with it: its views, `runBothViews`, `MAX_VERIFIERS`, the
 writer bound, the args reader and the slug walk. Rule 2's lens-literal bound is `LENS_SLOTS` in
 `check-verifier-fanout.js`, the same number the slot count holds every marked literal to, so it has

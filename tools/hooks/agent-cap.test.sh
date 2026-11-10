@@ -266,7 +266,7 @@ check() { # name expected_exit json
 # TOOL-dFairHearing-16: rules 0, 2 and 5 left this hook for the review kit, and their arms went with
 # them, each keeping its label, its payload and its verdict: rule 2's to the kit's
 # check-verifier-fanout.test.sh, rule 5's to check-review-join.test.sh, rule 0's to
-# spec-audit-optin.test.sh. What stays is what the hook still judges, rules 6 and 7, and the readers
+# spec-audit-optin.test.sh. What stays is what the hook still judges, rules 6, 8 and 7, and the readers
 # it EXPORTS to those homes. This arm requires the hook as a module: were `main()` to run on require it
 # would read the empty stdin and exit before the line printed, and a reader missing from the exports
 # prints `undefined` in its place.
@@ -745,36 +745,67 @@ write_roles none
 # Against a `main()` with its rule 8 block cut out, every refusal below exits 0 and every
 # not-checked line is gone. WHAT THESE DO NOT CHECK: the rendered index, which arm 6 of the roles
 # kit's adopter suite runs through this hook, and the word match, which its arm 20 holds.
-E8_EFFORT='{"default":{"roles":{"gov-researcher":"high","gov-builder":"high"},"stages":{"build":{"builder":"high"}}},"profiles":{"tfam":{"match":["tfam"],"roles":{"gov-researcher":"medium","gov-builder":"medium"},"stages":{"build":{"builder":"medium"}}},"tven":{"match":["vendor"],"roles":{"gov-researcher":"low","gov-builder":"low"},"stages":{"build":{"builder":"low"}}}},"harnesses":{"tools/'"$HO_WF"'/h.js":["build"]},"unset":{"build":{"builder":"high"}}}'
-E8_ROLES="${HO_ROLES%\}},\"effort\":$E8_EFFORT}"
+# TOOL-aGuardedEffort-2 — THE INDEX GREW, and no payload of the arms above the `aGuardedEffort-2`
+# line below did: `h.js` still serves `build` alone with its one stage, and those arms keep their
+# verdicts. Added: a third agent-true role, `gov-skeptic`, at `medium` where `gov-builder` is `high`;
+# `h2.js`, serving `closing` and `spec`, which share the keys `finder` and `synthesis` at different
+# levels, the policy's slots being `gov-skeptic` and `gov-builder`, so `spec.synthesis` is `medium`
+# in the default stage table while its role's level, and its `unset` level, is `high`; `h3.js`,
+# serving `build` and the unkeyed `bare`; and `h4.js`, serving `bare` alone. The tfam transcript
+# opens on another model's main-chain entry and holds a `user` record naming that model after the
+# tfam entry, so a read walking forward, or one with no `type` test, grades the AC1 arms as unmatched.
+E8_ROLES=$("$TESTPY" -c 'import json,sys
+d=json.loads(sys.argv[1]); wf="tools/%s/" % sys.argv[2]
+d["roles"]["gov-skeptic"]={"agent":True,"workflow":"review","writes":"none"}
+d["harnesses"]=[wf+n for n in ("h.js","h2.js","h3.js","h4.js")]
+def table(r,s,b,cf,cs,sf,ss):
+    return {"roles":{"gov-researcher":r,"gov-builder":r,"gov-skeptic":s},
+            "stages":{"build":{"builder":b},"closing":{"finder":cf,"synthesis":cs},"spec":{"finder":sf,"synthesis":ss},"bare":{}}}
+d["effort"]={"default":table("high","medium","high","low","high","medium","medium"),
+  "profiles":{"tfam":dict(table("medium","medium","medium","medium","medium","low","low"),match=["tfam"]),
+              "tven":dict(table("low","low","low","low","low","low","low"),match=["vendor"])},
+  "harnesses":{wf+"h.js":["build"],wf+"h2.js":["closing","spec"],wf+"h3.js":["bare","build"],wf+"h4.js":["bare"]},
+  "unset":{"build":{"builder":"high"},"closing":{"finder":"medium","synthesis":"high"},"spec":{"finder":"medium","synthesis":"high"},"bare":{}}}
+print(json.dumps(d))' "$HO_ROLES" "$HO_WF")
 write_roles "$E8_ROLES"
-printf '%s\n' '{"type":"assistant","message":{"model":"maker-tfam-9"}}' \
+printf '%s\n' '{"type":"assistant","message":{"model":"maker-other-9"}}' \
+  '{"type":"assistant","message":{"model":"maker-tfam-9"}}' \
+  '{"type":"user","message":{"model":"maker-other-9"}}' \
   '{"type":"assistant","isSidechain":true,"message":{"model":"maker-other-9"}}' \
   '{"type":"assistant","message":{"model":"<synthetic>"}}' 'not json' > "$TMP/e8.tfam.jsonl"
 printf '%s\n' '{"type":"assistant","message":{"model":"maker-other-9"}}' > "$TMP/e8.other.jsonl"
 printf '%s\n' '{"type":"assistant","message":{"model":"vendor-tfam-9"}}' > "$TMP/e8.two.jsonl"
 printf '%s\n' '{"type":"user","message":{"content":"hi"}}' > "$TMP/e8.empty.jsonl"
 E8_LEVEL=""
-run_effort() { # name expected_exit tool transcript(- for none) extra-json needle(empty: an allow with an empty stderr)
+# The knobs of TOOL-aGuardedEffort-2's arms, each empty for the default: E8_H the harness a Workflow
+# call names, E8_R its `args.roles` as JSON, E8_TYPE an Agent call's subagent_type, E8_NOT a text
+# stderr must not hold, and E8_CWD with E8_HOOK the checkout and the hook copy of the armed rule 7.
+E8_H=""; E8_R=""; E8_TYPE=""; E8_NOT=""; E8_CWD=""; E8_HOOK=""
+run_effort() { # name expected_exit tool transcript(- for none) extra-json needle(empty: an allow with an empty stderr) [more needles]
   # `extra` is merged into an Agent call's tool_input, and is a Workflow call's `args.efforts` unless null.
-  local payload got
+  local payload got name=$1 want=$2 miss="" n roles=$E8_R
+  [ -n "$roles" ] || roles='{"builder":"gov-builder"}'
   payload=$("$TESTPY" -c 'import json,sys
-cwd,tool,tp,extra,pf,h=sys.argv[1:7]
+cwd,tool,tp,extra,pf,h,roles,kind=sys.argv[1:9]
 extra=json.loads(extra)
 if tool=="Agent":
-    ti={"subagent_type":"gov-researcher","description":"bx · T-1 · research","prompt":open(pf,newline="").read()}
+    ti={"subagent_type":kind,"description":"bx · T-1 · research","prompt":open(pf,newline="").read()}
     ti.update(extra)
 else:
-    ti={"scriptPath":h,"args":{"roles":{"builder":"gov-builder"}}}
+    ti={"scriptPath":h,"args":{"roles":json.loads(roles)}}
     if extra is not None: ti["args"]["efforts"]=extra
 d={"tool_name":tool,"cwd":cwd,"tool_input":ti}
 if tp!="-": d["transcript_path"]=tp
-print(json.dumps(d))' "$HOJ/sub" "$3" "$4" "$5" "$TMP/ho.ok" "$HO_H")
-  printf '%s' "$payload" | (cd "$TMP" && unset CLAUDE_CODE_EFFORT_LEVEL && { [ -z "$E8_LEVEL" ] || export CLAUDE_CODE_EFFORT_LEVEL="$E8_LEVEL"; } && node "$HOOK") >/dev/null 2>"$TMP/err"; got=$?
-  if [ "$got" = "$2" ] && { if [ -z "$6" ]; then [ ! -s "$TMP/err" ]; else grep -qF -- "$6" "$TMP/err"; fi; }; then
-    echo "ok   $1 (exit $got)"; pass=$((pass+1))
+print(json.dumps(d))' "${E8_CWD:-$HOJ/sub}" "$3" "$4" "$5" "$TMP/ho.ok" "${E8_H:-$HO_H}" "$roles" "${E8_TYPE:-gov-researcher}")
+  printf '%s' "$payload" | (cd "$TMP" && unset CLAUDE_CODE_EFFORT_LEVEL && { [ -z "$E8_LEVEL" ] || export CLAUDE_CODE_EFFORT_LEVEL="$E8_LEVEL"; } && node "${E8_HOOK:-$HOOK}") >/dev/null 2>"$TMP/err"; got=$?
+  shift 5
+  if [ -z "$1" ]; then [ ! -s "$TMP/err" ] || miss=" an empty stderr"
+  else for n in "$@"; do grep -qF -- "$n" "$TMP/err" || miss="$miss '$n'"; done; fi
+  [ -z "$E8_NOT" ] || ! grep -qF -- "$E8_NOT" "$TMP/err" || miss="$miss no '$E8_NOT'"
+  if [ "$got" = "$want" ] && [ -z "$miss" ]; then
+    echo "ok   $name (exit $got)"; pass=$((pass+1))
   else
-    echo "FAIL $1 (exit $got, want $2${6:+, stderr carrying '$6'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+    echo "FAIL $name (exit $got, want $want${miss:+, stderr missing$miss})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
   fi
 }
 E8_T="$NODEDIR/e8.tfam.jsonl"; E8_O="$NODEDIR/e8.other.jsonl"
@@ -808,6 +839,67 @@ E8_LEVEL=high
 run_effort "rule8 AC11: a set CLAUDE_CODE_EFFORT_LEVEL admits an Agent call, naming the variable" 0 Agent "$E8_T" '{}' 'CLAUDE_CODE_EFFORT_LEVEL is set'
 run_effort "rule8 AC11: ...and a Workflow call is graded all the same" 2 Workflow "$E8_T" null 'rule 8 (TOOL-aGuardedEffort-1) refused this Workflow call'
 E8_LEVEL=""
+# ---- TOOL-aGuardedEffort-2: an unset stage is graded at the level of the role the call names -----
+# Item 1 — the call's own `roles`, never the policy's slot. Against a loop reading an unset stage's
+# level from the `unset` map, the first, third and fourth rows flip their exit and the second names
+# `medium` for `finder`, not `high`.
+E8_H2="$HOJ/tools/$HO_WF/h2.js"; E8_H3="$HOJ/tools/$HO_WF/h3.js"; E8_H4="$HOJ/tools/$HO_WF/h4.js"
+E8_R='{"builder":"gov-skeptic"}'
+run_effort "rule8 GE2 item 1: a role swapped for one at another level, no efforts, refused naming the role and its level" 2 Workflow "$E8_O" null "build: stage builder would run at medium (gov-skeptic, its agent type's level; the call's \`efforts\` names no builder), expected high"
+run_effort "rule8 GE2 item 1: a role swapped for one at the profile's level, no efforts, admitted" 0 Workflow "$E8_T" null ""
+E8_H=$E8_H2 E8_R='{"finder":"gov-builder","synthesis":"gov-builder"}'
+run_effort "rule8 GE2 item 1: ...and a swapped role on the two-workflow harness refused, naming it in both workflows" 2 Workflow "$E8_O" null 'closing: stage finder would run at high (gov-builder,' 'spec: stage finder would run at high (gov-builder,'
+E8_H="" E8_R='{"other":"gov-builder"}'
+run_effort "rule8 GE2 item 1: roles under a key no stage has, no efforts, refused as untyped" 2 Workflow "$E8_O" null "stage builder would run untyped at the session's level (the call's \`roles\` and \`efforts\` name no builder), expected high"
+run_effort "rule8 GE2 item 1: ...and admitted with the key's level in efforts" 0 Workflow "$E8_O" '{"builder":"high"}' ""
+E8_H=$E8_H2
+run_effort "rule8 GE2 item 1: the same omission on the two-workflow harness refused, a line per workflow" 2 Workflow "$E8_O" null 'closing: stage finder would run untyped' 'name no synthesis), expected medium'
+run_effort "rule8 GE2 item 1: ...and admitted with one workflow's levels in efforts" 0 Workflow "$E8_O" '{"finder":"medium","synthesis":"medium"}' ""
+# Item 2 — the policy's own roles: `spec.synthesis` runs at its role's `high`, and the default stage
+# table gives it `medium`. Against a loop reading the default stage table, the refusal is admitted.
+E8_R='{"finder":"gov-skeptic","synthesis":"gov-builder"}'
+run_effort "rule8 GE2 item 2: the policy's roles, no efforts, a stage whose role level is not its stage level refused" 2 Workflow "$E8_O" null "spec: stage synthesis would run at high (gov-builder, its agent type's level; the call's \`efforts\` names no synthesis), expected medium"
+run_effort "rule8 GE2 item 2: ...and admitted with that stage's level in efforts" 0 Workflow "$E8_O" '{"synthesis":"medium"}' ""
+# Item 4 — the any-of rule over two workflows, whole workflow by whole workflow. Against a loop
+# returning its first workflow's verdict, the first row is refused.
+run_effort "rule8 GE2 item 4: efforts right for the second workflow only admitted" 0 Workflow "$E8_O" '{"finder":"medium","synthesis":"medium"}' ""
+run_effort "rule8 GE2 item 4: efforts right for neither refused, a line per workflow and both verbs" 2 Workflow "$E8_O" '{"finder":"high","synthesis":"low"}' 'closing: stage finder would run at high' 'spec: stage finder would run at high' '`handoff.py stage-efforts closing --model "maker-other-9"` or `handoff.py stage-efforts spec --model "maker-other-9"`'
+run_effort "rule8 GE2 item 4: efforts taking one key's level from each workflow refused" 2 Workflow "$E8_O" '{"finder":"low","synthesis":"medium"}' 'closing: stage synthesis would run at medium' 'spec: stage finder would run at low'
+# Item 3 — a workflow with no stage key never admits beside a keyed one, and alone it is the
+# not-checked line. Against the empty-object default with the loop over the table's keys, the
+# first row is admitted and the second says nothing.
+E8_H=$E8_H3 E8_R=""
+run_effort "rule8 GE2 item 3: a keyed and an unkeyed workflow, levels wrong for the keyed one, refused naming it alone" 2 Workflow "$E8_O" '{"builder":"low"}' 'build: stage builder would run at low' 'Pass `efforts` as `handoff.py stage-efforts build --model "maker-other-9"` prints it'
+E8_H=$E8_H4
+run_effort "rule8 GE2 item 3: a harness whose only workflow is unkeyed admitted, saying so" 0 Workflow "$E8_O" null "rule 8 did not check this Workflow call's effort level — the effort tables of" 'hold no stage key for bare, which the harness'
+E8_H=""
+# Item 7 — the order. A spawn rule 6 refuses, whose role the effort tables also lack, is answered
+# by rule 6. Against a main() running rule 8's block first, the refusal is rule 8's throw.
+E8_TYPE=general-purpose E8_NOT='rule 8'
+run_effort "rule8 GE2 item 7: a general-purpose spawn over the effort index is refused by rule 6, with no rule 8 text" 2 Agent "$E8_T" '{}' 'is not an agent-true role'
+if [ "$(head -c 28 "$TMP/err")" = 'BLOCKED by agent-cap: rule 6' ]; then echo "ok   rule8 GE2 item 7: ...and its stderr opens as rule 6's"; pass=$((pass+1))
+else echo "FAIL rule8 GE2 item 7: the refusal does not open 'BLOCKED by agent-cap: rule 6'"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+E8_TYPE="" E8_NOT=""
+# ...and a harness call whose level differs, in the armed rule 7 section's checkout, whose settings
+# are put above the landed limit: rule 8 answers, before rule 7. The index is written there after
+# that section's arms. Against a main() running rule 8's block after rule 7's, the refusal is rule 7's.
+if [ -z "${R7:-}" ]; then
+  echo "FAIL rule8 GE2 item 7: no policy kit beside this hooks kit, so no checkout arms rule 7 for the order arm"; fail=$((fail+1))
+else
+  printf '%s' "$E8_ROLES" > "$R7/.claude/roles.json"
+  printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"3","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"3"}}\n' > "$R7/.claude/settings.json"
+  E8_CWD="$NODEDIR/r7" E8_HOOK="$R7_HOOKS/agent-cap.js" E8_H="$NODEDIR/r7/tools/$HO_WF/h.js" E8_NOT='rule 7'
+  run_effort "rule8 GE2 item 7: settings above the limit and a level that differs are refused by rule 8, with no rule 7 text" 2 Workflow "$E8_T" null 'rule 8 (TOOL-aGuardedEffort-1) refused'
+  E8_CWD="" E8_HOOK="" E8_H="" E8_NOT=""
+  rm -f "$R7/.claude/roles.json"
+fi
+# Item 3 — the tables agree on one population of stage keys. A matched table with no `stages` entry
+# for a workflow, and an `unset` lacking one key, each throw, and main() names a re-render. Against
+# the empty-object default with the loop over the table's keys, both calls are admitted.
+write_roles "$("$TESTPY" -c 'import json,sys; d=json.loads(sys.argv[1]); del d["effort"]["default"]["stages"]["build"]; print(json.dumps(d))' "$E8_ROLES")"
+run_effort "rule8 GE2 item 3: a matched table with no stages entry for the workflow refused, naming a re-render" 2 Workflow "$E8_O" '{"builder":"high"}' 'disagree on stage builder of build' 'render_agents.py --write'
+write_roles "$("$TESTPY" -c 'import json,sys; d=json.loads(sys.argv[1]); del d["effort"]["unset"]["build"]["builder"]; print(json.dumps(d))' "$E8_ROLES")"
+run_effort "rule8 GE2 item 3: an unset map lacking one stage key refused, naming a re-render" 2 Workflow "$E8_O" '{"builder":"high"}' 'disagree on stage builder of build' 'render_agents.py --write'
 # A role the effort tables do not hold: the rule throws and main() refuses, naming a re-render.
 write_roles "$("$TESTPY" -c 'import json,sys; d=json.loads(sys.argv[1]); del d["effort"]["default"]["roles"]["gov-researcher"]; print(json.dumps(d))' "$E8_ROLES")"
 run_effort "rule8: a role the effort tables lack refused, naming a re-render" 2 Agent "$E8_T" '{}' 'render_agents.py --write'
@@ -819,6 +911,12 @@ run_effort "rule8 AC5: an index with no effort key grades nothing" 0 Agent "$E8_
 write_roles "${HO_ROLES%\}},\"effort\":[]}"
 run_effort "rule8 AC8: an effort that is a list refuses the spawn as a broken index" 2 Agent "$E8_T" '{"effort":"medium"}' 'effort is not'
 run_effort "rule8 AC8: ...and the harness call" 2 Workflow "$E8_T" '{"builder":"medium"}' 'effort is not'
+# TOOL-aGuardedEffort-2 item 9 — the four keys, each a plain object. Against a loader holding the
+# outer plain-object test alone, each index is read as ok and the refusal is rule 8's throw.
+write_roles "${HO_ROLES%\}},\"effort\":{\"default\":{},\"profiles\":{},\"harnesses\":{}}}"
+run_effort "rule8 GE2 item 9: an effort holding three of its four keys refuses as a broken index" 2 Agent "$E8_T" '{"effort":"medium"}' 'effort is not'
+write_roles "${HO_ROLES%\}},\"effort\":{\"default\":[],\"profiles\":{},\"harnesses\":{},\"unset\":{}}}"
+run_effort "rule8 GE2 item 9: an effort whose default is a list refuses as a broken index" 2 Agent "$E8_T" '{"effort":"medium"}' 'effort is not'
 write_roles none
 
 echo "---- $pass passed, $fail failed ----"

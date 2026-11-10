@@ -90,6 +90,7 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +4 for arm 19 (TOOL-aProfiledEffort-2).
 # +1 for arm 9 and +1 for arm 19 (TOOL-aProfiledEffort-4).
 # +2 for arm 21 (TOOL-aGuardedEffort-1); arm 20 and arm 6's added payload are out of the floor.
+# +0 for arm 6's harness calls and rendered tables (TOOL-aGuardedEffort-2): on its SKIP path, out of the floor.
 FLOOR_ASSERTIONS=59
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
@@ -237,6 +238,69 @@ with open(sys.argv[3], "w", encoding="utf-8") as fh:
   (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR node "$HK/agent-cap.js" < "$TMP_ROOT/a6s.json" >/dev/null 2>"$TMP_ROOT/a6s.hook"); hrc=$?
   check_arm "arm 6 ...and named by the role's slot it is refused, naming the rendered name" \
      "$([ "$hrc" = 2 ] && [ "$(<"$TMP_ROOT/a6.name")" != null ] && grep -qF -- "$(<"$TMP_ROOT/a6.name")" "$TMP_ROOT/a6s.hook" && echo 1 || echo 0)"
+  # TOOL-aGuardedEffort-2 S6: the `Workflow` half of rule 8 over the RENDERED index. The harness is
+  # the one the index's `effort.harnesses` maps to `build`, spelled as the index spells it, and its
+  # file is created where the fixture holds none, so the hook resolves it; `roles` is what
+  # `harness-args` prints and `efforts` what `stage-efforts build` prints. Against a renderer keying
+  # `effort.harnesses` by workflow name, the first payload is refused as no declared harness.
+  printf '%s\n' '{"type":"assistant","message":{"model":"vendor-other-9"}}' > "$TMP_ROOT/a6.other.jsonl"
+  "$PY" -B -c 'import json, pathlib, subprocess, sys
+fx, kit, out, tfam, other = pathlib.Path(sys.argv[1]), sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5]
+def verb(*a):
+    return json.loads(subprocess.run([sys.executable, "-B", kit + "/handoff.py", *a], cwd=str(fx),
+                                     capture_output=True, check=True).stdout.decode("utf-8"))
+with open(fx / ".claude" / "roles.json", encoding="utf-8") as fh:
+    runs = json.load(fh)["effort"]["harnesses"]
+harness = next(h for h, names in runs.items() if "build" in names)
+(fx / harness).parent.mkdir(parents=True, exist_ok=True)
+(fx / harness).touch()
+roles = verb("harness-args", pathlib.PurePosixPath(harness).stem)
+for name, tp, efforts in (("w1", tfam, verb("stage-efforts", "build", "--model", "vendor-tfam-9")),
+                          ("w2", tfam, None), ("w3", other, verb("stage-efforts", "build"))):
+    args = {"roles": roles} if efforts is None else {"roles": roles, "efforts": efforts}
+    with open("%s.%s.json" % (out, name), "w", encoding="utf-8") as fh:
+        json.dump({"tool_name": "Workflow", "cwd": fx.as_posix(), "transcript_path": tp,
+                   "tool_input": {"scriptPath": (fx / harness).as_posix(), "args": args}}, fh)
+sys.stdout.buffer.write(("build: stage %s would run at " % sorted(roles)[0]).encode("utf-8"))' \
+    "$FXN" "$KREL" "$TMP_ROOT/a6" "$TRN/a6.tfam.jsonl" "$TRN/a6.other.jsonl" > "$TMP_ROOT/a6.stage" 2>"$TMP_ROOT/a6w.err"; _a6w=$?
+  _a6h=""
+  for _w in w1 w2 w3; do
+    (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR -u CLAUDE_CODE_EFFORT_LEVEL node "$HK/agent-cap.js" < "$TMP_ROOT/a6.$_w.json" >/dev/null 2>"$TMP_ROOT/a6.$_w.hook"); _a6h="$_a6h$?"
+  done
+  _a6ok=0; [ "$_a6w" = 0 ] && [ "$_a6h" = 020 ] && [ -s "$TMP_ROOT/a6.stage" ] && grep -qF -- "$(<"$TMP_ROOT/a6.stage")" "$TMP_ROOT/a6.w2.hook" && _a6ok=1
+  check_arm "arm 6 a harness call over the rendered index is admitted at the profile's levels, refused with none naming the stage, and admitted at the default levels on an unmatched model" "$_a6ok"
+  [ "$_a6ok" = 1 ] || { echo "    exits: $_a6h"; sed 's/^/    /' "$TMP_ROOT/a6w.err" "$TMP_ROOT"/a6.w?.hook; }
+  # ...and the rendered tables against the verbs and the agent files, for every workflow whose entry
+  # in the fixture kit's `workflows.toml` holds a `stages` table, read here by `tomllib` and never
+  # through the kit. Against a renderer resolving a profile's `stages` with no model, the tfam
+  # table is the default one and the second comparison fails. No staged workflow fails the arm.
+  out=$("$PY" -B -c 'import json, pathlib, subprocess, sys, tomllib
+fx, kit = pathlib.Path(sys.argv[1]), sys.argv[2]
+def verb(*a):
+    return json.loads(subprocess.run([sys.executable, "-B", kit + "/handoff.py", *a], cwd=str(fx),
+                                     capture_output=True, check=True).stdout.decode("utf-8"))
+with open(fx / kit / "workflows.toml", "rb") as fh:
+    staged = [w for w in tomllib.load(fh)["workflow"] if isinstance(w.get("stages"), dict)]
+with open(fx / ".claude" / "roles.json", encoding="utf-8") as fh:
+    e = json.load(fh)["effort"]
+bad = [] if staged else ["no workflow of workflows.toml holds a stages table"]
+def level(slot):
+    lines = (fx / ".claude" / "agents" / (slot + ".md")).read_text(encoding="utf-8").split("\n")
+    return next((ln[len("effort: "):] for ln in lines if ln.startswith("effort: ")), None)
+for w in staged:
+    name = w["name"]
+    if e["default"]["stages"].get(name) != verb("stage-efforts", name):
+        bad.append("default.stages.%s is not what stage-efforts prints" % name)
+    if e["profiles"]["tfam"]["stages"].get(name) != verb("stage-efforts", name, "--model", "vendor-tfam-9"):
+        bad.append("profiles.tfam.stages.%s is not what stage-efforts --model vendor-tfam-9 prints" % name)
+    for key, slot in w["stages"].items():
+        want = level(slot)
+        if want is None or e["unset"].get(name, {}).get(key) != want or e["default"]["roles"].get(slot) != want:
+            bad.append("unset.%s.%s or default.roles.%s is not the effort line of %s.md, %r" % (name, key, slot, slot, want))
+print("\n".join(bad))
+sys.exit(1 if bad else 0)' "$FXN" "$KREL" 2>&1); rc=$?
+  check_arm "arm 6 the rendered effort tables are what stage-efforts prints, with and without the profiled model, and each unset level its slot's agent file's" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
+  [ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
   msha=$(tr -d '\r' < "$TMP_ROOT/a6.task" | sed -n '1s/.* task-sha=\([0-9a-f]\{12\}\) -->$/\1/p')
   out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" check "$A6P" 2>&1); rc=$?; out=${out//$'\r'/}
   check_arm "arm 6 check re-derives the marker's task-sha" \
