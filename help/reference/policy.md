@@ -1,4 +1,5 @@
 <!-- gov:rendered from tools/playbook/references.toml doc.reference.policy; edit the registry, not this page -->
+<!-- unit: unit.policy-schema -->
 # Policy
 
 ## `charter.override`

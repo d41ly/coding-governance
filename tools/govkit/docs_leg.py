@@ -39,7 +39,13 @@ the bash govkit resolves with the adopter its working directory. A command exits
 printed with its reason and counted, never run. No runnable command at all is not a verdict.
 `--fingerprints` prints `<id>`, `<fp8>` and `<pages>` per row, tab-separated, the pages anchoring it comma-joined or `-`.
 
+THE UNIT LINES (PLAY-dOrderedCharter-76). Armed once the `unit-usage` class is registered: each
+`<!-- unit: <tag> -->` line outside a fence resolves where `unit:<tag>` is a member, else `UNIT`; a page
+under `help/reference/`, `help/concepts/` or `help/tasks/` with no line is `UNLINKED`; a `unit-usage`
+member no resolved line names is `UNPAGED`. `unit-usage` registered without `unit` is not a verdict.
+
 WHAT IT DOES NOT CHECK. Prose: an anchor whose fingerprint is current over a wrong paragraph passes.
+A unit line naming another unit than its page documents passes, and one inside a fence is not read.
 The default run runs no page command, `--run` runs no block marked `run: no`, and neither fetches an
 external link. The `file` and `installable` classes carry
 no usage shape, and an `agent` or `entry` member is graded for presence only.
@@ -90,12 +96,15 @@ PLANTS = ("none", "stale-page", "bad-flag", "bad-verb", "unrowed", "broken-link"
           "external-link", "undocumented", "drained-row", "grown-list", "orphan-anchor", "restated-row",
           "reader-rows", "none-rows", "leg-row", "unclassed", "empty-class", "untested",
           "console-prompt", "continued-flag", "unbalanced-quote", "comment-apostrophe", "scripts-prefix",
-          "synopsis-stale", "failing-command")
+          "synopsis-stale", "failing-command", "unit-lines")
 # PLAY-dOrderedCharter-37: the run arm's two markers, each the last non-blank line above a block's fence,
 # and the bound on one page command.
 RUN_NO_RE = re.compile(r"^\s*<!--\s*run:\s*no\s*[—-]+\s*(?P<why>.+?)\s*-->\s*$")
 EXPECT_RE = re.compile(r"^\s*<!--\s*expect:\s*(?P<code>\d+)\s*-->\s*$")
 RUN_TIMEOUT = 600
+# PLAY-dOrderedCharter-76: a page's unit line, read outside a fence, and the folders whose every page carries one.
+UNIT_LINE_RE = re.compile(r"^\s*<!--\s*unit:\s*(?P<tag>\S+)\s*-->\s*$")
+UNIT_PAGE_DIRS = ("help/reference/", "help/concepts/", "help/tasks/")
 
 
 def derive_usage_fingerprint(row: dict) -> str:
@@ -417,6 +426,37 @@ def check_legacy_low_water(root, count: int) -> tuple[int | None, list[str]]:
     return low, []
 
 
+# ------------------------------------------------------------------------------- the unit lines
+def check_unit_lines(root, pages, class_ids: list[str], population: set[str]) -> tuple:
+    """(resolved lines, or None while `unit-usage` is unregistered; findings; non-verdict states): each
+    `<!-- unit: <tag> -->` line outside a fence resolves where `unit:<tag>` is a member, a page under
+    `UNIT_PAGE_DIRS` carries one, and every `unit-usage` member's tag is named by a resolved line."""
+    if "unit-usage" not in class_ids:
+        return None, [], []
+    if "unit" not in class_ids:
+        return 0, [], ["class unit-usage is registered and class unit is not, so no unit line can resolve"]
+    root = pathlib.Path(root)
+    resolved, named, found = 0, set(), []
+    for p in pages:
+        rel = p.relative_to(root).as_posix()
+        lines = [(n, m["tag"]) for n, ln, lang in read_page_lines(p.read_text(encoding="utf-8"))
+                 if lang is None and (m := UNIT_LINE_RE.match(ln))]
+        for n, tag in lines:
+            if f"unit:{tag}" in population:
+                resolved += 1
+                named.add(tag)
+            else:
+                found.append(f"UNIT {rel}:{n} {tag}: names no gov unit")
+        if not lines and rel.startswith(UNIT_PAGE_DIRS):
+            found.append(f"UNLINKED {rel}: a page under {', '.join(UNIT_PAGE_DIRS[:-1])} or {UNIT_PAGE_DIRS[-1]} "
+                         f"with no unit line")
+    for m in sorted(population):
+        cid, _sep, tag = m.partition(":")
+        if cid == "unit-usage" and tag not in named:
+            found.append(f"UNPAGED {m}: no page's unit line names it")
+    return resolved, found, []
+
+
 # ------------------------------------------------------------------------------------ the leg
 def read_docs_state(root, class_ids: list[str], population: set[str]) -> dict:
     """Everything the leg and `--list` read, with the findings and the non-verdict states."""
@@ -481,8 +521,11 @@ def read_docs_state(root, class_ids: list[str], population: set[str]) -> dict:
         found += more
     if counts["tested"] + counts["skipped"] + counts["unrowed"] and not counts["tested"]:
         states.append("the pages show commands and no page command was tested against a row")
+    unit_lines, more, unit_states = check_unit_lines(root, pages, class_ids, population)
+    found += more
+    states += unit_states
     return {"classes": classes, "rows": rows, "anchors": at, "listed": listed, "low": low, "found": found,
-            "states": states, "counts": counts, "graded": graded, "pages": len(pages),
+            "states": states, "counts": counts, "graded": graded, "pages": len(pages), "unit_lines": unit_lines,
             "stale": sum(f.startswith("STALE ") for f in found), "shape_of": shape_of}
 
 
@@ -497,7 +540,8 @@ def check_docs(root, class_ids: list[str], population: set[str], mode: str, sour
           f"{sum(len(v) for v in s['anchors'].values())} anchors on {s['pages']} pages · {s['stale']} stale · "
           f"commands {c['tested']} tested, {c['skipped']} skipped, {c['unrowed']} unrowed · "
           f"links {c['checked']} checked, {c['external']} external · "
-          f"list {len(s['listed'])} rows, low-water {s['low'] if s['low'] is not None else 'none yet'}")
+          f"list {len(s['listed'])} rows, low-water {s['low'] if s['low'] is not None else 'none yet'} · "
+          f"unit lines {'unarmed' if s['unit_lines'] is None else str(s['unit_lines']) + ' resolved'}")
     for st in s["states"]:
         print(f"docs: REFUSED · {st}")
     for f in s["found"]:
@@ -811,6 +855,16 @@ def build_docs_fixture(tmp, plant: str) -> tuple[pathlib.Path, list[str], set[st
             "unbalanced-quote": "```bash\npython tools/fx/run.py go --part \"task\n",
             "comment-apostrophe": "```bash\npython tools/fx/run.py go --part task  # don't\n",
         }[plant])
+    elif plant == "unit-lines":
+        # PLAY-dOrderedCharter-76: the unit classes registered, a concept page whose unit line names no unit,
+        # a task page with none, and a unit-usage member no line names: one finding each.
+        write_edit(usage, "[[usage]]\n", '[[class]]\nclass = "unit"\nusage = "none"\nwhy = "fixture units"\n\n'
+                   '[[class]]\nclass = "unit-usage"\nusage = "none"\nwhy = "fixture units carrying a usage"\n\n[[usage]]\n')
+        class_ids += ["unit", "unit-usage"]
+        population |= {"unit:unit.fx", "unit-usage:unit.fx"}
+        for rel, text in (("help/concepts/fx.md", "<!-- unit: unit.nowhere -->\n# Fx\n"), ("help/tasks/fx.md", "# Fx\n")):
+            (root / rel).parent.mkdir(parents=True, exist_ok=True)
+            (root / rel).write_text(text, encoding="utf-8", newline="\n")
     elif plant == "untested":
         text = (root / usage).read_text(encoding="utf-8")
         (root / usage).write_text(text[:text.index("[[usage]]\nid = \"fx-verb:tool\"")] +

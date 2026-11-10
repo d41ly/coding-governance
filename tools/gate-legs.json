@@ -1517,7 +1517,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 130
+    "ceiling": 130,
+    "enforces": ["principle.p42"]
   },
   {
     "name": "help page commands",
@@ -1529,7 +1530,8 @@
     "reads": {"history": "it reads help.enforce at the landed revision through govkit's read_policy_value, and installs gov at this checkout's HEAD into one scratch adopter per page holding a runnable block (PLAY-dOrderedCharter-37)."},
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 600
+    "ceiling": 600,
+    "enforces": ["principle.p42"]
   },
   {
     "name": "upgrade-walk",

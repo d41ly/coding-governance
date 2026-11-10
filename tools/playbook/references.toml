@@ -2,7 +2,8 @@
 # (PLAY-dOrderedCharter-37), read by `python <prefix>/playbook/render_playbook.py --reference` beside this file.
 # `registry`, the page's `doc.` tag, which the `doc` namespace mints at this row; `h1`, one line naming what
 # the page documents, its purpose line (PLAY-dOrderedCharter-40); `reader`, `<path under the tool root>:<function>` returning the
-# registry's rows as `{<tag>: {"summary": ..., "usage": ...}}`; `page`, a path under help/reference/.
+# registry's rows as `{<tag>: {"summary": ..., "usage": ...}}`; `page`, a path under help/reference/; `unit`, the
+# instruction unit the page documents, written as the page's `<!-- unit: <tag> -->` line (PLAY-dOrderedCharter-76).
 # A page under help/reference/ no row declares refuses the render, and so does a registry with no rows.
 # A later registry joins by adding its row, which its own build lands.
 
@@ -11,15 +12,25 @@ registry = "doc.reference.policy"
 h1 = "The policy catalogue's reference page, one section per policy key"
 reader = "{prefix}/playbook/render_playbook.py:read_policy_reference_rows"
 page = "help/reference/policy.md"
+unit = "unit.policy-schema"
 
 [[reference]]
 registry = "doc.reference.drive"
 h1 = "The drive table's reference page, one section per stage and role of the loop"
 reader = "{prefix}/playbook/render_playbook.py:read_drive_reference_rows"
 page = "help/reference/drive.md"
+unit = "unit.drive-table"
 
 [[reference]]
 registry = "doc.reference.kinds"
 h1 = "The kinds register's reference page, one section per kind"
 reader = "{prefix}/playbook/render_playbook.py:read_kind_reference_rows"
 page = "help/reference/kinds.md"
+unit = "unit.kinds-register"
+
+[[reference]]
+registry = "doc.reference.units"
+h1 = "The unit registry's reference page, one section per instruction unit carrying a usage"
+reader = "{prefix}/playbook/render_playbook.py:read_unit_reference_rows"
+page = "help/reference/units.md"
+unit = "unit.unit-registry"

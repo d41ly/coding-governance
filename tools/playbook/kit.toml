@@ -20,6 +20,7 @@ requires = ["playbook"]
 # PLAY-dOrderedCharter-10 S6: the tag check's one edge to a non-core kit, the lexicon, is a declared slot.
 optional = [
   { part = "gov_tag.py", point = "point.instruction.name-check", fallback = "the shape check stands alone" },
+  { part = "render_playbook.py", point = "point.runtime.install-target", fallback = "--reference refuses naming the absent docs leg; the reference pages are gov's own" },
 ]
 
 [[files]]

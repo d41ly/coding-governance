@@ -370,16 +370,8 @@ def write_unit_plant(clone) -> str:
     units = iu.read_units(clone)
     if not units:
         raise ValueError("the unit plant found no gov unit row")
-    u = units[0]
-    path = pathlib.Path(clone) / u.path
-    text = path.read_bytes().decode("utf-8")
-    # ponytail: `read_units` reads with universal newlines, so a CRLF checkout holds the row as CRLF.
-    body = u.body.replace("\n", "\r\n") if "\r\n" in text else u.body
-    if body not in text:
-        raise ValueError(f"the unit plant found no row {u.tag} in the bytes of {u.path}")
-    path.write_bytes(text.replace(body, "", 1).encode("utf-8"))
-    iu.run_git(clone, "add", "--", u.path)
-    return f"unit:{u.tag}"
+    iu.remove_unit_row(clone, units[0])
+    return f"unit:{units[0].tag}"
 
 
 def read_change_successors(root) -> set:

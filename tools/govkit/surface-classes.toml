@@ -83,3 +83,10 @@ reader = "{prefix}/playbook/pins.py:read_unit_members"
 plant = "{prefix}/playbook/pins.py:write_unit_plant"
 summary = "each gov instruction unit, by its tag, from every kit's instructions.toml"
 witness = "{prefix}/playbook/pins.py:read_change_successors"
+
+[[class]]
+id = "unit-usage"
+reader = "{prefix}/playbook/render_playbook.py:read_unit_usage_members"
+plant = "{prefix}/playbook/render_playbook.py:write_unit_usage_plant"
+summary = "each gov instruction unit carrying a usage, by its tag, the units help/reference/units.md documents"
+witness = "{prefix}/playbook/pins.py:read_change_successors"

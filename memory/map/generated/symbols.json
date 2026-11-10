@@ -1578,6 +1578,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_row_removal",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_ruling_unproven",
       "kind": "function",
       "file": "tools/playbook/pins.py"
@@ -7526,6 +7531,11 @@
       "id": "check_under",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_unit_lines",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
     },
     {
       "id": "check_unit_row",
@@ -20526,6 +20536,11 @@
       "id": "remove_unheld_rows",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
+    },
+    {
+      "id": "remove_unit_row",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "remove_wall_watcher",

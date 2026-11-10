@@ -41,7 +41,6 @@ principle	principle.p38	dGroundRules
 principle	principle.p39	dGroundRules
 principle	principle.p40	dPlacedRequest
 principle	principle.p41	dTrueNorth
-principle	principle.p42	dGroundRules
 practice	practice.yagni	dWitnessedBar
 practice	practice.reuse	dWitnessedBar
 practice	practice.consistency	dWitnessedBar

@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-76 — the units reference page, each page's unit line and its check, the unit-usage class, and the reds PLAY-dOrderedCharter-37's pass left
 
-**Status:** DEFERRED · rev-1 · 2026-11-10 · node a · Tier-2 · base f66d97aea · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
+**Status:** CLOSED · rev-1 · 2026-11-10 · node a · Tier-2 · base f66d97aea · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-10-build-PLAY-dOrderedCharter-76-ledger.md](../build/2026-11-10-build-PLAY-dOrderedCharter-76-ledger.md) | journal | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-76-1-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-76-1-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-76-build-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-76-build-brief.md) | journal | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-76-spec-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-76-spec-brief.md) | research | — |

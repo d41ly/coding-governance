@@ -82,6 +82,12 @@ class = "unit"
 usage = "none"
 why = "a gov unit is loaded text, used by no verb, key, hook, leg or page; units carrying a usage field are the unit-usage class"
 
+[[class]]
+class = "unit-usage"
+usage = "synopsis"
+rows = "{prefix}/playbook/render_playbook.py:read_unit_reference_rows"
+why = "a unit carrying a usage is its text and its usage, which its instructions.toml row states; help/reference/units.md renders them"
+
 [[usage]]
 id = "command:build"
 shape = "verb"

@@ -46,6 +46,9 @@ It grades gov's own pages against gov's own members, and it never travels into a
 - `ORPHAN` — an anchor or a row naming nothing. `TWICE` — a member anchored in more than one place.
   `RESTATED` — a `[[usage]]` row for a member whose own registry states its usage. `CLASS` — a class
   of the step gate's registry with no `[[class]]` row, or a row that does not fit its shape.
+- `UNIT` — a unit line naming no gov unit, a retired one included. `UNLINKED` — a page under
+  `help/reference/`, `help/concepts/` or `help/tasks/` with no unit line. `UNPAGED` — a `unit-usage`
+  member, a gov unit carrying a usage, that no resolved unit line names.
 
 A shaped class with no member, pages whose commands none was tested, or a declaration that will not
 read is not a verdict: the leg exits 2 and says why.
@@ -64,6 +67,21 @@ The second form is for a member graded for presence only, a role agent or a regi
 member is anchored on exactly one page. A member no page documents yet is a row of
 `memory/project/docs-undocumented.txt`, `<id>` and a reason separated by a tab. The list only
 shrinks: the commit that documents a member removes its row, and a new member must be documented.
+
+## The unit line
+
+A page names the instruction unit it documents with one line outside a fence, an HTML comment like the
+anchor:
+
+```text
+<!-- unit: <tag> -->
+```
+
+A line resolves when its tag is a member of the step gate's `unit` class. The leg's summary line ends
+`unit lines <n> resolved`, or `unit lines unarmed` while the `unit-usage` class is not registered; with
+`unit-usage` registered and `unit` not, no line can resolve and the leg exits 2. A reference page takes its
+line from its `references.toml` row's `unit`. `python tools/govkit/docs_leg.py --fixture --plant unit-lines`
+plants one of each finding, `UNIT`, `UNLINKED` and `UNPAGED`, and exits 1.
 
 ## `help.enforce`
 
@@ -102,4 +120,6 @@ shows a runnable command is not a verdict: the arm exits 2.
 
 Prose: an anchor whose fingerprint is current over a paragraph that is wrong passes. The default run
 runs no page command, `--run` runs no block marked `run: no`, neither fetches an external link, and the
-`file` and `installable` classes have no usage shape.
+`file` and `installable` classes have no usage shape. A unit line is not checked for naming the unit its
+page documents, a unit line inside a fence is not read, and a page outside `help/reference/`,
+`help/concepts/` and `help/tasks/` needs none.

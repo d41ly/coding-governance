@@ -28,3 +28,4 @@ Reference pages, rendered from their registries by `python tools/playbook/render
 - [Policy keys](reference/policy.md) — each policy key's summary and usage, and the keys not yet summarised.
 - [Drive](reference/drive.md) — each stage and role of the loop, when it runs and the command that starts it.
 - [Kinds](reference/kinds.md) — each kind of extension and how a member of it is made.
+- [Units](reference/units.md) — each of gov's instruction units carrying a usage, its rule and the command that acts on it.

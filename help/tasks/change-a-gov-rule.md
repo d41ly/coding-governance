@@ -1,3 +1,4 @@
+<!-- unit: unit.unit-registry -->
 # Change one of gov's rules
 
 Gov's instruction units ship in each kit and are overwritten at every update, so you never edit them in

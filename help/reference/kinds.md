@@ -1,4 +1,5 @@
 <!-- gov:rendered from tools/playbook/references.toml doc.reference.kinds; edit the registry, not this page -->
+<!-- unit: unit.kinds-register -->
 # Kinds
 
 ## `kind.tool-kit`
@@ -75,7 +76,7 @@ a script <prefix>/hooks/<name>.js with its fragment
 
 ## `kind.skill`
 <!-- usage: kind:kind.skill 820c4989 -->
-A Skill under skills/<name>/, made by the core's factory.
+A Skill under skills/&lt;name&gt;/, made by the core's factory.
 
 ```text
 python <prefix>/playbook/core.py new skill <name> --description <text>

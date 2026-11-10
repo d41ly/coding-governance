@@ -1,26 +1,18 @@
 # The step gate
 
 **What it is.** `step-gate` is a leg of the merge bar that reds a landing which makes something an
-adopter can see disappear — a renamed or removed installed file, hook, Skill, agent, conf key,
-policy key, CLI verb or registry entry — without an `[[upgrade]]` or `[[retired]]` row saying where
-it went. It reads the adopter-visible population at the landing's base and at its tip, and every
+adopter can see disappear — a renamed or removed installed file, hook, policy key, CLI verb or
+instruction unit, for example — without an `[[upgrade]]` or `[[retired]]` row saying where it went. It reads the adopter-visible population at the landing's base and at its tip, and every
 member present at the base and missing at the tip must be named in some row's `surfaces`. An edit
 that changes a file's bytes but not its name moves no member and needs no row.
 
-A member is spelled `<class>:<name>`. A path under the tool root is spelled with `{prefix}` in place
-of that root, so one spelling names the member at every install prefix:
+A member is spelled `<class>:<name>`, e.g. `hook:scratch-guard`. A path under the tool root is
+spelled with `{prefix}` in place of that root, so one spelling names the member at every install
+prefix, e.g. `installable:{prefix}/roles/README.md`.
 
-| Class | A member is |
-|---|---|
-| `file` | each destination gov's own plan derives |
-| `installable` | each destination a shipped kit file lands at, e.g. `installable:{prefix}/roles/README.md` |
-| `hook` | each tracked hook fragment's `name`, e.g. `hook:scratch-guard` |
-| `command` | each Skill shipped to `.claude/skills/<name>/SKILL.md`, by `<name>` |
-| `agent` | each `tools/roles/agents/<name>.agent.md`, by `<name>` |
-| `conf` | each conf key a kit's `[config]` declares, as `<conf file>#<KEY>` |
-| `policy` | each `[[key]]` name in `tools/policy/catalogue.toml` |
-| `verb` | each verb `govkit.py`'s usage or `unattended.sh`'s header states, as `<cli>:<verb>` |
-| `entry` | each registry `[[entry]]` id |
+The classes are the rows of `tools/govkit/surface-classes.toml`, and
+`python tools/govkit/step_gate.py --list` prints each one with its member count and its summary, which
+says what a member of it is.
 
 ## How to use it
 

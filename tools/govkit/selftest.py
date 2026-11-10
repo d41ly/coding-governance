@@ -19867,7 +19867,11 @@ user_skills = "/tmp/gk-fake-skills"
                    (["comment-apostrophe"], 0, r"^docs: \d+ classes · .* commands 2 tested, 1 skipped, 0 unrowed"),
                    # TOOL-dSafePassage-87 AC10: the fixture laid out under `scripts`, its page commands
                    # spelled `<prefix>/`, tests both, so the leg resolves them off the tool root.
-                   (["scripts-prefix"], 0, r"^docs: \d+ classes · .* commands 2 tested, 1 skipped, 0 unrowed")]
+                   (["scripts-prefix"], 0, r"^docs: \d+ classes · .* commands 2 tested, 1 skipped, 0 unrowed"),
+                   # PLAY-dOrderedCharter-76 AC3: one plant reds each unit-line finding.
+                   (["unit-lines"], 1, r"^docs: UNIT help/concepts/fx\.md:1 unit\.nowhere: names no gov unit$"),
+                   (["unit-lines"], 1, r"^docs: UNLINKED help/tasks/fx\.md: a page under help/reference/, help/concepts/ or help/tasks/ with no unit line$"),
+                   (["unit-lines"], 1, r"^docs: UNPAGED unit-usage:unit\.fx: no page's unit line names it$")]
 
     def _run_docs_case(case):
         return case, subprocess.run([sys.executable, str(HERE / "docs_leg.py"), "--fixture", "--plant", *case[0]],

@@ -41,6 +41,8 @@ every kit manifest, `origin` the kit's descriptor `id`; `extract_unit` and `extr
 index's extractors of the `unit` and `repo` namespaces, `extract_unit` also reading each change record, the
 file `CHANGE_RECORD_RE` names, for the `retired` row of a tag it ended. `derive_unit_selection` picks a document's units
 by selector, and `render_unit` gives the line each loads as, a derived unit's from its source.
+`remove_unit_row` takes one row out of its manifest, matched in the file's own bytes, for the step gate's
+`unit` and `unit-usage` plants.
 
 THE STATEMENT GRAMMAR. Every loaded unit is one of `STATEMENT_TYPES`; `check_statement` grades a unit row
 against its type and `check_document` a rendered document for the four shapes that load without giving
@@ -402,6 +404,20 @@ def read_units(root) -> list:
     if faults:
         raise UnitRowError("\n".join(str(f) for f in faults))
     return units
+
+
+def remove_unit_row(root, unit) -> None:
+    """`unit`'s row taken out of its manifest under `root`, matched in the file's own bytes, and staged: the
+    row is re-parsed from those bytes, so its body holds the file's line endings, whatever `read_units`'
+    universal newlines held (PLAY-dOrderedCharter-76 S4). Raises ValueError naming the tag and the manifest
+    where the bytes hold no such row."""
+    path = pathlib.Path(root) / unit.path
+    text = path.read_bytes().decode("utf-8")
+    held = [u for u in parse_unit_rows(text, unit.path)[0] if u.index == unit.index and u.tag == unit.tag]
+    if not held:
+        raise ValueError(f"{unit.path} holds no row {unit.tag} in its bytes")
+    path.write_bytes(text.replace(held[0].body, "", 1).encode("utf-8"))
+    run_git(root, "add", "--", unit.path)
 
 
 def read_change_fields(text) -> dict:
@@ -1783,6 +1799,24 @@ def arm_row(c):
     c.check("a row declaring no class reads fixed", getattr(bare, "klass", None) == "fixed", str(bare))
 
 
+def arm_row_removal(c):
+    """PLAY-dOrderedCharter-76 S4: a CRLF manifest's first row taken out through `remove_unit_row`, its second
+    row's bytes intact; a row the bytes no longer hold raises a ValueError naming its tag."""
+    second = '[[unit]]\r\ntag = "unit.second"\r\nscope = ["reader.every"]\r\n'
+    write_kits(c, '[[unit]]\r\ntag = "unit.first"\r\nscope = ["reader.every"]\r\n\r\n' + second)
+    rel = "tools/alpha/instructions.toml"
+    first = read_units(c.top)[0]
+    remove_unit_row(c.top, first)
+    got = (c.top / rel).read_bytes().decode("utf-8")
+    c.check("the CRLF manifest's first row is taken out", "unit.first" not in got, repr(got))
+    c.check("its second row's bytes are intact", got == second, repr(got))
+    try:
+        remove_unit_row(c.top, first)
+        c.check("a row the bytes no longer hold raises a ValueError naming its tag", False, "it removed something")
+    except ValueError as exc:
+        c.check("a row the bytes no longer hold raises a ValueError naming its tag", "unit.first" in str(exc), str(exc))
+
+
 def arm_two_kits(c):
     from edge_grammar import read_tree_edges
     c.write_file(".memory-tree.conf", "MEMORY_ROOT=memory\n")
@@ -2623,7 +2657,8 @@ def arm_drive_lost_line(c):
 
 
 PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority, "statements": arm_statements,
-          "document": arm_document, "lock": arm_lock, "row": arm_row, "two-kits": arm_two_kits,
+          "document": arm_document, "lock": arm_lock, "row": arm_row, "row-removal": arm_row_removal,
+          "two-kits": arm_two_kits,
           "unreadable": arm_unreadable, "arms": arm_arms, "render": arm_render, "extractor": arm_extractor,
           "schema": arm_schema, "one-fact": arm_one_fact, "status": arm_status, "renderers": arm_renderers,
           "work-order": arm_work_order, "slots": arm_slots, "legacy": arm_legacy, "no-renderer": arm_no_renderer,

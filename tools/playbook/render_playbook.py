@@ -112,7 +112,8 @@ unit's and gov row's state, each repository unit's, then each widening, in `govk
 
 THE REFERENCE PAGES (PLAY-dOrderedCharter-37). `--reference` writes each page `references.toml` beside this
 engine declares, one `[[reference]]` row per registry, from its `reader`'s rows: one section per row, its tag,
-its `summary` and its `usage` in a `text` fence, `{prefix}/` shown as `<prefix>/`, under the docs leg's anchor,
+its `summary` with `<`, `>` and `&` escaped, and its `usage` in a `text` fence, `{prefix}/` shown as `<prefix>/`,
+under the docs leg's anchor, the page opening with a `<!-- unit: <tag> -->` line where its row names a `unit`,
 whose fingerprint the leg's `--fingerprints` prints in a child process. `--reference --check` compares each
 page with its render. A row lacking either field refuses, but on the policy schema's page, which lists those
 under `## Not yet summarised (<n>)`; a member another page under `help/` anchors is a link to that page. A
@@ -3484,9 +3485,7 @@ def write_unit_usage_plant(clone) -> str:
     u = next((u for u in iu.read_units(Path(clone)) if u.tag and u.usage), None)
     if u is None:
         raise ValueError('the unit-usage plant found no gov unit row carrying a usage')
-    path = Path(clone) / u.path
-    path.write_bytes(path.read_bytes().decode('utf-8').replace(u.body, '', 1).encode('utf-8'))
-    iu.run_git(clone, 'add', '--', u.path)
+    iu.remove_unit_row(clone, u)
     return f'unit-usage:{u.tag}'
 
 
@@ -3559,7 +3558,9 @@ def render_reference_page(decl_rel: str, ref: dict, rows: dict, fps: dict, polic
             out += [f'Documented on [{elsewhere[0]}]({derive_page_link(elsewhere[0], page)}).', '']
             continue
         usage = str(row['usage']).replace('{prefix}/', '<prefix>/')
-        out += [f'<!-- usage: {mid} {fp} -->', str(row['summary']), '', '```text', usage, '```', '']
+        # PLAY-dOrderedCharter-76 F6: a summary's `<`, `>` and `&` escaped, so `<prefix>` shows rather than reading as a tag
+        summary = str(row['summary']).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+        out += [f'<!-- usage: {mid} {fp} -->', summary, '', '```text', usage, '```', '']
     if missing:
         out += [f'## {UNSUMMARISED_HEADING} ({len(missing)})', *[f'- `{t}`' for t in missing], '']
     return '\n'.join(out).rstrip('\n') + '\n'
