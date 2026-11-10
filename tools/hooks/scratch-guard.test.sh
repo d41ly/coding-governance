@@ -1403,6 +1403,15 @@ run_sub "D-AC5 the same card, no run-state file -> the SubagentStart JSON" json 
 if grep -Fq 'TOOL-x-1 is buildable' "$TMP/ctx" || grep -Fq 'dispatch row' "$TMP/ctx"; then
   echo "FAIL D-AC5 no run-state file: the context still names TOOL-x-1 buildable or a dispatch row"; sed 's/^/     /' "$TMP/ctx" | head -8; fail=$((fail+1))
 else echo "ok   D-AC5 no run-state file: the context names neither TOOL-x-1 buildable nor a dispatch row"; pass=$((pass+1)); fi
+# TOOL-aSmoothedDispatch-8 AC6: a buildable card unit admits at step 9a, so the context reads no dispatch
+# row, even one naming the buildable Tier-1 TOOL-x-13.
+write_run_state TOOL-x-13
+run_sub "SD8 AC6 a buildable card unit and a dispatch row for TOOL-x-13 -> the SubagentStart JSON" json session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+check_ctx "SD8 AC6 the card unit is named buildable" has 'TOOL-x-1 is buildable'
+if grep -Fq 'dispatch row' "$TMP/ctx"; then
+  echo "FAIL SD8 AC6 a buildable card unit: the context still names a dispatch row"; sed 's/^/     /' "$TMP/ctx" | head -8; fail=$((fail+1))
+else echo "ok   SD8 AC6 a buildable card unit: the context names no dispatch row"; pass=$((pass+1)); fi
+rm -f "$SG_RUNMD"
 
 # ---- AC2: no card, or a card with no ## route, is ONE line naming the card and ROUTED_PATHS ------
 run_sub "S-AC2 no card for the session -> the SubagentStart JSON" json session_id=sgtest-s0 "cwd=$SG_CWD_WT"
@@ -1498,8 +1507,10 @@ n=$((pass+fail))
 # 325 = 309 + the 3 gov-spec-writer rows TOOL-aSmoothedDispatch-5 added without raising the pin + the
 # 13 dispatch-fallback rows TOOL-aSmoothedDispatch-6 added (1 for AC1, 4 for AC2, 1 for AC3, 2 for
 # AC4, 4 for AC5 and 1 for AC6), counted by hand under the same rule.
+# 328 = 325 + the 3 context rows TOOL-aSmoothedDispatch-8 added for its AC6 (the run_sub, the check_ctx
+# and the no-dispatch-row check), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=325
+FLOOR_ASSERTIONS=328
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

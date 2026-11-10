@@ -1,6 +1,6 @@
 # TOOL-aSmoothedDispatch-8 — the closing review's mediums and lows: the writer's row shape, an arm per admit clause and cache key, the no-field `--writes` arms, the context's step-9b read, and the hook leg's driver guard
 
-**Status:** SPECCED · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 8
+**Status:** CLOSED · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 

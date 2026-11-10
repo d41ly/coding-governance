@@ -1592,16 +1592,20 @@ function renderRouteContext(data, env) {
     kept.push(l.text)
     if (v) verdicts.push(v)
   }
-  // Step 6: the gate's step 9b, read through the same function; only a buildable unit is named.
-  const dispatched = readDispatchedUnits(top, memRoot.trim(), route.build)
-  const onCard = new Set(route.units.map((u) => u.unit))
-  for (const u of dispatched.units) {
-    if (onCard.has(u.unit) || checkBuildable(u, route.build, top, memRoot.trim(), confBytes)) continue
-    const st = readStatusCells(fs.readFileSync(path.join(top, buildNativePath(u.spec)), 'utf8'))
-    const v = `${u.unit} is buildable through its dispatch row in ${dispatched.file}, which scratch-guard counts as routed: ${st.tier} at ${st.status}.`
-    if (v.length + 1 > budget) break
-    budget -= v.length + 1
-    verdicts.push(v)
+  // Step 6: the gate's step 9b, read through the same function; only a buildable unit is named. Read
+  // only when no card unit is buildable, the set and test `checkRouted` walks at step 9a before it
+  // reaches 9b (TOOL-aSmoothedDispatch-8 S6): a card unit that admits means no dispatch row is read.
+  if (!route.units.some((u) => !checkBuildable(u, route.build, top, memRoot.trim(), confBytes))) {
+    const dispatched = readDispatchedUnits(top, memRoot.trim(), route.build)
+    const onCard = new Set(route.units.map((u) => u.unit))
+    for (const u of dispatched.units) {
+      if (onCard.has(u.unit) || checkBuildable(u, route.build, top, memRoot.trim(), confBytes)) continue
+      const st = readStatusCells(fs.readFileSync(path.join(top, buildNativePath(u.spec)), 'utf8'))
+      const v = `${u.unit} is buildable through its dispatch row in ${dispatched.file}, which scratch-guard counts as routed: ${st.tier} at ${st.status}.`
+      if (v.length + 1 > budget) break
+      budget -= v.length + 1
+      verdicts.push(v)
+    }
   }
   const out = [head, ...kept, ...verdicts, ...tail]
   if (kept.length < route.lines.length) out.push(renderClosing(route.lines.length - kept.length))

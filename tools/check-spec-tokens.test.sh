@@ -61,7 +61,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # OWED: observed at the close.
 # RAISED 224 -> 236 by TOOL-aSmoothedDispatch-5: its twelve --spec arms, one for AC1, two each for AC2,
 # AC4 and AC5, four for AC3 and one for AC6, each top-level. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=236
+# RAISED 236 -> 238 by TOOL-aSmoothedDispatch-8: its two overlay-parity arms, the row span and the summary
+# span; the missing-span check counts only as a failure. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=238
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -2022,6 +2024,27 @@ arm "SD5 AC4 the same hand-off is green once the sibling names the token" 0 "$d"
 ARM_ARGS=()
 d=$base/scopeoff; scratch "$d"
 arm "SD5 AC6 a run with no --spec prints no scope line and grades the tracked spec" 0 "$d" "1 live spec(s) · 0 terminal spec(s)" "scope ·"
+
+# TOOL-aSmoothedDispatch-8 S2: the gov-spec-writer overlay quotes the exit-1 row and summary shapes, and a
+# red --spec run must print both. The spans are read from the overlay itself, so a reworded overlay or
+# checker print reds here. A missing overlay or an empty span is a FAIL, never two arms over an empty
+# needle, which every output carries.
+ROLES_DIR=$(resolve_kit_dir "$PY" roles render_agents.py "$HERE") || exit 2
+sp_overlay="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$ROLES_DIR/house/gov-spec-writer.md"
+sp_row=$(tr -d '\r' < "$sp_overlay" 2>/dev/null | grep -o '`spec-tokens: <spec path> \[[^`]*`' | head -1 | tr -d '`')
+sp_sum=$(tr -d '\r' < "$sp_overlay" 2>/dev/null | grep -o '`spec-tokens: <N> unwaived[^`]*`' | head -1 | tr -d '`')
+if [ -z "$sp_row" ] || [ -z "$sp_sum" ]; then
+  echo "arm FAIL  SD8 AC2 the overlay $sp_overlay quotes no row span or no summary span"; fail=$((fail+1))
+else
+  d=$base/scope
+  write_handoff_spec "$d" "$sc_spec" TOOL-tOne-7 OPEN '## 7. Gates' '' '`imaginary leg`.'
+  sp_row=${sp_row//'<spec path>'/$sc_spec}; sp_row=${sp_row//'<kind>'/leg}
+  sp_sum=${sp_sum//'<N>'/1}
+  ARM_ARGS=(--spec "$sc_spec")
+  arm "SD8 AC2 a red --spec run prints the overlay's row span" 1 "$d" "$sp_row"
+  arm "SD8 AC2 a red --spec run prints the overlay's summary span" 1 "$d" "$sp_sum"
+  ARM_ARGS=()
+fi
 
 # TOOL-dGroundRules-32 S9, TOOL-dGroundRules-40: the build-order render's overlap rule is the
 # dispatcher's, and both are graded against the truth. Each OVERLAP_PAIRS row is two paths relative to

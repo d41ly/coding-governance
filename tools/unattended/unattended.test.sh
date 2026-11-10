@@ -7657,12 +7657,93 @@ if [ -f "$STC" ]; then
   o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
   hit "$o" "the spec-token checker reds only in other builds' specs, which the bar's whole-tree leg still grades, so this dispatch is admitted: 1 hit(s), first: spec-tokens: memory/builds/tOther/"
   hit "$o" "dispatch declared"
+  # ---- TOOL-aSmoothedDispatch-8 S4: each call that must RE-RUN the checker asserts the admit note AND
+  # ---- no skip line, so a key that leaves out a part reds the step that moves only that part.
+  sd_admit="the spec-token checker reds only in other builds' specs, which the bar's whole-tree leg still grades, so this dispatch is admitted"
+  sd_refuse="--dispatch refuses: the declared spec-token checker reds over the live tree"
+  sd_spec=memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md
+  sd_clean=$(cat "$sd_spec"); sd_bar='AC1 `GATE_SELFTESTS=1 bash run-gates.sh` is green.'
+  sd_red=${sd_clean/'AC1 observable.'/$sd_bar}
   o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")
   hit "$o" "--dispatch was given a --writes path carrying a glob metacharacter"
+  # TOOL-aSmoothedDispatch-8 AC4 step a: call 1's declared row moved the run-state file, so only $fp moved.
+  hit "$o" "$sd_admit"
+  miss "$o" "spec-token check skipped"
   o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")
   hit "$o" "spec-token check skipped: its inputs match the check last admitted for tRun"
   miss "$o" "spec-tokens: "
   hit "$o" "--dispatch was given a --writes path carrying a glob metacharacter"
+  # TOOL-aSmoothedDispatch-8 AC4 step b: an edited tracked file moves the fingerprint.
+  printf '\n' >> memory/builds/tRun/README.md
+  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")
+  hit "$o" "$sd_admit"
+  miss "$o" "spec-token check skipped"
+  # TOOL-aSmoothedDispatch-8 AC4 step c: an empty commit moves HEAD and nothing the fingerprint reads.
+  # `--only` with no path commits HEAD's own tree: a bare --allow-empty would commit the staged specs,
+  # which moves HEAD^{tree} and the porcelain, so the step would re-run with $hd dropped too.
+  git commit -q --allow-empty --only -m "sd8 empty" --no-verify
+  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")
+  hit "$o" "$sd_admit"
+  miss "$o" "spec-token check skipped"
+  git reset -q --soft HEAD~1
+  git checkout -q -- memory/builds/tRun/README.md
+  # TOOL-aSmoothedDispatch-8 AC4 step d: a second slug over the tree tRun's record was just written for.
+  # The tRun call re-records at this HEAD, or step c's record would miss on HEAD alone. In process,
+  # because a --dispatch tOther needs a run-state file, a chain and a spec of its own.
+  run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh" >/dev/null
+  o=$( ( load_driver_conf && run_spec_token_check tOther ) 2>&1 )
+  hit "$o" "$sd_refuse"
+  hit "$o" "spec-tokens: memory/builds/tOther/"
+  miss "$o" "spec-token check skipped"
+  # TOOL-aSmoothedDispatch-8 AC4 step e: a refusal records no key, so its repeat re-runs and refuses.
+  printf '%s\n' "$sd_red" > "$sd_spec"
+  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")
+  hit "$o" "$sd_refuse"
+  miss "$o" "spec-token check skipped"
+  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")
+  hit "$o" "$sd_refuse"
+  miss "$o" "spec-token check skipped"
+  printf '%s\n' "$sd_clean" > "$sd_spec"
+  # TOOL-aSmoothedDispatch-8 AC4 step f: no fingerprint, no key: the cache is off on both calls.
+  rm -f .git/unattended/spec-tokens.tRun.key "./${PFX}run-gates/gate-fingerprint.sh"
+  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")
+  hit "$o" "spec-token cache off"
+  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")
+  hit "$o" "spec-token cache off"
+  same "a cache-off dispatch writes no spec-token key" "$([ -f .git/unattended/spec-tokens.tRun.key ] && echo written || echo none)" none
+  # ---- TOOL-aSmoothedDispatch-8 S3: the admit predicate's refusing half, one verdict arm per case.
+  # ---- Each deletes the key first, so a cache skip cannot stand in for a verdict, and dispatches a
+  # ---- glob the check after the spec-token one refuses, so no row is written. The stubs are the
+  # ---- fixture, never the break: they print what the real checker cannot today, and what the
+  # ---- predicate must still refuse if its print drifts. Each arm's staged break is in that spec's §4.
+  # TOOL-aSmoothedDispatch-8 AC3 both: an own hit beside a foreign one refuses, quoting the own line.
+  printf '%s\n' "$sd_red" > "$sd_spec"
+  rm -f .git/unattended/spec-tokens.tRun.key
+  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")
+  hit "$o" "$sd_refuse"
+  hit "$o" "spec-tokens: memory/builds/tRun/"
+  miss "$o" "$sd_admit"
+  printf '%s\n' "$sd_clean" > "$sd_spec"
+  # TOOL-aSmoothedDispatch-8 AC3 stale: a stale waiver row beside a foreign-only red refuses.
+  printf 'no-spec-makes-this\tdeliberate, for this arm\n' >> memory/project/spec-token-waivers.txt
+  rm -f .git/unattended/spec-tokens.tRun.key
+  hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")" "$sd_refuse"
+  printf '# waivers\n' > memory/project/spec-token-waivers.txt
+  sd_own='spec-tokens: memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md [bar] `t` - w'
+  sd_far='spec-tokens: memory/builds/tOther/spec/2026-08-20-spec-ARCH-tOther-1.md [bar] `t` - w'
+  sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI="'"${PFX}stub-tokens.py"'"|' .unattended.conf
+  # TOOL-aSmoothedDispatch-8 AC3 undercount: an own line the summary does not count still refuses.
+  printf "import sys\nsys.stdout.write('''%s\n''')\nsys.exit(1)\n" "$sd_own"$'\n'"$sd_far"$'\n''spec-tokens: 1 unwaived hit(s), 0 stale row(s)' > ${PFX}stub-tokens.py
+  rm -f .git/unattended/spec-tokens.tRun.key
+  hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")" "$sd_refuse"
+  # TOOL-aSmoothedDispatch-8 AC3 unattributed: a counted hit under no build's folder refuses.
+  printf "import sys\nsys.stdout.write('''%s\n''')\nsys.exit(1)\n" 'spec-tokens: tools/x.md [packet] `tRun` - w'$'\n''spec-tokens: 1 unwaived hit(s), 0 stale row(s)' > ${PFX}stub-tokens.py
+  rm -f .git/unattended/spec-tokens.tRun.key
+  hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")" "$sd_refuse"
+  # TOOL-aSmoothedDispatch-8 AC3 nosummary: a foreign hit with no summary line refuses.
+  printf "import sys\nsys.stdout.write('''%s\n''')\nsys.exit(1)\n" "$sd_far" > ${PFX}stub-tokens.py
+  rm -f .git/unattended/spec-tokens.tRun.key
+  hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")" "$sd_refuse"
   git rm -q --cached memory/builds/tOther/spec/2026-08-20-spec-ARCH-tOther-1.md >/dev/null 2>&1
   rm -rf memory/builds/tOther "./${PFX}run-gates" .git/unattended/spec-tokens.tRun.key
   # Restore the fixture the brief arms below read: the undated spec name, no extras.
@@ -9113,6 +9194,12 @@ hit "$(run --dispatch tRun --pass notanid --writes ${PFX}a.sh)" "--dispatch was 
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes /etc/passwd)" "--dispatch was given an absolute --writes path, and a declaration is repo-relative or it names a file no comparison can find:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ../outside.sh)" "--dispatch was given a --writes path that escapes the repository, which no pass may declare and no comparison can bound:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes '')" "--dispatch was given an empty --writes path, and an empty declaration is not a narrow one:"
+# TOOL-aSmoothedDispatch-8 S5: a --writes with no field is one empty path wherever it stands, and a carriage
+# return inside a path is not a separator.
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes --writes ${PFX}a.sh)" "--dispatch was given an empty --writes path, and an empty declaration is not a narrow one:"  # TOOL-aSmoothedDispatch-8 AC5 flag next
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh --writes)" "--dispatch was given an empty --writes path, and an empty declaration is not a narrow one:"  # TOOL-aSmoothedDispatch-8 AC5 end of argv
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes '  ' --writes ${PFX}a.sh)" "--dispatch was given an empty --writes path, and an empty declaration is not a narrow one:"  # TOOL-aSmoothedDispatch-8 AC5 whitespace only
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes $'spells\r·\rseparator.sh')" "--dispatch was given a --writes path containing whitespace"  # TOOL-aSmoothedDispatch-8 AC5 carriage return
 # ---- TOOL-aSmoothedDispatch-1: one --writes takes every path up to the next flag, and splits a
 # ---- whitespace-joined value; a carriage return is not split and still meets the refusal.
 build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
@@ -19143,7 +19230,12 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3265 -> 3271 by TOOL-aSmoothedDispatch-4 on 2026-11-10: 6 region-three spec-token scope and cache
 # assertions (5 `hit`, 1 `miss`), so FLOOR_SHARD_3 carries the same 6.
 # COUNTED off the block's own lines; no suite ran, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=3271
+# RAISED 3271 -> 3298 by TOOL-aSmoothedDispatch-8 on 2026-11-10: 23 region-three spec-token assertions,
+# 16 for cache steps a to f (9 `hit`, 6 `miss`, 1 `same`) and 7 for the five verdict arms (6 `hit`,
+# 1 `miss`), so FLOOR_SHARD_3 carries
+# the same 23; and 4 region-four --writes `hit`s, so FLOOR_SHARD_4 carries the same 4.
+# COUNTED off the block's own lines; no suite ran, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=3298
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -19351,11 +19443,13 @@ FLOOR_SHARD_2=229
 # RAISED 270 -> 304 by TOOL-aBriskPreflight-4: the same 34 region-five overlapped-probe and handle assertions, see FLOOR_ASSERTIONS.
 # Region five MERGED at TOOL-aSparedSpawn-34's reconcile: the shared 270, less 7, plus 34 = 297.
 # RAISED 405 -> 411 by TOOL-aSmoothedDispatch-4 on 2026-11-10: the same 6 region-three spec-token assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_3=411
+# RAISED 411 -> 434 by TOOL-aSmoothedDispatch-8 on 2026-11-10: the same 23 region-three spec-token assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=434
 # RAISED 373 -> 382 by TOOL-dGroundRules-66: the same 9 region-four terminal-unit assertions, see FLOOR_ASSERTIONS.
 # RAISED 382 -> 383 by TOOL-dGroundRules-70: the same 1 region-four reader assertion, see FLOOR_ASSERTIONS.
 # RAISED 383 -> 386 by TOOL-aSmoothedDispatch-1 on 2026-11-10: the same net 3 region-four --writes split assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_4=386
+# RAISED 386 -> 390 by TOOL-aSmoothedDispatch-8 on 2026-11-10: the same 4 region-four --writes assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_4=390
 FLOOR_SHARD_5=297
 FLOOR_SHARD_6=127
 FLOOR_SHARD_7=311

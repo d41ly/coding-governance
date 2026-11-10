@@ -256,8 +256,10 @@ with exit 2, apart from a hit's exit 1. Under it the per-spec joins run over the
 hands-off join's uid map reads every live spec on disk in that file's own `spec/` folder, so a
 hand-off to an uncommitted sibling still joins. The carries and packet joins are SKIPPED, each line
 saying so, because their population is every chain spec or run, never one file. Stale waiver rows
-and stale size high-water rows are NOT reported, because one file cannot show a row is stale, and
-only HIT and NEAR rows naming the file are printed. A `scope ·` line names what did not run. A
+and stale size high-water rows are NOT reported, because one file cannot show a row is stale. A hit
+prints as `spec-tokens: <path> [<kind>]` followed by its token, then the `<N> unwaived hit(s)`
+summary, and the run exits 1. The `HIT` and `NEAR` labels are `--list`'s, and that run exits 0. A
+`scope ·` line names what did not run. A
 scoped green is not a whole-tree green: the bar's leg runs with no scope.
 """
 import datetime
