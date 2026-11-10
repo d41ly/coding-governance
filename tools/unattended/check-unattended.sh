@@ -4509,6 +4509,8 @@ for f in $RUNS; do
     # terminal first, then `check_unit_deferred`. The status is the generated units region's, check
     # 24's one status source, read once per record. A release not committed inside `dsgrp..dstop`
     # keeps today's bound, the strict direction, and a write before the release is still charged.
+    # The release lookup is ANCHORED at the row's start: an id spelled in ANOTHER row's title, at that
+    # row's own status, would otherwise read as this unit's release (id-matched-as-a-substring).
     if [ -z "$dshit" ]; then
       if [ -z "$ds_ured" ]; then
         ds_ured=1
@@ -4520,10 +4522,10 @@ for f in $RUNS; do
         case "$dsur" in *"| $dss |"*) dsst=$dss; break ;; esac
       done
       case "$dsst" in
-        CLOSED|WONTDO) dsrel=$(GIT log -1 --format=%H -G "$dsunit .*\\| $dsst \\|" "$dsgrp..$dstop" -- "$dsre" 2>/dev/null) ;;
+        CLOSED|WONTDO) dsrel=$(GIT log -1 --format=%H -G "^\\| \\[?$dsunit .*\\| $dsst \\|" "$dsgrp..$dstop" -- "$dsre" 2>/dev/null) ;;
         DEFERRED)
           if check_unit_deferred "$f" "$dsunit" "$dsst"; then
-            dsr1=$(GIT log -1 --format=%H -G "$dsunit .*\\| DEFERRED \\|" "$dsgrp..$dstop" -- "$dsre" 2>/dev/null)
+            dsr1=$(GIT log -1 --format=%H -G "^\\| \\[?$dsunit .*\\| DEFERRED \\|" "$dsgrp..$dstop" -- "$dsre" 2>/dev/null)
             dsr2=$(GIT log -1 --format=%H -S " rescope · item defer $dsunit · reason " "$dsgrp..$dstop" -- "$f" 2>/dev/null)
             if [ -n "$dsr1" ] && [ -n "$dsr2" ]; then
               if GIT merge-base --is-ancestor "$dsr1" "$dsr2" 2>/dev/null; then dsrel=$dsr2; else dsrel=$dsr1; fi
