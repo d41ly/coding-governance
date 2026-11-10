@@ -60,7 +60,7 @@ ids TOOL-aGuardedEffort-1 TOOL-aGuardedEffort-2
 | [TOOL-aGuardedEffort-2 — rule 8 grades an unset stage at the level of the role the call names, and the closing review's arms land](spec/2026-11-10-spec-TOOL-aGuardedEffort-2.md) | 2 | 2 | CLOSED | rev-1 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 4 record folder(s).
+Records: 10 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

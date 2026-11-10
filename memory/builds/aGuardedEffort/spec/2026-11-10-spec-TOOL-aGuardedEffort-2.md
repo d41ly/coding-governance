@@ -6,6 +6,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-10-build-TOOL-aGuardedEffort-1-agent-ledger.md](../build/2026-11-10-build-TOOL-aGuardedEffort-1-agent-ledger.md) | journal | TOOL-aGuardedEffort-1 |
+| [2026-11-10-build-TOOL-aGuardedEffort-2-1-acceptance-ledger.md](../build/2026-11-10-build-TOOL-aGuardedEffort-2-1-acceptance-ledger.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aGuardedEffort-2-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aGuardedEffort-2-1-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aGuardedEffort-2-round1-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-aGuardedEffort-2-round1-fix-brief.md) | research | — |
 
