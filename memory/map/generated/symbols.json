@@ -13563,6 +13563,21 @@
       "file": "tools/govkit/refusal_join.py"
     },
     {
+      "id": "pr4_ledger",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "pr4_run",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "pr4_spec",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
       "id": "pre",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.test.sh"
