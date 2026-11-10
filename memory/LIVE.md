@@ -4,13 +4,12 @@
 Derived, never authored: a build leaves this file when every one of its units reaches a
 terminal status. Nothing here is edited by hand.
 
-Dormant: no record dated within 21 days of 2026-11-08, the newest record date in this tree (dFairHearing).
+Dormant: no record dated within 21 days of 2026-11-10, the newest record date in this tree (aSwiftRefusal).
 
 Landed-unclosed: the build's non-terminal units whose id tracked product source cites, by drift-audit's non_terminal_specs_cited_by_product_source join. A candidate to close, not a verdict.
 
 | Build | Status | Node | Opened | Streams | Ids (n) | Last record | Activity | Landed-unclosed |
 |---|---|---|---|---|---|---|---|---|
-| [aScoutedSeam](builds/aScoutedSeam/README.md) | SPECCED | a | 2026-10-11 | tooling+kickoff+deployer | 5 | 2026-10-19 | active | 0 |
 | [dBoundRoles](builds/dBoundRoles/README.md) | DEFERRED | d | 2026-10-21 | tooling | 75 | 2026-11-05 | active | 0 |
 | [dCalibratedLens](builds/dCalibratedLens/README.md) | DEFERRED | d | 2026-10-21 | tooling | 56 | 2026-11-04 | active | 0 |
 | [dClosedLoop](builds/dClosedLoop/README.md) | INPROGRESS | d | 2026-10-14 | playbook+kickoff+tooling+deployer | 39 | 2026-10-26 | active | 0 |
@@ -42,6 +41,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [aPortableWarden](builds/aPortableWarden/README.md) | SPECCED | a | 2026-07-13 | tooling | 1 | 2026-07-13 | dormant | 0 |
 | [aQuarriedLantern](builds/aQuarriedLantern/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 3 | 2026-08-08 | dormant | 0 |
 | [aRoutedQuill](builds/aRoutedQuill/README.md) | DEFERRED | a | 2026-10-09 | tooling+kickoff+playbook+deployer | 15 | 2026-10-10 | dormant | 0 |
+| [aScoutedSeam](builds/aScoutedSeam/README.md) | SPECCED | a | 2026-10-11 | tooling+kickoff+deployer | 5 | 2026-10-19 | dormant | 0 |
 | [aTetheredScratch](builds/aTetheredScratch/README.md) | INPROGRESS | a | 2026-08-20 | tooling | 4 | 2026-08-20 | dormant | 0 |
 | [aTunedCompass](builds/aTunedCompass/README.md) | BLOCKED | a | 2026-09-04 | tooling | 11 | 2026-09-05 | dormant | 0 |
 | [aWalkedCorpus](builds/aWalkedCorpus/README.md) | DEFERRED | a | 2026-08-16 | tooling | 10 | 2026-08-18 | dormant | 0 |

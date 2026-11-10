@@ -128,7 +128,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   sidecar line, whatever its phase, when the record names a keepalive id and that line exists. The
   line stays ONE line: a field joins it or does not print, and the suite arms that.
 - `--audit` — one line per unit whose dispatch rows at their newest anchor, taken together, are still
-  open and whose spec is not terminal: how long the TREE has been idle (newest write, newest commit) and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
+  open and whose spec is neither terminal nor deferred (DEFERRED, with its latest rescope defer row
+  after every dispatch row naming it): how long the TREE has been idle (newest write, newest commit)
+  and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
   `STALLED` line followed by one remedy line. Read-only; the idle-wake runs it. It cannot see what
   the unit is doing or whether a process is stuck — its figures are properties of the tree. After
   the units it prints one line per open REGISTERED task: its heartbeat path, `last-beat <s>s ago`
@@ -229,12 +231,14 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   several pass kinds per unit, and a later row is read the same way whichever it is. What the verb
   REFUSES is overlap with a SIBLING pass still open, the disjointness question it exists for and the
   one thing here that is unchanged; a unit's own rows are never siblings of each other.
-  A pass of a unit whose spec is CLOSED or WONTDO is not a sibling: it reserves nothing, and a later pass for such a unit reserves its paths only once its spec is set back to INPROGRESS.
+  A pass of a unit whose spec is CLOSED or WONTDO is not a sibling: it reserves nothing, and a later pass for such a unit reserves its paths only once its spec is set back to INPROGRESS. A pass of a deferred unit, whose spec reads DEFERRED and whose latest rescope defer row follows every dispatch row naming it, is not a sibling either, until the unit is dispatched again.
   A pass's COMMIT is the one whose `Pass: <unit-id>` trailer names it; a commit with no trailer falls back to
-  its subject, and `Pass: none` names no unit. Before any of that it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
+  its subject, and `Pass: none` names no unit. After every cheap refusal and before the claim read it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
   live tree and refuses the dispatch when it exits non-zero: the checker's bar join grades LIVE specs,
   an unattended build closes each unit spec in its own build commit, and this verb is the one point
-  that sees a spec before its unit builds. A blank or absent key is an ANNOUNCED skip on stdout,
+  that sees a spec before its unit builds. It runs last because it costs a tree-wide scan, and every
+  refusal above it — the order gate, the edge and hold gates, the path and shared-record refusals,
+  condition 1 — is decided from the run-state file, the spec headers or `git` in seconds. A blank or absent key is an ANNOUNCED skip on stdout,
   never a silent pass. Where `RUN_CLAIMS` is `on` it reads the run's claim as the holder after every
   local refusal and before the row: another session's claim is check 108 and no row is written.
 - `--review` — records ONE review round for a subject and reports what the loop is doing:

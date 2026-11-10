@@ -7368,6 +7368,10 @@ same "duplicate title: the FIRST occurrence binds, so an empty first section is 
 fkspec 'none'
 same "tier-2 control: the canonical ordinals still grade READY" "$(plan_state "$TMP/fk.md")" "READY"
 
+fi   # ---- region 3 continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 3; then
+
 echo "MARK brief-and-dispatch-arms" >&2
 # ---------------------------------------------------------------------------------------------
 # ---- TOOL-dBriefedPass-2 and -3 - THE REFUSAL ARMS, asserting each branch's OWN longest literal
@@ -7646,6 +7650,68 @@ else
   # construction.
   echo "skip dispatch: the spec-token checker is not beside this kit at $STC, and govkit's registry exempts check-spec-tokens.py from every adopter ([[exempt]]), so the F3 arms have no subject in this tree and run in gov's"
 fi
+# ---- TOOL-aSwiftRefusal-1 - THE SPEC-TOKEN CHECKER RUNS AFTER EVERY CHEAP REFUSAL. It costs a
+# ---- tree-wide scan, while the order gate and condition 1 are decided from the run-state file and
+# ---- the spec headers in seconds, so each answers first with the checker still declared. A STUB
+# ---- exiting 1 stands in for it: these arms prove refusal ORDER, so they run where the real checker
+# ---- is absent too, and the F3 group above keeps the real checker's case. ARCH-tRun-5 at order 2 is
+# ---- the order gate's while ARCH-tRun-4 at order 1 is undispatched; once ARCH-tRun-4 is dispatched
+# ---- under a blank key, ARCH-tRun-5 declaring its path is condition 1's. RED-first: the driver at
+# ---- ae6735c1 answered both with the spec-token refusal. The units, the README and RUN.md restore.
+mkdir -p "./${PFX}"
+cp memory/builds/tRun/README.md "$TMP/swift-readme"; cp memory/builds/tRun/RUN.md "$TMP/swift-runmd"
+for _u in 4 5; do
+  printf '# ARCH-tRun-%s — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd · order %s\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' "$_u" "$((_u - 3))" > "memory/builds/tRun/spec/swift$_u.md"
+  sed -i 's#^<!-- /gen:build-units -->$#| [ARCH-tRun-'"$_u"' — u](spec/swift'"$_u"'.md) | SPECCED | rev-1 | 2026-08-20 |\n&#' memory/builds/tRun/README.md
+done
+printf 'import sys\nsys.exit(1)\n' > ${PFX}swift-stub.py
+printf 'SPEC_TOKENS_CLI="'"${PFX}swift-stub.py"'"\n' >> .unattended.conf
+git add memory/builds/tRun/spec/swift4.md memory/builds/tRun/spec/swift5.md memory/builds/tRun/README.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-5 --writes ${PFX}swift.sh)
+hit "$o" "and an earlier step still holds a unit that is neither terminal nor dispatched: ARCH-tRun-4 (order 1, SPECCED)"
+miss "$o" "--dispatch refuses: the declared spec-token checker reds over the live tree"
+sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI=""|' .unattended.conf
+o=$(run --dispatch tRun --pass ARCH-tRun-4 --writes ${PFX}swift.sh)
+hit "$o" "dispatch declared"
+sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI="'"${PFX}swift-stub.py"'"|' .unattended.conf
+o=$(run --dispatch tRun --pass ARCH-tRun-5 --writes ${PFX}swift.sh)
+hit "$o" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint: ${PFX}swift.sh also in"
+miss "$o" "--dispatch refuses: the declared spec-token checker reds over the live tree"
+# ---- TOOL-aSwiftRefusal-4 L1: THE POSITIVE CONTROL. The two `miss`es above pass as well on a stub
+# ---- that is never reached, so one dispatch clears the order gate (ARCH-tRun-4 is dispatched) and
+# ---- condition 1 (its own path) and must reach the stub. The unit-2 arm restores RUN.md below.
+o=$(run --dispatch tRun --pass ARCH-tRun-5 --writes ${PFX}swift5.sh)
+hit "$o" "--dispatch refuses: the declared spec-token checker reds over the live tree"
+
+# ---- TOOL-aSwiftRefusal-2 - A DEFERRED EARLIER-ORDER SIBLING DOES NOT HOLD BACK THE ORDER GATE, on
+# ---- the same pair. ARCH-tRun-4 passes only when its spec reads DEFERRED AND its last row is a
+# ---- `rescope · item defer` row, so the arm asserts both blockers beside the admission: a gate
+# ---- admitting every DEFERRED sibling, or every defer row, passes the admission alone. The edge
+# ---- refusal is not given the deferral, so a consumer of ARCH-tRun-4 stays refused. RED-first: the
+# ---- driver at ae6735c1 refused the admission case with the order gate's blocker text.
+sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI=""|' .unattended.conf
+run_swift_case() { # ARCH-tRun-4's status · defer row (1 or empty) -> the ARCH-tRun-5 dispatch's output
+  cp "$TMP/swift-runmd" memory/builds/tRun/RUN.md
+  sed -i "s/^\*\*Status:\*\* [A-Z]* /**Status:** $1 /" memory/builds/tRun/spec/swift4.md
+  [ -n "$2" ] && printf '\n2026-11-10T00:00:01Z rescope · item defer ARCH-tRun-4 · reason set aside\n' >> memory/builds/tRun/RUN.md
+  git add memory/builds/tRun/spec/swift4.md memory/builds/tRun/spec/swift5.md memory/builds/tRun/RUN.md >/dev/null 2>&1
+  run --dispatch tRun --pass ARCH-tRun-5 --writes ${PFX}swift.sh
+}
+o=$(run_swift_case DEFERRED 1)
+hit "$o" "unattended: dispatch — ARCH-tRun-4 (order 1) is DEFERRED with no dispatch after its defer row, so it does not hold back ARCH-tRun-5"
+hit "$o" "dispatch declared"
+o=$(run_swift_case INPROGRESS 1)
+hit "$o" "and an earlier step still holds a unit that is neither terminal nor dispatched: ARCH-tRun-4 (order 1, INPROGRESS)"
+o=$(run_swift_case DEFERRED "")
+hit "$o" "and an earlier step still holds a unit that is neither terminal nor dispatched: ARCH-tRun-4 (order 1, DEFERRED)"
+sed -i 's/^## 6\. Acceptance criteria$/## 3. Non-goals (OUT)\n\n- none\n\n### Edges\n\n- **consumes-from** `ARCH-tRun-4` — the code it builds on\n\n&/' memory/builds/tRun/spec/swift5.md
+o=$(run_swift_case DEFERRED 1)
+hit "$o" "consumes from a unit of its own build that is neither CLOSED nor WONTDO, so the consumer would build against code its producer has not landed: ARCH-tRun-5 consumes-from ARCH-tRun-4 (DEFERRED)"
+sed -i '/^SPEC_TOKENS_CLI=/d' .unattended.conf
+git rm -q --cached memory/builds/tRun/spec/swift4.md memory/builds/tRun/spec/swift5.md >/dev/null 2>&1
+rm -f memory/builds/tRun/spec/swift4.md memory/builds/tRun/spec/swift5.md ${PFX}swift-stub.py
+cp "$TMP/swift-readme" memory/builds/tRun/README.md; cp "$TMP/swift-runmd" memory/builds/tRun/RUN.md
+git add memory/builds/tRun/README.md memory/builds/tRun/RUN.md >/dev/null 2>&1
 # ---- region 3 ends HERE rather than at the old seam above the spec-token arm group: that group runs
 # ---- over the dispatch fixture the arms before it left, so it cannot open a region (TOOL-aGraftedHelix-41).
 fi   # ---- end REGION 3 ------------------------------------------------------------------------
@@ -9042,6 +9108,40 @@ out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/other)
 hit "$out" "ARCH-tRun-1 is CLOSED, so this declaration reserves nothing against a sibling"
 hit "$out" "dispatch declared"
 
+# ---- TOOL-aSwiftRefusal-3: A DEFERRED UNIT RESERVES NOTHING. The first unit declares a path, gets a
+# ---- `rescope · item defer` row in `park`'s grammar and a DEFERRED spec, and the second unit's claim
+# ---- on the same path is admitted with the released key named. RED-first: the driver at ae6735c1
+# ---- refused it under condition 1. The defer row alone does not release it (INPROGRESS), and a
+# ---- dispatch after the defer row re-takes the unit's OLDER key too. Ten assertions, three `mutate`s.
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/held >/dev/null 2>&1
+printf '2026-11-10T00:00:09Z rescope · item defer ARCH-tRun-1 · reason set aside\n' >> memory/builds/tRun/RUN.md
+mutate memory/builds/tRun/spec/u1.md 's/^\*\*Status:\*\* SPECCED/**Status:** DEFERRED/'
+git add -A && git commit -q -m "chore: defer the first spec" --no-verify
+out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/held)
+hit "$out" "dispatch declared"
+hit "$out" "ARCH-tRun-1 left out as deferred, so its declared paths reserve nothing until it is dispatched again: work/held"
+mutate memory/builds/tRun/spec/u1.md 's/^\*\*Status:\*\* DEFERRED/**Status:** INPROGRESS/'
+out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/held)
+hit  "$out" "two passes claiming one file are not disjoint: work/held also in"
+miss "$out" "left out as deferred"
+mutate memory/builds/tRun/spec/u1.md 's/^\*\*Status:\*\* INPROGRESS/**Status:** DEFERRED/'
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/other)" "dispatch declared"
+out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/held)
+hit  "$out" "two passes claiming one file are not disjoint: work/held also in"
+miss "$out" "left out as deferred"
+# ---- TOOL-aSwiftRefusal-4 M1: A SAME-REASON RE-DEFER AFTER A RE-DISPATCH IS A NEW DEFERRAL. On the
+# ---- state above, ARCH-tRun-1 re-took its keys after its defer row, so the same `--reason` appends a
+# ---- row and the unit reads deferred again; a second call while it is in force is the idempotent
+# ---- answer. RED-first: the driver at 17308b6c answered "already recorded" and wrote no row.
+out=$(run --rescope tRun --act defer --item ARCH-tRun-1 --reason "set aside")
+hit  "$out" "amendment recorded — defer ARCH-tRun-1"
+miss "$out" "already recorded"
+hit "$(run --rescope tRun --act defer --item ARCH-tRun-1 --reason "set aside")" "amendment already recorded, unchanged — defer ARCH-tRun-1"
+out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/held)
+hit "$out" "dispatch declared"
+hit "$out" "ARCH-tRun-1 left out as deferred"
+
 # ---- M1: the generated-index/generator pairing, armed. The `covers` to `overlaps` change at this
 # ---- site reverted with the whole suite still green, which is a repair nothing was holding.
 build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
@@ -9209,6 +9309,21 @@ out=$(run --audit tRun); rc=$?
 same "a CLOSED unit with an open row exits 0" "$rc" "0"
 same "a CLOSED unit with an open row is not listed" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
 miss "$out" "unattended-audit: ARCH-tRun-1"
+# ---- TOOL-aSwiftRefusal-4 M3: A DEFERRED UNIT IS NOT OPEN EITHER, the `--audit` half of the deferred
+# ---- skip in `read_open_passes`. A DEFERRED spec with its defer row after its dispatch row is left
+# ---- out, so no STALLED kill order is printed for it; flipped back to INPROGRESS it is listed again.
+# ---- RED once the close takes the `check_unit_deferred` skip out of `read_open_passes`.
+build_audit_fixture
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+printf '2026-11-10T00:00:09Z rescope · item defer ARCH-tRun-1 · reason set aside\n' >> memory/builds/tRun/RUN.md
+mutate memory/builds/tRun/spec/one.md 's/^\*\*Status:\*\* SPECCED/**Status:** DEFERRED/'
+git add -A && git commit -q -m "fixture: the spec is deferred, the row stays" --no-verify
+out=$(run --audit tRun)
+same "a DEFERRED unit with an open row is not listed" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
+miss "$out" "unattended-audit: ARCH-tRun-1"
+mutate memory/builds/tRun/spec/one.md 's/^\*\*Status:\*\* DEFERRED/**Status:** INPROGRESS/'
+hit "$(run --audit tRun)" "unattended-audit: ARCH-tRun-1"
+
 # ---- THE SPEC READ IS A PROBE (closing review of aProbedUnit, round 2, cluster H, ids 5 and 18).
 # ---- The status skip above is only as good as the read that feeds it: `load_spec_facts` swallowed
 # ---- with `|| true` left the maps empty on a failed read, the CLOSED skip never fired, and the unit
@@ -19083,7 +19198,14 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # a terminal record 6, the four chain reasons 10, the live set 5 and the waiver guard 3, and 5 in region two
 # for the fifth field, so FLOOR_SHARD_1 and FLOOR_SHARD_2 carry those. COUNTED off the block's own lines,
 # helpers' assertions included; no suite ran, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=3256
+# RAISED 3256 -> 3266 by TOOL-aSwiftRefusal-3: the deferred-unit sibling arm in region four after the
+# terminal-unit one, three `mutate`s and seven `hit`/`miss` lines, every one unconditional, counted off
+# the block's own lines; no suite ran, and its RED-first observation is the close's.
+# RAISED 3266 -> 3287 by TOOL-aSwiftRefusal-4: 11 in region three, the TOOL-aSwiftRefusal-1 and -2 arms'
+# 10 lines left unpinned and the L1 positive control's one `hit`, and 10 in region four, the M1 block's
+# five `hit`/`miss` lines and the M3 block's two `mutate`s and three `same`/`miss`/`hit` lines, every one
+# unconditional, counted off the blocks' own lines; no suite ran, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=3287
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -19289,10 +19411,13 @@ FLOOR_SHARD_2=223
 # 3 by 25, 4 by 17, 5 by 7, 6 by 2, 7 by 1 and 8 by 12.
 # RAISED 270 -> 304 by TOOL-aBriskPreflight-4: the same 34 region-five overlapped-probe and handle assertions, see FLOOR_ASSERTIONS.
 # Region five MERGED at TOOL-aSparedSpawn-34's reconcile: the shared 270, less 7, plus 34 = 297.
-FLOOR_SHARD_3=405
+# RAISED 405 -> 416 by TOOL-aSwiftRefusal-4: the same 11 region-three spec-token arm and L1 assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=416
 # RAISED 373 -> 382 by TOOL-dGroundRules-66: the same 9 region-four terminal-unit assertions, see FLOOR_ASSERTIONS.
 # RAISED 382 -> 383 by TOOL-dGroundRules-70: the same 1 region-four reader assertion, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_4=383
+# RAISED 383 -> 393 by TOOL-aSwiftRefusal-3: the same 10 region-four deferred-unit assertions, see FLOOR_ASSERTIONS.
+# RAISED 393 -> 403 by TOOL-aSwiftRefusal-4: the same 10 region-four M1 and M3 assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_4=403
 FLOOR_SHARD_5=297
 FLOOR_SHARD_6=127
 FLOOR_SHARD_7=311

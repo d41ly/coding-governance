@@ -4435,7 +4435,7 @@ fi
 for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac
-  dsslug=${f%/RUN.md}; dsslug=${dsslug##*/}; ds_absorbed=""; ds_win=""; ds_pend=""; ds_run_graded=0; ds_over=""; ds_over_n=0
+  dsslug=${f%/RUN.md}; dsslug=${dsslug##*/}; ds_absorbed=""; ds_win=""; ds_pend=""; ds_run_graded=0; ds_over=""; ds_over_n=0; ds_units=""; ds_ured=""
   fact_of "$f" phase >/dev/null; ph=$_fact_of; case "$ph" in LANDED|ABORTED) continue ;; esac
   # ONE ROW PER (anchor, unit), AND ITS PATHS ARE THE UNION OF EVERY ROW UNDER THAT KEY. The key
   # already carries the anchor, so rows at DIFFERENT anchors stay separate — they are different passes
@@ -4503,6 +4503,40 @@ for f in $RUNS; do
     dstop=$(next_anchor "$dsgrp" "$dsanchors")
     [ -n "$dstop" ] || dstop=HEAD
     dshit=$(pass_commit "$dsgrp" "$dsunit" "$f" "$dstop" || true)
+    # A RELEASED UNIT'S WINDOW ENDS AT ITS RELEASE (TOOL-aSwiftRefusal-4). With no pass commit, a unit
+    # `read_open_passes` releases, terminal or deferred, admits a sibling's write to its paths from the
+    # commit that released it, so that write is not charged here. Asked in that function's order,
+    # terminal first, then `check_unit_deferred`. The status is the generated units region's, check
+    # 24's one status source, read once per record. A release not committed inside `dsgrp..dstop`
+    # keeps today's bound, the strict direction, and a write before the release is still charged.
+    # The release lookup is ANCHORED at the row's start: an id spelled in ANOTHER row's title, at that
+    # row's own status, would otherwise read as this unit's release (id-matched-as-a-substring).
+    if [ -z "$dshit" ]; then
+      if [ -z "$ds_ured" ]; then
+        ds_ured=1
+        ds_units=$(region "$M/builds/$dsslug/README.md" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null) || ds_units=""
+      fi
+      dsst=""; dsrel=""; dsre="$M/builds/$dsslug/README.md"
+      dsur=$(id_rows "$ds_units" "$dsunit")
+      for dss in CLOSED WONTDO DEFERRED; do
+        case "$dsur" in *"| $dss |"*) dsst=$dss; break ;; esac
+      done
+      case "$dsst" in
+        CLOSED|WONTDO) dsrel=$(GIT log -1 --format=%H -G "^\\| \\[?$dsunit .*\\| $dsst \\|" "$dsgrp..$dstop" -- "$dsre" 2>/dev/null) ;;
+        DEFERRED)
+          if check_unit_deferred "$f" "$dsunit" "$dsst"; then
+            dsr1=$(GIT log -1 --format=%H -G "^\\| \\[?$dsunit .*\\| DEFERRED \\|" "$dsgrp..$dstop" -- "$dsre" 2>/dev/null)
+            dsr2=$(GIT log -1 --format=%H -S " rescope · item defer $dsunit · reason " "$dsgrp..$dstop" -- "$f" 2>/dev/null)
+            if [ -n "$dsr1" ] && [ -n "$dsr2" ]; then
+              if GIT merge-base --is-ancestor "$dsr1" "$dsr2" 2>/dev/null; then dsrel=$dsr2; else dsrel=$dsr1; fi
+            fi
+          fi ;;
+      esac
+      if [ -n "$dsrel" ]; then
+        report "check 23 released $dsunit in $f — its spec reads $dsst, so its window ends at its release ${dsrel:0:8} and no write after it is charged to it"
+        dstop=$dsrel
+      fi
+    fi
     # THE ROW'S WINDOW (TOOL-aWindowedPass-1 S1): its anchor to its pass commit, else to the unit's
     # next anchor, else open. Recorded for EVERY row that reaches here, graded or not, because a pass
     # that never committed was still running beside whatever was dispatched after it.
