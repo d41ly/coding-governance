@@ -60,7 +60,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 11 unit(s) · node a · opened 2026-11-10 · streams tooling
+**Build status:** CLOSED · 11 unit(s) · node a · opened 2026-11-10 · streams tooling
 ids TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 TOOL-aSmoothedDispatch-7 TOOL-aSmoothedDispatch-8 TOOL-aSmoothedDispatch-9 TOOL-aSmoothedDispatch-10 TOOL-aSmoothedDispatch-11
 ids TOOL-aSmoothedDispatch-12 TOOL-aSmoothedDispatch-13 TOOL-aSmoothedDispatch-14 TOOL-aSmoothedDispatch-15 TOOL-aSmoothedDispatch-16 TOOL-aSmoothedDispatch-17 TOOL-aSmoothedDispatch-18 TOOL-aSmoothedDispatch-19 TOOL-aSmoothedDispatch-20 TOOL-aSmoothedDispatch-21
 
@@ -77,7 +77,7 @@ ids TOOL-aSmoothedDispatch-12 TOOL-aSmoothedDispatch-13 TOOL-aSmoothedDispatch-1
 | [TOOL-aSmoothedDispatch-8 — the closing review's mediums and lows: the writer's row shape, an arm per admit clause and cache key, the no-field `--writes` arms, the context's step-9b read, and the hook leg's driver guard](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-8.md) | 8 | 2 | CLOSED | rev-1 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-9 — the three driver-suite arms unit 1's split left red: the stale `--dispatch` hostile-value exemption, and two carriage-return arms whose byte the substitution drops](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-9.md) | 9 | 1 | CLOSED | rev-2 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-18 — the three bar legs this build turned red: unit 4's loop read off a one-name local, four test lines respelled off kit paths, and `--help` anchored on a help page](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-18.md) | 10 | 1 | CLOSED | rev-2 | 2026-11-10 |
-| [TOOL-aSmoothedDispatch-21 — the reconcile merge with aSwiftRefusal on local main: one spec-token check, through `run_spec_token_check`, after every cheap refusal](spec/2026-11-11-spec-TOOL-aSmoothedDispatch-21.md) | 11 | 2 | INPROGRESS | rev-1 | 2026-11-11 |
+| [TOOL-aSmoothedDispatch-21 — the reconcile merge with aSwiftRefusal on local main: one spec-token check, through `run_spec_token_check`, after every cheap refusal](spec/2026-11-11-spec-TOOL-aSmoothedDispatch-21.md) | 11 | 2 | CLOSED | rev-1 | 2026-11-11 |
 <!-- /gen:build-units -->
 
 Records: 22 bound to this build, across 4 record folder(s).
