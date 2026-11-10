@@ -525,3 +525,5 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-10T12:49:17Z hold · item owner-decision · reason until owner · reaped 84c0e58e · resume none(owner)
 
 2026-11-10T14:35:52Z resume · item dOrderedCharter · reason held · keepalive 65a9574c · manual
+
+2026-11-10T15:39:09Z rescope · item add PLAY-dOrderedCharter-78 · reason the owner's picks for the close's three parked items: the playbook-render entry declares the kits its readers need, an adopter's tags check skips an owner its chain registry lacks, and the A25r arm asserts its whole signature
