@@ -77,3 +77,9 @@ The main loop observed the owed arms at the close, on frozen clones at `55d65f5c
 - AC1 — `grep -c "^_rf_exempt='brief|check 49: .*hash'\$" tools/unattended/unattended.test.sh` — the greps print 1 and 0; the region-two matrix observed RED on its staged break at the close and GREEN at the tip `b1e48cc59` (staging `u9-ac1`, the row put back: `the exemption for --dispatch is stale`), and the tip run of region two equals the base's FAIL lines
 - AC2 — `grep -cF -- "--writes \$'" tools/unattended/unattended.test.sh` — the greps print 0 and 1
 - AC3 — `grep -c 'TOOL-aSmoothedDispatch-9 AC3' tools/unattended/unattended.test.sh` — the grep prints 2; both arms observed RED on its staged break at the close and GREEN at the tip `b1e48cc59` (staging `c4a`, IFS widened to `\r`), and the tip run of region four equals the base's FAIL lines
+
+**Evidences:** TOOL-aSmoothedDispatch-18
+- AC1 — `python -I "$SCRATCH/sd10.py" . tools/unattended/unattended.sh` — the builder's probe printed two `loop-var-sub` lines and `gated <<< sites: 2`; the shell hygiene leg exited 0 in the bar over `6d2da0bec`
+- AC2 — `grep -cF 'run-gates/gate-fingerprint.sh' tools/unattended/unattended.test.sh` — the greps printed 0, 0 and 0; cache steps a and f and the unattributed arm observed RED on its staged break at the close and GREEN at the tip `6d2da0bec` (staging `c18`: `s3-unattributed`, `s4-fp` and `s4-noret` together), and the tip run of region three equals the base's FAIL lines
+- AC3 — `grep -c 'tools/a\.js' tools/hooks/scratch-guard.test.sh` — the greps printed 0 and 1; the D-AC1 row observed RED on its staged break at the close and GREEN at the tip `6d2da0bec` (staging `g-u6rev`, the hook at `af3ec143c`)
+- AC4 — `python -I "$SCRATCH/sd10fp.py" "." unattended.sh:--help` — the builder's probe printed `unattended.sh:--help 965e3eb2`; the docs leg exited 0 in the bar over `6d2da0bec`
