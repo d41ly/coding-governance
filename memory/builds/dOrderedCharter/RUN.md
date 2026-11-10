@@ -479,3 +479,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-09T22:53:46Z dispatch · item 0ec67531 PLAY-dOrderedCharter-33 · reason tools/govkit/surface-classes.toml tools/govkit/usage.toml memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-33-ledger.md memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-33.md
 
 2026-11-09T23:07:52Z dispatch · item 0ec67531 PLAY-dOrderedCharter-33 · reason tools/govkit/surface-classes.toml tools/govkit/usage.toml tools/playbook/pins.py memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-33-ledger.md memory/builds/dOrderedCharter/build/2026-11-10-build-PLAY-dOrderedCharter-33-deviation-336.md memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-33.md
+
+2026-11-09T23:54:06Z rescope · item add PLAY-dOrderedCharter-75 · reason found after unit 40's pass: its four unit rows arm the tags leg's selects join, which reds 42 declared practice and reader selectors no unit selects yet; spec 40 is CLOSED, so the correction is a unit on top
+
+2026-11-09T23:54:09Z rescope · item add PLAY-dOrderedCharter-76 · reason unit 37's later commit, refused at dispatch because reopening CLOSED spec 37 made its AC12 token live; its F8, F10 and F11 scope and unit 37's three lint reds move to a unit of their own
