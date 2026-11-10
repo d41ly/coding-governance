@@ -57,11 +57,12 @@ Sources, by key family: `task:` the card's `## task` field, read by the kickoff 
 (stated above its `check_card_task`, and ported here because that one is shell) under the labels
 that checker's `--task-skeleton` prints, so a skeleton that does not yield eight refuses; `card:` the lines
 under the card's last `## <heading>`; `brief:` the `### <sub-head>` under the brief record's
-`## The brief`; `input:` the `--input` argument; a rule tag the governing doc's section 1. The card is
-`--card`, else the file the kickoff checker's `--card --path` prints for CLAUDE_CODE_SESSION_ID, so
-the card's location stays that checker's rule. A required key resolving to nothing, an empty value
-or a placeholder refuses and writes nothing; an optional one is named on the `Not supplied` line.
-A relative path given to `--card`, `--out`, an `--input` or `check` is read from the repository root.
+`## The brief`, and `brief:prompt` that record's `## The prompt` section; `input:` the `--input`
+argument; a rule tag the governing doc's section 1. The card is `--card`, else the file the
+kickoff checker's `--card --path` prints for CLAUDE_CODE_SESSION_ID, so the card's location stays
+that checker's rule. A required key resolving to nothing, an empty value or a placeholder refuses
+and writes nothing; an optional one is named on the `Not supplied` line. A relative path
+given to `--card`, `--out`, an `--input` or `check` is read from the repository root.
 
 Exit 0 on success, 1 on a refusal naming its key, file, role or missing waiver row, 2 on usage or an unarmed
 environment: no repository, no MEMORY_ROOT, no CHARTER (`roster` needs no CHARTER). `agents` exits 1
@@ -151,7 +152,8 @@ def extract_label_unit(label):
 
 def extract_card_section(text, heading):
     """The lines under the card's LAST `## <heading>`, up to the next `## ` heading or READY line,
-    verbatim with blank edges trimmed; None when the card has no such heading."""
+    verbatim with blank edges trimmed; None when the card has no such heading. It also reads a
+    brief record's `## The prompt` (TOOL-dPavedRoad-3)."""
     found = cur = None
     for line in text.split("\n"):
         if line.rstrip() == "## " + heading:
@@ -373,7 +375,11 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         brief_text = lib.load_text(brief) if brief else ""
         for k in reads:
             if k.startswith("brief:") and brief:
-                section = extract_brief_section(brief_text, k.rstrip("?")[6:])
+                # TOOL-dPavedRoad-3: the owner's words are the record's own `## The prompt` section,
+                # read as a card section is; every other brief key is a sub-head of `## The brief`.
+                field = k.rstrip("?")[6:]
+                section = (extract_card_section(brief_text, "The prompt") if field == "prompt"
+                           else extract_brief_section(brief_text, field))
                 if section is not None:
                     values[k.rstrip("?")] = section
     sources = {"task": ("card", card), "card": ("card", card), "brief": ("brief record", brief),

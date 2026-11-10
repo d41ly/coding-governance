@@ -21,7 +21,9 @@ reference; this page is the short version.
    Protocols and Facts sections whole.
 3. **The handoff renderer joins them.** `handoff.py render` writes one prompt file under the build's
    `prompts/` folder, with `## Role` and then `## Task`, filled from the card, the build's brief and
-   any `--input` values. A required input that is missing or still a placeholder refuses by name.
+   any `--input` values. A spec writer's task also carries the brief's `## The prompt`, the owner's
+   own words, as its `brief:prompt` block. A required input that is missing or still a placeholder
+   refuses by name.
 4. **The agent runs as a native type.** Each role is rendered into `.claude/agents/gov-<role>.md`,
    which starts without the full charter and at the reasoning effort the policy file sets. It
    carries the section 1 rules its role cites and the charter's Protocols and Facts sections.

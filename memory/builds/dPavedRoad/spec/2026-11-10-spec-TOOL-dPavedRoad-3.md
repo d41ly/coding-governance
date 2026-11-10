@@ -1,6 +1,6 @@
 # TOOL-dPavedRoad-3 — the handoff carries the brief's prompt as a `brief:prompt` block
 
-**Status:** SPECCED · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 3
+**Status:** CLOSED · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 

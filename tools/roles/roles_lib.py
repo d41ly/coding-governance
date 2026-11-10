@@ -36,7 +36,7 @@ FRONT_MATTER_KEYS = tuple("name description tools model maxTurns "
 READ_KEYS = frozenset(
     ["task:" + f for f in ("title", "goal", "in", "out", "todo", "reuse", "acceptance", "gates")]
     + ["card:" + f for f in ("route", "records", "classes", "read", "open", "reuse")]
-    + ["brief:" + f for f in ("goal", "items", "acceptance", "gates", "non-goals")]
+    + ["brief:" + f for f in ("prompt", "goal", "items", "acceptance", "gates", "non-goals")]
     + ["input:" + f for f in ("spec", "diff", "question", "prompt")])
 
 #: The reasoning-effort levels a role or a stage may take (TOOL-aOrientedCast-10). Read from Claude

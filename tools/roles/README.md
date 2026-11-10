@@ -45,9 +45,10 @@ renders it under `## Role`, then `## Task`: one block per key of the role's `rea
 order, then, as its last block, the role's charter blocks (described under "The agent types"),
 whose library notes print on stderr as `handoff: note — `. A `task:` key is read from the session card's `## task`
 field by the kickoff checker's field grammar, a `card:` key from that card's section, a `brief:` key
-from the build's brief record, and an `input:` key from `--input`. A required key that resolves to
-nothing, an empty value or a placeholder refuses by name and writes nothing; an optional one is named
-on the task block's `Not supplied` line.
+from the build's brief record, `brief:prompt` from its `## The prompt` section and every other one
+from its `### <sub-head>` under `## The brief`, and an `input:` key from `--input`. A required key
+that resolves to nothing, an empty value or a placeholder refuses by name and writes nothing; an
+optional one is named on the task block's `Not supplied` line.
 
 The card is `--card`, else the file the kickoff checker's `--card --path` prints for
 `CLAUDE_CODE_SESSION_ID`, so the card's location stays that checker's rule. The brief record is
@@ -379,7 +380,7 @@ else; the check compares the two on every run.
 | `gov-session` | handoff | none | input:question, brief:goal?, task:todo?, card:route? | ids, memory | false | nothing to the sender; the receiving session acts on the task block and reports in its own session |
 | `gov-skeptic` | closing-review | none | input:diff?, input:spec? | verify, class, risk | true | a verdict per finding, confirmed or refuted, with the reason observed and, for a confirmed one, its severity |
 | `gov-spec-reviewer` | spec-review | none | input:spec, brief:goal?, brief:non-goals? | spec?, verify, gate, class, docs, security, risk | true | concrete findings, each with the spec and section, the evidence probed, the consequence and a proposed fix |
-| `gov-spec-writer` | spec-write | spec | brief:goal, brief:items, brief:acceptance, brief:gates, brief:non-goals, input:spec?, task:reuse?, card:route? | yagni, reuse, core, contract, derive, one-fact, spec?, verify, gate, class, small, docs, security | true | the units authored, already present and refused, each by its unit id, with the reason for every refusal |
+| `gov-spec-writer` | spec-write | spec | brief:prompt, brief:goal, brief:items, brief:acceptance, brief:gates, brief:non-goals, input:spec?, task:reuse?, card:route? | yagni, reuse, core, contract, derive, one-fact, spec?, verify, gate, class, small, docs, security | true | the units authored, already present and refused, each by its unit id, with the reason for every refusal |
 | `gov-synthesizer` | closing-review | review | input:diff?, input:spec? | left-shift, risk, signal | true | the report's path and the items it adjudicated, each with its severity and the ids of the findings it covers |
 
 <!-- /gen:roles-catalogue -->

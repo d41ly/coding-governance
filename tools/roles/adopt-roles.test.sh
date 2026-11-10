@@ -78,8 +78,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # floor by the SKIP that announces the arm unrun, so a skip still cannot red it.
 # +2 for arm 13 (TOOL-dRedressedBar-6). +3 for arm 14 (TOOL-dRenderedAnchor-2). +1 for arm 14, +3
 # for arm 15 and +2 for arm 16 (TOOL-dRenderedAnchor-3). +1 for arm 17 (TOOL-dRenderedAnchor-4).
-# +1 for arm 18 (TOOL-dFoldedAudit-15).
-FLOOR_ASSERTIONS=51
+# +1 for arm 18 (TOOL-dFoldedAudit-15). +2 for arm 19 (TOOL-dPavedRoad-3).
+FLOOR_ASSERTIONS=53
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 FX=""; FXK="$KREL"
@@ -727,6 +727,42 @@ _v18=$(! grep -qF 'the one driver verb used' "$SK17" \
    && grep -qF 'so this run is ATTENDED: the driver verbs used are' "$SK17" \
    && grep -qF -- 'plus `--record-round` and `--chain-verdict` where a' "$SK17" && echo 1 || echo 0)
 check_arm "arm 18 the render's ATTENDED bullet names the chain's two verbs" "$_v18"
+
+# ---- arm 19 (TOOL-dPavedRoad-3 AC2): the spec writer's handoff carries the brief's `## The prompt`
+# ---- as its `brief:prompt` block, and an empty prompt refuses that key by name. The keys are the
+# ---- fixture kit's gov-spec-writer reads filtered to the `brief:` family, so the shipped role is
+# ---- what is proved; `task:` needs the kickoff checker, which a roles-kit fixture does not hold.
+# ---- The failing case, observed at the close and not by the pass that wrote this: the dispatch
+# ---- reverted so `brief:prompt` reads a `### prompt` sub-head, which renders no block and passes
+# ---- the empty one.
+build_fixture; _rc19=$?
+A19=$("$PY" -B -c 'import pathlib, sys
+fx, kit = pathlib.Path(sys.argv[1]).resolve(), pathlib.Path(sys.argv[2]).resolve()
+sys.path.insert(0, str(kit))
+import handoff, roles_lib as lib
+reads = lib.load_roles(handoff.KIT_DIR)["gov-spec-writer"]["keys"]["reads"].split(", ")
+keys = {"reads": ", ".join(k for k in reads if k.startswith("brief:"))}
+brief = fx / sys.argv[3] / "builds" / "bx" / "prompts" / "2026-11-10-prompt-TOOL-bx-1-brief.md"
+brief.parent.mkdir(parents=True, exist_ok=True)
+heads = ("Goal", "Items", "Acceptance", "Gates", "Non-goals")
+body = "".join("### %s\n\n%s text\n\n" % (h, h) for h in heads)
+lines = "> owner words, verbatim\n— owner, 2026-11-10\n"
+for prompt in (lines, ""):
+    text = "# Brief\n\n## The prompt\n\n%s\n## The brief\n\n%s" % (prompt, body)
+    brief.write_text(text, encoding="utf-8")
+    try:
+        task = handoff.render_handoff(fx, sys.argv[3], lib.resolve_charter_path(fx),
+                                      "gov-spec-writer", keys, "bx", "TOOL-bx-1", None, {}, None)[2]
+        print("rendered %d" % ("### brief:prompt\n\n" + lines + "\n### brief:goal\n" in task))
+    except lib.RolesError as e:
+        print("refused %d" % str(e).split("\n")[0].startswith("brief:prompt — "))
+' "$FX" "$FX/$KREL" "$MR" 2>&1)
+A19=${A19//$'\r'/}
+check_arm "arm 19 the spec writer's handoff carries the brief's prompt verbatim" \
+   "$([ "$_rc19" = 0 ] && [ "${A19%%$'\n'*}" = 'rendered 1' ] && echo 1 || echo 0)"
+check_arm "arm 19 an empty prompt refuses by name" \
+   "$([ "${A19#*$'\n'}" = 'refused 1' ] && echo 1 || echo 0)"
+[ "$A19" = $'rendered 1\nrefused 1' ] || printf '    %s\n' "${A19//$'\n'/$'\n'    }"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
