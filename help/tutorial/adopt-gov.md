@@ -14,7 +14,7 @@ command, and `GOV` set in your shell to the path of your gov checkout.
 guess an answer, and names each one it is missing.
 
 ```bash
-python "$GOV/tools/govkit/govkit.py" intake --target . --kits playbook,playbook-render,memory-tree,policy,agent-instructions --answer playbook_path=AGENTS.md
+python "$GOV/tools/govkit/govkit.py" intake --target . --kits playbook,playbook-render,memory-tree,policy
 ```
 
 The charter's render asks for values no probe can derive in an empty repository: what the product is, how

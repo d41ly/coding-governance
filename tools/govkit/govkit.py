@@ -271,6 +271,29 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
+# The kit succession (PLAY-dOrderedCharter-31 S10), INLINED byte-identically from the canonical copy named on
+# its marker line and gated by the resolve-python self-test. `resolve_selection` reads a target's `kits`
+# through it, as the playbook renderer's kit readers do with their own copy.
+# >>> retired_kits — canonical copy: retired_kits.py in gov's lib dir (byte-identical; gated)
+def resolve_retired_kits(kits, entries, retired):
+    """<kits> with each id that is not in <entries> and that a row of <retired> names replaced by the
+    row's successor, or dropped where the successor is "none", in first-seen order with no id twice.
+    An id no entry and no row names comes back as it was, for its caller's own refusal."""
+    succ = {}
+    for n, row in enumerate(retired or [], 1):
+        rid, to = (row.get("id"), row.get("successor")) if isinstance(row, dict) else (None, None)
+        if not (isinstance(rid, str) and rid and isinstance(to, str) and to):
+            raise ValueError(f"[[retired]] row {n} needs a non-empty string id and successor")
+        succ[rid] = to
+    out = []
+    for k in kits:
+        k = k if k in entries else succ.get(k, k)
+        if k != "none" and k not in out:
+            out.append(k)
+    return out
+# <<< retired_kits
+
+
 def read_policy_value(key: str, root: pathlib.Path | str, rev: str | None = None) -> tuple:
     """-> (value, source, reason) for policy key `key` in the repository at `root`, as the policy
     kit's `policy.py get` answers it: the committed policy at the landed revision, or at `rev` when
@@ -1137,6 +1160,12 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
     mean "what this target declared" rather than "gov's registry default". Every caller that HAS a
     target descriptor passes it; `intake` does not, because it is the verb that writes that file and
     has none to read (TOOL-aScouredKit-13).
+
+    In the two branches that read a target-authored list, `--kits` and the target's `kits`, an id that
+    is no entry and that a `[[retired]]` row of `reg` names reads as its successor, or leaves the list
+    where the successor is `none`, through the shared `resolve_retired_kits`, so a target selecting a
+    kit that left still installs (PLAY-dOrderedCharter-31 S10). An id no entry and no row names is
+    refused as before, and a malformed row is a refusal.
     """
     # TOOL-aScouredKit-13, corrected twice by this build's own closing review. The shape guard sits
     # HERE, above the branch split, because BOTH branches consume a target-authored list: `cmd_adopt`
@@ -1169,6 +1198,10 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
         return derive_install_order(all_kits(descs), descs)
     if mode == "kits":
         kits = _check_kits_shape(kits, "the kit selection")
+        try:
+            kits = resolve_retired_kits(kits, descs, reg.get("retired"))
+        except ValueError as e:
+            raise Refusal(f"the registry's succession is malformed: {e}") from None
         unknown = [k for k in kits if k not in descs]
         if unknown:
             raise Refusal(
@@ -1183,6 +1216,10 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
     # the broken one, and `plan` previewed the same wrong set so nothing warned first.
     declared = _check_kits_shape((deploy or {}).get("kits"), "the target's deploy.toml `kits`")
     if declared:
+        try:
+            declared = resolve_retired_kits(declared, descs, reg.get("retired"))
+        except ValueError as e:
+            raise Refusal(f"the registry's succession is malformed: {e}") from None
         unknown = [k for k in declared if k not in descs]
         if unknown:
             raise Refusal(
@@ -2301,6 +2338,10 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     for k in default_kits(reg):
         if k not in descs:
             r.fail(f"the default set names '{k}', which is not a registry entry")
+    # PLAY-dOrderedCharter-31 S11: the default set is closed under `requires`, read through the one
+    # predicate `plan` and `apply` share with no receipt, so a default install never meets an UNMET line.
+    for eid, dep in derive_unsatisfied_requires([k for k in default_kits(reg) if k in descs], descs, None):
+        r.fail(f"the default set holds '{eid}', which requires '{dep}', and does not hold '{dep}'")
     unreachable = [e for e in descs if e not in derived_all
                    and descs[e][0].get("selectable") != "conditional"]
     for e in unreachable:
@@ -8999,8 +9040,11 @@ def derive_rename_map(root: pathlib.Path, base_commit: str | None, to_commit: st
 def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit: str,
                  index: dict[str, tuple[str, str]],
                  needles: dict[str, str] | None = None,
-                 rename=None) -> dict:
+                 rename=None, *, gov_absent: bool = False) -> dict:
     """One receipt row's verdict, from three identities. TWO of them are git blob OIDs.
+
+    `gov_absent` reads gov's side absent whatever gov holds at the row's `source`: a `seed` row whose kit
+    no longer lands its destination (PLAY-dOrderedCharter-31 S9), so the grid gives it the retired verdicts.
 
     OURS is the blob the TARGET's index holds, compared to the row's STORED `gov_oid` — the blob gov
     shipped at this row's `commit`. Not to `sha256`, and not to the target's WORKTREE: `sha256` is a
@@ -9035,7 +9079,7 @@ def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit:
     three are `None` on every other verdict.
     """
     src, base_commit = row.get("source"), row.get("commit")
-    theirs = blob_at(root, to_commit, src) if src else None
+    theirs = None if gov_absent else (blob_at(root, to_commit, src) if src else None)
     base = blob_at(root, base_commit, src) if (src and base_commit) else None
     entry = index.get(row["path"])
     ours_oid = entry[1] if entry else None
@@ -10389,7 +10433,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             print(f"  {'unattributed':<18} [{role:<13}] {row['path']}")
             continue
 
-        c = classify_row(root, target, row, to_commit, index0, needles, resolve_renamed)
+        # PLAY-dOrderedCharter-31 S9. A `seed` row whose kit is still an entry and whose destination the
+        # role re-resolution above finds no rule for is read with gov's side absent, so an edited copy
+        # reads `retired-edited` and an unedited one `withdrawn`, as TOOL-dSafePassage-9 rules for a
+        # retired seed row, while gov still ships the bytes at its `source` for another kit. What it does
+        # not see: a seed row whose recorded path an answer has since moved also finds no rule.
+        seed_gone = role == "seed" and row.get("kit") in descs and now is None
+        c = classify_row(root, target, row, to_commit, index0, needles, resolve_renamed, gov_absent=seed_gone)
 
         # DEPL-aRepatriatedFork-17 S4. LONE-CR LOSS IS A FINDING. Counted against gov's blob at the
         # row's own `commit`, on the target's worktree copy. Not a ROW line: this is a second line

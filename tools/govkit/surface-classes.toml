@@ -90,3 +90,9 @@ reader = "{prefix}/playbook/render_playbook.py:read_unit_usage_members"
 plant = "{prefix}/playbook/render_playbook.py:write_unit_usage_plant"
 summary = "each gov instruction unit carrying a usage, by its tag, the units help/reference/units.md documents"
 witness = "{prefix}/playbook/pins.py:read_change_successors"
+
+[[class]]
+id = "module-export"
+reader = "{prefix}/codebase-map/map_lib.py:read_module_export_members"
+plant = "{prefix}/codebase-map/map_lib.py:write_module_export_plant"
+summary = "each name map_lib re-exports from the join factory, held for install.deprecation-window (PLAY-dOrderedCharter-31)"

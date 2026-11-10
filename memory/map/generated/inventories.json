@@ -6,8 +6,6 @@
       "agent-cap restatement",
       "agent-cap restatement self-test",
       "agent-cap self-test",
-      "agent-instructions self-test",
-      "agent-instructions wiring",
       "backlog migration selftest",
       "branch-guard self-test",
       "branch-reconcile selftest",
@@ -176,7 +174,6 @@
       "writing practice (records and units)"
     ],
     "kits": [
-      "agent-instructions",
       "branch-reconcile",
       "codebase-map",
       "drift-audit",

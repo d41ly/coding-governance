@@ -36,7 +36,6 @@ conf:.unattended.conf#LANDER	undocumented when the docs leg landed
 conf:.unattended.conf#MEMORY_ROOT	undocumented when the docs leg landed
 conf:.unattended.conf#WIRING_CHECK	undocumented when the docs leg landed
 entry:agent-cap	undocumented when the docs leg landed
-entry:agent-instructions	undocumented when the docs leg landed
 entry:branch-reconcile	undocumented when the docs leg landed
 entry:check-agent-cap-restatement	undocumented when the docs leg landed
 entry:check-install-prefix	undocumented when the docs leg landed

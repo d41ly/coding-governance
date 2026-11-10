@@ -358,12 +358,12 @@ installed = "{prefix}/memory-tree/corpus_ids.py"
 name = "codex-instructions"
 class = "consumer"
 unit = "bytes"
-enforcer = "{prefix}/agent-instructions/adopt-agent-instructions.sh"
-home = "constant:{prefix}/agent-instructions/adopt-agent-instructions.sh:CODEX_MAX"
+enforcer = "{prefix}/playbook/render_playbook.py"
+home = "constant:{prefix}/playbook/render_playbook.py:CODEX_MAX"
 family = false
 research = 23
-kit = "agent-instructions"
-installed = "{prefix}/agent-instructions/adopt-agent-instructions.sh"
+kit = "playbook-render"
+installed = "{prefix}/playbook/render_playbook.py"
 
 [[cap]]
 name = "runlog-record"

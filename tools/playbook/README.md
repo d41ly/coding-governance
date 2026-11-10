@@ -14,9 +14,9 @@ python <prefix>/playbook/render_playbook.py --check-render [--scope <charter|ent
 
 `render_playbook.py` writes two scopes and compares three, `--target` defaulting to this kit's repository.
 `charter` is the region below, and `--check` is its compare. `entry-files` is `CLAUDE.md` and every other
-harness alias, the pointer or copy `adopt-agent-instructions.sh` used to write itself: that adopter now calls
-this scope with its `--aliases`, `--mode` and `--force`, and with no `--aliases` the scope wires the ones
-`renderers.toml` assigns it. `claims`, compare only, runs `check-playbook-parity.sh`'s arms until the charter's
+harness alias, the pointer or copy the retired agent-instructions kit's adopter used to write itself: the scope
+takes `--aliases`, `--mode` and `--force`, and with no `--aliases` it wires the ones `renderers.toml` assigns
+it. `claims`, compare only, runs `check-playbook-parity.sh`'s arms until the charter's
 stated values render from sourced fact units. Every write records the target's row in
 `.governance/instructions.lock`. The agent files are not a scope: `render_agents.py` keeps them.
 
@@ -102,16 +102,17 @@ that answers wrongly can be corrected without forking the descriptor. The render
 beside what the probe would have derived, and says when the two are equal. That is a note, never a
 failure.
 
-## `playbook_path` has two modes
+## `playbook_path` is retired
 
-With `playbook-render` selected, the render reads the template this kit ships beside its engine, at
+The render reads the template this kit ships beside its engine, at
 `<prefix>/playbook/coding-governance-agents.template.md` in an install and at gov's root in gov, and
 writes the charter named by `--charter` (default `AGENTS.md`). The two may not be one file. The copy at
 `playbook_path` is no input of the render: an answer naming it prints one `retired` note, and nothing
-of its bytes reaches the charter (PLAY-dOrderedCharter-34). Without `playbook-render`, `playbook_path`
-is the copied charter itself, and the `playbook-placeholders` hole probes it for a surviving `{{`. In
-render mode that hole stands down, because the template always carries placeholders and `--check`
-already reports one that survives.
+of its bytes reaches the charter (PLAY-dOrderedCharter-34). The `playbook` entry no longer seeds that
+copy (PLAY-dOrderedCharter-31): its seed rule and the placeholder hole that probed the copy left
+together, the registry's `[[retired]]` row `playbook/seeded-template` names the copy, and `update` keeps
+an adopter's, reading it `retired-edited` if edited and `withdrawn` if not. `--check` reports a
+placeholder that survives the render.
 
 ## The `[charter]` table
 

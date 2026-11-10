@@ -2240,27 +2240,6 @@ def arm_practices_reach(c):
             rc == 1 and any(reach in ln for ln in lines), " | ".join(lines))
 
 
-def arm_no_renderer(c):
-    from policy_value import resolve_kit_dir
-    from render_playbook import resolve_bash
-    name = "adopt-agent-instructions.sh"
-    try:
-        kit = resolve_kit_dir("agent-instructions", name, KIT_DIR)
-    except LookupError as exc:
-        c.check("the agent-instructions kit is present: this case needs it", False, str(exc))
-        return
-    script = c.top / derive_kit_prefix() / kit.name / name
-    script.parent.mkdir(parents=True)
-    shutil.copyfile(kit / name, script)
-    c.write_file("src.md", "# Rules\n")
-    bash = resolve_bash(script)
-    c.check("a bash sees the adopter", bash is not None)
-    rc, said = run_tool([bash or "bash", script.as_posix(), "--source", "src.md"], c.top)
-    c.check("the adopter exits 2 naming playbook-render", rc == 2 and "playbook-render" in said, said)
-    written = [p for p in ("AGENTS.md", "CLAUDE.md", ".gemini", LOCK) if (c.top / p).exists()]
-    c.check("it writes no target", not written, str(written))
-
-
 def arm_git_env(c):
     """PLAY-dOrderedCharter-69 S4: the `statements` plant run as a child under an exported `GIT_DIR` naming a
     linked worktree of this scratch repository acts on its own scratch, never on the repository it names."""
@@ -2661,7 +2640,7 @@ PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority, "state
           "two-kits": arm_two_kits,
           "unreadable": arm_unreadable, "arms": arm_arms, "render": arm_render, "extractor": arm_extractor,
           "schema": arm_schema, "one-fact": arm_one_fact, "status": arm_status, "renderers": arm_renderers,
-          "work-order": arm_work_order, "slots": arm_slots, "legacy": arm_legacy, "no-renderer": arm_no_renderer,
+          "work-order": arm_work_order, "slots": arm_slots, "legacy": arm_legacy,
           "git-env": arm_git_env, "cmd-source": arm_cmd_source, "envelope-missing": arm_envelope_missing,
           "envelope-level": arm_envelope_level, "envelope-unclosed": arm_envelope_unclosed,
           "envelope-foreign-closer": arm_envelope_foreign_closer, "envelope-second-charter": arm_envelope_second_charter,

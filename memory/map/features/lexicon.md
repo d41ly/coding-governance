@@ -134,8 +134,8 @@ shipped playbook file IS the un-instantiated template and carries placeholders p
 design, so a bare leg asserting "no placeholder survives" would red on its own landing commit. The
 bare mode therefore grades the version MARKER — present, and exactly one — while the survival
 predicate lives in `--check <a> <b>` and runs only over fixtures. The render-side owner of survival
-already exists and stays where it is: `tools/govkit/entries/playbook.kit.toml`'s
-`playbook-placeholders` hole.
+is the renderer's own `--check`; the `playbook` entry's placeholder hole left with the seeded copy it
+probed (PLAY-dOrderedCharter-31).
 
 **ONE file carries the `governance-template` marker, so there is no marker LOCKSTEP**: a comparison
 over a population of one is not a comparison. The gate derives the carrier count instead of

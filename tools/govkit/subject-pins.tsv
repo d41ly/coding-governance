@@ -13,8 +13,6 @@
 agent-cap restatement	repo	product
 agent-cap restatement self-test	kit	selftests
 agent-cap self-test	kit	selftests
-agent-instructions self-test	kit	selftests
-agent-instructions wiring	repo	wiring
 backlog migration selftest	kit	selftests
 branch-guard self-test	repo	selftests
 branch-reconcile selftest	kit	selftests

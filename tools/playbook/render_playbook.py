@@ -198,6 +198,29 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
+# The kit succession (PLAY-dOrderedCharter-31 S10), INLINED byte-identically from the canonical copy named on
+# its marker line and gated by the resolve-python self-test: `read_kits` and `read_drive_rows` read a target's
+# `kits` through it, as govkit's selection resolver does with its own copy.
+# >>> retired_kits — canonical copy: retired_kits.py in gov's lib dir (byte-identical; gated)
+def resolve_retired_kits(kits, entries, retired):
+    """<kits> with each id that is not in <entries> and that a row of <retired> names replaced by the
+    row's successor, or dropped where the successor is "none", in first-seen order with no id twice.
+    An id no entry and no row names comes back as it was, for its caller's own refusal."""
+    succ = {}
+    for n, row in enumerate(retired or [], 1):
+        rid, to = (row.get("id"), row.get("successor")) if isinstance(row, dict) else (None, None)
+        if not (isinstance(rid, str) and rid and isinstance(to, str) and to):
+            raise ValueError(f"[[retired]] row {n} needs a non-empty string id and successor")
+        succ[rid] = to
+    out = []
+    for k in kits:
+        k = k if k in entries else succ.get(k, k)
+        if k != "none" and k not in out:
+            out.append(k)
+    return out
+# <<< retired_kits
+
+
 # >>> render_envelope — canonical copy: envelope.py in the gov lib dir (byte-identical; gated)
 def render_envelope(doc, level, direction, body):
     """`body` between the opener and the closer naming `doc`; an empty body renders the two lines alone."""
@@ -245,6 +268,10 @@ WIDENING = 'widening'
 ONE_LINE_OPEN = '<!-- one-line -->'
 ONE_LINE_CLOSE = '<!-- /one-line -->'
 ONE_LINE_MAX = 200
+# Codex's default project_doc_max_bytes (32 KiB): a file of exactly this size is read whole. The census row
+# `codex-instructions` homes it here since PLAY-dOrderedCharter-31 retired the agent-instructions kit, whose
+# wiring this engine absorbed; the load-set budget and the template-size check read it through that row.
+CODEX_MAX = 32768
 # govkit's TOKEN_RX, spelled again because this engine ships without govkit. `{relpath}` and the
 # seeded three are govkit-derived, so they are never an operator's key.
 ARGV_TOKEN_RE = re.compile(r'(?<!\$)\{([a-z_]+)\}')
@@ -1040,11 +1067,13 @@ def resolve_template_path(gov_root: Path, target: Path) -> Path:
     return hit
 
 
-def load_declarations(desc_path: Path, reg_path: Path) -> tuple[dict, list[dict], set[str]]:
+def load_declarations(desc_path: Path, reg_path: Path) -> tuple[dict, list[dict], set[str], list]:
+    """The descriptor, its blocks, the registry's entry ids and its raw `[[retired]]` table, which
+    `read_kits` reads a retired id in `kits` through (PLAY-dOrderedCharter-31 S10)."""
     desc = tomllib.loads(read_input(desc_path, "the playbook entry's descriptor"))
     reg = tomllib.loads(read_input(reg_path, 'the govkit registry'))
     entries = {e['id'] for e in reg.get('entry', [])}
-    return desc, desc.get('block', []), entries
+    return desc, desc.get('block', []), entries, reg.get('retired') or []
 
 
 def read_argv_tokens(desc: dict) -> set[str]:
@@ -1167,9 +1196,14 @@ def read_deploy(target: Path) -> tuple[Path, dict, dict]:
     return dep, cfg, {k.lower(): v for k, v in (cfg.get('answers') or {}).items()}
 
 
-def read_kits(dep: Path, cfg: dict, entries: set[str]) -> set[str]:
-    """The `kits` selection, graded against the registry it is drawn from."""
-    kits = set(cfg.get('kits') or [])
+def read_kits(dep: Path, cfg: dict, entries: set[str], retired: list) -> set[str]:
+    """The `kits` selection, graded against the registry it is drawn from. An id that left the registry
+    with a `[[retired]]` row reads as its successor, or leaves the set where that is `none`, through the
+    shared `resolve_retired_kits` (PLAY-dOrderedCharter-31 S10), so a target still naming it renders."""
+    try:
+        kits = set(resolve_retired_kits(cfg.get('kits') or [], entries, retired))
+    except ValueError as e:
+        raise Refusal(f'the govkit registry: {e}') from None
     # THE `kits` ARRAY IS GRADED, and it was not. A member is a registry entry id — that is the
     # population it is drawn from — and an unrecognised one selects nothing, so the whole kit section
     # it was meant to keep is DROPPED and `--check` re-renders from the same file and stays green
@@ -1204,7 +1238,7 @@ def resolve_answers(engine_dir: Path, gov_root: Path, target: Path,
     rev-3 (the closing review's C6): every key compares case-insensitively, as `[answers]` and
     `[charter]` already do here, so one question never has two answers selected by spelling.
     """
-    desc, _blocks, entries = load_declarations(*resolve_declaration_paths(engine_dir, gov_root))
+    desc, _blocks, entries, retired = load_declarations(*resolve_declaration_paths(engine_dir, gov_root))
     dep, cfg, answers = read_deploy(target)
     rows = desc.get('placeholder', [])
     by_key = {r['key'].upper(): r for r in rows}
@@ -1219,7 +1253,7 @@ def resolve_answers(engine_dir: Path, gov_root: Path, target: Path,
                                                  engine_dir)[0]
             continue
         if low == 'kits':
-            out[key] = sorted(read_kits(dep, cfg, entries))
+            out[key] = sorted(read_kits(dep, cfg, entries, retired))
             continue
         if low.startswith('kit.') and low.count('.') >= 2:
             eid, sub = low[len('kit.'):].rsplit('.', 1)
@@ -1574,9 +1608,14 @@ def read_workflows(engine_dir: Path) -> list[dict]:
 def read_drive_rows(engine_dir: Path, kits: list[str]) -> list[dict]:
     """Every `[[drive]]` row of the selected `kits`, each with its `kit` and its 1-based `row` there, in render order: `start` rows
     first, then by the stage integer of the workflow the row names, then kit order and row order. A stage
-    no workflow names sorts last. A selected kit whose descriptor no place holds refuses, naming the kit."""
+    no workflow names sorts last. A selected kit whose descriptor no place holds refuses, naming the kit. A kit id
+    that left the registry with a `[[retired]]` row reads as its successor (PLAY-dOrderedCharter-31 S10)."""
     reg = tomllib.loads(read_input(resolve_declaration_paths(engine_dir, engine_dir)[1], 'the govkit registry'))
     spelled = {e.get('id'): e.get('descriptor', '') for e in reg.get('entry', [])}
+    try:
+        kits = resolve_retired_kits(kits, spelled, reg.get('retired'))
+    except ValueError as e:
+        raise Refusal(f'the govkit registry: {e}') from None
     rows = []
     for kit in kits:
         path = resolve_kit_descriptor(engine_dir, spelled.get(kit, ''))
@@ -1608,11 +1647,11 @@ def remove_drive_section(text: str) -> str:
 def render(engine_dir: Path, gov_root: Path, target: Path,
            charter_path: Path | None = None, slots: list | None = None,
            overlay_from: Path | None = None, parts: dict | None = None) -> tuple[str, list[str]]:
-    desc, blocks, entries = load_declarations(*resolve_declaration_paths(engine_dir, gov_root))
+    desc, blocks, entries, retired = load_declarations(*resolve_declaration_paths(engine_dir, gov_root))
     dep, cfg, answers = read_deploy(target)
     rows = desc.get('placeholder', [])
     charter = read_charter_table(cfg, rows, read_argv_tokens(desc))
-    kits = read_kits(dep, cfg, entries)
+    kits = read_kits(dep, cfg, entries, retired)
     drop_names = list(cfg.get('drop_blocks') or [])
 
     declared_blocks = {b['name'] for b in blocks}
@@ -2343,6 +2382,39 @@ def run_selftest() -> int:
     arm('the misspelling does NOT reach the render', '["codebasemap"]', ok_var, 'codebasemap')
     arm('an empty kits array is a refusal, not a charter with every block dropped',
         '[]', ok_var, 'declares no `kits`')
+
+    # PLAY-dOrderedCharter-31 S10: a kit id a `[[retired]]` row names, read through the shared succession reader,
+    # is its successor in `read_kits` and in `read_drive_rows`; with the row taken out each refuses naming the id.
+    for with_row in (True, False):
+        with tempfile.TemporaryDirectory() as td:
+            eng = Path(td) / 'engine'
+            eng.mkdir()
+            (eng / 'playbook.kit.toml').write_text(DESC_FIXTURE, encoding='utf-8')
+            (eng / 'registry.toml').write_text(
+                '[[entry]]\nid = "codebase-map"\ndescriptor = "{prefix}/x/codebase-map.kit.toml"\n\n'
+                + ('[[retired]]\nid = "old-kit"\nsuccessor = "codebase-map"\nsurfaces = []\n' if with_row else ''),
+                encoding='utf-8')
+            (eng / 'codebase-map.kit.toml').write_text(
+                '[[drive]]\nstage = "start"\nrole = "main"\nwhen = "w"\ncommand = "c"\n', encoding='utf-8')
+            _d, _b, rk_entries, rk_retired = load_declarations(*resolve_declaration_paths(eng, Path(td)))
+            rk_got = []
+            for rk_read in (lambda: sorted(read_kits(eng / 'deploy.toml', {'kits': ['old-kit']}, rk_entries, rk_retired)),
+                         lambda: sorted({r['kit'] for r in read_drive_rows(eng, ['old-kit'])})):
+                try:
+                    rk_got.append(rk_read())
+                except Refusal as e:
+                    rk_got.append(str(e))
+        if with_row:
+            rk_ok = rk_got == [['codebase-map'], ['codebase-map']]
+            rk_what = 'a retired kit id reads as its successor in read_kits and read_drive_rows'
+        else:
+            rk_ok = all(isinstance(g, str) and 'old-kit' in g for g in rk_got)
+            rk_what = 'with no [[retired]] row read_kits and read_drive_rows refuse naming the id'
+        if rk_ok:
+            passed += 1
+        else:
+            failed += 1
+            print(f'  arm FAIL {rk_what} — got {rk_got!r}')
 
     # M2 — substitution into a table row is escaped, and a newline in a cell is refused.
     arm('a pipe in a table-cell answer is escaped, so the row keeps its cells',

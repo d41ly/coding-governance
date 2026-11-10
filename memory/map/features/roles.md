@@ -80,7 +80,7 @@ file stays a valid agent definition. An indented, repeated or unknown key is ref
 drops an indented key without a word, and a repeated one silently keeps the last.
 
 **The governing doc is located by the memory-tree conf's `CHARTER` key, never by following an
-import or assuming a filename.** That declaration already names the file the agent-instructions kit
+import or assuming a filename.** That declaration already names the file the renderer's `entry-files` scope
 makes canonical; an absent key is an unarmed check, exit 2, rather than a guess.
 
 **A harness stage key meets its role in the workflow table's `stages`, not in a renderer.** Deriving

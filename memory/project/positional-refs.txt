@@ -1,5 +1,4 @@
 .memory-tree.conf	skills/session-kickoff/manifest-check.sh:32
-.memory-tree.conf	tools/agent-instructions/adopt-agent-instructions.sh:1
 .memory-tree.conf	tools/check-agent-cap-restatement.sh:2
 .memory-tree.conf	tools/check-dead-paths.sh:6
 .memory-tree.conf	tools/check-hook-destinations.sh:5
@@ -25631,10 +25630,6 @@ memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-53.md	to
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-53.md	tools/memory-tree/tree_lib.py:302
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-53.md	x.py:1
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-53.md	x.py:3
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-54.md	skills/session-kickoff/manifest-check.sh:292
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-54.md	tools/hooks/format-guard.js:496
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-54.md	tools/unattended/lib-unattended.sh:660
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-54.md	tools/unattended/unattended.sh:8625
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	BUILD-METHOD M4
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	memory/map/baseline.toml:14
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	memory/map/baseline.toml:14-15

@@ -372,6 +372,7 @@ common_git_dir|$ROOT/$KIT_REL/common_dir.py|$KIT_REL/common_dir
 render_envelope|$ROOT/$KIT_REL/envelope.py|$KIT_REL/envelope
 envelope_sh|$ROOT/$KIT_REL/envelope.sh|$KIT_REL/envelope
 auto_memory|$ROOT/$KIT_REL/auto_memory.py|$KIT_REL/auto_memory
+retired_kits|$ROOT/$KIT_REL/retired_kits.py|$KIT_REL/retired_kits
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -413,6 +414,9 @@ auto_memory|$ROOT/$KIT_REL/auto_memory.py|$KIT_REL/auto_memory
 # stem by prefix, so the row above would read a block of that name as one of its own copies.
 # auto_memory (PLAY-dOrderedCharter-14 S1) is the harness's auto-memory location, its template and its
 # resolver: drift-audit's dangling-pointer signal and the playbook kit's index measure each carry it inline.
+# retired_kits (PLAY-dOrderedCharter-31 S10) is a target's kit selection read through the registry's
+# `[[retired]]` rows; govkit's selection resolver and the playbook renderer's kit readers each carry it
+# inline, both kits copy-installed, and part 2l below holds the canonical to its behaviour.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
@@ -727,6 +731,24 @@ env_rows=$(cd "$ROOT" && git grep -l "^# >>> render_envelope" -- skills/session-
 [ -z "$env_rows" ] || bad "the render_envelope row counts a copy in the card engine: $env_rows"; ok
 [ "$(cd "$ROOT" && git grep -c "^# >>> envelope_sh" -- skills/session-kickoff/manifest-check.sh | cut -d: -f2)" = 1 ] \
   || bad "the card engine carries no envelope_sh block, so its envelope is graded by no row"; ok
+
+# ---- 2l. THE KIT SUCCESSION, BEHAVIOUR (PLAY-dOrderedCharter-31 S10) --------------------------------
+# Parity holds govkit's and the renderer's copies to the canonical; this holds the canonical to its
+# contract over one selection: a live id kept even where a row names it, a retired id read as its
+# successor, a `none` successor dropped, a repeat collapsed, an unknown id returned as it was; then a
+# row with no `successor` raising, the deny each caller turns into its refusal. WHAT THIS DOES NOT
+# CHECK: either caller's refusal text, which govkit's selftest and the renderer's --selftest assert.
+rk_got=$("$REALPY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); from retired_kits import resolve_retired_kits as r
+rows = [{"id": "live", "successor": "other"}, {"id": "old", "successor": "new"}, {"id": "gone", "successor": "none"}]
+print(" ".join(r(["live", "old", "new", "gone", "old", "stray"], {"live", "new"}, rows)))
+try:
+    r(["old"], set(), [{"id": "old"}])
+    print("no raise")
+except ValueError as e:
+    print("raised:", e)' "$HERE" | tr -d '\r')
+[ "$rk_got" = "live new stray
+raised: [[retired]] row 1 needs a non-empty string id and successor" ] \
+  || bad "the canonical resolve_retired_kits breaks its contract: ${rk_got//$'\n'/ | }"; ok
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver

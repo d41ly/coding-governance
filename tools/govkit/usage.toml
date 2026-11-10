@@ -88,6 +88,11 @@ usage = "synopsis"
 rows = "{prefix}/playbook/render_playbook.py:read_unit_reference_rows"
 why = "a unit carrying a usage is its text and its usage, which its instructions.toml row states; help/reference/units.md renders them"
 
+[[class]]
+class = "module-export"
+usage = "none"
+why = "an import name a module keeps for older callers has no verb, key, hook, leg or page"
+
 [[usage]]
 id = "command:build"
 shape = "verb"

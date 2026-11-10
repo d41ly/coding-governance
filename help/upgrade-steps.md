@@ -401,6 +401,37 @@ python tools/govkit/steps/fanout_cap.py down <repo>     # exit 1 if a file chang
 Then commit the result, `.governance/steps/agent-cap/` included: the before-image there is what the
 down restores from.
 
+## What this release's steps do to your repository
+
+Four moves reach an installed repository through `update`, each named here with what it leaves
+behind.
+
+- **Your adopter rules move into the overlay.** The step `playbook/adopter-rules-to-overlay` turns
+  each `- ` line of `[charter] adopter_rules` in `.governance/deploy.toml` into one level-0 unit of
+  `.governance/instructions.toml`, tagged `repo.rule-<NN>-<words>` in the rules' order and scoped to
+  every reader, then takes the key out of `deploy.toml`, every other byte kept. The rendered charter
+  holds the same rules in the same order before and after. The up refuses, writing nothing, on a key
+  line that is not a `- ` line, a rule the overlay reader refuses, a rule over the one-line budget,
+  or an overlay already holding a level-0 unit whose tag sorts below the converted rules. Its witness
+  holds once the key is gone and each rule is a unit's text; its down puts both files back
+  byte-for-byte. The key stays a key the render reads, so a repository that has not run the step
+  renders as before.
+- **The seeded charter template is retired.** The `playbook` entry no longer copies the template to
+  the path your `playbook_path` answer named: the `playbook-render` kit ships the template beside its
+  engine, and the `[[retired]]` row `playbook/seeded-template` names the old copy. `update` keeps
+  your copy either way: an edited one reads `retired-edited` and gets one order under
+  `.governance/outbox/` (none under `install.retired-edits = keep`), and one you never edited reads
+  `withdrawn`, deleted only under `--write-withdrawals`.
+- **The agent-instructions kit is retired into `playbook-render`.** Its wiring is the renderer's
+  `entry-files` scope. A receipt claiming `agent-instructions` is carried to `playbook-render`, as
+  above, and your `CLAUDE.md` import line is left as it is. Where your `deploy.toml` `kits` (or a
+  `--kits` list) still names `agent-instructions`, `plan`, `apply`, `adopt` and `intake` read it as
+  its successor `playbook-render`, and an id a `[[retired]]` row retires with `none` is dropped from
+  the list; an id that is neither an entry nor retired is still refused.
+- **`playbook-render` joins the default selection**, because the `check-microformats` gate now grades
+  the template it ships. `update` installs it as a default-gained kit, and the receipt claims it
+  from then on.
+
 ## How gov proves a step before you meet it
 
 Before a step reaches your repository, gov walks it over an install of an older vintage. The

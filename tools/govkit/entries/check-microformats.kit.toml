@@ -4,8 +4,9 @@
 # depth-1 paths under <prefix>/, and selfcheck reds on any such path no entry claims.
 #
 # NOT conditional, since TOOL-aHonedRuleset-8. This gate grades a block inside the SHIPPED charter,
-# so it travels WITH the charter: it is in the declared default selection, and `requires = ["playbook"]`
-# below states the dependency rather than gating the entry's reachability. The conditional mark it
+# so it travels WITH the charter: it is in the declared default selection, and `requires =
+# ["playbook-render"]` below states the dependency rather than gating the entry's reachability: that
+# entry lands the template the leg grades (PLAY-dOrderedCharter-31 S5), and it is in the default too. The conditional mark it
 # used to carry made it reachable only by an operator who typed its id, which is a state no runbook
 # or default led anyone to — the gate existed, was declared, and reached nobody for its entire life.
 # A target that does not want it declines the same way it declines any other entry: by naming the
@@ -16,7 +17,7 @@ scope = "repo"
 kind = "flat"
 home = "."
 layer = "layer.flow"
-requires = ["playbook"]
+requires = ["playbook-render"]
 # No constant: this gate versions with the CHARTER whose block it grades, not on its own clock. A
 # second version to keep in step would be a second thing to drift, and the grammar it enforces is
 # stated in that document rather than here.
@@ -30,7 +31,7 @@ to = "{prefix}/{relpath}"
 [adopt]
 argv = []
 mutates_index = false
-why_no_adopter = "a gate needs no adoption step; it reads the charter template wherever the playbook entry put it"
+why_no_adopter = "a gate needs no adoption step; it reads the charter template the playbook-render entry lands beside its engine"
 
 [check]
 none = """
@@ -38,14 +39,14 @@ the gate IS the check. Running it over a target's own charter is what the gate l
 """
 
 # THE SUBJECT IS PASSED, never defaulted, in a target. The gate's own default is gov's repo-root
-# filename, and the `playbook` entry lands the charter at the operator-chosen `{playbook_path}` — so
-# a leg carrying no argument resolved to a path no adopter has and exited 2 on install day
-# (reproduced in a scratch install). `{playbook_path}` is already an intake answer this entry's
-# `requires` guarantees; the plumbing existed and was simply not connected.
+# filename, a path no adopter has, so a leg carrying no argument exited 2 on install day (reproduced
+# in a scratch install). The subject is the template the `playbook-render` entry this one requires
+# lands beside its engine; it was the seeded copy at `{playbook_path}` until PLAY-dOrderedCharter-31
+# retired that copy, and a new adopter no longer holds one.
 [[gate_leg]]
 name = "micro-format definitions"
 subject = "repo"
-argv = ["bash", "{prefix}/check-microformats.sh", "{playbook_path}"]
+argv = ["bash", "{prefix}/check-microformats.sh", "{prefix}/playbook/coding-governance-agents.template.md"]
 
 [[gate_leg]]
 name = "micro-format gate selftest"

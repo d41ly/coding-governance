@@ -37,6 +37,9 @@ globs = [
 # carried-prefix ban as a path assembled from quoted segments.
 default = [
   "playbook",
+  # PLAY-dOrderedCharter-31 S11: the renderer ships the template `check-microformats` grades, so it
+  # ships with every default install.
+  "playbook-render",
   "kickoff-manifest",
   "memory-tree",
   "codebase-map",
@@ -101,10 +104,6 @@ descriptor = "{prefix}/roles/kit.toml"
 [[entry]]
 id = "branch-reconcile"
 descriptor = "{prefix}/branch-reconcile/kit.toml"
-
-[[entry]]
-id = "agent-instructions"
-descriptor = "{prefix}/agent-instructions/kit.toml"
 
 [[entry]]
 id = "unattended"
@@ -192,7 +191,30 @@ kind = "flat"
 # retiring commit is DERIVED from the default branch's first-parent history and never typed. `update`
 # and `check` read these rows through `<prefix>/govkit/upgrade_steps.py`, never here: a claimed kit
 # with a successor is carried to it, one retired to "none" is released and its rows read
-# `withdrawn`. A landed row is frozen. None has retired yet.
+# `withdrawn`. A landed row is frozen. A target's `kits` naming a retired id reads as its successor
+# (PLAY-dOrderedCharter-31 S10).
+
+# PLAY-dOrderedCharter-31 S1: the renderer's `entry-files` scope absorbed the kit's wiring.
+[[retired]]
+id = "agent-instructions"
+successor = "playbook-render"
+surfaces = [
+  "entry:agent-instructions",
+  "file:{prefix}/agent-instructions/README.md",
+  "file:{prefix}/agent-instructions/adopt-agent-instructions.sh",
+  "file:{prefix}/agent-instructions/kit.toml",
+  "installable:{prefix}/agent-instructions/README.md",
+  "installable:{prefix}/agent-instructions/adopt-agent-instructions.sh",
+  "installable:{prefix}/agent-instructions/kit.toml",
+]
+
+# PLAY-dOrderedCharter-31 S5: the `playbook` entry's seed rule, which copied the charter template to
+# `{playbook_path}`. The renderer kit ships the template beside its engine; an adopter's copy reads
+# `retired-edited` or `withdrawn` at `update`.
+[[retired]]
+id = "playbook/seeded-template"
+successor = "none"
+surfaces = ["file:coding-governance-agents.template.md", "installable:{playbook_path}"]
 
 # ------------------------------------------------------------------------------------- exemptions
 # Each carries a non-empty reason. `selfcheck` reds on an exemption whose path no longer exists, so
@@ -544,10 +566,6 @@ name = "foreign-prefix parity (every self-test at three prefixes)"
 why = "it runs `foreign-prefix.gov.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"` beside `run-gates.gov.test.sh`: it moves GOV's whole tool root in a scratch clone and grades gov's own declared self-test population there, so in any other tree it has no population to move. A held leg with a budget row, run once per build (TOOL-aRepatriatedFork-18 section 8 F3, TOOL-aRepatriatedFork-30 S1). NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`."
 
 [[exempt_leg]]
-name = "agent-instructions self-test"
-why = "it runs `adopt-agent-instructions.test.sh`, which `<prefix>/agent-instructions/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
-
-[[exempt_leg]]
 name = "codebase-map kit selftest"
 why = "it runs `selftest.py`, which `<prefix>/codebase-map/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
@@ -757,7 +775,7 @@ why = "it runs `<prefix>/playbook/render_playbook.py --check-render`, the render
 
 [[exempt_leg]]
 name = "instruction units selftest"
-why = "it runs `<prefix>/playbook/instruction_units.py fixture`, every plant of the module's table. `work-order`, `no-renderer` and `legacy` reach the `roles`, `agent-instructions` and `policy` kits, which a `playbook-render` target may not hold, so the LEG is gov's: on gov's bar each kit is present, and a kit not found reds the case, never a skip. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-20."
+why = "it runs `<prefix>/playbook/instruction_units.py fixture`, every plant of the module's table. `work-order` and `legacy` reach the `roles` and `policy` kits, which a `playbook-render` target may not hold, so the LEG is gov's: on gov's bar each kit is present, and a kit not found reds the case, never a skip. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-20."
 
 [[exempt_leg]]
 name = "core selftest"

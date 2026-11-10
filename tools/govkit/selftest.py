@@ -739,41 +739,60 @@ assert "kits = " not in DEPLOY_REGISTRY_DEFAULT, "the kits line must be gone, or
 
 DEPLOY_NO_ANSWERS = f"""gov_source = "local"
 prefix = "{PFX[:-1]}"
-kits = ["playbook"]
+kits = ["kickoff-manifest"]
 """
 
 
 def check_playbook_hole_modes(tmp: pathlib.Path) -> None:
-    """DEPL-aRepatriatedFork-1 AC6, AC7, AC9, S5 — the placeholder hole in both modes, and the
-    `[charter]` table's two govkit halves. Fixture-driven through `check`, asserted on its lines."""
-    base = (f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["playbook"]\n\n'
-            '[answers]\nplaybook_path = "CHARTER.md"\n')
-
+    """DEPL-aRepatriatedFork-1 AC9, S5 — the `[charter]` table's two govkit halves. Fixture-driven
+    through `check`, asserted on its lines. The placeholder hole's two modes left with the seed rule it
+    probed (PLAY-dOrderedCharter-31 S5), so the `[charter]` arm answers `kickoff-manifest`'s
+    `manifest_path`, a token a selected kit's destination names."""
     def run_fixture(name: str, kits: list[str], deploy: str) -> subprocess.CompletedProcess:
         t = build_target(tmp / name, deploy)
-        (t / "CHARTER.md").write_text("{{PROJECT_NAME}}\n", encoding="utf-8", newline="\n")
         (t / ".governance" / "install.json").write_text(
-            json.dumps({"schema": 2, "gov_source": "local", "kits": kits,
-                        "files": [{"path": "CHARTER.md", "role": "seed", "kit": "playbook",
-                                   "written": True}]}, indent=2),
+            json.dumps({"schema": 2, "gov_source": "local", "kits": kits, "files": []}, indent=2),
             encoding="utf-8", newline="\n")
         return run("check", "--target", str(t))
 
-    p = run_fixture("pb-copy", ["playbook"], base)
-    check("[aRF-1 AC7] copy mode: the placeholder hole still probes, and reds on a `{{` line",
-          "hole 'playbook-placeholders' is UNDISCHARGED" in p.stdout, p.stdout)
-    p = run_fixture("pb-render", ["playbook", "playbook-render"], base)
-    check("[aRF-1 AC6] render mode: the hole stands down, naming playbook-render",
-          "hole 'playbook-placeholders' stood down — playbook-render observes this" in p.stdout
-          and "playbook-placeholders' is UNDISCHARGED" not in p.stdout, p.stdout)
-    p = run_fixture("pb-charter", ["playbook"], base + '\n[charter]\nplaybook_path = "CHARTER.md"\n')
-    check("[aRF-1 S5] a [charter] key a selected kit's argv needs is a finding",
-          "[charter] playbook_path names a token" in p.stdout, p.stdout)
-    p = run_fixture("pb-trailer", ["playbook"],
-               base + 'commit_trailer = "Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"\n')
+    head = f'gov_source = "local"\nprefix = "{PFX[:-1]}"\n'
+    km = (head + 'kits = ["kickoff-manifest"]\n\n[answers]\nmanifest_path = "docs/SESSION-KICKOFF.md"\n'
+          'user_skills = "~/.claude/skills"\n')
+    p = run_fixture("pb-charter", ["kickoff-manifest"], km + '\n[charter]\nmanifest_path = "docs/SESSION-KICKOFF.md"\n')
+    check("[aRF-1 S5] a [charter] key a selected kit's destination needs is a finding",
+          "[charter] manifest_path names a token" in p.stdout, p.stdout)
+    p = run_fixture("pb-trailer", ["playbook"], head + 'kits = ["playbook"]\n\n[answers]\n'
+                    'commit_trailer = "Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"\n')
     check("[aRF-1 AC9] the same trailer under [answers] is still refused",
           p.returncode != 0 and "answers.commit_trailer" in p.stdout + p.stderr,
           p.stdout + p.stderr)
+
+
+def check_retired_selection() -> None:
+    """PLAY-dOrderedCharter-31 AC16 (S10): a `[[retired]]` row's id in a target's `kits`, or in `--kits`,
+    resolves to its successor, de-duplicated, and an id retired to `none` leaves the list; with the row
+    taken out the same selection refuses naming the id, and a row with no successor refuses naming the
+    registry's succession. A scratch registry, read in process."""
+    gk = govkit_module()
+    reg = {"retired": [{"id": "old-kit", "successor": "new-kit", "surfaces": []},
+                       {"id": "gone-kit", "successor": "none", "surfaces": []}]}
+    descs = {"new-kit": ({}, "new/kit.toml"), "other": ({}, "other/kit.toml")}
+    deploy = {"kits": ["old-kit", "new-kit", "gone-kit", "other"]}
+    got = gk.resolve_selection(reg, descs, "default", [], deploy)
+    check("[dOrderedCharter-31 AC16] a target's `kits` reads a retired id as its successor, once",
+          got == ["new-kit", "other"], str(got))
+    got = gk.resolve_selection(reg, descs, "kits", ["old-kit", "other"])
+    check("[dOrderedCharter-31 AC16] ...and so does --kits", got == ["new-kit", "other"], str(got))
+    for label, sreg, mode, kits, dep, want in (
+            ("with no row the default selection refuses naming the id", {}, "default", [], deploy, "old-kit"),
+            ("with no row the kits selection refuses naming the id", {}, "kits", ["old-kit"], None, "old-kit"),
+            ("a row with no successor refuses naming the succession",
+             {"retired": [{"id": "old-kit"}]}, "kits", ["old-kit"], None, "the registry's succession is malformed")):
+        try:
+            got = gk.resolve_selection(sreg, descs, mode, kits, dep)
+        except gk.Refusal as e:
+            got = str(e)
+        check(f"[dOrderedCharter-31 AC16] {label}", isinstance(got, str) and want in got, str(got))
 
 
 def check_answers_parity(tmp: pathlib.Path) -> None:
@@ -5655,9 +5674,9 @@ def main() -> int:
         # --- plan REFUSES when an answer a selected kit needs is absent, and NAMES THE KEY.
         # --- This is the arm that separates "refuses" from "refuses usefully".
         noans = build_target(tmp / "c", DEPLOY_NO_ANSWERS)
-        p = run("plan", "--target", str(noans), "--kits", "playbook")
+        p = run("plan", "--target", str(noans), "--kits", "kickoff-manifest")
         check("plan reds when a needed answer is missing", p.returncode == 1, p.stdout)
-        check("plan NAMES the missing answer key", "needs answer 'playbook_path'" in p.stdout,
+        check("plan NAMES the missing answer key", "needs answer 'manifest_path'" in p.stdout,
               p.stdout)
         # Quantified over EVERY mark except UNRES., not over `write` alone. The `write`-only form was
         # written when a `project-owned` row was marked `write`; once those rows became ORDER it went
@@ -5720,6 +5739,7 @@ def main() -> int:
         check("that message names the kit", "claims kit 'ghost-kit'" in p.stdout, p.stdout)
 
         check_playbook_hole_modes(tmp / "pb")
+        check_retired_selection()
         check_answers_parity(tmp / "ap")
         check_conf_reader_parity(tmp / "crp")
         check_shipped_verb(tmp)
@@ -5943,16 +5963,17 @@ def main() -> int:
         # while this arm printed `FAIL the playbook entry lands its one file — []`. Three arms went
         # red and not one of them named the file, the commit, or the word `apply`.
         pbp = run("apply", "--target", str(pb), "--kits", "playbook")
-        recpb = json.loads((pb / ".governance" / "install.json").read_text(encoding="utf-8"))
-        # ONE file since v3.0. The charter converged and its domain companion was deleted, so an arm
-        # asserting a PAIR here was asserting the shape of a product that no longer ships.
-        check("the playbook entry lands its one file",
-              pbp.returncode == 0 and (pb / "docs" / "PARALLEL.md").is_file(),
+        _rpb = pb / ".governance" / "install.json"
+        recpb = json.loads(_rpb.read_text(encoding="utf-8")) if _rpb.is_file() else {"files": []}
+        # NO file since PLAY-dOrderedCharter-31: the seeded template retired, and the renderer kit
+        # ships the template beside its engine. The entry still applies, landing nothing.
+        check("the playbook entry applies and lands no file",
+              pbp.returncode == 0 and not (pb / "docs" / "PARALLEL.md").exists(),
               chr(10).join(ln for ln in (pbp.stdout + pbp.stderr).splitlines()
                            if ln.startswith("govkit: "))
               or str(sorted(q.as_posix() for q in pb.rglob("docs/*"))))
-        check("recorded as seed, which is the role whose re-apply contract is never-rewritten",
-              all(f["role"] == "seed" for f in recpb["files"] if f["kit"] == "playbook"),
+        check("and its receipt holds no playbook row",
+              not [f for f in recpb["files"] if f["kit"] == "playbook"],
               str([f for f in recpb["files"] if f["kit"] == "playbook"]))
 
         # AC7 — three distinct strings for three distinct measurements. A kit declaring a reason is
@@ -5962,7 +5983,7 @@ def main() -> int:
         check("a declared-absence kit reports landed-unmeasured", "landed-unmeasured" in pc.stdout,
               pc.stdout)
         check("and prints the declared reason rather than the bare state",
-              "installation is a copy to an owner-chosen path" in pc.stdout, pc.stdout)
+              "the entry lands no file" in pc.stdout, pc.stdout)
 
         # ===== unit 2: the update verb =====
         # A REAL older install: the receipt is re-pinned to a gov commit where check-wiring.sh
@@ -6979,7 +7000,7 @@ user_skills = "/tmp/gk-fake-skills"
         cm = gcopy / PFX / KIT_NAMES["govkit"] / "entries" / "check-microformats.kit.toml"
         ckeep = cm.read_text(encoding="utf-8")
         cl = ckeep.split("\n")
-        ci = next(i for i, l in enumerate(cl) if l.startswith('requires = ["playbook"]'))
+        ci = next(i for i, l in enumerate(cl) if l.startswith('requires = ["playbook-render"]'))
         cl.insert(ci, 'why_conditional = "selftest fixture: 7e needs a conditional dependent"')
         cl.insert(ci, 'selectable = "conditional"')
         cm.write_text("\n".join(cl), encoding="utf-8")
@@ -6992,6 +7013,19 @@ user_skills = "/tmp/gk-fake-skills"
         cm.write_text(ckeep, encoding="utf-8")
         check("and is green again once the entry rejoins the default selection",
               _run_selfcheck(gcopy).returncode == 0, "")
+
+        # --- 7b (PLAY-dOrderedCharter-31 S11): the default set is closed under `requires`. Staged by
+        #     taking `playbook-render` out of the default while `check-microformats` requires it.
+        _r7b = rkeep.replace('  "playbook-render",\n', '', 1)
+        check("7b LIVENESS the staged registry really drops playbook-render from the default",
+              _r7b != rkeep, "the replace matched nothing in the registry")
+        reg.write_text(_r7b, encoding="utf-8")
+        r7b = _run_selfcheck(gcopy)
+        check("7b reds a default member requiring an id the default lacks, naming both",
+              r7b.returncode != 0
+              and "the default set holds 'check-microformats', which requires 'playbook-render'"
+              in (r7b.stdout + r7b.stderr), r7b.stdout + r7b.stderr)
+        reg.write_text(rkeep, encoding="utf-8")
 
         # --- TOOL-aRepatriatedFork-18 S8 (AC1): a shipped gate whose sibling suite is withheld
         #     again, the state all four arm-bearing kits were in before that unit.
@@ -8235,23 +8269,23 @@ user_skills = "/tmp/gk-fake-skills"
 
         # --- intake refuses to invent an answer, and NAMES the ones it wants.
         ik2 = build_target(tmp / "i", None)
-        p = run("intake", "--target", str(ik2), "--kits", "playbook")
+        p = run("intake", "--target", str(ik2), "--kits", "kickoff-manifest")
         check("intake refuses when an answer is missing", p.returncode == 2)
-        check("intake names the missing answers", "playbook_path" in p.stderr, p.stderr)
+        check("intake names the missing answers", "manifest_path" in p.stderr, p.stderr)
         check("intake refuses to INVENT one", "Refusing to invent" in p.stderr, p.stderr)
         check("intake wrote nothing when it refused",
               not (ik2 / ".governance" / "deploy.toml").exists(), "")
 
-        p = run("intake", "--target", str(ik2), "--kits", "playbook",
-                "--answer", "playbook_path=docs/PARALLEL.md",
-                "--answer", "playbook_dir=docs")
+        p = run("intake", "--target", str(ik2), "--kits", "kickoff-manifest",
+                "--answer", "manifest_path=docs/SESSION-KICKOFF.md",
+                "--answer", "user_skills=~/.claude/skills")
         check("intake accepts a prepared answer stream", p.returncode == 0, p.stdout + p.stderr)
         check("the descriptor records the answers",
-              "playbook_path" in (ik2 / ".governance" / "deploy.toml").read_text(encoding="utf-8"))
+              "manifest_path" in (ik2 / ".governance" / "deploy.toml").read_text(encoding="utf-8"))
 
         # --- intake will NOT silently rewrite a standing authorization.
-        p = run("intake", "--target", str(ik2), "--kits", "playbook",
-                "--answer", "playbook_path=x", "--answer", "playbook_dir=y")
+        p = run("intake", "--target", str(ik2), "--kits", "kickoff-manifest",
+                "--answer", "manifest_path=x", "--answer", "user_skills=y")
         check("intake refuses to overwrite an existing descriptor", p.returncode == 2)
         check("that refusal calls it the standing authorization",
               "standing authorization" in p.stderr, p.stderr)
@@ -15961,7 +15995,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- legitimate path fragment now RESOLVES. Without the second half the first passes by
         # ---- refusing everything, which is the shape this file exists to refuse.
         # `--kits` IS LOAD-BEARING on all three: `plan` with no selection takes the REGISTRY
-        # default, which carries `playbook`, whose unanswered `playbook_path` refuses before the
+        # default, which carries `kickoff-manifest`, whose unanswered `manifest_path` refuses before the
         # per-entry table is ever read. Measured while writing these arms -- all three passed by
         # finding nothing, on an error naming a kit the fixture does not install.
         _homed = a_evil_target('homedkit', 'docs/da', 'drift-audit', door='kit', key='kit')
@@ -19810,6 +19844,12 @@ user_skills = "/tmp/gk-fake-skills"
                    for _pl, _st in (("edited-row", "forked"), ("keep", "report-omits"),
                                     ("render-edited", "today"), ("seed-retired-edited", "seed-override"),
                                     ("render-edited-no-oid", "oid-only"))]
+    # PLAY-dOrderedCharter-31 AC9: a seed row whose kit's descriptor dropped the seed rule, gov keeping the
+    # source, reads `retired-edited` edited and `withdrawn` unedited; `seed-rule-kept` turns both red.
+    _rte_cases += [(f"[dOrderedCharter-31 AC9] plant {_pl} matches its case", [_pl], 0)
+                   for _pl in ("seed-rule-gone-edited", "seed-rule-gone-clean")]
+    _rte_cases += [(f"[dOrderedCharter-31 AC9] plant {_pl} --stub seed-rule-kept stages its red",
+                    [_pl, "--stub", "seed-rule-kept"], 1) for _pl in ("seed-rule-gone-edited", "seed-rule-gone-clean")]
 
     def _run_rte_case(case):
         return case, subprocess.run([sys.executable, str(HERE / "fixtures" / "retired_edits.py"),

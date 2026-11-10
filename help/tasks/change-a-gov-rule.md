@@ -11,7 +11,7 @@ scratch repository, so the page opens with the install [the tutorial](../tutoria
 `GOV` set to your gov checkout:
 
 ```bash
-python "$GOV/tools/govkit/govkit.py" intake --target . --kits playbook,playbook-render,memory-tree,policy,agent-instructions --answer playbook_path=AGENTS.md
+python "$GOV/tools/govkit/govkit.py" intake --target . --kits playbook,playbook-render,memory-tree,policy
 printf '%s\n' '' '[charter]' 'PROJECT_NAME = "demo"' 'PRODUCT_PREAMBLE = "demo is a scratch repository that adopts gov."' \
   'PRODUCT_CONTEXT_HOME = "README.md"' 'DOC_ROUTING_TABLE = "README.md"' 'REPO_LAYOUT_MAP = "root holds README.md"' \
   'STREAM_OWNERSHIP = "one stream"' 'CI_FILE = "none yet"' 'GATE_RUNNER = "none yet"' 'GATE_COMMANDS = "none yet"' \

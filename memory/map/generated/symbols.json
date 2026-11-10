@@ -1378,11 +1378,6 @@
       "file": "tools/playbook/pins.py"
     },
     {
-      "id": "arm_no_renderer",
-      "kind": "function",
-      "file": "tools/playbook/instruction_units.py"
-    },
-    {
       "id": "arm_noop",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -1956,11 +1951,6 @@
       "id": "bad",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
-    },
-    {
-      "id": "bad",
-      "kind": "function",
-      "file": "tools/agent-instructions/adopt-agent-instructions.test.sh"
     },
     {
       "id": "bad",
@@ -6303,6 +6293,11 @@
       "file": "tools/check-spec-tokens.test.sh"
     },
     {
+      "id": "check_overlay_order",
+      "kind": "function",
+      "file": "tools/govkit/steps/adopter_rules_to_overlay.py"
+    },
+    {
       "id": "check_override_arms",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -6814,6 +6809,11 @@
     },
     {
       "id": "check_retired_flags",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_retired_selection",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
     },
@@ -7990,6 +7990,11 @@
     {
       "id": "cmd_down",
       "kind": "function",
+      "file": "tools/govkit/steps/adopter_rules_to_overlay.py"
+    },
+    {
+      "id": "cmd_down",
+      "kind": "function",
       "file": "tools/govkit/steps/fanout_cap.py"
     },
     {
@@ -8260,6 +8265,11 @@
     {
       "id": "cmd_up",
       "kind": "function",
+      "file": "tools/govkit/steps/adopter_rules_to_overlay.py"
+    },
+    {
+      "id": "cmd_up",
+      "kind": "function",
       "file": "tools/govkit/steps/fanout_cap.py"
     },
     {
@@ -8276,6 +8286,11 @@
       "id": "cmd_verify",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
+    },
+    {
+      "id": "cmd_witness",
+      "kind": "function",
+      "file": "tools/govkit/steps/adopter_rules_to_overlay.py"
     },
     {
       "id": "cmd_witness",
@@ -9973,6 +9988,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "derive_module_export_rel",
+      "kind": "function",
+      "file": "tools/codebase-map/map_lib.py"
+    },
+    {
       "id": "derive_moved_invariants",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
@@ -10313,6 +10333,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_render_plant",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "derive_renderer_label",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -10431,6 +10456,16 @@
       "id": "derive_rule_kind",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_rule_rows",
+      "kind": "function",
+      "file": "tools/govkit/steps/adopter_rules_to_overlay.py"
+    },
+    {
+      "id": "derive_rule_tag",
+      "kind": "function",
+      "file": "tools/govkit/steps/adopter_rules_to_overlay.py"
     },
     {
       "id": "derive_rule_text",
@@ -12998,6 +13033,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "load_overlay",
+      "kind": "function",
+      "file": "tools/govkit/steps/adopter_rules_to_overlay.py"
+    },
+    {
       "id": "load_owned_names",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
@@ -13101,6 +13141,11 @@
       "id": "load_stand_in_waivers",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "load_steps",
+      "kind": "function",
+      "file": "tools/govkit/steps/adopter_rules_to_overlay.py"
     },
     {
       "id": "load_steps",
@@ -13351,6 +13396,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/govkit/steps/adopter_rules_to_overlay.py"
     },
     {
       "id": "main",
@@ -14470,11 +14520,6 @@
     {
       "id": "mkrepo",
       "kind": "function",
-      "file": "tools/agent-instructions/adopt-agent-instructions.test.sh"
-    },
-    {
-      "id": "mkrepo",
-      "kind": "function",
       "file": "tools/check-dead-paths.test.sh"
     },
     {
@@ -14541,11 +14586,6 @@
       "id": "need",
       "kind": "function",
       "file": "tools/check-kit-versions.sh"
-    },
-    {
-      "id": "need_val",
-      "kind": "function",
-      "file": "tools/agent-instructions/adopt-agent-instructions.sh"
     },
     {
       "id": "needed_answers",
@@ -14701,11 +14741,6 @@
       "id": "ok",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
-    },
-    {
-      "id": "ok",
-      "kind": "function",
-      "file": "tools/agent-instructions/adopt-agent-instructions.test.sh"
     },
     {
       "id": "ok",
@@ -15141,6 +15176,11 @@
       "id": "parse_row",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "parse_rules",
+      "kind": "function",
+      "file": "tools/govkit/steps/adopter_rules_to_overlay.py"
     },
     {
       "id": "parse_sections",
@@ -15706,11 +15746,6 @@
       "id": "print_selftests_owed",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
-    },
-    {
-      "id": "print_size_note",
-      "kind": "function",
-      "file": "tools/agent-instructions/adopt-agent-instructions.sh"
     },
     {
       "id": "print_spawn_populations",
@@ -18271,6 +18306,11 @@
       "id": "read_modes",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "read_module_export_members",
+      "kind": "function",
+      "file": "tools/codebase-map/map_lib.py"
     },
     {
       "id": "read_month_fixes",
@@ -21238,6 +21278,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "render_deploy_rest",
+      "kind": "function",
+      "file": "tools/govkit/steps/adopter_rules_to_overlay.py"
+    },
+    {
       "id": "render_dirt",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -23500,11 +23545,6 @@
     {
       "id": "resolve_python",
       "kind": "function",
-      "file": "tools/agent-instructions/adopt-agent-instructions.sh"
-    },
-    {
-      "id": "resolve_python",
-      "kind": "function",
       "file": "tools/check-agent-cap-restatement.test.sh"
     },
     {
@@ -23993,11 +24033,6 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
-      "id": "resolve_renderer",
-      "kind": "function",
-      "file": "tools/agent-instructions/adopt-agent-instructions.sh"
-    },
-    {
       "id": "resolve_repair_sides",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -24031,6 +24066,21 @@
       "id": "resolve_resume_fire",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "resolve_retired_kits",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_retired_kits",
+      "kind": "function",
+      "file": "tools/lib/retired_kits.py"
+    },
+    {
+      "id": "resolve_retired_kits",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "resolve_rev",
@@ -24426,11 +24476,6 @@
       "id": "run",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
-    },
-    {
-      "id": "run",
-      "kind": "function",
-      "file": "tools/agent-instructions/adopt-agent-instructions.test.sh"
     },
     {
       "id": "run",
@@ -31896,6 +31941,11 @@
       "id": "write_model_copy",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "write_module_export_plant",
+      "kind": "function",
+      "file": "tools/codebase-map/map_lib.py"
     },
     {
       "id": "write_moved_disp",

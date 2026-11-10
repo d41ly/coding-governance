@@ -53,7 +53,7 @@ A cap whose consumer drops what is over it, or a check of correctness, is no siz
 switch never reaches it:
 
 - **consumer limits** keep their own behaviour: the orientation card's 8192 bytes, Codex's 32 KiB of
-  project instructions (announced by the agent-instructions adopter), a runlog record, a codebase-map
+  project instructions (the render's harness limit, which refuses a charter past it), a runlog record, a codebase-map
   feature card and a hook's 10000-character context.
 - **correctness checks** keep refusing under `warn`: the template-size gate's checks 3, 5 and 6 (a
   record or a declared limit that is not a number, and a document whose own `**Budget:` line disagrees

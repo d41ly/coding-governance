@@ -11,8 +11,6 @@
 # spec so a reader meeting the shrink-only claim also meets its one exception.
 
 gate-legs = [
-  "agent-instructions self-test",
-  "agent-instructions wiring",
   "branch-guard self-test",
   "build-index selftest",
   "check-arms selftest",
@@ -32,7 +30,6 @@ gate-legs = [
   "template size <=48KiB",
 ]
 kits = [
-  "agent-instructions",
   "drift-audit",
   "lib",
   "pytest-parallel-guardrails",

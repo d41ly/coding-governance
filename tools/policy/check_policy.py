@@ -3355,25 +3355,31 @@ def derive_role_body_plant(cap):
             "warn": "BUDGET WARN — role-body ·", "refuse": "-byte ceiling (budgets.enforce is refuse)"}
 
 
-def derive_one_line_rule_plant(cap):
-    """A copy of the render engine beside a copy of the policy kit, a template whose one-line region
-    holds a rule one character past the engine's cap, and the smallest descriptor and registry. The
-    template sits beside the engine copy, where the render reads it first, with the modules its render
-    imports and the file holding `CODEX_MAX`, which its charter budget reads (PLAY-dOrderedCharter-34 F7)."""
+def derive_render_plant(cap, template):
+    """The render scaffold both render-engine plants build (PLAY-dOrderedCharter-31 S1): a copy of the engine
+    beside a copy of the policy kit, the smallest descriptor and registry, the modules its render imports
+    and the file holding `CODEX_MAX`, which its charter budget reads, and `template` beside the engine
+    copy, where the render reads it first (PLAY-dOrderedCharter-34 F7)."""
     rel = derive_enforcer_rel(cap)
-    v = read_source_number(rel, "ONE_LINE_MAX")
     eng = posixpath.dirname(rel)
     codex = budgets.resolve_prefix_token(budgets.read_cap_census(derive_source_top())["codex-instructions"].home
                                          .split(":")[1], budgets.derive_tool_root())
     carried = {f"{eng}/{m}": (derive_source_top() / eng / m).read_bytes()
                for m in ("instruction_units.py", "load_sets.py", "policy_value.py")}
     carried[codex] = (derive_source_top() / codex).read_bytes()
-    return {"files": {rel: (derive_source_top() / rel).read_bytes(), f"{eng}/playbook.kit.toml": "",
+    return {"files": {**carried, rel: (derive_source_top() / rel).read_bytes(), f"{eng}/playbook.kit.toml": "",
                       f"{eng}/registry.toml": '[[entry]]\nid = "lexicon"\n',
-                      ".governance/deploy.toml": 'kits = ["lexicon"]\n', **carried,
-                      f"{eng}/coding-governance-agents.template.md": f"<!-- one-line -->\n- {'x' * v}\n<!-- /one-line -->\nend\n"},
-            "copies": (budgets.derive_kit_rel().rstrip("/"),), "argv": [sys.executable, rel, "--target", "{repo}"],
-            "warn": "BUDGET WARN — one-line-rule", "refuse": f"past the {v} a one-line rule may take"}
+                      ".governance/deploy.toml": 'kits = ["lexicon"]\n',
+                      f"{eng}/coding-governance-agents.template.md": template},
+            "copies": (budgets.derive_kit_rel().rstrip("/"),), "argv": [sys.executable, rel, "--target", "{repo}"]}
+
+
+def derive_one_line_rule_plant(cap):
+    """The render scaffold with a template whose one-line region holds a rule one character past the
+    engine's cap."""
+    v = read_source_number(derive_enforcer_rel(cap), "ONE_LINE_MAX")
+    return derive_render_plant(cap, f"<!-- one-line -->\n- {'x' * v}\n<!-- /one-line -->\nend\n") | {
+        "warn": "BUDGET WARN — one-line-rule", "refuse": f"past the {v} a one-line rule may take"}
 
 
 def derive_roster_line_plant(cap):
@@ -3463,7 +3469,7 @@ def derive_recall_export_plant(cap):
 
 def derive_outside_probe_plant(cap):
     """An outside row's enforcer run under each value, breaching its cap where it has a CLI to reach
-    it: the orientation card at a 1-byte cap, Codex's canonical one byte over CODEX_MAX, a charter
+    it: the orientation card at a 1-byte cap, a template rendered past CODEX_MAX, a charter
     citing a file under no cap, and a subagent route longer than the hook's context cap. A library
     with no CLI, the runlog record's and the feature card's, is imported and its constant printed:
     that run cannot breach, so the arm that holds it outside the switch is `arm_cap_census`'s join,
@@ -3479,8 +3485,8 @@ def derive_outside_probe_plant(cap):
                           "AGENTS.md": "# Charter\n\nRead `memory/HYGIENE.md` first.\n", "memory/HYGIENE.md": "# Hygiene\n"},
                 "argv": [sys.executable, src, "--check"], "warn": "under no byte cap"}
     v = read_source_number(rel, f"const {key}" if rel.endswith(".js") else key)
-    if cap.name == "codex-instructions":
-        return {"files": {"AGENTS.md": "x" * v + "\n"}, "argv": ["bash", src], "warn": f"over {v}"}
+    if cap.name == "codex-instructions":  # the render's harness-limit refusal, the same under warn and refuse
+        return derive_render_plant(cap, ("x" * 99 + "\n") * (v // 100 + 1)) | {"warn": f"over CODEX_MAX {v}"}
     if rel.endswith(".js"):  # the subagent context: a routed card of more route lines than the cap holds
 
         def write_card(t):

@@ -128,11 +128,12 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
 - **Retrieval over that tree** (`memory-recall/` kit, requires the memory tree): ask the decision
   corpus a question and get the records that answer it, ranked. Offline, stdlib, writes nothing in
   the worktree.
-- **One canonical instruction file** (`agent-instructions/` kit): agents do not all read the same
-  filename, and Claude Code does not read `AGENTS.md` natively. Drop it only if exactly one agent
-  tool reads this repo; with two, this kit is what stops the second reading a stale copy. Its
-  `--card` switch, off by default, is the renderer's `render_playbook.py --render-scope entry-files
-  --card`: `CLAUDE.md` imports the session's orientation card beside `AGENTS.md`, and
+- **One canonical instruction file** (the `playbook-render` kit's `entry-files` scope): agents do not
+  all read the same filename, and Claude Code does not read `AGENTS.md` natively. The renderer wires
+  each harness's file to `AGENTS.md`, which is what stops a second agent reading a stale copy; the
+  agent-instructions kit that did this retired into it, and a `kits` list still naming that kit reads
+  as `playbook-render`. Its `--card` switch, off by default, is `render_playbook.py --render-scope
+  entry-files --card`: `CLAUDE.md` imports the session's orientation card beside `AGENTS.md`, and
   `--check-render --card` reds a pointer without it.
 - **Parallel-test guardrails** (`pytest-parallel-guardrails/` kit): drop it if the project is not
   Python or does not run `pytest -n auto`. The charter's one line on the bug classes it fixes is
@@ -197,9 +198,10 @@ records keep the letter they were written with.
 - **Precedence.** `[charter]`, then `[answers]`, then the probe or the declared default. An answer
   outranks a probe, and the render prints both, so correct a wrong derivation by answering it rather
   than by forking the descriptor.
-- **`playbook_path` names the TEMPLATE** when `playbook-render` is selected; the charter is
-  `--charter`, default `AGENTS.md`, and the render refuses when the two are one file. Without the
-  renderer it is the copied charter, and the placeholder hole probes it.
+- **`playbook_path` is no longer an answer any kit needs.** The `playbook` entry stopped seeding a
+  copy of the template there; the `playbook-render` kit ships the template beside its engine and
+  writes the charter named by `--charter`, default `AGENTS.md`. A copy seeded earlier is kept by
+  `update`, read `retired-edited` if you edited it and `withdrawn` if you did not.
 - **`[charter]`** holds render-only prose that `[answers]` refuses, such as the commit trailer with
   its angle brackets. govkit never reads it into an argv. A key there must name a declared
   placeholder and no argv token, and a value may not carry a control character other than a
@@ -1345,7 +1347,7 @@ it.
 
 ```
 <project>/
-├── AGENTS.md / CLAUDE.md        # (optional) project charter / agent-instruction file (agent-instructions kit)
+├── AGENTS.md / CLAUDE.md        # (optional) project charter / agent-instruction file (playbook-render kit)
 ├── docs/PARALLEL.md             # governance playbook, filled (its provenance in .governance/instructions.lock) — ONE file; §2 ships no companion
 ├── memory/guides/SESSION-KICKOFF.md  # kickoff manifest (v1.5: audit block + sealed eight-field §A region + registry key) — the engine reads this
 ├── <prefix>/manifest-check.sh # ratchet gate — engine-identical copy (overwrite wholesale on kit updates)
@@ -2169,11 +2171,9 @@ a `{kit}` token and both the writer and the checker expand it against the fragme
 
 - **Precedence on any conflict:** `CLAUDE.md` > manifest > skill — follow the winner, fix the loser.
 - **Pull upstream improvements:** the charter's row in `.governance/instructions.lock` carries the template's `vN.N`. `govkit update`
-  refreshes the engine and its declarations and re-renders the region from the template you HAVE
-  (unless GOVKIT_RERENDER=0): the template is a seed it never rewrites, and it reports
-  `reseed-available` when gov's has moved. To take a new template version, copy
-  `<gov>/coding-governance-agents.template.md` over the file `playbook_path` names, then re-render;
-  until you do, an older template still renders and the render notes its marker. The manifest
+  refreshes the engine, its declarations and the template the `playbook-render` kit lands beside the
+  engine, and re-renders the region from it (unless GOVKIT_RERENDER=0), so a new template version
+  arrives with the update. A copy seeded earlier at `playbook_path` is no input of the render. The manifest
   carries its own `kickoff-manifest: vN.N`. The `memory-tree/` scripts are identical across repos —
   copy the newer versions in wholesale.
   **v4.1 (2026-10-09), the first v4 release, REPLACES the charter's shape:** sections §0 to §16 are gone. Section 1 is

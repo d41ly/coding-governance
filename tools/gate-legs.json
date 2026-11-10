@@ -296,19 +296,6 @@
     "ceiling": 1130
   },
   {
-    "name": "agent-instructions wiring",
-    "argv": [
-      "bash",
-      "{prefix}/agent-instructions/adopt-agent-instructions.sh",
-      "--check",
-      "--aliases",
-      "claude"
-    ],
-    "chunk": "wiring",
-    "subject": "repo",
-    "ceiling": 300
-  },
-  {
     "name": "manifest-check self-test",
     "argv": [
       "bash",
@@ -384,20 +371,6 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 300
-  },
-  {
-    "name": "agent-instructions self-test",
-    "argv": [
-      "bash",
-      "{prefix}/agent-instructions/adopt-agent-instructions.test.sh"
-    ],
-    "guard": [
-      "{prefix}/agent-instructions/",
-      "{prefix}/lib/"
-    ],
-    "chunk": "selftests",
-    "subject": "kit",
-    "ceiling": 330
   },
   {
     "name": "memory-hygiene self-test",
@@ -2155,12 +2128,14 @@
       "{prefix}/memory-tree/gen_build_index.py",
       "{prefix}/roles/check_roles.py",
       "{prefix}/playbook/render_playbook.py",
+      "{prefix}/playbook/instruction_units.py",
+      "{prefix}/playbook/load_sets.py",
+      "{prefix}/playbook/policy_value.py",
       "{prefix}/roles/handoff.py",
       "skills/session-kickoff/manifest-check.sh",
       "{prefix}/memory-tree/gotchas.py",
       "{prefix}/memory-recall/query.py",
       "{prefix}/memory-tree/corpus_ids.py",
-      "{prefix}/agent-instructions/adopt-agent-instructions.sh",
       "{prefix}/runlog/record.py",
       "{prefix}/codebase-map/map_lib.py",
       "{prefix}/hooks/scratch-guard.js",
@@ -2172,7 +2147,6 @@
       "{prefix}/roles/kit.toml",
       "{prefix}/playbook/kit.toml",
       "{prefix}/memory-recall/kit.toml",
-      "{prefix}/agent-instructions/kit.toml",
       "{prefix}/runlog/kit.toml",
       "{prefix}/codebase-map/kit.toml",
       "{prefix}/hooks/kit.toml",

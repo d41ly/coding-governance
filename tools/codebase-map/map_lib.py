@@ -1446,6 +1446,38 @@ def derive_baseline_additions(root: Path, base: str) -> tuple[dict[str, list[str
         raise MapError(f"{rel}: toml parse error: {exc}") from exc
 
 
+# The step gate's `module-export` class (PLAY-dOrderedCharter-31 S3): the names this module re-exports from the
+# join factory, read from the source at a root and never imported, so a held name leaves only with a row naming it.
+def derive_module_export_rel() -> str:
+    """This file's path under the repository holding it, the same path in every tree the step gate reads."""
+    here = Path(os.path.abspath(__file__))
+    top = next((d for d in here.parents if (d / ".git").exists()), here.parent)
+    return here.relative_to(top).as_posix()
+
+
+def read_module_export_members(root) -> set:
+    """The `module-export` class's reader: each name the module-level `from coverage_join import` binds."""
+    path = Path(root) / derive_module_export_rel()
+    if not path.is_file():
+        return set()
+    tree = ast.parse(path.read_bytes().decode("utf-8"))
+    return {a.asname or a.name for n in tree.body if isinstance(n, ast.ImportFrom) and n.module == "coverage_join"
+            for a in n.names}
+
+
+def write_module_export_plant(clone) -> str:
+    """The `module-export` class's plant: the second re-exported name taken off its import line, staged."""
+    rel = derive_module_export_rel()
+    path = Path(clone) / rel
+    text = path.read_bytes().decode("utf-8")
+    m = re.search(r"(?m)^(from coverage_join import \w+), (\w+)", text)
+    if m is None:
+        raise ValueError("the module-export plant found no import line re-exporting two names")
+    path.write_bytes((text[:m.start()] + m[1] + text[m.end():]).encode("utf-8"))
+    subprocess.run(["git", "-C", str(clone), "add", "--", rel], check=True, capture_output=True)
+    return f"module-export:{m[2]}"
+
+
 def owners_of(tree: MapTree) -> dict[str, dict[str, tuple[str, ...]]]:
     owners = {d.feature: d.claims for d in tree.dossiers}
     owners["foundation"] = tree.foundation.claims
