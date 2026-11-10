@@ -41,3 +41,6 @@ tools/playbook/adopt-playbook.sh · a plant row of the edge-grammar selftest exp
 tools/playbook/edge_grammar.py · the resolve fixture writes a stand-in file at the method's path so a section edge has a target, and copies none of the method's text
 tools/playbook/instructions-legacy.txt · the legacy instruction-file list names the method as one of gov's own instruction files, a path in an inventory
 tools/playbook/renderers.toml · the renderer table lists the method among the guides its scope renders, a path the renderer writes
+help/charter.md · the charter's help page names the method as the one held document, a path in an inventory
+tools/playbook/documents.toml · the document registry declares the method's path and template source so its envelope renders, a path the renderer writes
+tools/playbook/instruction_units.py · the held-envelope constant and its fixture row name the method's path, and copy none of its text
