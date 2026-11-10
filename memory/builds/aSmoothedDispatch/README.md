@@ -70,9 +70,9 @@ ids TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 T
 | [TOOL-aSmoothedDispatch-7 — the `gov-spec-writer` house overlay has the writer run the spec-token checker's one-spec mode over each spec before it returns](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-7.md) | 7 | 2 | SPECCED | rev-1 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 2 record folder(s).
+Records: 8 bound to this build, across 2 record folder(s).
 
-Ids no record names: TOOL-aSmoothedDispatch-7.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 TOOL-aSmoothedDispatch-7.
 

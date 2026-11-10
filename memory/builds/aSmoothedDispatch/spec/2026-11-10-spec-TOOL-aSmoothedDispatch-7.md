@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-11-10-prompt-TOOL-aSmoothedDispatch-6-scope.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-6-scope.md) | research | TOOL-aSmoothedDispatch-6 |
 
 <!-- /gen:spec-records -->
 
