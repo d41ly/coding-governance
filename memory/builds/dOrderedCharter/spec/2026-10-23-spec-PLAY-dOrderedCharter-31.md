@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-31 — this build's own upgrade steps: the agent-instructions wiring to the one renderer, adopter rules into the overlay, the seeded template's succession row, the census's change records and the `map_lib` deprecation
 
-**Status:** DEFERRED · rev-13 · 2026-11-10 · node d · Tier-2 · base ce13efbe · streams playbook · order 36 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
+**Status:** DEFERRED · rev-14 · 2026-11-10 · node d · Tier-2 · base ce13efbe · streams playbook · order 36 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
 
 **Carries:** cl-dClosedLoop-0061@bf1a53b5 whole
 
@@ -36,7 +36,9 @@
 | [2026-11-09-prompt-PLAY-dOrderedCharter-31-repair-2-brief.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-31-repair-2-brief.md) | research | — |
 | [2026-11-09-prompt-PLAY-dOrderedCharter-31-repair-brief.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-31-repair-brief.md) | research | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-31-4-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-31-4-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-PLAY-dOrderedCharter-31-5-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-31-5-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-31-owner-picks-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-31-owner-picks-brief.md) | research | — |
+| [2026-11-10-prompt-PLAY-dOrderedCharter-31-tokens-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-31-tokens-brief.md) | research | — |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -708,10 +710,12 @@ query's two new hits are the task and tutorial pages S1 and S5 name.
   runs after the pass, it prints the row, followed by `usage = "none"`.
   Red when: a class registered in `tools/govkit/surface-classes.toml` has no `[[class]]` row in
   `tools/govkit/usage.toml`, which the docs leg reports as a finding.
-- **AC15** — When `python -c "import tomllib; d = tomllib.load(open('tools/govkit/entries/playbook.kit.toml', 'rb')); m = tomllib.load(open('tools/govkit/entries/check-microformats.kit.toml', 'rb')); print(d['version_from'], d.get('files'), d.get('hole'), m['requires'], [g['argv'] for g in m['gate_leg']])"`
-  runs after the pass, it prints a `version_from` holding `none`, no `files` and no `hole` for the
-  `playbook` entry, and `['playbook-render']` with the micro-format leg's subject the template beside
-  the engine.
+- **AC15** — When `git grep -n -e "^version_from" -e "^\[\[files\]\]" -e "^\[\[hole\]\]" -- tools/govkit/entries/playbook.kit.toml`
+  runs after the pass, it prints one line, a `version_from` holding `none`, and no `[[files]]` or
+  `[[hole]]` line for the `playbook` entry; and
+  `git grep -n -A2 -e "^requires" -e "micro-format definitions" -- tools/govkit/entries/check-microformats.kit.toml`
+  prints `requires = ["playbook-render"]` and the micro-format leg's `argv` with its subject the
+  template beside the engine, the row §4 states.
   Red when: `version_from` still names a file the entry no longer lands, which the selfcheck's
   version-constant arm refuses, or the micro-format leg still grades `{playbook_path}`.
 - **AC16** — When `python tools/govkit/step_gate.py --list` runs at the pass's tip, whose
@@ -732,8 +736,8 @@ query's two new hits are the task and tutorial pages S1 and S5 name.
   Red when: the default selection lacks `playbook-render` while `check-microformats` requires it, so
   `plan` prints an `UNMET` line naming `check-microformats` and `playbook-render`, and `apply` refuses.
   fixture: the same pair at HEAD with `check-microformats` requiring `playbook-render` reproduces the
-  red, as `tools/govkit/govkit.py#derive_unsatisfied_requires` over the default set returned the
-  pair `('check-microformats', 'playbook-render')` when probed at dfe4edb9f.
+  red, as the unmet-requirement read in `tools/govkit/govkit.py` that S11 names, over the default
+  set, returned the pair `('check-microformats', 'playbook-render')` when probed at dfe4edb9f.
 
 ## 7. Gates
 
@@ -1000,6 +1004,12 @@ New arm: tools/policy/check_policy.py · covers AC13 · the `budgets-cap-codex-i
   pages, drop the kit and the `playbook_path` answer; gov's guarded third adopter rule is kept for
   the owner (AC2); the `unit` class has landed (S6, AC10); the template leaves Files touched, having no
   hit; `PLAY-dOrderedCharter-32`'s S10 is named in full beside this spec's own S10.
+- rev-14 · 2026-11-10 · section 6 · AC15 AC17 · from
+  `2026-11-10-prompt-PLAY-dOrderedCharter-31-tokens-brief.md`: the spec-token check read live reds
+  three acceptance words, so AC15 observes the two entry files by `git grep` in place of an inline
+  `python -c` whose words held unresolvable paths, and AC17's fixture names the plain
+  `tools/govkit/govkit.py` and leaves the symbol to S11; no design text moved, and the unit stays
+  DEFERRED.
 
 ## 10. Reuse audit
 

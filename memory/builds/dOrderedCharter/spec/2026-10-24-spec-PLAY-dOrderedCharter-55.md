@@ -27,6 +27,8 @@
 | [2026-11-08-prompt-PLAY-dOrderedCharter-55-1-researcher.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-55-1-researcher.md) | journal | — |
 | [2026-11-08-prompt-PLAY-dOrderedCharter-55-own-reds-triage-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-55-own-reds-triage-brief.md) | research | — |
 | [2026-11-08-prompt-PLAY-dOrderedCharter-55-owner-resume.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-55-owner-resume.md) | research | — |
+| [2026-11-10-prompt-PLAY-dOrderedCharter-55-1-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-55-1-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-PLAY-dOrderedCharter-55-precheck-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-55-precheck-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
