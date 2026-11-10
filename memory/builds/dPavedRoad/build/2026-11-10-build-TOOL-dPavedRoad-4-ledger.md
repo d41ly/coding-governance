@@ -66,3 +66,10 @@ new names.
 - AC4 — re-observed: neither run named `ARCH-tPair-10/AC9` or `ARCH-tPair-9/AC8` or printed `check 23 HELD under --staged`, and each printed `memory-hygiene: check 23 graded 1 unit(s)`.
 - AC5 — re-observed: the full run from this tree against the `ae6735c1` clone at `%TEMP%/pr4b` gave an empty `diff` once the clone's check 26 cache was warm, the first run differing only in `cache hits`, as before.
 - AC6 — re-observed: the held-prose greps each printed 0, each replacement sentence counted 1 in all four copies, and `grep -nF '23 and 26'` printed nothing.
+
+## GREEN re-observed after the fix pass
+
+The bar-fix pass `3802bc13e` changed the script and its suite after the GREEN above, so the main loop
+re-ran `bash tools/memory-tree/check-memory-hygiene.test.sh` in a clone of `59c386425` under
+`%TEMP%/dpr`: it exited 1 in 2645 s with one failure only, the inherited `OSTYPE` arm the base run
+shares, and no section 4 arm failing. The merge bar at `59c386425` was GREEN, 72 of 72 legs.

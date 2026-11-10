@@ -50,3 +50,10 @@ match in the source role file. Owed at the close: the `install-prefix (shipped s
 **Evidences:** TOOL-dPavedRoad-1
 - AC5 — re-observed: `python tools/roles/render_agents.py --write` wrote the one changed agent type, `.claude/roles.json` still lists `spec tokens (a spec's own names resolve)` in `gov-spec-writer`'s gates, and `render_agents.py --check` exited 0 with 9 agent types and 1 index graded.
 - AC7 — re-observed: the `grep -c "check-spec-tokens.py --spec"` the criterion names counted 1 in each of its two files.
+
+## GREEN re-observed after the fix pass
+
+After the bar-fix pass `59c386425` respelled the role text, the main loop re-ran
+`bash tools/roles/adopt-roles.test.sh` in a clone of `59c386425` under `%TEMP%/dpr`: it exited 0 in
+87 s, `PASS (65 assertions)`. The merge bar at `59c386425` was GREEN, 72 of 72 legs, the
+`install-prefix (shipped surface)` leg among them.
