@@ -111,7 +111,7 @@ of its return.
 | Field | From | When nothing answers |
 |---|---|---|
 | role | the agent's meta `agentType`; for a direct spawn, else the marker's `role` | `unknown` |
-| effort | the agent transcript's last `effort`; else the agent type's `effort:` line | `unknown` |
+| effort | the agent transcript's last `effort` | `unknown` |
 | model | the transcript's last `message.model`; for a direct spawn, else the call's `resolvedModel` | `unknown` |
 | unit or label | the marker's `unit`, else the meta's `description`; for a harness agent, the one unit id its journal label names, else the label | `unknown` |
 | prompt | the handoff and its marker's `path`; for a harness agent, the call's `briefPath`, else its `scriptPath` | `unknown` |
@@ -192,8 +192,8 @@ R12 and every render refuses it with exit 2, so no level falls back silently.
 - `[effort.profiles.<name>]` is a profile for one model family (TOOL-aProfiledEffort-1). It holds
   `match` and `default`, and optionally `[effort.profiles.<name>.roles]` and
   `[effort.profiles.<name>.stages.<workflow>]` in the grammar of the tables above. The seeded
-  `[effort.profiles.fable]` names no role and no stage, so every role and stage runs at `medium` on
-  any Claude Fable version. Adding a profile is adding one such table: no code changes, and
+  `[effort.profiles.fable]` names no role and no stage, so every role and every stage key of a
+  workflow's `stages` table runs at `medium` on any Claude Fable version. Adding a profile is adding one such table: no code changes, and
   `check_roles.py` grades it as R12. A matched profile is read ALONE: the role and stage entries of
   the tables above do not reach a model a profile matches.
 
@@ -210,9 +210,12 @@ answer.
 **The limits.** The script does not check the id a caller types. A session that cannot name its
 model leaves the flag off, never passes an empty one, which exits 2, and gets the tables above. A
 spawn that is passed no level runs at its agent type's level, else the session's: a harness stage
-the workflow table gives no key, and a direct spawn from a session whose `Agent` tool offers no
-`effort` parameter. Nothing refuses a call made without the flag or under a misnamed model; the
-`agent` line, under "The agent lines", prints the effort and the model each agent ran at.
+the workflow table gives no key, which today is
+`committer` and `probe`: `committer` of `unattended-build.js` and `probe` of `tier2-review.js`; and
+a direct spawn from a session whose `Agent` tool offers no `effort` parameter. Nothing refuses a
+call made without the flag or under a misnamed model; the `agent` line, under "The agent lines",
+prints the effort and the model each agent's transcript records, and `unknown` for an effort it
+does not record.
 
 The levels are `low`, `medium`, `high`, `xhigh` and `max`, the names Claude Code 2.1.292 reads on both
 an agent type and a `Workflow` `agent()` call; the integer form only the agent loader takes is

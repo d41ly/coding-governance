@@ -52,7 +52,7 @@ reference; this page is the short version.
 - **Give a model its own levels:** add one `[effort.profiles.<name>]` table to the same file, with
   `match`, the words of the model id it answers, and `default`; `roles` and `stages.<workflow>`
   tables under it are optional. No code changes. The seeded `[effort.profiles.fable]` runs every
-  role and stage at `medium` on any Claude Fable version. A profile reaches an agent only through
+  role, and every stage a workflow's `stages` table keys, at `medium` on any Claude Fable version. A profile reaches an agent only through
   the two calls above, never through its rendered agent type, so it takes effect on the next call
   with no re-render and no new session.
 - **Render in this order.** After changing a role file, re-render the charter first with

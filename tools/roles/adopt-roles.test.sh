@@ -17,7 +17,8 @@
 # one line per role and its refusal of a line past 200 characters (arm 8); the agents verb's two
 # lines for a direct spawn, its tokens counted once per message id, each added to the build's agent
 # ledger exactly once across two runs, a run without `--write` writing nothing, a harness run's two
-# agent lines and one returned line, and a prompt opening with a blank line still matching (arm 9);
+# agent lines and one returned line, a prompt opening with a blank line still matching, and a
+# transcript stripped of its effort printing `unknown` under the plain policy (arm 9);
 # the stand-in render's refusal, R15 both ways and over eight bad rows, R13, R14 and R0 (arm 10);
 # the roles kit's reading of a prompt's marker line and of the charter's micro-format fence
 # against the hooks kit's own (arm 11, which SKIPs out loud as arm 6 does); a `--scaffold` whose
@@ -30,7 +31,7 @@
 # a harness held only in the directory above the tool root with no receipt, which the Skill and the
 # role index both name there (arm 17); and the handoff verbs `stage-efforts` and `role-efforts` over
 # a policy that gains one profile, with no model, a model id no profile matches, one that profile
-# matches, and an empty one (arm 19). Every arm is a self-contained block below the prologue, so a
+# matches, an empty or whitespace-only one, and one a second profile also matches (arm 19). Every arm is a self-contained block below the prologue, so a
 # slice of the prologue and one block runs that arm alone.
 #
 # WHAT THIS DOES NOT CHECK: what the rendered Skill or an agent type SAYS beyond the citation paths
@@ -47,7 +48,8 @@
 # micro-format head but `agent` and `returned`. Arm 13 does not check which rule refused: any
 # non-zero exit of the agent render takes the same branch, so it grades the adopter's handling of a
 # refusal, and R10 only as the trigger. Arm 19 does not check any profile the policy file seeds, nor
-# the resolver's order inside a profile.
+# the resolver's order inside a profile. Arm 9 does not check an agent whose model a profile
+# matches, since the verb reads no profile.
 #
 # Withheld from the payload by the kit's descriptor (`project-owned`): its subject is the adopter in
 # this directory, so it has a job only where that source changes.
@@ -83,7 +85,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # for arm 15 and +2 for arm 16 (TOOL-dRenderedAnchor-3). +1 for arm 17 (TOOL-dRenderedAnchor-4).
 # +1 for arm 18 (TOOL-dFoldedAudit-15).
 # +4 for arm 19 (TOOL-aProfiledEffort-2).
-FLOOR_ASSERTIONS=55
+# +1 for arm 9 and +1 for arm 19 (TOOL-aProfiledEffort-4).
+FLOOR_ASSERTIONS=57
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 FX=""; FXK="$KREL"
@@ -341,6 +344,19 @@ out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --handoff "$A9H" --session 
 check_arm "arm 9 a prompt opening with a blank line still matches its handoff" \
    "$([ "$rc" = 0 ] && [ "${out//$'\r'/}" = "$A9L1"$'\n'"$A9L2" ] && echo 1 || echo 0)"
 [ "$rc" = 0 ] || sed 's/^/    /' "$TMP_ROOT/a9b.err"
+# TOOL-aProfiledEffort-4 S1: an effort no transcript record carries prints `unknown`. It runs last
+# because it rewrites the fixture's transcript. The fixture's policy is the kit's own, so this is
+# the plain case and no profile is read. The last clause keeps the assertion from passing by finding
+# nothing: the rendered agent type does carry a level, and the verb did not print it.
+"$PY" -B -c 'import json, sys
+rows = [json.loads(ln) for ln in open(sys.argv[1], encoding="utf-8") if ln.strip()]
+for r in rows:
+    r.pop("effort", None)
+open(sys.argv[1], "w", encoding="utf-8", newline="\n").write("".join(json.dumps(r) + "\n" for r in rows))' "${A9S%.jsonl}/subagents/agent-a0000000000000001.jsonl"
+out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --handoff "$A9H" --session "$A9S" 2>"$TMP_ROOT/a9u.err"); rc=$?
+check_arm "arm 9 an effort no transcript record carries prints unknown, never the agent type's own level" \
+   "$([ "$rc" = 0 ] && [ "${out//$'\r'/}" = "${A9L1/effort medium/effort unknown}"$'\n'"$A9L2" ] \
+      && grep -q 'no record answers level' "$TMP_ROOT/a9u.err" && grep -q '^effort: ' "$FX/.claude/agents/gov-builder.md" && echo 1 || echo 0)"
 
 # ---- arm 10: the stand-in refusal, R15 both ways and over eight bad rows, R13, R14 and R0 --------
 # TOOL-aOrientedCast-25 S3: the rules TOOL-aOrientedCast-17 and TOOL-aOrientedCast-19 added, each
@@ -771,8 +787,10 @@ for _w in spec-write closing-review roles; do
   (cd "$FX" && "$PY" -B "$KREL/handoff.py" "${_q[@]}" --model vendor-other-9) > "$_f.other" 2>/dev/null || _b19=0
   cmp -s "$_f.plain" "$_f.other" || _b19=0
   (cd "$FX" && "$PY" -B "$KREL/handoff.py" "${_q[@]}" --model vendor-tfam-9) > "$_f.tfam" 2>/dev/null || _c19=0
-  out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" "${_q[@]}" --model "" 2>&1 >/dev/null); rc=$?
-  [ "$rc" = 2 ] && [[ $out == *'--model is empty'* ]] || _d19=0
+  for _m in "" " "; do
+    out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" "${_q[@]}" --model "$_m" 2>&1 >/dev/null); rc=$?
+    [ "$rc" = 2 ] && [[ $out == *'--model is empty'* ]] || _d19=0
+  done
 done
 grep -qF '"gov-builder":"max"' "$TMP_ROOT/a19.roles.tfam" && grep -qF '"synthesis":"xhigh"' "$TMP_ROOT/a19.closing-review.tfam" \
    && ! cmp -s "$TMP_ROOT/a19.roles.plain" "$TMP_ROOT/a19.roles.tfam" \
@@ -780,7 +798,21 @@ grep -qF '"gov-builder":"max"' "$TMP_ROOT/a19.roles.tfam" && grep -qF '"synthesi
 check_arm "arm 19 with no model both verbs print the default tables' levels, re-derived inline" "$_a19"
 check_arm "arm 19 a model id no profile matches prints the no-flag bytes" "$_b19"
 check_arm "arm 19 a model id the appended profile matches prints that profile's levels" "$_c19"
-check_arm "arm 19 an empty --model refuses with exit 2, naming the flag" "$_d19"
+check_arm "arm 19 an empty or whitespace-only --model refuses with exit 2, naming the flag" "$_d19"
+# 19e (TOOL-aProfiledEffort-4 S8): a second profile, `tven`, matching `vendor`, so `vendor-tfam-9`
+# is a model two profiles match. Both verbs exit 1 with stdout empty and a stderr naming R12 and
+# both `match` keys, and no Traceback. The append comes last: `tven` also answers `vendor-other-9`,
+# which 19b reads as unmatched.
+printf '%s\n' '' '[effort.profiles.tven]' 'match = ["vendor"]' 'default = "low"' >> "$FX/$KREL/house/policy.toml"
+_e19=1
+for _w in roles build; do
+  _q=(stage-efforts "$_w"); [ "$_w" = roles ] && _q=(role-efforts)
+  (cd "$FX" && "$PY" -B "$KREL/handoff.py" "${_q[@]}" --model vendor-tfam-9) > "$TMP_ROOT/a19e.out" 2>"$TMP_ROOT/a19e.err"; rc=$?
+  [ "$rc" = 1 ] && [ ! -s "$TMP_ROOT/a19e.out" ] && grep -qF 'R12' "$TMP_ROOT/a19e.err" \
+     && grep -qF 'effort.profiles.tfam.match' "$TMP_ROOT/a19e.err" && grep -qF 'effort.profiles.tven.match' "$TMP_ROOT/a19e.err" \
+     && ! grep -qF 'Traceback' "$TMP_ROOT/a19e.err" || _e19=0
+done
+check_arm "arm 19 a model two profiles match exits 1 through both verbs, naming both match keys" "$_e19"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

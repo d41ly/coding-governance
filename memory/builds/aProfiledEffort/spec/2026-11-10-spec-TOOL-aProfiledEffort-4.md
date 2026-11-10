@@ -1,11 +1,12 @@
 # TOOL-aProfiledEffort-4 — the closing review's seven confirmed items are closed, and arm 19 fails by its own FAIL lines
 
-**Status:** INPROGRESS · rev-2 · 2026-11-10 · node a · Tier-2 · base 7c896db6 · streams tooling · order 4
+**Status:** CLOSED · rev-2 · 2026-11-10 · node a · Tier-2 · base 7c896db6 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-10-build-TOOL-aProfiledEffort-4-1-acceptance-ledger.md](../build/2026-11-10-build-TOOL-aProfiledEffort-4-1-acceptance-ledger.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aProfiledEffort-4-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-4-1-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aProfiledEffort-4-2-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-4-2-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aProfiledEffort-4-ac4-revision-brief.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-4-ac4-revision-brief.md) | research | — |

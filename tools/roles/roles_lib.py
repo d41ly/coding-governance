@@ -629,10 +629,13 @@ def scan_stand_in_declarations(root, memory_root):
 
 def resolve_profile(policy, model):
     """The name of the one `[effort.profiles.<name>]` table whose `match` holds a word of the model
-    id, or None when none does or no model is named (TOOL-aProfiledEffort-1). The words are the id's
-    runs of letters and digits after lower-casing, so an entry matches a whole word and never a
-    substring. Two profiles matching one model raise a RolesError: no profile wins by file order."""
+    id, or None when none does or no model is named (TOOL-aProfiledEffort-1); None is also the answer
+    for an id that holds no word, given before any profile is read (TOOL-aProfiledEffort-4). The
+    words are the id's runs of letters and digits after lower-casing, so an entry matches a whole
+    word and never a substring. Two profiles matching one model raise a RolesError: no profile wins by file order."""
     words = set(MODEL_SEGMENT_RE.findall((model or "").lower()))
+    if not words:
+        return None
     hits = [name for name, profile in policy["effort"].get("profiles", {}).items()
             if words.intersection(profile["match"])]
     if len(hits) > 1:

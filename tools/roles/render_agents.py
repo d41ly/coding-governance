@@ -671,13 +671,17 @@ def run_selftest():
     # Arm 19 (TOOL-aProfiledEffort-1): a profile table per model family. 19b, a type carries the
     # default tables' level; 19a, 19c, 19d and 19f, the levels a model resolves under each policy;
     # 19e, every profile defect refuses the render under its own dotted key and writes nothing.
+    # The rows also hold (TOOL-aProfiledEffort-4): a default-table stage override, `k2`, that a
+    # matched profile does not inherit; a model id in mixed case; and a `match` of two words, on
+    # the resolve side by its second word and on the defect side by a second word `fam` holds.
     with tempfile.TemporaryDirectory() as tmp:
         root = pathlib.Path(tmp)
-        base = '[effort]\ndefault = "low"\n\n[effort.roles]\nr-one = "high"\n'
+        base = ('[effort]\ndefault = "low"\n\n[effort.roles]\nr-one = "high"\n\n'
+                '[effort.stages.w5]\nk2 = "high"\n')
         fam = base + ('\n[effort.profiles.fam]\nmatch = ["fam"]\ndefault = "max"\n\n'
                       '[effort.profiles.fam.roles]\nr-two = "xhigh"\n\n'
                       '[effort.profiles.fam.stages.w5]\nk1 = "medium"\n')
-        ven = fam + '\n[effort.profiles.ven]\nmatch = ["vendor"]\ndefault = "medium"\n'
+        ven = fam + '\n[effort.profiles.ven]\nmatch = ["vendor", "vend2"]\ndefault = "medium"\n'
         kit, tool_root = build_fixture(root, roles, fam)
         with open(kit / "workflows.toml", "a", encoding="utf-8") as fh:
             fh.write('\n[[workflow]]\nname = "w5"\ndriver = "workflow"\nharness = "%s"\n'
@@ -690,12 +694,14 @@ def run_selftest():
             p = root / ".claude" / "agents" / (slot + ".md")
             check_arm(state, 19, rc == 0 and p in before and "effort: %s" % level in before[p].decode(
                 "utf-8").split("\n"), "19b: %s does not carry the default tables' effort: %s" % (slot, level))
-        plain = ("high", "low", {"k1": "high", "k2": "low"})
+        plain = ("high", "low", {"k1": "high", "k2": "high"})
         for row, text, model, want in (
                 ("19a", base, "vendor-fam-9", plain), ("19a", base, None, plain),
                 ("19c", fam, "vendor-fam-9", ("max", "xhigh", {"k1": "medium", "k2": "xhigh"})),
+                ("19c", fam, "Vendor-FAM-9", ("max", "xhigh", {"k1": "medium", "k2": "xhigh"})),
                 ("19d", fam, "vendor-other-9", plain), ("19d", fam, "affam-9", plain), ("19d", fam, None, plain),
                 ("19f", ven, "vendor-other-9", ("medium", "medium", {"k1": "medium", "k2": "medium"})),
+                ("19f", ven, "vend2-other-9", ("medium", "medium", {"k1": "medium", "k2": "medium"})),
                 ("19f", ven, "vendor-fam-9", None)):
             (kit / "house" / "policy.toml").write_text(text, encoding="utf-8")
             try:
@@ -723,6 +729,7 @@ def run_selftest():
                 ('match = []\ndefault = "low"\n', "x.match"),
                 ('match = ["vendor-x"]\ndefault = "low"\n', "x.match"),
                 ('match = ["fam"]\ndefault = "low"\n', "x.match"),
+                ('match = ["x", "fam"]\ndefault = "low"\n', "x.match"),
                 (None, "x")):
             row = '\n[effort.profiles]\nx = "low"\n' if lines is None else "\n[effort.profiles.x]\n" + lines
             (kit / "house" / "policy.toml").write_text(fam + row, encoding="utf-8")

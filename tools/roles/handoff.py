@@ -47,7 +47,7 @@ charter (TOOL-aOrientedCast-17).
 
 `agents` prints the governing doc's `agent` line for each agent its selector names, then its
 `returned` line once it has returned, each shape read from the doc's micro-format fence and filled
-by placeholder name from the session's own records, the role index and the agent types; a field
+by placeholder name from the session's own records and the role index; a field
 nothing answers prints `unknown` (TOOL-aOrientedCast-20). `--handoff` names a direct spawn, every
 `Agent` call whose prompt opens with the file's marker line as the hooks kit's spawn guard reads it,
 through `roles_lib.extract_prompt_marker` (TOOL-aOrientedCast-25); `--run` a harness run, one agent
@@ -79,7 +79,9 @@ single and not a placeholder is copied verbatim; whether a rendered role is curr
 catalogue, since `check` hashes the file's own bytes and nothing more; and whether a secret sits in
 a card or a brief, which the charter's `[security]` rule guards and this script does not. For
 `agents`: the transcript format is no contract, so a renamed field reads as `unknown`; an `effort`
-or a `model` is what the transcript records, not proved to be what the API applied; a file written
+or a `model` is what the transcript records, not proved to be what the API applied; an effort no
+transcript record carries prints `unknown`, never the agent type's `effort:` line, which is the
+default tables' level and not the level a profile dispatched (TOOL-aProfiledEffort-4); a file written
 through Bash is not counted as written; the session read may not be the one the build ran in; and
 a ledger line edited by hand passes, since nothing re-derives the ledger.
 For `--model`: the id is not checked to be the model the session or the spawned agent runs, since
@@ -125,10 +127,9 @@ LEDGER_TAIL = "-agent-ledger.md"
 UNKNOWN = "unknown"
 WRITE_TOOLS = ("Write", "Edit", "MultiEdit", "NotebookEdit")
 SESSION_ID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
-#: A run id or an agent id reaches a path only in this shape; so does a role naming an agent type.
+#: A run id or an agent id reaches a path only in this shape.
 PATH_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
 LABEL_UNIT_RE = re.compile(r"[A-Z]+-[A-Za-z]+-[0-9]+")
-EFFORT_LINE_RE = re.compile(r"^effort:[ \t]*(\S+)$", re.M)
 SHAPE_FIELD_RE = re.compile(r"<([^<>]+)>")
 NOTIFICATION_RE = re.compile(r"<task-notification>(.*?)</task-notification>", re.S)
 #: The session file's lines worth parsing: every other line is skipped unparsed, by its bytes.
@@ -829,11 +830,11 @@ def write_agent_ledger(root, memory_root, build, lines):
 
 def print_agent_lines(root, memory_root, charter_path, session, handoff_arg, run_id, write=False):
     """Print the governing doc's `agent` line for each agent the selector names, then its `returned`
-    line once it has returned, filled by name from the session's records, the role index and the
-    agent types (TOOL-aOrientedCast-20). When `write` is true, add each line holding no UNKNOWN
+    line once it has returned, filled by name from the session's records and the role index
+    (TOOL-aOrientedCast-20). When `write` is true, add each line holding no UNKNOWN
     field to the build's agent ledger; else write nothing and note the held lines and `--write`
     (TOOL-aOrientedCast-25). RolesError on a refusal, with nothing printed."""
-    from render_agents import AGENTS_REL, INDEX_REL  # the renderer's two paths, as print_roster imports the checker's
+    from render_agents import INDEX_REL  # the renderer's index path, as print_roster imports the checker's
     doc = charter_path.relative_to(root).as_posix() if root in charter_path.parents else charter_path.as_posix()
     shapes = lib.extract_microformat_shapes(lib.load_text(charter_path))
     for head in ("agent", "returned"):
@@ -922,10 +923,6 @@ def print_agent_lines(root, memory_root, charter_path, session, handoff_arg, run
     for aid, tr, role_fallback, unit, (name, path), model_fallback, returned, outcome in agents:
         role = tr["type"] or role_fallback
         level = tr["effort"]
-        if level is None and role and PATH_ID_RE.match(role) and (root / AGENTS_REL / (role + ".md")).is_file():
-            fm = lib.FRONT_MATTER_RE.match(lib.load_text(root / AGENTS_REL / (role + ".md")))
-            hit = EFFORT_LINE_RE.search(fm.group(1)) if fm else None
-            level = hit.group(1) if hit else None
         entry = held.get(role) if isinstance(held.get(role), dict) else {}
         gates = entry.get("gates") if isinstance(entry.get("gates"), list) else []
         fields = {"role": role, "level": level, "model": tr["model"] or model_fallback, "unit-id|label": unit,
