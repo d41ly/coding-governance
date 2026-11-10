@@ -22,6 +22,12 @@ synthesis = "medium"
 skeptic = "medium"
 synthesis = "medium"
 
+[effort.profiles.fable]       # a table per model family; an unmatched model takes the tables above
+match = ["fable"]             # one word of the model id, any version, as in claude-fable-5-2
+default = "medium"            # names no role and no stage, so every one runs at medium
+# [effort.profiles.<name>.roles] and [effort.profiles.<name>.stages.<workflow>] take the keys of the
+# tables above. A profile reaches an agent at dispatch, never through its rendered agent type.
+
 [gates]                       # the gate legs a role may run, by manifest name; every other role runs none
 # A trailing `?` marks a leg whose kit a target may not install: absent from the manifest, it is a note.
 gov-spec-writer = ["memory hygiene", "lexicon naming predicates?"]

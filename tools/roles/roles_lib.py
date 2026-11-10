@@ -44,6 +44,9 @@ READ_KEYS = frozenset(
 #: integer form only the loader accepts is refused, so one level is legal on both carriers.
 EFFORT_LEVELS = tuple("low medium high xhigh max".split())
 POLICY_EFFORT_KEYS = ("default", "roles", "stages")
+#: One word of a model id, a run of lower-case letters and digits (TOOL-aProfiledEffort-1):
+#: `resolve_profile` splits a lower-cased id into them, and a profile's `match` entry is exactly one.
+MODEL_SEGMENT_RE = re.compile(r"[a-z0-9]+")
 #: The policy file's tables (TOOL-aOrientedCast-11 adds `gates`).
 POLICY_TABLES = ("effort", "gates")
 #: The gate manifest's file name under the tool root: the leg list the merge-bar runner reads.
@@ -407,6 +410,11 @@ def load_policy(kit_dir, roles, workflows, notes=None):
     reads; when it does not, one line is appended to `notes` (when given) instead of a defect.
     A name ending in `?` is OPTIONAL (TOOL-aOrientedCast-13): a leg the manifest lacks is a note
     rather than a defect, and the returned policy carries every name with its `?` taken off.
+
+    `[effort.profiles.<name>]` (TOOL-aProfiledEffort-1) is a level table for one model family: a
+    `match` list of words and the keys of `[effort]` itself, graded by the same helper. A word two
+    profiles hold is a defect on the later one. Which words are model families is not checked, so
+    two profiles holding different words of one id load, and `resolve_profile` refuses that id.
     """
     path = pathlib.Path(kit_dir) / "house" / "policy.toml"
     where = path.as_posix()
@@ -424,6 +432,53 @@ def load_policy(kit_dir, roles, workflows, notes=None):
             bad.append("%s: R12 — %s — %r is not a level; the levels are %s"
                        % (where, key, value, ", ".join(EFFORT_LEVELS)))
 
+    by_name = {w.get("name"): w for w in workflows}
+
+    def check_effort_table(at, table, own):
+        """The checks of one level table, `[effort]` or a profile, whose dotted key is `at` and
+        which holds the key `own` beside POLICY_EFFORT_KEYS."""
+        for k in table:
+            if k not in POLICY_EFFORT_KEYS + (own,):
+                bad.append("%s: R12 — %s.%s — unknown key; %s holds %s"
+                           % (where, at, k, at, ", ".join(POLICY_EFFORT_KEYS + (own,))))
+        if "default" not in table:
+            bad.append("%s: R12 — %s.default — is absent" % (where, at))
+        else:
+            check_level(at + ".default", table["default"])
+        role_levels = table.get("roles", {})
+        if not isinstance(role_levels, dict):
+            role_levels = {}
+            bad.append("%s: R12 — %s.roles — is not a table" % (where, at))
+        for slot, level in role_levels.items():
+            key = "%s.roles.%s" % (at, slot)
+            check_level(key, level)
+            if slot not in roles:
+                bad.append("%s: R12 — %s — names no role file" % (where, key))
+            elif roles[slot]["keys"].get("agent", "true") == "false":
+                bad.append("%s: R12 — %s — names an agent: false role, so no agent type carries it"
+                           % (where, key))
+        stage_levels = table.get("stages", {})
+        if not isinstance(stage_levels, dict):
+            stage_levels = {}
+            bad.append("%s: R12 — %s.stages — is not a table" % (where, at))
+        for name, levels in stage_levels.items():
+            key = "%s.stages.%s" % (at, name)
+            if not isinstance(levels, dict):
+                bad.append("%s: R12 — %s — is not a table" % (where, key))
+                continue
+            if name not in by_name:
+                bad.append("%s: R12 — %s — names no workflow" % (where, key))
+                continue
+            held = by_name[name].get("stages")
+            if not isinstance(held, dict):
+                bad.append("%s: R12 — %s — the workflow %s has no stages table" % (where, key, name))
+                continue
+            for stage, level in levels.items():
+                check_level("%s.%s" % (key, stage), level)
+                if stage not in held:
+                    bad.append("%s: R12 — %s.%s — is not a stage key of %s, whose keys are %s"
+                               % (where, key, stage, name, ", ".join(sorted(held))))
+
     for k in data:
         if k not in POLICY_TABLES:
             bad.append("%s: R12 — %s — unknown top-level key; the tables are %s"
@@ -432,48 +487,33 @@ def load_policy(kit_dir, roles, workflows, notes=None):
     if not isinstance(effort, dict):
         effort = {}
         bad.append("%s: R12 — effort — is not a table" % where)
-    for k in effort:
-        if k not in POLICY_EFFORT_KEYS:
-            bad.append("%s: R12 — effort.%s — unknown key; effort holds %s"
-                       % (where, k, ", ".join(POLICY_EFFORT_KEYS)))
-    if "default" not in effort:
-        bad.append("%s: R12 — effort.default — is absent" % where)
-    else:
-        check_level("effort.default", effort["default"])
-    role_levels = effort.get("roles", {})
-    if not isinstance(role_levels, dict):
-        role_levels = {}
-        bad.append("%s: R12 — effort.roles — is not a table" % where)
-    for slot, level in role_levels.items():
-        key = "effort.roles." + slot
-        check_level(key, level)
-        if slot not in roles:
-            bad.append("%s: R12 — %s — names no role file" % (where, key))
-        elif roles[slot]["keys"].get("agent", "true") == "false":
-            bad.append("%s: R12 — %s — names an agent: false role, so no agent type carries it"
-                       % (where, key))
-    stage_levels = effort.get("stages", {})
-    if not isinstance(stage_levels, dict):
-        stage_levels = {}
-        bad.append("%s: R12 — effort.stages — is not a table" % where)
-    by_name = {w.get("name"): w for w in workflows}
-    for name, table in stage_levels.items():
-        key = "effort.stages." + name
-        if not isinstance(table, dict):
-            bad.append("%s: R12 — %s — is not a table" % (where, key))
+    check_effort_table("effort", effort, "profiles")
+    profiles = effort.get("profiles", {})
+    if not isinstance(profiles, dict):
+        profiles = {}
+        bad.append("%s: R12 — effort.profiles — is not a table" % where)
+    matched = {}
+    for name, profile in profiles.items():
+        at = "effort.profiles." + name
+        if not isinstance(profile, dict):
+            bad.append("%s: R12 — %s — is not a table" % (where, at))
             continue
-        if name not in by_name:
-            bad.append("%s: R12 — %s — names no workflow" % (where, key))
-            continue
-        held = by_name[name].get("stages")
-        if not isinstance(held, dict):
-            bad.append("%s: R12 — %s — the workflow %s has no stages table" % (where, key, name))
-            continue
-        for stage, level in table.items():
-            check_level("%s.%s" % (key, stage), level)
-            if stage not in held:
-                bad.append("%s: R12 — %s.%s — is not a stage key of %s, whose keys are %s"
-                           % (where, key, stage, name, ", ".join(sorted(held))))
+        check_effort_table(at, profile, "match")
+        words = profile.get("match")
+        if "match" not in profile:
+            bad.append("%s: R12 — %s.match — is absent" % (where, at))
+        elif not isinstance(words, list) or not all(isinstance(w, str) for w in words):
+            bad.append("%s: R12 — %s.match — is not a list of strings" % (where, at))
+        elif not words:
+            bad.append("%s: R12 — %s.match — is empty, so the profile matches no model" % (where, at))
+        else:
+            for word in words:
+                if not MODEL_SEGMENT_RE.fullmatch(word):
+                    bad.append("%s: R12 — %s.match — %r is not one word; an entry is one run of "
+                               "lower-case letters and digits" % (where, at, word))
+                elif matched.setdefault(word, name) != name:
+                    bad.append("%s: R12 — %s.match — %r is also in effort.profiles.%s.match, so two "
+                               "profiles match one model" % (where, at, word, matched[word]))
     gates = data.get("gates", {})
     if not isinstance(gates, dict):
         gates = {}
@@ -587,17 +627,35 @@ def scan_stand_in_declarations(root, memory_root):
     return found, defects
 
 
-def resolve_effort(policy, slot):
-    """A role's level: its `[effort.roles]` entry, else `default`."""
-    effort = policy["effort"]
-    return effort.get("roles", {}).get(slot, effort["default"])
+def resolve_profile(policy, model):
+    """The name of the one `[effort.profiles.<name>]` table whose `match` holds a word of the model
+    id, or None when none does or no model is named (TOOL-aProfiledEffort-1). The words are the id's
+    runs of letters and digits after lower-casing, so an entry matches a whole word and never a
+    substring. Two profiles matching one model raise a RolesError: no profile wins by file order."""
+    words = set(MODEL_SEGMENT_RE.findall((model or "").lower()))
+    hits = [name for name, profile in policy["effort"].get("profiles", {}).items()
+            if words.intersection(profile["match"])]
+    if len(hits) > 1:
+        raise RolesError("R12 — the model %r — matches %s, so no one profile's levels are its own"
+                         % (model, " and ".join("effort.profiles.%s.match" % n for n in hits)))
+    return hits[0] if hits else None
 
 
-def resolve_stage_efforts(policy, workflow):
-    """`{stage key: level}` for every key of a workflow entry's `stages` table: its
-    `[effort.stages.<workflow>]` entry, else the level of the slot the table maps it to."""
-    over = policy["effort"].get("stages", {}).get(workflow.get("name"), {})
-    return {key: over.get(key, resolve_effort(policy, slot))
+def resolve_effort(policy, slot, model=None):
+    """A role's level in the level table `model` takes, the profile `resolve_profile` names or else
+    `[effort]`, read alone: that table's `roles` entry, else its `default`."""
+    name = resolve_profile(policy, model)
+    table = policy["effort"]["profiles"][name] if name else policy["effort"]
+    return table.get("roles", {}).get(slot, table["default"])
+
+
+def resolve_stage_efforts(policy, workflow, model=None):
+    """`{stage key: level}` for every key of a workflow entry's `stages` table, in the level table
+    `model` takes: its `stages.<workflow>` entry, else the level of the slot the table maps it to."""
+    name = resolve_profile(policy, model)
+    table = policy["effort"]["profiles"][name] if name else policy["effort"]
+    over = table.get("stages", {}).get(workflow.get("name"), {})
+    return {key: over.get(key, resolve_effort(policy, slot, model))
             for key, slot in (workflow.get("stages") or {}).items()}
 
 

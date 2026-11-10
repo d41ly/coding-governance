@@ -1,11 +1,12 @@
 # TOOL-aProfiledEffort-1 — the effort policy takes a profile table per model family, validated and resolved by model, with `fable` seeded at medium
 
-**Status:** INPROGRESS · rev-1 · 2026-11-10 · node a · Tier-2 · base 7c896db6 · streams tooling · order 1 · ratified 2026-11-10
+**Status:** CLOSED · rev-1 · 2026-11-10 · node a · Tier-2 · base 7c896db6 · streams tooling · order 1 · ratified 2026-11-10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-10-build-TOOL-aProfiledEffort-1-1-acceptance-ledger.md](../build/2026-11-10-build-TOOL-aProfiledEffort-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aProfiledEffort-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-1-brief.md) | research | TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 |
 | [2026-11-10-prompt-TOOL-aProfiledEffort-1-build-brief.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-1-build-brief.md) | research | — |
 

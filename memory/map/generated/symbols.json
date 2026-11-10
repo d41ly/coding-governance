@@ -20838,6 +20838,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "resolve_profile",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "resolve_projects_root",
       "kind": "function",
       "file": "tools/runlog/extract.py"

@@ -29,3 +29,7 @@ anchor-ref: refs/heads/main
 base: 7c896db61b45b2e825779fe7ace29337e75cd095
 
 ## Parked
+
+2026-11-10T03:48:27Z dispatch · item bb2e53cc TOOL-aProfiledEffort-1 · reason tools/roles/house/policy.toml tools/roles/roles_lib.py tools/roles/check_roles.py tools/roles/render_agents.py memory/map/generated/symbols.json memory/builds/aProfiledEffort/spec/2026-11-10-spec-TOOL-aProfiledEffort-1.md memory/builds/aProfiledEffort/build/2026-11-10-build-TOOL-aProfiledEffort-1-1-acceptance-ledger.md memory/builds/aProfiledEffort/README.md memory/LIVE.md
+
+2026-11-10T03:48:32Z brief · item TOOL-aProfiledEffort-1 · reason e7d7ad09d3a7 memory/builds/aProfiledEffort/prompts/2026-11-10-prompt-TOOL-aProfiledEffort-1-build-brief.md
