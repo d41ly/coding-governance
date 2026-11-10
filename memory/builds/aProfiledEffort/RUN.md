@@ -9,11 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-aProfiledEffort-5=OPEN TOOL-aProfiledEffort-6=OPEN
+units-at-landing: TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 TOOL-aProfiledEffort-4
+gates-run: unattended-17942892514737879693-1164460 b12a9c81
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 06840ba24b09b6527d0bbdf1a6f607ceb3ad060b
-phase: VERIFYING
+phase: LANDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/agent-effort-levels-role-task-507d91
