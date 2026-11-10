@@ -1,12 +1,14 @@
 # TOOL-aProfiledEffort-3 — every dispatch route names the session's model and spawns at the level the resolver returns
 
-**Status:** SPECCED · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-10-prompt-TOOL-aProfiledEffort-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-1-brief.md) | research | TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 |
+| [2026-11-10-prompt-TOOL-aProfiledEffort-3-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-3-1-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-TOOL-aProfiledEffort-3-token-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-3-token-fix-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -299,8 +301,8 @@ mints.
   which would mean a profile reached the render path.
 - **AC3** — When `bash tools/unattended/adopt-unattended.sh` has run, the observation's
   `tools/unattended/VERBS.template.md` line reads `calls=1+`, `bare=0`, `rule=1+` and `role=1+`,
-  and `diff <(tr -d '\r' < memory/guides/UNATTENDED-VERBS.md) <(tr -d '\r' < tools/unattended/VERBS.template.md)`
-  prints nothing.
+  and a `diff` of `memory/guides/UNATTENDED-VERBS.md` against `tools/unattended/VERBS.template.md`,
+  each read through `tr -d '\r'`, prints nothing.
   Red when: the `efforts` sentence keeps the unflagged call, the bullet states no direct-spawn
   rule, or the installed copy was left behind.
 - **AC4** — When the observation runs, its `tools/roles/README.md` line reads `calls=3+`, `bare=0`,
@@ -351,6 +353,11 @@ none
 
 - rev-1 · 2026-11-10 · initial draft, from the brief's items 6 and 7 and acceptance 7, the seven
   carriers read at `fc2695a2`, and the two sibling specs at rev-1.
+- rev-2 · 2026-11-10 · AC3 · the second clause's one backticked `diff` command is respelled so each
+  path stands in backticks of its own, per the record
+  `2026-11-10-prompt-TOOL-aProfiledEffort-3-token-fix-brief`. The spec token check read
+  `memory/guides/UNATTENDED-VERBS.md)` and `tools/unattended/VERBS.template.md)`, each with its
+  closing parenthesis, as two paths git does not track. What AC3 observes is unchanged.
 
 ## 10. Reuse audit
 
