@@ -2,7 +2,7 @@
 
 # gov-spec-writer handoff — PLAY-dOrderedCharter-55
 
-<!-- gov:handoff role=gov-spec-writer build=dOrderedCharter unit=PLAY-dOrderedCharter-55 path=memory/builds/dOrderedCharter/prompts/2026-11-10-prompt-PLAY-dOrderedCharter-55-1-spec-writer.md role-sha=90b89c43f238 task-sha=5a9a96739f31 -->
+<!-- gov:handoff role=gov-spec-writer build=dOrderedCharter unit=PLAY-dOrderedCharter-55 path=memory/builds/dOrderedCharter/prompts/2026-11-10-prompt-PLAY-dOrderedCharter-55-1-spec-writer.md role-sha=90b89c43f238 task-sha=9742a636bd4c -->
 
 ## Role
 
@@ -101,6 +101,10 @@ Revise spec 55 so a builder can build it as written over HEAD.
 5. Every section 8 fork carries a resolution mark; every new fact is pinned, keyed or marked DERIVED on its own line, outside backticks;
    every function name it mints passes `python tools/lexicon/lexicon.py --suggest <name> --as py.function`.
 6. **Every reader claim is a grep**, at HEAD, for anything this revision moves or retires.
+
+7. **Specs 39 and 49 are folded, not yet committed**: rev-5 at `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dorderedcharter-725f52/0394fa33-012c-408f-a840-e6e4cfaac23f/scratchpad/fold39/2026-10-24-spec-PLAY-dOrderedCharter-39.md` and rev-8 at `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dorderedcharter-725f52/0394fa33-012c-408f-a840-e6e4cfaac23f/scratchpad/fold49/2026-10-24-spec-PLAY-dOrderedCharter-49.md`; read those copies as what unit 55 consumes. Two of their picks contradict spec 55 and need re-deciding under the fork rule:
+   - spec 39 F3 (b) keeps the agent-instructions wiring leg on gov's own bar as a gov-only `[[exempt_leg]]` row, not shipped with `playbook-render`, because every new adopter's bar would red on install day; spec 55's S28, AC28 and F3 give every `playbook-render` adopter the leg. Spec 55's S10 says unit 39 deletes the self-test leg's baseline line, which unit 31 rev-13 does instead.
+   - spec 49 F3 builds no census step, since the census moves no unit at HEAD; spec 55's S9 and AC9 observe that step.
 
 Resolve each choice under the fork rule and record it in section 8. Bump the **Status:** rev by one, dated 2026-11-10, status kept
 `DEFERRED`, with a revision-log line naming this brief and the sections, scope ids and acceptance ids it touches.

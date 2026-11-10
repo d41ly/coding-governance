@@ -2,7 +2,7 @@
 
 # gov-spec-writer handoff — PLAY-dOrderedCharter-54
 
-<!-- gov:handoff role=gov-spec-writer build=dOrderedCharter unit=PLAY-dOrderedCharter-54 path=memory/builds/dOrderedCharter/prompts/2026-11-10-prompt-PLAY-dOrderedCharter-54-1-spec-writer.md role-sha=90b89c43f238 task-sha=d4b4c38bea0d -->
+<!-- gov:handoff role=gov-spec-writer build=dOrderedCharter unit=PLAY-dOrderedCharter-54 path=memory/builds/dOrderedCharter/prompts/2026-11-10-prompt-PLAY-dOrderedCharter-54-1-spec-writer.md role-sha=90b89c43f238 task-sha=5facf887c5f6 -->
 
 ## Role
 
@@ -101,6 +101,8 @@ Revise spec 54 so a builder can build it as written over HEAD.
 5. Every section 8 fork carries a resolution mark; every new fact is pinned, keyed or marked DERIVED on its own line, outside backticks;
    every function name it mints passes `python tools/lexicon/lexicon.py --suggest <name> --as py.function`.
 6. **Every reader claim is a grep**, at HEAD, for anything this revision moves or retires.
+
+7. **Spec 49 is folded to rev-8**, not yet committed, at `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dorderedcharter-725f52/0394fa33-012c-408f-a840-e6e4cfaac23f/scratchpad/fold49/2026-10-24-spec-PLAY-dOrderedCharter-49.md`: read that copy as the unit 54 consumes. Its pre-check turned 48 of its items into observations of built work and kept 16 to build; check every claim spec 54 makes about unit 49 against rev-8.
 
 Resolve each choice under the fork rule and record it in section 8. Bump the **Status:** rev by one, dated 2026-11-10, status kept
 `DEFERRED`, with a revision-log line naming this brief and the sections, scope ids and acceptance ids it touches.
