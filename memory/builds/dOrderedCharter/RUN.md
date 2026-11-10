@@ -9,12 +9,22 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: PLAY-dOrderedCharter-38=DEFERRED PLAY-dOrderedCharter-56=CLOSED PLAY-dOrderedCharter-57=CLOSED PLAY-dOrderedCharter-58=CLOSED PLAY-dOrderedCharter-59=CLOSED PLAY-dOrderedCharter-60=CLOSED PLAY-dOrderedCharter-66=OPEN
+units-at-landing: PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55
+hold-run: 
+hold-streak: 1 · at 3d1604a5
+resume-owed: none · owner
+held-at: 2026-11-10T12:49:04Z
+hold-reason: every unit this run can build is CLOSED, 65 of 70; units 31, 39, 49, 54 and 55 wait on unit 31's forks F8 to F11; the second full bar over e517511e2 left the govkit acceptance matrix red behind the owner's kit-requirement decision and the policy check red as inherited, cleared by the landing merge; this run edited its own grader, so it cannot land itself
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
 parked-surfaced: yes
 keepalive-reaped: yes
-refreshed-at: 1e4f3d88537d2e2ba3e781fcd211241f757d18d7 · park · 159 touching
+refreshed-at: 1e4f3d88537d2e2ba3e781fcd211241f757d18d7 · handoff · 159 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: fd220d40bc2b488e9347311311cf3ca3af1b0677
-phase: VERIFYING
+witness: 3d1604a5ab6581676bf64dc9a2e7886bcb8598b9
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -509,3 +519,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-10T11:28:21Z decision · item an adopter's tags check reds: the shipped tools/playbook/namespaces.toml names dOrderedCharter as each namespace's owner, which an adopter's chain registry does not hold (PLAY-dOrderedCharter-72 AC6, observed at e517511e2) · reason options: a unit that ships the owner field unarmed at an adopter, or the purpose arm skipping an owner the target's chain registry lacks; either is a new unit, so it waits for the owner's scheduling rather than this close
 
 2026-11-10T11:28:26Z decision · item tools/check-template-size.test.sh A25r asserts check 8 branch 1's remedy without its leading ')', so check-arms reads the branch unarmed; it is pinned in memory/project/unarmed-branches.txt · reason a one-line arm fix under tools/, which the write gate refuses now that PLAY-dOrderedCharter-77 is CLOSED; the pin row leaves when the arm asserts the whole slice
+
+2026-11-10T12:49:17Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dOrderedCharter && bash tools/push-main.sh --land --slug dOrderedCharter && bash tools/unattended/unattended.sh --settle dOrderedCharter
+
+2026-11-10T12:49:17Z hold · item owner-decision · reason until owner · reaped 84c0e58e · resume none(owner)
