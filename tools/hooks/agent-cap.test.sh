@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Runnable check for the portable agent-cap.js guard on the Workflow and Agent tool calls, the rules it
-# keeps since TOOL-dFairHearing-16: rule 6, the rendered handoff, and rule 7, the settings in force
+# keeps since TOOL-dFairHearing-16: rule 6, the rendered handoff, rule 8, the effort level a call runs
+# at against its model's (TOOL-aGuardedEffort-1), and rule 7, the settings in force
 # against the landed agent limit, plus the readers it exports, its refusal of every `--only=`, and
 # its refusal of a spec-audit call with no opt-in pack beside it (TOOL-dFairHearing-22).
 # Rules 2, 5 and 0 moved to the review kit and their arms to its suites; the retired rules' arms went
@@ -732,6 +733,92 @@ run_spawn "rule6 OC14 AC4: cwd in an index-less checkout keeps it over CLAUDE_PR
 HO_CWD="$NODEDIR" HO_PROJECT="$NODEDIR/noco"
 run_spawn "rule6 OC14 AC4: cwd and CLAUDE_PROJECT_DIR under no checkout -> admitted, naming rule 6 unarmed" 0 Explore ok 'rule 6 unarmed'
 HO_CWD="" HO_PROJECT=""
+write_roles none
+
+# ---- rule 8: the level a call runs at is its model's (TOOL-aGuardedEffort-1) ----------------------
+# Over rule 6's checkout and hook copy, with a hand-written index carrying an `effort` key: the role
+# and the one stage are `high` in the default tables and `medium` under the profile `tfam`, and a
+# second profile, `tven`, matches `vendor`, so `vendor-tfam-9` is a model two profiles match. Every
+# payload is a call rule 6 admits, so rule 8 is what decides. The first transcript ends on a
+# sidechain entry, a `<synthetic>` one and a line that is no JSON, which the read walks past.
+# CLAUDE_CODE_EFFORT_LEVEL is unset for every arm but the two that name it in E8_LEVEL.
+# Against a `main()` with its rule 8 block cut out, every refusal below exits 0 and every
+# not-checked line is gone. WHAT THESE DO NOT CHECK: the rendered index, which arm 6 of the roles
+# kit's adopter suite runs through this hook, and the word match, which its arm 20 holds.
+E8_EFFORT='{"default":{"roles":{"gov-researcher":"high","gov-builder":"high"},"stages":{"build":{"builder":"high"}}},"profiles":{"tfam":{"match":["tfam"],"roles":{"gov-researcher":"medium","gov-builder":"medium"},"stages":{"build":{"builder":"medium"}}},"tven":{"match":["vendor"],"roles":{"gov-researcher":"low","gov-builder":"low"},"stages":{"build":{"builder":"low"}}}},"harnesses":{"tools/'"$HO_WF"'/h.js":["build"]},"unset":{"build":{"builder":"high"}}}'
+E8_ROLES="${HO_ROLES%\}},\"effort\":$E8_EFFORT}"
+write_roles "$E8_ROLES"
+printf '%s\n' '{"type":"assistant","message":{"model":"maker-tfam-9"}}' \
+  '{"type":"assistant","isSidechain":true,"message":{"model":"maker-other-9"}}' \
+  '{"type":"assistant","message":{"model":"<synthetic>"}}' 'not json' > "$TMP/e8.tfam.jsonl"
+printf '%s\n' '{"type":"assistant","message":{"model":"maker-other-9"}}' > "$TMP/e8.other.jsonl"
+printf '%s\n' '{"type":"assistant","message":{"model":"vendor-tfam-9"}}' > "$TMP/e8.two.jsonl"
+printf '%s\n' '{"type":"user","message":{"content":"hi"}}' > "$TMP/e8.empty.jsonl"
+E8_LEVEL=""
+run_effort() { # name expected_exit tool transcript(- for none) extra-json needle(empty: an allow with an empty stderr)
+  # `extra` is merged into an Agent call's tool_input, and is a Workflow call's `args.efforts` unless null.
+  local payload got
+  payload=$("$TESTPY" -c 'import json,sys
+cwd,tool,tp,extra,pf,h=sys.argv[1:7]
+extra=json.loads(extra)
+if tool=="Agent":
+    ti={"subagent_type":"gov-researcher","description":"bx · T-1 · research","prompt":open(pf,newline="").read()}
+    ti.update(extra)
+else:
+    ti={"scriptPath":h,"args":{"roles":{"builder":"gov-builder"}}}
+    if extra is not None: ti["args"]["efforts"]=extra
+d={"tool_name":tool,"cwd":cwd,"tool_input":ti}
+if tp!="-": d["transcript_path"]=tp
+print(json.dumps(d))' "$HOJ/sub" "$3" "$4" "$5" "$TMP/ho.ok" "$HO_H")
+  printf '%s' "$payload" | (cd "$TMP" && unset CLAUDE_CODE_EFFORT_LEVEL && { [ -z "$E8_LEVEL" ] || export CLAUDE_CODE_EFFORT_LEVEL="$E8_LEVEL"; } && node "$HOOK") >/dev/null 2>"$TMP/err"; got=$?
+  if [ "$got" = "$2" ] && { if [ -z "$6" ]; then [ ! -s "$TMP/err" ]; else grep -qF -- "$6" "$TMP/err"; fi; }; then
+    echo "ok   $1 (exit $got)"; pass=$((pass+1))
+  else
+    echo "FAIL $1 (exit $got, want $2${6:+, stderr carrying '$6'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+  fi
+}
+E8_T="$NODEDIR/e8.tfam.jsonl"; E8_O="$NODEDIR/e8.other.jsonl"
+# AC1 — a matched model: no `effort` and the default level are refused, the profile's level admitted.
+run_effort "rule8 AC1: no effort on a profiled model refused, naming the profile's level" 2 Agent "$E8_T" '{}' 'and the tfam profile gives it medium on the model "maker-tfam-9" (read from the transcript)'
+run_effort "rule8 AC1: ...opening as rule 8 and naming the agent type's level" 2 Agent "$E8_T" '{}' "BLOCKED by agent-cap: rule 8 (TOOL-aGuardedEffort-1) refused this Agent call — gov-researcher would run at high (its agent type's level"
+run_effort "rule8 AC1: ...and the verb that prints the right value" 2 Agent "$E8_T" '{}' 'handoff.py role-efforts --model "maker-tfam-9"'
+run_effort "rule8 AC1: the default level passed as effort refused" 2 Agent "$E8_T" '{"effort":"high"}' "would run at high (the call's own"
+run_effort "rule8 AC1: the profile's level passed as effort admitted" 0 Agent "$E8_T" '{"effort":"medium"}' ""
+# AC2 — an unmatched model is graded against the default tables.
+run_effort "rule8 AC2: no effort on an unmatched model admitted" 0 Agent "$E8_O" '{}' ""
+run_effort "rule8 AC2: another level on an unmatched model refused, naming the default" 2 Agent "$E8_O" '{"effort":"medium"}' 'the default tables give it high'
+# AC3 — a harness call: a stage with no value runs at its agent type's level.
+run_effort "rule8 AC3: no efforts on a profiled model refused, naming the stage" 2 Workflow "$E8_T" null 'build: stage builder would run at high'
+run_effort "rule8 AC3: ...and the verb that prints the right value" 2 Workflow "$E8_T" null 'handoff.py stage-efforts build --model "maker-tfam-9"'
+run_effort "rule8 AC3: the default level passed in efforts refused" 2 Workflow "$E8_T" '{"builder":"high"}' 'expected medium'
+run_effort "rule8 AC3: the profile's level passed in efforts admitted" 0 Workflow "$E8_T" '{"builder":"medium"}' ""
+run_effort "rule8 AC3: efforts that is a list refused, saying so" 2 Workflow "$E8_T" '["medium"]' 'is present and not a plain object'
+# AC4 — the call's own model wins over the transcript's.
+run_effort "rule8 AC4: model tfam on another model's transcript graded as tfam" 2 Agent "$E8_O" '{"model":"tfam"}' 'on the model "tfam" (read from the call)'
+run_effort "rule8 AC4: ...and admitted at the profile's level" 0 Agent "$E8_O" '{"model":"tfam","effort":"medium"}' ""
+run_effort "rule8 AC4: an unmatched model on a tfam transcript admitted with no effort" 0 Agent "$E8_T" '{"model":"other"}' ""
+# AC5 — no model read admits with its own line; an index with no `effort` key is not graded.
+run_effort "rule8 AC5: no transcript_path admitted, saying so" 0 Agent - '{}' "rule 8 did not check this Agent call's effort level — the payload carries no transcript_path"
+run_effort "rule8 AC5: an unreadable transcript admitted, saying so" 0 Agent "$NODEDIR/e8.absent.jsonl" '{}' 'is unreadable (ENOENT)'
+run_effort "rule8 AC5: a transcript naming no model admitted, saying so" 0 Agent "$NODEDIR/e8.empty.jsonl" '{}' 'holds no main-chain assistant entry naming a model'
+run_effort "rule8 AC5: a harness call with no transcript_path admitted, saying so" 0 Workflow - null "rule 8 did not check this Workflow call's effort level"
+# AC11 — a model two profiles match, and a set CLAUDE_CODE_EFFORT_LEVEL on each tool.
+run_effort "rule8 AC11: a model two profiles match admitted, naming both" 0 Agent "$NODEDIR/e8.two.jsonl" '{}' 'matches the profiles tfam and tven'
+E8_LEVEL=high
+run_effort "rule8 AC11: a set CLAUDE_CODE_EFFORT_LEVEL admits an Agent call, naming the variable" 0 Agent "$E8_T" '{}' 'CLAUDE_CODE_EFFORT_LEVEL is set'
+run_effort "rule8 AC11: ...and a Workflow call is graded all the same" 2 Workflow "$E8_T" null 'rule 8 (TOOL-aGuardedEffort-1) refused this Workflow call'
+E8_LEVEL=""
+# A role the effort tables do not hold: the rule throws and main() refuses, naming a re-render.
+write_roles "$("$TESTPY" -c 'import json,sys; d=json.loads(sys.argv[1]); del d["effort"]["default"]["roles"]["gov-researcher"]; print(json.dumps(d))' "$E8_ROLES")"
+run_effort "rule8: a role the effort tables lack refused, naming a re-render" 2 Agent "$E8_T" '{}' 'render_agents.py --write'
+# An index with no `effort` key adds no rule: the call AC1 refuses is admitted with an empty stderr.
+write_roles "$HO_ROLES"
+run_effort "rule8 AC5: an index with no effort key grades nothing" 0 Agent "$E8_T" '{}' ""
+# AC8 — an `effort` that is not the shape is a broken index, which refuses both tools. Against a
+# loadRoleIndex returning the key unread, neither refusal is the broken index's.
+write_roles "${HO_ROLES%\}},\"effort\":[]}"
+run_effort "rule8 AC8: an effort that is a list refuses the spawn as a broken index" 2 Agent "$E8_T" '{"effort":"medium"}' 'effort is not'
+run_effort "rule8 AC8: ...and the harness call" 2 Workflow "$E8_T" '{"builder":"medium"}' 'effort is not'
 write_roles none
 
 echo "---- $pass passed, $fail failed ----"

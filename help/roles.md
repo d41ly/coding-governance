@@ -27,7 +27,8 @@ reference; this page is the short version.
    carries the section 1 rules its role cites and the charter's Protocols and Facts sections.
    The dispatcher passes the level for the model in use: a harness call carries `efforts`, the JSON
    `handoff.py stage-efforts <workflow> --model <id>` prints, where `<id>` is the session's own
-   model id as its environment states it.
+   model id as its environment states it. A harness call at another level is refused by the spawn
+   guard, which names the stage, both levels and that command; pass what it prints.
 
 ## How to use it
 
@@ -43,7 +44,13 @@ reference; this page is the short version.
   `gov-builder`. An edited prompt is refused. Pass the name it prints on stderr after
   `handoff: description — ` as the call's `description`; any other name is refused.
   That `Agent` call also carries `effort`: the role's value in the JSON
-  `handoff.py role-efforts --model <id>` prints.
+  `handoff.py role-efforts --model <id>` prints. A spawn at another level is refused, and the
+  refusal names the level to pass and that command. The guard reads the model from the call's
+  `model`, else from the session's transcript. When it cannot read one, or two profiles match it,
+  or `CLAUDE_CODE_EFFORT_LEVEL` is set, the call goes through with one line saying the level was not
+  checked. It does not check the agents a harness spawns itself, the `committer` and `probe`
+  stages, which workflow a call to a harness serving two runs, a default subagent model or an
+  effort ceiling in your settings, or a hand-edited role index.
 - **Change how a role behaves:** edit `<prefix>/roles/house/<role>.md`, never the file under
   `agents/`. Your overlay is appended under `## House rules`, and updates never overwrite it.
 - **Change a role's effort, or the gates a role may run:** edit `<prefix>/roles/house/policy.toml`.

@@ -31,8 +31,11 @@
 # a harness held only in the directory above the tool root with no receipt, which the Skill and the
 # role index both name there (arm 17); and the handoff verbs `stage-efforts` and `role-efforts` over
 # a policy that gains one profile, with no model, a model id no profile matches, one that profile
-# matches, an empty or whitespace-only one, and one a second profile also matches (arm 19). Every arm is a self-contained block below the prologue, so a
-# slice of the prologue and one block runs that arm alone.
+# matches, an empty or whitespace-only one, and one a second profile also matches (arm 19); one list
+# of model ids read by `resolve_profile` and by the spawn guard's `resolveModelProfile` over the index
+# rendered from arm 19's policy (arm 20, which SKIPs out loud as arm 6 does); and a profile level
+# edited with no re-render, which the adopter's check names as a drifted index (arm 21). Every arm is a self-contained block below the prologue, so a
+# slice of the prologue and one block runs that arm alone; arm 20 reads arm 19's fixture.
 #
 # WHAT THIS DOES NOT CHECK: what the rendered Skill or an agent type SAYS beyond the citation paths
 # of arms 14 to 17, which the catalogue checker and the renderer's own self-test grade; the
@@ -86,7 +89,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +1 for arm 18 (TOOL-dFoldedAudit-15).
 # +4 for arm 19 (TOOL-aProfiledEffort-2).
 # +1 for arm 9 and +1 for arm 19 (TOOL-aProfiledEffort-4).
-FLOOR_ASSERTIONS=57
+# +2 for arm 21 (TOOL-aGuardedEffort-1); arm 20 and arm 6's added payload are out of the floor.
+FLOOR_ASSERTIONS=59
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 FX=""; FXK="$KREL"
@@ -180,6 +184,11 @@ elif ! command -v node >/dev/null 2>&1; then
   echo "SKIP arm 6 — no node on PATH to run $HK/agent-cap.js"; FLOOR_ASSERTIONS=$((FLOOR_ASSERTIONS-1))
 else
   build_fixture
+  # TOOL-aGuardedEffort-1: the rendered index carries `effort`, so the hook's rule 8 grades this
+  # fixture's spawns. One profile, `tfam`, is appended and the index re-rendered: it gives every role
+  # `max`, and the third payload below names a transcript whose model it matches.
+  printf '%s\n' '' '[effort.profiles.tfam]' 'match = ["tfam"]' 'default = "max"' >> "$FX/$KREL/house/policy.toml"
+  (cd "$FX" && bash "$FXK/adopt-roles.sh" --scaffold >/dev/null 2>&1)
   printf -v _a6day '%(%F)T' -1; A6P="$MR/builds/bx/prompts/$_a6day-prompt-TOOL-bx-1-1-researcher.md"
   mkdir -p "$FX/$MR/builds/bx/prompts"
   (cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-researcher --build bx --unit TOOL-bx-1 \
@@ -203,10 +212,28 @@ sys.stdout.buffer.write(json.dumps(name, ensure_ascii=False).encode("utf-8"))' \
   # 6's, so it runs a copy of the hook with no policy kit beside it, where rule 7 adds no rule.
   HKC="$TMP_ROOT/hooks-copy/hooks"; mkdir -p "$HKC" && cp "$HK/agent-cap.js" "$HK/scratch-guard.js" "$HKC/"
   HK=$HKC
-  (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR node "$HK/agent-cap.js" < "$TMP_ROOT/a6.json" >/dev/null 2>"$TMP_ROOT/a6.hook"); hrc=$?
-  check_arm "arm 6 the renderer's task part, named as it printed, is admitted by the spawn guard" \
-     "$([ "$rc" = 0 ] && [ "$hrc" = 0 ] && [ ! -s "$TMP_ROOT/a6.hook" ] && echo 1 || echo 0)"
-  [ "$rc" = 0 ] && [ "$hrc" = 0 ] && [ ! -s "$TMP_ROOT/a6.hook" ] || sed 's/^/    /' "$TMP_ROOT/a6.err" "$TMP_ROOT/a6.hook"
+  # TOOL-aGuardedEffort-1: the payload names no transcript, so rule 8 reads no model and the admitted
+  # spawn's stderr is exactly its not-checked line. Against a main() with rule 8 cut out, it is empty.
+  A6_NOTE="agent-cap: rule 8 did not check this Agent call's effort level — the payload carries no transcript_path"
+  (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR -u CLAUDE_CODE_EFFORT_LEVEL node "$HK/agent-cap.js" < "$TMP_ROOT/a6.json" >/dev/null 2>"$TMP_ROOT/a6.hook"); hrc=$?
+  _a6ok=0; [ "$rc" = 0 ] && [ "$hrc" = 0 ] && [ "$(tr -d '\r' < "$TMP_ROOT/a6.hook")" = "$A6_NOTE" ] && _a6ok=1
+  check_arm "arm 6 the renderer's task part, named as it printed, is admitted by the spawn guard, saying only that rule 8 read no model" "$_a6ok"
+  [ "$_a6ok" = 1 ] || sed 's/^/    /' "$TMP_ROOT/a6.err" "$TMP_ROOT/a6.hook"
+  # ...and the same spawn on a transcript whose model the appended profile matches, carrying no
+  # `effort`, is refused over the RENDERED index: the hook is held to the renderer's shape.
+  TRN=$(cd "$TMP_ROOT" && { pwd -W 2>/dev/null || pwd; })
+  printf '%s\n' '{"type":"assistant","message":{"model":"vendor-tfam-9"}}' > "$TMP_ROOT/a6.tfam.jsonl"
+  "$PY" -c 'import json, sys
+with open(sys.argv[1], encoding="utf-8") as fh:
+    d = json.load(fh)
+d["transcript_path"] = sys.argv[2]
+with open(sys.argv[3], "w", encoding="utf-8") as fh:
+    json.dump(d, fh)' "$TMP_ROOT/a6.json" "$TRN/a6.tfam.jsonl" "$TMP_ROOT/a6e.json"
+  (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR -u CLAUDE_CODE_EFFORT_LEVEL node "$HK/agent-cap.js" < "$TMP_ROOT/a6e.json" >/dev/null 2>"$TMP_ROOT/a6e.hook"); hrc=$?
+  _a6e=0; [ "$hrc" = 2 ] && grep -qF 'BLOCKED by agent-cap: rule 8' "$TMP_ROOT/a6e.hook" \
+     && grep -qF 'the tfam profile gives it max on the model "vendor-tfam-9"' "$TMP_ROOT/a6e.hook" && _a6e=1
+  check_arm "arm 6 ...and on a profiled model's transcript with no effort it is refused over the rendered index, naming the profile's level" "$_a6e"
+  [ "$_a6e" = 1 ] || sed 's/^/    /' "$TMP_ROOT/a6e.hook"
   (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR node "$HK/agent-cap.js" < "$TMP_ROOT/a6s.json" >/dev/null 2>"$TMP_ROOT/a6s.hook"); hrc=$?
   check_arm "arm 6 ...and named by the role's slot it is refused, naming the rendered name" \
      "$([ "$hrc" = 2 ] && [ "$(<"$TMP_ROOT/a6.name")" != null ] && grep -qF -- "$(<"$TMP_ROOT/a6.name")" "$TMP_ROOT/a6s.hook" && echo 1 || echo 0)"
@@ -493,7 +520,9 @@ for name, text in variants.items():
   _seen=""
   for _v in v1 v2 v3 v4 v5; do
     (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR node "$HKA/agent-cap.js" < "$TMP_ROOT/a11/$_v.json" >/dev/null 2>"$TMP_ROOT/a11/$_v.hook"); hrc=$?
-    _js=refuse; [ "$hrc" = 0 ] && [ ! -s "$TMP_ROOT/a11/$_v.hook" ] && _js=admit
+    # The exit code alone: an admitted spawn's stderr holds rule 8's not-checked line, since the
+    # rendered index carries `effort` and the payload names no transcript (TOOL-aGuardedEffort-1).
+    _js=refuse; [ "$hrc" = 0 ] && _js=admit
     _py=$(<"$TMP_ROOT/a11/$_v.py")
     _seen+=" $_js"
     check_arm "arm 11 prompt variant $_v: the spawn guard and extract_prompt_marker both $_js" \
@@ -813,6 +842,60 @@ for _w in roles build; do
      && ! grep -qF 'Traceback' "$TMP_ROOT/a19e.err" || _e19=0
 done
 check_arm "arm 19 a model two profiles match exits 1 through both verbs, naming both match keys" "$_e19"
+
+# ---- arm 20 (TOOL-aGuardedEffort-1 AC6): the spawn guard matches a model id to a profile as the
+# ---- resolver does. One list of ids, read by `roles_lib.resolve_profile` over arm 19's fixture
+# ---- policy, which holds `tfam` and `tven`, and by the hooks kit's `resolveModelProfile` over the
+# ---- index rendered from it: a profile's name, `-` for none, `!` for two. The list holds the empty
+# ---- id, `affable-1`, `atfam-1`, which holds `tfam` inside a longer word, and the two-profile
+# ---- `vendor-tfam-9`. It SKIPs as arm 6 does and stays out of the floor. The failing case, observed
+# ---- at the close and not by the pass that wrote this: a substring match in the hook, which answers
+# ---- `tfam` for `atfam-1`. WHAT IT DOES NOT CHECK: an id holding a letter outside ASCII.
+A20_IDS=("" "affable-1" "atfam-1" "tfam9" "maker-tfam-9" "Maker-TFAM-9" "vendor-other-9" "vendor-tfam-9" "us.maker/x-tfam-9:0" "---")
+if [ -z "$HK" ]; then
+  echo "SKIP arm 20 — no hooks kit holding agent-cap.js was found from $KREL"
+elif ! command -v node >/dev/null 2>&1; then
+  echo "SKIP arm 20 — no node on PATH to run $HK/agent-cap.js"
+else
+  (cd "$FX" && "$PY" -B "$KREL/render_agents.py" --write >/dev/null 2>&1); _rc20=$?
+  FXN=$(cd "$FX" && { pwd -W 2>/dev/null || pwd; })
+  "$PY" -B -c 'import sys
+sys.path.insert(0, sys.argv[1])
+import roles_lib as l
+p = l.load_policy(sys.argv[1], l.load_roles(sys.argv[1]), l.load_workflows(sys.argv[1]))
+out = []
+for m in sys.argv[2:]:
+    try:
+        out.append(l.resolve_profile(p, m) or "-")
+    except l.RolesError:
+        out.append("!")
+sys.stdout.buffer.write("".join(a + "\n" for a in out).encode("utf-8"))' "$FX/$KREL" "${A20_IDS[@]}" > "$TMP_ROOT/a20.py" 2>/dev/null
+  node -e 'const cap = require(process.argv[1] + "/agent-cap.js")
+const e = require(process.argv[1] + "/scratch-guard.js").loadRoleIndex(process.argv[2]).effort
+for (const m of process.argv.slice(3)) { const n = cap.resolveModelProfile(e.profiles, m); process.stdout.write((n.length > 1 ? "!" : n[0] || "-") + "\n") }' \
+    "$HK" "$FXN" "${A20_IDS[@]}" > "$TMP_ROOT/a20.js" 2>/dev/null
+  _a20=$(tr -d '\r' < "$TMP_ROOT/a20.py" | tr '\n' ' '); _j20=$(tr -d '\r' < "$TMP_ROOT/a20.js" | tr '\n' ' ')
+  check_arm "arm 20 resolve_profile and resolveModelProfile give every listed model id the same answer" \
+     "$([ "$_rc20" = 0 ] && [ -n "$_a20" ] && [ "$_a20" = "$_j20" ] && echo 1 || echo 0)"
+  [ "$_a20" = "$_j20" ] || printf '    resolve_profile: %s\n    resolveModelProfile: %s\n' "$_a20" "$_j20"
+  check_arm "arm 20 ...and the resolver's answers are none for the empty id, affable-1, atfam-1 and tfam9, a profile for four ids, and two for vendor-tfam-9" \
+     "$([ "$_a20" = '- - - - tfam tfam tven ! tfam - ' ] && echo 1 || echo 0)"
+fi
+
+# ---- arm 21 (TOOL-aGuardedEffort-1 AC7): the role index carries the policy's resolved levels, so a
+# ---- profile level edited with no re-render is a drifted index. A profile is appended to the
+# ---- fixture's policy and scaffolded in, which checks clean; its level is then edited in place.
+# ---- No agent type carries a profile's level, so the index is the one path that can drift. The
+# ---- failing case, observed at the close and not by the pass that wrote this: a render that writes
+# ---- no `effort` key, under which the edited policy still checks clean.
+build_fixture
+printf '%s\n' '' '[effort.profiles.tfam]' 'match = ["tfam"]' 'default = "low"   # a21' >> "$FX/$KREL/house/policy.toml"
+(cd "$FX" && bash "$FXK/adopt-roles.sh" --scaffold >/dev/null 2>&1); _rc21=$?
+check_arm "arm 21 a policy that gains a profile scaffolds and checks clean" "$([ "$_rc21" = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
+sed -i 's/^default = "low"   # a21$/default = "max"/' "$FX/$KREL/house/policy.toml"
+out=$(run_adopter --check); rc=$?
+check_arm "arm 21 a profile level edited with no re-render is a drifted index, named" \
+   "$([ "$rc" = 1 ] && [[ $out == *'drift .claude/roles.json'* ]] && [[ $out != *'drift .claude/agents/'* ]] && echo 1 || echo 0)"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

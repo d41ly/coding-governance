@@ -227,7 +227,6 @@ Cite ids, never line numbers.
 | [TOOL-aProbedUnit-16](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tier2-review.js and the two drift-audit workflows hand their agents no… |
 | [TOOL-aProbedUnit-17](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | the closing review's round-3 mediums and lows stand unfolded: clusters… |
 | [TOOL-aProfiledEffort-5](../builds/aProfiledEffort/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | the build harness's committer stage and the review harness's probe… |
-| [TOOL-aProfiledEffort-6](../builds/aProfiledEffort/BACKLOG.md) | INPROGRESS | MED | TOOL-aGuardedEffort-1 | 2026-11-10 | nothing refuses a role spawn at a level its model's profile does not… |
 | [TOOL-aPromptedMandate-7](../builds/aPromptedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | the leg's SOURCE-level no-write arm (check-unattended.test.sh) greps… |
 | [TOOL-aPromptedMandate-9](../builds/aPromptedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | nothing in the driver's precondition chain has a timeout and the… |
 | [TOOL-aPromptedMandate-14](../builds/aPromptedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-19 | marker-contract.test.sh gates the four readers of the generated… |

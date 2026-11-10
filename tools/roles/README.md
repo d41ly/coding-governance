@@ -66,8 +66,14 @@ a call carrying any other (TOOL-aOrientedCast-27). stdout does not change in any
 That `Agent` call also carries `effort` (TOOL-aProfiledEffort-3): its role's value in the JSON
 `python handoff.py role-efforts --model <id>` prints, one line mapping every role whose `agent` is
 true to its level. The rule is the same for every model: where no profile matches the id, the value
-equals the agent type's own `effort:` line, so passing it changes nothing. The spawn guard reads no
-`effort`, so it refuses neither a call carrying one nor a call without.
+equals the agent type's own `effort:` line, so passing it changes nothing. The spawn guard refuses a
+call whose level is not the one this verb prints for the model in use (TOOL-aGuardedEffort-1): it
+reads the model from the call's `model`, else from the session's transcript, and the levels from
+the `effort` key `render_agents.py` writes into the role index. It does not check the agents a
+harness spawns itself, the `committer` and `probe` stages, which workflow a call to a harness
+serving two runs, a model no transcript names or two profiles match, an `Agent` call where
+`CLAUDE_CODE_EFFORT_LEVEL` is set, a configured default subagent model, an effort ceiling in
+settings, or a hand-edited index.
 `python handoff.py harness-args <harness>` prints the `roles` object a harness takes: the
 union of the `stages` tables of every workflow whose harness is that script, as one line of JSON.
 `python handoff.py stage-efforts <workflow> --model <id>` prints the `efforts` object a harness call

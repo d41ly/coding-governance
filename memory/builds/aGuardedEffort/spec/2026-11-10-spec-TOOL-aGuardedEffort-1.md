@@ -1,6 +1,6 @@
 # TOOL-aGuardedEffort-1 — the spawn guard refuses a role spawn or a harness call at a level the model's effort profile does not give
 
-**Status:** INPROGRESS · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 1 · closes TOOL-aProfiledEffort-6 · ratified 2026-11-10
+**Status:** CLOSED · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 1 · closes TOOL-aProfiledEffort-6 · ratified 2026-11-10
 
 <!-- gen:spec-records -->
 

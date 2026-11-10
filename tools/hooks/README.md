@@ -296,6 +296,38 @@ index; a forged name, since any caller can copy the right one; and a harness age
 its script sets inside a runtime call no hook sees. It never compares `role-sha` with the role an
 agent type was rendered from.
 
+## Rule 8 — the level a call runs at is its model's
+
+`TOOL-aGuardedEffort-1`. Armed by the index's `effort` key, which the roles kit's renderer writes with
+every level resolved; an index without it adds no rule and prints nothing, and one whose `effort` is
+not the renderer's shape is a broken index. The hook spawns no interpreter and reads no policy file.
+
+On a call rule 6 admitted, the model is an `Agent` call's own `model`, else the `message.model` of the
+last main-chain assistant entry of the payload's `transcript_path`, read whole, `<synthetic>`
+skipped. Its profile is the one whose `match` holds a word of the id, else the default tables.
+
+- An `Agent` call is refused unless its `effort`, or with none its agent type's level, is the level
+  that table gives its role. Pass the role's value in what `handoff.py role-efforts --model <id>`
+  prints.
+- A `Workflow` call is refused unless, for at least one workflow its harness runs, every stage key's
+  level is the table's: the `args.efforts` value, or with none the stage's agent type's level. Pass
+  what `handoff.py stage-efforts <workflow> --model <id>` prints as `efforts`.
+
+A refusal names the role or stage, both levels, the model and where it was read, and the call that
+prints the right value. A level it cannot check is admitted with one stderr line,
+`agent-cap: rule 8 did not check this <tool> call's effort level — <why>`: no `transcript_path`, an
+unreadable transcript, no entry naming a model, a model two profiles match, and an `Agent` call
+where `CLAUDE_CODE_EFFORT_LEVEL` is set, since that session's tool offers no `effort`.
+
+ORDER: after rule 6 admits, before rule 7. A throw inside the rule refuses, naming a re-render of
+the index.
+
+**What it does not check**: the agents a running harness spawns through its own `agent()`; the
+`committer` and `probe` stages, which no `stages` table keys; which workflow a call to a harness
+serving two runs, so a call right for one is admitted for both; a configured default subagent model,
+and an effort ceiling in settings, which change what an agent runs at and are read by no hook; a
+forged transcript and a hand-edited index.
+
 ## `.agent-cap.conf` — a legacy home of the agent limit
 
 This hook reads no conf since TOOL-dGroundRules-10. A `FANOUT_CAP=<n>` line in a tracked
