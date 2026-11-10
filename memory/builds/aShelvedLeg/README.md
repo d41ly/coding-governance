@@ -53,10 +53,10 @@ ids TOOL-aShelvedLeg-1
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aShelvedLeg-1 — the `unattended kit gate` leg is `subject = "kit"`, off every automatic bar](spec/2026-11-10-spec-TOOL-aShelvedLeg-1.md) | — | 2 | SPECCED | rev-1 | 2026-11-10 |
+| [TOOL-aShelvedLeg-1 — the `unattended kit gate` leg is `subject = "kit"`, off every automatic bar](spec/2026-11-10-spec-TOOL-aShelvedLeg-1.md) | — | 2 | SPECCED | rev-2 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 3 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -1,12 +1,14 @@
 # TOOL-aShelvedLeg-1 — the `unattended kit gate` leg is `subject = "kit"`, off every automatic bar
 
-**Status:** SPECCED · rev-1 · 2026-11-10 · node a · Tier-2 · base b904a0f9 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-11-10 · node a · Tier-2 · base b904a0f9 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-10-prompt-TOOL-aShelvedLeg-1-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aShelvedLeg-1-1-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aShelvedLeg-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aShelvedLeg-1-brief.md) | research | — |
+| [2026-11-10-prompt-TOOL-aShelvedLeg-1-token-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-aShelvedLeg-1-token-fix-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -189,21 +191,22 @@ No identifier is minted. The budget row's name is the leg's existing name.
   run it.
 - **AC3** — When `awk -F'\t'` selects the row of `tools/run-gates/selftest-budgets.txt` whose
   first field is `unattended kit gate`, its budget is 4721 and its argv field is empty.
-  Red when: the row is absent, which makes `run-selftests.sh --check` print the leg under "these
-  HELD legs carry no budget row".
-  permission: the `--check` run is a runner a role agent may not execute; the close's leg
-  `every held leg is budgeted, every budget row resolves` observes it.
+  Red when: the row is absent, which makes the leg
+  `every held leg is budgeted, every budget row resolves` print this leg under "these HELD legs
+  carry no budget row".
+  permission: that leg runs a runner a role agent may not execute; the close's bar observes it.
 - **AC4** — When `git diff b904a0f9 -- tools/run-gates/run-gates.sh .githooks/pre-push` runs, it
-  prints nothing, and `grep -c 'run_one "kit gate"'` over `tools/unattended/run-unattended-gates.sh`
+  prints nothing, and `grep -c 'run_one "kit gate"'` over tools/unattended/run-unattended-gates.sh
   prints 1, with that row's argv still `bash "$HERE/check-unattended.sh"`.
   Red when: the hold predicate, the push hook or the `--checks` row is edited, which would change
   what the self-test variable or `--checks` runs.
 - **AC5** — When `grep -n 'TOOL-aShelvedLeg-1'` runs over `tools/unattended/kit.toml`, a hit sits
   in the comment directly above the leg's `[[gate_leg]]` row, and that comment also names
-  TOOL-aBoundedCeiling-10, `run-unattended-gates.sh --checks` and the self-test variable.
+  TOOL-aBoundedCeiling-10, the kit's on-demand run-unattended-gates.sh --checks route and the
+  self-test variable.
   Red when: the comment is missing, or it sits anywhere but above that row.
 - **AC6** — When `grep -cE 'stay merge-bar legs|ALSO merge-bar legs|stay on the merge bar'` runs
-  over `tools/unattended/run-unattended-gates.sh`, it prints 0, and the `check-unattended.sh` line
+  over tools/unattended/run-unattended-gates.sh, it prints 0, and the `check-unattended.sh` line
   in the code block of `tools/unattended/README.md` says the leg is held off the bar.
   Red when: any of the three phrases survives. At base the grep prints 3.
 
@@ -227,6 +230,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-10 · initial draft.
+- rev-2 · 2026-11-10 · AC3 · AC4 · AC5 · AC6 · the spec-token bar join read four backticked runner
+  names in §6 as runs; each criterion now names the file it greps in prose, or the leg by name, and
+  observes the same fact (brief 2026-11-10-prompt-TOOL-aShelvedLeg-1-token-fix-brief).
 
 ## 10. Reuse audit
 
