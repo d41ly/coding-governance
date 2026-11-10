@@ -1,6 +1,6 @@
 # TOOL-aGuardedEffort-2 — rule 8 grades an unset stage at the level of the role the call names, and the closing review's arms land
 
-**Status:** CLOSED · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 2
+**Status:** INPROGRESS · rev-1 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-11-10-build-TOOL-aGuardedEffort-1-agent-ledger.md](../build/2026-11-10-build-TOOL-aGuardedEffort-1-agent-ledger.md) | journal | TOOL-aGuardedEffort-1 |
 | [2026-11-10-build-TOOL-aGuardedEffort-2-1-acceptance-ledger.md](../build/2026-11-10-build-TOOL-aGuardedEffort-2-1-acceptance-ledger.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aGuardedEffort-2-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aGuardedEffort-2-1-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-TOOL-aGuardedEffort-2-bar-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-aGuardedEffort-2-bar-fix-brief.md) | research | — |
 | [2026-11-10-prompt-TOOL-aGuardedEffort-2-round1-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-aGuardedEffort-2-round1-fix-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
