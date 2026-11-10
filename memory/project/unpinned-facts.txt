@@ -6731,7 +6731,7 @@ memory/builds/dBoundRoles/build/2026-10-26-build-TOOL-dBoundRoles-45-round2-fix-
 memory/builds/dBoundRoles/build/2026-10-26-build-TOOL-dBoundRoles-64-round6-fix-return.md	272 bytes
 memory/builds/dBoundRoles/build/2026-10-26-build-TOOL-dBoundRoles-64-round6-fix-return.md	339 bytes
 memory/builds/dBoundRoles/build/2026-10-26-build-TOOL-dBoundRoles-64-round6-fix-return.md	368 bytes
-memory/builds/dBoundRoles/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dBoundRoles/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	59 specs
 memory/builds/dBoundRoles/prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md	49152 bytes
 memory/builds/dBoundRoles/prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md	22 lines
 memory/builds/dBoundRoles/prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md	26 specs
@@ -6855,7 +6855,7 @@ memory/builds/dBriefedPass/spec/2026-09-01-spec-TOOL-dBriefedPass-3.md	44 s
 memory/builds/dBriefedPass/spec/2026-09-01-spec-TOOL-dBriefedPass-5.md	16 bytes
 memory/builds/dBriefedPass/spec/2026-09-01-spec-TOOL-dBriefedPass-5.md	24560 bytes
 memory/builds/dBriefedPass/spec/2026-09-01-spec-TOOL-dBriefedPass-5.md	5 bytes
-memory/builds/dCalibratedLens/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dCalibratedLens/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	0 specs
 memory/builds/dCarriedReceipt/BACKLOG.md	11 specs
 memory/builds/dCarriedReceipt/BACKLOG.md	15 units
 memory/builds/dCarriedReceipt/BACKLOG.md	59 files
@@ -8633,7 +8633,7 @@ memory/builds/dClosedLoop/reviews/2026-10-20-review-PLAY-dClosedLoop-1-whole-wal
 memory/builds/dClosedLoop/spec/2026-10-20-spec-PLAY-dClosedLoop-1.md	0 records
 memory/builds/dClosedLoop/spec/2026-10-20-spec-PLAY-dClosedLoop-1.md	10 citations
 memory/builds/dClosedLoop/spec/2026-10-20-spec-PLAY-dClosedLoop-1.md	16 MB
-memory/builds/dConvergedCharter/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dConvergedCharter/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	0 specs
 memory/builds/dConvergedCharter/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	140 legs
 memory/builds/dConvergedCharter/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	163 KB
 memory/builds/dConvergedCharter/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	18 KB
@@ -8664,7 +8664,7 @@ memory/builds/dDeclaredLoop/build/2026-10-25-build-TOOL-dDeclaredLoop-1-reground
 memory/builds/dDeclaredLoop/build/2026-10-25-build-TOOL-dDeclaredLoop-1-reground-returns.md	29502 bytes
 memory/builds/dDeclaredLoop/build/2026-10-25-build-TOOL-dDeclaredLoop-1-reground-returns.md	38348 bytes
 memory/builds/dDeclaredLoop/build/2026-10-25-build-TOOL-dDeclaredLoop-1-reground-returns.md	49152 bytes
-memory/builds/dDeclaredLoop/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dDeclaredLoop/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	99 specs
 memory/builds/dDeclaredLoop/prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-owner-review-cap.md	11 units
 memory/builds/dDeclaredLoop/prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-owner-review-until-no-high.md	11 units
 memory/builds/dDeclaredLoop/prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md	49152 bytes
@@ -9471,7 +9471,7 @@ memory/builds/dEasedEffort/spec/2026-11-02-spec-TOOL-dEasedEffort-1.md	4 lines
 memory/builds/dFairHearing/build/2026-10-23-build-TOOL-dFairHearing-1-deviation-11.md	59 rows
 memory/builds/dFairHearing/build/2026-10-23-build-TOOL-dFairHearing-15-deviation-159.md	9 lines
 memory/builds/dFairHearing/build/2026-10-23-build-TOOL-dFairHearing-16-deviation-169.md	9 lines
-memory/builds/dFairHearing/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dFairHearing/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	38 specs
 memory/builds/dFairHearing/prompts/2026-10-23-prompt-TOOL-dFairHearing-1-1-reuse-scout.md	18 specs
 memory/builds/dFairHearing/prompts/2026-10-23-prompt-TOOL-dFairHearing-1-2-spec-writer.md	10 records
 memory/builds/dFairHearing/prompts/2026-10-23-prompt-TOOL-dFairHearing-1-3-spec-writer.md	10 records
@@ -9929,7 +9929,7 @@ memory/builds/dFurnishedOrders/build/2026-10-28-build-TOOL-dFurnishedOrders-1-pa
 memory/builds/dFurnishedOrders/build/2026-10-28-build-TOOL-dFurnishedOrders-1-reground-returns.md	12 rows
 memory/builds/dFurnishedOrders/build/2026-10-28-build-TOOL-dFurnishedOrders-1-reground-returns.md	49152 bytes
 memory/builds/dFurnishedOrders/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	16KB
-memory/builds/dFurnishedOrders/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dFurnishedOrders/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	60 specs
 memory/builds/dFurnishedOrders/prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-1-spec-writer.md	20 specs
 memory/builds/dFurnishedOrders/prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md	2 KB
 memory/builds/dFurnishedOrders/prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md	49152 bytes
@@ -10411,7 +10411,7 @@ memory/builds/dGroundRules/build/2026-10-24-build-TOOL-dGroundRules-25-deviation
 memory/builds/dGroundRules/build/2026-10-25-build-TOOL-dGroundRules-1-runlog-28554d7f.md	198731s
 memory/builds/dGroundRules/build/2026-10-25-build-TOOL-dGroundRules-67-deviation-79.md	33 rows
 memory/builds/dGroundRules/build/2026-10-25-build-TOOL-dGroundRules-67-deviation-79.md	41 lines
-memory/builds/dGroundRules/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dGroundRules/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	86 specs
 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-1-owner-audit-cap.md	9 units
 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md	5 specs
 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-2-2-spec-writer.md	7 legs
@@ -10753,8 +10753,8 @@ memory/builds/dIndexedDesign/build/2026-10-28-build-TOOL-dIndexedDesign-1-reuse-
 memory/builds/dIndexedDesign/build/2026-10-28-build-TOOL-dIndexedDesign-47-promoted-fix-return.md	27309 bytes
 memory/builds/dIndexedDesign/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	1,301 specs
 memory/builds/dIndexedDesign/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	179 records
-memory/builds/dIndexedDesign/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
-memory/builds/dIndexedDesign/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dIndexedDesign/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	236 specs
+memory/builds/dIndexedDesign/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	40 specs
 memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-fix-brief.md	16 specs
 memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md	49152 bytes
 memory/builds/dIndexedDesign/reviews/2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md	2 bytes
@@ -10798,7 +10798,7 @@ memory/builds/dKeptSession/build/2026-10-26-build-KICK-dKeptSession-1-reground-r
 memory/builds/dKeptSession/build/2026-10-26-build-KICK-dKeptSession-1-reuse-scout-a.md	267 rows
 memory/builds/dKeptSession/build/2026-10-26-build-KICK-dKeptSession-64-promoted-fix-return.md	3 lines
 memory/builds/dKeptSession/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	15 calls
-memory/builds/dKeptSession/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dKeptSession/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	64 specs
 memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-6-spec-reviewer.md	10 specs
 memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-6-spec-reviewer.md	26 specs
 memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-7-spec-writer.md	49152 bytes
@@ -10921,13 +10921,13 @@ memory/builds/dLinkedLibrary/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet
 memory/builds/dLinkedLibrary/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	160 rows
 memory/builds/dLinkedLibrary/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	200 rows
 memory/builds/dLinkedLibrary/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	213 rows
-memory/builds/dLinkedLibrary/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dLinkedLibrary/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	256 specs
 memory/builds/dLinkedLibrary/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	3 calls
 memory/builds/dLinkedLibrary/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	47 rows
 memory/builds/dLinkedLibrary/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	477 MB
 memory/builds/dLinkedLibrary/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	67 MB
 memory/builds/dLinkedLibrary/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	81 rows
-memory/builds/dLinkedLibrary/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dLinkedLibrary/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	91 specs
 memory/builds/dLinkedLibrary/prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-1-reuse-scout.md	25 specs
 memory/builds/dLinkedLibrary/prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-2-reuse-scout.md	25 specs
 memory/builds/dLinkedLibrary/prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-3-reuse-scout.md	25 specs
@@ -11361,7 +11361,7 @@ memory/builds/dMindYourWords/build/2026-10-29-build-TOOL-dMindYourWords-1-spec-s
 memory/builds/dMindYourWords/build/2026-10-29-build-TOOL-dMindYourWords-14-reuse-scout-d.md	650 calls
 memory/builds/dMindYourWords/build/2026-10-29-build-TOOL-dMindYourWords-7-reuse-scout-b.md	2 s
 memory/builds/dMindYourWords/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	130 calls
-memory/builds/dMindYourWords/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dMindYourWords/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	48 specs
 memory/builds/dMindYourWords/prompts/2026-10-29-prompt-TOOL-dMindYourWords-1-fix-brief.md	119 lines
 memory/builds/dMindYourWords/prompts/2026-10-29-prompt-TOOL-dMindYourWords-1-fix-brief.md	17 specs
 memory/builds/dMindYourWords/prompts/2026-10-29-prompt-TOOL-dMindYourWords-1-fix-brief.md	4 files
@@ -11814,7 +11814,7 @@ memory/builds/dPlacedRequest/build/2026-10-26-build-TOOL-dPlacedRequest-1-regrou
 memory/builds/dPlacedRequest/build/2026-10-26-build-TOOL-dPlacedRequest-1-reground-returns.md	48198 bytes
 memory/builds/dPlacedRequest/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	334 s
 memory/builds/dPlacedRequest/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	6 calls
-memory/builds/dPlacedRequest/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dPlacedRequest/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	63 specs
 memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md	21 specs
 memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-owner-review-until-no-high.md	3 units
 memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md	20 units
@@ -12052,7 +12052,7 @@ memory/builds/dRankedPlan/build/2026-10-28-build-TOOL-dRankedPlan-82-runlog-9fd8
 memory/builds/dRankedPlan/build/2026-10-28-build-TOOL-dRankedPlan-83-deviation-831.md	300 s
 memory/builds/dRankedPlan/build/2026-10-28-build-TOOL-dRankedPlan-83-deviation-831.md	830 s
 memory/builds/dRankedPlan/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	24 rows
-memory/builds/dRankedPlan/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dRankedPlan/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	81 specs
 memory/builds/dRankedPlan/prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-4-spec-writer.md	24 rows
 memory/builds/dRankedPlan/prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-fix-brief.md	16 specs
 memory/builds/dRankedPlan/prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-repin-brief.md	16 specs
@@ -12615,7 +12615,7 @@ memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-97-ledger.md
 memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-98-ledger.md	7 legs
 memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-99-ledger.md	43 s
 memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-99-ledger.md	7 legs
-memory/builds/dSafePassage/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dSafePassage/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	100 specs
 memory/builds/dSafePassage/prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md	428 KB
 memory/builds/dSafePassage/prompts/2026-10-24-prompt-TOOL-dSafePassage-1-1-spec-writer.md	44847 bytes
 memory/builds/dSafePassage/prompts/2026-10-24-prompt-TOOL-dSafePassage-1-3-spec-writer.md	165 bytes
@@ -13016,7 +13016,7 @@ memory/builds/dScopedBuild/build/2026-11-01-build-TOOL-dScopedBuild-1-spec-stage
 memory/builds/dScopedBuild/build/2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md	29354 bytes
 memory/builds/dScopedBuild/build/2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md	3 calls
 memory/builds/dScopedBuild/build/2026-11-01-build-TOOL-dScopedBuild-3-reuse-scout-b.md	66 lines
-memory/builds/dScopedBuild/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dScopedBuild/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	34 specs
 memory/builds/dScopedBuild/prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-1-reuse-scout.md	15 specs
 memory/builds/dScopedBuild/prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-fix-brief.md	15 specs
 memory/builds/dScopedBuild/prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-fix-brief.md	29354 bytes
@@ -13308,7 +13308,7 @@ memory/builds/dShippedRelease/build/2026-11-01-build-DEPL-dShippedRelease-126-ro
 memory/builds/dShippedRelease/build/2026-11-01-build-DEPL-dShippedRelease-79-round2-disposal-return.md	132 records
 memory/builds/dShippedRelease/build/2026-11-01-build-DEPL-dShippedRelease-79-round2-disposal-return.md	70 specs
 memory/builds/dShippedRelease/build/2026-11-01-build-DEPL-dShippedRelease-79-round2-disposal-return.md	7030 seconds
-memory/builds/dShippedRelease/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dShippedRelease/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	126 specs
 memory/builds/dShippedRelease/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	163 KB
 memory/builds/dShippedRelease/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	73 files
 memory/builds/dShippedRelease/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	990 commits
@@ -13455,7 +13455,7 @@ memory/builds/dTendedCadence/build/2026-11-01-build-TOOL-dTendedCadence-1-spec-s
 memory/builds/dTendedCadence/build/2026-11-01-build-TOOL-dTendedCadence-13-deviation-131.md	2,824 files
 memory/builds/dTendedCadence/build/2026-11-01-build-TOOL-dTendedCadence-13-deviation-131.md	9,736 files
 memory/builds/dTendedCadence/build/2026-11-01-build-TOOL-dTendedCadence-5-reuse-scout-c.md	105 calls
-memory/builds/dTendedCadence/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dTendedCadence/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	58 specs
 memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-fix-brief.md	13 files
 memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-fix-brief.md	18 specs
 memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md	15 units
@@ -13637,7 +13637,7 @@ memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.m
 memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	478 MB
 memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	54 MB
 memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	83 s
-memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	91 specs
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-4-spec-writer.md	1 MB
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-4-spec-writer.md	30 s
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-4-spec-writer.md	33 KB
@@ -13910,8 +13910,8 @@ memory/builds/dTrueNorth/build/2026-10-22-build-TOOL-dTrueNorth-1-departures-bui
 memory/builds/dTrueNorth/build/2026-10-22-build-TOOL-dTrueNorth-1-runlog-2766a930.md	90575s
 memory/builds/dTrueNorth/build/2026-10-22-build-TOOL-dTrueNorth-12-deviation-21.md	25 rows
 memory/builds/dTrueNorth/build/2026-10-22-build-TOOL-dTrueNorth-33-deviation-41.md	71 legs
-memory/builds/dTrueNorth/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
-memory/builds/dTrueNorth/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dTrueNorth/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	105 specs
+memory/builds/dTrueNorth/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	30 specs
 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	34 records
 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md	3 calls
 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-13-1-spec-writer.md	7 legs
@@ -14117,7 +14117,7 @@ memory/builds/dWellOiledMachine/build/2026-10-28-build-TOOL-dWellOiledMachine-1-
 memory/builds/dWellOiledMachine/build/2026-10-28-build-TOOL-dWellOiledMachine-1-reground-returns.md	49152 bytes
 memory/builds/dWellOiledMachine/build/2026-10-28-build-TOOL-dWellOiledMachine-1-reground-returns.md	9 lines
 memory/builds/dWellOiledMachine/build/2026-10-28-build-TOOL-dWellOiledMachine-127-runlog-0487772d.md	125971s
-memory/builds/dWellOiledMachine/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dWellOiledMachine/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	126 specs
 memory/builds/dWellOiledMachine/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	13 s
 memory/builds/dWellOiledMachine/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	140 legs
 memory/builds/dWellOiledMachine/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	32 KiB
@@ -14331,7 +14331,7 @@ memory/builds/dWitnessedBar/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.
 memory/builds/dWitnessedBar/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	21 legs
 memory/builds/dWitnessedBar/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	23,494 s
 memory/builds/dWitnessedBar/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	28,066 s
-memory/builds/dWitnessedBar/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs
+memory/builds/dWitnessedBar/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	88 specs
 memory/builds/dWitnessedBar/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	9 rows
 memory/builds/dWitnessedBar/prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-4-spec-writer.md	140 legs
 memory/builds/dWitnessedBar/prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-5-spec-reviewer.md	20 units
