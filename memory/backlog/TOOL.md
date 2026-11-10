@@ -306,6 +306,7 @@ Cite ids, never line numbers.
 | [TOOL-aSmoothedDispatch-16](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | ROLE AGENTS RUN THE WHOLE-TREE HYGIENE GATE FOR A ONE-SPEC EDIT. Spec… |
 | [TOOL-aSmoothedDispatch-17](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | A CARRIAGE RETURN WRITTEN INLINE IN A SUITE ARGUMENT IS NOT A RELIABLE… |
 | [TOOL-aSmoothedDispatch-19](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | THE SHELL-HYGIENE SCANNER CREDITS ONE NAME PER LOCAL LINE.… |
+| [TOOL-aSmoothedDispatch-20](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | THE ROUTED-COMMITS LEG OUTGROWS ITS CEILING WHEN NO PUSH BASE IS SET. A… |
 | [TOOL-aSparedSpawn-20](../builds/aSparedSpawn/BACKLOG.md) | OPEN | MED | — | 2026-10-12 | the unit builder runs the govkit selfcheck and shell hygiene (a fork… |
 | [TOOL-aSparedSpawn-21](../builds/aSparedSpawn/BACKLOG.md) | OPEN | MED | — | 2026-10-12 | tools/memory-tree/check-arms.py compares each floored suite's declared… |
 | [TOOL-aSparedSpawn-22](../builds/aSparedSpawn/BACKLOG.md) | OPEN | LOW | — | 2026-10-12 | a lint over the *.test.sh suites flags a fixture sleep <N> whose arm… |
