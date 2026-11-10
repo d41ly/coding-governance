@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-10-build-TOOL-aSmoothedDispatch-1-1-acceptance-ledger.md](../build/2026-11-10-build-TOOL-aSmoothedDispatch-1-1-acceptance-ledger.md) | journal | TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 TOOL-aSmoothedDispatch-7 TOOL-aSmoothedDispatch-8 TOOL-aSmoothedDispatch-9 |
 | [2026-11-10-prompt-TOOL-aSmoothedDispatch-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-1-brief.md) | research | TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 |
 | [2026-11-10-prompt-TOOL-aSmoothedDispatch-1-token-fix.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-1-token-fix.md) | research | TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 |
 | [2026-11-10-prompt-TOOL-aSmoothedDispatch-3-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-3-1-spec-writer.md) | journal | — |

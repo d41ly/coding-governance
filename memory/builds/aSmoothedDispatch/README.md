@@ -74,7 +74,7 @@ ids TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 T
 | [TOOL-aSmoothedDispatch-9 — the three driver-suite arms unit 1's split left red: the stale `--dispatch` hostile-value exemption, and two carriage-return arms whose byte the substitution drops](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-9.md) | 9 | 1 | CLOSED | rev-2 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 13 bound to this build, across 3 record folder(s).
+Records: 14 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
