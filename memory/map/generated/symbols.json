@@ -3538,6 +3538,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkEffortLevel",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "checkEmptyTempVar",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -3598,9 +3603,19 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkOwn",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "checkPair",
       "kind": "function",
       "file": "tools/hooks/format-guard.js"
+    },
+    {
+      "id": "checkPlain",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "checkPlanDone",
@@ -8021,6 +8036,11 @@
       "id": "derive_drift_line",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "derive_effort_index",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "derive_enforcer_imports",
@@ -14338,6 +14358,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "readSessionModel",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "readSettingsLayers",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -18323,6 +18348,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "renderEffortDeny",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "renderFanoutDeny",
       "kind": "function",
       "file": "tools/workflows/check-verifier-fanout.js"
@@ -18393,6 +18423,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "renderLevel",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "renderLexedView",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -18421,6 +18456,11 @@
       "id": "renderLivenessNote",
       "kind": "function",
       "file": "tools/workflows/drift-audit-state.template.js"
+    },
+    {
+      "id": "renderNote",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "renderOrientationDeny",
@@ -18559,6 +18599,11 @@
     },
     {
       "id": "renderShippedView",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderShown",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
     },
@@ -19658,6 +19703,11 @@
       "file": "tools/hooks/format-guard.js"
     },
     {
+      "id": "resolveHarnessEntry",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "resolveHarnessName",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -19684,6 +19734,11 @@
     },
     {
       "id": "resolveLiteralEnd",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "resolveModelProfile",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
     },
@@ -22341,6 +22396,11 @@
       "id": "run_edit",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
+      "id": "run_effort",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.test.sh"
     },
     {
       "id": "run_engine",

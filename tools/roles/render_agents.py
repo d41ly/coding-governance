@@ -16,7 +16,9 @@ index `.claude/roles.json`: every role with its `workflow`, `writes`, `agent` an
 the policy's `[gates]` table lets it run (empty where it names none), `harnesses`, the repo-relative
 scripts of every workflow whose `driver` is `workflow`, and `gates.manifest`, the repo-relative path of
 the tool root's gate manifest or null when no file is there (TOOL-aOrientedCast-11; scratch-guard.js reads
-both to refuse a role agent a gate). Everything is rendered in memory first, so a role, overlay or
+both to refuse a role agent a gate), and `effort`, the resolved role and stage levels of the default
+tables and of every profile (TOOL-aGuardedEffort-1; agent-cap.js grades a spawn's level against
+them). Everything is rendered in memory first, so a role, overlay or
 rule tag that fails to resolve writes nothing.
 
 OWNERSHIP. The renderer owns the agent types its catalogue names plus every name the on-disk index
@@ -206,11 +208,40 @@ def resolve_gate_manifest(tool_root, target_root):
     return pathlib.Path(os.path.relpath(str(p), str(target_root))).as_posix() if p.is_file() else None
 
 
-def render_roles_index(roles, harnesses, policy, manifest):
-    """The index bytes: every role's `workflow`, `writes`, `agent` and `gates`, the harness list and
-    the gate manifest's path."""
+def derive_effort_index(policy, roles, workflows, tool_root, target_root):
+    """The index's `effort` value (TOOL-aGuardedEffort-1), every level resolved here so the spawn
+    guard only looks up: `default` and each `profiles.<name>` hold `roles`, every `agent`-true
+    role's level, and `stages`, each stage key's level for every `workflow`-driver workflow, a
+    profile's read with its first `match` word as the model and its `match` beside them;
+    `harnesses` maps each listed harness, spelled as `derive_harness_paths` spells it, to the
+    sorted names of the workflows it runs; `unset` holds each stage key's slot's rendered level.
+    A driven workflow with no `stages` table keeps its harness and reads `{}` in every `stages`
+    map and in `unset` (TOOL-aGuardedEffort-2 S3): the spawn guard holds the maps to one
+    population of stage keys, and a missing entry is a broken index to it."""
+    slots = [s for s, r in roles.items() if r["keys"].get("agent", "true") == "true"]
+    driven = [w for w in workflows if w.get("driver") == "workflow"]
+    tables = {}
+    profiles = policy["effort"].get("profiles", {})
+    for name, model in [(None, None)] + [(n, p["match"][0]) for n, p in profiles.items()]:
+        tables[name] = {"roles": {s: lib.resolve_effort(policy, s, model) for s in slots},
+                        "stages": {w["name"]: lib.resolve_stage_efforts(policy, w, model) for w in driven}}
+    runs = {}
+    for w in driven:
+        path, _held = lib.resolve_harness_path(tool_root, w.get("harness"))
+        rel = pathlib.Path(os.path.relpath(str(path), str(target_root))).as_posix()
+        runs.setdefault(rel, set()).add(w["name"])
+    return {"default": tables[None],
+            "profiles": {n: dict(tables[n], match=list(p["match"])) for n, p in profiles.items()},
+            "harnesses": {rel: sorted(names) for rel, names in runs.items()},
+            "unset": {w["name"]: {key: lib.resolve_effort(policy, slot)
+                                  for key, slot in (w.get("stages") or {}).items()} for w in driven}}
+
+
+def render_roles_index(roles, harnesses, policy, manifest, effort):
+    """The index bytes: every role's `workflow`, `writes`, `agent` and `gates`, the harness list,
+    the gate manifest's path and `derive_effort_index`'s `effort`."""
     allow = policy.get("gates", {})
-    obj = {"gates": {"manifest": manifest}, "harnesses": harnesses,
+    obj = {"effort": effort, "gates": {"manifest": manifest}, "harnesses": harnesses,
            "roles": {slot: {"agent": r["keys"].get("agent", "true") == "true",
                             "gates": list(allow.get(slot, [])),
                             "workflow": r["keys"].get("workflow", ""),
@@ -280,7 +311,9 @@ def run_mode(mode, kit_dir, tool_root, target_root):
                     lib.resolve_effort(cat["policy"], slot))
         harnesses, absent = derive_harness_paths(cat["workflows"], tool_root, target_root)
         manifest = resolve_gate_manifest(tool_root, target_root)
-        rendered[INDEX_REL] = render_roles_index(cat["roles"], harnesses, cat["policy"], manifest)
+        rendered[INDEX_REL] = render_roles_index(
+            cat["roles"], harnesses, cat["policy"], manifest,
+            derive_effort_index(cat["policy"], cat["roles"], cat["workflows"], tool_root, target_root))
     except lib.RolesError as e:
         print("\n".join("render_agents: " + ln for ln in str(e).split("\n")), file=sys.stderr)
         return 2
@@ -439,6 +472,13 @@ def run_selftest():
                   "an absent harness is not listed in harnesses at the resolver's path")
         check_arm(state, 10, all((agents / (s + ".md")).is_file() for s in ("r-one", "r-two")),
                   "a write noting an absent harness did not write every type")
+        # Arm 20 (TOOL-aGuardedEffort-2 S3): `w5` above is a driven workflow with no `stages` table.
+        effort = index.get("effort", {})
+        check_arm(state, 20, "w5" in effort.get("harnesses", {}).get(missing, []),
+                  "a stageless driven workflow left effort.harnesses")
+        check_arm(state, 20, effort.get("default", {}).get("stages", {}).get("w5") == {}
+                  and effort.get("unset", {}).get("w5") == {},
+                  "a stageless driven workflow is not {} in effort.default.stages and effort.unset")
     with tempfile.TemporaryDirectory() as tmp:
         kit, tool_root = build_fixture(tmp, {})
         for mode in ("write", "check"):

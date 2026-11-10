@@ -227,3 +227,4 @@ memory/builds/dEasedEffort/README.md
 memory/builds/dCountedConsumers/README.md
 memory/builds/dFinishedRecord/README.md
 memory/builds/aProfiledEffort/README.md
+memory/builds/aGuardedEffort/README.md
