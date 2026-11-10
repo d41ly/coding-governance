@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-10-prompt-TOOL-aSmoothedDispatch-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-1-brief.md) | research | TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 |
+| [2026-11-10-review-TOOL-aSmoothedDispatch-1-closing-diff-round1.md](../reviews/2026-11-10-review-TOOL-aSmoothedDispatch-1-closing-diff-round1.md) | diff-review | TOOL-aSmoothedDispatch-1 TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 TOOL-aSmoothedDispatch-7 |
 
 <!-- /gen:spec-records -->
 

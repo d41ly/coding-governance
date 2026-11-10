@@ -9,6 +9,7 @@
 | [2026-11-10-prompt-TOOL-aSmoothedDispatch-1-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-1-1-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aSmoothedDispatch-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-1-brief.md) | research | TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 |
 | [2026-11-10-prompt-TOOL-aSmoothedDispatch-1-token-fix.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-1-token-fix.md) | research | TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 |
+| [2026-11-10-review-TOOL-aSmoothedDispatch-1-closing-diff-round1.md](../reviews/2026-11-10-review-TOOL-aSmoothedDispatch-1-closing-diff-round1.md) | diff-review | TOOL-aSmoothedDispatch-2 TOOL-aSmoothedDispatch-3 TOOL-aSmoothedDispatch-4 TOOL-aSmoothedDispatch-5 TOOL-aSmoothedDispatch-6 TOOL-aSmoothedDispatch-7 |
 
 <!-- /gen:spec-records -->
 
