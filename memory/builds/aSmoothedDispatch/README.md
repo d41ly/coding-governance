@@ -55,6 +55,7 @@ None.
 | 7 | `TOOL-aSmoothedDispatch-7` | the `gov-spec-writer` role prompt has the writer run the spec-token checker's one-spec mode over its spec before returning |
 | 8 | `TOOL-aSmoothedDispatch-8` | promoted from the closing review: round 1's three mediums and two lows, batched with the carried scratch-guard leg guard gap |
 | 9 | `TOOL-aSmoothedDispatch-9` | the three driver-suite arms unit 1's split left red at the close: the stale `--dispatch` hostile-value exemption, and two carriage-return arms moved to a vertical tab |
+| 10 | `TOOL-aSmoothedDispatch-10` | the three bar legs this build turned red: the driver's split without a here-string, four test lines respelled off kit paths, and `--help` anchored on its help page |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
@@ -76,7 +77,7 @@ ids TOOL-aSmoothedDispatch-12 TOOL-aSmoothedDispatch-13 TOOL-aSmoothedDispatch-1
 | [TOOL-aSmoothedDispatch-9 — the three driver-suite arms unit 1's split left red: the stale `--dispatch` hostile-value exemption, and two carriage-return arms whose byte the substitution drops](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-9.md) | 9 | 1 | CLOSED | rev-2 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 16 bound to this build, across 4 record folder(s).
+Records: 17 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
