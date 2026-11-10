@@ -5,7 +5,7 @@ opened: 2026-11-10
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3
+ids: TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 TOOL-aProfiledEffort-4
 ---
 
 # aProfiledEffort — the effort policy takes a profile per model, and Claude Fable runs every role and stage at medium
@@ -33,7 +33,7 @@ with no change to code. The prompt is in `prompts/`.
 
 ## Build-level rules
 
-- **Classification (M2)**: three units, each MISSING at open, each Tier-2: the policy file, the
+- **Classification (M2)**: three units at open, each MISSING then, each Tier-2, and a fourth the closing review promoted: the policy file, the
   roles library, the handoff verbs and the Skill template are shipped kit files.
 - Order is 1, 2, 3: the verbs read the resolver, and the dispatch carriers name the verbs.
 - The agent types' own `effort:` line stays the default profile's, since a file read at session
@@ -52,11 +52,12 @@ None.
 | 1 | `TOOL-aProfiledEffort-1` | the policy's profile tables, their validation and the resolver that picks a profile by model, with the `fable` profile seeded |
 | 2 | `TOOL-aProfiledEffort-2` | the handoff verbs resolve a role's and a workflow's stage levels for a named model |
 | 3 | `TOOL-aProfiledEffort-3` | the dispatch carriers, the build Skill, the unattended verbs and the roles documents, pass the model and the resolved level on every spawn |
+| 4 | `TOOL-aProfiledEffort-4` | promoted from the closing review: round 1's four mediums and three lows, batched, with the self-test arm that fails by traceback |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 3 unit(s) · node a · opened 2026-11-10 · streams tooling
-ids TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3
+ids TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 TOOL-aProfiledEffort-4
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -66,7 +67,7 @@ ids TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3
 | [TOOL-aProfiledEffort-3 — every dispatch route names the session's model and spawns at the level the resolver returns](spec/2026-11-10-spec-TOOL-aProfiledEffort-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 9 bound to this build, across 3 record folder(s).
+Records: 11 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
