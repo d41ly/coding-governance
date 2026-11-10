@@ -810,9 +810,10 @@ harness's reserved untyped literal; an untyped stage is spelled by leaving its k
   under `efforts.probe`; the build harness spawns its spec writer, spec commit and disposal at theirs, forwards the audit's three
   review keys as the review call's `efforts` and `builder` in `dispatch.args`. A malformed object, an
   unknown key or a value off the shape refuses before any spawn. The vocabulary is the roles kit's, so
-  a harness grades the shape only. Compose it with `<prefix>/roles/handoff.py stage-efforts
-  <workflow>`, keyed by WORKFLOW: the review harness serves spec review and closing review, which run
-  one role at two levels.
+  a harness grades the shape only. Compose it with
+  `<prefix>/roles/handoff.py stage-efforts <workflow> --model <id>`, keyed by WORKFLOW: the review
+  harness serves spec review and closing review, which run one role at two levels. What `<id>` is,
+  the roles README's "The effort policy" says.
 - **The parity arm.** A workflow script cannot import, so each harness that tests an agent type keeps its
   own copy of the shape. The protocol-parity leg's agent-type shape arm compares every copy in this kit
   with the one `tier2-review.template.js` owns, and reds on a difference or on an owner yielding none.
