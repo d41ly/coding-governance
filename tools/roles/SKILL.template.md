@@ -24,8 +24,12 @@ before stage 3, and it wins any difference. The stages below are the workflows o
   role, whose `prompt` is the output of this line, unchanged, and whose `description` is the name
   the line prints on stderr after `handoff: description — `; the spawn guard refuses any other:
   `python {{KIT_DIR}}/handoff.py render --role <role> --build <slug> --unit <id> --input <key>=<value> --part task`
+  That `Agent` call also carries `effort`: its role's value in the JSON
+  `handoff.py role-efforts --model <id>` prints, on every direct spawn and for any model.
   Every harness call carries `roles`, the JSON `handoff.py harness-args <harness>` prints, and
-  `efforts`, the JSON `handoff.py stage-efforts <workflow>` prints for the workflow that call runs.
+  `efforts`, the JSON `handoff.py stage-efforts <workflow> --model <id>` prints for the workflow that
+  call runs. `<id>` is the model in use: the session's own model id, exactly as the session's
+  environment states it, read again at each call. The roles kit's README states the limits.
 - Every agent the session dispatches or receives is reported by pasting, unchanged, what
   `handoff.py agents --handoff <path>` prints for a direct spawn, or `handoff.py agents --run <run-id>`
   for a harness call. Run it once the call returns and again when its notification arrives, without
@@ -48,7 +52,7 @@ Read `unattended.sh --plan <slug> --paths`, then call `{{TOOL_ROOT}}workflows/un
 (`{{MEMORY_ROOT}}/guides/UNATTENDED-VERBS.md`), with these differences: `mode: 'attended'`; every
 `units[]` entry carries its `planState` and `rev` from that read; no `runStateExists`; `base` is the
 READY line's; `roles` from `handoff.py harness-args unattended-build`; `efforts` from
-`handoff.py stage-efforts spec-write`; `specAudit` only where the build
+`handoff.py stage-efforts spec-write --model <id>`; `specAudit` only where the build
 README declares `spec-audit:`; `disposal` beside it, the value on that read's
 `spec-disposal:` line, omitted on `absent`. Act on its `nextAction`.
 
@@ -66,7 +70,7 @@ Until `--plan --paths` prints `next: none - every tracked spec is terminal`, for
    check script's `--card --append`;
 3. call the hand-out's `dispatch.scriptPath` with `dispatch.args` plus `unitId`, `specPath`,
    `briefPath`, `roles` from `handoff.py harness-args unattended-unit` and `efforts` from
-   `handoff.py stage-efforts build`, on every dispatch;
+   `handoff.py stage-efforts build --model <id>`, on every dispatch;
 4. on `diverged: true`, write a revision record under the build's `prompts/` holding `## The brief`
    and no `## The prompt`, its Goal the builder's `why` verbatim and its other four sub-heads copied
    from the build's brief; spawn `gov-spec-writer` on it with `--input spec=<path> --input
@@ -76,8 +80,8 @@ Until `--plan --paths` prints `next: none - every tracked spec is terminal`, for
 ## Stage 6 — closing-review
 
 Call `{{TOOL_ROOT}}workflows/tier2-review.js` as M8 composes it, adding `roles` from
-`handoff.py harness-args tier2-review` and `efforts` from `handoff.py stage-efforts closing-review`.
-Each blocker's fix is a pass of the unit it lands in: write
+`handoff.py harness-args tier2-review` and `efforts` from
+`handoff.py stage-efforts closing-review --model <id>`. Each blocker's fix is a pass of the unit it lands in: write
 the finding into a fix record under `prompts/`, set that unit back to INPROGRESS by the same
 status-only edit, and dispatch it with that record as `briefPath`. Then re-review the fix (M8).
 

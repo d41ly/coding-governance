@@ -1,11 +1,12 @@
 # TOOL-aProfiledEffort-3 — every dispatch route names the session's model and spawns at the level the resolver returns
 
-**Status:** INPROGRESS · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-11-10 · node a · Tier-2 · base ae6735c1 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-10-build-TOOL-aProfiledEffort-3-1-acceptance-ledger.md](../build/2026-11-10-build-TOOL-aProfiledEffort-3-1-acceptance-ledger.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aProfiledEffort-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-1-brief.md) | research | TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 |
 | [2026-11-10-prompt-TOOL-aProfiledEffort-3-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-3-1-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aProfiledEffort-3-build-brief.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-3-build-brief.md) | research | — |
