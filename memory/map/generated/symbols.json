@@ -6378,6 +6378,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "check_unit_deferred",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
       "id": "check_unmerged_live",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -23521,6 +23526,11 @@
       "id": "run_sweep_one",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "run_swift_case",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "run_switch_probe",
