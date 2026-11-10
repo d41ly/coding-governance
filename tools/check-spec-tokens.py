@@ -327,6 +327,8 @@ KIT_SPEC_TOKENS_VERSION = "1.1"  # gov:kit spec-tokens@1.1 — the deployer's re
 
 WAIVERS = "memory/project/spec-token-waivers.txt"
 SPEC_GLOB = "memory/builds/*/spec/*.md"
+# The spec walk's path pattern, one compiled copy for the walk, the size join's stale arm and --spec.
+SPEC_PATH = re.compile(r"memory/builds/[^/]+/spec/.*\.md$")
 LEGS_NAME = "gate-legs.json"
 #: TOOL-aRepatriatedFork-29 S3 — the manifest sits in the tool root, which is this file's own
 #: directory; `LEGS` is the repo-relative spelling `main` derives, for its messages.
@@ -1406,7 +1408,7 @@ def scan_spec_sizes(root, specs, files, answer, highwater, hw_rel, judge):
         if key not in files:
             stale.append(("HIGH-WATER", key, f"in {hw_rel} — untracked"))
         elif key not in size:
-            what = "terminal" if re.match(r"memory/builds/[^/]+/spec/.*\.md$", key) else "not a spec"
+            what = "terminal" if SPEC_PATH.match(key) else "not a spec"
             stale.append(("HIGH-WATER", key, f"in {hw_rel} — {what}"))
         elif size[key] <= ceiling:
             stale.append(("HIGH-WATER", key, f"in {hw_rel} — back under the ceiling "
@@ -1554,7 +1556,7 @@ def read_named_specs(root, args):
             rel = p.resolve().relative_to(root.resolve()).as_posix()
         except ValueError:
             rel = ""
-        if not re.match(r"memory/builds/[^/]+/spec/.*\.md$", rel):
+        if not SPEC_PATH.match(rel):
             print(f"spec-tokens: REFUSING — --spec {op} is not a spec under memory/builds/<slug>/spec/")
             return None
         out.add(rel)
@@ -1585,7 +1587,7 @@ def main(argv):
         specs, frozen, unretired = named_specs, 0, list(named_specs)
     else:
         allspecs = sorted(f for f in files
-                          if re.match(r"memory/builds/[^/]+/spec/.*\.md$", f))
+                          if SPEC_PATH.match(f))
         specs, frozen, unretired = [], 0, []
         for f in allspecs:
             text = (root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
