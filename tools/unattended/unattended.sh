@@ -13999,6 +13999,10 @@ verb_rescope() { # slug · act · unit · successor · reason
   want="$want · reason $reason"
   while IFS= read -r pl; do
     [ "$pl" = "$want" ] || continue
+    # A DEFER IS RECORDED ONLY WHILE IT IS IN FORCE (TOOL-aSwiftRefusal-4): a dispatch row after the
+    # matching defer row re-took the unit, so the same reason is a new deferral and is appended. The
+    # literal DEFERRED satisfies the predicate's status half, so its answer is the row half alone.
+    [ "$act" = defer ] && ! check_unit_deferred "$rel" "$unit" DEFERRED && break
     echo "unattended: amendment already recorded, unchanged — $act $unit"
     return 0
   done <<RESCOPED
@@ -14155,21 +14159,8 @@ check_pass_open() { # grp · unit · run-state file · declared set (space-separ
   return 0
 }
 
-# A UNIT SET ASIDE WITH `--rescope --act defer` (TOOL-aSwiftRefusal-2): its spec reads DEFERRED AND
-# its last row among its `dispatch` rows and its `rescope · item defer` rows is a defer row. Both
-# halves, because a DEFERRED status with no defer row is a hand edit the close's carry-forward
-# refuses, and a dispatch after the defer row re-takes the unit (dOrderedCharter's unit 31). The id
-# is read only in the item field, anchored at line start and on ` · reason `, as the order gate's
-# dispatch-row grep reads it: `id_rows` matches an id anywhere, a reason field included. The status
-# is passed in because every caller already holds it. An unreadable file answers 2 (awk's exit),
-# so a failed read keeps the unit blocking, never admits it.
-check_unit_deferred() { # run-state file · unit · spec status -> 0 deferred, 1 not
-  [ "$3" = DEFERRED ] || return 1
-  awk -v u="$2" '
-    $0 ~ ("^[0-9][0-9-]*T[0-9:]*Z dispatch · item [0-9a-f]+ " u " · reason ") { k = "d" }
-    $0 ~ ("^[0-9][0-9-]*T[0-9:]*Z rescope · item defer " u " · reason ")      { k = "f" }
-    END { exit (k == "f") ? 0 : 1 }' "$1" 2>/dev/null
-}
+# `check_unit_deferred` USED TO BE DEFINED HERE, and moved to `lib-unattended.sh` (TOOL-aSwiftRefusal-4)
+# so check 23 asks the release question the order gate and `read_open_passes` ask, from one definition.
 
 # --check-commit (TOOL-aWindowedPass-3): CHECK 23 AT THE ONE MOMENT ITS FINDING IS STILL REPAIRABLE.
 # A pass may widen its declaration with `--dispatch` until it commits and never after, so a close that
@@ -14214,7 +14205,10 @@ check_commit_message() { # commit message file
   # check_pass_open alone, without the terminal-status skip `read_open_passes` adds for those two
   # (TOOL-dGroundRules-66): a pass commit flips its own spec to CLOSED in the commit being made, so
   # the skip would read that pass as closed, `pass_commit` does not name HEAD either, and every pass
-  # commit would be refused as having no open dispatched pass. This verb answers which declaration
+  # commit would be refused as having no open dispatched pass. It leaves out the deferred skip too, on
+  # purpose: a `Pass:` trailer naming a deferred unit is still graded against the declaration it
+  # carries, and a unit dispatched again after its defer row commits against the key it re-took
+  # (TOOL-aSwiftRefusal-4). This verb answers which declaration
   # grades this commit, not which paths are reserved. A key it calls
   # closed BECAUSE ITS PASS COMMIT IS HEAD is kept apart (`O`): that is `git commit --amend` on the
   # pass commit, whose HEAD is the commit being replaced (closing review r1, M4). Only a trailer naming

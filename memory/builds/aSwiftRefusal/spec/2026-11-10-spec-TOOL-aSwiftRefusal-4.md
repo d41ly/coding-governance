@@ -1,6 +1,6 @@
 # TOOL-aSwiftRefusal-4 — round 1's mediums and lows: one deferral answer for `--rescope` and check 23, the floors, the `--audit` arm, the positive control and the contract text
 
-**Status:** SPECCED · rev-2 · 2026-11-10 · node a · Tier-2 · base 17308b6c · streams tooling · order 4
+**Status:** CLOSED · rev-2 · 2026-11-10 · node a · Tier-2 · base 17308b6c · streams tooling · order 4
 
 <!-- gen:spec-records -->
 

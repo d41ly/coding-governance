@@ -128,7 +128,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   sidecar line, whatever its phase, when the record names a keepalive id and that line exists. The
   line stays ONE line: a field joins it or does not print, and the suite arms that.
 - `--audit` — one line per unit whose dispatch rows at their newest anchor, taken together, are still
-  open and whose spec is not terminal: how long the TREE has been idle (newest write, newest commit) and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
+  open and whose spec is neither terminal nor deferred (DEFERRED, with its latest rescope defer row
+  after every dispatch row naming it): how long the TREE has been idle (newest write, newest commit)
+  and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
   `STALLED` line followed by one remedy line. Read-only; the idle-wake runs it. It cannot see what
   the unit is doing or whether a process is stuck — its figures are properties of the tree. After
   the units it prints one line per open REGISTERED task: its heartbeat path, `last-beat <s>s ago`

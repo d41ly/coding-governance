@@ -53,7 +53,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 4 unit(s) · node a · opened 2026-11-10 · streams tooling
+**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-11-10 · streams tooling
 ids TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 TOOL-aSwiftRefusal-3 TOOL-aSwiftRefusal-4
 
 <!-- gen:build-units -->
@@ -62,7 +62,7 @@ ids TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 TOOL-aSwiftRefusal-3 TOOL-aSwiftRe
 | [TOOL-aSwiftRefusal-1 — `--dispatch` runs the spec-token check after every cheap refusal](spec/2026-11-10-spec-TOOL-aSwiftRefusal-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-11-10 |
 | [TOOL-aSwiftRefusal-2 — the order gate lets a deferred earlier-order unit pass](spec/2026-11-10-spec-TOOL-aSwiftRefusal-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-11-10 |
 | [TOOL-aSwiftRefusal-3 — `read_open_passes` leaves out every key of a deferred unit, naming each on stderr](spec/2026-11-10-spec-TOOL-aSwiftRefusal-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-10 |
-| [TOOL-aSwiftRefusal-4 — round 1's mediums and lows: one deferral answer for `--rescope` and check 23, the floors, the `--audit` arm, the positive control and the contract text](spec/2026-11-10-spec-TOOL-aSwiftRefusal-4.md) | 4 | 2 | SPECCED | rev-2 | 2026-11-10 |
+| [TOOL-aSwiftRefusal-4 — round 1's mediums and lows: one deferral answer for `--rescope` and check 23, the floors, the `--audit` arm, the positive control and the contract text](spec/2026-11-10-spec-TOOL-aSwiftRefusal-4.md) | 4 | 2 | CLOSED | rev-2 | 2026-11-10 |
 <!-- /gen:build-units -->
 
 Records: 9 bound to this build, across 3 record folder(s).

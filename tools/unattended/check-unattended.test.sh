@@ -4554,6 +4554,46 @@ drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "a commit that names no pass at all" --no-verify
 hit "$(run)" "unattended: check 23 — a declared path of a dispatched pass moved inside its window while no commit names that pass, so the declared work happened and the only join this check has was dodged:"
+# ---- TOOL-aSwiftRefusal-4 M4: A RELEASED UNIT'S WINDOW ENDS AT ITS RELEASE. ARCH-tRun-1 declares
+# ---- work/one.txt and never commits; once it is released, DEFERRED with its defer row or WONTDO, a
+# ---- sibling declaring the same path is admitted by the driver, and its write after the release is
+# ---- not charged to ARCH-tRun-1. Flipped back to INPROGRESS, it is. A write BEFORE the release still
+# ---- is: the release ends the window, it does not excuse it. RED-first: the gate at 17308b6c charged
+# ---- the sibling's write in both released cases. The row goes into the empty units region by `sed`.
+SWR='s#^<!-- /gen:build-units -->$#| ARCH-tRun-1 | 1 | 2 | INPROGRESS | rev-1 | 2026-11-10 |\n&#'
+reset_tree; sed -i "$SWR" memory/builds/tRun/README.md
+git add -A && git commit -q -m "fixture: a units row" --no-verify
+drow ARCH-tRun-1 "work/one.txt"
+printf '\n2026-08-22T00:00:00Z rescope · item defer ARCH-tRun-1 · reason set aside\n' >> memory/builds/tRun/RUN.md
+mutate memory/builds/tRun/README.md 's/^| ARCH-tRun-1 | 1 | 2 | INPROGRESS |/| ARCH-tRun-1 | 1 | 2 | DEFERRED |/'
+git add -A && git commit -q -m "fixture: the first unit is set aside" --no-verify
+drow ARCH-tRun-2 "work/one.txt"
+mkdir -p work && printf 'b\n' > work/one.txt
+git add -A && git commit -q -m "lane" -m "Pass: ARCH-tRun-2" --no-verify
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+miss "$out" "was dodged: ARCH-tRun-1"
+hit "$out" "check 23 released ARCH-tRun-1 in"
+mutate memory/builds/tRun/README.md 's/^| ARCH-tRun-1 | 1 | 2 | DEFERRED |/| ARCH-tRun-1 | 1 | 2 | INPROGRESS |/'
+hit "$(run)" "was dodged: ARCH-tRun-1"
+reset_tree; sed -i "$SWR" memory/builds/tRun/README.md
+git add -A && git commit -q -m "fixture: a units row" --no-verify
+drow ARCH-tRun-1 "work/one.txt"
+mutate memory/builds/tRun/README.md 's/^| ARCH-tRun-1 | 1 | 2 | INPROGRESS |/| ARCH-tRun-1 | 1 | 2 | WONTDO |/'
+git add -A && git commit -q -m "fixture: the first unit is retired" --no-verify
+drow ARCH-tRun-2 "work/one.txt"
+mkdir -p work && printf 'b\n' > work/one.txt
+git add -A && git commit -q -m "lane" -m "Pass: ARCH-tRun-2" --no-verify
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+miss "$out" "was dodged: ARCH-tRun-1"
+hit "$out" "check 23 released ARCH-tRun-1 in"
+reset_tree; sed -i "$SWR" memory/builds/tRun/README.md
+git add -A && git commit -q -m "fixture: a units row" --no-verify
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "a commit that names no pass at all" --no-verify
+mutate memory/builds/tRun/README.md 's/^| ARCH-tRun-1 | 1 | 2 | INPROGRESS |/| ARCH-tRun-1 | 1 | 2 | WONTDO |/'
+git add -A && git commit -q -m "fixture: the first unit is retired" --no-verify
+hit "$(run)" "was dodged: ARCH-tRun-1"
 
 # ---- AMBIGUOUS ATTRIBUTION is refused rather than guessed: a subset test over a commit that could
 # ---- belong to either of two passes proves nothing about either.
@@ -7343,7 +7383,11 @@ fi   # ---- end of the region-8 span, re-cut across the eight regions by TOOL-aG
 # ---- after arm C in region 8, one `hit` and one `miss`, so FLOOR_SHARD_8 carries the same +2 and the
 # ---- other seven are untouched. COUNTED off the block's own lines; this pass runs no suite, and its
 # ---- RED-first observation is the close's.
-FLOOR_ASSERTIONS=1142
+# ---- RAISED 1142 -> 1152 by exactly the arms, TOOL-aSwiftRefusal-4: check 23's released-unit block M4
+# ---- after the no-commit dodged-join arm in region 8, four `mutate`, four `hit` and two `miss`, so
+# ---- FLOOR_SHARD_8 carries the same +10 and the other seven are untouched. COUNTED off the block's own
+# ---- lines; this pass runs no suite, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=1152
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
@@ -7355,7 +7399,7 @@ FLOOR_SHARD_4=101
 FLOOR_SHARD_5=133
 FLOOR_SHARD_6=150
 FLOOR_SHARD_7=301
-FLOOR_SHARD_8=217
+FLOOR_SHARD_8=227
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
   *) _fv="FLOOR_SHARD_$SH_I"; FLOOR=${!_fv}; MODE="shard $SH_I/$SHARD_ARITY" ;;

@@ -7677,6 +7677,12 @@ sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI="'"${PFX}swift-stub.py"'"|' .unatt
 o=$(run --dispatch tRun --pass ARCH-tRun-5 --writes ${PFX}swift.sh)
 hit "$o" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint: ${PFX}swift.sh also in"
 miss "$o" "--dispatch refuses: the declared spec-token checker reds over the live tree"
+# ---- TOOL-aSwiftRefusal-4 L1: THE POSITIVE CONTROL. The two `miss`es above pass as well on a stub
+# ---- that is never reached, so one dispatch clears the order gate (ARCH-tRun-4 is dispatched) and
+# ---- condition 1 (its own path) and must reach the stub. The unit-2 arm restores RUN.md below.
+o=$(run --dispatch tRun --pass ARCH-tRun-5 --writes ${PFX}swift5.sh)
+hit "$o" "--dispatch refuses: the declared spec-token checker reds over the live tree"
+
 # ---- TOOL-aSwiftRefusal-2 - A DEFERRED EARLIER-ORDER SIBLING DOES NOT HOLD BACK THE ORDER GATE, on
 # ---- the same pair. ARCH-tRun-4 passes only when its spec reads DEFERRED AND its last row is a
 # ---- `rescope · item defer` row, so the arm asserts both blockers beside the admission: a gate
@@ -9124,6 +9130,17 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/other)" "dispatch de
 out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/held)
 hit  "$out" "two passes claiming one file are not disjoint: work/held also in"
 miss "$out" "left out as deferred"
+# ---- TOOL-aSwiftRefusal-4 M1: A SAME-REASON RE-DEFER AFTER A RE-DISPATCH IS A NEW DEFERRAL. On the
+# ---- state above, ARCH-tRun-1 re-took its keys after its defer row, so the same `--reason` appends a
+# ---- row and the unit reads deferred again; a second call while it is in force is the idempotent
+# ---- answer. RED-first: the driver at 17308b6c answered "already recorded" and wrote no row.
+out=$(run --rescope tRun --act defer --item ARCH-tRun-1 --reason "set aside")
+hit  "$out" "amendment recorded — defer ARCH-tRun-1"
+miss "$out" "already recorded"
+hit "$(run --rescope tRun --act defer --item ARCH-tRun-1 --reason "set aside")" "amendment already recorded, unchanged — defer ARCH-tRun-1"
+out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/held)
+hit "$out" "dispatch declared"
+hit "$out" "ARCH-tRun-1 left out as deferred"
 
 # ---- M1: the generated-index/generator pairing, armed. The `covers` to `overlaps` change at this
 # ---- site reverted with the whole suite still green, which is a repair nothing was holding.
@@ -9292,6 +9309,21 @@ out=$(run --audit tRun); rc=$?
 same "a CLOSED unit with an open row exits 0" "$rc" "0"
 same "a CLOSED unit with an open row is not listed" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
 miss "$out" "unattended-audit: ARCH-tRun-1"
+# ---- TOOL-aSwiftRefusal-4 M3: A DEFERRED UNIT IS NOT OPEN EITHER, the `--audit` half of the deferred
+# ---- skip in `read_open_passes`. A DEFERRED spec with its defer row after its dispatch row is left
+# ---- out, so no STALLED kill order is printed for it; flipped back to INPROGRESS it is listed again.
+# ---- RED once the close takes the `check_unit_deferred` skip out of `read_open_passes`.
+build_audit_fixture
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+printf '2026-11-10T00:00:09Z rescope · item defer ARCH-tRun-1 · reason set aside\n' >> memory/builds/tRun/RUN.md
+mutate memory/builds/tRun/spec/one.md 's/^\*\*Status:\*\* SPECCED/**Status:** DEFERRED/'
+git add -A && git commit -q -m "fixture: the spec is deferred, the row stays" --no-verify
+out=$(run --audit tRun)
+same "a DEFERRED unit with an open row is not listed" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
+miss "$out" "unattended-audit: ARCH-tRun-1"
+mutate memory/builds/tRun/spec/one.md 's/^\*\*Status:\*\* DEFERRED/**Status:** INPROGRESS/'
+hit "$(run --audit tRun)" "unattended-audit: ARCH-tRun-1"
+
 # ---- THE SPEC READ IS A PROBE (closing review of aProbedUnit, round 2, cluster H, ids 5 and 18).
 # ---- The status skip above is only as good as the read that feeds it: `load_spec_facts` swallowed
 # ---- with `|| true` left the maps empty on a failed read, the CLOSED skip never fired, and the unit
@@ -19169,7 +19201,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3256 -> 3266 by TOOL-aSwiftRefusal-3: the deferred-unit sibling arm in region four after the
 # terminal-unit one, three `mutate`s and seven `hit`/`miss` lines, every one unconditional, counted off
 # the block's own lines; no suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3266
+# RAISED 3266 -> 3287 by TOOL-aSwiftRefusal-4: 11 in region three, the TOOL-aSwiftRefusal-1 and -2 arms'
+# 10 lines left unpinned and the L1 positive control's one `hit`, and 10 in region four, the M1 block's
+# five `hit`/`miss` lines and the M3 block's two `mutate`s and three `same`/`miss`/`hit` lines, every one
+# unconditional, counted off the blocks' own lines; no suite ran, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=3287
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -19375,11 +19411,13 @@ FLOOR_SHARD_2=223
 # 3 by 25, 4 by 17, 5 by 7, 6 by 2, 7 by 1 and 8 by 12.
 # RAISED 270 -> 304 by TOOL-aBriskPreflight-4: the same 34 region-five overlapped-probe and handle assertions, see FLOOR_ASSERTIONS.
 # Region five MERGED at TOOL-aSparedSpawn-34's reconcile: the shared 270, less 7, plus 34 = 297.
-FLOOR_SHARD_3=405
+# RAISED 405 -> 416 by TOOL-aSwiftRefusal-4: the same 11 region-three spec-token arm and L1 assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=416
 # RAISED 373 -> 382 by TOOL-dGroundRules-66: the same 9 region-four terminal-unit assertions, see FLOOR_ASSERTIONS.
 # RAISED 382 -> 383 by TOOL-dGroundRules-70: the same 1 region-four reader assertion, see FLOOR_ASSERTIONS.
 # RAISED 383 -> 393 by TOOL-aSwiftRefusal-3: the same 10 region-four deferred-unit assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_4=393
+# RAISED 393 -> 403 by TOOL-aSwiftRefusal-4: the same 10 region-four M1 and M3 assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_4=403
 FLOOR_SHARD_5=297
 FLOOR_SHARD_6=127
 FLOOR_SHARD_7=311
