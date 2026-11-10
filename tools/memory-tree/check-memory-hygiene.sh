@@ -2050,15 +2050,18 @@ c12_all=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/spec/(.+/)?[0-9]{4}
 [ "$STAGED" = 1 ] || pop_guard 12 "no spec file under $M/builds/*/spec/" "$(printf '%s\n' "$c12_all" | grep -c . || true)" "$PRE_SPEC"
 # TOOL-dPavedRoad-4: `J` = a sibling read for its EDGES only, so the joins see both ends of a pair.
 # The build set is the staged SPECS' folders, never FILES, which is the whole listing when the conf
-# is staged. Empty in full mode, where every spec is `P`.
+# is staged. Empty in full mode, where every spec is `P`. The set is taken from the same piped stream
+# the tagging loop reads, so it costs neither a here-string nor a fork.
+c12_sel=$(printf '%s\n' "$c12_all" | grep . | {
+mapfile -t _c12l
 declare -A _C12B=()
 if [ "$STAGED" = 1 ] && [ -n "$SPEC_EDGES_CUTOFF" ]; then
-  while IFS= read -r _cf; do
-    [ -n "$_cf" ] && [ -n "${STAGED_SET[$_cf]+x}" ] || continue
+  for _cf in ${_c12l[@]+"${_c12l[@]}"}; do
+    [ -n "${STAGED_SET[$_cf]+x}" ] || continue
     _b=${_cf#"$M"/builds/}; _C12B["${_b%%/*}"]=1
-  done <<<"$c12_all"
+  done
 fi
-c12_sel=$(printf '%s\n' "$c12_all" | grep . | while IFS= read -r f; do
+for f in ${_c12l[@]+"${_c12l[@]}"}; do
   base=${f##*/}; d=${base:0:10}      # spawn-free date extract — this loop sees every spec file
   [ "$d" \< "$SPEC_FORMAT_CUTOFF" ] && continue
   if in_scope "$f"; then             # no-op in full mode; decides the GRADED selection under --staged
@@ -2067,7 +2070,8 @@ c12_sel=$(printf '%s\n' "$c12_all" | grep . | while IFS= read -r f; do
     _b=${f#"$M"/builds/}
     [ -n "${_C12B[${_b%%/*}]+x}" ] && [ -f "$f" ] && printf 'J\t%s\n' "$f"
   fi
-done)
+done
+})
 bad12_raw=""
 if [ -n "$c12_sel" ]; then
 # Every array below is read only up to its own counter (n, ng, q), so entries left from a previous
@@ -3372,11 +3376,12 @@ alcut="${ACCEPTANCE_LEDGER_CUTOFF:-}"
 # ---- record in its own build folder, as the full run grades it. A unit the commit names nowhere stays
 # ---- silent, and a record in another build evidencing a graded unit is read only by the full run.
 # ---- The announce line counts the graded units, so an empty selection reads 0 rather than a pass.
-_al_sbuild() {   # the listing on stdin, kept to the staged build folders; full mode passes it whole
+# ---- The listing is git's OWN in full mode, so the filter costs that run no subshell and no fork.
+read_al_listing() {   # <pathspec>... -> the tracked paths, kept to the staged build folders under --staged
   if [ "$STAGED" = 1 ]; then
-    awk -v pre="$M/builds/" -v keep=" ${!_SBUILD[*]} " \
+    git ls-files "$@" 2>/dev/null | awk -v pre="$M/builds/" -v keep=" ${!_SBUILD[*]} " \
       '{ r = substr($0, length(pre) + 1); sub(/\/.*$/, "", r); if (index(keep, " " r " ") > 0) print }'
-  else cat; fi
+  else git ls-files "$@" 2>/dev/null; fi
 }
 if [ -n "$alcut" ]; then
   # The ledger, flattened ONCE to `<unit> <label> <form>` triples across every tracked record. A
@@ -3389,7 +3394,7 @@ if [ -n "$alcut" ]; then
   # aborts the entire pass, where the retired per-file loop skipped that path and continued — and
   # `git ls-files` enumerates the INDEX, so a tracked-but-absent path is a real input. An empty
   # operand list would also make awk read stdin; an empty stream is a no-op. TOOL-aThawedCorpus-4.
-  alledger=$(git ls-files "$M/builds/*/build/*.md" "$M/builds/*/reviews/*.md" 2>/dev/null | _al_sbuild | awk '
+  alledger=$(read_al_listing "$M/builds/*/build/*.md" "$M/builds/*/reviews/*.md" | awk '
     { f = $0; if (f == "") next
       j = 0; u = ""; pu = ""; plab = ""; pform = ""; ptok = ""   # per-RECORD reset
       while ((getline line < f) > 0) {    # from a fresh process per file, and losing it would
@@ -3429,7 +3434,7 @@ if [ -n "$alcut" ]; then
       return r
     }')
   alpop=0; algap=""; albad=""; alnolab=""
-  alspecs=$(git ls-files "$M/builds/*/spec/*.md" 2>/dev/null | _al_sbuild || true)
+  alspecs=$(read_al_listing "$M/builds/*/spec/*.md" || true)
   # The LISTING, guarded, not the post-cutoff population: a tree whose closed Tier-2 specs all
   # predate the cutoff is a real empty and says so below, but a listing that comes back empty
   # while spec files exist is a broken selector, and it reds. That distinction is the whole

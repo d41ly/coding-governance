@@ -42,3 +42,27 @@ and the run exited 1 in 2409 s on two inherited failures, both also failing in t
 the base script: the conf example not declaring `OSTYPE`, which the engine read at base line 603
 already, and the scoped-run partition differing only in check 26's `cache hits` count on a cold
 clone, the same cold-cache line the pass saw.
+
+## Fix pass — the bar's reds at `d08106d4d`
+
+Per `2026-11-10-prompt-TOOL-dPavedRoad-4-bar-fix-brief.md`, with nothing the unit grades changed.
+Check 12's staged build set is now taken inside the tagging pipeline's own group, from a `mapfile`
+of the stream it already reads, so the `done <<<"$c12_all"` here-string is gone. Check 23's listing
+filter `_al_sbuild` became `read_al_listing <pathspec>...`, which runs `git ls-files` itself and
+pipes it through the `_SBUILD` awk only under `--staged`, so the full run pays no extra subshell.
+The suite's fixture writers became `write_pr4_spec`, `write_pr4_ledger` and `run_pr4_staged`; the
+dropped space in `UNEXERCISED here` and the stale comment on fixture spec 160 are restored.
+
+Probed, no gate run: `sh_hygiene.scan_file` over the script counts 8 substitution-fed loops (base
+`14320c985` 8); `sh_hygiene.scan_spawn_file` counts the same idiom sites as base and as the
+registry; the fork-ceiling row's scratch tree, traced the way `fork-count.sh` counts, gave 190
+forks for base, 192 for `166c1fef7` and 190 for this fix; `lexicon.py --suggest` accepts all four
+new names.
+
+**Evidences:** TOOL-dPavedRoad-4
+- AC1 — re-observed over the section 4 fixture at `%TEMP%/pr4`: with only spec 2 staged, and again with only spec 1, `--staged` printed `HYGIENE check 12` and the spec 1 `hands-off` `ARCH-tPair-2` one-way line.
+- AC2 — re-observed: with specs 2 and 5 staged, no `ARCH-tPair-4` or `ARCH-tPair-5` edge, no spec 6 or spec 8 finding, the first announce line, and no `the §3 edge JOINS are held under --staged`.
+- AC3 — re-observed: `ARCH-tPair-3/AC2` with spec 3 staged and `ARCH-tPair-9/AC9` with spec 9's ledger record staged, each in its `HYGIENE check 23` line.
+- AC4 — re-observed: neither run named `ARCH-tPair-10/AC9` or `ARCH-tPair-9/AC8` or printed `check 23 HELD under --staged`, and each printed `memory-hygiene: check 23 graded 1 unit(s)`.
+- AC5 — re-observed: the full run from this tree against the `ae6735c1` clone at `%TEMP%/pr4b` gave an empty `diff` once the clone's check 26 cache was warm, the first run differing only in `cache hits`, as before.
+- AC6 — re-observed: the held-prose greps each printed 0, each replacement sentence counted 1 in all four copies, and `grep -nF '23 and 26'` printed nothing.
