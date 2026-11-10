@@ -9,10 +9,10 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: ae6735c1f237423022016714b3da193f8ed971b7 · park · 146 touching
+refreshed-at: 1e4f3d88537d2e2ba3e781fcd211241f757d18d7 · park · 159 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 26eda42141ce00f5048070e1a161727ccc033131
-phase: BUILDING
+witness: fd220d40bc2b488e9347311311cf3ca3af1b0677
+phase: VERIFYING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -501,3 +501,9 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-10T08:29:52Z dispatch · item cb1ae0be PLAY-dOrderedCharter-77 · reason memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-18-ledger.md
 
 2026-11-10T08:44:47Z dispatch · item cb1ae0be PLAY-dOrderedCharter-77 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-10T11:28:16Z decision · item the govkit acceptance matrix reds: a scratch install of the playbook kits alone cannot render the charter, because this build's readers look up the memory-tree and policy kits · reason options: the playbook entry requires memory-tree and policy and the scratch install carries them, or those readers degrade as their older sibling does; unit 73 left the requirement to the owner and PLAY-dOrderedCharter-77 F2 kept it parked
+
+2026-11-10T11:28:21Z decision · item an adopter's tags check reds: the shipped tools/playbook/namespaces.toml names dOrderedCharter as each namespace's owner, which an adopter's chain registry does not hold (PLAY-dOrderedCharter-72 AC6, observed at e517511e2) · reason options: a unit that ships the owner field unarmed at an adopter, or the purpose arm skipping an owner the target's chain registry lacks; either is a new unit, so it waits for the owner's scheduling rather than this close
+
+2026-11-10T11:28:26Z decision · item tools/check-template-size.test.sh A25r asserts check 8 branch 1's remedy without its leading ')', so check-arms reads the branch unarmed; it is pinned in memory/project/unarmed-branches.txt · reason a one-line arm fix under tools/, which the write gate refuses now that PLAY-dOrderedCharter-77 is CLOSED; the pin row leaves when the arm asserts the whole slice
