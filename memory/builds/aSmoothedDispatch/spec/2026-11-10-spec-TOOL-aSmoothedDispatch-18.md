@@ -1,13 +1,15 @@
 # TOOL-aSmoothedDispatch-18 — the three bar legs this build turned red: unit 4's loop read off a one-name local, four test lines respelled off kit paths, and `--help` anchored on a help page
 
-**Status:** SPECCED · rev-1 · 2026-11-10 · node a · Tier-1 · base ae6735c1 · streams tooling · order 10
+**Status:** INPROGRESS · rev-2 · 2026-11-10 · node a · Tier-1 · base ae6735c1 · streams tooling · order 10 · ratified 2026-11-10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-10-prompt-TOOL-aSmoothedDispatch-18-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-18-1-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-TOOL-aSmoothedDispatch-18-2-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-18-2-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aSmoothedDispatch-18-bar-reds.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-18-bar-reds.md) | research | — |
+| [2026-11-10-prompt-TOOL-aSmoothedDispatch-18-f2.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-18-f2.md) | research | — |
 | [2026-11-10-prompt-TOOL-aSmoothedDispatch-18-re-id.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-18-re-id.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -32,8 +34,8 @@ changes no refusal, no refusal message and no `--writes` split.
 - **S3** — Install-prefix, hook suite. `write_run_state` in `tools/hooks/scratch-guard.test.sh:1180`
   writes the row's reason as `%s/a.js` fed `"$SGP"`, where it now spells `tools/a.js`. Observed by AC3.
 - **S4** — Docs. The anchor `<!-- usage: verb:unattended.sh:--help 965e3eb2 -->` goes on exactly one
-  page under `help/`, the page §7 F2 picks, beside a sentence saying what `--help` prints. Observed
-  by AC4.
+  page under `help/`, `help/spec-audit.md` as §7 F2 resolves, in a short section beside its
+  `--record-round` anchor, with a sentence saying what `--help` prints. Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -125,19 +127,20 @@ The row bytes stay the same. Only the spelling in the source moves.
 
 The fingerprint 965e3eb2 is DERIVED by the docs leg's own reader through `$SCRATCH/sd10fp.py`. That
 probe printed `5fdc7c80` for `--chain-verdict`, which is the anchor `help/spec-audit.md:85` holds,
-so the probe agrees with the leg. Under F2's recommendation, a new page `help/unattended.md`
-documents the verb, and `help/README.md` gains one index line for it:
+so the probe agrees with the leg. As §7 F2 resolves, `help/spec-audit.md` carries the anchor. A
+short section goes directly above its `## Recording a round` heading (`help/spec-audit.md:57`), the
+section that holds the `--record-round` anchor, in the same form as that section's opening line:
 
 ```markdown
-# The unattended driver's verb list
+## Listing the driver's verbs
 
-**What it is.** `unattended.sh --help` prints every verb the unattended driver takes and the guide
-that states each verb's contract, then the driver's usage header, and exits 0. `-h` is the same.
-<!-- usage: verb:unattended.sh:--help 965e3eb2 -->
+`--help` prints every verb the unattended driver takes and the guide that states each verb's contract, then the driver's usage header, and exits 0. `-h` is the same. <!-- usage: verb:unattended.sh:--help 965e3eb2 -->
 ```
 
 It is followed by a fenced `bash` block holding `bash tools/unattended/unattended.sh --help`. The
-docs leg tests that command against the verb rows, and `--help` is declared for that script.
+docs leg tests that command against the verb rows, and `--help` is declared for that script. No
+other page under `help/` changes, and `help/README.md` gains no line, because the page is already
+indexed.
 
 ### The pass probes
 
@@ -182,10 +185,7 @@ at the close.
 - `tools/unattended/unattended.sh`
 - `tools/unattended/unattended.test.sh`
 - `tools/hooks/scratch-guard.test.sh`
-- `help/unattended.md`
-- `help/README.md`
-
-The last two hold under F2 (b). Under (a) the one help path is `help/spec-audit.md`.
+- `help/spec-audit.md`
 
 ### Rollout
 
@@ -232,7 +232,7 @@ kits, so the lander's `mint` moves the unattended and hooks kit versions, never 
   unit the hook reads.
 - **AC4** — When `python -I "$SCRATCH/sd10fp.py" "." unattended.sh:--help` runs, it prints
   `unattended.sh:--help 965e3eb2`. `grep -rlF 'usage: verb:unattended.sh:--help 965e3eb2' help/`
-  prints exactly one path, the page F2 picks. At the close, the main loop observes the docs leg exit
+  prints exactly one path, `help/spec-audit.md`. At the close, the main loop observes the docs leg exit
   0 with no `UNDOCUMENTED` and no `TWICE` line.
   Red when: the anchor carries another fingerprint, so the leg prints `STALE`, or it sits on two
   pages, so the leg prints `TWICE`, or no page carries it.
@@ -269,14 +269,16 @@ hygiene gate and the naming lexicon over this file.
   verbs, two of them, under the subject of spec-audit chains.
   - (a) `help/spec-audit.md`, a short section beside `--record-round`. No new file. But `--help` has
     nothing to do with spec-audit chains, and `help/README.md` says one page per feature.
-  - (b) A new `help/unattended.md` holding only the `--help` paragraph and its command, plus one
-    `help/README.md` index line. This is the page the driver's later verbs can join. But a new
+  - (b) A new page for the driver under `help/` holding only the `--help` paragraph and its
+    command, plus one index line for it. This is the page the driver's later verbs can join. But a new
     document is its own unit under BUILD-METHOD M2, and here it would ride inside unit 18.
   - (c) Option (b) as a separate unit, with this unit's S4 handed off to it. That keeps M2 whole and
     adds one unit and one pass to the build.
   Recommendation: (b). The build README's roster row for unit 18 already names the anchor as this
   unit's mechanism, and the page carries nothing beyond that anchor and its sentence. The owner
-  decides, because the build runs with no mandate.
+  decides, because the build runs with no mandate. RESOLVED (owner, 2026-11-10): (a), the owner's
+  answer "(a) spec-audit.md". The anchor goes on `help/spec-audit.md` beside `--record-round` (§4
+  S4), no new page is written, and no index line is added.
 
 ## 8. Revision log
 
@@ -284,6 +286,11 @@ hygiene gate and the naming lexicon over this file.
   grounded at `e606fb89c`. A probe of the scanner found that the leg's third driver site is unit 4's
   loop, not unit 1's split, so S1 moves one `local` assignment and the split stays as it is. The
   docs page is F2, left to the owner.
+- rev-2 · 2026-11-10 · F2 RESOLVED by the owner as (a), per the record
+  `2026-11-10-prompt-TOOL-aSmoothedDispatch-18-f2`. S4 and AC4 name `help/spec-audit.md` as the one
+  page carrying the `--help` anchor, in a section above its `--record-round` section. "Files
+  touched" drops the new page and the index line that only (b) or (c) needed, and the header gains
+  `ratified 2026-11-10`. S1 to S3 and AC1 to AC3 are unchanged.
 
 ## 9. Reuse audit
 
