@@ -53,7 +53,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 3 unit(s) · node a · opened 2026-11-10 · streams tooling
+**Build status:** SPECCED · 4 unit(s) · node a · opened 2026-11-10 · streams tooling
 ids TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 TOOL-aSwiftRefusal-3 TOOL-aSwiftRefusal-4
 
 <!-- gen:build-units -->
@@ -62,15 +62,16 @@ ids TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 TOOL-aSwiftRefusal-3 TOOL-aSwiftRe
 | [TOOL-aSwiftRefusal-1 — `--dispatch` runs the spec-token check after every cheap refusal](spec/2026-11-10-spec-TOOL-aSwiftRefusal-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-11-10 |
 | [TOOL-aSwiftRefusal-2 — the order gate lets a deferred earlier-order unit pass](spec/2026-11-10-spec-TOOL-aSwiftRefusal-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-11-10 |
 | [TOOL-aSwiftRefusal-3 — `read_open_passes` leaves out every key of a deferred unit, naming each on stderr](spec/2026-11-10-spec-TOOL-aSwiftRefusal-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-10 |
+| [TOOL-aSwiftRefusal-4 — round 1's mediums and lows: one deferral answer for `--rescope` and check 23, the floors, the `--audit` arm, the positive control and the contract text](spec/2026-11-10-spec-TOOL-aSwiftRefusal-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-11-10 |
 <!-- /gen:build-units -->
 
 Records: 7 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 TOOL-aSwiftRefusal-3.
+Ids no `spec-audit` record has ever named: TOOL-aSwiftRefusal-1 TOOL-aSwiftRefusal-2 TOOL-aSwiftRefusal-3 TOOL-aSwiftRefusal-4.
 
-Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -80,6 +81,7 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 | 1 | `TOOL-aSwiftRefusal-1` | no |
 | 2 | `TOOL-aSwiftRefusal-2` | no |
 | 3 | `TOOL-aSwiftRefusal-3` | no |
+| 4 | `TOOL-aSwiftRefusal-4` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
