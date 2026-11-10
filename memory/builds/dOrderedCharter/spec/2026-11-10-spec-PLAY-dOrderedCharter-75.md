@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-10-prompt-PLAY-dOrderedCharter-75-1-spec-writer.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-75-1-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-PLAY-dOrderedCharter-75-build-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-75-build-brief.md) | journal | — |
 | [2026-11-10-prompt-PLAY-dOrderedCharter-75-spec-brief.md](../prompts/2026-11-10-prompt-PLAY-dOrderedCharter-75-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
