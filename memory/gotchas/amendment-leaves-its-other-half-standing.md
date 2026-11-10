@@ -107,6 +107,13 @@ as check 23 asks it, and listed the brief's placement under Alternatives rejecte
 of the call had two placements to follow. `TOOL-dFinishedRecord-2` rewrote the row. The check, at the close: no
 roster Mechanism cell describes a design its unit's spec lists under Alternatives rejected.
 
+It bit again in aProfiledEffort's closing diff review, 2026-11-10
+(memory/builds/aProfiledEffort/reviews/2026-11-10-review-TOOL-aProfiledEffort-1-closing-diff-round1.md, item 5).
+`TOOL-aProfiledEffort-1` added a comment to `tools/roles/house/policy.toml` saying a profile reaches an agent at
+dispatch, and left the file's own header saying a changed value reaches an agent after a render and a new
+session. `TOOL-aProfiledEffort-4` scoped the header. The check, at the close: after adding a statement of how a
+value takes effect, read the file's header for an older statement of the same thing.
+
 ## The fix
 
 **Amend the RULE, not the sentence.** Before writing the new wording, find everything whose truth

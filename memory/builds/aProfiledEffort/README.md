@@ -5,7 +5,7 @@ opened: 2026-11-10
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 TOOL-aProfiledEffort-4
+ids: TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 TOOL-aProfiledEffort-4 TOOL-aProfiledEffort-5 TOOL-aProfiledEffort-6
 ---
 
 # aProfiledEffort — the effort policy takes a profile per model, and Claude Fable runs every role and stage at medium
@@ -57,7 +57,7 @@ None.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 4 unit(s) · node a · opened 2026-11-10 · streams tooling
-ids TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 TOOL-aProfiledEffort-4
+ids TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 TOOL-aProfiledEffort-4 TOOL-aProfiledEffort-5 TOOL-aProfiledEffort-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -68,7 +68,7 @@ ids TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 TOOL-aP
 | [TOOL-aProfiledEffort-4 — the closing review's seven confirmed items are closed, and arm 19 fails by its own FAIL lines](spec/2026-11-10-spec-TOOL-aProfiledEffort-4.md) | 4 | 2 | CLOSED | rev-2 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 16 bound to this build, across 4 record folder(s).
+Records: 17 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

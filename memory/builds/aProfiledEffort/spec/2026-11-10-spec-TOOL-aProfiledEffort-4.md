@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-10-build-TOOL-aProfiledEffort-1-agent-ledger.md](../build/2026-11-10-build-TOOL-aProfiledEffort-1-agent-ledger.md) | journal | TOOL-aProfiledEffort-1 TOOL-aProfiledEffort-2 TOOL-aProfiledEffort-3 |
 | [2026-11-10-build-TOOL-aProfiledEffort-4-1-acceptance-ledger.md](../build/2026-11-10-build-TOOL-aProfiledEffort-4-1-acceptance-ledger.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aProfiledEffort-4-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-4-1-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aProfiledEffort-4-2-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aProfiledEffort-4-2-spec-writer.md) | journal | — |
