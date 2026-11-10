@@ -1,12 +1,14 @@
 # TOOL-aSwiftRefusal-4 — round 1's mediums and lows: one deferral answer for `--rescope` and check 23, the floors, the `--audit` arm, the positive control and the contract text
 
-**Status:** SPECCED · rev-1 · 2026-11-10 · node a · Tier-2 · base 17308b6c · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-11-10 · node a · Tier-2 · base 17308b6c · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-10-prompt-TOOL-aSwiftRefusal-4-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-4-1-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aSwiftRefusal-4-round1-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-4-round1-fix-brief.md) | research | — |
+| [2026-11-10-prompt-TOOL-aSwiftRefusal-4-token-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-4-token-fix-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -388,7 +390,7 @@ lib() { # status -> the library's answer for ARCH-x-1 over F (reads D)
   runs, it prints `FLOOR_ASSERTIONS=3287`, `FLOOR_SHARD_3=416` and `FLOOR_SHARD_4=403`, and
   `grep -E '^FLOOR_(SHARD_8|ASSERTIONS)=' tools/unattended/check-unattended.test.sh` prints
   `FLOOR_ASSERTIONS=1152` and `FLOOR_SHARD_8=227`. `grep -c 'RAISED .*TOOL-aSwiftRefusal-4' tools/unattended/unattended.test.sh`
-  prints `3`, and the same count over `tools/unattended/check-unattended.test.sh` prints `1`.
+  prints `3`, and `grep -c 'RAISED .*TOOL-aSwiftRefusal-4' tools/unattended/check-unattended.test.sh` prints `1`.
   `sed -n '/TOOL-aSwiftRefusal-1 - THE SPEC-TOKEN CHECKER/,/end REGION 3/p' tools/unattended/unattended.test.sh | grep -cE '^(hit|miss|same|mutate) '`
   prints `11` (`10` at base), and for each of `M1`, `M3` and `M4`,
   `sed -n '/^# ---- TOOL-aSwiftRefusal-4 M1:/,/^$/p' <its suite> | grep -cE '^(hit|miss|same|mutate) '`
@@ -431,6 +433,11 @@ none
   `memory/builds/aSwiftRefusal/prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-4-round1-fix-brief.md`
   and the review record `2026-11-10-review-TOOL-aSwiftRefusal-1-3-closing-diff-round1`, items M1
   to M4 and L1 to L3, grounded at base `17308b6c`.
+- rev-2 · 2026-11-10 · the spec-token `[bar]` hit in §6 folded, from
+  `memory/builds/aSwiftRefusal/prompts/2026-11-10-prompt-TOOL-aSwiftRefusal-4-token-fix-brief.md`:
+  AC4's bare backticked gate-suite path becomes the `grep -c` over that file it already meant, so
+  the token opens with grep and names no suite run. The suite stays named on the §7 `New arm:`
+  line only. No scope, design, criterion or fork changed.
 
 ## 10. Reuse audit
 
