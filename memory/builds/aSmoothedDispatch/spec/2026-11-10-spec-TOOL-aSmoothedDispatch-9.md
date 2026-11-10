@@ -1,11 +1,13 @@
 # TOOL-aSmoothedDispatch-9 — the three driver-suite arms unit 1's split left red: the stale `--dispatch` hostile-value exemption, and two carriage-return arms whose byte the substitution drops
 
-**Status:** SPECCED · rev-1 · 2026-11-10 · node a · Tier-1 · base ae6735c1 · streams tooling · order 9
+**Status:** INPROGRESS · rev-2 · 2026-11-10 · node a · Tier-1 · base ae6735c1 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-10-prompt-TOOL-aSmoothedDispatch-9-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-9-1-spec-writer.md) | journal | — |
+| [2026-11-10-prompt-TOOL-aSmoothedDispatch-9-diverged.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-9-diverged.md) | research | — |
 | [2026-11-10-prompt-TOOL-aSmoothedDispatch-9-stale-arms.md](../prompts/2026-11-10-prompt-TOOL-aSmoothedDispatch-9-stale-arms.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -157,10 +159,12 @@ One pass, after units 1 to 8, all CLOSED. The suite is shipped bytes of the unat
 
 ## 5. Acceptance criteria
 
-- **AC1** — When `sed -n "/^_rf_exempt='/,/'\$/p" tools/unattended/unattended.test.sh` runs, it
-  prints one line, the `brief|check 49` row. `grep -c '^dispatch|check 49' tools/unattended/unattended.test.sh`
-  prints 0. At the close, shard 2 prints no `FAIL the exemption for --dispatch is stale` line, and
-  its FAIL lines equal the base run's, the `--record-round` line alone.
+- **AC1** — When `grep -c "^_rf_exempt='brief|check 49: .*hash'\$" tools/unattended/unattended.test.sh`
+  runs, it prints 1, so the `_rf_exempt` string opens and closes on the `brief` row.
+  `grep -c '^dispatch|check 49' tools/unattended/unattended.test.sh` prints 0. Both greps print the
+  reverse, 0 and 1, at `6b636484`, and 1 and 0 on a scratch copy with S1 applied. At the close,
+  shard 2 prints no `FAIL the exemption for --dispatch is stale` line, and its FAIL lines equal the
+  base run's, the `--record-round` line alone.
   Red when: the `dispatch` row is put back on `_rf_exempt`, so the matrix reads exit 0 for a listed
   verb and prints the stale-exemption FAIL.
   figure: shard 2's count of 610 is DERIVED from the close's 611 at `55d65f5c`, less the one
@@ -209,6 +213,11 @@ the spec-token checker's one-spec mode over this file.
   `2026-11-10-prompt-TOOL-aSmoothedDispatch-9-stale-arms`, grounded at `c13b0b63`. A probe found that
   the substitution drops the carriage-return byte, so the arms keep the carriage return in a
   variable rather than moving to a vertical tab.
+- rev-2 · 2026-11-10 · AC1 · the builder's divergence record
+  `2026-11-10-prompt-TOOL-aSmoothedDispatch-9-diverged` showed AC1's `sed` range cannot print one
+  line: after S1 the string opens and closes on one line, and a `sed` range never tests its end
+  address on its start line, so it printed to the next line ending in a quote. AC1 now greps the
+  one-line `_rf_exempt` assignment. S1, S2 and the code they describe are unchanged.
 
 ## 9. Reuse audit
 
