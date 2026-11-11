@@ -189,7 +189,7 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY
 | [PLAY-dOrderedCharter-81 — the second close bar's two product reds, each by its narrowest fix](spec/2026-11-11-spec-PLAY-dOrderedCharter-81.md) | 43 | 1 | CLOSED | rev-1 | 2026-11-11 |
 <!-- /gen:build-units -->
 
-Records: 632 bound to this build, across 4 record folder(s).
+Records: 633 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
