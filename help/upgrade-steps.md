@@ -427,7 +427,10 @@ behind.
   above, and your `CLAUDE.md` import line is left as it is. Where your `deploy.toml` `kits` (or a
   `--kits` list) still names `agent-instructions`, `plan`, `apply`, `adopt` and `intake` read it as
   its successor `playbook-render`, and an id a `[[retired]]` row retires with `none` is dropped from
-  the list; an id that is neither an entry nor retired is still refused.
+  the list; an id that is neither an entry nor retired is still refused. The
+  `agent-instructions wiring` leg keeps its name on gov's own bar, running the renderer's
+  `--check-render --scope entry-files`; an adopter that held the agent-instructions kit stops
+  carrying it at its next `update`, and runs that command itself to check its entry files.
 - **`playbook-render` joins the default selection**, because the `check-microformats` gate now grades
   the template it ships. `update` installs it as a default-gained kit, and the receipt claims it
   from then on.

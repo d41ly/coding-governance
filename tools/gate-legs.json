@@ -296,6 +296,21 @@
     "ceiling": 1130
   },
   {
+    "name": "agent-instructions wiring",
+    "argv": [
+      "python",
+      "{prefix}/playbook/render_playbook.py",
+      "--check-render",
+      "--scope",
+      "entry-files",
+      "--aliases",
+      "claude"
+    ],
+    "chunk": "wiring",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "manifest-check self-test",
     "argv": [
       "bash",

@@ -533,3 +533,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-10T21:31:46Z dispatch · item 64bc9961 PLAY-dOrderedCharter-31 · reason memory/backlog/PLAY.md
 
 2026-11-10T21:57:01Z dispatch · item 64bc9961 PLAY-dOrderedCharter-31 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-11T00:32:21Z dispatch · item 25ed886f PLAY-dOrderedCharter-39 · reason tools/gate-legs.json tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/run-gates/ceiling-evidence.txt tools/playbook/core-pending.txt memory/map/features/playbook.md memory/map/baseline.toml memory/map/generated help/upgrade-steps.md memory/guides/SESSION-KICKOFF.md memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-39.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-39-ledger.md memory/builds/dOrderedCharter/build/2026-11-11-build-PLAY-dOrderedCharter-39-deviation-392.md memory/builds/dOrderedCharter/README.md memory/LIVE.md memory/backlog/PLAY.md
+
+2026-11-11T00:41:04Z brief · item PLAY-dOrderedCharter-39 · reason bd730625872d memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-39-build-brief.md

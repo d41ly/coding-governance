@@ -176,7 +176,7 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY
 | [PLAY-dOrderedCharter-34 — composition and its report: the project block and marked parts from the overlay, budgets and harness limits at render, one composition for every harness, the delta report, and the practice census](spec/2026-10-23-spec-PLAY-dOrderedCharter-34.md) | 35 | 2 | CLOSED | rev-10 | 2026-11-09 |
 | [PLAY-dOrderedCharter-31 — this build's own upgrade steps: the agent-instructions wiring to the one renderer, adopter rules into the overlay, the seeded template's succession row, the census's change records and the `map_lib` deprecation](spec/2026-10-23-spec-PLAY-dOrderedCharter-31.md) | 36 | 2 | CLOSED | rev-15 | 2026-11-10 |
 | [PLAY-dOrderedCharter-37 — the help pages: reference pages rendered from each registry's rows, concept, task and tutorial pages beside them, every shown command run, each page linked to its unit by tag](spec/2026-10-23-spec-PLAY-dOrderedCharter-37.md) | 37 | 2 | CLOSED | rev-7 | 2026-11-09 |
-| [PLAY-dOrderedCharter-39 — the card import survives the agent-instructions kit's retirement, with the wiring leg kept by name](spec/2026-10-24-spec-PLAY-dOrderedCharter-39.md) | 37 | 2 | DEFERRED | rev-5 | 2026-11-10 |
+| [PLAY-dOrderedCharter-39 — the card import survives the agent-instructions kit's retirement, with the wiring leg kept by name](spec/2026-10-24-spec-PLAY-dOrderedCharter-39.md) | 37 | 2 | CLOSED | rev-5 | 2026-11-11 |
 | [PLAY-dOrderedCharter-40 — gov's first instruction unit rows, one per reference page, and the pages' registry tags declared](spec/2026-10-24-spec-PLAY-dOrderedCharter-40.md) | 37 | 2 | CLOSED | rev-5 | 2026-11-10 |
 | [PLAY-dOrderedCharter-75 — the selects join arms per namespace, so gov's first unit rows leave the tags leg green](spec/2026-11-10-spec-PLAY-dOrderedCharter-75.md) | 37 | 2 | CLOSED | rev-2 | 2026-11-10 |
 | [PLAY-dOrderedCharter-76 — the units reference page, each page's unit line and its check, the unit-usage class, and the reds PLAY-dOrderedCharter-37's pass left](spec/2026-11-10-spec-PLAY-dOrderedCharter-76.md) | 37 | 2 | CLOSED | rev-1 | 2026-11-10 |
@@ -187,7 +187,7 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-7 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 598 bound to this build, across 4 record folder(s).
+Records: 600 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

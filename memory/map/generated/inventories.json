@@ -6,6 +6,7 @@
       "agent-cap restatement",
       "agent-cap restatement self-test",
       "agent-cap self-test",
+      "agent-instructions wiring",
       "backlog migration selftest",
       "branch-guard self-test",
       "branch-reconcile selftest",

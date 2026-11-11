@@ -566,6 +566,10 @@ name = "foreign-prefix parity (every self-test at three prefixes)"
 why = "it runs `foreign-prefix.gov.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"` beside `run-gates.gov.test.sh`: it moves GOV's whole tool root in a scratch clone and grades gov's own declared self-test population there, so in any other tree it has no population to move. A held leg with a budget row, run once per build (TOOL-aRepatriatedFork-18 section 8 F3, TOOL-aRepatriatedFork-30 S1). NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`."
 
 [[exempt_leg]]
+name = "agent-instructions wiring"
+why = "it runs `<prefix>/playbook/render_playbook.py --check-render --scope entry-files --aliases claude`, the renderer's `entry-files` check over gov's own entry files, which the retired agent-instructions kit's `--check` reached. NOT a [[gate_leg]] on the `playbook-render` descriptor: that row would hand it to every target selecting that entry, where it reds while the target's aliases are unwired, and no path of `apply` wires them (section 8, F3). PLAY-dOrderedCharter-39."
+
+[[exempt_leg]]
 name = "codebase-map kit selftest"
 why = "it runs `selftest.py`, which `<prefix>/codebase-map/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 

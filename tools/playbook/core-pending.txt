@@ -102,6 +102,7 @@ leg	shell-hygiene selftest	dWitnessedBar
 leg	kit version markers	dWitnessedBar
 leg	verdict epoch (kit version dates the engine)	dWitnessedBar
 leg	verdict-epoch self-test	dWitnessedBar
+leg	agent-instructions wiring	dWitnessedBar
 leg	manifest-check self-test	dWitnessedBar
 leg	agent-cap self-test	dWitnessedBar
 leg	scratch-guard self-test	dWitnessedBar
