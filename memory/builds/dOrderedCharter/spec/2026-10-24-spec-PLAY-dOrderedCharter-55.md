@@ -17,6 +17,7 @@
 | [2026-10-25-build-PLAY-dOrderedCharter-55-deviation-553.md](../build/2026-10-25-build-PLAY-dOrderedCharter-55-deviation-553.md) | deviation | — |
 | [2026-11-02-build-PLAY-dOrderedCharter-55-ledger.md](../build/2026-11-02-build-PLAY-dOrderedCharter-55-ledger.md) | journal | — |
 | [2026-11-05-build-PLAY-dOrderedCharter-55-close-carry.md](../build/2026-11-05-build-PLAY-dOrderedCharter-55-close-carry.md) | journal | — |
+| [2026-11-11-build-PLAY-dOrderedCharter-55-1-builder-return.md](../build/2026-11-11-build-PLAY-dOrderedCharter-55-1-builder-return.md) | journal | — |
 | [2026-11-11-build-PLAY-dOrderedCharter-55-deviation-554.md](../build/2026-11-11-build-PLAY-dOrderedCharter-55-deviation-554.md) | deviation | — |
 | [2026-11-11-build-PLAY-dOrderedCharter-55-deviation-555.md](../build/2026-11-11-build-PLAY-dOrderedCharter-55-deviation-555.md) | deviation | — |
 | [2026-11-11-build-PLAY-dOrderedCharter-55-deviation-556.md](../build/2026-11-11-build-PLAY-dOrderedCharter-55-deviation-556.md) | deviation | — |
