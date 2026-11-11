@@ -17,7 +17,7 @@
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
 #   unattended.sh --propose <slug> --item <text> --step <s> --reason <text>  # amend a playbook LATER
 #   unattended.sh --rescope <slug> --act <retire|supersede|add|defer> --item <id> [--successor <id>] --reason <text>
-#   unattended.sh --dispatch <slug> --pass <id> --writes <path> [--writes <path> ...]
+#   unattended.sh --dispatch <slug> --pass <id> --writes <path> [<path> ...] [--writes <path> ...]
 #   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
 #   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--highs <N> --minors <N>] [--folded <N> --promoted <N>] [--disposition fold|promote]
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
@@ -34,6 +34,7 @@
 #   unattended.sh --claims                                         # every run claim on the remote: slug, node, status, beat-age-s, verdict
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
 #   unattended.sh --version                                        # the kit version, then exit
+#   unattended.sh --help                                           # the verb list, the verb carrier's path and this text, then exit 0; -h is the same
 #   unattended.sh --overlaps                                       # the overlap probe against the LOCAL default-branch tracking ref, no network
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
@@ -14292,6 +14293,130 @@ check_commit_message() { # commit message file
   return 0
 }
 
+# TOOL-aSmoothedDispatch-2: THE RUN-STATE FILE ITSELF IS REMOVED FROM A DECLARATION, never refused.
+# Every pass commit carries it, and --check-commit and check 23 already leave it out, so a pass that
+# names it has declared nothing a comparison reads. EQUALITY ONLY, over `normpath`: a path CONTAINING
+# the file stays in the set and the containment refusal in verb_dispatch still answers it.
+remove_run_state_writes() { # run-state file · writes... -> _rw_keep (array) · _rw_removed (1 when one was)
+  local _rs _p
+  normpath "$1" >/dev/null; _rs=$_np; shift
+  _rw_keep=(); _rw_removed=""
+  for _p in "$@"; do
+    normpath "$_p" >/dev/null
+    [ "$_np" = "$_rs" ] && { _rw_removed=1; continue; }
+    _rw_keep+=("$_p")
+  done
+}
+
+# TOOL-aSmoothedDispatch-4 S1 - THE SPEC-TOKEN VERDICT, scoped to the dispatching build. A COUNTED
+# proof, never the absence of an own line: a red is admitted only when the checker's own summary
+# counts N hits and no stale row, and all N are hit lines whose file sits under ANOTHER build's
+# folder, which the bar's whole-tree leg still grades. A stale row, an unattributed hit, a missing
+# summary or a hit line whose shape drifted leaves N above the foreign count and refuses, as every
+# red did before. The trailing slash on the own prefix keeps `tA` from claiming `tAB`. The output is
+# a named local so the moved `head -1` read stays the spelling the spawn registry counts.
+check_spec_token_hits() { # slug · checker status · checker output -> 0 admits, 1 refuses; stdout the lines to quote, at most three
+  local own="$MEMORY_ROOT/builds/$1/" far="$MEMORY_ROOT/builds/" line tail n="" m="" nfar=0
+  local out="$3"
+  local hitre='^spec-tokens: ([^ ]+) \[[a-z-]+\] ' sumre='^spec-tokens: ([0-9]+) unwaived hit\(s\), ([0-9]+) stale row\(s\)$'
+  local ownq=() farq=()
+  [ "$2" = 0 ] && return 0
+  while IFS= read -r line; do
+    line=${line%$'\r'}
+    if [[ $line =~ $sumre ]]; then
+      n=${BASH_REMATCH[1]}; m=${BASH_REMATCH[2]}
+    elif [[ $line =~ $hitre ]]; then
+      case ${BASH_REMATCH[1]} in
+        "$own"*) ownq+=("$line") ;;
+        "$far"*) nfar=$((nfar + 1)); farq+=("$line") ;;
+      esac
+    fi
+  done <<<"$out"
+  if [ -n "$n" ] && [ "${#ownq[@]}" = 0 ] && [ "$m" = 0 ] && [ "$n" -gt 0 ] && [ "$n" = "$nfar" ]; then
+    printf '%s\n' "${farq[@]:0:3}"
+    return 0
+  fi
+  if [ -n "$n" ] && [ "${#ownq[@]}" -gt 0 ]; then
+    printf '%s\n' "${ownq[@]:0:3}"
+    return 1
+  fi
+  # A checker that GRADED leaves `spec-tokens:` lines; one that never ran leaves none, and the
+  # tail then names the rc and the first line it did print, so a launcher or import failure is
+  # not read as a spec that reds.
+  tail=$(printf '%s\n' "$out" | grep -E '^spec-tokens: ' | grep -vE 'live spec\(s\) ·|bar join ·|Gates heading' | head -3)
+  [ -n "$tail" ] || tail="the checker printed no spec-tokens: line, so it did not grade — first line: $(printf '%s\n' "$out" | head -1)"
+  printf '%s\n' "$tail"
+  return 1
+}
+
+# TOOL-aSmoothedDispatch-4 S2 - THE KEY over every input the spec-token checker reads: the slug the
+# verdict scopes to, the declared checker, the launcher that runs it, HEAD (the checker reads history
+# through `git log`), and the run-gates kit's WORKING-TREE fingerprint, resolved as `print_drift_delta`
+# resolves a sibling kit. The fingerprint prints nothing on any failure, and so does this: an empty
+# key is the cache OFF for that call, never a key over a missing input. What it does not see: a git
+# setting carried in the environment, and a Python package upgraded in place under one launcher path.
+derive_spec_token_key() { # slug · launcher -> a 40-hex key, or nothing and status 1
+  local d fp hd
+  d=$(resolve_kit_dir "$2" run-gates gate-fingerprint.sh "$KIT_DIR" 2>/dev/null) && [ -n "$d" ] || return 1
+  fp=$(bash "$ROOT/$d/gate-fingerprint.sh" 2>/dev/null) && [ -n "$fp" ] || return 1
+  hd=$(GIT rev-parse HEAD 2>/dev/null) && [ -n "$hd" ] || return 1
+  printf '%s\n' "$1" "$SPEC_TOKENS_CLI" "$2" "$hd" "$fp" | GIT hash-object --stdin 2>/dev/null
+}
+
+# ------------------------------------------------- aDeferredBar closing review F3 (unit 2)
+# THE SPEC-TOKEN CHECKER, RUN OVER THE LIVE TREE BEFORE THE DISPATCH IS ADMITTED. The memory
+# kit's `bar` join grades LIVE specs, and under this harness every unit spec is CLOSED in its own
+# build commit, so by the first bar that could grade it the population that join was built for is
+# empty by construction. This verb is the one point that sees every live spec before its unit
+# builds, and the checker is a direct check in seconds that the gate-guard hook admits. DECLARED,
+# never spelled — `SPEC_TOKENS_CLI` is repo-relative in the conf, in RECALL_CLI's register — and
+# BLANK or absent means the kit is not adopted, which is ANNOUNCED rather than passed over.
+# The launcher is the inline resolver's answer and nothing else (closing round 2, R2 and R8):
+# the first cut EXECUTED a bare `python3` on the adopter layout, which on Windows is the stub the
+# resolver exists to refuse, and every --dispatch there was then refused with a diagnosis
+# blaming the tree. `resolve_python` cannot be made to fail from the driver suite's fixture
+# without hiding every launcher from PATH, so that branch is pinned rather than armed.
+#
+# TOOL-aSmoothedDispatch-4 S2-S4 - MOVED HERE from `verb_dispatch` with its refusal texts and its
+# announced skip unchanged, then SCOPED and CACHED. It refuses only on a red `check_spec_token_hits`
+# cannot prove foreign. The key is derived BEFORE the checker runs and recorded only after the
+# verdict admits, so a refusal re-runs every time and a tree edited mid-run is recorded under the key
+# of the tree it read. The record is one file per slug under the sidecar root, read with `read -r`
+# and written with one `printf`; a failed read or write costs a later miss and never refuses.
+run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 49
+  local slug="$1" _stpy _strc _stq _stkey="" _stdir="" _strec="" _stwas=""
+  if [ -z "${SPEC_TOKENS_CLI:-}" ]; then
+    echo "unattended: dispatch — SPEC_TOKENS_CLI is blank or undeclared, so no spec-token check ran over the live tree before this dispatch: an announced skip, not a pass"
+    return 0
+  fi
+  [ -f "$ROOT/$SPEC_TOKENS_CLI" ] || { fail 49 "--dispatch: SPEC_TOKENS_CLI names a file that is not there, so the spec-token check would pass by running nothing: $SPEC_TOKENS_CLI"; return 1; }
+  _stpy=$(resolve_python) || { fail 49 "--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run: $SPEC_TOKENS_CLI"; return 1; }
+  _stkey=$(derive_spec_token_key "$slug" "$_stpy") || _stkey=""
+  if [ -n "$_stkey" ]; then
+    _stdir=$(resolve_sidecar_dir) && [ -n "$_stdir" ] && _strec="$_stdir/spec-tokens.$slug.key"
+    if [ -n "$_strec" ] && [ -f "$_strec" ]; then read -r _stwas <"$_strec" || :; fi
+    if [ "$_stwas" = "$_stkey" ]; then
+      echo "unattended: dispatch — spec-token check skipped: its inputs match the check last admitted for $slug (key ${_stkey:0:12})"
+      return 0
+    fi
+  else
+    echo "unattended: dispatch — spec-token cache off: no run-gates gate-fingerprint.sh resolves in this install, or it printed no digest, so the checker runs"
+  fi
+  run_bounded "$_stpy" "$SPEC_TOKENS_CLI"; _strc=$?
+  if ! _stq=$(check_spec_token_hits "$slug" "$_strc" "$RB_OUT"); then
+    fail 49 "--dispatch refuses: the declared spec-token checker reds over the live tree, so a live spec names a bar, a suite or a token that does not resolve and the unit would build against it ($SPEC_TOKENS_CLI exited $_strc in ${RB_TOOK}s): ${_stq//$'\n'/ }"
+    return 1
+  fi
+  if [ "$_strc" != 0 ]; then
+    [[ $RB_OUT =~ spec-tokens:\ ([0-9]+)\ unwaived ]]
+    echo "unattended: dispatch — the spec-token checker reds only in other builds' specs, which the bar's whole-tree leg still grades, so this dispatch is admitted: ${BASH_REMATCH[1]:-?} hit(s), first: ${_stq%%$'\n'*}"
+  fi
+  if [ -n "$_strec" ]; then
+    { mkdir -p "$_stdir" && printf '%s\n' "$_stkey" >"$_strec"; } 2>/dev/null || :
+  fi
+  return 0
+}
+
 verb_dispatch() { # slug · unit · writes...
   local slug="$1" unit="$2"; shift 2
   local rel shaped grp p q sib sibpaths want cur curpaths gen idx pair _dk
@@ -14492,8 +14617,8 @@ verb_dispatch() { # slug · unit · writes...
       return 1
     fi
   fi
-  # EACH --writes IS ONE PATH. A space-joined value cannot carry the whitespace refusal below: the
-  # path has already become two tokens by the time this verb sees it, and nothing recovers that.
+  # THE ARGUMENT LOOP SPLITS SPACE, TAB AND NEWLINE into separate paths before this verb sees them, so
+  # the whitespace refusal below catches the rest: a carriage return, a vertical tab, a form feed.
   for p in "$@"; do
     case "$p" in
       "") fail 49 "--dispatch was given an empty --writes path, and an empty declaration is not a narrow one: $unit"; return 1 ;;
@@ -14518,6 +14643,12 @@ verb_dispatch() { # slug · unit · writes...
     fi
   done
   refuse_if_terminal "$rel" --dispatch || return 1
+  remove_run_state_writes "$rel" "$@"
+  if [ -n "$_rw_removed" ]; then
+    echo "unattended: dispatch — $rel is this run's run-state file, which every pass commit carries and --check-commit and check 23 already leave out, so it is removed from this declaration rather than declared: $unit" >&2
+    [ "${#_rw_keep[@]}" -gt 0 ] || { fail 49 "--dispatch was given no --writes path except the run's run-state file, which is never declared, so the declaration would name no path: $unit"; return 1; }
+    set -- "${_rw_keep[@]}"
+  fi
   # CONDITION 3, FLAT HALF. The run-state file is DERIVED rather than declared - it is the one member
   # the kit already knows how to locate - and the rest come from the project's own declaration, so an
   # adopter whose layout differs gets refusals about THEIR paths and not this repo's.
@@ -14527,7 +14658,7 @@ verb_dispatch() { # slug · unit · writes...
   # narrow declarations get refused and the one that claims everything sails through.
   for p in "$@"; do
     if overlaps "$p" "$rel"; then
-      fail 49 "--dispatch declares the run-state file, or a path containing it, and every pass in the run shares that file, so two passes declaring it are not disjoint by construction: $p"; return 1
+      fail 49 "--dispatch declares a path containing the run-state file, and every pass in the run shares that file, so two passes declaring it are not disjoint by construction: $p"; return 1
     fi
     for q in ${SHARED_RECORDS:-}; do
       if overlaps "$p" "$q"; then
@@ -14631,38 +14762,11 @@ verb_dispatch() { # slug · unit · writes...
 $sibrows
 SIBS
   # ------------------------------------------------- aDeferredBar closing review F3 (unit 2)
-  # THE SPEC-TOKEN CHECKER, RUN OVER THE LIVE TREE BEFORE THE DISPATCH IS ADMITTED. The memory
-  # kit's `bar` join grades LIVE specs, and under this harness every unit spec is CLOSED in its own
-  # build commit, so by the first bar that could grade it the population that join was built for is
-  # empty by construction. This verb is the one point that sees every live spec before its unit
-  # builds, and the checker is a direct check in seconds that the gate-guard hook admits. DECLARED,
-  # never spelled — `SPEC_TOKENS_CLI` is repo-relative in the conf, in RECALL_CLI's register — and
-  # BLANK or absent means the kit is not adopted, which is ANNOUNCED rather than passed over.
+  # THE SPEC-TOKEN CHECK, `run_spec_token_check`: its header says what it runs, scopes and caches.
   # IT RUNS LAST AMONG THE LOCAL REFUSALS (TOOL-aSwiftRefusal-1): it is the one that costs a tree-wide
   # scan, and every refusal above it is decided from the run-state file, the spec headers or `git` in
   # seconds, so an out-of-order or overlapping dispatch is refused before the checker runs at all.
-  # The launcher is the inline resolver's answer and nothing else (closing round 2, R2 and R8):
-  # the first cut EXECUTED a bare `python3` on the adopter layout, which on Windows is the stub the
-  # resolver exists to refuse, and every --dispatch there was then refused with a diagnosis
-  # blaming the tree. `resolve_python` cannot be made to fail from the driver suite's fixture
-  # without hiding every launcher from PATH, so that branch is pinned rather than armed.
-  if [ -n "${SPEC_TOKENS_CLI:-}" ]; then
-    [ -f "$ROOT/$SPEC_TOKENS_CLI" ] || { fail 49 "--dispatch: SPEC_TOKENS_CLI names a file that is not there, so the spec-token check would pass by running nothing: $SPEC_TOKENS_CLI"; return 1; }
-    local _stpy _strc _sttail
-    _stpy=$(resolve_python) || { fail 49 "--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run: $SPEC_TOKENS_CLI"; return 1; }
-    run_bounded "$_stpy" "$SPEC_TOKENS_CLI"; _strc=$?
-    if [ "$_strc" != 0 ]; then
-      # A checker that GRADED leaves `spec-tokens:` lines; one that never ran leaves none, and the
-      # tail then names the rc and the first line it did print, so a launcher or import failure is
-      # not read as a spec that reds.
-      _sttail=$(printf '%s\n' "$RB_OUT" | grep -E '^spec-tokens: ' | grep -vE 'live spec\(s\) ·|bar join ·|Gates heading' | head -3 | tr '\n' ' ')
-      [ -n "$_sttail" ] || _sttail="the checker printed no spec-tokens: line, so it did not grade — first line: $(printf '%s\n' "$RB_OUT" | head -1)"
-      fail 49 "--dispatch refuses: the declared spec-token checker reds over the live tree, so a live spec names a bar, a suite or a token that does not resolve and the unit would build against it ($SPEC_TOKENS_CLI exited $_strc in ${RB_TOOK}s): $_sttail"
-      return 1
-    fi
-  else
-    echo "unattended: dispatch — SPEC_TOKENS_CLI is blank or undeclared, so no spec-token check ran over the live tree before this dispatch: an announced skip, not a pass"
-  fi
+  run_spec_token_check "$slug" || return 1
   # PARKED NORMALISED. Every refusal above asks its question through `normpath`; recording the raw
   # spelling meant the guards judged one path and the leg graded another, and `work/sub/` sailed
   # through the driver and then redded the leg permanently.
@@ -15116,7 +15220,15 @@ while [ $# -gt 0 ]; do
     --pass)         PK_ITEM="${2:-}"; shift 2 || shift ;;
     --task)         TK_NAME="${2:-}"; shift 2 || shift ;;
     --heartbeat)    TK_BEAT="${2:-}"; shift 2 || shift ;;
-    --writes)       DP_WRITES+=("${2:-}"); shift 2 || shift ;;
+    # TAKES EVERY PATH UP TO THE NEXT FLAG, each value split on space/tab/newline unglobbed; no field is one empty path.
+    --writes)       shift; _dw_n=0
+                    while [ $# -gt 0 ]; do
+                      case "$1" in --*) break ;; esac
+                      _dw=(); IFS=$' \t\n' read -r -d '' -a _dw <<<"$1" || :
+                      if [ ${#_dw[@]} -eq 0 ]; then DP_WRITES+=(""); else DP_WRITES+=("${_dw[@]}"); fi
+                      _dw_n=$((_dw_n+1)); shift
+                    done
+                    [ "$_dw_n" -gt 0 ] || DP_WRITES+=("") ;;
     --act)          RS_ACT="${2:-}"; shift 2 || shift ;;
     --successor)    RS_SUCC="${2:-}"; shift 2 || shift ;;
     --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;
@@ -15219,6 +15331,8 @@ while [ $# -gt 0 ]; do
     --claims)       refuse_waive_unless_preflight --claims || { RUNLOG_CLEAN=1; exit 1; }
                     print_claims; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; RUNLOG_CLEAN=1; exit 0 ;;
+    --help|-h)      echo "unattended: the verbs are $(verb_list); each verb's contract is $MEMORY_ROOT/guides/UNATTENDED-VERBS.md"
+                    usage; RUNLOG_CLEAN=1; exit 0 ;;
     --overlaps)     print_overlaps; RUNLOG_CLEAN=1; exit 0 ;;
     # THE SET IS THE DISPATCH. A slug-taking verb is recognised by membership in VERBS_SLUG rather
     # than by an alternation typed here, so the declaration is load-bearing: a verb absent from it

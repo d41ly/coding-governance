@@ -296,6 +296,16 @@ Cite ids, never line numbers.
 | [TOOL-aSiftedFork-7](../builds/aSiftedFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | THE RUN-GATES CANARY IS NON-DETERMINISTIC ON THIS HOST AND NAMES A… |
 | [TOOL-aSightedSkeptic-11](../builds/aSightedSkeptic/BACKLOG.md) | OPEN | HIGH | — | 2026-10-01 | inherited red: leg row-keyed merge driver replay red at ef1dcdb6,… |
 | [TOOL-aSignalledHook-2](../builds/aSignalledHook/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | the unattended kit does not handle push-main's exit 4 (landed UNGATED):… |
+| [TOOL-aSmoothedDispatch-10](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | INHERITED RED: THE HOSTILE-VALUE MATRIX DOES NOT DRIVE --record-round.… |
+| [TOOL-aSmoothedDispatch-11](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | INHERITED RED: THE BAR-SCRUB PARITY ARMS NAME GATE_REGEN_CHECK. Region… |
+| [TOOL-aSmoothedDispatch-12](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | INHERITED RED: THE PROLOGUE TAMPER CHECK NAMES write_bar_green. Region… |
+| [TOOL-aSmoothedDispatch-13](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | MED | — | 2026-11-10 | INHERITED RED: FIVE REGION-FOUR DISPATCH ARMS ARE ANSWERED BY CHECK… |
+| [TOOL-aSmoothedDispatch-14](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | MED | — | 2026-11-10 | THE SPEC-COMMIT STAGE CANNOT COMMIT A NEW BUILD'S FIRST SPECS. A build… |
+| [TOOL-aSmoothedDispatch-15](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | MED | — | 2026-11-10 | A RECORD QUOTING A DANGLING ID WRITES IT INTO ANOTHER BUILD'S IDS. Spec… |
+| [TOOL-aSmoothedDispatch-16](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | ROLE AGENTS RUN THE WHOLE-TREE HYGIENE GATE FOR A ONE-SPEC EDIT. Spec… |
+| [TOOL-aSmoothedDispatch-17](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | A CARRIAGE RETURN WRITTEN INLINE IN A SUITE ARGUMENT IS NOT A RELIABLE… |
+| [TOOL-aSmoothedDispatch-19](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | THE SHELL-HYGIENE SCANNER CREDITS ONE NAME PER LOCAL LINE.… |
+| [TOOL-aSmoothedDispatch-20](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | THE ROUTED-COMMITS LEG OUTGROWS ITS CEILING WHEN NO PUSH BASE IS SET. A… |
 | [TOOL-aSparedSpawn-20](../builds/aSparedSpawn/BACKLOG.md) | OPEN | MED | — | 2026-10-12 | the unit builder runs the govkit selfcheck and shell hygiene (a fork… |
 | [TOOL-aSparedSpawn-21](../builds/aSparedSpawn/BACKLOG.md) | OPEN | MED | — | 2026-10-12 | tools/memory-tree/check-arms.py compares each floored suite's declared… |
 | [TOOL-aSparedSpawn-22](../builds/aSparedSpawn/BACKLOG.md) | OPEN | LOW | — | 2026-10-12 | a lint over the *.test.sh suites flags a fixture sleep <N> whose arm… |

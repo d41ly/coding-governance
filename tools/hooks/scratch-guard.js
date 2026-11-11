@@ -74,7 +74,8 @@
  * whose target lies under the repository's declared product paths — `ROUTED_PATHS` in the target
  * toplevel's `.memory-tree.conf` — is refused unless this session's orientation card carries a
  * `## route` naming a unit whose spec is BUILDABLE: Tier-2 at INPROGRESS, Tier-1 at INPROGRESS, or
- * Tier-1 at SPECCED once `SPEC_TIER1_CUTOFF` graded it. `checkRouted` is the predicate and its
+ * Tier-1 at SPECCED once `SPEC_TIER1_CUTOFF` graded it, or a unit that route's build's run-state
+ * file records as dispatched and whose spec is buildable. `checkRouted` is the predicate and its
  * comment is the ONE evaluation order. It binds a subagent exactly as the main loop: a subagent's
  * payload carries the parent's `session_id` (measured, the aRoutedQuill probe record), so it reads
  * the parent's card. A conf that declares MEMORY_ROOT or ROUTED_PATHS blank, or an entry that is
@@ -865,6 +866,65 @@ function readStatusCells(text) {
 }
 
 /**
+ * A spec's H1 id, '' when it has none — the H1 read R4 and tree_lib.parse_spec_h1 make (S8): the
+ * first UNFENCED `#` line, its first token with backticks and asterisks stripped and trailing `:.,;`
+ * dropped. checkBuildable and readDispatchedUnits both read it here (TOOL-aSmoothedDispatch-6 S4).
+ */
+function readSpecH1Id(text) {
+  let fenced = false
+  for (const l of String(text || '').split(/\r?\n/)) {
+    if (/^ ? ? ?(```|~~~)/.test(l)) { fenced = !fenced; continue }
+    if (fenced || !/^#[ \t]/.test(l)) continue
+    return (l.split(/[ \t]+/)[1] || '').replace(/[`*]/g, '').replace(/[:.,;]+$/, '')
+  }
+  return ''
+}
+
+/** The unattended driver's run-state file in a build folder; the suite holds it equal to the driver's `runmd_of`. */
+const RUN_STATE_FILE = 'RUN.md'
+
+/**
+ * TOOL-aSmoothedDispatch-6 S1: the units the build's run-state file records as dispatched.
+ * `{ file, units: [{ unit, spec }] }`, `file` the comparable path of `<MEMORY_ROOT>/builds/<build>/RUN.md`,
+ * units in first-appearance order, each once. A row is the driver's `--dispatch` row, matched as its
+ * order gate matches it. `spec` is the repo-relative path of the first `.md` under the build's `spec/`,
+ * at any depth, whose H1 names the unit, spelled with the prefix checkBuildable accepts, or '' when
+ * none does. An empty build, or a file that is absent or unreadable, is an empty list: the fallback
+ * only ever adds an admission, so a failed read leaves the card's verdict standing.
+ */
+function readDispatchedUnits(top, memRoot, build) {
+  const fs = require('fs')
+  const path = require('path')
+  const folder = path.join(top, buildNativePath(memRoot), 'builds', buildNativePath(build))
+  const file = buildComparablePath(path.join(folder, RUN_STATE_FILE))
+  if (!build) return { file, units: [] }
+  let text
+  try { text = fs.readFileSync(path.join(folder, RUN_STATE_FILE), 'utf8') } catch { return { file, units: [] } }
+  const ids = []
+  for (const l of text.split('\n')) {
+    const m = /^\d{4}-\d{2}-\d{2}T[0-9:]+Z dispatch · item [0-9a-f]+ (\S+) · reason /.exec(l.replace(/\r/g, ''))
+    if (m && !ids.includes(m[1])) ids.push(m[1])
+  }
+  if (ids.length === 0) return { file, units: [] }
+  const found = new Map()
+  const scanSpecs = (dir, rel) => {
+    let ents
+    try { ents = fs.readdirSync(dir, { withFileTypes: true }) } catch { return }
+    for (const e of ents.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))) {
+      const r = `${rel}/${e.name}`
+      if (e.isDirectory()) { scanSpecs(path.join(dir, e.name), r); continue }
+      if (!e.isFile() || !e.name.endsWith('.md')) continue
+      let t
+      try { t = fs.readFileSync(path.join(dir, e.name), 'utf8') } catch { continue }
+      const id = readSpecH1Id(t)
+      if (ids.includes(id) && !found.has(id)) found.set(id, r)
+    }
+  }
+  scanSpecs(path.join(folder, 'spec'), `${memRoot}/builds/${build}/spec`)
+  return { file, units: ids.map((unit) => ({ unit, spec: found.get(unit) || '' })) }
+}
+
+/**
  * S3: is this routed unit BUILDABLE? '' when it is, else the reason. The spec path is repo-relative
  * under `<MEMORY_ROOT>/builds/<build>/spec/`, the file exists, its H1 names the unit, and its status
  * header's tier and status admit by BUILDABLE_STATUS — a Tier-1 SPECCED only when the conf's
@@ -882,16 +942,7 @@ function checkBuildable(u, build, top, memRoot, confBytes) {
   if (!rel.startsWith(want)) return `spec ${u.spec} is outside ${want}`
   let text
   try { text = fs.readFileSync(path.join(top, buildNativePath(u.spec)), 'utf8') } catch { return `spec ${u.spec} does not exist` }
-  // The H1 read R4 and tree_lib.parse_spec_h1 make (S8): the first UNFENCED `#` line, its first token
-  // with backticks and asterisks stripped and trailing `:.,;` dropped, compared whole.
-  let fenced = false
-  let h1Id = ''
-  for (const l of text.split(/\r?\n/)) {
-    if (/^ ? ? ?(```|~~~)/.test(l)) { fenced = !fenced; continue }
-    if (fenced || !/^#[ \t]/.test(l)) continue
-    h1Id = (l.split(/[ \t]+/)[1] || '').replace(/[`*]/g, '').replace(/[:.,;]+$/, '')
-    break
-  }
+  const h1Id = readSpecH1Id(text)
   if (h1Id !== u.unit) return `spec ${u.spec} has H1 naming ${h1Id || '(nothing)'}, not ${u.unit}`
   const { status, tier } = readStatusCells(text)
   const admits = BUILDABLE_STATUS[tier]
@@ -1112,11 +1163,19 @@ function checkRoleWrite(cls, index, w) {
  *     `product` role on a spec its card's `## route` names → null; else deny
  *  7. product, and `session_id` missing or no card for it under the common dir → deny, absent
  *  8. no `## route`, or no `- unit:` line in it → deny, unrouted
- *  9. no routed unit BUILDABLE (checkBuildable) → deny listing each unit's reason; else step 9a
+ *  9. a routed unit BUILDABLE (checkBuildable) → step 9a; else step 9b
+ * 9b. the dispatch fallback (TOOL-aSmoothedDispatch-6): readDispatchedUnits reads the dispatch rows of
+ *     RUN_STATE_FILE in the folder of the build the route's `- build:` line names; each unit those
+ *     rows name that the card does not route is judged by checkBuildable against the spec under that
+ *     build's `spec/` whose H1 names it, and the first buildable one → step 9a. None → deny listing
+ *     each card unit's reason, plus one line naming the run-state file and its dispatched-unit count
+ *     when it records any. It does not ask whether the pass committed: a pass's spec goes terminal in
+ *     its own pass commit, so a pass committed with its spec left INPROGRESS keeps admitting; and a
+ *     hand-appended row is read like the driver's.
  * 9a. checkRoleWrite('product'): absent → null; broken → deny; no `agent`-true role with
  *     `writes = product` → deny, UNARMED; the payload's `agent_type` names such a role → null; else
  *     deny. The route arm runs first and never instead: a builder with no buildable route meets
- *     step 7, 8 or 9's refusal word for word.
+ *     step 7, 8 or 9b's refusal word for word.
  * No `agent_id` exemption: a subagent's write is judged by the same order (S7).
  */
 function checkRouted(data, env) {
@@ -1196,16 +1255,24 @@ function checkRouted(data, env) {
     const what = route.seen ? `its ## route at ${card.shown} carries no - unit: line` : `its orientation card ${card.shown} carries no ## route`
     return { deny: renderRouteDeny(tool, targetC, entry, confShown, what, `Run /session-kickoff: give the unit its spec, then append a ## route naming it through manifest-check.sh --card --append --session ${sid}.`) }
   }
+  // Step 9a: the route admits; the writer's role decides. The slug is the unit id's middle.
+  const checkUnitWrite = (u) => {
+    const slug = (/^[A-Za-z]+-(.+)-\d+$/.exec(u.unit) || [])[1] || route.build
+    return checkRoleWrite('product', loadRoleIndex(top), { tool, ti, native: target, target: targetC, agentType, slug, routed: [] })
+  }
   const reasons = []
   for (const u of route.units) {
     const why = checkBuildable(u, route.build, top, memRoot.trim(), confBytes)
-    if (!why) {
-      // Step 9a: the route admits; the writer's role decides. The slug is the unit id's middle.
-      const slug = (/^[A-Za-z]+-(.+)-\d+$/.exec(u.unit) || [])[1] || route.build
-      return checkRoleWrite('product', loadRoleIndex(top), { tool, ti, native: target, target: targetC, agentType, slug, routed: [] })
-    }
+    if (!why) return checkUnitWrite(u)
     reasons.push(`  ${u.unit}: ${why}`)
   }
+  // Step 9b: the units the build's run-state file records as dispatched, minus the card's own.
+  const dispatched = readDispatchedUnits(top, memRoot.trim(), route.build)
+  const onCard = new Set(route.units.map((u) => u.unit))
+  for (const u of dispatched.units) {
+    if (!onCard.has(u.unit) && !checkBuildable(u, route.build, top, memRoot.trim(), confBytes)) return checkUnitWrite(u)
+  }
+  if (dispatched.units.length > 0) reasons.push(`  the run-state file ${dispatched.file} records a dispatch for ${dispatched.units.length} unit(s) of ${route.build}, and none is buildable`)
   return { deny: renderRouteDeny(tool, targetC, entry, confShown, `no unit its card ${card.shown} routes is buildable:\n${reasons.join('\n')}`, 'Make one routed unit buildable — its spec at the status that admits writes — or route the unit that owns this write through /session-kickoff and manifest-check.sh --card --append.') }
 }
 
@@ -1474,6 +1541,10 @@ const WRITE_TOOLS_PROSE = 'an Edit, Write, MultiEdit or NotebookEdit'
  *  5. otherwise the card path, its route lines byte for byte, one checkBuildable verdict per unit
  *     line, the ROUTED_PATHS value and what the gate refuses — route lines cut at a line boundary
  *     to ROUTE_CONTEXT_CAP, a cut unit line taking its verdict with it, and a closing count line
+ *  6. one line per unit the build's RUN_STATE_FILE records as dispatched, the card does not route,
+ *     and checkBuildable admits — the gate's step 9b through the same readDispatchedUnits, budgeted
+ *     after the route lines. A dispatched unit that is not buildable is not listed, as step 9b lists
+ *     none; nor is whether its pass committed checked (TOOL-aSmoothedDispatch-6)
  * The card is located as checkRouted locates it, so the context and the gate read one card.
  */
 function renderRouteContext(data, env) {
@@ -1529,6 +1600,21 @@ function renderRouteContext(data, env) {
     budget -= cost
     kept.push(l.text)
     if (v) verdicts.push(v)
+  }
+  // Step 6: the gate's step 9b, read through the same function; only a buildable unit is named. Read
+  // only when no card unit is buildable, the set and test `checkRouted` walks at step 9a before it
+  // reaches 9b (TOOL-aSmoothedDispatch-8 S6): a card unit that admits means no dispatch row is read.
+  if (!route.units.some((u) => !checkBuildable(u, route.build, top, memRoot.trim(), confBytes))) {
+    const dispatched = readDispatchedUnits(top, memRoot.trim(), route.build)
+    const onCard = new Set(route.units.map((u) => u.unit))
+    for (const u of dispatched.units) {
+      if (onCard.has(u.unit) || checkBuildable(u, route.build, top, memRoot.trim(), confBytes)) continue
+      const st = readStatusCells(fs.readFileSync(path.join(top, buildNativePath(u.spec)), 'utf8'))
+      const v = `${u.unit} is buildable through its dispatch row in ${dispatched.file}, which scratch-guard counts as routed: ${st.tier} at ${st.status}.`
+      if (v.length + 1 > budget) break
+      budget -= v.length + 1
+      verdicts.push(v)
+    }
   }
   const out = [head, ...kept, ...verdicts, ...tail]
   if (kept.length < route.lines.length) out.push(renderClosing(route.lines.length - kept.length))
@@ -1621,4 +1707,4 @@ function main() {
 }
 
 if (require.main === module) main()
-module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, scanCommandHeads, resolveRoleRoot }
+module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits }

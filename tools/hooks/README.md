@@ -425,6 +425,19 @@ its status header reads Tier-2 at INPROGRESS, Tier-1 at INPROGRESS, or Tier-1 at
 `SPEC_TIER1_CUTOFF` is set and the spec's filename date is on or after it. One buildable unit
 admits.
 
+**The dispatch fallback** (`TOOL-aSmoothedDispatch-6`). When no unit on the card's route is
+buildable, the gate reads the dispatch rows of the build's run-state file, `RUN_STATE_FILE`
+(`<MEMORY_ROOT>/builds/<build>/RUN.md`, the build the route's `- build:` line names), the rows the
+unattended driver's `--dispatch` writes. Each dispatched unit the card does not route is judged by
+the same BUILDABLE rule, against the spec under that build's `spec/` whose H1 names it, and the first
+buildable one admits through the role arm below, as a card-routed unit does. So a card whose route
+still names a CLOSED unit does not refuse the builder of the unit the driver dispatched next. With
+no run-state file, or none holding a dispatch row, the refusal is unchanged; with rows and none
+buildable, it gains one line naming the file and how many units it records. What it does not check:
+whether the dispatched pass has committed — a pass's spec goes terminal in its own pass commit, so a
+pass committed with its spec left INPROGRESS keeps admitting — and a hand-appended dispatch row is
+read like the driver's. No other build's run-state file and no rotated `RUN.LANDED.*` record is read.
+
 **The order** is `checkRouted`'s comment, and it is the only statement of it. In short: a target in
 no repository, or in one whose common dir is not the session's (`CLAUDE_PROJECT_DIR`, else the
 payload `cwd`), is not gated, so a scratch clone's writes never meet its own conf; a repository with
@@ -490,8 +503,9 @@ with matcher `*`. A second fragment is safe here where a second PreToolUse one i
 merger re-matches a marker only within one event's groups. `main` sends that payload to
 `renderRouteContext` before any `tool_name` test and prints
 `{"hookSpecificOutput":{"hookEventName":"SubagentStart","additionalContext":…}}`: the card's path,
-its `## route` lines byte for byte, one `checkBuildable` verdict per unit, the `ROUTED_PATHS` value
-and what the gate refuses under it. Its silence rules: nothing when the session directory
+its `## route` lines byte for byte, one `checkBuildable` verdict per unit, one line per unit the
+dispatch fallback would admit (a buildable unit the run-state file records as dispatched), the
+`ROUTED_PATHS` value and what the gate refuses under it. Its silence rules: nothing when the session directory
 (`CLAUDE_PROJECT_DIR`, else the payload `cwd`) is in no repository or its toplevel holds no conf,
 since the gate admits every write there; exactly one line when the conf is unreadable or UNARMED,
 or the session routes no unit. Every sentence states what holds and none directs. The text is

@@ -59,10 +59,16 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # reading; OWED: observed at the close.
 # RAISED 215 -> 224 by TOOL-dFairHearing-48: its nine arm-labels arms, each top-level. Counted by reading;
 # OWED: observed at the close.
+# RAISED 224 -> 236 by TOOL-aSmoothedDispatch-5: its twelve --spec arms, one for AC1, two each for AC2,
+# AC4 and AC5, four for AC3 and one for AC6, each top-level. Counted by reading; OWED: observed at the close.
+# RAISED 236 -> 238 by TOOL-aSmoothedDispatch-8: its two overlay-parity arms, the row span and the summary
+# span; the missing-span check counts only as a failure. Counted by reading; OWED: observed at the close.
 # RAISED 224 -> 231 by TOOL-dPavedRoad-1: its seven --spec arms, the bare run's untracked DEFERRED spec,
 # the ac-order red, the disk sibling's handoff red, the carries and packet skips with no stale row, and
 # the two refusals, each top-level. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=231
+# MERGED at TOOL-aSmoothedDispatch-22's reconcile: the base 224, plus TOOL-dPavedRoad-1's 7, plus this
+# branch's 14, less the ten unit 5 arms dropped there = 235. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=235
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -2013,6 +2019,40 @@ arm "PR1 AC4 --spec REFUSES an operand that is not a spec" 2 "$d" "REFUSING — 
 ARM_ARGS=(--spec "$SPECDIR/no-such-spec.md")
 arm "PR1 AC4 --spec REFUSES an operand that names no file" 2 "$d" "REFUSING — --spec $SPECDIR/no-such-spec.md is not a file"
 ARM_ARGS=()
+
+# ---- TOOL-aSmoothedDispatch-5: the two --spec arms the PR1 arms above do not cover, kept at
+#      TOOL-aSmoothedDispatch-22's reconcile and re-pointed at main's --spec output. The named spec
+#      is written and NEVER added. The overlay-parity arms below read the same scratch repo.
+sc_spec="$SPECDIR/$HCUT-spec-TOOL-tOne-7.md"
+d=$base/scope; scratch "$d"
+write_handoff_spec "$d" "$sc_spec" TOOL-tOne-7 OPEN '## 7. Gates' '' '`real leg`.'
+sed -i 's|^`real leg`\.|`imaginary leg`.|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+ARM_ARGS=(--spec "$sc_spec")
+arm "SD5 AC2 a hit only in the tracked spec is not reported under --spec" 0 "$d" "--spec · 1 named spec(s) graded whatever their status · 1 live spec(s)" "2026-09-02-spec-TOOL-tOne-1.md"
+ARM_ARGS=(--spec)
+arm "SD5 AC3 --spec with no value REFUSES with exit 2" 2 "$d" "REFUSING — --spec names no spec"
+ARM_ARGS=()
+
+# TOOL-aSmoothedDispatch-8 S2: the gov-spec-writer overlay quotes the exit-1 row and summary shapes, and a
+# red --spec run must print both. The spans are read from the overlay itself, so a reworded overlay or
+# checker print reds here. A missing overlay or an empty span is a FAIL, never two arms over an empty
+# needle, which every output carries.
+ROLES_DIR=$(resolve_kit_dir "$PY" roles render_agents.py "$HERE") || exit 2
+sp_overlay="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$ROLES_DIR/house/gov-spec-writer.md"
+sp_row=$(tr -d '\r' < "$sp_overlay" 2>/dev/null | grep -o '`spec-tokens: <spec path> \[[^`]*`' | head -1 | tr -d '`')
+sp_sum=$(tr -d '\r' < "$sp_overlay" 2>/dev/null | grep -o '`spec-tokens: <N> unwaived[^`]*`' | head -1 | tr -d '`')
+if [ -z "$sp_row" ] || [ -z "$sp_sum" ]; then
+  echo "arm FAIL  SD8 AC2 the overlay $sp_overlay quotes no row span or no summary span"; fail=$((fail+1))
+else
+  d=$base/scope
+  write_handoff_spec "$d" "$sc_spec" TOOL-tOne-7 OPEN '## 7. Gates' '' '`imaginary leg`.'
+  sp_row=${sp_row//'<spec path>'/$sc_spec}; sp_row=${sp_row//'<kind>'/leg}
+  sp_sum=${sp_sum//'<N>'/1}
+  ARM_ARGS=(--spec "$sc_spec")
+  arm "SD8 AC2 a red --spec run prints the overlay's row span" 1 "$d" "$sp_row"
+  arm "SD8 AC2 a red --spec run prints the overlay's summary span" 1 "$d" "$sp_sum"
+  ARM_ARGS=()
+fi
 
 # TOOL-dGroundRules-32 S9, TOOL-dGroundRules-40: the build-order render's overlap rule is the
 # dispatcher's, and both are graded against the truth. Each OVERLAP_PAIRS row is two paths relative to

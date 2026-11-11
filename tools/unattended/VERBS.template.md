@@ -219,7 +219,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   rather than in enforced ordering: the pair catches an amendment made with NO record, never a
   truthful-looking row attached to a different edit.
 - `--dispatch` — records the WRITE-SET DECLARATION a concurrent dispatch owes: `--pass <unit-id>`
-  and a REPEATABLE `--writes <path>`, one path per occurrence. The build method requires two path
+  and `--writes`, which takes every path up to the next flag: a whitespace-joined value splits into
+  its paths, and the flag may repeat. The build method requires two path
   lists written down before two passes run together, and until this verb nothing read one. It decides
   two of that condition's three clauses — the intersection test, and the shared-record refusal in
   BOTH halves, so a generated index alone is accepted and only the index TOGETHER WITH its generator
@@ -234,11 +235,15 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   A pass of a unit whose spec is CLOSED or WONTDO is not a sibling: it reserves nothing, and a later pass for such a unit reserves its paths only once its spec is set back to INPROGRESS. A pass of a deferred unit, whose spec reads DEFERRED and whose latest rescope defer row follows every dispatch row naming it, is not a sibling either, until the unit is dispatched again.
   A pass's COMMIT is the one whose `Pass: <unit-id>` trailer names it; a commit with no trailer falls back to
   its subject, and `Pass: none` names no unit. After every cheap refusal and before the claim read it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
-  live tree and refuses the dispatch when it exits non-zero: the checker's bar join grades LIVE specs,
-  an unattended build closes each unit spec in its own build commit, and this verb is the one point
-  that sees a spec before its unit builds. It runs last because it costs a tree-wide scan, and every
-  refusal above it — the order gate, the edge and hold gates, the path and shared-record refusals,
-  condition 1 — is decided from the run-state file, the spec headers or `git` in seconds. A blank or absent key is an ANNOUNCED skip on stdout,
+  live tree: the checker's bar join grades LIVE specs, an unattended build closes each unit spec in its
+  own build commit, and this verb is the one point that sees a spec before its unit builds. It runs
+  last because it costs a tree-wide scan, and every refusal above it — the order gate, the edge and
+  hold gates, the path and shared-record refusals, condition 1 — is decided from the run-state file,
+  the spec headers or `git` in seconds. It refuses on any red but a hit in another build's spec,
+  which it notes and admits, because the bar's whole-tree leg still grades that build.
+  It skips the run when its inputs match the last check it admitted for this build, keyed on the
+  slug, the checker, the launcher, HEAD and the run-gates working-tree fingerprint, recorded under
+  the sidecar root; with no fingerprint it announces that the cache is off and runs the checker. A blank or absent key is an ANNOUNCED skip on stdout,
   never a silent pass. Where `RUN_CLAIMS` is `on` it reads the run's claim as the holder after every
   local refusal and before the row: another session's claim is check 108 and no row is written.
 - `--review` — records ONE review round for a subject and reports what the loop is doing:
@@ -766,11 +771,14 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   `supersede` and `defer` are surfaced-class rows your `parked-decisions-surfaced` attestation must
   cover; `add` stays history.
 - **Before dispatching a pass, DECLARE its write set** (M6): `--dispatch <slug> --pass <unit-id>
-  --writes <path> --writes <path>`, one path per `--writes`. It refuses two passes claiming one file
+  --writes <path> <path>`. `--writes` takes every path up to the next flag: a whitespace-joined
+  value splits into its paths, and the flag may repeat. It refuses two passes claiming one file
   and a pass claiming a shared mutable record; a generated index alone is fine and only the index
-  WITH its generator is refused. Whether a file is a contract the sibling reads is a judgement no verb
-  makes. A pass needing another file declares again BEFORE the commit, naming only the paths it
-  adds: every row at one anchor stands and the pass may write their union, which `--dispatch` prints
+  WITH its generator is refused. A `--writes` naming the run's own run-state file is removed from
+  the declaration with a note, because every pass commit carries that file, and a path containing it
+  is still refused. Whether a file is a contract the sibling reads is a judgement no verb makes. A
+  pass needing another file declares again BEFORE the commit, naming only the paths it adds: every
+  row at one anchor stands and the pass may write their union, which `--dispatch` prints
   as `dispatch effective`. A narrower row is accepted and frees nothing, and a row at a LATER anchor
   is a new pass, graded on its own. **End the pass commit's message with a `Pass: <unit-id>` trailer**,
   and a commit naming a unit but no pass with `Pass: none`. Where the `commit-msg` hook runs

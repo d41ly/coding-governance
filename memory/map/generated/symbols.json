@@ -3743,6 +3743,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkUnitWrite",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkUnwalkableTarget",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -5313,6 +5318,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "check_no_runstate",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
       "id": "check_node_merge_arm",
       "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
@@ -6124,6 +6134,11 @@
     },
     {
       "id": "check_spec_run",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_spec_token_hits",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
     },
@@ -9336,6 +9351,11 @@
       "id": "derive_spec_class_plant",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_spec_token_key",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "derive_spec_unit",
@@ -14253,6 +14273,11 @@
       "file": "tools/unattended/run-lease.js"
     },
     {
+      "id": "readDispatchedUnits",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "readFact",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
@@ -14406,6 +14431,11 @@
       "id": "readSpecAuditDefault",
       "kind": "function",
       "file": "tools/workflows/spec-audit-optin.js"
+    },
+    {
+      "id": "readSpecH1Id",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "readStatusCells",
@@ -18051,6 +18081,11 @@
       "id": "remove_retired_keys",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
+    },
+    {
+      "id": "remove_run_state_writes",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "remove_scratch",
@@ -23553,6 +23588,11 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "run_spec_token_check",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "run_sr",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -23991,6 +24031,11 @@
       "id": "scanSegments",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "scanSpecs",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "scanTurnRecords",
@@ -29031,6 +29076,11 @@
       "id": "write_run_record",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_run_state",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "write_runlog_end",

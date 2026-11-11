@@ -226,6 +226,7 @@ memory/builds/dConvergedCharter/README.md
 memory/builds/dEasedEffort/README.md
 memory/builds/dCountedConsumers/README.md
 memory/builds/dFinishedRecord/README.md
+memory/builds/aSmoothedDispatch/README.md
 memory/builds/aSwiftRefusal/README.md
 memory/builds/aProfiledEffort/README.md
 memory/builds/aShelvedLeg/README.md

@@ -47,7 +47,7 @@ unattended.sh	49	8	cannot hash the brief, so the row would carry no join
 # rostered units carrying `order` verbs. The order-gate blocker message beside it was pinned for the
 # same reason until TOOL-aSwiftRefusal-1 armed it with a two-unit fixture that restores itself; this
 # one stays pinned, and arming it on that fixture is a follow-up.
-unattended.sh	49	18	a sibling spec status header carries something shaped like the build-order verb that does not conform, so this build's order cannot be sequenced against it
+unattended.sh	49	21	a sibling spec status header carries something shaped like the build-order verb that does not conform, so this build's order cannot be sequenced against it
 # THEY MOVED AGAIN, 22 -> 27, 21 -> 26 and 18 -> 23, at aWindowedPass: `--check-commit`'s five `fail 49`
 # refusals landed above verb_dispatch, the same insertion-point class; re-keyed, never re-waived.
 # THE ORDINALS ABOVE MOVED 19 -> 22 and 18 -> 21 at aDeferredBar's closing round 2 (R1): three
@@ -58,8 +58,13 @@ unattended.sh	49	18	a sibling spec status header carries something shaped like t
 # without hiding every python launcher from PATH, which the suite's own arms need on it.
 # RE-KEYED 11 -> 8, 27 -> 22, 26 -> 21 and 23 -> 18 at TOOL-aSparedSpawn-14: five `fail 49` refusals
 # above them left check 49 for the shared run-state and required-flag readers; re-keyed, never
-# re-waived.
+# re-waived. RE-KEYED 18 -> 15 at TOOL-aSmoothedDispatch-4: the spec-token block moved out of
+# `verb_dispatch` into `run_spec_token_check`, defined above it, so its three refusals now precede
+# the verb's id-shape, MISSING and THIN ones; same branch, same text.
 # RE-KEYED 21 -> 18 and 18 -> 38 at TOOL-aSwiftRefusal-1: the spec-token block's three `fail 49`
 # refusals moved from above the order gate to below condition 1, so the twenty sites between shift
 # up three and the block's own take 37 to 39; the order-gate row at 22 is armed now and taken out.
-unattended.sh	49	38	--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run
+# RE-KEYED 38 -> 15 and 18 -> 21 at TOOL-aSmoothedDispatch-21's reconcile: the three spec-token refusals
+# sit in `run_spec_token_check` above `verb_dispatch` again, so the resolver reads 15 and the sibling
+# malformed-order row, auto-merged at 18, reads 21; the order-gate row stays out, armed by TOOL-aSwiftRefusal-1.
+unattended.sh	49	15	--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run

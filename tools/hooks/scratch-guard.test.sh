@@ -1165,6 +1165,51 @@ run_edit "R-AC4 an index naming no spec role: gov-builder's product write -> all
 write_roles absent
 
 # ==================================================================================================
+# ---- the DISPATCH FALLBACK (TOOL-aSmoothedDispatch-6): a unit the build's run-state file records -
+# ---- as dispatched counts as routed when its spec is buildable -----------------------------------
+# The card routes a CLOSED unit, as a card does once the driver has dispatched the next one. Against
+# the hook at ae6735c1 the D-AC1, D-AC4 and D-AC6 rows read RED (it reads the card alone and exports
+# no RUN_STATE_FILE); the D-AC2 and D-AC3 rows are staged RED by a fallback that admits any unit a
+# dispatch row names.
+SG_RUNMD="$SGWT/mem/builds/bx/RUN.md"
+write_spec "$SG_SPECS/2026-10-09-spec-TOOL-x-30.md" TOOL-x-30 CLOSED Tier-2
+write_route_card sgtest-q1 write "TOOL-x-30=$SG_SPECS/2026-10-09-spec-TOOL-x-30.md"
+# write_run_state <unit>... — a run-state file holding one driver dispatch row per unit; none → no row.
+write_run_state() {
+  { printf '# RUN — bx\n\n## Run facts\nphase: BUILDING\n\n## Log\n'
+    for u in "$@"; do printf '2026-11-10T04:00:00Z dispatch · item 0123abcd %s · reason %s/a.js\n' "$u" "$SGP"; done; } > "$SG_RUNMD"
+}
+# check_no_runstate <name> — the last refusal carries no run-state file line.
+check_no_runstate() {
+  if grep -q 'run-state file' "$TMP/err"; then echo "FAIL $1"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+  else echo "ok   $1"; pass=$((pass+1)); fi
+}
+write_run_state TOOL-x-1
+run_write "D-AC1 a CLOSED card unit, a dispatch row for the INPROGRESS TOOL-x-1 -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+rm -f "$SG_RUNMD"
+run_write "D-AC2 the same card, no run-state file -> deny naming the CLOSED unit" 2 "any;;TOOL-x-30;;Tier-2 at CLOSED" Write "$SG_T" session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+check_no_runstate "D-AC2 no run-state file: the refusal carries no run-state file line"
+write_run_state
+run_write "D-AC2 the same card, a run-state file with no dispatch row -> deny naming the CLOSED unit" 2 "any;;TOOL-x-30;;Tier-2 at CLOSED" Write "$SG_T" session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+check_no_runstate "D-AC2 a row-less run-state file: the refusal carries no run-state file line"
+write_run_state TOOL-x-2 TOOL-x-6
+run_write "D-AC3 dispatch rows for a SPECCED Tier-2 unit and one whose spec is another build's -> deny naming the file and the count" 2 "any;;TOOL-x-30;;the run-state file;;2 unit(s)" Write "$SG_T" session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+write_run_state TOOL-x-1
+write_roles ok
+run_edit "D-AC4 gov-builder under the dispatch fallback -> allow, stderr EMPTY" 0 empty Write "$SG_T" - session_id=sgtest-q1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
+run_edit "D-AC4 the main loop under the dispatch fallback -> deny naming gov-builder" 2 "any;;gov-builder;;$SG_ROLES_SHOWN" Write "$SG_T" - session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+write_roles absent
+rm -f "$SG_RUNMD"
+# D-AC6: the hook's run-state file name is the basename the driver's runmd_of spells, both DERIVED.
+sg_runmd_driver=$(sed -n 's/^runmd_of() { _runmd="[^"]*\/\([^/"]*\)".*/\1/p' "$ROOT/$sg_driver" 2>/dev/null | head -1)
+sg_runmd_hook=$(node -p "require(process.argv[1]).RUN_STATE_FILE" "$HOOK" 2>/dev/null)
+if [ -n "$sg_runmd_driver" ] && [ "$sg_runmd_driver" = "$sg_runmd_hook" ]; then
+  echo "ok   D-AC6 the hook's RUN_STATE_FILE equals the driver's runmd_of basename ($sg_runmd_hook)"; pass=$((pass+1))
+else
+  echo "FAIL D-AC6 the hook's RUN_STATE_FILE is '$sg_runmd_hook' and the driver's runmd_of basename is '$sg_runmd_driver'"; fail=$((fail+1))
+fi
+
+# ==================================================================================================
 # ---- the ROLE-GATE ARM (TOOL-aOrientedCast-11): a role agent runs no gate its allowlist does not --
 # ---- name; the main loop is never refused -------------------------------------------------------
 # Over the linked worktree of the orientation fixture, with a role index carrying `gates` and a gate
@@ -1172,10 +1217,10 @@ write_roles absent
 # without `gates`, so the arm was absent or its leg row unarmed there. Against the base hook every
 # exit-2 arm below exits 0 (2026-10-12, node a, a hand probe of the spec's payloads over the
 # repository's own index); the exit-0 arms are their near-misses and the main loop's controls.
-# write_gate_manifest — five legs in the manifest's shape, one of them repo-relative with no {prefix}.
+# write_gate_manifest — six legs in the manifest's shape, one of them repo-relative with no {prefix}.
 write_gate_manifest() {
   mkdir -p "$SGWT/kit"
-  printf '[{"name":"memory hygiene","argv":["bash","{prefix}/memory-tree/check-memory-hygiene.sh"]},{"name":"lexicon naming predicates","argv":["python","{prefix}/lexicon/lexicon.py"]},{"name":"roles catalogue","argv":["python","{prefix}/roles/check_roles.py"]},{"name":"gotchas selftest","argv":["python3","{prefix}/memory-tree/gotchas.py","--selftest"]},{"name":"kickoff-manifest ratchet","argv":["bash","skills/session-kickoff/manifest-check.sh"]}]\n' > "$SGWT/kit/gate-legs.json"
+  printf '[{"name":"memory hygiene","argv":["bash","{prefix}/memory-tree/check-memory-hygiene.sh"]},{"name":"lexicon naming predicates","argv":["python","{prefix}/lexicon/lexicon.py"]},{"name":"roles catalogue","argv":["python","{prefix}/roles/check_roles.py"]},{"name":"gotchas selftest","argv":["python3","{prefix}/memory-tree/gotchas.py","--selftest"]},{"name":"kickoff-manifest ratchet","argv":["bash","skills/session-kickoff/manifest-check.sh"]},{"name":"spec tokens (a spec'"'"'s own names resolve)","argv":["python","{prefix}/check-spec-tokens.py"]}]\n' > "$SGWT/kit/gate-legs.json"
   mkdir -p "$SGWT/.claude"
   printf '{"gates":{"manifest":"%s"},"harnesses":[],"roles":{"gov-builder":{"agent":true,"gates":["lexicon naming predicates"],"workflow":"build","writes":"product"},"gov-orienter":{"agent":true,"gates":[],"workflow":"orient","writes":"none"},"gov-skeptic":{"agent":true,"gates":[],"workflow":"closing-review","writes":"none"},"gov-spec-writer":{"agent":true,"gates":["memory hygiene","lexicon naming predicates"],"workflow":"spec-write","writes":"spec"}}}\n' "$1" > "$SG_ROLES"
 }
@@ -1226,9 +1271,14 @@ run_role_bash "G-AC1 workflow-subagent runs memory hygiene -> deny naming the le
 run_role_bash "G-AC1 gov-builder runs the lexicon -> allow, stderr EMPTY" 0 empty gov-builder Bash "python kit/$SG_K_LEXICON/lexicon.py"
 run_role_bash "G-AC1 gov-spec-writer runs the lexicon -> allow, stderr EMPTY" 0 empty gov-spec-writer Bash "python kit/$SG_K_LEXICON/lexicon.py"
 run_role_bash "G-AC1 gov-skeptic runs the lexicon -> deny naming the leg" 2 "any;;G1 leg;;lexicon naming predicates" gov-skeptic Bash "python kit/$SG_K_LEXICON/lexicon.py"
+# TOOL-aSmoothedDispatch-5 AC7: the spec-token leg is not on gov-spec-writer's allowlist, so its bare
+# run and its suite stay refused while the --spec run below is admitted.
+run_role_bash "G-AC1 gov-spec-writer runs the bare spec-token leg -> deny naming the leg" 2 "any;;G1 leg;;spec tokens (a spec's own names resolve)" gov-spec-writer Bash "python kit/check-spec-tokens.py"
+run_role_bash "G-AC1 gov-spec-writer runs the spec-token suite -> deny naming G3" 2 "any;;G3 suite" gov-spec-writer Bash "bash kit/check-spec-tokens.test.sh"
 # ---- AC2: the NEAR-MISSES — a mention, a scoped variant or a render is not a gate run --------------
 run_role_bash "G-AC2 gotchas.py --for-diff -> allow, stderr EMPTY" 0 empty gov-builder Bash "python3 kit/$SG_K_MEMORY_TREE/gotchas.py --for-diff HEAD~1..HEAD"
 run_role_bash "G-AC2 lexicon.py --suggest -> allow, stderr EMPTY" 0 empty gov-builder Bash "python3 kit/$SG_K_LEXICON/lexicon.py --suggest checkRoleGate --as js.function"
+run_role_bash "G-AC2 gov-spec-writer runs the spec-token checker with --spec -> allow, stderr EMPTY" 0 empty gov-spec-writer Bash "python kit/check-spec-tokens.py --spec memory/builds/x/spec/y.md"
 run_role_bash "G-AC2 a *.test.sh carrying --render -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash kit/$SG_K_WORKFLOWS/check-protocol-parity.test.sh --render"
 run_role_bash "G-AC2 bash -n on a suite -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash -n kit/$SG_K_HOOKS/agent-cap.test.sh"
 run_role_bash "G-AC2 git log naming a suite -> allow, stderr EMPTY" 0 empty gov-builder Bash "git log --oneline -- kit/$SG_K_HOOKS/agent-cap.test.sh"
@@ -1344,6 +1394,24 @@ check_ctx "S-AC1 the Tier-2 SPECCED unit is named not buildable, with INPROGRESS
 # context calls buildable, and the one it refuses is the one called not buildable.
 run_write "S-AC1 agreement: the gate admits a Write under sgtest-r1's route" 0 empty Write "$SG_T" session_id=sgtest-r1 "cwd=$SG_CWD_WT"
 run_write "S-AC1 agreement: the gate refuses a Write under sgtest-r3's route" 2 "any;;TOOL-x-2;;INPROGRESS" Write "$SG_T" session_id=sgtest-r3 "cwd=$SG_CWD_WT"
+# TOOL-aSmoothedDispatch-6 AC5: the dispatched unit the gate admits is named buildable, through its row.
+write_run_state TOOL-x-1
+run_sub "D-AC5 a CLOSED card unit and a dispatch row for TOOL-x-1 -> the SubagentStart JSON" json session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+check_ctx "D-AC5 the dispatched unit is named buildable through its dispatch row" has 'TOOL-x-1 is buildable' 'dispatch row'
+rm -f "$SG_RUNMD"
+run_sub "D-AC5 the same card, no run-state file -> the SubagentStart JSON" json session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+if grep -Fq 'TOOL-x-1 is buildable' "$TMP/ctx" || grep -Fq 'dispatch row' "$TMP/ctx"; then
+  echo "FAIL D-AC5 no run-state file: the context still names TOOL-x-1 buildable or a dispatch row"; sed 's/^/     /' "$TMP/ctx" | head -8; fail=$((fail+1))
+else echo "ok   D-AC5 no run-state file: the context names neither TOOL-x-1 buildable nor a dispatch row"; pass=$((pass+1)); fi
+# TOOL-aSmoothedDispatch-8 AC6: a buildable card unit admits at step 9a, so the context reads no dispatch
+# row, even one naming the buildable Tier-1 TOOL-x-13.
+write_run_state TOOL-x-13
+run_sub "SD8 AC6 a buildable card unit and a dispatch row for TOOL-x-13 -> the SubagentStart JSON" json session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+check_ctx "SD8 AC6 the card unit is named buildable" has 'TOOL-x-1 is buildable'
+if grep -Fq 'dispatch row' "$TMP/ctx"; then
+  echo "FAIL SD8 AC6 a buildable card unit: the context still names a dispatch row"; sed 's/^/     /' "$TMP/ctx" | head -8; fail=$((fail+1))
+else echo "ok   SD8 AC6 a buildable card unit: the context names no dispatch row"; pass=$((pass+1)); fi
+rm -f "$SG_RUNMD"
 
 # ---- AC2: no card, or a card with no ## route, is ONE line naming the card and ROUTED_PATHS ------
 run_sub "S-AC2 no card for the session -> the SubagentStart JSON" json session_id=sgtest-s0 "cwd=$SG_CWD_WT"
@@ -1436,8 +1504,13 @@ n=$((pass+fail))
 # loop confirms the executed count at the close.
 # 309 = 292 + the 17 run_role_bash rows TOOL-aOrientedCast-14 added (9 for AC1, 5 for AC2 and 3 for
 # AC3), counted by hand under the same rule.
+# 325 = 309 + the 3 gov-spec-writer rows TOOL-aSmoothedDispatch-5 added without raising the pin + the
+# 13 dispatch-fallback rows TOOL-aSmoothedDispatch-6 added (1 for AC1, 4 for AC2, 1 for AC3, 2 for
+# AC4, 4 for AC5 and 1 for AC6), counted by hand under the same rule.
+# 328 = 325 + the 3 context rows TOOL-aSmoothedDispatch-8 added for its AC6 (the run_sub, the check_ctx
+# and the no-dispatch-row check), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=309
+FLOOR_ASSERTIONS=328
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
