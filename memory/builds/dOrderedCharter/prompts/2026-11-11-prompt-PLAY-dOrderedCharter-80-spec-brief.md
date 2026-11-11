@@ -1,4 +1,4 @@
-**Serves:** research PLAY-dOrderedCharter-1
+**Serves:** research PLAY-dOrderedCharter-80
 
 # Brief: spec PLAY-dOrderedCharter-80 — the close bar's own product reds
 

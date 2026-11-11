@@ -13,6 +13,7 @@
 | [2026-11-11-build-PLAY-dOrderedCharter-80-ledger.md](../build/2026-11-11-build-PLAY-dOrderedCharter-80-ledger.md) | journal | — |
 | [2026-11-11-prompt-PLAY-dOrderedCharter-80-1-spec-writer.md](../prompts/2026-11-11-prompt-PLAY-dOrderedCharter-80-1-spec-writer.md) | journal | — |
 | [2026-11-11-prompt-PLAY-dOrderedCharter-80-build-brief.md](../prompts/2026-11-11-prompt-PLAY-dOrderedCharter-80-build-brief.md) | journal | — |
+| [2026-11-11-prompt-PLAY-dOrderedCharter-80-spec-brief.md](../prompts/2026-11-11-prompt-PLAY-dOrderedCharter-80-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
