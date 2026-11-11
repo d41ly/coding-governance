@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-83 — the reconcile merge with origin/main at 47ed57fab: fifty conflicted files, each resolved by its kind
 
-**Status:** DEFERRED · rev-1 · 2026-11-11 · node a · Tier-2 · base f2780af94 · streams playbook · order 45 · advances PLAY-dOrderedCharter-38 · ratified 2026-11-11
+**Status:** CLOSED · rev-1 · 2026-11-12 · node a · Tier-2 · base f2780af94 · streams playbook · order 45 · advances PLAY-dOrderedCharter-38 · ratified 2026-11-11
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-11-build-PLAY-dOrderedCharter-83-deviation-831.md](../build/2026-11-11-build-PLAY-dOrderedCharter-83-deviation-831.md) | deviation | — |
+| [2026-11-11-build-PLAY-dOrderedCharter-83-ledger.md](../build/2026-11-11-build-PLAY-dOrderedCharter-83-ledger.md) | journal | — |
 | [2026-11-11-prompt-PLAY-dOrderedCharter-83-1-spec-writer.md](../prompts/2026-11-11-prompt-PLAY-dOrderedCharter-83-1-spec-writer.md) | journal | — |
 | [2026-11-11-prompt-PLAY-dOrderedCharter-83-build-brief.md](../prompts/2026-11-11-prompt-PLAY-dOrderedCharter-83-build-brief.md) | journal | — |
 | [2026-11-11-prompt-PLAY-dOrderedCharter-83-spec-brief.md](../prompts/2026-11-11-prompt-PLAY-dOrderedCharter-83-spec-brief.md) | research | — |
