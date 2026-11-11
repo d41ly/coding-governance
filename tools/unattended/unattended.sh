@@ -791,12 +791,13 @@ case "$RESUME_SCHEDULE" in
   *) echo "unattended: REFUSING - RESUME_SCHEDULE is declared as '$RESUME_SCHEDULE', which is outside the closed set 'on off'. A switch that cannot be resolved is a restart policy nobody declared." >&2
      RUNLOG_CLEAN=1; exit 2 ;;
 esac
-# TOOL-aGraftedHelix-1 S16 - THE RUN-CLAIM SWITCH, and it lands DARK. Charter section 1 puts Tier-2
-# behaviour behind a default-off flag, and no owner ruling of TOOL-dDerivedDocket-5's shape turns
-# this one on in the kit, so BLANK OR ABSENT IS `off`: an adopter whose conf predates the key is not
-# exposed by a kit update. A value outside the set is a REFUSAL, for LANDER_MODE's reason. The NOTE
-# naming an undeclared switch is printed by --preflight alone, the verb that starts a run, so a verb
-# that never touches a claim prints nothing new; RUN_CLAIMS_SET remembers whether it was declared.
+# TOOL-aGraftedHelix-1 S16 - THE RUN-CLAIM SWITCH, and it lands DARK. The charter's [small] practice
+# puts risky behaviour behind a default-off switch, and no owner ruling of TOOL-dDerivedDocket-5's
+# shape turns this one on in the kit, so BLANK OR ABSENT IS `off`: an adopter whose conf predates
+# the key is not exposed by a kit update. A value outside the set is a REFUSAL, for LANDER_MODE's
+# reason. The NOTE naming an undeclared switch is printed by --preflight alone, the verb that starts
+# a run, so a verb that never touches a claim prints nothing new; RUN_CLAIMS_SET remembers whether
+# it was declared.
 RUN_CLAIMS_SET=1
 case "$RUN_CLAIMS" in
   "") RUN_CLAIMS=off; RUN_CLAIMS_SET="" ;;
@@ -8622,7 +8623,7 @@ read_tree_clocks() {
 # has no newest write and reads as older than any bound. A listed path deleted from disk has no
 # mtime and is SKIPPED, not a dead probe. A clock or mtime probe that answers nothing IS a dead probe
 # and is a refusal: a zero from it would read as "written just now", which is PROGRESSING forever,
-# the reassuring-zero class the charter's section 7 refuses. Every verdict exits 0; only the three
+# the reassuring-zero class the charter's [gate] practice refuses. Every verdict exits 0; only the three
 # refusals exit 1. `refuse_if_terminal` is not reused for the terminal case: its sentence says the
 # verb "would rewrite" the record, and this verb rewrites nothing.
 print_audit() { # slug

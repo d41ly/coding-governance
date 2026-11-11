@@ -1250,6 +1250,12 @@ def derive_composition_lines(stdout: str | None) -> list[str]:
     return [ln for ln in (stdout or "").splitlines() if COMPOSITION_LINE_RE.match(ln)]
 
 
+def derive_delta_tag(line: str) -> str:
+    """The tag a delta line names, the first word after its `[origin]` (PLAY-dOrderedCharter-49 S62): the
+    unit drift's lines and a regenerate's composition lines share the shape, so one tag joins the two."""
+    return line.partition("] ")[2].split(" ", 1)[0]
+
+
 def run_target_argv(argv: list[str] | tuple[str, ...],
                     target: pathlib.Path) -> subprocess.CompletedProcess:
     """Run a kit's resolved target-side argv in `target`, its output captured and decoded as UTF-8
@@ -10519,6 +10525,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # once the outbox exists, and `refuse` holds the whole update below, before any write.
     _unit_orders: list[dict] = []
     _unit_refuse = False
+    # PLAY-dOrderedCharter-49 S62: the gov tags the drift report printed a line for, so the composition relay
+    # below prints a gov unit's `stale` or `orphaned` line once, never again from a regenerate's stdout.
+    _drift_tags: set[str] = set()
     if "playbook" in (kits or claimed):
         try:
             _drift, _stale_mode = read_unit_drift(root, target, base_commit, to_commit, write)
@@ -10528,6 +10537,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             _drift, _stale_mode = {}, None
         for _ln in _drift.get("lines") or []:
             print(_ln)
+            _drift_tags.add(derive_delta_tag(_ln))
             if not _ln.lstrip().startswith("held"):
                 _uv = f"unit:{_ln.split()[0]}"
                 tally[_uv] = tally.get(_uv, 0) + 1
@@ -12167,8 +12177,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"{len(_rr_declined)} declined")
         for _line in _rr_ran:
             print(f"govkit update —   ran {_line}")
-        print(f"govkit update — composition: {len(_rr_composition)} line(s)")
-        for _line in _rr_composition:
+        _rr_relayed = [ln for ln in _rr_composition if derive_delta_tag(ln) not in _drift_tags]
+        print(f"govkit update — composition: {len(_rr_relayed)} line(s)"
+              + (f", {len(_rr_composition) - len(_rr_relayed)} the unit drift already printed"
+                 if len(_rr_relayed) != len(_rr_composition) else ""))
+        for _line in _rr_relayed:
             print(_line)
     # DEPL-cMendedVintage-1 S4 — THE DECLINES ARE NOT GATED, and this SUPERSEDES half of
     # DEPL-dRetiredFork-3's AC6, which asked for output byte-identical to the pre-change run while

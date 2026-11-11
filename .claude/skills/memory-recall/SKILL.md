@@ -1,21 +1,17 @@
 ---
 name: memory-recall
 description: >-
-  Answer a question about WHY this repo is the way it is, from its in-repo decision logs,
-  by querying the retrieval index instead of guessing or reading a whole stream. Use whenever
-  the ask is recall-shaped: "why does X work this way", "what decided Y", "is there a record
-  for Z", "what binds this change", "was this considered before", "what's the rationale for
-  this constraint", "which decision covers <area>", "did we already try this" — any question
-  whose answer is a rationale, a trade-off, a prior id in one of this repo's families
-  (PLAY KICK TOOL DEPL), or a backlog row. Also use before touching an unfamiliar area, to find the
-  records that bind the change. Routes through the shipped CLI, python3 tools/memory-recall/query.py, which needs the
-  question in plain English AND 8-14 --terms in this corpus's own jargon (you write the terms;
-  the CLI is offline and stdlib-only, so it cannot).
-  Do NOT use for ordinary code search — finding a symbol, a caller, a definition, a config key,
-  a filename, or a string in code. Grep and Glob own those, they are correct, and this skill
-  neither replaces nor intercepts them: it ADDS retrieval as one more way to find a record.
-  While /session-kickoff is running, run the probes that skill itself asks for rather than
-  pre-empting them.
+  Answer a question about WHY this repo is the way it is, from its in-repo decision logs, by
+  querying the retrieval index instead of guessing. Use whenever the ask is recall-shaped: "why
+  does X work this way", "what decided Y", "is there a record for Z", "was this considered
+  before" — any question whose answer is a rationale, a trade-off, a prior id in one of this
+  repo's families (PLAY KICK TOOL DEPL), or a backlog row; and before touching an unfamiliar area, to
+  find the records that bind the change. Routes through python3 tools/memory-recall/query.py, which needs the question
+  in plain English AND 8-14 --terms in this corpus's own jargon, which you write.
+  Do NOT use for ordinary code search — a symbol, a caller, a config key, a filename or a string
+  in code. Grep and Glob own those, and this skill never replaces them: it ADDS retrieval as one
+  more way to find a record. While /session-kickoff is running, run the probes that skill itself
+  asks for rather than pre-empting them.
 ---
 [.claude/skills/memory-recall/SKILL.md · Level 4 · A Skill, followed when its trigger holds; yields to levels 0 to 3]
 

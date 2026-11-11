@@ -258,8 +258,10 @@ fi
 # native class of such an owner too, beside a held owner's class that still reds (PLAY-dOrderedCharter-78).
 # Then PLAY-dOrderedCharter-69's `git-env`: the `two-versions` and the edge
 # grammar's `resolve-tag` fixtures, run as children under an exported `GIT_DIR`, touch only their scratch. The
-# last six rows are PLAY-dOrderedCharter-70's: a TOML row placed on its own `tag =` line, a staged rename
-# serving the new name alone, and a charter moved by a committed and by an uncommitted conf edit.
+# next six rows are PLAY-dOrderedCharter-70's: a TOML row placed on its own `tag =` line, a staged rename
+# serving the new name alone, and a charter moved by a committed and by an uncommitted conf edit; between
+# them, PLAY-dOrderedCharter-49's two: a dirty row leaves with its reverted edit, and a worktree re-created at
+# a gone one's path inherits none of its rows.
 # run_plant_rows <label> <script>: one `<plant and flags>|<exit>|<must print>|<must not print>` row per stdin
 # line, each run as `<script> --fixture --plant <plant and flags>`; every failed row adds one to `_tf`.
 run_plant_rows() {
@@ -350,6 +352,8 @@ new-no-purpose $_tk|1|with a purpose: rc=0
 git-env|0|tags: plant git-env · both children green, core.bare false, the outer index unchanged
 toml-row|0|tags: plant toml-row · rows [('practice.a', 'tag', 4, 5), ('practice.b', 'tag', 8, 9)] on their own lines
 dirty-rename|0|doc.alpha resolves to [] and doc.beta to ['memory/guides/BETA.md']
+dirty-revert|0|the committed text served once reverted|STILL SERVED
+worktree-recreate|0|the re-created worktree serves the committed text|INHERITS
 charter-warm|0|incremental rows equal a cold build's
 charter-warm|0|doc.charter resolves to ['CHARTER2.md']
 charter-dirty|0|incremental rows equal a cold build's

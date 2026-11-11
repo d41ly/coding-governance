@@ -390,7 +390,8 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "bundle-dangling-target", "bundle-empty-sections", "unclosed-fence", "unclosed-record", "git-env",
           "toml-row", "dirty-rename", "charter-warm", "charter-dirty", "retired-section",
           "retired-section-aliased", "retired-section-reminted", "reference-row", "reference-no-h1",
-          "foreign-native", "held-native", "positional-no-tree", "positional-absent")
+          "foreign-native", "held-native", "positional-no-tree", "positional-absent", "dirty-revert",
+          "worktree-recreate")
 #: PLAY-dOrderedCharter-78 S4's two plants: a `family-id` native class over the fixture's own id grammar,
 #: owned by a build the chain registry lacks, and by the one it holds
 NATIVE_OWNERS = {"foreign-native": "dGhost", "held-native": "fixture"}
@@ -811,6 +812,35 @@ def run_plant(root, top, plant, sets) -> int:
             return sorted({r["path"] for r in ti.resolve_address(con, address)})
         finally:
             con.close()
+    def read_served(where, address):  # the text `address` serves in `where`'s view, overlay included
+        con = ti.load_index(where)
+        try:
+            ti.load_view(con, where, ti.derive_context(where, where / FIXTURE_KIT / "namespaces.toml"))
+            return "\n".join(r["text"] for r in ti.resolve_address(con, address))
+        finally:
+            con.close()
+    # PLAY-dOrderedCharter-49 AC41: a dirty row leaves with its edit, and a worktree re-created at a gone
+    # one's path inherits none of its rows
+    if plant == "dirty-revert":
+        write_files(root, {"memory/guides/ALPHA.md": GUIDE.replace("the intro text", "edited, then reverted")})
+        dirty = read_served(root, "doc.alpha#intro")
+        run_git(root, "checkout", "--", "memory/guides/ALPHA.md")
+        clean = read_served(root, "doc.alpha#intro")
+        ok = "edited, then reverted" in dirty and "the intro text" in clean and "edited" not in clean
+        say("the edit served while dirty" if "edited" in dirty else "the edit NOT served while dirty",
+            "· the committed text served once reverted" if ok else "· the reverted edit STILL SERVED")
+        return 0 if ok else 1
+    if plant == "worktree-recreate":
+        other = top / "wt2"
+        run_git(root, "worktree", "add", "-q", str(other), "-b", "two")
+        write_files(other, {"memory/guides/ALPHA.md": GUIDE.replace("the intro text", "the gone tree's edit")})
+        before = read_served(other, "doc.alpha#intro")
+        run_git(root, "worktree", "remove", "--force", str(other))
+        run_git(root, "worktree", "add", "-q", str(other), "two")
+        after = read_served(other, "doc.alpha#intro")
+        ok = "the gone tree's edit" in before and "the intro text" in after and "gone tree" not in after
+        say("the re-created worktree serves the committed text" if ok else "the re-created worktree INHERITS a row")
+        return 0 if ok else 1
     if plant == "dirty-rename":
         run_verb(root, "rebuild", None, sets=sets)
         run_git(root, "mv", "memory/guides/ALPHA.md", "memory/guides/BETA.md")

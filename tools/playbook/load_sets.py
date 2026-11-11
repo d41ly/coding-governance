@@ -49,11 +49,13 @@ refused whatever the mode. A load point with no census row prints `no cap declar
 budgets script refuses, printing its line; with no policy kit the budget part prints `unarmed`.
 
 THE INJECTED LOAD POINTS (S5), `measure_injected`: the agent list (each `description:` of
-`.claude/agents/*.md`), the Skill list (each `description:` of `.claude/skills/*/SKILL.md` and
-`skills/*/SKILL.md`) and the session-start card, one line each with its bytes and its cap or `no cap
-declared`, and an `injected — breach` line for each over its cap. No cap census row names an injected
-load point, so a cap is one `--cap` hands in, else none is declared. The kickoff card writer runs this verb and appends the breach lines; it imports nothing beyond
-the standard library, so that verb runs from a lone copy of this file.
+`.claude/agents/*.md`), the Skill list (each `description:` of the tracked Skills `kind.skill`'s population
+in `kinds.toml` names, `*skills/*/SKILL.md`, listed by the core's `read_skill_paths`) and the session-start
+card, one line each with its bytes and its cap or `no cap declared`, and an `injected — breach` line for each
+over its cap. Every description is read by the core's `read_front_matter`, the one reader the Skill gate
+reads too (PLAY-dOrderedCharter-49 S34), so the verb runs from this kit's directory, `core.py` beside it, and
+no longer from a lone copy of this file. No cap census row names an injected load point, so a cap is one
+`--cap` hands in, else none is declared. The kickoff card writer runs this verb and appends the breach lines.
 
 Exit 0 green, 1 refused, 2 a usage error.
 """
@@ -90,9 +92,10 @@ GAPS = "**Load gaps:**"
 #: roles kit's handoff reads off the subprocess its load-set check already runs (PLAY-dOrderedCharter-21 S3).
 REACH = "load-set — reach ·"
 INJECTED = "injected"
-#: S5's injected load points: the name a cap is asked under, the label printed, and the globs measured.
+#: S5's injected load points: the name a cap is asked under, the label printed, and what is measured: the
+#: agent list's glob, the Skill list's `kind.skill` population, read tracked (PLAY-dOrderedCharter-49 S34).
 INJECTED_POINTS = (("agent-list", "agent list", (".claude/agents/*.md",)),
-                   ("skill-list", "Skill list", (".claude/skills/*/SKILL.md", "skills/*/SKILL.md")),
+                   ("skill-list", "Skill list", "kind.skill"),
                    ("card", "card", ()))
 GIT_TIMEOUT_S = 30
 
@@ -413,23 +416,6 @@ def run_budget_check(root, points, mode=None) -> tuple[bool, list]:
 
 # ---- S5: the injected load points --------------------------------------------------------------------------
 
-def extract_description(text) -> str:
-    """The front matter's `description:` value: the line's own, or a folded block's lines joined by spaces."""
-    head = text.replace("\r\n", "\n").split("\n---", 1)[0].split("\n")
-    for i, line in enumerate(head):
-        if line.startswith("description:"):
-            value = line[len("description:"):].strip()
-            if value[:1] not in (">", "|"):
-                return value.strip("'\"")
-            block = []
-            for nxt in head[i + 1:]:
-                if nxt and not nxt[0].isspace():
-                    break
-                block.append(nxt.strip())
-            return " ".join(b for b in block if b)
-    return ""
-
-
 def measure_injected(root, card=None, caps=None) -> list:
     """S5's lines: each injected load point with its bytes and its cap, then a breach line for each over it."""
     root, caps, lines, breaches = pathlib.Path(root), dict(caps or {}), [], []
@@ -437,11 +423,16 @@ def measure_injected(root, card=None, caps=None) -> list:
         common = (run_git_bytes(root, "rev-parse", "--path-format=absolute", "--git-common-dir") or b"").decode().strip()
         cards = sorted(pathlib.Path(common, "orientation").glob("*.md"), key=lambda p: p.stat().st_mtime) if common else []
         card = cards[-1] if cards else None
+    import core   # the one front-matter reader and the tracked Skill list, beside this file
     for name, label, globs in INJECTED_POINTS:
         if globs:
-            files = sorted({p for g in globs for p in root.glob(g) if p.is_file()})
-            size = sum(len(extract_description(p.read_text(encoding="utf-8", errors="replace")).encode("utf-8"))
-                       for p in files)
+            if globs == "kind.skill":
+                row = core.read_kind_row(KIT_DIR, "", "skill") or {}
+                files = [root / p for p in core.read_skill_paths(root, row.get("population", "")) or ()]
+            else:
+                files = sorted({p for g in globs for p in root.glob(g) if p.is_file()})
+            size = sum(len(((core.read_front_matter(p.read_text(encoding="utf-8", errors="replace")) or {})
+                            .get("description") or "").encode("utf-8")) for p in files if p.is_file())
             what = f"{len(files)} description(s)"
         else:
             path = pathlib.Path(card) if card else None

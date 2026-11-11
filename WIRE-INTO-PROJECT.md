@@ -594,7 +594,7 @@ memory-tree owns that file, which is why §0 makes this decision depend on §3.
 1. Copy the kit dir in **as `<prefix>/memory-recall/`**. The kit dir's NAME is load-bearing; the prefix
    is not — `adopt-memory-recall.sh` derives its own with `git rev-parse --show-prefix` and
    `check-wiring.sh` probes both spellings — but every kit here goes under the one `<prefix>/`, and
-   `corpus_ids.py` needs memory-tree and memory-recall to be SIBLINGS, so they move together:
+   the id grammar this kit reads ships in memory-tree's `id_grammar.py`, so install memory-tree first:
    `cp -r <gov>/<prefix>/memory-recall <project>/<prefix>/memory-recall`.
 
    **Then delete the three GOV-ONLY files that copy brings with it.** `kit.toml` withholds them from

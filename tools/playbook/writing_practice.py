@@ -23,8 +23,8 @@ a listed one gone from the tree red as stale until `--shrink` takes it off; `--s
 `one-door`: `doors.toml`, one `[[door]]` row per kind of DOOR_KINDS, each writer a tracked file and each node of a
 kind with a witness carrying it. `rationale-apart`: a unit's `help` inside a registered document, and a build
 record's path in the registry or a unit's text or source, are red. `one-owner`: every namespace, kind and kit unit
-row names exactly one owner, a build `memory/builds/` holds or a layer `layers.toml` names; a repository unit
-names none. `check` with no arm runs the first four, the `writing practice (records and units)` leg; `check
+row names exactly one owner, a build row of the chain registry `memory/project/chain.toml` holds; a
+repository unit names none. `check` with no arm runs the first four, the `writing practice (records and units)` leg; `check
 one-owner` is the `one-owner` leg. Exit 0 green, 1 red, 2 a refusal.
 """
 from __future__ import annotations
@@ -79,9 +79,10 @@ EXPLAIN = {
                         "in a document registry row or in a unit's text or source",
                         "a paraphrase of a help text; an untracked registry row's file; a record path reached "
                         "through a pointer the document follows"),
-    "one-owner": ("every namespace, kind and kit unit row names exactly one owner, a build memory/builds/ holds or "
-                  "a layer of layers.toml; a repository unit names none",
-                  "whether the owner is the right one; registry rows outside namespaces.toml, kinds.toml and the "
+    "one-owner": ("every namespace, kind and kit unit row names exactly one owner, a build row of the chain "
+                  "registry; a repository unit names none",
+                  "whether the owner is the right one; a build folder under memory/builds/ or a layer as an owner; "
+                  "registry rows outside namespaces.toml, kinds.toml and the "
                   "unit manifests"),
 }
 
@@ -318,22 +319,26 @@ def check_rationale_apart(pop, opts) -> tuple:
 
 
 def check_one_owner(pop, opts) -> tuple:
+    """Every owner a build row of the chain registry holds, read through `tag_index.read_chain_registry`, the
+    one owner set the tags check grades too: never a `memory/builds/` folder nor a layer, whose registry header
+    admits no layer owner (PLAY-dOrderedCharter-49 S43, S57). With no registry file every owner is unarmed."""
     root, reds = pop["root"], []
-    builds = {p.split("/")[2] for p in iu.run_git(root, "ls-files", "-z", "--", f"{pop['memory_root']}/builds/")
-              .split("\0") if p.count("/") >= 3}
+    chain = pathlib.Path(root, pop["memory_root"], ti.CHAIN_REGISTRY)
     try:
-        layers = {r.get("tag") for r in tomllib.loads(iu.derive_kit_file(root, "layers.toml").read_text(
-            encoding="utf-8")).get("layer") or []}
-    except (OSError, tomllib.TOMLDecodeError) as exc:
-        raise Refused(f"one-owner: refused · the layer register does not read: {exc}") from None
+        builds = {r["slug"] for r in ti.read_chain_registry(chain)}
+    except ti.TagError as exc:
+        raise Refused(f"one-owner: refused · {exc}") from None
+    if not chain.is_file():
+        return [], [f"one-owner: unarmed · no chain registry at {pop['memory_root']}/{ti.CHAIN_REGISTRY}, so no owner "
+                    f"is graded"]
 
     def check_names(where, owner):
         names = re.split(r"[\s,]+", owner.strip()) if isinstance(owner, str) else [str(o) for o in owner or []]
         names = [n for n in names if n]
         if len(names) != 1:
             reds.append(f"one-owner: red · {where} names {len(names)} owners ({', '.join(names) or 'none'}): one")
-        elif names[0] not in builds and names[0] not in layers:
-            reds.append(f"one-owner: red · {where} names {names[0]}, no build memory/builds/ holds and no layer")
+        elif names[0] not in builds:
+            reds.append(f"one-owner: red · {where} names {names[0]}, which no build row of the chain registry holds")
 
     rows = 0
     for name, table in (("namespaces.toml", "namespace"), ("kinds.toml", "kind")):
@@ -410,7 +415,7 @@ FX_FILES = {
                                       'direction = "the fixture charter"\nsource = "AGENTS.md"\n'),
     "{prefix}/playbook/doors.toml": FX_DOORS,
     "{prefix}/playbook/namespaces.toml": '[[namespace]]\nns = "doc"\nowner = "dFx"\n',
-    "{prefix}/playbook/kinds.toml": '[[kind]]\ntag = "kind.fx"\nowner = "layer.instruction"\n',
+    "{prefix}/playbook/kinds.toml": '[[kind]]\ntag = "kind.fx"\nowner = "dFx"\n',
     "{prefix}/playbook/layers.toml": '[[layer]]\ntag = "layer.instruction"\n',
     "{prefix}/playbook/instructions_edit.py": "# the fixture writer\n",
     "{prefix}/roles/handoff.py": "# the fixture writer\n",
@@ -421,6 +426,7 @@ FX_FILES = {
     "memory/builds/dFx/README.md": "# dFx\n\n## Goal\n\nThe fixture build.\n",
     "memory/orders/2026-01-01-order.md": "<!-- gov:handoff role=gov-builder -->\n## Role\n",
     "memory/project/unpinned-facts.txt": "",
+    "memory/project/chain.toml": '[[build]]\nslug = "dFx"\n',
 }
 FACT = "the bar runs 142 legs"
 #: plant -> (the arm it runs, None for every arm, the files it writes over the base, or a callable of the root)
@@ -447,8 +453,12 @@ PLANTS = {
     "record-loaded": ("rationale-apart", {"{prefix}/playbook/documents.toml": FX_FILES["{prefix}/playbook/documents.toml"]
                       + '\n[[document]]\ntag = "doc.fx-record"\npath = "{memory_root}/builds/dFx/README.md"\n'
                         'level = 3\ndirection = "a record loaded"\nsource = "AGENTS.md"\nh1 = "dFx"\n'}),
+    # PLAY-dOrderedCharter-49 S43: dFy is a build folder no chain registry row holds, and a layer is no owner
     "owner-faults": ("one-owner", {
-        "{prefix}/playbook/namespaces.toml": '[[namespace]]\nns = "doc"\nowner = "dFx dFy"\n',
+        "{prefix}/playbook/namespaces.toml": ('[[namespace]]\nns = "doc"\nowner = "dFx dFy"\n\n'
+                                              '[[namespace]]\nns = "fx"\nowner = "dFy"\n'),
+        "{prefix}/playbook/kinds.toml": '[[kind]]\ntag = "kind.fx"\nowner = "layer.instruction"\n',
+        "memory/builds/dFy/README.md": "# dFy\n\n## Goal\n\nA build folder with no chain row.\n",
         "{prefix}/fx/instructions.toml": FX_UNITS.replace('owner = "dFx"\n', ""),
         ".governance/instructions.toml": FX_UNITS.replace("unit.fx-one", "unit.fx-repo")}),
 }

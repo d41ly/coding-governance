@@ -1038,7 +1038,9 @@ def check_path_match(path, pattern) -> bool:
 
 def check_renderers(root) -> list[str]:
     """S4, both ways: each instruction file claimed by exactly one row, each row's path claiming a file, and
-    each renderer one the table knows. An empty population is red, never green."""
+    each renderer one the table knows. An empty population is red, never green. A `writes` path of this kit's
+    `kit.toml` `[[regenerate]]` rows that `INSTRUCTION_PATHSPECS` names and no `playbook:` row claims is red,
+    so an instruction file's writer is never declared twice with no join (PLAY-dOrderedCharter-49 S64)."""
     say = "render-playbook: red · renderers"
     rows, files = read_renderers(root), derive_instruction_files(root)
     reds = [] if files else [f"{say} · INSTRUCTION_PATHSPECS matches no tracked file"]
@@ -1056,6 +1058,21 @@ def check_renderers(root) -> list[str]:
         elif len(owners) > 1:
             reds.append(f"{say} · {path} has {len(owners)} renderers of record, {', '.join(owners)} · remedy: leave "
                         f"it on one row of {RENDERERS_TABLE}")
+    descriptor = derive_kit_file(root, "kit.toml")
+    try:
+        regen = tomllib.loads(descriptor.read_text(encoding="utf-8")).get("regenerate") or []
+    except FileNotFoundError:
+        regen = []
+    except (OSError, tomllib.TOMLDecodeError) as exc:
+        raise UnitRowError(f"{descriptor.as_posix()} is unreadable: {exc}") from None
+    tokens = derive_instruction_tokens(root)
+    specs = [p.format(**tokens) for p in INSTRUCTION_PATHSPECS]
+    for path in [w for b in regen for w in b.get("writes") or ()]:
+        if any(check_path_match(path, s) for s in specs) and not any(
+                r["renderer"].startswith("playbook:") and any(check_path_match(path, p) for p in r["paths"])
+                for r in rows):
+            reds.append(f"{say} · {path} is written by kit.toml's [[regenerate]] and claimed by no playbook: row · "
+                        f"remedy: claim it on a playbook: row of {RENDERERS_TABLE}, or drop it from the writes")
     return reds
 
 
@@ -2140,6 +2157,20 @@ def arm_renderers(c):
     c.check("a row claiming no file reds", rc == 1 and "memory/guides/GONE.md claims no instruction file" in said, said)
 
 
+def arm_regenerate_unclaimed(c):
+    """PLAY-dOrderedCharter-49 S64: a `[[regenerate]]` writes path the render table gives a playbook row is green,
+    one it gives a kit's adopter is red."""
+    write_gate_tree(c)
+    regen = '[[regenerate]]\nargv = ["bash", "x.sh"]\nwrites = [{}]\n'
+    c.write_file(derive_kit_rel("kit.toml"), regen.format('"AGENTS.md", ".governance/instructions.lock"'))
+    rc, said = run_render(c.top, "--check-render")
+    c.check("a regenerate writing the charter and the lock is green", rc == 0, said)
+    c.write_file(derive_kit_rel("kit.toml"), regen.format('"AGENTS.md", ".claude/agents/a.md"'))
+    rc, said = run_render(c.top, "--check-render")
+    c.check("--check-render exits 1 naming the agent file the regenerate writes and no playbook: row claims",
+            rc == 1 and ".claude/agents/a.md is written by kit.toml's [[regenerate]]" in said, said)
+
+
 def arm_slots(c):
     run_git(c.top, "checkout", "-q", "-b", "main")
     write_kits(c, SLOT_ROWS)
@@ -2640,6 +2671,7 @@ PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority, "state
           "two-kits": arm_two_kits,
           "unreadable": arm_unreadable, "arms": arm_arms, "render": arm_render, "extractor": arm_extractor,
           "schema": arm_schema, "one-fact": arm_one_fact, "status": arm_status, "renderers": arm_renderers,
+          "regenerate-unclaimed": arm_regenerate_unclaimed,
           "work-order": arm_work_order, "slots": arm_slots, "legacy": arm_legacy,
           "git-env": arm_git_env, "cmd-source": arm_cmd_source, "envelope-missing": arm_envelope_missing,
           "envelope-level": arm_envelope_level, "envelope-unclosed": arm_envelope_unclosed,

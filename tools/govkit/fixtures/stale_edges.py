@@ -9,7 +9,8 @@ memory-tree kits, and a kit `alpha` shipping one open unit; installs a target se
 entry, commits its overlay unit amending gov's unit at its pin, then lands a gov release changing the
 unit's text under a `semantic` change record. `order` leaves `instructions.stale` at its default and
 observes the `stale` line among the verdicts, the tally's count and, under `--write`, one
-`update-unit-<slug>.md`; `refuse` commits `instructions.stale = "refuse"` in the target's policy file and
+`update-unit-<slug>.md` and the unit's `stale` line printed once, though the playbook kit's `[[regenerate]]`,
+touched in release B, prints its own composition line for the unit too (PLAY-dOrderedCharter-49 S62); `refuse` commits `instructions.stale = "refuse"` in the target's policy file and
 observes exit 1 with nothing written. `--stub no-handler` removes the handler call in the scratch copy,
 so each observation is seen red.
 
@@ -35,7 +36,11 @@ UNIT, REPO, BUILD = "unit.push", "repo.push", "tFx"
 TEXTS = ("MUST tell the team before a push.", "MUST tell nobody before a push.")
 PLAYBOOK_KIT = ('id = "playbook"\nhome = "playbook"\nversion_from = { none = "fixture" }\n\n'
                 '[check]\nnone = "fixture"\n\n[[files]]\ninclude = "**"\nrole = "engine"\n\n'
-                '[adopt]\nargv = []\nmutates_index = false\n')
+                '[adopt]\nargv = []\nmutates_index = false\n\n'
+                '[[regenerate]]\nargv = ["python", "{prefix}/playbook/fx_compose.py"]\n')
+#: the fixture's regenerate: one composition line, in the delta report's shape, naming the unit the drift names
+COMPOSE_LINE = f"  {'stale':<18} [{'gov:alpha':<13}] {UNIT}"
+COMPOSE = f"print({COMPOSE_LINE!r})\n"
 IGNORE = shutil.ignore_patterns("__pycache__", "*.test.sh", "legacy-homes.txt")
 
 
@@ -56,6 +61,7 @@ def build_stale_gov(tmp: pathlib.Path) -> pathlib.Path:
         shutil.copytree(govkit.resolve_kit_dir(home, anchor, govkit.GOVKIT_DIR), g / resolve_kit_path(home),
                         ignore=IGNORE)
     (g / resolve_kit_path("playbook", "kit.toml")).write_text(PLAYBOOK_KIT, encoding="utf-8", newline="\n")
+    (g / resolve_kit_path("playbook", "fx_compose.py")).write_text(COMPOSE, encoding="utf-8", newline="\n")
     (g / resolve_kit_path("alpha")).mkdir(parents=True)
     (g / resolve_kit_path("alpha", "kit.toml")).write_text('id = "alpha"\n', encoding="utf-8", newline="\n")
     write_manifest(g, TEXTS[0])
@@ -108,6 +114,8 @@ def run_stale_plant(tmp: pathlib.Path, plant: str, stub: str) -> list[tuple[str,
                                                        newline="\n")
     write_commit(t, "the overlay")
     write_manifest(g, TEXTS[1])
+    (g / resolve_kit_path("playbook", "fx_compose.py")).write_text("# release B\n" + COMPOSE, encoding="utf-8",
+                                                                     newline="\n")
     sys.path.insert(0, str(g / resolve_kit_path("memory-tree")))
     import build_records
     build_records.write_change(g, BUILD, "PLAY-tFx-1", UNIT, "edit", "semantic", f"{UNIT}@{pin}",
@@ -122,8 +130,10 @@ def run_stale_plant(tmp: pathlib.Path, plant: str, stub: str) -> list[tuple[str,
                ("the stale line among the verdicts", str(len(stale)), "1"),
                ("the tally's count", str("unit:stale 1" in tally), "True")]
         p = run_govkit(g, t, "update", "--write", stub=stub)
+        once = [ln for ln in (p.stdout + p.stderr).splitlines() if ln.startswith("  stale") and f"] {UNIT} " in ln + " "]
         return obs + [("the --write exit", str(p.returncode), "0"),
-                      ("update-unit orders", str(len(read_unit_orders(t))), "1")]
+                      ("update-unit orders", str(len(read_unit_orders(t))), "1"),
+                      ("the unit's stale lines under --write, the drift's and the regenerate's", str(len(once)), "1")]
     p = run_govkit(g, t, "update", "--write", stub=stub)
     dirty = run_git(t, "status", "--porcelain", "--untracked-files=all").stdout.strip()
     return [("the refused exit", str(p.returncode), "1"),

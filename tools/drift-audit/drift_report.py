@@ -944,6 +944,29 @@ _NOT_A_PATH = set("<>{}*?$|\"'\\")
 _LINE_SUFFIX = re.compile(r":\d+$")
 
 
+def read_git_stdout(repo: pathlib.Path, *args: str) -> str:
+    return subprocess.run(
+        ["git", "-C", str(repo), *args], capture_output=True, text=True, encoding="utf-8", check=True
+    ).stdout
+
+
+git = read_git_stdout  # the name the inlined common_git_dir block calls
+
+
+# >>> common_git_dir -- canonical copy: common_dir.py in the gov lib dir (byte-identical; gated)
+def common_git_dir(repo: pathlib.Path) -> pathlib.Path:
+    """The MAIN repository's git directory, shared by every worktree.
+
+    ``--git-dir`` in a linked worktree is ``.git/worktrees/<name>``, which ``git worktree remove``
+    deletes outright -- taking the query log with it. It is also RELATIVE (bare ``.git``) when run
+    at the repo root and absolute elsewhere, so the raw value is not a usable path either way.
+    """
+    raw = git(repo, "rev-parse", "--git-common-dir").strip()
+    p = pathlib.Path(raw)
+    return p.resolve() if p.is_absolute() else (repo / raw).resolve()
+# <<< common_git_dir
+
+
 # >>> auto_memory -- canonical copy: auto_memory.py in the gov lib dir (byte-identical; gated)
 #: the harness's location of a project's auto-memory; one constant, so a layout change is one edit
 AUTO_MEMORY_TEMPLATE = "~/.claude/projects/{checkout}/memory"
@@ -961,12 +984,12 @@ def resolve_auto_memory_dir(root: pathlib.Path, declared: str) -> pathlib.Path |
     if not declared:
         return None
     if "{checkout}" in declared:
-        out = subprocess.run(["git", "-C", str(root), "rev-parse", "--path-format=absolute",
-                              "--git-common-dir"], capture_output=True, text=True,
-                             encoding="utf-8", errors="replace")
-        common = out.stdout.strip()
-        if out.returncode == 0 and common:
-            key = re.sub(r"[^A-Za-z0-9-]", "-", str(pathlib.Path(common).parent))
+        try:   # the one common-dir derivation, the block beside this one (PLAY-dOrderedCharter-49 S68)
+            common = common_git_dir(root)
+        except (OSError, subprocess.CalledProcessError):
+            common = None
+        if common is not None:
+            key = re.sub(r"[^A-Za-z0-9-]", "-", str(common.parent))
             declared = declared.replace("{checkout}", key)
     return root / pathlib.Path(declared).expanduser()
 # <<< auto_memory

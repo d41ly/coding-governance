@@ -22,10 +22,11 @@ It grades gov's own pages against gov's own members, and it never travels into a
   under `--fixture` only.
 - **Run every page command:** `python tools/govkit/docs_leg.py --run` runs each fenced `bash`, `sh` and
   `console` block of every page under `help/`, in order, in one fresh scratch repository per page, with
-  `GOV` set to this checkout and the scratch repository as each command's working directory.
+  `GOV` set to this checkout and the scratch repository as each command's working directory. A
+  block's lines run as one script, so a line sees the variable or directory the line before it set.
   `--page <path>` runs one page. It prints each block marked `run: no` with its reason, then a summary of the
-  commands run and the blocks marked, and a `docs: RUN` line naming the page, the line and the command
-  for each command that exits other than its block declares.
+  commands run and the blocks marked, and a `docs: RUN` line naming the page and the block's line for
+  each block that exits other than it declares.
 - **Read the fingerprints:** `python tools/govkit/docs_leg.py --fingerprints` prints one line per row,
   its id, its fingerprint and the pages anchoring it, tab-separated, `-` for none. The reference pages
   under `help/reference/` take their anchors from it.
@@ -37,8 +38,9 @@ It grades gov's own pages against gov's own members, and it never travels into a
 - `COMMAND` — a page command whose verb is not declared for its script, or a `--flag` that is not
   declared for that verb.
 - `UNROWED` — a page command whose script is tracked and has no row and no list row.
-- `RUN` — under `--run`, a page command that exits other than its block declares: 0, or the code an
-  `<!-- expect: <code> -->` line directly above the block states.
+- `RUN` — under `--run`, a block whose script exits other than it declares: 0, or the code an
+  `<!-- expect: <code> -->` line directly above the block states. A runnable block holding a `<word>`
+  placeholder is a `RUN` finding too, and is not run: mark it `run: no` with its reason.
 - `LINK` and `FRAGMENT` — a relative link to no tracked path, or a `#fragment` that is no heading
   or `<a id>` of its page. An `http` or `https` link is counted and never fetched.
 - `UNDOCUMENTED` — a member no page anchors and the list does not name. `DRAINED` — a list row for a

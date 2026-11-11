@@ -96,12 +96,14 @@ PLANTS = ("none", "stale-page", "bad-flag", "bad-verb", "unrowed", "broken-link"
           "external-link", "undocumented", "drained-row", "grown-list", "orphan-anchor", "restated-row",
           "reader-rows", "none-rows", "leg-row", "unclassed", "empty-class", "untested",
           "console-prompt", "continued-flag", "unbalanced-quote", "comment-apostrophe", "scripts-prefix",
-          "synopsis-stale", "failing-command", "unit-lines", "unit-usage-alone")
+          "synopsis-stale", "failing-command", "unit-lines", "unit-usage-alone", "run-placeholder", "run-one-script")
 # PLAY-dOrderedCharter-37: the run arm's two markers, each the last non-blank line above a block's fence,
 # and the bound on one page command.
 RUN_NO_RE = re.compile(r"^\s*<!--\s*run:\s*no\s*[—-]+\s*(?P<why>.+?)\s*-->\s*$")
 EXPECT_RE = re.compile(r"^\s*<!--\s*expect:\s*(?P<code>\d+)\s*-->\s*$")
 RUN_TIMEOUT = 600
+#: PLAY-dOrderedCharter-49 S52: a `<word>` placeholder in a runnable block, a `RUN` finding and never run
+PLACEHOLDER_RE = re.compile(r"<[A-Za-z][\w-]*>")
 # PLAY-dOrderedCharter-76: a page's unit line, read outside a fence, and the folders whose every page carries one.
 UNIT_LINE_RE = re.compile(r"^\s*<!--\s*unit:\s*(?P<tag>\S+)\s*-->\s*$")
 UNIT_PAGE_DIRS = ("help/reference/", "help/concepts/", "help/tasks/")
@@ -596,8 +598,10 @@ def read_page_blocks(page) -> list[dict]:
 
 def run_page_commands(root, rels: list[str]) -> tuple[dict, list[str]]:
     """({pages, ran, marked, adopters}, findings): every runnable block of each page in `rels` run in order in
-    one scratch adopter per page, `GOV` this checkout, each command `[resolve_bash(), "-c", <command>]` in the
-    adopter, bounded by `RUN_TIMEOUT`; a `run: no` block is printed with its reason and counted, never run."""
+    one scratch adopter per page, `GOV` this checkout, each block's commands as ONE script,
+    `[resolve_bash(), "-c", <the block's lines>]`, in the adopter, bounded by `RUN_TIMEOUT`, so a line sees
+    what the line before it set; a `run: no` block is printed with its reason and counted, never run, and a
+    runnable block holding a `<word>` placeholder is a `RUN` finding, never run (PLAY-dOrderedCharter-49 S52)."""
     import subprocess
     import fixture_target
     root = pathlib.Path(root)
@@ -625,20 +629,23 @@ def run_page_commands(root, rels: list[str]) -> tuple[dict, list[str]]:
             counts["adopters"] += 1
             bash = gk.resolve_bash()
             for b, want in runnable:
-                failed = None
-                for n, cmd in b["commands"]:
-                    counts["ran"] += 1
-                    try:
-                        p = subprocess.run([bash, "-c", cmd], cwd=str(target), env=env, capture_output=True, text=True,
-                                           encoding="utf-8", errors="replace", timeout=RUN_TIMEOUT, stdin=subprocess.DEVNULL)
-                        rc, err = p.returncode, (p.stderr.strip().splitlines() or p.stdout.strip().splitlines() or [""])[-1]
-                    except subprocess.TimeoutExpired:
-                        rc, err = None, f"no exit within {RUN_TIMEOUT} s"
-                    if rc != want:
-                        failed = f"RUN {rel}:{n} {cmd}: exited {rc}, the block declares {want}: {err}"
-                        break
-                if failed:
-                    found.append(failed)
+                held = [(n, cmd, m.group(0)) for n, cmd in b["commands"] if (m := PLACEHOLDER_RE.search(cmd))]
+                if held:
+                    n, cmd, word = held[0]
+                    found.append(f"RUN {rel}:{n} {cmd}: holds the placeholder {word}, so the block is not run; "
+                                 f"mark it `run: no` with its reason")
+                    break
+                script = "\n".join(cmd for _n, cmd in b["commands"])
+                counts["ran"] += len(b["commands"])
+                try:
+                    p = subprocess.run([bash, "-c", script], cwd=str(target), env=env, capture_output=True, text=True,
+                                       encoding="utf-8", errors="replace", timeout=RUN_TIMEOUT, stdin=subprocess.DEVNULL)
+                    rc, err = p.returncode, (p.stderr.strip().splitlines() or p.stdout.strip().splitlines() or [""])[-1]
+                except subprocess.TimeoutExpired:
+                    rc, err = None, f"no exit within {RUN_TIMEOUT} s"
+                if rc != want:
+                    found.append(f"RUN {rel}:{b['line']} the block of {len(b['commands'])} command(s): exited {rc}, "
+                                 f"the block declares {want}: {err}")
                     break
         finally:
             sg.remove_scratch_tree(tmp)
@@ -837,6 +844,12 @@ def build_docs_fixture(tmp, plant: str) -> tuple[pathlib.Path, list[str], set[st
         population.add("fx-syn:thing")
     elif plant == "failing-command":
         (root / "help/fail.md").write_text("# Fail\n\n```bash\nexit 3\n```\n", encoding="utf-8", newline="\n")
+    elif plant == "run-placeholder":   # PLAY-dOrderedCharter-49 S52: a runnable block, then one holding `<slug>`
+        (root / "help/fail.md").write_text("# Hold\n\n```bash\ntrue\n```\n\n```bash\necho <slug>\n```\n",
+                                           encoding="utf-8", newline="\n")
+    elif plant == "run-one-script":    # a block whose second line reads the variable its first one set
+        (root / "help/fail.md").write_text('# One\n\n```bash\nFX_SEEN=1\ntest "$FX_SEEN" = 1\n```\n',
+                                           encoding="utf-8", newline="\n")
     elif plant == "none-rows":
         write_edit(usage, 'usage = "none"\n', 'usage = "none"\nrows = "usage.toml"\n')
     elif plant == "leg-row":
@@ -898,6 +911,18 @@ def run_docs_fixture(plant: str, mode: str) -> int:
         print(f"docs: fixture · plant {plant}")
         if plant == "failing-command":
             return check_page_runs(root, ["help/fail.md"], mode, "the fixture's default")
+        if plant in ("run-placeholder", "run-one-script"):   # each passes when the run arm behaves (S52)
+            import contextlib
+            import io
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                rc = check_page_runs(root, ["help/fail.md"], mode, "the fixture's default")
+            said = out.getvalue()
+            print(said, end="")
+            ok = (rc == 1 and "holds the placeholder <slug>" in said and "1 commands run" in said
+                  if plant == "run-placeholder" else rc == 0 and "0 findings" in said)
+            print(f"docs: fixture · {plant} · {'as expected' if ok else 'NOT as expected'}")
+            return 0 if ok else 1
         return check_docs(root, class_ids, population, mode, "--enforce" if mode != "refuse" else "the fixture's default")
     finally:
         sg.remove_scratch_tree(tmp)

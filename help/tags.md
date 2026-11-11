@@ -221,7 +221,11 @@ its `**Caused-by:**` and `**Made-by:**` lines; a spec's `**Carries:**` line as `
 work order's `gov:handoff` marker's `unit=` and `build=` as `serves`; an instruction unit's `edges`,
 `scope`, `required-by` and `enforced-by`; a code note's `refs=` segment; and a commit's trailers,
 `Pass:`, `Gov-Unit:` and `Gov-Item:` as `serves`, `Gov-Act:` as `made-by`, `Gov-Session:` as
-`runs-in` and `Decided:` as `decides`. The trailer keys are the `[[trailer]]` rows of `edges.toml`.
+`runs-in` and `Decided:` as `decides`. The trailer keys are the `[[trailer]]` rows of `edges.toml`. A
+`serves` trailer is read as edges only when every comma-separated target is a well-formed address; a
+value of prose, or `none`, is counted unread and is neither an edge nor a red, and `--check` prints the
+count. A spec's `### Edges` block declares `consumes-from` and `hands-off` between unit ids, whose
+inverses are `consumed-by` and `receives-from`; the memory hygiene check parses that block.
 
 These lines are red: a malformed edge line, every one named in a single refusal; a type the set does
 not hold; a declared inverse or a declared `cites`; a target outside its type's `To`; a pin on any
@@ -232,7 +236,7 @@ red, since the hygiene check already reds it. Nothing grades an edge's source ag
 id's section (`PLAY-dOrderedCharter-24#goal`) stays `unarmed`.
 
 - **List the set:** `python tools/playbook/edge_grammar.py --list` prints each type with its inverse,
-  `From`, `To` and `Pin`, then `edges: 25 types, 24 declared, 1 derived` and the trailer keys.
+  `From`, `To` and `Pin`, then `edges: 27 types, 26 declared, 1 derived` and the trailer keys.
 - **Check a file:** `python tools/playbook/edge_grammar.py --parse memory/guides/BUILD-METHOD.md`
   prints each edge and each red, then the derived inverses or the red count. It exits 1 on a red.
 - **Check the tree:** `python tools/playbook/edge_grammar.py --check` reads every site and the commit

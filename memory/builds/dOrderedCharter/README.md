@@ -182,12 +182,12 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY
 | [PLAY-dOrderedCharter-76 — the units reference page, each page's unit line and its check, the unit-usage class, and the reds PLAY-dOrderedCharter-37's pass left](spec/2026-11-10-spec-PLAY-dOrderedCharter-76.md) | 37 | 2 | CLOSED | rev-1 | 2026-11-10 |
 | [PLAY-dOrderedCharter-77 — the close bar's own product reds, each leg left green by the narrowest fix that leg demands](spec/2026-11-10-spec-PLAY-dOrderedCharter-77.md) | 37 | 2 | CLOSED | rev-2 | 2026-11-10 |
 | [PLAY-dOrderedCharter-78 — the close's three parked fixes: the renderer requires the kits it reads, an adopter's tags check unarms what it does not hold, and A25r asserts its whole slice](spec/2026-11-10-spec-PLAY-dOrderedCharter-78.md) | 37 | 2 | CLOSED | rev-1 | 2026-11-11 |
-| [PLAY-dOrderedCharter-49 — the round-1 spec audit's 73 minors: criteria that can pass, rows a new leg owes, one reader per fact, and seams in build order](spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md) | 39 | 2 | DEFERRED | rev-9 | 2026-11-10 |
+| [PLAY-dOrderedCharter-49 — the round-1 spec audit's 73 minors: criteria that can pass, rows a new leg owes, one reader per fact, and seams in build order](spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md) | 39 | 2 | CLOSED | rev-9 | 2026-11-11 |
 | [PLAY-dOrderedCharter-54 — the card file's owner is live only while its transcript moves, and a dead owner's card is taken over](spec/2026-10-24-spec-PLAY-dOrderedCharter-54.md) | 40 | 2 | DEFERRED | rev-3 | 2026-11-10 |
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-7 | 2026-11-10 |
 <!-- /gen:build-units -->
 
-Records: 606 bound to this build, across 4 record folder(s).
+Records: 608 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

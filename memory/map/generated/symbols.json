@@ -1508,6 +1508,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_regenerate_unclaimed",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_registry",
       "kind": "function",
       "file": "tools/playbook/core.py"
@@ -8345,12 +8350,27 @@
     {
       "id": "common_git_dir",
       "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "common_git_dir",
+      "kind": "function",
+      "file": "tools/lib/auto_memory.py"
+    },
+    {
+      "id": "common_git_dir",
+      "kind": "function",
       "file": "tools/lib/common_dir.py"
     },
     {
       "id": "common_git_dir",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "common_git_dir",
+      "kind": "function",
+      "file": "tools/playbook/memory_index.py"
     },
     {
       "id": "common_git_dir",
@@ -9114,6 +9134,11 @@
     },
     {
       "id": "derive_default_gained",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_delta_tag",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
     },
@@ -11691,11 +11716,6 @@
       "id": "extract_decorators",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
-    },
-    {
-      "id": "extract_description",
-      "kind": "function",
-      "file": "tools/playbook/load_sets.py"
     },
     {
       "id": "extract_doc",
@@ -17540,7 +17560,22 @@
     {
       "id": "read_git_stdout",
       "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "read_git_stdout",
+      "kind": "function",
+      "file": "tools/lib/auto_memory.py"
+    },
+    {
+      "id": "read_git_stdout",
+      "kind": "function",
       "file": "tools/lib/common_dir.py"
+    },
+    {
+      "id": "read_git_stdout",
+      "kind": "function",
+      "file": "tools/playbook/memory_index.py"
     },
     {
       "id": "read_git_stdout",
@@ -19223,6 +19258,11 @@
       "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
+      "id": "read_rule_tags",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
       "id": "read_run_commits",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -19416,6 +19456,11 @@
       "id": "read_skill_items",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_skill_paths",
+      "kind": "function",
+      "file": "tools/playbook/core.py"
     },
     {
       "id": "read_skill_section",
@@ -26781,6 +26826,11 @@
       "id": "run_traced",
       "kind": "function",
       "file": "tools/unattended/runlog-writer.test.sh"
+    },
+    {
+      "id": "run_trailer_plant",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
     },
     {
       "id": "run_tree_kill",

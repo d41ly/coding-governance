@@ -10,7 +10,8 @@
 # registered yet (`feature`, `item`, `record`, `commit`, `session`, `act`, and the classes `spec`,
 # `decision` and `build`) admits nothing until its build registers it; an id matching no class under such
 # a word is `unarmed`. These are P33's twelve declared types and the derived `cites`, then
-# PLAY-dOrderedCharter-28's twelve from the memory plan's [edges], `decides` and `after` widened.
+# PLAY-dOrderedCharter-28's twelve from the memory plan's [edges], `decides` and `after` widened,
+# then PLAY-dOrderedCharter-49's two of a spec's `### Edges` block.
 #
 # One [[trailer]] row per commit trailer key: `key` and the `type` it declares, so a key is registered
 # once and the commit adapter reads this table.
@@ -242,6 +243,27 @@ pin = "none"
 status = "declared"
 declared-at = "instructions.edit's change record"
 writer = "instructions.edit"
+
+# PLAY-dOrderedCharter-49 S40: a spec's `### Edges` block, each its own type and inverse (F11). The hygiene
+# gate and check-spec-tokens.py's scan_handoffs keep parsing the block; these rows put its two verbs in the set.
+
+[[edge]]
+type = "consumes-from"
+inverse = "consumed-by"
+from = ["family-id"]
+to = ["family-id"]
+pin = "none"
+status = "declared"
+declared-at = "a spec's ### Edges block"
+
+[[edge]]
+type = "hands-off"
+inverse = "receives-from"
+from = ["family-id"]
+to = ["family-id"]
+pin = "none"
+status = "declared"
+declared-at = "a spec's ### Edges block"
 
 # The commit trailer keys, each with the type it declares (the memory plan's [sites], a commit).
 

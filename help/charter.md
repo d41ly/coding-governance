@@ -122,7 +122,8 @@ python tools/memory-tree/build_records.py new override --build <slug> --unit <id
 
 It writes `<date>-build-<unit id>-override-<n>.md` with the rule set aside, the owner's words verbatim, the
 session, the value it was taken under and the unit. It writes nothing, and exits 1, under `absolute`, with
-a field empty, or where no policy kit answers the key.
+a field empty, where no policy kit answers the key, where `--rule` names no practice of the practice
+catalogue and no rule of one, or where a value holds a line break or opens like a field, `**Word:**`.
 
 ## Levels and envelopes
 

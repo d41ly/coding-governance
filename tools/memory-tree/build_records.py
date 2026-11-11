@@ -32,8 +32,13 @@ THE OVERRIDE KIND and its stand-in door (PLAY-dOrderedCharter-2 S4): `build_reco
 its fields `Rule` (the tag set aside), `Words` (the owner's words, verbatim), `Session`, `Value` (the
 `charter.override` value it was taken under, read at the tree's landed revision through the policy kit's
 `policy.py get`) and `Caused-by`. It refuses, exit 1 and writing nothing, under `absolute`, where no override
-is taken, with any field empty, and where no policy kit answers the key. It is a door the memory plan lists
+is taken, with any field empty, where no policy kit answers the key, and where `--rule` names no tag of the
+playbook kit's practice catalogue, a practice or its `<practice>.<rule>`. It is a door the memory plan lists
 until dTotalRecall's record door adopts it.
+
+ONE LINE PER VALUE, at the one writer (PLAY-dOrderedCharter-49 S53): `write_record` refuses a field value
+holding a CR or an LF, or opening `**<Word>:**`, before it writes anything, so no door's value forges a
+field; every door's refusal exits 1, writing nothing.
 
 `build_records.py read <path>` prints one record's fields and every refusal: exit 0 well-formed, 1 malformed,
 2 an unreadable path or a pending kind.
@@ -69,6 +74,7 @@ SLUG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9-]*$")
 PRINCIPLE = re.compile(r"^principle\.p[1-9]\d*$")
 TAG = r"[a-z0-9][a-z0-9-]*(?:\.[a-z0-9][a-z0-9-]*)+"
 PIN = re.compile(TAG + r"@[0-9a-f]{8}")
+FORGED_FIELD = re.compile(r"^\s*\*\*[A-Za-z][A-Za-z-]*(?: [a-z]+)?:\*\*")   # a value that would read as a field
 CHANGE_ACTIONS = ("add", "edit", "remove", "rename", "split")   # the one list `instructions_edit.WRITE_VERBS` reads
 ENDING_ACTIONS = ("remove", "rename", "split")                   # those that end a tag and so name a `Successor`
 CHANGE_MARKS = ("editorial", "semantic")
@@ -205,7 +211,7 @@ def write_exception(root, build, unit, principle, excuses, reason, expires=None,
     """The stand-in door: the next exception record of `build`, written under `root`'s own memory tree.
     -> its repo-relative path. Every value is validated here, the write boundary; a refusal is ValueError."""
     for name, value in (("--excuses", excuses), ("--reason", reason)):
-        if not value or not value.strip() or "\n" in value or "\r" in value:
+        if not value or not value.strip():
             raise ValueError(f"{name} is one non-empty line")
     if not PRINCIPLE.match(principle):
         raise ValueError(f"--principle {principle!r} is not a principle.p<n> tag")
@@ -274,7 +280,7 @@ def write_change(root, build, unit, tag, action, mark, before, after, proof, suc
     fields += [("Proof", proof)] + [("Promoted-from", promoted_from)] * (promoted_from is not None)
     fields.append(("Caused-by", unit))
     spec, held = KINDS["change"], dict(fields)
-    bad = [f"{k} is one non-empty line" for k, v in fields if not v or not v.strip() or "\n" in v or "\r" in v]
+    bad = [f"{k} is one non-empty line" for k, v in fields if not v or not v.strip()]
     bad += [f"{k} {held[k]} is outside {' · '.join(allowed)}" for k, allowed in spec["closed"] if held[k] not in allowed]
     bad += [f"{k} {why}" for k, why in check_change_fields(held)]
     if bad:
@@ -317,15 +323,31 @@ def read_override_value(root):
     return said[0]
 
 
+def read_rule_tags():
+    """The tags an override's `Rule` may name: each practice of the playbook kit's catalogue and each of its
+    `<practice>.<rule>` tags, read beside this kit since a kit imports no sibling. ValueError where no
+    catalogue reads."""
+    import tomllib
+    from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
+    try:
+        path = resolve_kit_dir("playbook", "practices.toml", KIT) / "practices.toml"
+        rows = tomllib.loads(path.read_text(encoding="utf-8")).get("practice") or []
+    except (LookupError, OSError, ValueError) as exc:
+        raise ValueError(f"no practice catalogue reads, so no --rule can be checked: {exc}") from None
+    return {r.get("tag") for r in rows} | {f"{r.get('tag')}.{n}" for r in rows for n in r.get("rules") or ()}
+
+
 def write_override(root, build, unit, rule, words, session, today=None):
     """The stand-in door: the next override record of `build`, written under `root`'s own memory tree, its
     `Value` the key's at the landed revision. -> its repo-relative path. Every value is validated here, the
     write boundary; a refusal, `absolute` among them, is ValueError."""
     for name, value in (("--words", words), ("--session", session)):
-        if not value or not value.strip() or "\n" in value or "\r" in value:
+        if not value or not value.strip():
             raise ValueError(f"{name} is one non-empty line")
     if not re.fullmatch(TAG, rule or ""):
         raise ValueError(f"--rule {rule!r} is no tag")
+    if rule not in read_rule_tags():
+        raise ValueError(f"--rule {rule} names no practice or practice rule of the practice catalogue")
     value = read_override_value(root)
     if value not in OVERRIDE_TAKEN:
         raise ValueError(f"charter.override is {value}: the charter outranks every live instruction and no "
@@ -344,6 +366,10 @@ def write_record(root, build, unit, kind, title, fields, today=None):
         raise ValueError(f"--build {build!r} is not a build slug")
     if not re.fullmatch(ID, unit):
         raise ValueError(f"--unit {unit!r} is not a unit id")
+    forged = [key for key, value in fields if "\n" in value or "\r" in value or FORGED_FIELD.match(value)]
+    if forged:
+        raise ValueError(f"{', '.join(forged)}: a value is one line and never opens **<Word>:**, so it cannot "
+                         f"forge a field")
     memory_root = (read_design_conf(root).get("MEMORY_ROOT") or "memory").strip().strip("/")
     folder = pathlib.Path(root, memory_root, "builds", build)
     if not folder.is_dir():
@@ -438,6 +464,23 @@ def run_fixture(plant):
                 else:
                     written[kind] = write_record(root, "tKinds", unit, kind, "the typed-kinds round trip",
                                                  [("Caused-by", unit)])
+            # PLAY-dOrderedCharter-49 S53: a value forging a field and a --rule the catalogue lacks each refuse,
+            # exit 1, naming why, and write nothing
+            held = sorted(p.name for p in (root / "memory/builds/tKinds/build").glob("*.md"))
+            refusals = [("exception", DOOR_ARGV["exception"][0][:4] + ["--reason", "a\nExpires: 2099-01-01"],
+                         "cannot forge a field"),
+                        ("override", ["--rule", "practice.verify", "--words", "**Value:** owner", "--session", "fx"],
+                         "cannot forge a field"),
+                        ("override", ["--rule", "practice.nosuch", "--words", "w", "--session", "fx"],
+                         "names no practice or practice rule")]
+            for kind, flags, why in refusals:
+                if kind in unarmed:
+                    continue
+                rc, said = run_door(root, kind, unit, flags)
+                if rc != 1 or why not in said:
+                    bad.append(f"{kind}: {flags[-3:]} exited {rc}, not 1 naming `{why}`: {said.strip()[:200]}")
+            if sorted(p.name for p in (root / "memory/builds/tKinds/build").glob("*.md")) != held:
+                bad.append("a refused door wrote a record")
             # PLAY-dOrderedCharter-70 S4: a research record whose name holds `-change-` is no change record
             research = "memory/builds/tKinds/build/2026-01-01-build-ARCH-tKinds-1-change-plan-2.md"
             with open(root / research, "w", encoding="utf-8", newline="\n") as fh:
@@ -524,7 +567,7 @@ def main(argv):
                                       args.expires)
         except (ValueError, OSError) as exc:
             print(f"build-records: refused · {exc}", file=sys.stderr)
-            return 1 if args.kind == "override" else 2
+            return 1
         print(f"build-records: wrote {rel}")
         return 0
     rel = args.path.replace("\\", "/")

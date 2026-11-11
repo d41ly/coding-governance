@@ -805,7 +805,8 @@ derive_map_block() {
     || { printf 'map — skipped: this node has no working timeout -k, so the read would be unbounded and none ran\n'; return 0; }
   sf=$(mkdir -p "$CARD_DIR" && mktemp "$CARD_DIR/.map.XXXXXX") \
     || { printf 'map — skipped: no scratch file under %s to capture the map in\n' "$CARD_DIR"; return 0; }
-  timeout -k 2 "$CARD_MAP_BOUND" "$py" "$iu" map --root "$ROOT" </dev/null >"$sf" 2>/dev/null; rc=$?
+  # PLAY-dOrderedCharter-49 S73: the session's own tree, the payload's `cwd`, never the hook's working directory
+  timeout -k 2 "$CARD_MAP_BOUND" "$py" "$iu" map --root "$CARD_TREE" </dev/null >"$sf" 2>/dev/null; rc=$?
   case "$rc" in
     0) tr -d '\r' < "$sf" ;;
     124|137) printf 'map — skipped: the map did not answer within %ss\n' "$CARD_MAP_BOUND" ;;
@@ -854,10 +855,22 @@ render_envelope_sh() {
 # written; any failure prints ONE `card-file — skipped:` line and returns 0, so it never changes a verb's
 # exit: the stored card is the record and this file its render. WHAT THIS DOES NOT DO: load the file;
 # nothing imports it until the charter's entry file does (PLAY-dOrderedCharter-43).
+# ONE OWNER PER TREE (PLAY-dOrderedCharter-49 S54): the file's second line is `card-owner — <session id>`,
+# and a file another session owns is left as it is, printing one skipped: line. Whether that session is
+# still live, and a takeover when it is not, are PLAY-dOrderedCharter-54's.
 CARD_FILE_REL=.claude/orientation-card.md
 CARD_FILE_DIRECTION="the build's card: where this session stands; level 0 outranks it"
 write_card_file() {
-  local dest="$CARD_TREE/$CARD_FILE_REL" common tmp
+  local dest="$CARD_TREE/$CARD_FILE_REL" common tmp body owner=""
+  if [ -f "$dest" ]; then
+    { IFS= read -r _; IFS= read -r owner; } < "$dest" 2>/dev/null
+    owner=${owner%$'\r'}
+    case "$owner" in
+      "card-owner — $CARD_SID") ;;
+      "card-owner — "*)
+        printf 'card-file — skipped: another live session %s owns this tree\n' "${owner#card-owner — }"; return 0 ;;
+    esac
+  fi
   if ! git -C "$CARD_TREE" check-ignore -q "$CARD_FILE_REL" 2>/dev/null; then
     common=$(git -C "$CARD_TREE" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) && common=${common%$'\r'} && [ -n "$common" ] \
       || { printf 'card-file — skipped: no git common dir resolves for %s\n' "$CARD_TREE"; return 0; }
@@ -873,11 +886,14 @@ write_card_file() {
   [ ! -d "$dest" ] || { printf 'card-file — skipped: %s is a directory\n' "$dest"; return 0; }
   mkdir -p "$CARD_TREE/.claude" 2>/dev/null || { printf 'card-file — skipped: cannot create %s/.claude\n' "$CARD_TREE"; return 0; }
   tmp=$(mktemp "$dest.XXXXXXXX" 2>/dev/null) || { printf 'card-file — skipped: no temp beside %s\n' "$dest"; return 0; }
-  if render_envelope_sh "$CARD_FILE_REL" 1 "$CARD_FILE_DIRECTION" "$CARD_FILE" > "$tmp" 2>/dev/null \
+  body=$(mktemp "$dest.XXXXXXXX" 2>/dev/null) || { rm -f "$tmp"; printf 'card-file — skipped: no temp beside %s\n' "$dest"; return 0; }
+  if { printf 'card-owner — %s\n' "$CARD_SID" && { [ ! -f "$CARD_FILE" ] || cat -- "$CARD_FILE"; }; } > "$body" 2>/dev/null \
+      && render_envelope_sh "$CARD_FILE_REL" 1 "$CARD_FILE_DIRECTION" "$body" > "$tmp" 2>/dev/null \
       && mv -f "$tmp" "$dest" 2>/dev/null; then
+    rm -f "$body" 2>/dev/null
     return 0
   fi
-  rm -f "$tmp" 2>/dev/null
+  rm -f "$tmp" "$body" 2>/dev/null
   printf 'card-file — skipped: cannot write %s\n' "$dest"
   return 0
 }

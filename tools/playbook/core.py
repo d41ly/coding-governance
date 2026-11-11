@@ -418,7 +418,9 @@ def run_kinds(root=None):
 
 
 def read_front_matter(text):
-    """A SKILL.md's front matter as {key: value}, a `>-` or `|` block folded to one line; None where absent."""
+    """A SKILL.md's front matter as {key: value}, a `>-` or `|` block folded to one line; None where absent.
+    The one `description` reader: the Skill gate and the load set's injected measure both read through it
+    (PLAY-dOrderedCharter-49 S34)."""
     lines = text.replace("\r\n", "\n").split("\n")
     if not lines or lines[0].strip() != "---":
         return None
@@ -445,6 +447,16 @@ def read_kind_row(root, kit_rel, kind):
     return next((r for r in rows if r.get("tag") == f"kind.{kind}"), None)
 
 
+def read_skill_paths(root, population):
+    """The tracked files the pathspec `population` names under `root`, sorted, through one `git ls-files`
+    (PLAY-dOrderedCharter-49 S34); None where git refuses. A pathspec `*` crosses `/`, so
+    `*skills/*/SKILL.md` holds every tracked Skill under a `skills/` directory, `.claude/skills/` among them."""
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    p = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", population], capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", env=env, stdin=subprocess.DEVNULL)
+    return sorted(x for x in p.stdout.split("\0") if x) if p.returncode == 0 else None
+
+
 def run_skills(root=None):
     root, kit_rel, prefix = derive_layout(root)
     try:
@@ -454,15 +466,17 @@ def run_skills(root=None):
     if row is None:
         return [f"{SAY}: red · kinds.toml holds no kind.skill row, so no Skill is graded"], 1
     glob = row.get("population", "").replace("{prefix}", prefix)
-    home = pathlib.Path(root, glob.split("/*")[0])
-    dirs = sorted(d for d in home.iterdir() if d.is_dir() and not d.name.startswith((".", "__"))) if home.is_dir() else []
+    paths = read_skill_paths(root, glob)
+    if paths is None:
+        return [f"{SAY}: red · git ls-files refused the population {glob}, so no Skill is graded"], 1
     reds = []
-    for d in dirs:
-        rel = d.relative_to(root).as_posix()
+    for path in paths:
+        d = pathlib.PurePosixPath(path).parent
+        rel = d.as_posix()
         try:
-            meta = read_front_matter((d / "SKILL.md").read_text(encoding="utf-8"))
-        except FileNotFoundError:
-            reds.append((CORE, rel, f"{rel}/ holds no SKILL.md"))
+            meta = read_front_matter(pathlib.Path(root, path).read_text(encoding="utf-8"))
+        except OSError:
+            reds.append((CORE, rel, f"{rel}/SKILL.md is tracked and does not read"))
             continue
         if meta is None:
             reds.append((CORE, rel, f"{rel}/SKILL.md opens with no --- front matter"))
@@ -477,7 +491,7 @@ def run_skills(root=None):
         elif len(desc) > SKILL_DESCRIPTION_MAX:
             reds.append((CORE, rel, f"{rel}/SKILL.md description is {len(desc)} characters, over "
                                     f"{SKILL_DESCRIPTION_MAX}"))
-    lines = [f"{SAY}: skills · {len(dirs)} Skills under {home.relative_to(root).as_posix()}/"]
+    lines = [f"{SAY}: skills · {len(paths)} tracked Skills under {glob}"]
     rc = check_exceptions(root, reds, lines)
     lines.append(f"{SAY}: skills conformance · {'red' if rc else 'green'}")
     return lines, rc
@@ -597,7 +611,7 @@ def run_new(argv, root=None):
             flags = dict(zip(rest[::2], rest[1::2]))
             if set(flags) != {"--description"} or len(rest) != 2:
                 raise ValueError("new skill <name> --description <text>")
-            home = row.get("population", "").replace("{prefix}", prefix).split("/*")[0]
+            home = row.get("population", "").replace("{prefix}", prefix).split("/*")[0].lstrip("*")
             return [f"{SAY}: new · wrote {write_skill(root, home, name, flags['--description'])}"], 0
         if own and own.group("kind") == "charter-practice":
             flags = dict(zip(rest[::2], rest[1::2]))
@@ -635,7 +649,7 @@ def write_fixture(top, policy="# no key set\n"):
             for n in range(1, FX_N + 1)),
         f"{kit}/kinds.toml": (
             '[[kind]]\ntag = "kind.skill"\nowner = "dFx"\nbinds = ["principle.p15", "principle.p16"]\n'
-            'population = "skills/*/SKILL.md"\nfactory = "python {prefix}/playbook/core.py new skill"\n'
+            'population = "*skills/*/SKILL.md"\nfactory = "python {prefix}/playbook/core.py new skill"\n'
             'gate = "fx skills"\n\n'
             '[[kind]]\ntag = "kind.charter-practice"\nowner = "dFx"\nbinds = ["principle.p16"]\n'
             'population = "{prefix}/playbook/practices.toml"\n'
@@ -796,6 +810,15 @@ def arm_skill(c):
     c.set_file("skills/empty/SKILL.md", None)
     c.write_file("skills/wrong/SKILL.md", lambda _t: "---\nname: other\ndescription: x\n---\n")
     c.check_gate("skill: a planted Skill whose name differs from its directory", run_skills, 1, "names 'other'")
+    c.set_file("skills/wrong/SKILL.md", None)
+    # PLAY-dOrderedCharter-49 S34: a rendered Skill under .claude/skills/, its description a folded block
+    # each of whose lines is short and whose fold runs past the cap
+    long = "---\nname: long\ndescription: >-\n" + "  a folded line of a long description\n" * 30 + "---\n"
+    c.write_file(".claude/skills/long/SKILL.md", lambda _t: long)
+    c.check_gate("skill: a rendered .claude/skills/ member whose folded description runs past the cap", run_skills, 1,
+                 ".claude/skills/long/SKILL.md description is", "over 1024")
+    c.set_file(".claude/skills/long/SKILL.md", None)
+    c.check_gate("skill: the folded member taken out", run_skills, 0, "skills conformance · green")
 
 
 def arm_practice(c):

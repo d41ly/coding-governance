@@ -27,7 +27,8 @@ whose `pin` is `tag` (`amends`, `supersedes`), a pinned id only on one whose `pi
 THE SITES, one adapter each: a record's header (`**Serves:**` through `tree_lib.read_bindings`,
 `**Caused-by:**`, `**Made-by:**`), a record's section (`**Edges:**`), an instruction unit's row (`edges`,
 `scope`, `required-by`, `enforced-by`, read through the registry's `parse_unit_rows`), code (a `gov:note` line's `refs=` segment), a commit's trailers
-(the `[[trailer]]` table), a work order's `gov:handoff` marker (`unit=` and `build=`) and a spec's
+(the `[[trailer]]` table; a `serves` value is edges only when every target passes the grammar, and a
+prose or `none` value is counted unread, never an edge and never a refusal), a work order's `gov:handoff` marker (`unit=` and `build=`) and a spec's
 `**Carries:**` line (through `design_lib.parse_binding_lines`, its one parser).
 
 RESOLUTION. A tag or section resolves through the tag index's `resolve_address`; a pinned tag when some
@@ -381,12 +382,13 @@ def read_handoff_edges(text, path) -> list[dict]:
     return check_site_targets(edges, path)
 
 
-def read_trailer_edges(root, base, keys) -> list[dict]:
-    """Every registered trailer of the commits in `base..HEAD`, one `git log`: `Decided:` a `decides`
-    edge to its commit, every other key its value's whitespace- or comma-split targets, `Pass: none`
-    none."""
+def read_trailer_edges(root, base, keys) -> tuple[list[dict], int]:
+    """Every registered trailer of the commits in `base..HEAD`, one `git log`: `(edges, unread)`.
+    `Decided:` is a `decides` edge to its commit, every other key its value's whitespace- or comma-split
+    targets; a `serves` value whose every comma-split target `derive_target_fault` passes is edges, and `none`
+    or a prose value, whose words hold a space, is counted in `unread`, never an edge or a refusal (PLAY-dOrderedCharter-49 S26)."""
     out = ti.read_git(root, "log", "--format=%H%x1f%(trailers:only,unfold)%x1e", f"{base}..HEAD")
-    edges = []
+    edges, unread = [], 0
     for chunk in out.split("\x1e"):
         sha, _, block = chunk.strip("\n").partition("\x1f")
         for n, line in enumerate(block.splitlines(), 1):
@@ -394,11 +396,15 @@ def read_trailer_edges(root, base, keys) -> list[dict]:
             if not sep or key not in keys:
                 continue
             at = {"path": f"commit {sha[:12]}", "line": n, "type": keys[key], "site": "commit", "key": key}
+            targets = [t for t in re.split(r"[\s,]+", value.strip()) if t]
             if keys[key] == "decides":
                 edges.append({**at, "targets": [sha], "source": value.strip()})
+            elif keys[key] == "serves" and (value.strip() == "none" or any(map(derive_target_fault, (
+                    t.strip() for t in value.strip().split(","))))):  # comma-split: prose holds a space
+                unread += 1
             elif value.strip() != "none":
-                edges.append({**at, "targets": [t for t in re.split(r"[\s,]+", value.strip()) if t]})
-    return check_site_targets(edges, f"{base}..HEAD")
+                edges.append({**at, "targets": targets})
+    return check_site_targets(edges, f"{base}..HEAD"), unread
 
 
 # ------------------------------------------------------------------------------------------ the checks
@@ -608,7 +614,7 @@ def read_tree_edges(root, base) -> tuple[list, list]:
         except (EdgeRefusal, design_lib.DesignRefusal) as exc:
             bad += [ln.strip() for ln in str(exc).splitlines()[1:]]
     if base:
-        edges += read_trailer_edges(root, base, read_trailer_keys(read_edge_types()))
+        edges += read_trailer_edges(root, base, read_trailer_keys(read_edge_types()))[0]
     return edges, bad
 
 
@@ -626,8 +632,15 @@ def run_check(root, base) -> int:
     types = read_edge_types()
     ns_path = KIT_DIR / "namespaces.toml"
     rc = build_resolve_context(root, ns_path)
-    edges, reds = read_tree_edges(root, base)
+    edges, reds = read_tree_edges(root, None)
     reds = [f"edges: refused · {r}" for r in reds]
+    unread = 0
+    if base:
+        try:
+            trailer_edges, unread = read_trailer_edges(root, base, read_trailer_keys(types))
+            edges += trailer_edges
+        except EdgeRefusal as exc:
+            reds += [f"edges: refused · {ln.strip()}" for ln in str(exc).splitlines()[1:]]
     reds += check_edges(edges, types, ti.read_namespaces(ns_path), rc["classes"])
     try:
         r_reds, counts = run_resolve(edges, rc)
@@ -648,7 +661,8 @@ def run_check(root, base) -> int:
         if e["site"] == "commit":
             trailers[e["key"]] = trailers.get(e["key"], 0) + 1
     print(f"edges: trailers · {base[:12] if base else 'none'}..HEAD · "
-          + (", ".join(f"{k}: {v}" for k, v in sorted(trailers.items())) or "none read"))
+          + (", ".join(f"{k}: {v}" for k, v in sorted(trailers.items())) or "none read")
+          + f" · {unread} serves value(s) unread, prose or none")
     print(f"edges: targets · {counts['resolved']} resolved, {counts['unresolved']} serves unresolved "
           f"(check 21's verdict), {counts['unarmed']} unarmed")
     print(f"edges: {'RED' if reds else 'green'} · {len(edges)} edge(s), {len(reds)} red")
@@ -773,6 +787,9 @@ RESOLVE_PLANTS = {
     "resolve-pinned-clause": ("spec.md", "# PLAY-dOrderedCharter-28 — x\n\n**Carries:** cl-dAlpha-0001@{clause} whole\n"),
     "clause-no-rev": ("spec.md", "# PLAY-dOrderedCharter-28 — x\n\n**Carries:** cl-dAlpha-0001@00000000 whole\n"),
 }
+#: PLAY-dOrderedCharter-49 S26: the commit plant's trailer values, each `(Pass: value, edges it yields)`; a prose
+#: value and `none` are counted unread, an id is one edge
+TRAILER_PLANT = (("the whole build", 0), ("none", 0), ("PLAY-dOrderedCharter-28", 1))
 FIXTURE_VIEW = "| Build | Clause | Text | Since |\n|---|---|---|---|\n| dAlpha | `cl-dAlpha-0001` | {text} | {since} |\n"
 FIXTURE_UNIT = '[[unit]]\ntag = "unit.x"\nhelp = "{help}"\n'
 
@@ -825,13 +842,39 @@ def build_resolve_fixture(top, plant) -> tuple[pathlib.Path, pathlib.Path, pathl
     return root, site, root / gov_tag.FIXTURE_KIT / "namespaces.toml"
 
 
+def run_trailer_plant(top) -> int:
+    """`prose-pass`: gov_tag's fixture repository, then one commit per `TRAILER_PLANT` value under a `Pass:`
+    trailer; `read_trailer_edges` over them must read the id alone as an edge and count the other two
+    unread, refusing nothing."""
+    import gov_tag
+    root = gov_tag.build_tags_fixture(pathlib.Path(top), "none")
+    base = ti.read_git(root, "rev-parse", "HEAD").strip()
+    for n, (value, _want) in enumerate(TRAILER_PLANT):
+        gov_tag.write_commit(root, {f"memory/guides/T{n}.md": "# T\n"}, f"plant {n}\n\nPass: {value}")
+    try:
+        edges, unread = read_trailer_edges(root, base, read_trailer_keys(read_edge_types()))
+    except EdgeRefusal as exc:
+        print(f"edges: plant prose-pass · REFUSED, a prose value refused the read: {exc}")
+        return 1
+    targets = sorted(t for e in edges for t in e["targets"])
+    ok = targets == ["PLAY-dOrderedCharter-28"] and unread == 2
+    print(f"edges: plant prose-pass · edges {targets} · {unread} unread · {'as expected' if ok else 'NOT as expected'}")
+    return 0 if ok else 1
+
+
 def run_fixture(plant) -> int:
-    """One plant: a parse-and-grade plant over a scratch site, or a resolve plant over a scratch repository;
-    `edges.toml` must come out unchanged."""
+    """One plant: a parse-and-grade plant over a scratch site, a resolve plant over a scratch repository, or
+    the trailer plant over one; `edges.toml` must come out unchanged."""
     shipped = (KIT_DIR / "edges.toml").read_bytes()
     top = tempfile.mkdtemp(prefix="edges-")
     try:
-        if plant in RESOLVE_PLANTS:
+        if plant == "prose-pass":
+            ti.load_memory_tree()
+            from deviation_join import set_env_aside
+            from tree_lib import GIT_ENV_LEAKS
+            with set_env_aside(GIT_ENV_LEAKS):
+                rc_ = run_trailer_plant(top)
+        elif plant in RESOLVE_PLANTS:
             ti.load_memory_tree()  # PLAY-dOrderedCharter-69 S3: the caller's git variables aside for the plant
             from deviation_join import set_env_aside
             from tree_lib import GIT_ENV_LEAKS
@@ -863,7 +906,7 @@ def main(argv=None) -> int:
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--base", metavar="REV")
     ap.add_argument("--fixture", action="store_true")
-    ap.add_argument("--plant", choices=sorted({*PLANTS, *RESOLVE_PLANTS}))
+    ap.add_argument("--plant", choices=sorted({*PLANTS, *RESOLVE_PLANTS, "prose-pass"}))
     a = ap.parse_args(argv)
     try:
         if a.list:

@@ -25551,11 +25551,6 @@ memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-9.md	too
 memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-9.md	tools/playbook/policy_value.py:72
 memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-9.md	tools/playbook/readers.toml:7
 memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-9.md	tools/playbook/tag_index.py:275
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-39.md	tools/agent-instructions/adopt-agent-instructions.sh:34-42
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-39.md	tools/agent-instructions/kit.toml:51-55
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-39.md	tools/gate-legs.json:293
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-39.md	tools/govkit/registry.toml:522-524
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-39.md	tools/govkit/registry.toml:66-67
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-41.md	tools/govkit/entries/playbook.kit.toml:285-287
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-41.md	tools/playbook/render_playbook.py:1004-1012
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-41.md	tools/playbook/render_playbook.py:1008-1012
@@ -25587,30 +25582,6 @@ memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-48.md	to
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-48.md	tools/workflows/orient-counterfactual.js:111
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-48.md	tools/workflows/review_replay.py:188
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	BUILD-METHOD M4
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/check-playbook-parity.sh:273
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/check-spec-tokens.py:376
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/codebase-map/map_lib.py:114
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/codebase-map/scen-adversarial.json:180
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/drift-audit/drift_report.py:109
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/govkit/govkit.py:1144
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/govkit/govkit.py:126
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/govkit/govkit.py:2944-2946
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/govkit/govkit.py:4422
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/govkit/govkit.py:6010-6017
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/govkit/selftest.py:9330
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/memory-recall/extract.py:282
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/memory-recall/extract.py:60
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/memory-tree/check-memory-hygiene.sh:2474
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/playbook/kit.toml:53-55
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/playbook/render_playbook.py:343
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/roles/check_roles.py:15
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/roles/handoff.py:312
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/roles/handoff.py:382-396
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/roles/roles_lib.py:202
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/run-gates/measure_legs.py:1001-1006
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/run-gates/regen.py:108
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/runlog/selftest.py:8172
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md	tools/unattended/unattended.sh:655
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-50.md	BUILD-METHOD M4
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-50.md	registry.toml:708
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-50.md	tools/codebase-map/map_lib.py:1506
@@ -25631,24 +25602,6 @@ memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-53.md	to
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-53.md	x.py:1
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-53.md	x.py:3
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	BUILD-METHOD M4
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	memory/map/baseline.toml:14
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	memory/map/baseline.toml:14-15
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	memory/map/generated/inventories.json:9
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	tools/agent-instructions/adopt-agent-instructions.sh:36-40
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	tools/agent-instructions/adopt-agent-instructions.sh:37-39
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	tools/agent-instructions/kit.toml:37
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	tools/agent-instructions/kit.toml:44
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	tools/agent-instructions/kit.toml:54
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	tools/gate-legs.json:1678-1681
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	tools/gate-legs.json:296
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	tools/gate-legs.json:382
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	tools/govkit/registry.toml:523
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	tools/memory-tree/merge-rows.py:1498-1514
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	tools/memory-tree/merge-rows.py:742
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	tools/memory-tree/tree_lib.py:302
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	tools/memory-tree/tree_lib.py:328
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	tools/playbook/kit.toml:7
-memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	tools/roles/handoff.py:934
 memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md	x.py:3
 memory/builds/dOrderedCharter/spec/2026-11-02-spec-PLAY-dOrderedCharter-61.md	.githooks/pre-push.test.sh:2279
 memory/builds/dOrderedCharter/spec/2026-11-02-spec-PLAY-dOrderedCharter-61.md	.githooks/pre_push_bar_selftest.py:180

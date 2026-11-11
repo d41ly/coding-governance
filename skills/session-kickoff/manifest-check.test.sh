@@ -1086,8 +1086,9 @@ check_eq "AC5 the replay-written card is followed by one now — line" "1" "$(gr
 CF_REL=.claude/orientation-card.md
 CF_SID="$NONCE-cf1"
 printf -v CF_PAYLOAD '{"session_id":"%s","cwd":"%s","hook_event_name":"SessionStart"}' "$CF_SID" "$CWT2"
-check_card_file() {   # $1=name: the second worktree's file is the opener, the stored card's bytes, the closer
+check_card_file() {   # $1=name: the opener, the owner line, the stored card's bytes, the closer
   { printf '[%s · Level 1 · %s]\n' "$CF_REL" "the build's card: where this session stands; level 0 outranks it"
+    printf 'card-owner — %s\n' "$CF_SID"
     cat "$CARD_HOME/$CF_SID.md"; printf '[/%s]\n' "$CF_REL"; } > "$TMP/cf.want"
   cmp -s "$TMP/cf.want" "$CWT2/$CF_REL" && { echo "ok   $1"; pass=$((pass+1)); } \
     || { echo "FAIL $1"; diff "$TMP/cf.want" "$CWT2/$CF_REL" 2>&1 | sed 's/^/    /'; fail=$((fail+1)); }
@@ -1109,6 +1110,16 @@ check_card_file "card file AC3: the replay re-renders it"
 check_eq "card file AC3: the append, in the worktree, exits 0" "0" "$got"
 check_card_file "card file AC3: the append re-renders it"
 check_eq "card file AC3: the re-rendered file carries the appended line" "1" "$(grep -cx -- '- TOOL-zCardFixture-10' "$CWT2/$CF_REL")"
+# PLAY-dOrderedCharter-49 S54: a second session writing a card into the same tree leaves the first's card,
+# its owner line naming the first, and prints the one skipped: line naming the owner.
+printf -v CF_PAYLOAD2 '{"session_id":"%s","cwd":"%s","hook_event_name":"SessionStart"}' "$NONCE-cf2" "$CWT2"
+cp "$CWT2/$CF_REL" "$TMP/cf.first"
+(cd "$CCLONE" && printf '%s\n' "$CF_PAYLOAD2" | bash "$CHECK" --card --write > "$CARD_OUT" 2>&1); got=$?
+check_eq "card owner: a second session's --card --write exits 0" "0" "$got"
+check_eq "card owner: it prints the skip line naming the first session" "1" \
+  "$(grep -cxF "card-file — skipped: another live session $CF_SID owns this tree" "$CARD_OUT")"
+cmp -s "$TMP/cf.first" "$CWT2/$CF_REL" && { echo "ok   card owner: the first session's card survives"; pass=$((pass+1)); } \
+  || { echo "FAIL card owner: the first session's card survives"; diff "$TMP/cf.first" "$CWT2/$CF_REL" | sed 's/^/    /'; fail=$((fail+1)); }
 # Unwritable: the path a directory. Each verb keeps its exit and prints one skipped: line.
 rm -f "$CWT2/$CF_REL"; mkdir "$CWT2/$CF_REL"
 for cf_verb in write replay; do

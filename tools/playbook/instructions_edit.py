@@ -78,7 +78,7 @@ LAYERS_TABLE = "layers.toml"
 PACKS_TABLE = "packs.toml"
 PRACTICES_TABLE = "practices.toml"
 PACK_KINDS = ("methodology", "governance", "language")
-PACK_ALL = "all"
+PACK_FOUNDATION = "foundation"   # the one selector: the practice catalogue's `foundation` array
 ROW_ORDER = ("tag", "level", "type", "scope", "trigger", "budget", "text", "source", "owner", "usage", "help",
              "required-by", "enforced-by", "class", "fixed-by", "edges")
 OPPOSED = re.compile(r"(MUST|NEVER)\s+(\S.*)", re.S)
@@ -433,12 +433,16 @@ def run_tag_check(root) -> list:
     return json.loads(said[said.index("{\n"):])["reds"]
 
 
-def read_practice_tags(root) -> list | None:
-    """The practice catalogue's tags, None until unit 1 writes it."""
+def read_practice_tags(root, field="practice") -> list | None:
+    """The practice catalogue's tags, its rows' or with `field` "foundation" its `foundation` array's; None
+    until unit 1 writes it."""
     path = iu.derive_kit_file(root, PRACTICES_TABLE)
     if not path.is_file():
         return None
-    return [r.get("tag") for r in tomllib.loads(path.read_text(encoding="utf-8")).get("practice") or []]
+    table = tomllib.loads(path.read_text(encoding="utf-8"))
+    if field == PACK_FOUNDATION:
+        return list(table.get(PACK_FOUNDATION) or [])
+    return [r.get("tag") for r in table.get("practice") or []]
 
 
 def read_packs(root=None) -> list:
@@ -452,7 +456,7 @@ def read_packs(root=None) -> list:
 
 def resolve_practices(value, root=None) -> list:
     """S8: a `charter.practices` value, pack names and practice tags, as practice tags in first-named order, a
-    pack's `all` every catalogue tag. No catalogue, or a name it lacks, raises UnitRowError, naming the row a
+    pack's `foundation` selector the catalogue's own `foundation` array (PLAY-dOrderedCharter-49 S15). No catalogue, or a name it lacks, raises UnitRowError, naming the row a
     retired tag's `replaces` points at."""
     root = root or resolve_root()
     packs, catalogue = {p.get("name"): p for p in read_packs(root)}, read_practice_tags(root)
@@ -461,7 +465,7 @@ def resolve_practices(value, root=None) -> list:
     tags = []
     for name in value:
         members = packs[name]["practices"] if name in packs else [name]
-        members = catalogue if members == PACK_ALL else members
+        members = read_practice_tags(root, PACK_FOUNDATION) if members == PACK_FOUNDATION else members
         unknown = [m for m in members if m not in catalogue]
         if unknown:
             path = iu.derive_kit_file(root, PRACTICES_TABLE)
@@ -483,11 +487,11 @@ def check_packs(root) -> tuple[list, list]:
             reds.append(f"{where} carries no `name` or `description`")
         if kind not in PACK_KINDS:
             reds.append(f"{where} · `kind` {kind!r} is outside {', '.join(PACK_KINDS)}")
-        if members != PACK_ALL and not (isinstance(members, list) and all(isinstance(m, str) for m in members)):
-            reds.append(f"{where} · `practices` is no list of practice tags and no `{PACK_ALL}`")
+        if members != PACK_FOUNDATION and not (isinstance(members, list) and all(isinstance(m, str) for m in members)):
+            reds.append(f"{where} · `practices` is no list of practice tags and no `{PACK_FOUNDATION}`")
         elif catalogue is not None:
             reds += [f"{where} names {m}, which the catalogue lacks"
-                     for m in (() if members == PACK_ALL else members) if m not in catalogue]
+                     for m in (() if members == PACK_FOUNDATION else members) if m not in catalogue]
             if name in catalogue or f"practice.{name}" in catalogue:
                 reds.append(f"{where} · its name equals a practice's")
     armed = "unarmed: no practice catalogue yet" if catalogue is None else f"{len(catalogue)} practice(s)"
@@ -553,7 +557,8 @@ FX_RECORD = ("--build", FX_BUILD, "--unit", FX_UNIT, "--mark", "semantic")
 FX_ROW = ("--manifest", "corekit", "--tag", "unit.demo", "--type", "directive", "--level", "3", "--trigger", "always",
           "--text", "MUST demo.")
 FX_RENDERERS = '[[target]]\npaths = ["AGENTS.md"]\nrenderer = "hand"\n'
-FX_PRACTICES = '[[practice]]\ntag = "practice.land"\n\n[[practice]]\ntag = "practice.memory"\n'
+FX_PRACTICES = ('foundation = ["practice.land"]\n\n[[practice]]\ntag = "practice.land"\n\n'
+                '[[practice]]\ntag = "practice.memory"\n')
 
 
 def derive_fx_row(tag, text="MUST hold.", kind="directive", level=3) -> str:
@@ -983,8 +988,10 @@ def arm_packs(c):
     c.check("with no catalogue the check prints unarmed", not reds and "unarmed" in lines[0], str(lines + reds))
     c.write_file(catalogue, FX_PRACTICES)
     tags = resolve_practices(["foundation"], c.top)
-    c.check("resolve_practices(['foundation']) returns every catalogue tag", tags == ["practice.land", "practice.memory"],
-            str(tags))
+    c.check("resolve_practices(['foundation']) returns the catalogue's narrower foundation array, not every row",
+            tags == ["practice.land"], str(tags))
+    lines, reds = check_packs(c.top)
+    c.check("check_packs admits the foundation selector", not reds, str(lines + reds))
     c.check("a value naming a pack and a practice holds each tag once",
             resolve_practices(["practice.memory", "foundation"], c.top) == ["practice.memory", "practice.land"])
     row = '[[pack]]\nname = "{}"\nkind = "language"\npractices = {}\ndescription = "x"\n'
