@@ -8,6 +8,10 @@ version_from = { file = "agent-cap.js", pattern = "KIT_AGENT_CAP_VERSION = " }
 # TOOL-aRoutedQuill-5 S2: kickoff-manifest is the card writer whose `## route` the gate reads, so the
 # gate never installs without it.
 requires = ["settings-merge", "kickoff-manifest"]
+# TOOL-dFairHearing-27 S12: the review kit's spec-audit opt-in pack reads this hook's exports and carries its
+# `gov:kit agent-cap@` marker, so a scoped `govkit update --kits agent-cap` moves a claimed review kit with it
+# through govkit's marker coupling. The hook's pack-presence check stays, for hand copies and hooks-only adopters.
+marker_carriers = ["{prefix}/workflows/spec-audit-optin.js"]
 
 # TWO destinations for ONE source. The kit copy AND the wired copy are both required: the parity arm
 # fails outright when the wired copy is absent, so a single-destination model reds it in every target.

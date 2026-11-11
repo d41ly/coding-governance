@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.113 -->
+<!-- gov:kit unattended@1.118 -->
 [memory/guides/UNATTENDED-PROTOCOL.md · Level 3 · Binding for a run that merges and pushes with no owner turn; yields to levels 0 to 2]
 # Unattended runs — the protocol
 
@@ -514,7 +514,7 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `UNITS_REGION_CUTOFF` | the date at which an absent units-region marker pair becomes a REFUSAL rather than an opt-out |
 | `RECALL_CLI` | the repo-relative path to the retrieval CLI whose query log `reuse-probed` reads. OPTIONAL: blank or absent means the recall kit is not adopted, and the item then reports an ANNOUNCED SKIP rather than an unmeetable UNMET, so a project that took this kit and not that one is not wedged by a core item it can never satisfy. |
 | `MAP_CLI` | the repo-relative path to the codebase-map probe whose lookup log `reuse-probed` also reads — the other half of the build method's M5 pair. OPTIONAL, on exactly `RECALL_CLI`'s terms: blank or absent means that kit is not adopted, and the item announces a skip only when NEITHER is declared. |
-| `SPEC_TOKENS_CLI` | the repo-relative path to the spec-token checker `--dispatch` runs over the live tree BEFORE it admits a build pass, refusing the dispatch on a non-zero exit. OPTIONAL, on `RECALL_CLI`'s terms: blank or absent means no spec-token checker is carried, and the verb announces the skip on stdout rather than passing over it. |
+| `SPEC_TOKENS_CLI` | the repo-relative path to the spec-token checker `--dispatch` runs over the live tree BEFORE it admits a build pass, refusing on any red but another build's. OPTIONAL, on `RECALL_CLI`'s terms: blank or absent means no spec-token checker is carried, and the verb announces the skip on stdout rather than passing over it. |
 | `GATE_POLICY_FILE` | where `INHERITED_RED` and its age bound are read at R, unsourced; `GATE_POST_MERGE` only from `.githooks/gate-env.sh`. OPTIONAL: blank reads that, else `land`, announced. `UNATTENDED-STOPS.md` |
 | `ASKS_CMD` | the ask generator the driver calls, in the shapes `UNATTENDED-ASKS.md` lists. OPTIONAL: blank or absent means not adopted, and the skip is announced |
 | `PROCMON_CMD` | the reaper, called `<cmd> --kill-msys <pid>` once per recorded orphan. OPTIONAL: blank turns reaping off, announced. `UNATTENDED-STOPS.md` |

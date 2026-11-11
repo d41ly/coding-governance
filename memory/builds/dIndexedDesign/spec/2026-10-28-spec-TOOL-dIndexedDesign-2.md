@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-2 — the design index: overlaps between live designs, as `design.overlap` says
 
-**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 6 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-3 · 2026-11-05 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 6 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0384@372bd58d whole
 **Carries:** node:item.design.overlaps
@@ -15,8 +15,15 @@
 | [2026-10-28-build-TOOL-dIndexedDesign-1-fix-return.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-fix-return.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-a.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-a.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-16 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-2-deviation-21.md](../build/2026-11-05-build-TOOL-dIndexedDesign-2-deviation-21.md) | deviation | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-fix-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-fix-brief.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-2-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-2-1-spec-writer.md) | journal | — |
 | [2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-3 |
 
 <!-- /gen:spec-records -->
@@ -68,8 +75,18 @@ view alone.
   Serves line naming each unit of the build with a row, one row per pair
   `- <unit id> · <unit id> · <path> · acknowledged|unacknowledged`, the value of `design.overlap` and
   the commit it read; `<n>` the next free sequence. Observed by AC6.
-- **S7** — The kind registered through `record_kinds.py new overlap --tag record.overlap`
-  (TOOL-dTotalRecall-1 S9), node `record-kind.overlap`. Observed by AC9.
+- **S7** — The kind's row. `overlap` appended to `tools/memory-tree/record-kinds.toml` through
+  TOOL-dTotalRecall-1 S9's factory, `python record_kinds.py new overlap --tag record.overlap --writer
+  "design_lib.py --overlaps --record <slug>" --check "memory hygiene" --purpose "a build's cross-build
+  overlaps: one row per unit pair whose declared write sets meet, and whether it is acknowledged"`, the
+  `--purpose` TOOL-dTotalRecall-16 S2 requires, with the columns TOOL-dTotalRecall-18 S1 requires set
+  through that unit's landed verb, since S9's `new` takes no flag for them: layer `layer.memory`, home
+  `memory/builds/*/build/*-overlap-[0-9]*.md`, id-rule `<date>-build-<first unit id>-overlap-<n>.md`,
+  schema `{ form = "rows" }` (one row per pair, S6's grammar; TOOL-dTotalRecall-1 §4 "Data model"),
+  lifecycle `append-only` (each run writes the next `<n>` and never rewrites one, S6), and
+  `readers = []` with `readers-none = "no work-order read key hands an overlap record;
+  TOOL-dIndexedDesign-15's planner reads the newest by its build folder"`. Its node is
+  `record-kind.overlap`. Observed by AC9.
 - **S8** — The catalogue row of `design.overlap` (`tools/policy/catalogue.toml:925-929`) gains its
   `summary` and `usage`, and `python tools/policy/policy.py lists --write` drains its name from
   `tools/policy/unsummarised-keys.txt`; the values `warn`, `refuse`, `index-only` and the default
@@ -80,6 +97,10 @@ view alone.
   design-index block; `help/policy.md` names the key's consumers; `tools/memory-tree/README.md` names
   the join, the arm and the record; `KIT_MEMORY_TREE_VERSION` and `KIT_UNATTENDED_VERSION` move.
   Observed by AC10.
+- **S10** — The item goes live. `item.design.overlaps`' `[[stand-in]]` row (TOOL-dDeclaredLoop-13 S8)
+  leaves `tools/loop/loop.toml` in this unit's landing, and the item's row's `witness` names
+  `design_lib.py --overlaps`; its needs, outcomes and routes stay as TOOL-dDeclaredLoop-12 transcribed
+  them. TOOL-dIndexedDesign-8 S11 arms `item.design.decompose` the same way. Observed by AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -99,7 +120,7 @@ view alone.
 - **consumes-from** `TOOL-dIndexedDesign-16` — `read_design_policy`, I3, which S3 calls with `design.overlap` and whose shell form S4 spells `policy.py get design.overlap`
 - **hands-off** `TOOL-dIndexedDesign-6` — `record.overlap`, the row grammar and the `**overlaps**` acknowledgement its unpushed-spec read announces pairs in, through S1's join
 - **hands-off** `TOOL-dIndexedDesign-15` — `record.overlap`, the overlap record the stream planner reads beside the order and the write sets
-- **consumes-from** external — TOOL-dTotalRecall-1 S9's `record_kinds.py new` and TOOL-dDeclaredLoop-12 S2's `[[item]]` row for `item.design.overlaps`, each DEFERRED at base and built before this build run
+- **consumes-from** external — TOOL-dTotalRecall-1 S9's `record_kinds.py new`, with the `--purpose` TOOL-dTotalRecall-16 S2 requires and the columns TOOL-dTotalRecall-18 S1 requires; TOOL-dDeclaredLoop-12 S2's `[[item]]` row for `item.design.overlaps` and TOOL-dDeclaredLoop-13 S8's `[[stand-in]]` row for it, which S10 deletes; each DEFERRED at base and built before this build run
 - **hands-off** `TOOL-dIndexedDesign-38` — the round-1 spec audit's minors that land on this spec, report ids 4, 22, 23, 24, 38 and 51, each a scope item of that batch unit
 
 ## 4. Design
@@ -178,6 +199,7 @@ each build acknowledges its own pairs as its specs are next written.
 ### Rollout
 
 Live at landing under the catalogue default `warn`, the owner's D2 answer (walkthrough:441-443).
+The overlaps item's stand-in row leaves in the same commit its witness lands (S10).
 `refuse` is a committed policy value; with 3,386 LIVE-side pairs at `4bf0f400d` it reds every LIVE
 spec until each acknowledges its paths, which §5 names.
 
@@ -193,7 +215,8 @@ spec until each acknowledges its paths, which §5 names.
 - `tools/unattended/unattended.sh`: S4, `KIT_UNATTENDED_VERSION`
 - `tools/unattended/unattended.test.sh`: S4's arm cases
 - `tools/unattended/VERBS.template.md` and its copy `memory/guides/UNATTENDED-VERBS.md`: S9
-- `tools/memory-tree/record-kinds.toml`: S7's row, through its factory
+- `tools/memory-tree/record-kinds.toml`: S7's row, through its factory and TOOL-dTotalRecall-18's verb
+- `tools/loop/loop.toml`: S10, the overlaps item's witness and its stand-in row deleted
 - `tools/policy/catalogue.toml` and `tools/policy/unsummarised-keys.txt`: S8
 - `help/policy.md` and `tools/memory-tree/README.md`: S9
 
@@ -277,14 +300,21 @@ spec until each acknowledges its paths, which §5 names.
   `git grep -c 'policy.py" get design.overlap' -- tools/unattended/unattended.sh` each print at least 1.
   Red when: the row lacks `summary` or `usage`, or either literal reader is missing.
 - **AC9** — When `python record_kinds.py --check` runs at this unit's tip, it passes with the `overlap`
-  row present, tagged `record.overlap`.
-  Red when: the row is missing or its tag differs.
+  row present, tagged `record.overlap`, its writer `design_lib.py --overlaps --record <slug>`, its
+  purpose, home `memory/builds/*/build/*-overlap-[0-9]*.md`, form `rows` and lifecycle `append-only`.
+  Red when: the row is missing, its tag or writer differs, or it lacks a column TOOL-dTotalRecall-16 or
+  -18 requires.
   fixture: the registry is TOOL-dTotalRecall-1's, absent at base until it lands.
 - **AC10** — When `grep -n "overlaps" memory/TEMPLATE-SPEC.md` runs, it prints the §3 section's
   sentence naming the third verb and its two payloads, and `tools/memory-tree/SPEC-TEMPLATE.template.md`
   carries the same bytes; `grep -n "design.overlap" memory/guides/UNATTENDED-VERBS.md` prints the
   `--overlaps` entry's sentence.
   Red when: a render differs from its template, or a payload form is unnamed.
+- **AC11** — When `python -c` loads `tools/loop/loop.toml` with `tomllib` at this unit's tip, it holds
+  no `[[stand-in]]` row for `item.design.overlaps`, and that item's row's `witness` names
+  `design_lib.py --overlaps`.
+  Red when: the stand-in survives the witness, or the witness names no overlaps run.
+  fixture: `loop.toml` is TOOL-dDeclaredLoop-12's, absent at base until it lands.
 
 ## 7. Gates
 
@@ -335,6 +365,11 @@ New arm: tools/unattended/unattended.test.sh · covers AC4 · `--overlaps` in a 
   spec brief's I3, I7 and I16.
 - rev-2 · 2026-10-28 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from edge of TOOL-dIndexedDesign-38,
   promoted by the round-1 spec audit of this build; nothing else moved.
+- rev-3 · 2026-11-05 · S7 · S10 · §3 Edges · §4 Rollout, Files touched · AC9 · AC11 · S7 spells the
+  row with `--writer`, `--check`, the `--purpose` TOOL-dTotalRecall-16 S2 requires and the columns
+  TOOL-dTotalRecall-18 S1 requires, form `rows`; S10 arms `item.design.overlaps` by deleting
+  TOOL-dDeclaredLoop-13 S8's stand-in row and pointing its witness at `--overlaps`, rows 7 and 9 of
+  `2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck`, by the brief prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md
 
 ## 10. Reuse audit
 

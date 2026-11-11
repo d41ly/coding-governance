@@ -23,7 +23,7 @@ gate-legs = [
 kits = ["hooks"]
 git-hooks = []
 harness-hooks = ["PreToolUse tools/hooks/agent-cap.js", "PreToolUse tools/hooks/scratch-guard.js", "SubagentStart tools/hooks/scratch-guard.js", "Stop tools/hooks/format-guard.js"]
-workflow-scripts = []
+workflow-scripts = ["check-verifier-fanout.js"]
 skill-engines = []
 rendered-skills = []
 gotcha-classes = ["bash-c-multiline-flattens-under-msys.md", "held-suite-guard-misses-a-sibling-kit.md", "git-rm-cached-refuses-a-diverged-index-blob.md",
@@ -46,6 +46,7 @@ globs = [
   "tools/check-agent-cap-restatement.test.sh",
   "tools/agent-cap-restatement-waivers.txt",
   "tools/workflows/check-verifier-fanout.sh",
+  "tools/workflows/check-verifier-fanout.js",
   "tools/workflows/check-verifier-fanout.test.sh",
   "tools/workflows/check-protocol-parity.test.sh",
   "tools/workflows/REVIEW-PROTOCOL.template.md",
@@ -186,8 +187,8 @@ resolver.
 
 `tools/workflows/check-verifier-fanout.sh` DELEGATES to the hook rather than re-implementing it: it
 builds a payload and feeds each committed harness through `tools/hooks/agent-cap.js`. One predicate,
-two entry points. A bash re-implementation would not disagree loudly — it would drift the day
-either side is tightened.
+two entry points. Its one native rule, which the hook lacks: each literal marked `gov:lens-slots`
+holds exactly five slots (`measureSlots`).
 
 `tools/settings-merge.py` owns the wiring fragment (event, matcher, marker, hook path, plus the
 optional interpreter and args from `TOOL-aReplayedCard-2`) and
@@ -209,7 +210,11 @@ scripts the join ban judges. A closed `--only=` set (`join`, `scripts`) lets fil
 predicate; a WIRED command never carries it (`tools/check-wiring.sh`).
 
 Rule 6 (`TOOL-aOrientedCast-7`) admits an `Agent` call only as a rendered handoff and a `Workflow`
-call only as a declared harness, per `.claude/roles.json`. `format-guard.js` reads agents
+call only as a declared harness, per `.claude/roles.json`. Rule 8 (`TOOL-aGuardedEffort-1`) then
+refuses a call whose effort level is not the one that index's `effort` key gives its model; not
+checked: a harness's own spawns, the unkeyed stages, a two-workflow harness's workflow, an unread
+or twice-matched model, an `Agent` call under `CLAUDE_CODE_EFFORT_LEVEL`, a default subagent model,
+a settings ceiling, a hand-edited index. `format-guard.js` reads agents
 from the transcript, never the agent ledger (`TOOL-aOrientedCast-21`).
 
 ## Gaps

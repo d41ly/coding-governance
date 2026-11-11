@@ -58,7 +58,6 @@ Cite ids, never line numbers.
 | [TOOL-aDeclaredBound-6](../builds/aDeclaredBound/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | tools/workflows/tier2-review.js describes its own find phase twice and… |
 | [TOOL-aDeferredBar-4](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | A *.test.sh UNDER A KIT DIRECTORY WITH A BUDGET ROW AND NO… |
 | [TOOL-aDeferredBar-5](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | HYGIENE CHECK 12'S ACCEPTANCE-WITNESS ARM ACCEPTS A *.test.sh-SHAPED… |
-| [TOOL-aDeferredBar-6](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | THE SPEC-STAGE WRITER IS NOT TOLD TO RUN THE SPEC-TOKEN CHECKER BEFORE… |
 | [TOOL-aDeferredBar-7](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/check-wiring.sh HAS NO ARM FOR… |
 | [TOOL-aDeferredBar-9](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/unattended/adopt-unattended.test.sh CARRIES NO ASSERTION FLOOR… |
 | [TOOL-aDeferredBar-10](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | AN ACCEPTANCE-LEDGER LINE CAN ASSERT A LEG'S EXIT FOR A TREE THAT MOVED… |
@@ -226,6 +225,7 @@ Cite ids, never line numbers.
 | [TOOL-aProbedUnit-15](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | unattended adopter e2e ran 137 s against its declared 60 s and the… |
 | [TOOL-aProbedUnit-16](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tier2-review.js and the two drift-audit workflows hand their agents no… |
 | [TOOL-aProbedUnit-17](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | the closing review's round-3 mediums and lows stand unfolded: clusters… |
+| [TOOL-aProfiledEffort-5](../builds/aProfiledEffort/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | the build harness's committer stage and the review harness's probe… |
 | [TOOL-aPromptedMandate-7](../builds/aPromptedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | the leg's SOURCE-level no-write arm (check-unattended.test.sh) greps… |
 | [TOOL-aPromptedMandate-9](../builds/aPromptedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | nothing in the driver's precondition chain has a timeout and the… |
 | [TOOL-aPromptedMandate-14](../builds/aPromptedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-19 | marker-contract.test.sh gates the four readers of the generated… |
@@ -262,7 +262,6 @@ Cite ids, never line numbers.
 | [TOOL-aResumedRelay-1](../builds/aResumedRelay/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | the lexicon VERB table needs a CURATION PASS over the deployer's… |
 | [TOOL-aRootedPrefix-3](../builds/aRootedPrefix/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-09 | hygiene checks 6/7 measure RAW working-tree bytes, so an adopter… |
 | [TOOL-aRoutedQuill-8](../builds/aRoutedQuill/BACKLOG.md) | DEFERRED | MED | TOOL-aRoutedQuill-6 | 2026-10-10 | run the routed-against-raw trial TOOL-aRoutedQuill-6 specifies, in an… |
-| [TOOL-aRoutedQuill-13](../builds/aRoutedQuill/BACKLOG.md) | OPEN | LOW | — | 2026-10-10 | the --dispatch order gate (check 49) counts a sibling whose spec reads… |
 | [TOOL-aScannedThrottle-3](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | ZERO Defender exclusions are confirmed on node a (Get-MpPreference… |
 | [TOOL-aScannedThrottle-4](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | HVCI/VBS is ON and ENFORCING on node a (Win32_DeviceGuard… |
 | [TOOL-aScannedThrottle-5](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | run-gates canary (466-587s in-bar, 317s standalone, 10-11% of… |
@@ -297,6 +296,17 @@ Cite ids, never line numbers.
 | [TOOL-aSiftedFork-7](../builds/aSiftedFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | THE RUN-GATES CANARY IS NON-DETERMINISTIC ON THIS HOST AND NAMES A… |
 | [TOOL-aSightedSkeptic-11](../builds/aSightedSkeptic/BACKLOG.md) | OPEN | HIGH | — | 2026-10-01 | inherited red: leg row-keyed merge driver replay red at ef1dcdb6,… |
 | [TOOL-aSignalledHook-2](../builds/aSignalledHook/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | the unattended kit does not handle push-main's exit 4 (landed UNGATED):… |
+| [TOOL-aSmoothedDispatch-10](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | INHERITED RED: THE HOSTILE-VALUE MATRIX DOES NOT DRIVE --record-round.… |
+| [TOOL-aSmoothedDispatch-11](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | INHERITED RED: THE BAR-SCRUB PARITY ARMS NAME GATE_REGEN_CHECK. Region… |
+| [TOOL-aSmoothedDispatch-12](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | INHERITED RED: THE PROLOGUE TAMPER CHECK NAMES write_bar_green. Region… |
+| [TOOL-aSmoothedDispatch-13](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | MED | — | 2026-11-10 | INHERITED RED: FIVE REGION-FOUR DISPATCH ARMS ARE ANSWERED BY CHECK… |
+| [TOOL-aSmoothedDispatch-14](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | MED | — | 2026-11-10 | THE SPEC-COMMIT STAGE CANNOT COMMIT A NEW BUILD'S FIRST SPECS. A build… |
+| [TOOL-aSmoothedDispatch-15](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | MED | — | 2026-11-10 | A RECORD QUOTING A DANGLING ID WRITES IT INTO ANOTHER BUILD'S IDS. Spec… |
+| [TOOL-aSmoothedDispatch-16](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | ROLE AGENTS RUN THE WHOLE-TREE HYGIENE GATE FOR A ONE-SPEC EDIT. Spec… |
+| [TOOL-aSmoothedDispatch-17](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | A CARRIAGE RETURN WRITTEN INLINE IN A SUITE ARGUMENT IS NOT A RELIABLE… |
+| [TOOL-aSmoothedDispatch-19](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | THE SHELL-HYGIENE SCANNER CREDITS ONE NAME PER LOCAL LINE.… |
+| [TOOL-aSmoothedDispatch-20](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | THE ROUTED-COMMITS LEG OUTGROWS ITS CEILING WHEN NO PUSH BASE IS SET. A… |
+| [TOOL-aSmoothedDispatch-23](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-11 | THE LANDING'S MINT IS NOT A FIXPOINT. Its first pass bumps a kit's… |
 | [TOOL-aSparedSpawn-20](../builds/aSparedSpawn/BACKLOG.md) | OPEN | MED | — | 2026-10-12 | the unit builder runs the govkit selfcheck and shell hygiene (a fork… |
 | [TOOL-aSparedSpawn-21](../builds/aSparedSpawn/BACKLOG.md) | OPEN | MED | — | 2026-10-12 | tools/memory-tree/check-arms.py compares each floored suite's declared… |
 | [TOOL-aSparedSpawn-22](../builds/aSparedSpawn/BACKLOG.md) | OPEN | LOW | — | 2026-10-12 | a lint over the *.test.sh suites flags a fixture sleep <N> whose arm… |
@@ -406,7 +416,15 @@ Cite ids, never line numbers.
 | [TOOL-dBoundRoles-75](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE BREAKER'S BUDGET DRAW HAS NO DRAWER. cl-dClosedLoop-0327 has an act… |
 | [TOOL-dBriefedPass-6](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THE --dispatch ORDER GATE HAS NO TEST ARM AND ITS FAILING CASE HAS… |
 | [TOOL-dBriefedPass-7](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | tools/workflows/unattended-build.test.sh is a 21-arm suite registered… |
-| [TOOL-dCalibratedLens-18](../builds/dCalibratedLens/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dCalibratedLens-18](../builds/dCalibratedLens/BACKLOG.md) | DEFERRED | MED | TOOL-dCalibratedLens-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dCalibratedLens-49](../builds/dCalibratedLens/BACKLOG.md) | OPEN | HIGH | — | 2026-11-03 | held red: suite line-length gate selftest red at 84acebdc on the daily… |
+| [TOOL-dCalibratedLens-50](../builds/dCalibratedLens/BACKLOG.md) | OPEN | HIGH | — | 2026-11-03 | held red: suite memory-recall kit selftest red at 84acebdc on the daily… |
+| [TOOL-dCalibratedLens-51](../builds/dCalibratedLens/BACKLOG.md) | OPEN | HIGH | — | 2026-11-03 | held red: suite manifest-check self-test red at 84acebdc on the daily… |
+| [TOOL-dCalibratedLens-52](../builds/dCalibratedLens/BACKLOG.md) | OPEN | HIGH | — | 2026-11-03 | held red: suite upgrade-walk red at 84acebdc on the daily held job, run… |
+| [TOOL-dCalibratedLens-53](../builds/dCalibratedLens/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | CHECK 24 READS A SPEC TITLE'S FOREIGN ID AS A ROSTER UNIT. The… |
+| [TOOL-dCalibratedLens-54](../builds/dCalibratedLens/BACKLOG.md) | OPEN | HIGH | — | 2026-11-03 | held red: suite unattended driver selftest shard 4/8 red at 2c50ab31 on… |
+| [TOOL-dCalibratedLens-55](../builds/dCalibratedLens/BACKLOG.md) | OPEN | HIGH | — | 2026-11-03 | held red: suite unattended runlog-writer selftest red at 2c50ab31 on… |
+| [TOOL-dCalibratedLens-56](../builds/dCalibratedLens/BACKLOG.md) | OPEN | LOW | — | 2026-11-02 | run the losing test of each of the six opt-in review lenses… |
 | [TOOL-dCarriedReceipt-1](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | --review's convergence predicate is scoped to ONE run's run-state file… |
 | [TOOL-dCarriedReceipt-2](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | --review makes CONVERGED terminal for a subject (unattended.sh:3135,… |
 | [TOOL-dCarriedReceipt-3](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | a FOLD pass legitimately spans many units, and the dispatch machinery… |
@@ -421,6 +439,9 @@ Cite ids, never line numbers.
 | [TOOL-dDeclaredLoop-106](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE PER-ORDER RETURN SCHEMA IS HANDED IN A CIRCLE.… |
 | [TOOL-dDeclaredLoop-107](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | A DROPPED, INVENTED OR DOUBLED ROW STANDS ON A RECORD EDGE.… |
 | [TOOL-dDeclaredLoop-108](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | item.entry.intake'S FIXED ROW IS NEVER ARMED. TOOL-dDeclaredLoop-24 §4… |
+| [TOOL-dDeclaredLoop-109](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | DERIVE_BREAKPOINTS READS NO REVIEW.MAINTAIN. v2:1656 lists… |
+| [TOOL-dDeclaredLoop-110](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE LOOP KIT REFUSES A CADENCE STEP VALUE. TOOL-dDeclaredLoop-50 S3… |
+| [TOOL-dDeclaredLoop-111](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | REVIEW.COST WRITES NO SHAPE-RUN RECORD. TOOL-dDeclaredLoop-20 S3 only… |
 | [TOOL-dDerivedDocket-38](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/run-gates/run-selftests.sh SELECTS SUITES ONLY BY A --kit <dir>… |
 | [TOOL-dDerivedDocket-39](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | govkit's requires_if SELECTS NO KIT AT APPLY. Its one reader is… |
 | [TOOL-dDerivedDocket-40](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-16 | NO LEASE-MATRIX ROW NAMES WHO REACHES IT, AND NOTHING COUNTS ROWS… |
@@ -444,7 +465,14 @@ Cite ids, never line numbers.
 | [TOOL-dDerivedDocket-75](../builds/dDerivedDocket/BACKLOG.md) | OPEN | LOW | — | 2026-09-30 | NODE d RUNS AN ABSOLUTE core.hooksPath FROM A WRITER NOBODY KNOWS. The… |
 | [TOOL-dDerivedDocket-76](../builds/dDerivedDocket/BACKLOG.md) | OPEN | MED | — | 2026-09-30 | THE UNATTENDED KIT'S COMPENSATING CHECK IS UNPAID FOR THIS LANDING.… |
 | [TOOL-dEasedEffort-3](../builds/dEasedEffort/BACKLOG.md) | OPEN | BLOCKER | — | 2026-11-02 | inherited red: leg recall floor arms red at 529b98a4, older than the… |
-| [TOOL-dFairHearing-19](../builds/dFairHearing/BACKLOG.md) | DEFERRED | MED | TOOL-dFairHearing-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dFairHearing-41](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-03 | A LIVE SPEC OF ANOTHER BUILD CITES tools/hooks/agent-cap.js BY LINES… |
+| [TOOL-dFairHearing-42](../builds/dFairHearing/BACKLOG.md) | OPEN | MED | — | 2026-11-04 | REPLAY 1 MISSED ITS BAR IN BOTH RUNS, SO R-1 IS REOPENED WITH ITS… |
+| [TOOL-dFairHearing-49](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-05 | A LIVE SPEC OF ANOTHER BUILD OWES A LEG ITS FILES NOW TRIP.… |
+| [TOOL-dFairHearing-51](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-05 | THREE POLICY KEYS HAVE NO PLANNED READER. TOOL-dFairHearing-50 moves… |
+| [TOOL-dFairHearing-52](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | A BUILDER KILLED A PROCESS IT DID NOT START. Unit 43's builder killed… |
+| [TOOL-dFairHearing-53](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | THE ARM-LABELS JOIN REDS A SPEC BEFORE ITS ARMS EXIST.… |
+| [TOOL-dFairHearing-55](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | THE CLOSE OBSERVES NEW ARMS WITH TOOLS IT WROTE IN SCRATCH. Observing… |
+| [TOOL-dFairHearing-56](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | A HELD SUITE'S GUARD MISSES A SIBLING KIT. The hook destinations… |
 | [TOOL-dFoldedVerdict-7](../builds/dFoldedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THREE CARRIERS WERE FOUND SITTING EXACTLY ON THEIR DECLARED CEILING IN… |
 | [TOOL-dFoldedVerdict-9](../builds/dFoldedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-02 | RETIRING ANOTHER BUILD'S UNIT LEFT TWO CONSEQUENCES ON THAT BUILD'S OWN… |
 | [TOOL-dFurnishedOrders-21](../builds/dFurnishedOrders/BACKLOG.md) | DEFERRED | MED | TOOL-dFurnishedOrders-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
@@ -619,6 +647,8 @@ Cite ids, never line numbers.
 | [TOOL-dTotalRecall-104](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE MEMORY READ LIST IS RENDERED AS A SECOND BLOCK. TOOL-dTotalRecall-9… |
 | [TOOL-dTotalRecall-105](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE SHAPE-RUN KIND HAS NO ACT FORM. TOOL-dTotalRecall-11 admits only a… |
 | [TOOL-dTotalRecall-106](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE CAUSES CHECK READS NO BINDING. TOOL-dTotalRecall-19 S8's… |
+| [TOOL-dTotalRecall-107](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE ITEM BUDGET HAS NO PER-ROLE FORM. v2:1370 gives memory.item-budget… |
+| [TOOL-dTotalRecall-108](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE RECORD-KIND CHECK READS NO SERVES LINE OUTSIDE THE BUILD FOLDERS.… |
 | [TOOL-dTracedLedger-2](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aSparedSpawn's owner: memory hygiene check 23 is red at origin/main… |
 | [TOOL-dTracedLedger-3](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aOrientedCast's owner: memory hygiene check 23 is red at origin/main… |
 | [TOOL-dTrueNorth-21](../builds/dTrueNorth/BACKLOG.md) | DEFERRED | LOW | TOOL-dPinnedHandoff-2 | 2026-10-21 | TWO LIVE SPECS OF dPinnedHandoff OMIT TWO LEGS THEIR FILES TRIP. Since… |
@@ -644,6 +674,8 @@ Cite ids, never line numbers.
 | [TOOL-dUnstuckLanding-11](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | carry the kit that ships asks 3 to 10 into inCMS and NicoCares through… |
 | [TOOL-dUnstuckLanding-26](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | a gate for a merge whose resolution drops one side's hunks: for each… |
 | [TOOL-dWellOiledMachine-62](../builds/dWellOiledMachine/BACKLOG.md) | DEFERRED | MED | TOOL-dWellOiledMachine-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dWellOiledMachine-128](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE PERIOD KEY HAS NO MONTH AND NO LANDING COUNT. derive_period knows… |
+| [TOOL-dWellOiledMachine-129](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | TWO STALL AND LOOP CLASSES HAVE NO WRITER. cl-dClosedLoop-0473 trends… |
 | [TOOL-dWitnessedBar-31](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | MED | TOOL-dWitnessedBar-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dWitnessedBar-32](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-22 | 2026-10-25 | THE enforces EDGE ROW OMITS principle. PLAY-dOrderedCharter-7 S2 admits… |
 | [TOOL-dWitnessedBar-33](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-22 | 2026-10-25 | THE DOSSIERS' gate-legs CLAIMS AND THE LEGS' tests EDGES ARE ONE FACT… |

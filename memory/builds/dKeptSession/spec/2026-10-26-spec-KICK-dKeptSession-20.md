@@ -1,6 +1,6 @@
 # KICK-dKeptSession-20 — a scenario's preset slot, scoped to the builds placed under it
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 6 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 6 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0158@19d3fbd9 whole
 
@@ -13,9 +13,11 @@
 | [2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md](../build/2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-build-KICK-dKeptSession-20-deviation-201.md](../build/2026-10-26-build-KICK-dKeptSession-20-deviation-201.md) | deviation | — |
 | [2026-10-26-build-KICK-dKeptSession-20-deviation-202.md](../build/2026-10-26-build-KICK-dKeptSession-20-deviation-202.md) | deviation | — |
+| [2026-11-05-build-KICK-dKeptSession-20-deviation-203.md](../build/2026-11-05-build-KICK-dKeptSession-20-deviation-203.md) | deviation | — |
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-18 KICK-dKeptSession-25 KICK-dKeptSession-36 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
+| [2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md](../prompts/2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-7 KICK-dKeptSession-9 KICK-dKeptSession-25 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -60,9 +62,13 @@ touch, seen on two builds under scenarios with different presets.
   after `read_file_value` and before KICK-dKeptSession-2's `read_preset_value`: it answers `None`
   with no build, for a build whose transition record names no scenario, and for a `never` key;
   otherwise it reads the build's placed scenarios and their slots, in declared order, from the loop
-  kit as a subprocess, §8 F3's `slots` verb, found through the policy kit's inline
-  `resolve_kit_dir("loop", "scenario.py", here)` (`tools/policy/policy.py:1132-1169`): TOOL-dDeclaredLoop-27
-  S8's `derive_step_scenarios(build)` is a loop-kit function, and a kit imports no sibling kit. It
+  kit as a subprocess: `scenario.py slots --build <slug>`, which §8 F3 (c) has this unit add to
+  `tools/loop/scenario.py`, the file S2 already edits, calling `derive_step_scenarios` inside the loop
+  kit and printing the scenarios the build's latest transition record places, in declared order, each
+  row resolved through `extends`, as JSON, and nothing for a record naming no scenario. It is found
+  through the policy kit's inline `resolve_kit_dir("loop", "scenario.py", here)`
+  (`tools/policy/policy.py:1132-1169`): TOOL-dDeclaredLoop-27 S8's `derive_step_scenarios(build)` is a
+  loop-kit function, and a kit imports no sibling kit. It
   composes the slots in declared order, and answers an override, or else the slot preset's value
   through `derive_preset_assignment`, as `Resolution(<value>, "preset", "scenario <tag> preset <name>
   at <rev>")`, `override` in place of `preset <name>` for an override. With the loop kit not found it
@@ -92,7 +98,7 @@ touch, seen on two builds under scenarios with different presets.
 - **consumes-from** `KICK-dKeptSession-2` — `RESOLUTION_ORDER` with `read_preset_value`, ahead of which the scenario's step is inserted
 - **consumes-from** external — TOOL-dDeclaredLoop-27's scenario row (S3), its schema file, its conflict rule (S7) and `derive_step_scenarios` over the transition record's `scenario=` field (S8), reached by subprocess (§8 F3); dGroundRules' `read_revision`, `read_ordered_value`, `resolve_read`, `resolve` and `get` (TOOL-dGroundRules-2, -3)
 - **hands-off** `KICK-dKeptSession-44` — `check_scenario_policy`'s pair rule, routed through `check_preset_pairs` by the batch's S41 (id 43)
-- **hands-off** external — under §8 F3 (a), a `scenario.py slots --build <slug>` verb, an ask for dDeclaredLoop
+- **hands-off** external — dDeclaredLoop's `tools/loop/scenario.py`, the module where §8 F3 (c) places this unit's `slots --build <slug>` verb beside the loop kit's own verbs
 
 ## 4. Design
 
@@ -255,9 +261,8 @@ New arm: tools/loop/scenario.py · covers AC4 AC5 · the `loop scenario fixtures
   cost of a wait on AC1 to AC3 and AC6; (b) needs no change elsewhere but makes the policy kit an
   in-process consumer of a loop-kit function; (c) needs no parent change and no exception, but puts a
   verb this build owns on a parent's module. Recommendation (c): the fields the verb exists to carry
-  are S1's slot, and S2 already places this unit's code in that file. Open for the owner: under (a),
-  the ask the build run files is "TOOL-dDeclaredLoop-27 S8: `scenario.py slots --build <slug>` prints
-  the build's placed scenarios in declared order, each row resolved through `extends`, as JSON".
+  are S1's slot, and S2 already places this unit's code in that file. RESOLVED (owner, 2026-11-05):
+  (c) this unit adds the `slots` verb to `tools/loop/scenario.py`; no ask is filed with dDeclaredLoop.
 
 ## 9. Revision log
 
@@ -270,6 +275,9 @@ New arm: tools/loop/scenario.py · covers AC4 AC5 · the `loop scenario fixtures
   reaches the policy kit through its `slot` and `pairs` verbs, and `read_scenario_value` the loop kit
   through a `slots` verb, each by subprocess through an inline `resolve_kit_dir`, with F3 open for
   where that verb lives.
+- rev-4 · 2026-11-05 · S4 · §3 Edges · §8 F3 · F3 resolved by the owner to (c), the `slots --build
+  <slug>` verb this unit adds to `tools/loop/scenario.py`, with no ask for dDeclaredLoop, under the
+  brief `2026-11-05-prompt-KICK-dKeptSession-1-owner-forks`; no other section moved.
 
 ## 10. Reuse audit
 

@@ -35,3 +35,8 @@ Gated by the leg `python reads (a name never bound, an import outside its guard)
 reds a module its guard does not cover. A shell suite is not walked, `tools/hooks/scratch-guard.test.sh` among
 them, because a shell walker is a build of its own. For those this record stays the checklist entry, selected
 by `gotchas.py --for-paths` for a diff touching `tools/gate-legs.json`.
+
+The `policy fixtures` leg's guard trace narrows this for one leg and no further: the guard trace joins
+what the two runners hand a child, never what a child reads, so a checker's own reads stay this
+record's question (memory/builds/dFairHearing/reviews/2026-11-05-review-TOOL-dFairHearing-43-47-diff-review.md,
+ids 3, 7, 12 and 16).

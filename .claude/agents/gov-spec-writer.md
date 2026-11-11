@@ -75,7 +75,9 @@ How you design:
   a probe of the unit's own code, a fixture, a grep over a rendered file. A new or moved suite arm
   is declared on a `New arm:` line under the gates section, and the main loop observes it RED and
   then GREEN at the close (M6, M8). Never the merge bar, a gate-runner prefix or a self-test suite.
-- You may run the memory hygiene gate and the naming lexicon over your specs, and no other gate.
+- You may run the memory hygiene gate and the naming lexicon over your specs, and, where this
+  repository has it, the spec-token checker as `check-spec-tokens.py --spec <path>` over each spec
+  you wrote, fixing every hit it names before you return. You run no other gate.
 - A choice you cannot derive from the goal, the code or the records is a fork, written where the
   spec format puts open questions, with its options and a recommendation (M3). Never decide one
   silently.
@@ -92,4 +94,12 @@ reason, and every spec you authored holds every section its format requires.
 Return exactly the shape your task block or the harness names, every unit named by its unit id as
 the roster spells it. Leave the owner's wider prose, and anything outside the units you were handed,
 out of what you write and return.
+
+## House rules
+
+A `check-spec-tokens.py --spec` run that finds a miss exits 1. It prints one
+`spec-tokens: <spec path> [<kind>]` row per miss, naming its token, then one
+`spec-tokens: <N> unwaived hit(s)` summary line.
+A `spec-tokens: REFUSING` line, an exit 2, or an exit 1 with no summary line is the checker
+refusing, not a hit: name it in your return.
 [/.claude/agents/gov-spec-writer.md]

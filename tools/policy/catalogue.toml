@@ -1,7 +1,10 @@
 # catalogue.toml - the policy kit's catalogue, and the schema every key of `.governance/policy.toml`
 # is checked against. One [[key]] row per row of the design's [policies] table, in that table's
-# order, each row's `name` and `owner` that table's own. The fields and the `allowed` grammar are
-# this kit's README; the value check and the shape audit are `policy.py` beside this file.
+# order, each row's `name` and `owner` that table's own, but for `review.opt-in`, `review.unclassed`,
+# `review.twin` and the two `review.design-audit.*` rows, whose `owner` is the build their reader lands
+# in, dDeclaredLoop, and not the table's dFairHearing (TOOL-dFairHearing-50 S16). The fields and the
+# `allowed` grammar are this kit's README; the value check and the shape audit are `policy.py` beside
+# this file.
 #
 # A row with no `summary` or no `usage` is named on `unsummarised-keys.txt`, a shrink-only list:
 # write both fields on a row, then drain it with `python <this kit>/policy.py lists --write`.
@@ -427,7 +430,7 @@ name = "review.opt-in"
 allowed = { type = "set", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "named lenses, each replacing a named default lens of its preset" }
 empty = "allowed"
 default = []
-owner = "dFairHearing"
+owner = "dDeclaredLoop"
 
 [[key]]
 name = "runtime.spawn-backend"
@@ -776,13 +779,13 @@ direction = "raise-loosens"
 name = "review.design-audit.runs"
 allowed = [1, 2, 3]
 default = 2
-owner = "dFairHearing"
+owner = "dDeclaredLoop"
 
 [[key]]
 name = "review.design-audit.seed"
 allowed = ["reverted-escapes", "synthetic", "none"]
 default = "reverted-escapes"
-owner = "dFairHearing"
+owner = "dDeclaredLoop"
 
 [[key]]
 name = "review.unverified"
@@ -794,7 +797,7 @@ owner = "dDeclaredLoop"
 name = "review.unclassed"
 allowed = ["refuse", "reason", "owner-rules"]
 default = "refuse"
-owner = "dFairHearing"
+owner = "dDeclaredLoop"
 
 [[key]]
 name = "flow.route-backs"
@@ -1436,7 +1439,7 @@ owner = "dBoundRoles"
 name = "review.twin"
 allowed = ["never", "design-records", "design-and-landing", "always"]
 default = "never"
-owner = "dFairHearing"
+owner = "dDeclaredLoop"
 
 [[key]]
 name = "roles.shape-enforce"

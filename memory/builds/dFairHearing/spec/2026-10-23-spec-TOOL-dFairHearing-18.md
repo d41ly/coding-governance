@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-18 — the whole-design walk as a preset of the design audit, and its recall grade
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0085@796d40aa whole
 
@@ -12,11 +12,18 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50 |
+| [2026-11-03-build-TOOL-dFairHearing-18-1-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-18-1-builder-return.md) | journal | — |
+| [2026-11-04-build-TOOL-dFairHearing-18-1-acceptance-ledger.md](../build/2026-11-04-build-TOOL-dFairHearing-18-1-acceptance-ledger.md) | journal | — |
+| [2026-11-08-build-TOOL-dFairHearing-1-runlog-70b3ac3f.md](../build/2026-11-08-build-TOOL-dFairHearing-1-runlog-70b3ac3f.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-17 |
 | [2026-10-23-prompt-TOOL-dFairHearing-18-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-18-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-4-edge-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-4-edge-fix-brief.md) | research | TOOL-dFairHearing-4 TOOL-dFairHearing-27 TOOL-dFairHearing-25 |
+| [2026-11-02-prompt-TOOL-dFairHearing-18-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-18-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md) | research | TOOL-dFairHearing-10 TOOL-dFairHearing-22 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-1 TOOL-dFairHearing-21 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-20 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 |
 | [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 |
+| [2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md](../reviews/2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md) | diff-review | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 
 <!-- /gen:spec-records -->
 
@@ -127,7 +134,7 @@ Each refusal names its field and runs before the resume probe, the first agent. 
 keep a newline, a pipe and a backtick out of every prompt line and table cell an item or scenario
 reaches; `name` and `walks` reach prompts through `renderPromptLine`'s line-break fold. `walk` joins
 the review key's input print, since the walker prompts interpolate it. The subjects are the design
-records walked, DESIGN subjects by path (`tools/workflows/tier2-review.js:317`), and under a seeded
+records walked, DESIGN subjects by path (`SPEC_SUBJECT_PATH`, `tools/workflows/tier2-review.js:420` at `9c1a2857`), and under a seeded
 mode `repo` is the sealed copy, outside the repository.
 
 One invocation is one run (§8 F3). `review.pin` invokes the harness `runs` times, `run` 1 to `runs`,
@@ -144,7 +151,7 @@ cells, and every cell of the grid is in exactly one slice:
 | 2 | step | every scenario, through one contiguous band of steps, the steps in first-seen item order and cut so each band's item count is as even as whole steps allow |
 | 3 | diagonal | each cell whose item index plus scenario index, mod 5, is `w - 1` |
 
-Run 1 reuses `deriveChecklistShares` (`tools/workflows/tier2-review.js:907-912`), keyed by the five
+Run 1 reuses `deriveChecklistShares` (`tools/workflows/tier2-review.js:1191-1196` at `9c1a2857`), keyed by the five
 walker lens keys. Run 3 is §8 F4's. A slot whose slice is empty, as when a design has fewer than five
 scenarios, is not dispatched: it joins `skippedLenses`, whose RUN INTEGRITY clause reads, on this
 preset, as walker slots with no slice rather than as a light run.
@@ -154,7 +161,7 @@ preset, as walker slots with no slice rather than as a light run.
 Five rows in `tools/workflows/lenses.toml`, `walk-1` to `walk-5`, each a default lens of `whole-design`
 alone, of the spec-audit kind, in the row grammar TOOL-dFairHearing-13 defines. Each row's `brief`
 says only which slot it is (§8 F2). `WALK_RULES`, a constant beside `PROBE_RULES`
-(`tools/workflows/tier2-review.js:715-727`), holds what every walker is told:
+(`tools/workflows/tier2-review.js:886-898` at `9c1a2857`), holds what every walker is told:
 
 - its run's slicing and its own cells, each scenario with its `name` and `walks`;
 - open with a pre-mortem reading: the design shipped and failed in this slice, and why;
@@ -166,7 +173,7 @@ says only which slot it is (§8 F2). `WALK_RULES`, a constant beside `PROBE_RULE
   tag that carries it;
 - when seeded, the key's SHA-256, and that the key is never to be read.
 
-The walker schema is `SPEC_FINDING_SCHEMA` (`:735-760`) plus a required `walk` array, one row per
+The walker schema is `SPEC_FINDING_SCHEMA` (`:906-931`) plus a required `walk` array, one row per
 cell: `item`, `scenario`, `actor`, `needs`, `witness`, `route`, all strings; `verdict`, one of
 `holds`, `finding` or `not-on-path`; `findings`, the zero-based indexes of the row's findings in the
 walker's own `findings` array; and `reason`, for `not-on-path`. The harness maps each index to the
@@ -205,7 +212,7 @@ walk-seed mode=<seed> key-sha256=<keySha|->
 Rows run item by item in the order given, each item through the scenarios in order. A verdict reads
 `holds`, the finding ids `<R><w>-F<id>` joined by `, ` (`R` is `A`, `B` or `C` for runs 1 to 3, `w` the
 walker slot and `id` the harness's integer id, the audit's id shape), or `not on path: <reason>`. Cells
-pass through `renderCell` (`:1624-1626`). The block reaches the synthesis between `<<<WALK TABLE` and
+pass through `renderCell` (`:2023-2025`). The block reaches the synthesis between `<<<WALK TABLE` and
 `WALK TABLE>>>` marker lines, to be copied verbatim directly before the appendix; the return's
 `walkTable` holds the rows, and the copy is not verified, as the appendix's is not.
 
@@ -219,14 +226,14 @@ re-run hands the same cells, and the cells join each batch's reuse print.
 
 When the walkers raise no finding, the batch list is one cell-only batch, labelled `verify:cells`, a
 label neither batch-label scheme produces; the batches line keeps its `// gov:fixed-verifiers` receiver
-shape (`:1353`). The skeptic schema is `VERDICT_SCHEMA` (`:672-695`) plus an optional `cells` array of
+shape (`:1701`). The skeptic schema is `VERDICT_SCHEMA` (`:843-866`) plus an optional `cells` array of
 `{ cell, verdict, reason, file, where, severity }`, `verdict` either `holds` or `refuted`, used on this
 preset alone. A refuted cell becomes a finding of the lens `cell-sample`, with the skeptic's address,
 reason as its claim, and grade, its id after every walker finding's. No second skeptic judges it, so it
 is UNVERIFIED (§8 F8). `cellsSampled` and `cellsRefuted` count the cells handed and refuted, and RUN
 INTEGRITY states both.
 
-Under this preset neither clean early exit returns (`:1321-1342`, `:1654-1679`): a run with no finding
+Under this preset neither clean early exit returns (`:1665-1686`, `:2057-2082`): a run with no finding
 still samples its clean cells and still synthesizes, because the record is where the walk table lives.
 
 ### The grade
@@ -405,11 +412,14 @@ Design breakpoint asks for one, through `review.pin`.
   each prints 1, and each row names `whole-design`; over `tools/workflows/README.md` for each of `walk`,
   `walkTable`, `walkGaps`, `cellsSampled`, `cellsRefuted`, `walk-seed` and `--design-recall`, each prints
   at least 1; the args header of `tools/workflows/tier2-review.js` carries `walk:` as a key line; and
-  `sed 's/{{FANOUT_CAP}}/5/g' tools/workflows/tier2-review.template.js` piped to `diff -` against the
-  render prints nothing.
-  Red when: the template is edited and the render is not re-rendered, so the diff prints the hunk.
-  figure: the cap `5` is PINNED at base `3708a705`; read the render's own `boundedParallel` default if
-  `.agent-cap.conf` moved it.
+  the `+` and `-` lines of `git diff -U0 <unit>~1 <unit> -- tools/workflows/tier2-review.template.js`,
+  with `{{FANOUT_CAP}}` replaced by the render's own `boundedParallel` default, equal those of the
+  same diff over `tools/workflows/tier2-review.js`, where `<unit>` is this unit's commit and
+  `<unit>~1` its parent, the tree the build pass starts from.
+  Red when: the template is edited and the render is not re-rendered, so the template's diff carries
+  a line the render's lacks.
+  figure: the cap is DERIVED, read from the render's `boundedParallel` default; it is 6 at
+  `9c1a2857`, where base `3708a705` read 5.
 
 ## 7. Gates
 
@@ -483,13 +493,21 @@ New arm: tools/workflows/replay_scorer.py selftest · covers AC7 AC8 AC9 · a tw
 - rev-1 · 2026-10-23 · initial draft, from the packet's Items 18, the brief's S1, S3, S4, S10, S11, S12
   and S14, the whole-design audit's records, and the harness and replay scorer read at base `3708a705`.
 - rev-2 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-20 and TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
+- rev-3 · 2026-11-03 · §4 · §10 · every line of the harness render re-cited at `9c1a2857`, where
+  other units moved them, the subject path by symbol
+  (2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief, item 2).
+- rev-3 · 2026-11-03 · AC10 · the render-parity half compares the unit's commit with its parent, the
+  tree the build pass starts from, and no longer the whole template with `5` filled in: since base
+  `3708a705` the template carries `{{LENS_SLOTS}}` and `{{TOOL_ROOT}}` and the render's cap reads 6,
+  so today's tree reds the base compare. TOOL-dFairHearing-23's hand-off of this clause stands (same
+  brief, item 3).
 
 ## 10. Reuse audit
 
 The seams are the harness's own: the spec-audit kind and its subjects, the lens catalogue's five slots,
-`deriveChecklistShares` for run 1's deal (`tools/workflows/tier2-review.js:907-912`), the verify batches
-and their reuse print (`:1347-1370`), `renderCell` and the appendix's copy instruction for the table
-(`:1624-1635`, `:1904-1908`), and the factory's appendix reader and unscorable refusal for the grade.
+`deriveChecklistShares` for run 1's deal (`tools/workflows/tier2-review.js:1191-1196` at `9c1a2857`),
+the verify batches and their reuse print (`:1691-1720`), `renderCell` and the appendix's copy
+instruction for the table (`:2023-2035`, `:2405-2411`), and the factory's appendix reader and unscorable refusal for the grade.
 The walk's grammar, slicing and bar are the whole-design audit's instruments, carried over:
 `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-walk.py` (its `cells_of` and
 `check`) and `...-score.py`. No new agent stage, record writer or scorer.

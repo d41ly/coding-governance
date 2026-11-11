@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-1 — one exit contract with a history-derived base
 
-**Status:** DEFERRED · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 1 · advances TOOL-dScopedBuild-16
+**Status:** DEFERRED · rev-4 · 2026-11-03 · node a · Tier-2 · base f4597719 · streams tooling · order 1 · advances TOOL-dScopedBuild-16
 
 **Carries:** cl-dClosedLoop-0399@182b9f2d whole
 **Carries:** node:item.build.base
@@ -16,11 +16,19 @@
 | [2026-11-01-build-TOOL-dScopedBuild-1-deviation-12.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-deviation-12.md) | deviation | — |
 | [2026-11-01-build-TOOL-dScopedBuild-1-reuse-scout-a.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-reuse-scout-a.md) | research | TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
 | [2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md) | research | TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
+| [2026-11-03-build-TOOL-dScopedBuild-1-crosscheck-returns.md](../build/2026-11-03-build-TOOL-dScopedBuild-1-crosscheck-returns.md) | research | TOOL-dScopedBuild-7 |
+| [2026-11-03-build-TOOL-dScopedBuild-1-deviation-13.md](../build/2026-11-03-build-TOOL-dScopedBuild-1-deviation-13.md) | deviation | — |
+| [2026-11-03-build-TOOL-dScopedBuild-1-parents-crosscheck.md](../build/2026-11-03-build-TOOL-dScopedBuild-1-parents-crosscheck.md) | research | TOOL-dScopedBuild-7 |
+| [2026-11-03-build-TOOL-dScopedBuild-1-reground-returns.md](../build/2026-11-03-build-TOOL-dScopedBuild-1-reground-returns.md) | research | — |
 | [2026-11-01-prompt-TOOL-dScopedBuild-1-1-reuse-scout.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-1-reuse-scout.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dScopedBuild-1-2-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-2-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dScopedBuild-1-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-fix-brief.md) | research | TOOL-dScopedBuild-3 TOOL-dScopedBuild-6 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
 | [2026-11-01-prompt-TOOL-dScopedBuild-1-owner-stop-chain.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-owner-stop-chain.md) | research | — |
 | [2026-11-01-prompt-TOOL-dScopedBuild-1-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-spec-brief.md) | research | TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
+| [2026-11-03-prompt-TOOL-dScopedBuild-1-1-spec-reviewer.md](../prompts/2026-11-03-prompt-TOOL-dScopedBuild-1-1-spec-reviewer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dScopedBuild-1-2-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dScopedBuild-1-2-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dScopedBuild-1-parents-crosscheck.md](../prompts/2026-11-03-prompt-TOOL-dScopedBuild-1-parents-crosscheck.md) | research | TOOL-dScopedBuild-7 |
+| [2026-11-03-prompt-TOOL-dScopedBuild-1-parents-reground.md](../prompts/2026-11-03-prompt-TOOL-dScopedBuild-1-parents-reground.md) | research | — |
 | [2026-11-01-review-TOOL-dScopedBuild-1-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dScopedBuild-1-spec-audit-round1.md) | spec-audit | TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 |
 
 <!-- /gen:spec-records -->
@@ -105,8 +113,10 @@ commits introduced stands.
 - The `gates-green` arm's decision table, `INHERITED_RED` and the item map of TOOL-dDeclaredLoop-11,
   which ties `gates-green` to `item.test.verdict` and `build-complete` to `item.build.exit`: S6 puts
   the contract in the second and leaves the first as it is.
-- A file-backed transition record for `build.exit`: the executor's (TOOL-dWellOiledMachine-6). Here
-  the transition's evidence is the exit's `PASS` line and, under a mandate, `--close`'s records commit.
+- A file-backed transition record for `build.exit`: TOOL-dDeclaredLoop-3 S5's writer,
+  `write_transition`, which the `build.exit` command item reaches through the loop kit's verb `python
+  loop_transition.py record`. Here the transition's evidence is the exit's `PASS` line and, under a
+  mandate, `--close`'s records commit.
 - The landing, the lander and `push-main.sh`.
 
 ### Edges
@@ -316,6 +326,9 @@ New arm: tools/unattended/unattended.test.sh · covers AC4 AC5 AC6 AC7 · the sl
 - rev-2 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-32, TOOL-dScopedBuild-33, TOOL-dScopedBuild-35, promoted by the round-1 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-39,
   the promotions of the round-1 spec audit of units 25 to 35 (id 5).
+- rev-4 · 2026-11-03 · §3 · the `build.exit` transition record's owner in the non-goal moves from
+  TOOL-dWellOiledMachine-6 to TOOL-dDeclaredLoop-3 S5's `write_transition`, reached through `python
+  loop_transition.py record`, by the brief prompts/2026-11-03-prompt-TOOL-dScopedBuild-1-parents-reground.md
 
 ## 10. Reuse audit
 

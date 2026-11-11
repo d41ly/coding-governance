@@ -368,6 +368,10 @@ why = "gov's own rendered charter, deliberately not shipped: the playbook kit re
 path = "help/policy.md"
 why = "gov's own help page for the policy kit, deliberately not shipped: an adopter writes its own pages under its own help directory. It lies outside the declared surface, so this row narrows nothing there. It is the class selfcheck's guard taxonomy (check 7c) gives the `policy fixtures` guard line naming it, a gov-only leg (its `[[exempt_leg]]` row) whose cases read the file. TOOL-dGroundRules-79."
 
+[[exempt]]
+path = ".governance/install.json"
+why = "gov's own source-mode deploy receipt, deliberately not shipped: the deployer writes each target its own. It lies outside the declared surface, so this row narrows nothing there. It is the class selfcheck's guard taxonomy gives the `policy fixtures` guard line naming it, a gov-only leg (its `[[exempt_leg]]` row) whose fixture reads the file. TOOL-dFairHearing-47."
+
 [[exempt_leg]]
 name = "hook destinations (every declared hook path ships)"
 why = "it resolves gov's own descriptors through `<prefix>/govkit`, the deployer, which is a registry exemption itself and never travels into a target. An adopter has fragments and adopter scripts but no deployer, so this gate cannot run there at all. The protection it buys is therefore gov-side only, and that limit is the reason for this row rather than an oversight: gov is where the fragments and the descriptors are AUTHORED, so it is where a fragment naming an unshipped destination is created. TOOL-dRetiredFork-21."
@@ -690,6 +694,10 @@ why = "it runs `.githooks/pre-push.runlog.test.sh`, which `<prefix>/govkit/entri
 [[exempt_leg]]
 name = "verifier fan-out self-test"
 why = "it runs `check-verifier-fanout.test.sh`, which `<prefix>/workflows/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+
+[[exempt_leg]]
+name = "spec-audit opt-in pack self-test"
+why = "it runs `spec-audit-optin.test.sh`, which `<prefix>/workflows/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-dFairHearing-16 added the leg; TOOL-dFairHearing-23 S26."
 
 [[exempt_leg]]
 name = "tier2-review self-test"

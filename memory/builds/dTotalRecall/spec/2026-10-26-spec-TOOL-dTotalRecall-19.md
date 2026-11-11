@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-19 — every record names its cause: the door's header and edge lines, the causes and orphan checks over a legacy population
 
-**Status:** DEFERRED · rev-6 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-7 · 2026-11-05 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0230@63f11811 whole
 
@@ -16,10 +16,13 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-19-deviation-191.md](../build/2026-10-26-build-TOOL-dTotalRecall-19-deviation-191.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-19-deviation-192.md](../build/2026-10-26-build-TOOL-dTotalRecall-19-deviation-192.md) | deviation | — |
+| [2026-11-05-build-TOOL-dTotalRecall-19-deviation-193.md](../build/2026-11-05-build-TOOL-dTotalRecall-19-deviation-193.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-14 TOOL-dTotalRecall-18 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
+| [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-11 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-43 TOOL-dTotalRecall-50 TOOL-dTotalRecall-61 TOOL-dTotalRecall-70 TOOL-dTotalRecall-89 |
+| [2026-11-05-prompt-TOOL-dTotalRecall-18-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-18-owner-forks.md) | research | TOOL-dTotalRecall-18 TOOL-dTotalRecall-20 |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
 
 <!-- /gen:spec-records -->
@@ -91,8 +94,7 @@ and the memory-tree policy adapter
   with no `<path> -` legacy row, whose kind is not a root, red when it carries no `Caused-by` or one that
   does not resolve; a legacy record is never red, its cause read from its Serves unit. A record of a
   member of `TYPED_RECORD_KINDS` whose factory fields declare no `Caused-by`, which its parent's own
-  command writes, is graded as §8 F7 settles, built as its recommendation until the owner picks: its
-  cause is its Serves unit, which must resolve. Observed by AC6.
+  command writes, is graded as §8 F7 (d) picks: its cause is its Serves unit, which must resolve. Observed by AC6.
 - **S9** — The orphan check, `check_orphans(root)` in the same module: the roots are each build whose
   `README.md` is tracked at the graded tree, or whose claim ref `refs/gov/claims/<slug>` the repository
   holds (I4); a unit id is reached when its build is rooted and the README's `ids:` names it, or, for a
@@ -373,8 +375,8 @@ New arm: tools/memory-tree/gov_record.py · covers AC1 AC2 AC3 AC5 · the door's
   unit and still reached by the walk. Recommendation: (d): no parent change, no list typed here, and a
   kind whose parent later adds the field is graded on it with no edit. Under (c) the build run would
   file in dPlacedRequest's `BACKLOG.md` "add `Caused-by` to the `card`, `probe-trigger` and `probe`
-  factory fields" and in dWitnessedBar's the same for `gate-health`. Until the owner picks, this unit
-  builds as (d). Open for the owner.
+  factory fields" and in dWitnessedBar's the same for `gate-health`. RESOLVED (owner, 2026-11-05):
+  (d) the cause read from the Serves unit; no ask is filed with dPlacedRequest or dWitnessedBar.
 
 ## 9. Revision log
 
@@ -391,6 +393,9 @@ New arm: tools/memory-tree/gov_record.py · covers AC1 AC2 AC3 AC5 · the door's
   re-ground, rows 38 and 39 of `2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck.md`: the
   parents' typed kinds that declare no `Caused-by` are graded as F7 settles, and the leg is declared
   with `enforces`.
+- rev-7 · 2026-11-05 · S8 · §8 F7 · the owner resolved F7 to (d), by
+  `2026-11-05-prompt-TOOL-dTotalRecall-18-owner-forks`: a typed kind declaring no `Caused-by` is
+  graded on its Serves unit, and the (c) asks are not filed.
 
 ## 10. Reuse audit
 

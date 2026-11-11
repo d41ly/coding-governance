@@ -36,15 +36,20 @@ no verdict as **unverified**, never as refuted. `{{TOOL_ROOT}}workflows/tier2-re
 
 ## Enforcement — and where it does NOT reach
 
-The rule is mechanical, and there are TWO MODALITIES to enforce it in, because there are two ways a
-session spawns agents:
+The rule is mechanical, and each review rule has ONE home in the review kit since TOOL-dFairHearing-16,
+while `{{TOOL_ROOT}}hooks/agent-cap.js` keeps the two rules that judge the call itself:
 
-- `{{TOOL_ROOT}}hooks/agent-cap.js` on the **`Workflow`** tool call — the STATIC half. It sees the inline
-  `script` string and (when given one) reads `scriptPath` off disk. **This is the primary point** for
-  a review, because the ad-hoc review script written in a session is never a file, so no file-scoped
-  gate can see it. Measured: of the `Workflow` calls in the session that motivated this document,
-  every one passed `script` and none passed `scriptPath`.
-- The same hook on the **`Agent`** and **`Workflow`** calls — the SETTINGS half, its rule 7
+- `{{TOOL_ROOT}}workflows/check-verifier-fanout.js` — the verify-stage total and the loop markers
+  (`gov:fixed-verifiers`, `gov:fixed-writers`, `gov:sequential-agents`), the predicate below. The
+  merge-bar leg `{{TOOL_ROOT}}workflows/check-verifier-fanout.sh` runs it over every committed harness,
+  reading `MAX_VERIFIERS` and the writer bound through the hook's exports and `LENS_SLOTS` from its
+  own file.
+- `{{TOOL_ROOT}}workflows/check-review-join.js` — the ref-keyed verdict join ban, the integer key
+  above. `{{TOOL_ROOT}}workflows/check-review-join.sh` alone runs it, per script.
+- `{{TOOL_ROOT}}workflows/spec-audit-optin.js` — the spec-audit opt-in, the review kit's pack: a
+  `PreToolUse` hook on `Workflow` calls that judges each call's `args`.
+- The hook on the **`Agent`** and **`Workflow`** calls — rule 6, every agent prompt a rendered
+  handoff, and the SETTINGS half, its rule 7
   (TOOL-dGroundRules-10). How many agents run at once is the agent limit, `runtime.agents-in-flight`,
   and the harness enforces it through the two concurrency settings the policy kit renders from it,
   because the harness counts agents in flight and knows when each one ends, which a `PreToolUse` hook
@@ -55,17 +60,19 @@ session spawns agents:
   ledger that counted direct spawns until TOOL-dGroundRules-10, with its 45-minute expiry, retired
   with it: it counted claims, not agents in flight, so five idle claims refused a sixth agent and five
   claims past the expiry admitted five more.
-- `{{TOOL_ROOT}}workflows/check-verifier-fanout.sh` — a merge-bar leg over the committed harnesses. It does
-  not re-implement the static rule; it feeds each script to the hook. One predicate, two entry points.
 
-The wiring is therefore `"matcher": "Workflow|Agent"` — a list of exact strings in ONE group, not a
+The hook's wiring is `"matcher": "Workflow|Agent"` — a list of exact strings in ONE group, not a
 regular expression. `check-wiring.sh` asserts that VALUE, because a group left at `Workflow`
 alone still contains the string `agent-cap.js` and used to report the tree correctly wired.
 
 **Where enforcement does NOT reach**, stated rather than implied away:
 
-- A `Workflow({name:'…'})` run of a saved workflow supplies no source to the hook. Those workflows
-  live in `workflows/` and the merge-bar leg covers them there.
+- An inline `script` on a `Workflow` call: its verifier total and loop markers are checked at no
+  tool call, because the fan-out leg reads committed harnesses only and the ad-hoc review script
+  written in a session is never a file. Measured: of the `Workflow` calls in the session that
+  motivated this document, every one passed `script` and none passed `scriptPath`. Run a review
+  through the shipped harness, which the leg grades; a `Workflow({name:'…'})` run of a saved
+  workflow is graded where it lives, in `workflows/`, never at the call.
 - The agents a workflow script spawns INSIDE itself. MEASURED 2026-08-15 by dispatching a probe and
   asking it to report what arrived before it read anything: a sidechain agent holds no `Agent` tool
   at all — `ToolSearch` for it returns nothing — so it cannot fan out, and the arity rule has nothing
@@ -104,8 +111,8 @@ Everything else is denied: a `forEach` body containing `agent(`, a `for` / `whil
 not carry a conforming `gov:sequential-agents(<K>)` marker on its header, a `.map` / `.flatMap` /
 `Array.from` over any other receiver, and a marked line whose second argument is an expression, a
 `.length`, a parameter, or a literal above 5. The sequential marker is the one loop affordance and
-it is a CLAIM, not an exemption: the hooks kit's own `README.md` owns its grammar and the hook
-checks every
+it is a CLAIM, not an exemption: the hooks kit's own `README.md` owns its grammar and
+`check-verifier-fanout.js` checks every
 clause of it, including that exactly one awaited call sits in the marked body.
 
 **`<K>` resolves** — one definition, used by every consumer above — when it is an integer literal ≤ 5,
@@ -152,16 +159,21 @@ memory tree and a design pass is where a new surface is first decided (PLAY-aDis
 
 ## The Tier-2 pattern
 
-Dimension finders (security / correctness / data-integrity / dead-code / integration-seams) emit
-findings cited as the blob-pinned line `<path>@<sha8>:<line>` at the reviewed sha, **scoped to an immutable base SHA**, then skeptics try to REFUTE each before it
+Dimension finders, the lenses of the review kit's catalogue `{{TOOL_ROOT}}workflows/lenses.toml` in the
+preset the subject kind names, its opt-in rows included, emit findings cited as the blob-pinned line `<path>@<sha8>:<line>` at the reviewed sha, **scoped to an immutable base SHA**, then skeptics try to REFUTE each before it
 is recorded. Feed the finders the security model, the open asks on the files under review — the
 rows `gen_build_index.py --asks --json --path <every path the diff touches>` prints, ranked by
 severity and capped, with `--limit 0` lifting the cap, or the backlog shards when its `mode` field
 says `shards` — and what is by-design, so they hunt NEW issues instead of re-reporting known ones.
 
-Default configuration: **3–6 primed finder lenses → batched default-refute skeptics within the
+Default configuration: **five primed finder lens slots on either kind → batched skeptics within the
 hook's declared bound → one
-synthesis pass**; three phases, find → verify → synthesize. The ready-made harness is
+synthesis pass**; three phases, find → verify → synthesize. Five is the slot count the verifier
+fan-out leg holds every marked lens literal to, `LENS_SLOTS` in
+`{{TOOL_ROOT}}workflows/check-verifier-fanout.sh`, and an opt-in lens swaps a slot rather than adding
+one. A skeptic that cannot establish a finding either way refutes it when its finder graded it
+medium or low, and answers uncertain when the finder graded it blocker or high, so a costly finding
+stays outstanding rather than lost. The ready-made harness is
 `{{TOOL_ROOT}}workflows/tier2-review.js` (`Workflow` with `{name:'tier2-review'}` or `{scriptPath}`); it
 takes a structured `args` object and REFUSES a prose string, because defaulting the review root to
 the process cwd twice made it audit a repository nobody had briefed it on.
@@ -171,23 +183,26 @@ On a spec subject each BLOCKER or HIGH item also lists the unit ids its fix woul
 read-only `Plan` type, which holds no Write tool, so it writes no result file and a resume reuses
 nothing: a re-run dispatches every judge again (TOOL-aMendedFleet-93). A run that passes
 `workerType: 'none'` spawns its judges with the charter loaded, and each Writes its result to
-`<git-common-dir>/review-lenses/<key>/find-<lens>.json` or `verify-<first id>-<last id>.json`
+`<git-common-dir>/review-lenses/<key>/find-<lens>.json` or `verify-batch-<n>.json`
 BEFORE it returns, and all three schemas require its `path`. The key is the kind, the round, the
 pinned subject and a print of the inputs, so a re-run with identical args reuses every file that
 carries it and dispatches only what is missing. A run where a lens, a batch or the synthesis
 returned nothing exits `deferred-platform`, naming the `pending` labels and no blocker count:
 re-run it once, and hold on a second.
 
-- **Precision — confirmed / (confirmed + refuted) — is the #1 token lever.** Below 0.5, tighten the
+- **Precision — (confirmed + merged) / (confirmed + merged + refuted), a same-batch duplicate of a
+  confirmed finding counted as merged — is the #1 token lever.** Below 0.5, tighten the
   scope before adding agents. Measured on the review that produced this document: 18 / 20.
   It tunes a review and ends no chain: a spec audit's chain stops on the derived verdict the build
   method states.
 - **Match intensity to target richness.** Heavy multi-lens review earns its tokens on fresh, complex
   write paths; over already-hardened code it manufactures defence-in-depth noise. Review light, or
   skip.
-- **Scale a large fresh surface by adding LENSES, not skeptics.** Coverage is what more agents buy;
-  precision saturates. The lens allowance is the same number as everything else here, and
-  `{{TOOL_ROOT}}hooks/agent-cap.js` holds it as `MAX_LENSES` — it
+- **Scale a large fresh surface by choosing LENSES, not adding skeptics.** Coverage is what
+  different lenses buy; precision saturates. Every run fills the five lens slots above on either
+  kind, and an opt-in lens from the catalogue swaps a slot rather than adding one. The array-literal
+  allowance the fan-out leg reads beside the slot count is the same number as everything else here,
+  and `{{TOOL_ROOT}}workflows/check-verifier-fanout.js` holds it as `LENS_SLOTS` — it
   briefly read as 6, which was never a decision: the hook counted a trailing comma as an element, so
   every prettier-formatted 5-lens array measured 6 and the constant had been raised to fit the error.
   Ratified at 5 by the owner once the miscount was found.
@@ -217,6 +232,6 @@ on one unescaped backslash and regenerating whole.
   `SessionStart`-shaped injection was observed — recorded as not-observed rather than as absent.
   `PreToolUse` fires there too, MEASURED 2026-09-12 on node `d`: a project-level guard on
   `Bash|PowerShell` denied a Bash command issued from inside a sidechain.
-  The cap is still enforced at the tool call rather than inside the script, but because the
-  orchestrator is where the fan-out decision is MADE — not because nothing reaches a sidechain.
+  The cap is graded over the committed harness rather than inside the running script, because the
+  orchestrator's script is where the fan-out decision is MADE — not because nothing reaches a sidechain.
 [/memory/guides/REVIEW-PROTOCOL.md]

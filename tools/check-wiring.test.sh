@@ -1770,6 +1770,27 @@ ck "BP2 AC12 LIVENESS ...and with one pair taken out of the list, the comparison
    "$(awk "$_kfp" "$_kfd/cw.sh" "$_kfd/cw.sh" | grep -qx 'unlisted memory-tree merge-rows.py' && echo 1 || echo 0)"
 rm -rf "$_kfd"
 
+# ---- TOOL-dFairHearing-16 AC9: the review kit's spec-audit opt-in pack, graded by the shared loop ----
+# Rule 0 left agent-cap for the review kit's spec-audit-optin.js, wired through its fragment, and the
+# scratch arm's per-fragment grading is the one function both arms call. Over THIS tree, through the
+# GOV_SETTINGS_JSON override: a copy of its settings with the pack's group removed must read UNWIRED
+# naming the pack, and the tree's own settings must read the pack ok, so the arm cannot pass on a
+# checker that reds every pack or none.
+_sao=$(mktemp -d)
+"$py" -c 'import json,sys
+d = json.load(open(sys.argv[1], encoding="utf-8"))
+d["hooks"]["PreToolUse"] = [g for g in d["hooks"]["PreToolUse"] if not any("spec-audit-optin.js" in h.get("command", "") for h in g["hooks"])]
+json.dump(d, open(sys.argv[2], "w", encoding="utf-8"), indent=2)' "$ROOT_ABS/.claude/settings.json" "$_sao/settings.json" 2>/dev/null
+out=$(cd "$ROOT_ABS" && GOV_SETTINGS_JSON="$_sao/settings.json" bash "$SCRIPT" --check 2>/dev/null)
+_re=$'(^|\n)UNWIRED  spec-audit — [^\n]*spec-audit-optin\\.js'
+_hit=0; [[ $out =~ $_re ]] && _hit=1
+ck "FH16 AC9 the pack's group removed from a settings copy -> UNWIRED naming spec-audit-optin.js" "$_hit"
+out=$(cd "$ROOT_ABS" && bash "$SCRIPT" --check 2>/dev/null)
+_re=$'(^|\n)ok       spec-audit — PreToolUse entry'
+_hit=0; [[ $out =~ $_re ]] && _hit=1
+ck "FH16 AC9 LIVENESS ...and over the tree's own settings the pack reads ok" "$_hit"
+rm -rf "$_sao"
+
 # ---- TOOL-aRepatriatedFork-19: the install RECEIPT is the first rung -----------------------------
 # An adopter that homes a kit somewhere no probe spells — the merge driver flat under `scripts/`, the
 # recall kit at `scripts/recall/`, the scratch guard in `.claude/hooks/` — got `skip … not adopted`

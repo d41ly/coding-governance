@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-26 — a build's composition pinned per step, its position read at the pin, and the move at the next step boundary
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base ed497191 · streams tooling · order 23 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base ed497191 · streams tooling · order 23 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0111@313dbc9c whole
 
@@ -13,10 +13,13 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-26-deviation-261.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-26-deviation-261.md) | deviation | — |
 | [2026-10-25-build-TOOL-dDeclaredLoop-26-deviation-262.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-26-deviation-262.md) | deviation | — |
+| [2026-11-05-build-TOOL-dDeclaredLoop-26-deviation-263.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-26-deviation-263.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-56 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-26-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-26-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dDeclaredLoop-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-3-owner-forks.md) | research | TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-56 |
+| [2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md) | research | TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
 <!-- /gen:spec-records -->
@@ -51,7 +54,8 @@ Today nothing pins a build to a composition and every reader takes the landed ti
   settles: in place when `rev` is `HEAD`'s commit, and otherwise in a scratch worktree detached at
   `rev`, so every read the composition makes at `HEAD` reads the pin. A `population` that is a reader
   command runs in that worktree, its `{prefix}` resolved there, and a glob is matched over its files.
-  How the loop kit reaches `compose_rows`, a sibling kit's function, is §8 F5. TOOL-dDeclaredLoop-7's
+  How the loop kit reaches `compose_rows`, a sibling kit's function, is §8 F5's pick: the `compose`
+  verb asked of dOrderedCharter, run as a subprocess. TOOL-dDeclaredLoop-7's
   engine, `derive_position` in `tools/loop/position.py`, reads its definition
   rows through `compose_at` at that revision, never at the tip, for every item inside the step.
   Observed by AC1.
@@ -78,13 +82,18 @@ Today nothing pins a build to a composition and every reader takes the landed ti
   `composition` field; `read_step_composition` then returns `HEAD`'s commit with the state `unpinned`,
   and the build's next transition pins. Observed by AC6.
 - **S8** — The fixture: `python tools/loop/composition.py --fixture --plant <case>` builds a scratch
-  repository with two commits of a loop definition, a build's transition record and its witnesses,
-  for the plants `rename`, `ended`, `split`, `policy-rename` and `unpinned`, each run against its
-  expected observation by `--fixture` alone; the leg `loop composition fixtures` in
-  `tools/gate-legs.json`, argv `python {prefix}/loop/composition.py --fixture`, carrying
-  `enforces = ["principle.p8"]` (dOrderedCharter-7 S2), declared in `tools/loop/kit.toml`. P8's text
-  names a build's composition "pinned per step" (v2:885-886); no principle's enforcement row cites
-  `cl-dClosedLoop-0111`. Observed by AC1 to AC6 and AC8.
+  repository with two commits of a loop definition, a build's transition record and its witnesses, for the
+  plants `rename`, `ended`, `split`, `policy-rename` and `unpinned`, each run against its expected
+  observation by `--fixture` alone; the leg `loop composition fixtures` in `tools/gate-legs.json`, argv
+  `python {prefix}/loop/composition.py --fixture`, carrying `enforces = ["principle.p8"]`
+  (dOrderedCharter-7 S2), declared in `tools/loop/kit.toml`. P8's text names a build's composition "pinned
+  per step" (v2:885-886); no principle's enforcement row cites `cl-dClosedLoop-0111`. Where the pending
+  list holds a `principle` row for that tag, this pass deletes it, as the meta-check reds it stale.
+  Observed by AC1 to AC6 and AC8.
+  **Readers:** by name: READER NOT IN TREE — the pending list and its reader, the meta-check verb of the
+  playbook kit's core.py, are minted by PLAY-dOrderedCharter-7, DEFERRED, so no tracked file spells the
+  row of `principle.p8` at this spec's base · by value: NO VALUE READERS — a pending row's value is its
+  arming build, which the meta-check prints only in its pending count.
 - **S9** — The page `help/loop.md` (TOOL-dDeclaredLoop-1 S7) gains a section on the pin: a build runs
   each step under the composition it entered it with and moves at the next boundary, and what an
   ended item and a renamed boundary file. Observed by AC7.
@@ -175,7 +184,8 @@ Live at landing: the pin only narrows what a mid-step reader sees.
 - `tools/loop/loop_transition.py`: `composition` in `TRANSITION_FIELDS`, and the move called before
   `write_transition` writes
 - `tools/loop/kit.toml`: the module and the leg declared
-- `tools/gate-legs.json`: the leg `loop composition fixtures`
+- `tools/gate-legs.json`: the leg `loop composition fixtures`, its `enforces` holding `principle.p8`
+- `tools/playbook/core-pending.txt`: the stale `principle` row of S8's tag, where it holds one
 - `help/loop.md`: the section of S9
 
 ### Alternatives rejected
@@ -239,7 +249,9 @@ Live at landing: the pin only narrows what a mid-step reader sees.
   it finds the section naming the `composition` field, `item-ended` and `policy-renamed`.
   Red when: the pin ships and the page still says a build reads the landed tip.
 - **AC8** — When `python -m json.tool gate-legs.json` runs in the tools folder, the row named
-  `loop composition fixtures` carries `enforces` holding `principle.p8`.
+  `loop composition fixtures` carries `enforces` holding `principle.p8`, and
+  `python tools/playbook/core.py meta-check` on this unit's pass exits 0, naming neither that leg nor a
+  stale pending row.
   Red when: the leg carries no `enforces`, which dOrderedCharter-7 S3's meta-check reds.
 
 ## 7. Gates
@@ -287,8 +299,10 @@ New arm: tools/loop/composition.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · the `loo
   declared import row on `tools/loop/kit.toml` naming playbook, in the shape of
   `tools/memory-tree/kit.toml:8`'s `requires_if` rows, with its reason. (b) is the rule's precedent
   exception, but it keeps the loop kit bound to the playbook module's names. Recommendation: (a), since
-  F4 already runs one process per pin. The ask the build run would file is that verb. OPEN for the
-  owner.
+  F4 already runs one process per pin. RESOLVED (owner, 2026-11-05): (a) the `compose` verb ask. The
+  build run files in dOrderedCharter's `BACKLOG.md` the ask for "a `compose` verb on
+  `tools/playbook/overlay_rows.py` printing `compose_rows`' five returns for each registered kind as
+  JSON".
 
 ## 9. Revision log
 
@@ -303,6 +317,11 @@ New arm: tools/loop/composition.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · the `loo
   composition revision is `HEAD` (unit 46 S1); a reader-command population runs in the pin's worktree;
   a pin is composed in a worktree detached at it (F4); the policy read, F5 and AC8 follow the
   sibling-kit and leg facts of `prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md`.
+- rev-4 · 2026-11-05 · S3 S8 · §4 Files touched · AC8 · §8 F5 · the owner resolved F5 to (a), the
+  `compose` verb ask, per the brief `2026-11-05-prompt-TOOL-dDeclaredLoop-3-owner-forks`; S3 names the
+  subprocess route. TOOL-dDeclaredLoop-56 §8 F5 (a), per the brief
+  `2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade`: the leg keeps `principle.p8`; S8 takes
+  the stale pending row of its tag, and AC8 observes the core meta-check green.
 
 ## 10. Reuse audit
 

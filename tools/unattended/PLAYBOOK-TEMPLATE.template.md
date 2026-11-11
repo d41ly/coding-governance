@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.113 -->
+<!-- gov:kit unattended@1.118 -->
 [memory/guides/PLAYBOOK-TEMPLATE.md · Level 3 · Read before writing a playbook a recipe run follows; yields to levels 0 to 2]
 # The playbook template — the canon a playbook is written from
 

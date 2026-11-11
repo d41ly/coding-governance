@@ -1,4 +1,118 @@
 {
+  "effort": {
+    "default": {
+      "roles": {
+        "gov-builder": "high",
+        "gov-diff-reviewer": "medium",
+        "gov-orienter": "high",
+        "gov-researcher": "medium",
+        "gov-reuse-scout": "medium",
+        "gov-skeptic": "medium",
+        "gov-spec-reviewer": "medium",
+        "gov-spec-writer": "high",
+        "gov-synthesizer": "high"
+      },
+      "stages": {
+        "build": {
+          "builder": "high"
+        },
+        "closing-review": {
+          "diffFinder": "medium",
+          "skeptic": "medium",
+          "synthesis": "high"
+        },
+        "spec-review": {
+          "skeptic": "medium",
+          "specFinder": "medium",
+          "synthesis": "medium"
+        },
+        "spec-write": {
+          "builder": "high",
+          "disposal": "high",
+          "skeptic": "medium",
+          "specFinder": "medium",
+          "specWriter": "high",
+          "synthesis": "medium"
+        }
+      }
+    },
+    "harnesses": {
+      "tools/workflows/tier2-review.js": [
+        "closing-review",
+        "spec-review"
+      ],
+      "tools/workflows/unattended-build.js": [
+        "spec-write"
+      ],
+      "tools/workflows/unattended-unit.js": [
+        "build"
+      ]
+    },
+    "profiles": {
+      "fable": {
+        "match": [
+          "fable"
+        ],
+        "roles": {
+          "gov-builder": "medium",
+          "gov-diff-reviewer": "medium",
+          "gov-orienter": "medium",
+          "gov-researcher": "medium",
+          "gov-reuse-scout": "medium",
+          "gov-skeptic": "medium",
+          "gov-spec-reviewer": "medium",
+          "gov-spec-writer": "medium",
+          "gov-synthesizer": "medium"
+        },
+        "stages": {
+          "build": {
+            "builder": "medium"
+          },
+          "closing-review": {
+            "diffFinder": "medium",
+            "skeptic": "medium",
+            "synthesis": "medium"
+          },
+          "spec-review": {
+            "skeptic": "medium",
+            "specFinder": "medium",
+            "synthesis": "medium"
+          },
+          "spec-write": {
+            "builder": "medium",
+            "disposal": "medium",
+            "skeptic": "medium",
+            "specFinder": "medium",
+            "specWriter": "medium",
+            "synthesis": "medium"
+          }
+        }
+      }
+    },
+    "unset": {
+      "build": {
+        "builder": "high"
+      },
+      "closing-review": {
+        "diffFinder": "medium",
+        "skeptic": "medium",
+        "synthesis": "high"
+      },
+      "spec-review": {
+        "skeptic": "medium",
+        "specFinder": "medium",
+        "synthesis": "high"
+      },
+      "spec-write": {
+        "builder": "high",
+        "disposal": "high",
+        "skeptic": "medium",
+        "specFinder": "medium",
+        "specWriter": "high",
+        "synthesis": "high"
+      }
+    }
+  },
   "gates": {
     "manifest": "tools/gate-legs.json"
   },
@@ -62,7 +176,8 @@
       "agent": true,
       "gates": [
         "memory hygiene",
-        "lexicon naming predicates"
+        "lexicon naming predicates",
+        "spec tokens (a spec's own names resolve)"
       ],
       "workflow": "spec-write",
       "writes": "spec"

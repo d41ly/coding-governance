@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.155 -->
+<!-- gov:kit memory-tree@2.157 -->
 [{{MEMORY_ROOT}}/guides/ANNOTATION-STYLE.md · Level 3 · Read before a code comment cites a record; yields to levels 0 to 2]
 # Annotation style — what a code comment that cites a record must carry
 

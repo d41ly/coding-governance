@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-17 — each review round's state, computed by the harness and carried in its record
 
-**Status:** DEFERRED · rev-4 · 2026-11-02 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-5 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0084@b793fdd5 whole
 
@@ -11,11 +11,18 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dFairHearing-17-deviation-171.md](../build/2026-10-23-build-TOOL-dFairHearing-17-deviation-171.md) | deviation | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50 |
+| [2026-11-03-build-TOOL-dFairHearing-17-1-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-17-1-builder-return.md) | journal | — |
+| [2026-11-04-build-TOOL-dFairHearing-17-1-acceptance-ledger.md](../build/2026-11-04-build-TOOL-dFairHearing-17-1-acceptance-ledger.md) | journal | — |
+| [2026-11-08-build-TOOL-dFairHearing-1-runlog-70b3ac3f.md](../build/2026-11-08-build-TOOL-dFairHearing-1-runlog-70b3ac3f.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-amend-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-amend-fix-brief.md) | research | TOOL-dFairHearing-1 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-repin-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-repin-brief.md) | research | TOOL-dFairHearing-1 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-18 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-18 |
+| [2026-11-02-prompt-TOOL-dFairHearing-17-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-17-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md) | research | TOOL-dFairHearing-10 TOOL-dFairHearing-22 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-1 TOOL-dFairHearing-21 TOOL-dFairHearing-15 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 |
 | [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-18 |
+| [2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md](../reviews/2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md) | diff-review | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 
 <!-- /gen:spec-records -->
 
@@ -25,7 +32,7 @@
 or `CEILING`, against the round before from that round's blocker and high count, at the `roundLimit`
 its caller passes. The state reaches the harness's return as `roundState` and the review record as one
 `review-round` line. Today only the unattended driver's `review_state` computes it
-(`tools/unattended/unattended.sh:12610-12618`), from blockers alone, so an attended review, a promotion
+(`review_state`, `tools/unattended/unattended.sh:12764-12772` at `9c1a2857`), from blockers alone, so an attended review, a promotion
 chain or a follow-up round has no rule (`gap-review-21`).
 
 ## 2. Scope (IN)
@@ -47,7 +54,8 @@ chain or a follow-up round has no rule (`gap-review-21`).
   suite's leg guard in `tools/gate-legs.json`. Observed by AC6, AC8.
 - **S6** — the args header of the harness and the return-field list in `tools/workflows/README.md`
   name the two arguments, the two return fields and the record line. Observed by AC7.
-- **S7** — the comment at `tools/workflows/unattended-build.template.js:1675-1678`, which says no JS can
+- **S7** — the comment at `tools/workflows/unattended-build.template.js:1771-1774` (at `9c1a2857`;
+  :1675-1678 at base), which says no JS can
   compute a round's state, rewritten to name the harness's `roundState` and the parity arm, in the
   template and its render. Observed by AC9.
 - **S8** — the suite arm the `New arm:` line in §7 declares. Observed by AC1, AC2, AC3, AC4, AC5, AC6
@@ -94,28 +102,28 @@ deriveRoundState(priorCounts, count, roundLimit)      round = priorCounts.length
   otherwise                                         -> CONVERGING
 ```
 
-This is `review_state`'s order (`tools/unattended/unattended.sh:12610-12618`): zero first, then the
+This is `review_state`'s order (`tools/unattended/unattended.sh:12764-12772` at `9c1a2857`): zero first, then the
 non-decrease test against the round before, then the ceiling, then the bound. The driver's runaway
-ceiling (`RUNAWAY_CEILING="8"`, `:774`) becomes one run past the caller's limit, and its bound becomes
+ceiling (`RUNAWAY_CEILING="8"`, `:911`) becomes one run past the caller's limit, and its bound becomes
 the limit itself. A flat sequence and an oscillating one stop at the first round that does not fall,
 because the test compares against the round before and never against a round further back. A strictly
 falling sequence reads `BOUNDED` at the round equal to the limit and `CEILING` one run past it.
 `CONVERGING`, the non-terminal state, is the driver's fifth token, kept by §8 F4.
 
-The function lives in the prelude, beside `renderShapeLine` (`tools/workflows/tier2-review.js:78-83`),
+The function lives in the prelude, beside `renderShapeLine` (`tools/workflows/tier2-review.js:80-85` at `9c1a2857`),
 so the suite's extraction (`tools/workflows/tier2-review.test.sh:70-81`) and a scratch slice reach it.
 
 ### The count
 
 `roundCount` is the number of confirmed findings whose binding grade is blocker or high:
-`verifiedCounts.blocker + verifiedCounts.high`, the counts built at `tools/workflows/tier2-review.js:1639-1644`
+`verifiedCounts.blocker + verifiedCounts.high`, the counts built at `tools/workflows/tier2-review.js:2042-2047`
 and printed as the review-shape line's `blocker=` and `high=` fields. It is known before the synthesis
 runs, so the record line can carry the state, and it is untouched by the tally fault that nulls
-`blockers` and `highs` (`:1973-1979`). §8 F2 settles this against the synthesis's adjudicated items.
+`blockers` and `highs` (`:2527-2535`). §8 F2 settles this against the synthesis's adjudicated items.
 
 ### The arguments
 
-Beside `priorFindings` and `round` (`tools/workflows/tier2-review.js:293-296`):
+Beside `priorFindings` and `round` (`tools/workflows/tier2-review.js:396-399`):
 
 - `roundLimit`: absent reads as `null`; otherwise a JavaScript integer of 1 or more, else refused
   naming `roundLimit`. With `null`, `BOUNDED` and `CEILING` cannot be reached, and one log line says so
@@ -130,22 +138,23 @@ Beside `priorFindings` and `round` (`tools/workflows/tier2-review.js:293-296`):
   nothing: `roundState` is `null` and a WARNING before the first agent names `priorCounts` (§8 F6).
 
 Neither argument reaches a lens or skeptic prompt, so neither joins the review key's input print
-(`tools/workflows/tier2-review.js:949-992`), and a resumed run still reuses its lens files.
+(`deriveReviewKey` and the comment above it, `tools/workflows/tier2-review.js:1233-1289`), and a resumed run still reuses its lens files.
 
 ### The returns
 
-Every return carries `roundState` and `roundCount` beside `round` (`tools/workflows/tier2-review.js:2068`):
+Every return carries `roundState` and `roundCount` beside `round` (`tools/workflows/tier2-review.js:2731`). Lines are at `9c1a2857`; each row names the
+exit by its `return`, so a later unit's shift moves a line and never the exit:
 
 | Exit | Lines | `roundCount` | `roundState` |
 |---|---|---|---|
-| every lens dead | `:1301-1320` | `null` | `null` |
-| no finding raised, complete | `:1321-1342` | `0` | the rule over 0 |
-| no finding raised, deferred | `:1321-1342` | `null` | `null` |
-| every finding refuted, complete | `:1654-1679` | `0` | the rule over 0 |
-| every finding refuted, deferred | `:1654-1679` | `null` | `null` |
-| partial fan | `:1687-1708` | `null` | `null` |
-| synthesis ran | `:2015-2080` | the count | the rule |
-| synthesis died | `:2015-2080` | `null` | `null` |
+| every lens dead | `:1645-1664` | `null` | `null` |
+| no finding raised, complete | `:1665-1686` | `0` | the rule over 0 |
+| no finding raised, deferred | `:1665-1686` | `null` | `null` |
+| every finding refuted, complete | `:2057-2082` | `0` | the rule over 0 |
+| every finding refuted, deferred | `:2057-2082` | `null` | `null` |
+| partial fan | `:2090-2111` | `null` | `null` |
+| synthesis ran | `:2664-2748` | the count | the rule |
+| synthesis died | `:2664-2748` | `null` | `null` |
 
 `roundState` is also `null` wherever §8 F6's missing `priorCounts` applies. `roundCount` stays an
 integer there, so a caller can still pass it on as the next round's prior count.
@@ -159,7 +168,7 @@ review-round round=<n> limit=<n|-> prior=<c1,c2,…|-> count=<n> state=<STATE|->
 `renderRoundLine` renders it from `round`, `roundLimit`, `priorCounts`, `roundCount` and `roundState`,
 a `-` standing for an absent value, never a `0`. It is computed once, before the synthesis, from the
 same `roundState` the final return carries. The synthesis prompt hands it between `<<<ROUND` and
-`ROUND>>>` marker lines, after the review-shape block (`tools/workflows/tier2-review.js:1902-1903`), with
+`ROUND>>>` marker lines, after the review-shape block (`tools/workflows/tier2-review.js:2397-2398`), with
 the instruction to copy it verbatim, alone on its line, directly below the review-shape line. A
 `review-round` line is what `record-kind.review` gains: every record a synthesis writes states its
 round's state, attended or not.
@@ -167,7 +176,7 @@ round's state, attended or not.
 ### The parity arm
 
 `tools/workflows/tier2-review.test.sh` reads the memory-tree kit's generator already
-(`tools/workflows/tier2-review.test.sh:244-260`), and its leg guards that path
+(`tools/workflows/tier2-review.test.sh:374-390` at `9c1a2857`), and its leg guards that path
 (`tools/gate-legs.json`, leg `tier2-review self-test`). The new arm slices `review_state()` and the
 `RUNAWAY_CEILING=` line from `tools/unattended/unattended.sh`, evaluates them in bash, and compares the
 token each prints with `deriveRoundState` over every sequence of 0 to 3 prior counts, each 0 to 3, a
@@ -177,7 +186,7 @@ tokens appears at least once, so a slice that matched nothing cannot pass. A dri
 or sliced fails the arm; it never skips.
 
 The domain stops at the limit on purpose. Past it the driver refuses the round outright
-(`tools/unattended/unattended.sh:12762-12765`) where the harness reports `CEILING`, so the two answer
+(`tools/unattended/unattended.sh:13041-13047` at `9c1a2857`) where the harness reports `CEILING`, so the two answer
 different questions there and the arm says so in its header.
 
 `{prefix}/unattended/unattended.sh` joins that leg's `guard` list in `tools/gate-legs.json`, so a
@@ -221,13 +230,13 @@ copy.
 ### Alternatives rejected
 
 - **Derive the prior counts from `priorFindings`.** BUILD-METHOD M8 passes round N only the blockers
-  the fold fixed as `priorFindings` (`memory/guides/BUILD-METHOD.md:255-257`), a subset, and the
+  the fold fixed as `priorFindings` (`memory/guides/BUILD-METHOD.md:259-261`), a subset, and the
   argument carries one round, never the sequence. A count derived from it would be wrong by design.
 - **Have the synthesis agent compute and write the state.** The harness already counts what an agent
-  was trusted to count and could not (`tools/workflows/tier2-review.js:1879-1888`). A rule the
+  was trusted to count and could not (`tools/workflows/tier2-review.js:2362-2371`). A rule the
   harness computes cannot drift that way.
 - **Append the state to the review-shape line.** That line's grammar is fixed and documented
-  (`tools/workflows/README.md:288-301`). A separate line adds a field to the record without moving a
+  (`tools/workflows/README.md:485-502` at `9c1a2857`). A separate line adds a field to the record without moving a
   line any reader parses.
 
 ## 5. Production-readiness checklist
@@ -275,7 +284,7 @@ copy.
   evaluated `round` is 3.
   Red when: the length check is missing, so `round: 3` with `priorCounts: [2]` proceeds.
 - **AC5** — When a scratch AsyncFunction run of `tools/workflows/tier2-review.js`, the shape
-  `tools/workflows/tier2-review.test.sh:321-340` uses, passes `round: 3`, `priorCounts: [4, 2]` and
+  `tools/workflows/tier2-review.test.sh:451-470` uses, passes `round: 3`, `priorCounts: [4, 2]` and
   `roundLimit: 3`, and its stubs confirm one finding at grade high and refute the rest, the return
   carries `roundState: 'BOUNDED'` and `roundCount: 1`, and the synthesis prompt carries
   `review-round round=3 limit=3 prior=4,2 count=1 state=BOUNDED` between the `<<<ROUND` and `ROUND>>>`
@@ -294,7 +303,7 @@ copy.
 - **AC7** — When `grep -c` runs over `tools/workflows/README.md` for each of `roundState`, `roundCount`,
   `roundLimit`, `priorCounts` and `review-round`, each prints at least 1; and the args header of
   `tools/workflows/tier2-review.js` carries `roundLimit:` and `priorCounts:` as key lines, the shape
-  `tools/workflows/tier2-review.test.sh:312` reads.
+  `tools/workflows/tier2-review.test.sh:442` reads.
   Red when: a field read off `a` is documented in prose only, so the header arm names it missing.
 - **AC8** — When `python -c` loads `tools/gate-legs.json` and prints the `guard` of the leg named
   `tier2-review self-test`, the list carries the driver's entry beside its two existing entries,
@@ -303,16 +312,19 @@ copy.
   arm under the scoped bar.
 - **AC9** — When `grep -c 'no JS can compute it'` runs over `tools/workflows/unattended-build.template.js`
   and `tools/workflows/unattended-build.js`, each prints 0 and `grep -c roundState` prints at least 1 in
-  each; and `sed 's/{{FANOUT_CAP}}/5/g'` over each template piped to `diff -` against its render prints
-  nothing, for both `tools/workflows/tier2-review.template.js` and
-  `tools/workflows/unattended-build.template.js`.
-  Red when: a template is edited and its render is not re-rendered, so the diff prints the hunk.
-  figure: the cap `5` is PINNED at base `3708a705`; read the render's own `boundedParallel` default if
-  `.agent-cap.conf` moved it.
+  each; and for each of `tools/workflows/tier2-review.template.js` and
+  `tools/workflows/unattended-build.template.js`, the `+` and `-` lines of
+  `git diff -U0 <unit>~1 <unit> -- <template>`, with `{{FANOUT_CAP}}` replaced by the render's own
+  `boundedParallel` default, equal those of the same diff over its render, where `<unit>` is this unit's commit and `<unit>~1`
+  its parent, the tree the build pass starts from.
+  Red when: a template is edited and its render is not re-rendered, so the template's diff carries a
+  line the render's lacks.
+  figure: the cap is DERIVED, read from the render's `boundedParallel` default; it is 6 at
+  `9c1a2857`, where base `3708a705` read 5.
 
 ## 7. Gates
 
-`tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `review-join self-test` · `verifier fan-out` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `lexicon naming predicates` · `testsuite counts (every bar self-test prints one)` · `spec tokens (a spec's own names resolve)`
+`tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `review-join self-test` · `verifier fan-out` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `policy fixtures` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `lexicon naming predicates` · `testsuite counts (every bar self-test prints one)` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 · the planted flat, oscillating, at-limit and past-limit sequences, a round 3 with a two-short prior sequence, a stub run's return and round line, and the driver parity table, each staged against the base harness, which has no deriveRoundState · FLOOR_ASSERTIONS in that suite, raised by the arms added
 
@@ -339,7 +351,7 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 
   input from its own derived rows to a value an agent hands it, against `[derive]`, and changes the
   convergence count of an unattended run from blockers to blockers and highs. That count is stated in
   the unattended verbs carrier, where `--blockers` is "THIS round's confirmed count" and CONVERGED is
-  "zero blockers" (`memory/guides/UNATTENDED-VERBS.md:778-786`), a governance-carrier change clause
+  "zero blockers" (`memory/guides/UNATTENDED-VERBS.md:839-846` at `9c1a2857`), a governance-carrier change clause
   `cl-dClosedLoop-0084` does not name, so veto 2 holds outside the grant. It also edits
   `tools/unattended/`, whose suites this landing does not read. RESOLVED (agent, 2026-10-23,
   delegated): (b), rung 3; dDeclaredLoop's convergence routing is where one rule replaces both, as
@@ -360,7 +372,7 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 
   WARNING; (b) the rule over `[]`; (c) refuse. (b) is the defect `TOOL-dCarriedReceipt-1` records: a
   sequence whose earlier rounds left no rows read `CONVERGING` because its prior count was zero
   (`memory/builds/dCarriedReceipt/BACKLOG.md:21`). (c) refuses the round-N call BUILD-METHOD M8 spells
-  today, which passes no prior counts (`memory/guides/BUILD-METHOD.md:261-266`). RESOLVED (agent,
+  today, which passes no prior counts (`memory/guides/BUILD-METHOD.md:265-270`). RESOLVED (agent,
   2026-10-23, delegated): (a), rung 3.
 - **F7 — The new arguments, return fields and record line change the harness's public surface; does
   the build's grant cover them?** The clause names the round state in the review report, and
@@ -378,27 +390,39 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 
 - rev-3 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-20 and TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
 - rev-4 · 2026-11-02 · §3 · the chain rule points at M4's derived verdict, the precision floor having left
   M4, for the owner's 2026-11-01 ruling (TOOL-dFoldedAudit-8).
+- rev-5 · 2026-11-03 · §7 · the leg line adds `policy fixtures`, whose guard §4's
+  `tools/workflows/unattended-build.template.js` and `tools/gate-legs.json` trip
+  (2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief, item 1).
+- rev-5 · 2026-11-03 · §1 · S7 · §4 · §8 · §10 · every line of the harness, its suite, the driver,
+  the build harness, the kit README and the two guides re-cited at `9c1a2857`, where other units
+  moved them; the exit table's rows named by their `return` (same brief, item 2).
+- rev-5 · 2026-11-03 · AC9 · the render-parity half compares the unit's commit with its parent, the
+  tree the build pass starts from, and no longer the whole template with `5` filled in: since base
+  `3708a705` the templates carry `{{LENS_SLOTS}}` and `{{TOOL_ROOT}}` and the render's cap reads 6,
+  so today's tree reds the base compare. TOOL-dFairHearing-23's hand-off of this clause stands (same
+  brief, item 3).
 
 ## 10. Reuse audit
 
-The seam is the driver's rule, `review_state` (`tools/unattended/unattended.sh:12594-12618`), whose
+The seam is the driver's rule, `review_state` (`tools/unattended/unattended.sh:12748-12772` at
+`9c1a2857`), whose
 order and terminal tokens the harness function takes over unchanged, its bound and ceiling re-read as
 the caller's limit; the parity arm keeps the two from drifting. The record line follows the review-shape
-line's pattern, a pure renderer (`tools/workflows/tier2-review.js:78-83`) handed to the synthesis between
-markers (`:1902-1903`), and the count is the `verifiedCounts` tally the shape line already prints
-(`:1639-1644`). The argument checks sit in the prelude the suite extracts, in the shape `intensity` uses
-(`:213-217`). No new parser, counter or record writer.
+line's pattern, a pure renderer (`tools/workflows/tier2-review.js:80-85` at `9c1a2857`) handed to the
+synthesis between markers (`:2397-2398`), and the count is the `verifiedCounts` tally the shape line
+already prints (`:2042-2047`). The argument checks sit in the prelude the suite extracts, in the shape
+`intensity` uses (`:252-256`). No new parser, counter or record writer.
 
 `python tools/codebase-map/reuse_lookup.py "compute whether a review round converged from the prior
 rounds blocker counts"` ranked `review_state` (`tools/unattended/unattended.sh`) and
 `derive_review_exit` (`tools/runlog/model.py:577`); the second only reads the driver's recorded exit
 token back out of a row and computes nothing, so it is no seam for this rule.
 `python tools/memory-recall/query.py` returned `memory/guides/UNATTENDED-VERBS.md`'s strictly-smaller
-rule (`:778-786`) and the `TOOL-aProbedUnit-6` brief's test order, which agree with source; `TOOL-dCarriedReceipt-1`,
+rule (`:839-846`) and the `TOOL-aProbedUnit-6` brief's test order, which agree with source; `TOOL-dCarriedReceipt-1`,
 whose defect §8 F6 avoids; and `TOOL-dCarriedReceipt-2`, which cites the terminal-round refusal at
 `unattended.sh:3135`, a line number that has gone stale: the refusal is at
-`tools/unattended/unattended.sh:12762-12765` today. One source disagrees with this unit once built:
-`tools/workflows/unattended-build.template.js:1675-1678` says no JS can compute a round's state, which
+`tools/unattended/unattended.sh:13041-13047` at `9c1a2857`. One source disagrees with this unit once
+built: `tools/workflows/unattended-build.template.js:1771-1774` says no JS can compute a round's state, which
 S7 rewrites.
 
 Recall terms used: review_state CONVERGED NON-CONVERGENT BOUNDED CEILING RUNAWAY_CEILING REVIEW_ROUNDS strictly smaller blocker count round

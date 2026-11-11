@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-6 — the role index and agent files beyond every worker's reach, a tree with no index refused, `role-sha` compared at spawn
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 9 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 9 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0171@efd80f4f whole
 
@@ -14,11 +14,13 @@
 | [2026-10-26-build-TOOL-dBoundRoles-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-spec-fix-return.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-26-build-TOOL-dBoundRoles-6-deviation-61.md](../build/2026-10-26-build-TOOL-dBoundRoles-6-deviation-61.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-6-deviation-62.md](../build/2026-10-26-build-TOOL-dBoundRoles-6-deviation-62.md) | deviation | — |
+| [2026-11-05-build-TOOL-dBoundRoles-6-deviation-63.md](../build/2026-11-05-build-TOOL-dBoundRoles-6-deviation-63.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-9 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-25 TOOL-dBoundRoles-43 TOOL-dBoundRoles-60 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-6-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-6-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks.md) | research | TOOL-dBoundRoles-3 TOOL-dBoundRoles-20 TOOL-dBoundRoles-22 TOOL-dBoundRoles-43 |
 | [2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-1 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-2 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 |
 
 <!-- /gen:spec-records -->
@@ -39,8 +41,9 @@ from").
   the index names is refused for every writer, a role agent and the main loop alike, its line naming
   `render_agents.py --write` as the one writer. An adopter's own file under `.claude/agents/`, named
   by no index row, keeps today's verdict. TOOL-dDeclaredLoop-2 S10's policy-path arm in the same
-  function denies a write to a listed path naming `policy_edit.py`; which arm answers the two render
-  entries is §8 F4. Observed by AC1.
+  function denies a write to a listed path naming `policy_edit.py`; this step runs before that arm and
+  answers the two render entries, and that arm passes over any path under them, the ask §8 F4 files in
+  dDeclaredLoop's `BACKLOG.md`. Observed by AC1.
 - **S2** — Out of reach at the commit, extending TOOL-dGroundRules-6: `tools/policy/guarded-paths.txt`
   gains `.claude/roles.json` and `.claude/agents/`, and the minimal guard `tools/policy/guard.py
   --staged` gains one admitted shape for them: every staged path under those two that the staged index
@@ -134,12 +137,12 @@ refuses, as any guarded change does without its shape.
 
 The pre-commit block runs TOOL-dDeclaredLoop-2's verdict, `tools/loop/guard.py --staged`, for an
 agent's commit. Its guard-self step comes first and refuses a change to the list file under every value
-(its S3, `floor.guard-self` on). The value's rule then decides a staged render with the shape holding:
+(its S3, `floor.guard-self` on). A staged render with the shape holding is then decided:
 
 | `policy-file.guard` | A staged render, the shape holding |
 |---|---|
 | `owner-only` (default) | admitted: the verdict's agent arm is the minimal guard, run as a subprocess (its S1), and this row answers |
-| `agents-with-reason`, `agents-within-mandate` | refused: each admits only a change to `.governance/policy.toml` (its §4 "The verdict"), so the row is never consulted; §8 F5 |
+| `agents-with-reason`, `agents-within-mandate` | admitted: after guard-self and before the value's rule, the verdict answers a guarded touch set lying wholly under the two render lines by the minimal guard, the ask §8 F5 files in dDeclaredLoop's `BACKLOG.md`, and this row answers |
 
 ### Data model
 
@@ -281,9 +284,10 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC4 AC5 · a handoff rendered b
   arm answers both entries and names `policy_edit.py`, which cannot write a render. (c) names a door
   that refuses, and (b) widens a landed unit's file format for one door. (a) changes only the order in
   one function both units edit, but changes what dDeclaredLoop's arm and its AC14 arm see.
-  Recommendation (a). Open for the owner: the ask the build run files is "TOOL-dDeclaredLoop-2 S10:
-  the policy-path arm passes over a path under `.claude/roles.json` or `.claude/agents/`, which the
-  roles arm before it answers".
+  Recommendation (a). RESOLVED (owner, 2026-11-05): (a) step 5a first, the policy-path arm passing
+  over the render lines. The ask the build run files in dDeclaredLoop's `BACKLOG.md` is
+  "TOOL-dDeclaredLoop-2 S10: the policy-path arm passes over a path under `.claude/roles.json` or
+  `.claude/agents/`, which the roles arm before it answers".
 - **F5 — How is a true re-render admitted under `agents-with-reason` and `agents-within-mandate`?**
   TOOL-dDeclaredLoop-2's verdict admits under either value only a change to `.governance/policy.toml`
   with its change record, so S2's row is never consulted there and every agent re-render is refused.
@@ -293,8 +297,10 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC4 AC5 · a handoff rendered b
   fixture case beside that unit's; (c) under the two values a re-render is the owner's terminal
   commit. (c) stalls every role change in a tree whose owner chose the looser values. (a) and (b)
   build the same step; (a) keeps the verdict's table and its fixture in the unit that owns them, and
-  (b) needs no parent change but grows that table from a later build. Recommendation (a). Open for
-  the owner: the ask the build run files is "TOOL-dDeclaredLoop-2 §4 The verdict: a guarded touch set
+  (b) needs no parent change but grows that table from a later build. Recommendation (a). RESOLVED
+  (owner, 2026-11-05): (a) the minimal guard answering a render-only touch set under every value. The
+  ask the build run files in dDeclaredLoop's `BACKLOG.md` is "TOOL-dDeclaredLoop-2 §4 The verdict: a
+  guarded touch set
   lying wholly under `.claude/roles.json` and `.claude/agents/` is answered by the minimal guard under
   every value of `policy-file.guard`".
 
@@ -308,6 +314,10 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC4 AC5 · a handoff rendered b
   row 15: the pre-commit verdict is `tools/loop/guard.py --staged`; the list's two lines are the
   owner's terminal commit, since guard-self refuses an agent's; the shape is stated per
   `policy-file.guard` value; F4 (the policy-path arm) and F5 (the two looser values) open for the owner.
+- rev-4 · 2026-11-05 · S1 · §4 The guard's admitted shape · §8 F4, F5 · the owner resolved F4 and F5 to
+  (a), by `2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks`: step 5a answers the two render entries before the
+  policy-path arm, and the two looser values admit a true re-render, each the ask the build run files in
+  dDeclaredLoop's `BACKLOG.md`.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-29 — the five escaped-quote arms of the hook's suite checked by name, at their home and gone from the old one
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,22 +9,30 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dFairHearing-29-deviation-291.md](../build/2026-10-23-build-TOOL-dFairHearing-29-deviation-291.md) | deviation | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50 |
+| [2026-11-03-build-TOOL-dFairHearing-29-1-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-29-1-builder-return.md) | journal | — |
+| [2026-11-04-build-TOOL-dFairHearing-29-1-acceptance-ledger.md](../build/2026-11-04-build-TOOL-dFairHearing-29-1-acceptance-ledger.md) | journal | — |
+| [2026-11-08-build-TOOL-dFairHearing-1-runlog-70b3ac3f.md](../build/2026-11-08-build-TOOL-dFairHearing-1-runlog-70b3ac3f.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50 |
 | [2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md) | research | TOOL-dFairHearing-28 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 |
 | [2026-10-23-prompt-TOOL-dFairHearing-29-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-29-1-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dFairHearing-29-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-29-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-16-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-16-fix-brief.md) | research | TOOL-dFairHearing-16 TOOL-dFairHearing-22 TOOL-dFairHearing-26 TOOL-dFairHearing-28 |
+| [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 | [2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md) | spec-audit | TOOL-dFairHearing-28 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 |
+| [2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md](../reviews/2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md) | diff-review | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
 The round-3 spec audit's finding id 1 (item H1, HIGH,
-`memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md`) is
-closed. `TOOL-dFairHearing-26`'s S1 and AC1 say the census population holds the escaped-quote array
-arm, while its pinned counts hold only the reading that drops every escaped-quote label. Its members
-and its counts therefore disagree, and a probe tuned to the counts drops 5 arms. This unit names
-those five arms by their source bytes and checks each one by name: present in the base population,
-at its home at this unit's commit, and gone from the hook's suite. A count cannot stand in for a
-named member, so no pinned total can hide one.
+`memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md`)
+is closed. `TOOL-dFairHearing-26`'s S1 and AC1 said the census population holds the escaped-quote
+array arm, while its pinned counts, until its rev-3, held only the reading that drops every
+escaped-quote label. Its members and its counts therefore disagreed, and a probe tuned to the counts
+drops 5 arms. This unit names those five arms by their source bytes and checks each one by name:
+present in the base population, at its home at this unit's commit, and gone from the hook's suite. A
+count cannot stand in for a named member, so no pinned total can hide one.
 
 ## 2. Scope (IN)
 
@@ -32,7 +40,9 @@ named member, so no pinned total can hide one.
   `tools/hooks/agent-cap.test.sh` at lines 874, 959, 985, 988 and 1063. Each is a `rule0` label that
   holds an escaped quote. A member check reads each label from its pinned line by an escape-aware
   scan with no regex, so no quoting layer can fold it, and refuses a line whose label is not such a
-  member. §4 gives the script. Observed by AC1 and AC3.
+  member. §4 gives the script. Re-measured at `8b2b995f` on 2026-11-03, the suite
+  `TOOL-dFairHearing-16` starts its move from: the same five labels, byte for byte, at lines 993,
+  1078, 1104, 1107 and 1182, so the base lines stay the pin. Observed by AC1 and AC3.
 - **S2** — Placement by name. At this unit's commit each member is spelled in
   `tools/workflows/spec-audit-optin.test.sh` (the pack's suite) and none in
   `tools/hooks/agent-cap.test.sh` (the hook's suite). A member the move left behind, or one spelled in
@@ -47,7 +57,7 @@ named member, so no pinned total can hide one.
 
 - No totals. The population's size is `TOOL-dFairHearing-28`'s mechanism, finding id 11. This unit
   checks named members only, so the two hold independently.
-- No rule-5 member: no rule-5 label at base holds an escaped quote.
+- No rule-5 member: no rule-5 label holds an escaped quote, at base or at `8b2b995f`.
 - No change to what a moved arm asserts, as unit 26 §3 states.
 - No permanent arm in a suite, by unit 26 §8 F1. No help page: `help/` covers no suite.
 
@@ -70,6 +80,12 @@ Measured at `3708a705` on 2026-10-23, PINNED. The five labels, as their source b
 | 985 | `rule0/U7: conf SPEC_AUDIT_DEFAULT=\"yes\" → deny naming the key, not a date` |
 | 988 | `rule0/U7: conf SPEC_AUDIT_DEFAULT=\"\" (blank) → the README deny, unchanged` |
 | 1063 | `rule0/aWardedAudit-6: harness reviewDir \"\" → placed in builds/tSA, the live run denies` |
+
+Re-measured on 2026-11-03, PINNED, by a script file running §4's `label()` scan over
+`git show 8b2b995f:tools/hooks/agent-cap.test.sh`: the labels at :993, :1078, :1104, :1107 and :1182
+equal the table's rows, each 119 lines below its base line, and they are the only escaped-quote
+labels in the census there. The check keeps reading base's lines through `git show 3708a705:`, so
+neither the move nor a later edit of the suite shifts its input.
 
 Each sits under `check_spec_audit`. The folded reading that produced unit 26's 66 drops exactly these
 five, as the audit's ids 1 and 11 measured.
@@ -140,7 +156,8 @@ Each changes only where AC2 finds a member left behind or missing.
 - **AC1** — When `python members.py 3708a705` runs, it prints five `member` lines, at :874, :959,
   :985, :988 and :1063, each label holding `\"` and equal to §4's table row, and exits 0.
   Red when: the scan ends a label at its first escaped quote, so a member prints truncated.
-  figure: the line numbers are PINNED, measured at `3708a705` on 2026-10-23.
+  figure: the line numbers are PINNED, measured at `3708a705` on 2026-10-23; at `8b2b995f` the same
+  labels sit 119 lines lower (§4 Evidence).
 - **AC2** — When `python members.py 3708a705` runs at this unit's commit with the hook's suite and the
   pack's suite as its two paths (S2 names the files), it prints no `home`, `gone` or `not a member`
   line and exits 0.
@@ -169,6 +186,11 @@ none
   of specs 4, 14, 25, 26 and 27.
 - rev-2 · 2026-10-23 · §3 · the round-4 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-36 (six minors);
   S2's move sentence and AC2 are superseded there.
+- rev-3 · 2026-11-03 · S1 · §3 · §4 · AC1 · the five members re-measured at `8b2b995f` by a script
+  file: the same labels at :993, :1078, :1104, :1107 and :1182, and no rule-5 member there either, so
+  the base lines stay the pin (fix brief 2026-11-03-prompt-TOOL-dFairHearing-16-fix-brief, item 5).
+- rev-3 · 2026-11-03 · §1 · the goal reads unit 26's disagreement in the past, its rev-3 having
+  re-pinned the counts to include the five members (same brief, item 5).
 
 ## 10. Reuse audit
 

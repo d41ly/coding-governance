@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-6 — the supervisor: `resume-tick.sh` grown into the executor's seam, one act session per role act, relaunch by policy, and a reconcile before the first beat
 
-**Status:** DEFERRED · rev-4 · 2026-10-29 · node a · Tier-2 · base 0689e7fa · streams tooling · order 28 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-6 · 2026-11-03 · node a · Tier-2 · base 0689e7fa · streams tooling · order 28 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0284@8ad94483 whole
 **Carries:** node:point.command-adapters
@@ -17,10 +17,16 @@
 | [2026-10-27-build-TOOL-dWellOiledMachine-6-deviation-61.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-6-deviation-61.md) | deviation | — |
 | [2026-10-28-build-TOOL-dWellOiledMachine-6-deviation-62.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-6-deviation-62.md) | deviation | — |
 | [2026-10-29-build-TOOL-dWellOiledMachine-6-deviation-63.md](../build/2026-10-29-build-TOOL-dWellOiledMachine-6-deviation-63.md) | deviation | — |
+| [2026-11-02-build-TOOL-dWellOiledMachine-6-deviation-64.md](../build/2026-11-02-build-TOOL-dWellOiledMachine-6-deviation-64.md) | deviation | — |
+| [2026-11-03-build-TOOL-dWellOiledMachine-6-deviation-65.md](../build/2026-11-03-build-TOOL-dWellOiledMachine-6-deviation-65.md) | deviation | — |
+| [2026-11-03-build-TOOL-dWellOiledMachine-6-owner-fork-returns.md](../build/2026-11-03-build-TOOL-dWellOiledMachine-6-owner-fork-returns.md) | research | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
 | [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
 | [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-90 |
 | [2026-10-29-prompt-TOOL-dWellOiledMachine-1-owner-forks.md](../prompts/2026-10-29-prompt-TOOL-dWellOiledMachine-1-owner-forks.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-54 |
+| [2026-11-02-prompt-TOOL-dWellOiledMachine-58-owner-fork.md](../prompts/2026-11-02-prompt-TOOL-dWellOiledMachine-58-owner-fork.md) | research | TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-58 |
+| [2026-11-03-prompt-TOOL-dWellOiledMachine-6-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dWellOiledMachine-6-1-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dWellOiledMachine-6-owner-fork.md](../prompts/2026-11-03-prompt-TOOL-dWellOiledMachine-6-owner-fork.md) | research | — |
 | [2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 |
 
 <!-- /gen:spec-records -->
@@ -95,14 +101,17 @@ restarted by the node tick leaves exactly one act session on the item (layer-run
 - **S6** — The reconcile before the first beat, `run_reconcile <slug> <epoch>` in `resume-tick.sh`,
   run before S2 starts a supervisor. Every `act-launch` journal line of the slug with no `act-exit` after
   it names a candidate; each candidate whose ledger row and pid `check_pid_alive` reads `yes` and whose
-  `epoch` is the lease's current epoch, read through the verb §8 F4 asks dPlacedRequest for, is adopted, passed to S1 as `--adopt <act>`, its slot
+  `epoch` is the lease's current epoch, the sixth TAB field of `--lease status build <slug>`
+  (TOOL-dPlacedRequest-34 S22), the holder verb TOOL-dTotalRecall-2 §8 F6 (a) picked and the verb
+  §8 F4 is served by, is adopted, passed to S1 as `--adopt <act>`, its slot
   reservation rebuilt by the hook TOOL-dWellOiledMachine-9 fills, and journaled `act-adopt`; every
   other live candidate has its tree killed through `run_kill_tree` (`:182`) and is journaled
   `act-killed`. So a supervisor killed while an act runs, and restarted by the tick, finds exactly one
   act session on the item. Observed by AC6.
 - **S7** — Fencing epochs. Each beat re-reads the build lease from the remote: its fleet tag and
   status through `unattended.sh --claims`, which prints fields 1 to 5 only (TOOL-dPlacedRequest-1,
-  pr1:206-208), and its epoch through the read-only verb §8 F4 asks for, since `--claims` prints no epoch. A lease whose epoch
+  pr1:206-208), and its epoch as the sixth TAB field of that same holder verb, `--lease status build
+  <slug>` (§8 F4), since `--claims` prints no epoch. A lease whose epoch
   moved past the one S1 was started with, which every take-over writes (pr1:74-75), or whose fleet
   tag names another node, makes the supervisor kill every act session it launched under the old epoch through
   `reap.py --kill <pid>` (`tools/process-monitor/reap.py:420-470`), journal `act-killed` with `reason=fenced`,
@@ -173,7 +182,7 @@ restarted by the node tick leaves exactly one act session on the item (layer-run
 - **hands-off** `TOOL-dWellOiledMachine-25` — `supervise.py`, which that unit makes the only driver
 - **hands-off** `TOOL-dWellOiledMachine-28` — `supervise.py` and `resume-tick.sh`, the seam the unattended kit dissolves into
 - **hands-off** `TOOL-dWellOiledMachine-29` — `point.command-adapters`, where `visual.capture` registers
-- **consumes-from** external — TOOL-dDeclaredLoop-7's `position.py <slug> --json` verb, TOOL-dPlacedRequest-1's lease record, `--claims` and `renews` rule and the epoch read §8 F4 asks for, and dBoundRoles' work-order renderer
+- **consumes-from** external — TOOL-dDeclaredLoop-7's `position.py <slug> --json` verb, TOOL-dPlacedRequest-1's lease record, `--claims` and `renews` rule, TOOL-dPlacedRequest-34 S22's `--lease status`, the holder verb TOOL-dTotalRecall-2 §8 F6 picked, for the lease's epoch, and dBoundRoles' work-order renderer
 
 - **hands-off** `TOOL-dWellOiledMachine-26` — `supervise.py`, whose launch S4 precedes with the announcement and whose beat S5 reads attendance at
 - **hands-off** `TOOL-dWellOiledMachine-45` — `supervise.py`, which gains the session executor and whose launches go through `admit`
@@ -336,13 +345,16 @@ New arm: tools/runtime/supervise.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 ·
   `--claims` prints fields 1 to 5, name, fleet tag, status, beat-age and verdict, and `epoch` is
   field 12 of `CLAIM_ROWS` (pr1:203-208); the `--lease` verbs print `epoch <n>` (pr1:86) but each
   writes. Options: (a) an ask to dPlacedRequest for a read-only verb over `read_claims` printing a
-  lease's `epoch`, best the same holder verb TOOL-dTotalRecall-2 §8 F6 asks dPlacedRequest for
-  (tr2:335-345), gaining the field; (b) `--lease renew` on each beat, read for its `epoch <n>` line, a
+  lease's `epoch`, best the same holder verb TOOL-dTotalRecall-2 §8 F6 asks dPlacedRequest for,
+  gaining the field; (b) `--lease renew` on each beat, read for its `epoch <n>` line, a
   write every beat that the `renews` rule does not admit; (c) parsing the lease commit's `epoch:` key
   here, a second parser of the record `read_claims` is the one parser of (pr1:71). Recommendation:
   (a), the ask the build run would file to dPlacedRequest (TOOL-dPlacedRequest-1). RESOLVED (owner,
   2026-10-29): (a) the ask to dPlacedRequest for a read-only epoch verb over `read_claims`; S6 and S7
-  read the epoch through it and build no epoch read of their own.
+  read the epoch through it and build no epoch read of their own. The verb that serves F4 is
+  TOOL-dPlacedRequest-34 S22's read-only `--lease status build <slug>`, which already prints `<epoch>`
+  as its sixth TAB field; TOOL-dTotalRecall-2 §8 F6 picked it as its holder verb on 2026-11-03, so
+  this build files no epoch row of its own.
 
 ## 9. Revision log
 
@@ -358,6 +370,15 @@ New arm: tools/runtime/supervise.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 ·
 - rev-4 · 2026-10-29 · §2 S6, S7 · §8 F4 · F4 resolved by the owner to (a), the ask to dPlacedRequest for a read-only
   epoch verb, by the brief `prompts/2026-10-29-prompt-TOOL-dWellOiledMachine-1-owner-forks.md`; S6 and
   S7 read the epoch through it.
+- rev-5 · 2026-11-02 · §2 S6, S7 · §8 F4, its F6 citation re-pointed to `tr2:337-354` · F4's ask is
+  served by TOOL-dTotalRecall-2 §8 F6 (a), the owner's pick of one holder verb printing `epoch`, by the
+  brief `prompts/2026-11-02-prompt-TOOL-dWellOiledMachine-58-owner-fork.md`; S6 and S7 read the epoch
+  through it and this build files no separate epoch row.
+- rev-6 · 2026-11-03 · §2 S6, S7 · §3 the external edge · §8 F4, its F6 citation re-pointed to
+  `TOOL-dTotalRecall-2 §8 F6` by name · F4 is served by TOOL-dPlacedRequest-34 S22's `--lease status
+  build <slug>`, whose sixth TAB field S6 compares and S7 re-reads, the holder verb TOOL-dTotalRecall-2
+  §8 F6 picked on 2026-11-03, by the brief `prompts/2026-11-03-prompt-TOOL-dWellOiledMachine-6-owner-fork.md`;
+  no fork re-opened and this build files no epoch row of its own.
 
 ## 10. Reuse audit
 

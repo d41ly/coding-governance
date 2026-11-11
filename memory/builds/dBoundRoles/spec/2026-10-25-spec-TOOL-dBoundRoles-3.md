@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-3 — the work order rendered per item, hashed into the spawn marker and bound to its act
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0168@abfd5f4f whole
 **Carries:** node:record-kind.work-order
@@ -16,12 +16,15 @@
 | [2026-10-26-build-TOOL-dBoundRoles-3-deviation-31.md](../build/2026-10-26-build-TOOL-dBoundRoles-3-deviation-31.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-3-deviation-32.md](../build/2026-10-26-build-TOOL-dBoundRoles-3-deviation-32.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-43-round1-size-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-43-round1-size-return.md) | research | TOOL-dBoundRoles-24 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 |
+| [2026-11-05-build-TOOL-dBoundRoles-3-deviation-33.md](../build/2026-11-05-build-TOOL-dBoundRoles-3-deviation-33.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-9 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-25 TOOL-dBoundRoles-43 TOOL-dBoundRoles-60 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-3-1-spec-reviewer.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-3-1-spec-reviewer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dBoundRoles-43-round1-size-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-43-round1-size-brief.md) | research | TOOL-dBoundRoles-24 TOOL-dBoundRoles-43 |
+| [2026-11-05-prompt-TOOL-dBoundRoles-3-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dBoundRoles-3-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks.md) | research | TOOL-dBoundRoles-6 TOOL-dBoundRoles-20 TOOL-dBoundRoles-22 TOOL-dBoundRoles-43 |
 | [2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-1 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-2 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 |
 
 <!-- /gen:spec-records -->
@@ -42,7 +45,8 @@ card (I12). Today the work order names no checklist item, allowance or witness k
   file found by `resolve_kit_dir("loop", "loop_lib.py", KIT_DIR)`, since a kit imports no sibling kit,
   and reading the declaration back as JSON. That unit specs no such verb: its CLI is `loop_lib.py
   --check`, which prints every item's effective declaration as text, and `--fixture` (its §5 and AC1,
-  AC2), so the verb is an ask, §8 F5. A tag the loop does not
+  AC2), so the verb is the ask the build run files in dDeclaredLoop's `BACKLOG.md`, §8 F5. A tag the
+  loop does not
   declare, an actor other than `role:<the --role slot>`, or no loop kit found refuses with exit 1 and
   writes nothing. Observed by AC1, AC2 and AC6.
 - **S2** — The five blocks, added in `render_handoff` (`tools/roles/handoff.py:312`) after the `reads`
@@ -275,8 +279,9 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC5 · an item work order spawn
   needs no parent change, but is the in-process sibling edge TOOL-dDeclaredLoop-12 §8 F5 weighs and
   recommends against. (a) is one verb over a function that already takes the item, the shape
   TOOL-dDeclaredLoop-12 F5 recommends for the same gap; its cost is
-  a wait, since AC1, AC2 and AC6 cannot pass until the verb lands. Recommendation (a). Open for the
-  owner: the ask the build run files is "TOOL-dDeclaredLoop-9: `loop_lib.py` gains `declaration --item
+  a wait, since AC1, AC2 and AC6 cannot pass until the verb lands. Recommendation (a). RESOLVED (owner,
+  2026-11-05): (a) the `declaration` verb, asked of dDeclaredLoop. The ask the build run files in
+  dDeclaredLoop's `BACKLOG.md` is "TOOL-dDeclaredLoop-9: `loop_lib.py` gains `declaration --item
   <tag> --json`, printing `resolve_item_declaration` for that item and exiting 1 for an undeclared tag".
 
 ## 9. Revision log
@@ -288,6 +293,8 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC5 · an item work order spawn
   `build/2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck.md` row 12: S1 names the verb it runs,
   `loop_lib.py declaration --item <tag> --json`, which that unit does not spec; F5, open for the owner,
   is the ask for it.
+- rev-4 · 2026-11-05 · S1 · §8 F5 · the owner resolved F5 to (a), by `2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks`: S1's
+  verb is the ask the build run files in dDeclaredLoop's `BACKLOG.md`; no design moved.
 
 ## 10. Reuse audit
 

@@ -234,6 +234,19 @@ git -C "$R" add -A >/dev/null 2>&1
 read_gate "$R"
 case "$LAST_OUT" in *"0 render(s) left out"*) good "AC9 a token value spanning a newline does not match" ;;
   *) bad "AC9 a multi-line token value matched the template: $(printf '%s' "$LAST_OUT" | tail -1)" ;; esac
+# TOOL-dFairHearing-45: a token ALONE on its line is a block, so two sites of one token fill with
+# different line counts and the render still leaves the ban; a literal edit outside the blocks puts
+# it back. RED against the rule at f4120c83, which read the token as one line and printed 0 renders.
+BK="$TMP/block"; build_source_fixture "$BK" 'A qdemo kit.'
+printf 'Head.\n{{ROWS}}\nMiddle.\n{{ROWS}}\nTail.\n' > "$BK/${PFX}qdemo/page.template.md"
+printf 'Head.\nRun %sqdemo/thing.sh by hand.\nA second row.\nMiddle.\nA third row.\nTail.\n' "$PFX" > "$BK/${PFX}qdemo/page.md"
+git -C "$BK" add -A >/dev/null 2>&1
+read_gate "$BK"
+case "$LAST_OUT" in *"1 render(s) left out"*) good "FH45 AC2 a block token's two sites fill with different line counts, and the render is left out" ;;
+  *) bad "FH45 AC2 the block render was not left out: $(printf '%s' "$LAST_OUT" | tail -2)" ;; esac
+printf 'Head.\nRun %sqdemo/thing.sh by hand.\nA second row.\nMiddle, edited.\nA third row.\nTail.\n' "$PFX" > "$BK/${PFX}qdemo/page.md"
+git -C "$BK" add -A >/dev/null 2>&1
+run_arm "FH45 AC2 ...and a literal edit outside the blocks puts it back in the population, named" "  ${PFX}qdemo/page.md:2  qdemo" 1 "$BK"
 
 # ==================== AC3 — no mode writes anything ==========================================
 for _m in --write-ratchet --rebaseline; do

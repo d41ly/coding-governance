@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-1 — the owed replays: the design-audit preset run blind at blob 767187aa, and the verdicts that flip the dark switches
 
-**Status:** DEFERRED · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-6 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0068@d09495d0 whole
 
@@ -11,6 +11,31 @@
 | [2026-10-23-build-TOOL-dFairHearing-1-departures-spec.md](../build/2026-10-23-build-TOOL-dFairHearing-1-departures-spec.md) | journal | — |
 | [2026-10-23-build-TOOL-dFairHearing-1-deviation-11.md](../build/2026-10-23-build-TOOL-dFairHearing-1-deviation-11.md) | deviation | — |
 | [2026-10-23-build-TOOL-dFairHearing-1-deviation-19.md](../build/2026-10-23-build-TOOL-dFairHearing-1-deviation-19.md) | deviation | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-1-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-1-builder-return.md) | journal | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-2-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-2-builder-return.md) | journal | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-3-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-3-builder-return.md) | journal | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-4-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-4-builder-return.md) | journal | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md) | journal | TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50 |
+| [2026-11-03-build-TOOL-dFairHearing-1-calibration.md](../build/2026-11-03-build-TOOL-dFairHearing-1-calibration.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-deviation-12.md](../build/2026-11-03-build-TOOL-dFairHearing-1-deviation-12.md) | deviation | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-known-set.md](../build/2026-11-03-build-TOOL-dFairHearing-1-known-set.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-matched-a.md](../build/2026-11-03-build-TOOL-dFairHearing-1-matched-a.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-matched-b.md](../build/2026-11-03-build-TOOL-dFairHearing-1-matched-b.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-2.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-2.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-a-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-a-return.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-a.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-a.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-b-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-b-return.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-b.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-3-synthesis-b.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-23-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-23-return.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-23.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-23.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-control-return.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-control-return.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-control.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-4-skeptic-control.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-replay-void-runs.md](../build/2026-11-03-build-TOOL-dFairHearing-1-replay-void-runs.md) | research | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-verdicts.md](../build/2026-11-03-build-TOOL-dFairHearing-1-verdicts.md) | research | — |
+| [2026-11-04-build-TOOL-dFairHearing-1-1-acceptance-ledger.md](../build/2026-11-04-build-TOOL-dFairHearing-1-1-acceptance-ledger.md) | journal | — |
+| [2026-11-04-build-TOOL-dFairHearing-25-replay-verdicts.md](../build/2026-11-04-build-TOOL-dFairHearing-25-replay-verdicts.md) | research | TOOL-dFairHearing-25 TOOL-dFairHearing-15 |
+| [2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md](../build/2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md) | journal | — |
+| [2026-11-08-build-TOOL-dFairHearing-1-runlog-70b3ac3f.md](../build/2026-11-08-build-TOOL-dFairHearing-1-runlog-70b3ac3f.md) | journal | TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-1-reuse-scout.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-1-reuse-scout.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-2-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-3-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-3-spec-writer.md) | journal | — |
@@ -24,7 +49,51 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-1-repin-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-repin-brief.md) | research | TOOL-dFairHearing-17 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md) | research | TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
+| [2026-11-02-prompt-TOOL-dFairHearing-1-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-1-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-1-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-10-skeptic.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-10-skeptic.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-11-skeptic.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-11-skeptic.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-2-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-2-fix-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-3-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-3-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-4-synthesizer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-4-synthesizer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-5-synthesizer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-5-synthesizer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-6-skeptic.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-6-skeptic.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-7-skeptic.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-7-skeptic.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-8-synthesizer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-8-synthesizer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-9-synthesizer.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-9-synthesizer.md) | journal | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-fix-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-pass-b-build-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-pass-b-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-pass-b2-build-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-pass-b2-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-23-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-23-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-23-v2-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-23-v2-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-control-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-control-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-control-v2-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-skeptic-control-v2-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-a-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-a-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-a-v2-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-a-v2-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-b-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-b-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-b-v2-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-1-replay-synthesis-b-v2-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-10-sweep-fix-brief.md) | research | TOOL-dFairHearing-10 TOOL-dFairHearing-22 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-21 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 |
+| [2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-1-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-1-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-10-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-10-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-2-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-2-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-3-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-3-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-4-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-4-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-5-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-5-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-6-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-6-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-7-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-7-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-8-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-8-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-9-researcher.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-9-researcher.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-batch1-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-batch1-brief.md) | research | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-batch2-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-batch2-brief.md) | research | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-batch3-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-batch3-brief.md) | research | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-batch4-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-batch4-brief.md) | research | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-batch5-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-batch5-brief.md) | research | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-1-ledgers-brief.md) | research | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-1-owner-accept-stop.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-1-owner-accept-stop.md) | research | — |
+| [2026-11-08-prompt-TOOL-dFairHearing-1-1-researcher.md](../prompts/2026-11-08-prompt-TOOL-dFairHearing-1-1-researcher.md) | journal | — |
+| [2026-11-08-prompt-TOOL-dFairHearing-1-arms-brief.md](../prompts/2026-11-08-prompt-TOOL-dFairHearing-1-arms-brief.md) | research | — |
 | [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
+| [2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md](../reviews/2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md) | diff-review | TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 
 <!-- /gen:spec-records -->
 
@@ -48,7 +117,9 @@ the replay's raw outputs.
   `…-build-TOOL-dFairHearing-1-known-set.md`. It opens `**Serves:** research TOOL-dFairHearing-1`,
   states `**Population:** 65 · reviewed 59 · escaped 6 · high 8`, and holds one table row per known
   defect: `| tag | address | grade | escaped |`. `tag` is the defect's slug; `address` is
-  `<record path>:[<section tag>]`, the form `extract_tag_ref` reads; `grade` is `high`, `medium` or
+  `<record path>:[<section tag>]`, the form `extract_tag_ref` reads, its tag the first `[tag]` of the
+  row's source finding which at least one confirmed finding of every round that found the defect also
+  cites (§4 The known set, §8 F6); `grade` is `high`, `medium` or
   `ungraded`; `escaped` is `yes` or `no`. Observed by AC1.
 - **S2** — `parse_known_set(text)` in the factory's `review-replay` instance, and `review_replay.py
   --known-set <src> --candidate <src> [--matched <src>]`. The reader refuses a row count or a
@@ -74,12 +145,16 @@ the replay's raw outputs.
   template's own batching code, with no agent. Its bar: A59 joins A38 in one batch, and at least 4 of
   the 8 twins meet one skeptic. Observed by AC6.
 - **S7** — Replay 3, the synthesis with twins shown: one synthesis each over runs A and B under
-  `addressTwins` `shown`. Its bar: A59 with A38 and B61 with B43 flagged, and the negative pair of
-  §4 not flagged. Observed by AC7.
+  `addressTwins` `shown`, its prompt rendered by the harness's own code from committed records
+  alone: a confirmed finding's claim, impact and fix from the run report's item holding its id, a
+  refuted finding's claim from its appendix `reason`, every other field from its appendix row (§4
+  Twins, §8 F7). Its bar: A59 with A38 and B61 with B43 flagged, and the negative pair of §4 not
+  flagged. Observed by AC7.
 - **S8** — Replay 4, aRoutedQuill #23's fix re-judged by class: one skeptic under the fix-verdict
-  switch `TOOL-dFairHearing-8` ships, over round 1's finding #23 and its fix `5b4f964d5`, and one
-  over the control fix §8 F4 selects. Its bar: #23's fix judged instance-only, the control not
-  flagged. Observed by AC8.
+  switch `TOOL-dFairHearing-8` ships, over round 1's finding #23, its claim, impact and fix read from
+  round 1's item B1, and its fix `5b4f964d5`; and one over the control fix §8 F4 selects, read from
+  its own report's item the same way. The skeptic prompt is the harness's own render (§4 Fix
+  verdict, §8 F7). Its bar: #23's fix judged instance-only, the control not flagged. Observed by AC8.
 - **S9** — The verdicts. A replay meeting its bar flips its switch's default in
   `tools/workflows/tier2-review.template.js`, re-rendered into `tools/workflows/tier2-review.js`;
   for replay 1 the flip is `review.pin` passing `design-audit` when every pinned revision is a design
@@ -119,10 +194,23 @@ the replay's raw outputs.
 The 59 reviewed rows are the `[map]` rows of
 `memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-runtime-reviews-compared.md:162-224`
 that carry a confirmed finding: every row but `prose-ceilings` and `slug-shape`, which only refuted
-findings name. A row's `address` is the first `[tag]` of the lowest-numbered confirmed finding
-`[map]` places on it, run A's ids before run B's, read from the two reports' appendices. Its grade is
-`high` for the eight defects `[numbers]` grades high (:90-98) and `medium` otherwise, since that
-instrument grades only those two (:74).
+findings name. A row's source finding is the lowest-numbered confirmed finding `[map]` places on it,
+run A's ids before run B's, read from the two reports' appendices. Its `address` is the source's
+record path and the first `[tag]` of the source's ref which at least one confirmed finding of every
+round that found the defect also cites (§8 F6). A defect one round found takes its source's first
+tag; the builder's probe found such a tag for every row both rounds found. The rule departs from the
+source's own first tag on two rows, both to `[supervise]`: `executor-map` (`[map]` :171), whose source
+A5 opens `[extend]`, which B10, run B's only finding on it, does not cite; and `inflight-count`
+(:175), whose source A8 opens `[invariants]`, which neither B12 nor B54 cites. Its grade is `high`
+for the eight defects `[numbers]` grades high (:90-98) and `medium` otherwise, since that instrument
+grades only those two (:74).
+
+`codex-events` (:186) takes `[policies]`, not `[harness]`: A22's and B13's refs spell the tag
+`[\harness]` (runtime-a report :539, runtime-b report :467), which `TAG_REF`
+(`tools/workflows/replay_scorer.py:81`) does not read, so A22's first readable tag is `[policies]`,
+which B13 also cites. No figure moves. The spelling is the reports' own and the reports are not
+edited (§3), so the build keeps `[policies]` and treats neither the row nor the reader as a defect to
+fix.
 
 The six escaped rows are the defects found after both rounds: the four the fold found (`[neither]`,
 :226-245) and the two the floor probe found
@@ -161,7 +249,11 @@ refusing each. The address check holds every pair to a cited `[tag]`, so an adju
 cross sections the finding never cited; a defect found only under a tag its finding does not cite is
 a miss. Matching by any cited tag, not only the first, is deliberate: the baseline's 46 and 45 were
 placed by reading, and a first-tag-only scorer would hold the preset to a harsher measure than the
-baseline it must match.
+baseline it must match. Under the address rule of The known set the scorer reproduces 46 and 45:
+every round that found a defect holds a confirmed finding citing its row's tag, so each `[map]`
+placement is a pair the address check admits, and neither moved row is graded high, so 6/8 and 8/8
+stand. Under the source's own first tag it would not: run B scores 43, with `executor-map` and
+`inflight-count` unmatched (`2026-11-03-build-TOOL-dFairHearing-1-1-builder-return`).
 
 ### The other three replays
 
@@ -171,11 +263,71 @@ baseline it must match.
   A38 and B61 with B43. A probe evaluates the template's prelude as the kit's review suite does,
   feeds each report's appendix rows as findings with each report's own batch count, and reads which
   pairs share a batch. Deterministic: no agent.
+  Measured on 2026-11-03 by the builder's probe over every appendix row of the five reports, each at
+  its own batch count of 5 (`2026-11-03-build-TOOL-dFairHearing-1-2-builder-return`): under `batchBy`
+  `id`, 0 of the 8 twins share a batch; under `address`, 4 of 8 (B61 with B43, aGraftedHelix #8 with
+  #14, aSightedSkeptic #7 with #11, aPairedSlots #18 with #8 and #29). A59 lands in batch 5 and A38
+  in batch 4: both are `[supervise]`, and the long `[supervise]` run is cut at a batch boundary. This
+  is data, not a change: S6's bar stands, and pass (b) records the verdict against it.
 - **Twins.** The synthesis prompt under `addressTwins: 'shown'` over each run's verified findings and
   refuted claims, one synthesizer each. The negative pair is the first same-address pair in id order
   whose two findings `[map]` places on different defects.
+  The runs' find and verify files are gone, and the appendices carry `id`, `lens`, `ref`, `severity`,
+  `skepticSeverity`, `verdict`, `reason`, `fixVerdict` and `classes`, never a claim, impact, fix or
+  evidence, so each field takes the committed source below (§8 F7). The harness's own code renders the
+  prompt: a probe drives `tools/workflows/tier2-review.js` under stub agents as `runReview` does
+  (`tools/workflows/tier2-review.test.sh:463-489`), with run B's arguments (§4 The isolation),
+  `preset` absent and `addressTwins: 'shown'`. Each finder stub returns its lens's appendix rows in
+  id order; each skeptic stub returns its batch's verdicts; the synthesis call's prompt, read from the
+  trace, is the staged input handed verbatim to one real synthesizer. The unit-spec preset's five
+  lenses (`tools/workflows/lenses.toml:53-90`) are the runs' own, in their order (runtime-a report
+  :16-21), and both appendices number rows lens by lens in that order, so the ids the harness assigns
+  (`tools/workflows/tier2-review.template.js:1513-1516`) are the appendix ids. The probe checks each
+  rendered `id=N` line's lens and ref against appendix row N, and stops on a mismatch rather than
+  renumbering.
+
+  | Field | Confirmed finding | Refuted finding |
+  |---|---|---|
+  | `file`, `where` | the appendix `ref` split at its first `:`, the inverse of the harness's `ref` (template :1515) | the same |
+  | `lens`, `severity` | the appendix `lens` and `severity` | the same |
+  | `claim` | the `What is wrong:` bullet (run A) or `What:` bullet (run B) of the report item whose heading's `(id N)` or `(ids …)` names its id, with its sub-bullets, folded to one line by `renderPromptLine` (template :1948) | the appendix `reason` |
+  | `impact` | that item's `Consequence:` bullet, folded the same way; the empty string where the item has none (6 of run A's 44 items) | the empty string: the REFUTED line renders no impact |
+  | `fix` | that item's bullet whose label opens `Fix`, its parenthetical verdict dropped, folded the same way | the empty string: the REFUTED line renders no fix |
+  | `evidence` | the empty string: neither synthesis block renders it | the same |
+  | verdict `verdict`, `reason` | the appendix `verdict` and `reason` | the same |
+  | verdict `severity` | the appendix `skepticSeverity`, absent where it reads `-` | absent |
+  | verdict `fixVerdict`, `fixNote` | the appendix `fixVerdict`; `fixNote` the empty string | the same |
+
+  The empty string, never an absent key: the CONFIRMED line interpolates `impact` raw, so an absent
+  key would print `undefined`. Every confirmed id of both runs is held by an item heading, checked on
+  2026-11-03 over both reports: 56 of 56 in run A, 57 of 57 in run B. The harness then formats them
+  itself. The CONFIRMED block (template :2056-2066) prints `- id=N [<binding grade>] lens=… <ref> —
+  <claim>`, then `impact:`, the fix line `renderFixLine` writes (:1789) and `why-real:` the verdict
+  `reason`. The REFUTED block (:2085) prints `- id=N [sev] lens=… <ref> — <claim> | refuted because:
+  <reason>`. SAME-ADDRESS PAIRS (:2087) comes from `deriveTwinPairs` over `file` and `where` (:469).
+  Under the stand-in, then, a refuted line shows its reason twice, and a confirmed line shows the
+  report's prose in place of the finder's return. §8 F7 records that departure.
 - **Fix verdict.** One skeptic per fix, handed round 1's finding and the fix's diff
-  (`ff0b3dc3..5b4f964d5` for #23), under the switch `TOOL-dFairHearing-8` ships.
+  (`ff0b3dc3..5b4f964d5` for #23), under the switch `TOOL-dFairHearing-8` ships. The harness's own
+  code renders the skeptic prompt. A probe drives `tools/workflows/tier2-review.js` as Twins does,
+  with `base` and `head` the fix's range and `fixJudge: 'class'`. The finder stub for the finding's
+  lens returns the one finding, every other finder stub returns none, and the skeptic is a real
+  agent. Its line is the template's `id=N [sev] lens=… <ref> — <claim> | impact: … | fix: …` (:1696),
+  with the harness's id 1, and the class fix question follows it (:1703-1710). #23's fields come from
+  its round-1 records (`memory/builds/aRoutedQuill/reviews/2026-10-10-review-TOOL-aRoutedQuill-1-closing-diff-round1.md`):
+  - `file` `.memory-tree.conf` and `line` 18, from its appendix `ref` (:463);
+  - `severity` `blocker` and lens `intent`, from the same row;
+  - `claim` from the `Defect:` bullet of item B1 (:73-76);
+  - `impact` from its `Impact:` bullet (:77-84);
+  - `fix` from its `Fix (judged SOUND by the skeptic):` bullet with the parenthetical dropped (:85-88);
+  - each folded by `renderPromptLine`.
+
+  The control takes the same fields from the item holding its id in its own report, by the labels
+  these three reports use: `What is wrong:`, `What:` or `Defect:` for the claim; `Consequence:` or
+  `Impact:` for the impact; a label opening `Fix` for the fix. A label its item lacks gives the empty
+  string. A control whose item holds no claim bullet under any of those labels is a divergence the
+  builder returns, not a guess. `evidence` renders on the spec kind alone (:1697), so a diff-review
+  fix never shows it. A spec-kind control passes the empty string, which renders as `-` (:1948-1951).
 
 ### Inventory
 
@@ -194,6 +346,10 @@ baseline it must match.
 - `tools/workflows/tier2-review.js`, its render
 - `tools/workflows/README.md`
 - `memory/builds/dFairHearing/build/`
+- `memory/builds/dFairHearing/build/2026-11-03-build-TOOL-dFairHearing-1-deviation-12.md`, the
+  deviation record §8 F7's `relaxes:` joins. It departs from `TOOL-dFairHearing-1@rev-5` with
+  Hand-off `spec-revised`, Cause `builder discovery` and Risk `loosening`, and its `**Bound:**`,
+  `**Tier:**` and `**Reason:**` are F7's. Pass (a) writes it.
 - `memory/builds/dFairHearing/BACKLOG.md`, only on a replay 1 miss
 
 `review.pin`'s mapping lives in the file `TOOL-dFairHearing-3`'s spec names; the build pass adds that
@@ -317,6 +473,40 @@ The record writes under `memory/builds/` owe the two recall-floor legs by the gu
   `design-audit` for design records. (b) A harness default of `design-audit` for every spec audit,
   which unit specs then also get, against the clause's "for design records" (veto 1). Recommendation
   (a). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+- **F6 — Which tag does a known row's address take when the rounds that found its defect cite
+  different tags?** The builder's probe
+  (`2026-11-03-build-TOOL-dFairHearing-1-1-builder-return`) showed the rev-4 rule, the source
+  finding's first tag, caps run B's calibration at 43/59 for any correct build: `executor-map` takes
+  `[extend]` from A5, which B10 does not cite, and `inflight-count` takes `[invariants]` from A8,
+  which B12 and B54 do not cite. (a) The first `[tag]` of the source finding which at least one
+  confirmed finding of every round that found the defect also cites. (b) An address may hold more
+  than one tag. (c) AC3's run-B figure restated as 43/59, the two-row deficit a recorded departure.
+  (c) fails AC3 as written, so veto 1 discards it. (a) and (b) both meet AC3; (b) widens the row
+  grammar `TOOL-dFairHearing-18` reuses through its hands-off edge, and `extract_tag_ref`
+  (`tools/workflows/replay_scorer.py:200-210`) returns one key, so S2's address check and that unit's
+  seeded key would each owe a follow-up. (a) leaves none open: the probe moves only those two rows,
+  both to `[supervise]`, and leaves every row a qualifying tag. Recommendation (a). Rung 3. RESOLVED
+  (agent, 2026-11-03, delegated): (a). widens: none · relaxes: none
+- **F7 — Where do replays 3 and 4 take each finding's claim, impact, fix and evidence?** The
+  builder's second return (`2026-11-03-build-TOOL-dFairHearing-1-2-builder-return`) found that the
+  runtime-a and runtime-b appendices carry none of the four. Refuted A14, A45, A46, A59 and B61
+  appear nowhere else in either report, and the runs' find and verify files are not on any node.
+  aRoutedQuill round 1's appendix row 23 likewise has only its item B1's prose. The options:
+  (a) a confirmed finding's text from the report item that holds its id, a refuted finding's claim
+  from its appendix `reason`, and #23's and the control's from their round-1 items, every other field
+  from the appendix row, with the stand-in recorded as a departure (§4 Twins, Fix verdict);
+  (b) re-run the find stage on a clone, so the harness renders real finder returns;
+  (c) judge flags from the SAME-ADDRESS PAIRS block alone, restating AC7.
+  (b) yields new findings, so the ids A59, A38, B61 and B43 that AC7 names would not exist, and AC7
+  fails. (c) fails AC7's negative-pair half as written, since claims are what tell two defects at one
+  address apart. Both fall to veto 1. (a) meets AC7 and AC8 and needs no agent beyond the four §5
+  prices. Recommendation (a). Rung 3. RESOLVED (agent, 2026-11-03, delegated): (a). The bound it
+  relaxes is weakest tier: rev-5's §4 Twins text, "over each run's verified findings and refuted
+  claims", read as the finders returned them. The carried clause names only "the synthesis with
+  twins shown" and "#23's fix re-judged by class", which the stand-in still runs. The deviation
+  record is `memory/builds/dFairHearing/build/2026-11-03-build-TOOL-dFairHearing-1-deviation-12.md`
+  (§4 Files touched). widens: none · relaxes: what replays 3 and 4 test, a synthesizer and a skeptic
+  reading report prose and the skeptic's refutation reasons in place of the finders' returns
 
 ## 9. Revision log
 
@@ -326,6 +516,15 @@ The record writes under `memory/builds/` owe the two recall-floor legs by the gu
   `2026-10-23-build-TOOL-dFairHearing-1-deviation-11`; nothing else changed.
 - rev-3 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
 - rev-4 · 2026-10-23 · §3 · the disposal of the spec audit of units 20 to 23: a hands-off edge to TOOL-dFairHearing-25, which runs replay 1 after unit 23's corrections and supersedes AC4, AC5 and AC9's replay-1 half.
+- rev-5 · 2026-11-03 · §8 F6 · a new fork on the builder's DIVERGENCE, resolved (a) by M3, per the fix brief `2026-11-03-prompt-TOOL-dFairHearing-1-fix-brief`.
+- rev-5 · 2026-11-03 · S1 · §4 The known set · the address rule becomes F6's (a), moving `executor-map` and `inflight-count` to `[supervise]`, per `2026-11-03-prompt-TOOL-dFairHearing-1-fix-brief`.
+- rev-5 · 2026-11-03 · §4 Scoring · the claim that the scorer reproduces 46 and 45 now rests on F6's rule, naming the two rows and run B's 43 under the old one, per `2026-11-03-prompt-TOOL-dFairHearing-1-fix-brief`.
+- rev-5 · 2026-11-03 · §4 The known set · `codex-events` takes `[policies]` because `TAG_REF` does not read A22's and B13's `[\harness]`; no figure moves and it is not a defect to fix, per `2026-11-03-prompt-TOOL-dFairHearing-1-fix-brief`.
+- rev-6 · 2026-11-03 · §8 F7 · a new fork on the builder's second DIVERGENCE, resolved (a) by M3 with `relaxes:` naming what replays 3 and 4 test, per the fix brief `2026-11-03-prompt-TOOL-dFairHearing-1-2-fix-brief`.
+- rev-6 · 2026-11-03 · S7 · §4 Twins · each field's committed source, the stub-driven harness render, the id check, and the empty string for what has no source, per `2026-11-03-prompt-TOOL-dFairHearing-1-2-fix-brief`.
+- rev-6 · 2026-11-03 · S8 · §4 Fix verdict · #23's fields from round 1's item B1, the control's by the same labels, and the harness's skeptic line, per `2026-11-03-prompt-TOOL-dFairHearing-1-2-fix-brief`.
+- rev-6 · 2026-11-03 · §4 Files touched · the deviation record `2026-11-03-build-TOOL-dFairHearing-1-deviation-12`, which F7's `relaxes:` joins, per `2026-11-03-prompt-TOOL-dFairHearing-1-2-fix-brief`.
+- rev-6 · 2026-11-03 · §4 Batches · replay 2's measured figures recorded as data, 0 of 8 under `id` and 4 of 8 under `address` with A59 and A38 split at a batch boundary; S6's bar is unchanged, per `2026-11-03-prompt-TOOL-dFairHearing-1-2-fix-brief`.
 
 ## 10. Reuse audit
 

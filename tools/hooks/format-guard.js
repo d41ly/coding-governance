@@ -4,7 +4,7 @@
  * final message lacks the charter's BUILD/SPEC pair, breaks rule r1, leaves a new commit unreported, or
  * leaves out the `agent` or `returned` line of an agent its turn dispatched or received.
  *
- * gov:kit agent-cap@1.42 — ships inside the hooks kit entry; the kit version is agent-cap.js's.
+ * gov:kit agent-cap@1.46 — ships inside the hooks kit entry; the kit version is agent-cap.js's.
  *
  * Contract: the spec for TOOL-aHeardState-1 under the build folder of that slug.
  *
@@ -37,6 +37,11 @@
  *     line, in its derived shape and whose text after its last ` · ` ends `/<agent-id>`
  *     (TOOL-aOrientedCast-21). Only when the fence defines both shapes; otherwise a turn that holds an
  *     agent writes one witness and requires nothing.
+ * A blocking reason also prints the lines it asks for, ready to paste (TOOL-dPavedRoad-2): a
+ * `committed` line rendered through the charter's shape from the commit's sha, the worktree's branch
+ * and the subject, and each `agent` or `returned` line `handoff.py agents` derives, run with no shell,
+ * no `--write` and the turn's own selector inside HANDOFF_BOUND_MS; a line off its shape is withheld,
+ * and any failure keeps the verb's sentence with one witness line.
  * HOW THE TURN'S AGENTS ARE READ. From the transcript the payload's `transcript_path` names: the turn
  * opens at the earliest of the last run of typed `user` records, the run-log prose reader's rule, with
  * two exceptions (TOOL-aOrientedCast-24): a compaction summary opens nothing, and neither does a meta
@@ -80,7 +85,10 @@
  * wherever it sits, a tool result before it included, so the turn splits there. The run-log prose
  * reader still opens a turn at every typed record, so the two readers differ on the two exceptions
  * above. Whether the
- * transcript format still holds: a renamed field reads as a turn with no agent, silently. Whether this hook is WIRED: check-wiring.sh and check-hook-destinations.sh own that. A
+ * transcript format still holds: a renamed field reads as a turn with no agent, silently. A derived
+ * line's field VALUES, which are the verb's. A line for an agent whose prompt carries no `gov:handoff`
+ * marker, such as a built-in agent type. A derivation the bound cut short: that agent keeps the verb's
+ * sentence. Whether this hook is WIRED: check-wiring.sh and check-hook-destinations.sh own that. A
  * broken hook never blocks a stop — every failure path is an allow, and an uncaught error exits 0.
  */
 'use strict'
@@ -97,6 +105,10 @@ const FENCE_CLOSE = '<!-- /microformats -->'
 const SIDECAR_DIR = 'format-guard'
 const SHA_MIN = 7
 const GIT_BOUND_MS = 10000
+// One budget for every `handoff.py agents` spawn of one stop, well under the harness's Stop timeout.
+const HANDOFF_BOUND_MS = 20000
+// resolve_python's launcher order, after GOV_PYTHON.
+const PYTHON_LAUNCHERS = ['python3', 'python', 'py']
 const AGENT_HEADS = ['agent', 'returned']
 const RUN_ID_RE = /^[A-Za-z0-9_-]{1,64}$/
 // The Claude Code session directory holding one subdirectory per Workflow run, not the review-harness kit.
@@ -242,18 +254,51 @@ function checkPair(rows, shapes, wantSpec) {
   return defects
 }
 
-/** The first-parent commits in prev..head, or null when prev is not an ancestor or git cannot answer. */
+/**
+ * The first-parent commits in prev..head as `[{ sha, subject }]`, or null when prev is not an ancestor
+ * or git cannot answer. One spawn, the rev-list walk with each subject beside its sha.
+ */
 function extractNewCommits(top, prev, head) {
-  const r = spawnSync('git', ['rev-list', '--first-parent', '--ancestry-path', `${prev}..${head}`], {
+  const r = spawnSync('git', ['log', '--first-parent', '--ancestry-path', '--format=%H%x1f%s', `${prev}..${head}`], {
     cwd: top, encoding: 'utf8', timeout: GIT_BOUND_MS, windowsHide: true,
   })
   if (r.status !== 0) return null
-  const shas = r.stdout.split(/\r?\n/).filter((l) => /^[0-9a-f]{40}$/.test(l))
-  return shas.length ? shas : null
+  const commits = []
+  for (const line of r.stdout.split(/\r?\n/)) {
+    const m = /^([0-9a-f]{40})\x1f(.*)$/.exec(line)
+    if (m) commits.push({ sha: m[1], subject: m[2] })
+  }
+  return commits.length ? commits : null
 }
 
-/** The commit defects: each new sha that no bare committed or merged line names by a 7+ hex prefix. */
-function checkCommitLines(rows, shapes, shas) {
+/** The worktree's branch from its HEAD file, or `HEAD`, git's own name for a detached or unreadable one. */
+function readHeadBranch(gitDir) {
+  let head = ''
+  try { head = fs.readFileSync(path.join(gitDir, 'HEAD'), 'utf8').trim() } catch { /* unreadable */ }
+  const m = /^ref:\s*refs\/heads\/(\S+)$/.exec(head)
+  return m ? m[1] : 'HEAD'
+}
+
+/**
+ * `- ` plus a charter definition with each `<name>` set to `fields[name]`: in each value ` · ` becomes
+ * `, ` and a line break a space, so no value adds a field, and an empty value becomes `unknown` —
+ * `render_shape_line`'s rule in handoff.py. Null when the definition names a field `fields` lacks.
+ */
+function renderShapeLine(def, fields) {
+  let lacking = false
+  const body = String(def).replace(/<([^<>]+)>/g, (whole, name) => {
+    if (!Object.prototype.hasOwnProperty.call(fields, name)) { lacking = true; return whole }
+    const v = String(fields[name] == null ? '' : fields[name]).replace(/\r\n|\r|\n/g, ' ').split(' · ').join(', ')
+    return v === '' ? 'unknown' : v
+  })
+  return lacking ? null : '- ' + body
+}
+
+/**
+ * `{ defects, unmet }`: one defect per new `{ sha, subject }` that no bare committed or merged line
+ * names by a 7+ hex prefix, and the commits that produced them.
+ */
+function checkCommitLines(rows, shapes, commits) {
   const named = []
   for (const r of rows) {
     if (r.fenced) continue
@@ -265,7 +310,8 @@ function checkCommitLines(rows, shapes, shas) {
     }
   }
   const checkNamed = (sha) => named.some((n) => /^[0-9a-f]+$/.test(n) && n.length >= SHA_MIN && sha.startsWith(n))
-  return shas.filter((s) => !checkNamed(s)).map((s) => `commit ${s.slice(0, 9)} is new since this session's previous stop and no bare committed or merged line names it`)
+  const unmet = commits.filter((c) => !checkNamed(c.sha))
+  return { defects: unmet.map((c) => `commit ${c.sha.slice(0, 9)} is new since this session's previous stop and no bare committed or merged line names it`), unmet }
 }
 
 /**
@@ -348,25 +394,45 @@ function readJournalAgents(sessionDir, runId) {
 }
 
 /**
- * `{ required, witnesses }`: the `{ head, agentId, why }` lines the turn owes, each pair once however
- * many routes reach it. A call's result is this turn's; a delivered notification's call may sit in an
- * earlier turn, so its result is found by the one raw transcript line carrying both its tool-use id
- * and `toolUseResult`. A notification naming any other tool requires nothing.
+ * `{ required, witnesses }`: the `{ head, agentId, why, via }` lines the turn owes, each pair once
+ * however many routes reach it, a repeated pair keeping its first `via`. A call's result is this
+ * turn's; a delivered notification's call may sit in an earlier turn, so its result is found by the
+ * one raw transcript line carrying both its tool-use id and `toolUseResult`. A notification naming any
+ * other tool requires nothing. `via` is the `handoff.py agents` selector (TOOL-dPavedRoad-2 S1):
+ * `{ run }` for a harness run, `{ handoff }` for an Agent prompt's one `gov:handoff` marker path, or
+ * null.
  */
 function extractTurnAgents(turn, transcriptText, sessionDir) {
   const required = []
   const witnesses = []
   const keys = new Set()
-  const addRequired = (head, agentId, why) => {
+  const addRequired = (head, agentId, why, via) => {
     if (typeof agentId !== 'string' || !agentId || keys.has(head + ' ' + agentId)) return
     keys.add(head + ' ' + agentId)
-    required.push({ head, agentId, why })
+    required.push({ head, agentId, why, via: via || null })
   }
   const addRun = (runId, withReturned, why) => {
     const j = readJournalAgents(sessionDir, runId)
     if (j.error) { witnesses.push(`format-guard: ${j.error}, so that run's agents are not required`); return }
-    for (const id of j.started) addRequired('agent', id, why)
-    if (withReturned) for (const id of j.ended) addRequired('returned', id, 'received')
+    for (const id of j.started) addRequired('agent', id, why, { run: runId })
+    if (withReturned) for (const id of j.ended) addRequired('returned', id, 'received', { run: runId })
+  }
+  // The prompt is the call's own input when this turn holds the call, else the result's. The marker
+  // path reaches a child process as an argument, so it is denied by default: an absolute or
+  // drive-qualified path, one holding a `..` segment on either slash, or one opening `-` gives null.
+  // agent-cap.js is required only when a prompt names the marker, so a turn with none parses nothing new.
+  const readHandoffVia = (toolUseId, r) => {
+    const input = calls.has(toolUseId) ? calls.get(toolUseId).input : null
+    const prompt = input && typeof input === 'object' && typeof input.prompt === 'string' ? input.prompt : r.prompt
+    if (typeof prompt !== 'string' || !prompt.includes('gov:handoff')) return null
+    // A missing module or export reads as no selector, never a throw: a throw here would allow the stop.
+    let marks
+    try { marks = require('./agent-cap.js').extractHandoffMarker(prompt) } catch { return null }
+    if (!Array.isArray(marks) || marks.length !== 1) return null
+    const p = marks[0].path
+    if (path.win32.isAbsolute(p) || path.posix.isAbsolute(p) || /^[A-Za-z]:/.test(p) || p.startsWith('-') ||
+        p.split(/[\\/]/).includes('..')) return null
+    return { handoff: p }
   }
   const calls = new Map()
   const results = new Map()
@@ -374,7 +440,7 @@ function extractTurnAgents(turn, transcriptText, sessionDir) {
   for (const rec of turn) {
     const content = rec.message && Array.isArray(rec.message.content) ? rec.message.content : []
     if (rec.type === 'assistant') {
-      for (const b of content) if (b && b.type === 'tool_use' && (b.name === 'Agent' || b.name === 'Workflow')) calls.set(b.id, b.name)
+      for (const b of content) if (b && b.type === 'tool_use' && (b.name === 'Agent' || b.name === 'Workflow')) calls.set(b.id, { name: b.name, input: b.input })
     } else if (rec.type === 'user' && rec.toolUseResult && typeof rec.toolUseResult === 'object') {
       for (const b of content) if (b && b.type === 'tool_result') results.set(b.tool_use_id, rec.toolUseResult)
     }
@@ -403,12 +469,13 @@ function extractTurnAgents(turn, transcriptText, sessionDir) {
     }
     return null
   }
-  for (const [id, name] of calls) {
+  for (const [id, { name }] of calls) {
     const r = results.get(id)
     if (!r) continue
     if (name === 'Agent' && typeof r.agentId === 'string') {
-      addRequired('agent', r.agentId, 'dispatched')
-      if (r.status === 'completed') addRequired('returned', r.agentId, 'received')
+      const via = readHandoffVia(id, r)
+      addRequired('agent', r.agentId, 'dispatched', via)
+      if (r.status === 'completed') addRequired('returned', r.agentId, 'received', via)
     } else if (name === 'Workflow' && r.runId != null) {
       addRun(r.runId, r.status !== 'async_launched', 'dispatched')
     }
@@ -418,26 +485,31 @@ function extractTurnAgents(turn, transcriptText, sessionDir) {
     if (!r) continue
     // A Workflow result carries `runId`, an Agent result `agentId`; any other tool's carries neither.
     if (r.runId != null) addRun(r.runId, true, 'received')
-    else if (typeof r.agentId === 'string') addRequired('returned', r.agentId, 'received')
+    else if (typeof r.agentId === 'string') addRequired('returned', r.agentId, 'received', readHandoffVia(id, r))
   }
   return { required, witnesses }
 }
 
+/** Whether a line's text after its last ` · ` ends `/<agentId>`, the agent line's own id field. */
+function checkCarries(text, agentId) {
+  const t = String(text).trimEnd()
+  const i = t.lastIndexOf(' · ')
+  return (i < 0 ? t : t.slice(i + 3)).endsWith('/' + agentId)
+}
+
 /**
- * One defect per required `{ head, agentId, why }` no row meets: a row meets it when it is not fenced,
- * starts `- <head> — `, matches that head's derived shape, and its text after its last ` · ` ends
- * `/<agentId>`.
+ * `{ defects, unmet }`: one defect per required `{ head, agentId, why }` no row meets, and the entries
+ * that produced them. A row meets one when it is not fenced, starts `- <head> — `, matches that head's
+ * derived shape, and carries the agent id (checkCarries).
  */
 function checkAgentLines(rows, shapes, required) {
-  const checkCarries = (text, agentId) => {
-    const t = text.trimEnd()
-    const i = t.lastIndexOf(' · ')
-    return (i < 0 ? t : t.slice(i + 3)).endsWith('/' + agentId)
-  }
   const defects = []
-  for (const { head, agentId, why } of required) {
+  const unmet = []
+  for (const q of required) {
+    const { head, agentId, why } = q
     const bare = rows.filter((r) => !r.fenced && r.text.startsWith(`- ${head} — `) && checkCarries(r.text, agentId))
     if (bare.some((r) => shapes[head].re.test(r.text))) continue
+    unmet.push(q)
     if (bare.length) {
       defects.push(`the ${head} line for agent ${agentId} does not match its charter shape \`${shapes[head].def}\``)
       continue
@@ -448,19 +520,105 @@ function checkAgentLines(rows, shapes, required) {
       ? `the ${head} line for agent ${agentId} is not a bare list item at column 0 (rule r1)`
       : `no ${head} line for agent ${agentId}, which this turn ${why}`)
   }
-  return defects
+  return { defects, unmet }
 }
 
-function renderBlockReason(slug, defects, shapes, withAgents) {
+/**
+ * `{ lines }`, every stdout line opening `- `, from `<launcher> -B <script> agents <selector> --session
+ * <transcriptPath>` run with no shell at the toplevel, `CLAUDE_CODE_SESSION_ID` set to `sid`; or
+ * `{ error }`. Never `--write`; `-B` writes no bytecode, so the spawn writes nothing. The launcher is
+ * GOV_PYTHON, then PYTHON_LAUNCHERS: a spawn failing ENOENT or exiting 9009, the Microsoft Store
+ * stub's exit, is passed over, and any other outcome ends the search. Each spawn gets what remains of
+ * `deadline`.
+ */
+function readHandoffLines({ script, top, sid, transcriptPath, selector, deadline }) {
+  const name = path.basename(script)
+  const pick = selector.run != null ? ['--run', String(selector.run)] : ['--handoff', String(selector.handoff)]
+  const args = ['-B', script, 'agents', ...pick, '--session', String(transcriptPath)]
+  const env = Object.assign({}, process.env, { CLAUDE_CODE_SESSION_ID: String(sid) })
+  const launchers = [process.env.GOV_PYTHON, ...PYTHON_LAUNCHERS].filter((c) => typeof c === 'string' && c)
+  for (const exe of launchers) {
+    const timeout = deadline - Date.now()
+    if (timeout <= 0) return { error: `the ${HANDOFF_BOUND_MS} ms bound was spent before ${name} agents ${pick.join(' ')} ran` }
+    const r = spawnSync(exe, args, { cwd: top, env, timeout, windowsHide: true, shell: false })
+    if ((r.error && r.error.code === 'ENOENT') || r.status === 9009) continue
+    if (r.error) return { error: `${name} agents ${pick.join(' ')} did not finish under ${exe} (${r.error.code || r.error.message})` }
+    if (r.status !== 0) {
+      const first = String(r.stderr || '').split(/\r?\n/).find((l) => l.trim()) || 'no stderr'
+      return { error: `${name} agents ${pick.join(' ')} exited ${r.status === null ? 'on ' + r.signal : r.status}: ${first.trim()}` }
+    }
+    return { lines: Buffer.from(r.stdout || '').toString('utf8').split(/\r?\n/).filter((l) => l.startsWith('- ')) }
+  }
+  return { error: `no python launcher ran ${name}: tried ${launchers.join(', ')}` }
+}
+
+/**
+ * `{ owed, witnesses }` for a blocking stop: a `committed` line per unmet commit, then per unmet agent
+ * entry, in `required` order, the first line `handoff.py agents` prints for its selector that opens
+ * `- <head> — `, carries the agent id and matches the head's shape. One run per distinct selector, all
+ * inside HANDOFF_BOUND_MS. An entry or commit with no such line adds a witness and no line, so its
+ * defect keeps the verb's sentence. The roles kit is found by agent-cap.js's resolveKitDir, required
+ * only when some entry has a selector.
+ */
+function deriveOwedLines({ agents, commits, branch, shapes, top, sid, transcriptPath }) {
+  const owed = []
+  const witnesses = []
+  for (const c of commits) {
+    const line = renderShapeLine(shapes.committed.def, { sha: c.sha.slice(0, 9), branch, subject: c.subject })
+    if (line && shapes.committed.re.test(line)) owed.push(line)
+    else witnesses.push(`format-guard: no committed line is derived for commit ${c.sha.slice(0, 9)}: the charter's committed shape renders off itself or names a field the hook does not derive`)
+  }
+  const deadline = Date.now() + HANDOFF_BOUND_MS
+  let found = { error: '' }
+  if (agents.some((q) => q.via)) {
+    try {
+      found = { script: path.join(require('./agent-cap.js').resolveKitDir('roles', 'handoff.py', __dirname), 'handoff.py') }
+    } catch (e) {
+      found = { error: (e && e.message) || String(e) }
+    }
+  }
+  const read = new Map()
+  for (const q of agents) {
+    let why
+    if (!q.via) {
+      why = 'no Workflow run id or single gov:handoff marker path names its selector'
+    } else if (!found.script) {
+      why = `handoff.py was not found: ${found.error}`
+    } else {
+      const key = q.via.run != null ? 'run ' + q.via.run : 'handoff ' + q.via.handoff
+      if (!read.has(key)) read.set(key, readHandoffLines({ script: found.script, top, sid, transcriptPath, selector: q.via, deadline }))
+      const got = read.get(key)
+      if (got.error) {
+        why = got.error
+      } else {
+        const carrying = got.lines.filter((l) => l.startsWith(`- ${q.head} — `) && checkCarries(l, q.agentId))
+        const line = carrying.find((l) => shapes[q.head].re.test(l))
+        if (line) { owed.push(line); continue }
+        why = carrying.length ? `the line handoff.py agents printed is off its charter shape` : `handoff.py agents printed no ${q.head} line for it`
+      }
+    }
+    witnesses.push(`format-guard: no ${q.head} line is derived for agent ${q.agentId}: ${why}`)
+  }
+  return { owed, witnesses }
+}
+
+/**
+ * The block reason. `withAgents` counts the agent defects: any shows the agent definitions, and the
+ * `handoff.py agents` sentence stays while `owed` derives fewer agent lines than that count. `owed`,
+ * committed lines first, is printed after the definitions, one line each, ready to paste.
+ */
+function renderBlockReason(slug, defects, shapes, withAgents, owed = []) {
+  const derived = owed.filter((l) => AGENT_HEADS.some((h) => l.startsWith(`- ${h} — `))).length
   return [
     `format-guard: this session routes build ${slug}, which LIVE.md lists as not yet terminal, and this final message breaks the charter's micro-format rules:`,
     ...defects.map((d) => `- ${d}`),
     '',
     `The definitions, from the ${FENCE_OPEN} fence of ${CHARTER_FILE}:`,
     ...['BUILD', 'SPEC', 'committed'].concat(withAgents ? AGENT_HEADS : []).map((h) => `- \`${shapes[h].def}\``),
+    ...(owed.length ? ['', 'The lines this message owes, derived for it — paste each unchanged as a bare `- ` list item at column 0:', ...owed] : []),
     '',
     'Re-send the final message so it ends with its state block: one bare `- committed — …` or `- merged — …` line per new commit, then the BUILD line with the SPEC line directly under it, each a bare `- ` list item at column 0, outside any fence.' +
-      (withAgents ? ' For each agent, paste unchanged the lines `handoff.py agents --handoff <path>` or `handoff.py agents --run <run-id>` prints.' : '') +
+      (withAgents > derived ? ' For each agent, paste unchanged the lines `handoff.py agents --handoff <path>` or `handoff.py agents --run <run-id>` prints.' : '') +
       ' This hook refuses once per turn end.',
   ].join('\n')
 }
@@ -492,7 +650,7 @@ function checkStop(data) {
   // One line per degraded outcome: two can happen in one stop, and a scalar would keep only the last.
   const witnesses = []
   // The agent arm (TOOL-aOrientedCast-21): each agent the turn dispatched or received owes its line.
-  let agentDefects = []
+  let agentGot = { defects: [], unmet: [] }
   const tp = data.transcript_path
   if (typeof tp !== 'string' || !tp) {
     witnesses.push('format-guard: the payload carries no transcript_path, so no agent line is required')
@@ -509,11 +667,12 @@ function checkStop(data) {
         const n = new Set(got.required.map((q) => q.agentId)).size
         witnesses.push(`format-guard: this turn dispatched or received ${n} agent(s), and ${CHARTER_FILE}'s micro-format fence defines no ${missing.join(' or ')} shape, so no agent line is required`)
       } else {
-        agentDefects = checkAgentLines(rows, shapes, got.required)
+        agentGot = checkAgentLines(rows, shapes, got.required)
       }
     }
   }
-  defects.push(...agentDefects)
+  defects.push(...agentGot.defects)
+  let unmetCommits = []
   const gitDir = resolveGitDir(hit)
   const head = gitDir ? readHeadSha(gitDir, common) : ''
   if (!head) {
@@ -524,9 +683,12 @@ function checkStop(data) {
     let prev = ''
     try { prev = fs.readFileSync(sidecar, 'utf8').trim() } catch { /* first armed stop */ }
     if (prev && prev !== head) {
-      const shas = extractNewCommits(hit.toplevel, prev, head)
-      if (shas) defects.push(...checkCommitLines(rows, shapes, shas))
-      else witnesses.push(`format-guard: HEAD moved from ${prev.slice(0, 9)} to ${head.slice(0, 9)} along no first-parent path, or git could not answer, so no commit is required to be named`)
+      const commits = extractNewCommits(hit.toplevel, prev, head)
+      if (commits) {
+        const c = checkCommitLines(rows, shapes, commits)
+        defects.push(...c.defects)
+        unmetCommits = c.unmet
+      } else witnesses.push(`format-guard: HEAD moved from ${prev.slice(0, 9)} to ${head.slice(0, 9)} along no first-parent path, or git could not answer, so no commit is required to be named`)
     }
     try {
       fs.mkdirSync(path.dirname(sidecar), { recursive: true })
@@ -535,8 +697,20 @@ function checkStop(data) {
       witnesses.push(`format-guard: the HEAD sidecar ${sidecar} is unwritable (${(e && e.code) || e}), so the next stop cannot name new commits`)
     }
   }
-  const witness = witnesses.join('\n')
-  return defects.length ? { block: renderBlockReason(route.build, defects, shapes, agentDefects.length > 0), witness } : { witness }
+  if (!defects.length) return { witness: witnesses.join('\n') }
+  // TOOL-dPavedRoad-2: only a stop that already blocks derives the lines it asks for, and a throw in
+  // the derivation keeps the block with one witness rather than reaching main's allow.
+  let derived
+  try {
+    derived = deriveOwedLines({
+      agents: agentGot.unmet, commits: unmetCommits, branch: unmetCommits.length ? readHeadBranch(gitDir) : 'HEAD',
+      shapes, top: hit.toplevel, sid, transcriptPath: tp,
+    })
+  } catch (e) {
+    derived = { owed: [], witnesses: [`format-guard: deriving the owed lines threw (${(e && e.message) || e}), so none is printed`] }
+  }
+  witnesses.push(...derived.witnesses)
+  return { block: renderBlockReason(route.build, defects, shapes, agentGot.defects.length, derived.owed), witness: witnesses.join('\n') }
 }
 
 function main() {
@@ -551,4 +725,8 @@ if (require.main === module) {
   try { main() } catch (e) { process.stderr.write(`format-guard: allowed on an internal error — ${(e && e.message) || e}\n`) }
   process.exitCode = 0
 }
-module.exports = { buildShapeRegex, readCharterShapes, scanMessageLines, checkPair, checkCommitLines, checkStop, readLiveSlugs, readHeadSha, scanTurnRecords, extractTurnAgents, readJournalAgents, checkAgentLines }
+module.exports = {
+  buildShapeRegex, readCharterShapes, scanMessageLines, checkPair, checkCommitLines, checkStop, readLiveSlugs, readHeadSha,
+  scanTurnRecords, extractTurnAgents, readJournalAgents, checkAgentLines, renderBlockReason,
+  readHandoffLines, deriveOwedLines, renderShapeLine, readHeadBranch, extractNewCommits,
+}

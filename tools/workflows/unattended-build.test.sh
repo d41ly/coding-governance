@@ -521,6 +521,49 @@ has "S1 the AUDIT stage invokes tier2-review as a SUB-WORKFLOW from the script" 
 # TOOL-aMendedFleet-111 AC8: the spec-audit call passes `workerType: 'none'`, so every judge writes its
 # file and the deferred `next`'s promise that a re-run reuses them holds. Staged red by deleting it.
 has "aMF-111 AC8 the spec-audit call passes workerType none" "$(printf '%s\n' "$o" | grep '^wargs:')" '"workerType":"none"'
+# TOOL-dFairHearing-3 AC9: the caller's `optIn` and `preset` reach the review call unchanged, and a caller
+# that passes neither sends neither key. Red against the base harness, which forwards neither.
+w=$(printf '%s\n' "$o" | grep '^wargs:')
+hasnt_ "FH3 AC9 a call with no optIn sends no optIn key" "$w" '"optIn"'
+hasnt_ "FH3 AC9 ...and no preset key" "$w" '"preset"'
+# TOOL-dFairHearing-9 AC8: a caller's per-preset `lensNotes` reaches the review call unchanged, and a call
+# without it sends no `lensNotes` key. Red against the base harness, which forwards none.
+hasnt_ "FH9 AC8 a call with no lensNotes sends no lensNotes key" "$w" '"lensNotes"'
+o=$(run_wf "${UNITS%\}}"',"optIn":{"topology":"blast-radius"},"preset":"design-audit"}' "$(returns CONVERGED 0)")
+w=$(printf '%s\n' "$o" | grep '^wargs:')
+has "FH3 AC9 the review call receives optIn unchanged" "$w" '"optIn":{"topology":"blast-radius"}'
+has "FH3 AC9 ...and preset unchanged" "$w" '"preset":"design-audit"'
+o=$(run_wf "${UNITS%\}}"',"lensNotes":{"unit-spec":{"reuse":"N1"},"design-audit":{"alternatives-and-cost":"N2"}}}' "$(returns CONVERGED 0)")
+w=$(printf '%s\n' "$o" | grep '^wargs:')
+has "FH9 AC8 the review call receives a per-preset lensNotes unchanged" "$w" '"lensNotes":{"unit-spec":{"reuse":"N1"},"design-audit":{"alternatives-and-cost":"N2"}}'
+# TOOL-dFairHearing-43 AC3: `twin`, `unclassed`, `fixJudge` and `walk` reach the review call unchanged, and
+# a call passing none sends none. Then the population is review_pin.py's own output, never typed here: each
+# key a whole-design pin prints reaches the call with its value, so a key a later pin prints reds this arm
+# until it is given a route. RED against the harness at unit 40, whose audit call carries none of the four.
+w=$(run_wf "$UNITS" "$(returns CONVERGED 0)" | grep '^wargs:')
+for k in twin unclassed fixJudge walk; do
+  hasnt_ "FH43 AC3 a call passing none of the four sends no $k key" "$w" "\"$k\":"
+done
+FH43_WALK='{"runs":2,"run":1,"seed":"reverted-escapes"}'
+w=$(run_wf "${UNITS%\}}"',"twin":"always","unclassed":"reason","fixJudge":"instance","walk":'"$FH43_WALK"'}' "$(returns CONVERGED 0)" | grep '^wargs:')
+has "FH43 AC3 the review call receives twin unchanged" "$w" '"twin":"always"'
+has "FH43 AC3 ...and unclassed unchanged" "$w" '"unclassed":"reason"'
+has "FH43 AC3 ...and fixJudge unchanged" "$w" '"fixJudge":"instance"'
+has "FH43 AC3 ...and walk unchanged" "$w" "\"walk\":$FH43_WALK"
+pin_file=$(mktemp) || exit 2
+"$_rkd_py" -B "$HERE/review_pin.py" --subject memory/builds/tB/build/d.md --design-record-preset whole-design \
+    --twin always --unclassed reason --opt-in '{"whole-design": {"topology": "blast-radius"}}' | "$_rkd_py" -c '
+import json, sys
+for line in sys.stdin:
+    for k, v in json.loads(line).items():
+        print(k + "\t" + json.dumps(v, separators=(",", ":")))' | tr -d '\r' | sort -u >"$pin_file"
+has "FH43 AC3 the pin prints a walk, so the population below is real" "$(<"$pin_file")" 'walk'
+while IFS=$'\t' read -r k v; do
+  [ -n "$k" ] || continue
+  w=$(run_wf "${UNITS%\}}"",\"$k\":$v}" "$(returns CONVERGED 0)" | grep '^wargs:')
+  has "FH43 AC3 the pin's $k reaches the review call with its value" "$w" "\"$k\":$v"
+done <"$pin_file"
+rm -f "$pin_file"
 
 # S3 — CONVERGING paired with 0 blockers is REFUSED BY NAME. A loop with nothing left to
 # converge on has converged, so the pairing is this repo's signature for a record no verb
@@ -544,6 +587,16 @@ n=$((n+1)); case "$o" in
   *"phase:Disposal"*) echo "FAIL S2 a degraded audit reached DISPOSAL"; st=1 ;;
   *) echo "ok   S2 ...and a degraded audit does not reach DISPOSAL" ;;
 esac
+
+# TOOL-dFairHearing-48 S4 — A GAPPED WALK STOPS AS A BLOCKED AUDIT. The callee's walk-red return holds
+# `blockers: null` beside an integer `confirmed`, and no agent died, so it is no DEGRADED run and no round.
+rec CONVERGED >/dev/null; printf -v wr_ret '{"spec-write":%s,"workflow":{"blockers":null,"confirmed":2,"highs":null,"unverified":0,"report":"r.md","walkGaps":["x"]},"record":%s,"dispose":%s}' \
+    "$SPEC_OK" "$_rec" "$DISPOSE_OK"; o=$(run_wf "$UNITS" "$wr_ret")
+has "FH48 AC4 a gapped walk returns exit walk-red" "$o" 'RESULT '
+has "FH48 AC4 ...naming the exit" "$o" '"exit":"walk-red"'
+has "FH48 AC4 ...and its gaps" "$o" '"walkGaps":["x"]'
+hasnt_ "FH48 AC4 ...and it throws nothing" "$o" "THROW "
+hasnt_ "FH48 AC4 ...and it spawns no record" "$o" "agent:record"
 
 # THE SUBJECT GUARD. An unpinned subject audits whatever the file happens to say when the lens
 # reads it, which is not a review of anything in particular — and tier2-review would refuse it
@@ -963,8 +1016,16 @@ build_merged_returns() {
     for (const [prefix, count] of Object.entries(shape.lenses))
       out[prefix] = { lens: "l", path: "/cd/find.json", findings: Array.from({ length: count }, () => finding) }
     out["verify:"] = { path: "/cd/verify.json", verdicts }
+    // TOOL-dFairHearing-23 S50 - each item of an array gains `grades`, every id it holds at its own severity, read
+    // after the arm edited the list, so the counting arms run the graded path; and `dispositions`, which the synthesis
+    // schema requires, one `new:merged-double` per id the skeptic double confirms, so the strict runner keeps it.
+    const items = process.argv[1] === "absent" ? undefined : JSON.parse(process.argv[1])
+    if (Array.isArray(items))
+      for (const it of items) if (it && typeof it === "object" && Array.isArray(it.ids)) it.grades = Object.fromEntries(it.ids.map((id) => [String(id), it.severity]))
+    const dispositions = shape.confirmed.filter((id) => id <= verdicts.length).map((id) => ({ id, disposition: "new:merged-double" }))
+    // TOOL-dFairHearing-1 S9 - `twinFlags`, which the synthesis schema requires since `addressTwins` defaults to shown.
     out.synth = { path: "r/merged.md", summary: shape.summary, blockers: shape.typed[0], highs: shape.typed[1],
-      items: process.argv[1] === "absent" ? undefined : JSON.parse(process.argv[1]) }
+      items, twinFlags: [], dispositions }
     console.log(JSON.stringify(out))
   ' "$1" "${2:-48}" "${3:-}"
 }
@@ -1023,7 +1084,7 @@ has    "MT a lowercase severity is the same word" "$au" '"blockers":3,"highs":6'
 # names `items`, and a synthesis double with no `items` key is refused the way the runtime refuses a
 # return missing a required key: the callee reads a dead synthesis, so neither count is invented.
 t2=$(run_merged_review "$(build_merged_returns "$MT_MERGED")")
-has    "MT the synthesis prompt asks for the item list" "$(printf '%s\n' "$t2" | grep '^prompt:synth:')" 'Return JSON {path, items, summary}'
+has    "MT the synthesis prompt asks for the item list" "$(printf '%s\n' "$t2" | grep '^prompt:synth:')" 'Return JSON {path, items, summary, twinFlags}'
 t2=$(run_merged_review "$(build_merged_returns absent)")
 au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
 has    "MT a synthesis return without items is refused by its schema" "$au" 'the synthesis agent died'
@@ -1034,7 +1095,7 @@ has    "MT ...and neither count is invented" "$au" '"blockers":null,"highs":null
 # accept a disposal that promotes them all into one batch unit (TOOL-aEvidencedLens-8: nothing folds).
 t2=$(run_merged_review "$(build_merged_returns '[]' 0)")
 au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
-has    "MT zero confirmed and 48 unverified reaches the synthesis" "$au" '"confirmed":0,"refuted":0,"unverified":48'
+has    "MT zero confirmed and 48 unverified reaches the synthesis" "$au" '"confirmed":0,"refuted":0,"merged":0,"unverified":48'
 has    "MT ...and an empty item list counts 0 and 0, not null" "$au" '"blockers":0,"highs":0'
 o=$(run_merged_build "$au" CONVERGED '{"disposed":true,"standing":[],"promoted":48,"folded":0,"refuted":0,"promotedIds":["A-tB-16"],"edges":[],"placements":[{"unit":"A-tB-16","repairs":"none","order":3}],"summary":"s"}')
 has    "MT ...and the harness disposes the unverified population" "$o" "disposal: done — promoted 48 · folded 0"
@@ -1056,7 +1117,7 @@ t2=$(run_merged_review "$(build_merged_returns "$MT20_MERGED" 46 "$MT20_SHAPE")"
 au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
 # LIVENESS, and the MERGE is part of it: a double that put one id in each item would count 4 and 6
 # too, and would reproduce nothing the record measured.
-has    "MT20 the callee ran over the measured shape — 46 raw, 16 confirmed, 30 refuted" "$au" '"raw":46,"confirmed":16,"refuted":30,"unverified":0'
+has    "MT20 the callee ran over the measured shape — 46 raw, 16 confirmed, 30 refuted" "$au" '"raw":46,"confirmed":16,"refuted":30,"merged":0,"unverified":0'
 has    "MT20 ...over nine items that split differently by item and by raw finding" "$t2" "by item 2/3/3/1, by raw confirmed finding 4/6/5/1"
 has    "MT20 the callee counts blockers and highs over RAW confirmed findings, not over items" "$au" '"blockers":4,"highs":6'
 # THE MEASURED REFUSAL, reproduced as a control: the same RESULT carrying the integers that audit's
@@ -2116,12 +2177,15 @@ build_layout() { # dir · kit dir · unattended dir, or '-' for none · checklis
   # it reds every check-mode run with a missing shipped copy.
   cp "$HERE/unattended-build.template.js" "$HERE/check-protocol-parity.test.sh" "$HERE/check_by_design_parity.py" \
      "$HERE/REVIEW-PROTOCOL.template.md" "$HERE/tier2-review.js" "$HERE/unattended-unit.js" "$d/$kd/"
+  # The parity render fills `{{LENS_SLOTS}}` from the lens catalogue, so a layout carries it and its renderer
+  # beside the parity script (TOOL-dFairHearing-23 S24); without them every render of the review harness refuses.
+  cp "$HERE/lenses.toml" "$HERE/render_lenses.py" "$d/$kd/"
   # THE RENDERER ASKS THE POLICY READER FOR FANOUT_CAP (TOOL-dGroundRules-10, which re-pointed it from
   # the agent-cap hook): `policy.py get runtime.agents-in-flight --rev HEAD`, the policy kit a
   # directory up where the inlined resolver's second probe finds it, and it refuses to render when
   # nothing answers. `requires = ["agent-cap", "policy"]`, so a real install has the reader, the hook
   # and the fan-out gate beside the parity script; the layout is committed so HEAD names a commit.
-  cp "$HERE/check-verifier-fanout.sh" "$d/$kd/"
+  cp "$HERE/check-verifier-fanout.sh" "$HERE/check-verifier-fanout.js" "$d/$kd/"
   mkdir -p "$d/$kd/../${POLICY_KIT}"; cp "$ROOT/${POLICY_KIT_DIR}/policy.py" "$ROOT/${POLICY_KIT_DIR}/catalogue.toml" "$d/$kd/../${POLICY_KIT}/"
   # The three pairs S7 made rendered: the renderer refuses a set with a template missing, and
   # `--tracked-only` would SKIP an absent live copy, so an install carries both halves of each.
@@ -2217,17 +2281,29 @@ has "DGR10 ...naming the answer" "$o" "answered 'abc' for runtime.agents-in-flig
 absent_harness=yes; [ -e "$PN/scripts/$WFK/unattended-build.js" ] && absent_harness=no
 same "DGR10 ...and writes no harness" "$absent_harness" "yes"
 
-# ---- TOOL-dGroundRules-74: THE WRITER-SPLIT FALLBACK, from an adopter's side. A hook that predates
-# ---- `gov:fixed-writers` denies the split, and --render writes the verifier-bounded fallback with one
+# ---- TOOL-dFairHearing-23 AC15: a layout's copy set renders the review harness's lens slots, and refuses with no lens
+# ---- catalogue. RED against the parent suite, whose layout copies neither lenses.toml nor render_lenses.py.
+LC="$LAY/lenses"; build_layout "$LC" scripts/$WFK scripts/$UNK scripts/gotchas.py
+o=$( (cd "$LC/scripts/$WFK" && "$_rkd_py" render_lenses.py lenses.toml < tier2-review.template.js >/dev/null 2>&1; echo "rc=$?") )
+has "FH23 AC15 a layout's copy set renders the review harness template" "$o" "rc=0"
+rm -f "$LC/scripts/$WFK/lenses.toml"
+o=$( (cd "$LC/scripts/$WFK" && "$_rkd_py" render_lenses.py lenses.toml < tier2-review.template.js 2>&1; echo "rc=$?") )
+has "FH23 AC15 ...and without lenses.toml it refuses naming the catalogue" "$o" "rule 1: the lens catalogue lenses.toml could not be read"
+has "FH23 AC15 ...at exit 2" "$o" "rc=2"
+
+# ---- TOOL-dGroundRules-74: THE WRITER-SPLIT FALLBACK, from an adopter's side. A hook that refuses the
+# ---- writer bound denies the split, and --render writes the verifier-bounded fallback with one
 # ---- stderr notice; a hook that denies the fallback too exits 2 and writes nothing. Gov's own tree
 # ---- always takes the split, so only a layout reaches this path. No layout carries the policy mirror,
 # ---- so its hook bounds the split at MAX_VERIFIERS and every layout above takes the fallback too, with
-# ---- nothing asserted. The old hook is staged by its marker here, never left to that accident.
+# ---- nothing asserted. The hook is staged at its bound here, never left to that accident
+# ---- (TOOL-dFairHearing-50 S8): the fan-out rule asks a hook through its exports, `readWriterBound` and
+# ---- MAX_VERIFIERS, so a stub hook exports nothing it can ask, and is refused before any rule runs.
 WS="$LAY/old-hook"; build_layout "$WS" scripts/$WFK scripts/$UNK scripts/gotchas.py
-sed -i "s/^const WRITER_MARK = 'gov:fixed-writers'\$/const WRITER_MARK = 'gov:an-older-writer-mark'/" "$WS/scripts/$HOOKS/agent-cap.js"
-same "DGR74 LIVENESS the layout's hook no longer carries the writer marker" "$(grep -c "^const WRITER_MARK = 'gov:an-older-writer-mark'\$" "$WS/scripts/$HOOKS/agent-cap.js")" "1"
+sed -i "s/^function readWriterBound(repo) {\$/function readWriterBound(repo) { return { why: 'a staged hook that bounds no writer split' }/" "$WS/scripts/$HOOKS/agent-cap.js"
+same "DGR74 LIVENESS the layout's hook refuses the writer bound" "$(grep -c "a staged hook that bounds no writer split" "$WS/scripts/$HOOKS/agent-cap.js")" "1"
 o=$( (cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render 2>"$LAY/old-hook.err"; echo "rc=$?") ); e=$(<"$LAY/old-hook.err")
-has "DGR74 a hook that predates the writer marker: --render still renders" "$o" "rc=0"
+has "DGR74 a hook that refuses the writer bound: --render still renders" "$o" "rc=0"
 has "DGR74 ...and stderr carries the hook's own reason" "$e" "does not admit the writer split: BLOCKED by agent-cap:"
 has "DGR74 ...and names the update" "$e" "Update it: govkit update --kits agent-cap"
 h=; [ -f "$WS/scripts/$WFK/unattended-build.js" ] && h=$(<"$WS/scripts/$WFK/unattended-build.js")
@@ -2235,18 +2311,27 @@ has "DGR74 ...and the harness bounds its pool at the verify total" "$h" "async f
 has "DGR74 ...and its spec writers too" "$h" "const SPEC_WRITERS = 5"
 has "DGR74 ...and judges the split under the verifiers marker" "$h" "Math.ceil(slices.length / SPEC_WRITERS)) // gov:fixed-verifiers"
 cp "$WS/scripts/$WFK/unattended-build.js" "$LAY/old-hook.js" 2>/dev/null
-printf '%s\n' "process.stdin.resume(); process.stdin.on('end', () => { console.error('a stub hook that denies every script'); process.exit(2) })" > "$WS/scripts/$HOOKS/agent-cap.js"
+sed -i 's/^const MAX_VERIFIERS = 5$/const MAX_VERIFIERS = 4/' "$WS/scripts/$HOOKS/agent-cap.js"
+same "DGR74 LIVENESS the layout's hook holds a total below the fallback's" "$(grep -c '^const MAX_VERIFIERS = 4$' "$WS/scripts/$HOOKS/agent-cap.js")" "1"
 o=$( (cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render 2>"$LAY/old-hook.err"; echo "rc=$?") ); e=$(<"$LAY/old-hook.err")
 has "DGR74 a hook that denies the fallback too: --render refuses" "$o" "rc=2"
 has "DGR74 ...naming the fallback" "$o" "denies unattended-build.js's verifier-bounded fallback too, so nothing was rendered or graded"
-has "DGR74 ...after a stderr notice carrying that hook's reason" "$e" "does not admit the writer split: a stub hook that denies every script. Update it"
+has "DGR74 ...after a stderr notice carrying that hook's reason" "$e" "does not admit the writer split: BLOCKED by agent-cap: a verify/fan-out stage spawns one agent per item. The review protocol caps verify-stage agents at 4 TOTAL"
 same "DGR74 ...and leaves the harness it rendered before unchanged" "$(cmp -s "$LAY/old-hook.js" "$WS/scripts/$WFK/unattended-build.js" && echo same || echo changed)" "same"
 # ---- TOOL-dGroundRules-83: A GATE THAT COULD NOT ASK THE HOOK IS NO VERDICT. A hook that denies
 # ---- printing nothing is said as one. With no hook at all the fan-out gate exits 2 naming why, and
 # ---- --render refuses at once with that answer on stderr, never as the hook's denial.
-printf '%s\n' "process.stdin.resume(); process.stdin.on('end', () => process.exit(2))" > "$WS/scripts/$HOOKS/agent-cap.js"
+printf '%s\n' "process.exit(1)" > "$WS/scripts/$HOOKS/agent-cap.js"
 ( cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render >/dev/null 2>"$LAY/old-hook.err" ); e=$(<"$LAY/old-hook.err")
 has "DGR83 a hook that denies printing nothing: the notice says so" "$e" "does not admit the writer split: the agent-cap hook denied it and printed no reason"
+# TOOL-dFairHearing-50 S8 - a hook the rule cannot load is no verdict: the fan-out gate exits 2 with the rule's
+# own reason, and --render refuses at once, never as the hook's denial.
+printf '%s\n' "module.exports = {}" > "$WS/scripts/$HOOKS/agent-cap.js"
+o=$( (cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render 2>"$LAY/old-hook.err"; echo "rc=$?") ); e=$(<"$LAY/old-hook.err")
+has "FH50 AC8 a hook the rule cannot load: --render refuses" "$o" "rc=2"
+has "FH50 AC8 ...naming the gate that could not ask the hook" "$e" "the fan-out gate exited 2 and could not ask the agent-cap hook"
+has "FH50 AC8 ...and the rule's own reason" "$e" "it exports no MAX_VERIFIERS"
+hasnt_ "FH50 AC8 ...never as the hook's denial" "$e" "does not admit the writer split"
 rm -f "$WS/scripts/$HOOKS/agent-cap.js"
 o=$( (cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render 2>"$LAY/old-hook.err"; echo "rc=$?") ); e=$(<"$LAY/old-hook.err")
 has "DGR83 no hook at all: --render refuses" "$o" "rc=2"
@@ -2479,19 +2564,20 @@ if [ -f "$UK/adopt-unattended.sh" ]; then
   # ---- RA6-1, RA6-2 (TOOL-dRenderedAnchor-6): A RENAMED KIT BEHIND A RECEIPT. govkit homes the
   # ---- review-harness kit by its entry id, so the protocol and the Skill cited harnesses at the tool
   # ---- root plus gov's home, which the install does not hold. One layout: the kit at `scripts/rh`,
-  # ---- the four receipt rows a real install writes, each `source` under a neutral `g/` and this
-  # ---- kit's own segment, and its `tier2-review.js` deleted, which is the fresh install the parity
-  # ---- script's second pass exists for, since the first derivation cannot see a render the same run
+  # ---- the nine receipt rows a real install writes, one per file the protocol cites
+  # ---- (TOOL-dFairHearing-50 S9), each `source` under a neutral `g/` and this kit's own segment, and
+  # ---- its `tier2-review.js` deleted, which is the fresh install the parity script's second pass exists for, since the first derivation cannot see a render the same run
   # ---- writes. Each document's absence count sits beside a positive count, and its check mode runs
   # ---- after. RA6-1 reds with the parity script's `render_kit_cites` call taken out, and separately
   # ---- with its second pass taken out; RA6-2 reds with the adopter's call taken out. RA6-1's render
   # ---- keeps its output (TOOL-dRenderedAnchor-7 S6): the re-run line once and the exit passed back.
   # The three helpers below are extracted at their second instance, by the RA7 arms after RA6-2.
-  build_renamed() { # dir -> RA6's layout: the kit at scripts/rh behind four receipt rows, its tier2-review.js deleted
+  build_renamed() { # dir -> RA6's layout: the kit at scripts/rh behind nine receipt rows, its tier2-review.js deleted
     build_layout "$1" scripts/rh scripts/$UNK scripts/gotchas.py
+    cp "$HERE/check-review-join.sh" "$HERE/check-review-join.js" "$HERE/spec-audit-optin.js" "$1/scripts/rh/"
     rm -f "$1/scripts/rh/tier2-review.js"; mkdir -p "$1/.governance"
-    printf '{"files": [\n {"role": "rendered", "source": "g/%s/tier2-review.template.js", "path": "scripts/rh/tier2-review.js"},\n {"role": "rendered", "source": "g/%s/unattended-build.template.js", "path": "scripts/rh/unattended-build.js"},\n {"role": "engine", "source": "g/%s/unattended-unit.js", "path": "scripts/rh/unattended-unit.js"},\n {"role": "engine", "source": "g/%s/check-verifier-fanout.sh", "path": "scripts/rh/check-verifier-fanout.sh"}]}\n' \
-      "$WFK" "$WFK" "$WFK" "$WFK" > "$1/.governance/install.json"
+    printf '{"files": [\n {"role": "rendered", "source": "g/%s/tier2-review.template.js", "path": "scripts/rh/tier2-review.js"},\n {"role": "rendered", "source": "g/%s/unattended-build.template.js", "path": "scripts/rh/unattended-build.js"},\n {"role": "engine", "source": "g/%s/unattended-unit.js", "path": "scripts/rh/unattended-unit.js"},\n {"role": "engine", "source": "g/%s/check-verifier-fanout.sh", "path": "scripts/rh/check-verifier-fanout.sh"},\n {"role": "engine", "source": "g/%s/check-verifier-fanout.js", "path": "scripts/rh/check-verifier-fanout.js"},\n {"role": "engine", "source": "g/%s/check-review-join.sh", "path": "scripts/rh/check-review-join.sh"},\n {"role": "engine", "source": "g/%s/check-review-join.js", "path": "scripts/rh/check-review-join.js"},\n {"role": "engine", "source": "g/%s/spec-audit-optin.js", "path": "scripts/rh/spec-audit-optin.js"},\n {"role": "engine", "source": "g/%s/lenses.toml", "path": "scripts/rh/lenses.toml"}]}\n' \
+      "$WFK" "$WFK" "$WFK" "$WFK" "$WFK" "$WFK" "$WFK" "$WFK" "$WFK" > "$1/.governance/install.json"
     ( cd "$1" && git add -A )
   }
   seed_unattended_kit() { # dir -> the unattended kit copied into the layout, its conf, and a settings file wiring each fragment
@@ -2531,7 +2617,7 @@ if [ -f "$UK/adopt-unattended.sh" ]; then
   same "RA6-1 ...and passes the re-run's exit back, 0" "${o##*$'\n'}" "rc=0"
   P6="$R6/memory/guides/REVIEW-PROTOCOL.md"
   same "RA6-1 a renamed kit behind a receipt: the protocol names its tier2-review.js on both lines" "$(grep -cF 'scripts/rh/tier2-review.js' "$P6")" 2
-  same "RA6-1 ...and its check-verifier-fanout.sh once" "$(grep -cF 'scripts/rh/check-verifier-fanout.sh' "$P6")" 1
+  same "RA6-1 ...and its check-verifier-fanout.sh twice" "$(grep -cF 'scripts/rh/check-verifier-fanout.sh' "$P6")" 2
   same "RA6-1 ...and the tool root plus gov's home for them nowhere" "$(grep -cF "scripts/$WFK/" "$P6")" 0
   o=$(run_layout "$R6" scripts/rh)
   has "RA6-1 ...and the check mode reads that render in parity" "$o" "protocol-parity: in parity"
@@ -3718,7 +3804,18 @@ has    "FA15 AC25 the undeclared throw" "$o" "a disposal passes the hand-out's \
 # AC10 (2), AC13's six calls of the FA3 refusal helper (30), AC20 (2 and one call, 7), AC22 (1, one call and
 # 2, 8), AC17 (2 and three calls, 17), AC21 (5) and AC25 (2). Not measured by a run: the pass that wrote it
 # runs no suite.
-FLOOR_ASSERTIONS=899
+# RAISED 899 -> 903 by TOOL-dFairHearing-3: the four `FH3 AC9` sites, two absences on a call without the
+# arguments and two forwarded values on one with them. Not measured by a run: the pass that wrote it runs
+# no suite.
+# RAISED 903 -> 905 by TOOL-dFairHearing-9: the two `FH9 AC8` sites, the absence on a call without
+# `lensNotes` and the forwarded per-preset value on one with it. Not measured by a run: the pass that
+# wrote it runs no suite.
+# RAISED 905 -> 920 by TOOL-dFairHearing-43: the `FH43 AC3` sites, four absences, four forwarded values, the
+# population's own check and the pin's six distinct key and value rows (its two lines differ in `walk` alone).
+# Not measured by a run: the pass that wrote it runs no suite.
+# RAISED 920 -> 925 by TOOL-dFairHearing-48: the five `FH48 AC4` sites, the result, its exit and gaps, and the
+# two absences. Counted by reading, not measured by a run: the pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=925
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

@@ -169,6 +169,147 @@ armIntensity('intensity: absent proceeds', {}, 'full')
 armIntensity('intensity: light on a spec audit is refused', Object.assign({ intensity: 'light' }, GOOD_SPEC), 'refused')
 armIntensity('intensity: full on a spec audit proceeds', Object.assign({ intensity: 'full' }, GOOD_SPEC), 'full')
 
+// ---- TOOL-dFairHearing-2 AC1 — `preset`, a closed set read in the prelude, refused beside the diff kind ----
+// The proceeding arms read the RESOLVED value back, so none passes over a prelude that never reads
+// `preset`: on the base render the read throws `preset is not defined`, a harness fault. A refusal must
+// START `tier2-review: \`preset\`` and carry its word, so an unrelated throw cannot satisfy one.
+const DESIGN_SPEC = { kind: 'spec-audit', round: 1, subjects: [{ path: 'memory/builds/dX/build/a.md', blob: BLOB, id: 'PLAY-dX-1' }] }
+function armPreset(name, extra, want, word) {
+  let got = null
+  let threw = null
+  try {
+    got = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn preset')(Object.assign({}, base, extra), () => {}, null, null, null)
+  } catch (e) { threw = e.message }
+  if (threw && /has already been declared|is not defined|Unexpected|Invalid or unexpected/.test(threw)) {
+    console.log('HARNESS-BROKEN ' + name + ' -> ' + threw)
+    fail++
+    return
+  }
+  ck(want === 'refused' ? !!threw && threw.indexOf('tier2-review: `preset`') === 0 && threw.indexOf(word) !== -1 : !threw && got === want,
+    name + (threw ? ' (threw: ' + threw + ')' : ' (resolved ' + JSON.stringify(got) + ')'))
+}
+armPreset('preset: design-audit over a design subject proceeds', Object.assign({ preset: 'design-audit' }, DESIGN_SPEC), 'design-audit')
+armPreset('preset: absent on a spec audit is unit-spec', DESIGN_SPEC, 'unit-spec')
+armPreset('preset: absent on a diff review is unit-spec', {}, 'unit-spec')
+armPreset('preset: an unknown preset is refused naming the set', Object.assign({ preset: 'no-such-preset' }, DESIGN_SPEC), 'refused', 'unit-spec | design-audit')
+armPreset('preset: a non-string is refused', Object.assign({ preset: 7 }, DESIGN_SPEC), 'refused', 'unit-spec | design-audit')
+armPreset('preset: an empty string is refused', Object.assign({ preset: '' }, DESIGN_SPEC), 'refused', 'unit-spec | design-audit')
+armPreset('preset: unit-spec beside the diff kind is refused naming it', { kind: 'diff-review', preset: 'unit-spec' }, 'refused', 'diff-review')
+
+// ---- TOOL-dFairHearing-3 AC1 — `optIn`'s SHAPE, refused in the prelude before the literals read it ----
+// The proceeding arm reads the RESOLVED value back, so it cannot pass over a prelude that never reads
+// `optIn`: on the base render the read throws `optIn is not defined`, a harness fault. A refusal must
+// START `tier2-review: \`optIn\``, so an unrelated throw cannot satisfy one.
+function armOptIn(name, value, want) {
+  let got = null
+  let threw = null
+  try {
+    got = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn optIn')(Object.assign({}, base, GOOD_SPEC, { optIn: value }), () => {}, null, null, null)
+  } catch (e) { threw = e.message }
+  if (threw && /has already been declared|is not defined|Unexpected|Invalid or unexpected/.test(threw)) {
+    console.log('HARNESS-BROKEN ' + name + ' -> ' + threw)
+    fail++
+    return
+  }
+  ck(want === 'refused' ? !!threw && threw.indexOf('tier2-review: `optIn`') === 0 : !threw && JSON.stringify(got) === want,
+    name + (threw ? ' (threw: ' + threw + ')' : ' (resolved ' + JSON.stringify(got) + ')'))
+}
+armOptIn('optIn: {} proceeds', {}, '{}')
+armOptIn('optIn: absent proceeds as {}', undefined, '{}')
+armOptIn('optIn: an array is refused', [], 'refused')
+armOptIn('optIn: a non-string value is refused', { topology: 7 }, 'refused')
+armOptIn('optIn: a key outside the lens-key grammar is refused', { 'Topology!': 'reuse' }, 'refused')
+armOptIn('optIn: null is refused', null, 'refused')
+
+// ---- TOOL-dFairHearing-4 AC1-AC4 — the address key, its equality and order, and `batchBy` ----------
+// Each arm reads a name the base harness does not define, so on the base it throws `... is not defined`,
+// a harness fault counted as a failure. The proceeding `batchBy` arms read the RESOLVED value back.
+function evalAddress(extra, ret) {
+  try {
+    return new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn ' + ret)(Object.assign({}, base, extra), () => {}, null, null, null)
+  } catch (e) { console.log('HARNESS-BROKEN address: ' + ret + ' -> ' + e.message); return null }
+}
+{
+  const dfn = evalAddress({}, '[deriveAddressKey, checkSameAddress, deriveAddressOrder]')
+  const sfn = evalAddress(GOOD_SPEC, '[deriveAddressKey, checkSameAddress, deriveAddressOrder]')
+  if (!dfn || !sfn) fail++
+  else {
+    const dk = (file, line) => dfn[0]({ file: file, line: line, lens: 'l', id: 1 })
+    const sk = (where) => sfn[0]({ file: 'x.md', where: where, lens: 'l', id: 1 })
+    ck(JSON.stringify(dfn[0]({ file: '.\\src\\a.js', line: 12, lens: 'security', id: 3 })) === JSON.stringify({ file: 'src/a.js', at: 12, lens: 'security', id: 3 }),
+      'address: a diff finding keys to its slash-folded file, its line, its lens and its id')
+    const wants = [['section 4 [walk-table] Design', '[walk-table]'], ['section 2 S5', '§2'], ['AC3 against section 6', 'AC3'], ['§ 7', '§7'], ['status header', null]]
+    const gots = wants.map((w) => sk(w[0]).at)
+    ck(gots.every((g, i) => g === wants[i][1]), 'address: a spec finding keys its first [tag], else its leftmost section token, else null: ' + JSON.stringify(gots))
+    ck(dfn[1](dk('a.js', 10), dk('a.js', 13)) && !dfn[1](dk('a.js', 10), dk('a.js', 14)) && !dfn[1](dk('a.js', 10), dk('b.js', 10)),
+      'address: diff lines within 3 on one file are one address, 4 apart or on two files are not')
+    const nk = dk('a.js', undefined)
+    ck(nk.at === null && !dfn[1](nk, nk) && !dfn[1](nk, dk('a.js', 10)), 'address: a key with no address matches nothing, itself included')
+    ck(sfn[1](sk('section 2'), sk('§2')) && !sfn[1](sk('§2'), sk('§3')), 'address: spec keys at one token are one address, at two are not')
+    const six = [{ id: 1, file: 'a.js', line: 100, lens: 'security' }, { id: 2, file: 'c.js', line: 5, lens: 'security' }, { id: 3, file: 'b.js', line: 7, lens: 'correctness' },
+      { id: 4, file: 'a.js', line: 42, lens: 'correctness' }, { id: 5, file: 'b.js', line: 7, lens: 'seams' }, { id: 6, file: 'a.js', line: 42, lens: 'intent' }]
+    const ord = dfn[2](six)
+    ck(ord !== six && ord.map((f) => f.id).join(',') === '4,6,1,3,5,2' && six.map((f) => f.id).join(',') === '1,2,3,4,5,6',
+      'address: the order is file, line by value, lens and id, in a new array, the argument left in id order: ' + ord.map((f) => f.id).join(','))
+    const sord = sfn[2]([{ id: 1, file: 'x.md', where: 'status header', lens: 'a' }, { id: 2, file: 'x.md', where: '§9', lens: 'b' }, { id: 3, file: 'w.md', where: '', lens: 'c' }])
+    ck(sord.map((f) => f.id).join(',') === '3,2,1', 'address: a spec finding with no address sorts after every addressed finding of its file: ' + sord.map((f) => f.id).join(','))
+    // TOOL-dFairHearing-32 AC2 - the section class is `section ?<n>` or `§ ?<n>`, any case, each as `§<n>`.
+    // RED against a class that requires the space, which keys `§4` and `section4` to null.
+    const secs = ['§4', 'Section 3 Design', 'section4', '§ 4', 'SECTION 12'].map((w) => sk(w).at)
+    ck(secs.join(' ') === '§4 §3 §4 §4 §12', 'address: FH32 AC2 the section forms key as §4 §3 §4 §4 §12: ' + JSON.stringify(secs))
+  }
+}
+// ---- TOOL-dFairHearing-23 AC39 — a repo-absolute path, its repo-relative spelling and a lower-case drive key as one file.
+// RED against the parent, whose key keeps the repo prefix, so the three keys differ.
+{
+  const rfn = evalAddress({ repo: 'C:/R' }, '[deriveAddressKey]')
+  const files = rfn ? ['C:/R/src/a.js', 'src/a.js', 'c:/R/src/a.js'].map((file) => rfn[0]({ file: file, line: 1, lens: 'l', id: 1 }).file) : []
+  ck(files.length === 3 && files.every((x) => x === 'src/a.js'), 'FH23 AC39 address: under repo C:/R the three spellings key as src/a.js: ' + JSON.stringify(files))
+}
+// A closed-set argument `field`: a proceeding arm reads the RESOLVED value back, a refusal must name `field`.
+function armClosedSet(field, name, extra, want) {
+  let got = null
+  let threw = null
+  try {
+    got = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn ' + field)(Object.assign({}, base, extra), () => {}, null, null, null)
+  } catch (e) { threw = e.message }
+  if (threw && /has already been declared|is not defined|Unexpected|Invalid or unexpected/.test(threw)) {
+    console.log('HARNESS-BROKEN ' + name + ' -> ' + threw)
+    fail++
+    return
+  }
+  ck(want === 'refused' ? !!threw && threw.indexOf('tier2-review: `' + field + '`') === 0 : !threw && got === want, name + (threw ? ' (threw: ' + threw + ')' : ' (resolved ' + JSON.stringify(got) + ')'))
+}
+armClosedSet('batchBy', 'batchBy: absent resolves to id', {}, 'id')
+armClosedSet('batchBy', 'batchBy: id proceeds', { batchBy: 'id' }, 'id')
+armClosedSet('batchBy', 'batchBy: address proceeds', { batchBy: 'address' }, 'address')
+armClosedSet('batchBy', 'batchBy: section is refused', { batchBy: 'section' }, 'refused')
+armClosedSet('batchBy', 'batchBy: a number is refused', { batchBy: 1 }, 'refused')
+armClosedSet('batchBy', 'batchBy: null is refused', { batchBy: null }, 'refused')
+
+// ---- TOOL-dFairHearing-7 AC1/AC2 — deriveTwinPairs over the address key, and `addressTwins` ----------
+// On the base harness neither name is defined, a harness fault counted as a failure, and `'on'` proceeds.
+{
+  const dtp = evalAddress({}, 'deriveTwinPairs')
+  const stp = evalAddress(GOOD_SPEC, 'deriveTwinPairs')
+  if (!dtp || !stp) fail++
+  else {
+    const df = (id, file, line) => ({ id: id, file: file, line: line, lens: 'l' })
+    const dgot = dtp([df(1, 'a.js', 10)], [df(2, 'a.js', 12), df(3, 'a.js', 14), df(4, 'b.js', 10)])
+    ck(JSON.stringify(dgot) === JSON.stringify([{ confirmed: 1, refuted: 2 }]),
+      'twins: a confirmed a.js:10 pairs with a refuted a.js:12 alone, not a.js:14 nor b.js:10: ' + JSON.stringify(dgot))
+    const sf = (id, where) => ({ id: id, file: 'x.md', where: where, lens: 'l' })
+    const sgot = stp([sf(1, 'section 2 S5'), sf(3, 'status header')], [sf(2, '§2'), sf(4, 'status header')])
+    ck(JSON.stringify(sgot) === JSON.stringify([{ confirmed: 1, refuted: 2 }]),
+      'twins: a spec finding at `section 2 S5` pairs with one at `§2`, and `status header` pairs with nothing: ' + JSON.stringify(sgot))
+  }
+}
+armClosedSet('addressTwins', 'addressTwins: absent resolves to shown', {}, 'shown')
+armClosedSet('addressTwins', 'addressTwins: hidden proceeds', { addressTwins: 'hidden' }, 'hidden')
+armClosedSet('addressTwins', 'addressTwins: shown proceeds', { addressTwins: 'shown' }, 'shown')
+armClosedSet('addressTwins', "addressTwins: 'on' is refused", { addressTwins: 'on' }, 'refused')
+armClosedSet('addressTwins', 'addressTwins: true is refused', { addressTwins: true }, 'refused')
+
 // ---- TOOL-aEvidencedLens-2 AC3 — `scratch`, required on a spec audit and refused by shape ---------
 // The proceeding arms read the RESOLVED value back, so none passes over a prelude that never reads
 // `scratch`: on the base render the read throws `scratch is not defined`, a harness fault. A refusal
@@ -307,7 +448,7 @@ if (alias === -1 || hStart === -1 || hEnd === -1 || hEnd <= hStart) {
   die('could not locate the args alias or the args header block — this arm would pass by finding nothing')
 }
 const hdr = src.slice(hStart, hEnd)
-const fields = [...new Set([...src.slice(alias).matchAll(/\ba\.([A-Za-z_$][\w$]*)/g)].map((m) => m[1]))].sort()
+const fields = [...new Set([...src.slice(alias).matchAll(/(?<![\w$.])a\.([A-Za-z_$][\w$]*)/g)].map((m) => m[1]))].sort()
 if (!fields.length) die('found no fields read off the args alias — this arm would pass by finding nothing')
 const missing = fields.filter((f) => !new RegExp('(^|[^\\w$])' + f + '\\s*:').test(hdr))
 ck(missing.length === 0, 'the args header documents all ' + fields.length + ' fields read off `a` as `name:` keys' + (missing.length ? ' — missing: ' + missing.join(' ') : ''))
@@ -315,6 +456,171 @@ ck(missing.length === 0, 'the args header documents all ' + fields.length + ' fi
 // them; the header's `subjects:` key line names both, as the refusal reads them.
 const subjectsKey = (hdr.match(/^\/\/\s+subjects:.*$/m) || [''])[0]
 ck(/\bid\b/.test(subjectsKey) && /\brev\b/.test(subjectsKey), 'pin: the args header documents a spec-audit subject\'s id and rev: ' + subjectsKey)
+
+// ---- TOOL-dFairHearing-17 AC1-AC4 — the round state's pure rule, its record line, and its two arguments.
+// The rule and the renderer are prelude functions, reached through the extracted body. Against the base
+// harness, which defines no deriveRoundState and reads neither argument, every arm below reds.
+const RS_SPEC = { kind: 'spec-audit', subjects: [{ path: 'memory/builds/dX/spec/a.md', blob: BLOB, id: 'TOOL-x-1', rev: 2 }] }
+let roundFns = null
+try {
+  roundFns = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn [deriveRoundState, renderRoundLine]')(
+    Object.assign({}, base, RS_SPEC, { round: 1 }), () => {}, null, null, null)
+} catch (e) { console.log('HARNESS-BROKEN round state: the prelude did not yield deriveRoundState -> ' + e.message) }
+const ROUND_ROWS = [
+  // AC1 - the planted flat and oscillating sequences stop; their strictly falling twins do not.
+  ['flat', [3], 3, 5, 'NON-CONVERGENT'], ['oscillating', [2, 1], 2, 5, 'NON-CONVERGENT'],
+  ['falling twin of flat', [3], 2, 5, 'CONVERGING'], ['falling twin of oscillating', [3, 2], 1, 5, 'CONVERGING'],
+  // AC2 - the bound at the caller's limit, the ceiling one run past it, and no limit reaching neither.
+  ['at the limit', [3, 2], 1, 3, 'BOUNDED'], ['one run past the limit', [4, 3, 2], 1, 3, 'CEILING'],
+  ['under the limit', [3], 2, 3, 'CONVERGING'], ['no limit', [3, 2], 1, null, 'CONVERGING'],
+  // AC3 - zero first, past the limit too; round 1's bound and its non-terminal twin.
+  ['clean round 1', [], 0, 3, 'CONVERGED'], ['clean after a fall', [2, 1], 0, 3, 'CONVERGED'], ['clean past the limit', [4, 3, 2], 0, 3, 'CONVERGED'],
+  ['round 1 at a limit of 1', [], 2, 1, 'BOUNDED'], ['round 1 under a limit of 3', [], 2, 3, 'CONVERGING'],
+]
+for (const [what, prior, count, limit, want] of ROUND_ROWS) {
+  const got = roundFns ? roundFns[0](prior, count, limit) : 'no function'
+  ck(got === want, 'round state: ' + what + ' deriveRoundState(' + JSON.stringify(prior) + ', ' + count + ', ' + limit + ') is ' + want + ': ' + got)
+}
+{
+  const line = roundFns ? roundFns[1]({ round: 1, roundLimit: null, priorCounts: [], roundCount: null, roundState: null }) : 'no function'
+  ck(line === 'review-round round=1 limit=- prior=- count=- state=-', 'round state: renderRoundLine writes every absent value as -, never 0: ' + line)
+}
+// AC4 - both arguments refused by name, before any agent; a round that disagrees with its prior sequence is refused naming both.
+for (const v of [0, 2.5, '3']) arm('round state: roundLimit ' + JSON.stringify(v) + ' -> refused naming roundLimit', Object.assign({}, RS_SPEC, { round: 1, roundLimit: v }), '`roundLimit`')
+for (const v of ['x', [1, -1], [1.5]]) arm('round state: priorCounts ' + JSON.stringify(v) + ' -> refused naming priorCounts', Object.assign({}, RS_SPEC, { priorCounts: v }), '`priorCounts`')
+arm('round state: round 3 with priorCounts [2] -> refused naming both', Object.assign({}, RS_SPEC, { round: 3, priorCounts: [2] }), '`round` 3 disagrees with `priorCounts`')
+arm('round state: round 3 with priorCounts [4, 2] and roundLimit 3 -> proceeds', Object.assign({}, RS_SPEC, { round: 3, priorCounts: [4, 2], roundLimit: 3 }), null)
+{
+  let inferred = null
+  try {
+    inferred = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn round')(
+      Object.assign({}, base, RS_SPEC, { priorCounts: [4, 2] }), () => {}, null, null, null)
+  } catch (e) { inferred = 'threw: ' + e.message }
+  ck(inferred === 3, 'round state: with no round, priorCounts [4, 2] makes the evaluated round 3: ' + inferred)
+}
+
+// ---- TOOL-dFairHearing-17 AC6 — THE PARITY ARM: deriveRoundState against the driver's review_state.
+// The shell block before this runner sliced `review_state()` and the `RUNAWAY_CEILING=` line out of the
+// unattended kit's driver and ran them over every row of the domain both can see: 0 to 3 prior counts,
+// each 0 to 3, a count of 0 to 3 and a limit of 1 to 4 with the round at or below it. Highs are 0 there,
+// so the driver's blocker count and the harness's count are one number. The domain stops at the limit on
+// purpose: past it the driver refuses the round outright where the harness reports CEILING, so the two
+// answer different questions there, and CEILING lies outside the domain on both sides. The arm asserts
+// the four tokens reachable inside it, and AC2's direct case above holds CEILING. A driver that could not
+// be read or sliced fails the arm by name; it never skips.
+{
+  let text = ''
+  try { text = fs.readFileSync(process.argv[6] || '', 'utf8') } catch (e) { text = 'PRODUCER-FAILED the driver rows could not be read: ' + e.message }
+  const failed = text.indexOf('PRODUCER-FAILED') === 0
+  const rows = failed ? [] : text.split('\n').filter((l) => l.trim() !== '').map((l) => l.replace(/\r$/, '').split('|'))
+  // The domain, enumerated here independently, so a producer that emitted fewer rows cannot pass.
+  let want = 0
+  for (let len = 0; len <= 3; len++) want += Math.pow(4, len) * 4 * (4 - len)
+  const bad = rows.filter((r) => {
+    const prior = r[0] === '' ? [] : r[0].split(' ').map(Number)
+    return !roundFns || r.length !== 4 || roundFns[0](prior, Number(r[1]), Number(r[2])) !== r[3]
+  })
+  ck(!failed && rows.length === want && bad.length === 0,
+    'round state: deriveRoundState equals the driver\'s review_state on every one of ' + want + ' rows (' +
+      (failed ? text.trim() : rows.length + ' read, ' + bad.length + ' disagree' + (bad.length ? ', first ' + bad[0].join('|') : '')) + ')')
+  const seen = new Set(rows.map((r) => r[3]))
+  const inDomain = ['CONVERGED', 'NON-CONVERGENT', 'BOUNDED', 'CONVERGING']
+  ck(!failed && inDomain.every((t) => seen.has(t)) && !seen.has('CEILING'),
+    'round state: the parity rows hold each of the four in-domain tokens and no CEILING: ' + [...seen].sort().join(' '))
+}
+
+// ---- TOOL-dFairHearing-18 AC1-AC3 — the `walk` argument, the slicer and the gap check, over the prelude ----
+// Against the base harness, which has no whole-design preset and defines neither function, every arm reds:
+// the preset itself is refused, so no refusal names `walk`, and reading either function is a harness fault.
+const WALK_KEY = 'f'.repeat(64)
+const WALK_OK = { items: [{ tag: 'plan.input', step: 's1' }], scenarios: [{ id: 'S1', name: 'the first', walks: 'one path' }], run: 1, keySha: WALK_KEY }
+const WALK_SPEC = Object.assign({}, DESIGN_SPEC, { preset: 'whole-design' })
+const buildWalk = (over) => Object.assign({}, WALK_SPEC, { walk: Object.assign({}, WALK_OK, over) })
+const WALK_NO = 'tier2-review: `walk'
+arm('walk: whole-design with no walk -> refused naming walk', WALK_SPEC, 'tier2-review: `walk`')
+arm('walk: a walk under preset unit-spec -> refused naming walk', Object.assign({}, DESIGN_SPEC, { preset: 'unit-spec', walk: WALK_OK }), 'tier2-review: `walk`')
+arm('walk: runs 0 -> refused naming walk.runs', buildWalk({ runs: 0 }), WALK_NO + '.runs`')
+arm('walk: runs 4 -> refused naming walk.runs', buildWalk({ runs: 4 }), WALK_NO + '.runs`')
+arm('walk: run 3 past runs 2 -> refused naming walk.run', buildWalk({ runs: 2, run: 3 }), WALK_NO + '.run`')
+arm('walk: seed x -> refused naming walk.seed', buildWalk({ seed: 'x' }), WALK_NO + '.seed`')
+arm('walk: a seeded walk with no keySha -> refused naming walk.keySha', buildWalk({ keySha: undefined }), WALK_NO + '.keySha`')
+arm('walk: a 63-hex keySha -> refused naming walk.keySha', buildWalk({ keySha: 'f'.repeat(63) }), WALK_NO + '.keySha`')
+arm('walk: an item tag carrying a newline -> refused naming walk.items', buildWalk({ items: [{ tag: 'plan\ninput', step: 's1' }] }), WALK_NO + '.items`')
+arm('walk: two scenarios sharing an id -> refused naming walk.scenarios',
+  buildWalk({ scenarios: [{ id: 'S1', name: 'a', walks: 'b' }, { id: 'S1', name: 'c', walks: 'd' }] }), WALK_NO + '.scenarios`')
+arm('walk: an empty items -> refused naming walk.items', buildWalk({ items: [] }), WALK_NO + '.items`')
+// TOOL-dFairHearing-23 AC40 - the grid's ceilings, each refused naming its field and its ceiling, each limit itself proceeding.
+// RED against the parent, which refuses none: every refusing arm proceeds there.
+{
+  const items = (n) => Array.from({ length: n }, (_, i) => ({ tag: 'i' + i, step: 's1' }))
+  const scenario = (over) => [Object.assign({ id: 'S1', name: 'n', walks: 'w' }, over)]
+  arm('FH23 AC40 walk: a run-1 walker slice of 201 cells -> refused naming walk and its 200-cell ceiling', buildWalk({ items: items(201) }),
+    WALK_NO + '` deals walker slot 1 of run 1 201 cells, above the 200-cell ceiling')
+  arm('FH23 AC40 walk: a walker slice of 200 cells -> proceeds', buildWalk({ items: items(200) }), null)
+  // TOOL-dFairHearing-27 AC19 - the cap is read on the slices `deriveWalkSlices` deals for the call's own `run`: 30 items
+  // of one step under 7 scenarios deal run 2's step slot 210 cells, refused before the first agent, where run 1's
+  // scenario deal stays under the ceiling. RED against a cap read on the run-1 deal alone, which admits both.
+  const SC7W = Array.from({ length: 7 }, (_, j) => ({ id: 'S' + (j + 1), name: 'n', walks: 'w' }))
+  arm('FH27 AC19 walk: a run-2 band of 210 cells -> refused naming the slice', buildWalk({ items: items(30), scenarios: SC7W, run: 2 }),
+    WALK_NO + '` deals walker slot 3 of run 2 210 cells, above the 200-cell ceiling')
+  arm('FH27 AC19 walk: the same grid under run 1 -> proceeds', buildWalk({ items: items(30), scenarios: SC7W, run: 1 }), null)
+  arm('FH23 AC40 walk: a scenario name of 121 characters -> refused naming walk.scenarios and its 120-character ceiling',
+    buildWalk({ scenarios: scenario({ name: 'n'.repeat(121) }) }), WALK_NO + '.scenarios` member 0 carries a name of 121 characters, above the 120-character ceiling')
+  arm('FH23 AC40 walk: a scenario name of 120 characters -> proceeds', buildWalk({ scenarios: scenario({ name: 'n'.repeat(120) }) }), null)
+  arm('FH23 AC40 walk: a walks of 601 characters -> refused naming walk.scenarios and its 600-character ceiling',
+    buildWalk({ scenarios: scenario({ walks: 'w'.repeat(601) }) }), WALK_NO + '.scenarios` member 0 carries a walks of 601 characters, above the 600-character ceiling')
+  arm('FH23 AC40 walk: a walks of 600 characters -> proceeds', buildWalk({ scenarios: scenario({ walks: 'w'.repeat(600) }) }), null)
+}
+let walkFns = null
+{
+  let got = null
+  try {
+    got = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn [walk, deriveWalkSlices, deriveWalkGaps]')(
+      Object.assign({}, base, WALK_SPEC, { walk: { items: WALK_OK.items, scenarios: WALK_OK.scenarios, run: 1, keySha: WALK_KEY } }), () => {}, null, null, null)
+  } catch (e) { console.log('HARNESS-BROKEN walk: the prelude did not yield walk and its two functions -> ' + e.message) }
+  ck(!!got && got[0].runs === 2 && got[0].seed === 'reverted-escapes' && got[0].run === 1,
+    'walk: a valid walk proceeds, reading runs 2 and seed reverted-escapes when both are absent: ' + JSON.stringify(got && got[0]))
+  walkFns = got ? got.slice(1) : null
+}
+// AC2 - ten items in five steps of two through seven scenarios, every run dealing each of the 70 cells exactly once.
+{
+  const items = Array.from({ length: 10 }, (_, i) => ({ tag: 'i' + i, step: 'p' + Math.floor(i / 2) }))
+  const scenarios = Array.from({ length: 7 }, (_, j) => ({ id: 'S' + (j + 1), name: 'n', walks: 'w' }))
+  const slices = (run, sc) => (walkFns ? walkFns[0](items, sc || scenarios, run) : [[], [], [], [], []])
+  const dealtOnce = (sl) => { const all = sl.flat().map((c) => c.join('|')); return all.length === 70 && new Set(all).size === 70 }
+  const scenariosOf = (s) => s.map((c) => c[1]).filter((x, i, all) => all.indexOf(x) === i).join(' ')
+  const itemsOf = (s) => s.map((c) => c[0]).filter((x, i, all) => all.indexOf(x) === i).join(' ')
+  const r1 = slices(1)
+  ck(scenariosOf(r1[0]) === 'S1 S6' && scenariosOf(r1[1]) === 'S2 S7' && [2, 3, 4].every((w) => r1[w].length === 10) &&
+    r1.every((s) => s.length && itemsOf(s) === 'i0 i1 i2 i3 i4 i5 i6 i7 i8 i9') && dealtOnce(r1),
+    'walk: run 1 deals S1 S6 and S2 S7 to slots 1 and 2, one scenario to each other, every slice holding all ten items, each cell once: ' + r1.map(scenariosOf).join(' / '))
+  const r2 = slices(2)
+  ck(r2.every((s, w) => s.length === 14 && itemsOf(s) === 'i' + 2 * w + ' i' + (2 * w + 1)) && dealtOnce(r2),
+    'walk: run 2 gives each slot one step\'s two items through all seven scenarios, each cell once: ' + r2.map(itemsOf).join(' / '))
+  const r3 = slices(3)
+  ck(r3.every((s, w) => s.every((c) => (Number(c[0].slice(1)) + Number(c[1].slice(1)) - 1) % 5 === w)) && dealtOnce(r3),
+    'walk: run 3 gives cell (i, j) to slot (i + j) mod 5 + 1, each cell once')
+  const r13 = slices(1, scenarios.slice(0, 3))
+  ck(r13[3].length === 0 && r13[4].length === 0 && r13[0].length === 10, 'walk: over three scenarios run 1 leaves slots 4 and 5 empty')
+}
+// AC3 - one walker's table against its two-cell slice: complete, the planted whitespace witness, and six planted defects.
+{
+  const slices = [[['a', 'S1'], ['b', 'S1']], [], [], [], []]
+  const row = (item, over) => Object.assign({ item: item, scenario: 'S1', actor: '=', needs: '=', witness: '=', route: '=', verdict: 'holds', findings: [] }, over)
+  const gapsOf = (rows, n) => (walkFns ? walkFns[1](slices, [{ findings: Array.from({ length: n || 0 }, () => ({})), walk: rows }, null, null, null, null]) : null)
+  const whole = gapsOf([row('a'), row('b')])
+  ck(!!whole && whole.length === 0, 'walk: a complete table returns no gap: ' + JSON.stringify(whole))
+  const planted = gapsOf([row('a', { witness: '  ' }), row('b')])
+  ck(!!planted && planted.length === 1 && planted[0].indexOf('a · S1') === 0 && planted[0].indexOf('witness') !== -1,
+    'walk: the planted whitespace witness returns one gap naming the item, the scenario and witness: ' + JSON.stringify(planted))
+  for (const [what, rows, n] of [['a missing row', [row('a')]], ['two rows for one cell', [row('a'), row('a'), row('b')]],
+    ['a row outside the slice', [row('a'), row('b'), row('c')]], ['the verdict maybe', [row('a', { verdict: 'maybe' }), row('b')]],
+    ['a finding index past the findings', [row('a', { verdict: 'finding', findings: [1] }), row('b')], 1],
+    ['not-on-path with an empty reason', [row('a', { verdict: 'not-on-path', reason: '' }), row('b')]]]) {
+    const g = gapsOf(rows, n)
+    ck(!!g && g.length === 1, 'walk: ' + what + ' returns one gap: ' + JSON.stringify(g))
+  }
+}
 
 // ==== TOOL-dDerivedDocket-29 — THE WHOLE SCRIPT, over stub agents ==================================
 // The runner evaluates the file as the Workflow runtime does. Each stub is looked up by exact label
@@ -360,10 +666,14 @@ const B = 'b'.repeat(40)
 const H = 'c'.repeat(40)
 // TOOL-aMendedFleet-93 S4 - absent `workerType` reads as Plan, so the durable-spawn arms below pin `none`,
 // which spawns exactly as an absent value did before the default.
-const DIFF = { repo: '/tmp/r', base: B, head: H, round: 1, context: 'ctx', reviewDir: 'memory/reviews', workerType: 'none' }
-const SPEC = { repo: '/tmp/r', kind: 'spec-audit', round: 1, context: 'ctx', subjects: [{ path: 'memory/builds/dX/spec/s.md', blob: 'abc1234', id: 'TOOL-x-1', rev: 1 }], scratch: '/tmp/s', workerType: 'none' }
+// TOOL-dFairHearing-1 S9 - absent `addressTwins` reads as shown and absent `fixJudge` as class, so every arm
+// below pins `hidden` and `instance`, which run exactly as an absent value did before the two flips; the
+// arms that read the defaults themselves delete the pins.
+const DIFF = { repo: '/tmp/r', base: B, head: H, round: 1, context: 'ctx', reviewDir: 'memory/reviews', workerType: 'none', addressTwins: 'hidden', fixJudge: 'instance' }
+const SPEC = { repo: '/tmp/r', kind: 'spec-audit', round: 1, context: 'ctx', subjects: [{ path: 'memory/builds/dX/spec/s.md', blob: 'abc1234', id: 'TOOL-x-1', rev: 1 }], scratch: '/tmp/s', workerType: 'none', addressTwins: 'hidden', fixJudge: 'instance' }
+const DESIGN = Object.assign({}, SPEC, { subjects: [{ path: 'memory/builds/dX/build/a.md', blob: 'abc1234', id: 'PLAY-dX-1' }] })
 const buildProbe = (finds, verifies, base, head) => ({ commonDir: '/cd', base: base || B, head: head || H, finds: finds || [], verifies: verifies || [] })
-// One finding per lens, so five lenses make five ids and five batches of one: verify:ids-1-1 .. 5-5.
+// One finding per lens, so five lenses make five ids and five batches of one: verify:batch-1 .. verify:batch-5.
 const buildLensReturn = (label) => {
   const lens = label.slice('find:'.length)
   return { lens: lens, path: '/cd/review-lenses/k/find-' + lens + '.json', findings: [{ file: lens + '.js', line: 1, where: 'section 1', severity: 'high', claim: lens + ' claim', impact: 'i', fix: 'f' }] }
@@ -374,11 +684,14 @@ const buildVerdicts = (verdict) => (label, prompt) => {
   const ids = m ? m[1].split(',').map((x) => parseInt(x, 10)) : []
   return { path: '/cd/v.json', verdicts: ids.map((id) => ({ id: id, verdict: verdict, reason: 'r' })) }
 }
+// TOOL-dFairHearing-6 - an item's `grades`, every id it holds at one grade: the stubs below place each id
+// at the item's severity, the count the tally read before per-id grades.
+const buildGrades = (ids, sev) => Object.fromEntries(ids.map((id) => [String(id), sev]))
 // The synthesis places every CONFIRMED id in one item unless told to drop one.
 const buildSynth = (drop) => (label, prompt) => {
   const head = prompt.split('UNVERIFIED findings')[0]
   const ids = [...head.matchAll(/id=(\d+) \[/g)].map((x) => parseInt(x[1], 10)).filter((id) => id !== drop)
-  return { path: 'memory/reviews/r.md', summary: 's', items: [{ severity: 'HIGH', ids: ids, specs: ['TOOL-x-1'] }] }
+  return { path: 'memory/reviews/r.md', summary: 's', items: [{ severity: 'HIGH', ids: ids, grades: buildGrades(ids, 'HIGH'), specs: ['TOOL-x-1'] }] }
 }
 const ALL_OK ={ 'resume:probe': buildProbe(), 'find:': buildLensReturn, 'verify:': buildVerdicts('confirmed'), synth: buildSynth(null) }
 const buildStubs = (over) => Object.assign({}, ALL_OK, over)
@@ -394,9 +707,64 @@ async function runWholeScriptArms() {
       'a run where every agent returned exits complete, with no pending label and an integer blocker count')
     ck(typeof r.result.key === 'string' && r.result.key.indexOf('diff-review-r1-' + B.slice(0, 12) + '-' + H.slice(0, 12) + '-') === 0,
       'the diff-review key is kind, round and the RESOLVED base and head, then the input print: ' + r.result.key)
-    ck(r.trace[0] && r.trace[0].label === 'resume:probe', 'the resume probe is the first agent, before any lens')
+    // TOOL-dFairHearing-15 - DIFF passes no `checklist`, so the checklist agent spawns first and the probe second.
+    ck(r.trace[0] && r.trace[0].label === 'resume:checklist' && r.trace[1] && r.trace[1].label === 'resume:probe',
+      'the checklist agent, then the resume probe, are the first two agents, before any lens')
+    // TOOL-dFairHearing-32 AC1 - the resume probe's instruction names the skeptic file by the name the
+    // batches write. The retired id-range spelling is AC1's tree-wide grep, so this file never spells it.
+    const probeAsk = (r.trace.find((t) => t.label === 'resume:probe') || { prompt: '' }).prompt
+    ck(probeAsk.indexOf('verify-batch-<n>.json') !== -1, 'FH32 AC1 the resume:probe prompt names verify-batch-<n>.json')
   }
   const K = r.result ? r.result.key : ''
+
+  // ---- TOOL-dFairHearing-37 AC6: a `repo` of `C:\x\y` reaches every prompt's `git -C` as `C:/x/y`, the
+  // fold at the harness's one `repo` read. RED against that read taking `a.repo` raw, as at unit 32's commit.
+  {
+    const rw = await runReview(Object.assign({}, DIFF, { repo: 'C:\\x\\y' }), ALL_OK)
+    const ps = rw.trace.map((t) => t.prompt)
+    const named = ps.join('\n').match(/git -C [^\s`]+/g) || []
+    ck(!rw.threw && named.length > 0 && named.every((g) => g === 'git -C "C:/x/y"') && ps.every((p) => p.indexOf('C:\\x') === -1),
+      'FH37 AC6 a repo of C:\\x\\y reaches every prompt as git -C "C:/x/y": ' + named.length + ' git -C command(s), ' +
+      JSON.stringify(named.filter((g) => g !== 'git -C "C:/x/y"').slice(0, 3)))
+  }
+
+  // ---- TOOL-dFairHearing-40 AC19: every `git -C` quotes `repo`, so a `repo` of `C:/x y/z` reaches each
+  // prompt as one argument, and a `repo` holding `$`, `"` or a backtick is refused naming it before any
+  // agent spawns. RED against the harness at unit 37's commit `6d768c563`, where all 13 interpolations
+  // are bare and no character of `repo` is refused. This run is the diff kind; the spec presets are the
+  // `FH43 AC7` arm in runWalkArms.
+  {
+    const rs = await runReview(Object.assign({}, DIFF, { repo: 'C:/x y/z' }), ALL_OK)
+    const named = rs.trace.map((t) => t.prompt).join('\n').match(/git -C (?:"[^"]*"|[^\s`]+)/g) || []
+    ck(!rs.threw && named.length > 0 && named.every((g) => g === 'git -C "C:/x y/z"'),
+      'FH40 AC19 a repo of C:/x y/z reaches every prompt of a diff review as git -C "C:/x y/z": ' + named.length + ' git -C command(s), ' +
+      JSON.stringify(named.filter((g) => g !== 'git -C "C:/x y/z"').slice(0, 3)))
+    const unrefused = []
+    for (const c of ['$', '"', '`']) {
+      const rr = await runReview(Object.assign({}, DIFF, { repo: '/tmp/a' + c + 'b' }), ALL_OK)
+      if (!rr.threw || rr.threw.indexOf(JSON.stringify(c)) === -1 || rr.trace.length !== 0) unrefused.push(c + ' ' + (rr.threw || 'did not throw'))
+    }
+    ck(unrefused.length === 0, 'FH40 AC19 a repo holding $, " or a backtick is refused naming it before any agent spawns: ' + JSON.stringify(unrefused))
+  }
+
+  // ---- TOOL-dFairHearing-43 AC1: `base` and `head` reach the checklist agent's and the probe's shell lines, so a
+  // value outside the ref shape is refused naming its field before any agent; a moving ref and a parent suffix
+  // complete, the checklist agent first. RED against the harness at unit 40, where the `head` run spawns that agent
+  // with the value in its command.
+  {
+    const unrefused = []
+    for (const [field, v] of [['head', 'HEAD;echo PWNED'], ['base', 'abc $(echo PWNED)'], ['base', 'ab`c'], ['base', '-x']]) {
+      const rr = await runReview(Object.assign({}, DIFF, { [field]: v }), ALL_OK)
+      if (!rr.threw || rr.threw.indexOf('tier2-review:') !== 0 || rr.threw.indexOf('`' + field + '`') === -1 || rr.trace.length !== 0) unrefused.push(field + ' ' + v + ' ' + (rr.threw || 'did not throw'))
+    }
+    ck(unrefused.length === 0, 'FH43 AC1 a base or head outside the ref shape is refused naming its field before any agent spawns: ' + JSON.stringify(unrefused))
+    const stopped = []
+    for (const over of [{ base: 'origin/main' }, { head: 'HEAD~1' }]) {
+      const rr = await runReview(Object.assign({}, DIFF, over), ALL_OK)
+      if (rr.threw || !rr.trace[0] || rr.trace[0].label !== 'resume:checklist') stopped.push(JSON.stringify(over) + ' ' + rr.threw)
+    }
+    ck(stopped.length === 0, 'FH43 AC1 a base of origin/main and a head of HEAD~1 each complete, the checklist agent first: ' + JSON.stringify(stopped))
+  }
 
   // ---- TOOL-aOrientedCast-27 AC8: every whole label is `<slug> · <kind> round <n> · <stage>`, the slug
   // read from a `builds/<slug>/` reviewDir and absent outside one; every check carries its count, so an
@@ -406,7 +774,7 @@ async function runWholeScriptArms() {
     const fb = rb.trace.map((t) => t.full)
     ck(!rb.threw && fb.length > 0 && fb.every((f) => f.indexOf('tB · diff-review round 1 · ') === 0),
       'OC27 AC8 in a build folder every label opens "tB · diff-review round 1 · ": ' + fb.length + ' label(s)')
-    const ends = [/ · resume:probe$/, / · find:[a-z-]+$/, / · verify:ids-\d+-\d+$/, / · synth$/].map((re) => fb.filter((f) => re.test(f)).length)
+    const ends = [/ · resume:probe$/, / · find:[a-z-]+$/, / · verify:batch-\d+$/, / · synth$/].map((re) => fb.filter((f) => re.test(f)).length)
     ck(ends.every((c) => c > 0), 'OC27 AC8 ...and the probe, a finder, a skeptic batch and the synthesis each carry one: ' + ends.join(' '))
     const fr = r.trace.map((t) => t.full)
     ck(fr.length > 0 && fr.every((f) => f.indexOf('diff-review round 1 · ') === 0),
@@ -435,9 +803,9 @@ async function runWholeScriptArms() {
   ck(finds.length === 5 && finds.every((t) => t.prompt.indexOf('/review-lenses/' + K + '/find-' + t.label.slice(5) + '.json') !== -1),
     'AC1 every find: prompt names review-lenses/<key>/find-<lens>.json')
   ck(verifies.length === 5 && verifies.every((t) => {
-    const m = /^verify:ids-(\d+)-(\d+)$/.exec(t.label)
-    return m && t.prompt.indexOf('/review-lenses/' + K + '/verify-' + m[1] + '-' + m[2] + '.json') !== -1
-  }), 'AC1 every verify: prompt names review-lenses/<key>/verify-<first id>-<last id>.json')
+    const m = /^verify:batch-(\d+)$/.exec(t.label)
+    return m && t.prompt.indexOf('/review-lenses/' + K + '/verify-batch-' + m[1] + '.json') !== -1
+  }), 'AC1 every verify: prompt names review-lenses/<key>/verify-batch-<n>.json')
   ck(finds.every((t) => t.prompt.indexOf('BEFORE you return') !== -1) && verifies.every((t) => t.prompt.indexOf('BEFORE you return') !== -1),
     'AC1 both prompt kinds order the write BEFORE the return')
   ck(finds.every((t) => t.schema && t.schema.required.indexOf('path') !== -1), 'AC1 the diff finding schema lists path in required')
@@ -518,7 +886,8 @@ async function runWholeScriptArms() {
 
   // ---- TOOL-aMendedFleet-67 S5 - `workerType` routes the JUDGES and only them, and they write nothing.
   // ---- The default half reads the first run's judges, so an arm that always sets the option reds here.
-  ck(finds.concat(verifies).every((t) => t.agentType === undefined), 'workerType: none, no judge spawn carries an agentType')
+  // TOOL-dFairHearing-11 S2 - `none` types every judge as PLATFORM_TYPE, so no judge spawns untyped.
+  ck(finds.concat(verifies).every((t) => t.agentType === 'general-purpose'), 'workerType: none, every judge spawn carries agentType general-purpose')
   const ABSENT = Object.assign({}, DIFF)
   delete ABSENT.workerType
   const rd = await runReview(ABSENT, ALL_OK)
@@ -535,7 +904,9 @@ async function runWholeScriptArms() {
     const judges = r.trace.filter((t) => /^(find|verify):/.test(t.label))
     const orch = r.trace.filter((t) => !/^(find|verify):/.test(t.label))
     ck(judges.length === 10 && judges.every((t) => t.agentType === 'Plan'), 'workerType: all five finders and five skeptic batches spawn as Plan')
-    ck(orch.length === 2 && orch.every((t) => t.agentType === undefined), 'workerType: the probe and the synthesis carry none: ' + orch.map((t) => t.label).join(' '))
+    ck(orch.length === 3 && orch[0].label === 'resume:checklist' && orch[0].agentType === 'Plan' && orch[1].label === 'resume:probe' &&
+      orch[1].agentType === 'Plan' && orch[2].agentType === 'general-purpose',
+      'workerType: the probe takes Plan and the synthesis general-purpose, never the worker type: ' + orch.map((t) => t.label + '=' + t.agentType).join(' '))
     ck(judges.every((t) => t.prompt.indexOf('DURABILITY') === -1), 'workerType: no judge is told to write a lens or verify file')
     ck(judges.every((t) => t.prompt.indexOf('Set path to an empty string') !== -1), 'workerType: every judge is told to return path empty')
     ck(r.logs.some((l) => l.indexOf('worker type Plan') === 0 && l.indexOf('NOT durable') !== -1), 'workerType: the log says the results are not durable')
@@ -601,16 +972,58 @@ async function runWholeScriptArms() {
   let print = ''
   if (checkNoThrow(r, 'AC5 print capture')) {
     ck(r.scanSpawned('find:').length === 0, 'AC5 with every lens file present no lens is dispatched')
-    const v1 = r.trace.find((t) => t.label === 'verify:ids-1-1')
+    const v1 = r.trace.find((t) => t.label === 'verify:batch-1')
     const m = v1 ? /"batch":"([0-9a-f]{8})"/.exec(v1.prompt) : null
     print = m ? m[1] : ''
     ck(print.length === 8, 'AC5 the verify prompt names the batch print the file must carry')
   }
-  const vfile = (batch) => ({ name: 'verify-1-1.json', key: K, batch: batch, path: '/cd/v.json', verdicts: [{ id: 1, verdict: 'confirmed', reason: 'r' }] })
+  const vfile = (batch) => ({ name: 'verify-batch-1.json', key: K, batch: batch, ids: [1], path: '/cd/v.json', verdicts: [{ id: 1, verdict: 'confirmed', reason: 'r' }] })
   r = await runReview(DIFF, buildStubs({ 'resume:probe': buildProbe(allLensFiles, [vfile(print)]) }))
-  if (checkNoThrow(r, 'AC5 matching print')) ck(r.scanSpawned('verify:ids-1-1').length === 0 && r.result.batchesReused === 1, 'AC5 a verify file with the key and the matching print is reused')
+  if (checkNoThrow(r, 'AC5 matching print')) ck(r.scanSpawned('verify:batch-1').length === 0 && r.result.batchesReused === 1, 'AC5 a verify file with the key and the matching print is reused')
   r = await runReview(DIFF, buildStubs({ 'resume:probe': buildProbe(allLensFiles, [vfile('0badf00d')]) }))
-  if (checkNoThrow(r, 'AC5 other print')) ck(r.scanSpawned('verify:ids-1-1').length === 1, 'AC5 the right ids over a print of other claims is dispatched')
+  if (checkNoThrow(r, 'AC5 other print')) ck(r.scanSpawned('verify:batch-1').length === 1, 'AC5 the right ids over a print of other claims is dispatched')
+
+  // ---- TOOL-dFairHearing-4 AC5/AC6 — address-ordered batches, numbered labels and files, `ids` carried.
+  // Five lenses of two findings each, every lens's first citing a.js line 10 and its second its own file.
+  {
+    const buildAddressLens = (label) => {
+      const lens = label.slice('find:'.length)
+      const mk = (file, claim) => ({ file: file, line: file === 'a.js' ? 10 : 1, severity: 'high', claim: lens + ' ' + claim, impact: 'i', fix: 'f' })
+      return { lens: lens, path: '/p', findings: [mk('a.js', 'shared'), mk(lens + '.js', 'own')] }
+    }
+    const A_IDS = [1, 3, 5, 7, 9]
+    const readBatches = (rr) => rr.trace.filter((t) => t.label.indexOf('verify:') === 0)
+      .map((t) => ({ label: t.label, prompt: t.prompt, ids: [...t.prompt.matchAll(/^id=(\d+) \[/gm)].map((x) => parseInt(x[1], 10)) }))
+    const ra = await runReview(Object.assign({}, DIFF, { batchBy: 'address' }), buildStubs({ 'find:': buildAddressLens }))
+    const rd = await runReview(DIFF, buildStubs({ 'find:': buildAddressLens }))
+    if (checkNoThrow(ra, 'batch: address run') && checkNoThrow(rd, 'batch: id run')) {
+      const ga = readBatches(ra)
+      const gd = readBatches(rd)
+      const shared = (g) => g.map((x) => x.ids.filter((id) => A_IDS.indexOf(id) !== -1).length).join(',')
+      ck(shared(ga) === '2,2,1,0,0', 'batch: by address the five a.js findings fill three consecutive batches: ' + shared(ga))
+      ck(gd.length === 5 && gd.every((x) => x.ids.filter((id) => A_IDS.indexOf(id) !== -1).length <= 1), 'batch: by id no two a.js findings share a batch: ' + shared(gd))
+      const NUMBERED = 'verify:batch-1 verify:batch-2 verify:batch-3 verify:batch-4 verify:batch-5'
+      ck(ga.map((x) => x.label).join(' ') === NUMBERED && gd.map((x) => x.label).join(' ') === NUMBERED,
+        'batch: both orders spawn exactly five skeptics, verify:batch-1 to verify:batch-5')
+      ck([ga, gd].every((g) => g.every((x, i) => x.ids.length === 2 && x.prompt.indexOf('/verify-batch-' + (i + 1) + '.json') !== -1 &&
+        x.prompt.indexOf('"ids":[' + x.ids.join(',') + ']') !== -1)), 'batch: each verify prompt names verify-batch-<n>.json and an "ids" list equal to its own findings')
+      ck(ra.logs.some((l) => / verifier\(s\) \(cap \d+\) by address$/.test(l)) && rd.logs.some((l) => / verifier\(s\) \(cap \d+\) by id$/.test(l)),
+        'batch: the verifier log line names the order it sliced by')
+    }
+    const lensFiles = ['security', 'correctness', 'seams', 'verification', 'intent'].map((l) => Object.assign({ name: 'find-' + l + '.json', key: K }, buildAddressLens('find:' + l)))
+    const r0 = await runReview(DIFF, buildStubs({ 'find:': buildAddressLens, 'resume:probe': buildProbe(lensFiles) }))
+    const v1 = r0.trace.find((t) => t.label === 'verify:batch-1')
+    const bp = v1 ? (/"batch":"([0-9a-f]{8})"/.exec(v1.prompt) || [])[1] || '' : ''
+    const bids = v1 ? [...v1.prompt.matchAll(/^id=(\d+) \[/gm)].map((x) => parseInt(x[1], 10)) : []
+    const vf = (name, ids) => Object.assign({ name: name, key: K, batch: bp, path: '/cd/v.json', verdicts: bids.map((id) => ({ id: id, verdict: 'confirmed', reason: 'r' })) }, ids ? { ids: ids } : {})
+    const reuseArm = async (file, reused, name) => {
+      const rr = await runReview(DIFF, buildStubs({ 'find:': buildAddressLens, 'resume:probe': buildProbe(lensFiles, [file]) }))
+      if (checkNoThrow(rr, name)) ck(bp.length === 8 && rr.scanSpawned('verify:batch-1').length === (reused ? 0 : 1) && rr.result.batchesReused === (reused ? 1 : 0), name)
+    }
+    await reuseArm(vf('verify-batch-1.json', bids), true, 'batch: verify-batch-1.json with the key, the batch print and ids is reused, batchesReused 1')
+    await reuseArm(vf('verify-1-2.json', bids), false, 'batch: the same file named verify-1-2.json is dispatched')
+    await reuseArm(vf('verify-batch-1.json', null), false, 'batch: the same file lacking ids is dispatched')
+  }
 
   // ---- AC6: the three lens-stage death paths all defer and none reads clean or partial.
   r = await runReview(DIFF, buildStubs({ 'find:': null }))
@@ -633,9 +1046,9 @@ async function runWholeScriptArms() {
 
   // ---- AC7: a dead skeptic batch defers WITHOUT a synthesis; a dead synthesis defers; the tally
   // ---- fault stays complete beside a null count.
-  r = await runReview(DIFF, buildStubs({ 'verify:ids-2-2': null }))
+  r = await runReview(DIFF, buildStubs({ 'verify:batch-2': null }))
   if (checkNoThrow(r, 'AC7 dead batch')) {
-    ck(r.result.exit === 'deferred-platform' && r.result.blockers === null && r.result.pending.join(' ') === 'verify:ids-2-2',
+    ck(r.result.exit === 'deferred-platform' && r.result.blockers === null && r.result.pending.join(' ') === 'verify:batch-2',
       'AC7 one skeptic batch dead: deferred, blockers null, that batch pending')
     ck(r.scanSpawned('synth').length === 0, 'AC7 ...and no synthesis runs over the half-judged set')
   }
@@ -724,6 +1137,30 @@ async function runWholeScriptArms() {
   r = await runReview(Object.assign({}, SPEC, { lensNotes: { reuse: 'n' } }), ALL_OK)
   ck(!r.threw && r.result && r.result.exit === 'complete' && r.scanSpawned('find:').length === 5,
     'a malformed lensNotes refuses before any agent spawns: control, a spec-kind key on a spec audit, proceeds')
+  // ---- TOOL-dFairHearing-9 AC4: a per-preset map, each run reading its own literal's entry and no other.
+  // ---- Five finders are asserted beside each absence, so it cannot pass over a run that spawned none.
+  // ---- RED against the base harness, which refuses `unit-spec` as a lens key.
+  const PER_PRESET = { 'unit-spec': { reuse: 'FH9-N1' }, 'design-audit': { 'alternatives-and-cost': 'FH9-N2' } }
+  const noteCarriers = (run, mark) => run.trace.filter((t) => t.prompt.indexOf(mark) !== -1).map((t) => t.label).join(' ')
+  for (const [preset, own, other, lens] of [['unit-spec', 'FH9-N1', 'FH9-N2', 'reuse'], ['design-audit', 'FH9-N2', 'FH9-N1', 'alternatives-and-cost']]) {
+    r = await runReview(Object.assign({}, SPEC, preset === 'unit-spec' ? {} : { preset: preset }, { lensNotes: PER_PRESET }), ALL_OK)
+    ck(!r.threw && r.scanSpawned('find:').length === 5 && noteCarriers(r, own) === 'find:' + lens && noteCarriers(r, other) === '',
+      'lens notes: AC4 a ' + preset + ' run reads its own per-preset entry, in find:' + lens + ' alone, and never another preset\'s: ' + (r.threw || noteCarriers(r, own)))
+  }
+  // ---- TOOL-dFairHearing-9 AC6: a typo'd key, flat or in the run's entry, names the legal keys; an object
+  // ---- mixing literal names with lens keys names both forms. Each before the first agent.
+  for (const [what, notes, word] of [['a typo\'d flat key', { nope: 'x' }, 'legal keys: ' + SPEC_KEYS],
+    ['a typo\'d key in the run\'s entry', { 'unit-spec': { nope: 'x' } }, 'legal keys: ' + SPEC_KEYS],
+    ['a mixed object', { 'unit-spec': { reuse: 'x' }, reuse: 'y' }, 'per-preset form']]) {
+    r = await runReview(Object.assign({}, SPEC, { lensNotes: notes }), ALL_OK)
+    ck(typeof r.threw === 'string' && r.threw.indexOf('tier2-review: `lensNotes`') === 0 && r.threw.indexOf(word) !== -1 && r.trace.length === 0,
+      'lens notes: AC6 ' + what + ' refuses before any agent, naming "' + word + '": ' + r.threw)
+  }
+  // ---- TOOL-dFairHearing-9 AC7: the flat and the per-preset form of one note derive one review key.
+  const kFlat = await runReview(Object.assign({}, SPEC, { lensNotes: { reuse: 'N' } }), ALL_OK)
+  const kPer = await runReview(Object.assign({}, SPEC, { lensNotes: { 'unit-spec': { reuse: 'N' } } }), ALL_OK)
+  ck(!!kFlat.result && !!kPer.result && !!kFlat.result.key && kFlat.result.key === kPer.result.key,
+    'lens notes: AC7 the flat and the per-preset form of one note derive one review key: ' + (kFlat.threw || kFlat.result.key) + ' / ' + (kPer.threw || (kPer.result && kPer.result.key)))
 
   // ---- AC5: the absence is ANNOUNCED in the log and in RUN INTEGRITY; a supplied note silences the
   // ---- warning and is named instead.
@@ -763,7 +1200,7 @@ async function runWholeScriptArms() {
   r = await runReview(Object.assign({}, DIFF, { context: 'CTX-MARK', byDesign: 'BD-MARK' }), ALL_OK)
   if (checkNoThrow(r, 'briefed skeptic')) {
     const bv = scanPrompts(r, 'verify:')
-    ck(bv.length === 5 && bv.every((t) => t.prompt.indexOf('REPO: /tmp/r') !== -1 && t.prompt.indexOf('git -C /tmp/r diff ' + B + '...' + H) !== -1 &&
+    ck(bv.length === 5 && bv.every((t) => t.prompt.indexOf('REPO: /tmp/r') !== -1 && t.prompt.indexOf('git -C "/tmp/r" diff ' + B + '...' + H) !== -1 &&
       t.prompt.indexOf('CTX-MARK') !== -1 && t.prompt.indexOf('BD-MARK') !== -1),
       'a skeptic prompt carries the repo, the range, the context and the by-design list')
   }
@@ -930,7 +1367,8 @@ async function runWholeScriptArms() {
       'checklist: fewer items than lenses leaves an explicit empty share: ' + none.join(' '))
   }
   // ---- AC4: absent and empty are each announced in their own words; a real checklist warns nothing.
-  r = await runReview(DIFF, ALL_OK)
+  // On the SPEC kind since TOOL-dFairHearing-15: a diff review with none acquires one, armed below.
+  r = await runReview(SPEC, ALL_OK)
   if (checkNoThrow(r, 'checklist absent')) {
     const sp = r.trace.find((t) => t.label === 'synth')
     const fp = scanPrompts(r, 'find:')
@@ -963,6 +1401,54 @@ async function runWholeScriptArms() {
     ck(scanSplit(r, SPEC_ORDER) && fp.every((t) => t.prompt.indexOf('against the spec set') !== -1),
       'spec-audit: the checklist splits over the spec lenses')
   }
+
+  // ==== TOOL-dFairHearing-15 — a diff review given no `checklist` ACQUIRES one (AC1-AC4) ===============
+  // Every arm is RED against the parent render, which spawns no `resume:checklist` agent: AC1's items reach
+  // no prompt, and every no-checklist run logs the absent WARNING and states `absent` in RUN INTEGRITY.
+  // TOOL-dFairHearing-23 S36 - the stub ends in the checker's `# by design —` head, as every whole stdout does.
+  const ACQ = '# recurring-bug-class checklist for b..c (1 file(s))\n# 3 class(es) selected by an anchor + 0 universal\n\n' +
+    '- [ ] ACQONEX\n- [ ] ACQTWOX\n- [ ] ACQTHREEX\n\n# by design — 0 invariant(s) this selection touches\n'
+  const extractChecklistLine = (run) => {
+    const sp = run.trace.find((t) => t.label === 'synth')
+    return (/(^|\n)(Checklist: [^\n]*)/.exec(sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : '') || ['', '', ''])[2]
+  }
+  // TOOL-dFairHearing-48 S6 - a prefix of any depth: one spelling ending the memory-tree kit's directory, one not.
+  const CHECKER_SPELLED = /ls-files --error-unmatch (\S*\/)?gotchas\.py/g
+  r = await runReview(DIFF, buildStubs({ 'resume:checklist': { checklist: ACQ } }))
+  if (checkNoThrow(r, 'FH15 checklist acquired')) {
+    const cp = r.trace[0] || { label: '', prompt: '' }
+    const inKit = [...cp.prompt.matchAll(CHECKER_SPELLED)].map((x) => /(^|\/)memory-tree\/$/.test(x[1] || ''))
+    ck(cp.label === 'resume:checklist' && cp.prompt.indexOf('--for-diff ' + B + '..' + H) !== -1 &&
+      inKit.includes(true) && inKit.includes(false),
+      'FH48 AC6 FH15 AC1 the first agent is resume:checklist, naming --for-diff <base>..<head> and both checker spellings: ' + cp.label)
+    ck(['ACQONEX', 'ACQTWOX', 'ACQTHREEX'].every((x, i) => scanPrompts(r, 'find:').some((t) => new RegExp('(^|\\n)C' + (i + 1) + ' \\[ \\] ' + x).test(t.prompt))),
+      'FH15 AC1 the three acquired items reach the finder prompts as C1, C2 and C3')
+    ck(r.logs.indexOf('checklist from --for-diff ' + B + '..' + H) !== -1 &&
+      extractChecklistLine(r).indexOf('acquired by the harness from --for-diff ' + B + '..' + H) !== -1,
+      'FH15 S3 an acquired checklist is logged and stated in RUN INTEGRITY: ' + extractChecklistLine(r))
+  }
+  r = await runReview(Object.assign({}, DIFF, { checklist: ['CALLERONEX'] }), buildStubs({ 'resume:checklist': { checklist: ACQ } }))
+  ck(!r.threw && r.scanSpawned('resume:checklist').length === 0 && scanPrompts(r, 'find:').some((t) => t.prompt.indexOf('CALLERONEX') !== -1) &&
+    r.trace.length > 0 && r.trace.every((t) => t.prompt.indexOf('ACQONEX') === -1), 'FH15 AC2 a caller\'s checklist wins, and no checklist agent spawns')
+  for (const [what, ret, why] of [['a checklistError', { checklistError: 'no checker tracked' }, 'no checker tracked'],
+    ['stdout with no item line', { checklist: '# recurring-bug-class checklist for b..c (0 file(s))\n' }, 'no bug class selected'],
+    ['a dead agent', null, 'the checklist agent died']]) {
+    r = await runReview(DIFF, buildStubs({ 'resume:checklist': ret }))
+    const line = extractChecklistLine(r)
+    ck(!r.threw && r.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf(why) !== -1) && line.indexOf(why) !== -1 &&
+      line.indexOf('supplied with no item') === -1 && line.indexOf('— absent') === -1,
+      'FH15 AC3 ' + what + ' is warned and named in RUN INTEGRITY, never as absent or supplied: ' + (r.threw || line))
+  }
+  // TOOL-dFairHearing-50 S2 - a whole return whose head lines state no class holds no item and stays a genuine zero,
+  // never a cut. Without it a fix reading any head line as a cut stays green: the fixture above has no selection line.
+  r = await runReview(DIFF, buildStubs({ 'resume:checklist': { checklist: '# recurring-bug-class checklist for b..c (1 file(s))\n' +
+    '# 0 class(es) selected by an anchor + 0 universal\n\n# by design — 0 invariant(s) this selection touches\n' } }))
+  ck(!r.threw && r.logs.some((l) => l.indexOf('WARNING: no checklist was acquired — no bug class selected') === 0),
+    'FH50 AC2 a head stating no class and no item stays no bug class selected, never a cut: ' +
+      (r.threw || r.logs.filter((l) => l.indexOf('checklist') !== -1).join(' / ')))
+  r = await runReview(SPEC, buildStubs({ 'resume:checklist': { checklist: ACQ } }))
+  ck(!r.threw && r.trace.length > 0 && r.scanSpawned('resume:checklist').length === 0 && r.trace.every((t) => t.prompt.indexOf('ACQONEX') === -1),
+    'FH15 AC4 a spec audit with no checklist spawns no checklist agent')
 
   // ==== TOOL-aGraftedHelix-3 — the checker's by-design block becomes `byDesign`, never an item =========
   // Every arm is RED against the parent render, which reads no block: the entry is swept as item C2,
@@ -1029,6 +1515,30 @@ async function runWholeScriptArms() {
       'by-design range: every lens reads bd-base as intended behaviour, and no prompt carries bd-new\'s ruling')
     ck(fp.filter((t) => t.prompt.indexOf('NEW/CHANGED invariant bd-new') !== -1).length === 1,
       'by-design range: exactly one lens sweeps the added invariant as a NEW/CHANGED item')
+  }
+  // ---- TOOL-dFairHearing-15 AC5: the same real stdout ACQUIRED by the checklist agent keeps the checker's
+  // item order as the C<n> labels and its by-design block reaches `byDesign`. RED against the parent render,
+  // which spawns no checklist agent, so no item reaches a prompt and no invariant is logged.
+  r = await runReview(DIFF, buildStubs({ 'resume:checklist': { checklist: BD_RANGE } }))
+  if (bdRan && checkNoThrow(r, 'FH15 acquired by-design range')) {
+    const fp = scanPrompts(r, 'find:')
+    const acqItems = BD_RANGE.split('\n# by design')[0].replace(/\r/g, '').split('\n').filter((l) => l.indexOf('- ') === 0).map((l) => l.slice(2).replace(/\s+$/, ''))
+    ck(acqItems.length > 0 && acqItems.every((x, i) => fp.filter((t) => t.prompt.indexOf('C' + (i + 1) + ' ' + x) !== -1).length === 1),
+      'FH15 AC5 the acquired items reach the finders as C<n> in the checker\'s order: ' + acqItems.length + ' item(s)')
+    ck(r.logs.indexOf('by-design: 1 invariant(s) from the checklist\'s by-design block') !== -1 && !fp.some((t) => /(^|\n)C\d+ bd-base/.test(t.prompt)),
+      'FH15 AC5 the acquired by-design block reaches byDesign, and no lens sweeps it as a class')
+  }
+  // ---- TOOL-dFairHearing-23 AC27: the same real stdout cut inside its item list, or before its by-design head, is a
+  // checklistError and passes no checklist. RED against the parent render, which admits any return holding one `- ` line.
+  if (bdRan) {
+    const bdHead = BD_RANGE.indexOf('\n# by design')
+    const bdLast = BD_RANGE.lastIndexOf('\n- ', bdHead)
+    for (const [what, ret] of [['cut inside its item list', BD_RANGE.slice(0, bdLast + 1)], ['cut before its by-design head', BD_RANGE.slice(0, bdHead + 1)],
+      ['missing one item above its head', BD_RANGE.slice(0, bdLast + 1) + BD_RANGE.slice(bdHead + 1)]]) {
+      r = await runReview(DIFF, buildStubs({ 'resume:checklist': { checklist: ret } }))
+      ck(!r.threw && r.logs.some((l) => l.indexOf('WARNING: no checklist was acquired — checklistError') === 0) && r.logs.indexOf('checklist from --for-diff ' + B + '..' + H) === -1,
+        'FH23 AC27 the real stdout ' + what + ' is a checklistError WARNING and passes no checklist: ' + (r.threw || r.logs.filter((l) => l.indexOf('checklist') !== -1).join(' / ')))
+    }
   }
 
   // ==== TOOL-aSightedSkeptic-2 — the skeptic judges each finding's proposed fix as well as its claim ====
@@ -1139,7 +1649,7 @@ async function runWholeScriptArms() {
   })
   r = await runReview(DIFF, buildStubs({ 'resume:probe': buildProbe(otherFixFiles, [vfile(print)]) }))
   if (checkNoThrow(r, 'fix verdict other fix')) {
-    ck(print.length === 8 && r.scanSpawned('find:').length === 0 && r.scanSpawned('verify:ids-1-1').length === 1,
+    ck(print.length === 8 && r.scanSpawned('find:').length === 0 && r.scanSpawned('verify:batch-1').length === 1,
       'fix verdict: a verify file judged over another fix is dispatched')
   }
 
@@ -1204,7 +1714,7 @@ async function runWholeScriptArms() {
       'severity: a confirmed verdict with no grade falls back to the finder\'s, counted and announced')
   }
   // ---- AC5: one batch answers uncertain; it is unverified, outside precision, and listed with its reason.
-  r = await runReview(DIFF, buildStubs({ 'verify:ids-3-3': buildGradedVerdicts('uncertain') }))
+  r = await runReview(DIFF, buildStubs({ 'verify:batch-3': buildGradedVerdicts('uncertain') }))
   if (checkNoThrow(r, 'uncertain verdict')) {
     const sp = r.trace.find((t) => t.label === 'synth')
     const uv = sp ? sp.prompt.slice(sp.prompt.indexOf('UNVERIFIED findings')) : ''
@@ -1326,14 +1836,14 @@ async function runWholeScriptArms() {
       'observed-by: a dead synthesis logs every CONFIRMED finding\'s fix through renderFixLine')
   }
   // ---- S2: a dead skeptic batch logs the four confirmed findings at their binding grade.
-  r = await runReview(DIFF, buildStubs({ 'verify:': buildGradedVerdicts('confirmed', () => 'blocker'), 'verify:ids-2-2': null }))
+  r = await runReview(DIFF, buildStubs({ 'verify:': buildGradedVerdicts('confirmed', () => 'blocker'), 'verify:batch-2': null }))
   if (checkNoThrow(r, 'observed-by dead batch')) {
     const cl = scanConfirmedLogs(r)
     ck(cl.length === 4 && cl.every((l) => l.indexOf('  CONFIRMED [blocker] ') === 0),
       'observed-by: a dead skeptic batch logs every CONFIRMED finding at its binding grade')
   }
   // ---- S3: one uncertain answer, counted apart from no verdict in the note, RUN INTEGRITY and the log.
-  r = await runReview(DIFF, buildStubs({ 'verify:ids-3-3': buildGradedVerdicts('uncertain') }))
+  r = await runReview(DIFF, buildStubs({ 'verify:batch-3': buildGradedVerdicts('uncertain') }))
   if (checkNoThrow(r, 'observed-by one uncertain')) {
     const sp = r.trace.find((t) => t.label === 'synth')
     const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
@@ -1407,7 +1917,7 @@ async function runLedgerArms() {
   ck(!!lc.result && lc.result.confirmed === 5 && [...lhead.matchAll(/id=(\d+) \[/g)].length === 5 && lcl.length === 5 &&
     lcl.every((l) => { const m = LINE_RE.exec(l); return !!m && m[2] === m[3] }),
     'ledger: the skeptic and synthesis lines name the lens: every CONFIRMED synth line, id pattern intact')
-  r = await runReview(DIFF, buildStubs({ 'verify:ids-2-2': null }))
+  r = await runReview(DIFF, buildStubs({ 'verify:batch-2': null }))
   if (checkNoThrow(r, 'ledger deferred log')) {
     const dl = r.logs.filter((l) => /^ {2}(CONFIRMED|UNVERIFIED) \[/.test(l))
     ck(dl.length === 5 && dl.every((l) => { const m = / lens=([a-z-]+) ([a-z-]+)\.js:1 - /.exec(l); return !!m && m[1] === m[2] }),
@@ -1417,11 +1927,11 @@ async function runLedgerArms() {
   // ---- AC3: one batch per state. id 1 refuted, 2 uncertain, 3 no verdict, 4 contradicted, 5 confirmed
   // ---- at low with an unsound fix.
   const VS = {
-    'verify:ids-1-1': { path: '/v', verdicts: [{ id: 1, verdict: 'refuted', reason: 'r1' }] },
-    'verify:ids-2-2': { path: '/v', verdicts: [{ id: 2, verdict: 'uncertain', reason: 'r2' }] },
-    'verify:ids-3-3': { path: '/v', verdicts: [] },
-    'verify:ids-4-4': { path: '/v', verdicts: [{ id: 4, verdict: 'confirmed', reason: 'a' }, { id: 4, verdict: 'refuted', reason: 'b' }] },
-    'verify:ids-5-5': { path: '/v', verdicts: [{ id: 5, verdict: 'confirmed', reason: 'r5', severity: 'low', fixVerdict: 'unsound', fixNote: 'n5' }] },
+    'verify:batch-1': { path: '/v', verdicts: [{ id: 1, verdict: 'refuted', reason: 'r1' }] },
+    'verify:batch-2': { path: '/v', verdicts: [{ id: 2, verdict: 'uncertain', reason: 'r2' }] },
+    'verify:batch-3': { path: '/v', verdicts: [] },
+    'verify:batch-4': { path: '/v', verdicts: [{ id: 4, verdict: 'confirmed', reason: 'a' }, { id: 4, verdict: 'refuted', reason: 'b' }] },
+    'verify:batch-5': { path: '/v', verdicts: [{ id: 5, verdict: 'confirmed', reason: 'r5', severity: 'low', fixVerdict: 'unsound', fixNote: 'n5' }] },
   }
   r = await runReview(DIFF, buildStubs(VS))
   if (checkNoThrow(r, 'ledger verdict states')) {
@@ -1446,7 +1956,7 @@ async function runLedgerArms() {
     for (const v of vr.verdicts) Object.assign(v, { severity: 'blocker', fixVerdict: 'unsound', fixNote: 'better fix' })
     return vr
   }
-  r = await runReview(DIFF, buildStubs({ 'verify:ids-2-2': unsound2 }))
+  r = await runReview(DIFF, buildStubs({ 'verify:batch-2': unsound2 }))
   if (checkNoThrow(r, 'ledger rejected fix')) {
     const c2 = Array.isArray(r.result.confirmedFindings) ? r.result.confirmedFindings : []
     ck(c2.length === 5 && c2[1].fix === 'better fix' && c2[1].fixVerdict === 'unsound' && c2[1].severity === 'blocker' &&
@@ -1456,7 +1966,7 @@ async function runLedgerArms() {
   // ---- Closing review round 1, L3 (finding 16): an EMPTY or blank note is no correction, so the
   // ---- finder's fix stays, marked by fixVerdict unsound; dropping the `&& note` guard hands on ''.
   for (const [what, note] of [['an empty note', ''], ['a blank note', '   ']]) {
-    r = await runReview(DIFF, buildStubs({ 'verify:ids-2-2': { path: '/v', verdicts: [{ id: 2, verdict: 'confirmed', reason: 'r', fixVerdict: 'unsound', fixNote: note }] } }))
+    r = await runReview(DIFF, buildStubs({ 'verify:batch-2': { path: '/v', verdicts: [{ id: 2, verdict: 'confirmed', reason: 'r', fixVerdict: 'unsound', fixNote: note }] } }))
     if (!checkNoThrow(r, 'ledger unsound ' + what)) continue
     const c3 = Array.isArray(r.result.confirmedFindings) ? r.result.confirmedFindings : []
     ck(c3.length === 5 && c3[1].fix === 'f' && c3[1].fixVerdict === 'unsound',
@@ -1476,25 +1986,28 @@ async function runLedgerArms() {
     if (lr.lens === 'security') lr.findings[0].claim = 'a | b\nc'
     return lr
   }
-  r = await runReview(DIFF, buildStubs({ 'find:': buildPipeLens, 'verify:ids-1-1': { path: '/v', verdicts: [{ id: 1, verdict: 'refuted', reason: 'x | y\r\nz' }] } }))
+  r = await runReview(DIFF, buildStubs({ 'find:': buildPipeLens, 'verify:batch-1': { path: '/v', verdicts: [{ id: 1, verdict: 'refuted', reason: 'x | y\r\nz' }] } }))
   if (checkNoThrow(r, 'ledger appendix')) {
     const ap = typeof r.result.appendix === 'string' ? r.result.appendix : ''
     const al = ap.split('\n')
     const rows = al.slice(4)
     const unescaped = (row) => row.split('').filter((ch, i) => ch === '|' && row[i - 1] !== '\\').length
     ck(al[0] === '## Appendix — every finding' && al[1] === '' &&
-      al[2] === '| id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict | classes |' && al[3] === '|---|---|---|---|---|---|---|---|---|' &&
+      al[2] === '| id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict | classes | disposition |' && al[3] === '|---|---|---|---|---|---|---|---|---|---|' &&
       rows.length === 5 && rows.length === r.result.ledger.length && rows[0].indexOf('| 1 | security | security.js:1 | high | - | refuted |') === 0,
-      'ledger: the appendix is rendered by the harness: heading, nine columns, one row per finding, the refuted one included')
-    ck(rows.length === 5 && rows.every((row) => unescaped(row) === 10) && rows[0].indexOf('x \\| y z') !== -1 && ap.indexOf('\r') === -1,
+      'ledger: the appendix is rendered by the harness: heading, ten columns, one row per finding, the refuted one included')
+    ck(rows.length === 5 && rows.every((row) => unescaped(row) === 11) && rows[0].indexOf('x \\| y z') !== -1 && ap.indexOf('\r') === -1,
       'ledger: the appendix is rendered by the harness: a pipe and a line break in a cell leave the row count unchanged')
+    // TOOL-dFairHearing-8 S8 - the synthesis's copy differs from the returned one in each confirmed row's
+    // disposition cell alone: `(synthesis)` there, `-` in the return, since this stub returns no dispositions.
     const sp = r.trace.find((t) => t.label === 'synth')
-    ck(ap.length > 0 && !!sp && sp.prompt.indexOf(ap) !== -1 && sp.prompt.indexOf('VERBATIM') !== -1,
-      'ledger: the appendix is handed to the synthesis verbatim')
+    const handed = al.map((l) => (l.indexOf(' | confirmed | ') !== -1 ? l.replace(/ - \|$/, ' (synthesis) |') : l)).join('\n')
+    ck(ap.length > 0 && !!sp && handed !== ap && sp.prompt.indexOf(handed) !== -1 && sp.prompt.indexOf('VERBATIM') !== -1,
+      'ledger: the appendix is handed to the synthesis verbatim but for the confirmed rows\' (synthesis) cells')
   }
   // ---- Closing review round 1, L2: a reason carrying every other boundary Python's str.splitlines
   // ---- breaks on. The appendix must split into the same lines under that rule as under `\n`.
-  r = await runReview(DIFF, buildStubs({ 'verify:ids-1-1': { path: '/v', verdicts: [{ id: 1, verdict: 'refuted', reason: 'p\u2028q\u2029r\x85s\x0bt\x0cu\x1cv\x1ew' }] } }))
+  r = await runReview(DIFF, buildStubs({ 'verify:batch-1': { path: '/v', verdicts: [{ id: 1, verdict: 'refuted', reason: 'p\u2028q\u2029r\x85s\x0bt\x0cu\x1cv\x1ew' }] } }))
   if (checkNoThrow(r, 'ledger appendix splitlines')) {
     const ap = typeof r.result.appendix === 'string' ? r.result.appendix : ''
     const al = ap.split('\n')
@@ -1514,8 +2027,8 @@ async function runLedgerArms() {
     const lg = Array.isArray(r.result.ledger) ? r.result.ledger : []
     const al = (typeof r.result.appendix === 'string' ? r.result.appendix : '').split('\n')
     ck(lg.length === 5 && JSON.stringify(lg.map((e) => e.classes)) === JSON.stringify([['beta-two'], ['alpha-one', 'C9'], [], [], []]) &&
-      al[2].endsWith(' | fixVerdict | classes |') && al[4].endsWith(' | beta-two |') && al[5].endsWith(' | alpha-one C9 |') &&
-      al.slice(6).every((row) => row.endsWith(' | - |')),
+      al[2].endsWith(' | fixVerdict | classes | disposition |') && al[4].endsWith(' | beta-two | - |') && al[5].endsWith(' | alpha-one C9 | - |') &&
+      al.slice(6).every((row) => row.endsWith(' | - | - |')),
       'ledger: classes resolves each head label to its item slug, keeps C<n> out of range, and renders - when unlabelled')
   }
 
@@ -1526,7 +2039,7 @@ async function runLedgerArms() {
     ['no finding raised', buildStubs({ 'find:': buildEmptyLens }), 'array', (x) => x.ledger.length === 0 && x.appendix === ''],
     ['every finding refuted', buildStubs({ 'verify:': buildVerdicts('refuted') }), 'array',
       (x) => x.ledger.length === 5 && x.ledger.every((e) => e.verdict === 'refuted') && x.confirmedFindings.length === 0 && x.appendix.split('\n').length === 9],
-    ['one skeptic batch dead', buildStubs({ 'verify:ids-2-2': null }), 'integer',
+    ['one skeptic batch dead', buildStubs({ 'verify:batch-2': null }), 'integer',
       (x) => x.exit === 'deferred-platform' && x.ledger.length === 5 && x.ledger[1].verdict === 'unverified' && x.confirmedFindings.length === 4],
     ['the synthesis dead', buildStubs({ synth: null }), 'integer', (x) => x.exit === 'deferred-platform' && x.ledger.length === 5 && x.confirmedFindings.length === 5],
     ['complete', ALL_OK, 'integer', (x) => x.exit === 'complete' && x.ledger.length === 5 && x.confirmedFindings.length === 5 && x.appendix.length > 0],
@@ -1537,7 +2050,7 @@ async function runLedgerArms() {
   const regradedWrong = []
   // TOOL-aMendedFleet-18 - each exit's `shape` matches the S1 grammar at the stage its path reaches,
   // is logged, and reads `out-tokens=unknown` because the stub runtime's `budget` has no `spent`.
-  const SHAPE_RE = /^review-shape kind=(diff-review|spec-audit) round=\d+ intensity=(full|light) at=(find|verify|synth) raw=(\d+|-) confirmed=(\d+|-) refuted=(\d+|-) unverified=(\d+|-) blocker=(\d+|-) high=(\d+|-) medium=(\d+|-) low=(\d+|-) agents=\d+ out-tokens=unknown$/
+  const SHAPE_RE = /^review-shape kind=(diff-review|spec-audit) round=\d+ intensity=(full|light) at=(find|verify|synth) raw=(\d+|-) confirmed=(\d+|-) refuted=(\d+|-) merged=(\d+|-) unverified=(\d+|-) blocker=(\d+|-) high=(\d+|-) medium=(\d+|-) low=(\d+|-) agents=\d+ out-tokens=unknown$/
   const shapeStage = { 'every lens dead': 'find', 'no finding raised': 'find', 'every finding refuted': 'verify',
     'one skeptic batch dead': 'verify', 'the synthesis dead': 'synth', complete: 'synth' }
   let shapeSeen = 0
@@ -1556,7 +2069,7 @@ async function runLedgerArms() {
     if (what === 'complete') {
       const sp = r.trace.find((t) => t.label === 'synth')
       synthPromptShape = !!sp && sh.length > 0 && sp.prompt.indexOf('<<<SHAPE\n' + sh + '\nSHAPE>>>') !== -1 &&
-        sh.indexOf(' raw=5 confirmed=5 refuted=0 unverified=0 ') !== -1 && sh.indexOf(' agents=11 ') !== -1
+        sh.indexOf(' raw=5 confirmed=5 refuted=0 merged=0 unverified=0 ') !== -1 && sh.indexOf(' agents=11 ') !== -1
     }
   }
   ck(regradedSeen === 6 && regradedWrong.length === 0,
@@ -1567,7 +2080,7 @@ async function runLedgerArms() {
 
   // ==== TOOL-aEvidencedLens-3 — the spec skeptic confirms by the rubric, re-runs the evidence, and an
   // ==== ORPHANED duplicate is demoted. One finding per lens carries one-line, two-line or no evidence;
-  // ==== two per lens put ids 1 and 2 in one batch, verify:ids-1-2.
+  // ==== two per lens put ids 1 and 2 in one batch, verify:batch-1.
   const EVID = { coherence: 'cmd: grep -c x a.md -> 0', grounding: 'line one\nline two' }
   const buildEvidenceLens = (label) => {
     const out = buildLensReturn(label)
@@ -1617,19 +2130,20 @@ async function runLedgerArms() {
   r = await runReview(SPEC, buildStubs({ 'find:': buildPairLens, 'verify:': buildSkepticAnswers({ 2: { verdict: 'refuted', reason: 'duplicate of id=1' } }) }))
   if (checkNoThrow(r, 'spec skeptic kept duplicate')) {
     const row = (r.result.ledger || []).find((e) => e.id === 2) || {}
-    ck(r.trace.some((t) => t.label === 'verify:ids-1-2') && row.verdict === 'refuted' && row.reason === 'duplicate of id=1' && !r.logs.some((l) => /DUPLICATE of an id/.test(l)),
+    ck(r.trace.some((t) => t.label === 'verify:batch-1') && row.verdict === 'refuted' && row.reason === 'duplicate of id=1' && !r.logs.some((l) => /DUPLICATE of an id/.test(l)),
       'spec skeptic: a duplicate of a confirmed survivor in its batch stays refuted, unannounced')
   }
-  const runOrphanArm = async (over, what) => {
-    r = await runReview(SPEC, buildStubs({ 'find:': buildPairLens, 'verify:': buildSkepticAnswers(over) }))
-    if (!checkNoThrow(r, 'spec skeptic orphan ' + what)) return
+  // TOOL-dFairHearing-5 S2 - the kind is a parameter, so the diff kind's orphans run the same arm (AC4).
+  const runOrphanArm = async (over, what, args, kname) => {
+    r = await runReview(args || SPEC, buildStubs({ 'find:': buildPairLens, 'verify:': buildSkepticAnswers(over) }))
+    if (!checkNoThrow(r, (kname || 'spec') + ' skeptic orphan ' + what)) return
     const row = (r.result.ledger || []).find((e) => e.id === 2) || {}
     const sp = r.trace.find((t) => t.label === 'synth')
     const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
     ck(r.result.unverified >= 1 && row.verdict === 'unverified' && row.reason === 'duplicate of an unconfirmed id' &&
       r.logs.some((l) => l.indexOf('WARNING:') === 0 && /DUPLICATE of an id/.test(l) && / ids 2$/.test(l)) &&
       ri.indexOf('1 orphaned duplicate refutation(s) demoted to unverified') !== -1,
-      'spec skeptic: a duplicate of ' + what + ' is demoted to unverified, ledgered, warned and counted in RUN INTEGRITY')
+      (kname || 'spec') + ' skeptic: a duplicate of ' + what + ' is demoted to unverified, ledgered, warned and counted in RUN INTEGRITY')
   }
   await runOrphanArm({ 1: { verdict: 'refuted', reason: 'r' }, 2: { verdict: 'refuted', reason: 'duplicate of id=1' } }, 'a refuted survivor')
   await runOrphanArm({ 2: { verdict: 'refuted', reason: 'duplicate of id=2' } }, 'its own id')
@@ -1638,9 +2152,57 @@ async function runLedgerArms() {
   if (checkNoThrow(r, 'spec skeptic diff kind')) {
     const row = (r.result.ledger || []).find((e) => e.id === 2) || {}
     const dv = r.trace.filter((t) => t.label.indexOf('verify:') === 0)
+    // TOOL-dFairHearing-5 S2 - inverted: the base harness skipped the diff kind's orphan check.
     ck(dv.length > 0 && dv.every((t) => t.prompt.indexOf(' | evidence: ') === -1 && t.prompt.indexOf('PROBE POLICY') === -1) &&
-      row.verdict === 'refuted' && !r.logs.some((l) => /DUPLICATE of an id/.test(l)),
-      'spec skeptic: a diff-kind verify prompt carries no evidence field and no probe policy, and its duplicate refutation is not scanned')
+      row.verdict === 'unverified' && r.logs.some((l) => /DUPLICATE of an id/.test(l)),
+      'spec skeptic: a diff-kind verify prompt carries no evidence field and no probe policy, and its orphaned duplicate refutation is scanned')
+  }
+
+  // ==== TOOL-dFairHearing-5 — a same-batch duplicate counts as a MERGED confirmation on both kinds, and
+  // ==== the orphan check runs on the diff kind. RED against the base harness, which defines no
+  // ==== extractDuplicateTarget, counts the duplicate as refuted, skips the diff kind's orphan check
+  // ==== and gives the diff skeptic no duplicate form. buildPairLens puts ids 1 and 2 in verify:batch-1.
+  // AC4 - the diff kind's orphans, through the spec arm's own runner.
+  await runOrphanArm({ 2: { verdict: 'refuted', reason: 'duplicate of id=3' } }, 'an id in another batch', DIFF, 'diff')
+  await runOrphanArm({ 1: { verdict: 'refuted', reason: 'r' }, 2: { verdict: 'refuted', reason: 'duplicate of id=1' } }, 'a refuted survivor', DIFF, 'diff')
+  // AC1 - the reason form, read from the prelude.
+  {
+    let dt = null
+    try { dt = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn extractDuplicateTarget')(base, () => {}, null, null, null) } catch (e) { console.log('HARNESS-BROKEN merged: ' + e.message) }
+    const got = dt ? ['duplicate of id=4', '  Duplicate of id=12: same claim', 'duplicate of prior a.js:3', 'dup of id=4', '', undefined].map((x) => dt(x)) : []
+    ck(JSON.stringify(got) === '[4,12,null,null,null,null]', 'merged: extractDuplicateTarget reads id=4 and a cased, padded id=12, and a prior ref, another word, empty and undefined as null: ' + JSON.stringify(got))
+  }
+  for (const [kname, kargs] of [['diff', DIFF], ['spec', SPEC]]) {
+    // AC2, AC3, AC6 - id 2 refuted as a duplicate of id 1, its confirmed batch-mate.
+    r = await runReview(kargs, buildStubs({ 'find:': buildPairLens, 'verify:': buildSkepticAnswers({ 2: { verdict: 'refuted', reason: 'duplicate of id=1' } }) }))
+    if (checkNoThrow(r, 'merged ' + kname)) {
+      const x = r.result
+      const row = (x.ledger || []).find((e) => e.id === 2) || {}
+      const yr = (x.lensYield || []).find((e) => e.lens === row.lens) || {}
+      ck(x.confirmed === 9 && x.merged === 1 && x.refuted === 0 && x.precision === 1 && String(x.shape).indexOf(' refuted=0 merged=1 ') !== -1 &&
+        yr.merged === 1 && yr.refuted === 0 && yr.precision === 1,
+        'merged: ' + kname + ' — a same-batch duplicate reads confirmed 9, merged 1, refuted 0, precision 1, in the shape and its lens\'s yield row')
+      const arow = String(x.appendix || '').split('\n').find((l) => l.indexOf('| 2 |') === 0) || ''
+      ck(row.verdict === 'refuted' && row.reason === 'duplicate of id=1' && arow.indexOf('| refuted | duplicate of id=1 |') !== -1,
+        'merged: ' + kname + ' — the ledger and appendix keep the skeptic\'s refuted verdict and duplicate reason')
+      const sp = r.trace.find((t) => t.label === 'synth')
+      const conf = sp ? sp.prompt.split('UNVERIFIED findings')[0] : 'id=2 ['
+      const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
+      ck(!(x.confirmedFindings || []).some((f) => f.id === 2) && conf.indexOf('id=2 [') === -1 && x.blockers === 0 && x.highs === 9 &&
+        ri.indexOf('1 duplicate refutation(s) counted as merged confirmations') !== -1 && sp.prompt.indexOf(', refuted 0, merged 1, ') !== -1,
+        'merged: ' + kname + ' — the merged id stays out of the confirmed set and the CONFIRMED list, the tally holds, and the synthesis states merged')
+    }
+    // AC3 - a duplicate of a prior round's finding is no merge.
+    r = await runReview(kargs, buildStubs({ 'find:': buildPairLens, 'verify:': buildSkepticAnswers({ 2: { verdict: 'refuted', reason: 'duplicate of prior a.js:3' } }) }))
+    if (checkNoThrow(r, 'merged prior ' + kname)) {
+      ck(r.result.merged === 0 && r.result.refuted === 1, 'merged: ' + kname + ' — a `duplicate of prior` refutation stays refuted, merged 0')
+    }
+  }
+  // AC5 - the diff skeptic is given the duplicate form, on every batch.
+  r = await runReview(DIFF, ALL_OK)
+  if (checkNoThrow(r, 'merged diff prompt')) {
+    const dv = r.trace.filter((t) => t.label.indexOf('verify:') === 0)
+    ck(dv.length === 5 && dv.every((t) => t.prompt.indexOf('duplicate of id=<n>') !== -1), 'merged: every diff verify prompt carries the `duplicate of id=<n>` form')
   }
 
   // ==== TOOL-aEvidencedLens-4 — a spec fold round reads its diff, and a moved subject is graded, not
@@ -1656,7 +2218,7 @@ async function runLedgerArms() {
     const fv = scanPrompts(r, 'find:').concat(scanPrompts(r, 'verify:'))
     const extractFoldLine = (p, path) => p.split('\n').find((l) => l.indexOf('  - ' + path + ': ') === 0) || ''
     ck(fv.length === 10 && fv.every((t) => t.prompt.indexOf('FOLD DIFF') !== -1 && t.prompt.indexOf('first-round') === -1 &&
-      extractFoldLine(t.prompt, 'memory/builds/dX/spec/one.md') === '  - memory/builds/dX/spec/one.md: git -C /tmp/r diff ' + P40 + ' ' + D40 &&
+      extractFoldLine(t.prompt, 'memory/builds/dX/spec/one.md') === '  - memory/builds/dX/spec/one.md: git -C "/tmp/r" diff ' + P40 + ' ' + D40 &&
       extractFoldLine(t.prompt, 'memory/builds/dX/spec/two.md') === '  - memory/builds/dX/spec/two.md: unchanged since the previous round' &&
       extractFoldLine(t.prompt, 'memory/builds/dX/spec/three.md') === '  - memory/builds/dX/spec/three.md: no prevBlob was supplied - review this file whole'),
       'fold: a round-2 spec run carries each subject\'s FOLD DIFF line in every find: and verify: prompt')
@@ -1725,6 +2287,337 @@ async function runLedgerArms() {
   await runRolesArms()
   await runEffortsArms()
   await runAddressArms()
+  await runGradesArms()
+  await runTwinArms()
+  await runPresetArms()
+  await runOptInArms()
+  await runTypedStageArms()
+  await runTwinRunArms()
+  await runDispositionArms()
+  await runRoundStateArms()
+  await runWalkArms()
+}
+
+// ==== TOOL-dFairHearing-17 AC5 — the round state on the returns and in the synthesis prompt ====
+// Red against the base harness, whose returns carry no roundState and whose prompt carries no ROUND block.
+async function runRoundStateArms() {
+  // One finding confirmed at high, the rest refuted: the count is 1, round 3 sits at its limit of 3.
+  const confirmOne = (label, prompt) => {
+    const m = /ids ([0-9, ]+)\)/.exec(prompt)
+    const ids = m ? m[1].split(',').map((x) => parseInt(x, 10)) : []
+    return { path: '/cd/v.json', verdicts: ids.map((id) => ({ id: id, verdict: id === 1 ? 'confirmed' : 'refuted', reason: 'r' })) }
+  }
+  const RS = Object.assign({}, DIFF, { round: 3, priorCounts: [4, 2], roundLimit: 3 })
+  let r = await runReview(RS, buildStubs({ 'verify:': confirmOne }))
+  if (checkNoThrow(r, 'round state stub run')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    ck(r.result.exit === 'complete' && r.result.roundState === 'BOUNDED' && r.result.roundCount === 1,
+      'round state: a complete round 3 at limit 3 after [4, 2] with one high returns BOUNDED and count 1: ' + r.result.roundState + ' ' + r.result.roundCount)
+    ck(!!sp && sp.prompt.indexOf('<<<ROUND\nreview-round round=3 limit=3 prior=4,2 count=1 state=BOUNDED\nROUND>>>') !== -1,
+      'round state: the synthesis prompt carries the review-round line between the ROUND markers')
+  }
+  r = await runReview(RS, buildStubs({ 'verify:': confirmOne, 'find:seams': null }))
+  ck(!r.threw && r.result.exit === 'deferred-platform' && r.result.roundState === null && r.result.roundCount === null,
+    'round state: a run with a dead lens defers and reports no state: ' + (r.result && r.result.roundState))
+  r = await runReview(Object.assign({}, DIFF, { round: 2 }), ALL_OK)
+  ck(!r.threw && r.result.roundState === null && Number.isInteger(r.result.roundCount) &&
+    r.logs.some((l) => l.indexOf('WARNING') === 0 && l.indexOf('priorCounts') !== -1),
+    'round state: round 2 with no priorCounts returns a null state, an integer count, and a WARNING naming priorCounts')
+  r = await runReview(DIFF, buildStubs({ 'find:': buildEmptyLens }))
+  ck(!r.threw && r.result.exit === 'complete' && r.result.roundState === 'CONVERGED' && r.result.roundCount === 0,
+    'round state: a round whose lenses raise nothing returns CONVERGED and count 0: ' + (r.result && r.result.roundState))
+}
+
+// ==== TOOL-dFairHearing-18 AC4-AC6 — the whole-design walk over stub walkers ====================================
+// Each walker stub returns one row per CELLS line of its own prompt, every field `=` and the verdict holds, plus
+// the findings asked for, the first cell of a walker with a finding reading `finding`. Against the base harness,
+// which refuses the preset, no run completes and every arm reds.
+async function runWalkArms() {
+  const KEY = 'e'.repeat(64)
+  const SCEN = ['S1', 'S2', 'S3', 'S4', 'S5'].map((id) => ({ id: id, name: 'name ' + id, walks: 'walks ' + id }))
+  const ITEMS = ['plan.input', 'plan.output', 'act.spawn', 'act.reap'].map((t, i) => ({ tag: t, step: 's' + (i >> 1) }))
+  const WD = Object.assign({}, SPEC, { preset: 'whole-design', subjects: [{ path: 'memory/builds/dX/build/d.md', blob: 'abc1234', id: 'PLAY-dX-1' }],
+    walk: { items: ITEMS, scenarios: SCEN, run: 1, keySha: KEY } })
+  const readCells = (prompt) => {
+    const at = prompt.indexOf('CELLS of your slice')
+    return at === -1 ? [] : prompt.slice(at).split('\n').slice(1).filter((l) => l.indexOf('  - ') === 0).map((l) => l.slice(4).split(' · '))
+  }
+  const buildWalker = (over) => (label, prompt) => {
+    const o = over || {}
+    const lens = label.slice('find:'.length)
+    const n = typeof o.findings === 'function' ? o.findings(lens) : o.findings || 0
+    const findings = Array.from({ length: n }, (_, k) => ({ file: 'd.md', where: '[plan] ' + lens, severity: 'high', claim: lens + ' claim ' + k, impact: 'i', fix: 'f', evidence: 'read: d.md:1' }))
+    const walk = readCells(prompt).map((c, i) => ({ item: c[0], scenario: c[1], actor: '=', needs: '=', witness: o.blank === lens && i === 0 ? '  ' : '=', route: '=',
+      verdict: n && i === 0 ? 'finding' : 'holds', findings: n && i === 0 ? [0] : [] }))
+    return { lens: lens, path: '/cd/review-lenses/k/find-' + lens + '.json', findings: findings, walk: walk }
+  }
+  const WALK_OK_STUBS = buildStubs({ 'resume:probe': buildProbe(), 'find:': buildWalker({ findings: 1 }) })
+  // ---- AC4: the complete walk's synthesis prompt carries the WALK TABLE block, and the return no gap.
+  let r = await runReview(WD, WALK_OK_STUBS)
+  if (checkNoThrow(r, 'walk: complete run')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    ck(!!sp && sp.prompt.indexOf('<<<WALK TABLE\n## Walk table — run 1 of 2, sliced by scenario\nwalk-seed mode=reverted-escapes key-sha256=' + KEY +
+      '\n\n| Item | Scenario | Actor | Needs | Witness | Route | Verdict |\n') !== -1,
+      'walk: the synthesis prompt carries the WALK TABLE block, its heading, the walk-seed line and the table header')
+    ck(r.result.exit === 'complete' && JSON.stringify(r.result.walkGaps) === '[]' && Array.isArray(r.result.walkTable) && r.result.walkTable.length === 20,
+      'walk: a complete walk returns walkGaps [] beside its 20 walkTable rows: ' + JSON.stringify(r.result.walkGaps))
+  }
+  // The planted empty cell: walker slot 3's first witness is whitespace.
+  r = await runReview(WD, buildStubs({ 'resume:probe': buildProbe(), 'find:': buildWalker({ findings: 1, blank: 'walk-3' }) }))
+  if (checkNoThrow(r, 'walk: planted empty cell')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    ck(r.result.walkGaps.length === 1 && !!sp && sp.prompt.indexOf(r.result.walkGaps[0]) !== -1 && /`## Verdict:` token is BLOCKED/.test(sp.prompt),
+      'walk: the planted empty cell is one gap, named in the synthesis prompt, which says the verdict is BLOCKED: ' + JSON.stringify(r.result.walkGaps))
+  }
+  // The red case: a walk raising no finding still dispatches one cell-only batch and still synthesizes.
+  r = await runReview(WD, buildStubs({ 'resume:probe': buildProbe(), 'find:': buildWalker({ findings: 0 }) }))
+  if (checkNoThrow(r, 'walk: no finding')) {
+    const vs = r.trace.filter((t) => t.label.indexOf('verify:') === 0).map((t) => t.label)
+    ck(JSON.stringify(vs) === '["verify:cells"]' && r.trace.some((t) => t.label === 'synth') && r.result.exit === 'complete',
+      'walk: a walk raising no finding dispatches one verify:cells batch and the synthesis: ' + JSON.stringify(vs))
+    // ---- TOOL-dFairHearing-20 AC2: the complete no-finding walk keeps its integer counts and CONVERGED.
+    const csp = r.trace.find((t) => t.label === 'synth')
+    ck(JSON.stringify(r.result.walkGaps) === '[]' && r.result.blockers === 0 && r.result.highs === 0 && r.result.roundCount === 0 &&
+      r.result.roundState === 'CONVERGED' && !!csp && !/token is BLOCKED/.test(csp.prompt),
+      'walk red: a complete no-finding walk returns blockers 0, highs 0, count 0 and CONVERGED, its prompt no BLOCKED sentence: ' + r.result.roundState)
+    // TOOL-dFairHearing-27 AC20: the absence half reads the gap sentence, never the static verdict list's `BLOCKED`.
+    ck(!!csp && !csp.prompt.split('\n').some((l) => /the walk table has [0-9]+ gap/.test(l)),
+      'FH27 AC20 walk red: the complete walk\'s synthesis prompt carries no `the walk table has <n> gap` line')
+  }
+  // ---- TOOL-dFairHearing-20 AC1/AC3: the same no-finding walk with one planted empty cell. Against the harness at
+  // TOOL-dFairHearing-18's commit it returns roundState CONVERGED and blockers 0 beside the gap, and both arms red.
+  r = await runReview(WD, buildStubs({ 'resume:probe': buildProbe(), 'find:': buildWalker({ findings: 0, blank: 'walk-3' }) }))
+  if (checkNoThrow(r, 'walk red: planted empty cell, no finding')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    ck(r.result.walkGaps.length === 1 && r.result.blockers === null && r.result.highs === null && r.result.roundCount === null &&
+      r.result.roundState === null && r.result.note.indexOf('BLOCKED: the walk table has 1 gap(s)') === 0,
+      'walk red: a gapped no-finding walk nulls blockers, highs, roundCount and roundState, its note opening BLOCKED: ' + r.result.roundState + ' ' + r.result.blockers)
+    ck(!!sp && /<<<ROUND\nreview-round [^\n]* count=- state=-\nROUND>>>/.test(sp.prompt),
+      'walk red: the gapped walk\'s round line reads count=- and state=-')
+    ck(!!sp && sp.prompt.split('\n').filter((l) => /the walk table has [0-9]+ gap/.test(l)).length === 1,
+      'FH27 AC20 walk red: the gapped walk\'s synthesis prompt carries one `the walk table has <n> gap` line')
+  }
+  ck(src.split('\n').filter((l) => /\bconst walkRed\b/.test(l)).length === 1, 'walk red: the harness defines walkRed once')
+  // ---- AC5: 40 clean cells of 42 over two skeptic batches, walkers 1 and 2 raising one finding each.
+  const IT6 = Array.from({ length: 6 }, (_, i) => ({ tag: 'it' + i, step: 's' }))
+  const SC7 = Array.from({ length: 7 }, (_, j) => ({ id: 'S' + (j + 1), name: 'n', walks: 'w' }))
+  const WD40 = Object.assign({}, WD, { walk: { items: IT6, scenarios: SC7, run: 1, keySha: KEY } })
+  const CELL_LINE = /^- it\d · S\d — /
+  const judgeCells = (label, prompt) => {
+    const v = buildVerdicts('confirmed')(label, prompt)
+    v.cells = prompt.split('\n').filter((l) => CELL_LINE.test(l)).map((l, i) => ({ cell: l.slice(2).split(' — ')[0],
+      verdict: label === 'verify:batch-1' && i === 0 ? 'refuted' : 'holds', reason: 'it fails there', file: 'd.md', where: '[act]', severity: 'high' }))
+    return v
+  }
+  const stubs40 = buildStubs({ 'resume:probe': buildProbe(), 'find:': buildWalker({ findings: (lens) => (lens === 'walk-1' || lens === 'walk-2' ? 1 : 0) }), 'verify:': judgeCells })
+  const a1 = await runReview(WD40, stubs40)
+  const a2 = await runReview(WD40, stubs40)
+  if (checkNoThrow(a1, 'walk: clean-cell sample') && checkNoThrow(a2, 'walk: clean-cell sample, second render')) {
+    const cellsOf = (run) => run.trace.filter((t) => t.label.indexOf('verify:') === 0).map((t) => t.prompt.split('\n').filter((l) => CELL_LINE.test(l)).map((l) => l.slice(2).split(' — ')[0]))
+    const s1 = cellsOf(a1)
+    ck(s1.length === 2 && s1.every((g) => g.length === 8) && s1[0].every((c) => s1[1].indexOf(c) === -1) && JSON.stringify(s1) === JSON.stringify(cellsOf(a2)),
+      'walk: each of two skeptic prompts carries eight clean cells, the sets disjoint and identical on a second render: ' + s1.map((g) => g.length).join(' '))
+    const holds = new Set(a1.result.walkTable.filter((x) => x.verdict === 'holds').map((x) => x.item + ' · ' + x.scenario))
+    ck(holds.size === 40 && s1.flat().every((c) => holds.has(c)), 'walk: every sampled cell is one of the 40 whose verdict is holds: ' + holds.size)
+    ck(a1.result.cellsSampled === 16 && a1.result.cellsRefuted === 1 && a1.result.ledger.some((e) => e.lens === 'cell-sample' && e.verdict === 'unverified'),
+      'walk: one refuted cell returns cellsSampled 16, cellsRefuted 1 and an unverified cell-sample ledger entry: ' + a1.result.cellsSampled + ' ' + a1.result.cellsRefuted)
+  }
+  // ---- AC6: each walker prompt names its own scenario and no other slot's, carries the rules and, seeded, the key's SHA-256.
+  r = await runReview(WD, WALK_OK_STUBS)
+  const finds = r.trace.filter((t) => t.label.indexOf('find:') === 0)
+  ck(finds.length === 5 && finds.every((t, w) => t.prompt.indexOf('WALK RULES:\n- ') !== -1 && t.prompt.indexOf(KEY) !== -1 &&
+    SCEN.every((s, j) => (t.prompt.indexOf('  - ' + s.id + ' — ') !== -1) === (j === w))),
+    'walk: each walker prompt names its own scenario alone, carries WALK_RULES and the key\'s SHA-256: ' + finds.length + ' walker(s)')
+  r = await runReview(Object.assign({}, WD, { walk: { items: ITEMS, scenarios: SCEN, run: 1, seed: 'none' } }), WALK_OK_STUBS)
+  const unseeded = r.trace.filter((t) => t.label.indexOf('find:') === 0)
+  ck(unseeded.length === 5 && unseeded.every((t) => t.prompt.indexOf('SHA-256') === -1 && !/[0-9a-f]{64}/.test(t.prompt)),
+    'walk: under seed none no walker prompt carries a SHA-256: ' + unseeded.length + ' walker(s)')
+  ck(src.split('\n').filter((l) => /\bconst WALK_RULES\b/.test(l)).length === 1, 'walk: the harness defines WALK_RULES once')
+  // ---- TOOL-dFairHearing-43 AC7: the spaced-repo quoting over every preset the harness ships, here beside WD and its
+  // walker stubs: each run holds a `git -C` and every one is quoted. The diff kind is the `FH40 AC19` arm. The round-2
+  // fold's subject is the THREE fixture's first, `prevBlob` unequal to its blob. RED on the quotes stripped from the
+  // probe's hash-object command alone, then from the acquire sentence's alone.
+  const SPACED = 'git -C "C:/x y/z"'
+  const FOLD = { round: 2, subjects: [{ path: 'memory/builds/dX/spec/one.md', blob: 'd'.repeat(40), id: 'TOOL-x-1', rev: 1, prevBlob: 'a'.repeat(40) }], priorFindings: [{ ref: 'one.md:section 2', claim: 'PRIOR' }] }
+  for (const [preset, args, stubs] of [['unit-spec at round 1', SPEC, ALL_OK], ['the unit-spec round-2 fold', Object.assign({}, SPEC, FOLD), ALL_OK],
+    ['design-audit', Object.assign({}, DESIGN, { preset: 'design-audit' }), ALL_OK], ['whole-design', WD, WALK_OK_STUBS]]) {
+    const rq = await runReview(Object.assign({}, args, { repo: 'C:/x y/z' }), stubs)
+    const named = rq.trace.map((t) => t.prompt).join('\n').match(/git -C (?:"[^"]*"|[^\s`]+)/g) || []
+    ck(!rq.threw && named.length > 0 && named.every((g) => g === SPACED),
+      'FH43 AC7 ' + preset + ' reaches every prompt as ' + SPACED + ': ' + named.length + ' git -C command(s), ' + JSON.stringify(named.filter((g) => g !== SPACED).slice(0, 3)) + (rq.threw ? ' threw ' + rq.threw : ''))
+    if (args !== SPEC) continue
+    const holds = (t, c) => t.prompt.indexOf(SPACED + ' ' + c) !== -1
+    const probeSpawn = rq.trace.find((t) => t.label === 'resume:probe') || { prompt: '' }
+    const others = rq.trace.filter((t) => t !== probeSpawn)
+    ck(holds(probeSpawn, 'hash-object <path>') && others.some((t) => holds(t, 'hash-object <path>')) && others.some((t) => holds(t, 'diff <blob> -- <path>')),
+      'FH43 AC7 unit-spec at round 1 carries the probe\'s hash-object command and the acquire sentence\'s hash-object and diff commands')
+  }
+}
+
+// ==== TOOL-dFairHearing-2 — the design-audit preset: its lenses, its review key and its announcements ====
+// Every arm is RED against the base harness, which reads no `preset`: a design-audit run fans over
+// SPEC_LENSES, derives the default run's key, logs nothing and carries no `preset` on any return. The
+// briefs are read off the live harness's own literals, and each check carries its count of five.
+async function runPresetArms() {
+  const readLiteral = (name) => {
+    const ls = src.split('\n')
+    const at = ls.findIndex((l) => l.startsWith('const ' + name + ' = ['))
+    const end = ls.findIndex((l, i) => i > at && l === ']')
+    // TOOL-dFairHearing-3 - each slot is a `deriveSlotLens(<literal>, L)` call; read here as L itself.
+    return at === -1 || end === -1 ? [] : new Function('deriveSlotLens', 'return [' + ls.slice(at + 1, end).join('\n') + ']')((lit, L) => L)
+  }
+  const DL = readLiteral('DESIGN_LENSES')
+  const SL = readLiteral('SPEC_LENSES')
+  const scanFinds = (run) => run.trace.filter((t) => t.label.indexOf('find:') === 0)
+  const checkBriefs = (finds, lenses) => finds.length === 5 && lenses.length === 5 &&
+    finds.every((t, i) => t.label === 'find:' + lenses[i].key && t.prompt.indexOf('LENS: ' + lenses[i].brief + '\n') !== -1)
+  const rd = await runReview(Object.assign({}, DESIGN, { preset: 'design-audit' }), ALL_OK)
+  const ru = await runReview(DESIGN, ALL_OK)
+  const rx = await runReview(Object.assign({}, DESIGN, { preset: 'unit-spec' }), ALL_OK)
+  if (checkNoThrow(rd, 'preset design-audit run') && checkNoThrow(ru, 'preset default run') && checkNoThrow(rx, 'preset explicit unit-spec run')) {
+    // ---- AC3: the design-audit run's five finders carry the design briefs; the default run's, the spec briefs.
+    ck(DL.map((L) => L.key).join(' ') === 'coherence grounding reuse failure-envelope alternatives-and-cost' && checkBriefs(scanFinds(rd), DL),
+      'preset: a design-audit run fans over DESIGN_LENSES, each finder carrying its design brief: ' + rd.scanSpawned('find:').join(' '))
+    ck(checkBriefs(scanFinds(ru), SL) && checkBriefs(scanFinds(rx), SL),
+      'preset: a run without it, or naming unit-spec, fans over SPEC_LENSES with the spec briefs: ' + ru.scanSpawned('find:').join(' '))
+    ck(DL.length === 5 && DL.every((L) => !/\bsections? \d/.test(L.brief)),
+      'preset: no design brief names a unit spec\'s numbered section')
+    // ---- TOOL-dFairHearing-2 AC4: the preset joins the key off its default only.
+    ck(rd.result.key !== ru.result.key, 'preset: a design-audit run and a default run over the same subjects derive different keys')
+    ck(ru.result.key === rx.result.key && ru.result.key.indexOf('spec-audit-r1-') === 0,
+      'preset: unit-spec, absent or named, derives one key, so a caller without the argument keeps its key: ' + ru.result.key)
+    // ---- AC6: the preset on the complete return and on the no-finding return, in RUN INTEGRITY and in the log.
+    const re = await runReview(Object.assign({}, DESIGN, { preset: 'design-audit' }), buildStubs({ 'find:': buildEmptyLens }))
+    ck(rd.result.preset === 'design-audit' && !re.threw && re.result.note === 'clean: 0 findings' && re.result.preset === 'design-audit',
+      'preset: the complete and the no-finding return of a design-audit run carry preset design-audit')
+    const sp = rd.trace.find((t) => t.label === 'synth')
+    const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
+    ck(/\npreset: design-audit - /.test(ri) && rd.logs.some((l) => l.indexOf('preset design-audit') === 0) && !ru.logs.some((l) => l.indexOf('preset ') === 0),
+      'preset: RUN INTEGRITY names design-audit, and only a run off the default logs its preset')
+    const rdf = await runReview(DIFF, ALL_OK)
+    ck(ru.result.preset === 'unit-spec' && !!rdf.result && !Object.prototype.hasOwnProperty.call(rdf.result, 'preset'),
+      'preset: a default spec audit returns preset unit-spec, and a diff review carries no preset field')
+  }
+}
+
+// ==== TOOL-dFairHearing-3 — the opt-in swap over scratch renders, and review_pin.py (AC2-AC5, AC7, AC8) ====
+// The shipped catalogue ships no opt-in, so each swap arm renders the TEMPLATE over a scratch copy of
+// `lenses.toml` with the named opt-in rows flipped to `optin = true`, fills `{{FANOUT_CAP}}` with the
+// live harness's cap, and runs that render whole. Every arm is RED against the base harness, which
+// reads no `optIn` and renders no `deriveSlotLens`, and against a tree with no `review_pin.py`. The
+// python is the one this shell resolved, so an absent one reds these arms by name.
+async function runOptInArms() {
+  const path = require('path')
+  const { spawnSync } = require('child_process')
+  const kit = path.dirname(FILE)
+  const py = process.argv[5] || ''
+  const tpl = fs.readFileSync(path.join(kit, 'tier2-review.template.js'), 'utf8')
+  const cap = (/async function boundedParallel\(thunks, cap = (\d+)\)/.exec(src) || [])[1]
+  const scratch = fs.mkdtempSync(path.join(require('os').tmpdir(), 'optin-'))
+  // A scratch render with `keys` shipped as opt-ins, or the refusal that stopped it, as `why`.
+  const renderOptIns = (keys) => {
+    let text = fs.readFileSync(path.join(kit, 'lenses.toml'), 'utf8')
+    for (const k of keys) {
+      const re = new RegExp('(key = "' + k + '"\\r?\\n(?:[^\\n]*\\n){2}default_in = \\[\\]\\r?\\n)optin = false')
+      if (!re.test(text)) return { why: 'no opt-in row `' + k + '` to flip in lenses.toml' }
+      text = text.replace(re, '$1optin = true')
+    }
+    if (!py) return { why: 'no python was resolved' }
+    if (!cap) return { why: 'no `cap = <n>` in the live harness to fill {{FANOUT_CAP}} with' }
+    const cat = path.join(scratch, keys.join('_') + '.toml')
+    fs.writeFileSync(cat, text)
+    const r = spawnSync(py, ['-B', path.join(kit, 'render_lenses.py'), cat], { input: tpl, encoding: 'utf8', env: Object.assign({}, process.env, { PYTHONUTF8: '1' }) })
+    if (r.status !== 0) return { why: 'the render exited ' + r.status + ': ' + (r.stderr || String(r.error)) }
+    return { src: r.stdout.split('{{FANOUT_CAP}}').join(cap).replace(/^\s*export\s+const\s+meta\s*=/m, 'const meta =') }
+  }
+  const readSlots = (text, name) => {
+    const ls = text.split('\n')
+    const at = ls.findIndex((l) => l.startsWith('const ' + name + ' = ['))
+    const end = ls.findIndex((l, i) => i > at && l === ']')
+    return at === -1 || end === -1 ? [] : new Function('deriveSlotLens', 'return [' + ls.slice(at + 1, end).join('\n') + ']')((lit, L) => L)
+  }
+  const scanFinds = (run) => run.trace.filter((t) => t.label.indexOf('find:') === 0)
+  const SWAP = Object.assign({}, SPEC, { optIn: { topology: 'blast-radius' } })
+  const top = renderOptIns(['topology'])
+  ck(!!top.src, 'optIn: the scratch render with topology shipped as an opt-in exists' + (top.why ? ' (' + top.why + ')' : ''))
+  if (top.src) {
+    // ---- AC2: topology runs in blast-radius's slot, the other four in place, five finders in order.
+    const SL = readSlots(src, 'SPEC_LENSES')
+    const OL = readSlots(top.src, 'OPTIN_LENSES')
+    const want = SL.length === 5 && OL.length === 1 ? [SL[0], SL[1], SL[2], OL[0], SL[4]] : []
+    const r2 = await runReview(SWAP, ALL_OK, top.src)
+    const f2 = scanFinds(r2)
+    ck(!r2.threw && want.length === 5 && f2.length === 5 && f2.every((t, i) => t.label === 'find:' + want[i].key && t.prompt.indexOf('LENS: ' + want[i].brief + '\n') !== -1) &&
+      want.map((L) => L.key).join(' ') === 'coherence grounding reuse topology failure-envelope',
+      'optIn: AC2 a unit-spec swap runs topology in the blast-radius slot, five finders in order: ' + (r2.threw || f2.map((t) => t.label).join(' ')))
+    const sp2 = r2.trace.find((t) => t.label === 'synth')
+    const ri2 = sp2 ? sp2.prompt.slice(sp2.prompt.indexOf('RUN INTEGRITY')) : ''
+    ck(!!r2.result && JSON.stringify(r2.result.optIn) === '{"topology":"blast-radius"}' &&
+      r2.logs.some((l) => l.indexOf('optIn: topology runs in the slot of blast-radius') === 0) &&
+      /\noptIn: topology ran in the slot of blast-radius - /.test(ri2),
+      'optIn: AC2 the return carries the swap, and the log and RUN INTEGRITY name the dropped default')
+    // ---- AC3: the four named refusals, each before the stub agent is called.
+    const both = renderOptIns(['topology', 'adopter-migration'])
+    for (const [render, v, word] of [[top, { coherence: 'reuse' }, 'already a lens'], [top, { portability: 'reuse' }, 'no opt-in of `unit-spec`'],
+      [top, { topology: 'nope' }, 'no default `nope`'], [both, { topology: 'reuse', 'adopter-migration': 'reuse' }, '`reuse` replaced twice']]) {
+      const r = render.src ? await runReview(Object.assign({}, SPEC, { optIn: v }), ALL_OK, render.src) : { threw: render.why, trace: [] }
+      ck(typeof r.threw === 'string' && r.threw.indexOf('tier2-review: `optIn`') === 0 && r.threw.indexOf(word) !== -1 && r.trace.length === 0,
+        'optIn: AC3 ' + JSON.stringify(v) + ' refuses before any agent, naming "' + word + '": ' + r.threw)
+    }
+    // ---- TOOL-dFairHearing-3 AC5: the key moves with a swap, and without one equals the live harness's key.
+    const k0 = await runReview(SPEC, ALL_OK)
+    const k1 = await runReview(SPEC, ALL_OK, top.src)
+    ck(!!k0.result && !!k1.result && !!r2.result && k1.result.key === k0.result.key && r2.result.key !== k1.result.key,
+      'optIn: AC5 a swap moves the review key, and a run without one keeps the key: ' + (k1.result && k1.result.key) + ' / ' + (r2.result && r2.result.key))
+    // ---- TOOL-dFairHearing-9 AC5: a note keyed to the default the swap displaced proceeds and is reported
+    // ---- unread; the swapped-in lens's note reaches its prompt. RED against the harness TOOL-dFairHearing-3
+    // ---- left, whose check throws on the replaced key.
+    const r9 = await runReview(Object.assign({}, SWAP, { lensNotes: { 'blast-radius': 'FH9-B', topology: 'FH9-T' } }), ALL_OK, top.src)
+    const sp9 = r9.trace.find((t) => t.label === 'synth')
+    const ri9 = sp9 ? sp9.prompt.slice(sp9.prompt.indexOf('RUN INTEGRITY')) : ''
+    const carry9 = (mark) => r9.trace.filter((t) => t.prompt.indexOf(mark) !== -1).map((t) => t.label).join(' ')
+    ck(!r9.threw && scanFinds(r9).length === 5 && carry9('FH9-T') === 'find:topology' && carry9('FH9-B') === '' &&
+      ri9.indexOf('lens notes supplied for: topology; lens notes for skipped lenses, unread: blast-radius.') !== -1 &&
+      r9.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf('unread: blast-radius') !== -1),
+      'lens notes: AC5 a note for the replaced default is unread in the log and RUN INTEGRITY, the opt-in\'s reaches find:topology: ' + (r9.threw || carry9('FH9-T')))
+  }
+  // ---- AC4: a light diff run takes a swap into a light slot, and skips by the default keys.
+  const port = renderOptIns(['portability'])
+  const r4 = port.src ? await runReview(Object.assign({}, DIFF, { intensity: 'light', optIn: { portability: 'seams' } }), ALL_OK, port.src) : { threw: port.why, trace: [] }
+  ck(!r4.threw && scanFinds(r4).map((t) => t.label).join(' ') === 'find:correctness find:portability find:verification' &&
+    !!r4.result && r4.result.skippedLenses.join(' ') === 'security intent',
+    'optIn: AC4 a light swap runs portability in the seams slot and skips security and intent: ' + (r4.threw || scanFinds(r4).map((t) => t.label).join(' ')))
+  // ---- AC7/AC8: review_pin.py prints one call's arguments, and refuses a malformed one by name.
+  const pin = path.join(kit, 'review_pin.py')
+  const runPin = (argv, at) => {
+    if (!py) return { status: -1, stdout: '', stderr: 'no python was resolved' }
+    const r = spawnSync(py, ['-B', at || pin].concat(argv), { encoding: 'utf8', env: Object.assign({}, process.env, { PYTHONUTF8: '1' }) })
+    return { status: r.status, stdout: r.stdout || '', stderr: (r.stderr || '') + (r.error ? String(r.error) : '') }
+  }
+  // AC7's no-flag design preset is the module's DESIGN_RECORD_PRESET, read off the module, never typed here.
+  const dflt = (/^DESIGN_RECORD_PRESET = "([a-z-]+)"/m.exec(fs.existsSync(pin) ? fs.readFileSync(pin, 'utf8') : '') || [])[1]
+  const S1 = 'memory/builds/dX/spec/2026-01-01-spec-TOOL-dX-1.md'
+  const D = ['--subject', 'memory/builds/dX/build/a.md', '--subject', 'memory/builds/dX/build/b.md']
+  for (const [what, argv, want] of [
+    ['one spec subject', ['--subject', S1], '{"preset": "unit-spec"}'],
+    ['two design subjects', D, '{"preset": "' + dflt + '"}'],
+    ['two design subjects under the design-audit flag', D.concat(['--design-record-preset', 'design-audit']), '{"preset": "design-audit"}'],
+    ['a mixed set under that flag', ['--subject', 'memory/builds/dX/build/a.md', '--subject', S1, '--design-record-preset', 'design-audit'], '{"preset": "unit-spec"}'],
+    ['the spec subject with an opt-in', ['--subject', S1, '--opt-in', '{"unit-spec": {"topology": "blast-radius"}}'], '{"preset": "unit-spec", "optIn": {"topology": "blast-radius"}}'],
+  ]) {
+    const r = runPin(argv)
+    ck(!!dflt && r.status === 0 && r.stdout === want + '\n', 'pin: AC7 ' + what + ' prints ' + want + ' (got ' + r.status + ': ' + (r.stdout || r.stderr).trim() + ')')
+  }
+  const lone = path.join(scratch, 'pin')
+  fs.mkdirSync(lone)
+  if (fs.existsSync(pin)) fs.copyFileSync(pin, path.join(lone, 'review_pin.py'))
+  fs.writeFileSync(path.join(lone, 'tier2-review.js'), 'const NOT_THE_PREDICATE = 1\n')
+  for (const [what, argv, at, word] of [['a harness with no SPEC_SUBJECT_PATH line', ['--subject', S1], path.join(lone, 'review_pin.py'), 'SPEC_SUBJECT_PATH'],
+    ['--opt-in [1]', ['--subject', S1, '--opt-in', '[1]'], null, '--opt-in'], ['no --subject', [], null, '--subject']]) {
+    const r = runPin(argv, at)
+    ck(r.status === 2 && r.stdout === '' && r.stderr.indexOf(word) !== -1, 'pin: AC8 ' + what + ' exits 2 naming ' + word + ' (got ' + r.status + ': ' + r.stderr.trim().split('\n').pop() + ')')
+  }
+  fs.rmSync(scratch, { recursive: true, force: true })
 }
 
 // ==== TOOL-dFoldedAudit-5 — THE ADDRESS, each spec-kind BLOCKER or HIGH naming the specs its fix changes ====
@@ -1736,8 +2629,10 @@ async function runLedgerArms() {
 // `addressOwed` reading `isSpec` nulls that arm's counts.
 async function runAddressArms() {
   const SPEC_DECLARED = Object.assign({}, SPEC, { disposal: 'by-nature' })
-  const buildSynthItem = (over) => (label, prompt) => ({ path: 'memory/reviews/r.md', summary: 's',
-    items: [Object.assign({ severity: 'HIGH', ids: [...prompt.split('UNVERIFIED findings')[0].matchAll(/id=(\d+) \[/g)].map((x) => parseInt(x[1], 10)) }, over)] })
+  const buildSynthItem = (over) => (label, prompt) => {
+    const it = Object.assign({ severity: 'HIGH', ids: [...prompt.split('UNVERIFIED findings')[0].matchAll(/id=(\d+) \[/g)].map((x) => parseInt(x[1], 10)) }, over)
+    return { path: 'memory/reviews/r.md', summary: 's', items: [Object.assign(it, { grades: buildGrades(it.ids, it.severity) })] }
+  }
   const scanSynth = (run) => run.trace.filter((t) => t.label.indexOf('synth') === 0)[0].prompt
   // ---- AC1: the item's address comes back beside the counts, and the prompt asks for the line.
   let r = await runReview(SPEC_DECLARED, buildStubs({ synth: buildSynthItem({ specs: ['TOOL-x-1'] }) }))
@@ -1776,6 +2671,523 @@ async function runAddressArms() {
   }
 }
 
+// ==== TOOL-dFairHearing-6 — `grades`, one item per defect, each confirmed id counted at its own grade ====
+// Skeptics confirm id 1 at blocker and id 2 at medium and refute ids 3 to 5; the synthesis stub hands back
+// the items it is given. RED against the base harness, whose tally places each id at its item's severity
+// and whose prompt still merges findings of one binding grade only: observed at the close, not by this pass.
+async function runGradesArms() {
+  const buildMixedVerdicts = (label, prompt) => {
+    const m = /ids ([0-9, ]+)\)/.exec(prompt)
+    const ids = m ? m[1].split(',').map((x) => parseInt(x, 10)) : []
+    return { path: '/v', verdicts: ids.map((id) => (id === 1 ? { id: id, verdict: 'confirmed', reason: 'r', severity: 'blocker' }
+      : id === 2 ? { id: id, verdict: 'confirmed', reason: 'r', severity: 'medium' } : { id: id, verdict: 'refuted', reason: 'r' })) }
+  }
+  const runItems = (items) => runReview(DIFF, buildStubs({ 'verify:': buildMixedVerdicts, synth: { path: 'memory/reviews/r.md', summary: 's', items: items } }))
+  const MIXED = { severity: 'BLOCKER', ids: [1, 2], grades: { 1: 'BLOCKER', 2: 'MEDIUM' } }
+  const scanWarn = (run, text) => run.logs.filter((l) => l.indexOf('WARNING:') === 0 && l.indexOf(text) !== -1)
+  // ---- AC1: one mixed item counts each id at its own grade; a repeated id still nulls both counts.
+  let r = await runItems([MIXED])
+  if (checkNoThrow(r, 'grades mixed item')) {
+    ck(r.result.blockers === 1 && r.result.highs === 0 && Array.isArray(r.result.regraded) && r.result.regraded.length === 0 &&
+      !r.logs.some((l) => l.indexOf('other than their binding one') !== -1),
+      'grades: one item holding a blocker and a medium counts blockers 1, highs 0 and regrades none')
+  }
+  r = await runItems([MIXED, { severity: 'BLOCKER', ids: [1], grades: { 1: 'BLOCKER' } }])
+  if (checkNoThrow(r, 'grades repeated id'))
+    ck(r.result.blockers === null && r.result.highs === null, 'grades: an id in two items still nulls both counts')
+  // ---- AC2: a per-id grade off the binding one is regraded by id.
+  r = await runItems([{ severity: 'BLOCKER', ids: [1, 2], grades: { 1: 'BLOCKER', 2: 'HIGH' } }])
+  if (checkNoThrow(r, 'grades regraded'))
+    ck(r.result.highs === 1 && Array.isArray(r.result.regraded) && r.result.regraded.join(' ') === '2',
+      'grades: id 2 graded HIGH reads highs 1 and regraded [2]')
+  // ---- AC3: an absent and an illegal grade each fall back to the item's severity, named.
+  for (const [name, grades] of [['an absent grade', { 1: 'BLOCKER' }], ['an illegal grade', { 1: 'BLOCKER', 2: 'severe' }]]) {
+    r = await runItems([{ severity: 'BLOCKER', ids: [1, 2], grades: grades }])
+    if (checkNoThrow(r, 'grades ' + name))
+      ck(r.result.blockers === 2 && scanWarn(r, 'no legal grade').some((l) => /ids 2$/.test(l)),
+        'grades: ' + name + ' places id 2 at the item\'s BLOCKER and names it')
+  }
+  // ---- TOOL-dFairHearing-23 AC21: an item with no `grades`, and one with `grades: null`, place each id at the item's
+  // severity, one WARNING naming the item. RED against the parent, whose `it.grades[String(id)]` throws a TypeError.
+  for (const [name, item] of [['no grades', { severity: 'BLOCKER', ids: [1, 2] }], ['grades null', { severity: 'BLOCKER', ids: [1, 2], grades: null }]]) {
+    r = await runItems([item])
+    if (checkNoThrow(r, 'FH23 AC21 ' + name)) {
+      const w = scanWarn(r, 'carries no grades object')
+      ck(r.result.blockers === 2 && w.length === 1 && w[0].indexOf('holding ids 1, 2 ') !== -1,
+        'FH23 AC21 an item with ' + name + ' places ids 1 and 2 at its BLOCKER, one WARNING naming it: ' + w.join(' / '))
+    }
+  }
+  // ---- AC4: an item whose severity is not its highest grade is named, and the counts stay per id.
+  r = await runItems([Object.assign({}, MIXED, { severity: 'MEDIUM' })])
+  if (checkNoThrow(r, 'grades misranked'))
+    ck(r.result.blockers === 1 && scanWarn(r, 'other than the highest grade').some((l) => /items holding ids 1$/.test(l)),
+      'grades: a MEDIUM item holding a BLOCKER grade counts blockers 1 and is named')
+  // ---- AC5: the old merge rule is gone from both files; the prompt and the schema carry the new one.
+  const tpl = fs.readFileSync(require('path').join(require('path').dirname(FILE), 'tier2-review.template.js'), 'utf8')
+  ck(src.indexOf('merge findings of one binding grade only') === -1 && tpl.indexOf('merge findings of one binding grade only') === -1,
+    'grades: neither the template nor the render says merge findings of one binding grade only')
+  r = await runItems([MIXED])
+  if (checkNoThrow(r, 'grades prompt')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    const req = sp && sp.schema && sp.schema.properties.items.items.required
+    ck(!!sp && sp.prompt.indexOf('one item per defect') !== -1 && sp.prompt.indexOf('`grades`') !== -1,
+      'grades: the synthesis prompt asks for one item per defect and its `grades`')
+    ck(Array.isArray(req) && req.indexOf('grades') !== -1, 'grades: the synthesis schema requires `grades` on each item')
+  }
+}
+
+// ==== TOOL-dFairHearing-7 — twins: refuted claims and same-address pairs handed to the synthesis ====
+// The `security` lens, first in the diff literal, raises ids 1 and 2 at a.js lines 10 and 12, so both meet
+// one skeptic in verify:batch-1; `seams` raises id 5 at c.js; every other finding cites its lens's own file
+// at lines 1 and 50, which pairs with nothing. Skeptics confirm every id `over` does not name. RED against
+// the base harness, which reads no `addressTwins`: the shown run hands neither block, its schema has no
+// `twinFlags`, and its return carries neither `twinPairs` nor `twinFlags`. Observed at the close.
+async function runTwinArms() {
+  const buildTwinLens = (label) => {
+    const lens = label.slice('find:'.length)
+    const mk = (file, line) => ({ file: file, line: line, severity: 'high', claim: lens + ' claim at ' + file + ':' + line, impact: 'i', fix: 'f' })
+    return { lens: lens, path: '/p', findings: lens === 'security' ? [mk('a.js', 10), mk('a.js', 12)]
+      : lens === 'seams' ? [mk('c.js', 1), mk('seams.js', 50)] : [mk(lens + '.js', 1), mk(lens + '.js', 50)] }
+  }
+  const buildTwinVerdicts = (over) => (label, prompt) => {
+    const m = /ids ([0-9, ]+)\)/.exec(prompt)
+    const ids = m ? m[1].split(',').map((x) => parseInt(x, 10)) : []
+    return { path: '/v', verdicts: ids.map((id) => Object.assign({ id: id, verdict: 'confirmed', reason: 'r' }, over[id] || {})) }
+  }
+  const runTwins = (twins, over, flags) => runReview(Object.assign({}, DIFF, twins === undefined ? {} : { addressTwins: twins }),
+    buildStubs({ 'find:': buildTwinLens, 'verify:': buildTwinVerdicts(over),
+      synth: (label, prompt) => Object.assign(buildSynth(null)(label, prompt), flags ? { twinFlags: flags } : {}) }))
+  const scanSynthCall = (run) => run.trace.find((t) => t.label === 'synth') || { prompt: '', schema: { required: [], properties: {} } }
+  const FLAGS = [{ refuted: 2, confirmed: 1 }, { refuted: 2, confirmed: 1 }, { refuted: 1, confirmed: 2 }, { refuted: 9, confirmed: 1 }]
+  const BY_DESIGN = { 2: { verdict: 'refuted', reason: 'by design' } }
+  // ---- AC3: the shown prompt carries both blocks and the schema requires twinFlags; the hidden one carries neither.
+  const rs = await runTwins('shown', BY_DESIGN, FLAGS)
+  const rh = await runTwins('hidden', BY_DESIGN, FLAGS)
+  if (checkNoThrow(rs, 'twins shown') && checkNoThrow(rh, 'twins hidden')) {
+    const ss = scanSynthCall(rs)
+    const sh = scanSynthCall(rh)
+    const refBlock = ss.prompt.slice(ss.prompt.indexOf('REFUTED findings'), ss.prompt.indexOf('SAME-ADDRESS PAIRS'))
+    ck(refBlock.indexOf('- id=2 [high] lens=security a.js:12 — security claim at a.js:12 | refuted because: by design') !== -1 &&
+      ss.prompt.indexOf('- confirmed id=1 and refuted id=2, both at a.js 10') !== -1 &&
+      ss.prompt.indexOf('refuted findings shown: 1; same-address pairs shown: 1.') !== -1 &&
+      ss.schema.required.indexOf('twinFlags') !== -1 && !!ss.schema.properties.twinFlags,
+      'twins: a shown run hands id 2\'s claim and reason, the pair 1/2, both counts in RUN INTEGRITY, and a schema requiring twinFlags')
+    ck(sh.prompt.length > 0 && sh.prompt.indexOf('REFUTED findings') === -1 && sh.prompt.indexOf('SAME-ADDRESS PAIRS') === -1 &&
+      sh.prompt.indexOf('twinFlags') === -1 && sh.schema.required.indexOf('twinFlags') === -1 && !('twinFlags' in sh.schema.properties) &&
+      !('twinFlags' in rh.result) && !('twinPairs' in rh.result),
+      'twins: the hidden run hands neither block, a schema without twinFlags, and returns neither field')
+    // ---- AC4: one flag kept, its repeat dropped, the two naming a wrong verdict discarded and named.
+    ck(JSON.stringify(rs.result.twinFlags) === JSON.stringify([{ refuted: 2, confirmed: 1, sameAddress: true }]) && rs.result.twinPairs === 1 &&
+      rs.logs.some((l) => l.indexOf('WARNING: 2 twin flag(s)') === 0 && l.indexOf('discarded: 1/2, 9/1') !== -1),
+      'twins: of four flags 2/1 is kept at sameAddress true, its repeat dropped, and 1/2 and 9/1 named as discarded: ' + JSON.stringify(rs.result.twinFlags))
+    // ---- AC5: no flag moves a verdict, a grade, an item or a count.
+    const FIELDS = ['confirmed', 'refuted', 'merged', 'precision', 'blockers', 'highs', 'confirmedFindings', 'ledger']
+    ck(rs.result.refuted === 1 && FIELDS.every((k) => JSON.stringify(rs.result[k]) === JSON.stringify(rh.result[k])),
+      'twins: the hidden and shown runs agree on ' + FIELDS.join(', '))
+  }
+  const r5 = await runTwins('shown', Object.assign({ 5: { verdict: 'refuted', reason: 'r' } }, BY_DESIGN), [{ refuted: 5, confirmed: 1 }])
+  if (checkNoThrow(r5, 'twins off-address'))
+    ck(JSON.stringify(r5.result.twinFlags) === JSON.stringify([{ refuted: 5, confirmed: 1, sameAddress: false }]) && r5.result.twinPairs === 1,
+      'twins: a refuted id 5 at c.js flagged against id 1 is kept at sameAddress false: ' + JSON.stringify(r5.result.twinFlags))
+  // ---- AC6: a merged duplicate is no twin of its own original.
+  const rd = await runTwins('shown', { 2: { verdict: 'refuted', reason: 'duplicate of id=1' } }, [])
+  if (checkNoThrow(rd, 'twins merged'))
+    ck(rd.result.merged === 1 && rd.result.twinPairs === 0 &&
+      scanSynthCall(rd).prompt.indexOf('SAME-ADDRESS PAIRS (a confirmed and a refuted finding citing one address):\n  (none)') !== -1,
+      'twins: id 2 refuted as a duplicate of id 1 hands no pair, and the block reads (none)')
+}
+
+// ==== TOOL-dFairHearing-11 — every spawn typed from a declared stage (AC1-AC4) ======================
+// RED against the parent render: its probe passes no stage options, its synthesis and a `none` run's
+// judges carry no agentType, `roles.probe` is an unknown key, and the code-reading arm names the probe's
+// agent( call. WHAT IT DOES NOT CHECK: that the platform spawns a type the options name; and the code
+// arm reads the template's agent( calls only, an `agent` reached under another name being invisible to it.
+const STAGE_OPTS = ['probeOpts', 'findOpts', 'verifyOpts', 'synthOpts']
+// The code with every string, template text, comment and regex literal blanked, lengths and newlines
+// kept, so a paren, a comma or an `agent(` inside one is never read; a `${...}` body stays code.
+function blankStrings(s) {
+  const out = s.split('')
+  const blank = (a, b) => { for (let k = a; k < b && k < s.length; k++) if (out[k] !== '\n') out[k] = ' ' }
+  const tpl = [] // the brace depth each open template literal's `${` returns to
+  let depth = 0
+  let lastCh = ''
+  let lastWord = ''
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i]
+    if (tpl.length && depth === tpl[tpl.length - 1]) { // template text, up to its close or a `${`
+      const st = i
+      while (i < s.length && s[i] !== '`' && !(s[i] === '$' && s[i + 1] === '{')) i += s[i] === '\\' ? 2 : 1
+      blank(st, i)
+      if (s[i] === '`') { out[i] = ' '; tpl.pop(); lastCh = ')'; lastWord = '' } else { i++; depth++; lastCh = '{'; lastWord = '' }
+      continue
+    }
+    if (c === '/' && s[i + 1] === '/') { const e = s.indexOf('\n', i); const end = e === -1 ? s.length : e; blank(i, end); i = end - 1; continue }
+    if (c === '/' && s[i + 1] === '*') { const e = s.indexOf('*/', i + 2); const end = e === -1 ? s.length : e + 2; blank(i, end); i = end - 1; continue }
+    if (c === '\'' || c === '"' || (c === '/' && (lastCh === '' || '(,=:[!&|?{};+-*%<>~^'.indexOf(lastCh) !== -1 || lastWord === 'return'))) {
+      let j = i + 1
+      let cls = false
+      while (j < s.length && s[j] !== '\n' && (cls || s[j] !== c)) {
+        if (s[j] === '\\') j++
+        else if (c === '/' && s[j] === '[') cls = true
+        else if (c === '/' && s[j] === ']') cls = false
+        j++
+      }
+      blank(i, j + 1); i = j; lastCh = ')'; lastWord = ''; continue
+    }
+    if (c === '`') { out[i] = ' '; tpl.push(depth); continue }
+    if (c === '{') depth++
+    else if (c === '}') depth--
+    if (/\s/.test(c)) continue
+    lastWord = /[\w$]/.test(c) ? (/[\w$]/.test(s[i - 1] || '') ? lastWord + c : c) : ''
+    lastCh = c
+  }
+  return out.join('')
+}
+// Every agent( call outside a string or comment: its line, and its second top-level argument as code and as written.
+function scanAgentCalls(text) {
+  const code = blankStrings(text)
+  const calls = []
+  const re = /(^|[^.\w$])agent\s*\(/g
+  let m
+  while ((m = re.exec(code))) {
+    const open = m.index + m[0].length - 1
+    let d = 0
+    let k = open
+    const commas = []
+    for (; k < code.length; k++) {
+      const ch = code[k]
+      if (ch === '(' || ch === '[' || ch === '{') d++
+      else if (ch === ')' || ch === ']' || ch === '}') { if (--d === 0) break }
+      else if (ch === ',' && d === 1) commas.push(k)
+    }
+    const end = commas.length > 1 ? commas[1] : k
+    calls.push({ line: code.slice(0, open).split('\n').length, opts: commas.length ? code.slice(commas[0] + 1, end) : '',
+      raw: commas.length ? text.slice(commas[0] + 1, end) : '' })
+  }
+  return calls
+}
+// The arm's predicate: an agent( call whose options name none of the four stage option constants is untyped.
+function checkStageOpts(text) {
+  const calls = scanAgentCalls(text)
+  const bad = calls.filter((c) => !STAGE_OPTS.some((n) => new RegExp('(?<![\\w$])' + n + '(?![\\w$])').test(c.opts)))
+  return { calls: calls, bad: bad }
+}
+async function runTypedStageArms() {
+  const path = require('path')
+  const tpl = fs.readFileSync(path.join(path.dirname(FILE), 'tier2-review.template.js'), 'utf8')
+  // ---- S3/AC4: every agent( call of the template takes a stage constant; a copy without the probe's names it.
+  const live = checkStageOpts(tpl)
+  ck(live.calls.length >= 5 && live.bad.length === 0, 'stage: all ' + live.calls.length + ' agent( calls of the template take one of ' + STAGE_OPTS.join(', ') +
+    ' as their options' + (live.bad.length ? ' — untyped at L' + live.bad.map((c) => c.line).join(', L') : ''))
+  const PROBE_OPTS = '  }, probeOpts), // TOOL-dFairHearing-11 S1'
+  const planted = checkStageOpts(tpl.replace(PROBE_OPTS, '  }), // TOOL-dFairHearing-11 S1'))
+  ck(tpl.indexOf(PROBE_OPTS) !== -1 && planted.bad.length === 1 && planted.bad[0].raw.indexOf('\'resume:probe\'') !== -1,
+    'stage: a copy with the probe\'s probeOpts removed names exactly the probe\'s agent( call: ' + planted.bad.map((c) => 'L' + c.line).join(' '))
+  const SYNTH_TYPE = 'const synthType = roles.synthesis || PLATFORM_TYPE'
+  const re = whole.indexOf(SYNTH_TYPE) === -1 ? { threw: 'the stage table line moved', trace: [] }
+    : await runReview(DIFF, ALL_OK, whole.replace(SYNTH_TYPE, 'const synthType = roles.synthesis || \'\''))
+  ck(!!re.threw && re.threw.indexOf('the stage synthesis resolves to no agent type') !== -1 && re.trace.length === 0,
+    'stage: a stage table resolving synthesis to an empty string refuses by name before the probe: ' + re.threw)
+  // ---- AC1: roles.probe types the probe, Plan without it, and `none` is refused like any roles value.
+  const probeOf = (x) => x.trace.find((t) => t.label === 'resume:probe') || {}
+  let r = await runReview(Object.assign({}, DIFF, { roles: { probe: 'gov-orienter' } }), ALL_OK)
+  ck(!r.threw && probeOf(r).agentType === 'gov-orienter' && r.logs.indexOf('role probe: gov-orienter — roles.probe') !== -1,
+    'stage: roles.probe types the resume probe, and its log line names the source')
+  r = await runReview(Object.assign({}, DIFF, { roles: { probe: 'none' } }), ALL_OK)
+  ck(!!r.threw && r.threw.indexOf('tier2-review: `roles` key probe') === 0 && r.trace.length === 0, 'stage: roles.probe none is refused before any spawn')
+  r = await runReview(Object.assign({}, DIFF, { efforts: { probe: 'low' } }), ALL_OK)
+  ck(!r.threw && probeOf(r).effort === 'low' && r.logs.indexOf('effort probe: low — efforts.probe') !== -1, 'stage: efforts.probe sets the probe\'s effort')
+  // ---- AC2: under `none` every judge and the synthesis take general-purpose; absent, the judges Plan.
+  const rn = await runReview(DIFF, ALL_OK)
+  const ABSW = Object.assign({}, DIFF); delete ABSW.workerType
+  const ra = await runReview(ABSW, ALL_OK)
+  const typesOf = (x, re2) => x.trace.filter((t) => re2.test(t.label)).map((t) => t.agentType)
+  ck(!rn.threw && probeOf(rn).agentType === 'Plan' && typesOf(rn, /^(find|verify):|^synth$/).length === 11 &&
+    typesOf(rn, /^(find|verify):|^synth$/).every((t) => t === 'general-purpose'), 'stage: none, the five finders, five batches and the synthesis are general-purpose and the probe Plan')
+  ck(!ra.threw && probeOf(ra).agentType === 'Plan' && typesOf(ra, /^(find|verify):/).length === 10 && typesOf(ra, /^(find|verify):/).every((t) => t === 'Plan') &&
+    typesOf(ra, /^synth$/).join() === 'general-purpose' && ra.trace.every((t) => typeof t.agentType === 'string' && t.agentType !== ''),
+    'stage: workerType absent, the judges are Plan, the synthesis general-purpose, and every spawn typed: ' + ra.trace.length)
+  // ---- AC3: `durable` follows the judge stages' resolution to PLATFORM_TYPE, not the explicit type.
+  ck(rn.result.durable === true && rn.trace.filter((t) => t.label.indexOf('find:') === 0).every((t) => t.prompt.indexOf('DURABILITY') !== -1) &&
+    ra.result.durable === false, 'stage: none is durable with every finder told DURABILITY, and Plan is not durable')
+}
+
+// ==== TOOL-dFairHearing-11 — `twin`, run b and the twin merge (AC5-AC10) =============================
+// RED against the parent render: it reads no `twin`, refuses no value, dispatches five finders on every
+// run, hands no TWIN RUN block or review-twin line, and returns no `twin`. WHAT IT DOES NOT CHECK: that a
+// live synthesis merges the two runs as told or copies the line; the return's `twin` is the source a caller
+// compares against.
+async function runTwinRunArms() {
+  const finds = (x) => x.trace.filter((t) => t.label.indexOf('find:') === 0)
+  // ---- AC5: a closed set, refused outside it before any spawn; each member starts.
+  let r = await runReview(Object.assign({}, DIFF, { twin: 'sometimes' }), ALL_OK)
+  ck(!!r.threw && r.threw.indexOf('tier2-review: `twin` must be one of never | design-records | design-and-landing | always') === 0 && r.trace.length === 0,
+    'twin: sometimes is refused before any spawn, naming the four values')
+  const started = []
+  for (const v of ['never', 'design-records', 'design-and-landing', 'always']) {
+    r = await runReview(Object.assign({}, DIFF, { twin: v }), ALL_OK)
+    if (!r.threw && r.result && r.result.exit === 'complete') started.push(v)
+  }
+  ck(started.length === 4, 'twin: each of the four values starts and completes: ' + started.join(' '))
+  // ---- AC6: ten finders exactly where S5 says; ten is twice the five-slot literal.
+  const CASES = { diff: DIFF, 'unit-spec audit': SPEC, 'design-audit preset': Object.assign({}, SPEC, { preset: 'design-audit' }),
+    'design-subject audit': Object.assign({}, SPEC, { subjects: [{ path: 'memory/builds/dX/build/a.md', blob: 'abc1234', id: 'PLAY-dX-1' }] }) }
+  const WANT = { never: [], 'design-records': ['design-audit preset', 'design-subject audit'], 'design-and-landing': ['diff', 'design-audit preset', 'design-subject audit'],
+    always: ['diff', 'unit-spec audit', 'design-audit preset', 'design-subject audit'] }
+  for (const t of Object.keys(WANT)) {
+    const got = []
+    for (const c of Object.keys(CASES)) {
+      const x = await runReview(Object.assign({}, CASES[c], { twin: t }), ALL_OK)
+      got.push(x.threw ? c + ' threw' : finds(x).length === 10 ? c : finds(x).length === 5 ? null : c + ' at ' + finds(x).length)
+    }
+    ck(got.filter(Boolean).join(', ') === WANT[t].join(', '), 'twin: ' + t + ' dispatches ten finders on ' + (got.filter(Boolean).join(', ') || 'no run'))
+  }
+  // ---- AC7: run a two findings a lens, run b one; ids run 1-10 then 11-15, and the batch count is an
+  // untwinned fifteen-finding run's.
+  const buildRunLens = (label) => {
+    const lens = label.slice('find:'.length).replace(/:b$/, '')
+    const b = /:b$/.test(label)
+    const mk = (n) => ({ file: lens + '.js', line: n, severity: 'high', claim: lens + ' ' + n + (b ? ' b' : ' a'), impact: 'i', fix: 'f' })
+    return { lens: lens, path: '/p', findings: b ? [mk(1)] : [mk(1), mk(40)] }
+  }
+  const buildFifteen = (label) => ({ lens: label.slice('find:'.length), path: '/p', findings: [1, 2, 3].map((n) => ({ file: 'f.js', line: n * 10, severity: 'high', claim: 'c' + n, impact: 'i', fix: 'f' })) })
+  const buildTwinSynth = (drop) => (label, prompt) => {
+    const ids = [...prompt.split('UNVERIFIED findings')[0].matchAll(/id=(\d+) \[/g)].map((x) => parseInt(x[1], 10)).filter((id) => id !== drop && id !== 12)
+    return { path: 'memory/reviews/r.md', summary: 's', items: ids.map((id) => {
+      const hold = id === 3 ? [3, 12] : [id]
+      return { severity: 'HIGH', ids: hold, grades: buildGrades(hold, 'HIGH') }
+    }) }
+  }
+  const TW = Object.assign({}, DIFF, { twin: 'always' })
+  const rt = await runReview(TW, buildStubs({ 'find:': buildRunLens, synth: buildTwinSynth(null) }))
+  const ru = await runReview(DIFF, buildStubs({ 'find:': buildFifteen }))
+  if (checkNoThrow(rt, 'twin run') && checkNoThrow(ru, 'untwinned fifteen')) {
+    const fb = finds(rt).slice(5)
+    ck(rt.result.ledger.map((e) => e.id).join(',') === '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15' &&
+      rt.result.ledger.every((e) => / (a|b)$/.exec(e.claim)[1] === (e.id <= 10 ? 'a' : 'b')) &&
+      fb.length === 5 && fb.every((t) => /:b$/.test(t.label) && t.prompt.indexOf('/find-' + t.label.slice(5, -2) + '-b.json') !== -1),
+      'twin: run a takes ids 1-10 and run b 11-15, run b\'s labels ending :b and its files -b: ' + fb.map((t) => t.label).join(' '))
+    const vb = (x) => x.trace.filter((t) => t.label.indexOf('verify:') === 0).length
+    ck(vb(rt) === vb(ru) && ru.result.raw === 15 && rt.result.raw === 15 && rt.result.agents === 10 + vb(rt) + 1 && rt.result.lensesRun === 10 &&
+      / raw=15 .* agents=16 /.test(rt.result.shape), 'twin: the verify stage dispatches ' + vb(rt) + ' batches as an untwinned fifteen does, and agents, raw and the shape line count both runs: ' + rt.result.shape)
+    // ---- AC8: the figures come from the items; the prompt carries the block and the line; an untwinned run neither.
+    const tw = rt.result.twin || {}
+    ck(tw.agreed === 1 && tw.onlyA === 9 && tw.onlyB === 4 && (tw.a || []).join(',') === '1,2,3,4,5,6,7,8,9,10' && (tw.b || []).join(',') === '11,12,13,14,15',
+      'twin: ids 3 and 12 in one item read agreed 1, and a and b list each run\'s confirmed ids: ' + JSON.stringify(rt.result.twin))
+    const sp = (rt.trace.find((t) => t.label === 'synth') || { prompt: '' }).prompt
+    ck(sp.indexOf('\n\nTWIN RUN - ') !== -1 && sp.indexOf('<<<TWIN\nreview-twin runs=2 a=1-10 b=11-15\nTWIN>>>') !== -1 && sp.indexOf(' lens=correctness run=a correctness.js:1 — ') !== -1 &&
+      sp.indexOf('- run a id=3 and run b id=12, both at correctness.js 1') !== -1, 'twin: the synthesis prompt carries the TWIN RUN block, each finding\'s run, the pair 3/12 and the review-twin line between markers')
+    const su = (ru.trace.find((t) => t.label === 'synth') || { prompt: '' }).prompt
+    ck(su.length > 0 && su.indexOf('TWIN RUN') === -1 && su.indexOf('review-twin') === -1 && su.indexOf(' run=') === -1 && ru.result.twin === null,
+      'twin: an untwinned run\'s synthesis prompt carries neither the block nor the line, and its return reads twin null')
+  }
+  // ---- AC9: a run-b confirmed id in no item nulls blockers and twin, and the note names it.
+  r = await runReview(TW, buildStubs({ 'find:': buildRunLens, synth: buildTwinSynth(14) }))
+  ck(!r.threw && r.result.blockers === null && r.result.twin === null && r.result.note.indexOf('confirmed id(s) 14 sit in no item') !== -1,
+    'twin: an unplaced run-b id 14 nulls blockers and twin, and the note names it')
+  // ---- AC10: a twinned run keys apart; `never` keys as an absent value.
+  const deriveTwinKey = async (v) => {
+    const x = await runReview(v === undefined ? DIFF : Object.assign({}, DIFF, { twin: v }), ALL_OK)
+    return x.result ? x.result.key : 'threw: ' + x.threw
+  }
+  const kAbsent = await deriveTwinKey(undefined)
+  const kNever = await deriveTwinKey('never')
+  const kAlways = await deriveTwinKey('always')
+  ck(kAbsent.indexOf('threw') !== 0 && kAbsent === kNever && kAlways !== kAbsent, 'twin: always moves the key and never keeps it: ' + [kAbsent, kNever, kAlways].join(' '))
+  // ---- a dead run-b lens defers by its :b label.
+  r = await runReview(TW, buildStubs({ 'find:seams:b': null }))
+  ck(!r.threw && r.result.exit === 'deferred-platform' && JSON.stringify(r.result.pending) === '["find:seams:b"]', 'twin: a dead run-b lens defers, pending find:seams:b: ' + JSON.stringify(r.result && r.result.pending))
+  // ---- AC5's stand-in half: review_pin.py prints the pin argument, and refuses a value off the set by name.
+  const py = process.argv[5] || ''
+  const { spawnSync } = require('child_process')
+  const pin = require('path').join(require('path').dirname(FILE), 'review_pin.py')
+  const runPin = (argv) => {
+    if (!py) return { status: -1, stdout: '', stderr: 'no python was resolved' }
+    const x = spawnSync(py, ['-B', pin].concat(argv), { encoding: 'utf8', env: Object.assign({}, process.env, { PYTHONUTF8: '1' }) })
+    return { status: x.status, stdout: x.stdout || '', stderr: (x.stderr || '') + (x.error ? String(x.error) : '') }
+  }
+  const p1 = runPin(['--subject', 'memory/builds/dX/spec/2026-01-01-spec-TOOL-dX-1.md', '--twin', 'always'])
+  ck(p1.status === 0 && p1.stdout === '{"preset": "unit-spec", "twin": "always"}\n', 'twin: review_pin.py --twin always prints twin always (got ' + p1.status + ': ' + (p1.stdout || p1.stderr).trim() + ')')
+  const p2 = runPin(['--subject', 'memory/builds/dX/spec/2026-01-01-spec-TOOL-dX-1.md', '--twin', 'sometimes'])
+  ck(p2.status === 2 && p2.stdout === '' && p2.stderr.indexOf('--twin') !== -1, 'twin: review_pin.py --twin sometimes exits 2 naming --twin (got ' + p2.status + ')')
+  // ---- TOOL-dFairHearing-8 AC4's stand-in half, on this runner: `--unclassed` printed, and refused off its three values.
+  const p3 = runPin(['--subject', 'memory/builds/dX/spec/2026-01-01-spec-TOOL-dX-1.md', '--unclassed', 'reason'])
+  ck(p3.status === 0 && p3.stdout === '{"preset": "unit-spec", "unclassed": "reason"}\n', 'unclassed: review_pin.py --unclassed reason prints unclassed reason (got ' + p3.status + ': ' + (p3.stdout || p3.stderr).trim() + ')')
+  const p4 = runPin(['--subject', 'memory/builds/dX/spec/2026-01-01-spec-TOOL-dX-1.md', '--unclassed', 'maybe'])
+  ck(p4.status === 2 && p4.stdout === '' && p4.stderr.indexOf('--unclassed') !== -1, 'unclassed: review_pin.py --unclassed maybe exits 2 naming --unclassed (got ' + p4.status + ')')
+}
+
+// ==== TOOL-dFairHearing-8 — the class fix judge, and every confirmed finding's disposition (AC1-AC9) ======
+// RED against the parent render: it reads no `fixJudge`, `unclassed` or `gateManifest`, so none refuses; its
+// skeptics are never asked the class question; its probe reads no leg manifest; its synthesis is handed no
+// DISPOSITIONS block and its schema requires no `dispositions`; its appendix has nine columns; and its return
+// carries no `dispositions`, `dispositionFault` or `ownerItems`. WHAT IT DOES NOT CHECK: that a live skeptic
+// judges a fix by its class, or that a live synthesis writes the disposition cells it is told to; the return's
+// `appendix` is the source a caller compares the record against. AC2's byte-equality to the parent render is
+// the pass's probe, since this suite reads one render; here `class` and an absent value agree, the default
+// TOOL-dFairHearing-1 S9 flipped, so the absent arms run DIFF with its `fixJudge` pin deleted.
+async function runDispositionArms() {
+  const skepticPrompts = (x) => x.trace.filter((t) => t.label.indexOf('verify:') === 0).map((t) => t.prompt)
+  const synthCall = (x) => x.trace.find((t) => t.label === 'synth') || { prompt: '', schema: { required: [], properties: {} } }
+  const probeCall = (x) => x.trace.find((t) => t.label === 'resume:probe') || { prompt: '' }
+  // A synthesis placing every confirmed id in one HIGH item, returning `pick(ids)` as its dispositions.
+  const buildDisposingSynth = (pick) => (label, prompt) => Object.assign(buildSynth(null)(label, prompt),
+    { dispositions: pick([...prompt.split('UNVERIFIED findings')[0].matchAll(/id=(\d+) \[/g)].map((x) => parseInt(x[1], 10))) })
+  // ---- AC1: a closed set, refused outside it before any spawn; each member and the absent value start.
+  let r = await runReview(Object.assign({}, DIFF, { fixJudge: 'both' }), ALL_OK)
+  ck(!!r.threw && r.threw.indexOf('tier2-review: `fixJudge` must be one of instance | class') === 0 && r.trace.length === 0,
+    'fixJudge: both is refused before any spawn, naming the two values')
+  const UNJUDGED = Object.assign({}, DIFF)
+  delete UNJUDGED.fixJudge
+  const started = []
+  for (const v of [undefined, 'instance', 'class']) {
+    r = await runReview(v === undefined ? UNJUDGED : Object.assign({}, DIFF, { fixJudge: v }), ALL_OK)
+    if (!r.threw && r.result && r.result.exit === 'complete') started.push(String(v))
+  }
+  ck(started.length === 3, 'fixJudge: absent, instance and class each start and complete: ' + started.join(' '))
+  // ---- AC2: `class` keeps the absent run's skeptic prompts and key; `instance` asks the instance question and keys apart.
+  const ra = await runReview(UNJUDGED, ALL_OK)
+  const ri = await runReview(Object.assign({}, DIFF, { fixJudge: 'instance' }), ALL_OK)
+  const rc = await runReview(Object.assign({}, DIFF, { fixJudge: 'class' }), ALL_OK)
+  if (checkNoThrow(ra, 'fixJudge absent') && checkNoThrow(ri, 'fixJudge instance') && checkNoThrow(rc, 'fixJudge class')) {
+    ck(skepticPrompts(ri).length === 5 && skepticPrompts(ri).every((p) => p.indexOf('"instance"') === -1 && p.indexOf('fixVerdict:"sound"|"unsound"|"none", fixNote') !== -1) &&
+      ri.result.key !== ra.result.key,
+      'fixJudge: instance asks every skeptic the instance question, with no instance verdict, and moves the key: ' + ri.result.key)
+    ck(skepticPrompts(ra).length === 5 && JSON.stringify(skepticPrompts(rc)) === JSON.stringify(skepticPrompts(ra)) && rc.result.key === ra.result.key &&
+      skepticPrompts(ra).every((p) => p.indexOf('judge its proposed fix by the defect\'s CLASS') !== -1 &&
+      p.indexOf('"instance" when it cures the cited instance and leaves another of its class standing') !== -1 &&
+      p.indexOf('fixVerdict:"sound"|"unsound"|"none"|"instance", fixNote') !== -1),
+      'fixJudge: class hands the absent run\'s skeptic prompts, the class question with the instance verdict, and derives its key')
+  }
+  // ---- AC3: an instance verdict with a note is the fix under `class`, and not judged under `instance`.
+  const buildInstanceVerdicts = (label, prompt) => {
+    const v = buildVerdicts('confirmed')(label, prompt)
+    for (const x of v.verdicts) Object.assign(x, x.id === 2 ? { fixVerdict: 'instance', fixNote: 'cure every instance' } : { fixVerdict: 'sound' })
+    return v
+  }
+  const r3c = await runReview(Object.assign({}, DIFF, { fixJudge: 'class' }), buildStubs({ 'verify:': buildInstanceVerdicts }))
+  const r3i = await runReview(DIFF, buildStubs({ 'verify:': buildInstanceVerdicts }))
+  if (checkNoThrow(r3c, 'instance under class') && checkNoThrow(r3i, 'instance under instance')) {
+    const c2 = r3c.result.confirmedFindings.find((e) => e.id === 2) || {}
+    const i2 = r3i.result.confirmedFindings.find((e) => e.id === 2) || {}
+    ck(c2.fix === 'cure every instance' && c2.fixVerdict === 'instance' &&
+      synthCall(r3c).prompt.indexOf('fixes on confirmed findings: 4 judged sound, 0 judged UNSOUND, 1 judged INSTANCE-ONLY') !== -1 &&
+      synthCall(r3c).prompt.indexOf('fix: judged INSTANCE-ONLY by the skeptic, whose class-level fix is: cure every instance') !== -1,
+      'fixJudge: under class an instance fix gives way to its note, and RUN INTEGRITY counts one instance-only fix')
+    ck(i2.fix === 'f' && i2.fixVerdict === null && synthCall(r3i).prompt.indexOf('INSTANCE-ONLY') === -1 &&
+      synthCall(r3i).prompt.indexOf('4 judged sound, 0 judged UNSOUND, 0 none proposed, 1 NOT JUDGED') !== -1,
+      'fixJudge: under instance the same answer counts as a fix not judged')
+  }
+  // ---- AC4: `unclassed`, a closed set, and `refuse` stated when absent.
+  r = await runReview(Object.assign({}, DIFF, { unclassed: 'maybe' }), ALL_OK)
+  ck(!!r.threw && r.threw.indexOf('tier2-review: `unclassed` must be one of refuse | reason | owner-rules') === 0 && r.trace.length === 0,
+    'unclassed: maybe is refused before any spawn, naming the three values')
+  ck(synthCall(ra).prompt.indexOf('\nunclassed: refuse - none is refused') !== -1, 'unclassed: absent, the synthesis prompt states refuse')
+  // ---- AC5: `gateManifest` refused on the specs rule, rendered into the probe, and no legs refusing every gate:.
+  r = await runReview(Object.assign({}, DIFF, { gateManifest: '../x.json' }), ALL_OK)
+  ck(!!r.threw && r.threw.indexOf('tier2-review: `gateManifest` must be a repo-relative path') === 0 && r.trace.length === 0,
+    'gateManifest: ../x.json is refused before any spawn')
+  ck(probeCall(ra).prompt.indexOf('gate-legs.json, the leg manifest') !== -1 && probeCall(ra).prompt.indexOf('{{TOOL_ROOT}}') === -1,
+    'gateManifest: absent, the probe is told to read the rendered default gate-legs.json')
+  const r5 = await runReview(DIFF, buildStubs({ synth: buildDisposingSynth((ids) => ids.map((id) => ({ id: id, disposition: 'gate:memory hygiene' }))) }))
+  if (checkNoThrow(r5, 'no legs'))
+    ck(r5.logs.some((l) => l.indexOf('WARNING: no leg manifest was read from ') === 0) && synthCall(r5).prompt.indexOf('Leg names: no leg manifest was read') !== -1 &&
+      r5.result.dispositions === null && r5.result.dispositionFault.indexOf('id 1 is "gate:memory hygiene", and no leg manifest was read') !== -1,
+      'gateManifest: a probe returning no legs is logged and stated, and gate:memory hygiene is refused')
+  // ---- AC6: two slug-led items and one with no slug; one leg; the four forms; the schema requires the field.
+  const CL = Object.assign({}, DIFF, { checklist: ['[ ] alpha-one (universal)', 'beta-two the second', 'Not slug-led'] })
+  const LEGS = { 'resume:probe': Object.assign(buildProbe(), { legs: ['memory hygiene'], legCount: 1 }) }
+  const r6 = await runReview(CL, buildStubs(LEGS))
+  if (checkNoThrow(r6, 'dispositions block')) {
+    const s6 = synthCall(r6)
+    ck(s6.prompt.indexOf('Class slugs (2): alpha-one, beta-two.') !== -1 && s6.prompt.indexOf('Leg names (1), one per line:\n  - memory hygiene\n') !== -1 &&
+      ['class:<slug>', 'gate:<leg>', 'new:<slug>', 'none'].every((f) => s6.prompt.indexOf('\n- ' + f + ' - ') !== -1) &&
+      s6.schema.required.indexOf('dispositions') !== -1 && !!s6.schema.properties.dispositions,
+      'dispositions: the synthesis is handed two slugs, no C<n>, one leg and the four forms, and its schema requires dispositions')
+  }
+  // ---- AC7: a legal set is accepted; each of six planted faults refuses it, names the id, and keeps the counts.
+  const GOOD = { 1: 'class:alpha-one', 2: 'gate:memory hygiene', 3: 'new:fresh-class', 4: 'class:beta-two', 5: 'new:other-class' }
+  const buildSet = (map, extra) => (ids) => ids.filter((id) => map[id] !== undefined).map((id) => ({ id: id, disposition: map[id] })).concat(extra || [])
+  const r7 = await runReview(CL, buildStubs(Object.assign({ synth: buildDisposingSynth(buildSet(GOOD)) }, LEGS)))
+  if (checkNoThrow(r7, 'dispositions accepted'))
+    ck(Array.isArray(r7.result.dispositions) && r7.result.dispositions.map((x) => x.disposition).join(',') === [1, 2, 3, 4, 5].map((n) => GOOD[n]).join(',') &&
+      r7.result.dispositionFault === '' && r7.result.note === 'complete', 'dispositions: class:, gate: and new: over the handed names are accepted, the fault empty')
+  const FAULTS = [['class:C3', Object.assign({}, GOOD, { 1: 'class:C3' }), [], 'id 1 '], ['gate:no such leg', Object.assign({}, GOOD, { 1: 'gate:no such leg' }), [], 'id 1 '],
+    ['new: a handed slug', Object.assign({}, GOOD, { 1: 'new:alpha-one' }), [], 'id 1 '], ['a repeated id', GOOD, [{ id: 2, disposition: 'new:x' }], 'id 2 is disposed more than once'],
+    ['an id not confirmed', GOOD, [{ id: 99, disposition: 'new:x' }], 'id 99 is not a confirmed id'], ['a confirmed id with none', Object.assign({}, GOOD, { 5: undefined }), [], 'id 5 has no disposition']]
+  for (const [what, map, extra, names] of FAULTS) {
+    const x = await runReview(CL, buildStubs(Object.assign({ synth: buildDisposingSynth(buildSet(map, extra)) }, LEGS)))
+    ck(!x.threw && x.result.dispositions === null && x.result.dispositionFault.indexOf(names) !== -1 && x.result.blockers === 0 && x.result.highs === 5 &&
+      x.result.note.indexOf('the DISPOSITIONS were refused') !== -1 && x.result.appendix.split('\n').slice(4).every((l) => l.endsWith(' | - |')),
+      'dispositions: ' + what + ' refuses the set naming "' + names.trim() + '", keeps the counts and returns - cells: ' + (x.threw || x.result.dispositionFault))
+  }
+  // ---- AC8: `none` with a reason under each `unclassed` value, and `none` with an empty reason under all three.
+  for (const u of ['refuse', 'reason', 'owner-rules']) {
+    const buildNone = (reason) => buildDisposingSynth((ids) => ids.map((id) => (id === 1 ? { id: id, disposition: 'none', reason: reason } : { id: id, disposition: 'new:fresh-class' })))
+    const x = await runReview(Object.assign({}, DIFF, { unclassed: u }), buildStubs({ synth: buildNone('no home') }))
+    const y = await runReview(Object.assign({}, DIFF, { unclassed: u }), buildStubs({ synth: buildNone('') }))
+    ck(!x.threw && !y.threw && (u === 'refuse' ? x.result.dispositions === null : Array.isArray(x.result.dispositions)) &&
+      JSON.stringify(x.result.ownerItems) === (u === 'owner-rules' ? '[1]' : '[]') && y.result.dispositions === null && y.result.dispositionFault.indexOf('id 1 ') === 0,
+      'dispositions: under ' + u + ' none with a reason is ' + (u === 'refuse' ? 'refused' : 'accepted') + ', ownerItems ' + JSON.stringify(x.result && x.result.ownerItems) +
+      ', and none with an empty reason is refused')
+  }
+  // ---- TOOL-dFairHearing-43 AC2: `renderCell` is the one encoder of the returned appendix, so a `none` reason is plain
+  // text: a raw `|` and a line break are each accepted, and `parse_appendix_rows` reads id 1's cell back. The agent writes
+  // the record's own cell, so the appendix paragraph states the escape. RED against the render at unit 40, which refuses
+  // both reasons and states no such sentence.
+  {
+    const py = process.argv[5] || ''
+    const { spawnSync } = require('child_process')
+    const buildReason = (reason) => buildDisposingSynth((ids) => ids.map((id) => (id === 1 ? { id: id, disposition: 'none', reason: reason } : { id: id, disposition: 'new:fresh-class' })))
+    const readCell = (x) => {
+      if (x.threw || !py) return 'no read-back: ' + (x.threw || 'no python was resolved')
+      const p = spawnSync(py, ['-B', '-c', 'import json, sys\nsys.path.insert(0, sys.argv[1])\nimport replay_scorer\nrows, err = replay_scorer.parse_appendix_rows(sys.stdin.read())\n' +
+        'print(json.dumps(err or [r["disposition"] for r in rows if r["id"] == "1"][0]))', require('path').dirname(FILE)],
+      { input: 'confirmed ' + x.result.confirmed + '\n' + x.result.appendix, encoding: 'utf8', env: Object.assign({}, process.env, { PYTHONUTF8: '1' }) })
+      try { return JSON.parse(p.stdout) } catch { return 'no read-back: ' + p.stdout + p.stderr }
+    }
+    const raw = await runReview(Object.assign({}, DIFF, { unclassed: 'reason' }), buildStubs({ synth: buildReason('a | b') }))
+    const brk = await runReview(Object.assign({}, DIFF, { unclassed: 'reason' }), buildStubs({ synth: buildReason('a\nb') }))
+    ck(!raw.threw && Array.isArray(raw.result.dispositions) && readCell(raw) === 'none — a | b',
+      'FH43 AC2 a reason holding a raw | is accepted and reads back whole: ' + readCell(raw))
+    ck(!brk.threw && Array.isArray(brk.result.dispositions) && readCell(brk) === 'none — a b',
+      'FH43 AC2 a reason holding a line break is accepted and reads back as one space: ' + readCell(brk))
+    const ask = synthCall(raw).prompt
+    const paragraph = ask.slice(ask.indexOf('APPENDIX - the report\'s LAST section'))
+    ck(ask.indexOf('a pipe written as') === -1 && paragraph.indexOf('APPENDIX - ') === 0 && paragraph.indexOf('which you write and the harness does not encode') !== -1,
+      'FH43 AC2 the prompt asks for no escape in the returned reason, and the appendix paragraph states it for the record\'s cell')
+  }
+  // ---- TOOL-dFairHearing-23 AC22: the leg list is used whole or not at all. RED against the parent render, whose filter keeps a
+  // truncated list and an empty one as the manifest, so the short list admits the gate and the empty one names no missing manifest.
+  {
+    const GATED = buildSet({ 1: 'gate:memory hygiene', 2: 'new:fresh-class', 3: 'new:fresh-class', 4: 'new:fresh-class', 5: 'new:fresh-class' })
+    for (const [what, legs, legCount] of [['an empty list', [], 0], ['a list one short of legCount', ['memory hygiene'], 2],
+      ['a duplicate', ['memory hygiene', 'memory hygiene'], 2], ['a non-string', ['memory hygiene', 7], 2]]) {
+      const x = await runReview(CL, buildStubs({ 'resume:probe': Object.assign(buildProbe(), { legs: legs, legCount: legCount }), synth: buildDisposingSynth(GATED) }))
+      ck(!x.threw && x.logs.some((l) => l.indexOf('WARNING: no leg manifest was read from ') === 0) && x.result.dispositions === null &&
+        x.result.dispositionFault.indexOf('id 1 is "gate:memory hygiene", and no leg manifest was read') !== -1,
+        'FH23 AC22 ' + what + ' reads as no leg manifest and admits no gate: disposition: ' + (x.threw || x.result.dispositionFault))
+    }
+    const whole = await runReview(CL, buildStubs(Object.assign({ synth: buildDisposingSynth(GATED) }, LEGS)))
+    ck(!whole.threw && Array.isArray(whole.result.dispositions) && whole.result.dispositions[0].disposition === 'gate:memory hygiene',
+      'FH23 AC22 a whole list matching legCount admits the valid gate: ' + (whole.threw || whole.result.dispositionFault))
+  }
+  // ---- AC9: two confirmed and three refuted; the handed appendix has ten columns and two placeholders; the return the dispositions.
+  const r9 = await runReview(Object.assign({}, DIFF, { unclassed: 'reason' }), buildStubs({
+    'verify:': (label, prompt) => { const v = buildVerdicts('confirmed')(label, prompt); for (const z of v.verdicts) if (z.id > 2) z.verdict = 'refuted'; return v },
+    synth: buildDisposingSynth((ids) => ids.map((id) => (id === 1 ? { id: id, disposition: 'new:fresh-class' } : { id: id, disposition: 'none', reason: 'no home' }))) }))
+  if (checkNoThrow(r9, 'disposition column')) {
+    const handed = (synthCall(r9).prompt.split('<<<APPENDIX\n')[1] || '').split('\nAPPENDIX>>>')[0].split('\n')
+    ck(handed[2] === '| id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict | classes | disposition |' &&
+      handed.length === 9 && handed[4].endsWith(' | (synthesis) |') && handed[5].endsWith(' | (synthesis) |') && handed.slice(6).every((l) => l.endsWith(' | - |')),
+      'dispositions: the handed appendix ends classes | disposition, (synthesis) on the two confirmed rows and - on the refuted ones')
+    const back = r9.result.appendix.split('\n')
+    ck(back[4].endsWith(' | new:fresh-class |') && back[5].endsWith(' | none — no home |') && back.slice(6).every((l) => l.endsWith(' | - |')) &&
+      r9.result.ledger[0].disposition === 'new:fresh-class' && r9.result.ledger[2].disposition === '-' && r9.result.confirmedFindings[1].disposition === 'none',
+      'dispositions: the returned appendix, ledger and confirmed set carry the accepted dispositions, a none cell with its reason')
+  }
+}
+
 // ==== TOOL-aOrientedCast-10 — `efforts`, each stage spawned at the reasoning effort its caller names ====
 // Every arm is RED against the parent render, which reads no `efforts`: no refusal fires, no spawn's
 // options carry an `effort` key and no `effort ` line is logged. A green arm says the routing follows
@@ -1810,7 +3222,7 @@ async function runEffortsArms() {
   // ---- independent of `roles`: an untyped skeptic still takes its level.
   r = await runReview(Object.assign({}, DIFF, { efforts: { skeptic: 'max' } }), ALL_OK)
   if (checkNoThrow(r, 'efforts untyped skeptic'))
-    ck(checkEvery(scanStage(r, 'verify:'), (t) => t.effort === 'max' && t.agentType === undefined), 'efforts: an untyped skeptic spawns at its level')
+    ck(checkEvery(scanStage(r, 'verify:'), (t) => t.effort === 'max' && t.agentType === 'general-purpose'), 'efforts: a skeptic no role names spawns at its level')
   // ---- absent, no spawn's options carry the key: the call is today's byte for byte.
   r = await runReview(DIFF, ALL_OK)
   if (checkNoThrow(r, 'efforts absent'))
@@ -1824,7 +3236,7 @@ async function runLensYieldArms() {
   const LORDER = ['security', 'correctness', 'seams', 'verification', 'intent']
   const scanYield = (run, n) => !!run.result && Array.isArray(run.result.lensYield) && run.result.lensYield.length === n
   const buildSynthOwn = (label, prompt) => ({ path: 'memory/reviews/r.md', summary: 's',
-    items: [...prompt.split('UNVERIFIED findings')[0].matchAll(/id=(\d+) \[/g)].map((x) => ({ severity: 'HIGH', ids: [parseInt(x[1], 10)], specs: ['TOOL-x-1'] })) })
+    items: [...prompt.split('UNVERIFIED findings')[0].matchAll(/id=(\d+) \[/g)].map((x) => ({ severity: 'HIGH', ids: [parseInt(x[1], 10)], grades: { [x[1]]: 'HIGH' }, specs: ['TOOL-x-1'] })) })
   const buildVerdictById = (pick) => (label, prompt) => {
     const m = /ids ([0-9, ]+)\)/.exec(prompt)
     const ids = m ? m[1].split(',').map((x) => parseInt(x, 10)) : []
@@ -1892,7 +3304,7 @@ async function runLensYieldArms() {
     const block = end === -1 ? '' : sp.prompt.slice(at, end)
     const keys = scanYield(r, 5) ? r.result.lensYield.map((e) => e.lens) : []
     ck(keys.length === 5 && block !== '' && sp.prompt.indexOf('precision 1.00. \n\nLENS YIELD') !== -1 &&
-      keys.every((k) => block.indexOf('| ' + k + ' | yes | 1 | 1 | 0 | 0 | 0 | 1.00 |') !== -1),
+      keys.every((k) => block.indexOf('| ' + k + ' | yes | 1 | 1 | 0 | 0 | 0 | 0 | 1.00 |') !== -1),
       'lens yield: the spec synthesis prompt carries the marked block, a row per running lens with its precision')
     const yl = r.logs.filter((l) => l.indexOf('lens yield: ') === 0)
     ck(yl.length === 5 && keys.every((k) => yl.some((l) => l.indexOf('lens yield: ' + k + ' returned yes') === 0 && l.indexOf('defects 1') !== -1 && l.indexOf('unique 0') !== -1)),
@@ -1927,12 +3339,12 @@ async function runRolesArms() {
   }
   let r = await runReview(Object.assign({}, ABSW, { roles: {} }), ALL_OK)
   ck(!r.threw && r.result && r.result.exit === 'complete', 'roles: an empty object proceeds' + (r.threw ? ' (threw: ' + r.threw + ')' : ''))
-  // ---- S3: each stage spawns as the type its key names, and the probe never takes one.
+  // ---- S3: each stage spawns as the type its key names, and the probe as Plan when no key names it.
   r = await runReview(Object.assign({}, ABSW, { roles: FULL }), ALL_OK)
   if (checkNoThrow(r, 'roles full diff')) {
     ck(checkAll(scanTypes(r, 'find:'), 'gov-diff-reviewer') && checkAll(scanTypes(r, 'verify:'), 'gov-skeptic') &&
-      checkAll(scanTypes(r, 'synth'), 'gov-synthesizer') && checkAll(scanTypes(r, 'resume:probe'), undefined),
-      'roles: a full diff set spawns finders, skeptics and the synthesis as their roles, and the probe untyped')
+      checkAll(scanTypes(r, 'synth'), 'gov-synthesizer') && checkAll(scanTypes(r, 'resume:probe'), 'Plan'),
+      'roles: a full diff set spawns finders, skeptics and the synthesis as their roles, and the probe as Plan')
   }
   const rsf = await runReview(Object.assign({}, SPEC, { roles: FULL }), ALL_OK)
   if (checkNoThrow(rsf, 'roles full spec'))
@@ -1940,11 +3352,11 @@ async function runRolesArms() {
       'roles: a spec audit spawns its finders as specFinder, never diffFinder')
   const rsk = await runReview(Object.assign({}, ABSW, { roles: { skeptic: 'gov-skeptic' } }), ALL_OK)
   if (checkNoThrow(rsk, 'roles skeptic only'))
-    ck(checkAll(scanTypes(rsk, 'find:'), 'Plan') && checkAll(scanTypes(rsk, 'verify:'), 'gov-skeptic') && checkAll(scanTypes(rsk, 'synth'), undefined),
-      'roles: a skeptic key alone moves the skeptics; the finders keep workerType\'s Plan and the synthesis stays untyped')
+    ck(checkAll(scanTypes(rsk, 'find:'), 'Plan') && checkAll(scanTypes(rsk, 'verify:'), 'gov-skeptic') && checkAll(scanTypes(rsk, 'synth'), 'general-purpose'),
+      'roles: a skeptic key alone moves the skeptics; the finders keep workerType\'s Plan and the synthesis stays general-purpose')
   const rsy = await runReview(Object.assign({}, DIFF, { roles: { synthesis: 'gov-synthesizer' } }), ALL_OK)
   if (checkNoThrow(rsy, 'roles synthesis only'))
-    ck(checkAll(scanTypes(rsy, 'find:'), undefined) && checkAll(scanTypes(rsy, 'verify:'), undefined) && checkAll(scanTypes(rsy, 'synth'), 'gov-synthesizer'),
+    ck(checkAll(scanTypes(rsy, 'find:'), 'general-purpose') && checkAll(scanTypes(rsy, 'verify:'), 'general-purpose') && checkAll(scanTypes(rsy, 'synth'), 'gov-synthesizer'),
       'roles: a synthesis key under workerType none moves the synthesis alone')
   // ---- S4: a roled judge makes the whole run not durable; a synthesis role does not.
   const rdf = await runReview(Object.assign({}, DIFF, { roles: { diffFinder: 'gov-diff-reviewer' } }), ALL_OK)
@@ -2009,8 +3421,9 @@ async function runRolesArms() {
   }
   r = await runReview(DIFF, ALL_OK)
   if (checkNoThrow(r, 'roles classic logs'))
-    ck(r.logs.filter((l) => /^role (find|verify|synthesis): /.test(l)).length === 3 && r.logs.indexOf('role synthesis: the platform default — no roles.synthesis, as before roles') !== -1,
-      'roles: a classic run logs the three stage lines too')
+    ck(r.logs.filter((l) => /^role (probe|find|verify|synthesis): /.test(l)).length === 4 && r.logs.indexOf('role synthesis: general-purpose — no roles.synthesis, so PLATFORM_TYPE') !== -1 &&
+      r.logs.indexOf('role probe: Plan — no roles.probe, so Plan') !== -1,
+      'roles: a classic run logs the four stage lines too, the probe\'s and the synthesis\'s naming their default type')
   // ---- S8: the synthesis record says the run ran under roles; a classic run's prompt carries no clause.
   const extractSynthPrompt = (run) => (scanStage(run, 'synth')[0] || { prompt: '' }).prompt
   if (rsy.result) {
@@ -2020,6 +3433,78 @@ async function runRolesArms() {
   }
   ck(extractSynthPrompt(r).length > 0 && extractSynthPrompt(r).indexOf('Roles:') === -1, 'roles: a classic run\'s synthesis prompt carries no Roles clause')
 }
+
+// ---- TOOL-dFairHearing-13: the lens catalogue and its render (AC1, AC4, AC7) ---------------------
+// The lens literals are rendered from `lenses.toml` by `render_lenses.py`, both beside the harness.
+// The python is the one this shell resolved, passed in, so an absent one reds these arms rather
+// than skipping them. Synchronous, and ahead of the whole-script arms, so no early exit strands it.
+function runLensArms() {
+  const path = require('path')
+  const { spawnSync } = require('child_process')
+  const kit = path.dirname(FILE)
+  const py = process.argv[5] || ''
+  const renderer = path.join(kit, 'render_lenses.py')
+  const tpl = fs.readFileSync(path.join(kit, 'tier2-review.template.js'))
+  const runRender = (catalogue, input) => {
+    if (!py) return { status: -1, stdout: '', stderr: 'no python was resolved' }
+    const r = spawnSync(py, ['-B', renderer, catalogue], { input, encoding: 'utf8', env: Object.assign({}, process.env, { PYTHONUTF8: '1' }) })
+    return { status: r.status, stdout: r.stdout || '', stderr: (r.stderr || '') + (r.error ? String(r.error) : '') }
+  }
+  // A literal's body: the lines between its opening line and the `]` that closes it, the marker
+  // comment ignored, so the live harness and the render compare on the lens text alone.
+  const extractLensBody = (text, name) => {
+    const ls = text.split('\n')
+    const at = ls.findIndex((l) => l.startsWith('const ' + name + ' = ['))
+    const end = ls.findIndex((l, i) => i > at && l === ']')
+    return at === -1 || end === -1 ? null : ls.slice(at + 1, end).join('\n')
+  }
+  const shipped = runRender(path.join(kit, 'lenses.toml'), tpl)
+  ck(shipped.status === 0 && shipped.stdout.indexOf('{{LENS_SLOTS}}') === -1, 'lens: the shipped catalogue renders the template, every slot token filled (' + shipped.stderr.trim() + ')')
+  for (const name of ['DIFF_LENSES', 'SPEC_LENSES']) {
+    const want = extractLensBody(src, name)
+    ck(want !== null && want.split('\n').length === 25 && extractLensBody(shipped.stdout, name) === want,
+      'lens: the rendered ' + name + ' holds the live harness\'s five lenses byte for byte')
+  }
+  const scratch = fs.mkdtempSync(path.join(require('os').tmpdir(), 'lens-'))
+  const writeCatalogue = (name, text) => { const p = path.join(scratch, name + '.toml'); fs.writeFileSync(p, text); return p }
+  const optin = '\n[[lens]]\nkey = "extra-lens"\nkinds = ["diff-review", "spec-audit"]\npresets = ["unit-spec", "diff-review"]\n' +
+    'default_in = []\noptin = true\nbrief = "An opt-in lens nothing selects by default."\n'
+  const withOptin = runRender(writeCatalogue('optin', fs.readFileSync(path.join(kit, 'lenses.toml'), 'utf8') + optin), tpl)
+  // TOOL-dFairHearing-3 - the row now renders under the opt-in marker, and still into no slot literal.
+  ck(withOptin.status === 0 && shipped.status === 0 && ['DIFF_LENSES', 'SPEC_LENSES', 'DESIGN_LENSES'].every((n) =>
+    extractLensBody(shipped.stdout, n) !== null && extractLensBody(withOptin.stdout, n) === extractLensBody(shipped.stdout, n)) &&
+    extractLensBody(shipped.stdout, 'OPTIN_LENSES') === '' && extractLensBody(withOptin.stdout, 'OPTIN_LENSES').indexOf("key: 'extra-lens'") !== -1,
+    'lens: an opt-in row added as data changes no marked literal, and renders into OPTIN_LENSES alone')
+  // One scratch catalogue per refusal rule, over a two-literal template: each exits 2, writes
+  // nothing, and names its rule and its subject.
+  const TPL = 'const D = [ // gov:lens-slots diff-review\n{{LENS_SLOTS}}\n]\nconst S = [ // gov:lens-slots unit-spec\n{{LENS_SLOTS}}\n]\n'
+  const row = (o) => '[[lens]]\n' + Object.entries(Object.assign({ key: 'k', kinds: ['diff-review'], presets: ['diff-review'],
+    default_in: ['diff-review'], optin: false, brief: 'b' }, o)).filter(([, v]) => v !== undefined)
+    .map(([k, v]) => k + ' = ' + JSON.stringify(v)).join('\n') + '\n'
+  const SPEC = row({ key: 's', kinds: ['spec-audit'], presets: ['unit-spec'], default_in: ['unit-spec'] })
+  const cases = [
+    ['the parse', 'this is = = not toml\n', TPL, 'rule 1: the lens catalogue', 'is not TOML'],
+    ['the field', row({ optin: undefined }) + SPEC, TPL, 'rule 2: row `k`', 'optin'],
+    ['the kind set', row({ kinds: ['full-review'] }) + SPEC, TPL, 'rule 3: row `k`', 'full-review'],
+    ['default_in', row({ default_in: ['unit-spec'] }) + SPEC, TPL, 'rule 4: row `k`', 'default_in'],
+    ['the kind disagreement', row({ kinds: ['spec-audit'] }) + SPEC, TPL, 'rule 5: row `k`', 'kinds'],
+    ['the duplicated key and literal', row({}) + row({}) + SPEC, TPL, 'rule 6:', 'key `k` and the literal diff-review'],
+    ['the key equal to diff-review', row({ key: 'diff-review' }) + SPEC, TPL, 'rule 7: row `diff-review`', 'literal name'],
+    ['the unknown literal', row({}) + SPEC + row({ key: 'x', kinds: ['spec-audit'], presets: ['design-audit'], default_in: [] }), TPL, 'rule 8: row `x`', 'design-audit'],
+    ['the unfilled literal', row({}), TPL, 'rule 9:', 'unit-spec'],
+    ['the opt-in with nowhere to go', row({ optin: true }) + SPEC, TPL, 'rule 10: row `k`', 'optin = true'],
+    ['the orphan token', row({}) + SPEC, TPL + '{{LENS_SLOTS}}\n', 'rule 11:', 'without a `gov:lens-slots` marker'],
+    // TOOL-dFairHearing-3 S6 - rule 11 covers the opt-in marker too.
+    ['the opt-in marker with no token', row({}) + SPEC, TPL + 'const O = [ // gov:lens-optins\n]\n', 'rule 11:', 'gov:lens-optins'],
+  ]
+  for (const [subject, text, template, rule, word] of cases) {
+    const r = runRender(writeCatalogue(subject.replace(/\W+/g, '-'), text), template)
+    ck(r.status === 2 && r.stdout === '' && r.stderr.indexOf(rule) !== -1 && r.stderr.indexOf(word) !== -1,
+      'lens: ' + subject + ' refuses, exit 2, naming ' + rule.replace(/:.*/, '') + ' (got ' + r.status + ': ' + r.stderr.trim() + ')')
+  }
+  fs.rmSync(scratch, { recursive: true, force: true })
+}
+runLensArms()
 
 runWholeScriptArms().then(() => {
   console.log('---- ' + pass + ' passed, ' + fail + ' failed ----')
@@ -2281,7 +3766,39 @@ if [ -z "$bd_why" ]; then
 fi
 [ -z "$bd_why" ] || printf 'PRODUCER-FAILED %s\n' "$bd_why" > "$BD_OUT"
 
-out=$(node "$TMP/run.js" "$ROOT/$FILE" "$BD_OUT" "$bd_mtd"); rc=$?
+# The lens arms (TOOL-dFairHearing-13) run the renderer with the python resolved above, or with none,
+# which reds them by name rather than skipping them.
+case "$bd_why" in "no usable python"*) lens_py="" ;; *) lens_py=$bd_py ;; esac
+
+# ---- TOOL-dFairHearing-17 S5: the driver's `review_state()` and its `RUNAWAY_CEILING=` line, sliced out of the
+# unattended kit beside this one and run over the parity domain, one `<priors>|<count>|<limit>|<token>` row each.
+# The runner compares every row with deriveRoundState; a driver that cannot be read or sliced writes
+# PRODUCER-FAILED, which reds the arm by name rather than skipping it.
+RS_OUT="$TMP/review-state.out"; rs_why=""; rs_src=""
+# A refusal leaves RS_DRIVER empty, so the arm below reds naming no driver rather than slicing one.
+RS_DRIVER=$(resolve_kit_dir "$bd_py" unattended unattended.sh "$HERE" 2>/dev/null) && RS_DRIVER="$ROOT/$RS_DRIVER/unattended.sh" || RS_DRIVER=""
+if [ ! -f "$RS_DRIVER" ]; then rs_why="the driver '$RS_DRIVER' is not a file: the unattended kit did not resolve to one"
+else
+  rs_src=$(tr -d '\r' < "$RS_DRIVER" | sed -n -e '/^RUNAWAY_CEILING=/p' -e '/^review_state() {/,/^}$/p')
+  case "$rs_src" in RUNAWAY_CEILING=*'review_state() {'*) ;; *) rs_why="could not slice RUNAWAY_CEILING= and review_state() out of $RS_DRIVER" ;; esac
+fi
+if [ -z "$rs_why" ]; then
+  ( eval "$rs_src" || exit 1
+    for l in 1 2 3 4; do for c in 0 1 2 3; do
+      printf '|%s|%s|%s\n' "$c" "$l" "$(review_state "" "$c" "$l")"
+      for p1 in 0 1 2 3; do
+        [ "$l" -ge 2 ] && printf '%s|%s|%s|%s\n' "$p1" "$c" "$l" "$(review_state "$p1" "$c" "$l")"
+        for p2 in 0 1 2 3; do
+          [ "$l" -ge 3 ] && printf '%s %s|%s|%s|%s\n' "$p1" "$p2" "$c" "$l" "$(review_state "$p1 $p2" "$c" "$l")"
+          for p3 in 0 1 2 3; do
+            [ "$l" -ge 4 ] && printf '%s %s %s|%s|%s|%s\n' "$p1" "$p2" "$p3" "$c" "$l" "$(review_state "$p1 $p2 $p3" "$c" "$l")"
+          done
+        done
+      done
+    done; done; exit 0 ) > "$RS_OUT" 2>&1 || rs_why="the sliced review_state() did not run: $(head -1 "$RS_OUT")"
+fi
+[ -z "$rs_why" ] || printf 'PRODUCER-FAILED %s\n' "$rs_why" > "$RS_OUT"
+out=$(node "$TMP/run.js" "$ROOT/$FILE" "$BD_OUT" "$bd_mtd" "$lens_py" "$RS_OUT"); rc=$?
 printf '%s\n' "$out"
 
 # The arms run inside a node process, so the count crosses a process boundary and this shell cannot
@@ -2390,7 +3907,91 @@ printf '%s\n' "$out"
 # hand, not by a run: the pass runs no suite.
 # RAISED 354 -> 357 by TOOL-dFoldedAudit-15: the undeclared spec audit's three `ck` sites beside the address
 # arms. Not measured by a run: the pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=357
+# RAISED 357 -> 372 by TOOL-dFairHearing-13: 15 assertions, counted off the `lens:` arms — the shipped
+# render (1), its two literals against the live harness (2), the opt-in row (1) and the eleven refusal
+# rules (11). Counted by hand and by a probe of the block alone: the pass runs no suite.
+# RAISED 372 -> 387 by TOOL-dFairHearing-2: 15 assertions, counted off the `preset:` arms — seven prelude
+# arms, three proceeding and four refusals (7), the two lens sets and the briefs (3), the key (2), the
+# returns, RUN INTEGRITY and the log (2) and the default and diff returns (1). Counted by hand, not by a
+# run: the pass runs no suite.
+# RAISED 387 -> 410 by TOOL-dFairHearing-3: 23 assertions, counted off the `optIn:` and `pin:` arms — six
+# prelude shape arms (6), the scratch render (1), the swap's finders and its return and log (2), the four
+# named refusals (4), the key (1), the light swap (1), five review_pin.py prints (5) and three refusals (3).
+# Counted by hand, not by a run: the pass runs no suite.
+# RAISED 410 -> 411 by TOOL-dFairHearing-3's checklist follow-up: the opt-in marker's rule-11 refusal (1);
+# RUN INTEGRITY's swap line joined the AC2 log arm, adding none. Counted by hand, not by a run.
+# RAISED 411 -> 418 by TOOL-dFairHearing-9: 7 assertions, counted off the `lens notes:` arms — AC4's loop
+# over two presets (2), AC6's loop over three refusals (3), the AC7 key (1) and the AC5 replaced-default
+# note (1). Counted by hand, not by a run: the pass runs no suite.
+# RAISED 418 -> 439 by TOOL-dFairHearing-4: 21 assertions, counted off the `address:`, `batchBy:` and
+# `batch:` arms — seven address-key arms (7), six batchBy arms (6), five batch-order arms (5) and three
+# reuse arms (3). The 25 renamed `verify:batch-<n>` references add none. Counted by hand, not by a run:
+# the pass runs no suite.
+# RAISED 439 -> 451 by TOOL-dFairHearing-5: 12 assertions, counted off the `merged:` block and its diff
+# orphans — two diff-kind orphan arms (2), the reason form (1), per kind the merged counts, the kept
+# verdict, the untouched confirmed set and the prior duplicate (8), and the diff prompt's form (1). The
+# inverted diff-kind arm adds none. Counted by hand, not by a run: the pass runs no suite.
+# RAISED 451 -> 460 by TOOL-dFairHearing-6: 9 assertions, counted off the `grades:` arms — the mixed item
+# and the repeated id (2), the regraded id (1), the absent and the illegal grade (2), the misranked item
+# (1) and the old sentence, the prompt and the schema (3). The stubs gaining `grades` add none. Counted
+# by hand, not by a run: the pass runs no suite.
+# RAISED 460 -> 473 by TOOL-dFairHearing-7: 13 assertions, counted off the `twins:` and `addressTwins:`
+# arms — the diff and spec pairs (2), five addressTwins arms (5), the shown and default prompts (2), the
+# kept and discarded flags (1), the agreeing counts (1), the off-address flag (1) and the merged duplicate
+# (1). armBatchBy becoming armClosedSet adds none. Counted by hand, not by a run: the pass runs no suite.
+# RAISED 473 -> 498 by TOOL-dFairHearing-11: 25 assertions, counted off the `stage:` and `twin:` arms — the
+# code-reading arm and its planted copy (2), the emptied synthesis type (1), the probe's role, refusal and
+# effort (3), the two type tables and durability (3), the twin refusal and its four starts (2), AC6's loop
+# over four values (4), the two run ranges and counts (2), the figures and both prompts (3), the unplaced id
+# (1), the key (1), the dead run-b lens (1) and two review_pin.py --twin arms (2). The six re-pinned type
+# arms add none. Counted by hand, not by a run: the pass runs no suite.
+# RAISED 498 -> 524 by TOOL-dFairHearing-8: 26 assertions, counted off the `fixJudge:`, `unclassed:`,
+# `gateManifest:` and `dispositions:` arms — the fixJudge refusal and its three starts (2), the instance and
+# class prompts and keys (2), the instance verdict under each judge (2), the unclassed refusal and its default
+# (2), the gateManifest refusal, its rendered default and the no-legs run (3), the DISPOSITIONS block (1), the
+# accepted set and six planted faults (7), AC8's loop over three values (3), the handed and returned appendix
+# (2) and two review_pin.py --unclassed arms (2). The four re-pinned ten-column appendix arms add none.
+# Counted by hand, not by a run: the pass runs no suite.
+# HELD at 524 by TOOL-dFairHearing-1 S9, whose two default flips re-point arms and add none: DIFF and SPEC
+# pin `addressTwins: 'hidden'` and `fixJudge: 'instance'`, the absent addressTwins arm resolves to shown,
+# the twins arm's second run is the hidden one, and the fixJudge absent arms delete the pin and agree with
+# class. Counted by hand, not by a run: the pass runs no suite.
+# RAISED 524 -> 534 by TOOL-dFairHearing-15: 10 assertions, counted off the `FH15` arms — AC1's agent, items
+# and acquired line (3), AC2 (1), AC3's loop over three outcomes (3), AC4 (1) and AC5's order and block (2).
+# The re-pointed first-agent, orchestrator-type and absent-checklist arms add none. Counted by hand, not by
+# a run: the pass runs no suite.
+# RAISED 534 -> 564 by TOOL-dFairHearing-17: 30 assertions, counted off the `round state:` arms — AC1 to AC3's
+# thirteen rule rows (13), the absent-value line (1), AC4's six refusals, the disagreeing round, the proceeding
+# round and the inferred one (9), AC6's parity rows and token set (2) and AC5's stub runs (5). Counted by hand
+# and by a scratch probe of the same calls, not by a run: the pass runs no suite.
+# RAISED 564 -> 598 by TOOL-dFairHearing-18: 34 assertions, counted off the `walk:` arms — AC1's eleven refusals and
+# the proceeding walk (12), AC2's three runs and the three-scenario deal (4), AC3's complete table, the planted
+# witness and six planted defects (8), AC4's block, return, planted gap and no-finding run (4), AC5's sample,
+# holds-only draw and counts (3), and AC6's walker prompts, unseeded prompts and the one WALK_RULES definition (3).
+# The re-pointed unknown-preset arm adds none. Counted by hand and by scratch probes of the same calls, not by a
+# run: the pass runs no suite.
+# RAISED 598 -> 602 by TOOL-dFairHearing-20: 4 assertions, counted off the `walk red:` arms — AC2's complete walk (1),
+# AC1's nulled return (1), AC3's round line (1) and the one walkRed definition (1). Counted by hand and by a scratch
+# probe of the same calls, not by a run: the pass runs no suite.
+# RAISED 602 -> 620 by TOOL-dFairHearing-23: 18 assertions, counted off the `FH23` arms — AC39's address key (1), AC40's
+# three refusals and three limits (6), AC21's two ungraded items (2), AC27's three cut returns (3), AC23's reason cell
+# (1) and AC22's four short lists and the whole one (5). The ACQ stub gaining its by-design head, LEGS its legCount
+# and the gateManifest rename add none. Counted by hand, not by a run: the pass runs no suite.
+# RAISED 620 -> 624 by TOOL-dFairHearing-27: 4 assertions, counted off the `FH27` arms — AC19's run-2 refusal and its
+# run-1 control (2) and AC20's complete-walk absence and gapped-walk presence (2). The two re-labelled key-pinning
+# headers add none. Counted by hand, not by a run: the pass runs no suite.
+# RAISED 624 -> 626 by TOOL-dFairHearing-32: 2 assertions, the `FH32` arms — AC1's resume:probe prompt (1) and AC2's
+# five section forms (1). AC11's arm reads DESIGN_RECORD_PRESET already and adds none. Counted by hand, not by a
+# run: the pass runs no suite.
+# RAISED 626 -> 627 by TOOL-dFairHearing-37: 1 assertion, the `FH37` arm — AC6's backslashed repo (1). Counted by
+# hand and by a scratch probe of the same call, not by a run: the pass runs no suite.
+# RAISED 627 -> 629 by TOOL-dFairHearing-40: 2 assertions, the `FH40` arms — AC19's spaced repo (1) and its three
+# refused characters (1). The three quoted expectations it rewrites add none. Counted by hand and by a scratch
+# probe of the same calls, not by a run: the pass runs no suite.
+# RAISED 629 -> 638 by TOOL-dFairHearing-43: 9 assertions, the `FH43` arms — AC1's refusals and admissions (2), AC2's
+# three in place of the one it moved (2 net), and AC7's four runs and its command check (5). Counted by hand and by
+# scratch probes of the same calls, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=638
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

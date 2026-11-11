@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-31 — the version-line check resolves the bar's own base first, and refuses by name when it cannot, rather than passing on an empty diff
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 22 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-3 · 2026-11-03 · node d · Tier-2 · base 3708a705 · streams tooling · order 22 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,9 +9,16 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dFairHearing-31-deviation-311.md](../build/2026-10-23-build-TOOL-dFairHearing-31-deviation-311.md) | deviation | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50 |
+| [2026-11-03-build-TOOL-dFairHearing-31-1-builder-return.md](../build/2026-11-03-build-TOOL-dFairHearing-31-1-builder-return.md) | journal | — |
+| [2026-11-04-build-TOOL-dFairHearing-31-1-acceptance-ledger.md](../build/2026-11-04-build-TOOL-dFairHearing-31-1-acceptance-ledger.md) | journal | — |
+| [2026-11-08-build-TOOL-dFairHearing-1-runlog-70b3ac3f.md](../build/2026-11-08-build-TOOL-dFairHearing-1-runlog-70b3ac3f.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50 |
 | [2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md) | research | TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-32 |
 | [2026-10-23-prompt-TOOL-dFairHearing-31-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-31-1-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dFairHearing-31-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-31-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 | [2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md) | spec-audit | TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-32 |
+| [2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md](../reviews/2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md) | diff-review | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 
 <!-- /gen:spec-records -->
 
@@ -31,8 +38,8 @@ diff.
 - **S1** — The base. `GATE_BASE` when it is set, verified by `git rev-parse --verify`; otherwise the
   merge-base of `HEAD` with `refs/remotes/<remote>/<observed>`, where `resolve_remote` in
   `tools/lib/resolve_remote.py` names the remote and the branch its `HEAD` observes. That is the
-  baseline `tools/run-gates/README.md:404-410` states and `tools/run-gates/run-gates.sh:395-405`
-  computes. A local branch named `main` is never read. Observed by AC1 and AC2.
+  baseline `tools/run-gates/README.md:404-410` states and the `GATE_BASE` block of
+  `tools/run-gates/run-gates.sh` (:515-525 at `9c1a2857a`) computes. A local branch named `main` is never read. Observed by AC1 and AC2.
 - **S2** — Every input is asserted before the diff is read. A ladder refusal, no remote, a remote
   whose `HEAD` names no branch, a `GATE_BASE` that does not resolve, no merge-base, or a `git diff`
   that exits non-zero each exits 2 with `version-lines: no base, nothing diffed:` and the reason. Each
@@ -184,11 +191,13 @@ none
   audit of specs 4, 14, 25, 26 and 27.
 - rev-2 · 2026-10-23 · §3 · the round-4 spec audit's disposal: hands-off edges to TOOL-dFairHearing-33 and -34 (item H1,
   ids 22 and 31) and TOOL-dFairHearing-36 (three minors on the base).
+- rev-3 · 2026-11-03 · S1 · §10 · the bar's baseline block re-cited at `9c1a2857a`, by its `GATE_BASE`
+  test, :395-405 and :366-405 having moved 120 lines to :515-525 and :486-525 (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 2).
 
 ## 10. Reuse audit
 
 The seam extended is the remote ladder, `resolve_remote` in `tools/lib/resolve_remote.py`, which
-`tools/run-gates/run-gates.sh` (its shell twin, :366-405) and `tools/push-main.sh` already use to find
+`tools/run-gates/run-gates.sh` (its shell twin and the baseline block, :486-525 at `9c1a2857a`) and `tools/push-main.sh` already use to find
 the default branch. `python tools/codebase-map/reuse_lookup.py "resolve the merge base with the
 remote default branch or refuse"` ranked `resolve_kit_dir`, `resolve_python` and the generic
 `resolve` and `merge` stems; the ladder was found by reading the bar's baseline block. The recall query

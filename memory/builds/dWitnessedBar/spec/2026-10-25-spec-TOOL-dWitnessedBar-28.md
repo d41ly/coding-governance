@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-28 — a repository's legs from its overlay's leg rows through the leg factory, gov's legs changed only by pinned patches, every other leg landing
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 30 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 30 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0366@337938da whole
 
@@ -15,11 +15,13 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-28-deviation-281.md](../build/2026-10-25-build-TOOL-dWitnessedBar-28-deviation-281.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-40-round1-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-40-round1-fix-return.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-51 |
 | [2026-10-26-build-TOOL-dWitnessedBar-28-deviation-282.md](../build/2026-10-26-build-TOOL-dWitnessedBar-28-deviation-282.md) | deviation | — |
+| [2026-11-05-build-TOOL-dWitnessedBar-28-deviation-283.md](../build/2026-11-05-build-TOOL-dWitnessedBar-28-deviation-283.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-51 |
 | [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-10-26-prompt-TOOL-dWitnessedBar-28-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-28-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md) | research | TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-15 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 |
 
 <!-- /gen:spec-records -->
@@ -66,7 +68,7 @@ directions are declared; and every other leg lands (FA-1, FA-2, FA-5, the flow a
   33's drift verb, `tools/playbook/pins.py drift`, whose row pass composes every kind the kinds
   register lists (PLAY-dOrderedCharter-33 S7), `kind.gate-leg` among them once S1's `schema` names its
   schema. `cmd_update` already runs it as a subprocess before its write loop, found through govkit's
-  inlined `resolve_kit_dir` (`tools/govkit/govkit.py:197`). Under §8 F6's recommendation, an ask of
+  inlined `resolve_kit_dir` (`tools/govkit/govkit.py:197`). By §8 F6's pick, an ask of
   dOrderedCharter, `cmd_update` passes it the gov rows `write_gate_legs`' manifest branch builds from
   the selected kits' declarations as today, the verb's JSON carries the kind's composed rows, states
   and held patches, and `compose_target_legs` in `tools/run-gates/leg_factory.py` (TOOL-dWitnessedBar-11's module) maps them
@@ -86,9 +88,9 @@ directions are declared; and every other leg lands (FA-1, FA-2, FA-5, the flow a
   which `cmd_update` writes with `write_row_order(outbox, "gate-leg", row, to_commit, body)`,
   `row['path']` being `.governance/instructions.toml#<overlay row tag>` (35 §4; TOOL-dSafePassage-9
   S4). Each held patch is named on one line and recorded as a problem, and every other composed row is
-  written. A check finding refuses the whole composition (PLAY-dOrderedCharter-36 S7); whether a
-  refused overlay row is held alone instead, so that one bad patch keeps no other leg out, is §8 F7,
-  open, and AC3, AC4 and AC9's `key-outside` case are written to its recommendation. A target that
+  written. A check finding refuses the whole composition (PLAY-dOrderedCharter-36 S7); by §8 F7's
+  pick a refused overlay row is held alone instead, so that one bad patch keeps no other leg out, an
+  ask of dOrderedCharter, and AC3, AC4 and AC9's `key-outside` case are written to it. A target that
   does not select the playbook kit runs no drift verb (33 S7): its leg step writes gov's rows and S7's
   legacy rows, and prints `gate-leg rows unarmed: no playbook kit` once. Observed by AC2, AC3, AC4,
   AC6, AC13, AC14 and AC15.
@@ -112,7 +114,7 @@ directions are declared; and every other leg lands (FA-1, FA-2, FA-5, the flow a
   runs `leg_factory.py --sources` over the target: each manifest row must be a receipt `emitted` row,
   an overlay `[[gate-leg]]` row or a legacy-list entry, and each overlay row must be in the manifest. A miss
   exits 1 naming the row and its missing source. It reads the overlay's rows at `HEAD` by subprocess,
-  through the playbook verb §8 F6 names, and where the playbook kit is absent it counts no overlay row
+  through the `overlay_rows.py` verb §8 F6's ask adds, and where the playbook kit is absent it counts no overlay row
   and says so once. Observed by AC1 and AC15.
 - **S9** — A deleted gov leg comes back named: a gov row the composition produces and the target's
   manifest lacks is written with the line `restored leg '<name>' — a gov leg leaves a repository only
@@ -292,9 +294,9 @@ row keys reach a target only at or above `LEG_KEY_FLOORS`' floor (TOOL-dWitnesse
 - observability — the slot line with the pack's counts, one line per held, refused, restored or
   legacy row, and the widening list.
 - risks — `argv` widens on any change, so a patch that only reorders arguments is reported as a
-  widening; reporting a narrowing as wider is the safe direction. Until the owner settles §8 F6 and
-  F7, the verb S5 reads and a row-level hold are asks of dOrderedCharter, and under the parents as
-  written a refused patch withholds the leg step.
+  widening; reporting a narrowing as wider is the safe direction. The verb S5 reads and a row-level hold
+  are asks of dOrderedCharter (§8 F6, F7); until they land, under the parents as written a refused
+  patch withholds the leg step.
 - testing — AC1 to AC15 by fixture and probe; the arms in §7.
 - migration — per §4.
 - user docs — `help/overlay-rows.md` (S13).
@@ -309,8 +311,7 @@ row keys reach a target only at or above `LEG_KEY_FLOORS`' floor (TOOL-dWitnesse
   `#<the patch's tag>`, and the written manifest holds every other leg.
   Red when: the patch is silently dropped, files no order, or its problem withholds the manifest.
 - **AC3** — When `python leg_factory.py --fixture --plant exclude-fixed` runs, the exclusion is refused
-  naming `principle.p16` and the canary's row is in the written manifest (§8 F7's (a); under (b) the
-  leg step is withheld, naming the refusal).
+  naming `principle.p16` and the canary's row is in the written manifest (§8 F7's (a)).
   Red when: a fixed leg is dropped by `instructions.exclude`.
 - **AC4** — When `python leg_factory.py --fixture --plant patch-fixed` runs, the patch is refused, and
   the written canary row equals gov's (§8 F7's (a)).
@@ -419,8 +420,9 @@ New arm: tools/govkit/selftest.py · covers AC6 AC10 · the drift and keep-rule 
   without govkit (TOOL-dWitnessedBar-45 S3) and often without the playbook kit, and the drift verb
   would still compose the kind a second time. Recommendation: (a), since the drift verb is already
   the one composition per update, writing every kind's orders and holding the update under `refuse`
-  before a byte is written. The ask the build run would file is (a)'s three changes, beside
-  TOOL-dDeclaredLoop-26 F5's. OPEN for the owner.
+  before a byte is written. RESOLVED (owner, 2026-11-05): (a) the drift verb governs, by an ask to
+  dOrderedCharter. The ask this build run files in `memory/builds/dOrderedCharter/BACKLOG.md` is
+  (a)'s three changes, beside TOOL-dDeclaredLoop-26 F5's.
 - **F7 — Does a refused overlay row withhold the leg step?** PLAY-dOrderedCharter-36 S7 makes a check
   finding refuse the whole composition, so under the parents as written a patch to a fixed leg, an
   exclusion of one, or a key outside `LEG_KEYS` withholds every leg, which is gap-test-21's withheld
@@ -432,8 +434,9 @@ New arm: tools/govkit/selftest.py · covers AC6 AC10 · the drift and keep-rule 
   no composed row and names the refusal, and AC3, AC4 and AC9 observe the withheld step; (c) on a
   refused composition, write gov's rows as shipped with no overlay row, which drops the adopter's valid
   rows with the bad one. (b) misses §1's "every other leg lands"; (c) loses legs the adopter
-  wrote correctly. Recommendation: (a), the ask the build run would file of dOrderedCharter, recorded
-  as a deviation of 36 S7 until it lands. OPEN for the owner.
+  wrote correctly. Recommendation: (a). RESOLVED (owner, 2026-11-05): (a) a row-level hold, by an
+  ask to dOrderedCharter. The ask this build run files in `memory/builds/dOrderedCharter/BACKLOG.md`
+  is (a)'s row-level hold, recorded as a deviation of 36 S7 until it lands.
 
 ## 9. Revision log
 
@@ -450,6 +453,10 @@ New arm: tools/govkit/selftest.py · covers AC6 AC10 · the drift and keep-rule 
   composer only by subprocess through unit 33's drift verb, which governs so the kind is composed
   once (F6), and follows unit 35's stale and orphan modes with their orders (35 S7, S8; 33 S3); the
   departure from 36 S7 is F7; four plants are added.
+- rev-4 · 2026-11-05 · §2 S5, S8 · §5 risks · AC3 · §8 F6, F7 · F6 and F7 RESOLVED (owner) to (a), by
+  the brief `2026-11-05-prompt-TOOL-dWitnessedBar-3-1-spec-writer`: the drift verb governs and a
+  refused overlay row is held alone, each an ask filed in dOrderedCharter's `BACKLOG.md`; nothing
+  else moved.
 
 ## 10. Reuse audit
 

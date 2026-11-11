@@ -257,6 +257,9 @@ GK_DIR=$(resolve_kit_dir "$_rkd_py" govkit registry.toml "$HERE") || exit 2
 GK="${GK_DIR##*/}"
 PB_DIR=$(resolve_kit_dir "$_rkd_py" playbook render_playbook.py "$HERE") || exit 2
 PB="${PB_DIR##*/}"
+# TOOL-dFairHearing-27 S16: the lens-array bound's owning side is LENS_SLOTS in the review kit's fan-out rule.
+WF_DIR=$(resolve_kit_dir "$_rkd_py" workflows check-verifier-fanout.js "$HERE") || exit 2
+WF="${WF_DIR##*/}"
 # FX is the prefix the NEXT fixture is built at: this suite's own by default, and empty for the
 # root-install arms, which every install owes whatever prefix this suite itself sits at.
 FX=$PFX
@@ -270,20 +273,23 @@ say_fail() { fails=$((fails+1)); printf 'arm FAIL  %s — %s\n' "$1" "$2"; }
 # fixture <dir> — a minimal but VALID tree the gate passes on, so each arm breaks exactly one thing.
 fixture() {
   local d=$1
-  mkdir -p "$d/${FX}${MT_KIT}" "$d/${FX}${HOOKS}" "$d/${FX}lib" "$d/${FX}${GK}" "$d/.claude"
+  mkdir -p "$d/${FX}${MT_KIT}" "$d/${FX}${HOOKS}" "$d/${FX}${WF}" "$d/${FX}lib" "$d/${FX}${GK}" "$d/.claude"
   git -C "$d" init -q 2>/dev/null
   git -C "$d" config user.email t@t; git -C "$d" config user.name t
   cp "$GATE_SRC" "$d/${FX}check-playbook-parity.sh"
   : > "$d/${FX}${MT_KIT}/engine.sh"
-  printf 'const CAP = 5\nconst MAX_VERIFIERS = 5\nconst MAX_LENSES = 5\n' > "$d/${FX}${HOOKS}/agent-cap.js"
+  printf 'const CAP = 5\nconst MAX_VERIFIERS = 5\n' > "$d/${FX}${HOOKS}/agent-cap.js"
+  # The lens-array bound's owner (TOOL-dFairHearing-27 S16): a planted workflows kit the registry declares and the
+  # waivers excuse (TOOL-dFairHearing-32 S29), so the valid-fixture control stays green with it in the population.
+  printf 'const LENS_SLOTS = 5\n' > "$d/${FX}${WF}/check-verifier-fanout.js"
   # The hook README states two of the bounds, the lens-array bound and the resolved-K ceiling, the
   # latter in the rule-2 sentence its row reads (TOOL-dGroundRules-21 S35, TOOL-dGroundRules-25 S34).
   printf 'an array LITERAL of <=5 elements\n- Any marker `K` it cannot resolve to an integer <=5, the hook MAX_VERIFIERS\n' \
     | sed 's/<=/≤/g' > "$d/${FX}${HOOKS}/README.md"
-  # The registry declares the two kits this fixture plants. `lib` is declared and holds no tracked
+  # The registry declares the three kits this fixture plants. `lib` is declared and holds no tracked
   # file, so it is no kit; the registry's own directory is declared nowhere, so it is none either.
-  printf '[[entry]]\nid = "memory-tree"\ndescriptor = "{prefix}/%s/kit.toml"\n\n[[entry]]\nid = "agent-cap"\ndescriptor = "{prefix}/%s/kit.toml"\n\n[[exempt]]\npath = "{prefix}/lib"\nwhy = "gov-internal"\n' \
-    "$MT_KIT" "$HOOKS" > "$d/${FX}${GK}/registry.toml"
+  printf '[[entry]]\nid = "memory-tree"\ndescriptor = "{prefix}/%s/kit.toml"\n\n[[entry]]\nid = "agent-cap"\ndescriptor = "{prefix}/%s/kit.toml"\n\n[[entry]]\nid = "review-harness"\ndescriptor = "{prefix}/%s/kit.toml"\n\n[[exempt]]\npath = "{prefix}/lib"\nwhy = "gov-internal"\n' \
+    "$MT_KIT" "$HOOKS" "$WF" > "$d/${FX}${GK}/registry.toml"
   printf '{ "hooks": { "PreToolUse": [ { "matcher": "Workflow|Agent" } ] } }\n' > "$d/.claude/settings.json"
   # The trio. hooks is waived; memory-tree is documented, and it is documented in the RUNBOOK.
   #
@@ -310,7 +316,7 @@ fixture() {
   # through the `<prefix>/` token (VERIFYING repair: a bare `memory-tree/` documents nothing).
   # The bare `§2` is S4's NEAR-MISS: a section sign with no charter word, counted and never failed.
   printf 'runbook {{MEMORY_ROOT}}\nadopt '"${FX:-<prefix>/}${MT_KIT}/"' into the target repo\nthe runbook §2 lists the steps\n' > "$d/WIRE-INTO-PROJECT.md"
-  printf '# waivers\nhooks   not adopter-facing as a kit.\n' > "$d/${FX}playbook-kit-waivers.txt"
+  printf '# waivers\nhooks   not adopter-facing as a kit.\n%s   planted as the lens-array bound owner, not a kit under test.\n' "$WF" > "$d/${FX}playbook-kit-waivers.txt"
   # The stamp-rule pair (TOOL-aHonedRuleset-5) is the one row whose two homes both sit OUTSIDE
   # <prefix>/: the manifest template states the expression and manifest-check.sh owns it. The control
   # redded on a missing owning source from the day that row landed, because this fixture built no
@@ -399,9 +405,9 @@ arm "S4 at a root install a kit file citing a charter section reds" red \
 FX=$PFX
 
 # --- AC2 · the unit's central proof: a stated value drifting from the source that owns it ----------
-arm "AC2 MAX_LENSES drifts from the hook README's stated bound" red \
+arm "AC2 LENS_SLOTS drifts from the hook README's stated bound" red \
   "a declared value pair disagrees with the source that owns it. Pair lens-array bound" \
-  sh -c 'printf "const MAX_VERIFIERS = 5\nconst MAX_LENSES = 6\n" > '"${PFX}${HOOKS}/agent-cap.js"''
+  sh -c 'printf "const LENS_SLOTS = 6\n" > '"${PFX}${WF}/check-verifier-fanout.js"''
 arm "AC4 the renderer's TEMPLATE_MAJOR drifts from the template marker" red \
   "a declared value pair disagrees with the source that owns it. Pair template major" \
   sh -c 'printf "TEMPLATE_MAJOR = 3\n" > '"${PFX}${PB}/render_playbook.py"''
@@ -482,10 +488,12 @@ arm "S2 a lost results file reds rather than reading as no-disagreement" red \
 # check-arms refuses an unarmed branch that is not written into memory/project/unarmed-branches.txt,
 
 # check 1 · the kit derivation returns an EMPTY set. Distinct from AC5, where the set is non-empty
-# and merely lost its sentinel: here coverage would be vacuously true over nothing at all.
+# and merely lost its sentinel: here coverage would be vacuously true over nothing at all. The
+# staging takes every kit the fixture's registry declares, the workflows kit too, since `arm` re-adds
+# what survives it (TOOL-dFairHearing-50 S6).
 arm "S1 an empty kit derivation reds before reporting coverage" red \
   "the kit derivation returned an empty set, so coverage would pass by checking nothing" \
-  sh -c 'git rm -q -r --cached '"${PFX%/}"' >/dev/null 2>&1; rm -rf '"${PFX}${MT_KIT}"' '"${PFX}${HOOKS}"' '"${PFX}lib"''
+  sh -c 'git rm -q -r --cached '"${PFX%/}"' >/dev/null 2>&1; rm -rf '"${PFX}${MT_KIT}"' '"${PFX}${HOOKS}"' '"${PFX}${WF}"' '"${PFX}lib"''
 
 # check 8 · a stated count that cannot be extracted at all. Without this the arithmetic block would
 # compare three empty strings and report ok — the same vacuity the pair loop guards against.

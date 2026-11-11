@@ -89,6 +89,10 @@ Four practices, each earned by one of the shapes above:
   them for the old value's pronoun forms too (`it`, `the flag`), not only its spelling, and a fold
   that widens a claim from one value to two re-reads the code path for the SECOND value, not only
   the ruling behind the first (`dAlignedCarrier`'s closing review, round 2, L3 and M2).
+- **A lint repair that respells a sentence is re-read against the code that sentence describes.** A
+  repair is fold text too: unit 45 respelled a README sentence for a lint, and the new words named a
+  prefix the resolver never compares
+  (memory/builds/dFairHearing/reviews/2026-11-05-review-TOOL-dFairHearing-43-47-diff-review.md, id 6).
 
 **A fold's review is a fact of the history, so check it there.** Each report's Reviewed line is a
 blob set or a range, and a range excludes its base. A fold commit at a range's base, or outside every

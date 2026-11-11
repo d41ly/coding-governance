@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-29 — an item's upstream field: commitment rows handed on, answered at the return, gating only a measured edge
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 22 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-3 · 2026-11-05 · node d · Tier-2 · base ed497191 · streams tooling · order 22 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0114@f3e34c2f whole
 
@@ -12,8 +12,10 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-readers-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-readers-fix-return.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-25 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-b.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-b.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-11-05-build-TOOL-dDeclaredLoop-29-deviation-291.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-29-deviation-291.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-25 |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md) | research | TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-30 |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
 <!-- /gen:spec-records -->
@@ -71,11 +73,20 @@ are recorded on every edge and gate only where a measurement passed.
   `memory/builds/<slug>/build/<date>-build-<unit id>-upstream-<n>.md`, opening
   `**Serves:** journal <unit id>`. Observed by AC10.
 - **S9** — The fixture: `python tools/loop/upstream.py --fixture --plant <case>` builds a scratch
-  definition holding one item with one upstream entry on each gate, a role file reading
-  `upstream:rows?`, and the planted returns §6 names, each run against its expected observation by
-  `--fixture` alone; the leg `loop upstream fixtures` in `tools/gate-legs.json`, argv
-  `python {prefix}/loop/upstream.py --fixture`, declared in `tools/loop/kit.toml`. Observed by AC1 to
-  AC10.
+  definition holding one item with one upstream entry on each gate, a role file reading `upstream:rows?`,
+  and the planted returns §6 names, each run against its expected observation by `--fixture` alone; the
+  leg `loop upstream fixtures` in `tools/gate-legs.json`, argv
+  `python {prefix}/loop/upstream.py --fixture`, carrying `enforces = ["principle.p26"]` (dOrderedCharter-7
+  S2), declared in `tools/loop/kit.toml`. No v2 `[enforcement]` row names `cl-dClosedLoop-0114`, so the
+  tag is settled by TOOL-dDeclaredLoop-3 §8 F7's rule, what the leg checks: the join of an item's handed
+  rows against its return's typed answers, the exchange P26's "each return is a template filled through a
+  schema-forced channel" (v2:946-947) governs. P29, which governs what a role is handed, fits the hand-on
+  but not the join the leg grades. Where the pending list holds a `principle` row for that tag, this pass
+  deletes it, as the meta-check reds it stale. Observed by AC1 to AC10 and AC12.
+  **Readers:** by name: READER NOT IN TREE — the pending list and its reader, the meta-check verb of the
+  playbook kit's core.py, are minted by PLAY-dOrderedCharter-7, DEFERRED, so no tracked file spells the
+  row of `principle.p26` at this spec's base · by value: NO VALUE READERS — a pending row's value is its
+  arming build, which the meta-check prints only in its pending count.
 - **S10** — The page `help/loop.md` (TOOL-dDeclaredLoop-1 S7) gains a section on the `upstream`
   field, the three answers and when an edge gates. Observed by AC11.
 
@@ -187,7 +198,8 @@ and the finding route a `bypassed` row takes.
 - `tools/roles/handoff.py`
 - `tools/roles/README.md`: the `upstream:` family beside `task:`, `card:`, `brief:` and `input:` (:44-49)
 - `tools/loop/kit.toml`: the module and the leg declared
-- `tools/gate-legs.json`: the leg `loop upstream fixtures`
+- `tools/gate-legs.json`: the leg `loop upstream fixtures`, its `enforces` holding `principle.p26`
+- `tools/playbook/core-pending.txt`: the stale `principle` row of S9's tag, where it holds one
 - `help/loop.md`: the section of S10
 
 ### Alternatives rejected
@@ -260,6 +272,11 @@ and the finding route a `bypassed` row takes.
 - **AC11** — When `grep -n "not-applicable" loop.md` runs over the help page at this unit's commit, it
   finds the section naming `upstream`, the three answers and the `measured` gate.
   Red when: the field ships and the page says nothing of it, so an adopter cannot learn the contract.
+- **AC12** — When `python -m json.tool gate-legs.json` runs in the tools folder, the row named
+  `loop upstream fixtures` carries `enforces` holding `principle.p26`, and
+  `python tools/playbook/core.py meta-check` on this unit's pass exits 0, naming neither that leg nor a
+  stale pending row.
+  Red when: the leg carries no `enforces`, which dOrderedCharter-7 S3's meta-check reds.
 
 ## 7. Gates
 
@@ -296,6 +313,10 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC7 AC8 · the base `READ_KEY
   storage point's row contract, and the roles kit read at base `ed497191`.
 - rev-2 · 2026-10-24 · §3 · the Edges block gains a hands-off TOOL-dDeclaredLoop-56, the mirror of each unit the round-1 spec audit
   promoted (reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md); no scope moved.
+- rev-3 · 2026-11-05 · S9 · §4 Files touched · AC12 · TOOL-dDeclaredLoop-56 §8 F5 (a), per the brief
+  `2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade`: the leg `loop upstream fixtures` carries
+  `principle.p26`, settled here by TOOL-dDeclaredLoop-3 §8 F7's rule; its own pass writes it, so the core
+  meta-check never reds the leg.
 
 ## 10. Reuse audit
 

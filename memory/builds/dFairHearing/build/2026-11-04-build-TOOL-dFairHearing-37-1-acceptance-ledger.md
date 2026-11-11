@@ -1,0 +1,27 @@
+# Acceptance ledger — TOOL-dFairHearing-37
+
+**Serves:** journal TOOL-dFairHearing-37
+
+Built against spec rev-6, observed at the pass's parent `3ad4a6698` and on the working tree its commit
+carries, by scratch probes under the pass's scratch directory and clones under `%TEMP%`. No suite,
+gate or bar ran in the pass: the four `New arm:` lines of spec §7 and its legs are owed to the close,
+which records each arm's RED and GREEN here under a `Pass: none` commit.
+
+The close observed this unit's `New arm:` lines on 2026-11-08 at `4896589bc`: each row, RED or UNSEEN with its log line, is in `2026-11-08-build-TOOL-dFairHearing-1-arm-observations.md`, and every suite holding them exits 0 at that tip.
+
+**Evidences:** TOOL-dFairHearing-37
+- AC1 — `git show --name-only --format= <c30>` — `<c30>` is `db0f99c71`; piped through `grep -v '^memory/' | grep -vx 'tools/workflows/README.md'` it printed nothing. `<c27>` is `e3bd1ad45` and `<c35>` is `a4fbcbf33`; `git merge-base --is-ancestor` exited 0 against each of `<c30>` and `<c35>`
+- AC2 — `attempts.py` — unit 35 §4's checker, written under the scratch directory, exited 0 over unit 30's record and printed eight `scored` lines and no `unscored` line, as the record's `## Scoring` section states: the `unscored` half is n/a: no unscored attempt, recorded and not counted as coverage. Unit 32's builder return records its AC12 as eight `scored` lines and `paired 4 of 4`, with no red on any attempt; unit 32 has no acceptance ledger at this commit
+- AC3 — `grep -n "orchestrating commit"` — it printed lines over unit 30's record and unit 25's record, and none ends `(derived)`. Unit 32's AC9 probe: each record's adding commit (`db0f99c71`, `7711f0e98`) has the first parent the record names (`3cf918a65`, `8ee00000a`), unit 23's `7ff570cfa` is an ancestor of each, and each of the three blobs each record names equals `git rev-parse <adding commit>:<path>`
+- AC4 — `^\*\*The decision:` — the grep printed one line, :374, naming `selected`. AC4's `selected` half is superseded by TOOL-dFairHearing-38 (its AC1 and AC2, spec §3), so this ledger grades no exit of `gotchas.py`
+- AC5 — `--experiment` — over a `%TEMP%/u37fx` fixture repository, `heldOut` naming one tracked file exited 0 printing `held-out: frozen at <sha>`; naming a directory exited 2 naming `2 line(s)`, and a path holding `*` exited 2 naming `0 line(s)`. A scratch copy with `--literal-pathspecs` after `ls-files` refused all three, `exited 129`. `grep -c '"--literal-pathspecs", "ls-files"' replay_scorer.py` printed 1. The `held-out-tracked` arm takes `ARMS_DECLARED` from 24 to 25
+- AC6 — `tools/workflows/tier2-review.js` — a scratch stub-agent run given `repo` `C:\x\y` completed with 13 agents, and all 45 of its `git -C` commands name `C:/x/y`; no prompt holds `C:\x`. The same run over the render at unit 32's commit `fb755fa80` names `C:\x\y` in all 45. `FLOOR_ASSERTIONS` goes from 626 to 627 for the `FH37 AC6` arm
+- AC7 — `extract_section_ref` — the body sliced from its `def` line to the next top-level `def` or `class` is 410 bytes at `fb755fa80` and at its parent, sha1 `844208ce` both times
+- AC9 — `MAX_LENSES` — a scratch node probe, using the hook's own `renderBlankedView` plus a scan of every `${…}` interpolation, found none in `tools/hooks/agent-cap.js` or `check-verifier-fanout.js`. Copies holding `` `x ${MAX_LENSES}` `` and `const MAX_LENSES = 6` fail it, and `// MAX_LENSES was 6` passes
+- AC10 — `gen_map.py --check` — exited 0 on the pass's tree, and `grep -c '"resolveKitDir"'` over `symbols.json` printed 1
+- AC11 — `attempts.py` — its eight scored clones, f1s1, f1u1, f2s2, f2u1, f3s1, f3u1, f4s1 and f4u1, are distinct, and each is still under `%TEMP%`. For each, `git -C <clone> rev-parse HEAD` equals its record's range head (`6f5f4ddec`, `033b15f24`, `0a6eff73e` and `f8ad789e1`), the record lists an empty status before its call, and `git status --porcelain --untracked-files=all` lists one `??` path, its report. f2s1 is listed with its status and its void reason
+- AC12 — `tools/lib/resolve_kit_dir.py` — over §2k's nine layouts in a scratch copy of its layout block, the canonical and the agent-cap.js port both print `k h refused k p/h h refused h h`. A port copy testing `isDirectory()` for `.git` printed `k` on row 8, and one letting `JSON.parse` throw printed `refused` on row 9, and each reds the block's comparison
+- AC13 — `git ls-files` — the scratch prefix `$SCRATCH/lp/` is 174 characters and the longest tracked path is 129, a sum of 303, above 259, on win32. `git -c core.longpaths=false clone -q . "$SCRATCH/lp"` exited 128 printing `Filename too long`, and the same clone into `%TEMP%/u37lp` exited 0. Both were removed
+- AC14 — `check_ungated` — a scratch python probe of `tools/memory-tree/gotchas.py` scoped `.**` and `.*)` each to `tools/check-wiring.sh` alone, so with only `tools/y` tracked each reads ungated. With the closer class narrowed to `[*_)`]?`, the `.*)` scope ran on to `tools/y` and read gated. The selftest arm `read_mixed_closer_scope` pins it
+- AC15 — `function deriveAddressKey` — `grep -n -B12` printed a comment with no `:1664`. It cites no instrument line at all
+- AC16 — `check-workflow-syntax.js` — over `tools/workflows/tier2-review.js` it exited 0, `1 workflow script(s) parsed clean`. Over a scratch copy ending `let y=(` it exited 1. The template and the render carry byte-identical diffs for the S6 edit

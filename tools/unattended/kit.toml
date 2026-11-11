@@ -226,10 +226,12 @@ means = "render-failed-half-stamped"
 # none at all in an adopter's repo that copy-installs the kit and never edits it. Ruled 2026-08-23:
 # they run on the owner's demand, never on the merge bar, here and in every adopter alike.
 #
-# THE LEGS BELOW STAY, and the difference is their SUBJECT, and the difference is their subject: they read the REPOSITORY - its
+# THE LEGS BELOW STAY, and the difference is their SUBJECT: they read the REPOSITORY - its
 # run-state records, its playbooks, the shipped skill's wiring - which goes stale with nobody editing
-# this kit. Those are seconds. The self-tests were 3339 s of a 4926 s bar, 68% of all leg-seconds,
-# with the largest putting a 26-minute FLOOR under every full run. Measured node d, 2026-08-23;
+# this kit. Those are seconds, EXCEPT the `unattended kit gate`, which costs tens of minutes and is
+# held off every automatic bar by the owner ruling of 2026-11-10 recorded above its row. The
+# self-tests were 3339 s of a 4926 s bar, 68% of all leg-seconds, with the largest putting a
+# 26-minute FLOOR under every full run. Measured node d, 2026-08-23;
 # memory/builds/dScriptedRepeat/build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md.
 #
 # THE COMPENSATING CHECK, because an exemption is not coverage (charter [gate]). Work touching
@@ -260,9 +262,19 @@ means = "render-failed-half-stamped"
 # runs it, and this file is where that trade is recorded as having been made deliberately.
 # ---------------------------------------------------------------------------------------------------
 
+# HELD BY OWNER RULING, 2026-11-10 (TOOL-aShelvedLeg-1). By the subject criterion in `run-gates.sh`
+# this leg is `repo`: it reads run-state records, guides and the remote, and its failure means this
+# repository is misconfigured. It is `kit` by that ruling and not by the criterion, for cost: 707 to
+# 3147 s on node a, the longest leg of most bars. So no merge or push bar runs it, here or in any
+# adopter. The price is TOOL-aBoundedCeiling-10: a held leg cannot notice its own drift, and this
+# one sat red on main for weeks in August 2026 (TOOL-aBoundedCeiling-9). It still runs on demand,
+# by either route: `bash {kit}/run-unattended-gates.sh --checks`, or a bar run with GATE_SELFTESTS=1.
+# GATE_SELFTESTS=changed selects it by this kit's shipped sources only, never by the records its
+# `doc_reads` names, so a change that moves only those records leaves it held: run it with the
+# variable at 1, or through `--checks`, after such a change.
 [[gate_leg]]
 name = "unattended kit gate"
-subject = "repo"
+subject = "kit"
 argv = ["bash", "{kit}/check-unattended.sh"]
 reads = { remote = "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint — the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`." }
 guard = []

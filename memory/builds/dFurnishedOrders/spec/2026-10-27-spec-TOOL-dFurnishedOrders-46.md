@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-46 — the fourth spec audit's 18 roles, run-gates, process-monitor, unattended and kickoff minors: one re-stamp last, one bounded runner that carries its imports and kills on any exception, criteria that read the real gate, and the guards and pins the new arms move
 
-**Status:** DEFERRED · rev-4 · 2026-10-28 · node d · Tier-2 · base 47d3a464 · streams tooling · order 26 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-5 · 2026-11-05 · node d · Tier-2 · base 47d3a464 · streams tooling · order 26 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,9 +12,11 @@
 | [2026-10-27-build-TOOL-dFurnishedOrders-46-deviation-462.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-46-deviation-462.md) | deviation | — |
 | [2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md) | journal | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
 | [2026-10-28-build-TOOL-dFurnishedOrders-46-deviation-463.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-46-deviation-463.md) | deviation | — |
+| [2026-11-05-build-TOOL-dFurnishedOrders-46-deviation-464.md](../build/2026-11-05-build-TOOL-dFurnishedOrders-46-deviation-464.md) | deviation | — |
 | [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
 | [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-58 |
 | [2026-10-28-prompt-TOOL-dFurnishedOrders-46-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-46-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dFurnishedOrders-7-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dFurnishedOrders-7-owner-forks.md) | research | TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-29 |
 | [2026-10-27-review-TOOL-dFurnishedOrders-43-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-43-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 |
 
 <!-- /gen:spec-records -->
@@ -432,8 +434,9 @@ the `kickoff-manifest ratchet` leg as S1's.
   predicate id 15 found; (b) declares to every adopter an edge only a withheld file holds, which the
   review-harness precedent, an edge held wherever `/build` is used, does not admit; (a) is one mode
   over a function that already takes its walk root as a parameter, and its cost is a wait, since AC5
-  passes only against the landed mode. Recommendation (a). Open for the owner: the ask the build run
-  files, on the build that owns `tools/lexicon/` at the pass, is "`lexicon.py --self-containment
+  passes only against the landed mode. Recommendation (a). RESOLVED (owner, 2026-11-05): (a) a `--self-containment
+  <kit-dir>` mode, asked of the lexicon kit. The ask the build run files in the `BACKLOG.md` of the
+  build that owns `tools/lexicon/` at the pass is "`lexicon.py --self-containment
   <kit-dir>` prints `check_self_containment(kit_dir)`'s problems and its judged count, exiting 1 on
   any problem".
 
@@ -452,6 +455,9 @@ the `kickoff-manifest ratchet` leg as S1's.
   `leg_factory.py --write`, a recorded hand edit standing in where it is not built; S5's check runs
   through a lexicon verb by subprocess, and F7, open for the owner, is the ask for it; nothing else
   moved.
+- rev-5 · 2026-11-05 · §8 F7 · F7 resolved by the owner to (a), per the brief
+  `2026-11-05-prompt-TOOL-dFurnishedOrders-7-1-spec-writer`: the fork holds the ask the build run files
+  in the owning build's `BACKLOG.md`; nothing else moved.
 
 ## 10. Reuse audit
 

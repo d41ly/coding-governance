@@ -397,6 +397,65 @@ def scan_dead_anchors(recs: list, paths, m: str) -> list:
             for a in r["anchors"] if not selectable(a, paths, m)]
 
 
+def check_gate_token(t: str, tracked: set, legs):
+    """Does backticked token `t` name a gate? One of three states: True, resolved, for a tracked path, a
+    directory over tracked paths, or a leg name; None, unresolved because `legs is None`, so a leg name
+    cannot be checked; False, unresolved.
+
+    `check_invariant` keeps its note on the None state. `check_ungated` reads that state as not gated
+    and notes it on stderr (TOOL-dFairHearing-27 S9), so both read a class's gate through this one
+    rule, and no live path calls `check_ungated`; its docstring names its callers.
+    """
+    if t in tracked or any(x.startswith(t.rstrip("/") + "/") for x in tracked):
+        return True
+    if legs is None:
+        return None
+    return t in legs
+
+
+GATED_LINE_RE = re.compile(r"gated (?:by|in|at)", re.I)
+# From a `gated by|in|at` match to the end of its sentence: a full stop, optionally closed by `*`, `_`,
+# `)` or a backtick, then whitespace or the paragraph's end, never a dot inside a backticked token
+# (TOOL-dFairHearing-27 S11, TOOL-dFairHearing-32 S32: `.**` ends a bold sentence too).
+GATED_SCOPE_RE = re.compile(r"(?:`[^`]*`|\.(?![*_)`]*(?:\s|\Z))|[^.`])*")
+GATED_SECTION_RE = re.compile(r"^## Gated by[ \t]*\n(.*?)(?=^## |\Z)", re.M | re.S | re.I)
+
+
+def extract_gated_scope(body: str) -> list:
+    """The text a class record names its gates in: each `gated by`, `gated in` or `gated at` match,
+    wherever it falls, to the end of its sentence across wrapped lines, and each `## Gated by` body."""
+    scopes = []
+    for para in re.split(r"\n[ \t]*\n", body):
+        flat = " ".join(para.split("\n"))
+        scopes += [GATED_SCOPE_RE.match(flat, m.end()).group(0) for m in GATED_LINE_RE.finditer(flat)]
+    return scopes + GATED_SECTION_RE.findall(body)
+
+
+def check_ungated(text: str, tracked: set, legs) -> bool:
+    """Is this class record UNGATED? True when its body says `no machine gate`, or when no backticked
+    token in its gated scope (`extract_gated_scope`) passes `check_gate_token`.
+
+    The BODY only, cut as `declares()` cuts it, so the front matter never decides. A token that cannot
+    be checked (no leg manifest) does not pass, so it reads ungated rather than gated, and is announced
+    on stderr as `check_invariant` notes it.
+
+    No live path calls this. Its callers are this file's selftest arms and the replay instrument
+    `2026-11-04-build-TOOL-dFairHearing-30-ungated.py`, a committed build record. `gotchas.py` has no
+    `--all-ungated` flag, and the unit that adds one wires this in (TOOL-dFairHearing-23 S21).
+    """
+    m = FM_RE.match(text)
+    body = text[m.end():] if m else text
+    if re.search(r"no machine gate", body, re.I):
+        return True
+    states = [(t, check_gate_token(t, tracked, legs)) for s in extract_gated_scope(body) for t in GUARD_TOKEN_RE.findall(s)]
+    if any(ok is True for _, ok in states):
+        return False
+    for t in dict.fromkeys(t for t, ok in states if ok is None):
+        print(f"gotchas: gate `{t}` NOT resolved — LEG_MANIFEST is blank, so a token that is not a tracked "
+              f"path cannot be checked against a leg name, and the class reads ungated", file=sys.stderr)
+    return True
+
+
 def check_invariant(rec: dict, tracked: set, legs, defined, why_undefined: str) -> tuple:
     """Check 18 over ONE invariant record: `(findings, announcements)`.
 
@@ -430,12 +489,11 @@ def check_invariant(rec: dict, tracked: set, legs, defined, why_undefined: str) 
                        f"tokens alone: {line}")
         else:
             for t in toks:
-                if t in tracked or any(x.startswith(t.rstrip("/") + "/") for x in tracked):
-                    continue
-                if legs is None:
+                ok = check_gate_token(t, tracked, legs)
+                if ok is None:
                     notes.append(f"gotchas: {p} guard `{t}` NOT resolved — LEG_MANIFEST is blank, so a "
                                  f"token that is not a tracked path cannot be checked against a leg name")
-                elif t not in legs:
+                elif not ok:
                     bad.append(f"check 18: {p} guard `{t}` is neither a tracked path nor a leg name in "
                                f"the leg manifest")
     if rec["universal"]:
@@ -452,7 +510,9 @@ def render(recs: list, m: str) -> str:
         "One authored record per class. The table below is GENERATED from each record's front matter",
         "and its DERIVED anchors — do not hand-edit between the markers.",
         "",
-        "Hand a reviewer the classes their diff can hit:",
+        # TOOL-dFairHearing-27 S29: the review harness acquires the checklist itself on the diff kind.
+        "The review harness acquires the classes a diff can hit on the diff kind, so a reviewer is",
+        "handed them without a lookup. For a reader who wants the checklist:",
         "",
         "```bash",
         # THIS install's path, derived, because INDEX.md is committed in the adopter's tree (S5).
@@ -921,6 +981,46 @@ def cmd_selftest() -> int:
         cmd_write(t2, c2); run("git", "add", "-A", cwd=t2); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t2)
         arm("check 18 catches a record that names no gate", "names no gate and does not say it has none",
             lambda: cmd_check(t2, c2))
+        # TOOL-dFairHearing-23 S21 — `check_ungated` reads a class's gate through `check_gate_token`.
+        gate_set = {f"{PFX}check-wiring.sh"}
+        arm("check_ungated: a tracked gate is gated, `no machine gate` and an untracked token are ungated",
+            "ungated False True True",
+            lambda: print("ungated", check_ungated(f"Gated by `{PFX}check-wiring.sh`.\n", gate_set, set()),
+                          check_ungated("There is no machine gate.\n", gate_set, set()),
+                          check_ungated("Gated by `no-such-gate.sh`.\n", gate_set, set())) or 0)
+        # TOOL-dFairHearing-27 S9, S11 — the scope runs across wrapped lines to its sentence's end, a `## Gated by`
+        # body is read, and a leg name under a blank manifest reads ungated with a note. RED against the
+        # line-by-line reader of TOOL-dFairHearing-23, which read the two wrapped forms and the body as ungated.
+        def read_scoped_ungated():
+            err = io.StringIO()
+            with contextlib.redirect_stderr(err):
+                got = [check_ungated(f"Gated in\n`{PFX}check-wiring.sh`'s arm.\n", gate_set, set()),
+                       check_ungated(f"The lock is gated by\n`{PFX}check-wiring.sh`.\n", gate_set, set()),
+                       check_ungated(f"Prose.\n\n## Gated by\n\n`{PFX}check-wiring.sh` runs it.\n", gate_set, set()),
+                       check_ungated("## Gated by\n\n`fixture leg`\n", gate_set, None)]
+            print("scoped", *got, "note" if "`fixture leg` NOT resolved" in err.getvalue() else "silent")
+            return 0
+        arm("check_ungated: a wrapped gated sentence and a `## Gated by` body are gated, a leg under a blank "
+            "manifest is ungated and announced", "scoped False False False True note", read_scoped_ungated)
+        # TOOL-dFairHearing-32 S32 — a bold sentence closing on `.**` ends there, so the next sentence's token is
+        # outside the scope: with only that token tracked the class reads ungated. RED against TOOL-dFairHearing-27's
+        # scope, which ran past `.**` and read `y` as the gate.
+        def read_bold_scope():
+            text = f"**Gated by `{PFX}check-wiring.sh`.** Next sentence names `{PFX}y`.\n"
+            print("bold", *[t for s in extract_gated_scope(text) for t in GUARD_TOKEN_RE.findall(s)],
+                  check_ungated(text, {f"{PFX}y"}, set()))
+            return 0
+        arm("check_ungated: a gated sentence closing on `.**` keeps the next sentence out of its scope",
+            f"bold {PFX}check-wiring.sh True\n[rc=0]", read_bold_scope)
+        # TOOL-dFairHearing-37 S15 — a mixed run of closers, `.*)`, ends the sentence as `.**` does. RED against
+        # GATED_SCOPE_RE's closer class narrowed to one character, which carries the scope past `.*)`.
+        def read_mixed_closer_scope():
+            text = f"(gated by `{PFX}check-wiring.sh`.*) Next sentence names `{PFX}y`.\n"
+            print("mixed", *[t for s in extract_gated_scope(text) for t in GUARD_TOKEN_RE.findall(s)],
+                  check_ungated(text, {f"{PFX}y"}, set()))
+            return 0
+        arm("check_ungated: a gated sentence closing on `.*)` keeps the next sentence out of its scope",
+            f"mixed {PFX}check-wiring.sh True\n[rc=0]", read_mixed_closer_scope)
         arm("--declares is the one predicate: 'no machine gate' declares", "[rc=0]",
             lambda: 0 if declares(_rec("x", "d", "There is no machine gate for this.\n")) else 1)
         arm("--declares reads the BODY, not the front matter", "[rc=0]",

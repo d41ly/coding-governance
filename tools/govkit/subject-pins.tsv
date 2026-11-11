@@ -155,6 +155,7 @@ shell hygiene (a loop fed by a command substitution)	repo	product
 shell-hygiene selftest	kit	selftests
 spawn budget (forks per hot entrypoint)	repo	product
 spec tokens (a spec's own names resolve)	repo	declarations
+spec-audit opt-in pack self-test	kit	selftests
 spec-tokens self-test	kit	selftests
 step-gate	repo	declarations
 step-rows-frozen	repo	declarations
@@ -168,7 +169,7 @@ testsuite counts (every bar self-test prints one)	repo	declarations
 testsuite counts self-test	kit	selftests
 tier2-review self-test	kit	selftests
 transition-audit arms	repo	declarations
-unattended kit gate	repo	declarations
+unattended kit gate	kit	declarations
 unattended protocol size	repo	product
 unattended skill size	repo	product
 unattended skill wiring	repo	wiring

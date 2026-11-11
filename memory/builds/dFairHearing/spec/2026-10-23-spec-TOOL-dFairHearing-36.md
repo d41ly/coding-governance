@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-36 — the round-4 spec audit's 13 minors on units 28, 29 and 31: probes that read every node's bytes alike, misses seen red, and the bar's own base
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 24 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-5 · 2026-11-04 · node d · Tier-2 · base 3708a705 · streams tooling · order 26 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,9 +9,19 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dFairHearing-36-deviation-361.md](../build/2026-10-23-build-TOOL-dFairHearing-36-deviation-361.md) | deviation | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50 |
+| [2026-11-04-build-TOOL-dFairHearing-36-1-acceptance-ledger.md](../build/2026-11-04-build-TOOL-dFairHearing-36-1-acceptance-ledger.md) | journal | — |
+| [2026-11-04-build-TOOL-dFairHearing-36-1-builder-return.md](../build/2026-11-04-build-TOOL-dFairHearing-36-1-builder-return.md) | journal | — |
+| [2026-11-04-build-TOOL-dFairHearing-36-2-builder-return.md](../build/2026-11-04-build-TOOL-dFairHearing-36-2-builder-return.md) | journal | — |
+| [2026-11-08-build-TOOL-dFairHearing-1-runlog-70b3ac3f.md](../build/2026-11-08-build-TOOL-dFairHearing-1-runlog-70b3ac3f.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50 |
 | [2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md) | research | TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-37 |
 | [2026-10-23-prompt-TOOL-dFairHearing-36-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-36-1-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dFairHearing-36-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-36-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
+| [2026-11-04-prompt-TOOL-dFairHearing-36-1-spec-writer.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-36-1-spec-writer.md) | journal | — |
+| [2026-11-04-prompt-TOOL-dFairHearing-36-token-fix-brief.md](../prompts/2026-11-04-prompt-TOOL-dFairHearing-36-token-fix-brief.md) | research | — |
 | [2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md) | spec-audit | TOOL-dFairHearing-35 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-37 |
+| [2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md](../reviews/2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md) | diff-review | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 
 <!-- /gen:spec-records -->
 
@@ -72,12 +82,12 @@ it. Where a report item merges ids, the later id points at the first one's mecha
   `TOOL-dFairHearing-16` adds, `spec-audit opt-in pack self-test`. This unit's §7 names it in a prose
   sentence, because a leg line naming a leg absent at base is refused. Observed by AC7.
 - **S11** — id 19 (M10, unit 31 S1, unit 32 S28). The version check's base takes `GATE_BASE`
-  unchanged when it is set, verified by `git rev-parse --verify`, as `tools/run-gates/run-gates.sh:396-399`
-  does. Unit 31 S1's and unit 32 S28's claim that the check uses the bar's base is then true. This
+  unchanged when it is set, verified by `git rev-parse --verify`, as the `GATE_BASE` block of
+  `tools/run-gates/run-gates.sh` (:515-519 at `9c1a2857a`) does. Unit 31 S1's and unit 32 S28's claim that the check uses the bar's base is then true. This
   supersedes the merge-base of `HEAD` with `GATE_BASE` in unit 31 §4. Observed by AC8.
 - **S12** — id 9 (L4, unit 31). With no `GATE_BASE`, the base is `resolve_compare_base`'s answer
-  (`tools/codebase-map/map_lib.py:1502`): the remote ladder's observed branch, or `main` when it names
-  none, as `run-gates.sh` reads it (:376, :401), and its merge-base with `HEAD` where that is a proper
+  (`tools/codebase-map/map_lib.py:1507` at `9c1a2857a`): the remote ladder's observed branch, or `main`
+  when it names none, as `run-gates.sh` reads it (`DEFBR` at :496 and the tip read at :521), and its merge-base with `HEAD` where that is a proper
   ancestor. Where that function answers the remote tip, the probe exits 2 naming that the branch has
   nothing of its own to diff. Unit 31's S1 and its script then give one answer. Observed by AC8.
 - **S13** — id 18 (L7, unit 31 §10). The probe calls `resolve_compare_base` instead of a third hand
@@ -231,9 +241,10 @@ directory. A clone or fixture repository goes under `%TEMP%/<short name>`.
 - **AC2** — When a scratch copy of `census.py` that expects `(60, 14)` runs as `python <copy>
   3708a705`, it prints `population 59 14` and exits 1 naming `the population is not 59 and 14`.
   Red when: it exits 0, which means the population assertion cannot fire.
-- **AC3** — When `census.py` and `members.py` each run with the hook's suite given as every suite path,
-  once with `PYTHONUTF8=1` and once with `PYTHONUTF8=0`, each run prints the same count of `gone`
-  lines under both settings, 73 for the census and 5 for the members, and no `Traceback`.
+- **AC3** — When `census.py` and `members.py` each run with base's hook suite, the file S1 names,
+  as `git show` prints it at `3708a705`, written to a scratch file and
+  given as every suite path, once with `PYTHONUTF8=1` and once with `PYTHONUTF8=0`, each run prints the
+  same count of `gone` lines under both settings, 73 for the census and 5 for the members, and no `Traceback`.
   Red when: the count differs between the two settings, or either run raises.
   figure: 73 and 5 are PINNED, measured at `3708a705` on 2026-10-23.
 - **AC4** — When `census.py 3708a705` runs over three sets of scratch copies at this unit's commit,
@@ -287,11 +298,24 @@ suite takes no `New arm:` line: it only loses an arm, as unit 26 §7 states.
 - rev-1 · 2026-10-23 · initial draft, promoting the 6 MEDIUM and 7 LOW findings of the round-4 spec
   audit of specs 28 to 32 that land on units 28, 29 and 31, as one of two batches.
 - rev-2 · 2026-10-23 · §3 · the round-5 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-40 (seven minors).
+- rev-3 · 2026-11-03 · S11 · S12 · §10 · re-cited at `9c1a2857a`: the bar's `GATE_BASE` block (:396-399
+  to :515-519), `DEFBR` and the tip read (:376 and :401 to :496 and :521), and `resolve_compare_base`
+  (:1502 to :1507) (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 2).
+- rev-3 · 2026-11-03 · AC3 · its suite input is base's hook suite as `git show` prints it at `3708a705`,
+  the revision its pinned 73 and 5 were measured at. Unit 16 moved every rule-0 and rule-5 arm out of
+  the live hook suite, so over that file both probes print 0 `gone` lines at `9c1a2857a` and the
+  criterion was red before any pass. Unit 40 S11 states the same input (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 3).
+- rev-4 · 2026-11-03 · header order · §4 · the header's order 24 to 26, keeping this unit in one order
+  with `TOOL-dFairHearing-37`, the other batch over the disjoint write set §4 states (fix brief
+  2026-11-03-prompt-TOOL-dFairHearing-25-reorder-fix-brief, item 2).
+- rev-5 · 2026-11-04 · AC3 · its input names base's hook suite as the file S1 names, not by a bare
+  backticked suite path, which the token check's bar join reads as a suite run; it reads the same
+  file at `3708a705` (fix brief 2026-11-04-prompt-TOOL-dFairHearing-36-token-fix-brief, items 1 to 3).
 
 ## 10. Reuse audit
 
 Every item extends a seam an earlier unit mints or the base tree carries. The base probe calls
-`resolve_compare_base` (`tools/codebase-map/map_lib.py:1502`), the bar's rule in Python, which
+`resolve_compare_base` (`tools/codebase-map/map_lib.py:1507` at `9c1a2857a`), the bar's rule in Python, which
 `python tools/codebase-map/reuse_lookup.py "resolve the merge base with the remote default branch or
 refuse"` lists as a SEAM with fan-in 3, the row unit 31's reuse audit did not name. The census and
 member scripts are units 28 and 29's, corrected in place. The recall query returned the audit's

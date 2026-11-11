@@ -1,0 +1,1947 @@
+#!/usr/bin/env python3
+"""The replay scorer factory: one deterministic scorer re-deriving every figure from committed raw outputs.
+
+Stdlib only. Every population arrives as an argument; nothing here names a path outside this kit but
+the self-test's proof, which reads aScoutedSeam's committed records where the tree holds them.
+
+    python3 replay_scorer.py --instance scouted-seam --cases <src> --results <src> --grade <arm>
+    python3 replay_scorer.py --instance scouted-seam --cases <src> --results <src> --compare <arm> <arm> [...]
+    python3 replay_scorer.py --instance scouted-seam --cases <src> --results <src> --judged <arm|a+b> [...]
+    python3 replay_scorer.py --instance review-replay --known <src> --candidate <src> [--window N]
+    python3 replay_scorer.py --experiment <src> [--repo <clone>]
+    python3 replay_scorer.py --design-recall --key <known-set file> --seed <mode> <record-run-1> [<record-run-2> ...]
+    python3 replay_scorer.py --selftest
+
+A `<src>` resolves in one order: an existing working-tree path; else a 40-hex blob id; else
+`<rev>:<path>`, when the part before the first `:` is longer than one character, so `C:/x` is never a
+rev. A git object is read by ONE `git cat-file blob` with argv, never a shell; a source opening `-` is
+refused, and so is an object git cannot read, never read as an empty arm. Leading `//` lines are
+skipped, as aScoutedSeam's `read_json` skips the `**Serves:**` head its records carry.
+
+PAIRING. `derive_paired_cases` is the ONE place variants are paired with cases: the ids every variant
+answered, in case order, and each variant's unanswered ids. It refuses an answer naming a case outside
+the population, a variant that answered nothing, and an empty pairing, so a partial population is a
+refusal and never a smaller score. Each figure line names its population first, `paired <n> of <N> ·
+<variant> unanswered <ids>`, then the scores. Output follows the case file's order and the argument
+order of the variants, never a set's, so two runs over the same bytes print the same bytes.
+
+THE INSTANCES. `review-replay` is `review_replay.py`'s scoring core, moved here; that file keeps its
+CLI, its printer and its corpus listing as the instance's adapter. A spec ref there is read by
+`extract_tag_ref`: its first lower-case `[tag]`, else its section. Its known-set file, read by
+`parse_known_set`, is one `| tag | address | grade | escaped |` row per known defect under a
+`**Population:**` line its counts must reproduce; `read_matched_list` reads an adjudicator's
+`| candidate | tag |` pairs, and `measure_known_set` counts each tag once, refusing a pair whose
+candidate ref cites no `[tag]` of its row. `scouted-seam` is aScoutedSeam's
+grader (`check_hit`, `check_case` and the `grade`, `compare` and `judged` readings), ported from the
+grader blob a03896116e3c5cbf853affda241c22d8408cb945 at b0fe68f30; a result row without a `seams` list,
+or a judged cell without `primary` and `covered`, is a refusal naming the arm and the case.
+
+THE EXPERIMENT SHAPE. `check_experiment` reads one committed JSON manifest (`--experiment <src>`) and
+runs every rule of aScoutedSeam's method before the first figure line, a broken one exiting 2 by name:
+each case's `case_evidence` hook returns something; a `review-replay` manifest's `candidates` is a list
+of `{case, report, matched}`, one review run of one subject record each, naming its `arm` unless one is
+declared; a `heldOut` file has exactly one commit in a
+history that is not shallow, working-tree bytes hashing to that commit's blob, and no id a tuning case carries; an arm with a `base` varies exactly one declared setting from it; every arm's
+parsed replies print against its `dispatched` count; a committed label key rotates; and the arms'
+`union` is read per set and pooled. What none of them checks: a variable nobody declared, that no
+prompt author read the held-out file, that one judge read each case, and that evidence is right.
+
+THE DESIGN GRADE (TOOL-dFairHearing-18). `--design-recall` grades a whole-design walk's recall on a seeded key,
+as `review.design-audit.seed` says: each record is one run's review record, read by its `## Walk table — run <r>
+of <runs>` heading, its `walk-seed` line and its confirmed appendix rows, each ref keyed by `extract_tag_ref`; each
+plant is one known-set row of the key, matched on the same file and the same key at window 0. A plant counts once
+per run. Every run must find two thirds of the plants and, with two runs or more, the union five sixths; under
+`--seed none` nothing is graded and no key is read. Refused: a key whose SHA-256 over its bytes is not every
+record's pin, records disagreeing on `runs`, a run missing or repeated, a record seeded another way, a plant
+whose `escaped` disagrees with the seed, and a confirmed row with no file and key.
+
+THE CONFORMANCE ARM. `scan_pairing_sites` names every comprehension, in a tracked `*.py` at and below
+this kit's own directory (this file and any path under `memory/` excepted, so a repository-root install
+never reaches a record folder's bench), whose filter is `all()` over a second population with
+an `in` test from the outer case to the inner variant, or an `is not None` test naming both. What it
+does not see: a JavaScript harness, and a pairing written as a `for` loop building a common list.
+
+Exit: 0 scored run · 1 red self-test, or a design-recall run under its bar · 2 any refusal or argument error.
+"""
+
+import argparse
+import ast
+import contextlib
+import hashlib
+import io
+import json
+import os
+import pathlib
+import re
+import statistics
+import subprocess
+import sys
+import tempfile
+
+# ---- the review-replay instance's constants, moved from review_replay.py with its core.
+APPENDIX_HEADING = "## Appendix — every finding"
+SERVES_PREFIX = "**Serves:** diff-review"
+SPEC_SERVES_PREFIX = "**Serves:** spec-audit"
+SECTION_REF = re.compile(r"(?:§|\bsection\s+)\s*(\d+)", re.IGNORECASE)
+ITEM_SECTION = re.compile(r"\b(S|AC|F)(\d+)\b")
+#: The spec format's section for each item kind: scope §2, acceptance §6, open questions §8.
+ITEM_SECTIONS = {"S": 2, "AC": 6, "F": 8}
+SUBJECT_PIN = re.compile(r"([^\s`@,()]+)@([0-9a-fA-F]{7,40})\b")
+CELL_SPLIT = re.compile(r"(?<!\\)\|")
+BACKTICKED = re.compile(r"`([^`]+)`")
+LINE_REF = re.compile(r"([^\s:]*[./][^\s:]*):(\d+)")
+RANGE = re.compile(r"\b([0-9a-fA-F]{7,40})\.\.\.?([0-9a-fA-F]{7,40})\b")
+STATED = re.compile(r"\bconfirmed\W{0,6}(\d+)", re.IGNORECASE)
+#: The count as the harness states it: the `review-shape` line the synthesis copies above the appendix.
+SHAPE_STATED = re.compile(r"^\W*review-shape\b.*?\bconfirmed=(\d+)", re.IGNORECASE | re.MULTILINE)
+ITEM_ID = re.compile(r"[A-Za-z]{0,3}\d+(?:-\d+)?")
+SEVERITY = re.compile(r"\**(?:blocker|high|medium|low)\**", re.IGNORECASE)
+RAW_IDS = re.compile(r"\d+(?:\s*,\s*\d+)*")
+#: The `[tag]` a design-record audit addresses a finding by, read as tier2-review.js's deriveAddressKey reads it.
+TAG_REF = re.compile(r"\[[a-z][a-z0-9-]*\]")
+#: A known-set file's head (TOOL-dFairHearing-1 S1), and a matched list's (S3).
+POPULATION = re.compile(r"^\*\*Population:\*\* (\d+) · reviewed (\d+) · escaped (\d+) · high (\d+)\s*$", re.MULTILINE)
+ADJUDICATOR = re.compile(r"^\*\*Adjudicator:\*\* (\S.*?)\s*$", re.MULTILINE)
+KNOWN_GRADES = ("high", "medium", "ungraded")
+#: A whole-design record's walk-table heading and seed pin, as tier2-review.js's renderWalkTable writes them (TOOL-dFairHearing-18).
+WALK_HEADING = re.compile(r"^## Walk table — run (\d+) of (\d+), sliced by \S+[ \t]*$", re.MULTILINE)
+WALK_SEED = re.compile(r"^walk-seed mode=(\S+) key-sha256=(\S+)[ \t]*$", re.MULTILINE)
+#: `review.design-audit.seed`'s values, the graded ones first.
+DESIGN_SEEDS = ("reverted-escapes", "synthetic", "none")
+
+# ---- the scouted-seam instance's constant, ported from the grader blob.
+CODE_TOKEN = re.compile(r"-{0,2}[A-Za-z_][\w-]*")
+
+HEX40 = re.compile(r"[0-9a-fA-F]{40}")
+KIT_DIR = pathlib.Path(__file__).resolve().parent
+#: The two instances the factory exists for; `check_instances` reds when the table lacks one.
+INSTANCE_KEYS = ("review-replay", "scouted-seam")
+#: The arm count `run_selftest` must reach, as review_replay.py declares its own. Raised 18 -> 21 by
+#: TOOL-dFairHearing-27 S19: its three arms, tag-item, experiment-freeze-spelling and pairing-walk. Raised 21 -> 24
+#: by TOOL-dFairHearing-32 S9: replay-subject, experiment-references and held-out-pathspec. Raised 24 -> 25 by
+#: TOOL-dFairHearing-37 S5: held-out-tracked. Raised 25 -> 26 by TOOL-dFairHearing-46 S5: stated-shape. Raised 26 -> 29
+#: by TOOL-dFairHearing-48 S3, S5: appendix-pipe, appendix-break and proof-pinned.
+ARMS_DECLARED = 29
+
+
+class Refusal(Exception):
+    """A population the factory will not score: an unreadable source, a malformed row, a partial pairing."""
+
+
+def read_raw_output(src, repo="."):
+    """The text of a committed raw output: a working-tree path, a 40-hex blob, or `<rev>:<path>`."""
+    if not src or src.startswith("-"):
+        raise Refusal(f"source {src!r}: a source opening `-` or empty is refused")
+    path = pathlib.Path(src)
+    if path.is_file():
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as exc:
+            raise Refusal(f"source {src}: unreadable ({exc})") from None
+    elif HEX40.fullmatch(src) or len(src.partition(":")[0]) > 1 and ":" in src:
+        try:
+            proc = subprocess.run(["git", "-C", str(repo), "cat-file", "blob", src], capture_output=True, check=False)
+        except OSError as exc:
+            raise Refusal(f"object {src}: git could not run ({exc})") from None
+        if proc.returncode:
+            why = proc.stderr.decode("utf-8", "replace").strip().splitlines()
+            raise Refusal(f"object {src}: git cannot read it ({why[0] if why else 'exit ' + str(proc.returncode)})")
+        try:
+            text = proc.stdout.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise Refusal(f"object {src}: not UTF-8 ({exc})") from None
+    else:
+        raise Refusal(f"source {src}: no such file, and not a blob id or <rev>:<path>")
+    lines = text.splitlines(keepends=True)
+    skip = 0
+    while skip < len(lines) and lines[skip].startswith("//"):
+        skip += 1
+    return "".join(lines[skip:])
+
+
+def derive_paired_cases(case_ids, answers):
+    """`(paired, unanswered)`: the ids every variant answered in case order, and each variant's misses.
+
+    `answers` maps each variant, in argument order, to the case ids it answered. Refused: no variant,
+    an answer outside the population, a variant that answered nothing, and an empty pairing.
+    """
+    if not answers:
+        raise Refusal("no variant to pair")
+    population = set(case_ids)
+    unanswered, missed = {}, set()
+    for variant, ids in answers.items():
+        ids = list(ids)
+        foreign = [i for i in ids if i not in population]
+        if foreign:
+            raise Refusal(f"{variant} answers {', '.join(map(str, foreign))}, outside the population of {len(case_ids)} case(s)")
+        if not ids:
+            raise Refusal(f"{variant} answered no case of {len(case_ids)}")
+        answered = set(ids)
+        unanswered[variant] = [c for c in case_ids if c not in answered]
+        missed.update(unanswered[variant])
+    paired = [c for c in case_ids if c not in missed]
+    if not paired:
+        raise Refusal(f"empty pairing: no case of {len(case_ids)} is answered by every one of {', '.join(answers)}")
+    return paired, unanswered
+
+
+def render_population(paired, total, unanswered, variant):
+    """The head every figure line opens with: the paired population, then this variant's misses."""
+    return f"paired {len(paired)} of {total} · {variant} unanswered {', '.join(map(str, unanswered[variant])) or 'none'}"
+
+
+# ---- the review-replay instance: review_replay.py's scoring core.
+
+def extract_line_ref(text):
+    """`(path, line)` from a ref like `a/b.py:12`, `b.py:12-20` or `C:\\x\\b.py:12`, else None."""
+    if text is None:
+        return None
+    s = text.strip().strip("`").replace("\\", "/")
+    # A drive prefix keeps its absolute suffix, which check_same_file's endswith rule then matches.
+    s = re.sub(r"^[A-Za-z]:/", "/", s)
+    while s.startswith("./"):
+        s = s[2:]
+    m = LINE_REF.match(s)
+    return (m.group(1), int(m.group(2))) if m else None
+
+
+def derive_ref_parts(text):
+    """`(path, where)` of a spec ref `<file>:<where>`, the path folded: `\\` to `/`, a drive to `/`, `./` dropped."""
+    if text is None:
+        return None
+    s = text.strip().strip("`").replace("\\", "/")
+    s = re.sub(r"^[A-Za-z]:/", "/", s)
+    while s.startswith("./"):
+        s = s[2:]
+    path, sep, where = s.partition(":")
+    return (path, where) if sep and path else None
+
+
+def extract_section_ref(text):
+    """`(path, section)` from a spec ref like `x.md:§2 S5` or `C:/r/x.md:section 4`, else None."""
+    parts = derive_ref_parts(text)
+    if parts is None:
+        return None
+    path, where = parts
+    m = SECTION_REF.search(where)
+    if m:
+        return path, int(m.group(1))
+    m = ITEM_SECTION.search(where)
+    return (path, ITEM_SECTIONS[m.group(1)]) if m else None
+
+
+def extract_tag_ref(text):
+    """`(path, key)` from a spec ref: `key` is the first `[tag]` in `<where>`, else the integer section.
+
+    The section is `extract_section_ref`'s, so a ref with no tag keys exactly as before; None when
+    the address names neither. A tag key is a string, so a matcher compares it by equality only.
+    """
+    parts = derive_ref_parts(text)
+    if parts is None:
+        return None
+    m = TAG_REF.search(parts[1])
+    return (parts[0], m.group(0)) if m else extract_section_ref(text)
+
+
+def read_record_kind(text):
+    """`spec-audit` or `diff-review` from the first non-blank line's `**Serves:**` binding, else None."""
+    first = next((line.strip() for line in text.splitlines() if line.strip()), "")
+    for prefix in (SPEC_SERVES_PREFIX, SERVES_PREFIX):
+        if first.startswith(prefix):
+            return prefix.split()[-1]
+    return None
+
+
+def extract_subject_pins(text):
+    """Every `(path, hex)` pin AFTER the binding line and before the first `## `, one line or one per bullet."""
+    lines = text.replace("\r\n", "\n").split("\n")
+    start = next((i for i, line in enumerate(lines) if line.strip()), len(lines))
+    pins = []
+    for line in lines[start + 1:]:
+        if line.startswith("## "):
+            break
+        pins += SUBJECT_PIN.findall(line)
+    return pins
+
+
+def extract_range(text):
+    """`(base, head)` from the first hex..hex or hex...hex token; a symbolic end matches nothing."""
+    m = RANGE.search(text)
+    return (m.group(1).lower(), m.group(2).lower()) if m else None
+
+
+def extract_stated_count(text):
+    """The `review-shape` line's count, else the first number after the word `confirmed`, from before any appendix."""
+    head = text.split(APPENDIX_HEADING, 1)[0]
+    m = SHAPE_STATED.search(head) or STATED.search(head)
+    return int(m.group(1)) if m else None
+
+
+def parse_appendix_rows(text):
+    """The appendix's CONFIRMED rows as dicts keyed by header name, and an error or None.
+
+    Refused: no appendix, a missing column, a row whose cell count differs from the header's, or a
+    confirmed-row count differing from the stated one.
+    Cell encoding inverted: `\\|` is a literal bar, and a cell reading `-` is an absent value.
+    Rows split on a newline ONLY: `splitlines` also breaks on U+2028, `\\x85` and others a cell may
+    carry, and one cut row ends the table and drops every row after it.
+    """
+    lines = text.replace("\r\n", "\n").split("\n")
+    starts = [i for i, line in enumerate(lines) if line.strip() == APPENDIX_HEADING]
+    if not starts:
+        return None, "no-appendix: no `" + APPENDIX_HEADING + "` heading"
+    table = []
+    for line in lines[starts[0] + 1:]:
+        if line.strip().startswith("|"):
+            table.append([c.strip().replace("\\|", "|") for c in CELL_SPLIT.split(line.strip())[1:-1]])
+        elif table:
+            break
+    if len(table) < 2:
+        return None, "no-appendix: the heading carries no table"
+    header = table[0]
+    for col in ("id", "lens", "ref", "verdict"):
+        if col not in header:
+            return None, f"malformed: the appendix has no `{col}` column"
+    for cells in table[2:]:
+        if len(cells) != len(header):
+            row = dict(zip(header, cells)).get("id", "?")
+            return None, f"malformed: row {row} holds {len(cells)} cells against {len(header)} columns"
+    rows = [{h: (None if c == "-" else c) for h, c in zip(header, cells)} for cells in table[2:]]
+    confirmed = [r for r in rows if r.get("verdict") == "confirmed"]
+    stated = extract_stated_count(text)
+    if stated is None:
+        return None, "no-count: no stated confirmed count"
+    if len(confirmed) != stated:
+        return None, f"liveness: {len(confirmed)} confirmed appendix row(s) against a stated confirmed count of {stated}"
+    return confirmed, None
+
+
+def parse_record_findings(text, mode="diff-review"):
+    """A past record's known set: `({items, range, stated, unit, subjects}, None)` or `(None, error)`.
+
+    Each item is `{id, path, line}`, path and line None when the item is UNSCORABLE; in `spec-audit`
+    mode `line` holds the `[tag]` or the SECTION. `unit` names what one item is: `raw-finding` from an
+    appendix, `adjudicated-item` from a legacy table. An appendix item also carries its `lens`.
+    """
+    spec = mode == "spec-audit"
+    read_ref = extract_tag_ref if spec else extract_line_ref
+    rng = None if spec else extract_range(text)
+    # Spec mode has no legacy fallback: a missing appendix is refused by parse_appendix_rows.
+    if spec or APPENDIX_HEADING in text:
+        unit = "raw-finding"
+        rows, err = parse_appendix_rows(text)
+        if err:
+            return None, err
+        stated = len(rows)
+        items = []
+        for r in rows:
+            loc = read_ref(r.get("ref"))
+            items.append({"id": r.get("id") or "?", "lens": r.get("lens") or "-", "path": loc and loc[0], "line": loc and loc[1]})
+    else:
+        unit = "adjudicated-item"
+        stated = extract_stated_count(text)
+        if stated is None:
+            return None, "no-count: no stated confirmed count"
+        items, raw = [], set()
+        for line in text.splitlines():
+            if not line.strip().startswith("|"):
+                continue
+            cells = [c.strip() for c in CELL_SPLIT.split(line.strip())[1:-1]]
+            if (len(cells) < 3 or not ITEM_ID.fullmatch(cells[0]) or not SEVERITY.fullmatch(cells[1])
+                    or not RAW_IDS.fullmatch(cells[-1])):
+                continue
+            raw.update(int(n) for n in re.findall(r"\d+", cells[-1]))
+            loc = next((ref for ref in map(extract_line_ref, BACKTICKED.findall(line)) if ref), None)
+            items.append({"id": cells[0], "path": loc and loc[0], "line": loc and loc[1]})
+        if len(raw) != stated:
+            return None, f"liveness: the item rows' raw ids union to {len(raw)} against a stated confirmed count of {stated}"
+    where = "section" if spec else "line"
+    if not any(i["path"] for i in items):
+        return None, f"no-scorable: {len(items)} item(s), none with a file-and-{where} location"
+    if rng is None and not spec:
+        return None, "no-range: no hex..hex range token"
+    return {"items": items, "range": rng, "stated": stated, "unit": unit,
+            "subjects": extract_subject_pins(text) if spec else None}, None
+
+
+def parse_candidates(text, mode="diff-review"):
+    """A report's confirmed appendix rows as candidates `{lens, ref, path, line}`: `(list, None)` or `(None, error)`.
+
+    The ONE row-to-candidate mapping, called by `main` and the self-test alike. Refused when confirmed
+    rows exist and none names a file and line (a section, in `spec-audit` mode): a ref shape the
+    parser cannot read would otherwise score every candidate as a miss and print a recall of zero at
+    exit 0. Refused `kind-mismatch` when the report opens with the OTHER kind's binding.
+    """
+    kind = read_record_kind(text)
+    if kind and kind != mode:
+        return None, f"kind-mismatch: the known record is {mode} and the candidate opens with the {kind} binding"
+    rows, err = parse_appendix_rows(text)
+    if err:
+        return None, err
+    spec = mode == "spec-audit"
+    read_ref = extract_tag_ref if spec else extract_line_ref
+    candidates = []
+    for r in rows:
+        loc = read_ref(r.get("ref"))
+        candidates.append({"lens": r.get("lens"), "ref": r.get("ref") or "-", "path": loc and loc[0], "line": loc and loc[1]})
+    if candidates and not any(c["path"] for c in candidates):
+        return None, f"no-scorable: {len(candidates)} confirmed row(s), none with a file-and-{'section' if spec else 'line'} ref"
+    return candidates, None
+
+
+def check_same_file(a, b):
+    """Equal, or one ends with `/` plus the other (the basename ceiling in review_replay.py's docstring)."""
+    return a == b or a.endswith("/" + b) or b.endswith("/" + a)
+
+
+def measure_recall(items, candidates, window):
+    """Match every scorable known item against the candidates; returns the score as a dict.
+
+    At window 0 a match is EQUALITY, never a subtraction, so a `[tag]` key is compared and never
+    subtracted from a section.
+    """
+    scorable = [it for it in items if it["path"]]
+    pairs = [(i, j) for i, it in enumerate(scorable) for j, c in enumerate(candidates)
+             if c["path"] and check_same_file(it["path"], c["path"])
+             and (it["line"] == c["line"] if window == 0 else abs(it["line"] - c["line"]) <= window)]
+    first_hit = {}
+    for i, j in pairs:
+        first_hit.setdefault(i, j)
+    hit_candidates = {j for _, j in pairs}
+    lenses = {}
+    for j, c in enumerate(candidates):
+        tally = lenses.setdefault(c["lens"] or "-", [0, 0])
+        tally[0] += 1
+        tally[1] += j in hit_candidates
+    return {
+        "matched": [(scorable[i], candidates[j]) for i, j in sorted(first_hit.items())],
+        "missed": [it for i, it in enumerate(scorable) if i not in first_hit],
+        "unscorable": [it for it in items if not it["path"]],
+        "candidate_only": [c for j, c in enumerate(candidates) if j not in hit_candidates],
+        "lenses": lenses,
+        "scorable": len(scorable),
+    }
+
+
+def measure_replay(known_text, cand_text, window):
+    """Two texts to a score: `({mode, known, candidates, window, score}, None)` or `(None, (side, error))`.
+
+    The ONE known-to-score path, called by `main` and the self-test alike. The mode is the known
+    record's binding, `diff-review` when it states none; `spec-audit` forces the window to 0, so a
+    match is the same file and the same section whatever `--window` said. `side` is `known` or
+    `candidate`.
+    """
+    mode = read_record_kind(known_text) or "diff-review"
+    known, err = parse_record_findings(known_text, mode)
+    if err:
+        return None, ("known", err)
+    candidates, err = parse_candidates(cand_text, mode)
+    if err:
+        return None, ("candidate", err)
+    if mode == "spec-audit":
+        window = 0
+    return {"mode": mode, "known": known, "candidates": candidates, "window": window,
+            "score": measure_recall(known["items"], candidates, window)}, None
+
+
+# ---- the review-replay instance's known set and adjudicated matches (TOOL-dFairHearing-1 S2, S3).
+
+def read_table(text, header):
+    """The cell lists of the rows of the first markdown table whose header row is `header`, else None.
+
+    Cells split as the appendix's are, `\\|` a literal bar; a separator row is skipped and the table
+    ends at its first non-table line.
+    """
+    rows, inside = [], False
+    for line in text.replace("\r\n", "\n").split("\n"):
+        s = line.strip()
+        cells = [c.strip().replace("\\|", "|") for c in CELL_SPLIT.split(s)[1:-1]] if s.startswith("|") else None
+        if not inside:
+            inside = cells == list(header)
+        elif cells is None:
+            break
+        elif not all(set(c) <= set("-: ") for c in cells):
+            rows.append(cells)
+    return rows if inside else None
+
+
+def parse_known_set(text):
+    """A known-set file: `{rows, reviewed, escaped, high}`, each row `{id, tag, address, path, line, record, grade, escaped}`.
+
+    Refused: no `**Population:**` line, no `| tag | address | grade | escaped |` table, a row count or
+    a partition count (escaped `no`, escaped `yes`, `high` among the reviewed) differing from that
+    line, a repeated tag, a grade or flag outside its set, and an address `extract_tag_ref` cannot read
+    as `<record path>:[<tag>]`. `path` and `line` are the address's record and tag and `record` the
+    record it names, so `derive_replay_evidence` reads a row as any review-replay case.
+    """
+    m = POPULATION.search(text)
+    if not m:
+        raise Refusal("known set: no `**Population:** <n> · reviewed <n> · escaped <n> · high <n>` line")
+    total, reviewed, escaped, high = map(int, m.groups())
+    table = read_table(text, ("tag", "address", "grade", "escaped"))
+    if table is None:
+        raise Refusal("known set: no `| tag | address | grade | escaped |` table")
+    rows, seen = [], set()
+    for cells in table:
+        if len(cells) != 4:
+            raise Refusal(f"known set: row {cells!r} has {len(cells)} cells, not 4")
+        tag, address, grade, flag = cells
+        if tag in seen:
+            raise Refusal(f"known set: tag {tag} is repeated")
+        seen.add(tag)
+        if grade not in KNOWN_GRADES or flag not in ("yes", "no"):
+            raise Refusal(f"known set: row {tag} reads grade {grade!r} and escaped {flag!r}; "
+                          f"a grade is one of {', '.join(KNOWN_GRADES)} and escaped is yes or no")
+        ref = extract_tag_ref(address)
+        if ref is None or not isinstance(ref[1], str):
+            raise Refusal(f"known set: row {tag}'s address {address!r} is not `<record path>:[<tag>]`")
+        rows.append({"id": tag, "tag": tag, "address": address, "path": ref[0], "line": ref[1], "record": ref[0],
+                     "grade": grade, "escaped": flag == "yes"})
+    counts = {"rows": (len(rows), total), "reviewed": (sum(not r["escaped"] for r in rows), reviewed),
+              "escaped": (sum(r["escaped"] for r in rows), escaped),
+              "high": (sum(r["grade"] == "high" and not r["escaped"] for r in rows), high)}
+    off = [f"{k} {got} against the population line's {want}" for k, (got, want) in counts.items() if got != want]
+    if off:
+        raise Refusal("known set: " + "; ".join(off))
+    return {"rows": rows, "reviewed": reviewed, "escaped": escaped, "high": high}
+
+
+def read_matched_list(text):
+    """An adjudicated matched list: `(adjudicator, [(candidate id, tag), ...])` in file order.
+
+    Refused: no `**Adjudicator:**` line, no `| candidate | tag |` table, and a row other than one
+    candidate id and one tag.
+    """
+    m = ADJUDICATOR.search(text)
+    if not m:
+        raise Refusal("matched list: no `**Adjudicator:** <who>` line")
+    table = read_table(text, ("candidate", "tag"))
+    if table is None:
+        raise Refusal("matched list: no `| candidate | tag |` table")
+    bad = next((c for c in table if len(c) != 2 or not all(c)), None)
+    if bad is not None:
+        raise Refusal(f"matched list: row {bad!r} is not one candidate id and one tag")
+    return m.group(1), [(c[0], c[1]) for c in table]
+
+
+def measure_known_set(known, cand_text, pairs=None):
+    """A known set against a candidate report: `{address}`, and with adjudicated `pairs` also `{matched, figures}`.
+
+    `address` is each `(row, candidate)` whose confirmed ref `extract_tag_ref` keys at the row's record
+    and tag: the adjudicator's candidates, never a score. A pair counts only when its candidate is a
+    confirmed appendix row whose ref cites the row's `[tag]` anywhere at the row's record, else the
+    pair is refused by name; a tag counts once however many pairs name it. `figures` is
+    `(name, k, n)` for reviewed, escaped and high-among-reviewed.
+    """
+    rows, err = parse_appendix_rows(cand_text)
+    if err:
+        raise Refusal(f"candidate: {err}")
+    keys = [(c, extract_tag_ref(c.get("ref"))) for c in rows]
+    address = [(r, c) for r in known["rows"] for c, k in keys
+               if k is not None and check_same_file(k[0], r["path"]) and k[1] == r["line"]]
+    if pairs is None:
+        return {"address": address}
+    by_tag, by_id = {r["tag"]: r for r in known["rows"]}, {c.get("id"): c for c in rows}
+    matched = {}
+    for cid, tag in pairs:
+        row, cand = by_tag.get(tag), by_id.get(cid)
+        if row is None:
+            raise Refusal(f"pair {cid} {tag}: {tag} is no row of the known set")
+        if cand is None:
+            raise Refusal(f"pair {cid} {tag}: {cid} is no confirmed appendix row of the candidate")
+        parts = derive_ref_parts(cand.get("ref"))
+        if not parts or not check_same_file(parts[0], row["path"]) or row["line"] not in TAG_REF.findall(parts[1]):
+            raise Refusal(f"pair {cid} {tag}: the candidate's ref {cand.get('ref')!r} cites no {row['line']} of {row['path']}")
+        matched.setdefault(tag, []).append(cid)
+    hit = [r for r in known["rows"] if r["tag"] in matched]
+    return {"address": address, "matched": matched, "figures": [
+        ("reviewed", sum(not r["escaped"] for r in hit), known["reviewed"]),
+        ("escaped", sum(r["escaped"] for r in hit), known["escaped"]),
+        ("high", sum(r["grade"] == "high" and not r["escaped"] for r in hit), known["high"])]}
+
+
+def measure_design_recall(records, plants, seed, key_sha):
+    """A whole-design walk's recall on a seeded key (TOOL-dFairHearing-18 S7): `(lines, ok)`, or Refusal.
+
+    `records` is `[(src, text)]`, one review record per run; `plants` the known-set rows `parse_known_set`
+    reads off the key; `key_sha` the SHA-256 over the key's bytes, which every record's `walk-seed` pins.
+    Each run's confirmed appendix rows are candidates through `parse_candidates`, scored by `measure_recall`
+    at window 0, so a plant counts once per run. `ok` is false when a run finds under two thirds of the
+    plants or, with two runs or more, the union under five sixths: the audit's bar of eight of twelve a run
+    and ten of twelve together, as fractions so a key of another size grades alike (spec section 8 F5).
+    """
+    if seed not in DESIGN_SEEDS[:2]:
+        raise Refusal(f"--seed {seed!r}: recall is graded under {' or '.join(DESIGN_SEEDS[:2])} alone")
+    escaped = seed == "reverted-escapes"
+    off = next((p for p in plants if p["escaped"] != escaped), None)
+    if off is not None:
+        raise Refusal(f"plant {off['tag']}: escaped {'yes' if off['escaped'] else 'no'}, and every plant under --seed {seed} "
+                      f"reads escaped {'yes' if escaped else 'no'}")
+    if not plants:
+        raise Refusal("the key holds no plant, so no recall can be graded")
+    runs, total = {}, None
+    for src, text in records:
+        head, pin = WALK_HEADING.search(text), WALK_SEED.search(text)
+        if not head or not pin:
+            raise Refusal(f"record {src}: no `## Walk table — run <r> of <runs>` heading or no `walk-seed` line")
+        r, n = int(head.group(1)), int(head.group(2))
+        if total is not None and n != total:
+            raise Refusal(f"record {src}: run {r} of {n}, where an earlier record reads of {total}: the records disagree on runs")
+        total = n
+        if pin.group(1) != seed:
+            raise Refusal(f"record {src}: walk-seed mode={pin.group(1)}, not --seed {seed}")
+        if pin.group(2) != key_sha:
+            raise Refusal(f"record {src}: walk-seed pins key-sha256={pin.group(2)}, and the key's SHA-256 over its bytes is "
+                          f"{key_sha}: the key moved since the walk")
+        if not 1 <= r <= n:
+            raise Refusal(f"record {src}: run {r} of {n} is outside 1 to {n}")
+        if r in runs:
+            raise Refusal(f"run {r} is repeated: {runs[r][0]} and {src}")
+        cands, err = parse_candidates(text, "spec-audit")
+        if err:
+            raise Refusal(f"record {src}: {err}")
+        loose = next((c for c in cands if not c["path"]), None)
+        if loose is not None:
+            raise Refusal(f"record {src}: unscorable — the confirmed ref {loose['ref']!r} names no file and key")
+        runs[r] = (src, cands)
+    if total is None:
+        raise Refusal("no record: hand one review record per run")
+    missing = [r for r in range(1, total + 1) if r not in runs]
+    if missing:
+        raise Refusal(f"run(s) {', '.join(map(str, missing))} of {total} missing: hand one record per run")
+    n, ok, union = len(plants), True, set()
+    lines = [f"design-recall · seed {seed} · key-sha256 {key_sha} · {n} plant(s) · {total} run(s)"]
+
+    def render_row(name, hit, bar):
+        missed = [p["tag"] for p in plants if p["tag"] not in hit]
+        return f"{name}: {len(hit)} of {n} · missed {', '.join(missed) or 'none'} · bar {bar}"
+    for r in sorted(runs):
+        hit = {it["tag"] for it, _ in measure_recall(plants, runs[r][1], 0)["matched"]}
+        union |= hit
+        under = len(hit) * 3 < 2 * n
+        ok = ok and not under
+        lines.append(render_row(f"run {r}", hit, "2/3 " + ("UNDER" if under else "met")))
+    under = total >= 2 and len(union) * 6 < 5 * n
+    lines.append(render_row("union", union, ("5/6 " + ("UNDER" if under else "met")) if total >= 2 else "not applied to one run"))
+    return lines, ok and not under
+
+
+# ---- the scouted-seam instance: aScoutedSeam's grader, ported from blob a0389611 at b0fe68f30.
+
+def derive_path_key(p):
+    return (p or "").replace(chr(92), "/").strip().lstrip("./").lower()
+
+
+def extract_code_tokens(symbol):
+    return [t.lower() for t in CODE_TOKEN.findall(symbol or "")
+            if len(t) >= 3 and (re.search(r"[A-Z_-]", t) or (symbol or "").strip() == t)]
+
+
+def check_path_match(a, b):
+    a, b = derive_path_key(a), derive_path_key(b)
+    return bool(a and b) and (a.endswith(b) or b.endswith(a))
+
+
+def check_hit(gt, seam):
+    if not check_path_match(gt["path"], seam.get("path")):
+        return False
+    toks = extract_code_tokens(gt.get("symbol"))
+    lead = CODE_TOKEN.match((gt.get("symbol") or "").strip())
+    if not toks or not lead or lead.group(0).lower() not in toks:
+        return True
+    text = ((seam.get("symbol") or "") + " " + (seam.get("how") or "")).lower()
+    return any(t in text for t in toks)
+
+
+def check_case(case, res, k=None):
+    """One case's verdict: items hit, the primary's rank and binding, SOLVED, and decoy MUSTs.
+
+    A decoy matches on its path AND its symbol, because one file can hold the right seam and the
+    wrong one: `resolveEntryImage` and `imageField` share a file in adopter ic (grader blob a0389611).
+    """
+    seams = (res or {}).get("seams") or []
+    rows = []
+    for g in case.get("ground_truth") or []:
+        best = next(((s.get("rank", si + 1), s.get("binding")) for si, s in enumerate(seams)
+                     if check_hit(g, s)), None)
+        rows.append({"rank": best[0] if best else None, "binding": best[1] if best else None})
+    decoys = case.get("decoys") or []
+    false_must = [s for s in seams if s.get("binding") == "MUST" and any(check_hit(d, s) for d in decoys)]
+    solved = (bool(rows) and rows[0]["rank"] is not None and rows[0]["binding"] in ("MUST", "SHOULD")
+              and (k is None or rows[0]["rank"] <= k))
+    return {"id": case["id"], "point": case.get("point"), "n_gt": len(rows),
+            "hit": sum(1 for r in rows if r["rank"] is not None), "solved": solved,
+            "primary_rank": rows[0]["rank"] if rows else None, "n_seams": len(seams),
+            "n_must": sum(1 for s in seams if s.get("binding") == "MUST"), "false_must": len(false_must)}
+
+
+def read_case_list(src, repo="."):
+    """A cases file through `read_raw_output`: a non-empty JSON list of cases, each carrying an `id`."""
+    try:
+        cases = json.loads(read_raw_output(src, repo))
+    except ValueError as exc:
+        raise Refusal(f"source {src}: not JSON ({exc})") from None
+    if not isinstance(cases, list) or not cases or not all(isinstance(c, dict) and "id" in c for c in cases):
+        raise Refusal(f"source {src}: not a non-empty list of cases each carrying an `id`")
+    return cases
+
+
+def read_scouted_population(cases_src, results_src, repo="."):
+    """`(corpus, results)` from the cases file and the results file, each through `read_raw_output`."""
+    corpus = read_case_list(cases_src, repo)
+    try:
+        results = json.loads(read_raw_output(results_src, repo))
+    except ValueError as exc:
+        raise Refusal(f"source {results_src}: not JSON ({exc})") from None
+    if not isinstance(results, dict):
+        raise Refusal(f"source {results_src}: not an object of arms")
+    return corpus, results
+
+
+def read_arm_rows(results, arm):
+    """One arm's rows by case id; refused when the results carry no such arm."""
+    rows = results.get(arm)
+    if arm == "judge" or not isinstance(rows, dict):
+        raise Refusal(f"no arm {arm!r} in the results")
+    return rows
+
+
+def read_seam_row(arm, cid, row):
+    """A result row, refused naming the arm and the case when it carries no `seams` list."""
+    if not isinstance(row, dict) or not isinstance(row.get("seams"), list):
+        raise Refusal(f"arm {arm} case {cid}: the result row carries no `seams` list")
+    return row
+
+
+def read_judge_cell(arm, cid, cell):
+    """A judged cell, refused naming the arm and the case when it lacks `primary` or `covered`."""
+    if not isinstance(cell, dict) or "primary" not in cell or "covered" not in cell:
+        raise Refusal(f"judged arm {arm} case {cid}: the cell carries no `primary` and `covered`")
+    return cell
+
+
+def measure_scouted_grade(corpus, results, arm, k=None):
+    """`grade`: per-case rows and the arm's total, over the cases it answered."""
+    ids = [c["id"] for c in corpus]
+    by_id = {c["id"]: c for c in corpus}
+    rows = read_arm_rows(results, arm)
+    paired, unanswered = derive_paired_cases(ids, {arm: list(rows)})
+    graded = [check_case(by_id[cid], read_seam_row(arm, cid, rows[cid]), k) for cid in paired]
+    lines = [f"{g['id']:<34} {g['point']:<9} gt {g['hit']}/{g['n_gt']} solved={str(g['solved'])[0]} "
+             f"prim={g['primary_rank']} seams={g['n_seams']} must={g['n_must']} decoyMUST={g['false_must']}" for g in graded]
+    pos = [g for g in graded if g["n_gt"]]
+    lines.append(f"{render_population(paired, len(ids), unanswered, arm)} · positives {len(pos)} solved "
+                 f"{sum(g['solved'] for g in pos)} · items {sum(g['hit'] for g in pos)}/{sum(g['n_gt'] for g in pos)} · "
+                 f"controls {len(graded) - len(pos)} decoy MUSTs {sum(g['false_must'] for g in graded)} · "
+                 f"graded {len(graded)} of {len(corpus)}")
+    return lines
+
+
+def measure_scouted_compare(corpus, results, arms):
+    """`compare`: the arms side by side over the cases every one of them answered."""
+    ids = [c["id"] for c in corpus]
+    by_id = {c["id"]: c for c in corpus}
+    arm_rows = {a: read_arm_rows(results, a) for a in arms}
+    paired, unanswered = derive_paired_cases(ids, {a: list(rows) for a, rows in arm_rows.items()})
+    tot = {a: [0, 0, 0, 0, 0, 0] for a in arm_rows}
+    lines = []
+    for cid in paired:
+        cells = []
+        for a, rows in arm_rows.items():
+            g = check_case(by_id[cid], read_seam_row(a, cid, rows[cid]))
+            for i, v in enumerate((g["solved"], g["hit"], g["n_gt"], g["n_seams"], g["n_must"], g["false_must"])):
+                tot[a][i] += v
+            prim = "-" if g["primary_rank"] is None else g["primary_rank"]
+            cells.append(f"{prim:>3} {g['hit']}/{g['n_gt']} m{g['n_must']}")
+        lines.append(f"{cid:<34}" + "".join(f"{x:>16}" for x in cells))
+    pos = sum(1 for cid in paired if by_id[cid].get("ground_truth"))
+    lines.append(f"common {len(paired)} ({pos} positive)")
+    for a, t in tot.items():
+        lines.append(f"{render_population(paired, len(ids), unanswered, a)} · solved {t[0]}/{pos} · items {t[1]}/{t[2]} · "
+                     f"seams {t[3]} · MUST {t[4]} · decoy MUST {t[5]}")
+    return lines
+
+
+def measure_scouted_judged(corpus, results, arms):
+    """`judged`: the judge's semantic reading over the cases it read for every arm; `a+b` is a union."""
+    ids = [c["id"] for c in corpus]
+    by_id = {c["id"]: c for c in corpus}
+    judge = results.get("judge")
+    if not isinstance(judge, dict):
+        raise Refusal("the results carry no `judge` verdicts")
+    answers = {}
+    for a in arms:
+        parts = a.split("+")
+        absent = [p for p in parts if not isinstance(judge.get(p), dict)]
+        if absent:
+            raise Refusal(f"no judged arm {', '.join(absent)} in the results")
+        # A union answers a case when every part was judged on it: a pairing, so it goes through the one pairer.
+        answers[a] = derive_paired_cases(ids, {p: list(judge[p]) for p in parts})[0]
+    paired, unanswered = derive_paired_cases(ids, answers)
+
+    def derive_judged_cell(arm, cid):
+        vs = [read_judge_cell(p, cid, judge[p][cid]) for p in arm.split("+")]
+        return {"primary": any(v.get("primary") for v in vs),
+                "covered": set().union(*[set(v.get("covered") or []) for v in vs]),
+                "wrong": sum(len(v.get("wrong") or []) for v in vs),
+                "extra": sum(v.get("valid_extra") or 0 for v in vs),
+                "score": max(v.get("score") or 0 for v in vs)}
+
+    pos = [cid for cid in paired if by_id[cid].get("ground_truth")]
+    lines = [f"judged common {len(paired)} ({len(pos)} positive)"]
+    for a in arms:
+        cs = [derive_judged_cell(a, cid) for cid in pos]
+        ctl = [derive_judged_cell(a, cid) for cid in paired if not by_id[cid].get("ground_truth")]
+        mean = f"{statistics.mean(x['score'] for x in cs):.2f}" if cs else "-"
+        lines.append(f"{render_population(paired, len(ids), unanswered, a)} · primary {sum(x['primary'] for x in cs)}/{len(pos)} · "
+                     f"items {sum(len(x['covered']) for x in cs)}/{sum(len(by_id[cid]['ground_truth']) for cid in pos)} · "
+                     f"wrong MUST {sum(x['wrong'] for x in cs + ctl)} · valid extra {sum(x['extra'] for x in cs)} · "
+                     f"mean score {mean}")
+    return lines
+
+
+# ---- the experiment shape (TOOL-dFairHearing-14): the method's rules, enforced where committed outputs show them.
+ARM_KEYS = {"name", "base", "settings", "dispatched"}
+#: The union's sets, as the manifest spells them and as the figure line prints them.
+UNION_SETS = {"tuning": "tuning", "heldOut": "held-out"}
+
+
+def derive_scouted_evidence(case):
+    """A scouted-seam case's objective evidence: its `sha`, then each ground-truth item's `path` and `why`; empty when any is missing."""
+    items = case.get("ground_truth") or []
+    if not case.get("sha") or not isinstance(items, list):
+        return []
+    if not all(isinstance(g, dict) and g.get("path") and g.get("why") for g in items):
+        return []
+    return [str(case["sha"])] + [f"{g['path']}: {g['why']}" for g in items]
+
+
+def derive_replay_evidence(case):
+    """A review-replay case's evidence, read in unit 23 S4's terms (TOOL-dFairHearing-32 S11); empty when it has none.
+
+    A RUN-CASE, one review run of one subject record, carries `subject`: its report's `Reviewed:` pins as
+    `<path>@<blob>`, else a diff review's `<base>..<head>` range, and that list is its evidence. A KNOWN-SET
+    row, the half of the case it is scored against, is its address and the record it came from (spec 1
+    S2). `measure_replay_experiment` asks this hook of every known row, then of every run-case.
+    """
+    if "subject" in case:
+        return list(case["subject"])
+    return [f"{case['path']}:{case['line']}", case["record"]] if case.get("path") and case.get("record") else []
+
+
+def check_case_evidence(instance, cases):
+    """Refused naming the first case whose instance's `case_evidence` hook returns nothing."""
+    hook = INSTANCES[instance]["case_evidence"]
+    bare = next((c["id"] for c in cases if not hook(c)), None)
+    if bare is not None:
+        raise Refusal(f"case {bare}: `case_evidence` returns nothing for it under {instance}, so it carries no objective evidence to grade")
+
+
+def check_held_out_frozen(path, tuning_ids, repo="."):
+    """`(line, cases)`: the freeze line and the held-out cases.
+
+    The path is normalised once, to its repo-relative POSIX form through `git ls-files --full-name`, before
+    any `<rev>:<path>` read, and any git call exiting non-zero refuses naming the call and its stderr, its
+    stdout never compared (TOOL-dFairHearing-27 S7).
+    Refused: a path opening `-` or outside the repository; one whose literal `git ls-files` lists other than
+    exactly its own path, which a directory, a glob and an untracked path all do (TOOL-dFairHearing-32 S31);
+    one not a working-tree file; a shallow history,
+    whose boundary commit lists every file; a history of other than exactly one commit, read by ONE
+    `git log --format=%H` with argv; working-tree bytes whose `git hash-object` (the checkout's filters
+    applied, so a CRLF checkout of an LF blob agrees) differ from the freeze's blob; and an id that is
+    also a tuning case's. "Never read to change a prompt" is printed as recorded: no committed output shows it.
+    """
+    if not path or not isinstance(path, str) or path.startswith("-"):
+        raise Refusal(f"heldOut {path!r}: a path opening `-` or empty is refused")
+    try:
+        top = subprocess.run(["git", "-C", str(repo), "rev-parse", "--show-toplevel"], capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
+    except OSError as exc:
+        raise Refusal(f"heldOut {path}: git could not run ({exc})") from None
+    if top.returncode:
+        raise Refusal(f"heldOut {path}: {repo} is not a git checkout, so no freeze can be read")
+    root = pathlib.Path(top.stdout.strip()).resolve()
+    try:
+        rel = pathlib.Path(path).resolve().relative_to(root).as_posix()
+    except ValueError:
+        raise Refusal(f"heldOut {path}: outside the repository {root.as_posix()}") from None
+
+    def read_git(*argv):
+        """One git call's stdout; a non-zero exit refuses naming the call and its stderr, its stdout never read."""
+        proc = subprocess.run(["git", "-C", str(root), *argv], capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
+        if proc.returncode:
+            raise Refusal(f"heldOut {path}: `git {' '.join(argv)}` exited {proc.returncode}: {proc.stderr.strip() or 'no stderr'}")
+        return proc.stdout.strip()
+
+    # TOOL-dFairHearing-27 S7: the path is normalised ONCE, through git, before any `<rev>:<path>` read, so a
+    # backslashed or an absolute spelling reads the same blob as the repo-relative POSIX one.
+    # TOOL-dFairHearing-32 S31: exactly ONE line, and it is the path's own: a directory lists every file under
+    # it and a glob what it matches, so a first line taken would check a file other than the one named.
+    # `--literal-pathspecs` is git's own option, so it stands before the verb, where git reads it.
+    listed = read_git("--literal-pathspecs", "ls-files", "--full-name", "--", str(pathlib.Path(path).resolve())).splitlines()
+    if listed != [rel]:
+        raise Refusal(f"heldOut {path}: `git ls-files` lists {len(listed)} line(s) for it, not the one line {rel}, "
+                      "so it names no single tracked file to read a freeze from")
+    if not pathlib.Path(path).is_file():
+        raise Refusal(f"heldOut {path}: not a working-tree file")
+    shallow = read_git("rev-parse", "--is-shallow-repository")
+    if shallow != "false":
+        raise Refusal(f"heldOut {rel}: `git rev-parse --is-shallow-repository` printed {shallow!r}, not 'false': "
+                      "a shallow history cannot show a freeze, since its boundary commit lists every file")
+    shas = read_git("log", "--format=%H", "--", rel).split()
+    if not shas:
+        raise Refusal(f"heldOut {rel}: no commit in its history, so it was never frozen")
+    if len(shas) > 1:
+        raise Refusal(f"heldOut {rel}: {len(shas)} commits, frozen at {shas[-1]} and changed after it at {', '.join(reversed(shas[:-1]))}")
+    work, blob = read_git("hash-object", "--", rel), read_git("rev-parse", f"{shas[0]}:{rel}")
+    if not work or work != blob:
+        raise Refusal(f"heldOut {rel}: the working tree hashes to {work or 'nothing'}, not the freeze's blob {blob or 'nothing'} at {shas[0]}")
+    cases = read_case_list(path, repo)
+    tuning = set(tuning_ids)
+    shared = [c["id"] for c in cases if c["id"] in tuning]
+    if shared:
+        raise Refusal(f"heldOut {rel}: case id(s) {', '.join(map(str, shared))} are tuning cases too")
+    return f"held-out: frozen at {shas[0]} · {len(cases)} case(s) · never read to change a prompt — recorded, not checked", cases
+
+
+def check_one_variable(arms):
+    """One line per arm: `base`, or the ONE settings key it varies from its base, compared as JSON values.
+    Every `base` is a declared arm here: `check_experiment` refused a dangling one and a cycle first."""
+    by_name = {a["name"]: a for a in arms}
+    lines = []
+    for a in arms:
+        base = a.get("base")
+        if base is None:
+            lines.append(f"arm {a['name']}: base")
+            continue
+        mine, theirs = a["settings"], by_name[base]["settings"]
+        varied = [k for k in sorted(set(mine) | set(theirs)) if k not in mine or k not in theirs
+                  or json.dumps(mine[k], sort_keys=True) != json.dumps(theirs[k], sort_keys=True)]
+        if not varied:
+            raise Refusal(f"arm {a['name']}: its settings equal its base {base}'s, so it varies no variable")
+        if len(varied) > 1:
+            raise Refusal(f"arm {a['name']}: varies {', '.join(varied)} from {base}; one variable per arm")
+        lines.append(f"arm {a['name']}: varies {varied[0]} from {base}")
+    return lines
+
+
+def measure_parsed(arms, parsed):
+    """One `parsed <arm>: <n> of <dispatched>` line per arm; refused when `dispatched` is undeclared or below `n`."""
+    lines = []
+    for a in arms:
+        sent = a.get("dispatched")
+        if isinstance(sent, bool) or not isinstance(sent, int) or sent < 0:
+            raise Refusal(f"arm {a['name']}: `dispatched` is {sent!r}, not a count, so its parsed replies have nothing to be counted against")
+        n = len(parsed[a["name"]])
+        if n > sent:
+            raise Refusal(f"arm {a['name']}: {n} parsed against {sent} dispatched")
+        lines.append(f"parsed {a['name']}: {n} of {sent}")
+    return lines
+
+
+def check_judge_rotation(judge, repo="."):
+    """The judge line. A committed key `{<case>: {<label>: <arm>}}` gives each judged arm one label per case,
+    and with two or more arms over two or more cases no arm holds one label on every case. No key:
+    recorded, not checked."""
+    src = (judge or {}).get("key")
+    if src is None:
+        return "labels rotated — recorded, not checked: no committed key"
+    try:
+        key = json.loads(read_raw_output(src, repo))
+    except ValueError as exc:
+        raise Refusal(f"judge key {src}: not JSON ({exc})") from None
+    if not isinstance(key, dict) or not key or not all(
+            isinstance(v, dict) and v and all(isinstance(arm, str) for arm in v.values()) for v in key.values()):
+        raise Refusal(f"judge key {src}: not a non-empty object of {{<case>: {{<label>: <arm>}}}}")
+    arms = list(dict.fromkeys(arm for labels in key.values() for arm in labels.values()))
+    for case, labels in key.items():
+        held = list(labels.values())
+        unlabelled = [a for a in arms if a not in held]
+        doubled = [a for a in arms if held.count(a) > 1]
+        if unlabelled or doubled:
+            raise Refusal(f"judge key case {case}: arm(s) {', '.join(unlabelled + doubled)} hold "
+                          f"{'no label' if unlabelled else 'more than one label'}; each judged arm takes one")
+    if len(arms) < 2 or len(key) < 2:
+        return f"labels rotated — recorded, not checked: {len(arms)} arm(s) over {len(key)} case(s) leave nothing to rotate"
+    for arm in arms:
+        worn = {next(label for label, a in labels.items() if a == arm) for labels in key.values()}
+        if len(worn) == 1:
+            raise Refusal(f"judge key {src}: arm {arm} holds label {worn.pop()} on every one of {len(key)} case(s), so its label is not rotated")
+    return f"labels rotated — checked: {len(arms)} arm(s) over {len(key)} case(s) in {src}"
+
+
+def measure_union(sets, verdicts):
+    """aScoutedSeam's system reading per set, then pooled: a positive case one of the set's arms was judged on
+    is covered when any of them covered its primary; a case none was judged on is outside the population."""
+    lines, hit, total = [], 0, 0
+    for name, cases, arms in sets:
+        cells = {a: verdicts[a] for a in arms}
+        ids = [c["id"] for c in cases if c.get("ground_truth") and any(cells[a].get(c["id"]) for a in arms)]
+        covered = sum(1 for cid in ids if any(read_judge_cell(a, cid, cells[a][cid]).get("primary")
+                                              for a in arms if cells[a].get(cid)))
+        lines.append(f"system {name} {covered}/{len(ids)} · {' + '.join(arms)}")
+        hit, total = hit + covered, total + len(ids)
+    if len(sets) > 1:
+        lines.append(f"system pooled {hit}/{total} · {' + '.join(name for name, _, _ in sets)}")
+    return lines
+
+
+def measure_scouted_experiment(manifest, arms, repo="."):
+    """The scouted-seam experiment's lines: the four rule lines, then the paired figures and the union."""
+    corpus, results = read_scouted_population(manifest["cases"], manifest["results"], repo)
+    sets, head = [("tuning", corpus)], []
+    if "heldOut" in manifest:
+        line, held = check_held_out_frozen(manifest["heldOut"], [c["id"] for c in corpus], repo)
+        head.append(line)
+        sets.append(("held-out", held))
+    for _, cases in sets:
+        check_case_evidence("scouted-seam", cases)
+    head += check_one_variable(arms)
+    population = [c["id"] for _, cases in sets for c in cases]
+    parsed = {}
+    for a in arms:
+        rows = results.get(a["name"]) if a["name"] != "judge" else None
+        rows = rows if isinstance(rows, dict) else {}
+        parsed[a["name"]] = {cid: rows[cid] for cid in population
+                             if isinstance(rows.get(cid), dict) and isinstance(rows[cid].get("seams"), list)}
+    head += measure_parsed(arms, parsed)
+    judge = manifest.get("judge")
+    if judge is not None and (not isinstance(judge, dict) or set(judge) - {"verdicts", "key"} or not isinstance(judge.get("verdicts"), str)):
+        raise Refusal(f"judge {judge!r}: not an object naming `verdicts` and optionally `key`")
+    head.append(check_judge_rotation(judge, repo))
+    figures = []
+    # Figures pair the PARSED rows only, so an unparsed reply is counted above and never scored here.
+    for name, cases in sets:
+        ids = {c["id"] for c in cases}
+        answered = {a: {cid: row for cid, row in rows.items() if cid in ids} for a, rows in parsed.items()}
+        answered = {a: rows for a, rows in answered.items() if rows}
+        if answered:
+            figures.append(f"figures {name}")
+            figures += measure_scouted_compare(cases, answered, list(answered))
+    union = manifest.get("union")
+    if union is not None:
+        want = [k for k in UNION_SETS if k == "tuning" or "heldOut" in manifest]
+        if (not isinstance(union, dict) or sorted(union) != sorted(want)
+                or not all(isinstance(v, list) and v and all(isinstance(a, str) for a in v) for v in union.values())):
+            raise Refusal(f"union {union!r}: not an object naming a non-empty arm list for each of {', '.join(want)}")
+        if judge is None:
+            raise Refusal("union: declared with no `judge.verdicts` to read coverage from")
+        verdicts = results.get(judge["verdicts"])
+        if not isinstance(verdicts, dict):
+            raise Refusal(f"judge.verdicts {judge['verdicts']!r}: no such verdicts object in the results")
+        absent = [a for v in union.values() for a in v if not isinstance(verdicts.get(a), dict)]
+        if absent:
+            raise Refusal(f"union: no judged arm {', '.join(absent)} in {judge['verdicts']}")
+        figures += measure_union([(UNION_SETS[k], cases, union[k]) for k, (_, cases) in zip(want, sets)], verdicts)
+    return head + figures
+
+
+#: A review-replay `candidates` entry's keys (TOOL-dFairHearing-23 S4); `arm` may be left out by a one-arm manifest.
+CANDIDATE_KEYS = {"case", "report", "matched", "arm"}
+
+
+def read_replay_cases(candidates, arms):
+    """`{<arm>: [entry, ...]}` from a review-replay `candidates` list, each entry one review run of one subject record.
+
+    Refused: not a list; an entry not an object, with a key outside CANDIDATE_KEYS, an empty `case` or
+    `report`, or a `matched` neither a source nor null; and an entry naming no declared arm, which an
+    entry may leave out only when the manifest declares one arm.
+    """
+    if not isinstance(candidates, list):
+        raise Refusal(f"candidates {candidates!r}: not a list of {{case, report, matched}}, one per review run")
+    names = [a["name"] for a in arms]
+    runs = {n: [] for n in names}
+    for i, c in enumerate(candidates):
+        if not isinstance(c, dict) or set(c) - CANDIDATE_KEYS:
+            raise Refusal(f"candidates[{i}]: not an object of {', '.join(sorted(CANDIDATE_KEYS))}"
+                          + (f"; unknown key(s) {', '.join(sorted(set(c) - CANDIDATE_KEYS))}" if isinstance(c, dict) else ""))
+        if not all(isinstance(c.get(k), str) and c[k] for k in ("case", "report")) or "matched" not in c \
+                or not (c["matched"] is None or (isinstance(c["matched"], str) and c["matched"])):
+            raise Refusal(f"candidates[{i}]: `case` and `report` are non-empty sources and `matched` a source or null, "
+                          f"not {json.dumps({k: c.get(k) for k in ('case', 'report', 'matched')})}")
+        arm = c.get("arm", names[0] if len(names) == 1 else None)
+        if arm not in runs:
+            raise Refusal(f"candidates[{i}] (case {c['case']}): arm {arm!r} is not a declared arm"
+                          + ("" if "arm" in c else "; with more than one arm declared each entry names its `arm`"))
+        runs[arm].append(c)
+    return runs
+
+
+def measure_replay_experiment(manifest, arms, repo="."):
+    """The review-replay experiment's lines (TOOL-dFairHearing-23 S4). A case is one review run of one subject
+    record; `dispatched` counts an arm's dispatched runs, and `parsed` the runs whose report holds an appendix
+    with at least one row `parse_candidates` reads. A parsed run with a `matched` list is scored against a
+    known set; against a review record, by `measure_replay`. An agent death is read from the report's
+    RUN INTEGRITY and skeptic counts, never from here."""
+    runs = read_replay_cases(manifest["candidates"], arms)
+    known_text = read_raw_output(manifest["known"], repo)
+    known_set = parse_known_set(known_text) if POPULATION.search(known_text) else None
+    if known_set is not None:
+        check_case_evidence("review-replay", known_set["rows"])
+    else:
+        mode = read_record_kind(known_text) or "diff-review"
+        known, err = parse_record_findings(known_text, mode)
+        if err:
+            raise Refusal(f"known {manifest['known']}: {err}")
+        check_case_evidence("review-replay", [{**it, "record": manifest["known"]} for it in known["items"] if it["path"]])
+    # TOOL-dFairHearing-32 S11: each run-case's subject, pinned in its own report, before any run is scored.
+    reports = {a["name"]: [(c, read_raw_output(c["report"], repo)) for c in runs[a["name"]]] for a in arms}
+    run_cases = []
+    for pairs in reports.values():
+        for c, text in pairs:
+            rng = extract_range(text)
+            run_cases.append({"id": c["case"], "subject": [f"{p}@{b}" for p, b in extract_subject_pins(text)]
+                              or ([f"{rng[0]}..{rng[1]}"] if rng else [])})
+    check_case_evidence("review-replay", run_cases)
+    head = check_one_variable(arms)
+    parsed, figures = {}, []
+    for a in arms:
+        parsed[a["name"]] = []
+        for c, text in reports[a["name"]]:
+            cands, err = parse_candidates(text, read_record_kind(text) or "diff-review")
+            if err or not cands:
+                continue
+            parsed[a["name"]].append(c)
+            if known_set is not None and c["matched"] is not None:
+                score = measure_known_set(known_set, text, read_matched_list(read_raw_output(c["matched"], repo))[1])
+                figures.append(f"known-set {a['name']} {c['case']}: " + " · ".join(f"{n} {k}/{t}" for n, k, t in score["figures"]))
+            elif known_set is None:
+                replay, refusal = measure_replay(known_text, text, 10)
+                if refusal:
+                    raise Refusal(f"candidates case {c['case']}: {refusal[0]} {refusal[1]}")
+                s = replay["score"]
+                figures.append(f"recall {a['name']} {c['case']}: {len(s['matched'])} of {s['scorable']} scorable · "
+                               f"unscorable {len(s['unscorable'])} · candidate-only {len(s['candidate_only'])}")
+    head += measure_parsed(arms, parsed)
+    head.append(check_judge_rotation(None))
+    return head + figures
+
+
+def check_experiment(manifest, repo="."):
+    """An experiment's lines, every rule before the first figure; a broken rule is a Refusal naming the rule, the arm or case, and the value."""
+    why = check_instances()
+    if why:
+        raise Refusal(why)
+    if not isinstance(manifest, dict):
+        raise Refusal("manifest: not a JSON object")
+    instance = manifest.get("instance")
+    if instance not in INSTANCES:
+        raise Refusal(f"manifest instance {instance!r}: not one of {', '.join(INSTANCES)}")
+    required, optional = INSTANCES[instance]["manifest"]
+    unknown, missing = sorted(set(manifest) - required - optional), sorted(required - set(manifest))
+    if unknown or missing:
+        raise Refusal(f"manifest: {'unknown key(s) ' + ', '.join(unknown) if unknown else ''}"
+                      f"{'; ' if unknown and missing else ''}{'missing key(s) ' + ', '.join(missing) if missing else ''}")
+    arms = manifest["arms"]
+    if not isinstance(arms, list) or not arms:
+        raise Refusal("manifest arms: no arm declared")
+    seen = set()
+    for a in arms:
+        if not isinstance(a, dict) or not isinstance(a.get("name"), str) or not a["name"]:
+            raise Refusal(f"arm {a!r}: not an object with a `name`")
+        if set(a) - ARM_KEYS:
+            raise Refusal(f"arm {a['name']}: unknown key(s) {', '.join(sorted(set(a) - ARM_KEYS))}")
+        if not isinstance(a.get("settings"), dict):
+            raise Refusal(f"arm {a['name']}: no `settings` object, so the variable it varies is undeclared")
+        if a["name"] in seen:
+            raise Refusal(f"arm {a['name']}: declared twice")
+        seen.add(a["name"])
+    # TOOL-dFairHearing-32 S12: the manifest's references. Every `base` names another declared arm and the
+    # base graph has no cycle; every `union` member is a declared arm. The union's shape is its reader's.
+    bases = {a["name"]: a.get("base") for a in arms}
+    for name, base in bases.items():
+        if base is not None and (not isinstance(base, str) or base not in seen or base == name):
+            raise Refusal(f"arm {name}: base {base!r} is not another declared arm")
+    for name in bases:
+        chain = [name]
+        while bases[chain[-1]] is not None:
+            if bases[chain[-1]] in chain:
+                raise Refusal(f"arm {name}: its base chain {' -> '.join(chain + [bases[chain[-1]]])} is a cycle, so no arm is its root")
+            chain.append(bases[chain[-1]])
+    union = manifest.get("union")
+    stray = [m for v in (union.values() if isinstance(union, dict) else ()) if isinstance(v, list)
+             for m in v if isinstance(m, str) and m not in seen]
+    if stray:
+        raise Refusal(f"union: arm(s) {', '.join(stray)} named but not declared, so they add no coverage")
+    return INSTANCES[instance]["experiment"](manifest, arms, repo)
+
+
+#: Each instance: its readers, its measures, its `case_evidence` hook, and its experiment manifest's
+#: keys, required then optional; any other key is refused, so a misspelt rule is never skipped.
+INSTANCES = {
+    "review-replay": {"readers": (read_raw_output, parse_record_findings, parse_candidates, parse_known_set, read_matched_list),
+                      "measure": measure_replay,
+                      "case_evidence": derive_replay_evidence, "experiment": measure_replay_experiment,
+                      "manifest": ({"instance", "known", "candidates", "arms"}, set())},
+    "scouted-seam": {"readers": (read_raw_output, read_scouted_population, read_seam_row, read_judge_cell),
+                     "measure": {"grade": measure_scouted_grade, "compare": measure_scouted_compare,
+                                 "judged": measure_scouted_judged},
+                     "case_evidence": derive_scouted_evidence, "experiment": measure_scouted_experiment,
+                     "manifest": ({"instance", "cases", "results", "arms"}, {"heldOut", "judge", "union"})},
+}
+
+
+def check_instances():
+    """None when the table holds every instance the factory exists for, each with its `case_evidence` hook, else a refusal naming the gap."""
+    missing = [k for k in INSTANCE_KEYS if k not in INSTANCES]
+    if missing:
+        return f"INSTANCES lacks {', '.join(missing)}: the factory needs both of {', '.join(INSTANCE_KEYS)}"
+    hookless = [k for k, v in INSTANCES.items() if not callable(v.get("case_evidence"))]
+    return f"INSTANCES entry {', '.join(hookless)} declares no `case_evidence` hook, so its cases' evidence is unread" if hookless else None
+
+
+# ---- the conformance arm: no second scorer pairs variants with cases outside this factory.
+ALL_CALL = re.compile(rb"\ball\s*\(")
+COMPREHENSIONS = (ast.ListComp, ast.SetComp, ast.GeneratorExp, ast.DictComp)
+
+
+#: The memory tree's root directory, whose record folders hold committed bench code, never a second scorer.
+MEMORY_ROOT = "memory"
+
+
+def scan_pairing_sites(root):
+    """`<path>:<line>` of each pairing comprehension in the tracked `*.py` at and below `root`, this file excepted.
+
+    A pairing comprehension filters on `all()` over a generator ranging over a second population whose
+    element is `<outer case> in <inner variant>`, or an `is not None` test naming both. A file that does
+    not parse is named too: it is unread. A path under `MEMORY_ROOT/` is excluded by rule
+    (TOOL-dFairHearing-23 S25): at a repository-root install `root` is the repository, whose record
+    folders keep benches the factory replaced. Refused, never `[]`, when the `git ls-files` read fails or
+    lists no `*.py` (TOOL-dFairHearing-27 S30): a walk over nothing names no site and proves nothing.
+    """
+    root = pathlib.Path(root)
+    try:
+        proc = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", "*.py"], capture_output=True, check=False)
+    except OSError as exc:
+        raise Refusal(f"scan_pairing_sites {root.as_posix()}: `git ls-files` could not run ({exc})") from None
+    if proc.returncode:
+        raise Refusal(f"scan_pairing_sites {root.as_posix()}: `git ls-files` exited {proc.returncode}: "
+                      f"{proc.stderr.decode('utf-8', 'replace').strip() or 'no stderr'}")
+    files = [f for f in proc.stdout.decode("utf-8").split("\0") if f]
+    if not files:
+        raise Refusal(f"scan_pairing_sites {root.as_posix()}: `git ls-files` lists no *.py, so the walk graded nothing")
+
+    def extract_names(node):
+        return {n.id for n in ast.walk(node) if isinstance(n, ast.Name)}
+
+    sites = []
+    for rel in sorted(files):
+        if pathlib.PurePosixPath(rel).name == pathlib.Path(__file__).name or rel.split("/")[0] == MEMORY_ROOT:
+            continue
+        data = (root / rel).read_bytes()
+        if not ALL_CALL.search(data):
+            continue
+        try:
+            tree = ast.parse(data)
+        except SyntaxError as exc:
+            sites.append(f"{rel}:{exc.lineno or 0} unparseable")
+            continue
+        for node in ast.walk(tree):
+            if not isinstance(node, COMPREHENSIONS):
+                continue
+            outer = set().union(*(extract_names(g.target) for g in node.generators))
+            outer_iters = {ast.dump(g.iter) for g in node.generators}
+            for cond in (c for g in node.generators for c in g.ifs):
+                for call in ast.walk(cond):
+                    if not (isinstance(call, ast.Call) and isinstance(call.func, ast.Name) and call.func.id == "all"
+                            and len(call.args) == 1 and isinstance(call.args[0], ast.GeneratorExp)):
+                        continue
+                    gen = call.args[0]
+                    if any(ast.dump(g.iter) in outer_iters for g in gen.generators):
+                        continue
+                    inner = set().union(*(extract_names(g.target) for g in gen.generators))
+                    test = gen.elt
+                    if not (isinstance(test, ast.Compare) and len(test.ops) == 1):
+                        continue
+                    left, right = extract_names(test.left), extract_names(test.comparators[0])
+                    member = isinstance(test.ops[0], ast.In) and left & outer and right & inner
+                    present = (isinstance(test.ops[0], ast.IsNot) and isinstance(test.comparators[0], ast.Constant)
+                               and test.comparators[0].value is None and left & outer and left & inner)
+                    if member or present:
+                        sites.append(f"{rel}:{node.lineno}")
+    return list(dict.fromkeys(sites))
+
+
+# ---- self-test. The proof reads aScoutedSeam's committed blobs; the rest are inline fixtures.
+PROOF_COMMIT = "b0fe68f30"
+PROOF_DIR = "memory/builds/aScoutedSeam/build"
+GRADER_BLOB = "a03896116e3c5cbf853affda241c22d8408cb945"
+PLANTED = 'def pair(cases, arms):\n    return [c for c in cases if all(c["id"] in rows for rows in arms.values())]\n'
+FIXTURE_CASES = [{"id": "a", "point": "p", "ground_truth": [{"path": "x.py", "symbol": "f"}]},
+                 {"id": "b", "point": "p", "ground_truth": []}, {"id": "c", "point": "p", "ground_truth": []}]
+FIXTURE_RESULTS = {v: {"a": {"seams": [{"path": "x.py", "symbol": "f", "binding": "MUST"}]}, "b": {"seams": []}}
+                   for v in ("v1", "v2", "v3", "v4")}
+EXPERIMENT_CASES = [{"id": "a", "point": "p", "sha": "a" * 40, "ground_truth": [{"path": "x.py", "symbol": "f", "why": "the seam"}]},
+                    {"id": "b", "point": "p", "sha": "b" * 40, "ground_truth": [{"path": "y.py", "symbol": "g", "why": "the seam"}]},
+                    {"id": "c", "point": "p", "sha": "c" * 40, "ground_truth": []}]
+EXPERIMENT_HELD = [{"id": "h", "point": "p", "sha": "d" * 40, "ground_truth": [{"path": "w.py", "symbol": "k", "why": "the seam"}]}]
+EXPERIMENT_SEAMS = {cid: {"seams": [{"path": p, "symbol": s, "binding": "MUST"}]} for cid, p, s in
+                    (("a", "x.py", "f"), ("b", "y.py", "g"), ("c", "z.py", "h"), ("h", "w.py", "k"))}
+# m1b's reply on `c` did not parse; m1b@medium was judged on `b` alone, so the union reads `a` from m1b only.
+EXPERIMENT_RESULTS = {"m1b": {**EXPERIMENT_SEAMS, "c": {"error": "no reply"}}, "m1b@medium": EXPERIMENT_SEAMS,
+                      "judge2": {"m1b": {"a": {"primary": True, "covered": [0]}, "b": {"primary": False, "covered": []},
+                                         "h": {"primary": True, "covered": [0]}},
+                                 "m1b@medium": {"b": {"primary": True, "covered": [0]}}}}
+EXPERIMENT_KEY = {"a": {"ARM-A": "m1b", "ARM-B": "m1b@medium"}, "b": {"ARM-A": "m1b@medium", "ARM-B": "m1b"},
+                  "c": {"ARM-A": "m1b", "ARM-B": "m1b@medium"}}
+#: The method's own experiment: the cases and results at this commit, and the held-out file frozen at b6c828a92.
+UNION_PROOF_COMMIT = "5f8ef021d"
+PROOF_CASES = "-aScoutedSeam-1-3-cases.json"
+PROOF_RESULTS = "-aScoutedSeam-1-5-results.json"
+HELD_OUT_FILE = "-aScoutedSeam-1-13-held-out-cases.json"  # each a record's name ending under PROOF_DIR
+
+
+def derive_proof_path(top, commit, ending):
+    """The one record `commit` holds under `PROOF_DIR` whose name ends `ending`, repo-relative; refused
+    unless exactly one does. Read from the commit, so nothing in today's tree moves the answer."""
+    proc = subprocess.run(["git", "-C", str(top), "ls-tree", "--name-only", commit, PROOF_DIR + "/"],
+                          capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
+    if proc.returncode:
+        raise Refusal(f"proof: `git ls-tree {commit}` exited {proc.returncode}: {proc.stderr.strip() or 'no stderr'}")
+    found = [p for p in proc.stdout.splitlines() if p.endswith(ending)]
+    if len(found) != 1:
+        raise Refusal(f"proof: {len(found)} record(s) under {PROOF_DIR} at {commit} end {ending}, not one")
+    return found[0]
+
+
+def read_proof_tree():
+    """The checkout holding aScoutedSeam's records, or None: the proof's population exists only there."""
+    try:
+        proc = subprocess.run(["git", "-C", str(KIT_DIR), "rev-parse", "--show-toplevel"], capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
+    except OSError:
+        return None
+    top = pathlib.Path(proc.stdout.strip()) if proc.returncode == 0 else None
+    return top if top and (top / "memory" / "builds" / "aScoutedSeam").is_dir() else None
+
+
+def run_selftest():
+    top = read_proof_tree()
+    no_tree = ("skip", "no aScoutedSeam records in this tree")
+
+    def check_refused(fn, *needles):
+        try:
+            fn()
+        except Refusal as exc:
+            return None if all(n in str(exc) for n in needles) else f"refused without naming {needles}: {exc}"
+        return f"not refused; wanted a refusal naming {needles}"
+
+    def check_paired_refuses():
+        return (check_refused(lambda: derive_paired_cases(["a", "b"], {"x": ["a"], "y": ["b"]}), "empty pairing", "x", "y")
+                or check_refused(lambda: derive_paired_cases(["a", "b"], {"x": ["a", "z"]}), "x", "z", "outside")
+                or check_refused(lambda: derive_paired_cases(["a", "b"], {"x": ["a"], "y": []}), "y", "no case")
+                or (None if derive_paired_cases(["c", "a", "b"], {"y": ["b", "a"], "x": ["a", "b", "c"]})
+                    == (["a", "b"], {"y": ["c"], "x": []}) else "the pairing left case order or argument order"))
+
+    def check_row_refuses():
+        rows = {"v": {"a": {"seams": []}, "b": {"why": "no seams"}}}
+        return check_refused(lambda: measure_scouted_grade(FIXTURE_CASES, rows, "v"), "arm v", "case b", "seams")
+
+    def check_tag_section():
+        want = [("x.md:[supervise] Relaunch, [spawn] first bullet", ("x.md", "[supervise]")), ("x.md:§2 [act]", ("x.md", "[act]")),
+                ("x.md:§2 S5", ("x.md", 2)), ("x.md:status header", None)]
+        bad = next((f"{ref!r} read as {extract_tag_ref(ref)!r}, not {w!r}" for ref, w in want if extract_tag_ref(ref) != w), None)
+        if bad:
+            return bad
+        known = [{"id": "1", "path": "x.md", "line": "[supervise]"}]
+        cands = [{"lens": "l", "ref": "x.md:[supervise]", "path": "x.md", "line": "[supervise]"},
+                 {"lens": "l", "ref": "x.md:[spawn]", "path": "x.md", "line": "[spawn]"}]
+        score = measure_recall(known, cands, 0)
+        return None if [c["ref"] for _, c in score["matched"]] == ["x.md:[supervise]"] else f"window 0 over tags: {score!r}"
+
+    def check_instances_arm():
+        if check_instances() is not None:
+            return f"refused with both entries present: {check_instances()}"
+        held = INSTANCES.pop("scouted-seam")
+        try:
+            why = check_instances()
+        finally:
+            INSTANCES["scouted-seam"] = held
+        return None if why and "scouted-seam" in why else f"the review-replay entry alone passed: {why!r}"
+
+    def check_scouted_proof():
+        if top is None:
+            return no_tree
+        corpus, results = read_scouted_population(f"{PROOF_COMMIT}:{derive_proof_path(top, PROOF_COMMIT, PROOF_CASES)}",
+                                                  f"{PROOF_COMMIT}:{derive_proof_path(top, PROOF_COMMIT, PROOF_RESULTS)}", top)
+        grade = measure_scouted_grade(corpus, results, "m1b")[-1]
+        compare = "\n".join(measure_scouted_compare(corpus, results, ["m1b", "m1b@medium"]))
+        judged = "\n".join(measure_scouted_judged(corpus, results, ["m1cA@medium"]))
+        want = [(grade, "paired 19 of 30 · m1b unanswered "), (grade, "· positives 15 solved 10 · items 17/40 ·"),
+                (grade, "· graded 19 of 30"), (compare, "\ncommon 19 (15 positive)\n"),
+                (compare, "· m1b unanswered "), (compare, "solved 10/15 · items 17/40 · seams 175 · MUST 97 ·"),
+                (compare, "· m1b@medium unanswered none · solved 9/15 · items 17/40 · seams 164 · MUST 114 ·"),
+                (judged, "judged common 30 (24 positive)\n"), (judged, "primary 17/24 · items 39/59 ·")]
+        return next((f"{w!r} not in {text!r}" for text, w in want if w not in text), None)
+
+    def derive_git_tree(root, files):
+        """`files` ({relative path: text}) written under `root` and staged in a fresh repository there, the
+        tracked population `scan_pairing_sites` walks (TOOL-dFairHearing-27 S30)."""
+        for rel, text in files.items():
+            pathlib.Path(root, rel).parent.mkdir(parents=True, exist_ok=True)
+            pathlib.Path(root, rel).write_text(text, encoding="utf-8")
+        for argv in (["init", "-q"], ["add", "-A"]):
+            subprocess.run(["git", "-C", str(root), *argv], capture_output=True, check=True)
+        return pathlib.Path(root)
+
+    def check_conformance():
+        live = scan_pairing_sites(KIT_DIR)
+        if live:
+            return f"a pairing outside the factory: {', '.join(live)}"
+        with tempfile.TemporaryDirectory() as tmp:
+            kit = derive_git_tree(pathlib.Path(tmp, "kit"), {
+                "sub/planted.py": PLANTED, "replay_scorer.py": PLANTED,
+                "replay_scorer_twin.py": KIT_DIR.joinpath("replay_scorer.py").read_text(encoding="utf-8")})
+            planted = scan_pairing_sites(kit)
+            if planted != ["sub/planted.py:2"]:
+                return f"the planted module, and only it, should be named: {planted!r}"
+            if top is None:
+                return no_tree
+            grader = scan_pairing_sites(derive_git_tree(pathlib.Path(tmp, "grader"), {"bench.py": read_raw_output(GRADER_BLOB, top)}))
+        return None if grader == ["bench.py:384", "bench.py:647"] else f"the grader blob read as {grader!r}"
+
+    def check_pairing_walk_arm():
+        """TOOL-dFairHearing-27 AC25: the pairing module under a copy's factory directory is named and under its
+        memory/ is not; a walk whose `git ls-files` fails, or that lists no `*.py`, refuses by name, never `[]`."""
+        with tempfile.TemporaryDirectory() as tmp:
+            factory = f"{KIT_DIR.name}/planted.py"
+            copy = derive_git_tree(pathlib.Path(tmp, "copy"), {factory: PLANTED, f"{MEMORY_ROOT}/b/planted.py": PLANTED})
+            named = scan_pairing_sites(copy)
+            if named != [f"{factory}:2"]:
+                return f"the copy's pairing sites read {named!r}, not the factory module alone"
+            pathlib.Path(tmp, "bare").mkdir()
+            empty = derive_git_tree(pathlib.Path(tmp, "empty"), {"x.txt": "no python here\n"})
+            return (check_refused(lambda: scan_pairing_sites(pathlib.Path(tmp, "bare")), "scan_pairing_sites", "`git ls-files` exited")
+                    or check_refused(lambda: scan_pairing_sites(empty), "scan_pairing_sites", "lists no *.py"))
+
+    def check_deterministic():
+        with tempfile.TemporaryDirectory() as tmp:
+            cases, res = pathlib.Path(tmp, "cases.json"), pathlib.Path(tmp, "results.json")
+            cases.write_text("// a head line the reader skips\n" + json.dumps(FIXTURE_CASES), encoding="utf-8")
+            res.write_text(json.dumps(FIXTURE_RESULTS), encoding="utf-8")
+            argv = [sys.executable, str(KIT_DIR / "replay_scorer.py"), "--instance", "scouted-seam", "--cases", str(cases),
+                    "--results", str(res), "--compare", "v3", "v1", "v4", "v2"]
+            outs = [subprocess.run(argv, capture_output=True, check=False, env={**os.environ, "PYTHONHASHSEED": seed}) for seed in ("1", "2")]
+        if any(o.returncode for o in outs) or outs[0].stdout != outs[1].stdout:
+            return f"two runs differ: {[(o.returncode, o.stdout, o.stderr) for o in outs]!r}"
+        heads = [line.split(" · ")[1] for line in outs[0].stdout.decode("utf-8").splitlines() if line.startswith("paired ")]
+        return None if heads == [f"{v} unanswered c" for v in ("v3", "v1", "v4", "v2")] else f"variant lines out of argument order: {heads!r}"
+
+    # ---- the experiment shape's arms: a valid fixture manifest, then one planted break per rule.
+    def derive_fixture_manifest(tmp, **over):
+        """A valid two-arm experiment over fixture files written into `tmp`; `over` replaces top-level keys."""
+        cases, res = pathlib.Path(tmp, "cases.json"), pathlib.Path(tmp, "results.json")
+        cases.write_text(json.dumps(EXPERIMENT_CASES), encoding="utf-8")
+        res.write_text(json.dumps(EXPERIMENT_RESULTS), encoding="utf-8")
+        manifest = {"instance": "scouted-seam", "cases": str(cases), "results": str(res),
+                    "arms": [{"name": "m1b", "base": None, "settings": {"model": "m1b", "effort": "high"}, "dispatched": 3},
+                             {"name": "m1b@medium", "base": "m1b", "settings": {"model": "m1b", "effort": "medium"}, "dispatched": 4}],
+                    "judge": {"verdicts": "judge2", "key": None}, "union": {"tuning": ["m1b", "m1b@medium"]}}
+        return json.loads(json.dumps({**manifest, **over}))
+
+    def derive_frozen_repo(tmp):
+        """A fixture repository at `tmp` whose held-out file has ONE commit: its path, that commit, and a git runner."""
+        def run_git(*argv):
+            return subprocess.run(["git", "-C", tmp, "-c", "user.name=selftest", "-c", "user.email=selftest@invalid",
+                                   "-c", "commit.gpgsign=false", *argv], capture_output=True, text=True, encoding="utf-8", errors="replace", check=True).stdout.strip()
+        run_git("init", "-q")
+        held = pathlib.Path(tmp, "held.json")
+        held.write_text(json.dumps(EXPERIMENT_HELD), encoding="utf-8")
+        run_git("add", "held.json")
+        run_git("commit", "-q", "--no-verify", "-m", "freeze the held-out set")
+        return held, run_git("rev-parse", "HEAD"), run_git
+
+    def check_evidence_arm():
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest = derive_fixture_manifest(tmp)
+            check_experiment(manifest)
+            bare = json.loads(json.dumps(EXPERIMENT_CASES))
+            bare[1]["sha"] = ""
+            pathlib.Path(tmp, "bare.json").write_text(json.dumps(bare), encoding="utf-8")
+            why = check_refused(lambda: check_experiment({**manifest, "cases": str(pathlib.Path(tmp, "bare.json"))}), "case b", "case_evidence")
+            if why:
+                return why
+            hook = INSTANCES["scouted-seam"].pop("case_evidence")
+            try:
+                return check_refused(lambda: check_experiment(manifest), "scouted-seam", "case_evidence")
+            finally:
+                INSTANCES["scouted-seam"]["case_evidence"] = hook
+
+    def check_freeze_arm():
+        with tempfile.TemporaryDirectory() as tmp:
+            held, freeze, run_git = derive_frozen_repo(tmp)
+            manifest = derive_fixture_manifest(tmp, heldOut=str(held), union={"tuning": ["m1b"], "heldOut": ["m1b"]})
+            first = check_experiment(manifest, tmp)[0]
+            if not first.startswith(f"held-out: frozen at {freeze} · 1 case(s) · never read to change a prompt — recorded, not checked"):
+                return f"the first line reads {first!r}"
+            # TOOL-dFairHearing-21 AC1: one byte appended and left uncommitted moves the bytes scored off the freeze.
+            raw = held.read_bytes()
+            held.write_bytes(raw + b" ")
+            why = check_refused(lambda: check_experiment(manifest, tmp), "held.json", run_git("hash-object", "--", "held.json"),
+                                run_git("rev-parse", f"{freeze}:held.json"))
+            held.write_bytes(raw)
+            # TOOL-dFairHearing-21 AC2: a depth-1 clone's boundary commit is the only one its log lists.
+            shallow = pathlib.Path(tmp, "shallow")
+            run_git("clone", "-q", "--depth", "1", pathlib.Path(tmp).as_uri(), str(shallow))
+            why = why or check_refused(lambda: check_experiment({**manifest, "heldOut": str(shallow / "held.json")}, str(shallow)),
+                                       "held.json", "shallow")
+            if why:
+                return why
+            shared = pathlib.Path(tmp, "shared.json")
+            shared.write_text(json.dumps(EXPERIMENT_CASES + EXPERIMENT_HELD), encoding="utf-8")
+            why = (check_refused(lambda: check_experiment({**manifest, "cases": str(shared)}, tmp), "heldOut", "h", "tuning")
+                   or check_refused(lambda: check_experiment({**manifest, "heldOut": "-held.json"}, tmp), "heldOut", "`-`")
+                   or check_refused(lambda: check_experiment({**manifest, "heldOut": str(pathlib.Path(tmp).parent / "held.json")}, tmp), "outside"))
+            if why:
+                return why
+            held.write_text(json.dumps(EXPERIMENT_HELD, indent=1), encoding="utf-8")
+            run_git("commit", "-q", "--no-verify", "-am", "tune after the freeze")
+            second = run_git("rev-parse", "HEAD")
+            return check_refused(lambda: check_experiment(manifest, tmp), "2 commits", f"frozen at {freeze}", second)
+
+    def check_freeze_spelling_arm():
+        """TOOL-dFairHearing-27 AC5: the held-out path spelled absolute with forward slashes and in the platform's
+        own separators (backslashes on Windows; the same spelling elsewhere) prints the one freeze line."""
+        with tempfile.TemporaryDirectory() as tmp:
+            held, freeze, _ = derive_frozen_repo(tmp)
+            for spelling in (held.resolve().as_posix(), str(held.resolve())):
+                manifest = derive_fixture_manifest(tmp, heldOut=spelling, union={"tuning": ["m1b"], "heldOut": ["m1b"]})
+                first = check_experiment(manifest, tmp)[0]
+                if not first.startswith(f"held-out: frozen at {freeze} · "):
+                    return f"the held-out path spelled {spelling!r} reads {first!r}"
+        return None
+
+    def check_tag_item_arm():
+        """TOOL-dFairHearing-27 AC4: a ref naming an S, AC or F item and no tag keys on the section the item maps to,
+        as `extract_section_ref` reads it; prose alone is None."""
+        want = [("x.md:AC3", ("x.md", 6)), ("x.md:S5 scope", ("x.md", 2)), ("x.md:F2", ("x.md", 8)), ("x.md:prose", None)]
+        return next((f"{ref!r} read as {extract_tag_ref(ref)!r}, not {w!r}" for ref, w in want
+                     if extract_tag_ref(ref) != w or extract_section_ref(ref) != w), None)
+
+    def check_variable_arm():
+        with tempfile.TemporaryDirectory() as tmp:
+            lines = check_experiment(derive_fixture_manifest(tmp))
+            if not {"arm m1b: base", "arm m1b@medium: varies effort from m1b"} <= set(lines):
+                return f"the arm lines read {[line for line in lines if line.startswith('arm ')]!r}"
+            two, none = derive_fixture_manifest(tmp), derive_fixture_manifest(tmp)
+            two["arms"][1]["settings"]["model"] = "m1c"
+            none["arms"][1]["settings"]["effort"] = "high"
+            return (check_refused(lambda: check_experiment(two), "arm m1b@medium", "effort, model")
+                    or check_refused(lambda: check_experiment(none), "arm m1b@medium", "varies no variable"))
+
+    def check_parsed_arm():
+        with tempfile.TemporaryDirectory() as tmp:
+            lines = check_experiment(derive_fixture_manifest(tmp))
+            counts = [i for i, line in enumerate(lines) if line.startswith("parsed ")]
+            figure = next((i for i, line in enumerate(lines) if line.startswith(("figures ", "system "))), None)
+            if [lines[i] for i in counts] != ["parsed m1b: 2 of 3", "parsed m1b@medium: 3 of 4"] or figure is None or max(counts) > figure:
+                return f"the parsed counts do not all precede the first figure: {lines!r}"
+            if "paired 2 of 3 · m1b unanswered c" not in "\n".join(lines):
+                return f"the unparsed reply was scored: {lines!r}"
+            undeclared, over = derive_fixture_manifest(tmp), derive_fixture_manifest(tmp)
+            del undeclared["arms"][1]["dispatched"]
+            over["arms"][0]["dispatched"] = 1
+            return (check_refused(lambda: check_experiment(undeclared), "arm m1b@medium", "dispatched")
+                    or check_refused(lambda: check_experiment(over), "arm m1b", "2 parsed against 1 dispatched"))
+
+    def check_judge_arm():
+        with tempfile.TemporaryDirectory() as tmp:
+            key = pathlib.Path(tmp, "key.json")
+            key.write_text(json.dumps(EXPERIMENT_KEY), encoding="utf-8")
+            manifest = derive_fixture_manifest(tmp, judge={"verdicts": "judge2", "key": str(key)})
+            lines = check_experiment(manifest)
+            if not any(line.startswith("labels rotated — checked: 2 arm(s) over 3 case(s)") for line in lines):
+                return f"a rotating key did not read checked: {lines!r}"
+            if "labels rotated — recorded, not checked: no committed key" not in check_experiment(derive_fixture_manifest(tmp)):
+                return "a null key did not print as recorded"
+            key.write_text(json.dumps({c: {"ARM-A": "m1b", "ARM-B": "m1b@medium"} for c in EXPERIMENT_KEY}), encoding="utf-8")
+            return check_refused(lambda: check_experiment(manifest), "arm m1b", "ARM-A", "every one of 3")
+
+    def check_union_arm():
+        with tempfile.TemporaryDirectory() as tmp:
+            held, _, _ = derive_frozen_repo(tmp)
+            manifest = derive_fixture_manifest(tmp, heldOut=str(held), union={"tuning": ["m1b", "m1b@medium"], "heldOut": ["m1b"]})
+            text = "\n".join(check_experiment(manifest, tmp))
+            want = ["system tuning 2/2 · m1b + m1b@medium", "system held-out 1/1 · m1b", "system pooled 3/3 · tuning + held-out"]
+            bad = next((f"{w!r} not in {text!r}" for w in want if w not in text), None)
+            if bad:
+                return bad
+            why = check_refused(lambda: check_experiment({**manifest, "union": {"tuning": ["m1b"]}}, tmp), "union", "heldOut")
+            if why:
+                return why
+        if top is None:
+            return no_tree
+        proof = {"instance": "scouted-seam", "cases": f"{UNION_PROOF_COMMIT}:{derive_proof_path(top, UNION_PROOF_COMMIT, PROOF_CASES)}",
+                 "results": f"{UNION_PROOF_COMMIT}:{derive_proof_path(top, UNION_PROOF_COMMIT, PROOF_RESULTS)}",
+                 "heldOut": str(top / derive_proof_path(top, UNION_PROOF_COMMIT, HELD_OUT_FILE)),
+                 "arms": [{"name": a, "base": None, "settings": {"prompt": a}, "dispatched": n}
+                          for a, n in (("m1cA@medium", 30), ("t1r@medium", 35), ("m1c@medium", 12))],
+                 "judge": {"verdicts": "judge2", "key": None},
+                 "union": {"tuning": ["m1cA@medium", "t1r@medium"], "heldOut": ["m1c@medium", "t1r@medium"]}}
+        text = "\n".join(check_experiment(proof, top))
+        want = ["system tuning 21/23 ·", "system held-out 12/12 ·", "system pooled 33/35 ·"]
+        return next((f"{w!r} not in {text!r}" for w in want if w not in text), None)
+
+    def check_known_set_arm():
+        """TOOL-dFairHearing-1 AC1, AC2: a known set whole, one row cut, one tag repeated, and a pair crossing sections."""
+        rows = ["| a | x.md:[supervise] | high | no |", "| b | x.md:[act] | medium | no |", "| c | x.md:[spawn] | ungraded | yes |"]
+        head = "**Serves:** research X-1\n\n**Population:** {n} · reviewed 2 · escaped 1 · high 1\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"
+        whole = head.format(n=3) + "\n".join(rows) + "\n"
+        known = parse_known_set(whole)
+        if [(r["tag"], r["line"], r["escaped"]) for r in known["rows"]] != [("a", "[supervise]", False), ("b", "[act]", False), ("c", "[spawn]", True)]:
+            return f"the whole set read as {known!r}"
+        if derive_replay_evidence(known["rows"][0]) != ["x.md:[supervise]", "x.md"]:
+            return f"a row's evidence reads {derive_replay_evidence(known['rows'][0])!r}"
+        cand = APPENDIX_HEADING.join(["Review shape: raw 2, confirmed 2, refuted 0.\n\n", "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n"
+                                      "| 1 | l | x.md:[act] lifetime, [supervise] relaunch | confirmed |\n| 2 | l | x.md:[act] | confirmed |\n"])
+        score = measure_known_set(known, cand, [("1", "a"), ("1", "b"), ("2", "b")])
+        if score["figures"] != [("reviewed", 2, 2), ("escaped", 0, 1), ("high", 1, 1)] or score["matched"] != {"a": ["1"], "b": ["1", "2"]}:
+            return f"a doubly matched tag or a later tag did not score once: {score!r}"
+        if [(r["tag"], c["id"]) for r, c in score["address"]] != [("b", "1"), ("b", "2")]:
+            return f"the address matches read {[(r['tag'], c['id']) for r, c in score['address']]!r}"
+        return (check_refused(lambda: parse_known_set(head.format(n=3) + "\n".join(rows[:2]) + "\n"), "rows 2", "3")
+                or check_refused(lambda: parse_known_set(whole.replace("| b |", "| a |")), "tag a", "repeated")
+                or check_refused(lambda: measure_known_set(known, cand, [("2", "a")]), "pair 2 a", "[supervise]"))
+
+    def check_replay_manifest_arm():
+        """TOOL-dFairHearing-23 AC2: four review runs, each with a report and a matched list, parse 4 of 4; one
+        report's appendix cut parses 3 of 4; an unknown key still refuses by name."""
+        head = "**Serves:** research X-1\n\n**Population:** 2 · reviewed 2 · escaped 0 · high 1\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"
+        report = (f"**Serves:** spec-audit X-1\n\nReviewed: x.md@{'a' * 40}\n\nReview shape: raw 1, confirmed 1, refuted 0.\n\n" + APPENDIX_HEADING +
+                  "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n| 1 | l | x.md:[act] lifetime | confirmed |\n")
+        with tempfile.TemporaryDirectory() as tmp:
+            pathlib.Path(tmp, "known.md").write_text(head + "| a | x.md:[supervise] | high | no |\n| b | x.md:[act] | medium | no |\n", encoding="utf-8")
+            pathlib.Path(tmp, "m.md").write_text("**Adjudicator:** selftest\n\n| candidate | tag |\n|---|---|\n| 1 | b |\n", encoding="utf-8")
+            for r in range(4):
+                pathlib.Path(tmp, f"r{r}.md").write_text(report, encoding="utf-8")
+            manifest = {"instance": "review-replay", "known": str(pathlib.Path(tmp, "known.md")),
+                        "candidates": [{"case": f"run {r}", "report": str(pathlib.Path(tmp, f"r{r}.md")), "matched": str(pathlib.Path(tmp, "m.md"))}
+                                       for r in range(4)],
+                        "arms": [{"name": "a", "base": None, "settings": {}, "dispatched": 4}]}
+            lines = check_experiment(manifest)
+            if "parsed a: 4 of 4" not in lines or "known-set a run 0: reviewed 1/2 · escaped 0/0 · high 0/1" not in lines:
+                return f"four whole runs read {lines!r}"
+            pathlib.Path(tmp, "r3.md").write_text(report.split(APPENDIX_HEADING)[0], encoding="utf-8")
+            lines = check_experiment(manifest)
+            if "parsed a: 3 of 4" not in lines:
+                return f"a run whose appendix is cut read {lines!r}"
+            return (check_refused(lambda: check_experiment({**manifest, "cases": "x"}), "unknown key(s) cases")
+                    or check_refused(lambda: check_experiment({**manifest, "candidates": {"a": str(pathlib.Path(tmp, "r0.md"))}}), "not a list"))
+
+    def check_replay_subject_arm():
+        """TOOL-dFairHearing-32 AC6: a run-case's subject is its report's `Reviewed:` pin or its range. A report
+        whose subject blob is blanked refuses naming its case and `case_evidence`, and a known row with no
+        source record refuses naming the row."""
+        head = "**Serves:** research X-1\n\n**Population:** 1 · reviewed 1 · escaped 0 · high 0\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"
+        rows = APPENDIX_HEADING + "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n| 1 | l | x.md:[act] lifetime | confirmed |\n"
+        with tempfile.TemporaryDirectory() as tmp:
+            known = pathlib.Path(tmp, "known.md")
+            known.write_text(head + "| a | x.md:[act] | medium | no |\n", encoding="utf-8")
+            for name, pin in (("spec", f"Reviewed: x.md@{'a' * 40}"), ("diff", f"Range: {'b' * 40}...{'c' * 40} (round 1)"),
+                              ("bare", "Reviewed: x.md@")):
+                pathlib.Path(tmp, f"{name}.md").write_text(f"**Serves:** spec-audit X-1\n\n{pin}\n\n"
+                                                           f"Review shape: raw 1, confirmed 1, refuted 0.\n\n{rows}", encoding="utf-8")
+
+            def derive_run_entry(n):
+                return {"case": f"run {n}", "report": str(pathlib.Path(tmp, f"{n}.md")), "matched": None}
+            manifest = {"instance": "review-replay", "known": str(known), "candidates": [derive_run_entry("spec"), derive_run_entry("diff")],
+                        "arms": [{"name": "a", "base": None, "settings": {}, "dispatched": 3}]}
+            lines = check_experiment(manifest)
+            if "parsed a: 2 of 3" not in lines:
+                return f"a pinned spec run and a ranged diff run read {lines!r}"
+            why = check_refused(lambda: check_experiment({**manifest, "candidates": manifest["candidates"] + [derive_run_entry("bare")]}),
+                                "case run bare", "case_evidence")
+            known.write_text(head + "| a | :[act] | medium | no |\n", encoding="utf-8")
+            return why or check_refused(lambda: check_experiment(manifest), "row a")
+
+    def check_references_arm():
+        """TOOL-dFairHearing-32 AC7: a duplicate arm, a dangling base, a two-arm base cycle and a union member no
+        arm declares each refuse naming the arm, never a KeyError."""
+        with tempfile.TemporaryDirectory() as tmp:
+            dup, dangling, cycle, union = (derive_fixture_manifest(tmp) for _ in range(4))
+            dup["arms"].append(dict(dup["arms"][1]))
+            dangling["arms"][1]["base"] = "m1c"
+            cycle["arms"][0]["base"] = "m1b@medium"
+            union["union"] = {"tuning": ["m1b", "m1b@hgih"]}
+            return (check_refused(lambda: check_experiment(dup), "arm m1b@medium", "declared twice")
+                    or check_refused(lambda: check_experiment(dangling), "arm m1b@medium", "'m1c'", "not another declared arm")
+                    or check_refused(lambda: check_experiment(cycle), "arm m1b", "cycle")
+                    or check_refused(lambda: check_experiment(union), "m1b@hgih", "not declared"))
+
+    def check_held_out_pathspec_arm():
+        """TOOL-dFairHearing-32 AC19: `heldOut` naming a directory, or a path holding `*`, refuses naming the path
+        and its literal `git ls-files` line count; a first line taken would check another file."""
+        with tempfile.TemporaryDirectory() as tmp:
+            _, _, run_git = derive_frozen_repo(tmp)
+            sub = pathlib.Path(tmp, "d")
+            sub.mkdir()
+            for n in ("x.json", "y.json"):
+                (sub / n).write_text("[]", encoding="utf-8")
+            run_git("add", "d")
+            run_git("commit", "-q", "--no-verify", "-m", "two files under d")
+            union = {"tuning": ["m1b"], "heldOut": ["m1b"]}
+            star = str(pathlib.Path(tmp, "*.json"))
+            return (check_refused(lambda: check_experiment(derive_fixture_manifest(tmp, heldOut=str(sub), union=union), tmp),
+                                  str(sub), "2 line(s)")
+                    or check_refused(lambda: check_experiment(derive_fixture_manifest(tmp, heldOut=star, union=union), tmp),
+                                     star, "0 line(s)"))
+
+    def check_held_out_tracked_arm():
+        """TOOL-dFairHearing-37 AC5: the valid-path control `held-out-pathspec` lacks: `heldOut` naming one tracked
+        file reaches the freeze comparison. RED against `--literal-pathspecs` spelled after `ls-files`, which git
+        refuses with exit 129, so every path refuses."""
+        with tempfile.TemporaryDirectory() as tmp:
+            held, freeze, _ = derive_frozen_repo(tmp)
+            manifest = derive_fixture_manifest(tmp, heldOut=str(held), union={"tuning": ["m1b"], "heldOut": ["m1b"]})
+            first = check_experiment(manifest, tmp)[0]
+            return None if first.startswith(f"held-out: frozen at {freeze} · ") else f"one tracked file reads {first!r}"
+
+    def check_conformance_root_arm():
+        """TOOL-dFairHearing-23 AC16: at the repository root and at this kit, no pairing site is under memory/."""
+        if top is None:
+            return no_tree
+        named = [s for root in (top, KIT_DIR) for s in scan_pairing_sites(root) if s.startswith(MEMORY_ROOT + "/")]
+        return None if not named else f"a record folder's site was named: {', '.join(named)}"
+
+    def check_tag_drive_arm():
+        """TOOL-dFairHearing-18 AC7: the first of two tags, and a drive-lettered path folded as the section reader folds it."""
+        want = [(r"C:\x.md:[a] then [b]", ("/x.md", "[a]")), ("x.md:[walk-table] plan.input", ("x.md", "[walk-table]"))]
+        return next((f"{ref!r} read as {extract_tag_ref(ref)!r}, not {w!r}" for ref, w in want if extract_tag_ref(ref) != w), None)
+
+    def build_design_fixture(tmp, run2_hits_c=False, plant_c_escaped="yes"):
+        """A key of three escaped plants and two run records pinning its SHA-256: the key path and the two record paths."""
+        key = pathlib.Path(tmp, "key.md")
+        reviewed = 1 if plant_c_escaped == "no" else 0
+        key.write_bytes((f"**Serves:** research X-1\n\n**Population:** 3 · reviewed {reviewed} · escaped {3 - reviewed} · high 0\n\n"
+                         "| tag | address | grade | escaped |\n|---|---|---|---|\n| a | d.md:[plan] | high | yes |\n"
+                         f"| b | d.md:[act] | medium | yes |\n| c | d.md:[spawn] | ungraded | {plant_c_escaped} |\n").encode("utf-8"))
+        sha = hashlib.sha256(key.read_bytes()).hexdigest()
+        paths = []
+        for r in (1, 2):
+            refs = ["d.md:[plan] input", "d.md:[act] lifetime"] + (["d.md:[spawn] relaunch"] if r == 2 and run2_hits_c else [])
+            rows = "".join(f"| {i} | walk-{i} | {ref} | high | confirmed |\n" for i, ref in enumerate(refs, 1))
+            path = pathlib.Path(tmp, f"run{r}.md")
+            path.write_text(f"**Serves:** spec-audit PLAY-dX-1\n\n## Verdict: CLEAN WITH FIXES\n\nReview shape: confirmed {len(refs)}.\n\n"
+                            f"## Walk table — run {r} of 2, sliced by {('scenario', 'step')[r - 1]}\n"
+                            f"walk-seed mode=reverted-escapes key-sha256={sha}\n\n| Item | Scenario | Actor | Needs | Witness | Route | Verdict |\n"
+                            f"|---|---|---|---|---|---|---|\n| `plan` | S1 | = | = | = | = | holds |\n\n{APPENDIX_HEADING}\n\n"
+                            f"| id | lens | ref | severity | verdict |\n|---|---|---|---|---|\n{rows}", encoding="utf-8")
+            paths.append(str(path))
+        return str(key), paths
+
+    def run_entry(argv):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            try:
+                rc = main(argv)
+            except SystemExit as exc:
+                rc = exc.code
+        return rc, out.getvalue(), err.getvalue()
+
+    def check_design_recall_arm():
+        """TOOL-dFairHearing-18 AC8, AC9: a plant both runs miss reds the union; a moved key, a missing run, a plant off its seed refuse."""
+        with tempfile.TemporaryDirectory() as tmp:
+            key, recs = build_design_fixture(tmp)
+            argv = ["--design-recall", "--key", key, "--seed", "reverted-escapes"]
+            rc, out, _ = run_entry(argv + recs)
+            if rc != 1 or not all(w in out for w in ("run 1: 2 of 3 · missed c", "run 2: 2 of 3 · missed c", "union: 2 of 3 · missed c")):
+                return f"the planted miss read {rc}: {out!r}"
+            key, recs = build_design_fixture(tmp, run2_hits_c=True)
+            rc, out, _ = run_entry(argv + recs)
+            if rc != 0 or "union: 3 of 3 · missed none" not in out:
+                return f"run 2's hit on the third plant read {rc}: {out!r}"
+            raw = pathlib.Path(key).read_bytes()
+            pathlib.Path(key).write_bytes(raw.replace(b"research X-1", b"research X-2"))
+            rc, _, err = run_entry(argv + recs)
+            if rc != 2 or "SHA-256" not in err:
+                return f"a moved key read {rc}: {err!r}"
+            key, recs = build_design_fixture(tmp)
+            rc, _, err = run_entry(argv + recs[:1])
+            if rc != 2 or "run(s) 2 of 2 missing" not in err:
+                return f"a partial population read {rc}: {err!r}"
+            key, recs = build_design_fixture(tmp, plant_c_escaped="no")
+            rc, _, err = run_entry(argv + recs)
+            if rc != 2 or "plant c" not in err:
+                return f"a plant off its seed read {rc}: {err!r}"
+            rc, out, _ = run_entry(["--design-recall", "--key", str(pathlib.Path(tmp, "absent.md")), "--seed", "none"] + recs)
+            return None if rc == 0 and "not graded" in out else f"--seed none read {rc}: {out!r}"
+
+    def check_stated_shape_arm():
+        """TOOL-dFairHearing-46 AC5: the count is the `review-shape` line's, so prose reading `3 confirmed, 0 blocker`
+        above it reads 3 and never 0; a line disagreeing with the rows still refuses; with no line, `STATED` still reads."""
+        prose = "By raw confirmed finding the tally is the same: 3 confirmed, 0 blocker, 0 high, 1 medium, 2 low.\n\n"
+        line = "review-shape kind=diff-review round=1 intensity=full at=synth raw=3 confirmed={n} refuted=0\n\n"
+        table = (APPENDIX_HEADING + "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n"
+                 + "".join(f"| {i} | l | a.py:{i} | confirmed |\n" for i in (1, 2, 3)))
+        rows, err = parse_appendix_rows(prose + line.format(n=3) + table)
+        if err or len(rows) != 3:
+            return f"a report whose prose leads read {err or rows!r}"
+        _, err = parse_appendix_rows(prose + line.format(n=2) + table)
+        if not (err or "").endswith("stated confirmed count of 2"):
+            return f"a shape line disagreeing with its rows read {err!r}"
+        want = [("confirmed 2\n", 2), ("Review shape: raw 1, confirmed 1, refuted 0.\n", 1), ("no count here\n", None)]
+        return next((f"{t!r} read {extract_stated_count(t)!r}, not {w!r}" for t, w in want if extract_stated_count(t) != w), None)
+
+    appendix_head = ("Review shape: raw 2, confirmed 2, refuted 0.\n\n" + APPENDIX_HEADING +
+                     "\n\n| id | lens | ref | verdict | disposition |\n|---|---|---|---|---|\n")
+    appendix_row = "| 1 | l | a.py:1 | confirmed | none |\n"
+
+    def check_appendix_pipe_arm():
+        """FH48 AC3: a raw `|` in a cell is one cell too many, refused by name; the same bar escaped still parses."""
+        _, err = parse_appendix_rows(appendix_head + appendix_row + "| 2 | l | a.py:2 | confirmed | none — a | b |\n")
+        if err != "malformed: row 2 holds 6 cells against 5 columns":
+            return f"a raw pipe read {err!r}"
+        rows, err = parse_appendix_rows(appendix_head + appendix_row + "| 2 | l | a.py:2 | confirmed | none — a \\| b |\n")
+        return None if not err and rows[1]["disposition"] == "none — a | b" else f"an escaped pipe read {err or rows!r}"
+
+    def check_appendix_break_arm():
+        """FH48 AC3: a line break in a cell cuts its row one cell short, in the last row and in a middle one."""
+        cut = "| 2 | l | a.py:2 | confirmed | none — a\nb |\n"
+        want = "malformed: row 2 holds 4 cells against 5 columns"
+        return next((f"a break read {err!r}" for err in (parse_appendix_rows(appendix_head + rows)[1]
+                                                          for rows in (appendix_row + cut, cut + appendix_row)) if err != want), None)
+
+    def check_proof_pinned_arm():
+        """FH48 AC5: a proof name resolves in its commit: neither a stray file nor a later commit moves
+        the answer, two matches at a commit refuse, and a commit git cannot read refuses by name."""
+        name, stray = f"{PROOF_DIR}/a-x-cases.json", f"{PROOF_DIR}/stray-x-cases.json"
+        commit = ["-c", "user.name=p", "-c", "user.email=p@p", "commit", "-qm", "proof"]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = derive_git_tree(pathlib.Path(tmp, "r"), {name: "{}\n"})
+            subprocess.run(["git", "-C", str(root), *commit], capture_output=True, check=True)
+            sha = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"], capture_output=True, text=True,
+                                 encoding="utf-8", errors="replace", check=True).stdout.strip()
+            pathlib.Path(root, stray).write_text("{}\n", encoding="utf-8")
+            if derive_proof_path(root, sha, "-x-cases.json") != name:
+                return "an untracked stray moved a pinned read"
+            for argv in (["add", "-A"], commit):
+                subprocess.run(["git", "-C", str(root), *argv], capture_output=True, check=True)
+            if derive_proof_path(root, sha, "-x-cases.json") != name:
+                return "a later commit moved a pinned read"
+            return (check_refused(lambda: derive_proof_path(root, "HEAD", "-x-cases.json"), "2 record(s)", "not one")
+                    or check_refused(lambda: derive_proof_path(root, "0" * 40, "-x-cases.json"), "git ls-tree"))
+
+    arms = [("paired-refuses", check_paired_refuses), ("row-refuses", check_row_refuses), ("tag-section", check_tag_section),
+            ("instances", check_instances_arm), ("scouted-proof", check_scouted_proof), ("conformance", check_conformance),
+            ("deterministic", check_deterministic), ("experiment-evidence", check_evidence_arm),
+            ("experiment-freeze", check_freeze_arm), ("experiment-variable", check_variable_arm),
+            ("experiment-parsed", check_parsed_arm), ("experiment-judge", check_judge_arm), ("experiment-union", check_union_arm),
+            ("known-set", check_known_set_arm), ("tag-drive", check_tag_drive_arm), ("design-recall", check_design_recall_arm),
+            ("replay-manifest", check_replay_manifest_arm), ("conformance-root", check_conformance_root_arm),
+            ("tag-item", check_tag_item_arm), ("experiment-freeze-spelling", check_freeze_spelling_arm),
+            ("pairing-walk", check_pairing_walk_arm), ("replay-subject", check_replay_subject_arm),
+            ("experiment-references", check_references_arm), ("held-out-pathspec", check_held_out_pathspec_arm),
+            ("held-out-tracked", check_held_out_tracked_arm), ("stated-shape", check_stated_shape_arm),
+            ("appendix-pipe", check_appendix_pipe_arm), ("appendix-break", check_appendix_break_arm),
+            ("proof-pinned", check_proof_pinned_arm)]
+    passed = skipped = ran = 0
+    for name, arm in arms:
+        ran += 1
+        try:
+            why = arm()
+        except Exception as exc:  # an arm that crashes is a red arm, never a dead runner
+            why = f"raised {exc!r}"
+        if isinstance(why, tuple):
+            print(f"SKIP {name}: {why[1]}")
+            skipped += 1
+            continue
+        print(f"ok {name}" if why is None else f"FAIL {name}: {why}")
+        passed += why is None
+    print(f"replay_scorer selftest: {passed}/{ARMS_DECLARED} arms" + (f" · {skipped} skipped" if skipped else ""))
+    if ran != ARMS_DECLARED:
+        print(f"FAIL replay_scorer selftest: {ran} arm(s) ran against {ARMS_DECLARED} declared")
+    return 0 if passed + skipped == ran == ARMS_DECLARED else 1
+
+
+def main(argv):
+    ap = argparse.ArgumentParser(prog="replay_scorer.py", description="Score committed replay outputs through one instance.")
+    ap.add_argument("--selftest", action="store_true")
+    ap.add_argument("--instance", metavar="KEY")
+    ap.add_argument("--cases", metavar="SRC")
+    ap.add_argument("--results", metavar="SRC")
+    verbs = ap.add_mutually_exclusive_group()
+    verbs.add_argument("--grade", metavar="ARM")
+    verbs.add_argument("--compare", nargs="+", metavar="ARM")
+    verbs.add_argument("--judged", nargs="+", metavar="ARM")
+    ap.add_argument("--known", metavar="SRC")
+    ap.add_argument("--candidate", metavar="SRC")
+    ap.add_argument("--window", type=int, default=10)
+    ap.add_argument("--experiment", metavar="SRC")
+    ap.add_argument("--repo", default=".")
+    ap.add_argument("--design-recall", action="store_true")
+    ap.add_argument("--key", metavar="FILE")
+    ap.add_argument("--seed", metavar="MODE")
+    ap.add_argument("records", nargs="*", metavar="RECORD")
+    args = ap.parse_args(argv)
+    if args.selftest:
+        return run_selftest()
+    if args.records and not args.design_recall:
+        ap.error("a positional record is read by --design-recall alone")
+    if args.design_recall:
+        if args.seed not in DESIGN_SEEDS:
+            ap.error(f"--design-recall needs --seed, one of {', '.join(DESIGN_SEEDS)}, not {args.seed!r}")
+        if args.seed == "none":
+            print("design-recall: recall is not graded under review.design-audit.seed none, and no key was read")
+            return 0
+        if not (args.key and args.records):
+            ap.error("--design-recall needs --key <known-set file> and one review record per run")
+        try:
+            key = pathlib.Path(args.key)
+            if not key.is_file():
+                raise Refusal(f"key {args.key}: no such file; its SHA-256 is taken over the file's bytes")
+            raw = key.read_bytes()
+            try:
+                known = parse_known_set(raw.decode("utf-8"))
+            except UnicodeDecodeError as exc:
+                raise Refusal(f"key {args.key}: not UTF-8 ({exc})") from None
+            records = [(src, read_raw_output(src, args.repo)) for src in args.records]
+            lines, ok = measure_design_recall(records, known["rows"], args.seed, hashlib.sha256(raw).hexdigest())
+        except Refusal as exc:
+            print(f"replay_scorer: REFUSED — {exc}", file=sys.stderr)
+            return 2
+        print("\n".join(lines))
+        return 0 if ok else 1
+    if args.experiment:
+        # Every line is derived before the first prints, so a refusal leaves no figure on stdout.
+        try:
+            try:
+                manifest = json.loads(read_raw_output(args.experiment, args.repo))
+            except ValueError as exc:
+                raise Refusal(f"manifest {args.experiment}: not JSON ({exc})") from None
+            lines = check_experiment(manifest, args.repo)
+        except Refusal as exc:
+            print(f"replay_scorer: REFUSED — {exc}", file=sys.stderr)
+            return 2
+        print("\n".join(lines))
+        return 0
+    instance = INSTANCES.get(args.instance)
+    if instance is None:
+        ap.error(f"--instance must name one of {', '.join(INSTANCES)}, not {args.instance!r}")
+    try:
+        if args.instance == "scouted-seam":
+            verb = next((v for v in ("grade", "compare", "judged") if getattr(args, v)), None)
+            if not (args.cases and args.results and verb):
+                ap.error("scouted-seam needs --cases, --results and one of --grade, --compare or --judged")
+            corpus, results = read_scouted_population(args.cases, args.results, args.repo)
+            print("\n".join(instance["measure"][verb](corpus, results, getattr(args, verb))))
+            return 0
+        if not (args.known and args.candidate):
+            ap.error("review-replay needs --known and --candidate")
+        if args.window < 0:
+            ap.error("--window must be 0 or more")
+        known_text = read_raw_output(args.known, args.repo)
+        cand_text = read_raw_output(args.candidate, args.repo)
+    except Refusal as exc:
+        print(f"replay_scorer: REFUSED — {exc}", file=sys.stderr)
+        return 2
+    replay, refusal = instance["measure"](known_text, cand_text, args.window)
+    if refusal:
+        side, err = refusal
+        print(f"replay_scorer: REFUSED {side} {args.known if side == 'known' else args.candidate} — {err}", file=sys.stderr)
+        return 2
+    # The printer stays in the instance's adapter (it imports this module), so it is imported here, at use.
+    from review_replay import print_score
+    print_score(args.known, replay["known"], args.candidate, replay["candidates"], replay["window"], replay["score"], replay["mode"])
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))

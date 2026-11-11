@@ -97,7 +97,8 @@
     "guard": [
       "{prefix}/check-playbook-parity.sh",
       "{prefix}/check-playbook-parity.test.sh",
-      "{prefix}/playbook-kit-waivers.txt"
+      "{prefix}/playbook-kit-waivers.txt",
+      "{prefix}/workflows/check-verifier-fanout.js"
     ],
     "argv": [
       "bash",
@@ -348,7 +349,8 @@
     ],
     "guard": [
       "{prefix}/hooks/",
-      "{prefix}/lib/"
+      "{prefix}/lib/",
+      "{prefix}/workflows/spec-audit-optin.js"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -363,6 +365,7 @@
     "guard": [
       "{prefix}/hooks/",
       "{prefix}/lib/",
+      "{prefix}/unattended/unattended.sh",
       "skills/session-kickoff/"
     ],
     "chunk": "selftests",
@@ -379,6 +382,7 @@
       "{prefix}/hooks/format-guard.js",
       "{prefix}/hooks/format-guard.test.sh",
       "{prefix}/hooks/scratch-guard.js",
+      "{prefix}/hooks/agent-cap.js",
       "{prefix}/runlog/prose.py",
       "{prefix}/runlog/extract.py",
       "{prefix}/lib/"
@@ -740,7 +744,8 @@
     ],
     "guard": [
       "{prefix}/workflows/",
-      "{prefix}/memory-tree/gen_build_index.py"
+      "{prefix}/memory-tree/gen_build_index.py",
+      "{prefix}/unattended/unattended.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -769,6 +774,16 @@
       "{prefix}/hooks/",
       "{prefix}/lib/",
       "{prefix}/workflows/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
+  },
+  {
+    "name": "spec-audit opt-in pack self-test",
+    "argv": [
+      "bash",
+      "{prefix}/workflows/spec-audit-optin.test.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1097,7 +1112,7 @@
     ],
     "reads": {"remote": "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint — the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`."},
     "chunk": "declarations",
-    "subject": "repo",
+    "subject": "kit",
     "ceiling": 16040,
     "doc_reads": ["memory/builds/", "memory/guides/", "memory/archive/"]
   },
@@ -1348,7 +1363,10 @@
     "guard": [
       "{prefix}/check-hook-destinations.sh",
       "{prefix}/hooks/",
-      "{prefix}/memory-recall/"
+      "{prefix}/memory-recall/",
+      "{prefix}/workflows/kit.toml",
+      "{prefix}/workflows/spec-audit-optin.fragment.json",
+      "{prefix}/workflows/spec-audit-optin.js"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -2135,6 +2153,8 @@
       "{prefix}/govkit/registry.toml",
       "{prefix}/govkit/selftest.py",
       "{prefix}/workflows/unattended-build.template.js",
+      "{prefix}/workflows/check-review-join.js",
+      "{prefix}/workflows/check-verifier-fanout.js",
       "{prefix}/lib/",
       "{prefix}/hooks/agent-cap.js",
       "{prefix}/memory-tree/tree_lib.py",
@@ -2195,7 +2215,8 @@
       "{prefix}/workflows/kit.toml",
       "AGENTS.md",
       "memory/builds/dClosedLoop/build/",
-      "help/policy.md"
+      "help/policy.md",
+      ".governance/install.json"
     ],
     "chunk": "selftests",
     "subject": "kit",

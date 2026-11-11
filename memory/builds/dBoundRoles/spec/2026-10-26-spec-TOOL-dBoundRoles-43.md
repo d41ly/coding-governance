@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-43 — the round-1 audit's 46 roles-code minors: one grammar each for returns, shapes and slots, one reader and writer each, bounded readers, resumable steps, and the registries they feed
 
-**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 28 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-05 · node d · Tier-2 · base 462d20f3 · streams tooling · order 28 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,11 +15,13 @@
 | [2026-10-26-build-TOOL-dBoundRoles-43-deviation-433.md](../build/2026-10-26-build-TOOL-dBoundRoles-43-deviation-433.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-43-round1-size-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-43-round1-size-return.md) | research | TOOL-dBoundRoles-3 TOOL-dBoundRoles-24 TOOL-dBoundRoles-44 |
 | [2026-10-26-build-TOOL-dBoundRoles-45-round2-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-45-round2-fix-return.md) | research | TOOL-dBoundRoles-45 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 |
+| [2026-11-05-build-TOOL-dBoundRoles-43-deviation-434.md](../build/2026-11-05-build-TOOL-dBoundRoles-43-deviation-434.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-9 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-25 TOOL-dBoundRoles-60 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-37-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-37-round1-fix-brief.md) | research | TOOL-dBoundRoles-37 TOOL-dBoundRoles-40 TOOL-dBoundRoles-42 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-43-round1-size-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-43-round1-size-brief.md) | research | TOOL-dBoundRoles-3 TOOL-dBoundRoles-24 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-45-round2-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-45-round2-fix-brief.md) | research | TOOL-dBoundRoles-45 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 |
+| [2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks.md) | research | TOOL-dBoundRoles-3 TOOL-dBoundRoles-6 TOOL-dBoundRoles-20 TOOL-dBoundRoles-22 |
 | [2026-10-26-review-TOOL-dBoundRoles-37-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-37-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-44 |
 
 <!-- /gen:spec-records -->
@@ -582,8 +584,8 @@ F9 and F14 moved to `TOOL-dBoundRoles-44` with S31 and S42.
   Options: (a) ask dOrderedCharter for one, run by step programs as a subprocess; (b) this unit adds it, a
   write surface on another build's module; (c) PLAY-dOrderedCharter-15's `instructions_edit.py rename`,
   which under the default `instructions.edit` writes nothing. (a) also serves PLAY-dOrderedCharter-31 S4's
-  and -49 S11's steps; S10, S23 and AC23 wait on it. Recommendation (a). OPEN for the owner: the ask is
-  "PLAY-dOrderedCharter-32 S8: an `overlay.py` verb writing rows through `write_overlay_units`, re-key mode
+  and -49 S11's steps; S10, S23 and AC23 wait on it. Recommendation (a). RESOLVED (owner, 2026-11-05): (a). The ask its build run files
+  in dOrderedCharter's `BACKLOG.md` is "PLAY-dOrderedCharter-32 S8: an `overlay.py` verb writing rows through `write_overlay_units`, re-key mode
   included, for govkit step programs".
 
 ## 9. Revision log
@@ -598,6 +600,7 @@ F9 and F14 moved to `TOOL-dBoundRoles-44` with S31 and S42.
   `build/2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck.md` rows 49 to 51: no sibling kit
   imported; F17 open; §2's item titles, §3, §4 and §8's rung-3 `widens`/`relaxes` cut for size, no design
   moved.
+- rev-6 · 2026-11-05 · §8 F17 · resolved by the owner to (a), `2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks`; no design moved.
 
 ## 10. Reuse audit
 

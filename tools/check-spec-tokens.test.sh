@@ -60,7 +60,20 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # RAISED 215 -> 218 by PLAY-dOrderedCharter-63: its three status-header arms, the fenced OPEN example
 # below and above a DEFERRED header and the fenced CLOSED example in an OPEN spec, each top-level.
 # Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=218
+# RAISED 215 -> 224 by TOOL-dFairHearing-48: its nine arm-labels arms, each top-level. Counted by reading;
+# OWED: observed at the close.
+# RAISED 224 -> 236 by TOOL-aSmoothedDispatch-5: its twelve --spec arms, one for AC1, two each for AC2,
+# AC4 and AC5, four for AC3 and one for AC6, each top-level. Counted by reading; OWED: observed at the close.
+# RAISED 236 -> 238 by TOOL-aSmoothedDispatch-8: its two overlay-parity arms, the row span and the summary
+# span; the missing-span check counts only as a failure. Counted by reading; OWED: observed at the close.
+# RAISED 224 -> 231 by TOOL-dPavedRoad-1: its seven --spec arms, the bare run's untracked DEFERRED spec,
+# the ac-order red, the disk sibling's handoff red, the carries and packet skips with no stale row, and
+# the two refusals, each top-level. Counted by reading; OWED: observed at the close.
+# MERGED at TOOL-aSmoothedDispatch-22's reconcile: the base 224, plus TOOL-dPavedRoad-1's 7, plus this
+# branch's 14, less the ten unit 5 arms dropped there = 235. Counted by reading; OWED: observed at the close.
+# MERGED at PLAY-dOrderedCharter-83's reconcile of 47ed57fab: main's 235 plus this branch's 3 from
+# PLAY-dOrderedCharter-63 = 238. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=238
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -1063,12 +1076,13 @@ git -C "$d" reset -q --hard "$clean"
 #        test_recall_floor.py — the pytest `test_*.py` convention, gov-only and 12 s to 34 s in the
 #          ledger; a `test_*.py` shape would hit an adopter's single-file pytest run, which is
 #          exactly the direct check a spec may name.
-#        corpus_ids.py --selftest (ceiling 2690 s, 599 s in the ledger) and gen_build_index.py
-#          --selftest (350 s) — flag-form suites above the bound; the backlog row this round owes
-#          moves their entrypoints to a `selftest.py` file both readers already deny.
+#        corpus_ids.py --selftest (ceiling 2690 s, 599 s in the ledger), gen_build_index.py
+#          --selftest (350 s) and measure_legs.py --selftest (ceiling 500 s) — flag-form suites
+#          above the bound; the backlog row this round owes moves their entrypoints to a
+#          `selftest.py` file both readers already deny.
 LEGS="$(dirname "$LINT")/gate-legs.json"
 DIRECT_CHECK_BOUND=300
-PARITY_EXEMPT="test_recall_floor.py corpus_ids.py gen_build_index.py"
+PARITY_EXEMPT="test_recall_floor.py corpus_ids.py gen_build_index.py measure_legs.py"
 # `-c`, not `python -` with a heredoc: the Windows python launcher reads the first argument after
 # `-` as a script and runs its shebang, which is how a probe of this arm ran bash instead.
 parity=$("$PY" -c 'import importlib.util, json, sys
@@ -1986,6 +2000,115 @@ arm "TOOL-dFoldedAudit-4 the join's line prints with the text --dispatch filters
 ARM_ARGS=(--list)
 arm "TOOL-dFoldedAudit-4 --list reads the waived token as a HIT" 0 "$d" 'HIT    [supersede]' 'WAIVED [supersede]'
 ARM_ARGS=()
+
+# TOOL-dFairHearing-48 S9: the arm-labels join. The scratch tree tracks one suite spelling `FH1 AC1`, and
+# each edit appends a `New arm:` line and the bullet, then resets. Staged red by deleting the
+# scan_arm_labels call. WHAT THESE DO NOT CHECK: that the arm under a spelled label runs.
+d=$base/labels; scratch "$d"
+ls_spec=memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md
+ls_two=memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-2.md
+printf 'the FH1 AC1 arm\n' > "$d/x.test.sh"
+printf 'the FH1 AC10 arm\n' > "$d/y.test.sh"
+git -C "$d" add -A >/dev/null; git -C "$d" commit -qm labels --no-verify
+albase=$(git -C "$d" rev-parse HEAD)
+write_arm_label() {   # $1 the spec's repo-relative path · $2 the arm line's suite · $3 its covers · $4 the label
+  printf '\nNew arm: %s · covers %s · the arm · none\n\n### Inventory\n\n- The suite arm labels `%s`.\n' "$2" "$3" "$4" >> "$d/$1"
+}
+write_second_spec() {  # $1 the Status word: a second spec, so the first keeps the tree's live population whole
+  sed -e 's/TOOL-tOne-1/TOOL-tOne-2/' -e "s/^\*\*Status:\*\* OPEN/**Status:** $1/" "$d/$ls_spec" > "$d/$ls_two"
+  write_arm_label "$ls_two" x.test.sh AC1 'FH2 AC1'
+  git -C "$d" add -A >/dev/null
+}
+arm "FH48 AC9 a tree with no carrier prints a zero and refuses nothing" 0 "$d" "arm-labels join · 0 label(s) in 0 spec(s)" "[arm-labels]"
+write_arm_label "$ls_spec" '`x.test.sh`' AC1 'FH1 AC1'
+arm "FH48 AC9 a label its covering suite spells is clean" 0 "$d" "arm-labels join · 1 label(s) in 1 spec(s), every status but WONTDO, not only live spec(s) · 0 hit(s)" "[arm-labels]"
+git -C "$d" reset -q --hard "$albase"
+write_arm_label "$ls_spec" x.test.sh AC1 'FH2 AC1'
+arm "FH48 AC9 a label no suite spells REDS as [arm-labels]" 1 "$d" "[arm-labels] \`arm-labels <- $ls_spec FH2 AC1\`"
+git -C "$d" reset -q --hard "$albase"
+write_arm_label "$ls_spec" x.test.sh none 'FH1 AC1'
+arm "FH48 AC9 a spelled label with no covering arm REDS" 1 "$d" "[arm-labels] \`arm-labels <- $ls_spec FH1 AC1\`"
+git -C "$d" reset -q --hard "$albase"
+write_arm_label "$ls_spec" y.test.sh AC1 'FH1 AC1'
+arm "FH48 AC9 FH1 AC10 in the suite does not meet FH1 AC1" 1 "$d" "[arm-labels] \`arm-labels <- $ls_spec FH1 AC1\`"
+git -C "$d" reset -q --hard "$albase"
+write_second_spec CLOSED
+arm "FH48 AC9 a CLOSED carrier is graded" 1 "$d" "[arm-labels] \`arm-labels <- $ls_two FH2 AC1\`"
+git -C "$d" reset -q --hard "$albase"
+write_second_spec WONTDO
+arm "FH48 AC9 a WONTDO carrier is set apart" 0 "$d" "arm-labels join · 0 label(s) in 0 spec(s)" "[arm-labels]"
+git -C "$d" reset -q --hard "$albase"
+printf '\n```\n- The suite arm labels `FH2 AC1`.\n```\n' >> "$d/$ls_spec"
+arm "FH48 AC9 a fenced bullet is unread" 0 "$d" "arm-labels join · 0 label(s) in 0 spec(s)" "[arm-labels]"
+git -C "$d" reset -q --hard "$albase"
+write_arm_label "$ls_spec" x.test.sh AC1 'FH2 AC1'
+printf 'arm-labels <- %s FH2 AC1\tdeliberate, for this arm\n' "$ls_spec" >> "$d/memory/project/spec-token-waivers.txt"
+arm "FH48 AC9 a waiver row reaches a hit" 0 "$d" "1 label(s) in 1 spec(s)" "STALE WAIVER"
+git -C "$d" reset -q --hard "$albase"
+
+# TOOL-dPavedRoad-1 — --spec, a writer's self-check: the named specs graded as if live, whatever their
+# status and whether or not git tracks them. The fixture spec is UNTRACKED and DEFERRED, so the bare
+# run grades none of it; its sibling is untracked and OPEN; the tracked spec produces the one waived
+# hit, so a stale-waiver arm run over the one named spec would call that row STALE.
+d=$base/onespec; scratch "$d"
+printf 'SPEC_AC_ORDER_CUTOFF="%s"\nSPEC_HANDOFF_CUTOFF="%s"\n' "$HCUT" "$HCUT" > "$d/.memory-tree.conf"
+sed -i 's|^`real leg`\.|`imaginary leg`.|' "$d/$SPECDIR/$HCUT-spec-TOOL-tOne-1.md"
+printf 'imaginary leg\tonly the tracked spec produces this, for the --spec arms\n' >> "$d/memory/project/spec-token-waivers.txt"
+git -C "$d" add -A >/dev/null
+os_spec="$SPECDIR/$HCUT-spec-EXMP-tOne-5.md"
+write_handoff_spec "$d" "$os_spec" EXMP-tOne-5 DEFERRED \
+  '## 3. Non-goals (OUT)' '' '### Edges' '' \
+  '- **hands-off** `EXMP-tOne-6` — it reads `--frob` from this unit.' '' \
+  '## 6. Acceptance criteria' '' '- **AC2** — a second criterion.' '- **AC1** — a first criterion.'
+arm "PR1 the bare run leaves an untracked DEFERRED spec ungraded" 0 "$d" "spec-tokens: 1 live spec(s) · 0 terminal spec(s) not graded"
+ARM_ARGS=(--spec "$os_spec")
+arm "PR1 AC1 --spec grades the untracked DEFERRED spec and REDS on its descending labels" 1 "$d" "EXMP-tOne-5.md [ac-order] \`ac-order <- AC2\`"
+sed -i -e 's|^- \*\*AC2\*\* — a second|- **AC1** — a second|' -e 's|^- \*\*AC1\*\* — a first|- **AC2** — a first|' "$d/$os_spec"
+write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-EXMP-tOne-6.md" EXMP-tOne-6 OPEN \
+  '## 4. Design' '' 'It reads the flag this unit was handed.'
+arm "PR1 AC3 --spec reads an untracked OPEN sibling from disk and REDS on the token it never names" 1 "$d" "[handoff] \`EXMP-tOne-5>EXMP-tOne-6:--frob\`"
+sed -i 's|It reads the flag|It reads `--frob`, the flag|' "$d/$SPECDIR/$HCUT-spec-EXMP-tOne-6.md"
+arm "PR1 AC2 --spec calls no waiver row stale that only another spec produces, and skips the carries join" 0 "$d" "carries join · skipped under --spec" "STALE"
+arm "PR1 AC2 --spec skips the packet join and says so" 0 "$d" "packet join · skipped under --spec" "STALE"
+ARM_ARGS=(--spec "${PFX}gate.sh")
+arm "PR1 AC4 --spec REFUSES an operand that is not a spec" 2 "$d" "REFUSING — --spec ${PFX}gate.sh is not a spec under memory/builds/<slug>/spec/"
+ARM_ARGS=(--spec "$SPECDIR/no-such-spec.md")
+arm "PR1 AC4 --spec REFUSES an operand that names no file" 2 "$d" "REFUSING — --spec $SPECDIR/no-such-spec.md is not a file"
+ARM_ARGS=()
+
+# ---- TOOL-aSmoothedDispatch-5: the two --spec arms the PR1 arms above do not cover, kept at
+#      TOOL-aSmoothedDispatch-22's reconcile and re-pointed at main's --spec output. The named spec
+#      is written and NEVER added. The overlay-parity arms below read the same scratch repo.
+sc_spec="$SPECDIR/$HCUT-spec-TOOL-tOne-7.md"
+d=$base/scope; scratch "$d"
+write_handoff_spec "$d" "$sc_spec" TOOL-tOne-7 OPEN '## 7. Gates' '' '`real leg`.'
+sed -i 's|^`real leg`\.|`imaginary leg`.|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+ARM_ARGS=(--spec "$sc_spec")
+arm "SD5 AC2 a hit only in the tracked spec is not reported under --spec" 0 "$d" "--spec · 1 named spec(s) graded whatever their status · 1 live spec(s)" "2026-09-02-spec-TOOL-tOne-1.md"
+ARM_ARGS=(--spec)
+arm "SD5 AC3 --spec with no value REFUSES with exit 2" 2 "$d" "REFUSING — --spec names no spec"
+ARM_ARGS=()
+
+# TOOL-aSmoothedDispatch-8 S2: the gov-spec-writer overlay quotes the exit-1 row and summary shapes, and a
+# red --spec run must print both. The spans are read from the overlay itself, so a reworded overlay or
+# checker print reds here. A missing overlay or an empty span is a FAIL, never two arms over an empty
+# needle, which every output carries.
+ROLES_DIR=$(resolve_kit_dir "$PY" roles render_agents.py "$HERE") || exit 2
+sp_overlay="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$ROLES_DIR/house/gov-spec-writer.md"
+sp_row=$(tr -d '\r' < "$sp_overlay" 2>/dev/null | grep -o '`spec-tokens: <spec path> \[[^`]*`' | head -1 | tr -d '`')
+sp_sum=$(tr -d '\r' < "$sp_overlay" 2>/dev/null | grep -o '`spec-tokens: <N> unwaived[^`]*`' | head -1 | tr -d '`')
+if [ -z "$sp_row" ] || [ -z "$sp_sum" ]; then
+  echo "arm FAIL  SD8 AC2 the overlay $sp_overlay quotes no row span or no summary span"; fail=$((fail+1))
+else
+  d=$base/scope
+  write_handoff_spec "$d" "$sc_spec" TOOL-tOne-7 OPEN '## 7. Gates' '' '`imaginary leg`.'
+  sp_row=${sp_row//'<spec path>'/$sc_spec}; sp_row=${sp_row//'<kind>'/leg}
+  sp_sum=${sp_sum//'<N>'/1}
+  ARM_ARGS=(--spec "$sc_spec")
+  arm "SD8 AC2 a red --spec run prints the overlay's row span" 1 "$d" "$sp_row"
+  arm "SD8 AC2 a red --spec run prints the overlay's summary span" 1 "$d" "$sp_sum"
+  ARM_ARGS=()
+fi
 
 # TOOL-dGroundRules-32 S9, TOOL-dGroundRules-40: the build-order render's overlap rule is the
 # dispatcher's, and both are graded against the truth. Each OVERLAP_PAIRS row is two paths relative to

@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-32 — the round-3 spec audit's 32 minors: criteria that observe what their specs change, one source per procedure, and refusals that name their cause
 
-**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-6 · 2026-11-04 · node d · Tier-2 · base 3708a705 · streams tooling · order 25 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,10 +10,18 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dFairHearing-32-deviation-321.md](../build/2026-10-23-build-TOOL-dFairHearing-32-deviation-321.md) | deviation | — |
 | [2026-10-23-build-TOOL-dFairHearing-32-deviation-329.md](../build/2026-10-23-build-TOOL-dFairHearing-32-deviation-329.md) | deviation | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50 |
+| [2026-11-04-build-TOOL-dFairHearing-32-1-acceptance-ledger.md](../build/2026-11-04-build-TOOL-dFairHearing-32-1-acceptance-ledger.md) | journal | — |
+| [2026-11-04-build-TOOL-dFairHearing-32-1-builder-return.md](../build/2026-11-04-build-TOOL-dFairHearing-32-1-builder-return.md) | journal | — |
+| [2026-11-08-build-TOOL-dFairHearing-1-runlog-70b3ac3f.md](../build/2026-11-08-build-TOOL-dFairHearing-1-runlog-70b3ac3f.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-departures-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-departures-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-3 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-30 |
 | [2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md) | research | TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 |
 | [2026-10-23-prompt-TOOL-dFairHearing-32-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-32-1-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dFairHearing-32-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-32-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-25-fold-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-25-fold-fix-brief.md) | research | TOOL-dFairHearing-25 TOOL-dFairHearing-30 TOOL-dFairHearing-35 TOOL-dFairHearing-37 TOOL-dFairHearing-40 |
+| [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 | [2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md) | spec-audit | TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 |
+| [2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md](../reviews/2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md) | diff-review | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 
 <!-- /gen:spec-records -->
 
@@ -36,8 +44,8 @@ Each item names its report id, its report item, the unit it lands on and the cri
 it. Where a report item merges ids, each id is its own item, and the later ids point at the first
 one's mechanism.
 
-- **S1** — id 2 (M1, unit 4, AC1). The resume probe's instruction at
-  `tools/workflows/tier2-review.template.js:1021` and its render names `find-<lens>.json or
+- **S1** — id 2 (M1, unit 4, AC1). The resume probe's instruction (its step 4,
+  `tools/workflows/tier2-review.template.js:1247` at `9c1a2857a`) and its render names `find-<lens>.json or
   verify-batch-<n>.json`, and no carrier under `tools/` or `memory/guides/` spells `verify-<a>-<b>`. A
   stub-run arm captures the `resume:probe` prompt and asserts that it names `verify-batch-<n>.json`.
   This supersedes unit 4 AC8's two absence patterns and adds a prompt half to its AC6.
@@ -74,68 +82,68 @@ one's mechanism.
   names are unique. Every `base` names another declared arm, and the base graph has no cycle. Every
   `union` member is a declared arm. Each violation exits 2 naming the arm, never a traceback. This adds
   to unit 14 S1's rule list.
-- **S13** — id 4 (L1, unit 25, AC8). The `selected` half of unit 25's AC6, which
-  `TOOL-dFairHearing-30` AC4 answers, is observed by behaviour. Over a fixture catalogue holding an
-  ungated class outside the range's selection, `gotchas.py --for-diff <range> --all-ungated` prints
-  output byte-identical to `gotchas.py --for-diff <range>`. This supersedes the `grep -c --
-  "--all-ungated"` count, which a docstring recording unit 23 S21's contract reds.
+- **S13** — id 4 (L1, unit 25, AC8). After unit 35's decision, a `selected` verdict is observed by
+  behaviour. Over a fixture catalogue holding an ungated class outside the range's selection,
+  `gotchas.py --for-diff <range> --all-ungated` prints output byte-identical to `gotchas.py --for-diff
+  <range>`. Unit 25 AC6's `grep -c -- "--all-ungated"` count, which a docstring recording unit 23 S21's
+  contract reds, passed to unit 30 with the replay, and `TOOL-dFairHearing-30` AC4 holds no count
+  since the fold, so this item reads the decision and corrects no replay unit's criterion.
 - **S14** — id 5 (M3, unit 25, AC9). Each replay verdict record, unit 25's and unit 30's, names the
   orchestrating commit: this repository's `HEAD` whose recipe, harness and scorer drove the runs,
-  distinct from each clone's `HEAD`, which the record names separately. That commit is bound by
-  evidence the writer does not choose: it is the first parent of the commit that adds the record, it
-  descends from unit 23's build commit, and the record names the blobs of `tools/workflows/README.md`,
-  `tools/workflows/tier2-review.js` and `tools/workflows/replay_scorer.py` at it. This pass appends
-  what a record lacks, derived from git. This supersedes unit 25 S6's "the commit the runs started
-  from", §4's "Each run starts from a commit that descends from unit 23's build commit" and AC7's
-  ancestry test.
+  distinct from each clone's `HEAD`. What had to hold before the runs, the commit read at call time
+  and bound by evidence the writer does not choose, is carried by unit 25 S7 and unit 30 S8 (unit 25
+  §8 F2). This item keeps the post-run re-read: at this unit's commit, after unit 35 wrote unit 30's
+  `## Scoring`, AC9 reads both records again. It appends nothing; a record lacking the line is red at
+  its own unit's AC7 or AC6.
 - **S15** — id 13 (M3, unit 25, AC9). S14's defect from the grounding lens; S14 closes it.
 - **S16** — id 9 (L3, unit 25). Unit 25 reads `check_experiment` (unit 14), `DESIGN_RECORD_PRESET`
   (unit 3) and `spec-audit-optin.js` (unit 16) without an edge. Each read is declared by the unit that
   reads it after this audit: `TOOL-dFairHearing-30`, which now carries unit 15's manifest, consumes
   from unit 14, and this unit consumes from unit 3 (S19) and unit 16 (S25). Spec 25 itself takes no new
-  consumes-from edge, because adding one there would fold this finding into the spec it was raised on,
-  which M4 refuses. NOT OBSERVED by a criterion: an edge is a declaration that hygiene check 12's
-  parity arm reads, and no product file changes.
+  consumes-from edge. M4 has a repair unit correct an unbuilt sibling's spec itself (owner,
+  2026-11-01), but hygiene check 12's reciprocity join (`tools/memory-tree/check-memory-hygiene.sh`
+  :2929-2931) needs each such edge mirrored by a hands-off in spec 3, 14 or 16, which are CLOSED and
+  frozen. NOT OBSERVED by a criterion: an edge is a declaration that hygiene check 12's parity arm
+  reads, and no product file changes.
 - **S17** — id 21 (L6, unit 25, AC10). One source for the clone envelope. The replay section of
-  `tools/workflows/README.md`, with unit 27 S22's EXIT trap, is the procedure every later replay runs,
-  and unit 25 §4's restated block is superseded by it. For the runs units 25 and 30 already made, AC10
-  observes the residue in this repository.
-- **S18** — id 31 (M11, unit 25, AC10). The README's replay section gains the placement step: a
-  commit the source history lacks is made by `git commit-tree` over a tree written through a temporary
-  `GIT_INDEX_FILE`, referenced only by a transient ref, which the EXIT trap clears with `git update-ref
-  -d`. The working tree, the index and `HEAD` of the orchestrating repository never move. This
-  supersedes unit 25 §4's "made on a transient branch" and §5's claim that id 36 is covered by the
-  exact-commit check.
+  `tools/workflows/README.md`, with unit 27 S22's EXIT trap, is the procedure every replay runs:
+  carried by unit 25 S8 and unit 30 S1, which point at it in place of unit 25 §4's restated block,
+  before the runs. This item keeps the post-run read of the runs' residue in this repository, AC10.
+- **S18** — id 31 (M11, unit 25, AC10). The placement step through a temporary `GIT_INDEX_FILE`,
+  referenced only by a transient ref the EXIT trap clears, is carried by unit 25 S8 and S9 before
+  replay 1 runs, and unit 25 §5's claim on id 36 is corrected there. NOT OBSERVED here: unit 25 AC8
+  observes it.
 - **S19** — id 24 (M8, unit 25, AC11). Spec 3's AC7 arm in `tools/workflows/tier2-review.test.sh`
   reads its expected no-flag preset from `DESIGN_RECORD_PRESET` in `tools/workflows/review_pin.py` at
   run time, never the literal `unit-spec`, so it holds under either replay-1 verdict. Any arm pinning
   spec 15 S1's command text is checked the same way against unit 30's decision.
-- **S20** — id 29 (L7, unit 25, AC12). A re-run takes a new clone named per attempt: `fhr<run><a>`,
-  `<a>` the attempt letter from `a`, for replay 1, and unit 30's `f<r><a><n>` for unit 15's replay. A
-  voided clone stays until the record cites it. A run takes at most two attempts. After a second void,
-  replay 1 is recorded as not run and spec 1 S9's R-1 ask is filed. This supersedes unit 25 S1's fixed
-  names `fhr1` and `fhr2` and S3's unbounded re-run.
+- **S20** — id 29 (L7, unit 25, AC12). Per-attempt clones and the two-attempt cap. Replay 1's
+  `fhr<run><a>` names, its cap and its `not run` rule are carried by unit 25 S10; unit 15's
+  `f<r><a><n>` attempts are carried by unit 30 S1, S3 and S9 and read through unit 35 S1's rule, as
+  unit 37 S2 words their unit-15 half. This item keeps the post-run read, AC12.
 - **S21** — id 30 (M10, unit 25, AC12). One rule for a dead run in unit 15's replay: spec 1's void and
-  re-run rule applies, with S20's cap, and the count `paired 4 of 4` stands. A record still void after
-  its cap ends the replay with no decision taken and no product file of spec 15 S6 changed. This
-  supersedes unit 25 S4's "pairs over the records both arms answered".
+  re-run rule, recorded per attempt by unit 30 S9 and scored by unit 35 S1 and S4, which end a
+  void-after-cap record with no decision and no product file of spec 15 S6 changed. Carried there
+  before the runs; this item keeps the post-run read, AC12.
 - **S22** — id 3 (M2, unit 27, AC13). Unit 27 AC11's and AC9's absence checks read the two `.js` files,
   `tools/hooks/agent-cap.js` and `tools/workflows/check-verifier-fanout.js`, through `renderBlankedView`
-  (`tools/hooks/agent-cap.js:1303`), the view with string, template and comment contents blanked.
+  (`tools/hooks/agent-cap.js:529` at `9c1a2857a`, reached through the exported
+  `renderBlankedLiterals`), the view with string, template and comment contents blanked.
   `tools/check-playbook-parity.sh`, its suite and both REVIEW-PROTOCOL copies keep the whole-text grep,
   where `MAX_LENSES` sits in `sed` and `printf` strings or in prose S16 rewrites. AC9's shell half reads
   assignment lines only. This supersedes the whole-text `.js` halves of AC11 and AC9.
 - **S23** — id 8 (L2, unit 27, AC14). Unit 27 S28 is restated: the path limit holds for a clone
   without `core.longpaths`, which is the default for a fresh clone here, since this worktree's `true`
   sits only in its `config.worktree`. Fixtures go under `%TEMP%`. Spec 14 AC2's fixture line
-  (:189-190) joins S28's list. Unit 27 AC23, which no tree can turn red, is superseded by AC14.
+  (:198-199 of its rev-5) joins S28's list. Unit 27 AC23, which no tree can turn red, is superseded by AC14.
 - **S24** — id 16 (L2, unit 27, AC14). S23's defect from the grounding lens; S23 closes it.
 - **S25** — id 12 (M6, unit 27, AC15). `checkOptinPackPresent` ports `tools/lib/resolve_kit_dir.py` as
   its contract, rung for rung. A receipt row whose path is missing or escapes the tree is skipped, a
   `rendered` row joins, and the probes are `<here>/<home>/<anchor>` then `<here>/../<home>/<anchor>`.
   It denies only on the resolver's own refusal, naming the three places looked. One function,
   `resolveKitDir(home, anchor, here)`, between `// >>> resolveKitDir` and `// <<< resolveKitDir` in
-  `tools/hooks/agent-cap.js`, serves both `resolveHarnessName` (:112-116) and `checkOptinPackPresent`.
+  `tools/hooks/agent-cap.js`, serves both `resolveHarnessName` (:74-80 at `9c1a2857a`) and
+  `checkOptinPackPresent`.
   This supersedes unit 27 S20's deny on a missing-path row and AC15's third case.
 - **S26** — id 17 (M6, unit 27, AC16). The port is held to the canonical: a behaviour arm in
   `tools/lib/resolve-python.test.sh`, shaped as its `{prefix}` contract arm (2b), runs
@@ -148,14 +156,14 @@ one's mechanism.
   AC2 observe it.
 - **S29** — id 26 (M9, unit 27, AC17). `tools/check-playbook-parity.sh` resolves the owned side of the
   `lens-array bound` pair through `resolve_kit_dir "$_pp_py" workflows check-verifier-fanout.js
-  "$_self_dir"`, falling back to `<no workflows kit>` as `HK_DIR` does (:141-148). `fixture()` in
+  "$_self_dir"`, falling back to `<no workflows kit>` as `HK_DIR` does (:261-268 at `9c1a2857a`). `fixture()` in
   `tools/check-playbook-parity.test.sh` plants `${FX}workflows/check-verifier-fanout.js` holding `const
   LENS_SLOTS = 5`, declares it as an `[[entry]]` in the fixture registry and waives it in the fixture's
-  `playbook-kit-waivers.txt`, so the valid-fixture control stays green. The drift arm (:279-281)
-  re-points at that file.
+  `playbook-kit-waivers.txt`, so the valid-fixture control stays green. The drift arm, `AC2 MAX_LENSES
+  drifts from the hook README's stated bound` (:400-402 at `9c1a2857a`), re-points at that file.
 - **S30** — id 27 (L8, unit 27, AC18). Unit 27 §5 says the coupling is transitive. review-harness is
   already coupled to drift-audit (`tools/drift-audit/kit.toml:13`), and govkit closes a scoped update
-  over coupled kits the receipt claims (`tools/govkit/govkit.py:1050-1059`, `:9311`). So a scoped
+  over coupled kits the receipt claims (`tools/govkit/govkit.py:1120-1129`, `:9638`, at `9c1a2857a`). So a scoped
   agent-cap or review-harness update also moves drift-audit when the receipt claims it. This
   supersedes unit 27 AC7's two-kit fixture.
 - **S31** — id 35 (M13, unit 27, AC19). `check_held_out_frozen` runs `git ls-files --full-name
@@ -168,11 +176,13 @@ one's mechanism.
 
 ## 3. Non-goals (OUT)
 
-- No re-review, and no fold into the specs of units 4, 14, 25 and 27: each item makes the corrected
-  statement true and reopens no severity.
+- No re-review, and no fold into the specs of units 4, 14 and 27: units 4 and 14 are CLOSED and
+  frozen (M4), and unit 27's items correct what that unit builds. Unit 25's items that had to hold
+  before its runs are folded into units 25 and 30 under M4's repair rule (unit 25 §8 F2). Each item
+  left here makes the corrected statement true and reopens no severity.
 - No BLOCKER or HIGH finding: ids 11, 1, 28 and 34 are `TOOL-dFairHearing-28`, `-29`, `-30` and `-31`.
-- No re-run of a replay. S14, S17, S20 and S21 read the records the runs left and complete them from
-  git; a void record that ends a replay is recorded, never re-run here.
+- No re-run of a replay. S14, S17, S20 and S21 read the records the runs left and append nothing; a
+  void record that ends a replay is recorded by its own unit, never re-run here.
 - No new gate leg: every arm lands in a suite that exists or that an earlier unit adds.
 - No govkit code change: S30 corrects a stated blast radius and a fixture.
 - No help page: `help/` covers neither the review harness, the scorer factory nor the hooks.
@@ -181,13 +191,14 @@ one's mechanism.
 
 - **consumes-from** `TOOL-dFairHearing-4` — `deriveAddressKey`, the resume probe's instruction and the verify file name, which S1 to S8 correct
 - **consumes-from** `TOOL-dFairHearing-14` — `check_experiment`, `case_evidence` and the runner arms, which S9 to S12 correct
-- **consumes-from** `TOOL-dFairHearing-25` — replay 1's verdict record and its clone and placement procedure, which S13 to S21 correct
+- **consumes-from** `TOOL-dFairHearing-25` — replay 1's verdict record and the procedure its S7 to S10 carry, which S14, S17, S20 and S21 read after the runs and S16 and S19 complete
 - **consumes-from** `TOOL-dFairHearing-27` — S7, S11, S15, S16, S20, AC7, AC9, AC11 and AC23, which S22 to S32 correct
 - **consumes-from** `TOOL-dFairHearing-30` — unit 15's replay verdict record and its clones, which S13, S14, S20 and S21 read
+- **consumes-from** `TOOL-dFairHearing-35` — the decision and the checker output in unit 30's record, which S13 and AC12 read
 - **consumes-from** `TOOL-dFairHearing-31` — the bar's baseline for the version check, which S28 names in place of a second mechanism
 - **consumes-from** `TOOL-dFairHearing-3` — `DESIGN_RECORD_PRESET` and its AC7 arm, which S19 re-pins to the constant
 - **consumes-from** `TOOL-dFairHearing-16` — the opt-in pack, `spec-audit-optin.js`, whose home S25's resolver finds
-- **hands-off** `TOOL-dFairHearing-37` — the round-4 spec audit's minors on this spec, ids 2, 4, 6, 8, 10, 13, 17, 23, 25, 35, 36 and 37: S20, S21 and AC12 read unit 35's attempt rule for unit 15's replay, AC9 grades no derived value, S13 and AC8's selected half are observed by behaviour, and S6, S7, S18, S22, S25, S26, S31, S32, AC4, AC10, AC13, AC14, AC15, AC16, AC19 and AC20 are corrected there (its S2 to S5, S7, S9, S10 and S13 to S19)
+- **hands-off** `TOOL-dFairHearing-37` — the round-4 spec audit's minors on this spec, ids 2, 4, 6, 8, 10, 13, 17, 23, 25, 35 and 36: AC12's unit-15 half read through unit 35's checker, AC9 read over the values the records wrote at call time, S13 and AC8's selected half observed by behaviour, and S6, S7, S22, S25, S26, S31, S32, AC4, AC10, AC13, AC14, AC15, AC16, AC19 and AC20 corrected there (its S2 to S5, S7, S9, S10 and S13 to S17); id 37, the placement's one trap, is carried by unit 25 S9
 - **hands-off** `TOOL-dFairHearing-38` — finding id 1 (item H1, shared with id 11) of the round-5 spec audit: AC8's comparison and its `%TEMP%/fgc` fixture, re-run there with a staged break as the observation of a `selected` verdict
 - **hands-off** `TOOL-dFairHearing-40` — the round-5 spec audit's finding id 28: where `resolveKitDir`, this unit's S25 port, disagrees with `resolve_kit_dir.py` on unit 37's rows 8 and 9, the cure is that unit's (its S17)
 
@@ -241,17 +252,7 @@ name fallback on a throw. `checkOptinPackPresent` calls it with `('workflows',
 
 ### The placement step (S18)
 
-```bash
-idx=$(mktemp -p "$SCRATCH"); trap 'rm -f "$idx"; git update-ref -d refs/replay/<name> 2>/dev/null' EXIT
-GIT_INDEX_FILE="$idx" git read-tree <source commit>
-GIT_INDEX_FILE="$idx" git update-index --add --cacheinfo 100644,<blob>,<path>
-tree=$(GIT_INDEX_FILE="$idx" git write-tree)
-git update-ref refs/replay/<name> "$(git commit-tree "$tree" -p <source commit> -m placement)"
-# then the recipe, bundling refs/replay/<name>
-```
-
-`$SCRATCH` is the run's scratch directory. Each command's exit status is checked, and no step
-touches the working tree, the index or `HEAD`.
+Carried by unit 25 §4, "The placement step", with its one trap, before replay 1 runs.
 
 ### Files touched (estimate)
 
@@ -259,7 +260,6 @@ touches the working tree, the index or `HEAD`.
 - `tools/workflows/tier2-review.js`
 - `tools/workflows/tier2-review.test.sh`
 - `tools/workflows/replay_scorer.py`
-- `tools/workflows/README.md`
 - `tools/hooks/agent-cap.js`
 - `tools/hooks/agent-cap.test.sh`
 - `tools/hooks/README.md`
@@ -270,8 +270,8 @@ touches the working tree, the index or `HEAD`.
 - `memory/builds/dFairHearing/build/`
 
 `tools/workflows/tier2-review.js` is the template's render. `tools/hooks/README.md` changes where it
-states the pack's home and the deny's wording. Under `memory/builds/dFairHearing/build/` only the two
-replay verdict records change, and only by the lines S14 derives from git.
+states the pack's home and the deny's wording. Under `memory/builds/dFairHearing/build/` only this
+unit's acceptance ledger is written: S14 appends nothing to the replay records.
 
 ### Alternatives rejected
 
@@ -279,26 +279,25 @@ replay verdict records change, and only by the lines S14 derives from git.
 - **Keep S20's hand port and widen it by hand (S25)** — the next widening of the resolver would miss
   it again, the drift `TOOL-aMendedFleet-102` repaired. One port behind a truth table cannot drift
   silently.
-- **Amend spec 25's §3 for id 9 (S16)** — that folds the finding into the spec it was raised on, which
-  M4 refuses.
+- **Amend spec 25's §3 for id 9 (S16)** — M4 has a repair unit correct an unbuilt sibling's spec
+  itself, but each new consumes-from edge there needs a matching hands-off in spec 3, 14 or 16, which
+  are CLOSED and frozen, so the edges stay on the units that read.
 - **Drop unit 27's AC23 with no replacement (S23)** — the restated S28 makes a claim a probe can
   refute, so it gets a criterion that can fail.
 
 ## 5. Production-readiness checklist
 
 - security — S25 follows no receipt path outside the tree and no `..` path, as the canonical does, and
-  keeps the fail-closed deny on the resolver's refusal. S18's placement writes only a transient ref the
-  trap deletes. No new write path.
+  keeps the fail-closed deny on the resolver's refusal. No new write path.
 - perf / scale — one receipt read per spec-audit `Workflow` call; one `git ls-files` per held-out path.
 - error / empty / loading states — S12, S31 and S25 turn a bad reference, a multi-line pathspec result
   and a failed resolution into a named exit or deny, never a traceback or an empty population.
 - observability — each refusal names its arm, path or the places it looked.
-- risks — S14 appends to two records written by earlier units, only with values git derives, so the
-  appended lines cannot disagree with the tree.
+- risks — S14 appends nothing; a replay record lacking the call-time commit is red at its own unit.
 - testing — scratch probes and fixtures per criterion; the §7 arms observed RED then GREEN at the close.
 - migration — none for adopters beyond the deny's wording and the resolver's wider admission (S25).
-- user docs — `tools/workflows/README.md` (the replay section) and `tools/hooks/README.md` (the pack's
-  home). There is no `help/` page (§3).
+- user docs — `tools/hooks/README.md` (the pack's home); the replay section of
+  `tools/workflows/README.md` is units 25 and 30's. There is no `help/` page (§3).
 
 ## 6. Acceptance criteria
 
@@ -308,7 +307,8 @@ replay verdict records change, and only by the lines S14 derives from git.
 - **AC1** — When `git grep -n -e 'verify-<a>-<b>' -e 'verify-${' -e 'verify:ids' -e 'verify-<first id>' -- tools memory/guides`
   runs, it prints nothing. When a scratch stub-agent run of `tools/workflows/tier2-review.js` resumes,
   the prompt its stub captures for the `resume:probe` agent names `verify-batch-<n>.json`.
-  Red when: `tools/workflows/tier2-review.template.js:1021` still reads `verify-<a>-<b>.json`.
+  Red when: the `resume:probe` instruction in `tools/workflows/tier2-review.template.js` still reads
+  `verify-<a>-<b>.json`.
 - **AC2** — When a scratch node probe evaluates the prelude of `tools/workflows/tier2-review.js` as unit
   4 AC1 does, a spec-kind run keys the `where` values `§4`, `Section 3 Design`, `section4`, `§ 4` and
   `SECTION 12` to the `at` values `§4`, `§3`, `§4`, `§4` and `§12`.
@@ -341,29 +341,29 @@ replay verdict records change, and only by the lines S14 derives from git.
   `ungated`, unit 30 AC4 answers this criterion.
   Red when: a `selected` verdict ships a flag that widens the checklist.
   fixture: a scratch catalogue repository under `%TEMP%/fgc`, made by the probe.
-- **AC9** — When each replay verdict record is read, `git log --diff-filter=A --format=%P -1 -- <record>`
-  prints a first parent equal to the record's orchestrating commit. `git merge-base --is-ancestor <unit
-  23's commit> <that commit>` exits 0, and each blob the record names equals `git rev-parse
-  <that commit>:<path>`. Each clone's `HEAD` is named on its own line.
+- **AC9** — When each replay verdict record is read at this unit's commit, `git log --diff-filter=A
+  --format=%P -1 -- <record>` prints a first parent equal to the record's orchestrating commit. `git
+  merge-base --is-ancestor <unit 23's commit> <that commit>` exits 0, and each blob the record names
+  equals `git rev-parse <the adding commit>:<path>`, the binding units 25 S7 and 30 S8 wrote before
+  their runs. Each clone's `HEAD` is named on its own line.
   Red when: the record's commit is one the writer picked, or it names a clone's `HEAD` as the
   orchestrating commit.
-- **AC10** — When `grep -n "trap " tools/workflows/README.md` runs, the replay section prints the EXIT
-  trap, and `grep -n "commit-tree" tools/workflows/README.md` prints its placement step. A scratch run
-  of that placement and recipe in a fixture repository, with `git bundle create` forced to fail, leaves
-  `git for-each-ref refs/replay/` printing nothing, and that repository's `git status --porcelain` and
-  `HEAD` unchanged. In this repository `git for-each-ref refs/replay/` prints nothing.
-  Red when: a failed bundle leaves a transient ref, or the placement moves the working tree.
-  fixture: the repository under `%TEMP%/fpl`, made by the probe.
+- **AC10** — When `git for-each-ref refs/replay/` runs in this repository at this unit's commit, it
+  prints nothing: no run of units 25 and 30 left a transient ref. The placement step and its failure
+  fixture are unit 25 AC8's.
+  Red when: a transient ref survives the runs.
 - **AC11** — When `grep -n DESIGN_RECORD_PRESET tools/workflows/tier2-review.test.sh` runs, it finds
   spec 3's AC7 arm reading its expected preset from the constant. A scratch copy of `review_pin.py` with
   the constant set to `design-audit`, run with two design subjects and no flag as spec 3 AC7 runs it,
   prints `{"preset": "design-audit"}`, which is the value that arm then expects.
   Red when: the arm pins the literal `unit-spec`, so a replay-1 hit reds it.
-- **AC12** — When the two replay verdict records are read, every attempt names its own clone, no run
-  and no record-and-arm pair lists more than two attempts, and unit 30's record prints `paired 4 of 4` or
-  names its void record beside `no decision`. A replay-1 run with no scored attempt has its R-1 ask in
-  `memory/builds/dFairHearing/BACKLOG.md`.
-  Red when: a clone serves two attempts, a third attempt runs, or a partial pairing decides.
+- **AC12** — When the two replay verdict records are read at this unit's commit, every attempt names
+  its own clone. Replay 1 lists at most two attempts per run, and a run with no scored attempt reads
+  `not run` with its R-1 ask in `memory/builds/dFairHearing/BACKLOG.md`. Unit 30's record quotes unit
+  35's `attempts.py` output and prints `paired 4 of 4` or names each `void after cap` pair beside `no
+  decision`; an attempt after a pair's second completed one is listed `unscored`, never red.
+  Red when: a clone serves two attempts, a replay-1 run takes a third attempt, or a partial pairing
+  decides.
 - **AC13** — When a scratch node probe reads `tools/hooks/agent-cap.js` and `check-verifier-fanout.js`
   through `renderBlankedView`, neither holds a `MAX_LENSES` identifier, and the second holds one `const
   LENS_SLOTS` declaration. `git grep -n MAX_LENSES -- tools/check-playbook-parity.sh tools/check-playbook-parity.test.sh tools/workflows/REVIEW-PROTOCOL.template.md memory/guides/REVIEW-PROTOCOL.md`
@@ -409,7 +409,7 @@ replay verdict records change, and only by the lines S14 derives from git.
 
 ## 7. Gates
 
-`tier2-review self-test` · `verifier fan-out self-test` · `verifier fan-out` · `unattended-build self-test` · `review-join self-test` · `agent-cap self-test` · `scratch-guard self-test` · `hook destinations self-test` · `agent-cap restatement` · `playbook parity selftest` · `playbook parity` · `python resolver (behaviour + inline parity + idiom ban)` · `review-replay selftest` · `gotchas selftest` · `workflow script syntax` · `harness arms (fail branches armed or pinned)` · `testsuite counts (every bar self-test prints one)` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`tier2-review self-test` · `verifier fan-out self-test` · `verifier fan-out` · `unattended-build self-test` · `review-join self-test` · `agent-cap self-test` · `scratch-guard self-test` · `hook destinations self-test` · `agent-cap restatement` · `playbook parity selftest` · `playbook parity` · `python resolver (behaviour + inline parity + idiom ban)` · `review-replay selftest` · `gotchas selftest` · `workflow script syntax` · `harness arms (fail branches armed or pinned)` · `testsuite counts (every bar self-test prints one)` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC2 AC11 · the resume probe's old spelling, a space-required section class and spec 3's AC7 arm pinned to the literal under a flipped constant, staged against the harness at `TOOL-dFairHearing-30`'s commit · FLOOR_ASSERTIONS in that suite, raised by the arms added
 New arm: tools/workflows/replay_scorer.py (its runner, in the `review-replay selftest` leg) · covers AC5 AC6 AC7 AC19 · a blanked subject blob, each broken reference and a directory and a glob held-out path, staged against the factory at `TOOL-dFairHearing-30`'s commit · that runner's `ARMS_DECLARED`, raised by the arms added
@@ -427,9 +427,10 @@ New arm: tools/memory-tree/gotchas.py (its selftest) · covers AC20 · a gated s
 - **F2 — How does id 9's missing edge close without folding (S16)?** Options: (a) add three
   consumes-from edges to spec 25 now; (b) declare each read on the unit that reads it after this audit,
   unit 30 for unit 14 and this unit for units 3 and 16; (c) amend spec 25 at this unit's build pass.
-  (a) folds the finding into its own spec, which M4 refuses. (c) edits a spec that is CLOSED by the
-  time this unit builds, and a landed record is frozen. RESOLVED (agent, 2026-10-23, delegated): (b),
-  rung 3. widens: none · relaxes: none
+  (a) is the form M4's repair rule takes today (owner, 2026-11-01), but each edge joins only with a
+  matching hands-off in spec 3, 14 or 16, which are CLOSED and frozen. (c) edits a spec that is CLOSED
+  by the time this unit builds, and a landed record is frozen. RESOLVED (agent, 2026-10-23,
+  delegated): (b), rung 3. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -438,15 +439,39 @@ New arm: tools/memory-tree/gotchas.py (its selftest) · covers AC20 · a gated s
 - rev-2 · 2026-10-23 · §3 · the round-4 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-37 (twelve minors).
 - rev-3 · 2026-10-23 · §3 · the round-5 spec audit's disposal: hands-off edges to TOOL-dFairHearing-38 (AC8 re-run, item H1) and TOOL-dFairHearing-40
   (the port's cure, id 28).
+- rev-4 · 2026-11-03 · §7 · the leg line adds `policy fixtures`, whose guard §4's
+  `tools/hooks/agent-cap.js` and `tools/memory-tree/gotchas.py` trip (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 1).
+  §4 keeps the hook: `renderBlankedView`, `resolveHarnessName` and unit 22's
+  `checkOptinPackPresent` stay there after unit 16.
+- rev-4 · 2026-11-03 · S22 · §10 · `renderBlankedView` re-cited from the hook's line 1303, past the
+  hook's 947 lines since unit 16, to :529 at `9c1a2857a` (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, items 2 and 4).
+- rev-4 · 2026-11-03 · S1 · S23 · S25 · S29 · S30 · AC1 · §10 · every other line re-cited at
+  `9c1a2857a`: the resume probe's step 4 (:1021 to :1247, AC1's red case by its text),
+  `resolveHarnessName` (:112-116 to :74-80), `HK_DIR` (:141-148 to :261-268), the drift arm (:279-281
+  to :400-402), govkit's coupling closure (:1050-1059 and :9311 to :1120-1129 and :9638), and spec 14
+  AC2's fixture line (:189-190 to :198-199) (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief, item 2).
+- rev-5 · 2026-11-03 · header order · §3 Edges · the header's order 23 to 25: its §3 consumes from
+  units 25 and 30, now at 22 and 23, and it stays after unit 35, now at 24, which writes the same
+  verdict record (fix brief 2026-11-03-prompt-TOOL-dFairHearing-25-reorder-fix-brief, item 2).
+- rev-6 · 2026-11-03 · S13 · S14 · S16 · S17 · S18 · S20 · S21 · §3 · §4 · §5 · AC9 · AC10 · AC12 ·
+  §8 F2 · the replays' pre-run halves moved to the replay units (fix brief
+  2026-11-03-prompt-TOOL-dFairHearing-25-fold-fix-brief, items 2, 3 and 5; unit 25 §8 F2). S14's
+  orchestrating-commit binding is carried by unit 25 S7 and unit 30 S8, and AC9 re-reads it with no
+  append; S17's one clone envelope by unit 25 S8 and unit 30 S1, AC10 keeping the residue read; S18's
+  placement by unit 25 S8 and S9, with §4's block and the README leaving this unit's write set; S20 and
+  S21's attempts, cap and void rule by unit 25 S10, unit 30 S1, S3 and S9 and unit 35 S1 and S4, AC12
+  re-reading both records. S13 reads the decision and corrects no replay unit's criterion. §3 takes a
+  consumes-from edge on unit 35, whose checker output AC12 reads, and its hands-off to unit 37 drops
+  id 37, carried by unit 25 S9. S16, §4 and §8 F2 read today's M4 (owner, 2026-11-01).
 
 ## 10. Reuse audit
 
 Every item extends a seam an earlier unit mints or the base tree carries, and none adds a module. The
 seams: `resolve_kit_dir`'s three rungs (`tools/lib/resolve_kit_dir.py:15-51`) and its behaviour-arm
-shape (`tools/lib/resolve-python.test.sh`, arm 2b); `renderBlankedView` (`tools/hooks/agent-cap.js:1303`);
-the parity gate's per-kit resolution (`tools/check-playbook-parity.sh:141-148`); govkit's coupling
-closure (`tools/govkit/govkit.py:1050-1059`, `:9311`); the runner floor (`tools/workflows/review_replay.py:84`,
-`:604-606`); and the README recipe with unit 27 S22's trap. `python tools/codebase-map/reuse_lookup.py
+shape (`tools/lib/resolve-python.test.sh`, arm 2b); `renderBlankedView` (`tools/hooks/agent-cap.js:529`);
+the parity gate's per-kit resolution (`tools/check-playbook-parity.sh:261-268`); govkit's coupling
+closure (`tools/govkit/govkit.py:1120-1129`, `:9638`), each at `9c1a2857a`; the runner floor (`tools/workflows/review_replay.py:84`,
+`:604-606`); and, read only, the README recipe with unit 27 S22's trap, which units 25 and 30 extend. `python tools/codebase-map/reuse_lookup.py
 "resolve the merge base with the remote default branch or refuse"` ranked `resolve_kit_dir`, with 72
 installs, which is the port S25 holds to it. The recall query returned the audit's appendix, spec
 4's inventory of the verify file name, spec 14's criteria and `TOOL-aEvidencedLens-15`, the replay

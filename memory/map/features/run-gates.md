@@ -34,7 +34,10 @@ gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md", "a-runner-knob-owes-
   "signal-trap-runs-the-exit-handler-twice.md",
   "async-job-starts-with-sigint-ignored.md",
   "decision-re-derived-by-a-second-process.md",
-  "canary-waits-on-a-rendezvous-not-a-clock.md", "sweep-issues-no-cost-verdict.md"]
+  "canary-waits-on-a-rendezvous-not-a-clock.md", "sweep-issues-no-cost-verdict.md",
+  "changed-mode-selection-ignores-doc-reads.md",
+  "fail-count-reads-a-pattern-the-row-never-prints.md",
+  "hand-typed-count-of-an-enumerated-population.md"]
 guides = ["MERGE-BAR.md"]
 backlog-shards = []
 lexicon-verbs = []

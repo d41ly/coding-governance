@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-22 — workflow entries as data: ordered stages, each naming its role, fan, cap, effort and rows, every cap under the agent limit
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 5 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 5 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0187@5afc67cc whole
 
@@ -13,9 +13,12 @@
 | [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 |
 | [2026-10-26-build-TOOL-dBoundRoles-22-deviation-221.md](../build/2026-10-26-build-TOOL-dBoundRoles-22-deviation-221.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-22-deviation-222.md](../build/2026-10-26-build-TOOL-dBoundRoles-22-deviation-222.md) | deviation | — |
+| [2026-11-05-build-TOOL-dBoundRoles-22-deviation-223.md](../build/2026-11-05-build-TOOL-dBoundRoles-22-deviation-223.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-9 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-25 TOOL-dBoundRoles-43 TOOL-dBoundRoles-60 |
+| [2026-11-05-prompt-TOOL-dBoundRoles-20-owner-forks-cascade.md](../prompts/2026-11-05-prompt-TOOL-dBoundRoles-20-owner-forks-cascade.md) | research | TOOL-dBoundRoles-20 |
+| [2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks.md) | research | TOOL-dBoundRoles-3 TOOL-dBoundRoles-6 TOOL-dBoundRoles-20 TOOL-dBoundRoles-43 |
 | [2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-1 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-2 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 |
 
 <!-- /gen:spec-records -->
@@ -64,7 +67,9 @@ harness.
 - The five kinds as named defaults over the rows, the checklist, the orientation template, the merge,
   the twin rule and the experiment kind: TOOL-dBoundRoles-16's, over these rows (§8 F1).
 - A repository's workflow entries and role rows composed with gov's: TOOL-dBoundRoles-20's, and
-  `load_workflows` returns that composition. A scenario's, composed per build, is §8 F2, open.
+  `load_workflows` returns that composition. A scenario's, composed per build, is
+  TOOL-dBoundRoles-20's too, which adds `kind.role` and `kind.workflow` to TOOL-dDeclaredLoop-27 S3's
+  `activatable` list (§8 F2).
 - Harnesses reading `fan` and `cap` from the rows: the harness literals (`MAX_VERIFIERS` at
   `tools/workflows/tier2-review.js:1352`, `SPEC_WRITERS` at `tools/workflows/unattended-build.js:942`)
   stay until TOOL-dBoundRoles-16 binds the shapes to the calls.
@@ -261,8 +266,8 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC4 AC5 · a fixture kit 
   order (the kinds at order 23, this unit at 5); (c) the scenario half recorded unowned in this build, a
   scenario activating no role or workflow row until a later build adds the kinds. (a) carries the
   clause whole on the unit owning the kinds, at the cost of a scope change to unit 20; (c) leaves the
-  clause's scenario half unbuilt. Recommendation (a). OPEN for the owner: whether unit 20's scope gains
-  the two `activatable` members or the half is recorded unowned.
+  clause's scenario half unbuilt. Recommendation (a). RESOLVED (owner, 2026-11-05): (a) unit 20's scope
+  gains the two `activatable` members and composes a scenario's activated rows.
 - **F3 — Is a row's `effort` required?** Options: (a) required, the clause's "every stage naming its
   ... effort"; (b) optional, the order falling to the role's declaration. RESOLVED (agent, 2026-10-25,
   delegated): (a), rung 1, the clause text; TOOL-dBoundRoles-16 may let a kind supply it.
@@ -282,8 +287,9 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC4 AC5 · a fixture kit 
   always. (a) is one read-only verb over a set that already exists, and keeps the edge in the shape
   that spec's §4 states; until it lands the `seg`-shape fallback runs with its note, so AC4's third line
   waits on it. (b) binds the roles kit to a loop module's names. (c) drops S4's closed-set check.
-  Recommendation (a), the precedent of TOOL-dDeclaredLoop-12 §8 F5. OPEN for the owner: the ask the
-  build run files is "TOOL-dDeclaredLoop-29: `upstream.py kinds` prints S3's closed set of establishes
+  Recommendation (a), the precedent of TOOL-dDeclaredLoop-12 §8 F5. RESOLVED (owner, 2026-11-05): (a)
+  the `kinds` verb, asked of dDeclaredLoop. The ask the build run files in dDeclaredLoop's `BACKLOG.md`
+  is "TOOL-dDeclaredLoop-29: `upstream.py kinds` prints S3's closed set of establishes
   kinds, one per line".
 
 ## 9. Revision log
@@ -296,6 +302,9 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC4 AC5 · a fixture kit 
   is read through `read_policy_setting`'s `policy.py get` subprocess; the row kinds through a loop-kit
   verb by subprocess, F5 open for that ask; F2 re-opened for the owner, since
   TOOL-dDeclaredLoop-27 S3's `activatable` list holds neither kind.
+- rev-4 · 2026-11-05 · §3 · §8 F2 F5 · the owner resolved F2 and F5 to (a), by
+  `2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks`: a scenario's rows are TOOL-dBoundRoles-20's to
+  compose, and the row kinds' verb is the ask the build run files in dDeclaredLoop's `BACKLOG.md`.
 
 ## 10. Reuse audit
 

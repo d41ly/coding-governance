@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-34 — the version check reads every gov:kit marker in every file the build changed, not four typed directories
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-3 · 2026-11-04 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,9 +9,16 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dFairHearing-34-deviation-341.md](../build/2026-10-23-build-TOOL-dFairHearing-34-deviation-341.md) | deviation | — |
+| [2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md](../build/2026-11-03-build-TOOL-dFairHearing-1-agent-ledger.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50 |
+| [2026-11-04-build-TOOL-dFairHearing-34-1-acceptance-ledger.md](../build/2026-11-04-build-TOOL-dFairHearing-34-1-acceptance-ledger.md) | journal | — |
+| [2026-11-04-build-TOOL-dFairHearing-34-1-builder-return.md](../build/2026-11-04-build-TOOL-dFairHearing-34-1-builder-return.md) | journal | — |
+| [2026-11-08-build-TOOL-dFairHearing-1-runlog-70b3ac3f.md](../build/2026-11-08-build-TOOL-dFairHearing-1-runlog-70b3ac3f.md) | journal | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 TOOL-dFairHearing-43 TOOL-dFairHearing-44 TOOL-dFairHearing-45 TOOL-dFairHearing-46 TOOL-dFairHearing-47 TOOL-dFairHearing-48 TOOL-dFairHearing-50 |
 | [2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md) | research | TOOL-dFairHearing-33 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 |
 | [2026-10-23-prompt-TOOL-dFairHearing-34-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-34-1-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dFairHearing-34-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-34-build-brief.md) | research | — |
+| [2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md](../prompts/2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief.md) | research | TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 | [2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md) | spec-audit | TOOL-dFairHearing-35 TOOL-dFairHearing-33 TOOL-dFairHearing-36 TOOL-dFairHearing-37 |
+| [2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md](../reviews/2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md) | diff-review | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40 |
 
 <!-- /gen:spec-records -->
 
@@ -34,7 +41,8 @@ whose marker number changed. The constant half, the typed pattern, is id 22's, i
   `git diff --name-only -z --no-renames --diff-filter=M <base> HEAD` prints, with no pathspec. The
   check prints `files <n>` for it. Observed by AC1.
 - **S2** — The comparison. In each such file, every `gov:kit <kit>@<n>` marker is read at the base and
-  at `HEAD`, with the marker grammar of `write_version_carriers` (`tools/govkit/govkit.py:820`). A kit
+  at `HEAD`, with the marker grammar of `write_version_carriers` (`tools/govkit/govkit.py:890` at
+  `9c1a2857a`). A kit
   whose marker appears at both ends and carries a number at `HEAD` that the file did not hold at the
   base prints `<path> <kit> <old> -> <new>`, and the check exits 1 when it printed one and 0 otherwise.
   A prose edit that keeps a quoted marker's number moves nothing. Observed by AC1 and AC2.
@@ -114,7 +122,7 @@ The pass writes it with its file-writing tool under its scratch directory.
 
 ### Why the write set and not the carrier manifest
 
-`derive_marker_basis` (`tools/govkit/govkit.py:767`) is the population `selfcheck` check 5c grades,
+`derive_marker_basis` (`tools/govkit/govkit.py:837` at `9c1a2857a`) is the population `selfcheck` check 5c grades,
 built from each entry's claimed paths and its `marker_carriers`. A dogfood copy such as
 `memory/HYGIENE.md` is a rendered file that a carrier list may not name, and `DEPL-aHoistedPass-10`
 records a marker carrier outside both of the populations `tools/check-kit-versions.sh` reads. The
@@ -186,11 +194,14 @@ none
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 31 (item H1, HIGH, shared with id 22) of
   the round-4 spec audit of specs 28 to 32.
 - rev-2 · 2026-10-23 · §3 · the round-5 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-40 (five minors).
+- rev-3 · 2026-11-03 · S2 · §4 · §10 · re-cited at `9c1a2857a`: the marker grammar in
+  `write_version_carriers` (:820 to :890) and `derive_marker_basis` (:767 to :837) (fix brief 2026-11-03-prompt-TOOL-dFairHearing-27-sweep-fix-brief,
+  item 2).
 
 ## 10. Reuse audit
 
 The marker grammar is govkit's, `gov:kit ([a-z0-9-]+)@([0-9]+(?:\.[0-9]+)*)` in
-`write_version_carriers` (`tools/govkit/govkit.py:820`), copied into the scratch probe because that
+`write_version_carriers` (`tools/govkit/govkit.py:890` at `9c1a2857a`), copied into the scratch probe because that
 function writes and this one only reads. `python tools/codebase-map/reuse_lookup.py "find gov:kit
 version markers whose number changed between two commits"` ranked `changed` in
 `tools/run-gates/run-gates.sh`, the bar's path filter, and generic `kit` and `commit` stems; no

@@ -696,7 +696,7 @@ only mitigation; there is no detector.
 
 ### M4 — the spec-audit lens catalogue
 
-The one source of the catalogue is `SPEC_LENSES` in `<prefix>/workflows/tier2-review.js`; each lens's brief is there.
+The one source of the catalogue is `<prefix>/workflows/lenses.toml`, and `SPEC_LENSES` in `<prefix>/workflows/tier2-review.js` is its render; each lens's brief is in both.
 
 ## Running this engine verbatim — the four adopter routes
 

@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-56 — the round-1 spec audit's 47 minors: owed leg rows, one reader each, honest skew and failure paths, and the citations that drifted
 
-**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-5 · 2026-11-05 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,9 +13,14 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-56-deviation-561.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-56-deviation-561.md) | deviation | — |
 | [2026-10-24-build-TOOL-dDeclaredLoop-56-deviation-562.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-56-deviation-562.md) | deviation | — |
 | [2026-10-25-build-TOOL-dDeclaredLoop-56-deviation-563.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-56-deviation-563.md) | deviation | — |
+| [2026-11-05-build-TOOL-dDeclaredLoop-56-deviation-564.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-56-deviation-564.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 |
+| [2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 |
+| [2026-11-05-prompt-TOOL-dDeclaredLoop-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-3-owner-forks.md) | research | TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-11-05-prompt-TOOL-dDeclaredLoop-56-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-56-1-spec-writer.md) | journal | — |
+| [2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md) | research | TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 |
 | [2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 |
 
 <!-- /gen:spec-records -->
@@ -92,10 +97,8 @@ That is 44 MEDIUM and 3 LOW findings by raw id.
   the `[[gate_leg]]` part of what PLAY-dOrderedCharter-50's `owed_rows.py --base <the build run's start
   commit>` prints for a leg added, where that parent has landed, else this item's list; an
   `[[exempt_leg]]` row never answers one, since every loop leg ships in the loop kit's descriptor.
-  `enforces` is this item's own list, as the probe owes no such row: a leg whose unit wrote it is
-  observed; any other gets the tag of the principle whose v2 `[enforcement]` row names the adding
-  unit's clause, and the pending list's stale row for that tag is deleted. No tag is invented for a
-  clause no row names (§8 F5). Observed by AC3.
+  Each leg's own unit writes its `enforces` in its pass, re-grounded by this build's run where its
+  spec names none, and this item only observes it (§8 F5). Observed by AC3.
   **Readers:** by name: READER NOT IN TREE — the pending list and its reader, the meta-check verb of
   the playbook kit's core.py, are minted by PLAY-dOrderedCharter-7, DEFERRED, so no tracked file spells
   the rows of S4's tags at this spec's base; once that unit lands, the meta-check is the one reader, and it reds
@@ -294,23 +297,26 @@ sequenced.
 
 ### The owed leg rows (S4, S5)
 
-In the `enforces` column, "own" means the leg's unit writes it in its pass and this item observes it;
-a tag means this item writes it. "Base" is `[[gate_leg]]`, pins, dossier and ceiling evidence.
+Each leg's unit writes its `enforces` in its pass and this item observes it (§8 F5); a tag is the one
+that unit's re-ground writes. "Base" is `[[gate_leg]]`, pins, dossier and ceiling evidence.
 
 | Leg | Unit | `enforces` | Rows owed here |
 |---|---|---|---|
 | `loop definition` | 1 | own | base |
-| `loop guard fixtures` | 2 | F5: no row names `cl-dClosedLoop-0087` | base |
+| `loop guard fixtures` | 2 | `principle.p10` (F5) | base |
 | `loop transition record` | 3 | own, its §8 F7 | base |
 | `loop stage coverage` | 4 | own | base |
 | `loop command conformance`, `loop factories fixtures` | 6 | own | base, and `stage` |
 | `loop position fixtures` | 7 | `principle.p22` | base |
 | `loop claims fixtures` | 8 | `principle.p23` | base |
+| `loop checklist tags` | 11 | `principle.p11` | base |
+| `loop transition tables` | 13 | `principle.p20` | base |
 | `loop frontier fixtures` | 14 | `principle.p24` | base |
+| `loop parent routes` | 15 | `principle.p21` (F5) | base |
 | `loop computed witness` | 17 | own | base |
 | `loop review bounds fixtures` | 21 | `principle.p38` | pins, dossier, ceiling evidence, `stage` |
 | `loop splice check` | 25 | `principle.p20` | base, and `stage` |
-| `loop composition fixtures`, `loop adapt fixtures`, `loop upstream fixtures` | 26, 28, 29 | F5: no row names their clauses | pins, dossier, ceiling evidence, `stage` |
+| `loop composition fixtures`, `loop adapt fixtures`, `loop upstream fixtures` | 26, 28, 29 | `principle.p8` (26, 28), `principle.p26` (29, F5) | pins, dossier, ceiling evidence, `stage` |
 | `loop scenario fixtures` | 27 | own | pins, dossier, ceiling evidence, `stage` |
 | `loop budget fixtures` | 30 | `principle.p39` | pins, dossier, ceiling evidence, `stage` |
 | `loop termination` | 33 | own | base, and `stage` |
@@ -590,7 +596,7 @@ AC42 are observed by probes, never by those suites.
   names its clause, and S4 only observes; (b) S4 writes the keys at order 36, the bar's `core
   meta-check` leg red from each such pass until then; (c) a pending-list row, which the shrink-only
   list refuses. (b) lands red across many passes and (c) breaks unit 7's rule. Recommendation: (a).
-  Open for the owner, since (a) revises specs outside this re-ground.
+  RESOLVED (owner, 2026-11-05): (a) each unit's own pass writes the key.
 
 ## 9. Revision log
 
@@ -605,6 +611,9 @@ AC42 are observed by probes, never by those suites.
   the `enforces` rows 7, 18, 23, 36 and 47: S4 takes only the `[[gate_leg]]` part from `owed_rows.py`,
   keeps its own `enforces` list with no pending-list fallback and refuses an `[[exempt_leg]]` answer;
   the table gains units 3, 17 and 27; S20 tests stderr, per PLAY-dOrderedCharter-15 F4.
+- rev-5 · 2026-11-05 · S4 · §4 owed rows · §8 F5 · owner picked F5 (a), brief
+  `2026-11-05-prompt-TOOL-dDeclaredLoop-3-owner-forks`; S4 observes only. Brief
+  `2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade`: §4 owed rows states every unit's tag.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-28 — spec folds run through the build harness, and a leased session spawns no spec writer directly
 
-**Status:** OPEN · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 29 · ratified 2026-10-13
+**Status:** OPEN · rev-3 · 2026-11-10 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 29 · ratified 2026-10-13
 
 <!-- gen:spec-records -->
 
@@ -599,7 +599,7 @@ to any file but the authored spec is committed before its run.
 
 ## 7. Gates
 
-`unattended kit gate` · `unattended skill wiring` · `unattended protocol size` · `unattended skill size` · `hook destinations (every declared hook path ships)` · `check-wiring self-test` · `unattended-build self-test` · `tier2-review self-test` · `verifier fan-out self-test` · `review-join self-test` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `verifier fan-out` · `review-join ban (no ref-keyed join)` · `roles adopter self-test` · `roles catalogue` · `roles render wiring` · `roles render selftest` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `install-prefix (shipped surface)` · `encoding posture (text IO names its encoding)` · `codebase-map coverage + freshness` · `govkit selfcheck` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `unattended skill wiring` · `unattended protocol size` · `unattended skill size` · `hook destinations (every declared hook path ships)` · `check-wiring self-test` · `unattended-build self-test` · `tier2-review self-test` · `verifier fan-out self-test` · `review-join self-test` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `verifier fan-out` · `review-join ban (no ref-keyed join)` · `roles adopter self-test` · `roles catalogue` · `roles render wiring` · `roles render selftest` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `install-prefix (shipped surface)` · `encoding posture (text IO names its encoding)` · `codebase-map coverage + freshness` · `govkit selfcheck` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `scratch-guard self-test`
 
 New arm: tools/workflows/unattended-build.test.sh · covers AC1 AC2 AC3 AC4 AC5 · the fold arms, against the fold refusals staged out, then the merge's rev compare staged to accept any rev, then the commit message staged to the authoring form · `FLOOR_ASSERTIONS` raised by the assertions added
 New arm: tools/unattended/gate-guard.test.sh · covers AC6 AC7 · the spawn arms, against `checkSpawn` staged to return null, then its `roles[type].workflow` test staged out so every role is refused · `FLOOR_ASSERTIONS` raised by the assertions added
@@ -650,6 +650,9 @@ No pass runs a leg above.
   of 2026-10-13: the commit block runs the `SPEC_TOKENS_CLI` checker and refuses on a hit in a
   spec it commits (§4 "The token check"); AC10 passes its two paths as arguments, each a tracked
   path token; AC5 drops the commit stage's prompt from its compare.
+- rev-3 · 2026-11-10 · §7 · adds scratch-guard self-test, which TOOL-aSmoothedDispatch-8's guard on the
+  driver now trips through this spec's tools/unattended/ estimate
+  (2026-11-10-review-TOOL-aSmoothedDispatch-1-closing-diff-round1).
 
 ## 10. Reuse audit
 

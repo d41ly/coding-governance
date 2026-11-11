@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.155 -->
+<!-- gov:kit memory-tree@2.157 -->
 [memory/TEMPLATE-SPEC.md · Level 3 · The spec format, read before writing a spec or adding a write path; yields to levels 0 to 2]
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
@@ -233,9 +233,11 @@ resting on something the unit does not build. The measured case is one spec whos
 AC5 all rested on a verb the owner had cut from its scope; two of the four never spell the verb,
 which is why an edge is DECLARED and not grepped.
 
-**Three of the four arms are JOINS and are HELD under `--staged`**, with an announce line, because
-there the selection is the staged set and one end of a correctly declared pair would report the other
-as missing. The shape arm reads one file and stays live. A join whose target is outside the graded
+**Three of the four arms are JOINS, and under `--staged` they read each staged spec's whole build**:
+the staged spec is joined against its build's specs as they stand in the worktree, and an edge is
+reported when either end of it is staged, so the commit that leaves a declared edge one-way is the
+commit that reds. The shape arm reads one file and grades only the staged specs. A join whose
+target is outside the graded
 population — a Tier-1 sibling, or a spec the cutoff grandfathered — is silent by design: absence is
 not disagreement. And reciprocity proves the other author WROTE the line, never that their scope
 covers the work; a rubber-stamped reciprocal passes, and it is worth having because writing the line

@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 170 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 151 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 171 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 162 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -155,6 +155,7 @@ Inventories: gate-legs: 170 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `shell-hygiene selftest` | gate-lint |
 | `spawn budget (forks per hot entrypoint)` | gate-lint |
 | `spec tokens (a spec's own names resolve)` | spec-tokens |
+| `spec-audit opt-in pack self-test` | review-harnesses |
 | `spec-tokens self-test` | spec-tokens |
 | `step-gate` | govkit |
 | `step-rows-frozen` | govkit |
@@ -223,6 +224,7 @@ Inventories: gate-legs: 170 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `PreToolUse tools/hooks/agent-cap.js` | agent-cap |
 | `PreToolUse tools/hooks/scratch-guard.js` | agent-cap |
 | `PreToolUse tools/unattended/gate-guard.js` | unattended |
+| `PreToolUse tools/workflows/spec-audit-optin.js` | review-harnesses |
 | `SessionStart skills/session-kickoff/manifest-check.sh` | session-kickoff |
 | `SessionStart tools/check-wiring.sh` | foundation |
 | `SessionStart tools/process-monitor/procmon-hook.js` | process-monitor |
@@ -235,12 +237,15 @@ Inventories: gate-legs: 170 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 
 | key | claimant |
 |---|---|
+| `check-review-join.js` | review-harnesses |
+| `check-verifier-fanout.js` | agent-cap |
 | `check-workflow-syntax.js` | review-harnesses |
 | `drift-audit-code.js` | review-harnesses |
 | `drift-audit-code.template.js` | review-harnesses |
 | `drift-audit-state.js` | review-harnesses |
 | `drift-audit-state.template.js` | review-harnesses |
 | `orient-counterfactual.js` | review-harnesses |
+| `spec-audit-optin.js` | review-harnesses |
 | `tier2-review.js` | review-harnesses |
 | `tier2-review.template.js` | review-harnesses |
 | `unattended-build.js` | unattended |
@@ -286,6 +291,7 @@ Inventories: gate-legs: 170 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `ab-arm-never-did-the-work.md` | run-gates |
 | `absence-assertion-over-whole-file-text.md` | baseline |
 | `absence-read-from-one-of-several-homes.md` | build-method |
+| `adopter-migration-sweep.md` | review-harnesses |
 | `allocation-knob-without-a-ceiling.md` | run-gates-turnstile |
 | `allowlist-narrower-than-the-root-it-guards.md` | agent-cap |
 | `amendment-leaves-its-other-half-standing.md` | build-method |
@@ -302,8 +308,10 @@ Inventories: gate-legs: 170 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `borrowed-seed-inherits-its-head-state.md` | unattended |
 | `bounded-through-a-pipe-is-unbounded.md` | run-gates, unattended |
 | `canary-waits-on-a-rendezvous-not-a-clock.md` | run-gates |
+| `changed-mode-selection-ignores-doc-reads.md` | run-gates |
 | `check-format-grades-two-populations.md` | build-readme-surface |
 | `check-grades-one-layer-of-a-layered-config.md` | policy |
+| `comment-claims-a-check-the-case-does-not-run.md` | memory-tree-hygiene |
 | `concurrency-is-not-a-budget.md` | baseline |
 | `concurrent-runs-are-announced-not-refused.md` | unattended-mandate |
 | `conf-value-interpolated-into-a-regex.md` | agent-cap |
@@ -313,7 +321,9 @@ Inventories: gate-legs: 170 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `decision-re-derived-by-a-second-process.md` | run-gates |
 | `degradation-known-but-unreported.md` | review-harnesses |
 | `destructive-step-before-its-precondition.md` | unattended |
+| `doc-names-an-argument-the-code-never-reads.md` | memory-tree-hygiene |
 | `empty-field-collapses-unless-it-is-last.md` | run-gates |
+| `fail-count-reads-a-pattern-the-row-never-prints.md` | run-gates |
 | `fallback-drain-strands-its-witnesses.md` | build-method |
 | `fallback-fabricates-the-passing-value.md` | unattended |
 | `fixed-sleep-does-not-place-a-signal.md` | runlog |
@@ -325,13 +335,16 @@ Inventories: gate-legs: 170 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `fold-text-is-unreviewed-surface.md` | build-method |
 | `foreign-code-runs-on-the-ambient-credential.md` | build-method |
 | `format-derived-from-arity.md` | run-gates |
+| `forwarded-arg-opens-an-unhandled-return-shape.md` | memory-tree-hygiene |
 | `gate-green-by-accident-on-generated-bytes.md` | baseline |
 | `git-rm-cached-refuses-a-diverged-index-blob.md` | agent-cap |
 | `grammar-bound-to-the-wrong-root.md` | baseline |
 | `guard-above-a-fold-makes-its-fallback-dead.md` | govkit |
 | `guard-fed-the-value-it-supersedes.md` | unattended |
 | `hand-named-gate-list-green-while-the-bar-reds.md` | build-method |
+| `hand-typed-count-of-an-enumerated-population.md` | run-gates |
 | `held-suite-guard-misses-a-sibling-kit.md` | agent-cap |
+| `helper-whose-only-caller-is-its-selftest.md` | memory-tree-hygiene |
 | `heredoc-escape-reaches-the-regex.md` | baseline |
 | `history-leg-graded-before-the-reconcile-commit.md` | memory-tree-hygiene |
 | `hookspath-resolves-into-another-checkout.md` | run-gates |
@@ -371,6 +384,7 @@ Inventories: gate-legs: 170 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `pipe-in-a-code-span-splits-a-table-cell.md` | memory-tree-hygiene |
 | `policy-value-with-no-route.md` | build-method |
 | `porcelain-diff-names-a-rename-by-its-destination.md` | unattended |
+| `portability-sweep.md` | review-harnesses |
 | `predicate-bounded-by-its-own-count.md` | run-gates-turnstile |
 | `predicate-designed-without-a-run-over-the-tree.md` | build-method |
 | `process-creation-is-the-suite-cost.md` | unattended |
@@ -408,12 +422,14 @@ Inventories: gate-legs: 170 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `task-handed-as-the-spec-is-reviewed-not-done.md` | build-method |
 | `test-oracle-read-from-a-historical-sha.md` | review-harnesses |
 | `text-mode-read-eats-a-bare-cr.md` | unattended |
+| `topology-sweep.md` | review-harnesses |
 | `trace-profile-measures-itself.md` | unattended |
 | `trailing-comma-counted-as-an-element.md` | agent-cap |
 | `trapped-signal-waits-for-the-foreground-child.md` | runlog |
 | `two-answers-to-one-question.md` | baseline |
 | `two-guards-one-question-two-answers.md` | unattended |
 | `two-readers-of-one-config-one-re-derived.md` | unattended |
+| `unvalidated-arg-reaches-an-agent-shell-line.md` | memory-tree-hygiene |
 | `vacuous-selector-empty-population.md` | baseline |
 | `verdict-printed-before-the-step-that-reverts-it.md` | govkit |
 | `waiver-row-that-hides-nothing-reds.md` | memory-tree-hygiene |

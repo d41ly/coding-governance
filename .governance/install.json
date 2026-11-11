@@ -1109,10 +1109,22 @@
       "source": "tools/workflows/check-protocol-parity.test.sh"
     },
     {
+      "path": "tools/review-harness/check-review-join.js",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/check-review-join.js"
+    },
+    {
       "path": "tools/review-harness/check-review-join.sh",
       "kit": "review-harness",
       "role": "engine",
       "source": "tools/workflows/check-review-join.sh"
+    },
+    {
+      "path": "tools/review-harness/check-verifier-fanout.js",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "path": "tools/review-harness/check-verifier-fanout.sh",
@@ -1151,6 +1163,12 @@
       "source": "tools/workflows/kit.toml"
     },
     {
+      "path": "tools/review-harness/lenses.toml",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/lenses.toml"
+    },
+    {
       "path": "tools/review-harness/orient-counterfactual.js",
       "kit": "review-harness",
       "role": "engine",
@@ -1163,10 +1181,40 @@
       "source": "tools/workflows/orient.agent.md"
     },
     {
+      "path": "tools/review-harness/render_lenses.py",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/render_lenses.py"
+    },
+    {
+      "path": "tools/review-harness/replay_scorer.py",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "path": "tools/review-harness/review_pin.py",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/review_pin.py"
+    },
+    {
       "path": "tools/review-harness/review_replay.py",
       "kit": "review-harness",
       "role": "engine",
       "source": "tools/workflows/review_replay.py"
+    },
+    {
+      "path": "tools/review-harness/spec-audit-optin.fragment.json",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/spec-audit-optin.fragment.json"
+    },
+    {
+      "path": "tools/review-harness/spec-audit-optin.js",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/spec-audit-optin.js"
     },
     {
       "path": "tools/review-harness/tier2-review.template.js",

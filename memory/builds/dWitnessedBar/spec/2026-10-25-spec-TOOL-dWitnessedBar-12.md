@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-12 — the `leg`, `check` and `pack` tag namespaces, and a `tag` on every leg
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 5 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 5 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0350@37beff65 whole
 **Carries:** node:tag-namespace.leg
@@ -15,10 +15,12 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-1-reuse-scout-b.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-reuse-scout-b.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-28 |
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-26-build-TOOL-dWitnessedBar-12-deviation-121.md](../build/2026-10-26-build-TOOL-dWitnessedBar-12-deviation-121.md) | deviation | — |
+| [2026-11-05-build-TOOL-dWitnessedBar-12-deviation-122.md](../build/2026-11-05-build-TOOL-dWitnessedBar-12-deviation-122.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 |
 | [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
+| [2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md) | research | TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-28 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -71,7 +73,8 @@ other tagged thing. 139 of 140 leg names failed the tag shape when the systems r
 - A rename or retirement of a leg tag. No write path owns it: PLAY-dOrderedCharter-15's write verbs
   take `--manifest <kit id>|overlay` over instruction manifests, and its change record's `Unit` field
   is an instruction unit's tag (its S2, S7 and `WRITE_VERBS`), so no path of that unit writes
-  `tools/gate-legs.json`. §8 F5 holds where the path goes. PLAY-dOrderedCharter-15 S9's
+  `tools/gate-legs.json`. Per §8 F5 the path goes to that unit's `new change` door, by the ask this
+  build run files in dOrderedCharter's `BACKLOG.md`. PLAY-dOrderedCharter-15 S9's
   `extract_change_records` is named here only as the reader that turns a recorded end of a tag into
   its retired index row.
 
@@ -107,8 +110,8 @@ equal, every one matching `seg := [a-z0-9][a-z0-9-]*`, and no `<owner>` a namesp
 measured 2026-10-25 by a probe over the manifest, the descriptors and the registry).
 
 The rule runs once, at the pass, to write the tags. After that a tag is the leg's declared identity
-and is not re-derived when its `name` changes; a rename of the tag has no owned write path yet
-(§3, §8 F5). A new leg is given its tag by the same rule, which the gov canary's
+and is not re-derived when its `name` changes; a rename of the tag has no owned write path until
+the `new change` door accepts a `leg.*` tag (§3, §8 F5). A new leg is given its tag by the same rule, which the gov canary's
 shape and uniqueness arm and 7h hold it to.
 
 ### The three rows
@@ -293,7 +296,8 @@ New arm: tools/govkit/selftest.py · covers AC6 AC7 · the `tag` floor pair and 
   record of its own, which S9's extractor then cannot read without a second record kind. (a) keeps one
   record kind and one retirement reader; its cost is a parent change, and until it lands a leg tag is
   renamed by no door. (b) needs no parent change but adds a mechanism to unit 11 and a second record of
-  a tag's end. Recommendation (a). Open for the owner: the ask the build run files is
+  a tag's end. Recommendation (a). RESOLVED (owner, 2026-11-05): (a) an ask to dOrderedCharter's
+  `new change` door. The ask this build run files in `memory/builds/dOrderedCharter/BACKLOG.md` is
   "PLAY-dOrderedCharter-15: the S7 `new change` door accepts a `leg.*` tag in `Unit`".
 
 ## 9. Revision log
@@ -307,6 +311,10 @@ New arm: tools/govkit/selftest.py · covers AC6 AC7 · the `tag` floor pair and 
   `2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck`, row 37: a leg tag's rename or retirement
   has no write path in PLAY-dOrderedCharter-15, so it is named unowned, with F5 open for the owner and
   oc15 S9 named only as the reader of retired rows.
+- rev-4 · 2026-11-05 · §3 · §4 The tag rule · §8 F5 · F5 RESOLVED (owner) to (a), by the brief
+  `2026-11-05-prompt-TOOL-dWitnessedBar-3-1-spec-writer`: a leg tag's rename or retirement goes to
+  PLAY-dOrderedCharter-15's `new change` door, by the ask filed in dOrderedCharter's `BACKLOG.md`;
+  nothing else moved.
 
 ## 10. Reuse audit
 

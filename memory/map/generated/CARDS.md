@@ -13,10 +13,11 @@ PreToolUse guards — fan-out bounded across Workflow+Agent, scratch bounded acr
 - gate-legs 10: `agent-cap self-test`, `scratch-guard self-test`, `format-guard self-test`, `verifier fan-out`, `verifier fan-out self-test`, `review-protocol parity (kit vs dogfood)`, `agent-cap restatement`, `agent-cap restatement self-test`, `hook destinations (every declared hook path ships)`, `hook destinations self-test`
 - kits 1: `hooks`
 - harness-hooks 4: `PreToolUse tools/hooks/agent-cap.js`, `PreToolUse tools/hooks/scratch-guard.js`, `SubagentStart tools/hooks/scratch-guard.js`, `Stop tools/hooks/format-guard.js`
-- gotcha-classes 9: `bash-c-multiline-flattens-under-msys.md`, `held-suite-guard-misses-a-sibling-kit.md`, `git-rm-cached-refuses-a-diverged-index-blob.md`
+- workflow-scripts 1: `check-verifier-fanout.js`
+- gotcha-classes 9: `bash-c-multiline-flattens-under-msys.md`, `held-suite-guard-misses-a-sibling-kit.md`
 - guides 1
-- globs 11
-- cut 18 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- globs 12
+- cut 20 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## annotation-style
 
@@ -159,9 +160,9 @@ check-memory-hygiene.sh: the memory tree's structural gate, its per-class size c
 - gate-legs 11: `memory hygiene`, `memory-hygiene self-test`, `verdict epoch (kit version dates the engine)`, `verdict-epoch self-test`, `kit version markers`, `kit/dogfood doc parity`, `transition-audit arms`, `backlog migration selftest`, `straggler-guard arms`, `routed commits name a specced unit`, `routed-commits selftest`
 - kits 1: `memory-tree`
 - git-hooks 2: `commit-msg`, `pre-rebase`
-- gotcha-classes 17: `a-grep-for-a-word-is-a-presence-probe.md`, `suite-edited-while-bash-executes-it.md`, `ledger-token-wrapped-across-a-line-joins-nothing.md`
+- gotcha-classes 22: `a-grep-for-a-word-is-a-presence-probe.md`, `suite-edited-while-bash-executes-it.md`, `ledger-token-wrapped-across-a-line-joins-nothing.md`
 - globs 11: `tools/memory-tree/check-memory-hygiene.sh`
-- cut 24 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 29 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## memory-tree-merge-driver
 
@@ -234,10 +235,12 @@ Workflow review harnesses — one pipeline, three implementations, one hardened
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/review-harnesses.md`
 - decisions 0
-- gate-legs 6: `workflow script syntax`, `review-join ban (no ref-keyed join)`, `review-join self-test`, `review-replay selftest`, `tier2-review self-test`, `unattended-build self-test`
-- workflow-scripts 9: `check-workflow-syntax.js`, `drift-audit-code.js`, `drift-audit-code.template.js`, `drift-audit-state.js`, `drift-audit-state.template.js`, `orient-counterfactual.js`, `tier2-review.js`, `tier2-review.template.js`, `unattended-build.template.js`
-- gotcha-classes 4: `degradation-known-but-unreported.md`, `node-check-is-not-a-syntax-gate.md`, `observed-by-claim-no-arm-discharges.md`, `test-oracle-read-from-a-historical-sha.md`
+- gate-legs 7: `workflow script syntax`, `review-join ban (no ref-keyed join)`, `review-join self-test`, `spec-audit opt-in pack self-test`, `review-replay selftest`, `tier2-review self-test`, `unattended-build self-test`
+- harness-hooks 1: `PreToolUse tools/workflows/spec-audit-optin.js`
+- workflow-scripts 11: `check-review-join.js`, `check-workflow-syntax.js`, `drift-audit-code.js`, `drift-audit-code.template.js`, `drift-audit-state.js`, `drift-audit-state.template.js`, `orient-counterfactual.js`, `spec-audit-optin.js`, `tier2-review.js`, `tier2-review.template.js`, `unattended-build.template.js`
+- gotcha-classes 7: `degradation-known-but-unreported.md`, `node-check-is-not-a-syntax-gate.md`
 - globs 1: `tools/workflows/*`
+- cut 5 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## roles
 
@@ -268,10 +271,10 @@ The gate runner, its harnesses, and the adopter that keeps a target's verdict re
 - decisions 9: `TOOL-aPacedTurnstile-1`, `TOOL-aPacedTurnstile-2`, `TOOL-aPacedTurnstile-4`, `TOOL-aPacedTurnstile-5`, `TOOL-aPacedTurnstile-6`, `TOOL-aPacedTurnstile-3`, `TOOL-aPacedTurnstile-7`, `TOOL-aPacedTurnstile-16`, `TOOL-dLoggedFlight-3`
 - gate-legs 15: `run-gates gov canary`, `run-gates adopter e2e`, `run-gates wiring`, `profile-bar selftest`, `every held leg is budgeted, every budget row resolves`, `run-selftests self-test`, `selftest harness self-test`, `extract-arms self-test`, `leg ceilings clear their evidenced maximum`, `run-gates run-log line`, `receipt sync (installed files match the receipt)`, `pre-push bar self-test`, `held-halves selftest`, `measure-legs selftest`
 - kits 1
-- gotcha-classes 15
+- gotcha-classes 18
 - guides 1
 - globs 28
-- cut 46 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 49 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## run-gates-turnstile
 

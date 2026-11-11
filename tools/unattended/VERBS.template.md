@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.113 -->
+<!-- gov:kit unattended@1.118 -->
 [memory/guides/UNATTENDED-VERBS.md · Level 3 · Binding with the unattended protocol, the verbs a run calls; yields to levels 0 to 2]
 # Unattended runs — the verbs
 
@@ -129,7 +129,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   sidecar line, whatever its phase, when the record names a keepalive id and that line exists. The
   line stays ONE line: a field joins it or does not print, and the suite arms that.
 - `--audit` — one line per unit whose dispatch rows at their newest anchor, taken together, are still
-  open and whose spec is not terminal: how long the TREE has been idle (newest write, newest commit) and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
+  open and whose spec is neither terminal nor deferred (DEFERRED, with its latest rescope defer row
+  after every dispatch row naming it): how long the TREE has been idle (newest write, newest commit)
+  and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
   `STALLED` line followed by one remedy line. Read-only; the idle-wake runs it. It cannot see what
   the unit is doing or whether a process is stuck — its figures are properties of the tree. After
   the units it prints one line per open REGISTERED task: its heartbeat path, `last-beat <s>s ago`
@@ -218,7 +220,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   rather than in enforced ordering: the pair catches an amendment made with NO record, never a
   truthful-looking row attached to a different edit.
 - `--dispatch` — records the WRITE-SET DECLARATION a concurrent dispatch owes: `--pass <unit-id>`
-  and a REPEATABLE `--writes <path>`, one path per occurrence. The build method requires two path
+  and `--writes`, which takes every path up to the next flag: a whitespace-joined value splits into
+  its paths, and the flag may repeat. The build method requires two path
   lists written down before two passes run together, and until this verb nothing read one. It decides
   two of that condition's three clauses — the intersection test, and the shared-record refusal in
   BOTH halves, so a generated index alone is accepted and only the index TOGETHER WITH its generator
@@ -230,12 +233,18 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   several pass kinds per unit, and a later row is read the same way whichever it is. What the verb
   REFUSES is overlap with a SIBLING pass still open, the disjointness question it exists for and the
   one thing here that is unchanged; a unit's own rows are never siblings of each other.
-  A pass of a unit whose spec is CLOSED or WONTDO is not a sibling: it reserves nothing, and a later pass for such a unit reserves its paths only once its spec is set back to INPROGRESS.
+  A pass of a unit whose spec is CLOSED or WONTDO is not a sibling: it reserves nothing, and a later pass for such a unit reserves its paths only once its spec is set back to INPROGRESS. A pass of a deferred unit, whose spec reads DEFERRED and whose latest rescope defer row follows every dispatch row naming it, is not a sibling either, until the unit is dispatched again.
   A pass's COMMIT is the one whose `Pass: <unit-id>` trailer names it; a commit with no trailer falls back to
-  its subject, and `Pass: none` names no unit. Before any of that it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
-  live tree and refuses the dispatch when it exits non-zero: the checker's bar join grades LIVE specs,
-  an unattended build closes each unit spec in its own build commit, and this verb is the one point
-  that sees a spec before its unit builds. A blank or absent key is an ANNOUNCED skip on stdout,
+  its subject, and `Pass: none` names no unit. After every cheap refusal and before the claim read it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
+  live tree: the checker's bar join grades LIVE specs, an unattended build closes each unit spec in its
+  own build commit, and this verb is the one point that sees a spec before its unit builds. It runs
+  last because it costs a tree-wide scan, and every refusal above it — the order gate, the edge and
+  hold gates, the path and shared-record refusals, condition 1 — is decided from the run-state file,
+  the spec headers or `git` in seconds. It refuses on any red but a hit in another build's spec,
+  which it notes and admits, because the bar's whole-tree leg still grades that build.
+  It skips the run when its inputs match the last check it admitted for this build, keyed on the
+  slug, the checker, the launcher, HEAD and the run-gates working-tree fingerprint, recorded under
+  the sidecar root; with no fingerprint it announces that the cache is off and runs the checker. A blank or absent key is an ANNOUNCED skip on stdout,
   never a silent pass. Where `RUN_CLAIMS` is `on` it reads the run's claim as the holder after every
   local refusal and before the row: another session's claim is check 108 and no row is written.
 - `--review` — records ONE review round for a subject and reports what the loop is doing:
@@ -763,11 +772,14 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   `supersede` and `defer` are surfaced-class rows your `parked-decisions-surfaced` attestation must
   cover; `add` stays history.
 - **Before dispatching a pass, DECLARE its write set** (M6): `--dispatch <slug> --pass <unit-id>
-  --writes <path> --writes <path>`, one path per `--writes`. It refuses two passes claiming one file
+  --writes <path> <path>`. `--writes` takes every path up to the next flag: a whitespace-joined
+  value splits into its paths, and the flag may repeat. It refuses two passes claiming one file
   and a pass claiming a shared mutable record; a generated index alone is fine and only the index
-  WITH its generator is refused. Whether a file is a contract the sibling reads is a judgement no verb
-  makes. A pass needing another file declares again BEFORE the commit, naming only the paths it
-  adds: every row at one anchor stands and the pass may write their union, which `--dispatch` prints
+  WITH its generator is refused. A `--writes` naming the run's own run-state file is removed from
+  the declaration with a note, because every pass commit carries that file, and a path containing it
+  is still refused. Whether a file is a contract the sibling reads is a judgement no verb makes. A
+  pass needing another file declares again BEFORE the commit, naming only the paths it adds: every
+  row at one anchor stands and the pass may write their union, which `--dispatch` prints
   as `dispatch effective`. A narrower row is accepted and frees nothing, and a row at a LATER anchor
   is a new pass, graded on its own. **End the pass commit's message with a `Pass: <unit-id>` trailer**,
   and a commit naming a unit but no pass with `Pass: none`. Where the `commit-msg` hook runs
@@ -792,8 +804,12 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   `scriptPath`. **Every harness call also carries `roles`**: the JSON the roles kit's
   `handoff.py harness-args <harness>` prints, `<harness>` being `unattended-build`, `unattended-unit`
   or, for the closing review M8 composes, `tier2-review`. **It also carries `efforts`**: the JSON
-  `handoff.py stage-efforts <workflow>` prints for the workflow that call runs — `spec-write` for
-  the build harness, `build` for the unit harness, `closing-review` for the closing review. With no
+  `handoff.py stage-efforts <workflow> --model <id>` prints for the workflow that call runs —
+  `spec-write` for the build harness, `build` for the unit harness, `closing-review` for the closing
+  review. `<id>` is the model in use: the session's own model id, exactly as the session's
+  environment states it, read again at each call. A direct role spawn's `Agent` call carries `effort`
+  too, its role's value in the JSON `handoff.py role-efforts --model <id>` prints; the roles kit's
+  README states the limits. With no
   `.claude/roles.json` the roles kit is not installed: pass no `roles` and no `efforts`, and each
   harness logs its per-stage fallback. A session started
   before the rendered agent types existed cannot spawn them: it passes none too, and once the spawn

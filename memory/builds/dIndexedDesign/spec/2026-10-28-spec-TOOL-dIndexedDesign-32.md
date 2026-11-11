@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-32 — the feature level's Serves kinds bind: `fork` a typed kind, `feature-design` an untyped one, and `roster` a region that binds nothing
 
-**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 9 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-3 · 2026-11-05 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 9 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,12 @@
 |---|---|---|
 | [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-47 TOOL-dIndexedDesign-48 TOOL-dIndexedDesign-49 TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-52 TOOL-dIndexedDesign-53 |
 | [2026-10-28-build-TOOL-dIndexedDesign-32-deviation-321.md](../build/2026-10-28-build-TOOL-dIndexedDesign-32-deviation-321.md) | deviation | — |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md](../build/2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
+| [2026-11-05-build-TOOL-dIndexedDesign-32-deviation-322.md](../build/2026-11-05-build-TOOL-dIndexedDesign-32-deviation-322.md) | deviation | — |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 |
+| [2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-52 |
 | [2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 |
 
 <!-- /gen:spec-records -->
@@ -35,7 +41,8 @@ H1, are `TOOL-dIndexedDesign-33` and `TOOL-dIndexedDesign-34`.
 ## 2. Scope (IN)
 
 Build-run preconditions this unit calls and does not build: `TYPED_RECORD_KINDS`, the untyped head of
-`RECORD_KIND_TOKENS` and the file-name join both ways (PLAY-dOrderedCharter-42 S1, S3); the typed
+`RECORD_KIND_TOKENS` and the file-name join both ways (PLAY-dOrderedCharter-42 S1, S3), the head as
+TOOL-dTotalRecall-18 S7's rename leaves it; the typed
 record factory `tools/memory-tree/build_records.py` with its per-kind table of required fields and
 closed sets, refused at import when its keys differ from `TYPED_RECORD_KINDS`
 (PLAY-dOrderedCharter-7 S7, PLAY-dOrderedCharter-42 S2); the `typed-kinds` plant
@@ -50,7 +57,8 @@ S4 and S6 write through `record_kinds.py new` (TOOL-dTotalRecall-1 S9).
   `build/` folder, is the typed grammar, so the file-name join polices it both ways. Observed by AC1,
   AC2 and AC3.
 - **S2** — `feature-design`, an untyped kind. `feature-design` joins the untyped head of
-  `RECORD_KIND_TOKENS` beside `spec-audit`, `diff-review`, `journal` and `research`, and never
+  `RECORD_KIND_TOKENS` beside `spec-audit`, `diff-review`, `log` and `research`, the head
+  TOOL-dTotalRecall-18 S7 leaves, with `journal` a read-only alias in its `KIND_ALIASES`, and never
   `TYPED_RECORD_KINDS`: its home `<date>-build-<first unit id>-feature-<seg>.md` names a segment, not a
   number, so the typed join would mark every such record malformed. A `feature-design` record is
   selected by its binding, as unit 8 S2's `read_feature_designs` already selects it. Observed by AC1
@@ -74,7 +82,7 @@ S4 and S6 write through `record_kinds.py new` (TOOL-dTotalRecall-1 S9).
 ### Edges
 
 - **consumes-from** `TOOL-dIndexedDesign-8` — the `feature-design` and `fork` kinds of its S1 and S6, their `-feature-<seg>.md` and `-fork-<n>.md` homes, and `read_feature_designs` and `check_fork_records`, which read through `read_bindings` and see nothing until S1 and S2 bind (id 19)
-- **consumes-from** external — PLAY-dOrderedCharter-42 S1 to S4's `TYPED_RECORD_KINDS`, untyped head, file-name join and `typed-kinds` plant, and PLAY-dOrderedCharter-7 S7's `build_records.py`, each DEFERRED at base and an ancestor's
+- **consumes-from** external — PLAY-dOrderedCharter-42 S1 to S4's `TYPED_RECORD_KINDS`, untyped head, file-name join and `typed-kinds` plant, TOOL-dTotalRecall-18 S7's renamed head (`log`, with `journal` its read-only alias), and PLAY-dOrderedCharter-7 S7's `build_records.py`, each DEFERRED at base and an ancestor's
 - **hands-off** `TOOL-dIndexedDesign-42` — S1's typed `fork` kind, under whose per-build collision that unit numbers fork files within the build (id 12)
 - **hands-off** `TOOL-dIndexedDesign-46` — S1's closed sets in the per-kind table, which that unit makes the fork join's one source (id 8)
 
@@ -175,6 +183,10 @@ none
 - rev-2 · 2026-10-28 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dIndexedDesign-42 and TOOL-dIndexedDesign-46, promoted by the round-1 spec audit of
   units 31 to 38; nothing else moved.
+- rev-3 · 2026-11-05 · §2 preconditions, S2 · §3 Edges · S2 names the untyped head as
+  TOOL-dTotalRecall-18 S7 leaves it, `spec-audit`, `diff-review`, `log` and `research`, with `journal`
+  a read-only alias, and the external edge cites it, by the brief
+  prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-reground.md
 
 ## 10. Reuse audit
 

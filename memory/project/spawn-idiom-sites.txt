@@ -107,8 +107,7 @@ tools/codebase-map/adopt-codebase-map.test.sh	var-pipe	10	predates the lint; a p
 tools/drift-audit/adopt-drift-audit.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/drift-audit/adopt-drift-audit.sh	pure-fn-subst	2	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: _wf_missing×2
 tools/govkit/census.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
-tools/hooks/agent-cap.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
-tools/hooks/agent-cap.test.sh	var-pipe	3	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/hooks/agent-cap.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/hooks/scratch-guard.test.sh	cat-file	11	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
 tools/hooks/scratch-guard.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/hooks/scratch-guard.test.sh	printf-subst	2	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit

@@ -68,20 +68,27 @@ exactly like one that is wired. The `check-wiring.sh --session` and process-moni
 are NOT graded by any arm: their matchers are re-matched on apply and never read afterwards, so a
 hand narrowing passes green (the aReplayedCard closing review, F12).
 
-## What the hook DENIES, and how to satisfy it
+## What the review kit's script checks DENY, and how to satisfy them
+
+Since `TOOL-dFairHearing-16` (the owner's NT-27) this hook runs no script rule. The verify-stage total
+and the loop markers below are the review kit's `check-verifier-fanout.js`, the ref-keyed join ban its
+`check-review-join.js`, each run by the merge bar's gate beside it over every committed harness, and
+the spec-audit opt-in is its `spec-audit-optin.js`, a `PreToolUse` hook on `Workflow` calls. They read
+this hook's views, `MAX_VERIFIERS` and readers through its exports, which is why the grammar is
+stated here, beside the constants it turns on. How to run each: `<prefix>/workflows/README.md`.
 
 - Not a raw `parallel(` / `pipeline(` primitive, any more. TOOL-dGroundRules-10 retired that ban, the
   resolution of every concurrency width and the per-prompt slot ledger (TOOL-dGroundRules-10): the
   harness's own settings bound how many run at once. The verify-stage remedy the hook prints still
   fans through `boundedParallel(thunks, 5)`, its width the hook's `MAX_VERIFIERS`, as an example.
-- Any `agent(` fanned over a receiver the hook cannot PROVE bounded. The batching assignment carries
+- Any `agent(` fanned over a receiver the check cannot PROVE bounded. The batching assignment carries
   a `gov:fixed-verifiers` marker, and EVERY top-level value branch of that assignment must qualify on
   its own — a marked line is admitted only when all of its branches do, never when the first one that
   matches does. A branch qualifies in one of three ways and no fourth: a bounded split, spelling
-  `chunk(x, Math.ceil(x.length / K))` or `splitInto(x, K)` with a `K` the hook can resolve; an array
+  `chunk(x, Math.ceil(x.length / K))` or `splitInto(x, K)` with a `K` the check can resolve; an array
   LITERAL whose element count it can count here; or an identifier it has already proven bounded,
   alone or followed by operations that cannot grow it. A branch it cannot delimit never qualifies, so
-  an expression the hook cannot read lands on the deny side rather than being waved through.
+  an expression the check cannot read lands on the deny side rather than being waved through.
 - An `agent(` inside a `for (const x of <identifier>)` body. This is the ONE loop shape the hook
   admits, and only under `gov:sequential-agents(<K>)` written as a line comment on the LOOP HEADER.
   It exists because a ratified `parallelism route: none` verdict forbids the bounded PARALLEL fan the
@@ -115,12 +122,12 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
   something inferred from a name. Every top-level branch of that right-hand side is judged on its own
   text, and the chain after a bounded root must CONSUME to a close: a tail this file cannot delimit
   is refused rather than assumed shrink-only.
-- Any marker `K` it cannot resolve to an integer ≤5, the hook's `MAX_VERIFIERS`: the `K` of a
+- Any marker `K` the check cannot resolve to an integer ≤5, the hook's `MAX_VERIFIERS`: the `K` of a
   `gov:fixed-verifiers` split or of a `gov:sequential-agents` header. The burden is on the fan-out.
 - A `gov:fixed-writers` split whose `K` is above the agent limit (TOOL-dGroundRules-18). A WRITER
   split, the spec stage's in the build harness, is no verify stage, so its bound is
-  `runtime.agents-in-flight`, read through the policy kit's `readPolicy` beside this hooks kit once
-  per call and only for a script carrying the marker. With no policy kit there the bound is
+  `runtime.agents-in-flight`, read through the policy kit's `readPolicy`, found by `resolveKitDir`, once
+  per call and only for a script carrying the marker. With no policy kit found the bound is
   `MAX_VERIFIERS`, the stricter answer; a reader that refuses denies, naming its line. The shape
   rules are the verifier marker's, a verifier split stays at `MAX_VERIFIERS` whatever the limit, and
   a line carrying both markers is refused as ambiguous. The refusal names the marker, the `K` it read
@@ -133,10 +140,10 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
   `.get`/`.set`/`.has`/`.delete` called on one, and the retired `verdictByRef` identifier in any
   position. Key the join on the integer id the orchestrator assigns before the skeptic sees the
   finding. This rule reads the literal-blanked view, so a mention inside a string is not a hit, and a
-  REGEX literal is — which is why a gate holding the ban table excludes itself from its own
-  population.
-- An UNDECLARED SPEC AUDIT. A `Workflow` call whose structured `args` carry `kind: "spec-audit"` is
-  denied unless the build README at `<args.repo>/<parent of args.reviewDir>/README.md` carries
+  REGEX literal is — which is why the gate excludes `check-review-join.js`, which holds the ban table,
+  from its own population.
+- An UNDECLARED SPEC AUDIT, the review kit's `spec-audit-optin.js` pack. A `Workflow` call whose
+  structured `args` carry `kind: "spec-audit"` is denied unless the build README at `<args.repo>/<parent of args.reviewDir>/README.md` carries
   `spec-audit: <YYYY-MM-DD>` in its FRONT MATTER — the slice between the opening `---` and the next,
   the same scope `scratch-guard.js` reads `authorized-by:` in, through the one reader both hooks
   share. A body mention (a fenced example) is not front matter, and `spec-audit: yes` is a claim
@@ -156,7 +163,7 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
   place it. A subject that is absolute or `~`-rooted is denied too: a direct spec-audit subject is
   repo-relative by the harness's contract, and a same-slug `builds/` folder in a second checkout is
   otherwise indistinguishable from this one. A PROJECT-WIDE DEFAULT (`TOOL-aBlindedTrial-7`): when
-  the README is readable and carries NO key, the hook reads `SPEC_AUDIT_DEFAULT` from
+  the README is readable and carries NO key, the pack reads `SPEC_AUDIT_DEFAULT` from
   `<args.repo>/.unattended.conf` — the worktree copy, last assignment wins, both quote styles and a
   trailing `# comment` read as the shell would — and a date admits, a non-date denies by name, a
   missing file or a blank is no default. The README key wins whatever it says, so a malformed key
@@ -169,24 +176,25 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
   another build is denied, and an absent or empty `reviewDir` takes the harness's
   `memory/builds/<slug>/reviews` default), and in a live run must equal the fact. TWO LIMITS, stated
   rather than implied. The `workflow()` a running harness calls from INSIDE its script is a runtime
-  call and not a tool call, so the hook judges only the call that STARTS the harness, and the rest is
-  the unattended driver's to refuse (`TOOL-aBlindedTrial-3`); and in an ATTENDED session this hook
+  call and not a tool call, so the pack judges only the call that STARTS the harness, and the rest is
+  the unattended driver's to refuse (`TOOL-aBlindedTrial-3`); and in an ATTENDED session the pack
   reads the WORKTREE README and conf while that driver reads the README at BASE and the conf at its
   default-branch side, so the two can disagree for exactly one uncommitted edit. An `args` string that does
-  not parse shows the hook no `kind` and is admitted here; the harness itself throws on it, so no
-  audit runs.
+  not parse shows the pack no `kind` and is admitted; the harness itself throws on it, so no audit
+  runs. The pack finds this kit through its inline `resolveKitDir`, the install receipt's row and then
+  the two sibling probes. A pack that finds no hooks kit cannot load those readers, so it denies a call
+  whose args may be a spec audit, naming the three places it looked, and admits every other.
 
-## Running ONE rule
+## Every `--only=` refuses
 
-`--only=<rule>` narrows the hook over a closed set: `join` is rule 5 alone, and `scripts` is rules 2
-and 5, the rules that read a script, without rules 0, 6 and 7, which judge the call. Anything
-outside the set is REFUSED with the set named, rather than silently matching nothing. It exists so a
-file gate can share this predicate instead of re-implementing it: the review-join gate asks for
-`join`, and the verifier fan-out gate for `scripts`, because it feeds committed scripts as inline
-`script` payloads that rule 6 refuses wherever a role index exists.
+Every argument opening `--only=` is REFUSED, exit 2, before stdin is read (`TOOL-dFairHearing-16`).
+The selector narrowed this hook to the rules that read a script, rules 2 and 5, for the two review
+gates; both rules left for the review kit, so a selector kept here would read a script and run no
+rule, a call that could never go red. The refusal names `check-verifier-fanout.js` and
+`check-review-join.js`, where the script rules run, so a gate older than this hook reds by name.
 
-**A WIRED command must never carry it.** `--only=join` in `.claude/settings.json` would turn the cap
-rules off with no diff and a hook that still looks wired. `<prefix>/check-wiring.sh` asserts its absence.
+**A WIRED command never carries it**: it would now block every call. `<prefix>/check-wiring.sh`
+asserts its absence.
 
 An array LITERAL of ≤5 elements — the finder-lens fan — is a RECEIVER the hook can size, which is
 one of the three ways a receiver branch qualifies above; it needs no helper. The allowance is a
@@ -202,22 +210,52 @@ queues) in `.claude/settings.json`, and every landing regenerates that render. T
 settings from the working tree, so a hand-raised `env`, or a render left behind a lowering, would run
 past the landed limit. Rule 7 refuses that at the next call.
 
-On every `Agent` and `Workflow` call outside `--only=`, after rule 6, the hook locates
-`policy-mirror.js` in the `policy` kit beside its own kit, reads the landed limit through
+On every `Agent` and `Workflow` call, after rule 6, the hook finds
+`policy-mirror.js` through `resolveKitDir`, the install receipt's row and then the sibling `policy`
+directory, with no rule where none is found. The limit is landed; the helper that reads it is not:
+its location rests on the working-tree receipt, so a forged row chooses the code this rule runs
+(TOOL-dFairHearing-48 F1). The hook reads the landed limit through
 `readPolicy`, then the settings file in force, `GOV_SETTINGS_JSON` else `.claude/settings.json`,
 resolved as `check-wiring.sh` resolves it, and `.claude/settings.local.json`, each at the payload
 `cwd`'s checkout root (TOOL-dGroundRules-21 S34). For each variable it takes the value the harness
 applies, the local file's where it sets one, else the project file's, and it refuses, exit 2, when
 either is absent, not a positive integer, or above the limit, naming the file, the variable, both
-numbers and the render command. A refused policy read refuses with its line. With no `policy` kit
-beside the hooks kit it adds no rule; beside one, a `cwd` in no checkout refuses, a settings file
+numbers and the render command. A refused policy read refuses with its line.
+With no policy kit found it adds no rule; with one, a `cwd` in no checkout refuses, a settings file
 that does not parse refuses naming it, and a throw at any step refuses naming the step, since a rule
-that cannot finish does not admit (S38). After rule 7 an `Agent` call is admitted.
+that cannot finish does not admit (S38). After rule 7 only the pack's presence check below is left.
 
 **What it does not see**: an environment override of the two variables, which the harness applies
 and no hook can read. That a session started before a lowering keeps its settings until it restarts
 is UNVERIFIED (help/agent-limit.md). A set `AGENT_CAP` is read by nothing since TOOL-dGroundRules-10. A ready-made harness that satisfies every
 rule above ships at `<prefix>/workflows/tier2-review.js`.
+
+## The spec-audit pack's presence — the hook carries no opt-in rule
+
+`TOOL-dFairHearing-22`. The hook carries no opt-in rule, only a presence check: whether a build
+declared `spec-audit:` is judged by the review kit's `spec-audit-optin.js` pack alone, the opt-in's
+one home. Last, after rules 6, 8 and 7, a `Workflow` call whose structured `args` carry
+`kind: "spec-audit"` or a `specAudit` key, the pack's own trigger, is refused, exit 2, unless the
+pack is found by `resolveKitDir`, the hook's port of the sibling-kit resolver `resolve_kit_dir`, rung
+for rung (`TOOL-dFairHearing-32`): first a row of the install receipt, `.governance/install.json` at
+the root the nearest `.git` names,
+whose `source`'s last two segments are the review kit's home and the pack's file name (or a
+`rendered` row from that home naming the file) and whose `path` is a file inside the tree; then the
+probes `<hook dir>/workflows/` and `<hook dir>/../workflows/`. A receipt row whose `path` is missing,
+escapes the tree or holds `..` is skipped, never followed and never a deny, so a stale row with the
+pack beside the hook admits. Only the resolver's own refusal denies, and the deny quotes it: the
+receipt and both probe paths, the three places looked. The port sits between `// >>> resolveKitDir`
+and `// <<< resolveKitDir`, and gov's own lib-dir resolver suite holds it to the canonical row for
+row; `resolveHarnessName` finds `tier2-review.js` through it too. The refusal names two remedies. The first follows the receipt: `govkit update
+--kits review-harness` when its `kits` claims `review-harness`, and `govkit apply --kits
+review-harness` otherwise or with no receipt, because `update` refuses a kit the receipt does not
+claim. The second is a hand copy wired with `<prefix>/settings-merge.py --fragment`. Why: the hooks
+kit cannot require the review kit, which requires it back. The pack carries this kit's `gov:kit
+agent-cap@` marker, declared in `kit.toml`'s `marker_carriers`, so a scoped `govkit update --kits
+agent-cap` moves a claimed review kit with it; the check stays for a hand copy and a hooks-only
+adopter, since a hook landed without its pack must not admit an audit nobody judged. A throw
+refuses. **What it does not check**: that the pack is wired, which `<prefix>/check-wiring.sh`
+reports, or that it judges correctly, which the pack's own suite does.
 
 ## Rule 6 — every agent prompt is a rendered handoff
 
@@ -249,7 +287,7 @@ A `Workflow` call passes only by a `scriptPath` listed in `harnesses` (never an 
 `name:` run), with `args.roles` a non-empty object whose every value is an `agent`-true role: pass
 what `handoff.py harness-args <harness>` prints.
 
-ORDER: first, before rule 7 and rule 0. Skipped under any `--only=`. A throw inside the rule refuses.
+ORDER: first, before rule 7. A throw inside the rule refuses.
 
 **What it does not stop**, said rather than implied: a hook-less or `--bare` run; the agents a running
 harness spawns through its own `agent()`, which is a runtime call and not a tool call; a
@@ -257,6 +295,42 @@ session-to-session message; a hand-written prompt file that agrees with itself; 
 index; a forged name, since any caller can copy the right one; and a harness agent's label, which
 its script sets inside a runtime call no hook sees. It never compares `role-sha` with the role an
 agent type was rendered from.
+
+## Rule 8 — the level a call runs at is its model's
+
+`TOOL-aGuardedEffort-1`. Armed by the index's `effort` key, which the roles kit's renderer writes with
+every level resolved; an index without it adds no rule and prints nothing, and one whose `effort` is
+not the renderer's shape is a broken index. The hook spawns no interpreter and reads no policy file.
+
+On a call rule 6 admitted, the model is an `Agent` call's own `model`, else the `message.model` of the
+last main-chain assistant entry of the payload's `transcript_path`, read whole, `<synthetic>`
+skipped. Its profile is the one whose `match` holds a word of the id, else the default tables.
+
+- An `Agent` call is refused unless its `effort`, or with none its agent type's level, is the level
+  that table gives its role. Pass the role's value in what `handoff.py role-efforts --model <id>`
+  prints.
+- A `Workflow` call is refused unless, for at least one workflow its harness runs, every stage key's
+  level is the table's. The stage level is the `args.efforts` value, or with none the level of the
+  agent type the call's `roles` names for the stage, and a stage neither names counts as differing
+  (`TOOL-aGuardedEffort-2`). A workflow's stage keys are those the index's `unset` and the matched
+  table's `stages` both hold for it. Pass what `handoff.py stage-efforts <workflow> --model <id>`
+  prints as `efforts`.
+
+A refusal names the role or stage, both levels, the model and where it was read, and the call that
+prints the right value. A level it cannot check is admitted with one stderr line,
+`agent-cap: rule 8 did not check this <tool> call's effort level — <why>`: no `transcript_path`, an
+unreadable transcript, no entry naming a model, a model two profiles match, a harness whose
+workflows hold no stage key, and an `Agent` call where `CLAUDE_CODE_EFFORT_LEVEL` is set, since that
+session's tool offers no `effort`.
+
+ORDER: after rule 6 admits, before rule 7. A throw inside the rule, tables that disagree on a stage
+key among them, refuses, naming a re-render of the index.
+
+**What it does not check**: the agents a running harness spawns through its own `agent()`; the
+`committer` and `probe` stages, which no `stages` table keys; which workflow a call to a harness
+serving two runs, so a call right for one is admitted for both; a configured default subagent model,
+and an effort ceiling in settings, which change what an agent runs at and are read by no hook; a
+forged transcript and a hand-edited index.
 
 ## `.agent-cap.conf` — a legacy home of the agent limit
 
@@ -351,6 +425,19 @@ its status header reads Tier-2 at INPROGRESS, Tier-1 at INPROGRESS, or Tier-1 at
 `SPEC_TIER1_CUTOFF` is set and the spec's filename date is on or after it. One buildable unit
 admits.
 
+**The dispatch fallback** (`TOOL-aSmoothedDispatch-6`). When no unit on the card's route is
+buildable, the gate reads the dispatch rows of the build's run-state file, `RUN_STATE_FILE`
+(`<MEMORY_ROOT>/builds/<build>/RUN.md`, the build the route's `- build:` line names), the rows the
+unattended driver's `--dispatch` writes. Each dispatched unit the card does not route is judged by
+the same BUILDABLE rule, against the spec under that build's `spec/` whose H1 names it, and the first
+buildable one admits through the role arm below, as a card-routed unit does. So a card whose route
+still names a CLOSED unit does not refuse the builder of the unit the driver dispatched next. With
+no run-state file, or none holding a dispatch row, the refusal is unchanged; with rows and none
+buildable, it gains one line naming the file and how many units it records. What it does not check:
+whether the dispatched pass has committed — a pass's spec goes terminal in its own pass commit, so a
+pass committed with its spec left INPROGRESS keeps admitting — and a hand-appended dispatch row is
+read like the driver's. No other build's run-state file and no rotated `RUN.LANDED.*` record is read.
+
 **The order** is `checkRouted`'s comment, and it is the only statement of it. In short: a target in
 no repository, or in one whose common dir is not the session's (`CLAUDE_PROJECT_DIR`, else the
 payload `cwd`), is not gated, so a scratch clone's writes never meet its own conf; a repository with
@@ -374,8 +461,8 @@ and the push-time leg owns that guarantee. A hook-less or `--bare` run fires no 
 status flipped to INPROGRESS without the owner's approval admits, because the gate reads a status
 the agent writes: approval is recorded, not proven. The gate stops forgetting, not evasion.
 
-`readConfKey(bytes, key)` is this home's one shell-grammar conf reader; `agent-cap.js`'s
-`readSpecAuditDefault` delegates to it.
+`readConfKey(bytes, key)` is this home's one shell-grammar conf reader; the review kit's
+`spec-audit-optin.js` reads it, through `readSpecAuditDefault`.
 
 **The role arm: WHO writes a spec or a product file** (`TOOL-aOrientedCast-6`). The same gate reads
 the payload's `agent_type` against the role index `.claude/roles.json` at the target's toplevel,
@@ -416,8 +503,9 @@ with matcher `*`. A second fragment is safe here where a second PreToolUse one i
 merger re-matches a marker only within one event's groups. `main` sends that payload to
 `renderRouteContext` before any `tool_name` test and prints
 `{"hookSpecificOutput":{"hookEventName":"SubagentStart","additionalContext":…}}`: the card's path,
-its `## route` lines byte for byte, one `checkBuildable` verdict per unit, the `ROUTED_PATHS` value
-and what the gate refuses under it. Its silence rules: nothing when the session directory
+its `## route` lines byte for byte, one `checkBuildable` verdict per unit, one line per unit the
+dispatch fallback would admit (a buildable unit the run-state file records as dispatched), the
+`ROUTED_PATHS` value and what the gate refuses under it. Its silence rules: nothing when the session directory
 (`CLAUDE_PROJECT_DIR`, else the payload `cwd`) is in no repository or its toplevel holds no conf,
 since the gate admits every write there; exactly one line when the conf is unreadable or UNARMED,
 or the session routes no unit. Every sentence states what holds and none directs. The text is
@@ -460,6 +548,18 @@ received with no bare `returned` line, in its derived shape and ending `/<agent-
 as such. The reason then quotes both definitions and says to paste the lines `handoff.py agents`
 prints. This arm runs only when the fence defines both shapes; otherwise a turn holding an agent
 writes one witness line and requires nothing.
+
+**The refusal prints the lines it asks for** (`TOOL-dPavedRoad-2`). A blocking reason adds, after the
+definitions, the lines this message owes, derived for it and ready to paste: a `committed` line per
+unreported commit, rendered through the charter's own shape from the sha, the worktree's branch and
+the subject, a ` · ` inside a value folded to `, `; then each missing `agent` or `returned` line as
+`handoff.py agents` prints it. The hook runs that verb with no shell and never with `--write`, using
+the selector the turn already names: `--run <run-id>` for a harness agent, `--handoff <path>` from
+the `gov:handoff` marker of a direct agent's prompt, an absolute or climbing path refused. The roles
+kit is found by `agent-cap.js`'s `resolveKitDir`, and every spawn of one stop shares a 20 s bound.
+A line off its derived shape is withheld. An agent with no marker, no script, no launcher, a failing
+verb or a spent bound keeps the sentence naming the verb, with one witness line; a derivation never
+turns a block into an allow, and an allowing stop spawns nothing.
 
 **How the turn's agents are read.** From the transcript the payload's `transcript_path` names, read
 once and parsed from the end. The turn opens at the earliest of the last run of typed `user` records,

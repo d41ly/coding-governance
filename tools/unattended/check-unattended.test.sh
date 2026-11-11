@@ -241,7 +241,7 @@ RESUME_SCHEDULE_DELETE="TheScheduleDelete"
 # the shared fixture is what made this a suite-wide red rather than one arm's problem.
 #
 # WHAT THIS DOES NOT FIX: an adopter who copies .unattended.conf.example verbatim gets the key BLANK
-# and therefore the same announcement on every bar. Whether it should fire there is dFoldedVerdict's
+# and therefore the same announcement on every run of the leg. Whether it should fire there is dFoldedVerdict's
 # question, not this fixture's, and it is untouched.
 DISPOSITION_CUTOFF="2099-01-01"
 # THE SAME REASON, TOOL-dFoldedAudit-2: a blank key announces on every run, and a date ahead of every
@@ -940,7 +940,7 @@ hit "$out" "LANDER"
 # ---- THE CONF MAY NOT REDIRECT THE LEG'S OWN SUBJECT (closing-review F1). The import's arm used to
 # ---- be the open glob `[A-Z][A-Z0-9_]*`, which assigned EVERY uppercase key the conf declared -
 # ---- including the three this leg sets ABOVE the import. `.unattended.conf` is a tracked file an
-# ---- unattended run commits itself, and this leg is on an unguarded merge bar, so one line in it
+# ---- unattended run commits itself, and this leg is unguarded, so one line in it
 # ---- pointed the gate at a file other than the one it certifies.
 # ----
 # ---- PORTED FROM `check-brief-recorded.test.sh`'s evil-driver arm, which armed the same class on
@@ -2482,7 +2482,7 @@ reset_tree; rm -f memory/builds/tRun/RUN.md
 hit "$(run)" "a run-state file is tracked at a path this leg cannot read, and skipping it silently removes it from every check below"
 reset_tree
 
-# ---- SOURCE-level: the leg must stay READ-ONLY. It runs on the merge bar, where a gate that writes
+# ---- SOURCE-level: the leg must stay READ-ONLY. It is a gate, and a gate that writes
 # ---- is a gate that can make the tree it is judging pass.
 # ----
 # ---- THE PROPERTY IS "NO WRITE INTO THE TREE IT JUDGES", not "no redirect anywhere", and the two
@@ -3035,7 +3035,7 @@ mutate $KIT_REL/unattended.test.sh "/^check_status_one_line() {/r $TMPBIN_PARENT
 miss "$(run)" "check 33"
 # ...and the RESTORED copy: the shipped driver suite, unmodified, in the population. This is the
 # reading that says spec 17's `grep -c ''` fold actually landed — a suite still carrying the
-# instance would red here, on every bar, naming its own line.
+# instance would red here, on every run of this suite, naming its own line.
 reset_tree
 cp "$HERE/unattended.test.sh" $KIT_REL/
 miss "$(run)" "check 33"
@@ -3327,7 +3327,7 @@ reset_tree
 # ---- looped `core` - core PLUS extra - while its own rationale promised CORE-ONLY, so an adopter
 # ---- who used the documented `DIRECTIVES_EXTRA` knob got a permanent `fail 16` on a carrier the
 # ---- memory-tree kit ships as `role = "rendered"` and the doc-parity leg byte-compares. No route
-# ---- to green, on an unguarded merge-bar leg.
+# ---- to green, on an unguarded leg.
 # ----
 # ---- THE FIXTURE MUST HAVE THE CARRIER, and that is the reusable half. `declared + shown is
 # ---- silent` above runs after a `reset_tree` that leaves no `BUILD-METHOD.md`, so the term's own
@@ -4226,6 +4226,65 @@ hit  "$out" "check 24's ADD arm skipped for memory/builds/tSpc/RUN.md — the ba
 miss "$out" "so the scope moved with nothing on the record saying so: ARCH-tSpc-1 in"
 reset_tree
 
+# ---- DERIVED LANDED IS NOT GRADED BY CHECK 24 EITHER (TOOL-dFinishedRecord-1): an in-place landing
+# ---- leaves its record at LANDING, and a roster that grows after the landing owes a rescope row the
+# ---- driver's --rescope refuses on a finished record. Each arm is tRos live with ARCH-tRos-1, its
+# ---- record moved to LANDING, or in arm D to HELD under a hand-off code, then ARCH-tRos-7 added
+# ---- AFTER the landing commit with no row - the dConvergedCharter shape. Each asserts only check
+# ---- 24's strings, because a LANDING record also moves checks 7, 15 and 19.
+# A: pushed, so derived LANDED - excluded, naming the record and its landing commit
+seed_ros
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRos/RUN.md
+git add -A && git commit -q -m "tRos lands" --no-verify
+c24_land=$(git rev-parse HEAD)
+git push -q -f origin HEAD:main
+add_u7
+git add -A && git commit -q -m "a unit added after the landing" --no-verify
+out=$(run)
+hit  "$out" "check 24 EXCLUDED memory/builds/tRos/RUN.md — derived LANDED: its landing commit $c24_land"
+miss "$out" "check 24 FAILED"
+git push -q -f origin "$ANCHOR0":main
+# B (control): the same LANDING record, NOT pushed, is a live run and is graded
+seed_ros
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRos/RUN.md
+git add -A && git commit -q -m "tRos lands" --no-verify
+add_u7
+git add -A && git commit -q -m "a unit added after the landing" --no-verify
+out=$(run)
+hit  "$out" "so the scope moved with nothing on the record saying so: ARCH-tRos-7 in memory/builds/tRos/RUN.md"
+miss "$out" "check 24 EXCLUDED"
+# C: no advertised tip resolves, with TWO LANDING records before the predicate - UNAVAILABLE once,
+# and the record is graded rather than excluded. With one record the count is 1 with or without the
+# guard, so the arm could not tell a working guard from a missing one.
+seed_ros
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRos/RUN.md
+git add -A && git commit -q -m "tRos lands" --no-verify
+add_u7
+git add -A && git commit -q -m "a unit added after the landing" --no-verify
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "tRun lands" --no-verify
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/nothing-here
+out=$(run)
+same "check 24 exclusion UNAVAILABLE prints once" "$(grep -c 'check 24 exclusion UNAVAILABLE' <<<"$out")" "1"
+hit  "$out" "so the scope moved with nothing on the record saying so: ARCH-tRos-7 in memory/builds/tRos/RUN.md"
+miss "$out" "check 24 EXCLUDED"
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main
+# D: HELD under a hand-off code, pushed, so derived LANDED too. Check 24's call admits every phase the
+# predicate admits there, and this is the arm a call narrowed to LANDING turns red
+# (TOOL-dFinishedRecord-2, the closing review's L1). The code is check 7's HELD arm's.
+seed_ros
+sed -i 's/^phase: .*/phase: HELD\nhold-code: owner-landing/' memory/builds/tRos/RUN.md
+git add -A && git commit -q -m "tRos hands off" --no-verify
+c24_hold=$(git rev-parse HEAD)
+git push -q -f origin HEAD:main
+add_u7
+git add -A && git commit -q -m "a unit added after the hand-off" --no-verify
+out=$(run)
+hit  "$out" "check 24 EXCLUDED memory/builds/tRos/RUN.md — derived LANDED: its landing commit $c24_hold"
+miss "$out" "check 24 FAILED"
+git push -q -f origin "$ANCHOR0":main
+reset_tree
+
 # ---- check 23 (TOOL-dUnstalledConvoy-10): a DECLARED write set against what the pass COMMITTED.
 # ---- The sibling verb records what a dispatched pass said it would write; this is the half that can
 # ---- catch the declaration out, because the two artifacts are made by different acts at different
@@ -4495,6 +4554,46 @@ drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "a commit that names no pass at all" --no-verify
 hit "$(run)" "unattended: check 23 — a declared path of a dispatched pass moved inside its window while no commit names that pass, so the declared work happened and the only join this check has was dodged:"
+# ---- TOOL-aSwiftRefusal-4 M4: A RELEASED UNIT'S WINDOW ENDS AT ITS RELEASE. ARCH-tRun-1 declares
+# ---- work/one.txt and never commits; once it is released, DEFERRED with its defer row or WONTDO, a
+# ---- sibling declaring the same path is admitted by the driver, and its write after the release is
+# ---- not charged to ARCH-tRun-1. Flipped back to INPROGRESS, it is. A write BEFORE the release still
+# ---- is: the release ends the window, it does not excuse it. RED-first: the gate at 17308b6c charged
+# ---- the sibling's write in both released cases. The row goes into the empty units region by `sed`.
+SWR='s#^<!-- /gen:build-units -->$#| ARCH-tRun-1 | 1 | 2 | INPROGRESS | rev-1 | 2026-11-10 |\n&#'
+reset_tree; sed -i "$SWR" memory/builds/tRun/README.md
+git add -A && git commit -q -m "fixture: a units row" --no-verify
+drow ARCH-tRun-1 "work/one.txt"
+printf '\n2026-08-22T00:00:00Z rescope · item defer ARCH-tRun-1 · reason set aside\n' >> memory/builds/tRun/RUN.md
+mutate memory/builds/tRun/README.md 's/^| ARCH-tRun-1 | 1 | 2 | INPROGRESS |/| ARCH-tRun-1 | 1 | 2 | DEFERRED |/'
+git add -A && git commit -q -m "fixture: the first unit is set aside" --no-verify
+drow ARCH-tRun-2 "work/one.txt"
+mkdir -p work && printf 'b\n' > work/one.txt
+git add -A && git commit -q -m "lane" -m "Pass: ARCH-tRun-2" --no-verify
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+miss "$out" "was dodged: ARCH-tRun-1"
+hit "$out" "check 23 released ARCH-tRun-1 in"
+mutate memory/builds/tRun/README.md 's/^| ARCH-tRun-1 | 1 | 2 | DEFERRED |/| ARCH-tRun-1 | 1 | 2 | INPROGRESS |/'
+hit "$(run)" "was dodged: ARCH-tRun-1"
+reset_tree; sed -i "$SWR" memory/builds/tRun/README.md
+git add -A && git commit -q -m "fixture: a units row" --no-verify
+drow ARCH-tRun-1 "work/one.txt"
+mutate memory/builds/tRun/README.md 's/^| ARCH-tRun-1 | 1 | 2 | INPROGRESS |/| ARCH-tRun-1 | 1 | 2 | WONTDO |/'
+git add -A && git commit -q -m "fixture: the first unit is retired" --no-verify
+drow ARCH-tRun-2 "work/one.txt"
+mkdir -p work && printf 'b\n' > work/one.txt
+git add -A && git commit -q -m "lane" -m "Pass: ARCH-tRun-2" --no-verify
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+miss "$out" "was dodged: ARCH-tRun-1"
+hit "$out" "check 23 released ARCH-tRun-1 in"
+reset_tree; sed -i "$SWR" memory/builds/tRun/README.md
+git add -A && git commit -q -m "fixture: a units row" --no-verify
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "a commit that names no pass at all" --no-verify
+mutate memory/builds/tRun/README.md 's/^| ARCH-tRun-1 | 1 | 2 | INPROGRESS |/| ARCH-tRun-1 | 1 | 2 | WONTDO |/'
+git add -A && git commit -q -m "fixture: the first unit is retired" --no-verify
+hit "$(run)" "was dodged: ARCH-tRun-1"
 
 # ---- AMBIGUOUS ATTRIBUTION is refused rather than guessed: a subset test over a commit that could
 # ---- belong to either of two passes proves nothing about either.
@@ -7286,7 +7385,19 @@ fi   # ---- end of the region-8 span, re-cut across the eight regions by TOOL-aG
 # ---- carries +18, and 9 in region 1 beside the HALT arms, three `miss` and three `hit` with the three
 # ---- `mutate` counts, so FLOOR_SHARD_1 carries +9. COUNTED off the block's own lines; this pass runs no
 # ---- suite, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=1133
+# ---- RAISED 1133 -> 1140 by exactly the arms, TOOL-dFinishedRecord-1: check 24's derived-LANDED arms A to
+# ---- C after the roster block in region 8, three `hit`, three `miss` and one `same`, so FLOOR_SHARD_8
+# ---- carries the same +7 and the other seven are untouched. COUNTED off the block's own lines; this pass
+# ---- runs no suite, and their RED-first observation is the close's.
+# ---- RAISED 1140 -> 1142 by exactly the arms, TOOL-dFinishedRecord-2: check 24's derived-LANDED arm D
+# ---- after arm C in region 8, one `hit` and one `miss`, so FLOOR_SHARD_8 carries the same +2 and the
+# ---- other seven are untouched. COUNTED off the block's own lines; this pass runs no suite, and its
+# ---- RED-first observation is the close's.
+# ---- RAISED 1142 -> 1152 by exactly the arms, TOOL-aSwiftRefusal-4: check 23's released-unit block M4
+# ---- after the no-commit dodged-join arm in region 8, four `mutate`, four `hit` and two `miss`, so
+# ---- FLOOR_SHARD_8 carries the same +10 and the other seven are untouched. COUNTED off the block's own
+# ---- lines; this pass runs no suite, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=1152
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
@@ -7298,7 +7409,7 @@ FLOOR_SHARD_4=101
 FLOOR_SHARD_5=133
 FLOOR_SHARD_6=150
 FLOOR_SHARD_7=301
-FLOOR_SHARD_8=208
+FLOOR_SHARD_8=227
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
   *) _fv="FLOOR_SHARD_$SH_I"; FLOOR=${!_fv}; MODE="shard $SH_I/$SHARD_ARITY" ;;
