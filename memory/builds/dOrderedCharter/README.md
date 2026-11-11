@@ -187,7 +187,7 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | CLOSED | rev-7 | 2026-11-11 |
 | [PLAY-dOrderedCharter-80 — the second close bar's own product reds, each leg left green by the narrowest fix it demands](spec/2026-11-11-spec-PLAY-dOrderedCharter-80.md) | 42 | 2 | CLOSED | rev-1 | 2026-11-11 |
 | [PLAY-dOrderedCharter-81 — the second close bar's two product reds, each by its narrowest fix](spec/2026-11-11-spec-PLAY-dOrderedCharter-81.md) | 43 | 1 | CLOSED | rev-1 | 2026-11-11 |
-| [PLAY-dOrderedCharter-82 — the acceptance matrix's guard covers the modules its closure now imports](spec/2026-11-11-spec-PLAY-dOrderedCharter-82.md) | 44 | 1 | DEFERRED | rev-1 | 2026-11-11 |
+| [PLAY-dOrderedCharter-82 — the acceptance matrix reads the renderer's bullet keys in a child process, so its closure stays its own](spec/2026-11-11-spec-PLAY-dOrderedCharter-82.md) | 44 | 1 | DEFERRED | rev-2 | 2026-11-11 |
 <!-- /gen:build-units -->
 
 Records: 636 bound to this build, across 4 record folder(s).

@@ -1,6 +1,6 @@
-# PLAY-dOrderedCharter-82 — the acceptance matrix's guard covers the modules its closure now imports
+# PLAY-dOrderedCharter-82 — the acceptance matrix reads the renderer's bullet keys in a child process, so its closure stays its own
 
-**Status:** DEFERRED · rev-1 · 2026-11-11 · node a · Tier-1 · base 8ecef2cf1 · streams playbook · order 44 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-11-11 · node a · Tier-1 · base c2ac2c03a · streams playbook · order 44 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -17,143 +17,216 @@
 
 ## 1. Goal
 
-The python-reads leg reds at `8ecef2cf1` on fourteen modules the `govkit acceptance matrix` leg
-imports and its guard does not cover. This unit adds exactly those fourteen paths to that leg's
-guard, so the reads leg reads green over the tree, and changes nothing else.
+The python-reads leg reds on fourteen modules the `govkit acceptance matrix` leg's closure imports
+and its guard does not cover. Widening that guard reds the spec-token check on other builds' specs,
+so this unit removes the cause: the matrix reads the renderer's bullet keys from a child process, the
+import edge that pulled the renderer's closure into the matrix's goes away, and the guard stays as it
+is.
 
 ## 2. Scope (IN)
 
-- **S1** — The `guard` list of the `govkit acceptance matrix` row in `tools/gate-legs.json`,
-  `tools/gate-legs.json@094abe94:1732`, gains fourteen exact file entries, each spelled
-  `{prefix}/<kit>/<module>.py`: the eleven memory-tree modules, the policy kit's `budgets.py` and
-  `policy.py`, and the roles kit's `roles_lib.py`, as section 4 lists them. The five entries the row
-  holds today stay, in their order. Observed by AC1, AC2 and AC3.
+- **S1** — `tools/playbook/render_playbook.py` gains `derive_bullet_keys(template)`, the sorted
+  lowercased keys whose token is a whole line inside a one-line region of `template`, and a
+  `--bullet-keys` flag that prints those keys for the template the engine renders, one per line, and
+  exits 0. A refusal exits 1 and names itself on stderr, as the engine's other verbs do. Observed by
+  AC3.
+- **S2** — `derive_bullet_placeholders` in `tools/govkit/matrix.py` keeps its name, its signature and
+  its one caller. It runs `render_playbook.py --bullet-keys` in a child process, at the path it
+  already resolves through `govkit.resolve_kit_dir`, and returns the set of words the child prints.
+  It no longer touches `sys.path` or imports the renderer. A non-zero exit raises, naming the exit
+  code and the child's stderr. Observed by AC1, AC2 and AC4, with AC5 at the close.
 
 ## 3. Non-goals (OUT)
 
-- The row's `ceiling`, argv, chunk and subject. A guard decides when a scoped bar runs the leg, not
-  how long a run takes (`tools/run-gates/run-gates.sh@4ab05900:539`), so the ceiling of 7030 does not
-  move.
-- Any edit to `tools/govkit/matrix.py`, the renderer or the reads checker. The import that grew the
-  closure is PLAY-dOrderedCharter-81 S2's, and its reading of the renderer's constants stays.
-- A directory guard over the three kits (section 4, Alternatives rejected).
-- Any other leg's guard: the matrix row is the only one with a gap (section 4, Evidence).
+- Any edit to `tools/gate-legs.json`. The matrix row's guard, ceiling, argv, chunk and subject stay
+  as they are.
+- Any edit to the reads checker, `render_deploy_tail` or the stub rule PLAY-dOrderedCharter-81 S2
+  set. Which keys take a `- ` stub is unchanged (AC4).
+- A selftest arm for the flag in the renderer's `--selftest`. AC3 runs the flag over gov's own
+  template and AC4 and AC5 run its one consumer.
+- A `[[usage]]` row or a help page for the flag (section 4, Docs).
+- A bump of `KIT_PLAYBOOK_RENDER_VERSION`. PLAY-dOrderedCharter-80 edited the renderer without one
+  (`827115352`).
 
 ## 4. Design
 
 ### Evidence
 
-Read at `8ecef2cf1`. The reads leg itself is refused to this writer's role, so each figure is from a
-probe calling the checker's own `derive_guard_gaps` and `read_legs`,
-`tools/run-gates/py_reads.py@cf8f2730:179`, over the tree.
+Read at `c2ac2c03a`, whose `tools/` and charter template are those of `8ecef2cf1`. The reads leg is
+refused to this writer's role, so each figure comes from calling the checker's own
+`derive_guard_gaps` and `read_legs`, `tools/run-gates/py_reads.py@cf8f2730:179`.
 
-- The gaps: fourteen, all on the `govkit acceptance matrix` row, and no other row of the 26 the arm
-  walks has one (PINNED, that probe at `8ecef2cf1`). Eleven are under `tools/memory-tree/`, two under
-  `tools/policy/` and one under `tools/roles/`. The brief counted fourteen memory-tree modules; the
-  policy and roles kits supply three of them.
-- The cause: the matrix closure is two files at `84a28f634~1` and 33 at `84a28f634`, the build of
-  PLAY-dOrderedCharter-81, with 0 and 14 gaps (PINNED, the same probe over a `git archive` of each
-  commit's `tools/`). The brief named PLAY-dOrderedCharter-78. The new reach is
-  `govkit.resolve_kit_dir("playbook", "render_playbook.py", HERE)` and the import after it,
-  `tools/govkit/matrix.py@0d6bbdf0:111` to `tools/govkit/matrix.py@0d6bbdf0:113`: the walk adds a
-  literally resolved kit's directory, `tools/run-gates/py_reads.py@cf8f2730:169`, and follows the
-  renderer's imports from there. The seventeen playbook modules it reaches are under
-  `{prefix}/playbook/`, which the guard holds.
-- The name arm is clean at the base: no hit over 151 tracked files, no star import (PINNED, a probe
-  of `scan_tracked_names` at `8ecef2cf1`). So the fourteen guard lines are the leg's whole red, and
-  the leg exits 0 once they are covered, `tools/run-gates/py_reads.py@cf8f2730:266`.
-- A guard entry covers a module by its exact path, or by a prefix when the entry ends in `/`,
-  `tools/run-gates/py_reads.py@cf8f2730:194`. All fourteen paths are tracked (PINNED, `git ls-files`
-  at `8ecef2cf1` lists 14).
-- No second copy of this guard exists. The leg's name appears in `tools/govkit/registry.toml`
-  as an `exempt_leg` row with a reason only, `tools/govkit/registry.toml@7b1f4bec:533`, in
-  `tools/govkit/subject-pins.tsv` with its subject and chunk, and in
-  `tools/run-gates/ceiling-evidence.txt` with its measured time; none carries a guard, so no
-  parity row moves.
+- The red: fourteen gaps, all on the matrix row; eleven under `tools/memory-tree/`, two under
+  `tools/policy/` and one under `tools/roles/` (PINNED, that probe at `8ecef2cf1`).
+- The cause (PINNED, the same probe over a `git archive` of each commit): the matrix closure was 2
+  files with 0 gaps at `84a28f634~1` and is 33 files with 14 gaps (PINNED) at `84a28f634`,
+  PLAY-dOrderedCharter-81's build. The import that pulls them in is `import render_playbook as rp`,
+  `tools/govkit/matrix.py@0d6bbdf0:113`, after the `sys.path` insert at
+  `tools/govkit/matrix.py@0d6bbdf0:112`. The walk resolves a name against every kit directory a
+  walked file resolves by a literal `resolve_kit_dir` call, `tools/run-gates/py_reads.py@cf8f2730:169`,
+  so the renderer's own imports reach the three kits.
+- Why the guard is not widened: rev-1 added the fourteen files to the matrix guard. At build, the
+  spec-token check's guard join then flagged an OPEN spec of another build,
+  `memory/builds/aOrientedCast/spec/2026-10-13-spec-TOOL-aOrientedCast-28.md`. Its estimate names
+  `tools/roles/roles_lib.py` and its leg line does not name the matrix leg. The modules appear in
+  other builds' specs too, so any exact-file or directory guard over them causes the same problem.
+- The fix measured: a scratch copy of the tree carrying S1 and S2 as section 4 writes them. There,
+  the matrix closure is 2 files (PINNED), `tools/govkit/govkit.py` and `tools/govkit/matrix.py`,
+  with 0 gaps, and the whole guard arm walks 26 rows with 0 gaps (PINNED, `derive_guard_gaps` over that copy).
+  The walk does not follow a subprocess, `tools/run-gates/py_reads.py@cf8f2730:18`. The literal
+  `resolve_kit_dir("playbook", ...)` call still adds the playbook directory, and no name the two
+  govkit files import resolves there. `tools/govkit/govkit.py@37f075e4:9411` resolved the playbook kit
+  literally before PLAY-dOrderedCharter-81 too, and the closure was two files then.
+- The same copy's `--bullet-keys` prints seven keys: `adopter_rules`, `decision_principles`,
+  `drive`, `override_rule`, `practices`, `principles` and `role_roster` (PINNED, that run). These
+  are the seven that PLAY-dOrderedCharter-81 derived in process. Its stub probe prints the line AC4
+  quotes. The child also works with the working directory outside the repository, because the
+  template is resolved from the engine's own path.
+- The template read: in gov, `resolve_template_path(root, root)` with `root` the engine's
+  grandparent returns the root `coding-governance-agents.template.md`. That is the file the matrix
+  reads today as `ROOT / rp.TEMPLATE_NAME` (PINNED, a probe at `8ecef2cf1`). In an install it
+  returns the kit's copy, as every render does, `tools/playbook/render_playbook.py@bb09280e:1066`.
 
-### The row after the pass (S1)
+### The renderer (S1)
 
-```json
-    "guard": [
-      "{prefix}/govkit/",
-      "{prefix}/playbook/",
-      "{prefix}/check-microformats.sh",
-      "{prefix}/check-line-length.sh",
-      "{prefix}/memory-tree/asbuilt_view.py",
-      "{prefix}/memory-tree/backlog.py",
-      "{prefix}/memory-tree/build_records.py",
-      "{prefix}/memory-tree/coverage_join.py",
-      "{prefix}/memory-tree/design_lib.py",
-      "{prefix}/memory-tree/deviation_join.py",
-      "{prefix}/memory-tree/id_grammar.py",
-      "{prefix}/memory-tree/import_walk.py",
-      "{prefix}/memory-tree/routed_commits.py",
-      "{prefix}/memory-tree/row_grammar.py",
-      "{prefix}/memory-tree/tree_lib.py",
-      "{prefix}/policy/budgets.py",
-      "{prefix}/policy/policy.py",
-      "{prefix}/roles/roles_lib.py",
-      ".lexicon.conf"
-    ],
+```python
+def derive_bullet_keys(template: Path) -> list[str]:
+    """PLAY-dOrderedCharter-82 S1. The sorted lowercased keys whose token is a whole line inside a
+    one-line region of `template`: the render grades that line as a `- ` bullet, so an answer that
+    fills it must be one."""
+    inside, keys = False, set()
+    for line in template.read_text(encoding='utf-8').splitlines():
+        bare = line.strip()
+        if bare in (ONE_LINE_OPEN, ONE_LINE_CLOSE):
+            inside = bare == ONE_LINE_OPEN
+        elif inside and (m := PLACEHOLDER_RE.fullmatch(bare)):
+            keys.add(m.group(1).lower())
+    return sorted(keys)
 ```
 
-The new entries sit after the row's `{prefix}` files and before its root file, in the walk's sorted
-order. This is the exact-file form other legs already use for the same modules: `playbook render
-selftest`, `recall floor arms` and `policy fixtures` each list memory-tree, policy or roles files
-one by one.
+It sits after `resolve_template_path`, `tools/playbook/render_playbook.py@bb09280e:1066`. In
+`main`, one `add_argument` follows the `--reference` one at
+`tools/playbook/render_playbook.py@bb09280e:3734`, with a comment naming this unit. One branch
+follows the `--selftest` branch at `tools/playbook/render_playbook.py@bb09280e:3742`:
 
-What the guard still does not check: it lists the closure as the walk reads it today. A module that
-joins the closure later is outside the guard until someone adds it, and the reads leg reds on that
-the same way it reds now. A module reached through a subprocess or a computed kit name is outside
-the walk, `tools/run-gates/py_reads.py@cf8f2730:18`, and so outside this guard as well.
+```python
+    if a.bullet_keys:
+        root = Path(__file__).resolve().parent.parent.parent
+        try:
+            keys = derive_bullet_keys(resolve_template_path(root, root))
+        except (Refusal, ValueError) as e:   # ValueError: the units module's LevelError
+            print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
+            return 1
+        print(chr(10).join(keys))
+        return 0
+```
 
-### Alternatives rejected
+`ValueError` is caught because `resolve_template_path` asks git for the kit prefix and the units
+module raises `LevelError`, a `ValueError`, when git cannot answer,
+`tools/playbook/instruction_units.py@1ac380c7:233`.
 
-- Three directory entries, `{prefix}/memory-tree/`, `{prefix}/policy/` and `{prefix}/roles/`.
-  Shorter, but a scoped bar would then run the matrix after an edit to any file in those kits,
-  for example `tools/memory-tree/gen_build_index.py`, which the matrix never imports. Its evidenced
-  run is 218.8 s on node a (PINNED, `tools/run-gates/ceiling-evidence.txt@0d5d8d62:57`). The brief
-  asks for the narrowest addition, and that is the fourteen exact paths.
-- Reading the renderer's four constants without importing it. That changes PLAY-dOrderedCharter-81
-  S2's design, which the brief puts out of scope.
+### The matrix (S2)
+
+```python
+def derive_bullet_placeholders() -> set[str]:
+    """PLAY-dOrderedCharter-81 S2, PLAY-dOrderedCharter-82 S2. The lowercased keys whose token is a
+    whole line inside a one-line region of gov's charter template, as the renderer's `--bullet-keys`
+    prints them. A child process, so no import edge joins the renderer's closure to this one."""
+    kd = govkit.resolve_kit_dir("playbook", "render_playbook.py", HERE)
+    p = subprocess.run([sys.executable, str(kd / "render_playbook.py"), "--bullet-keys"], capture_output=True,
+                       text=True, encoding="utf-8", stdin=subprocess.DEVNULL)
+    if p.returncode:
+        raise RuntimeError(f"render_playbook.py --bullet-keys exited {p.returncode}: {p.stderr.strip()}")
+    return set(p.stdout.split())
+```
+
+`subprocess` and `sys` are already imported at `tools/govkit/matrix.py@0d6bbdf0:29`. The function
+no longer reads `ROOT` or `NL`, which other code in the module still uses.
+
+### What it does not check
+
+The renderer's modules now run in a child process that the reads arm does not walk. An edit to
+one of the fourteen no longer trips the matrix leg in a scoped bar, as it never did before
+PLAY-dOrderedCharter-81. The same is already true of every kit the matrix reaches through `govkit
+apply`. The pre-push hook's forced total run bounds how long such a break can go unseen,
+`tools/run-gates/run-gates.sh@4ab05900:528`.
+
+### Docs
+
+The docs leg reds a flag only where a page under `help/` shows a command whose flag the entry's row
+does not declare, `tools/govkit/docs_leg.py@259afa60:363`. The renderer's row,
+`tools/govkit/usage.toml@fa34ce95:358`, declares only the three flags a page shows. `--bullet-keys`
+is used only by gov's own matrix, which never travels, so no page shows it and no row is owed.
+
+### Inventory
+
+| Minted | Where | Cell |
+|---|---|---|
+| `derive_bullet_keys` | `tools/playbook/render_playbook.py` | `py.function`, `OK` by `--suggest` at design |
+| `--bullet-keys` | the renderer's `main` | no cell in `.lexicon.conf` grades a flag |
+
+### Risk
+
+The leg's ceiling does not move. The matrix calls `render_deploy_tail` three times, at
+`tools/govkit/matrix.py@0d6bbdf0:870`, `tools/govkit/matrix.py@0d6bbdf0:941` and
+`tools/govkit/matrix.py@0d6bbdf0:999`. Each call now adds one child process, measured at 0.25 s on
+node a (PINNED, one timed run over the scratch copy). The leg's evidenced run is 218.8 s against a
+ceiling of 7030 (PINNED, `tools/run-gates/ceiling-evidence.txt@0d5d8d62:57`).
 
 ### Files touched (estimate)
 
-- `tools/gate-legs.json` (S1)
+- `tools/playbook/render_playbook.py` (S1)
+- `tools/govkit/matrix.py` (S2)
 
 ## 5. Acceptance criteria
 
 | Leg | Criteria |
 |---|---|
 | `python reads (a name never bound, an import outside its guard)` | AC1, with AC2 |
+| `govkit acceptance matrix` | AC5, with AC3 and AC4 |
 
 - **AC1** — When `python tools/run-gates/py_reads.py` runs over the tree after the pass, it exits
   0, prints no line opening `py-reads: RED`, and prints
   `py-reads: guards · 26 suites walked, 45 guarded legs of another head not read`. At the base it
   exits 1 and prints fourteen lines opening `py-reads: RED guard · govkit acceptance matrix ·`.
-  Red when: a module in the matrix closure is still outside the row's guard.
-  figure: PINNED, 26 rows walked out of 71 guarded rows, by a probe of `derive_guard_gaps` at `8ecef2cf1`.
+  Red when: the matrix still imports the renderer, so its closure reaches a kit outside its guard.
+  figure: PINNED, 26 rows walked and 0 gaps by `derive_guard_gaps` over a scratch copy carrying the pass.
   permission: the main loop runs it; a role agent's scratch guard refuses this leg.
 - **AC2** — When `python tools/run-gates/py_reads.py --guards "govkit acceptance matrix"` runs after
-  the pass, it exits 0, prints 33 lines opening `py-reads: closure · govkit acceptance matrix ·`,
-  and prints no line opening `py-reads: RED`.
-  Red when: an added entry is misspelled, so the module it was meant to cover is still a gap.
-  figure: PINNED, a 33-file closure by the same probe at `8ecef2cf1`.
+  the pass, it exits 0 and prints exactly two closure lines,
+  `py-reads: closure · govkit acceptance matrix · tools/govkit/govkit.py` and
+  `py-reads: closure · govkit acceptance matrix · tools/govkit/matrix.py`. The base prints 33
+  closure lines and exits 1.
+  Red when: an import edge from the matrix to the renderer survives.
+  figure: PINNED, a closure of two files by the same probe; PLAY-dOrderedCharter-81's base `84a28f634~1` held the same two.
   permission: the main loop runs it, as for AC1.
-- **AC3** — When `python -c "import json, sys; r = [l for l in json.load(sys.stdin.buffer) if l['name'] == 'govkit acceptance matrix'][0]; print(len(r['guard']), r['ceiling'], r['guard'][0], r['guard'][-1])" < tools/gate-legs.json`
-  runs after the pass, it prints `19 7030 {prefix}/govkit/ .lexicon.conf`, where the base prints
-  `5 7030 {prefix}/govkit/ .lexicon.conf`.
-  Red when: the pass adds an entry the closure does not need, drops one the row held, or moves the
-  ceiling.
+- **AC3** — When `python tools/playbook/render_playbook.py --bullet-keys` runs after the pass, it
+  exits 0 and prints seven lines, in order: `adopter_rules`, `decision_principles`, `drive`,
+  `override_rule`, `practices`, `principles`, `role_roster`.
+  Red when: the loop reads a placeholder outside every one-line region, or misses one inside.
+  figure: PINNED, the seven by the flag over the scratch copy, as PLAY-dOrderedCharter-81 derived in process.
+- **AC4** — When `python -c "import sys; sys.path.insert(0, 'tools/govkit'); import matrix; print([l for l in matrix.render_deploy_tail(['roles'], {}).splitlines() if l.startswith(('role_roster', 'adopter_rules', 'node_table'))])"`
+  runs after the pass, it prints
+  `['adopter_rules = "- stated"', 'node_table = "stated"', 'role_roster = "- stated"']`, as the base
+  does.
+  Red when: the child's keys do not reach the stub rule, so a whole-line placeholder inside a
+  one-line region takes the plain stub.
+- **AC5** — When `python tools/govkit/matrix.py` runs after the pass, it prints `ok` for
+  `default install: apply completes` and for `aged install: apply from the aged vintage completes`.
+  Red when: the child refuses or prints nothing, so the default and aged installs meet the
+  renderer's one-line refusal again.
+  cost: one matrix run; its evidenced maximum is 218.8 s on node a (PINNED, `tools/run-gates/ceiling-evidence.txt`).
+  permission: the main loop runs it at the close, since a role agent's scratch guard refuses a
+  scratch install (PLAY-dOrderedCharter-72 AC6).
 
 ## 6. Gates
 
-`python reads (a name never bound, an import outside its guard)` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
+`python reads (a name never bound, an import outside its guard)` · `govkit acceptance matrix` · `playbook render selftest` · `policy fixtures` · `govkit selftest` · `govkit refusal join` · `recall floor arms` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
 
-The guarded legs on the line are the four whose guard names `{prefix}/gate-legs.json` itself. The
-legs guarded by `{prefix}/` are broad by the spec-token check's floor of five,
-`tools/check-spec-tokens.py@bf9a3e50:390`, so the join leaves them out. The matrix leg is not on the
-line: `tools/gate-legs.json` does not trip its guard, and its verdict does not depend on its guard.
+The guarded legs on the line are those the two touched files trip: `govkit acceptance matrix`,
+`playbook render selftest` and `policy fixtures` for the renderer, and the govkit legs with `recall
+floor arms` for `tools/govkit/` (DERIVED, the spec-token check's `--legs-for` over both paths).
+`lexicon naming predicates` grades `derive_bullet_keys`.
 
 ## 7. Open questions
 
@@ -170,12 +243,20 @@ none
   place of a quoted path inside `open(...)`, which the spec-token check graded as an untracked
   path. The observation and its printed figures are unchanged, re-probed at `8ecef2cf1`; the rev
   stays.
+- rev-2 · 2026-11-11 · §1 §2 §3 §4 §6 §9 · S1 S2 · AC1 AC2 AC3 AC4 AC5 · diverged at build. The
+  rev-1 guard widening made the spec-token check's guard join red on
+  `2026-10-13-spec-TOOL-aOrientedCast-28.md`, so the cause is removed instead. S1, the guard scope
+  item, and its AC3 are dropped. The new S1 is the renderer's `--bullet-keys` flag, and S2 runs it
+  in a child process from `derive_bullet_placeholders`. The new AC2 observes the closure back at its
+  pre-81 two files, AC3 the flag, AC4 keeps PLAY-dOrderedCharter-81's stub probe, and AC5 runs the
+  matrix. Each figure was re-probed over a scratch copy carrying the pass, at `c2ac2c03a`.
 
 ## 9. Reuse audit
 
-This unit extends an existing seam, the matrix row's own `guard` list in `tools/gate-legs.json`, in
-the exact-file form `playbook render selftest`, `recall floor arms` and `policy fixtures` already use
-for memory-tree, policy and roles modules. The gaps are measured by the reads checker's own reader.
-No new mechanism is added.
+This unit extends an existing seam: the renderer's own CLI, whose verbs already serve other kits
+(`--answers` serves another kit's renderer, `tools/playbook/render_playbook.py@bb09280e:3715`), and
+its own one-line constants and `resolve_template_path`. `derive_bullet_placeholders` keeps its
+`resolve_kit_dir` lookup and its caller. A child process is how the matrix already drives the
+deployer, `tools/govkit/matrix.py@0d6bbdf0:165`. No new mechanism is added.
 
-Recall terms used: `py_reads guard gap closure resolve_kit_dir govkit acceptance matrix gate-legs guard exact-file memory-tree policy roles_lib scoped bar`
+Recall terms used: `py_reads guard gap closure import edge subprocess render_playbook bullet placeholder one-line region resolve_kit_dir acceptance matrix spec-tokens guards join`
