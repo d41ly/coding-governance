@@ -190,7 +190,7 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY
 | [PLAY-dOrderedCharter-82 — the acceptance matrix reads the renderer's bullet keys in a child process, so its closure stays its own](spec/2026-11-11-spec-PLAY-dOrderedCharter-82.md) | 44 | 1 | CLOSED | rev-2 | 2026-11-11 |
 <!-- /gen:build-units -->
 
-Records: 637 bound to this build, across 4 record folder(s).
+Records: 638 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
