@@ -240,7 +240,16 @@ would report the join as set while it graded nothing.
   python <prefix>/check-spec-tokens.py --list     # every hit and near-miss, authoring aid, exit 0
   python <prefix>/check-spec-tokens.py --legs-for <path>...   # the legs each path's guards trip
   git diff --name-only A..B | python <prefix>/check-spec-tokens.py --legs-for -   # paths on stdin
-  python <prefix>/check-spec-tokens.py --spec <path>   # grade one live spec, tracked or not
+  python <prefix>/check-spec-tokens.py --spec <path>...       # grade the named specs as if live
+
+--spec (TOOL-dPavedRoad-1) is a spec writer's self-check: it grades exactly the named specs, each as
+if it were LIVE, whatever its status and whether or not git tracks it, because a writer's spec is
+uncommitted when it returns. An operand must name a file under a build's `spec/` folder inside the
+root, or the run refuses with exit 2. Every per-spec join runs as the full run runs it; the hands-off
+join reads its sibling map from the LIVE specs on disk in each named spec's own `spec/` folder. FOUR
+arms that read the corpus rather than a spec do not run: the carries join and the packet join, whose
+report lines say `skipped under --spec`, and the stale-waiver and stale high-water arms, whose rows a
+one-spec population would call stale. So a `--spec` green is not the bar's green.
 
 --legs-for (TOOL-aMendedFleet-87) is a QUERY, not a join: it runs before the spec walk, grades no
 spec and exits 0. It reads the guards through `check_guard_trips`, the guards join's own trip rule,
@@ -248,19 +257,6 @@ keeps the broad guards that join drops and marks them, and prints the chunk and 
 hold rule reads without applying that rule. A guard carrying `*`, `?` or `[` is printed UNEVALUATED
 under every path, because the runner's `git diff` would expand it and this rule compares literals.
 A query in which EVERY path is untracked exits 2.
-
---spec <path> (TOOL-aSmoothedDispatch-5) is a SCOPE: the live population is that one file, read from
-disk whether or not git tracks it, so a spec writer can grade the spec it has not committed. The
-path must be a `.md` under `memory/builds/<slug>/spec/`, exist, and be LIVE; anything else REFUSES
-with exit 2, apart from a hit's exit 1. Under it the per-spec joins run over the one file, and the
-hands-off join's uid map reads every live spec on disk in that file's own `spec/` folder, so a
-hand-off to an uncommitted sibling still joins. The carries and packet joins are SKIPPED, each line
-saying so, because their population is every chain spec or run, never one file. Stale waiver rows
-and stale size high-water rows are NOT reported, because one file cannot show a row is stale. A hit
-prints as `spec-tokens: <path> [<kind>]` followed by its token, then the `<N> unwaived hit(s)`
-summary, and the run exits 1. The `HIT` and `NEAR` labels are `--list`'s, and that run exits 0. A
-`scope ·` line names what did not run. A
-scoped green is not a whole-tree green: the bar's leg runs with no scope.
 """
 import datetime
 import importlib.util
@@ -331,7 +327,8 @@ KIT_SPEC_TOKENS_VERSION = "1.1"  # gov:kit spec-tokens@1.1 — the deployer's re
 
 WAIVERS = "memory/project/spec-token-waivers.txt"
 SPEC_GLOB = "memory/builds/*/spec/*.md"
-SPEC_PATH = re.compile(r"memory/builds/[^/]+/spec/.*\.md$")   # the population, and --spec's test of its value
+# The spec walk's path pattern, one compiled copy for the walk, the size join's stale arm and --spec.
+SPEC_PATH = re.compile(r"memory/builds/[^/]+/spec/.*\.md$")
 LEGS_NAME = "gate-legs.json"
 #: TOOL-aRepatriatedFork-29 S3 — the manifest sits in the tool root, which is this file's own
 #: directory; `LEGS` is the repo-relative spelling `main` derives, for its messages.
@@ -1541,6 +1538,31 @@ def scan_live_packets(root, files):
     return hits, live, checked
 
 
+def read_named_specs(root, args):
+    """The --spec population (TOOL-dPavedRoad-1): each operand made root-relative as a POSIX path,
+    sorted and de-duplicated, or None after printing the REFUSING line for the first bad one. Every
+    later argument not opening with `-` is an operand, as --legs-for reads its own."""
+    ops = [a for a in args if not a.startswith("-")]
+    if not ops:
+        print("spec-tokens: REFUSING — --spec names no spec")
+        return None
+    out = set()
+    for op in ops:
+        p = pathlib.Path.cwd() / op
+        if not p.is_file():
+            print(f"spec-tokens: REFUSING — --spec {op} is not a file")
+            return None
+        try:
+            rel = p.resolve().relative_to(root.resolve()).as_posix()
+        except ValueError:
+            rel = ""
+        if not SPEC_PATH.match(rel):
+            print(f"spec-tokens: REFUSING — --spec {op} is not a spec under memory/builds/<slug>/spec/")
+            return None
+        out.add(rel)
+    return sorted(out)
+
+
 def main(argv):
     listing = "--list" in argv
     root = pathlib.Path(run("git", "rev-parse", "--show-toplevel").strip())
@@ -1556,40 +1578,25 @@ def main(argv):
               "its SPEC_FILE_DATE is the one spec filename date every dated join reads (TOOL-dTrueNorth-16 "
               "S32), so no spec could be dated")
         return 1
-    # THE SCOPE (TOOL-aSmoothedDispatch-5): `--spec <path>` grades that one live spec, read from disk.
-    # A wrong scope exits 2, apart from a hit's 1, so a caller can tell the two apart.
-    scope = None
+    named_specs = None
     if "--spec" in argv:
-        i = argv.index("--spec") + 1
-        value = argv[i] if i < len(argv) and not argv[i].startswith("--") else ""
-        why = "no path follows the flag" if not value else ""
-        if value:
-            p = pathlib.Path(value)
-            p = (p if p.is_absolute() else pathlib.Path.cwd() / p).resolve()
-            try:
-                scope = p.relative_to(root.resolve()).as_posix()
-            except ValueError:
-                scope = ""
-            if not SPEC_PATH.match(scope):
-                why = "not a .md file under memory/builds/<slug>/spec/"
-            elif not p.is_file():
-                why = "no file there"
-            elif not LIVE.search(p.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")):
-                why = "not a live spec (OPEN, SPECCED, INPROGRESS or BLOCKED)"
-        if why:
-            print(f"spec-tokens: REFUSING — --spec {value or '(no value)'}: {why}")
+        named_specs = read_named_specs(root, argv[argv.index("--spec") + 1:])
+        if named_specs is None:
             return 2
-    allspecs = [] if scope else sorted(f for f in files if SPEC_PATH.match(f))
-    # A live scope is never WONTDO, so it is its own unretired population too.
-    specs, frozen, unretired = ([scope], 0, [scope]) if scope else ([], 0, [])
-    for f in allspecs:
-        text = (root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
-        if LIVE.search(text):
-            specs.append(f)
-        else:
-            frozen += 1
-        if not WONTDO_STATUS.search(text):
-            unretired.append(f)
+    if named_specs is not None:   # the writer's self-check: LIVE and git ls-files are not consulted
+        specs, frozen, unretired = named_specs, 0, list(named_specs)
+    else:
+        allspecs = sorted(f for f in files
+                          if SPEC_PATH.match(f))
+        specs, frozen, unretired = [], 0, []
+        for f in allspecs:
+            text = (root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
+            if LIVE.search(text):
+                specs.append(f)
+            else:
+                frozen += 1
+            if not WONTDO_STATUS.search(text):
+                unretired.append(f)
     if not specs:
         print("spec-tokens: REFUSING — no tracked spec matched "
               f"{SPEC_GLOB}; a lint that graded nothing reports the same zero as a clean tree")
@@ -1843,13 +1850,16 @@ def main(argv):
     # The seventh join, over a population the six above never build: one uid map over the live specs,
     # then one read per graded target. It is folded into `hits` before the waiver pass, so a handoff
     # hit takes a row of the same registry and a stale row naming one reds like any other.
-    # Under --spec the map reads every live spec on disk in the scope's own `spec/` folder, tracked or
-    # not, so a hand-off to a sibling nobody has committed yet still joins (TOOL-aSmoothedDispatch-5 S4).
+    # Under --spec the siblings are read from DISK, because a writer's group siblings are uncommitted,
+    # and kept LIVE, because the full run treats a hand-off to a terminal sibling as silent.
     ho_pop = specs
-    if scope and handoff_cut:
-        ho_pop = sorted({scope} | {g.relative_to(root).as_posix()
-                                   for g in (root / "/".join(scope.split("/")[:4])).rglob("*.md")
-                                   if LIVE.search(g.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n"))})
+    if named_specs is not None and handoff_cut:
+        ho_pop = set(named_specs)
+        for slug in {f.split("/")[2] for f in named_specs}:
+            for p in (root / "memory" / "builds" / slug / "spec").rglob("*.md"):
+                if LIVE.search(p.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")):
+                    ho_pop.add(p.relative_to(root).as_posix())
+        ho_pop = sorted(ho_pop)
     ho_uids = read_spec_uids(root, ho_pop) if handoff_cut else {}
     ho_hits, ho_bullets, ho_tokens, ho_silent = scan_handoffs(root, specs, ho_uids, handoff_cut)
     hits += ho_hits
@@ -1862,14 +1872,17 @@ def main(argv):
         sz_hits, sz_stale, sz_held, sz_largest, sz_warned = scan_spec_sizes(
             root, specs, files, sz_answer, highwater, hw_rel, sz_judge)
         hits += sz_hits
+        if named_specs is not None:   # a one-spec population reads every other row as terminal
+            sz_stale = []
 
     # The ninth join (TOOL-dTrueNorth-2), over a population of its own: the tracked chain-build specs
     # at/after its cutoff, every status but WONTDO, with their history. Its hits are folded into
     # `hits` before the waiver pass under a composite token; the two exit arms are counted and listed
-    # as NEAR, never graded, because they are a Design exit's. Armed over nothing, it refuses. Under
-    # --spec it does not run: its population is every chain spec, never one file.
+    # as NEAR, never graded, because they are a Design exit's. Armed over nothing, it refuses.
+    # Under --spec neither the carries nor the packet join runs: both read the corpus and its history,
+    # which an uncommitted spec does not have. The full run at the close grades both.
     try:
-        cov = {"state": "skipped under --spec"} if scope else derive_carries_coverage(root, files)
+        cov = derive_carries_coverage(root, files) if named_specs is None else {"state": "skipped"}
     except (ImportError, SyntaxError) as exc:
         print(f"spec-tokens: REFUSING — the carries join cannot load its parser: {exc}")
         return 1
@@ -1891,7 +1904,7 @@ def main(argv):
 
     # The tenth join (TOOL-dGroundRules-63): each live chain run's packet, by its own instrument.
     try:
-        pk = None if scope else scan_live_packets(root, files)   # every live run, never one file
+        pk = scan_live_packets(root, files) if named_specs is None else None
     except ValueError as exc:
         print(f"spec-tokens: REFUSING — the packet join cannot name its instrument: {exc}")
         return 1
@@ -1908,23 +1921,19 @@ def main(argv):
     al_hits, al_carriers, al_graded = scan_arm_labels(root, unretired, files)
     hits += al_hits
 
-    if scope:   # a scoped run reports on its scope
-        hits = [h for h in hits if h[0] == scope]
-        near = [n for n in near if n[0] == scope]
     live = [h for h in hits if h[1] == "supersede" or h[2] not in waivers]
     for h in hits:
         if h[2] in waivers:
             seen_waived.add(h[2])
 
     stale = []
-    for tok, why in waivers.items():
+    # Under --spec a row no NAMED spec produces is not stale: some other spec may produce it.
+    for tok, why in (waivers.items() if named_specs is None else ()):
         if not why:
             stale.append(("WAIVER", tok, "carries no reason"))
         elif tok not in seen_waived:
             stale.append(("WAIVER", tok, "no spec produces this hit any more"))
     stale += sz_stale
-    if scope:   # one file cannot show a waiver row or a high-water row is stale
-        stale = []
 
     if listing:
         for f, kind, tok, why in hits:
@@ -1933,12 +1942,10 @@ def main(argv):
         for f, kind, tok, where in near:
             print(f"spec-tokens: NEAR   [{kind}] {f} :: {tok} — {where}")
 
-    print(f"spec-tokens: {len(specs)} live spec(s) · {frozen} terminal spec(s) not graded · "
+    mode = "" if named_specs is None else f"--spec · {len(named_specs)} named spec(s) graded whatever their status · "
+    print(f"spec-tokens: {mode}{len(specs)} live spec(s) · {frozen} terminal spec(s) not graded · "
           f"{graded} token(s) graded · {skipped} citation(s) skipped (untracked path) · "
           f"{len(waivers)} waiver(s)")
-    if scope:
-        print(f"spec-tokens: scope · --spec {scope} · {'tracked' if scope in files else 'untracked'} · "
-              "not run: carries, packet · stale rows not reported")
     # The bar join's own line, on every run: what it examined, and what it did NOT — the pre-cutoff
     # carriers it counted and skipped. On the landing day the examined figures read zero by the
     # register's own relation, and this line is what keeps that zero from reading as coverage.
@@ -2010,7 +2017,7 @@ def main(argv):
     # The carries join's line, ONE shape on every run, off and armed alike, carrying `live spec(s) ·`
     # for the hands-off line's reason: `--dispatch` filters its refusal diagnosis on that text.
     ca_builds = cov.get("builds", {}).values()
-    if scope:
+    if named_specs is not None:
         print("spec-tokens: carries join · skipped under --spec")
     else:
         print(f"spec-tokens: carries join · {cov.get('measured', 0)} chain spec(s) measured in "
@@ -2020,7 +2027,7 @@ def main(argv):
               f"{sum(1 for f in ca_found if f[1] in CARRIES_EXIT_ARMS)} at the Design exit only · {CARRIES_KEY} "
               + (cov["cutoff"] if cov["state"] == "armed" else "blank (arm off)"))
     # The packet join's line, on every run, so zero live runs reads as zero and not as clean.
-    if scope:
+    if named_specs is not None:
         print("spec-tokens: packet join · skipped under --spec")
     elif pk is None:
         print("spec-tokens: packet join · off · no packet instrument")

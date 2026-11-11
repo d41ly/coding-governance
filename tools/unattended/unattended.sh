@@ -66,7 +66,7 @@ set -u
 if [ -n "${EPOCHREALTIME:-}" ]; then DRIVER_T0_US=${EPOCHREALTIME//[!0-9]/}
 else printf -v DRIVER_T0_US '%(%s)T' -1; DRIVER_T0_US="${DRIVER_T0_US}000000"; fi
 readonly DRIVER_T0_US
-KIT_UNATTENDED_VERSION=1.116 # gov:kit unattended@1.116 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.117 # gov:kit unattended@1.117 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -4842,8 +4842,8 @@ unit_ids_of() { # slug
 # WHY THIS EXISTS, in numbers rather than in taste. `verb_plan` resolved a region id to its spec by
 # running an awk per (unit, spec) pair until one matched, and the pass above it read each spec's
 # status and heading with two more. Measured on node `a` 2026-08-26: a 24-spec build cost 16.6 s
-# against 1.5 s for a one-spec build, and check 30 of the sibling checker - an UNGUARDED merge-bar
-# leg - walks this verb over every tracked build for 235 s of a 289 s leg. The same diagnosis and the
+# against 1.5 s for a one-spec build, and check 30 of the sibling checker - a bar leg then, held
+# since TOOL-aShelvedLeg-1 - walked this verb over every tracked build for 235 s of a 289 s leg. The same diagnosis and the
 # same fix are already recorded for the gate self-test in `run-unattended-gates.sh`: the unit of cost
 # on this platform is process creation, and it is the only term in that product this repo owns.
 #

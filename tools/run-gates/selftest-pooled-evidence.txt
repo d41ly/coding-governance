@@ -18,9 +18,13 @@
 # ROWS WHOSE SUITES PRINT NO TRAILER, declared here because the runner cannot witness their
 # completion: `check-brief-recorded.test.sh` and `check-pass-order.test.sh` exit `$st` with no
 # `PASS (` line, so a completed exit from either is a reading of rc plus ^FAIL count only, and the
-# calibrate prints that gap on the row rather than being silent about it.
+# calibrate prints that gap on the row rather than being silent about it. `check-unattended.sh`, a
+# checker rather than a suite (TOOL-aShelvedLeg-1), exits on its status with no `PASS (` line, and
+# its row's reading is rc only: the checker prints each failure as `UNATTENDED check <n> FAILED`,
+# never as a ^FAIL line, so the row's FAIL column is always 0 and two different red runs read alike.
 # no-trailer: unattended brief-recorded selftest
 # no-trailer: unattended pass-order selftest
+# no-trailer: unattended kit gate
 #
 # THE POOLED POPULATION, DECLARED, so `--check` can hold the trailer rule over it statically
 # before a calibrate pays for it: every row whose argv lies under a `pooled-kit:` dir must print

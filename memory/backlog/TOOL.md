@@ -58,7 +58,6 @@ Cite ids, never line numbers.
 | [TOOL-aDeclaredBound-6](../builds/aDeclaredBound/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | tools/workflows/tier2-review.js describes its own find phase twice and… |
 | [TOOL-aDeferredBar-4](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | A *.test.sh UNDER A KIT DIRECTORY WITH A BUDGET ROW AND NO… |
 | [TOOL-aDeferredBar-5](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | HYGIENE CHECK 12'S ACCEPTANCE-WITNESS ARM ACCEPTS A *.test.sh-SHAPED… |
-| [TOOL-aDeferredBar-6](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | THE SPEC-STAGE WRITER IS NOT TOLD TO RUN THE SPEC-TOKEN CHECKER BEFORE… |
 | [TOOL-aDeferredBar-7](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/check-wiring.sh HAS NO ARM FOR… |
 | [TOOL-aDeferredBar-9](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/unattended/adopt-unattended.test.sh CARRIES NO ASSERTION FLOOR… |
 | [TOOL-aDeferredBar-10](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | AN ACCEPTANCE-LEDGER LINE CAN ASSERT A LEG'S EXIT FOR A TREE THAT MOVED… |
@@ -227,7 +226,6 @@ Cite ids, never line numbers.
 | [TOOL-aProbedUnit-16](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tier2-review.js and the two drift-audit workflows hand their agents no… |
 | [TOOL-aProbedUnit-17](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | the closing review's round-3 mediums and lows stand unfolded: clusters… |
 | [TOOL-aProfiledEffort-5](../builds/aProfiledEffort/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | the build harness's committer stage and the review harness's probe… |
-| [TOOL-aProfiledEffort-6](../builds/aProfiledEffort/BACKLOG.md) | OPEN | MED | — | 2026-11-10 | nothing refuses a role spawn at a level its model's profile does not… |
 | [TOOL-aPromptedMandate-7](../builds/aPromptedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | the leg's SOURCE-level no-write arm (check-unattended.test.sh) greps… |
 | [TOOL-aPromptedMandate-9](../builds/aPromptedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | nothing in the driver's precondition chain has a timeout and the… |
 | [TOOL-aPromptedMandate-14](../builds/aPromptedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-19 | marker-contract.test.sh gates the four readers of the generated… |
@@ -472,7 +470,6 @@ Cite ids, never line numbers.
 | [TOOL-dFairHearing-51](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-05 | THREE POLICY KEYS HAVE NO PLANNED READER. TOOL-dFairHearing-50 moves… |
 | [TOOL-dFairHearing-52](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | A BUILDER KILLED A PROCESS IT DID NOT START. Unit 43's builder killed… |
 | [TOOL-dFairHearing-53](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | THE ARM-LABELS JOIN REDS A SPEC BEFORE ITS ARMS EXIST.… |
-| [TOOL-dFairHearing-54](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | SPEC WRITERS CANNOT RUN THE TOKEN CHECK THEY ARE GRADED BY. A spec… |
 | [TOOL-dFairHearing-55](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | THE CLOSE OBSERVES NEW ARMS WITH TOOLS IT WROTE IN SCRATCH. Observing… |
 | [TOOL-dFairHearing-56](../builds/dFairHearing/BACKLOG.md) | OPEN | LOW | — | 2026-11-08 | A HELD SUITE'S GUARD MISSES A SIBLING KIT. The hook destinations… |
 | [TOOL-dFoldedVerdict-7](../builds/dFoldedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THREE CARRIERS WERE FOUND SITTING EXACTLY ON THEIR DECLARED CEILING IN… |

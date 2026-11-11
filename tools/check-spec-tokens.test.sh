@@ -63,7 +63,12 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # AC4 and AC5, four for AC3 and one for AC6, each top-level. Counted by reading; OWED: observed at the close.
 # RAISED 236 -> 238 by TOOL-aSmoothedDispatch-8: its two overlay-parity arms, the row span and the summary
 # span; the missing-span check counts only as a failure. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=238
+# RAISED 224 -> 231 by TOOL-dPavedRoad-1: its seven --spec arms, the bare run's untracked DEFERRED spec,
+# the ac-order red, the disk sibling's handoff red, the carries and packet skips with no stale row, and
+# the two refusals, each top-level. Counted by reading; OWED: observed at the close.
+# MERGED at TOOL-aSmoothedDispatch-22's reconcile: the base 224, plus TOOL-dPavedRoad-1's 7, plus this
+# branch's 14, less the ten unit 5 arms dropped there = 235. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=235
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -1985,45 +1990,48 @@ printf 'arm-labels <- %s FH2 AC1\tdeliberate, for this arm\n' "$ls_spec" >> "$d/
 arm "FH48 AC9 a waiver row reaches a hit" 0 "$d" "1 label(s) in 1 spec(s)" "STALE WAIVER"
 git -C "$d" reset -q --hard "$albase"
 
-# ---- TOOL-aSmoothedDispatch-5: the --spec scope. Twelve arms over three scratch repos. The scoped
-#      specs are written and NEVER added, since grading a spec git does not track is the point. Each
-#      `Red when:` is the checker at ae6735c1, which ignores the flag and grades the tracked tree.
+# TOOL-dPavedRoad-1 — --spec, a writer's self-check: the named specs graded as if live, whatever their
+# status and whether or not git tracks them. The fixture spec is UNTRACKED and DEFERRED, so the bare
+# run grades none of it; its sibling is untracked and OPEN; the tracked spec produces the one waived
+# hit, so a stale-waiver arm run over the one named spec would call that row STALE.
+d=$base/onespec; scratch "$d"
+printf 'SPEC_AC_ORDER_CUTOFF="%s"\nSPEC_HANDOFF_CUTOFF="%s"\n' "$HCUT" "$HCUT" > "$d/.memory-tree.conf"
+sed -i 's|^`real leg`\.|`imaginary leg`.|' "$d/$SPECDIR/$HCUT-spec-TOOL-tOne-1.md"
+printf 'imaginary leg\tonly the tracked spec produces this, for the --spec arms\n' >> "$d/memory/project/spec-token-waivers.txt"
+git -C "$d" add -A >/dev/null
+os_spec="$SPECDIR/$HCUT-spec-EXMP-tOne-5.md"
+write_handoff_spec "$d" "$os_spec" EXMP-tOne-5 DEFERRED \
+  '## 3. Non-goals (OUT)' '' '### Edges' '' \
+  '- **hands-off** `EXMP-tOne-6` — it reads `--frob` from this unit.' '' \
+  '## 6. Acceptance criteria' '' '- **AC2** — a second criterion.' '- **AC1** — a first criterion.'
+arm "PR1 the bare run leaves an untracked DEFERRED spec ungraded" 0 "$d" "spec-tokens: 1 live spec(s) · 0 terminal spec(s) not graded"
+ARM_ARGS=(--spec "$os_spec")
+arm "PR1 AC1 --spec grades the untracked DEFERRED spec and REDS on its descending labels" 1 "$d" "EXMP-tOne-5.md [ac-order] \`ac-order <- AC2\`"
+sed -i -e 's|^- \*\*AC2\*\* — a second|- **AC1** — a second|' -e 's|^- \*\*AC1\*\* — a first|- **AC2** — a first|' "$d/$os_spec"
+write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-EXMP-tOne-6.md" EXMP-tOne-6 OPEN \
+  '## 4. Design' '' 'It reads the flag this unit was handed.'
+arm "PR1 AC3 --spec reads an untracked OPEN sibling from disk and REDS on the token it never names" 1 "$d" "[handoff] \`EXMP-tOne-5>EXMP-tOne-6:--frob\`"
+sed -i 's|It reads the flag|It reads `--frob`, the flag|' "$d/$SPECDIR/$HCUT-spec-EXMP-tOne-6.md"
+arm "PR1 AC2 --spec calls no waiver row stale that only another spec produces, and skips the carries join" 0 "$d" "carries join · skipped under --spec" "STALE"
+arm "PR1 AC2 --spec skips the packet join and says so" 0 "$d" "packet join · skipped under --spec" "STALE"
+ARM_ARGS=(--spec "${PFX}gate.sh")
+arm "PR1 AC4 --spec REFUSES an operand that is not a spec" 2 "$d" "REFUSING — --spec ${PFX}gate.sh is not a spec under memory/builds/<slug>/spec/"
+ARM_ARGS=(--spec "$SPECDIR/no-such-spec.md")
+arm "PR1 AC4 --spec REFUSES an operand that names no file" 2 "$d" "REFUSING — --spec $SPECDIR/no-such-spec.md is not a file"
+ARM_ARGS=()
+
+# ---- TOOL-aSmoothedDispatch-5: the two --spec arms the PR1 arms above do not cover, kept at
+#      TOOL-aSmoothedDispatch-22's reconcile and re-pointed at main's --spec output. The named spec
+#      is written and NEVER added. The overlay-parity arms below read the same scratch repo.
 sc_spec="$SPECDIR/$HCUT-spec-TOOL-tOne-7.md"
 d=$base/scope; scratch "$d"
-write_handoff_spec "$d" "$sc_spec" TOOL-tOne-7 OPEN '## 7. Gates' '' '`imaginary leg`.'
-ARM_ARGS=(--spec "$sc_spec")
-arm "SD5 AC1 --spec grades an UNTRACKED spec and REDS on its leg" 1 "$d" "$sc_spec [leg]"
 write_handoff_spec "$d" "$sc_spec" TOOL-tOne-7 OPEN '## 7. Gates' '' '`real leg`.'
 sed -i 's|^`real leg`\.|`imaginary leg`.|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
-arm "SD5 AC2 a hit only in the tracked spec is not reported under --spec" 0 "$d" "scope · --spec $sc_spec · untracked · not run: carries, packet" "2026-09-02-spec-TOOL-tOne-1.md"
-arm "SD5 AC2 the carries and packet joins print that they did not run" 0 "$d" "carries join · skipped under --spec"
-ARM_ARGS=(--spec)
-arm "SD5 AC3 --spec with no value REFUSES with exit 2" 2 "$d" "REFUSING — --spec (no value)"
-ARM_ARGS=(--spec memory/project/spec-token-waivers.txt)
-arm "SD5 AC3 --spec outside the builds' spec folders REFUSES with exit 2" 2 "$d" "REFUSING — --spec memory/project/spec-token-waivers.txt: not a .md file"
-ARM_ARGS=(--spec "$SPECDIR/nope.md")
-arm "SD5 AC3 --spec naming no file REFUSES with exit 2" 2 "$d" "REFUSING — --spec $SPECDIR/nope.md: no file there"
-write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-TOOL-tOne-8.md" TOOL-tOne-8 CLOSED '## 7. Gates' '' '`real leg`.'
-ARM_ARGS=(--spec "$SPECDIR/$HCUT-spec-TOOL-tOne-8.md")
-arm "SD5 AC3 --spec naming a CLOSED spec REFUSES with exit 2" 2 "$d" "not a live spec"
-sed -i 's|^`imaginary leg`\.|`real leg`.|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
-printf 'no-spec-makes-this\tdeliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
-ARM_ARGS=()
-arm "SD5 AC5 a waiver row no spec produces is STALE on the unscoped run" 1 "$d" "STALE WAIVER"
 ARM_ARGS=(--spec "$sc_spec")
-arm "SD5 AC5 the same row is not reported under --spec" 0 "$d" "1 live spec(s)" "STALE"
-d=$base/scopeho; scratch "$d"
-printf 'SPEC_HANDOFF_CUTOFF="%s"\n' "$HCUT" > "$d/.memory-tree.conf"
-git -C "$d" add -A >/dev/null
-write_handoff_spec "$d" "$sc_spec" TOOL-tOne-7 OPEN '## 3. Non-goals (OUT)' '' '### Edges' '' \
-  '- **hands-off** `TOOL-tOne-9` — it reads `--frob` from this unit.'
-write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-TOOL-tOne-9.md" TOOL-tOne-9 OPEN '## 4. Design' '' 'It reads the flag.'
-arm "SD5 AC4 a hand-off to an UNTRACKED sibling joins under --spec and REDS" 1 "$d" '[handoff] `TOOL-tOne-7>TOOL-tOne-9:--frob`'
-sed -i 's|It reads the flag|It reads `--frob`|' "$d/$SPECDIR/$HCUT-spec-TOOL-tOne-9.md"
-arm "SD5 AC4 the same hand-off is green once the sibling names the token" 0 "$d" "1 bullet(s) graded in live spec(s) · 1 payload token(s)"
+arm "SD5 AC2 a hit only in the tracked spec is not reported under --spec" 0 "$d" "--spec · 1 named spec(s) graded whatever their status · 1 live spec(s)" "2026-09-02-spec-TOOL-tOne-1.md"
+ARM_ARGS=(--spec)
+arm "SD5 AC3 --spec with no value REFUSES with exit 2" 2 "$d" "REFUSING — --spec names no spec"
 ARM_ARGS=()
-d=$base/scopeoff; scratch "$d"
-arm "SD5 AC6 a run with no --spec prints no scope line and grades the tracked spec" 0 "$d" "1 live spec(s) · 0 terminal spec(s)" "scope ·"
 
 # TOOL-aSmoothedDispatch-8 S2: the gov-spec-writer overlay quotes the exit-1 row and summary shapes, and a
 # red --spec run must print both. The spans are read from the overlay itself, so a reworded overlay or

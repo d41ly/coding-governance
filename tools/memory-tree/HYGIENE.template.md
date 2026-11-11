@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.156 -->
+<!-- gov:kit memory-tree@2.157 -->
 # {{MEMORY_ROOT}}/ retention & hygiene
 
 `{{MEMORY_ROOT}}/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -319,7 +319,8 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
     A Tier-2 spec must carry a `### Edges` block in §3 once the filename date reaches
     `SPEC_EDGES_CUTOFF`: one bullet per edge, `**consumes-from**` or `**hands-off**` plus a
     backticked sibling id or the bare word `external`, or the single word `none`. The SHAPE arm
-    runs under `--staged`; the reciprocity, order and payload JOINS are held there and announce it.
+    runs under `--staged`; there the reciprocity, order and payload JOINS read each staged spec's
+    whole build from the worktree and report an edge either of whose ends is staged.
     Every §2 scope item must name the acceptance criterion that observes it, or carry `NOT OBSERVED`
     and a reason, once the filename date reaches `SCOPE_JOIN_CUTOFF`, on either tier — and only for a
     spec carrying BOTH headings, matched by heading TEXT rather than by ordinal. SHAPE only.
@@ -713,6 +714,9 @@ Both are branches of the same check, so a blank `ACCEPTANCE_LEDGER_CUTOFF` disar
 - The gate reads SHAPE and COVERAGE only. It asserts every criterion a closed spec numbers has a line
   in one of the two forms; it does NOT assert the token names anything real, that the observation was
   actually made, or that an amendment was justified. Its header says so.
+- Under `--staged` it grades the closed units a staged spec or a staged journal record names,
+  against the records of their own build folders. A record in another build that evidences one of
+  them is read only by the full run.
 
 ## The harness meta-gate
 

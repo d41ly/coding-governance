@@ -21,13 +21,17 @@ reference; this page is the short version.
    Protocols and Facts sections whole.
 3. **The handoff renderer joins them.** `handoff.py render` writes one prompt file under the build's
    `prompts/` folder, with `## Role` and then `## Task`, filled from the card, the build's brief and
-   any `--input` values. A required input that is missing or still a placeholder refuses by name.
+   any `--input` values. A spec writer's task also carries the brief's `## The prompt`, the owner's
+   own words, as its `brief:prompt` block. A required input that is missing or still a placeholder
+   refuses by name.
 4. **The agent runs as a native type.** Each role is rendered into `.claude/agents/gov-<role>.md`,
    which starts without the full charter and at the reasoning effort the policy file sets. It
    carries the section 1 rules its role cites and the charter's Protocols and Facts sections.
    The dispatcher passes the level for the model in use: a harness call carries `efforts`, the JSON
    `handoff.py stage-efforts <workflow> --model <id>` prints, where `<id>` is the session's own
-   model id as its environment states it.
+   model id as its environment states it. A harness call at another level is refused by the spawn
+   guard, which names the stage, both levels and that command; pass what it prints. A stage that
+   neither `roles` nor `efforts` names is refused too.
 
 ## How to use it
 
@@ -43,7 +47,13 @@ reference; this page is the short version.
   `gov-builder`. An edited prompt is refused. Pass the name it prints on stderr after
   `handoff: description — ` as the call's `description`; any other name is refused.
   That `Agent` call also carries `effort`: the role's value in the JSON
-  `handoff.py role-efforts --model <id>` prints.
+  `handoff.py role-efforts --model <id>` prints. A spawn at another level is refused, and the
+  refusal names the level to pass and that command. The guard reads the model from the call's
+  `model`, else from the session's transcript. When it cannot read one, or two profiles match it,
+  or `CLAUDE_CODE_EFFORT_LEVEL` is set, the call goes through with one line saying the level was not
+  checked. It does not check the agents a harness spawns itself, the `committer` and `probe`
+  stages, which workflow a call to a harness serving two runs, a default subagent model or an
+  effort ceiling in your settings, or a hand-edited role index.
 - **Change how a role behaves:** edit `<prefix>/roles/house/<role>.md`, never the file under
   `agents/`. Your overlay is appended under `## House rules`, and updates never overwrite it.
 - **Change a role's effort, or the gates a role may run:** edit `<prefix>/roles/house/policy.toml`.
@@ -120,8 +130,9 @@ until an owner writes its first row.
   on a specced unit. The main loop may still flip a spec's `**Status:**` line.
 - A role agent running the bar, the self-test runner or any suite, beyond what `[gates]` allows.
 - In a session routed to a live build, a final message that leaves out the `agent` or `returned`
-  line of an agent its turn dispatched or received. It is refused once per turn end, and
-  `handoff.py agents` prints the lines to paste. This one switches on with the route, not with
+  line of an agent its turn dispatched or received. It is refused once per turn end, and the
+  refusal prints the lines to paste, derived for it by `handoff.py agents`; where it cannot derive
+  one, it names that verb instead. This one switches on with the route, not with
   `roles.json`, and only where the governing doc's micro-formats define both lines.
 
 All of these switch on only where `.claude/roles.json` exists. They do not see writes made through

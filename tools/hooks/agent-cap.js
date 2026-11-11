@@ -8,7 +8,7 @@
  * flight and knows when each one ends, which a PreToolUse hook cannot. What a call-time check CAN see
  * is the settings files the harness started from, and RULE 7 holds them to the landed limit.
  *
- * THE RULES IT KEEPS, in the order `main()` runs them: rule 6, then rule 7, then the call is admitted.
+ * THE RULES IT KEEPS, in the order `main()` runs them: rule 6, then rule 8, then rule 7, then the call is admitted.
  * Rules 0, 2 and 5 left for the review kit (TOOL-dFairHearing-16, the owner's NT-27): the verify-stage
  * total and the loop markers are its `check-verifier-fanout.js`, the ref-keyed verdict join ban its
  * `check-review-join.js`, both run by the merge bar's gates beside them over every committed harness,
@@ -36,6 +36,30 @@
  * self-consistent hand-written prompt file and a hand-edited index all pass it, and it never compares
  * `role-sha` with the role an agent type was rendered from.
  *
+ * RULE 8 (TOOL-aGuardedEffort-1) — the level a call runs at is the one the effort policy gives its
+ * model. Armed by the index's `effort` key, which the roles kit's renderer writes with every level
+ * resolved; an index without it adds no rule and prints nothing. On a call rule 6 admitted, the model
+ * is an `Agent` call's own `model`, else the `message.model` of the last main-chain assistant entry of
+ * the payload's `transcript_path`, read whole, `<synthetic>` skipped. Its profile is the one whose
+ * `match` holds a word of the id, else the default tables. An `Agent` call is refused unless its
+ * `effort`, or with none its agent type's level, is the level that table gives its role. A `Workflow`
+ * call is refused unless, for at least one workflow its harness runs, every stage key's level is the
+ * table's. The stage level is the `args.efforts` value, or with none the level of the agent type the
+ * call's `roles` names for the stage, and a stage neither names counts as differing
+ * (TOOL-aGuardedEffort-2). A workflow's stage keys are those the index's `unset` and the matched
+ * table's `stages` both hold for it. A refusal names
+ * the role or stage, both levels, the model and where it was read, and the `handoff.py role-efforts`
+ * or `stage-efforts` call that prints the right value. A level it cannot check is admitted with one
+ * stderr line saying why: no `transcript_path`, an unreadable transcript, no entry naming a model, a
+ * model two profiles match, a harness whose workflows hold no stage key, and an `Agent` call where
+ * `CLAUDE_CODE_EFFORT_LEVEL` is set, since that session's tool offers no `effort`. A throw inside it,
+ * tables that disagree on a stage key among them, refuses, naming a re-render.
+ * WHAT IT DOES NOT CHECK: the agents a running harness spawns through its own `agent()`; the
+ * `committer` and `probe` stages, which no `stages` table keys; which workflow a call to a harness
+ * serving two runs, so a call right for one is admitted for both; a configured default subagent
+ * model, and an effort ceiling in settings, which change what an agent runs at and are read by no
+ * hook; a forged transcript and a hand-edited index.
+ *
  * RULE 7 (TOOL-dGroundRules-10) — the settings in force. With the policy kit's `policy-mirror.js` found
  * through `resolveKitDir`, the receipt's row and then the sibling probes, every `Agent` and `Workflow`
  * call reads the landed limit through `readPolicy`, then every settings layer `readSettingsLayers` reads at the payload `cwd`'s
@@ -52,7 +76,7 @@
  *     "hooks": [ { "type": "command",
  *       "command": "node \"${CLAUDE_PROJECT_DIR}/<path>/agent-cap.js\"" } ] } ] }
  * The matcher is a LIST OF EXACT STRINGS separated by `|`, in ONE group — not a regular expression.
- * `Workflow` is a harness call rules 6 and 7 judge; `Agent` is a direct spawn they judge too.
+ * `Workflow` is a harness call rules 6, 8 and 7 judge; `Agent` is a direct spawn they judge too.
  * main() exits 0 on any other tool_name.
  * Blocks via exit 2 + stderr (version-robust; no JSON-schema dependency).
  *
@@ -69,7 +93,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.43' // gov:kit agent-cap@1.43 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.45' // gov:kit agent-cap@1.45 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 
 // The review harness a deny message points at, DERIVED (TOOL-aRepatriatedFork-2 S6): found by
 // `resolveKitDir` in the workflows kit (TOOL-dFairHearing-32 S25), and the bare name when it refuses,
@@ -733,23 +757,13 @@ function renderSpawnName(marker, workflow) {
 
 // Rule 6 on a `Workflow` call (§4 "The evaluation order", step 3): null to admit, else a deny string.
 function checkHarnessCall(data, index, root) {
-  const fs = require('fs')
-  const path = require('path')
-  const { buildComparablePath } = require(path.join(__dirname, 'scratch-guard.js'))
   const ti = data.tool_input || {}
   if (!index.harnesses.length) return renderHandoffDeny('Workflow', `UNARMED: ${index.shown} declares no harness, so no Workflow call can be admitted.`, index)
   if (ti.script) return renderHandoffDeny('Workflow', 'an inline `script` is never a declared harness.', index)
   const sp = ti.scriptPath
   if (typeof sp !== 'string' || sp === '') return renderHandoffDeny('Workflow', 'the call names no `scriptPath` (a `name:` run is not a declared harness).', index)
-  const folded = process.platform === 'win32' ? sp.replace(/\\/g, '/').replace(/^\/([A-Za-z])\//, '$1:/') : sp
-  const abs = path.resolve(data.cwd || process.cwd(), folded)
-  let real = abs
-  try { real = fs.realpathSync(abs) } catch { real = abs }
-  let top = root
-  try { top = fs.realpathSync(root) } catch { top = root }
-  const rel = buildComparablePath(path.relative(top, real)).replace(/^\.\//, '')
-  if (!index.harnesses.some((h) => buildComparablePath(h).replace(/^\.\//, '') === rel)) {
-    return renderHandoffDeny('Workflow', `scriptPath ${sp} (${rel} from the checkout root) is not a declared harness.`, index)
+  if (resolveHarnessEntry(data, index, root) === null) {
+    return renderHandoffDeny('Workflow', `scriptPath ${sp} (${resolveHarnessEntry.rel} from the checkout root) is not a declared harness.`, index)
   }
   const a = extractWorkflowArgs(data)
   if (!a) return renderHandoffDeny('Workflow', '`args` is not a plain object, or a JSON string of one.', index)
@@ -763,6 +777,161 @@ function checkHarnessCall(data, index, root) {
     }
   }
   return null
+}
+
+// The `harnesses` entry of the index a Workflow call's `scriptPath` names, as the index spells it, or
+// null: the path resolved against the payload cwd, symlinks followed, compared repo-relative. Rule 6
+// and rule 8 share it (TOOL-aGuardedEffort-1 S6); `.rel` is the path as compared, for rule 6's refusal.
+function resolveHarnessEntry(data, index, root) {
+  const fs = require('fs')
+  const path = require('path')
+  const { buildComparablePath } = require(path.join(__dirname, 'scratch-guard.js'))
+  const sp = String((data.tool_input || {}).scriptPath)
+  const folded = process.platform === 'win32' ? sp.replace(/\\/g, '/').replace(/^\/([A-Za-z])\//, '$1:/') : sp
+  const abs = path.resolve(data.cwd || process.cwd(), folded)
+  let real = abs
+  try { real = fs.realpathSync(abs) } catch { real = abs }
+  let top = root
+  try { top = fs.realpathSync(root) } catch { top = root }
+  const rel = buildComparablePath(path.relative(top, real)).replace(/^\.\//, '')
+  resolveHarnessEntry.rel = rel
+  const hit = index.harnesses.find((h) => buildComparablePath(h).replace(/^\.\//, '') === rel)
+  return hit === undefined ? null : hit
+}
+
+// RULE 8 (TOOL-aGuardedEffort-1) — the level a call runs at is the one the effort policy gives its
+// model. Every level is resolved by the roles kit's renderer into the index's `effort` key, so this
+// rule only looks up: it spawns no interpreter and reads no policy file. The two verbs it names in a
+// refusal are the roles kit's, by bare file name.
+
+// The model of the last main-chain assistant entry of a transcript: `{ model }`, or `{ why }` when the
+// path is absent, the read throws, or no entry names one. The file is read whole and walked from the
+// end; a line that does not parse, a sidechain record and the model `<synthetic>` are skipped. Never throws.
+function readSessionModel(transcriptPath) {
+  if (typeof transcriptPath !== 'string' || transcriptPath === '') return { why: 'the payload carries no transcript_path' }
+  let lines
+  try { lines = require('fs').readFileSync(transcriptPath, 'utf8').split('\n') } catch (e) {
+    return { why: `the transcript ${transcriptPath} is unreadable (${(e && e.code) || e})` }
+  }
+  for (let i = lines.length - 1; i >= 0; i--) {
+    let rec
+    try { rec = JSON.parse(lines[i]) } catch { continue }
+    if (!rec || rec.type !== 'assistant' || rec.isSidechain === true) continue
+    const model = rec.message && rec.message.model
+    if (typeof model === 'string' && model !== '' && model !== '<synthetic>') return { model }
+  }
+  return { why: `the transcript ${transcriptPath} holds no main-chain assistant entry naming a model` }
+}
+
+// The names of every profile whose `match` holds a word of the model id, the words being the id's runs
+// of letters and digits after lower-casing: the roles kit's `resolve_profile` rule, held to it by arm
+// 20 of that kit's adopter suite. None is the default tables, one that profile, two or more no profile.
+function resolveModelProfile(profiles, model) {
+  const words = String(model).toLowerCase().match(/[a-z0-9]+/g) || []
+  return Object.keys(profiles).filter((n) => profiles[n] && Array.isArray(profiles[n].match) && profiles[n].match.some((w) => words.includes(w)))
+}
+
+// The refusal: the rule, the tool, the reason, and the call that prints the right value.
+function renderEffortDeny(tool, why, remedy) {
+  return `BLOCKED by agent-cap: rule 8 (TOOL-aGuardedEffort-1) refused this ${tool} call — ${why}\n${remedy}\n`
+}
+
+// Rule 8 on a call rule 6 admitted: null when it was graded and admitted, or when the index carries
+// no `effort`; `{ deny }` with the refusal text; `{ note }` with the one line saying the level was not
+// checked and why. A role or harness the index's tables do not hold, and a stage key they disagree
+// on, throws, and `main()` refuses. A harness none of whose workflows has a stage key is a note.
+function checkEffortLevel(data, index, root) {
+  const e = index.effort
+  if (!e) return null
+  const tool = data.tool_name
+  const ti = data.tool_input || {}
+  const checkOwn = (o, k) => !!o && typeof o === 'object' && Object.prototype.hasOwnProperty.call(o, k)
+  const renderShown = (v) => JSON.stringify(typeof v === 'string' ? v.slice(0, 80) : v === undefined ? null : v)
+  const renderLevel = (v) => (typeof v === 'string' ? v.slice(0, 80) : renderShown(v))
+  const renderNote = (why) => ({ note: `agent-cap: rule 8 did not check this ${tool} call's effort level — ${why}` })
+  // F2: a session whose environment fixes the level offers no `effort` on its Agent tool, so no call
+  // could pass. An Agent call's step alone, before the model is read; a Workflow call is graded.
+  if (tool === 'Agent' && process.env.CLAUDE_CODE_EFFORT_LEVEL) {
+    return renderNote("CLAUDE_CODE_EFFORT_LEVEL is set, so this session's Agent tool carries no effort")
+  }
+  let model = tool === 'Agent' ? ti.model : undefined
+  let source = 'the call'
+  if (typeof model !== 'string' || model === '') {
+    const read = readSessionModel(data.transcript_path)
+    if (read.why) return renderNote(read.why)
+    model = read.model
+    source = 'the transcript'
+  }
+  const names = resolveModelProfile(e.profiles, model)
+  // F1: the resolver refuses an id two profiles match, so no expected level exists to name.
+  if (names.length > 1) return renderNote(`the model ${renderShown(model)} matches the profiles ${names.join(' and ')}, so no one profile's levels are its own`)
+  const table = names.length ? e.profiles[names[0]] : e.default
+  const giver = names.length ? `the ${names[0]} profile gives it` : 'the default tables give it'
+  const where = `on the model ${renderShown(model)} (read from ${source})`
+  if (tool === 'Agent') {
+    const type = ti.subagent_type
+    if (!checkOwn(e.default.roles, type) || !checkOwn(table.roles, type)) throw new Error(`the effort tables of ${index.shown} hold no level for the role ${type}`)
+    const own = checkOwn(ti, 'effort')
+    const seen = own ? ti.effort : e.default.roles[type]
+    const expected = table.roles[type]
+    if (seen === expected) return null
+    return { deny: renderEffortDeny('Agent',
+      `${type} would run at ${renderLevel(seen)} (${own ? "the call's own `effort`" : "its agent type's level; the call carries no `effort`"}), and ${giver} ${expected} ${where}.`,
+      `Pass \`effort\` as \`handoff.py role-efforts --model ${renderShown(model)}\` prints it for ${type}.`) }
+  }
+  const entry = resolveHarnessEntry(data, index, root)
+  const workflows = entry === null ? null : e.harnesses[entry]
+  if (!Array.isArray(workflows) || !workflows.length) throw new Error(`the effort tables of ${index.shown} name no workflow for the harness ${entry}`)
+  const a = extractWorkflowArgs(data) || {}
+  const efforts = a.efforts === undefined ? {} : a.efforts
+  if (!efforts || typeof efforts !== 'object' || Array.isArray(efforts)) {
+    return { deny: renderEffortDeny('Workflow', '`args.efforts` is present and not a plain object, so no stage level can be read from it.',
+      workflows.map((w) => `Pass \`efforts\` as \`handoff.py stage-efforts ${w} --model ${renderShown(model)}\` prints it.`).join('\n')) }
+  }
+  // A harness serving two workflows: the hook cannot tell which one a call runs, so the call is
+  // admitted when the levels of at least ONE whole workflow are its own, and never key by key.
+  // A stage's level is the call's `efforts` value, or with none the level of the agent type the
+  // call's `roles` names for the stage, and a stage neither names counts as differing: it would
+  // spawn untyped at the session's level, which no table holds (TOOL-aGuardedEffort-2 S1). A
+  // workflow's stage keys are those of `unset` joined with those of the matched table's `stages`,
+  // and a key one side lacks throws; a workflow with no key adds no line and never admits (S2).
+  const lines = []
+  const keyed = []
+  for (const w of workflows) {
+    const stages = (checkOwn(table.stages, w) && table.stages[w]) || {}
+    const unset = (checkOwn(e.unset, w) && e.unset[w]) || {}
+    const keys = [...new Set([...Object.keys(unset), ...Object.keys(stages)])].sort()
+    for (const key of keys) {
+      if (!checkOwn(unset, key) || !checkOwn(stages, key)) throw new Error(`the effort tables of ${index.shown} disagree on stage ${key} of ${w}`)
+    }
+    if (!keys.length) continue
+    keyed.push(w)
+    const differing = []
+    for (const key of keys) {
+      let seen
+      let how
+      if (checkOwn(efforts, key)) {
+        seen = efforts[key]
+        how = `the call's own \`efforts.${key}\``
+      } else if (checkOwn(a.roles, key)) {
+        const role = a.roles[key]
+        if (!checkOwn(e.default.roles, role)) throw new Error(`the effort tables of ${index.shown} hold no level for the role ${renderLevel(role)}`)
+        seen = e.default.roles[role]
+        how = `${role}, its agent type's level; the call's \`efforts\` names no ${key}`
+      } else {
+        differing.push(`stage ${key} would run untyped at the session's level (the call's \`roles\` and \`efforts\` name no ${key}), expected ${stages[key]}`)
+        continue
+      }
+      if (seen === stages[key]) continue
+      differing.push(`stage ${key} would run at ${renderLevel(seen)} (${how}), expected ${stages[key]}`)
+    }
+    if (!differing.length) return null
+    lines.push(`${w}: ${differing.join('; ')}`)
+  }
+  if (!keyed.length) return renderNote(`the effort tables of ${index.shown} hold no stage key for ${workflows.join(' and ')}, which the harness ${entry} runs`)
+  return { deny: renderEffortDeny('Workflow',
+    `the harness ${entry} would run a stage at another level than ${giver} ${where}.\n${lines.join('\n')}`,
+    `Pass \`efforts\` as ${keyed.map((w) => `\`handoff.py stage-efforts ${w} --model ${renderShown(model)}\``).join(' or ')} prints it, for the workflow this call runs.`) }
 }
 
 // RULE 7 (TOOL-dGroundRules-10) — the settings in force. The agent limit is the harness's to enforce,
@@ -846,7 +1015,7 @@ function main() {
       `agent-cap: ${onlyArg} is refused — this hook runs no script rule since TOOL-dFairHearing-16. ` +
         `The verifier total and the loop markers run from the review kit's check-verifier-fanout.js, ` +
         `and the ref-keyed join ban from its check-review-join.js, each given this hook as --hook. ` +
-        `Omit the flag to run this hook's rules 6 and 7.\n`,
+        `Omit the flag to run this hook's rules 6, 8 and 7.\n`,
     )
     process.exit(2)
   }
@@ -862,14 +1031,15 @@ function main() {
   // RULE 6 (TOOL-aOrientedCast-7) — first, so a call outside a declared harness is refused whatever its
   // args. An absent `.claude/roles.json` at the role root adds no rule; a broken one, or a throw
   // anywhere in the rule, refuses: a rule that cannot finish does not admit.
+  let index = null
+  let root = null
   {
     let deny = null
-    let index = null
     try {
       // TOOL-aOrientedCast-14: the root of the payload cwd, else of CLAUDE_PROJECT_DIR.
       const { loadRoleIndex, resolveRoleRoot } = require(require('path').join(__dirname, 'scratch-guard.js'))
       const cwd = data.cwd || process.cwd()
-      const root = resolveRoleRoot(cwd, process.env)
+      root = resolveRoleRoot(cwd, process.env)
       if (root) {
         index = loadRoleIndex(root)
         if (index.state === 'broken') deny = renderHandoffDeny(data.tool_name, `the role index ${index.shown} ${index.why}; fix or regenerate it.`, null)
@@ -884,6 +1054,24 @@ function main() {
       process.stderr.write(deny)
       process.exit(2)
     }
+  }
+
+  // RULE 8 (TOOL-aGuardedEffort-1) — the effort level, on a call rule 6 admitted through an index
+  // carrying `effort`. A refusal exits 2; a level it could not check is one stderr line, and rule 7
+  // runs as before. A throw refuses, naming a re-render: a rule that cannot finish does not admit.
+  if (index && index.state === 'ok' && index.effort) {
+    let verdict
+    try {
+      verdict = checkEffortLevel(data, index, root)
+    } catch (e) {
+      verdict = { deny: renderEffortDeny(data.tool_name, `the rule threw (${(e && e.message) || e}), and a rule that cannot finish does not admit.`,
+        `Re-render the role index ${index.shown} with \`render_agents.py --write\`.`) }
+    }
+    if (verdict && verdict.deny) {
+      process.stderr.write(verdict.deny)
+      process.exit(2)
+    }
+    if (verdict && verdict.note) process.stderr.write(verdict.note + '\n')
   }
 
   // RULE 7 (TOOL-dGroundRules-10) — the settings in force, for both tools. A throw refuses: a rule that
@@ -916,6 +1104,9 @@ function main() {
 module.exports = {
   MAX_VERIFIERS, readWriterBound, runBothViews, renderCodeView, renderStrippedView,
   renderBlankedLiterals, resolveHarnessName, extractWorkflowArgs, extractBuildSlug,
+  resolveModelProfile, checkEffortLevel, // rule 8's, for the roles kit's parity arm and a probe of the rule alone
+  // TOOL-dPavedRoad-2 S5: format-guard.js finds the roles kit and reads the handoff marker through these.
+  resolveKitDir, extractHandoffMarker,
 }
 if (require.main === module) main()
 
@@ -952,7 +1143,7 @@ function readSettingsLayers(root) {
   })
 }
 
-// TOOL-dFairHearing-22 — THE OPT-IN PACK'S PRESENCE, after rules 6 and 7. The spec-audit opt-in left
+// TOOL-dFairHearing-22 — THE OPT-IN PACK'S PRESENCE, after rules 6, 8 and 7. The spec-audit opt-in left
 // this hook for the review kit's spec-audit-optin.js (TOOL-dFairHearing-16), and a partial update
 // that names this kit alone lands the hook without it: the hooks kit cannot require the review kit,
 // which requires it back, a cycle govkit refuses. So a Workflow call carrying the opt-in's own

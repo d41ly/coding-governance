@@ -3538,6 +3538,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkEffortLevel",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "checkEmptyTempVar",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -3598,9 +3603,19 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkOwn",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "checkPair",
       "kind": "function",
       "file": "tools/hooks/format-guard.js"
+    },
+    {
+      "id": "checkPlain",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "checkPlanDone",
@@ -7538,6 +7553,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "deriveOwedLines",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "deriveReadRev",
       "kind": "function",
       "file": "tools/workflows/unattended-build.js"
@@ -8041,6 +8061,11 @@
       "id": "derive_drift_line",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "derive_effort_index",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "derive_enforcer_imports",
@@ -14273,6 +14298,21 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "readHandoffLines",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
+      "id": "readHandoffVia",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
+      "id": "readHeadBranch",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "readHeadRef",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
@@ -14366,6 +14406,11 @@
       "id": "readSegment",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "readSessionModel",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "readSettingsLayers",
@@ -14476,6 +14521,11 @@
       "id": "read_agreement",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_al_listing",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.sh"
     },
     {
       "id": "read_ancestors",
@@ -16221,6 +16271,11 @@
       "id": "read_named_hold",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_named_specs",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "read_new_build_args",
@@ -18363,6 +18418,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "renderEffortDeny",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "renderFanoutDeny",
       "kind": "function",
       "file": "tools/workflows/check-verifier-fanout.js"
@@ -18433,6 +18493,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "renderLevel",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "renderLexedView",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -18461,6 +18526,11 @@
       "id": "renderLivenessNote",
       "kind": "function",
       "file": "tools/workflows/drift-audit-state.template.js"
+    },
+    {
+      "id": "renderNote",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "renderOrientationDeny",
@@ -18580,6 +18650,11 @@
     {
       "id": "renderShapeLine",
       "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
+      "id": "renderShapeLine",
+      "kind": "function",
       "file": "tools/workflows/tier2-review.js"
     },
     {
@@ -18599,6 +18674,11 @@
     },
     {
       "id": "renderShippedView",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderShown",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
     },
@@ -19698,6 +19778,11 @@
       "file": "tools/hooks/format-guard.js"
     },
     {
+      "id": "resolveHarnessEntry",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "resolveHarnessName",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -19724,6 +19809,11 @@
     },
     {
       "id": "resolveLiteralEnd",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "resolveModelProfile",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
     },
@@ -22383,6 +22473,11 @@
       "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
+      "id": "run_effort",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
       "id": "run_engine",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -23121,6 +23216,11 @@
       "id": "run_post_merge",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "run_pr4_staged",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
       "id": "run_prefix_commit",
@@ -28721,6 +28821,16 @@
       "id": "write_post_merge_record",
       "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "write_pr4_ledger",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_pr4_spec",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
       "id": "write_pre_fix_spelling",

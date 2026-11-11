@@ -232,6 +232,15 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 TESTPY=$(resolve_python) || { echo "format-guard.test: no usable python"; exit 2; }
 RUNLOG_DIR=$(resolve_kit_dir "$TESTPY" runlog prose.py "$HERE") || exit 2
+# TOOL-dPavedRoad-2 — every arm runs a COPY of the hook, its two sibling modules beside it, and a stub
+# handoff.py in the roles home beside that, so no arm reads the real roles kit. Both homes are
+# resolved, never spelled; the stub is written once its lines are defined, below.
+HOOKS_HOME=$(resolve_kit_dir "$TESTPY" hooks format-guard.js "$HERE") || exit 2
+ROLES_HOME=$(resolve_kit_dir "$TESTPY" roles handoff.py "$HERE") || exit 2
+mkdir -p "$TMP/kit/$HOOKS_HOME" "$TMP/kit/$ROLES_HOME"
+cp "$HERE/format-guard.js" "$HERE/scratch-guard.js" "$HERE/agent-cap.js" "$TMP/kit/$HOOKS_HOME/"
+HOOK="$TMP/kit/$HOOKS_HOME/format-guard.js"
+export GOV_PYTHON="$TESTPY"
 
 # The native spelling of a directory: node reads the payload's cwd as a Windows path on Windows, and
 # an MSYS `/tmp/x` names nothing there (memory/gotchas, the node-a /tmp mount).
@@ -452,12 +461,14 @@ write_transcript() {
       fs.writeFileSync(path.join(dir, "subagents", sub, "journal.jsonl"), entries.map((e) => JSON.stringify(e)).join("\n") + "\n")
     }
     const dispatch = [call("t1", "Agent"), result("t1", { status: "async_launched", agentId: "a1" })]
+    const mark = "<!-- gov:handoff role=gov-builder build=tBuild unit=TOOL-tBuild-1 path=memory/builds/tBuild/prompts/x.md role-sha=000000000000 task-sha=000000000000 -->"
     const agentTurn = [typed("go"), ...dispatch, said("Launched.")]
     const runTurn = [typed("go"), call("t2", "Workflow"), result("t2", { status: "async_launched", runId: "wf_t-1" }), said("Launched.")]
     const quotedTurn = [typed("go"), ...dispatch, call("t9", "Agent"), result("t9", { status: "async_launched", agentId: "a9" }), said("Launched.")]
     const quote = "I also saw <tool-use-id>t9</tool-use-id> go by."
     const records = {
       agent: agentTurn,
+      "agent-marked": [typed("go"), call("t1", "Agent"), result("t1", { status: "async_launched", agentId: "a1", prompt: mark + "\n## Task\n" }), said("Launched.")],
       "agent-notified": [...agentTurn, notice("t1"), said("Done.")],
       run: runTurn,
       "run-notified": [...runTurn, notice("t2"), said("Done.")],
@@ -487,6 +498,28 @@ A2='agent — gov-builder · effort high · model m · TOOL-tBuild-1 · prompt [
 A3='agent — gov-builder · effort high · model m · TOOL-tBuild-2 · prompt [y.txt](y.txt) · writes product · gates none · run wf_t-1/a3'
 R2='returned — gov-builder · committed · 3m · 12k out · run wf_t-1/a2'
 R3='returned — gov-builder · failed · 1m · 2k out · run wf_t-1/a3'
+# The stub handoff.py (TOOL-dPavedRoad-2): it appends its argv and CLAUDE_CODE_SESSION_ID to the log,
+# prints A1 and R1 for the agent-marked scenario's marker path and A2, A3, R2 and R3 for the run, and
+# exits 1 with one stderr line for any other selector or while the fail flag exists. Written by node,
+# every Python literal JSON-quoted, so no byte crosses a shell quote.
+STUB_LOG="$TMP/stub.log"; STUB_FAIL="$TMP/stub.fail"; : > "$STUB_LOG"
+node -e '
+  const fs = require("fs")
+  const [file, log, fail, a1, r1, a2, a3, r2, r3] = process.argv.slice(1)
+  const q = JSON.stringify
+  const lines = { "--handoff memory/builds/tBuild/prompts/x.md": [a1, r1], "--run wf_t-1": [a2, a3, r2, r3] }
+  fs.writeFileSync(file, [
+    "import os, sys",
+    "LINES = " + q(lines),
+    "LOG, FAIL, SID = " + q(log) + ", " + q(fail) + ", os.environ.get(" + q("CLAUDE_CODE_SESSION_ID") + ", " + q("") + ")",
+    "with open(LOG, " + q("a") + ", encoding=" + q("utf-8") + ") as f:",
+    "    f.write(" + q(" ") + ".join(sys.argv[1:]) + " + q(" sid=") + " + SID + chr(10))",
+    "sel = " + q(" ") + ".join(sys.argv[2:4])",
+    "if os.path.exists(FAIL) or sel not in LINES:",
+    "    sys.exit(" + q("stub handoff.py: no lines for ") + " + sel)",
+    "sys.stdout.buffer.write(" + q("") + ".join(" + q("- ") + " + l + chr(10) for l in LINES[sel]).encode(" + q("utf-8") + "))",
+  ].join(String.fromCharCode(10)) + String.fromCharCode(10))' \
+  "$TMP/kit/$ROLES_HOME/handoff.py" "$(resolve_native "$TMP")/stub.log" "$(resolve_native "$TMP")/stub.fail" "$A1" "$R1" "$A2" "$A3" "$R2" "$R3"
 write_message agent1   "Done." "" "- $A1" "- $B" "- $S"
 write_message agenttick "Done." "" "- $BT$A1$BT" "- $B" "- $S"
 write_message agentcut "Done." "" "- ${A1/run direct/direct}" "- $B" "- $S"
@@ -570,6 +603,44 @@ run_stop "TOOL-aOrientedCast-24 a torn line in the turn still grades its agent: 
 check_contains "TOOL-aOrientedCast-24 the torn reason names the agent" "$TMP/out" "agent a1"
 check_contains "TOOL-aOrientedCast-24 the witness counts the torn line" "$TMP/err" "1 line(s)"
 
+# TOOL-dPavedRoad-2 (PR2) — a blocking reason prints the lines it asks for, derived by the stub
+# handoff.py for agents and through the charter's committed shape for commits; an allow spawns nothing.
+seed_repo "$TMP/charter.md"
+TP=$(write_transcript agent-marked)
+TPATH="$(resolve_native "$TMP/sess")/$SID.jsonl"
+: > "$STUB_LOG"
+run_stop "PR2 a marked agent with the pair alone blocks" block "$TMP/good.md" "$TP"
+check_contains "PR2 the reason holds the derived agent line verbatim" "$TMP/out" "- $A1"
+check_absent "PR2 every agent derived drops the verb's sentence" "$TMP/out" "handoff.py agents --run"
+check_contains "PR2 the stub ran the agents verb" "$STUB_LOG" "agents --handoff memory/builds/tBuild/prompts/x.md"
+check_contains "PR2 the stub was passed --session" "$STUB_LOG" "--session"
+check_contains "PR2 the stub was passed the transcript path" "$STUB_LOG" "$TPATH"
+check_contains "PR2 the stub saw the payload's session id" "$STUB_LOG" "sid=$SID"
+check_absent "PR2 the stub was never passed --write" "$STUB_LOG" "--write"
+: > "$STUB_LOG"
+run_stop "PR2 the message plus the derived line allows" allow "$TMP/agent1.md" "$TP"
+check_empty "PR2 an allowing stop spawns no handoff.py" "$STUB_LOG"
+TP=$(write_transcript run)
+run_stop "PR2 a run's agent left out blocks" block "$TMP/runa2.md" "$TP"
+check_contains "PR2 the reason holds the left-out agent's derived line" "$TMP/out" "- $A3"
+check_absent "PR2 the reason holds no line for the agent shown" "$TMP/out" "- $A2"
+: > "$STUB_FAIL"
+run_stop "PR2 a failing handoff.py still blocks" block "$TMP/runa2.md" "$TP"
+check_contains "PR2 a failed derivation keeps the verb's sentence" "$TMP/out" "handoff.py agents --run"
+check_contains "PR2 the witness names the verb's exit" "$TMP/err" "exited 1"
+rm -f "$STUB_FAIL"
+seed_repo "$TMP/charter.md"
+run_stop "PR2 the commit fixture's baseline stop allows" allow "$TMP/good.md"
+base=$(git -C "$REPO" rev-parse HEAD)
+sha=$(seed_fixture_commit "PR2 a · b")
+branch=$(git -C "$REPO" symbolic-ref --short HEAD)
+run_stop "PR2 an unreported commit whose subject holds the separator blocks" block "$TMP/good.md"
+check_contains "PR2 the reason holds the derived committed line, the separator folded" "$TMP/out" "- committed — ${sha:0:9} · $branch · PR2 a, b"
+# The block moved the sidecar to HEAD; put the baseline back so the pasted line is what clears it.
+printf '%s\n' "$base" > "$REPO/.git/format-guard/$SID.head"
+printf '%s\n\n- committed — %s · %s · PR2 a, b\n' "$(<"$TMP/good.md")" "${sha:0:9}" "$branch" > "$TMP/pasted.md"
+run_stop "PR2 the message plus the derived committed line allows" allow "$TMP/pasted.md"
+
 # AC9 — a payload that is not JSON allows.
 printf 'not json' | node "$HOOK" > "$TMP/out" 2> "$TMP/err"; rc=$?
 if [ "$rc" = 0 ] && [ ! -s "$TMP/out" ]; then echo "ok   AC9 non-JSON stdin exits 0 with empty stdout"; pass=$((pass+1))
@@ -614,9 +685,11 @@ n=$((pass+fail))
 # messages and its liveness); 57 = 54 + TOOL-aHeardState-7's three chained-stop assertions; 73 =
 # 57 + TOOL-aHeardState-8's 16: 2 wording, 13 in its fixture block, 1 inline parity message; 101 =
 # 73 + TOOL-aOrientedCast-21's 28 agent-line assertions; 129 = 101 + TOOL-aOrientedCast-24's 28: 4 quoted,
-# 1 headless, 9 in the three-record loop, 2 tick, 6 in the two-route loop, 3 foreground-run, 3 torn.
+# 1 headless, 9 in the three-record loop, 2 tick, 6 in the two-route loop, 3 foreground-run, 3 torn;
+# 149 = 129 + TOOL-dPavedRoad-2's 20 PR2 assertions: 8 marked agent, 2 allow, 3 run, 3 failing stub,
+# 4 commit.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=129
+FLOOR_ASSERTIONS=149
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
