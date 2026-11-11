@@ -4841,8 +4841,8 @@ unit_ids_of() { # slug
 # WHY THIS EXISTS, in numbers rather than in taste. `verb_plan` resolved a region id to its spec by
 # running an awk per (unit, spec) pair until one matched, and the pass above it read each spec's
 # status and heading with two more. Measured on node `a` 2026-08-26: a 24-spec build cost 16.6 s
-# against 1.5 s for a one-spec build, and check 30 of the sibling checker - an UNGUARDED merge-bar
-# leg - walks this verb over every tracked build for 235 s of a 289 s leg. The same diagnosis and the
+# against 1.5 s for a one-spec build, and check 30 of the sibling checker - a bar leg then, held
+# since TOOL-aShelvedLeg-1 - walked this verb over every tracked build for 235 s of a 289 s leg. The same diagnosis and the
 # same fix are already recorded for the gate self-test in `run-unattended-gates.sh`: the unit of cost
 # on this platform is process creation, and it is the only term in that product this repo owns.
 #

@@ -241,7 +241,7 @@ RESUME_SCHEDULE_DELETE="TheScheduleDelete"
 # the shared fixture is what made this a suite-wide red rather than one arm's problem.
 #
 # WHAT THIS DOES NOT FIX: an adopter who copies .unattended.conf.example verbatim gets the key BLANK
-# and therefore the same announcement on every bar. Whether it should fire there is dFoldedVerdict's
+# and therefore the same announcement on every run of the leg. Whether it should fire there is dFoldedVerdict's
 # question, not this fixture's, and it is untouched.
 DISPOSITION_CUTOFF="2099-01-01"
 # THE SAME REASON, TOOL-dFoldedAudit-2: a blank key announces on every run, and a date ahead of every
@@ -940,7 +940,7 @@ hit "$out" "LANDER"
 # ---- THE CONF MAY NOT REDIRECT THE LEG'S OWN SUBJECT (closing-review F1). The import's arm used to
 # ---- be the open glob `[A-Z][A-Z0-9_]*`, which assigned EVERY uppercase key the conf declared -
 # ---- including the three this leg sets ABOVE the import. `.unattended.conf` is a tracked file an
-# ---- unattended run commits itself, and this leg is on an unguarded merge bar, so one line in it
+# ---- unattended run commits itself, and this leg is unguarded, so one line in it
 # ---- pointed the gate at a file other than the one it certifies.
 # ----
 # ---- PORTED FROM `check-brief-recorded.test.sh`'s evil-driver arm, which armed the same class on
@@ -2482,7 +2482,7 @@ reset_tree; rm -f memory/builds/tRun/RUN.md
 hit "$(run)" "a run-state file is tracked at a path this leg cannot read, and skipping it silently removes it from every check below"
 reset_tree
 
-# ---- SOURCE-level: the leg must stay READ-ONLY. It runs on the merge bar, where a gate that writes
+# ---- SOURCE-level: the leg must stay READ-ONLY. It is a gate, and a gate that writes
 # ---- is a gate that can make the tree it is judging pass.
 # ----
 # ---- THE PROPERTY IS "NO WRITE INTO THE TREE IT JUDGES", not "no redirect anywhere", and the two
@@ -3035,7 +3035,7 @@ mutate $KIT_REL/unattended.test.sh "/^check_status_one_line() {/r $TMPBIN_PARENT
 miss "$(run)" "check 33"
 # ...and the RESTORED copy: the shipped driver suite, unmodified, in the population. This is the
 # reading that says spec 17's `grep -c ''` fold actually landed — a suite still carrying the
-# instance would red here, on every bar, naming its own line.
+# instance would red here, on every run of this suite, naming its own line.
 reset_tree
 cp "$HERE/unattended.test.sh" $KIT_REL/
 miss "$(run)" "check 33"
@@ -3327,7 +3327,7 @@ reset_tree
 # ---- looped `core` - core PLUS extra - while its own rationale promised CORE-ONLY, so an adopter
 # ---- who used the documented `DIRECTIVES_EXTRA` knob got a permanent `fail 16` on a carrier the
 # ---- memory-tree kit ships as `role = "rendered"` and the doc-parity leg byte-compares. No route
-# ---- to green, on an unguarded merge-bar leg.
+# ---- to green, on an unguarded leg.
 # ----
 # ---- THE FIXTURE MUST HAVE THE CARRIER, and that is the reusable half. `declared + shown is
 # ---- silent` above runs after a `reset_tree` that leaves no `BUILD-METHOD.md`, so the term's own

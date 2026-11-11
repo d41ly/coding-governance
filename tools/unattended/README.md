@@ -404,7 +404,7 @@ learned when the second one merges. The summary line always prints, opening
 
 ```
 adopt-unattended.sh --check      # the installed artifacts are in sync, the hook wired
-check-unattended.sh              # the kit gate
+check-unattended.sh              # the kit gate, HELD off the bar: --checks or GATE_SELFTESTS=1
 check-playbook.sh                # playbook validity, including the fixture
 check-pass-order.sh              # refuses a unit built before it was specced
 check-brief-recorded.sh          # refuses a closed unit whose build commit records no brief
@@ -419,4 +419,8 @@ a checker has a job only when that checker's source changes, and none at all in 
 that copy-installs this kit and never edits it. So those suites left both the merge bar's leg
 manifest and this kit's own `kit.toml`, and adopters stop receiving them too. The legs whose
 subject is the *repository* stayed on the bar, because those go stale with nobody editing the kit;
-`<prefix>/gate-legs.json` names which.
+`<prefix>/gate-legs.json` names which. The kit gate is the exception: it is held off every automatic
+bar by owner ruling (2026-11-10) for its cost, and runs only through `run-unattended-gates.sh --checks`
+or a bar run with `GATE_SELFTESTS=1`. `GATE_SELFTESTS=changed` selects it by this kit's shipped
+sources only, never by the records its `doc_reads` names, so a change that moves only those records
+leaves it held: run it with the variable at `1`, or through `--checks`, after such a change.
