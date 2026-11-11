@@ -2721,6 +2721,9 @@ def run_selftest() -> int:
         print(f'  unarmed: gov\'s template half — {gov_tpl.as_posix()} or {gov_dep.as_posix()} is not '
               f'here, so this install holds no gov template above the engine')
     was = os.environ.pop('GOV_DEFAULT_BRANCH', None)
+    # PLAY-dOrderedCharter-80 S8: gov's template carries `{{INSTRUCTION_MAP}}`, which reads the TARGET's
+    # document registry, so each fixture target holds a one-row registry naming its charter.
+    iu = load_units_module()
     try:
         for name, tpl, dep in halves:
             for drop in ('', 'drop_blocks = ["cross-os"]\n'):
@@ -2729,6 +2732,9 @@ def run_selftest() -> int:
                     (tgt / '.governance').mkdir()
                     (tgt / '.governance' / 'deploy.toml').write_text(drop + dep, encoding='utf-8')
                     write_template(tgt, tpl, encoding='utf-8')
+                    reg = tgt / iu.derive_kit_rel(iu.DOCUMENTS)
+                    reg.parent.mkdir(parents=True, exist_ok=True)
+                    reg.write_text(build_map_rows(('AGENTS.md', 0, None)), encoding='utf-8')
                     read_git(tgt, 'init', '-q', '-b', 'main')
                     read_git(tgt, 'add', '-A')
                     read_git(tgt, '-c', 'user.name=fx', '-c', 'user.email=fx@example.invalid',
@@ -2743,23 +2749,9 @@ def run_selftest() -> int:
     finally:
         if was is not None:
             os.environ['GOV_DEFAULT_BRANCH'] = was
-    # PLAY-dOrderedCharter-23: a build runs unattended by default and the attended route is its stated
-    # exception, so the SHIPPED unattended and roles descriptors render the unattended start line once with
-    # the `/build` line directly under it. Dropping either row, or reordering the two, reds this arm.
-    if gov_tpl.is_file():
-        try:
-            drive, got = [render_drive_line(r) for r in read_drive_rows(here, ['unattended', 'roles'])], None
-        except Refusal as e:
-            drive, got = [], str(e)
-        unattended = ('- start · main — a build is requested: it runs unattended by default, its committed '
-                      'README at BASE being the mandate: `/unattended <slug>`')
-        attended = '- start · main — only when the owner asks to attend a build: `/build`'
-        check_arm(got is None and drive.count(unattended) == drive.count(attended) == 1
-                  and drive.index(attended) == drive.index(unattended) + 1,
-                  'the unattended start line renders once, with the attended /build line directly under it',
-                  f'refused with {got!r}' if got else f'drive lines {drive!r}')
-    else:
-        print('  unarmed: the default-route drive lines — this install holds no gov template above the engine')
+    # PLAY-dOrderedCharter-23's default-route arm moved to `instruction_units.py fixture --plant
+    # drive-default-route` (PLAY-dOrderedCharter-80 S10): it reads the unattended and roles descriptors,
+    # which an install of this kit need not hold, and that fixture's leg runs on gov's bar alone.
     # TOOL-aDistilledCharter-2 rev-2 (closing review round 1, R1). A SEEDED v3.x template renders
     # under THIS engine and its SHIPPED declarations, because `update` never rewrites a seed and a
     # refusal here rolls the kit back. The declarations are the real ones beside this engine, so the
@@ -2807,12 +2799,13 @@ def run_selftest() -> int:
               f'sits outside the region', f'rc {rc} out {out.getvalue()!r}')
 
     # TOOL-aDistilledCharter-8 — N2: `checkout_dir` names the clone when the product is named apart;
-    # N5: `--check` prints the reseed note; N6: a v4 template naming a legacy placeholder is refused.
+    # N5: `--check` prints the reseed note; N6: a current-major template naming a legacy placeholder is
+    # refused. The marker is the engine's own major, never a typed one (PLAY-dOrderedCharter-80 S9).
     body, err = build_node_render(build_fleet_text(fleet_rows), 'checkout_dir = "app/main"\n',
                                   name='App')
     check_arm(err is None and '`C:/p/app/main`' in body and '`C:/p/App`' not in body,
               'checkout_dir names the clone where the product name differs', f'{err!r} {body!r}')
-    for marker_v, want in (('v3.5', 'reseed'), ('v4.0', 'legacy v3 placeholder')):
+    for marker_v, want in (('v3.5', 'reseed'), (f'v{TEMPLATE_MAJOR}.0', 'legacy v3 placeholder')):
         with tempfile.TemporaryDirectory() as td:
             tgt = Path(td)
             (tgt / '.governance').mkdir()

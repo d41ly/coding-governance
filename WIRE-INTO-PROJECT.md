@@ -229,8 +229,9 @@ it, so a target that renders the charter gets the gate that keeps that block hon
 default selection; decline it by naming a selection that omits it.
 
 Wire the leg into your gate runner and CI as `micro-format definitions`, running
-`bash {prefix}/check-microformats.sh <playbook>` — the argv the descriptor declares, with
-`{prefix}` resolved to your install prefix. The token form is deliberate: a literal `tools/` path
+`bash {prefix}/check-microformats.sh` — the argv the descriptor declares, with `{prefix}` resolved
+to your install prefix. With no argument the gate reads the charter template beside the
+`playbook-render` kit's engine, found through your install receipt; an argument names another file. The token form is deliberate: a literal `tools/` path
 here would be a kit path the `install-prefix` ban reds on, with no waiver to take.
 
 <!-- govkit:entry memory-tree -->

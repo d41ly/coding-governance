@@ -1475,6 +1475,14 @@ def derive_root_confs(descs: dict) -> set[str]:
     return out
 
 
+def derive_root_shipped(descs: dict) -> set[str]:
+    """The `root-shipped` guard class's population. PLAY-dOrderedCharter-80 S3. Every source a
+    `root_relative` [[files]] rule ships from the repo root, derived as `derive_root_confs` derives
+    the root confs, so a root file no descriptor ships still falls into no class and reds 7c."""
+    return {s for d, _p in descs.values() for rule in d.get("files") or []
+            if rule.get("root_relative") for s in rule_sources(d, rule) if "/" not in s}
+
+
 def scan_argv_neighbours(root: pathlib.Path, rel: str, tracked: set[str]) -> list[str]:
     """Tracked files an argv file pulls in BY NAME — the near-miss population of check 7c2.
 
@@ -2390,7 +2398,12 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     #          conf-only commit skipped that leg: struck twice for `.lexicon.conf`, and the leg
     #          TOOL-aWalkedCorpus-5 was filed on. Its population is DERIVED from the descriptors, so
     #          a root file no kit declares as its conf still falls into none and still reds here.
+    #          THE SEVENTH, `root-shipped` (PLAY-dOrderedCharter-80 S3): a root file a `root_relative`
+    #          rule ships, the charter template since PLAY-dOrderedCharter-34, which a leg guards
+    #          without its being any kit's conf. Derived too, and kept apart from `root-conf`, since
+    #          a conf a leg reads and a file a kit ships are two facts.
     root_confs = derive_root_confs(descs)
+    root_shipped = derive_root_shipped(descs)
     legs_path = resolve_tool_path(root, "gate-legs.json")
     _legs_rel = legs_path.relative_to(root).as_posix()  # named in the messages below, never typed
     if legs_path.is_file():
@@ -2415,6 +2428,8 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                     classes.append("kit-relative")
                 if g in root_confs:
                     classes.append("root-conf")
+                if g in root_shipped:
+                    classes.append("root-shipped")
                 if len(classes) != 1:
                     r.fail(f"guard pathspec '{g}' (leg '{leg.get('name')}') falls into "
                            f"{len(classes)} declared classes {classes or '[]'}, not exactly one — "
@@ -13949,9 +13964,14 @@ def derive_epoch_state(root: pathlib.Path, eid: str, desc: dict, base: str, head
     rng = f"{base}..{head}"
     paths = sorted({row["src"] for row in resolve_entry(root, desc, canonical_ctx(eid))["survivors"]
                     if row.get("src") and row["role"] in EPOCH_ROLES})
-    if not paths:
-        return "broken", f"FAILED · no {'/'.join(EPOCH_ROLES)} source to measure", "", 0
     vf = desc.get("version_from") or {}
+    if not paths:
+        # PLAY-dOrderedCharter-80 S5: a fileless entry declaring no version has nothing to measure
+        # and nothing owed, and `git log` never runs with an empty path list; one declaring a file
+        # still reads broken, since its version has no shipped source to date.
+        if "none" in vf:
+            return "skip", "skip · no declared version · moved: none", "", 0
+        return "broken", f"FAILED · no {'/'.join(EPOCH_ROLES)} source to measure", "", 0
     if "none" in vf or not vf.get("file"):
         moved = sorted({p for p in git(root, "-c", "core.quotePath=false", "log", "--format=",
                                        "--name-only", "--full-history", "--no-merges", rng,

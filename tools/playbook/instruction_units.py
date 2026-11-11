@@ -2668,6 +2668,24 @@ def arm_drive_lost_line(c):
     check_drive_red(c, "a rendered line deleted from the drive region", [f"{DRIVE_KITS[1]} · row 1", "fixture-land.sh"])
 
 
+def arm_drive_default_route(c):
+    """PLAY-dOrderedCharter-23, moved by PLAY-dOrderedCharter-80 S10: the shipped unattended and roles
+    descriptors render the unattended start line once, the attended /build line directly under it.
+    Dropping either row, or reordering the two, reds it; a kit not found reds it too."""
+    from render_playbook import Refusal, read_drive_rows, render_drive_line
+    try:
+        drive, got = [render_drive_line(r) for r in read_drive_rows(KIT_DIR, ["unattended", "roles"])], None
+    except Refusal as e:
+        drive, got = [], str(e)
+    unattended = ("- start · main — a build is requested: it runs unattended by default, its committed "
+                  "README at BASE being the mandate: `/unattended <slug>`")
+    attended = "- start · main — only when the owner asks to attend a build: `/build`"
+    c.check("the unattended start line renders once, with the attended /build line directly under it",
+            got is None and drive.count(unattended) == drive.count(attended) == 1
+            and drive.index(attended) == drive.index(unattended) + 1,
+            f"refused with {got!r}" if got else f"drive lines {drive!r}")
+
+
 PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority, "statements": arm_statements,
           "document": arm_document, "lock": arm_lock, "row": arm_row, "row-removal": arm_row_removal,
           "two-kits": arm_two_kits,
@@ -2682,7 +2700,8 @@ PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority, "state
           "hold-fits": arm_hold_fits, "hold-second": arm_hold_second, "hold-refused": arm_hold_refused,
           "drive-bad-role": arm_drive_bad_role, "drive-no-row": arm_drive_no_row,
           "drive-empty-command": arm_drive_empty_command, "drive-unshipped-descriptor": arm_drive_unshipped_descriptor,
-          "drive-hand-line": arm_drive_hand_line, "drive-lost-line": arm_drive_lost_line, "map-held": arm_map_held,
+          "drive-hand-line": arm_drive_hand_line, "drive-lost-line": arm_drive_lost_line,
+          "drive-default-route": arm_drive_default_route, "map-held": arm_map_held,
           "practices-reach": arm_practices_reach, "card-absent": arm_card_absent, "card-level": arm_card_level,
           "card-tracked": arm_card_tracked}
 

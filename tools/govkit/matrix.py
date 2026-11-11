@@ -97,6 +97,29 @@ SCRATCH_EXPECT = {
     # table quietly describe a leg that had stopped being emitted.
 }
 
+#: The five answers shapes 6 and 7 fix over the stubs (PLAY-dOrderedCharter-80 S7), one constant so the
+#: default install and the aged one cannot drift apart.
+INSTALL_ANSWERS = {"memory_root": "memory", "playbook_path": "docs/PARALLEL.md", "playbook_dir": "docs",
+                   "manifest_path": "docs/SESSION-KICKOFF.md", "user_skills": "~/.claude/skills"}
+
+
+def render_deploy_tail(kits, fixed: dict) -> str:
+    """A scratch deploy file's tail: the `kits` line, the `[answers]` header and one stub per
+    placeholder the playbook entry declares, with `fixed` over the stubs. PLAY-dOrderedCharter-80 S7.
+
+    The answers are DERIVED from the descriptor's own placeholder rows, never listed. Every key gets
+    a stub, whatever its class: for a `derived` row the probe still wins when it can see, and the stub
+    is only the override the engine already honours when it cannot. A hand list here would go stale
+    the first time the charter grew a placeholder. A placeholder whose declared default is a `- `
+    bullet fills a one-line region the render grades (aDistilledCharter), so its stub takes the
+    default's shape."""
+    pdesc = govkit.load_toml(ROOT / PFX / KIT_NAMES["govkit"] / "entries" / "playbook.kit.toml")
+    ans = {r["key"].lower(): ("- stated" if str(r.get("default", "")).startswith("- ") else "stated")
+           for r in pdesc.get("placeholder", [])}
+    ans.update(fixed)
+    return ("kits = [" + ", ".join('"%s"' % k for k in kits) + "]" + NL + "[answers]" + NL
+            + NL.join('%s = "%s"' % (k, v) for k, v in sorted(ans.items())) + NL)
+
 
 def check(label: str, cond: bool, detail: str = "") -> None:
     if cond:
@@ -812,19 +835,8 @@ def main() -> int:
         git(g, "init", "-q", "-b", "main"); git(g, "config", "user.email", "t@e")
         git(g, "config", "user.name", "t"); git(g, "add", "-A"); git(g, "commit", "-qm", "base")
 
-        # The answers are DERIVED from the descriptor's own placeholder rows, never listed. Every
-        # key gets a stub, whatever its class: for a `derived` row the probe still wins when it can
-        # see, and the stub is only the override the engine already honours when it cannot. A hand
-        # list here would go stale the first time the charter grew a placeholder — which is the
-        # rot this file's own header refuses.
-        pdesc = govkit.load_toml(ROOT / PFX / KIT_NAMES["govkit"] / "entries" / "playbook.kit.toml")
-        # A placeholder whose declared default is a `- ` bullet fills a one-line region the render
-        # grades (aDistilledCharter), so its stub takes the default's shape: derived, not listed.
-        ans = {r["key"].lower(): ("- stated"
-                                  if str(r.get("default", "")).startswith("- ")
-                                  else "stated")
-               for r in pdesc.get("placeholder", [])}
-        ans["playbook_path"] = "docs/PARALLEL.md"
+        # The answers are DERIVED from the descriptor's own placeholder rows by render_deploy_tail,
+        # which shapes 6 and 7 call too (PLAY-dOrderedCharter-80 S7).
         # The install is SCRATCH_KITS widened to its requirement closure, through apply's own predicate,
         # so a requirement a descriptor gains moves this install with it rather than a typed list.
         rep = govkit.Report()
@@ -836,22 +848,28 @@ def main() -> int:
         (g / ".governance").mkdir(exist_ok=True)
         (g / ".governance" / "deploy.toml").write_text(
             'gov_source = "."' + NL + f'prefix = "{PFX[:-1]}"' + NL + "drop_blocks = []" + NL
-            + "kits = [" + ", ".join('"%s"' % k for k in install) + "]" + NL
-            + "[answers]" + NL
-            + NL.join('%s = "%s"' % (k, v) for k, v in sorted(ans.items())) + NL,
+            + render_deploy_tail(install, {"playbook_path": "docs/PARALLEL.md"}),
             encoding="utf-8", newline=NL)
         git(g, "add", "-A"); git(g, "commit", "-qm", "governance")
 
         p = run("apply", "--target", str(g), "--kits", ",".join(install))
-        # Beside the engine since PLAY-dOrderedCharter-31 retired the seeded copy at `playbook_path`.
+        deploy = govkit.load_toml(g / ".governance" / "deploy.toml")
+        # Beside the engine since PLAY-dOrderedCharter-31 retired the seeded copy at `playbook_path`. The
+        # destination is READ off the renderer's own descriptor, its `to` resolved in this target's
+        # context as the settings-merge arm resolves its prefix, never a kit path typed here
+        # (PLAY-dOrderedCharter-80 S1).
+        _tn = "coding-governance-agents.template.md"
+        _pr = descs["playbook-render"][0]
+        _pctx = govkit.target_context(g, deploy, "playbook-render", _pr)
+        _tpl = [govkit.resolve_tokens(r["to"], _pctx)[0] for r in _pr.get("files") or []
+                if _tn in (r.get("include") or []) and r.get("to")]
         check("scratch install: the charter template lands beside the renderer's engine",
-              (g / PFX / "playbook" / "coding-governance-agents.template.md").is_file(), p.stdout + p.stderr)
+              len(_tpl) == 1 and (g / _tpl[0]).is_file(), f"{_tpl} · " + p.stdout + p.stderr)
         check("scratch install: apply RENDERS the region into the target's own charter",
               (g / "AGENTS.md").is_file()
               and "<!-- gov:playbook -->" in (g / "AGENTS.md").read_text(encoding="utf-8"),
               p.stdout + p.stderr)
 
-        deploy = govkit.load_toml(g / ".governance" / "deploy.toml")
         legs: list[tuple[str, list[str]]] = []
         for eid in SCRATCH_KITS:
             d, _dp = descs[eid]
@@ -892,16 +910,18 @@ def main() -> int:
         # the install lands is `wired`, the declined hook's fragment is `not wired` naming its hook,
         # nothing lands UNWIRED and nothing is REFUSED; then the target's own check-wiring reads
         # `ok` for agent-cap, scratch and card. Before the unit the default carried no
-        # settings-merge, so every fragment landed UNWIRED — the state this shape reds on.
+        # settings-merge, so every fragment landed UNWIRED — the state this shape reds on. Its deploy
+        # file names the registry's default as its `kits`, since the renderer refuses a target
+        # declaring none, and stubs every placeholder (PLAY-dOrderedCharter-80 S7).
         shapes += 1
         g = tmp.resolve() / "default-install"
         g.mkdir(parents=True, exist_ok=True)
         (g / ".governance").mkdir(exist_ok=True)
         (g / ".governance" / "deploy.toml").write_text(
-            'gov_source = "local"' + NL + f'prefix = "{PFX[:-1]}"' + NL + "[answers]" + NL
-            + 'memory_root = "memory"' + NL + 'playbook_path = "docs/PARALLEL.md"' + NL
-            + 'playbook_dir = "docs"' + NL + 'manifest_path = "docs/SESSION-KICKOFF.md"' + NL
-            + 'user_skills = "~/.claude/skills"' + NL, encoding="utf-8", newline=NL)
+            'gov_source = "local"' + NL + f'prefix = "{PFX[:-1]}"' + NL
+            + render_deploy_tail(govkit.default_kits(govkit.load_toml(
+                ROOT / PFX / KIT_NAMES["govkit"] / "registry.toml")), INSTALL_ANSWERS),
+            encoding="utf-8", newline=NL)
         (g / "README.md").write_text("t" + NL, encoding="utf-8", newline=NL)
         git(g, "init", "-q", "-b", "main"); git(g, "config", "user.email", "t@e")
         git(g, "config", "user.name", "t"); git(g, "config", "core.autocrlf", "false")
@@ -957,10 +977,7 @@ def main() -> int:
         (tg / ".governance").mkdir(parents=True, exist_ok=True)
         (tg / ".governance" / "deploy.toml").write_text(
             'gov_source = "local"' + NL + f'prefix = "{PFX[:-1]}"' + NL
-            + "kits = [" + ", ".join('"%s"' % k for k in aged_default) + "]" + NL + "[answers]" + NL
-            + 'memory_root = "memory"' + NL + 'playbook_path = "docs/PARALLEL.md"' + NL
-            + 'playbook_dir = "docs"' + NL + 'manifest_path = "docs/SESSION-KICKOFF.md"' + NL
-            + 'user_skills = "~/.claude/skills"' + NL, encoding="utf-8", newline=NL)
+            + render_deploy_tail(aged_default, INSTALL_ANSWERS), encoding="utf-8", newline=NL)
         (tg / "README.md").write_text("t" + NL, encoding="utf-8", newline=NL)
         git(tg, "init", "-q", "-b", "main"); git(tg, "config", "user.email", "t@e")
         git(tg, "config", "user.name", "t"); git(tg, "config", "core.autocrlf", "false")

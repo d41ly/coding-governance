@@ -38,15 +38,15 @@ none = """
 the gate IS the check. Running it over a target's own charter is what the gate leg does, and a second verb wrapping it would be one more thing to keep in step
 """
 
-# THE SUBJECT IS PASSED, never defaulted, in a target. The gate's own default is gov's repo-root
-# filename, a path no adopter has, so a leg carrying no argument exited 2 on install day (reproduced
-# in a scratch install). The subject is the template the `playbook-render` entry this one requires
-# lands beside its engine; it was the seeded copy at `{playbook_path}` until PLAY-dOrderedCharter-31
-# retired that copy, and a new adopter no longer holds one.
+# THE SUBJECT IS FOUND, never typed, in a target (PLAY-dOrderedCharter-80 S4). It is the template the
+# `playbook-render` entry this one requires lands beside its engine, and the gate finds it with no
+# argument through its inline sibling-kit resolver, wherever that kit is homed. The argv named it as
+# `{prefix}/playbook/...` until then, a file only another entry ships, which the selfcheck's
+# cross-entry argv check reds. Gov's own root template is the fallback where that kit holds none.
 [[gate_leg]]
 name = "micro-format definitions"
 subject = "repo"
-argv = ["bash", "{prefix}/check-microformats.sh", "{prefix}/playbook/coding-governance-agents.template.md"]
+argv = ["bash", "{prefix}/check-microformats.sh"]
 
 [[gate_leg]]
 name = "micro-format gate selftest"

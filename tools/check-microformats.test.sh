@@ -141,6 +141,29 @@ arm "a field naming where a credential lives does NOT red" ok "" \
 arm "an opener that is not a whole line is cannot-run" cannot \
   "not delimited by exactly one fence pair" 's/^<!-- microformats -->$/x <!-- microformats -->/'
 
+# PLAY-dOrderedCharter-80 S4: with NO argument a copy of the gate reads the template beside the
+# playbook-render kit's engine, found by its anchor `render_playbook.py`, over a fence-less template at
+# the repository root; once the kit's template is gone it reads the root one and cannot run. Red before
+# S4, when the gate's no-argument subject was the root template alone.
+KW="$TMP/kit-subject"
+mkdir -p "$KW/tools/playbook"
+git -C "$KW" init -q 2>/dev/null
+cp "$GATE" "$KW/tools/check-microformats.sh"
+: > "$KW/tools/playbook/render_playbook.py"
+fixture "$KW/tools/playbook"
+mv "$KW/tools/playbook/charter.md" "$KW/tools/playbook/coding-governance-agents.template.md"
+printf 'A root template with no fence.\n' > "$KW/coding-governance-agents.template.md"
+out=$(cd "$KW" && bash tools/check-microformats.sh 2>&1); rc=$?
+label="no argument reads the template beside the playbook-render kit's engine"
+[ "$rc" -eq 0 ] && say_ok "$label" || say_fail "$label" "expected 0, got $rc: $out"
+rm -f "$KW/tools/playbook/coding-governance-agents.template.md"
+out=$(cd "$KW" && bash tools/check-microformats.sh 2>&1); rc=$?
+label="no argument and no kit template reads the root template"
+case "$rc:$out" in
+  2:*"not delimited by exactly one fence pair"*) say_ok "$label" ;;
+  *) say_fail "$label" "expected rc 2 naming the fence pair, got $rc: $out" ;;
+esac
+
 printf '\n'
 if [ "$FAILED" -ne 0 ]; then
   printf 'check-microformats.test.sh FAILED — %d arm(s)\n' "$FAILED"

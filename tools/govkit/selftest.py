@@ -991,6 +991,8 @@ def check_epoch_verb(tmp: pathlib.Path) -> None:
     One versioned entry (`vk`) and one that declares none (`nk`). Edit without a bump, bump, edit
     after the bump, then a decoy edit of the version line: observed FAILED, clean, FAILED, FAILED.
     Each arm reads a different line, so a verb that printed one verdict for every state fails three.
+    PLAY-dOrderedCharter-80 S5 adds `fk`, a fileless entry declaring no version, as the playbook entry
+    has been since PLAY-dOrderedCharter-31: it reads a skip with nothing moved, never FAILED.
     """
     fx = tmp / "epoch-fx"
     for d in (f"{PFX}{KIT_NAMES['govkit']}/entries", f"{PFX}vk", f"{PFX}nk"):
@@ -1001,7 +1003,10 @@ def check_epoch_verb(tmp: pathlib.Path) -> None:
     files = {
         f"{PFX}{KIT_NAMES['govkit']}/registry.toml":
             '[[entry]]\nid = "vk"\ndescriptor = "{prefix}/govkit/entries/vk.kit.toml"\n\n'
-            '[[entry]]\nid = "nk"\ndescriptor = "{prefix}/govkit/entries/nk.kit.toml"\n',
+            '[[entry]]\nid = "nk"\ndescriptor = "{prefix}/govkit/entries/nk.kit.toml"\n\n'
+            '[[entry]]\nid = "fk"\ndescriptor = "{prefix}/govkit/entries/fk.kit.toml"\n',
+        f"{PFX}{KIT_NAMES['govkit']}/entries/fk.kit.toml":
+            'id = "fk"\nversion_from = { none = "a fileless fixture entry" }\n',
         f"{PFX}{KIT_NAMES['govkit']}/entries/vk.kit.toml":
             'id = "vk"\nhome = "vk"\n'
             'version_from = { file = "vk.sh", pattern = "^KIT_VK_VERSION=" }\n\n'
@@ -1036,6 +1041,9 @@ def check_epoch_verb(tmp: pathlib.Path) -> None:
           and "no value change" in p.stdout and "(still 1.0)" in p.stdout, p.stdout + p.stderr)
     check("[aRF-15 AC6] an unversioned kit that moved prints an announced skip naming its file",
           f"epoch: nk · skip · no declared version · moved: {PFX}nk/nk.sh" in p.stdout, p.stdout)
+    check("[PLAY-dOrderedCharter-80 AC6] a fileless entry declaring no version reads a skip, never FAILED",
+          "epoch: fk · skip · no declared version · moved: none" in p.stdout
+          and "epoch: fk · FAILED" not in p.stdout, p.stdout)
 
     (fx / PFX / "vk" / "vk.sh").write_text("KIT_VK_VERSION=1.1   # gov:kit vk@1.1\n",
                                               encoding="utf-8", newline="\n")

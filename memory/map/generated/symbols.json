@@ -1078,6 +1078,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "arm_drive_default_route",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_drive_empty_command",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -10434,6 +10439,11 @@
     },
     {
       "id": "derive_root_confs",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_root_shipped",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
     },
@@ -21353,6 +21363,11 @@
       "file": "tools/govkit/steps/adopter_rules_to_overlay.py"
     },
     {
+      "id": "render_deploy_tail",
+      "kind": "function",
+      "file": "tools/govkit/matrix.py"
+    },
+    {
       "id": "render_dirt",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -23000,6 +23015,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/check-microformats.sh"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/check-playbook-parity.sh"
     },
     {
@@ -23651,6 +23671,11 @@
       "id": "resolve_python",
       "kind": "function",
       "file": "tools/check-line-length.test.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
+      "file": "tools/check-microformats.sh"
     },
     {
       "id": "resolve_python",
