@@ -1086,9 +1086,9 @@ check_eq "AC5 the replay-written card is followed by one now — line" "1" "$(gr
 CF_REL=.claude/orientation-card.md
 CF_SID="$NONCE-cf1"
 printf -v CF_PAYLOAD '{"session_id":"%s","cwd":"%s","hook_event_name":"SessionStart"}' "$CF_SID" "$CWT2"
-check_card_file() {   # $1=name: the opener, the owner line, the stored card's bytes, the closer
+check_card_file() {   # $1=name: the opener, the owner line (no transcript_path in the payload), the stored card's bytes, the closer
   { printf '[%s · Level 1 · %s]\n' "$CF_REL" "the build's card: where this session stands; level 0 outranks it"
-    printf 'card-owner — %s\n' "$CF_SID"
+    printf 'card-owner — %s · absent\n' "$CF_SID"
     cat "$CARD_HOME/$CF_SID.md"; printf '[/%s]\n' "$CF_REL"; } > "$TMP/cf.want"
   cmp -s "$TMP/cf.want" "$CWT2/$CF_REL" && { echo "ok   $1"; pass=$((pass+1)); } \
     || { echo "FAIL $1"; diff "$TMP/cf.want" "$CWT2/$CF_REL" 2>&1 | sed 's/^/    /'; fail=$((fail+1)); }
@@ -1111,7 +1111,11 @@ check_eq "card file AC3: the append, in the worktree, exits 0" "0" "$got"
 check_card_file "card file AC3: the append re-renders it"
 check_eq "card file AC3: the re-rendered file carries the appended line" "1" "$(grep -cx -- '- TOOL-zCardFixture-10' "$CWT2/$CF_REL")"
 # PLAY-dOrderedCharter-49 S54: a second session writing a card into the same tree leaves the first's card,
-# its owner line naming the first, and prints the one skipped: line naming the owner.
+# its owner line naming the first, and prints the one skipped: line naming the owner. The first session
+# writes again with a transcript touched now, since an owner with none is dead (PLAY-dOrderedCharter-54).
+: > "$TMP/cf1.jsonl"
+printf -v CF_PAYLOAD '{"session_id":"%s","cwd":"%s","transcript_path":"%s","hook_event_name":"SessionStart"}' "$CF_SID" "$CWT2" "$TMP/cf1.jsonl"
+run_card_file write
 printf -v CF_PAYLOAD2 '{"session_id":"%s","cwd":"%s","hook_event_name":"SessionStart"}' "$NONCE-cf2" "$CWT2"
 cp "$CWT2/$CF_REL" "$TMP/cf.first"
 (cd "$CCLONE" && printf '%s\n' "$CF_PAYLOAD2" | bash "$CHECK" --card --write > "$CARD_OUT" 2>&1); got=$?
@@ -1129,6 +1133,65 @@ done
 (cd "$CWT2" && printf -- '- TOOL-zCardFixture-10\n' | bash "$CHECK" --card --append --session "$CF_SID" > "$CARD_OUT" 2>&1); got=$?
 check_eq "card file AC3: --append over an unwritable card file exits 0 with one skipped: line" "0 1" "$got $(grep -c '^card-file — skipped: ' "$CARD_OUT")"
 rmdir "$CWT2/$CF_REL"
+
+# ---- the card file's owner (PLAY-dOrderedCharter-54) ----------------------------------------------
+# One scratch repository, a folder of transcripts and one payload per session. The owner line names
+# the session and its transcript; another session's owner is live while that transcript moved within
+# CARD_OWNER_BOUND, and a dead owner's card, or any owner under a `clear` payload, is taken over with
+# one printed line. Staged red by reading every other owner as live (AC4), by ignoring `source` (AC5),
+# or by recording `absent` on a session's own payload-less write (AC2).
+mkrepo owner; OW="$R"; OW_FILE="$OW/$CF_REL"; OWT="$TMP/owner-tx"; mkdir -p "$OWT"
+# write_owner_payload <stem> <sid> <transcript> [source] — $TMP/<stem>.json, the transcript in its native
+# spelling with JSON's doubled backslashes where cygpath gives one; OW_TX the `/` spelling the line holds.
+write_owner_payload() {
+  local p=$3
+  command -v cygpath >/dev/null 2>&1 && p=$(cygpath -w "$3")
+  printf '{"session_id":"%s","cwd":"%s","transcript_path":"%s","source":"%s","hook_event_name":"SessionStart"}\n' \
+    "$2" "$OW" "${p//\\/\\\\}" "${4:-startup}" > "$TMP/$1.json"
+  OW_TX=${p//\\//}
+}
+run_owner_card() { (cd "$OW" && bash "$CHECK" --card "$@" > "$CARD_OUT" 2>&1); got=$?; }   # stdin is the caller's
+read_owner_line() { sed -n 2p "$OW_FILE" | tr -d '\r'; }
+# write_owner_card <line> — the kept card with its second line replaced, or dropped when <line> is empty.
+write_owner_card() { { head -n 1 "$TMP/ow.keep"; [ -z "$1" ] || printf '%s\n' "$1"; tail -n +3 "$TMP/ow.keep"; } > "$OW_FILE"; }
+write_owner_payload s1 s1 "$OWT/t1.jsonl"; OW_T1=$OW_TX
+write_owner_payload s1b s1 "$OWT/t1b.jsonl"; OW_T1B=$OW_TX
+write_owner_payload s2 s2 "$OWT/t2.jsonl"; OW_T2=$OW_TX
+write_owner_payload s2-clear s2 "$OWT/t2.jsonl" clear
+: > "$OWT/t1.jsonl"; : > "$OWT/t1b.jsonl"; : > "$OWT/t2.jsonl"
+run_owner_card --write < "$TMP/s1.json"
+check_eq "owner AC1: a payload's write names the session and its transcript, spelled with /" "0|card-owner — s1 · $OW_T1" "$got|$(read_owner_line)"
+cp "$OW_FILE" "$TMP/ow.keep"
+run_owner_card --replay --session s1 </dev/null
+check_eq "owner AC2: the owner's payload-less replay keeps its transcript" "card-owner — s1 · $OW_T1" "$(read_owner_line)"
+mkrepo owner3
+(cd "$R" && bash "$CHECK" --card --write --session s3 </dev/null > "$CARD_OUT" 2>&1)
+check_eq "owner AC2: a first payload-less write records absent" "card-owner — s3 · absent" "$(sed -n 2p "$R/$CF_REL" | tr -d '\r')"
+touch "$OWT/t1.jsonl"; write_owner_card "card-owner — s1 · $OW_T1"
+run_owner_card --write < "$TMP/s2.json"
+check_eq "owner AC3: a live owner's card is skipped, naming it, and kept" \
+  "1|card-owner — s1 · $OW_T1" "$(grep -cxF 'card-file — skipped: another live session s1 owns this tree' "$CARD_OUT")|$(read_owner_line)"
+# The age is read at the write, so it may pass 3600 by the seconds the write itself took, and no more.
+ow_t0=$EPOCHSECONDS; touch -d "@$((ow_t0 - 3600))" "$OWT/t1.jsonl"; write_owner_card "card-owner — s1 · $OW_T1"
+run_owner_card --write < "$TMP/s2.json"
+ow_age=$(sed -n 's/^card-file — took over: session s1 · transcript \([0-9]*\)s old$/\1/p' "$CARD_OUT")
+check_eq "owner AC4: a transcript dated 3600 s back is a dead owner, taken over, its age 3600 s and the write's own" \
+  "card-owner — s2 · $OW_T2|1" "$(read_owner_line)|$([ -n "$ow_age" ] && (( ow_age >= 3600 && ow_age <= 3600 + EPOCHSECONDS - ow_t0 )) && echo 1)"
+rm -f "$OWT/t1.jsonl"
+for ow_case in "card-owner — s1 · $OW_T1|s1" "card-owner — s1 · absent|s1" "card-owner — s1|s1" "|none"; do
+  write_owner_card "${ow_case%|*}"
+  run_owner_card --write < "$TMP/s2.json"
+  check_eq "owner AC4: '${ow_case%|*}' is a dead owner, taken over" \
+    "card-owner — s2 · $OW_T2|1" "$(read_owner_line)|$(grep -cxF "card-file — took over: session ${ow_case##*|} · transcript absent" "$CARD_OUT")"
+done
+: > "$OWT/t1.jsonl"; write_owner_card "card-owner — s1 · $OW_T1"
+run_owner_card --write < "$TMP/s2-clear.json"
+check_eq "owner AC5: a clear payload takes over a live owner's card" \
+  "card-owner — s2 · $OW_T2|1" "$(read_owner_line)|$(grep -cxF 'card-file — took over: session s1 · source clear' "$CARD_OUT")"
+write_owner_card "card-owner — s1 · $OW_T1"
+run_owner_card --write < "$TMP/s1b.json"
+check_eq "owner AC6: the owner's own write with a new transcript records it, printing no verdict" \
+  "card-owner — s1 · $OW_T1B|0" "$(read_owner_line)|$(grep -cE '^card-file — (skipped|took over):' "$CARD_OUT")"
 
 # AC6 — --path prints one line and touches nothing.
 run_card "AC6 --card --path prints the card's path" "$CWT" 0 "/orientation/$NONCE-t6.md" --card --path --session "$NONCE-t6"

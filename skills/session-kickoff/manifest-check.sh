@@ -299,14 +299,19 @@ add_health_event() {
 # any byte outside [A-Za-z0-9._-] is refused before it can be joined into a path. `--append` never
 # reads stdin here — stdin is the body it stores — so it takes `--session` alone. The payload is read
 # ONCE, and its `cwd` kept in CARD_CWD for the card file's tree (PLAY-dOrderedCharter-8 S2); JSON's
-# escaped backslash reads as `/`, the spelling git accepts on every host.
-CARD_CWD=""
+# escaped backslash reads as `/`, the spelling git accepts on every host. The same read keeps the
+# payload's `transcript_path` in CARD_TRANSCRIPT, unescaped alike, and its `source` in CARD_SOURCE, the
+# card file's owner and its `clear` takeover (PLAY-dOrderedCharter-54 S1); no payload leaves both empty.
+CARD_CWD=""; CARD_TRANSCRIPT=""; CARD_SOURCE=""
 read_session_id() {
   local sid="" payload="" re_sid='"session_id"[[:space:]]*:[[:space:]]*"([^"]*)"' re_cwd='"cwd"[[:space:]]*:[[:space:]]*"([^"]*)"'
+  local re_tx='"transcript_path"[[:space:]]*:[[:space:]]*"([^"]*)"' re_src='"source"[[:space:]]*:[[:space:]]*"([^"]*)"'
   [ "$CARD_VERB" = append ] || [ -n "$CARD_SID" ] || [ -t 0 ] || payload=$(cat)
   [[ $payload =~ $re_sid ]] && sid=${BASH_REMATCH[1]}
   # ponytail: a POSIX directory whose name holds a backslash reads wrong here, and the tree falls back to $ROOT
   [[ $payload =~ $re_cwd ]] && CARD_CWD=${BASH_REMATCH[1]//\\\\//}
+  [[ $payload =~ $re_tx ]] && CARD_TRANSCRIPT=${BASH_REMATCH[1]//\\\\//}
+  [[ $payload =~ $re_src ]] && CARD_SOURCE=${BASH_REMATCH[1]}
   [ -n "$sid" ] || sid="$CARD_SID"
   if [ -z "$sid" ] && [ "$CARD_VERB" = append ]; then
     echo "MANIFEST env ERROR — --card --append has no session id: stdin is the body, so pass --session <sid>"; exit 2
@@ -855,21 +860,39 @@ render_envelope_sh() {
 # written; any failure prints ONE `card-file — skipped:` line and returns 0, so it never changes a verb's
 # exit: the stored card is the record and this file its render. WHAT THIS DOES NOT DO: load the file;
 # nothing imports it until the charter's entry file does (PLAY-dOrderedCharter-43).
-# ONE OWNER PER TREE (PLAY-dOrderedCharter-49 S54): the file's second line is `card-owner — <session id>`,
-# and a file another session owns is left as it is, printing one skipped: line. Whether that session is
-# still live, and a takeover when it is not, are PLAY-dOrderedCharter-54's.
+# ONE OWNER PER TREE (PLAY-dOrderedCharter-49 S54, PLAY-dOrderedCharter-54): the file's second line is
+# `card-owner — <session id> · <transcript>`, the payload's transcript, else the one this session's own
+# owner line already records, else `absent`. Another session's owner is LIVE while its transcript is a
+# file `stat -c %Y` dates within CARD_OWNER_BOUND seconds of now, since the CLI appends to it every turn;
+# a live owner's file is left as it is, printing one skipped: line. Every other owner is dead: an id-only
+# or absent transcript, a missing file, an older one, or a time stat cannot read. A dead owner's file, or
+# any owner's under a `clear` payload, is taken over, printing one `took over:` line after the rename.
+# WHAT THIS DOES NOT CHECK: a sub-agent's transcript (an owner waiting on its agents past the bound reads
+# dead), a path spelled with a \uXXXX escape or an escaped quote (reads missing, so dead), a host whose
+# stat lacks -c (every owner dead), and a `resume` payload, which gets no `clear` treatment.
 CARD_FILE_REL=.claude/orientation-card.md
 CARD_FILE_DIRECTION="the build's card: where this session stands; level 0 outranks it"
+CARD_OWNER_BOUND=1800
 write_card_file() {
-  local dest="$CARD_TREE/$CARD_FILE_REL" common tmp body owner=""
+  local dest="$CARD_TREE/$CARD_FILE_REL" common tmp body owner="" osid="" otx="" mtime="" took="" tx=${CARD_TRANSCRIPT:-absent}
+  local re_owner='^card-owner — ([A-Za-z0-9][A-Za-z0-9._-]*)( · (.+))?$'
   if [ -f "$dest" ]; then
     { IFS= read -r _; IFS= read -r owner; } < "$dest" 2>/dev/null
     owner=${owner%$'\r'}
-    case "$owner" in
-      "card-owner — $CARD_SID") ;;
-      "card-owner — "*)
-        printf 'card-file — skipped: another live session %s owns this tree\n' "${owner#card-owner — }"; return 0 ;;
-    esac
+    [[ $owner =~ $re_owner ]] && osid=${BASH_REMATCH[1]} && otx=${BASH_REMATCH[3]}
+    if [ "$osid" = "$CARD_SID" ]; then
+      [ -n "$CARD_TRANSCRIPT" ] || [ -z "$otx" ] || tx=$otx
+    elif [ "$CARD_SOURCE" = clear ]; then
+      took="session ${osid:-none} · source clear"
+    else
+      took="session ${osid:-none} · transcript absent"
+      if [ -n "$otx" ] && [ "$otx" != absent ] && [ -f "$otx" ] && mtime=$(stat -c %Y -- "$otx" 2>/dev/null) && [[ $mtime =~ ^[0-9]+$ ]]; then
+        if (( EPOCHSECONDS - mtime <= CARD_OWNER_BOUND )); then
+          printf 'card-file — skipped: another live session %s owns this tree\n' "$osid"; return 0
+        fi
+        took="session $osid · transcript $((EPOCHSECONDS - mtime))s old"
+      fi
+    fi
   fi
   if ! git -C "$CARD_TREE" check-ignore -q "$CARD_FILE_REL" 2>/dev/null; then
     common=$(git -C "$CARD_TREE" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) && common=${common%$'\r'} && [ -n "$common" ] \
@@ -887,10 +910,11 @@ write_card_file() {
   mkdir -p "$CARD_TREE/.claude" 2>/dev/null || { printf 'card-file — skipped: cannot create %s/.claude\n' "$CARD_TREE"; return 0; }
   tmp=$(mktemp "$dest.XXXXXXXX" 2>/dev/null) || { printf 'card-file — skipped: no temp beside %s\n' "$dest"; return 0; }
   body=$(mktemp "$dest.XXXXXXXX" 2>/dev/null) || { rm -f "$tmp"; printf 'card-file — skipped: no temp beside %s\n' "$dest"; return 0; }
-  if { printf 'card-owner — %s\n' "$CARD_SID" && { [ ! -f "$CARD_FILE" ] || cat -- "$CARD_FILE"; }; } > "$body" 2>/dev/null \
+  if { printf 'card-owner — %s · %s\n' "$CARD_SID" "$tx" && { [ ! -f "$CARD_FILE" ] || cat -- "$CARD_FILE"; }; } > "$body" 2>/dev/null \
       && render_envelope_sh "$CARD_FILE_REL" 1 "$CARD_FILE_DIRECTION" "$body" > "$tmp" 2>/dev/null \
       && mv -f "$tmp" "$dest" 2>/dev/null; then
     rm -f "$body" 2>/dev/null
+    [ -z "$took" ] || printf 'card-file — took over: %s\n' "$took"
     return 0
   fi
   rm -f "$tmp" "$body" 2>/dev/null

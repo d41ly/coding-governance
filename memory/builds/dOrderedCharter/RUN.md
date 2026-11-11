@@ -31,10 +31,10 @@ mode: slug
 run-branch: refs/heads/branch/unattended-dorderedcharter-725f52
 anchor-kind: default-branch
 cli-version: 2.1.309
-lease-utc: 2026-11-11T03:05:06Z
+lease-utc: 2026-11-11T11:17:21Z
 pid-image: claude.exe
 host: compeeto-agent
-pid: 19004
+pid: 8496
 session: 0394fa33-012c-408f-a840-e6e4cfaac23f
 keepalive: 65a9574c
 anchor-url: https://github.com/d41ly/coding-governance.git
@@ -545,3 +545,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-11T04:18:19Z dispatch · item ed6c8f2e PLAY-dOrderedCharter-49 · reason tools/playbook/packs.toml tools/playbook/instructions_edit.py tools/playbook/edge_grammar.py tools/playbook/edges.toml help/tags.md tools/memory-recall/query.py tools/memory-recall/README.md .gitattributes tools/playbook/core.py tools/playbook/load_sets.py tools/playbook/kinds.toml tools/memory-recall/SKILL.template.md .claude/skills/memory-recall/SKILL.md tools/playbook/writing_practice.py WIRE-INTO-PROJECT.md tools/unattended/unattended.sh tools/playbook/tag_index.py tools/playbook/gov_tag.py tools/playbook/adopt-playbook.sh tools/govkit/docs_leg.py help/docs-leg.md tools/memory-tree/build_records.py help/charter.md skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh tools/govkit/govkit.py tools/govkit/fixtures/stale_edges.py tools/playbook/instruction_units.py tools/lib/auto_memory.py tools/drift-audit/drift_report.py tools/playbook/memory_index.py tools/playbook/README.md help/measure-legs.md .lexicon.conf memory/guides/SESSION-KICKOFF.md memory/map/generated memory/map/baseline.toml memory/project/positional-refs.txt memory/project/unpinned-facts.txt memory/project/encoding-posture-sites.txt memory/project/spawn-idiom-sites.txt memory/project/unarmed-branches.txt memory/project/docs-undocumented.txt memory/project/temp-name-sites.txt memory/project/testsuite-count-waivers.txt memory/LIVE.md memory/backlog/PLAY.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/builds/dOrderedCharter/README.md memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-49-ledger.md memory/builds/dOrderedCharter/build/2026-11-11-build-PLAY-dOrderedCharter-49-deviation-494.md memory/builds/dOrderedCharter/build/2026-11-11-build-PLAY-dOrderedCharter-49-deviation-495.md memory/builds/dOrderedCharter/build/2026-11-11-build-PLAY-dOrderedCharter-49-deviation-496.md memory/builds/dOrderedCharter/build/2026-11-11-build-PLAY-dOrderedCharter-49-deviation-497.md memory/builds/dOrderedCharter/build/2026-11-11-build-PLAY-dOrderedCharter-49-deviation-498.md
 
 2026-11-11T04:18:24Z brief · item PLAY-dOrderedCharter-49 · reason 64a88bf00428 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-49-build-brief.md
+
+2026-11-11T05:12:57Z brief · item PLAY-dOrderedCharter-54 · reason 344a10bbe89f memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-54-build-brief.md
+
+2026-11-11T05:24:28Z dispatch · item e15f0584 PLAY-dOrderedCharter-54 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md memory/builds/dOrderedCharter/spec/2026-10-24-spec-PLAY-dOrderedCharter-54.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-54-ledger.md memory/builds/dOrderedCharter/build/2026-11-11-build-PLAY-dOrderedCharter-54-deviation-542.md memory/builds/dOrderedCharter/build/2026-11-11-build-PLAY-dOrderedCharter-54-deviation-543.md memory/builds/dOrderedCharter/README.md memory/LIVE.md memory/backlog/PLAY.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/map/generated memory/map/baseline.toml memory/project/positional-refs.txt memory/project/unpinned-facts.txt memory/project/spawn-idiom-sites.txt memory/project/unarmed-branches.txt

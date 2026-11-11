@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-54 — the card file's owner is live only while its transcript moves, and a dead owner's card is taken over
 
-**Status:** DEFERRED · rev-3 · 2026-11-10 · node d · Tier-2 · base ce13efbe · streams playbook · order 40 · advances PLAY-dOrderedCharter-38
+**Status:** CLOSED · rev-3 · 2026-11-11 · node d · Tier-2 · base ce13efbe · streams playbook · order 40 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,9 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-54-deviation-541.md](../build/2026-10-24-build-PLAY-dOrderedCharter-54-deviation-541.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-54-promoted-fix-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-54-promoted-fix-return.md) | research | — |
 | [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77 PLAY-dOrderedCharter-78 |
+| [2026-11-02-build-PLAY-dOrderedCharter-54-ledger.md](../build/2026-11-02-build-PLAY-dOrderedCharter-54-ledger.md) | journal | — |
+| [2026-11-11-build-PLAY-dOrderedCharter-54-deviation-542.md](../build/2026-11-11-build-PLAY-dOrderedCharter-54-deviation-542.md) | deviation | — |
+| [2026-11-11-build-PLAY-dOrderedCharter-54-deviation-543.md](../build/2026-11-11-build-PLAY-dOrderedCharter-54-deviation-543.md) | deviation | — |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-50-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-50-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-55 |
 | [2026-11-02-prompt-PLAY-dOrderedCharter-54-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-54-build-brief.md) | journal | — |
 | [2026-11-08-prompt-PLAY-dOrderedCharter-39-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-39-drift-fold-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-55 |
@@ -81,7 +84,7 @@ after it.
   depend on.
 - A session's sub-agent transcripts as a liveness term (section 8 F3).
 - A help page for the card file. None exists at HEAD, since unit 8 shipped none; a page is a document
-  unit of its own (BUILD-METHOD M2), the follow-up section 8 F6 names.
+  unit of its own (`doc.build-method#m2-the-spec-set-decompose-detect-classify-act`), the follow-up section 8 F6 names.
 - `TOOL-dPlacedRequest-2` S7 and `KICK-dKeptSession-15` S3, DEFERRED in other builds, read the
   payload's `transcript_path` and `source`. `CARD_TRANSCRIPT` and `CARD_SOURCE` are the one capture
   for them to read rather than a second, and this unit edits neither spec.
@@ -277,7 +280,7 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 AC4
   comment above `write_card_file` and the printed line; (c) a sentence in
   `skills/session-kickoff/SKILL.md`. No page under `help/` and no paragraph of that Skill names the
   card file at `95a63d8ab`, by `git grep -n -i "orientation-card" -- help/ skills/session-kickoff/SKILL.md`.
-  (a) is a document unit of its own (BUILD-METHOD M2), and (c) a sentence about a file the Skill
+  (a) is a document unit of its own (`doc.build-method#m2-the-spec-set-decompose-detect-classify-act`), and (c) a sentence about a file the Skill
   never introduces. RESOLVED (agent, 2026-11-10, delegated): (b), rung 1. widens: none · relaxes:
   none, since no help page covers the card file and none goes stale
 
