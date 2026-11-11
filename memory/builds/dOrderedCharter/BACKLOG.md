@@ -20,3 +20,4 @@
 - SEV · PLAY-dOrderedCharter-59 · LOW · six research records read as malformed plan records until TOOL-dRankedPlan-16 S2 narrows the stem itself
 - SEV · PLAY-dOrderedCharter-60 · LOW · a reader looks for the code-notes filler in a build that does not fill it
 - SEV · PLAY-dOrderedCharter-66 · MED · one load-bearing guide sits outside the envelope gate until the owner rules
+- KEEP · PLAY-dOrderedCharter-66 · the BUILD-METHOD size row is the owner's to move (PLAY-dOrderedCharter-3 F5); the owner's 2026-11-11 order to fix the items waiting on them takes F5's recommendation (a), built after PLAY-dOrderedCharter-55 as a unit of its own
