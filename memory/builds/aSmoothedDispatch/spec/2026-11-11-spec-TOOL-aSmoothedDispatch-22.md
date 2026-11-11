@@ -1,6 +1,6 @@
 # TOOL-aSmoothedDispatch-22 — the reconcile merge with main at bdb633d94: TOOL-dPavedRoad-1's `--spec` kept in the spec-token checker, unit 5's duplicate retired
 
-**Status:** SPECCED · rev-1 · 2026-11-11 · node a · Tier-2 · base bdb633d9 · streams tooling · order 12
+**Status:** INPROGRESS · rev-1 · 2026-11-11 · node a · Tier-2 · base bdb633d9 · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
