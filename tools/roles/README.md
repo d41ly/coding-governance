@@ -1,4 +1,4 @@
-<!-- gov:kit roles@1.14 -->
+<!-- gov:kit roles@1.16 -->
 # roles — the role catalogue: one agent definition per role, the workflow table, and the checker
 
 A governed session runs its LLM work through ten declared WORKFLOWS — `orient`, `research`, `reuse`,
@@ -45,9 +45,10 @@ renders it under `## Role`, then `## Task`: one block per key of the role's `rea
 order, then, as its last block, the role's charter blocks (described under "The agent types"),
 whose library notes print on stderr as `handoff: note — `. A `task:` key is read from the session card's `## task`
 field by the kickoff checker's field grammar, a `card:` key from that card's section, a `brief:` key
-from the build's brief record, and an `input:` key from `--input`. A required key that resolves to
-nothing, an empty value or a placeholder refuses by name and writes nothing; an optional one is named
-on the task block's `Not supplied` line.
+from the build's brief record, `brief:prompt` from its `## The prompt` section and every other one
+from its `### <sub-head>` under `## The brief`, and an `input:` key from `--input`. A required key
+that resolves to nothing, an empty value or a placeholder refuses by name and writes nothing; an
+optional one is named on the task block's `Not supplied` line.
 
 The card is `--card`, else the file the kickoff checker's `--card --path` prints for
 `CLAUDE_CODE_SESSION_ID`, so the card's location stays that checker's rule. The brief record is
@@ -66,8 +67,14 @@ a call carrying any other (TOOL-aOrientedCast-27). stdout does not change in any
 That `Agent` call also carries `effort` (TOOL-aProfiledEffort-3): its role's value in the JSON
 `python handoff.py role-efforts --model <id>` prints, one line mapping every role whose `agent` is
 true to its level. The rule is the same for every model: where no profile matches the id, the value
-equals the agent type's own `effort:` line, so passing it changes nothing. The spawn guard reads no
-`effort`, so it refuses neither a call carrying one nor a call without.
+equals the agent type's own `effort:` line, so passing it changes nothing. The spawn guard refuses a
+call whose level is not the one this verb prints for the model in use (TOOL-aGuardedEffort-1): it
+reads the model from the call's `model`, else from the session's transcript, and the levels from
+the `effort` key `render_agents.py` writes into the role index. It does not check the agents a
+harness spawns itself, the `committer` and `probe` stages, which workflow a call to a harness
+serving two runs, a model no transcript names or two profiles match, an `Agent` call where
+`CLAUDE_CODE_EFFORT_LEVEL` is set, a configured default subagent model, an effort ceiling in
+settings, or a hand-edited index.
 `python handoff.py harness-args <harness>` prints the `roles` object a harness takes: the
 union of the `stages` tables of every workflow whose harness is that script, as one line of JSON.
 `python handoff.py stage-efforts <workflow> --model <id>` prints the `efforts` object a harness call
@@ -413,7 +420,7 @@ else; the check compares the two on every run.
 | `gov-session` | handoff | none | input:question, brief:goal?, task:todo?, card:route? | ids, memory | false | nothing to the sender; the receiving session acts on the task block and reports in its own session |
 | `gov-skeptic` | closing-review | none | input:diff?, input:spec? | verify, class, risk | true | a verdict per finding, confirmed or refuted, with the reason observed and, for a confirmed one, its severity |
 | `gov-spec-reviewer` | spec-review | none | input:spec, brief:goal?, brief:non-goals? | spec?, verify, gate, class, docs, security, risk | true | concrete findings, each with the spec and section, the evidence probed, the consequence and a proposed fix |
-| `gov-spec-writer` | spec-write | spec | brief:goal, brief:items, brief:acceptance, brief:gates, brief:non-goals, input:spec?, task:reuse?, card:route? | yagni, reuse, core, contract, derive, one-fact, spec?, verify, gate, class, small, docs, security | true | the units authored, already present and refused, each by its unit id, with the reason for every refusal |
+| `gov-spec-writer` | spec-write | spec | brief:prompt, brief:goal, brief:items, brief:acceptance, brief:gates, brief:non-goals, input:spec?, task:reuse?, card:route? | yagni, reuse, core, contract, derive, one-fact, spec?, verify, gate, class, small, docs, security | true | the units authored, already present and refused, each by its unit id, with the reason for every refusal |
 | `gov-synthesizer` | closing-review | review | input:diff?, input:spec? | left-shift, risk, signal | true | the report's path and the items it adjudicated, each with its severity and the ids of the findings it covers |
 
 <!-- /gen:roles-catalogue -->

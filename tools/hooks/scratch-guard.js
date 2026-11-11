@@ -141,7 +141,7 @@
  */
 'use strict'
 
-const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.43 — ships inside the hooks kit entry
+const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.45 — ships inside the hooks kit entry
 
 const TOOLS = ['Bash', 'PowerShell']
 const MAX_FINDINGS = 6
@@ -944,10 +944,12 @@ const ROLE_INDEX = '.claude/roles.json'
  * S1: the role index, in one of three states. `{ state: 'absent', shown }` when the file does not
  * exist; `{ state: 'broken', shown, why }` when it cannot be read, is not JSON, or is not the shape
  * `{ roles: { <name>: { writes: <string>, agent: <boolean>, … } }, harnesses: [<string>] }`;
- * `{ state: 'ok', shown, roles, harnesses, gates }` otherwise. Only the shape is checked: the value set of
+ * `{ state: 'ok', shown, roles, harnesses, gates, effort }` otherwise. Only the shape is checked: the value set of
  * `writes` belongs to the index's generator, and a value outside it simply admits no class here.
  * TOOL-aOrientedCast-11 adds two OPTIONAL keys, graded only when present: a role's `gates`, a list of
  * strings, and the top-level `gates`, `{ manifest: <string|null> }`; `gates` is null when absent.
+ * TOOL-aGuardedEffort-1 adds a third: the top-level `effort`, a plain object whose `default`,
+ * `profiles`, `harnesses` and `unset` are plain objects; `effort` is null when absent.
  */
 function loadRoleIndex(top) {
   const fs = require('fs')
@@ -985,7 +987,14 @@ function loadRoleIndex(top) {
     || !(gates.manifest === null || typeof gates.manifest === 'string'))) {
     return { state: 'broken', shown, why: `${shape}: gates is not { manifest: <string|null> }` }
   }
-  return { state: 'ok', shown, roles: d.roles, harnesses: d.harnesses, gates: gates || null }
+  // TOOL-aGuardedEffort-1 S2: the top-level `effort`, when present, is a plain object whose four keys
+  // are plain objects; agent-cap.js's rule 8 reads it. Absent reads as null, which adds no rule there.
+  const effort = d.effort
+  const checkPlain = (v) => !!v && typeof v === 'object' && !Array.isArray(v)
+  if (effort !== undefined && !(checkPlain(effort) && ['default', 'profiles', 'harnesses', 'unset'].every((k) => checkPlain(effort[k])))) {
+    return { state: 'broken', shown, why: `${shape}: effort is not { default: {…}, profiles: {…}, harnesses: {…}, unset: {…} }` }
+  }
+  return { state: 'ok', shown, roles: d.roles, harnesses: d.harnesses, gates: gates || null, effort: effort || null }
 }
 
 /**

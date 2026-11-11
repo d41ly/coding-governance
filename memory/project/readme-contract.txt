@@ -229,3 +229,5 @@ memory/builds/dFinishedRecord/README.md
 memory/builds/aSwiftRefusal/README.md
 memory/builds/aProfiledEffort/README.md
 memory/builds/aShelvedLeg/README.md
+memory/builds/aGuardedEffort/README.md
+memory/builds/dPavedRoad/README.md
