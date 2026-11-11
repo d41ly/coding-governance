@@ -5,7 +5,7 @@
 ## The brief
 
 ### Goal
-The MEDIUM and LOW the closing review of TOOL-aShelvedLeg-2 confirmed are fixed in one batch unit, as M4 promotes them, and each is left-shifted. The findings are in `memory/builds/aShelvedLeg/reviews/2026-11-11-review-TOOL-aShelvedLeg-2-closing-diff-round1.md`.
+The MEDIUM and LOW the closing review of TOOL-aShelvedLeg-2 confirmed are fixed in one batch unit, as M4 promotes them, and each is left-shifted. The findings are in `memory/builds/aShelvedLeg/reviews/2026-11-11-review-TOOL-aShelvedLeg-2-closing-diff-round1.md`. The spec is written with status DEFERRED: by the owner's ruling of 2026-11-11 units 1 and 2 land first and this unit lands later on its own. Its §3 declares **consumes-from** `TOOL-aShelvedLeg-2` and no edge to unit 1.
 
 ### Items
 1. **The every-bar comments S1 missed (MEDIUM, ids 2 and 3).** `tools/unattended/lib-unattended.sh:2389` says `read_spec_audit_ids` exists "because check 2 runs on every bar", and `tools/unattended/unattended.sh:2997` rests an owner-accepted cost on check 9 asserting the same facts "on the bar". Both checks are `check-unattended.sh`'s, which TOOL-aShelvedLeg-1 held off every automatic bar. Re-derive the population by grep over every script in `tools/unattended/`, not a named-file list, and reword each sentence; where a sentence's argument rested on the bar running the leg, say what bounds it now.
@@ -24,7 +24,7 @@ memory hygiene · spec tokens · docs · kit version markers · kit epoch · lex
 Behaviour of any script. The changed-mode selection itself.
 
 ### Limitations
-Comments, docs and records only. `check-unattended.sh` carries raw CR bytes if touched. Kit versions move through the lander's `mint`.
+The spec is written with status DEFERRED: by the owner's ruling of 2026-11-11 units 1 and 2 land first and this unit lands later on its own. Its §3 declares **consumes-from** `TOOL-aShelvedLeg-2` and no edge to unit 1. Comments, docs and records only. `check-unattended.sh` carries raw CR bytes if touched. Kit versions move through the lander's `mint`.
 
 ### Reuse
 The wording TOOL-aShelvedLeg-2 wrote is the shape.

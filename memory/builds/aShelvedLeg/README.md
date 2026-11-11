@@ -52,23 +52,24 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 2 unit(s) · node a · opened 2026-11-10 · streams tooling
+**Build status:** DEFERRED · 3 unit(s) · node a · opened 2026-11-10 · streams tooling
 ids TOOL-aShelvedLeg-1 TOOL-aShelvedLeg-2 TOOL-aShelvedLeg-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aShelvedLeg-1 — the `unattended kit gate` leg is `subject = "kit"`, off every automatic bar](spec/2026-11-10-spec-TOOL-aShelvedLeg-1.md) | — | 2 | CLOSED | rev-2 | 2026-11-10 |
-| [TOOL-aShelvedLeg-2 — the closing review's minors on the held kit gate, batched](spec/2026-11-10-spec-TOOL-aShelvedLeg-2.md) | — | 2 | CLOSED | rev-1 | 2026-11-11 |
+| [TOOL-aShelvedLeg-1 — the `unattended kit gate` leg is `subject = "kit"`, off every automatic bar](spec/2026-11-10-spec-TOOL-aShelvedLeg-1.md) | — | 2 | CLOSED | rev-3 | 2026-11-11 |
+| [TOOL-aShelvedLeg-2 — the closing review's minors on the held kit gate, batched](spec/2026-11-10-spec-TOOL-aShelvedLeg-2.md) | — | 2 | CLOSED | rev-2 | 2026-11-11 |
+| [TOOL-aShelvedLeg-3 — unit 2's closing-review minors on the held kit gate, batched](spec/2026-11-11-spec-TOOL-aShelvedLeg-3.md) | — | 1 | DEFERRED | rev-1 | 2026-11-11 |
 <!-- /gen:build-units -->
 
-Records: 12 bound to this build, across 4 record folder(s).
+Records: 16 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aShelvedLeg-1 TOOL-aShelvedLeg-2.
+Ids no `spec-audit` record has ever named: TOOL-aShelvedLeg-1 TOOL-aShelvedLeg-2 TOOL-aShelvedLeg-3.
 
-Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

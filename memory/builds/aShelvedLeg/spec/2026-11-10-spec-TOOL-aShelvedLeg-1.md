@@ -1,17 +1,19 @@
 # TOOL-aShelvedLeg-1 — the `unattended kit gate` leg is `subject = "kit"`, off every automatic bar
 
-**Status:** CLOSED · rev-2 · 2026-11-10 · node a · Tier-2 · base b904a0f9 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-11-11 · node a · Tier-2 · base b904a0f9 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-10-build-TOOL-aShelvedLeg-1-agent-ledger.md](../build/2026-11-10-build-TOOL-aShelvedLeg-1-agent-ledger.md) | journal | TOOL-aShelvedLeg-2 |
+| [2026-11-10-build-TOOL-aShelvedLeg-1-agent-ledger.md](../build/2026-11-10-build-TOOL-aShelvedLeg-1-agent-ledger.md) | journal | TOOL-aShelvedLeg-2 TOOL-aShelvedLeg-3 |
 | [2026-11-11-build-TOOL-aShelvedLeg-1-1-acceptance-ledger.md](../build/2026-11-11-build-TOOL-aShelvedLeg-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aShelvedLeg-1-1-spec-writer.md](../prompts/2026-11-10-prompt-TOOL-aShelvedLeg-1-1-spec-writer.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aShelvedLeg-1-brief.md](../prompts/2026-11-10-prompt-TOOL-aShelvedLeg-1-brief.md) | research | — |
 | [2026-11-10-prompt-TOOL-aShelvedLeg-1-round1-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-aShelvedLeg-1-round1-fix-brief.md) | research | — |
 | [2026-11-10-prompt-TOOL-aShelvedLeg-1-token-fix-brief.md](../prompts/2026-11-10-prompt-TOOL-aShelvedLeg-1-token-fix-brief.md) | research | — |
+| [2026-11-11-prompt-TOOL-aShelvedLeg-1-1-spec-writer.md](../prompts/2026-11-11-prompt-TOOL-aShelvedLeg-1-1-spec-writer.md) | journal | — |
+| [2026-11-11-prompt-TOOL-aShelvedLeg-1-edge-fix-brief.md](../prompts/2026-11-11-prompt-TOOL-aShelvedLeg-1-edge-fix-brief.md) | research | TOOL-aShelvedLeg-2 |
 | [2026-11-10-review-TOOL-aShelvedLeg-1-closing-diff-round1.md](../reviews/2026-11-10-review-TOOL-aShelvedLeg-1-closing-diff-round1.md) | diff-review | — |
 | [2026-11-10-review-TOOL-aShelvedLeg-1-closing-diff-round2.md](../reviews/2026-11-10-review-TOOL-aShelvedLeg-1-closing-diff-round2.md) | diff-review | — |
 | [2026-11-11-review-TOOL-aShelvedLeg-2-closing-diff-round1.md](../reviews/2026-11-11-review-TOOL-aShelvedLeg-2-closing-diff-round1.md) | diff-review | TOOL-aShelvedLeg-2 |
@@ -71,6 +73,9 @@ owner chose this on 2026-11-10, knowing the price: a held leg cannot notice its 
   subject, so a hand-wired copy still runs the leg on every bar. A govkit-installed adopter
   receives the row with its subject. This is the gap DEPL-aBenchedProbe-5 closed for the lander
   self-test, and the main loop files it as an ask rather than widening this unit.
+- **hands-off** `TOOL-aShelvedLeg-2` — the HELD comment, the budget row, the no-trailer
+  declaration and the reworded `run-unattended-gates.sh` lines this unit wrote, on which that unit
+  folds the closing review's minors.
 
 ## 4. Design
 
@@ -239,6 +244,10 @@ none
 - rev-2 · 2026-11-10 · AC3 · AC4 · AC5 · AC6 · the spec-token bar join read four backticked runner
   names in §6 as runs; each criterion now names the file it greps in prose, or the leg by name, and
   observes the same fact (brief 2026-11-10-prompt-TOOL-aShelvedLeg-1-token-fix-brief).
+- rev-3 · 2026-11-11 · §3 Edges · mirrors `TOOL-aShelvedLeg-2`'s `consumes-from` as `hands-off`,
+  which check 12's reciprocity arm reported missing; from
+  `memory/builds/aShelvedLeg/prompts/2026-11-11-prompt-TOOL-aShelvedLeg-1-edge-fix-brief.md`
+  item 1. Nothing else moves.
 
 ## 10. Reuse audit
 

@@ -1,14 +1,16 @@
 # TOOL-aShelvedLeg-2 — the closing review's minors on the held kit gate, batched
 
-**Status:** CLOSED · rev-1 · 2026-11-11 · node a · Tier-2 · base 5f066b0a · streams tooling
+**Status:** CLOSED · rev-2 · 2026-11-11 · node a · Tier-2 · base 5f066b0a · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-10-build-TOOL-aShelvedLeg-1-agent-ledger.md](../build/2026-11-10-build-TOOL-aShelvedLeg-1-agent-ledger.md) | journal | TOOL-aShelvedLeg-1 |
+| [2026-11-10-build-TOOL-aShelvedLeg-1-agent-ledger.md](../build/2026-11-10-build-TOOL-aShelvedLeg-1-agent-ledger.md) | journal | TOOL-aShelvedLeg-1 TOOL-aShelvedLeg-3 |
 | [2026-11-11-build-TOOL-aShelvedLeg-2-1-acceptance-ledger.md](../build/2026-11-11-build-TOOL-aShelvedLeg-2-1-acceptance-ledger.md) | journal | — |
 | [2026-11-10-prompt-TOOL-aShelvedLeg-2-brief.md](../prompts/2026-11-10-prompt-TOOL-aShelvedLeg-2-brief.md) | research | — |
+| [2026-11-11-prompt-TOOL-aShelvedLeg-1-edge-fix-brief.md](../prompts/2026-11-11-prompt-TOOL-aShelvedLeg-1-edge-fix-brief.md) | research | TOOL-aShelvedLeg-1 |
+| [2026-11-11-prompt-TOOL-aShelvedLeg-2-1-spec-writer.md](../prompts/2026-11-11-prompt-TOOL-aShelvedLeg-2-1-spec-writer.md) | journal | — |
 | [2026-11-11-review-TOOL-aShelvedLeg-2-closing-diff-round1.md](../reviews/2026-11-11-review-TOOL-aShelvedLeg-2-closing-diff-round1.md) | diff-review | TOOL-aShelvedLeg-1 |
 
 <!-- /gen:spec-records -->
@@ -89,6 +91,9 @@ items 2 to 6 and round 2 id 1 (`2026-11-10-review-TOOL-aShelvedLeg-1-closing-dif
   kit-subject legs that declare `doc_reads`. The main loop files them as asks.
 - **hands-off** external — the `PROTOCOL.template.md:48` sentence and its rendered twin, an owner
   turn because it is a governance carrier. The main loop files it as an ask.
+- **hands-off** `TOOL-aShelvedLeg-3` — the every-bar sentences this unit's rewording left standing
+  in the kit's scripts, and the changed-mode sentence it wrote in the kit README, the descriptor and
+  the gotchas entry, which that unit corrects for the closing review's MEDIUM and LOW.
 
 ## 4. Design
 
@@ -335,6 +340,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-10 · initial draft.
+- rev-2 · 2026-11-11 · §3 Edges · mirrors `TOOL-aShelvedLeg-3`'s `consumes-from` as `hands-off`,
+  which check 12's reciprocity arm reported missing; from
+  `memory/builds/aShelvedLeg/prompts/2026-11-11-prompt-TOOL-aShelvedLeg-1-edge-fix-brief.md`
+  item 2. Nothing else moves.
 
 ## 10. Reuse audit
 
