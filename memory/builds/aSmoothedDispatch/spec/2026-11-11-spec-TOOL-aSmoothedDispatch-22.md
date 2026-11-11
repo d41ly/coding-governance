@@ -1,12 +1,14 @@
 # TOOL-aSmoothedDispatch-22 — the reconcile merge with main at bdb633d94: TOOL-dPavedRoad-1's `--spec` kept in the spec-token checker, unit 5's duplicate retired
 
-**Status:** INPROGRESS · rev-1 · 2026-11-11 · node a · Tier-2 · base bdb633d9 · streams tooling · order 12
+**Status:** INPROGRESS · rev-2 · 2026-11-11 · node a · Tier-2 · base bdb633d9 · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-11-prompt-TOOL-aSmoothedDispatch-22-1-spec-writer.md](../prompts/2026-11-11-prompt-TOOL-aSmoothedDispatch-22-1-spec-writer.md) | journal | — |
 | [2026-11-11-prompt-TOOL-aSmoothedDispatch-22-reconcile.md](../prompts/2026-11-11-prompt-TOOL-aSmoothedDispatch-22-reconcile.md) | research | — |
+| [2026-11-11-prompt-TOOL-aSmoothedDispatch-22-rev2.md](../prompts/2026-11-11-prompt-TOOL-aSmoothedDispatch-22-rev2.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -25,7 +27,8 @@ merge, so Tier-2 (`memory/TEMPLATE-SPEC.md`, "Tiers").
 The conflict set is the trial merge `git merge-tree --write-tree HEAD bdb633d94`, run at
 `ba6c2f1f9` while this spec was written. It printed tree `de33b5c7` and the merge base `b904a0f91`.
 Every line number below cited as "trial" is in that tree. The builder re-takes the conflict set at
-the merge and records any difference in the acceptance ledger.
+the merge and records any difference in the acceptance ledger. Re-taken at `e1f9cebb3`, the same
+command printed tree `6002767` with the same three files and the same region counts, 8, 2 and 1.
 
 | File | Conflict regions | Kind |
 |---|---|---|
@@ -65,7 +68,10 @@ the merge and records any difference in the acceptance ledger.
   `tools/roles/render_agents.py --write`, never by hand. Observed by AC4.
 - **S5** — The hook. `tools/hooks/scratch-guard.js` is carried as git merged it. Its role-gate arm
   already admits main's multi-operand form to `gov-spec-writer`, as §4's probe shows, so the hook
-  and its suite take no edit. Observed by AC5 and AC7.
+  and its suite take no edit. Main's TOOL-dPavedRoad-1 also puts the bare spec-token leg on the
+  writer's allowlist, so the merged hook admits that leg too; the checker's suite is what it still
+  refuses. `tools/roles/house/policy.toml` and `.claude/roles.json` are carried as merged. Observed
+  by AC5 and AC7.
 - **S6** — The kickoff manifest. `memory/guides/SESSION-KICKOFF.md` takes main's side of its one
   conflict region, then `last-audit` is re-stamped by the manifest's own stamp rule, and the merge
   commit's body carries the `manifest-audit:` delta line. Observed by AC6.
@@ -78,6 +84,8 @@ the merge and records any difference in the acceptance ledger.
 - Any change to what main's `--spec` grades, refuses or prints.
 - Any edit to `tools/hooks/scratch-guard.js` or its suite. A widening and its arm were owed only if
   the hook refused the multi-operand form, and it does not.
+- Any change to the writer's grant. `tools/roles/house/policy.toml` and `.claude/roles.json` arrive
+  as main wrote them, with `spec tokens (a spec's own names resolve)` in the writer's `gates`.
 - Re-opening unit 5's, unit 7's or unit 8's spec. All three are CLOSED and stay frozen; the owner's
   ruling is recorded at `memory/DECISIONS.md:140`.
 - The unattended driver and its suite.
@@ -172,8 +180,8 @@ The builder recounts off the merged lines, and a count that differs wins and mov
 ### S4 — the overlay
 
 `tools/roles/house/gov-spec-writer.md` is replaced whole by the text below. It drops what the kit
-prompt already says: when to run the check, its command, fixing each hit, and that the bare leg is
-not the writer's. It keeps the three facts the kit prompt lacks. Each backticked span stays on one
+prompt already says: when to run the check, its command and fixing each hit. It also drops the
+claim that the bare leg stays refused to the writer, which main's grant makes false (S5). It keeps the three facts the kit prompt lacks. Each backticked span stays on one
 line, because the `SD8` arms read each span with a line-wise `grep -o`.
 
 ```text
@@ -192,16 +200,34 @@ and `:1909`. Then `python tools/roles/render_agents.py --write` from the reposit
 ### S5 — the hook probe
 
 The role-gate arm refuses a G1 leg only when the command's words equal the leg's argv word for word
-(`tools/hooks/scratch-guard.js:1440-1446`). The spec-token leg's argv is the checker with no
-argument (`tools/gate-legs.json:1758-1762`), and the G3 suite shape needs a `.test.sh` head or
-`--selftest` (`tools/hooks/scratch-guard.js:1401-1406`). So `--spec` with any number of operands
+and the leg is not on the role's allowlist (`tools/hooks/scratch-guard.js:1383-1388` and
+`:1455-1457` at `bdb633d94`). The spec-token leg's argv is the checker with no argument
+(`tools/gate-legs.json:1758-1762`), and the G3 suite shape needs a `.test.sh` head or `--selftest`
+(`tools/hooks/scratch-guard.js:1401-1406` on this branch, `:1343-1348` at `bdb633d94`). So `--spec` with any number of operands
 is neither. Main's hook diff from `b904a0f91` touches only `loadRoleIndex` and the version comment.
 Unit 5 changed no hook code; its admission is this rule, pinned by its three rows at
 `tools/hooks/scratch-guard.test.sh:1274-1281`.
 
-The probe below, run at `ba6c2f1f9` while this spec was written, printed `exit=0` with an empty
-stderr for the two-operand form, and `exit=2` naming `G1 leg` for the bare leg, its liveness
-control. AC5 re-runs it at the merge. `$SCRATCH` is the run's scratch directory.
+Main's TOOL-dPavedRoad-1 (`1b991ef0c`) puts `spec tokens (a spec's own names resolve)` on the
+writer's allowlist, at `tools/roles/house/policy.toml:36` at `bdb633d94` and in the `gates` list of
+the `"gov-spec-writer"` entry of `.claude/roles.json`, lines 177-181 of
+`git show bdb633d94:.claude/roles.json`. The arm's `if (leg && allow.includes(leg.name)) continue`
+(`tools/hooks/scratch-guard.js:1455` at `bdb633d94`) then admits the bare leg to the writer, so the bare leg is no control. The control
+is the checker's suite, `bash tools/check-spec-tokens.test.sh`: its head ends `.test.sh`, the G3
+shape (`tools/hooks/scratch-guard.js:1346`), and its leg `spec-tokens self-test`
+(`tools/gate-legs.json:1950-1954`) is not on the writer's allowlist. So the arm takes row `G3 suite`
+(`:1456-1457`), renders the refusal at `:1390-1393`, and the hook exits 2 at `:1616-1617`.
+
+The probe below, run over the trial tree `6002767` extracted to a scratch repository, printed
+`exit=0` with an empty stderr for the two-operand form and for the bare leg, and `exit=2` for the
+suite, its stderr opening with this line:
+
+```text
+BLOCKED by scratch-guard: a role agent runs no gate. Agent type gov-spec-writer ran `bash tools/check-spec-tokens.test.sh`, which is row G3 suite, the leg "spec-tokens self-test".
+```
+
+At `ba6c2f1f9` the bare leg printed `exit=2` only because that tip's `.claude/roles.json` lacks
+main's grant. AC5 re-runs the probe at the merge. `$SCRATCH` is the run's scratch directory.
 
 ```bash
 probe() {
@@ -210,7 +236,7 @@ probe() {
   echo "exit=$?"; cat "$SCRATCH/sd22-hook.err"
 }
 probe "python tools/check-spec-tokens.py --spec memory/builds/x/spec/a.md memory/builds/x/spec/b.md"
-probe "python tools/check-spec-tokens.py"
+probe "bash tools/check-spec-tokens.test.sh"
 ```
 
 ### S6 — the manifest stamp
@@ -267,8 +293,10 @@ ledger and the index re-render.
 
 ## 5. Production-readiness checklist
 
-- security — the hook still refuses the bare leg and the checker suite to `gov-spec-writer`, AC5's
-  control. Main's `--spec` is read-only and refuses an operand outside a build's `spec/` folder.
+- security — main grants `gov-spec-writer` the bare spec-token leg (TOOL-dPavedRoad-1), and this
+  unit leaves that grant as merged. The hook still refuses the writer the checker's suite,
+  `bash tools/check-spec-tokens.test.sh`, as row `G3 suite`, AC5's control. Main's `--spec` is
+  read-only and refuses an operand outside a build's `spec/` folder.
 - perf / scale — N/A: main's mode runs the same per-spec joins over the named specs.
 - error / empty / loading states — an empty operand list refuses with exit 2, the kept `SD5 AC3` arm.
 - observability — the ledger records `main`'s sha at pass start, each file's resolution, the probe
@@ -313,9 +341,12 @@ ledger and the index re-render.
   Red when: the overlay keeps a sentence the kit prompt says, or the agent file is hand-edited or
   left stale.
 - **AC5** — When §4's `probe` runs at the merge, the two-operand `--spec` command prints `exit=0`
-  and an empty stderr, and the bare `python tools/check-spec-tokens.py` prints `exit=2` and a
-  `G1 leg` line.
-  Red when: the merged hook refuses the multi-operand form, which S5 would then owe a widening for.
+  and an empty stderr, and the probe's third command, the checker's suite, prints `exit=2` and a
+  stderr line opening `BLOCKED by scratch-guard: a role agent runs no gate. Agent type gov-spec-writer ran`
+  and naming `row G3 suite, the leg "spec-tokens self-test"`, the refusal rendered at
+  `tools/hooks/scratch-guard.js:1390-1393` and returned at `:1616-1617` at `bdb633d94`.
+  Red when: the merged hook refuses the multi-operand form, which S5 would then owe a widening for,
+  or admits the suite, so the control reads `exit=0`.
 - **AC6** — When these run at the merge, they print as stated. Over
   `memory/guides/SESSION-KICKOFF.md`, `grep -c '^last-audit: .* @ <the first parent, in full>$'`
   prints 1, `grep -c '^last-body-change: 1dc7a7932d57dda674832fcd143d97b7a06edd3d$'` prints 1, and
@@ -329,8 +360,9 @@ ledger and the index re-render.
   `python tools/codebase-map/gen_map.py --write` leave `git status --porcelain` empty.
   Red when: the hook or another auto-merged product file is hand-edited, or a generated file is
   committed stale or hand-merged.
-  fixture: the trial tree is the one `git merge-tree --write-tree HEAD bdb633d94` printed at
-  `ba6c2f1f9`; a builder whose pre-merge tip differs re-takes it with that command and uses its sha.
+  fixture: `de33b5c71e20ea4f4fd6d69044e976f4d5563b58` stands for the trial tree, which the builder
+  re-takes at its pre-merge tip with `git merge-tree --write-tree HEAD bdb633d94` and uses that sha
+  in its place; at `e1f9cebb3` it printed `6002767011c11185915115ad06749c073773bf3c`.
 
 ## 7. Gates
 
@@ -341,8 +373,9 @@ New arm: tools/check-spec-tokens.test.sh · covers AC3 · the kept `SD5 AC3` arm
 New arm: tools/check-spec-tokens.test.sh · covers AC4 · the two `SD8` overlay-parity arms, now reading S4's overlay against main's checker; staged by respelling the overlay's summary span as `spec-tokens: <N> unwaived miss(es)`, which still parses and which the red run does not print · none
 
 The main loop also runs the checker suite and the scratch-guard suite at the close, and each prints
-no FAIL line. The bar runs once after that, through the lander. This spec's author ran no gate but
-the spec-token checker's `--spec` mode over this file.
+no FAIL line. The bar runs once after that, through the lander. This spec's authors ran no gate but
+the spec-token checker's `--spec` mode over this file, and at rev-2 the memory hygiene gate and the
+naming lexicon.
 
 ## 8. Open questions
 
@@ -355,14 +388,19 @@ none
   the role-gate arm's exact-argv rule and unit 5's three suite rows, since unit 5 changed no hook
   code. Item 2's drop rule is applied arm by arm in §4; the bare-run `SD5 AC5` control is dropped
   with its scoped partner, its own case armed at the suite's `:538`.
+- rev-2 · 2026-11-11 · from brief `2026-11-11-prompt-TOOL-aSmoothedDispatch-22-rev2`: main's grant
+  admits the bare spec-token leg to the writer, so S5's and AC5's control becomes the checker's
+  suite, refused as row `G3 suite`; §5's security line, §3's grant non-goal, S4's note on the
+  overlay's retired claim and AC7's fixture follow, and the trial merge is re-taken at `e1f9cebb3`
+  as tree `6002767`.
 
 ## 10. Reuse audit
 
 The seams this unit extends: main's `read_named_specs` (`tools/check-spec-tokens.py:1541` at
 `bdb633d94`), kept whole; main's `PR1` arms and the suite's `arm` helper
 (`tools/check-spec-tokens.test.sh:371`); the roles kit's renderer `tools/roles/render_agents.py
---write` for the agent file; the role-gate arm's G1 rule (`tools/hooks/scratch-guard.js:1440-1446`),
-which already admits the multi-operand form; and the reconcile shape of unit 21's merge `0a3eef5ca`
+--write` for the agent file; the role-gate arm's G1 rule (`tools/hooks/scratch-guard.js:1383-1388` and
+`:1455` at `bdb633d94`), which already admits the multi-operand form; and the reconcile shape of unit 21's merge `0a3eef5ca`
 and of `ccfa23ffe` for the stamp. `tools/codebase-map/reuse_lookup.py` ranked only generic name
 stems (`check`, `merge`, `resolve_prefix_token`) for "keep one side's spec-token checker mode and
 retire the other side's duplicate at a merge", so no existing code seam fits a merge, which is a

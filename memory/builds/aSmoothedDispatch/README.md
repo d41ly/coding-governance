@@ -79,10 +79,10 @@ ids TOOL-aSmoothedDispatch-12 TOOL-aSmoothedDispatch-13 TOOL-aSmoothedDispatch-1
 | [TOOL-aSmoothedDispatch-9 — the three driver-suite arms unit 1's split left red: the stale `--dispatch` hostile-value exemption, and two carriage-return arms whose byte the substitution drops](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-9.md) | 9 | 1 | CLOSED | rev-2 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-18 — the three bar legs this build turned red: unit 4's loop read off a one-name local, four test lines respelled off kit paths, and `--help` anchored on a help page](spec/2026-11-10-spec-TOOL-aSmoothedDispatch-18.md) | 10 | 1 | CLOSED | rev-2 | 2026-11-10 |
 | [TOOL-aSmoothedDispatch-21 — the reconcile merge with aSwiftRefusal on local main: one spec-token check, through `run_spec_token_check`, after every cheap refusal](spec/2026-11-11-spec-TOOL-aSmoothedDispatch-21.md) | 11 | 2 | CLOSED | rev-1 | 2026-11-11 |
-| [TOOL-aSmoothedDispatch-22 — the reconcile merge with main at bdb633d94: TOOL-dPavedRoad-1's `--spec` kept in the spec-token checker, unit 5's duplicate retired](spec/2026-11-11-spec-TOOL-aSmoothedDispatch-22.md) | 12 | 2 | INPROGRESS | rev-1 | 2026-11-11 |
+| [TOOL-aSmoothedDispatch-22 — the reconcile merge with main at bdb633d94: TOOL-dPavedRoad-1's `--spec` kept in the spec-token checker, unit 5's duplicate retired](spec/2026-11-11-spec-TOOL-aSmoothedDispatch-22.md) | 12 | 2 | INPROGRESS | rev-2 | 2026-11-11 |
 <!-- /gen:build-units -->
 
-Records: 23 bound to this build, across 4 record folder(s).
+Records: 25 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
