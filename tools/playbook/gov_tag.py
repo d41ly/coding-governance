@@ -391,7 +391,8 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "toml-row", "dirty-rename", "charter-warm", "charter-dirty", "retired-section",
           "retired-section-aliased", "retired-section-reminted", "reference-row", "reference-no-h1",
           "foreign-native", "held-native", "positional-no-tree", "positional-absent", "dirty-revert",
-          "worktree-recreate")
+          "worktree-recreate", "helper-edit", "held-open", "extractor-removed", "worktree-spelling",
+          "positional-spec-revbump", "positional-bulk-move")
 #: PLAY-dOrderedCharter-78 S4's two plants: a `family-id` native class over the fixture's own id grammar,
 #: owned by a build the chain registry lacks, and by the one it holds
 NATIVE_OWNERS = {"foreign-native": "dGhost", "held-native": "fixture"}
@@ -404,6 +405,14 @@ TOML_ROWS = ('foundation = ["practice.b"]\n\n[[practice]]\ntag = "practice.a"\nl
 #: PLAY-dOrderedCharter-44's `extractor-edit`: the fixture extractor's module edited to stop yielding one tag
 EDITED_EXTRACTOR = FIXTURE_EXTRACTOR.replace("elif len(word) == 1:",
                                              'elif len(word) == 1 and word[0] != "layer.memory.recall":')
+#: PLAY-dOrderedCharter-55 S13's third version of the extractor, for the third worktree of `two-versions`
+THIRD_EXTRACTOR = FIXTURE_EXTRACTOR.replace("elif len(word) == 1:",
+                                            'elif len(word) == 1 and word[0] != "layer.memory":')
+#: PLAY-dOrderedCharter-55 S15's `helper-edit`: the fixture extractor importing a helper module beside it
+HELPED_EXTRACTOR = FIXTURE_EXTRACTOR.replace(
+    "\n\n\ndef extract_declared",
+    "\nimport os\nimport sys\n\nsys.path.insert(0, os.path.dirname(__file__))\n"
+    "import fixture_helper  # noqa: E402,F401  the helper whose edit the version sees\n\n\ndef extract_declared")
 
 
 def derive_fixture_row(ns, extractor, role="describes", layer="layer.instruction", purpose="AGENTS.md") -> str:
@@ -627,7 +636,9 @@ def read_dump(root) -> list[str]:
 
 
 def remove_index(root) -> None:
-    (ti.common_git_dir(root) / "gov" / "index.db").unlink(missing_ok=True)
+    """The index's tables reset in place through `load_index`'s one transaction, the file never unlinked
+    (PLAY-dOrderedCharter-55 S16)."""
+    ti.load_index(root, reset=True).close()
 
 
 def run_plant(root, top, plant, sets) -> int:
@@ -719,12 +730,71 @@ def run_plant(root, top, plant, sets) -> int:
         con.close()
         say(f"stamped {stamp} after the build;")
         return 0 if print_equal(after, read_cold_dump()) and stamp == ti.INDEX_SCHEMA else 1
+    # PLAY-dOrderedCharter-55's three: a helper's edit moves its importer's version, a schema rebuild under a
+    # held reader, and a removed extractor's stored rows never served
+    if plant == "helper-edit":
+        helper, edited = f"{FIXTURE_KIT}/fixture_helper.py", "fixture_tags:extract_declared"
+        write_commit(root, {f"{FIXTURE_KIT}/fixture_tags.py": HELPED_EXTRACTOR, helper: "EDITION = 1\n"},
+                     "the extractor imports a helper")
+        run_verb(root, "rebuild", None, sets=sets)
+        write_commit(root, {helper: "EDITION = 2\n"}, "edit the helper alone")
+        con = ti.load_index(root)
+        try:
+            state = ti.load_view(con, root, ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml"))
+        finally:
+            con.close()
+        say(f"after the helper edit {edited} re-ran over {state['runs'][edited]} blobs,",
+            f"{state['skipped'][edited]} skipped as fresh")
+        return 0 if state["runs"][edited] and not state["skipped"][edited] else 1
+    if plant == "held-open":
+        import sqlite3
+        run_verb(root, "rebuild", None, sets=sets)
+        path = ti.derive_index_path(root)
+        con = sqlite3.connect(str(path))
+        con.execute("PRAGMA user_version = 0")  # a stale stamp, so the next open rebuilds
+        con.commit()
+        con.close()
+        held = sqlite3.connect(str(path), timeout=ti.BUSY_TIMEOUT)
+        held.execute("SELECT COUNT(*) FROM blob_row").fetchone()  # a reader holding the file across the rebuild
+        try:
+            run_verb(root, "rebuild", None, sets=sets)
+            done = True
+        except ti.TagError as exc:
+            done = False
+            say(f"the rebuild refused: {exc}")
+        rows = held.execute("SELECT COUNT(*) FROM blob_row").fetchone()[0]
+        stamp = held.execute("PRAGMA user_version").fetchone()[0]
+        held.close()
+        same = print_equal(read_dump(root), read_cold_dump())
+        named = path.name == f"index-s{ti.INDEX_SCHEMA}.db" and path.is_file()
+        say(f"the rebuild {'completed' if done else 'FAILED'} under a held reader, which reads {rows} blob rows",
+            f"stamped {stamp}; the file is {path.name}")
+        return 0 if done and rows and stamp == ti.INDEX_SCHEMA and named and same else 1
+    if plant == "extractor-removed":
+        reg, gone = f"{FIXTURE_KIT}/namespaces.toml", "fixture_again:extract_again"
+        base_reg = (root / reg).read_text(encoding="utf-8")
+        write_commit(root, {reg: base_reg + derive_fixture_row("kind", gone),
+                            f"{FIXTURE_KIT}/fixture_again.py": FIXTURE_EXTRACTOR.replace("extract_declared",
+                                                                                         "extract_again")},
+                     "register a second extractor")
+        run_verb(root, "rebuild", None, sets=sets)
+        write_commit(root, {reg: base_reg, f"{FIXTURE_KIT}/fixture_again.py": None}, "remove it")
+        run_verb(root, "rebuild", None, sets=sets)
+        con = ti.load_index(root)
+        try:
+            stored = con.execute("SELECT COUNT(*) FROM blob_row WHERE extractor=?", (gone,)).fetchone()[0]
+        finally:
+            con.close()
+        dump = read_dump(root)
+        served = sum(1 for r in dump if f"\t{gone}\t" in r)
+        say(f"the removed extractor's stored rows: {stored}, served: {served};")
+        return 0 if stored and not served and print_equal(dump, read_cold_dump()) else 1
     # PLAY-dOrderedCharter-69 S5: two child fixtures under an exported GIT_DIR act on their own scratch only
     if plant == "git-env":
         from deviation_join import set_env_aside
         linked = top / "linked"
         run_git(root, "worktree", "add", "-q", str(linked), "-b", "linked")
-        index, sentinel = root / ".git" / "gov" / "index.db", b"sentinel, not a database"
+        index, sentinel = ti.derive_index_path(root), b"sentinel, not a database"
         index.parent.mkdir(parents=True, exist_ok=True)
         index.write_bytes(sentinel)
         git_dir = run_git(linked, "rev-parse", "--absolute-git-dir").strip()
@@ -743,10 +813,12 @@ def run_plant(root, top, plant, sets) -> int:
         return 1
     # PLAY-dOrderedCharter-51's two: each extractor version's rows kept apart, each worktree served its own
     if plant == "two-versions":
-        other, edited = top / "wt2", "fixture_tags:extract_declared"
+        other, third, edited = top / "wt2", top / "wt3", "fixture_tags:extract_declared"
         run_git(root, "worktree", "add", "-q", str(other), "-b", "two")
         write_commit(other, {f"{FIXTURE_KIT}/fixture_tags.py": EDITED_EXTRACTOR}, "edit the extractor in two")
-        both = (root, other)
+        run_git(root, "worktree", "add", "-q", str(third), "-b", "three")  # PLAY-dOrderedCharter-55 S13
+        write_commit(third, {f"{FIXTURE_KIT}/fixture_tags.py": THIRD_EXTRACTOR}, "edit the extractor in three")
+        both = (root, other, third)
         cold = {}
         for where in both:  # each worktree's rows from nothing, the other's never built
             remove_index(root)
@@ -764,7 +836,7 @@ def run_plant(root, top, plant, sets) -> int:
                                (edited,)).fetchone()[0]
         finally:
             con.close()
-        say(f"round 2 parsed {second[0]} and {second[1]} blobs; {held} versions of {edited} held side by side")
+        say(f"round 2 parsed {' and '.join(map(str, second))} blobs; {held} versions of {edited} held side by side")
         before = read_dump(root)
         run_git(root, "worktree", "remove", "--force", str(other))
         run_git(root, "worktree", "prune")
@@ -780,7 +852,7 @@ def run_plant(root, top, plant, sets) -> int:
         kept = read_dump(root) == before
         say(f"two removed and pruned, --gc left {left} rows of its version;",
             "the live dump unchanged" if kept else "the live dump CHANGED")
-        return 0 if all(same) and second == [0, 0] and held == 2 and rc == 0 and not left and kept else 1
+        return 0 if all(same) and second == [0, 0, 0] and held == 3 and rc == 0 and not left and kept else 1
     if plant == "served-across":
         other = top / "wt2"
         run_git(root, "worktree", "add", "-q", str(other), "-b", "two")
@@ -841,6 +913,42 @@ def run_plant(root, top, plant, sets) -> int:
         ok = "the gone tree's edit" in before and "the intro text" in after and "gone tree" not in after
         say("the re-created worktree serves the committed text" if ok else "the re-created worktree INHERITS a row")
         return 0 if ok else 1
+    # PLAY-dOrderedCharter-55 S21: a worktree read under a second spelling of its path keeps its dirty rows
+    # through another worktree's sweep, and a pruned worktree's rows leave
+    if plant == "worktree-spelling":
+        other, gone = top / "wt2", top / "wt3"
+        for where, branch in ((other, "two"), (gone, "three")):
+            run_git(root, "worktree", "add", "-q", str(where), "-b", branch)
+            write_files(where, {"memory/guides/ALPHA.md": GUIDE.replace("the intro text", f"edited in {where.name}")})
+        real = ti.read_git(other, "rev-parse", "--show-toplevel").strip()
+        # the second spelling: a git that prints the caller's own, the drive letter's case swapped and the
+        # slashes turned back, which this host's git never prints (deviation 557)
+        spelled = (real[0].swapcase() + real[1:]).replace("/", "\\") if real[1:2] == ":" else real
+        read_git = ti.read_git
+
+        def read_git_spelled(where, *args):
+            out = read_git(where, *args)
+            return spelled + "\n" if args == ("rev-parse", "--show-toplevel") and out.strip() == real else out
+        ti.read_git = read_git_spelled
+        try:
+            mine = read_served(other, "doc.alpha#intro")
+        finally:
+            ti.read_git = read_git
+        read_served(gone, "doc.alpha#intro")
+        run_git(root, "worktree", "remove", "--force", str(gone))
+        run_git(root, "worktree", "prune")
+        write_commit(root, {"AGENTS.md": "# Charter\n\n## Practices\n\nchanged\n"}, "a commit the sweep follows")
+        run_verb(root, "rebuild", None, sets=sets)
+        con = ti.load_index(root)
+        try:
+            held = dict(con.execute("SELECT worktree, COUNT(*) FROM dirty_path GROUP BY worktree").fetchall())
+        finally:
+            con.close()
+        kept = held.get(ti.derive_worktree_key(spelled), 0)
+        left = sum(n for wt, n in held.items() if wt.endswith("/wt3"))
+        say(f"{real} read as {spelled}: served its own edit" if "edited in wt2" in mine else "NOT served its edit",
+            f"· {kept} dirty rows kept under its key after the sweep, {left} of the pruned worktree's left")
+        return 0 if "edited in wt2" in mine and kept and not left else 1
     if plant == "dirty-rename":
         run_verb(root, "rebuild", None, sets=sets)
         run_git(root, "mv", "memory/guides/ALPHA.md", "memory/guides/BETA.md")
@@ -896,7 +1004,7 @@ def run_plant(root, top, plant, sets) -> int:
             seen = mine in text and theirs not in text
             ok &= seen
             say(pathlib.Path(where).name, "serves its own edit" if seen else "SERVES ANOTHER'S", "· index",
-                (ti.common_git_dir(where) / "gov" / "index.db").as_posix())
+                ti.derive_index_path(where).as_posix())
         same = ti.common_git_dir(root) == ti.common_git_dir(other)
         say("both worktrees share one index" if same else "the worktrees hold TWO indexes")
         return 0 if ok and same else 1
@@ -969,11 +1077,11 @@ def derive_cite(n, oid=None) -> str:
     return f"{POS_CODE}{'@' + oid if oid else ''}:{n}"
 
 
-def write_forked_record(root, kit, record, text) -> None:
-    """PLAY-dOrderedCharter-47 S4's history: `record` committed on a branch forked before the check's module
-    lands on main, then that branch merged."""
+def write_forked_record(root, kit, records: dict) -> None:
+    """PLAY-dOrderedCharter-47 S4's history: `records`, path to text, committed on a branch forked before the
+    check's module lands on main, then that branch merged."""
     run_git(root, "checkout", "-q", "-b", "side")
-    write_commit(root, {record: text}, "a record on a branch forked before the check")
+    write_commit(root, records, "a record on a branch forked before the check")
     run_git(root, "checkout", "-q", "main")
     write_commit(root, {f"{kit}/positional.py": "# the check\n"}, "the check lands")
     run_git(root, "merge", "-q", "--no-ff", "side", "-m", "the side branch merged")
@@ -1065,9 +1173,24 @@ def run_positional_plant(root, top, plant, say, check) -> int:
         say(f"without the live bad pins: rc={check()}")
         return rc
     record, cite = "memory/builds/x/build/record.md", "see x.py:{}\n"
+    if plant == "positional-spec-revbump":  # PLAY-dOrderedCharter-55 S24: a spec added before the check, bumped after
+        spec = "memory/builds/x/spec/spec.md"
+        write_forked_record(root, kit, {spec: cite.format(1)})
+        write_commit(root, {spec: cite.format(1) + cite.format(3)}, "the spec's rev bump cites a line")
+        return check()
+    if plant == "positional-bulk-move":  # PLAY-dOrderedCharter-55 S25: three records moved, a line edited in each
+        filler = "".join(f"a line of record {{n}} that the move keeps, the {w}\n" for w in
+                         ("first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth"))
+        old = {n: filler.format(n=n) + cite.format(1) + cite.format(2) for n in (1, 2, 3)}
+        write_forked_record(root, kit, {f"memory/builds/x/build/r{n}.md": t for n, t in old.items()})
+        moved = {f"memory/builds/x/build/r{n}.md": None for n in old}
+        moved.update({f"memory/builds/x/reviews/r{n}.md": t.replace(cite.format(2), cite.format(4 + n))
+                      for n, t in old.items()})
+        write_commit(root, moved, "three records moved, a line edited in each")
+        return check()
     if plant in ("positional-edited-after", "positional-renamed-after", "positional-uncommitted"):
         # PLAY-dOrderedCharter-53 S4: the pre-fork record edited, renamed, or edited and left uncommitted after the merge
-        write_forked_record(root, kit, record, cite.format(1))
+        write_forked_record(root, kit, {record: cite.format(1)})
         if plant == "positional-renamed-after":
             run_git(root, "mv", record, "memory/builds/x/build/moved.md")
             write_commit(root, {}, "the record renamed after the merge")
@@ -1080,7 +1203,7 @@ def run_positional_plant(root, top, plant, say, check) -> int:
         return check()
     if plant == "positional-forked-before":  # PLAY-dOrderedCharter-47 S4: a branch forked before the check lands
         after = "memory/builds/x/build/after.md"
-        write_forked_record(root, kit, record, cite.format(1))
+        write_forked_record(root, kit, {record: cite.format(1)})
         rc1 = check()
         write_commit(root, {after: cite.format(2)}, "a record after the merge")
         rc2 = check()

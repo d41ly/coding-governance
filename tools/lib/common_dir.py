@@ -3,7 +3,7 @@
 The canonical copy. `<prefix>/lib/` is gov-internal and ships nothing, so every consumer carries the
 block below INLINE, byte-identical, and `<prefix>/lib/resolve-python.test.sh`'s parity table reds a copy
 that drifts. The copies are the recall kit's `query.py`, whose query log lives there, and the playbook
-kit's `tag_index.py`, whose `gov/index.db` does. The block calls `git(repo, *args)`, a one-call stdout
+kit's `tag_index.py`, whose `gov/index-s<INDEX_SCHEMA>.db` does. The block calls `git(repo, *args)`, a one-call stdout
 reader each consumer binds beside it; this module binds its own.
 """
 from __future__ import annotations

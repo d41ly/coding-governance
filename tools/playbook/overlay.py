@@ -6,7 +6,7 @@
 
 THE HOME. The overlay holds the repository's own `[[unit]]` rows, in the kit manifests' row grammar, and its
 `[[policy]]` rows. `read_overlay` is the composers' one reader of it: the blob `HEAD:<overlay>` through
-`git cat-file`, never the index and never the working tree, through `parse_unit_rows` (PLAY-dOrderedCharter-46
+memory-tree's `tree_lib.read_blobs_at` (PLAY-dOrderedCharter-55 S19), never the index and never the working tree, through `parse_unit_rows` (PLAY-dOrderedCharter-46
 S1). Its `state` says which: `landed`; `absent`, a commit holding no such file, the empty overlay; `unarmed`,
 no commit at all, the empty overlay each render names in `UNARMED_LINE`; `candidate`, text a write verb's
 render passes in place of the blob, which every check verb refuses. Every unit it
@@ -96,10 +96,11 @@ def check_born(root) -> bool:
 
 
 def read_landed_text(root) -> str | None:
-    """The overlay's blob at HEAD through `git cat-file`, None where HEAD holds no such file."""
-    if not iu.run_git(root, "ls-tree", "--name-only", "HEAD", "--", iu.OVERLAY).strip():
-        return None
-    return iu.run_git(root, "cat-file", "blob", f"HEAD:{iu.OVERLAY}")
+    """The overlay's blob at HEAD through memory-tree's one `<rev>:<path>` reader, `tree_lib.read_blobs_at`,
+    None where HEAD holds no such file: at a born HEAD, the absent state."""
+    iu.load_memory_tree_path()
+    from tree_lib import read_blobs_at
+    return read_blobs_at(root, [("HEAD", iu.OVERLAY)])[("HEAD", iu.OVERLAY)]
 
 
 def read_overlay(root, candidate: str | None = None) -> Overlay:

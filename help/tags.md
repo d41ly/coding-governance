@@ -23,11 +23,14 @@ a namespace no row registers, such as `step.build`, is red: `step`, `item` and `
 dDeclaredLoop registers them, `role` with dBoundRoles and `record` with dTotalRecall.
 
 The resolver is `tools/playbook/gov_tag.py`, which stands in for `gov tag`. It reads a derived index,
-`<git-common-dir>/gov/index.db`: one SQLite file per machine that every worktree shares, built on
-first use, never committed. A commit re-parses only the files it changed, and a worktree's
-uncommitted edits are served to that worktree alone. A newly registered or edited extractor re-reads
-the files it reads on the next build, and an index file of an older format is rebuilt once, printing
-`tag-index — rebuilt: schema <old> to <new>`. Deleting the file costs one rebuild. Two worktrees whose
+`<git-common-dir>/gov/index-s<n>.db`, `<n>` the index's format number: one SQLite file per machine
+that every worktree shares, built on first use, never committed. A commit re-parses only the files it
+changed, and a worktree's uncommitted edits are served to that worktree alone. A newly registered or
+edited extractor re-reads the files it reads on the next build, and so does one whose imported helper
+module was edited. A new format reads a file of its own name; a file stamped with another format is
+rebuilt in place, never deleted, so a session reading it keeps it, printing
+`tag-index — rebuilt: schema <old> to <new>`. An older format's file is left behind, unread, until you
+delete it. Deleting the file costs one rebuild. Two worktrees whose
 extractor code differs keep their rows side by side in the one file, and each is served only the rows
 its own extractor code wrote, so switching between them re-parses nothing.
 

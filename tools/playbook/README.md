@@ -294,12 +294,15 @@ that arms each adds its row:
 | `role` | dBoundRoles |
 | `record` | dTotalRecall |
 
-The index is `<git-common-dir>/gov/index.db`, one SQLite file per node shared by every worktree, never
-committed. Rows are keyed by blob, so a commit re-parses only the blobs it changed and one blob at two
-paths is parsed once; a worktree's uncommitted edits are its own `dirty_path` rows, served to it alone.
+The index is `<git-common-dir>/gov/index-s<INDEX_SCHEMA>.db`, `tag_index.derive_index_path`'s, one SQLite
+file per node shared by every worktree, never committed; a file of another stamp is rebuilt in place inside
+one `BEGIN IMMEDIATE` transaction, never unlinked (PLAY-dOrderedCharter-55). Rows are keyed by blob, so a
+commit re-parses only the blobs it changed and one blob at two paths is parsed once; a worktree's
+uncommitted edits are its own `dirty_path` rows, keyed by `derive_worktree_key`, served to it alone.
 Freshness is keyed on the blob, the extractor and the extractor's version, the first 12 hex of the
-SHA-256 of its module file, in `blob_parsed`, written when a run yields no row too: a newly registered
-extractor reads the old blobs, an edited module re-runs its extractors, and a blob that yields nothing is
+SHA-256 over its module file and its import closure (`import_walk.derive_module_closure`), in
+`blob_parsed`, written when a run yields no row too: a newly registered
+extractor reads the old blobs, an edited module or helper re-runs its extractors, and a blob that yields nothing is
 not read again (PLAY-dOrderedCharter-44). Each version's rows stand apart (PLAY-dOrderedCharter-51): two
 worktrees whose extractor bytes differ share the file, so `blob_row`, `path_row` and `blob_parsed` carry
 the version, a build never deletes another version's rows, and every read is joined to the reading

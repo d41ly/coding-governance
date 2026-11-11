@@ -1168,7 +1168,8 @@ def check_lock(root=".") -> tuple[list, int]:
             continue
         if run_git(root, "hash-object", "--", path).strip() != r["blob"]:
             found.append(f"{SAY}: red · {path} · differs from the bytes the renderer wrote · remedy: "
-                         f"re-render; never edit the rendered text")
+                         f"re-render, after a merge outside the lander too, since the lock merges ours; "
+                         f"never edit the rendered text")
         if r["template"] and TEMPLATE_MARKER_RE.search((root / path).read_text(encoding="utf-8")):
             found.append(f"{SAY}: red · {path} · the rendered charter carries a version marker · remedy: "
                          f"the lock's `template` carries it; re-render")
@@ -2279,7 +2280,8 @@ def arm_git_env(c):
     run_commit(c.top, "base")
     linked = c.top / "linked"
     run_git(c.top, "worktree", "add", "-q", str(linked))
-    index, sentinel = c.top / ".git" / "gov" / "index.db", b"sentinel, not a database"
+    import tag_index
+    index, sentinel = tag_index.derive_index_path(c.top), b"sentinel, not a database"
     index.parent.mkdir(parents=True, exist_ok=True)
     index.write_bytes(sentinel)
     git_dir = run_git(linked, "rev-parse", "--absolute-git-dir").strip()

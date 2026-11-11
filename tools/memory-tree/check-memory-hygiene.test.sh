@@ -3137,6 +3137,12 @@ cnot 12 'memory/builds/tTen/spec/2026-08-01-spec-tTen-1.md'
 out=$("$_PY" "$HERE/build_records.py" --fixture --plant typed-kinds 2>&1)
 hit 'build-records: PASS typed-kinds'
 
+# --- PLAY-dOrderedCharter-55 S8 (AC8) — a pending kind: a copy of the record factory with one kind's
+# --- entry declared pending imports, `read` exits 2 naming the unit, and `write_record` refuses it
+# --- naming the unit with no file written. Red on a write_record that writes a pending kind.
+out=$("$_PY" "$HERE/build_records.py" --fixture --plant pending-kind 2>&1)
+hit 'build-records: PASS pending-kind'
+
 # ---- the verdict, printed AFTER the last arm. Upstream printed PASS ~150 lines early and landed a
 # ---- red merge bar because the head of the output said success.
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23, and it closes TOOL-cTracedPromise-4 rather than
@@ -4553,7 +4559,9 @@ fi
 # 95, 96 and 97, each top-level and never skipped. Counted by reading; OWED: observed at the close.
 # RAISED 673 -> 674 by PLAY-dOrderedCharter-42: its typed-kinds round-trip assertion, top-level and
 # never skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=674
+# RAISED 674 -> 675 by PLAY-dOrderedCharter-55: its pending-kind assertion, top-level and never
+# skipped. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=675
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

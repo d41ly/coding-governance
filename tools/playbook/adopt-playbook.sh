@@ -249,9 +249,13 @@ fi
 # exit on a `rc=` line, read here as a line. PLAY-dOrderedCharter-75's `unscoped-unit`, beside them, leaves
 # the `reader` join unarmed under a unit row with no `scope`. Then four are PLAY-dOrderedCharter-44's: the index's
 # freshness keyed on blob, extractor and version, and its schema stamp. Then three rows are
-# PLAY-dOrderedCharter-51's two plants: two worktrees whose extractor bytes differ keep their rows apart,
+# PLAY-dOrderedCharter-51's two plants: worktrees whose extractor bytes differ, three of them since
+# PLAY-dOrderedCharter-55, keep their rows apart,
 # re-parse nothing on a second alternating round, and `--gc` collects the pruned one's version; a worktree
-# is never served another version's rows of a tree already built. The rows after them are
+# is never served another version's rows of a tree already built. Then PLAY-dOrderedCharter-55's four: a
+# helper's edit re-runs the extractor importing it, a schema rebuild completes in place under a held
+# reader, a removed extractor's stored rows are never served, and a worktree read under a second spelling
+# of its path keeps its dirty rows while a pruned one's leave. The rows after them are
 # PLAY-dOrderedCharter-22's `purpose` arm: the namespace rows' `owner` and `purpose-source`, and the chain
 # registry joined to the fixture design's view; `pending-source` and `new-no-purpose` print their second
 # half's exit on a `rc=` line. An owner the chain registry lacks prints unarmed and is never red, and a
@@ -329,9 +333,14 @@ new-extractor|0|incremental rows equal a cold build's|old blobs: 0
 extractor-edit|0|the others ran 0 times, 4 skipped as fresh; 0 rows of the old version
 tagless|0|1 blob parsed after one file changed, 0 on a build with no change
 schema|0|tag-index — rebuilt: schema 0 to
-two-versions|0|round 2 parsed 0 and 0 blobs; 2 versions of fixture_tags:extract_declared held side by side|DIFFER
+two-versions|0|round 2 parsed 0 and 0 and 0 blobs; 3 versions of fixture_tags:extract_declared held side by side|DIFFER
 two-versions|0|--gc left 0 rows of its version; the live dump unchanged
 served-across|0|served 0 rows of one's version, and one serves 1
+helper-edit|0|after the helper edit fixture_tags:extract_declared re-ran over 2 blobs, 0 skipped as fresh
+held-open|0|the rebuild completed under a held reader|DIFFER
+held-open|0|the file is index-s
+extractor-removed|0|the removed extractor's stored rows: 4, served: 0;|DIFFER
+worktree-spelling|0|served its own edit · 1 dirty rows kept under its key after the sweep, 0 of the pruned worktree's left
 none $_tk|0|tags: purpose · no chain to read
 no-owner $_tk|2|namespace row 1 lacks owner
 ghost-owner $_tk|0|tags: purpose · owner 'dGhost' · unarmed|names no build of

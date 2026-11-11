@@ -1784,7 +1784,9 @@
       "{prefix}/memory-tree/coverage_join.py",
       "{prefix}/memory-tree/design_lib.py",
       "{prefix}/memory-tree/corpus_ids.py",
-      "{prefix}/lexicon/"
+      "{prefix}/lexicon/",
+      "{prefix}/govkit/entries/playbook.kit.toml",
+      "coding-governance-agents.template.md"
     ],
     "argv": [
       "bash",

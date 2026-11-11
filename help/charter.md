@@ -17,8 +17,15 @@ it `retired`.
 
 Only the marker's major decides how an older template is treated. One whose major is below the renderer's
 gets a note asking you to reseed it from gov, and may still carry a fence for a block the renderer has
-retired. One at the renderer's major gets no such note, a minor behind included, and a fence for a retired
+retired. One at the renderer's major gets no reseed note, a minor behind included, and a fence for a retired
 block in it stops the render.
+
+Each render also writes `.governance/instructions.lock`, the provenance of what it wrote. The render adds
+the line `.governance/instructions.lock merge=ours` to your `.gitattributes` where it is missing, and sets
+`merge.ours.driver` to `true` in your git config where it holds no value, so a merge of two branches that
+each rendered keeps your branch's lock and never conflicts on it. After a merge outside the lander, render
+again: `instruction_units.py lock --check` reds a charter whose bytes differ from its lock row, and names
+the re-render as the remedy.
 
 ## Read the active set
 

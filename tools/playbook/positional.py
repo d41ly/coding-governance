@@ -516,12 +516,11 @@ def run_pin(root, memory_root, file, rev="HEAD") -> int:
     oids, refused, done = {}, [], []
 
     def read_oid(path):
-        if path not in oids:
-            p = subprocess.run(["git", "-C", str(root), "cat-file", "-t", f"{rev}:{path}"], capture_output=True, text=True,
-                               encoding="utf-8")
-            q = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet", "--short=8", f"{rev}:{path}"],
+        if path not in oids:  # one ask for the entry's type and id, so a tree answers nothing (deviation 558)
+            q = subprocess.run(["git", "-C", str(root), "ls-tree", "--full-tree", "--abbrev=8", rev, "--", path],
                                capture_output=True, text=True, encoding="utf-8")
-            oids[path] = q.stdout.strip() if p.stdout.strip() == "blob" and not q.returncode else None
+            entry = q.stdout.split("\t", 1)[0].split() if not q.returncode else []
+            oids[path] = entry[2] if len(entry) == 3 and entry[1] == "blob" else None
         return oids[path]
 
     def derive_pin(m):
@@ -587,6 +586,11 @@ positional-edited-after|1|tags: positional · unlisted · memory/builds/x/build/
 positional-renamed-after|0|positional — grandfathered: memory/builds/x/build/moved.md:1 {x}:1 (written in
 positional-uncommitted|1|positional — grandfathered: memory/builds/x/build/record.md:1 {x}:1 (written in
 positional-uncommitted|1|tags: positional · unlisted · memory/builds/x/build/record.md · {x}:3
+positional-spec-revbump|1|positional — grandfathered: memory/builds/x/spec/spec.md:1 {x}:1 (written in
+positional-spec-revbump|1|tags: positional · unlisted · memory/builds/x/spec/spec.md · {x}:3
+positional-bulk-move|1|positional — grandfathered: memory/builds/x/reviews/r1.md:9 {x}:1 (written in
+positional-bulk-move|1|positional — grandfathered: memory/builds/x/reviews/r3.md:9 {x}:1 (written in
+positional-bulk-move|1|tags: positional · unlisted · memory/builds/x/reviews/r2.md · {x}:6
 positional-producer-new|1|tags: positional · producer · {prefix}/roles/agents/gov-x.agent.md:3 · - cite it by file:line · re-point it
 positional-producer-new|1|re-pointed to a stable form: rc=0
 positional-producer-stale|0|tags: positional · producer stale · {prefix}/roles/agents/gov-x.agent.md · - cite it by file:line · no hit

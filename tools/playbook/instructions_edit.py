@@ -757,6 +757,27 @@ def arm_merge_unterminated(c):
     c.check("disjoint edits over an unterminated last entry merge clean", rc == 0
             and [u["tag"] for u in tomllib.loads(merged)["unit"]] == ["unit.one", "unit.two"], f"{rc} {said}")
     c.check("...holding both edits", edit_one in merged and edit_two in merged, merged)
+    written = (c.top / FX_MANIFEST).read_bytes()
+    c.check("...with one terminator throughout the merged bytes",
+            written.count(b"\r\n") in (0, written.count(b"\n")) and written.count(b"\r") == written.count(b"\r\n"),
+            repr(written[:200]))
+
+
+def arm_merge_crlf_mixed(c):
+    """PLAY-dOrderedCharter-55 S22: ours CRLF throughout, theirs LF, edited apart: every kept chunk is written with
+    the dominant terminator, read here as bytes, since `run_merge_pair` reads text that folds them."""
+    iu.run_git(c.top, "config", "core.autocrlf", "false")  # each side's bytes reach the driver as written
+    write_merge_driver(c)
+    one, two = derive_fx_row("unit.one"), derive_fx_row("unit.two")
+    edit_one, edit_two = derive_fx_row("unit.one", "MUST move."), derive_fx_row("unit.two", "MUST move.")
+    crlf = (edit_one + two).replace("\n", "\r\n")
+    rc, said, merged = run_merge_pair(c, "crlf", one + two, crlf, one + edit_two)
+    written = (c.top / FX_MANIFEST).read_bytes()
+    c.check("a CRLF side and an LF side, edited apart, merge clean holding both edits", rc == 0
+            and [u["tag"] for u in tomllib.loads(merged)["unit"]] == ["unit.one", "unit.two"]
+            and edit_one in merged and edit_two in merged, f"{rc} {said}")
+    c.check("...with ours' CRLF throughout the merged bytes", written.count(b"\n") == written.count(b"\r\n") > 0,
+            repr(written[:300]))
 
 
 def arm_merge_moved(c):
@@ -1053,7 +1074,8 @@ def arm_retired_rows(c):
 
 PLANTS = {"merge": arm_merge, "merge-multiline": arm_merge_multiline, "merge-same-add": arm_merge_same_add,
           "merge-policy": arm_merge_policy, "merge-parse": arm_merge_parse, "merge-cut": arm_merge_cut,
-          "merge-unterminated": arm_merge_unterminated, "merge-moved": arm_merge_moved,
+          "merge-unterminated": arm_merge_unterminated, "merge-crlf-mixed": arm_merge_crlf_mixed,
+          "merge-moved": arm_merge_moved,
           "merge-written": arm_merge_written, "root-prefix": arm_root_prefix,
           **{name: functools.partial(arm_merge_edit, name=name)
              for name in ("merge-both-edit", "merge-delete-edit", "merge-edit-delete")},

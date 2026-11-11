@@ -433,7 +433,8 @@ behind.
   carrying it at its next `update`, and runs that command itself to check its entry files.
 - **`playbook-render` joins the default selection**, because the `check-microformats` gate now grades
   the template it ships. `update` installs it as a default-gained kit, and the receipt claims it
-  from then on.
+  from then on. An existing adopter's next `update` adds the `policy` kit too, because it joined the
+  default selection and `playbook-render` requires it.
 
 ## How gov proves a step before you meet it
 

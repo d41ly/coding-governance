@@ -46,7 +46,8 @@ field; every door's refusal exits 1, writing nothing.
 ONE KIND LIST (PLAY-dOrderedCharter-42 S2): `KINDS`' keys are `tree_lib.TYPED_RECORD_KINDS`, the kinds the
 bindings reader admits and joins to their file names, and an import whose table differs from that tuple
 raises naming each kind. A kind whose fields a later unit owns holds a declared-pending entry,
-`{"pending": "<unit id>"}`. `build_records.py --fixture --plant typed-kinds` writes one record of every typed
+`{"pending": "<unit id>"}`, which `read` and `write_record` each refuse naming the unit, the second before
+any write; `--fixture --plant pending-kind` stages one in a copy of this module. `build_records.py --fixture --plant typed-kinds` writes one record of every typed
 kind into a scratch git repository, through `new <kind>` where the kind has a door and `write_record`
 otherwise, asserts `tree_lib.read_bindings` reads each `bound` and `gen_build_index.py --print-bindings`
 prints no `A` row, and asserts no door takes another door's flags: exit 0 PASS, 1 FAIL naming each failure.
@@ -109,7 +110,10 @@ if set(KINDS) != set(TYPED_RECORD_KINDS):
     raise ImportError("build_records: the kind table and tree_lib.TYPED_RECORD_KINDS differ on "
                       + ", ".join(sorted(set(KINDS) ^ set(TYPED_RECORD_KINDS))))
 DOORS = ("exception", "change", "override")  # the kinds `new <kind>` writes; every other kind is `write_record`'s alone
-PLANTS = ("typed-kinds",)
+PLANTS = ("typed-kinds", "pending-kind")
+#: PLAY-dOrderedCharter-55 S8's `pending-kind`: the exception kind's entry staged pending, in a copy of this module
+PENDING_ENTRY = ('    "exception": {\n        "required": ("Principle", "Excuses", "Reason", "Caused-by"),\n'
+                 '        "closed": (),\n    },\n', '    "exception": {"pending": "ARCH-tKinds-9"},\n')
 
 
 def derive_stem(kind):
@@ -362,6 +366,9 @@ def write_record(root, build, unit, kind, title, fields, today=None):
     `fields` as a bold-key bullet. -> its repo-relative path. A refusal is ValueError."""
     if kind not in KINDS:
         raise ValueError(f"{kind!r} is not a typed kind: " + ", ".join(KINDS))
+    if "pending" in KINDS[kind]:   # PLAY-dOrderedCharter-55 S8: refused before any write, as `read` refuses it
+        raise ValueError(f"the {kind} kind is pending on {KINDS[kind]['pending']}, which gives it fields, so no "
+                         f"record of it is written")
     if not SLUG.match(build):
         raise ValueError(f"--build {build!r} is not a build slug")
     if not re.fullmatch(ID, unit):
@@ -425,6 +432,51 @@ def run_fixture(plant):
     from tree_lib import GIT_ENV_LEAKS, read_bindings        # noqa: E402
     unit, bad, written = "ARCH-tKinds-1", [], {}
     root = pathlib.Path(tempfile.mkdtemp(prefix="br-"))
+    if plant == "pending-kind":   # PLAY-dOrderedCharter-55 S8: a copy of this module with one kind pending
+        import contextlib
+        import io
+        import types
+        try:
+            source = pathlib.Path(__file__).read_text(encoding="utf-8")
+            if source.count(PENDING_ENTRY[0]) != 1:
+                bad.append("the exception kind's entry is not where the plant stages it")
+            mod = types.ModuleType("build_records_pending")
+            mod.__file__ = __file__
+            try:
+                exec(compile(source.replace(PENDING_ENTRY[0], PENDING_ENTRY[1]), __file__, "exec"), mod.__dict__)
+                print(f"build-records: {plant} · the module imports with exception pending on ARCH-tKinds-9")
+            except ImportError as exc:
+                bad.append(f"the import refused a pending entry: {exc}")
+                mod = None
+            if mod is not None:
+                folder = root / "memory/builds/tKinds/build"
+                folder.mkdir(parents=True)
+                (root / ".memory-tree.conf").write_text("MEMORY_ROOT=memory\n", encoding="utf-8")
+                rec = folder / f"2026-01-01-build-{unit}-exception-1.md"
+                rec.write_text(f"# {unit} exception 1 — t\n\n**Serves:** exception {unit}\n", encoding="utf-8")
+                buf = io.StringIO()
+                with contextlib.redirect_stdout(buf):
+                    rc = mod.main(["read", str(rec)])
+                if rc != 2 or "pending on ARCH-tKinds-9" not in buf.getvalue():
+                    bad.append(f"read exited {rc}, not 2 naming the unit: {buf.getvalue().strip()[:200]}")
+                held = sorted(p.name for p in folder.iterdir())
+                try:
+                    mod.write_record(root, "tKinds", unit, "exception", "t", [("Caused-by", unit)])
+                    bad.append("write_record wrote a pending kind")
+                except ValueError as exc:
+                    if "pending on ARCH-tKinds-9" not in str(exc):
+                        bad.append(f"write_record refused without naming the unit: {exc}")
+                if sorted(p.name for p in folder.iterdir()) != held:
+                    bad.append("write_record wrote a file for a pending kind")
+                print(f"build-records: {plant} · read exited {rc}; write_record refused, writing nothing")
+        finally:
+            remove_tree(root)
+        for why in bad:
+            print(f"build-records: FAIL {plant} · {why}")
+        if bad:
+            return 1
+        print(f"build-records: PASS {plant} — the import, read and write_record each hold a pending kind")
+        return 0
     try:
         with set_env_aside(GIT_ENV_LEAKS):
             def run_git(*args):

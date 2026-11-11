@@ -1308,6 +1308,11 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "arm_merge_crlf_mixed",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "arm_merge_cut",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -9613,6 +9618,11 @@
       "file": "tools/playbook/memory_index.py"
     },
     {
+      "id": "derive_index_path",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "derive_index_repair",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -10011,6 +10021,11 @@
       "id": "derive_minute",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "derive_module_closure",
+      "kind": "function",
+      "file": "tools/memory-tree/import_walk.py"
     },
     {
       "id": "derive_module_export_rel",
@@ -11251,6 +11266,11 @@
       "id": "derive_wiring_bound",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "derive_worktree_key",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "derive_worktree_root",

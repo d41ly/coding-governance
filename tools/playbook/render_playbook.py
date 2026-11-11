@@ -969,13 +969,25 @@ def write_charter_lock(gov_root: Path, target: Path, charter_path: Path, units=(
     written after every write-mode render: `blob` hashes the bytes `write_region` just wrote, `renderer`
     is this kit at KIT_PLAYBOOK_RENDER_VERSION, `template` the template's path and its version marker,
     the provenance the rendered text no longer carries, and `units` each `(tag, line)` a slot expanded to.
-    `instruction_units.write_lock_row` writes it."""
+    `instruction_units.write_lock_row` writes it. Then the target merges its lock ours (PLAY-dOrderedCharter-55
+    S20): the `<lock> merge=ours` line is appended to its `.gitattributes` where no line says so, and
+    `merge.ours.driver` is set `true` where its config holds no value, a value already set left alone as
+    `check-wiring.sh`'s `check_merge_ours` leaves it; a merge outside the lander re-renders, which
+    `lock --check` names as the remedy."""
     template = resolve_template_path(gov_root, target).resolve()
     marker = TEMPLATE_MARKER_RE.search(read_input(template, 'the charter template'))
     base = target if template.is_relative_to(target) else gov_root.resolve()
-    load_units_module().write_lock_row(
+    iu = load_units_module()
+    iu.write_lock_row(
         target, Path(os.path.relpath(charter_path, target)).as_posix(), derive_renderer_label(),
         f'{template.relative_to(base).as_posix()}@v{marker.group(1)}.{marker.group(2)}' if marker else '', units)
+    attrs, line = target / '.gitattributes', f'{iu.LOCK} merge=ours'
+    held = attrs.read_text(encoding='utf-8') if attrs.is_file() else ''
+    if line not in (ln.strip() for ln in held.splitlines()):   # idempotent: a re-render appends nothing
+        with open(attrs, 'a', encoding='utf-8', newline='') as fh:
+            fh.write(('' if not held or held.endswith('\n') else '\n') + line + '\n')
+    if subprocess.run(['git', '-C', str(target), 'config', 'merge.ours.driver'], capture_output=True).returncode == 1:
+        subprocess.run(['git', '-C', str(target), 'config', 'merge.ours.driver', 'true'], capture_output=True)
 
 
 def write_empty_lists(target: Path) -> list[str]:

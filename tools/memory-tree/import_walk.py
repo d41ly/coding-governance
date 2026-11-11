@@ -15,6 +15,10 @@ imports were not read.
 
     python import_walk.py --closure <kit-prefix> <scanned file>...
 
+`derive_module_closure(path, dirs)` is one module's own closure, the tag index's extractor version
+(PLAY-dOrderedCharter-55 S15): each static import's first name `<n>` resolves to the first `<dir>/<n>.py`
+among `dirs`, as `sys.path` would, a dynamic one is skipped, and a module that does not parse raises.
+
 WHAT IT DOES NOT SEE: a module loaded by a computed name or path, and a shell invocation.
 """
 import ast
@@ -46,6 +50,25 @@ def scan_imports(path):
                     and isinstance(node.args[at].value, str):
                 rows.append((node.args[at].value, node.lineno, "dynamic"))
     return rows
+
+
+def derive_module_closure(path, dirs):
+    """-> the sorted paths of `path` and of every module its static imports reach, each walked the same
+    way: an import's first name `<n>` is the first `<dir>/<n>.py` among `dirs`, and one no dir holds, the
+    standard library's, is skipped. Raises what `scan_imports` raises on a module that does not parse."""
+    start = os.path.normpath(path)
+    seen, queue = {start}, [start]
+    for mod in queue:
+        for name, _line, kind in scan_imports(mod):
+            if kind == "dynamic":
+                continue
+            first = name.split(".")[0] + ".py"
+            hit = next((os.path.normpath(os.path.join(d, first)) for d in dirs
+                        if os.path.isfile(os.path.join(d, first))), None)
+            if hit and hit not in seen:
+                seen.add(hit)
+                queue.append(hit)
+    return sorted(seen)
 
 
 def derive_import_closure(kit, scan):

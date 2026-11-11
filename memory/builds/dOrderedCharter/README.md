@@ -102,7 +102,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 71 unit(s) · node d · opened 2026-10-21 · streams playbook
+**Build status:** CLOSED · 71 unit(s) · node d · opened 2026-10-21 · streams playbook
 ids PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12
 ids PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24
 ids PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36
@@ -184,10 +184,10 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY
 | [PLAY-dOrderedCharter-78 — the close's three parked fixes: the renderer requires the kits it reads, an adopter's tags check unarms what it does not hold, and A25r asserts its whole slice](spec/2026-11-10-spec-PLAY-dOrderedCharter-78.md) | 37 | 2 | CLOSED | rev-1 | 2026-11-11 |
 | [PLAY-dOrderedCharter-49 — the round-1 spec audit's 73 minors: criteria that can pass, rows a new leg owes, one reader per fact, and seams in build order](spec/2026-10-24-spec-PLAY-dOrderedCharter-49.md) | 39 | 2 | CLOSED | rev-9 | 2026-11-11 |
 | [PLAY-dOrderedCharter-54 — the card file's owner is live only while its transcript moves, and a dead owner's card is taken over](spec/2026-10-24-spec-PLAY-dOrderedCharter-54.md) | 40 | 2 | CLOSED | rev-3 | 2026-11-11 |
-| [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-7 | 2026-11-10 |
+| [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | CLOSED | rev-7 | 2026-11-11 |
 <!-- /gen:build-units -->
 
-Records: 614 bound to this build, across 4 record folder(s).
+Records: 620 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

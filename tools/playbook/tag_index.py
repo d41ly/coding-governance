@@ -4,8 +4,8 @@ THE GRAMMAR. A tag is `<ns>.<seg>(.<seg>)*`, each `seg` `[a-z0-9][a-z0-9-]*`, at
 `<ns>` is a word the registry, `namespaces.toml` beside this file, declares, never one typed here. A
 document section is `doc.<name>#<seg>`, its `<seg>` the `##` heading folded by `derive_heading_seg`.
 
-THE INDEX is `<git-common-dir>/gov/index.db`, one file per node that every worktree of the repository
-shares, written by the extractors alone through `build_index`, never committed: deleting it costs one
+THE INDEX is `<git-common-dir>/gov/index-s<INDEX_SCHEMA>.db`, `derive_index_path`'s, one file per node
+that every worktree of the repository shares, written by the extractors alone through `build_index`, never committed: deleting it costs one
 rebuild. Its tables, keyed by blob or by path and blob so a later build can add its own beside them:
 
   tree_path(tree, path, blob)                               the paths a built tree holds
@@ -20,7 +20,10 @@ so one blob at two paths is parsed once and named twice; every other tag is whol
 marks a blob read by one extractor at one version, written when the run yields nothing too, so a build
 runs each extractor over the blobs it has not read at its current version: a newly registered extractor
 reads old blobs. A `parsed` path row marks a (path, blob, extractor, version) quadruple named. The file is
-stamped `PRAGMA user_version = INDEX_SCHEMA`; a file of another stamp is started again from nothing.
+stamped `PRAGMA user_version = INDEX_SCHEMA`, and the schema is in its name, so two schemas never share one
+file; a file of another stamp is rebuilt in place, its tables dropped and created again inside one
+`BEGIN IMMEDIATE` transaction and the file never unlinked, so a reader holding it keeps it
+(PLAY-dOrderedCharter-55 S16).
 
 EACH VERSION'S ROWS STAND APART (PLAY-dOrderedCharter-51). Every worktree shares the file and two of them
 can carry different extractor bytes, so a build never deletes a row of another version: the rows of two
@@ -35,9 +38,11 @@ path is `doc.charter` and which are guides, so `derive_conf_key` folds both into
 the freshness digest, and into every read through the temp table `view_conf`: a conf edit, committed or
 not, is served the names its own conf gives. `blob_row` is keyed by text alone and needs no key.
 
-AN EXTRACTOR'S VERSION is derived, never typed: the first 12 hex of the SHA-256 of the bytes of the module
-file defining it. An extractor that imports a helper from another module does not see that helper's
-edits in its version: edit the extractor's own module, or `gov_tag.py --rebuild`.
+AN EXTRACTOR'S VERSION is derived, never typed: the first 12 hex of the SHA-256 over the bytes of the
+module file defining it and of every module of its import closure, in path order, the closure from
+memory-tree's `import_walk.derive_module_closure` over the module's own directory, then memory-tree's
+(PLAY-dOrderedCharter-55 S15), so a helper's edit re-runs every extractor importing it. `--gc` reads
+another worktree's modules through this worktree's memory-tree directory.
 
 AN EXTRACTOR is `<module>:<function>`, called `fn(ctx, path, None)` to ask whether it reads `path` (the
 path's name, `""` for none, or None when it does not read it) and `fn(ctx, path, text)` for the rows,
@@ -105,7 +110,7 @@ CREATE TABLE IF NOT EXISTS tree_built(tree TEXT NOT NULL, versions TEXT NOT NULL
 CREATE TABLE IF NOT EXISTS blob_parsed(blob TEXT NOT NULL, extractor TEXT NOT NULL, version TEXT NOT NULL,
                                        PRIMARY KEY(blob, extractor, version));
 """
-#: the index file's `PRAGMA user_version`; a file stamped otherwise is rebuilt from nothing
+#: the index file's `PRAGMA user_version` and the number in its name; a file stamped otherwise is rebuilt in place
 INDEX_SCHEMA = 3
 #: SQLite's busy timeout, seconds: a second writer waits this long on the first, then the verb exits 2.
 BUSY_TIMEOUT = 60
@@ -176,17 +181,24 @@ def resolve_extractor_module(mod_name, registry_dir) -> pathlib.Path:
 
 def derive_extractor_versions(namespaces, registry_dir) -> dict:
     """{'<module>:<function>': version} for every row's extractor and extract_citations, each module file
-    hashed once (PLAY-dOrderedCharter-44 S3). An unreadable module refuses, naming the row."""
+    hashed once (PLAY-dOrderedCharter-44 S3) with its import closure (PLAY-dOrderedCharter-55 S15). An
+    unreadable or unparsable module of a closure refuses, naming the row."""
+    tree_lib, _ = load_memory_tree()
+    import import_walk  # memory-tree's, on the path load_memory_tree put it on
+    mt = str(pathlib.Path(tree_lib.__file__).parent)
     by_file: dict = {}
     out = {}
     for name, ns in [(CITATIONS, "")] + [(r["extractor"], r["ns"]) for r in namespaces]:
         src = resolve_extractor_module(name.partition(":")[0], registry_dir)
         if src not in by_file:
             try:
-                by_file[src] = hashlib.sha256(src.read_bytes()).hexdigest()[:12]
-            except OSError as exc:
-                raise TagError(f"namespace '{ns}' extractor {name}: its module {src.as_posix()} is unreadable: "
-                               f"{exc.strerror or exc}") from None
+                digest = hashlib.sha256()
+                for path in import_walk.derive_module_closure(str(src), [str(src.parent), mt]):
+                    digest.update(pathlib.Path(path).read_bytes())
+                by_file[src] = digest.hexdigest()[:12]
+            except (OSError, SyntaxError, ValueError) as exc:
+                raise TagError(f"namespace '{ns}' extractor {name}: its module {src.as_posix()} or a module it "
+                               f"imports is unreadable: {getattr(exc, 'strerror', None) or exc}") from None
         out[name] = by_file[src]
     return out
 
@@ -487,21 +499,41 @@ def load_memory_tree():
     return tree_lib, id_grammar
 
 
-def load_index(root) -> sqlite3.Connection:
-    """The node's index, `<git-common-dir>/gov/index.db`, created on first use. WAL off: every worktree
-    opens the one file, and SQLite's lock serialises the writers. A file holding tables under a
-    `user_version` other than INDEX_SCHEMA is deleted and started again, one line saying so (S4)."""
-    db = common_git_dir(pathlib.Path(root)) / "gov" / "index.db"
+def derive_index_path(root) -> pathlib.Path:
+    """The node's index file, `<git-common-dir>/gov/index-s<INDEX_SCHEMA>.db`, the one spelling every code
+    reader uses: two schemas never share a file (PLAY-dOrderedCharter-55 S16)."""
+    return common_git_dir(pathlib.Path(root)) / "gov" / f"index-s{INDEX_SCHEMA}.db"
+
+
+def load_index(root, reset=False) -> sqlite3.Connection:
+    """The node's index at `derive_index_path`, created on first use. WAL off: every worktree opens the one
+    file, and SQLite's lock serialises the writers. A file holding tables under a `user_version` other than
+    INDEX_SCHEMA, or any file under `reset`, has every table dropped and created again in place inside one
+    `BEGIN IMMEDIATE` transaction, never unlinked, so a reader holding the file keeps it (S16); a stale
+    stamp prints one line saying so."""
+    db = derive_index_path(root)
     db.parent.mkdir(parents=True, exist_ok=True)
     try:
         con = sqlite3.connect(str(db), timeout=BUSY_TIMEOUT)
-        old = con.execute("PRAGMA user_version").fetchone()[0]
-        if old != INDEX_SCHEMA and con.execute("SELECT 1 FROM sqlite_master LIMIT 1").fetchone():
-            con.close()
-            db.unlink()
-            print(f"tag-index — rebuilt: schema {old} to {INDEX_SCHEMA}", file=sys.stderr)
-            con = sqlite3.connect(str(db), timeout=BUSY_TIMEOUT)
         con.execute("PRAGMA journal_mode=DELETE")
+        old = con.execute("PRAGMA user_version").fetchone()[0]
+        if (reset or old != INDEX_SCHEMA) and con.execute("SELECT 1 FROM sqlite_master LIMIT 1").fetchone():
+            con.execute("BEGIN IMMEDIATE")
+            try:
+                old = con.execute("PRAGMA user_version").fetchone()[0]  # read again under the write lock
+                if reset or old != INDEX_SCHEMA:
+                    for (name,) in con.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall():
+                        con.execute(f'DROP TABLE "{name}"')
+                    for statement in SCHEMA.split(";"):
+                        if statement.strip():
+                            con.execute(statement)
+                    con.execute(f"PRAGMA user_version = {INDEX_SCHEMA}")
+                con.commit()
+            except BaseException:
+                con.rollback()
+                raise
+            if old != INDEX_SCHEMA:
+                print(f"tag-index — rebuilt: schema {old} to {INDEX_SCHEMA}", file=sys.stderr)
         con.executescript(SCHEMA)
         con.execute(f"PRAGMA user_version = {INDEX_SCHEMA}")
     except (sqlite3.Error, OSError) as exc:
@@ -532,8 +564,16 @@ def derive_context(root, registry) -> dict:
         "versions": versions,
         "digest": derive_versions_digest(versions, key),
         "extractors": load_extractors(namespaces, pathlib.Path(registry).parent),
-        "worktree": read_git(root, "rev-parse", "--show-toplevel").strip(),
+        "worktree": derive_worktree_key(read_git(root, "rev-parse", "--show-toplevel").strip()),
     }
+
+
+def derive_worktree_key(path) -> str:
+    """A worktree's key in `dirty_path`: its top-level path with the slashes forward and a drive letter
+    lower-cased, so the spelling `--show-toplevel` prints and the one `git worktree list` prints compare
+    equal (PLAY-dOrderedCharter-55 S21)."""
+    key = str(path).replace("\\", "/")
+    return key[0].lower() + key[1:] if key[1:2] == ":" else key
 
 
 def _write_parsed(con, ctx, blobs: dict, read_text, stats) -> None:
@@ -633,12 +673,12 @@ def build_index(root, tree, ctx, con, stats) -> None:
 
 
 def read_worktree_trees(root) -> tuple[set, set]:
-    """(the tree each worktree's HEAD names, the worktrees' top-level paths)."""
+    """(the tree each worktree's HEAD names, the worktrees' top-level paths, each `derive_worktree_key`'s)."""
     trees, tops = set(), set()
     for block in read_git(root, "worktree", "list", "--porcelain").split("\n\n"):
         fields = dict(ln.split(" ", 1) for ln in block.splitlines() if " " in ln)
         if "worktree" in fields:
-            tops.add(fields["worktree"])
+            tops.add(derive_worktree_key(fields["worktree"]))
         if fields.get("HEAD"):
             try:
                 trees.add(read_git(root, "rev-parse", fields["HEAD"] + "^{tree}").strip())

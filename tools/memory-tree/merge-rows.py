@@ -1294,7 +1294,9 @@ def resolve_table(base: str | None, ours: str | None, theirs: str | None) -> tup
 def resolve_tables(o_lines, a_lines, b_lines) -> list[str]:
     """The manifests' merge: ours' surviving entries in ours' order, then theirs' entries whose result is `theirs` and
     that ours does not hold, in theirs'; a `deleted` result is emitted nowhere. Returned only once the
-    written text parses, holds the merged keys each once, and holds each chunk byte for byte as one side wrote it."""
+    written text parses, holds the merged keys each once, and holds each chunk byte for byte as one side wrote it,
+    modulo the terminator: every kept chunk is written with its terminators folded to the file's dominant one,
+    so a CRLF side and an LF side merge to one terminator throughout (PLAY-dOrderedCharter-55 S22)."""
     (o_pre, O), (a_pre, A), (b_pre, B) = read_tables(o_lines), read_tables(a_lines), read_tables(b_lines)
     preamble, clash = resolve_table(o_pre, a_pre, b_pre)
     conflicts, kept = ["the preamble"] * clash, {}
@@ -1307,13 +1309,18 @@ def resolve_tables(o_lines, a_lines, b_lines) -> list[str]:
     if conflicts:
         raise TableConflict(", ".join(conflicts))
     term = _dominant(a_lines, b_lines, o_lines)
-    parts = [preamble or "", *kept.values()]
-    merged = _lines("".join(p if not p or p.endswith(("\n", "\r")) else p + term for p in parts))
+
+    def derive_terminated(t):
+        # PLAY-dOrderedCharter-70 S6: a side's unterminated last chunk is written terminated; PLAY-dOrderedCharter-55
+        # S22: each of its terminators folded to `term`, so the written file holds one terminator throughout
+        if not t:
+            return t
+        body = t.replace("\r\n", "\n").replace("\r", "\n")
+        return (body if body.endswith("\n") else body + "\n").replace("\n", term)
+    merged = _lines("".join(derive_terminated(p) for p in [preamble or "", *kept.values()]))
     written = read_tables(merged)[1]    # text that does not parse, or a key twice, raises here
     if list(written) != list(kept):
         raise RowLoss(f"the written tables {list(written)} are not the merged {list(kept)}")
-    def derive_terminated(t):  # PLAY-dOrderedCharter-70 S6: a side's unterminated last chunk is written terminated
-        return t if t is None or t.endswith(("\n", "\r")) else t + term
     for entry, text in written.items():
         if text not in (derive_terminated(O.get(entry)), derive_terminated(A.get(entry)), derive_terminated(B.get(entry))):
             raise StructureDrift(f"the written chunk of {entry} is byte-identical to no side's")
