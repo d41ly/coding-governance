@@ -104,21 +104,15 @@ INSTALL_ANSWERS = {"memory_root": "memory", "playbook_path": "docs/PARALLEL.md",
 
 
 def derive_bullet_placeholders() -> set[str]:
-    """PLAY-dOrderedCharter-81 S2. The lowercased keys whose token is a whole line inside a one-line
-    region of gov's charter template: the render grades that line as a `- ` bullet, so its stub must
-    be one. Read from the template, so the stub follows wherever the charter moves a placeholder.
-    Markers, token pattern and template name are the renderer's own, found as a sibling kit."""
+    """PLAY-dOrderedCharter-81 S2, PLAY-dOrderedCharter-82 S2. The lowercased keys whose token is a
+    whole line inside a one-line region of gov's charter template, as the renderer's `--bullet-keys`
+    prints them. A child process, so no import edge joins the renderer's closure to this one."""
     kd = govkit.resolve_kit_dir("playbook", "render_playbook.py", HERE)
-    sys.path.insert(0, str(kd))
-    import render_playbook as rp
-    inside, keys = False, set()
-    for line in (ROOT / rp.TEMPLATE_NAME).read_text(encoding="utf-8").split(NL):
-        bare = line.strip()
-        if bare in (rp.ONE_LINE_OPEN, rp.ONE_LINE_CLOSE):
-            inside = bare == rp.ONE_LINE_OPEN
-        elif inside and (m := rp.PLACEHOLDER_RE.fullmatch(bare)):
-            keys.add(m.group(1).lower())
-    return keys
+    p = subprocess.run([sys.executable, str(kd / "render_playbook.py"), "--bullet-keys"], capture_output=True,
+                       text=True, encoding="utf-8", stdin=subprocess.DEVNULL)
+    if p.returncode:
+        raise RuntimeError(f"render_playbook.py --bullet-keys exited {p.returncode}: {p.stderr.strip()}")
+    return set(p.stdout.split())
 
 
 def render_deploy_tail(kits, fixed: dict) -> str:

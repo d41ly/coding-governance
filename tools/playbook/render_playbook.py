@@ -1079,6 +1079,20 @@ def resolve_template_path(gov_root: Path, target: Path) -> Path:
     return hit
 
 
+def derive_bullet_keys(template: Path) -> list[str]:
+    """PLAY-dOrderedCharter-82 S1. The sorted lowercased keys whose token is a whole line inside a
+    one-line region of `template`: the render grades that line as a `- ` bullet, so an answer that
+    fills it must be one."""
+    inside, keys = False, set()
+    for line in template.read_text(encoding='utf-8').splitlines():
+        bare = line.strip()
+        if bare in (ONE_LINE_OPEN, ONE_LINE_CLOSE):
+            inside = bare == ONE_LINE_OPEN
+        elif inside and (m := PLACEHOLDER_RE.fullmatch(bare)):
+            keys.add(m.group(1).lower())
+    return sorted(keys)
+
+
 def load_declarations(desc_path: Path, reg_path: Path) -> tuple[dict, list[dict], set[str], list]:
     """The descriptor, its blocks, the registry's entry ids and its raw `[[retired]]` table, which
     `read_kits` reads a retired id in `kits` through (PLAY-dOrderedCharter-31 S10)."""
@@ -3732,6 +3746,8 @@ def main(argv: list[str]) -> int:
     ap.add_argument('--overlay-from', type=Path)
     # PLAY-dOrderedCharter-37: the reference pages of the repository this engine sits in; no --target.
     ap.add_argument('--reference', action='store_true')
+    # PLAY-dOrderedCharter-82 S1: the acceptance matrix asks, in a child process, which keys take a bullet stub.
+    ap.add_argument('--bullet-keys', action='store_true')
     a = ap.parse_args(argv)
     if a.scope and not a.check_render:
         ap.error('--scope names what --check-render compares')
@@ -3741,6 +3757,15 @@ def main(argv: list[str]) -> int:
 
     if a.selftest:
         return run_selftest()
+    if a.bullet_keys:
+        root = Path(__file__).resolve().parent.parent.parent
+        try:
+            keys = derive_bullet_keys(resolve_template_path(root, root))
+        except (Refusal, ValueError) as e:   # ValueError: the units module's LevelError
+            print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
+            return 1
+        print(chr(10).join(keys))
+        return 0
     if a.reference:
         if a.target or a.render_scope or a.check_render:
             ap.error('--reference renders the repository this engine sits in and takes only --check')
