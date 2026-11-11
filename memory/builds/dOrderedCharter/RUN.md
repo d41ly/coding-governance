@@ -565,3 +565,5 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-11T17:15:57Z brief · item PLAY-dOrderedCharter-81 · reason 97727a2dc1e0 memory/builds/dOrderedCharter/prompts/2026-11-11-prompt-PLAY-dOrderedCharter-81-build-brief.md
 
 2026-11-11T17:28:54Z dispatch · item c90be53d PLAY-dOrderedCharter-81 · reason tools/check-microformats.test.sh tools/govkit/matrix.py memory/builds/dOrderedCharter/spec/2026-11-11-spec-PLAY-dOrderedCharter-81.md memory/builds/dOrderedCharter/build/2026-11-11-build-PLAY-dOrderedCharter-81-ledger.md memory/builds/dOrderedCharter/build/2026-11-11-build-PLAY-dOrderedCharter-81-deviation-811.md memory/builds/dOrderedCharter/README.md memory/LIVE.md memory/backlog/PLAY.md memory/map/generated memory/map/baseline.toml memory/map/features/govkit.md memory/project/positional-refs.txt memory/project/unpinned-facts.txt memory/project/unarmed-branches.txt memory/project/spawn-idiom-sites.txt memory/project/temp-name-sites.txt memory/project/encoding-posture-sites.txt
+
+2026-11-11T18:27:26Z rescope · item add PLAY-dOrderedCharter-82 · reason the third close bar's python-reads guard red that unit 81's matrix change left, by its narrowest fix
