@@ -144,20 +144,24 @@ arm "an opener that is not a whole line is cannot-run" cannot \
 # PLAY-dOrderedCharter-80 S4: with NO argument a copy of the gate reads the template beside the
 # playbook-render kit's engine, found by its anchor `render_playbook.py`, over a fence-less template at
 # the repository root; once the kit's template is gone it reads the root one and cannot run. Red before
-# S4, when the gate's no-argument subject was the root template alone.
+# S4, when the gate's no-argument subject was the root template alone. The layout is a foreign prefix
+# with the kit's home in a variable, so no kit path is spelled (PLAY-dOrderedCharter-81 S1).
 KW="$TMP/kit-subject"
-mkdir -p "$KW/tools/playbook"
+KR=vendor/gov    # a foreign prefix: the resolver probes beside the gate, wherever it is installed
+KH=playbook      # the home the gate's resolver names, held once so no kit path is spelled
+KP="$KW/$KR"
+mkdir -p "$KP/$KH"
 git -C "$KW" init -q 2>/dev/null
-cp "$GATE" "$KW/tools/check-microformats.sh"
-: > "$KW/tools/playbook/render_playbook.py"
-fixture "$KW/tools/playbook"
-mv "$KW/tools/playbook/charter.md" "$KW/tools/playbook/coding-governance-agents.template.md"
+cp "$GATE" "$KP/${GATE##*/}"
+: > "$KP/$KH/render_playbook.py"
+fixture "$KP/$KH"
+mv "$KP/$KH/charter.md" "$KP/$KH/coding-governance-agents.template.md"
 printf 'A root template with no fence.\n' > "$KW/coding-governance-agents.template.md"
-out=$(cd "$KW" && bash tools/check-microformats.sh 2>&1); rc=$?
+out=$(cd "$KW" && bash "$KR/${GATE##*/}" 2>&1); rc=$?
 label="no argument reads the template beside the playbook-render kit's engine"
 [ "$rc" -eq 0 ] && say_ok "$label" || say_fail "$label" "expected 0, got $rc: $out"
-rm -f "$KW/tools/playbook/coding-governance-agents.template.md"
-out=$(cd "$KW" && bash tools/check-microformats.sh 2>&1); rc=$?
+rm -f "$KP/$KH/coding-governance-agents.template.md"
+out=$(cd "$KW" && bash "$KR/${GATE##*/}" 2>&1); rc=$?
 label="no argument and no kit template reads the root template"
 case "$rc:$out" in
   2:*"not delimited by exactly one fence pair"*) say_ok "$label" ;;

@@ -8903,6 +8903,11 @@
       "file": "tools/playbook/gov_tag.py"
     },
     {
+      "id": "derive_bullet_placeholders",
+      "kind": "function",
+      "file": "tools/govkit/matrix.py"
+    },
+    {
       "id": "derive_byte_cut",
       "kind": "function",
       "file": "tools/playbook/memory_index.py"

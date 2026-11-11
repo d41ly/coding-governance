@@ -103,6 +103,24 @@ INSTALL_ANSWERS = {"memory_root": "memory", "playbook_path": "docs/PARALLEL.md",
                    "manifest_path": "docs/SESSION-KICKOFF.md", "user_skills": "~/.claude/skills"}
 
 
+def derive_bullet_placeholders() -> set[str]:
+    """PLAY-dOrderedCharter-81 S2. The lowercased keys whose token is a whole line inside a one-line
+    region of gov's charter template: the render grades that line as a `- ` bullet, so its stub must
+    be one. Read from the template, so the stub follows wherever the charter moves a placeholder.
+    Markers, token pattern and template name are the renderer's own, found as a sibling kit."""
+    kd = govkit.resolve_kit_dir("playbook", "render_playbook.py", HERE)
+    sys.path.insert(0, str(kd))
+    import render_playbook as rp
+    inside, keys = False, set()
+    for line in (ROOT / rp.TEMPLATE_NAME).read_text(encoding="utf-8").split(NL):
+        bare = line.strip()
+        if bare in (rp.ONE_LINE_OPEN, rp.ONE_LINE_CLOSE):
+            inside = bare == rp.ONE_LINE_OPEN
+        elif inside and (m := rp.PLACEHOLDER_RE.fullmatch(bare)):
+            keys.add(m.group(1).lower())
+    return keys
+
+
 def render_deploy_tail(kits, fixed: dict) -> str:
     """A scratch deploy file's tail: the `kits` line, the `[answers]` header and one stub per
     placeholder the playbook entry declares, with `fixed` over the stubs. PLAY-dOrderedCharter-80 S7.
@@ -110,11 +128,12 @@ def render_deploy_tail(kits, fixed: dict) -> str:
     The answers are DERIVED from the descriptor's own placeholder rows, never listed. Every key gets
     a stub, whatever its class: for a `derived` row the probe still wins when it can see, and the stub
     is only the override the engine already honours when it cannot. A hand list here would go stale
-    the first time the charter grew a placeholder. A placeholder whose declared default is a `- `
-    bullet fills a one-line region the render grades (aDistilledCharter), so its stub takes the
-    default's shape."""
+    the first time the charter grew a placeholder. A placeholder whose token is a whole line inside a
+    one-line region the render grades (aDistilledCharter) takes a `- ` bullet stub: the template,
+    not the row's default, decides the bullet shape."""
     pdesc = govkit.load_toml(ROOT / PFX / KIT_NAMES["govkit"] / "entries" / "playbook.kit.toml")
-    ans = {r["key"].lower(): ("- stated" if str(r.get("default", "")).startswith("- ") else "stated")
+    bullets = derive_bullet_placeholders()
+    ans = {r["key"].lower(): ("- stated" if r["key"].lower() in bullets else "stated")
            for r in pdesc.get("placeholder", [])}
     ans.update(fixed)
     return ("kits = [" + ", ".join('"%s"' % k for k in kits) + "]" + NL + "[answers]" + NL
