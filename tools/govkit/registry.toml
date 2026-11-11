@@ -42,6 +42,8 @@ default = [
   "playbook-render",
   "kickoff-manifest",
   "memory-tree",
+  # PLAY-dOrderedCharter-78 S1: `playbook-render` requires the policy kit, so the default carries it.
+  "policy",
   "codebase-map",
   "memory-recall",
   "run-gates",

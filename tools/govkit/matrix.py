@@ -67,6 +67,10 @@ FAILURES: list[str] = []
 #: rather than against a kit's own fixtures, which is where a gov-only default strands an adopter.
 #: Widening this to the whole registry is a matter of supplying each entry's answers; every other
 #: entry's legs stay unexecuted here and that is a known ceiling, not an assertion about them.
+#: The install itself is this list's REQUIREMENT CLOSURE, derived from the descriptors' `requires`
+#: (PLAY-dOrderedCharter-78 S2): the kits it adds, the renderer's memory-tree and policy, ride along
+#: with their legs unexecuted, by the same ceiling, and the leg loop and SCRATCH_EXPECT stay over
+#: this list alone.
 # ponytail: four entries, not the registry — widen when another entry's leg reads a deployed path.
 SCRATCH_KITS = ["playbook", "playbook-render", "check-microformats", "check-line-length"]
 
@@ -821,27 +825,33 @@ def main() -> int:
                                   else "stated")
                for r in pdesc.get("placeholder", [])}
         ans["playbook_path"] = "docs/PARALLEL.md"
+        # The install is SCRATCH_KITS widened to its requirement closure, through apply's own predicate,
+        # so a requirement a descriptor gains moves this install with it rather than a typed list.
+        rep = govkit.Report()
+        descs = govkit.read_descriptors(ROOT, govkit.load_toml(
+            ROOT / PFX / KIT_NAMES["govkit"] / "registry.toml"), rep)
+        install = list(SCRATCH_KITS)
+        while gap := govkit.derive_unsatisfied_requires(install, descs, None):
+            install += sorted({dep for _eid, dep in gap})
         (g / ".governance").mkdir(exist_ok=True)
         (g / ".governance" / "deploy.toml").write_text(
             'gov_source = "."' + NL + f'prefix = "{PFX[:-1]}"' + NL + "drop_blocks = []" + NL
-            + "kits = [" + ", ".join('"%s"' % k for k in SCRATCH_KITS) + "]" + NL
+            + "kits = [" + ", ".join('"%s"' % k for k in install) + "]" + NL
             + "[answers]" + NL
             + NL.join('%s = "%s"' % (k, v) for k, v in sorted(ans.items())) + NL,
             encoding="utf-8", newline=NL)
         git(g, "add", "-A"); git(g, "commit", "-qm", "governance")
 
-        p = run("apply", "--target", str(g), "--kits", ",".join(SCRATCH_KITS))
-        check("scratch install: the charter template lands at the operator's chosen path",
-              (g / "docs" / "PARALLEL.md").is_file(), p.stdout + p.stderr)
+        p = run("apply", "--target", str(g), "--kits", ",".join(install))
+        # Beside the engine since PLAY-dOrderedCharter-31 retired the seeded copy at `playbook_path`.
+        check("scratch install: the charter template lands beside the renderer's engine",
+              (g / PFX / "playbook" / "coding-governance-agents.template.md").is_file(), p.stdout + p.stderr)
         check("scratch install: apply RENDERS the region into the target's own charter",
               (g / "AGENTS.md").is_file()
               and "<!-- gov:playbook -->" in (g / "AGENTS.md").read_text(encoding="utf-8"),
               p.stdout + p.stderr)
 
         deploy = govkit.load_toml(g / ".governance" / "deploy.toml")
-        rep = govkit.Report()
-        descs = govkit.read_descriptors(ROOT, govkit.load_toml(
-            ROOT / PFX / KIT_NAMES["govkit"] / "registry.toml"), rep)
         legs: list[tuple[str, list[str]]] = []
         for eid in SCRATCH_KITS:
             d, _dp = descs[eid]

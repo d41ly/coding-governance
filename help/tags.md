@@ -82,10 +82,17 @@ tag-shaped word that is not a citation, quote it another way, with doubled backt
   `reader` or `practice` member no unit selects, once some unit's `scope` names a tag of its namespace.
   Until then the namespace prints `selects · unarmed`. A describing namespace's unused members are
   listed, never red.
-- **purpose** — a namespace row whose `owner` names no build of the chain registry, or whose
-  `purpose-source` a member lacks; a chain registry row naming no build of the design view, a design
-  build with no row, and a row with no `purpose` for a build v2's `[chain]` did not name at the
-  baseline. See "Where a purpose is read" below.
+- **purpose** — a namespace row whose `purpose-source` a member lacks; a chain registry row naming no
+  build of the design view, a design build with no row, and a row with no `purpose` for a build v2's
+  `[chain]` did not name at the baseline. A row whose `owner` the chain registry does not hold is
+  printed `tags: purpose · owner '<owner>' · unarmed: no build of <chain registry>, <n> namespace row(s)
+  not graded for it` and is never red; at a repository that installed the kit, which holds no chain
+  registry of its own, that is every owner. See "Where a purpose is read" below.
+- **positional** — a positional reference the list `memory/project/positional-refs.txt` does not
+  hold, or a row the tree no longer cites; an absent list is red. Where the list's folder,
+  `<MEMORY_ROOT>/project/`, is absent too, as at a repository with no memory tree adopted, the arm
+  prints `tags: positional · unarmed: <MEMORY_ROOT>/project is absent, so no memory tree is adopted
+  here` and is never red.
 - **unclosed fence** — a Markdown file that opens a code fence and never closes it, printed as
   `<path>:<line> · unclosed fence ·` at the line the fence opens. Every line after it is inside the
   fence, so a citation there goes unread; close the fence. Under `memory/builds/` the file is a frozen
@@ -108,7 +115,8 @@ Markdown not read, and prints `tags: unarmed <ns> (<n> not graded)` for each emp
 
 Every row of `tools/playbook/namespaces.toml` carries two fields the `purpose` arm grades:
 
-- **`owner`** — the chain build that owns the namespace, a `slug` of `memory/project/chain.toml`.
+- **`owner`** — the chain build that owns the namespace, a `slug` of `memory/project/chain.toml`. An
+  owner the registry does not hold is printed `unarmed`, never red.
 - **`purpose-source`** — where the namespace's members say what they are for, in one of three forms:
 
 | Form | Example | What is graded |
@@ -197,7 +205,9 @@ word is counted `unarmed`.
 members. Two are registered: `family-id`, the `PLAY-dOrderedCharter-24` ids, owner dOrderedCharter,
 resolved against the ids a spec defines; and `clause-id`, the `cl-dTrueNorth-0001` clause ids, owner
 dTrueNorth, resolved against the design view. `python tools/playbook/gov_tag.py check` prints each
-class with its owner and its member count.
+class with its owner and its member count. A class whose owner the chain registry does not hold prints
+`tags: native · <class> (owner <owner>) · unarmed: no build of the chain registry` and runs no
+resolver, the same way the `purpose` arm prints such an owner unarmed, so its members are not counted.
 
 **Pinned forms.** A pin is written `@` and eight hex digits. A pinned tag (`kit.y@1a2b3c4d`) is
 legal only on `amends` and `supersedes`, and resolves when some committed revision of the tag's unit

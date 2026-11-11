@@ -254,7 +254,9 @@ fi
 # is never served another version's rows of a tree already built. The rows after them are
 # PLAY-dOrderedCharter-22's `purpose` arm: the namespace rows' `owner` and `purpose-source`, and the chain
 # registry joined to the fixture design's view; `pending-source` and `new-no-purpose` print their second
-# half's exit on a `rc=` line. Then PLAY-dOrderedCharter-69's `git-env`: the `two-versions` and the edge
+# half's exit on a `rc=` line. An owner the chain registry lacks prints unarmed and is never red, and a
+# native class of such an owner too, beside a held owner's class that still reds (PLAY-dOrderedCharter-78).
+# Then PLAY-dOrderedCharter-69's `git-env`: the `two-versions` and the edge
 # grammar's `resolve-tag` fixtures, run as children under an exported `GIT_DIR`, touch only their scratch. The
 # last six rows are PLAY-dOrderedCharter-70's: a TOML row placed on its own `tag =` line, a staged rename
 # serving the new name alone, and a charter moved by a committed and by an uncommitted conf edit.
@@ -330,7 +332,9 @@ two-versions|0|--gc left 0 rows of its version; the live dump unchanged
 served-across|0|served 0 rows of one's version, and one serves 1
 none $_tk|0|tags: purpose · no chain to read
 no-owner $_tk|2|namespace row 1 lacks owner
-ghost-owner $_tk|1|namespace 'doc' · owner 'dGhost' names no build of memory/project/chain.toml
+ghost-owner $_tk|0|tags: purpose · owner 'dGhost' · unarmed|names no build of
+foreign-native $_tk|0|family-id (owner dGhost) · unarmed|resolves nothing
+held-native $_tk|1|family-id (owner fixture) · resolves nothing
 no-purpose-source $_tk|2|namespace row 1 lacks purpose-source
 bad-purpose-source $_tk|1|namespace 'doc' · purpose-source 'AGENTS.md#practices' reads a field in a .md file
 member-no-field $_tk|1|namespace 'doc' · member doc.beta (memory/guides/BETA.md) lacks h1

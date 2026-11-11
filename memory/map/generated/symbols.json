@@ -30078,6 +30078,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_record_duration_derived_mark",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "test_record_kind_sweep",
       "kind": "function",
       "file": "tools/runlog/selftest.py"

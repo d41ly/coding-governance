@@ -227,7 +227,9 @@ RECORD_SCHEMA = {
                 ("window", ("{utc} to {utc}",)),
                 ("window opened by", ("{opened-by}",)),
                 ("window closed by", ("{closed-by}",)),
-                ("duration", ("{duration}",)),
+                # PLAY-dOrderedCharter-78 S8: the render writes the first, its DERIVED mark pinning the
+                # count for the pinned-facts check; the bare second keeps every landed record clean.
+                ("duration", ("{duration} · DERIVED from the window", "{duration}")),
                 ("own commits", ("{int}",)),
                 ("last own commit", ("{sha}",)),
                 ("merged", ("{yes-no}",)),
@@ -538,7 +540,8 @@ def derive_int_slots(schema) -> dict:
     fact that gains or loses a count slot moves this map rather than stranding a figure beside it.
 
     The FIRST template alone: a fact's alternative carries no value slot at all (the commitment's
-    `none`), so a count can only ever be filled from the first.
+    `none`) or the first's own slots (the duration's bare form), so a count can only ever be filled
+    from the first.
     """
     out = {}
     for section, spec in schema["sections"].items():
@@ -641,7 +644,8 @@ def scan_time_slots(schema) -> dict:
     class, read off the schema's own facts and tables.
 
     Three key shapes, one per place a class is declared: `(section, label, nth)` for the nth time
-    placeholder of a fact's FIRST template, since a fact's alternative carries no value slot at all;
+    placeholder of a fact's FIRST template, since a fact's alternative carries no value slot at all, or
+    the first's own (the duration's bare form);
     `(section, table, row kind, column header)` where a table classes its columns per row kind; and
     `(section, table, column header)` for any other table. The three are distinguishable, and
     `check_time_sources` prints one as its parts joined by `/`.

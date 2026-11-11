@@ -15,7 +15,10 @@ version_from = { file = "render_playbook.py", pattern = "^KIT_PLAYBOOK_RENDER_VE
 # and `needed_answers()` quantifies over every selected descriptor either way. So a target taking the
 # renderer without that entry would have an engine and no declarations to read. The template it renders
 # travels with this kit, by the rule below the descriptor's (PLAY-dOrderedCharter-34 S5).
-requires = ["playbook"]
+# `memory-tree` and `policy` are read by the engine's own composition (PLAY-dOrderedCharter-78 S1):
+# `instruction_units.py#load_memory_tree_path` dies with no memory-tree kit holding `design_lib.py`,
+# and `overlay.py#read_excluded_tags` refuses the composition with no policy kit found.
+requires = ["playbook", "memory-tree", "policy"]
 
 # PLAY-dOrderedCharter-10 S6: the tag check's one edge to a non-core kit, the lexicon, is a declared slot.
 optional = [

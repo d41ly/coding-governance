@@ -98,10 +98,13 @@ placeholder from the target's own `deploy.toml` and drops the conditional blocks
 kit for. Run it rather than copying by hand.
 
 ```bash
-python <gov>/<prefix>/govkit/govkit.py intake --target <project> --kits playbook,playbook-render,check-microformats,…
+python <gov>/<prefix>/govkit/govkit.py intake --target <project> --kits playbook,playbook-render,memory-tree,policy,check-microformats,…
 bash  <gov>/<prefix>/playbook/adopt-playbook.sh --target <project>
 bash  <gov>/<prefix>/playbook/adopt-playbook.sh --target <project> --check   # wire as a gate leg
 ```
+
+`playbook-render` requires `memory-tree` and `policy`, since its render reads both, so `govkit`
+refuses a selection that names the renderer without them.
 
 **Commit `.governance/instructions.lock` with the charter** — the render writes its provenance there,
 never into the charter: the lock's charter row carries the template's `vN.N` in `template`, and the
@@ -763,11 +766,12 @@ CLI runs by path and reads the repository it is pointed at.
 ## 3i — Adopt the policy kit (with the review harness)
 
 One file per repository, `.governance/policy.toml`, holds the policy values its gates and hooks
-read, each checked against the kit's catalogue. The kit is not in the default selection. The
-`review-harness` kit requires it, and `govkit` refuses a selection that names a kit without what it
-requires, naming the missing id.
+read, each checked against the kit's catalogue. The kit is in the default selection because the
+`playbook-render` kit requires it, as the `review-harness` kit does, and `govkit` refuses a selection
+that names a kit without what it requires, naming the missing id.
 
-1. Add `policy` to `kits` in `.governance/deploy.toml`, with `memory-tree`, which it requires.
+1. A selection other than the default adds `policy` to `kits` in `.governance/deploy.toml`, with
+   `memory-tree`, which it requires.
 2. **What the install renders.** The kit's adopter, `bash <prefix>/policy/adopt-policy.sh
    --scaffold`, runs at install and at every update unless `GOVKIT_RERENDER=0` declines it. It
    writes the starter policy file only where none exists, and says `kept` otherwise: the file is

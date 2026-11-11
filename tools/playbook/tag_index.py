@@ -1119,7 +1119,7 @@ CHAIN_REGISTRY = "project/chain.toml"
 
 def read_chain_registry(path) -> list[dict]:
     """The chain registry's `[[build]]` rows (PLAY-dOrderedCharter-22 S3); a missing file holds no row,
-    so every namespace `owner` reds against it. A row with no `slug`, or a slug twice, is a TagError."""
+    so every namespace `owner` is unarmed against it (PLAY-dOrderedCharter-78 S3). A row with no `slug`, or a slug twice, is a TagError."""
     path = pathlib.Path(path)
     try:
         rows = tomllib.loads(path.read_text(encoding="utf-8")).get("build") or []
@@ -1165,7 +1165,7 @@ def read_py_assigns(text) -> set:
     return {t.id for t in targets if isinstance(t, ast.Name)}
 
 
-def check_namespace_purpose(con, ctx, chain_rows, chain_rel) -> tuple[list, dict]:
+def check_namespace_purpose(con, ctx, chain_rows) -> tuple[list, dict]:
     """S1 and S2 of PLAY-dOrderedCharter-22: every row's `owner` is a build of the chain registry, and its
     `purpose-source` grades its members, the `#`-free defining rows its own extractor serves for it. A
     source is `<path>` (tracked, printed path-only), `<path>#<field>` (each member at a `.toml` path
@@ -1173,8 +1173,10 @@ def check_namespace_purpose(con, ctx, chain_rows, chain_rel) -> tuple[list, dict
     member's own file carries it: its TOML row's key, or `h1`, a Markdown file's first `# ` line outside a
     fence). A `{prefix}/` in the source resolves first against the registry's tool root, the parent of
     its directory (PLAY-dOrderedCharter-72 S7). A source not in the view, a path not served or a
-    `#<field>` with no member, is `pending`: printed as spelled and never graded.
-    -> (reds, {"graded": {ns: members}, "path_only": [ns], "pending": [(ns, source)]})."""
+    `#<field>` with no member, is `pending`: printed as spelled and never graded. An `owner` the registry
+    does not hold is `unarmed`, never red, its row's source graded as before (PLAY-dOrderedCharter-78 S3).
+    -> (reds, {"graded": {ns: members}, "path_only": [ns], "pending": [(ns, source)],
+    "unarmed": {owner: [ns]}})."""
     slugs = {r["slug"] for r in chain_rows}
     served = {p for (p,) in con.execute("SELECT path FROM view_path")}
     defined = read_rows(con, DEFINE_KINDS)
@@ -1190,13 +1192,13 @@ def check_namespace_purpose(con, ctx, chain_rows, chain_rel) -> tuple[list, dict
         return texts[path]
 
     reds: list = []
-    state: dict = {"graded": {}, "path_only": [], "pending": []}
+    state: dict = {"graded": {}, "path_only": [], "pending": [], "unarmed": {}}
     troot = pathlib.PurePosixPath(ctx["kit"]).parent.as_posix()  # PLAY-dOrderedCharter-72 S7: the registry's tool root
     for row in ctx["namespaces"]:
         ns, src = row["ns"], row["purpose-source"]
         at = f"tags: {ctx['registry']} · purpose · namespace '{ns}'"
         if row["owner"] not in slugs:
-            reds.append(f"{at} · owner '{row['owner']}' names no build of {chain_rel}")
+            state["unarmed"].setdefault(row["owner"], []).append(ns)
         members = [(t, p) for t, p, _n, _k, _b, ex in defined
                    if ex == row["extractor"] and "#" not in t and t.split(".")[0] == ns]
         path, hashed, field = resolve_prefix_token(src, troot).partition("#")

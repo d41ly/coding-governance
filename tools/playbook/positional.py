@@ -406,6 +406,9 @@ def check_positional(root, kit_rel, mode, memory_root) -> tuple[list, list, dict
     rel = derive_list_path("", memory_root).as_posix()
     rows = read_list(derive_list_path(root, memory_root))
     if rows is None:
+        folder = pathlib.PurePosixPath(rel).parent.as_posix()
+        if not derive_list_path(root, memory_root).parent.is_dir():  # PLAY-dOrderedCharter-78 S5: no memory tree
+            return [], [f"{say}unarmed: {folder} is absent, so no memory tree is adopted here"], {"absent": True}
         return [f"{say}the list {rel} is absent, so no positional population is read"], [], {"absent": True}
     listed = set(rows)
     tree = read_file_line_rows(root, memory_root) | read_section_rows(root)
@@ -588,6 +591,8 @@ positional-producer-new|1|tags: positional · producer · {prefix}/roles/agents/
 positional-producer-new|1|re-pointed to a stable form: rc=0
 positional-producer-stale|0|tags: positional · producer stale · {prefix}/roles/agents/gov-x.agent.md · - cite it by file:line · no hit
 positional-producer-stale|0|kept: rc=0; a second seed: rc=1; the kept line re-pointed: rc=1
+positional-no-tree|0|tags: positional · unarmed: memory/project is absent
+positional-absent|1|tags: positional · the list memory/project/positional-refs.txt is absent
 """
 
 

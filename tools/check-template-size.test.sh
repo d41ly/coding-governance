@@ -240,7 +240,7 @@ build_cap_repo 40960
 expect_out "A25 a charter cap of 40960 under warn refuses naming CODEX_MAX" \
   "the rendered charter's cap is not held inside the smallest harness's limit, CODEX_MAX" 1 run_cap_gate
 expect_out "A25r ...and its refusal carries check 8 branch 1's remedy sentence whole" \
-  "Lower the cap to CODEX_MAX or under; a harness reading less than the charter drops its tail." 1 run_cap_gate
+  "). Lower the cap to CODEX_MAX or under; a harness reading less than the charter drops its tail." 1 run_cap_gate
 build_cap_repo 20480
 expect_out "A25b a charter cap of 20480 passes, the charter measured within it" "/ 20480 bytes" 0 run_cap_gate
 

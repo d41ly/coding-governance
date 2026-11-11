@@ -655,9 +655,11 @@ def run_check(root, base) -> int:
     return 1 if reds else 0
 
 
-def check_native_classes(root, ns_path) -> tuple[list, list]:
+def check_native_classes(root, ns_path, slugs) -> tuple[list, list]:
     """The native classes for `gov_tag.py check`'s summary: `(reds, lines)`, one line per class naming its
-    owner and its population; a class that resolves nothing is red, one not armed here says so."""
+    owner and its population; a class that resolves nothing is red, one not armed here says so. A class
+    whose owner is none of the chain registry's `slugs` prints unarmed and runs no resolver
+    (PLAY-dOrderedCharter-78 S4)."""
     ti.load_memory_tree()
     import design_lib
     conf = design_lib.read_design_conf(root)
@@ -667,6 +669,9 @@ def check_native_classes(root, ns_path) -> tuple[list, list]:
     except EdgeError as exc:
         return [f"tags: native · {exc}"], []
     for cls, row in classes.items():
+        if row["owner"] not in slugs:
+            lines.append(f"tags: native · {cls} (owner {row['owner']}) · unarmed: no build of the chain registry")
+            continue
         try:
             members = read_native_members(row, root, conf)
         except (EdgeError, design_lib.DesignRefusal) as exc:

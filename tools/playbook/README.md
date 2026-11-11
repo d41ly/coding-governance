@@ -347,7 +347,9 @@ the chain registry, `memory/project/chain.toml` (one `[[build]]` row per build, 
 `purpose`), and its `purpose-source` grades the namespace's members: `<path>` a tracked file, read
 path-only; `<path>#<field>` a field each member's row carries in a `.toml` file or an assignment in a
 `.py` file; `#<field>` a field each member's own file carries, `h1` being a Markdown file's first `# `
-line. A source the tree does not hold yet is printed `pending` and never graded. Where the conf declares
+line. A source the tree does not hold yet is printed `pending` and never graded. An `owner` the chain
+registry does not hold is printed `owner '<owner>' · unarmed` and never red, as is a native class of
+such an owner (PLAY-dOrderedCharter-78). Where the conf declares
 the design (`DESIGN_RECORD`, `DESIGN_BASELINE`, `DESIGN_VIEW`, `DESIGN_NODES`), the chain registry's
 slugs are joined both ways with the design view's builds, and a row with no `purpose` is legal only for a
 build the baseline already names; with those keys blank `check` prints that there is no chain to read.

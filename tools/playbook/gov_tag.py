@@ -192,17 +192,19 @@ def run_name_check(root, tags) -> tuple[list, str]:
         f"{NAME_CHECK} · filled"
 
 
-def run_purpose_check(con, root, ctx) -> tuple[list, list, dict]:
+def run_purpose_check(con, root, ctx, chain, chain_rel) -> tuple[list, list, dict]:
     """The `purpose` arm (PLAY-dOrderedCharter-22 S5): the namespace rows' `owner` and `purpose-source`
-    against the chain registry, then the registry joined to the design view, or one line saying there is
-    no chain to read where the DESIGN_* keys are blank. -> (reds, lines, the summary's counts)."""
-    chain_rel = f"{ctx['memory_root']}/{ti.CHAIN_REGISTRY}"
-    chain = ti.read_chain_registry(root / chain_rel)
-    reds, ns = ti.check_namespace_purpose(con, ctx, chain, chain_rel)
+    against the chain registry `chain`, read from `chain_rel`, then the registry joined to the design view,
+    or one line saying there is no chain to read where the DESIGN_* keys are blank. An owner the registry
+    does not hold prints one unarmed line (PLAY-dOrderedCharter-78 S3). -> (reds, lines, the summary's
+    counts)."""
+    reds, ns = ti.check_namespace_purpose(con, ctx, chain)
     from design_lib import read_design_conf  # memory-tree is on sys.path once derive_context has run
     c_reds, cs = ti.check_chain_registry(root, read_design_conf(root), chain, chain_rel)
     graded = ns["graded"]
-    lines = [f"tags: purpose · pending {n} · {src}" for n, src in ns["pending"]]
+    lines = [f"tags: purpose · owner '{o}' · unarmed: no build of {chain_rel}, {len(rows)} namespace row(s) "
+             "not graded for it" for o, rows in sorted(ns["unarmed"].items())]
+    lines += [f"tags: purpose · pending {n} · {src}" for n, src in ns["pending"]]
     lines.append(f"tags: purpose · {len(graded)} graded over {sum(graded.values())} members, "
                  f"{len(ns['path_only'])} path-only, pending {len(ns['pending'])}")
     if cs is None:
@@ -212,7 +214,7 @@ def run_purpose_check(con, root, ctx) -> tuple[list, list, dict]:
         lines.append(f"tags: purpose · {cs['rows']} registry rows joined to {cs['builds']} view builds, "
                      f"{len(cs['awaiting'])} rows awaiting PM-5's review")
     counts = {"graded": graded, "path_only": ns["path_only"], "pending": [list(p) for p in ns["pending"]],
-              "chain": cs}
+              "unarmed": ns["unarmed"], "chain": cs}
     return reds + c_reds, lines, counts
 
 
@@ -246,9 +248,11 @@ def run_check(con, root, ctx, kit_rel, *, sets, base, as_json, state) -> int:
     r_reds, warns, cited = ti.check_retired(con, ctx, retired_mode, base_spans, armed, base_sections, aliases)
     o_reds = ti.check_owned(con, ctx, root / kit_rel / "layers.toml")
     n_reds, slot = run_name_check(root, shaped)
-    p_reds, p_lines, purpose = run_purpose_check(con, root, ctx)
+    chain_rel = f"{ctx['memory_root']}/{ti.CHAIN_REGISTRY}"  # read once, for the two arms that grade owners
+    chain = ti.read_chain_registry(root / chain_rel)
+    p_reds, p_lines, purpose = run_purpose_check(con, root, ctx, chain, chain_rel)
     from edge_grammar import check_native_classes   # PLAY-dOrderedCharter-28 S2: the native-id classes
-    x_reds, x_lines = check_native_classes(root, root / kit_rel / "namespaces.toml")
+    x_reds, x_lines = check_native_classes(root, root / kit_rel / "namespaces.toml", {r["slug"] for r in chain})
     p_lines += x_lines
     from positional import check_positional, read_positional_mode  # PLAY-dOrderedCharter-26: the positional arm
     q_reds, q_lines, positional = check_positional(root, kit_rel, read_positional_mode(root, sets), ctx["memory_root"])
@@ -385,7 +389,11 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "bundle-rows-values", "bundle-inline", "bundle-mode-values", "bundle-unregistered-type",
           "bundle-dangling-target", "bundle-empty-sections", "unclosed-fence", "unclosed-record", "git-env",
           "toml-row", "dirty-rename", "charter-warm", "charter-dirty", "retired-section",
-          "retired-section-aliased", "retired-section-reminted", "reference-row", "reference-no-h1")
+          "retired-section-aliased", "retired-section-reminted", "reference-row", "reference-no-h1",
+          "foreign-native", "held-native", "positional-no-tree", "positional-absent")
+#: PLAY-dOrderedCharter-78 S4's two plants: a `family-id` native class over the fixture's own id grammar,
+#: owned by a build the chain registry lacks, and by the one it holds
+NATIVE_OWNERS = {"foreign-native": "dGhost", "held-native": "fixture"}
 #: PLAY-dOrderedCharter-40's two plants: a fixture reference row, with its `h1` and without
 REFERENCE_ROW = ('[[reference]]\nregistry = "doc.reference.fixture"\nh1 = "The fixture\'s reference page"\n'
                  'page = "help/reference/fixture.md"\n')
@@ -569,6 +577,11 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
         files["memory/guides/ALPHA.md"] = GUIDE + UNCLOSED
     if plant == "unclosed-record":
         files["memory/builds/x/README.md"] = UNCLOSED
+    if plant in NATIVE_OWNERS:
+        files[".memory-tree.conf"] += 'DISCIPLINES="arch"\nFAMILIES="arch:ARCH"\n'
+        files[f"{kit}/namespaces.toml"] += (f'\n[[native]]\nclass = "family-id"\nowner = "{NATIVE_OWNERS[plant]}"\n'
+                                            'pattern = "id_grammar:grammar_for"\n'
+                                            'resolver = "corpus_ids:--print-defined-ids"\n')
     if plant == "tagless":  # a blob the extractor reads and takes no row from
         files["tools/corekit/none.tags"] = "# declares nothing\n"
     if plant in SHAPE_PLANTS:
@@ -947,6 +960,12 @@ def run_positional_plant(root, top, plant, say, check) -> int:
 
     def read_rows():
         return pos.read_list(list_path) or []
+    if plant in ("positional-no-tree", "positional-absent"):  # PLAY-dOrderedCharter-78 S5
+        gone = list_path.parent.glob("*") if plant == "positional-no-tree" else [list_path]
+        write_commit(root, {p.relative_to(root).as_posix(): None for p in gone}, "the list removed")
+        if plant == "positional-no-tree":
+            list_path.parent.rmdir()
+        return check()
     if plant == "positional-seed":
         write_commit(root, {POS_CODE: POS_MOD, "AGENTS.md": "# Charter\n\nsee HYGIENE check 5\n",
                             guide: GUIDE + f"\nsee {derive_cite(1)}, {derive_cite('2-3')} and {derive_cite(1)} again\n",
