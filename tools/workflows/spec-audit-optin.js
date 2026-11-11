@@ -4,7 +4,7 @@
  * calls holding RULE 0 of the agent-cap hook whole, moved here by TOOL-dFairHearing-16 (the owner's
  * NT-27), since the opt-in is the review kit's rule and not a fan-out guard's.
  *
- * gov:kit agent-cap@1.45 — the hooks kit's marker, declared in its `marker_carriers`: this pack reads
+ * gov:kit agent-cap@1.46 — the hooks kit's marker, declared in its `marker_carriers`: this pack reads
  * agent-cap.js's exports, so a scoped update of either kit moves both (TOOL-dFairHearing-27 S12).
  *
  * Wiring (per project), through its fragment beside it, which declares the event, the `Workflow`
