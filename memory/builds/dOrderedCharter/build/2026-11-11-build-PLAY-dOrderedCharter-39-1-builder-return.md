@@ -4,7 +4,7 @@
 
 Run wf_687dd598-b25, summarized from its return.
 
-- Built to spec rev-5 and committed as pass commit `ee40561c9` with no divergence; deviation 392 records the bound and tier that
+- Built to spec rev-5 and committed as pass commit `ee40561c9` with no divergence; its deviation record (DERIVED at ee40561c9) holds the bound and tier that
   section 8 F3's relax owes.
 - What landed: the `agent-instructions wiring` leg written back by name on the renderer's entry-files check, on gov's own bar
   only, with an exempt-leg row in govkit's registry, its pending row in the playbook core, the playbook dossier's claim, and one
