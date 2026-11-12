@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-15 — the closing review's thirteen mediums and four lows, batched: the pass-leg tooling, the commit grader, the hooks, three guards and two help pages say and check what they do
 
-**Status:** INPROGRESS · rev-1 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 15
+**Status:** INPROGRESS · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 15
 
 <!-- gen:spec-records -->
 
@@ -40,7 +40,9 @@ An item below is named by its heading there, `M1` to `M13` and `L1` to `L4`.
   `check` behind the leg shim, so the freshness preflight grades the manifest beside the kit under
   any runner. Observed by AC6.
 - **S7** — M7. `tools/memory-tree/routed_commits.py` reads a blank `LEG_MANIFEST` as the manifest
-  beside the resolved run-gates kit. The conf example and `help/red-fix-lane.md` state the key, and
+  beside the resolved run-gates kit. The write gate's open-red reader in `tools/hooks/scratch-guard.js`,
+  which `TOOL-aNimbleMend-14` made close the lane on a blank key, reads a blank key the same way, so
+  both halves of the lane open on a default install. The conf example and `help/red-fix-lane.md` state the key, and
   the adopter case of `tools/policy/check_policy.py` writes no `LEG_MANIFEST` line. Observed by AC7.
 - **S8** — M8. The pass-budget block of the run-gates evidence suite gains arms for `--write`,
   `--report` and `--check`, spec 2's fixtures F and B as code. Observed by AC8.
@@ -453,6 +455,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-12 · initial draft.
+- rev-2 · 2026-11-12 · S7 gains the write gate's half: `TOOL-aNimbleMend-14`, built after rev-1, closes the lane on a blank `LEG_MANIFEST`, so the adopter case of S7 and AC7 cannot drop the key until the hook reads a blank key as the grader does.
 
 ## 10. Reuse audit
 

@@ -32,7 +32,7 @@ row form, names a leg of the manifest, and its head is HEAD or an ancestor of HE
 revision does not already hold. A newest-run bound is the wrong fix: a later run that does not
 measure the subject would then clear a red that still stands.
 
-Gated for the lane by the arm class "a carried-forward ledger row never opens the lane" in
-`tools/hooks/scratch-guard.test.sh`. For any other reader of the gate ledger, or of another store
+Gated by the leg `scratch-guard self-test` for the lane: its arm class "a carried-forward ledger
+row never opens the lane" sits in `tools/hooks/scratch-guard.test.sh`. For any other reader of the gate ledger, or of another store
 with a carry-forward writer, this record is the checklist entry: ask which field of the row says
 when and where it was measured, and whether the reader tests it.
