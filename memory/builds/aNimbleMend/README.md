@@ -71,13 +71,13 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 12 unit(s) · node a · opened 2026-11-12 · streams tooling
+**Build status:** OPEN · 12 unit(s) · node a · opened 2026-11-12 · streams tooling
 ids TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aNimbleMend-1 — two policy keys, default on, and the ask each mechanism makes before it acts](spec/2026-11-12-spec-TOOL-aNimbleMend-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-11-12 |
+| [TOOL-aNimbleMend-1 — two policy keys, default on, and the ask each mechanism makes before it acts](spec/2026-11-12-spec-TOOL-aNimbleMend-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-12 |
 | [TOOL-aNimbleMend-2 — the pass-leg declaration: a `pass_leg` field on a leg's row, written by a derivation over the bar run log and the ceiling evidence](spec/2026-11-12-spec-TOOL-aNimbleMend-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-11-12 |
 | [TOOL-aNimbleMend-4 — the scoped legs: three manifest rows a pass can afford, for memory hygiene's pass checks, the positional check alone and the spec tokens of the pass's own spec](spec/2026-11-12-spec-TOOL-aNimbleMend-4.md) | 3 | 2 | OPEN | rev-2 | 2026-11-12 |
 | [TOOL-aNimbleMend-3 — the budget gate: the declared pass legs' cost rows sum inside the budget, red past the limit, with no leg over the cap, unmeasured, held or of an excluded class](spec/2026-11-12-spec-TOOL-aNimbleMend-3.md) | 4 | 2 | SPECCED | rev-1 | 2026-11-12 |
