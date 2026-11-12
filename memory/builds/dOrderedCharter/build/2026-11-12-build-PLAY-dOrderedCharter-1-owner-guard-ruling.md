@@ -1,6 +1,6 @@
 # dOrderedCharter — the owner's ruling on the policy guard
 
-**Serves:** journal PLAY-dOrderedCharter-55
+**Serves:** journal PLAY-dOrderedCharter-1
 
 ## The words
 
