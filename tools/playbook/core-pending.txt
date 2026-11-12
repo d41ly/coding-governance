@@ -135,6 +135,7 @@ leg	workflow script syntax	dWitnessedBar
 leg	tier2-review self-test	dWitnessedBar
 leg	unattended-build self-test	dWitnessedBar
 leg	review-join self-test	dWitnessedBar
+leg	spec-audit opt-in pack self-test	dWitnessedBar
 leg	review-replay selftest	dWitnessedBar
 leg	pytest-guardrails self-test	dWitnessedBar
 leg	codebase-map kit selftest	dWitnessedBar

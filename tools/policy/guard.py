@@ -234,7 +234,7 @@ def check_run_mandate():
     if not kept:
         return None, [f"no run-state file at HEAD names {branch} as its run-branch"]
     lines = run_git("grep", "-h", "-E", '^PHASES_TERMINAL="[^"]*"[[:space:]]*$', "HEAD", "--",
-                    ":(glob)**/unattended/unattended.sh", missing=True)
+                    ":(glob)**/unattended.sh", missing=True)
     sets = {tuple(ln.split('"')[1].split())
             for ln in (lines or b"").decode("utf-8", errors="replace").split("\n") if ln.strip()}
     if not sets:

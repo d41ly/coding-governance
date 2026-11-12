@@ -375,7 +375,7 @@ the candidates, the run-state files `git grep -l` finds naming it over `:(glob)*
 `HEAD`, kept where `read_run_fact`'s `run-branch`, `refs/heads/` off, is the branch (none:
 `no run-state file at HEAD names <branch> as its run-branch`), so a run-state file staged in the same
 commit grants nothing; the terminal set, the `PHASES_TERMINAL="..."` line of each
-`unattended/unattended.sh` at `HEAD`, parsed and never imported (none:
+`unattended.sh` at `HEAD` at any depth, parsed and never imported (none:
 `no unattended driver at HEAD declares PHASES_TERMINAL, so no phase reads live`; more than one set, or
 a token not `[A-Z]+`: `the PHASES_TERMINAL declarations at HEAD read <values>, not one set of phase
 tokens`); and the phase, the first candidate in path order whose `phase` is a phase token outside

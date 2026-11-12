@@ -2446,7 +2446,7 @@ def run_guard_case(name):
         if name in GUARD_RUN:
             # Literals only, so the case reads no source file: the driver's terminal set, then per
             # scenario (phase, run-branch, the step after the record's commit, exit, stdout needles).
-            run_rel, driver_rel = "memory/builds/tRun/RUN.md", "tools/unattended/unattended.sh"
+            run_rel, driver_rel = "memory/builds/tRun/RUN.md", "vendor/gov/run/unattended.sh"
             admitted = (f"policy-guard: admitted · {DEPLOY_REL} .governance/instructions.toml · "
                         f"the run-branch of {run_rel}, phase BUILDING")
             unnamed = "no run-state file at HEAD names run/t as its run-branch"

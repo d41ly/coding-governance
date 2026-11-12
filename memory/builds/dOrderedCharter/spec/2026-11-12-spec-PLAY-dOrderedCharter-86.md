@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-86 — the run guard finds the driver by its file name, and the opt-in pack's self-test leg gets its pending row
 
-**Status:** DEFERRED · rev-1 · 2026-11-12 · node a · Tier-1 · base 1f82d4bdc · streams tooling · order 47 · advances PLAY-dOrderedCharter-38
+**Status:** CLOSED · rev-1 · 2026-11-12 · node a · Tier-1 · base 1f82d4bdc · streams tooling · order 47 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-12-build-PLAY-dOrderedCharter-86-ledger.md](../build/2026-11-12-build-PLAY-dOrderedCharter-86-ledger.md) | journal | — |
 | [2026-11-12-prompt-PLAY-dOrderedCharter-86-1-spec-writer.md](../prompts/2026-11-12-prompt-PLAY-dOrderedCharter-86-1-spec-writer.md) | journal | — |
 | [2026-11-12-prompt-PLAY-dOrderedCharter-86-build-brief.md](../prompts/2026-11-12-prompt-PLAY-dOrderedCharter-86-build-brief.md) | journal | — |
 | [2026-11-12-prompt-PLAY-dOrderedCharter-86-spec-brief.md](../prompts/2026-11-12-prompt-PLAY-dOrderedCharter-86-spec-brief.md) | research | — |
