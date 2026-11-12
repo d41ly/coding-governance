@@ -6,7 +6,6 @@ streams: tooling
 roster: TOOL
 ids: TOOL-aLiftedCeiling-1
 authorized-by: prompt
-status: OPEN
 ---
 
 # aLiftedCeiling — the instruction-edits leg's ceiling covers its wait on the tag index
@@ -45,25 +44,29 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-11-12 · streams tooling
+**Build status:** DEFERRED · 1 unit(s) · node a · opened 2026-11-12 · streams tooling
 ids TOOL-aLiftedCeiling-1
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aLiftedCeiling-1 — the instruction-edits leg's ceiling covers its wait on the tag index](spec/2026-11-12-spec-TOOL-aLiftedCeiling-1.md) | 1 | 1 | DEFERRED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 1 record folder(s).
+Records: 4 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aLiftedCeiling-1.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aLiftedCeiling-1` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
