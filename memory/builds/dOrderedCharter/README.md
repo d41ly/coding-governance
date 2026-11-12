@@ -197,7 +197,7 @@ ids PLAY-dOrderedCharter-86 PLAY-dOrderedCharter-87 PLAY-dOrderedCharter-88 TOOL
 | [PLAY-dOrderedCharter-88 — the `repo` namespace reads its purpose path-only, and the reader join counts a unit scoped `reader.every` as selected by every reader](spec/2026-11-12-spec-PLAY-dOrderedCharter-88.md) | 49 | 2 | CLOSED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 670 bound to this build, across 4 record folder(s).
+Records: 671 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
