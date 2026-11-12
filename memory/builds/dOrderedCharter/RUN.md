@@ -587,3 +587,5 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-12T00:55:41Z resume · item dOrderedCharter · reason held · keepalive 561bec20 · manual
 
 2026-11-12T00:57:05Z rescope · item add PLAY-dOrderedCharter-84 · reason the owner's 2026-11-12 ruling that no file is owner-only to a run under its mandate: the policy guard admits a live run's guarded change, and the prepare commits its upgrade steps' output before regenerating
+
+2026-11-12T01:22:06Z rescope · item add PLAY-dOrderedCharter-85 · reason spec 84's F1 taken on the owner's take-forks-recommendations ruling: the lander's merge fold before the regeneration splits from the guard's run admission, one mechanism per spec
