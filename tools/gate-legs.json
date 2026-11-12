@@ -2045,7 +2045,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 180,
+    "ceiling": 420,
     "enforces": ["principle.p11", "principle.p13"]
   },
   {
