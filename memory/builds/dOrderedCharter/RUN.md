@@ -31,12 +31,12 @@ mode: slug
 run-branch: refs/heads/branch/unattended-dorderedcharter-725f52
 anchor-kind: default-branch
 cli-version: 2.1.309
-lease-utc: 2026-11-12T00:55:36Z
+lease-utc: 2026-11-12T06:55:29Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 5716
 session: 0394fa33-012c-408f-a840-e6e4cfaac23f
-keepalive: 561bec20
+keepalive: 43486bcf
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 8bec4cefd957d194660a8d7c2916f420b7299074
 anchor-ref: refs/heads/main
