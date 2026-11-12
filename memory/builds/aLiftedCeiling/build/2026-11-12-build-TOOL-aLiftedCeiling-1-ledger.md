@@ -23,3 +23,17 @@ it unbacked, so no check grades the new ceiling.
 
 **Owed to the close.** Every leg of the spec's Gates section, AC2's race, AC3's row and its copy into this worktree, then AC4
 and AC5 over that row. The spec declares no `New arm:` line.
+
+**Main-loop observations at the close.** In a fresh scratch clone of pass commit 33a1a8676 with no tag index in its git
+directory, and over this worktree with the generated evidence file copied back (DERIVED at 33a1a8676, the scratchpad logs
+al-ac2.txt and al-ac5.log).
+
+- AC2 — `ie rc=0` — the race printed the instruction-edits check at exit 0 after 110 s and the tags check at exit 0, and neither
+  log carried a lock refusal.
+- AC3 — `instruction edits (manifest checks)` — the run-gates kit's own write, run inside that clone with the race's wall as an
+  observed reading, added one evidence row at 110 s, one reading, node a, sourced from the race.
+- AC4 — `1` — the evidence file's diff against the build's base counts one added line and none deleted.
+- AC5 — `CEILING-EVIDENCE FAILED` — the ceiling check exited 0 with no such line at 420 s and named the leg among the ceilings backed
+  by an outside reading; with the row in place and the ceiling set back to 180 it printed the leg short by 50 s, and restored it
+  exited 0.
+- AC6 — `stamped` — the manifest's stamp commit has the ceiling commit as an ancestor.

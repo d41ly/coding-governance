@@ -53,7 +53,7 @@ ids TOOL-aLiftedCeiling-1
 | [TOOL-aLiftedCeiling-1 — the instruction-edits leg's ceiling covers its wait on the tag index](spec/2026-11-12-spec-TOOL-aLiftedCeiling-1.md) | 1 | 1 | CLOSED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 3 record folder(s).
+Records: 7 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
