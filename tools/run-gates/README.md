@@ -169,6 +169,7 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `windows-only-legs.txt` | gov's declaration of the held legs that run natively, one `<leg> TAB <reason>` row each; withheld from the payload |
 | `regen.py` | the generated-output verb behind `--regen`, `--regen-check` and `--regen-list`: it reads the staged `[[generated]]` and `[[regenerate]]` rows of every tracked kit descriptor and regenerates them in stage order, or proves each fresh without writing; see "Generated outputs" below |
 | `pass_legs.py` | the pass-leg declaration: derives which legs a unit pass runs from recorded reds per evidenced second and writes `pass_leg` onto their manifest rows; see "The pass legs" below |
+| `pass-legs.sh` | the pass-leg runner: runs the declared pass legs over one pass's diff through `run-gates.sh`, writes a run record and prints an overrun or a held leg as a finding; see "The pass-leg runner" below |
 | `pass-leg-evidence.txt` | gov's recorded reds per leg, written by `pass_legs.py --write`; withheld from the payload |
 | `kit.toml` | this entry, declared as data |
 
@@ -1061,6 +1062,74 @@ cost rows.
 What the gate does not check: a cost row is the worst reading on record on one node, and a leg
 never re-measured can sit under its true cost. The sum is the legs run one after another, and a leg
 its guard skips counts in full.
+
+## The pass-leg runner — `pass-legs.sh --base <rev>`
+
+`bash <prefix>/run-gates/pass-legs.sh --base <rev>` runs the declared pass legs over one pass's
+diff (TOOL-aNimbleMend-5). It holds no leg command and no verdict logic: it filters the manifest to
+the rows whose `pass_leg` is true, in manifest order, writes them to `<git-dir>/gate-pass-legs.json`
+and starts `run-gates.sh` once with that file as `GATE_LEGS`. `--base` is required and must name a
+commit; without one it exits 2 and starts nothing, because the runner reads an unresolvable base as
+empty and runs every leg.
+
+| What it sets for the runner | Why |
+|---|---|
+| `GATE_BASE=<the resolved base>` | each leg's own `guard` decides against the pass's diff |
+| `GATE_FULL` and `GATE_SELFTESTS` empty | a flag the calling session exported cannot widen the run |
+| `GATE_RUN_ID=pass-<UTC stamp>-<pid>` | the run's directory under `gate-run/` is known, so its record can be read back |
+| `GATE_TURNSTILE=0` | the run starts beside a queued bar: one that waits out another worktree's bar cannot be held to a budget |
+
+The exit code is the runner's, unchanged. The runner's output is passed through and never captured.
+Before it starts anything the adapter asks the policy key `pass.fast-legs` once, under the policy
+kit's ask contract: `off`, a refused read and a value outside the pair each end the run with exit 0,
+no runner and no file, and where no policy kit resolves it runs under one NOTE line on stderr. When
+no row carries the field it starts no runner, prints `pass-legs: 0 legs declared, nothing ran` and
+exits 0.
+
+**The record is `<git-dir>/gate-pass-legs.txt`**, `key TAB value` per line, replaced on every run
+that got as far as reading the manifest:
+
+| Key | Value |
+|---|---|
+| `run_id` | the pinned id, naming the directory under `gate-run/`; `-` when no runner started |
+| `base`, `head` | the resolved base and `HEAD` when the run started, full shas |
+| `started` | UTC, to the second |
+| `exit` | the runner's exit code, or `-` when no runner started |
+| `verdict` | the runner's own verdict, `EMPTY` when no row carries the field, `NO-VERDICT` when the runner wrote none |
+| `declared` | how many rows carried the field |
+| `wall_s`, `budget_s`, `limit_s` | whole seconds around the runner call, and the two declared figures |
+| `over` | `none`, `tolerance` or `limit` |
+| `held` | the runner's count of held legs |
+| `leg` | one line per declared leg: name, status, seconds |
+
+A leg's status is the runner's own, `ok`, `fail` or `timeout`, its retry's where it was retried. A
+declared leg with no row reads `not-run` with `-` for seconds: its guard skipped it, or the runner
+held it. `head` is what tells a record earned at another commit from one earned at this one.
+
+**Two findings, and neither moves the exit code.** Each is one stdout line and a key of the record.
+
+| Condition | Line |
+|---|---|
+| `wall_s` above `PASS_LIMIT_SECONDS` | `pass-legs: FINDING overrun: the run took <wall>s, over the <limit>s limit (budget <budget>s)` |
+| `wall_s` above `PASS_BUDGET_SECONDS`, at or under the limit | `pass-legs: NOTE the run took <wall>s, inside the tolerance above the <budget>s budget`, which is no finding |
+| the runner's `held` above 0 | `pass-legs: FINDING held: <n> declared leg(s) did not run, held as a self-test or a kit-subject leg` |
+
+Both figures are read from `pass_legs.py` at each run. The wall time is the shell's clock around
+the runner call, so it includes the runner's own start, which no cost row holds.
+
+**What a pass-leg run costs the bar's records**, each because it runs through the bar runner:
+
+- A red run replaces `gate-last-failure.txt`, exactly as the next red bar would.
+- A green run with no skipped leg and a clean tree replaces the `gate-full-green` stamp with one
+  naming the filtered manifest. The push hook trusts a stamp only when its manifest is the kit's
+  own, so the next push runs its bar in full, and the next full bar re-earns the stamp.
+- The run adds its legs' rows to the gate ledger and leaves every other row standing.
+- `GATE_LEGS` is inherited by every leg, so a declared leg that reads it as its subject grades the
+  filtered list and not the manifest. `GATE_BASE` is inherited the same way.
+
+What it does not check: whether the declared list is the rule's own output or inside its budget,
+which are `pass_legs.py --check` and `--budget`, and whether a skipped leg's guard is too narrow. It
+scrubs no runner knob beyond the two flags above.
 
 ## The gov-only harness
 

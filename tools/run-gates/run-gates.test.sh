@@ -267,7 +267,9 @@ fail=0
 # 407 -> 410, PLAY-dOrderedCharter-70 S13: arm 13g's `filled` line and arm 13h's two, neither gated.
 # 410 -> 412, TOOL-aNimbleMend-4: arm 1a's `scope_of` control, and arm 1a's `pass_leg` control, which
 # TOOL-aNimbleMend-2 added and left uncounted. Neither is gated. Counted by reading; this pass runs no suite.
-FLOOR_ASSERTIONS=412
+# 412 -> 438, TOOL-aNimbleMend-5: section 14's twenty-six pass-leg assertions, none of them gated.
+# Counted off the section's own `check_pl_value` calls; this pass runs no suite.
+FLOOR_ASSERTIONS=438
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -4085,6 +4087,111 @@ run_sc_bar GATE_SELFTESTS=changed
 check_sc_line "S13 a govkit no resolver finds reads the slot not-installed" '^run-gates: selftests changed: slot point.flow.version · not-installed: '
 check_sc_value "S13 ...and the not-reachable line follows it" "$(printf '%s\n' "$SC_OUT" | grep -A1 '^run-gates: selftests changed: slot point.flow.version · not-installed: ' | sed -n 2p | grep -c '^run-gates: selftests changed: govkit is not reachable ')" 1
 rm -rf "$SC" 2>/dev/null || true
+
+# ---- 14. THE PASS-LEG RUNNER, `pass-legs.sh`. TOOL-aNimbleMend-5 AC1 AC2 AC3 AC5 AC6 AC7 AC8 ------
+#    A scratch repository carrying the runner, the declaration module and the adapter, with the
+#    manifest as the kit dir's sibling: `alpha` unguarded and declared, `beta` declared and guarded
+#    on `watched/`, `gamma` unguarded and NOT declared. Each row's script leaves a marker named after
+#    it OUTSIDE the repository, so "ran" is read off the disk and never off the runner's output.
+#    `gamma` is the liveness half: an adapter that handed the runner the whole manifest would leave
+#    its marker. No policy kit sits in the fixture, so the switch reads on under its NOTE line; the
+#    switch's own arm needs a policy kit beside the adapter and is not this suite's.
+#
+#    WHAT THIS DOES NOT CHECK: the switch (AC4), and the record's mode, which a Windows tree does
+#    not hold. The overrun arms sleep four seconds against a fixture budget of 1 and a limit of 2,
+#    figures edited into the fixture's OWN copy of the declaration module; the adapter types none.
+PL=$(mktemp -d) || { echo "canary: cannot create a scratch dir for the pass-leg arms"; exit 2; }
+PLR="$PL/r"; mkdir -p "$PLR/$KIT_REL" "$PLR/fx" "$PLR/watched" "$PL/marks" "$PL/ts"
+cp "$KITDIR/run-gates.sh" "$KITDIR/gate-profiles.txt" "$KITDIR/gate-fingerprint.sh" "$KITDIR/pass_legs.py" \
+   "$KITDIR/pass-legs.sh" "$PLR/$KIT_REL/" 2>/dev/null
+printf '#!/usr/bin/env bash\n: > "%s/$1"\n[ "$1" = alpha ] && { sleep "${FX_SLEEP:-0}"; exit "${FX_RC:-0}"; }\nexit 0\n' "$PL/marks" > "$PLR/fx/mark.sh"
+write_pl_legs() { # alpha's own extra fields · rows appended after gamma
+  printf '[{"name": "alpha", %s"argv": ["bash", "fx/mark.sh", "alpha"]},\n {"name": "beta", "pass_leg": true, "argv": ["bash", "fx/mark.sh", "beta"], "guard": ["watched/"]},\n {"name": "gamma", "argv": ["bash", "fx/mark.sh", "gamma"]}%s]\n' "$1" "$2" > "$PLR/${PFX}gate-legs.json"
+}
+write_pl_figures() { # budget · limit -> the fixture's own copy of the declaration states them
+  sed "s/^PASS_BUDGET_SECONDS = .*/PASS_BUDGET_SECONDS = $1/; s/^PASS_LIMIT_SECONDS = .*/PASS_LIMIT_SECONDS = $2/" \
+    "$KITDIR/pass_legs.py" > "$PLR/$KIT_REL/pass_legs.py"
+}
+write_pl_commit() { ( cd "$PLR" && git add -A && git commit -q --allow-empty -m "$1" ) >/dev/null 2>&1; }
+run_pl_legs() { # VAR=value… -- the adapter's arguments -> PL_OUT (stdout and stderr), PL_RC; markers cleared first
+  local _pl_env=()
+  while [ "$#" -gt 0 ] && [ "$1" != -- ]; do _pl_env+=("$1"); shift; done
+  shift
+  rm -f "$PL/marks"/* 2>/dev/null
+  PL_OUT=$( cd "$PLR" && env GATE_LEGS= GATE_REUSE= GATE_WALL= GATE_ATTRIBUTE= GATE_INHERITED_RED= \
+      GATE_INHERITED_RED_MAX_AGE= GATE_RUN_ID= GATE_PROFILES= GATE_DOCS_BASE= GATE_JOBS=4 GATE_PROFILE=minimal \
+      GATE_TURNSTILE_DIR="$PL/ts" ${_pl_env[@]+"${_pl_env[@]}"} bash $KIT_REL/pass-legs.sh "$@" 2>&1 ); PL_RC=$?
+}
+read_pl_marks() { ls "$PL/marks" 2>/dev/null | tr '\n' ' '; }
+read_pl_key() { awk -F'\t' -v k="$1" '$1 == k { print $2 }' "$PLR/.git/gate-pass-legs.txt" 2>/dev/null; }
+read_pl_leg() { awk -F'\t' -v l="$1" '$1 == "leg" && $2 == l { print $3 }' "$PLR/.git/gate-pass-legs.txt" 2>/dev/null; }
+check_pl_value() { # label · got · want -> one counted assertion
+  n=$((n+1))
+  [ "$2" = "$3" ] || { echo "canary: pass legs — $1: got [$2], wanted [$3]"; printf '%s\n' "$PL_OUT" | sed 's/^/    /'; fail=1; }
+}
+write_pl_legs '"pass_leg": true, ' ''
+printf 'w\n' > "$PLR/watched/w.txt"; printf 'o\n' > "$PLR/fx/other.txt"
+( cd "$PLR" && git init -q --template= -b main . && git add -A && git commit -qm base ) >/dev/null 2>&1
+
+# 14a. AC1 — a pass that moved `watched/`: both declared rows run, the undeclared one does not.
+printf 'w2\n' > "$PLR/watched/w.txt"; write_pl_commit "watched moves"
+run_pl_legs -- --base HEAD~1
+check_pl_value "AC1 the adapter exits with the runner's green" "$PL_RC" 0
+check_pl_value "AC1 the two declared rows ran and the undeclared row did not" "$(read_pl_marks)" "alpha beta "
+# 14b. AC5 — the record of that run: every key, the declared count, and both legs ok.
+_plk=""
+for _k in run_id base head started exit verdict declared wall_s budget_s limit_s over held; do
+  [ -n "$(read_pl_key "$_k")" ] || _plk="$_plk $_k"
+done
+check_pl_value "AC5 the record holds every key" "$_plk" ""
+check_pl_value "AC5 declared counts the rows carrying the field" "$(read_pl_key declared)" 2
+check_pl_value "AC5 a leg that ran green reads ok" "$(read_pl_leg alpha) $(read_pl_leg beta)" "ok ok"
+check_pl_value "AC5 the record names the runner's own run directory" "$([ -f "$PLR/.git/gate-run/$(read_pl_key run_id)/verdict" ] && echo yes)" yes
+# 14c. AC2 — no argument, and a base that names no commit: exit 2, the base named, nothing run.
+run_pl_legs --
+check_pl_value "AC2 no argument exits 2" "$PL_RC" 2
+check_pl_value "AC2 ...on a usage line naming --base" "$(printf '%s\n' "$PL_OUT" | grep -c '^pass-legs: usage: .*--base <rev>')" 1
+run_pl_legs -- --base no-such-rev
+check_pl_value "AC2 an unresolvable base exits 2" "$PL_RC" 2
+check_pl_value "AC2 ...naming the value" "$(printf '%s\n' "$PL_OUT" | grep -c "^pass-legs: --base 'no-such-rev' resolves to no commit")" 1
+check_pl_value "AC2 ...and no leg ran" "$(read_pl_marks)" ""
+# 14d. AC3 — a pass that moved nothing under `watched/`, with both widening flags exported by the
+#      caller: the guard still decides, so `beta` is skipped and the record says not-run.
+printf 'o2\n' > "$PLR/fx/other.txt"; write_pl_commit "other moves"
+run_pl_legs GATE_SELFTESTS=1 GATE_FULL=1 -- --base HEAD~1
+check_pl_value "AC3 the guarded row is skipped under an inherited GATE_FULL" "$(read_pl_marks)" "alpha "
+check_pl_value "AC3 the skipped leg's record line reads not-run" "$(read_pl_leg beta)" not-run
+# 14e. AC5 — a red declared leg: the leg line, the record's exit and the adapter's own exit all say so.
+run_pl_legs FX_RC=1 -- --base HEAD~1
+check_pl_value "AC5 the adapter exits with the runner's red" "$PL_RC" 1
+check_pl_value "AC5 a failed leg reads fail and the record's exit reads 1" "$(read_pl_leg alpha) $(read_pl_key exit)" "fail 1"
+# 14f. AC7 — a declared row the runner holds: one finding, no marker, not-run, and the exit unmoved.
+write_pl_legs '"pass_leg": true, ' ',
+ {"name": "delta", "pass_leg": true, "subject": "kit", "argv": ["bash", "fx/mark.sh", "delta"]}'
+write_pl_commit "a declared kit-subject row"
+run_pl_legs -- --base HEAD~1
+check_pl_value "AC7 a held declared leg is one FINDING held line" "$(printf '%s\n' "$PL_OUT" | grep -c '^pass-legs: FINDING held: 1 declared leg(s) did not run')" 1
+check_pl_value "AC7 the held row did not run" "$(read_pl_marks)" "alpha "
+check_pl_value "AC7 its record line reads not-run, and the finding moved no exit" "$(read_pl_leg delta) $PL_RC" "not-run 0"
+# 14g. AC8 — no row carries the field: no runner, the zero line, exit 0, and a record that says EMPTY.
+printf '[{"name": "gamma", "argv": ["bash", "fx/mark.sh", "gamma"]}]\n' > "$PLR/${PFX}gate-legs.json"
+write_pl_commit "no declared row"
+run_pl_legs -- --base HEAD~1
+check_pl_value "AC8 the zero line prints once" "$(printf '%s\n' "$PL_OUT" | grep -c '^pass-legs: 0 legs declared, nothing ran$')" 1
+check_pl_value "AC8 no runner started and the exit is 0" "$(printf '%s\n' "$PL_OUT" | grep -c '^gates ') $(read_pl_marks)$PL_RC" "0 0"
+check_pl_value "AC8 the record's verdict reads EMPTY" "$(read_pl_key verdict)" EMPTY
+# 14h. AC6 — the wall time against the fixture's own figures: over the limit is a finding that moves
+#      no exit, and the same run under a limit of 600 is a NOTE and no finding.
+write_pl_legs '"pass_leg": true, ' ''; write_pl_figures 1 2; write_pl_commit "a budget of 1 and a limit of 2"
+run_pl_legs FX_SLEEP=4 -- --base HEAD~1
+check_pl_value "AC6 a run over the limit is one FINDING overrun line" "$(printf '%s\n' "$PL_OUT" | grep -c '^pass-legs: FINDING overrun: the run took [0-9]*s, over the 2s limit (budget 1s)$')" 1
+check_pl_value "AC6 the record's over reads limit" "$(read_pl_key over)" limit
+check_pl_value "AC6 the finding moved no exit" "$PL_RC" 0
+write_pl_figures 1 600; write_pl_commit "a limit of 600"
+run_pl_legs FX_SLEEP=4 -- --base HEAD~1
+check_pl_value "AC6 inside the tolerance there is no overrun finding" "$(printf '%s\n' "$PL_OUT" | grep -c '^pass-legs: FINDING overrun')" 0
+check_pl_value "AC6 ...and one NOTE line naming the budget" "$(printf '%s\n' "$PL_OUT" | grep -c '^pass-legs: NOTE the run took [0-9]*s, inside the tolerance above the 1s budget$') $(read_pl_key over)" "1 tolerance"
+rm -rf "$PL" 2>/dev/null || true
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
