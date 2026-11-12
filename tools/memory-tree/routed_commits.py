@@ -8,6 +8,7 @@ must name a unit id whose spec existed at that commit's first parent.
 
     python routed_commits.py                          # grade the range, print the summary
     python routed_commits.py --newest-unit <range>    # the newest unit id <range>'s commits attribute
+    python routed_commits.py --red-fix-limits <rev>   # one `Red-fix:` commit against the lane's limits
     python routed_commits.py --selftest               # the arms, over scratch repositories
 
 THE RANGE. `$GATE_PUSH_BASE..HEAD` (RANGE) when that variable is set, not all zeros, and names a
@@ -34,6 +35,21 @@ key `bar.inline-red-fixes` gates the pushed RANGE and never the history: off, a 
 RANGE is `names no unit`, and WHOLE still admits it, so turning the key off reds nothing that
 landed. The key is read once, by `read_lane_state`, and only when a RANGE commit is a candidate; a
 history with no trailer costs no spawn it did not cost before.
+
+THE LANE'S LIMITS (TOOL-aNimbleMend-10). Every non-merge commit of each population carrying a
+`Red-fix:` trailer, whether or not it names a unit, is graded against four limits, and a finding
+moves the exit to 1. L1 size: at most RED_FIX_MAX_PATHS paths under `ROUTED_PATHS` and at most
+RED_FIX_MAX_LINES lines over them, added plus deleted, a binary path over the bound. L2: no path the
+policy kit's `guarded-paths.txt` lists, read as the working tree holds it; where no policy kit
+resolves, no path under `.governance/`. L3: no path under any build's `spec/` folder. L4: no path
+added under `ROUTED_PATHS`, a rename read as a deletion and an addition. `ROUTED_COMMIT_WAIVED`
+excuses a finding in WHOLE and never in RANGE, and the stale rule counts a finding as a violation.
+One `red-fix limits` line per population says how many were graded; a population holding no fix
+commit costs no git call, any other exactly one. `--red-fix-limits <rev>` grades the one commit
+`<rev>` names, merge or not, with no waiver: exit 0 inside the limits, 1 over one, 2 when the rev
+names no commit or the commit carries no trailer. NOT checked: whether the change is a fix, a new
+surface made inside an existing file, a deleted path, any record outside `spec/`, and a guarded
+list the fix commit itself shortened.
 
 Exit 0 clean · 1 a violation or a stale waiver · 2 REFUSED, the leg cannot give an answer worth
 reading (an unarmed conf, a shallow clone, an empty id map, a truncated log stream).
@@ -87,6 +103,10 @@ from tree_lib import (GIT_ENV_LEAKS, RED_FIX_TRAILER, build_git_env, build_spec_
                       parse_leg_names, parse_spec_h1, read_policy_value)
 
 SAY = "routed-commits"
+#: TOOL-aNimbleMend-10 F1: the most paths under ROUTED_PATHS one `Red-fix:` commit may change.
+RED_FIX_MAX_PATHS = 3
+#: TOOL-aNimbleMend-10 F1: the most lines, added plus deleted, it may change over those paths.
+RED_FIX_MAX_LINES = 60
 ZERO_SHA_RE = re.compile(r"^0+$")
 SHA_RE = re.compile(r"^[0-9a-f]{7,40}$")
 #: Every git process this module starts, counted so the self-test can hold it constant (AC6).
@@ -275,6 +295,76 @@ def read_lane_state(repo) -> tuple:
     return False, f"bar.inline-red-fixes reads {value}, neither on nor off, so the red-fix lane is closed"
 
 
+def read_guarded_paths():
+    """The lines of the policy kit's `guarded-paths.txt` as the working tree holds it, the kit found
+    beside this one; None where no policy kit resolves or the list does not read, which limit L2
+    answers by refusing every path under `.governance/` (TOOL-aNimbleMend-10 S3)."""
+    from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
+    try:
+        text = (resolve_kit_dir("policy", "guarded-paths.txt", KIT) / "guarded-paths.txt").read_text(encoding="utf-8")
+    except (LookupError, OSError, ValueError):
+        return None
+    return [ln.strip() for ln in text.splitlines() if ln.strip() and not ln.strip().startswith("#")]
+
+
+def check_red_fix_limits(repo, fixes: list, entries: list, memory_root: str, guarded: list) -> dict:
+    """`{sha: [finding]}` over `fixes`, the `Red-fix:` commits of one population: the inline lane's four
+    limits (TOOL-aNimbleMend-10), one finding per limit a commit is over, and no key for a commit
+    inside all four.
+
+    L1 size: more than RED_FIX_MAX_PATHS paths under ROUTED_PATHS, more than RED_FIX_MAX_LINES lines
+    added plus deleted over them, or a binary one. L2 guarded policy file: a path the policy kit's
+    list names. L3 spec edit: a path under any build's `spec/` folder. L4 new surface: a path added
+    under ROUTED_PATHS, a rename read as a deletion and an addition.
+
+    No git call where `fixes` is empty, and ONE otherwise whatever its length (S9): a `git log` over
+    those commits alone, the shas on stdin, carrying the numeric and the raw status form. A merge is
+    read against its first parent. `guarded` is the caller's one-slot cache of `read_guarded_paths`,
+    filled here on the first fix commit of the run and never before."""
+    if not fixes:
+        return {}
+    if not guarded:
+        guarded.append(read_guarded_paths())
+    spec_re = build_spec_path_re(memory_root)
+    raw = run_git(repo, "log", "--no-walk=unsorted", "--stdin", "--root", "--no-renames", "--raw", "--numstat",
+                  "-z", "--no-color", "--diff-merges=first-parent", "--format=%x1e%H%x1f",
+                  stdin="".join(c["sha"] + "\n" for c in fixes).encode("utf-8")).decode("utf-8", "replace")
+    found = {}
+    for rec in raw.split("\x1e")[1:]:
+        sha, rest = rec.split("\x1f", 1)
+        tokens = iter(rest.split("\0"))
+        paths, added, lines, binary = [], [], 0, False
+        for tok in tokens:
+            tok = tok.lstrip("\n")
+            stat = re.match(r"(\d+|-)\t(\d+|-)\t(.+)$", tok, re.S)
+            if tok.startswith(":"):                 # the raw form: `:modes shas STATUS`, then its path
+                path = next(tokens, "")
+                paths.append(path)
+                if tok.split()[-1].startswith("A") and test_routed_path(path, entries):
+                    added.append(path)
+            elif stat and test_routed_path(stat.group(3), entries):
+                if stat.group(1) == "-":
+                    binary = True
+                else:
+                    lines += int(stat.group(1)) + int(stat.group(2))
+        routed_n = sum(1 for p in paths if test_routed_path(p, entries))
+        held = [p for p in paths if (p.startswith(".governance/") if guarded[0] is None else p in guarded[0])]
+        specs = [p for p in paths if spec_re.match(p)]
+        out = []
+        if routed_n > RED_FIX_MAX_PATHS or lines > RED_FIX_MAX_LINES or binary:
+            out.append(f"L1 size: {routed_n} path(s), {lines} line(s){', a binary one' if binary else ''}; "
+                       f"the bound is {RED_FIX_MAX_PATHS} and {RED_FIX_MAX_LINES}")
+        if held:
+            out.append(f"L2 guarded policy file: {', '.join(held)}")
+        if specs:
+            out.append(f"L3 spec edit: {', '.join(specs)}")
+        if added:
+            out.append(f"L4 new surface: {', '.join(added)}")
+        if out:
+            found[sha] = out
+    return found
+
+
 def check_routed_commits(repo, env) -> tuple:
     """`(exit code, lines)`: grade the range, and WHOLE beside a RANGE (S1, S4, S5, S8, S9). Raises Refusal on S7."""
     repo = pathlib.Path(repo)
@@ -301,6 +391,8 @@ def check_routed_commits(repo, env) -> tuple:
     # names no unit. It gates the pushed range, never the history: WHOLE admits whatever the key says.
     lane = []
     manifest = (conf.get("LEG_MANIFEST") or "").strip()
+    # TOOL-aNimbleMend-10: the limits pass's lines, its listed shas, and its one-slot guarded-list cache.
+    limit_lines, limit_shas, guarded = [], set(), []
     for mode, rev_args, label, tag in populations:
         commits = read_routed_commits(repo, rev_args)
         read.append((mode, label.split(" (")[0], commits))
@@ -370,7 +462,11 @@ def check_routed_commits(repo, env) -> tuple:
                     violations.append((c, [], f"`{RED_FIX_TRAILER}: {strays[0]}` names no leg of {manifest} at that commit"))
                 else:
                     red_fix_n += 1
-        waived_n, stale = 0, []
+        # TOOL-aNimbleMend-10 S1: every non-merge `Red-fix:` commit of the population against the lane's
+        # four limits, whether or not it names a unit. No git call where the population holds none.
+        fixes = [c for c in commits if c["red_fix"] and len(c["parents"]) < 2]
+        over = check_red_fix_limits(repo, fixes, entries, memory_root, guarded)
+        waived_n, limit_waived, stale = 0, 0, []
         if mode == "WHOLE" and waived:
             kept = []
             for v in violations:
@@ -378,9 +474,20 @@ def check_routed_commits(repo, env) -> tuple:
                     waived_n += 1
                 else:
                     kept.append(v)
-            stale = [w for w in waived if not any(v[0]["sha"].startswith(w) for v in violations)]
+            # S6: a limits finding is a violation to the stale rule, and the one waiver excuses it.
+            stale = [w for w in waived if not any(sha.startswith(w) for sha in [v[0]["sha"] for v in violations] + list(over))]
             violations = kept
-        failed = failed or bool(violations or stale)
+            limit_waived = sum(1 for sha in over if any(sha.startswith(w) for w in waived))
+            over = {sha: found for sha, found in over.items() if not any(sha.startswith(w) for w in waived)}
+        failed = failed or bool(violations or stale or over)
+        limit_lines.append(f"{SAY}: red-fix limits · graded {len(fixes)} · bound {RED_FIX_MAX_PATHS} path(s), "
+                           f"{RED_FIX_MAX_LINES} line(s) · {limit_waived} waived")
+        # A commit over a limit is listed once: the WHOLE half names only what the RANGE half did not.
+        listed = [c for c in fixes if c["sha"] in over and c["sha"] not in limit_shas]
+        if listed:
+            limit_lines.append(f"{SAY} FAILED — a Red-fix commit is outside the inline lane's limits:")
+        limit_lines.extend(f"  {c['sha'][:8]} {c['subject']} — {found}" for c in listed for found in over[c["sha"]])
+        limit_shas.update(c["sha"] for c in listed)
         lines.append(f"{SAY}: {label} · graded {graded} · {exempt} exempt by the {cutoff} cutoff · {merges} merge(s) · "
                      f"{not_routed} not routed · {waived_n} waived{f' · {red_fix_n} red-fix' if red_fix_n else ''} · "
                      f"{len(id_map)} spec id(s) at HEAD · ROUTED_PATHS {routed}")
@@ -404,7 +511,7 @@ def check_routed_commits(repo, env) -> tuple:
                          f"population: a stale waiver widens nothing, remove it")
     # TOOL-dTrueNorth-4 S7: the deviation join over the populations just read. It lists and never moves
     # the exit, which stays this leg's own verdict.
-    return (1 if failed else 0), lines + check_deviation_join(repo, conf, read)
+    return (1 if failed else 0), lines + limit_lines + check_deviation_join(repo, conf, read)
 
 
 def check_deviation_join(repo, conf, read) -> list:
@@ -730,12 +837,16 @@ def run_selftest() -> int:
         # ---- TOOL-aNimbleMend-8 AC4 AC5 AC6: the red-fix lane. Four commits, graded WHOLE and RANGE with
         # the lane key stubbed on and then off, then a trailer-free twin for the spawn count. Against a
         # grader that reads no `Red-fix:` trailer every arm but the last two reads RED.
-        lane_files = [{"README.md": "x\n", "legs.json": '[{"name": "leg one"}]\n'}, {"src/a.txt": "a\n"},
-                      {"src/b.txt": "b\n"}, {"src/c.txt": "c\n"}]
+        # TOOL-aNimbleMend-10: the two fix commits CHANGE a file the pre-cutoff init holds, since a fix
+        # commit adding a path is over limit L4, and these arms grade the lane's admission alone.
+        lane_files = [{"README.md": "x\n", "legs.json": '[{"name": "leg one"}]\n', "src/a.txt": "0\n", "src/b.txt": "0\n"},
+                      {"src/a.txt": "a\n"}, {"src/b.txt": "b\n"}, {"src/c.txt": "c\n"}]
         lane_msgs = ["init", "fix: clear leg one\n\nRed-fix: leg one\nPass: none", "fix: names no leg\n\nRed-fix: leg nine",
                      "chore: no id"]
-        repo, s = build_fixture(root, "lane", [{"msg": m, "files": f} for m, f in zip(lane_msgs, lane_files)])
-        free, _s = build_fixture(root, "lanefree", [{"msg": m.split("\n")[0], "files": f} for m, f in zip(lane_msgs, lane_files)])
+        lane_dates = [{"date": OLD_EPOCH}, {}, {}, {}]
+        repo, s = build_fixture(root, "lane", [{"msg": m, "files": f, **d} for m, f, d in zip(lane_msgs, lane_files, lane_dates)])
+        free, _s = build_fixture(root, "lanefree", [{"msg": m.split("\n")[0], "files": f, **d}
+                                                    for m, f, d in zip(lane_msgs, lane_files, lane_dates)])
         set_fixture_conf(repo, LEG_MANIFEST="legs.json")
         set_fixture_conf(free, LEG_MANIFEST="legs.json")
         c2, c3, c4 = (f"  {x[:8]} " for x in s[1:])
@@ -797,9 +908,11 @@ def run_selftest() -> int:
         before = GIT_SPAWNS[0]
         run_check(free)
         spawns["free whole"] = GIT_SPAWNS[0] - before
-        print_arm(rc == 1 and rc2 == 1 and "red-fix" not in out + out2 and spawns["lane"] == spawns["free whole"] + 1,
+        print_arm(rc == 1 and rc2 == 1 and " red-fix ·" not in out + out2 and spawns["lane"] == spawns["free whole"] + 2
+            and out.count("red-fix limits · graded 0") == 1 and out2.count("red-fix limits · graded 0") == 2,
             "TOOL-aNimbleMend-8 AC5 a trailer-free history reads no lane key, prints no red-fix count and costs "
-            f"one git spawn fewer than its lane twin, the batched manifest read ({spawns})", out + "\n" + out2)
+            "two git spawns fewer than its lane twin, the batched manifest read and the limits read; "
+            f"TOOL-aNimbleMend-10 AC6 it prints `red-fix limits · graded 0` once per population ({spawns})", out + "\n" + out2)
         policy_get = "policy" + ".py"       # spelled apart: AC6 counts that name in this file as zero
         import build_records  # noqa: E402  a sibling, for the one policy read's second caller
         import inspect
@@ -809,6 +922,104 @@ def run_selftest() -> int:
             and policy_get not in pathlib.Path(__file__).read_text(encoding="utf-8"),
             "TOOL-aNimbleMend-8 AC6 the policy read lives once, in tree_lib, the override door calls it, and "
             "this file spells no policy reader of its own")
+
+        # ---- TOOL-aNimbleMend-10 AC1-AC5 AC7: the inline lane's limits. One history, c1 before the cutoff
+        # and trailer-free, c2 inside every limit, c3 to c7 one commit per limit; each fix names the unit,
+        # so the routing half is green and every red below is the limits pass's. Graded through the verb,
+        # then by the leg with the waiver blank, full and one sha too long. Against a grader with no
+        # limits pass every arm here reads RED.
+        def run_limits_verb(repo, rev: str) -> tuple:
+            here, said = os.getcwd(), io.StringIO()
+            os.chdir(repo)
+            try:
+                with contextlib.redirect_stdout(said):
+                    rc = main(["routed_commits.py", "--red-fix-limits", rev])
+            finally:
+                os.chdir(here)
+            return rc, said.getvalue()
+
+        fix_msg = "TOOL-tFix-1: fix {}\n\nRed-fix: leg one"
+        rows = [f"a{k}\n" for k in range(40)]
+        big = ["A0\n"] + [f"B{k}\n" for k in range(1, 31)] + rows[31:] + ["c2\n", "c3\n", "c4\n"]
+        policy_toml = ".governance/policy.toml"
+        repo, s = build_fixture(root, "limits", [
+            {"msg": "init", "date": OLD_EPOCH, "files": {
+                "src/a.txt": "".join(rows), "src/b.txt": "b\n", "src/c.txt": "c\n", "src/d.txt": "d\n",
+                SPEC1: "# TOOL-tFix-1 — one\n", policy_toml: "x = 1\n"}},
+            {"msg": fix_msg.format("c2"), "files": {"src/a.txt": "".join(["A0\n"] + rows[1:] + ["c2\n"])}},
+            {"msg": fix_msg.format("c3"), "files": {"src/a.txt": "".join(["A0\n"] + rows[1:] + ["c2\n", "c3\n"]),
+                                                    "src/b.txt": "b\nc3\n", "src/c.txt": "c\nc3\n", "src/d.txt": "d\nc3\n"}},
+            {"msg": fix_msg.format("c4"), "files": {"src/a.txt": "".join(big)}},
+            {"msg": fix_msg.format("c5"), "files": {"src/a.txt": "".join(big + ["c5\n"]), policy_toml: "x = 1\ny = 2\n"}},
+            {"msg": fix_msg.format("c6"), "files": {"src/a.txt": "".join(big + ["c5\n", "c6\n"]),
+                                                    SPEC1: "# TOOL-tFix-1 — one\nrevised\n"}},
+            {"msg": fix_msg.format("c7"), "files": {"src/e.txt": "e\n"}},
+        ])
+        set_fixture_conf(repo)
+        got = [run_limits_verb(repo, sha) for sha in s]
+        bound = f"; the bound is {RED_FIX_MAX_PATHS} and {RED_FIX_MAX_LINES}"
+        print_arm(got[1][0] == 0 and "is inside all four" in got[1][1]
+            and got[2][0] == 1 and f"L1 size: 4 path(s), 4 line(s){bound}" in got[2][1]
+            and got[3][0] == 1 and f"L1 size: 1 path(s), 61 line(s){bound}" in got[3][1]
+            and "L1" not in got[4][1] + got[5][1] + got[6][1],
+            "TOOL-aNimbleMend-10 AC1 the verb exits 0 for a 3-line fix, and 1 naming L1, both counts and the bound "
+            "for four routed paths and for 30 lines deleted with 31 added; a path outside ROUTED_PATHS counts "
+            "toward neither", "\n".join(out for _rc, out in got))
+        orig_guarded = globals()["read_guarded_paths"]
+        try:
+            globals()["read_guarded_paths"] = lambda: None
+            bare = run_limits_verb(repo, s[4])
+            globals()["read_guarded_paths"] = lambda: [".governance/other.toml"]
+            other = run_limits_verb(repo, s[4])
+        finally:
+            globals()["read_guarded_paths"] = orig_guarded
+        print_arm(got[4][0] == 1 and f"L2 guarded policy file: {policy_toml}" in got[4][1]
+            and bare[0] == 1 and f"L2 guarded policy file: {policy_toml}" in bare[1] and other[0] == 0,
+            "TOOL-aNimbleMend-10 AC2 the verb exits 1 naming L2 and the guarded path, still does with no policy "
+            "kit resolving, and reads a resolved list by its lines, not the directory", got[4][1] + bare[1] + other[1])
+        print_arm(got[5][0] == 1 and f"L3 spec edit: {SPEC1}" in got[5][1] and "L2" not in got[5][1],
+            "TOOL-aNimbleMend-10 AC3 the verb exits 1 naming L3 and the spec's path", got[5][1])
+        print_arm(got[6][0] == 1 and "L4 new surface: src/e.txt" in got[6][1] and "L4" not in got[2][1] + got[3][1],
+            "TOOL-aNimbleMend-10 AC4 the verb exits 1 naming L4 and the added path, and a changed path is no addition",
+            got[6][1])
+        none = run_limits_verb(repo, "0123456789abcdef0123456789abcdef01234567")
+        print_arm(none[0] == 2 and f"{SAY} REFUSED — " in none[1] and "names no commit in this clone" in none[1]
+            and got[0][0] == 2 and f"{SAY} REFUSED — commit {s[0][:8]} carries no `{RED_FIX_TRAILER}:` trailer" in got[0][1],
+            "TOOL-aNimbleMend-10 AC7 the verb refuses at exit 2 a rev naming no commit and a commit carrying no "
+            "trailer, saying which", none[1] + got[0][1])
+        limits_head = f"{SAY} FAILED — a Red-fix commit is outside the inline lane's limits:"
+        rc, out = run_check(repo)
+        under = out.split(limits_head)[-1]
+        print_arm(rc == 1 and out.count(limits_head) == 1 and all(f"  {x[:8]} " in under for x in s[2:])
+            and f"  {s[1][:8]} " not in out and "red-fix limits · graded 6 · bound 3 path(s), 60 line(s) · 0 waived" in out
+            and f"{SAY} FAILED — a commit touching" not in out,
+            "TOOL-aNimbleMend-10 AC5 the leg exits 1 listing c3 to c7 under the limits header and not c2, the "
+            "routing half green", out)
+        set_fixture_conf(repo, ROUTED_COMMIT_WAIVED=" ".join(x[:12] for x in s[2:]))
+        rc, out = run_check(repo)
+        print_arm(rc == 0 and "red-fix limits · graded 6 · bound 3 path(s), 60 line(s) · 5 waived" in out
+            and limits_head not in out and "stale" not in out,
+            "TOOL-aNimbleMend-10 AC5 the five shas waived, the leg exits 0, counts them, and reads none as stale", out)
+        rc, out = run_check(repo, {"GATE_PUSH_BASE": s[0]})
+        print_arm(rc == 1 and out.count(limits_head) == 1 and out.count(f"  {s[2][:8]} ") == 1
+            and "· 0 waived\n" in out + "\n" and "· 5 waived" in out,
+            "TOOL-aNimbleMend-10 S6 the RANGE half reads no waiver: the waived commits still red there, listed once", out)
+        set_fixture_conf(repo, ROUTED_COMMIT_WAIVED=" ".join(x[:12] for x in s[1:]))
+        rc, out = run_check(repo)
+        print_arm(rc == 1 and f"lists {s[1][:12]}" in out and out.count("stale") == 1,
+            "TOOL-aNimbleMend-10 AC5 the sha of a fix inside every limit added, the leg reds it alone as stale", out)
+        sixty = "".join(f"n{k}\n" for k in range(20))
+        repo, s = build_fixture(root, "limit60", [
+            {"msg": "init", "date": OLD_EPOCH, "files": {"src/a.txt": "a\n", "src/b.txt": "b\n", "src/c.txt": "c\n",
+                                                         SPEC1: "# TOOL-tFix-1 — one\n"}},
+            {"msg": fix_msg.format("at the bound"), "files": {"src/a.txt": "a\n" + sixty, "src/b.txt": "b\n" + sixty,
+                                                              "src/c.txt": "c\n" + sixty, "README.md": "x\n"}},
+        ])
+        set_fixture_conf(repo)
+        rc, out = run_limits_verb(repo, s[1])
+        print_arm(rc == 0 and "is inside all four" in out,
+            "TOOL-aNimbleMend-10 AC1 three routed paths and 60 changed lines are at the bound and not over it, a "
+            "fourth path outside ROUTED_PATHS beside them", out)
 
         # ---- TOOL-dTrueNorth-4 AC1-AC7 AC10 AC13: the deviation join's fixture over every plant, each
         # plant's failing case staged by the plant itself, and the record-late plant through this host.
@@ -919,8 +1130,31 @@ def main(argv: list) -> int:
             if unit:
                 print(unit)
             return 0
+        if len(args) == 2 and args[0] == "--red-fix-limits":
+            # TOOL-aNimbleMend-10 S8: the one commit the rev names, merge or not, against the same
+            # predicate the leg runs. It reads no waiver.
+            conf = load_conf(repo)
+            tracked = [p for p in run_git(repo, "ls-tree", "-r", "-z", "--name-only", "HEAD").decode("utf-8", "replace").split("\0") if p]
+            entries, _cutoff, _families, memory_root, _waived = check_conf(conf, tracked)
+            got = run_git(repo, "rev-parse", "--verify", "--quiet", "--end-of-options", args[1] + "^{commit}", may_fail=True)
+            if not got:
+                raise Refusal(f"--red-fix-limits {args[1]} names no commit in this clone")
+            fix = read_routed_commits(repo, ["-1", got.decode("utf-8").strip()])[0]
+            if not fix["red_fix"]:
+                raise Refusal(f"commit {fix['sha'][:8]} carries no `{RED_FIX_TRAILER}:` trailer, so the inline "
+                              f"lane's limits do not grade it")
+            over = check_red_fix_limits(repo, [fix], entries, memory_root, []).get(fix["sha"], [])
+            if not over:
+                print(f"{SAY}: red-fix limits · {fix['sha'][:8]} is inside all four · bound {RED_FIX_MAX_PATHS} "
+                      f"path(s), {RED_FIX_MAX_LINES} line(s)")
+                return 0
+            print(f"{SAY} FAILED — a Red-fix commit is outside the inline lane's limits:")
+            for found in over:
+                print(f"  {fix['sha'][:8]} {fix['subject']} — {found}")
+            return 1
         if args:
-            print(f"{SAY}: unknown arguments {' '.join(args)}; the verbs are none, --newest-unit <range> and --selftest")
+            print(f"{SAY}: unknown arguments {' '.join(args)}; the verbs are none, --newest-unit <range>, "
+                  f"--red-fix-limits <rev> and --selftest")
             return 2
         rc, lines = check_routed_commits(repo, os.environ)
     except Refusal as exc:

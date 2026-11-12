@@ -6988,6 +6988,11 @@
       "file": "tools/memory-tree/build_records.py"
     },
     {
+      "id": "check_red_fix_limits",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
       "id": "check_reds",
       "kind": "function",
       "file": "tools/playbook/overlay_rows.py"
@@ -18436,6 +18441,11 @@
       "id": "read_guard_misses",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "read_guarded_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "read_guarded_paths",
