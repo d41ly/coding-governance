@@ -10,6 +10,7 @@
 | [2026-11-12-build-TOOL-aQueuedIndex-1-agent-ledger.md](../build/2026-11-12-build-TOOL-aQueuedIndex-1-agent-ledger.md) | journal | TOOL-aQueuedIndex-2 TOOL-aQueuedIndex-3 |
 | [2026-11-12-build-TOOL-aQueuedIndex-1-deviation-11.md](../build/2026-11-12-build-TOOL-aQueuedIndex-1-deviation-11.md) | deviation | — |
 | [2026-11-12-build-TOOL-aQueuedIndex-1-ledger.md](../build/2026-11-12-build-TOOL-aQueuedIndex-1-ledger.md) | journal | — |
+| [2026-11-12-build-TOOL-aQueuedIndex-1-runlog-0b9c7ce9.md](../build/2026-11-12-build-TOOL-aQueuedIndex-1-runlog-0b9c7ce9.md) | journal | TOOL-aQueuedIndex-2 TOOL-aQueuedIndex-3 |
 | [2026-11-12-prompt-TOOL-aQueuedIndex-1-1-spec-writer.md](../prompts/2026-11-12-prompt-TOOL-aQueuedIndex-1-1-spec-writer.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aQueuedIndex-1-brief.md](../prompts/2026-11-12-prompt-TOOL-aQueuedIndex-1-brief.md) | research | — |
 | [2026-11-12-prompt-TOOL-aQueuedIndex-1-build-brief.md](../prompts/2026-11-12-prompt-TOOL-aQueuedIndex-1-build-brief.md) | journal | — |
