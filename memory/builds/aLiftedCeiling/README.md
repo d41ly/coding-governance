@@ -41,25 +41,27 @@ None.
 | # | Unit | Mechanism |
 |---|---|---|
 | 1 | `TOOL-aLiftedCeiling-1` | the instruction-edits leg's declared ceiling rises to cover a wait on the other tag-index writer's tree build |
+| 2 | `TOOL-aLiftedCeiling-2` | the closing review's minor: the evidence row's source names the host load and the commit its race ran at |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-11-12 · streams tooling
+**Build status:** DEFERRED · 2 unit(s) · node a · opened 2026-11-12 · streams tooling
 ids TOOL-aLiftedCeiling-1 TOOL-aLiftedCeiling-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aLiftedCeiling-1 — the instruction-edits leg's ceiling covers its wait on the tag index](spec/2026-11-12-spec-TOOL-aLiftedCeiling-1.md) | 1 | 1 | CLOSED | rev-1 | 2026-11-12 |
+| [TOOL-aLiftedCeiling-2 — the instruction-edits evidence row names its host load and its clone's commit](spec/2026-11-12-spec-TOOL-aLiftedCeiling-2.md) | 2 | 1 | DEFERRED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 4 record folder(s).
+Records: 11 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aLiftedCeiling-1.
+Ids no `spec-audit` record has ever named: TOOL-aLiftedCeiling-1 TOOL-aLiftedCeiling-2.
 
-Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -67,6 +69,7 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aLiftedCeiling-1` | no |
+| 2 | `TOOL-aLiftedCeiling-2` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
