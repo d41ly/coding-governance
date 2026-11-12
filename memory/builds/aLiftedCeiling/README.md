@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-12
 streams: tooling
 roster: TOOL
-ids: TOOL-aLiftedCeiling-1 TOOL-aLiftedCeiling-2
+ids: TOOL-aLiftedCeiling-1 TOOL-aLiftedCeiling-2 TOOL-aLiftedCeiling-3
 authorized-by: prompt
 ---
 
@@ -42,11 +42,12 @@ None.
 |---|---|---|
 | 1 | `TOOL-aLiftedCeiling-1` | the instruction-edits leg's declared ceiling rises to cover a wait on the other tag-index writer's tree build |
 | 2 | `TOOL-aLiftedCeiling-2` | the closing review's minor: the evidence row's source names the host load and the commit its race ran at |
+| 3 | `TOOL-aLiftedCeiling-3` | the close bar's install-prefix red: the evidence row's source rewritten by the kit without the kit path it spelled |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 2 unit(s) · node a · opened 2026-11-12 · streams tooling
-ids TOOL-aLiftedCeiling-1 TOOL-aLiftedCeiling-2
+ids TOOL-aLiftedCeiling-1 TOOL-aLiftedCeiling-2 TOOL-aLiftedCeiling-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -55,7 +56,7 @@ ids TOOL-aLiftedCeiling-1 TOOL-aLiftedCeiling-2
 | [TOOL-aLiftedCeiling-2 — the instruction-edits evidence row names its host load and its clone's commit](spec/2026-11-12-spec-TOOL-aLiftedCeiling-2.md) | 2 | 1 | CLOSED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 13 bound to this build, across 4 record folder(s).
+Records: 15 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

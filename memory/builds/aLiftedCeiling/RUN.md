@@ -12,19 +12,19 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 068fc7304d5bc107e57ca71bb8179a093a59fbfd
-phase: VERIFYING
+witness: 60c1eacfca87ca911c0679e210cc268ccd371433
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/unattended-aliftedceiling
 anchor-kind: local
 cli-version: 2.1.321
-lease-utc: 2026-11-12T18:26:10Z
+lease-utc: 2026-11-12T20:58:38Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 5716
 session: 0394fa33-012c-408f-a840-e6e4cfaac23f
-keepalive: 6506ac7a
+keepalive: abdd7c09
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: aa8f0800087a4d4cde9854bdbfb18a4932857726
 anchor-ref: refs/heads/main
@@ -43,3 +43,5 @@ base: 768014ca37d52bef329959838d97957c97f541e9
 2026-11-12T19:50:27Z brief · item TOOL-aLiftedCeiling-2 · reason 8336a1ad12a0 memory/builds/aLiftedCeiling/prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-2-build-brief.md
 
 2026-11-12T19:51:41Z dispatch · item 9ee03312 TOOL-aLiftedCeiling-2 · reason tools/run-gates/ceiling-evidence.txt memory/builds/aLiftedCeiling/spec/2026-11-12-spec-TOOL-aLiftedCeiling-2.md memory/builds/aLiftedCeiling/build/2026-11-12-build-TOOL-aLiftedCeiling-2-ledger.md memory/builds/aLiftedCeiling/README.md memory/LIVE.md
+
+2026-11-12T20:59:11Z rescope · item add TOOL-aLiftedCeiling-3 · reason the close bar's install-prefix red: unit 2's evidence row source spells the playbook kit's path, which a shipped file may not; the row is rewritten by the kit without it
