@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-3 — the budget gate: the declared pass legs' cost rows sum inside the budget, red past the limit, with no leg over the cap, unmeasured, held or of an excluded class
 
-**Status:** SPECCED · rev-1 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 4
+**Status:** INPROGRESS · rev-1 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
