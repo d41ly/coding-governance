@@ -617,6 +617,20 @@ imported, and with a pin set and the file absent the failure is NAMED, not a tra
     held line (`TOOL-dTrueNorth-16`, `TOOL-dTrueNorth-20`). A full run reads this verdict from check
     9's generator process as check 29 reads its own, printed as the standalone verb prints it
     (`TOOL-dTrueNorth-27`).
+31. **a red fix has its record** — an inline red fix has no spec, so its one account is the `red-fix`
+    record written after it. Every commit reachable from HEAD that carries a `Red-fix:` trailer owes,
+    per trailer value, one record whose `Commit` is that commit's sha and whose `Leg` is that value.
+    Failing, each named: J1 a fix commit below HEAD with no record, J2 a record whose `Commit` is no
+    such commit, J3 a record whose `Leg` is no trailer value of its commit, J4 a record whose `Files`
+    differs from the commit's own paths, J5 two records answering one commit and leg, J6 a malformed
+    record. A fix AT HEAD with no record is printed as owed and passes, because the record names the
+    commit by sha and so is always the next commit. Under `--staged` the check grades HEAD alone: a
+    HEAD carrying the trailer with no record in the index fails, so the commit after a fix is its
+    record's, and a HEAD with no trailer prints a held line. Delegated to `build_records.py join
+    red-fix`, whose summary line, the commits and records it read, is printed on every green run; a
+    join that cannot read git or the tracked records fails as well (`TOOL-aNimbleMend-9`).
+    NOT GRADED: that the record is the fix's direct child on a full run, a clone with no pre-commit
+    hook having no promptness check at all; that `Rerun` or `Red line` is true; that the leg was red.
 
 ## Record bindings — how a record names its spec
 
@@ -634,8 +648,9 @@ carry it too:
   code) · `journal` (evidence of what was built) · `research` (a report that precedes the specs) ·
   `deviation` (a departure from the design or from a spec, in the grammar under "Deviation records") ·
   `exception` (a principle excused for one part, minted by `PLAY-dOrderedCharter-7`'s record factory) ·
-  `override` (minted by `PLAY-dOrderedCharter-2`) · `change` (minted by `PLAY-dOrderedCharter-15`).
-  The four after `research` are the typed kinds: each record is named
+  `override` (minted by `PLAY-dOrderedCharter-2`) · `change` (minted by `PLAY-dOrderedCharter-15`) ·
+  `red-fix` (the record of an inline red fix, in the grammar under "Red-fix records").
+  The five after `research` are the typed kinds: each record is named
   `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
   joined both ways. An open kind field stops being groupable the first time two authors spell one
   relation differently.
@@ -692,6 +707,17 @@ names the departed clause or the new unit; `by-risk` also refuses a role below t
 ask naming the record, and its follow-up is a new record naming the declined one in Supersedes, the
 as-built view re-rendered in that commit, so no landed record keeps citing a withdrawn approval
 (`TOOL-dTrueNorth-20`).
+
+**Red-fix records.** An inline red fix, a commit carrying a `Red-fix: <leg name>` trailer, is recorded
+after the fix by a `red-fix` record named `<date>-build-<unit id>-red-fix-<n>.md` in a build's `build/`
+folder, under the unit whose pass the red followed, or a unit of the build that last changed the fixed
+file. Its fields are `- **<Key>:** <value>` bullets, one line each and all required: Leg (the leg's
+name as the trailer spells it), Red line (the line of the failure the fix clears), Files (the commit's
+paths, sorted, joined by a comma and a space), Commit (the fix commit's full 40-hex sha), Rerun (the
+command that showed the leg green, and its result) and Caused-by (one id). Write it through the door,
+`build_records.py new red-fix --build <slug> --unit <id> --leg <leg name> --red-line <line> --commit
+<rev> --rerun <command and result>`, which derives Files and Commit from the commit and refuses a
+commit carrying no trailer naming that leg. Check 31 joins every such commit to its record.
 
 ## Acceptance ledger — how a built unit evidences its criteria
 

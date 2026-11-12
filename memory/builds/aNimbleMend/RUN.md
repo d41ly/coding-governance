@@ -85,3 +85,9 @@ base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 2026-11-12T17:22:57Z brief · item TOOL-aNimbleMend-8 · reason 31459d489d13 memory/builds/aNimbleMend/prompts/2026-11-12-prompt-TOOL-aNimbleMend-8-build-brief.md
 
 2026-11-12T17:34:14Z dispatch · item 1d010f40 TOOL-aNimbleMend-8 · reason memory/LIVE.md memory/builds/aNimbleMend/README.md memory/map/generated/symbols.json
+
+2026-11-12T17:45:54Z dispatch · item 53c28923 TOOL-aNimbleMend-9 · reason tools/memory-tree/tree_lib.py tools/memory-tree/build_records.py tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-9.md memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-9-1-acceptance-ledger.md
+
+2026-11-12T17:45:56Z brief · item TOOL-aNimbleMend-9 · reason c32de8f14408 memory/builds/aNimbleMend/prompts/2026-11-12-prompt-TOOL-aNimbleMend-9-build-brief.md
+
+2026-11-12T17:58:54Z dispatch · item 53c28923 TOOL-aNimbleMend-9 · reason tools/memory-tree/tree_lib.py tools/memory-tree/build_records.py tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-9.md memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-9-1-acceptance-ledger.md memory/guides/SESSION-KICKOFF.md

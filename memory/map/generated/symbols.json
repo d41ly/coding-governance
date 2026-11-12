@@ -6983,6 +6983,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "check_red_fix_join",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
       "id": "check_reds",
       "kind": "function",
       "file": "tools/playbook/overlay_rows.py"
@@ -19878,6 +19883,11 @@
       "file": "tools/run-gates/pass_legs.py"
     },
     {
+      "id": "read_red_fix",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
       "id": "read_refs",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -27598,6 +27608,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "run_rf31_gate",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
       "id": "run_rm",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -33568,6 +33583,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "write_red_fix",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
       "id": "write_red_ref",
       "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
@@ -33629,6 +33649,11 @@
     },
     {
       "id": "write_rev_spec",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_rf31_commit",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
