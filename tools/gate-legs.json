@@ -1679,6 +1679,20 @@
     "ceiling": 12720
   },
   {
+    "name": "memory hygiene (the pass checks)",
+    "argv": [
+      "bash",
+      "{prefix}/memory-tree/check-memory-hygiene.sh",
+      "--only",
+      "9,21,23"
+    ],
+    "scope_of": "memory hygiene",
+    "reads": {"base": "its later checks diff what was added since the mainline merge-base (TOOL-aSparedSpawn-13 S3).", "clock": "it compares the date against RECORD_SERVES_CUTOFF (TOOL-aSparedSpawn-13 S3).", "history": "it reads commits since that merge-base (TOOL-aSparedSpawn-13 S3)."},
+    "chunk": "records",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "transition-audit arms",
     "argv": [
       "bash",
@@ -1848,6 +1862,19 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 940
+  },
+  {
+    "name": "spec tokens (the pass's own spec)",
+    "argv": [
+      "python",
+      "{prefix}/check-spec-tokens.py",
+      "--pass-spec"
+    ],
+    "scope_of": "spec tokens (a spec's own names resolve)",
+    "reads": {"history": "it names the pass's unit from the `git log` of `$GATE_BASE..HEAD`, else of the last commit (TOOL-aNimbleMend-4 S2)."},
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
   },
   {
     "name": "kit placeholders (a declared token its adopter substitutes)",
@@ -2096,6 +2123,19 @@
     "ceiling": 420,
     "pack": "tags",
     "enforces": ["practice.writing.address", "practice.writing.retirement"]
+  },
+  {
+    "name": "positional (the citation check alone)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/positional.py",
+      "check"
+    ],
+    "scope_of": "tags (the resolver's checks)",
+    "reads": {"history": "it reads when each line holding a citation was written, by `git blame -M` (TOOL-aNimbleMend-4 S1)."},
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
   },
   {
     "name": "tags positional selftest",

@@ -19378,6 +19378,11 @@
       "file": "tools/run-gates/pass_legs.py"
     },
     {
+      "id": "read_pass_spec",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "read_patch_lines",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -20151,6 +20156,11 @@
       "id": "read_scan_overlaps",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "read_scope_reds",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "read_scouted_population",

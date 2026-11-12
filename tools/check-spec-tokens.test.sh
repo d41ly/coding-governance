@@ -73,7 +73,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # branch's 14, less the ten unit 5 arms dropped there = 235. Counted by reading; OWED: observed at the close.
 # MERGED at PLAY-dOrderedCharter-83's reconcile of 47ed57fab: main's 235 plus this branch's 3 from
 # PLAY-dOrderedCharter-63 = 238. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=238
+# RAISED 238 -> 245 by TOOL-aNimbleMend-4: its seven --pass-spec arms, one for AC3 and two each for
+# AC2, AC4 and AC5, each top-level. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=245
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -2109,6 +2111,30 @@ else
   arm "SD8 AC2 a red --spec run prints the overlay's summary span" 1 "$d" "$sp_sum"
   ARM_ARGS=()
 fi
+
+# TOOL-aNimbleMend-4 — --pass-spec, the pass form of --spec: the one spec of the newest unit the
+# range's commits name. The scratch repo gains a conf declaring the family, in a commit naming no
+# unit, then an empty commit whose subject names the tracked spec's unit. Every range is spelled or
+# set on the arm, since a bar may run this suite with GATE_BASE exported. The `--spec · 1 named`
+# arm is the one a flag grading the whole corpus reds: that run prints no mode segment.
+d=$base/passspec; scratch "$d"
+printf 'FAMILIES="tooling:TOOL"\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null; git -C "$d" commit -qm "the conf, naming no unit" --no-verify
+ps_base=$(git -C "$d" rev-parse HEAD~1)
+ps_spec="$SPECDIR/$HCUT-spec-TOOL-tOne-1.md"
+ARM_ARGS=(--pass-spec HEAD~1..HEAD)
+arm "NM4 AC3 --pass-spec over a commit naming no unit grades nothing and exits 0" 0 "$d" "--pass-spec · HEAD~1..HEAD · names no specced unit · 0 spec(s) graded" "--spec ·"
+git -C "$d" commit -q --allow-empty -m "feat: TOOL-tOne-1 a pass" --no-verify
+arm "NM4 AC2 --pass-spec names the unit of the last commit and its spec" 0 "$d" "--pass-spec · HEAD~1..HEAD · TOOL-tOne-1 · $ps_spec"
+arm "NM4 AC2 --pass-spec grades that one spec by the --spec path" 0 "$d" "--spec · 1 named spec(s) graded"
+ARM_ARGS=(--pass-spec no-such-rev..HEAD)
+arm "NM4 AC4 --pass-spec REFUSES a range that does not resolve" 2 "$d" "REFUSING — --pass-spec no-such-rev..HEAD" "--spec ·"
+ARM_ARGS=(--pass-spec --spec "$ps_spec")
+arm "NM4 AC4 --pass-spec REFUSES beside --spec" 2 "$d" "REFUSING — --pass-spec takes its one spec from the range"
+ARM_ARGS=(--pass-spec)
+GATE_BASE=$ps_base arm "NM4 AC5 --pass-spec with no operand reads the inherited GATE_BASE" 0 "$d" "--pass-spec · $ps_base..HEAD · TOOL-tOne-1"
+GATE_BASE= arm "NM4 AC5 --pass-spec with no operand and a blank GATE_BASE reads the last commit" 0 "$d" "--pass-spec · HEAD~1..HEAD · TOOL-tOne-1"
+ARM_ARGS=()
 
 # TOOL-dGroundRules-32 S9, TOOL-dGroundRules-40: the build-order render's overlap rule is the
 # dispatcher's, and both are graded against the truth. Each OVERLAP_PAIRS row is two paths relative to

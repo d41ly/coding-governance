@@ -157,12 +157,12 @@ check-memory-hygiene.sh: the memory tree's structural gate, its per-class size c
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/memory-tree-hygiene.md`
 - decisions 3: `TOOL-aRelaxedShard-1`, `TOOL-aWidenedGuide-1`, `TOOL-dDerivedDocket-31`
-- gate-legs 11: `memory hygiene`, `memory-hygiene self-test`, `verdict epoch (kit version dates the engine)`, `verdict-epoch self-test`, `kit version markers`, `kit/dogfood doc parity`, `transition-audit arms`, `backlog migration selftest`, `straggler-guard arms`, `routed commits name a specced unit`, `routed-commits selftest`
+- gate-legs 12: `memory hygiene`, `memory hygiene (the pass checks)`, `memory-hygiene self-test`, `verdict epoch (kit version dates the engine)`, `verdict-epoch self-test`, `kit version markers`, `kit/dogfood doc parity`, `transition-audit arms`, `backlog migration selftest`, `straggler-guard arms`, `routed commits name a specced unit`, `routed-commits selftest`
 - kits 1: `memory-tree`
 - git-hooks 2: `commit-msg`, `pre-rebase`
 - gotcha-classes 22: `a-grep-for-a-word-is-a-presence-probe.md`, `suite-edited-while-bash-executes-it.md`, `ledger-token-wrapped-across-a-line-joins-nothing.md`
-- globs 11: `tools/memory-tree/check-memory-hygiene.sh`
-- cut 29 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- globs 11
+- cut 30 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## memory-tree-merge-driver
 
@@ -180,10 +180,10 @@ The governance playbook — the shipped template + companions, and the gates ove
 
 - status `shipped` · streams `playbook`, `tooling` · dossier `memory/map/features/playbook.md`
 - decisions 1: `TOOL-aSiftedPlaybook-1`
-- gate-legs 32: `template size gate selftest`, `playbook parity`, `playbook parity selftest`, `playbook render wiring`, `agent-instructions wiring`, `playbook render selftest`, `charter size`, `micro-format definitions`, `micro-format gate selftest`, `line length`, `line-length gate selftest`, `layer dependencies (the core never depends on an expansion)`, `instruction units (schema, one fact)`, `instruction render (one renderer of record)`, `help reference pages`, `instruction units selftest`, `instruction edits (manifest checks)`, `instruction edits selftest`, `tags (the resolver's checks)`, `tags positional selftest`, `tags bundle selftest`
+- gate-legs 33: `template size gate selftest`, `playbook parity`, `playbook parity selftest`, `playbook render wiring`, `agent-instructions wiring`, `playbook render selftest`, `charter size`, `micro-format definitions`, `micro-format gate selftest`, `line length`, `line-length gate selftest`, `layer dependencies (the core never depends on an expansion)`, `instruction units (schema, one fact)`, `instruction render (one renderer of record)`, `help reference pages`, `instruction units selftest`, `instruction edits (manifest checks)`, `instruction edits selftest`, `tags (the resolver's checks)`, `positional (the citation check alone)`, `tags positional selftest`
 - kits 1: `playbook`
 - globs 8
-- cut 19 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 20 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## playbook-mode
 
@@ -318,7 +318,7 @@ The joins that resolve a live spec's leg names, witness paths and line citations
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/spec-tokens.md`
 - decisions 0
-- gate-legs 2: `spec tokens (a spec's own names resolve)`, `spec-tokens self-test`
+- gate-legs 3: `spec tokens (a spec's own names resolve)`, `spec tokens (the pass's own spec)`, `spec-tokens self-test`
 - globs 3: `tools/check-spec-tokens.py`, `tools/check-spec-tokens.test.sh`, `memory/project/spec-token-waivers.txt`
 
 ## testsuite-counts

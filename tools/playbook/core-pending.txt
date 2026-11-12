@@ -198,6 +198,7 @@ leg	lexicon wiring	dWitnessedBar
 leg	playbook placeholder catalogue	dWitnessedBar
 leg	placeholder-catalogue self-test	dWitnessedBar
 leg	memory hygiene	dWitnessedBar
+leg	memory hygiene (the pass checks)	dWitnessedBar
 leg	transition-audit arms	dWitnessedBar
 leg	straggler-guard arms	dWitnessedBar
 leg	marker contracts	dWitnessedBar
@@ -210,12 +211,14 @@ leg	testsuite counts self-test	dWitnessedBar
 leg	playbook render wiring	dWitnessedBar
 leg	playbook render selftest	dWitnessedBar
 leg	spec tokens (a spec's own names resolve)	dWitnessedBar
+leg	spec tokens (the pass's own spec)	dWitnessedBar
 leg	kit placeholders (a declared token its adopter substitutes)	dWitnessedBar
 leg	roles catalogue	dWitnessedBar
 leg	roles render wiring	dWitnessedBar
 leg	roles render selftest	dWitnessedBar
 leg	roles adopter self-test	dWitnessedBar
 leg	policy check	dWitnessedBar
+leg	positional (the citation check alone)	dWitnessedBar
 leg	tags positional selftest	dWitnessedBar
 leg	tags bundle selftest	dWitnessedBar
 leg	policy fixtures	dWitnessedBar

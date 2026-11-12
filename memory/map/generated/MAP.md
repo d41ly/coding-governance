@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 171 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 162 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 174 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 162 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -87,6 +87,7 @@ Inventories: gate-legs: 171 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · 
 | `marker contracts` | row-grammar |
 | `measure-legs selftest` | run-gates |
 | `memory hygiene` | memory-tree-hygiene |
+| `memory hygiene (the pass checks)` | memory-tree-hygiene |
 | `memory-hygiene self-test` | memory-tree-hygiene |
 | `memory-recall kit selftest` | memory-recall |
 | `memory-recall skill wiring` | memory-recall |
@@ -105,6 +106,7 @@ Inventories: gate-legs: 171 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · 
 | `playbook validity gate` | playbook-mode |
 | `policy check` | policy |
 | `policy fixtures` | policy |
+| `positional (the citation check alone)` | playbook |
 | `pre-push bar self-test` | run-gates |
 | `pre-push run-log line` | runlog |
 | `pre-push self-test` | push-main |
@@ -155,6 +157,7 @@ Inventories: gate-legs: 171 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · 
 | `shell-hygiene selftest` | gate-lint |
 | `spawn budget (forks per hot entrypoint)` | gate-lint |
 | `spec tokens (a spec's own names resolve)` | spec-tokens |
+| `spec tokens (the pass's own spec)` | spec-tokens |
 | `spec-audit opt-in pack self-test` | review-harnesses |
 | `spec-tokens self-test` | spec-tokens |
 | `step-gate` | govkit |

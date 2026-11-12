@@ -436,6 +436,31 @@ exemption for that reason. An adopter receives neither.
 """
 
 [[exempt_leg]]
+name = "spec tokens (the pass's own spec)"
+why = """
+the pass form of the leg above: the same gov-only script under `--pass-spec`, grading the one spec
+the pass's commits name. An adopter receives neither the script nor the leg. TOOL-aNimbleMend-4.
+"""
+
+[[exempt_leg]]
+name = "memory hygiene (the pass checks)"
+why = """
+the pass form of `memory hygiene`: the same script under `--only 9,21,23`. The script ships, but the
+selection is sized against gov's corpus, where those three checks fit a pass and checks 12 and 25
+do not, so a `[[gate_leg]]` row would hand an adopter a pin measured in another tree. An adopter
+runs the whole leg. TOOL-aNimbleMend-4.
+"""
+
+[[exempt_leg]]
+name = "positional (the citation check alone)"
+why = """
+the pass form of `tags (the resolver's checks)`: its positional arm alone, `<prefix>/playbook/positional.py
+check`, over gov's own records. Gov-only for the parent leg's reason, and no `[[gate_leg]]` for the
+same one: a descriptor row naming a leg the target cannot carry is what reds the deployer.
+TOOL-aNimbleMend-4.
+"""
+
+[[exempt_leg]]
 name = "spec-tokens self-test"
 why = "gov's own red/green proof of the leg above; it travels with a gate that does not travel."
 

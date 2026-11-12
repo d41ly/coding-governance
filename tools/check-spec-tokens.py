@@ -253,6 +253,13 @@ arms that read the corpus rather than a spec do not run: the carries join and th
 report lines say `skipped under --spec`, and the stale-waiver and stale high-water arms, whose rows a
 one-spec population would call stale. So a `--spec` green is not the bar's green.
 
+--pass-spec [<range>] (TOOL-aNimbleMend-4) is the pass form of --spec: it grades the spec of the
+newest unit the range's commits name, by subject or `Pass:` trailer, and its exit is --spec's. The
+range is the operand, else `$GATE_BASE..HEAD`, else `HEAD~1..HEAD`. A range naming no specced unit
+prints a `0 spec(s) graded` line and exits 0; one that does not resolve, or the flag beside --spec
+or --legs-for, refuses with exit 2. It grades ONE spec, so a sibling's token a pass broke is seen
+at the bar and not here.
+
 --legs-for (TOOL-aMendedFleet-87) is a QUERY, not a join: it runs before the spec walk, grades no
 spec and exits 0. It reads the guards through `check_guard_trips`, the guards join's own trip rule,
 keeps the broad guards that join drops and marks them, and prints the chunk and subject the runner's
@@ -263,6 +270,7 @@ A query in which EVERY path is untracked exits 2.
 import datetime
 import importlib.util
 import json
+import os
 import pathlib
 import re
 import subprocess
@@ -1576,6 +1584,40 @@ def read_named_specs(root, args):
     return sorted(out)
 
 
+def read_pass_spec(root, files, args):
+    """The --pass-spec population (TOOL-aNimbleMend-4): the spec of the newest unit the range's commits
+    name, as a one-path list `--spec`'s path grades; [] after the zero line when they name no specced
+    unit; None after a REFUSING line. The range is the first operand, else `$GATE_BASE..HEAD` when
+    GATE_BASE is set and not empty, else `HEAD~1..HEAD`. It reaches git as ONE argument, and a range
+    with no `..`, or either end naming no revision, refuses: nothing falls back to another range.
+    The unit and its spec are the memory-tree kit's `read_newest_unit` and `load_spec_paths`."""
+    ops = [a for a in args if not a.startswith("-")]
+    base = os.environ.get("GATE_BASE") or ""
+    rng = ops[0] if ops else f"{base}..HEAD" if base else "HEAD~1..HEAD"
+    try:
+        rc = load_kit_module("routed_commits")
+        if ".." not in rng or rng.startswith("-") or rc.run_git(root, "rev-parse", "--quiet", rng, may_fail=True) is None:
+            print(f"spec-tokens: REFUSING — --pass-spec {rng} is not a range whose two ends resolve")
+            return None
+        uid = rc.read_newest_unit(root, rng)
+        if not uid:
+            print(f"spec-tokens: --pass-spec · {rng} · names no specced unit · 0 spec(s) graded")
+            return []
+        conf = rc.load_conf(root)
+        memory_root = (conf.get("MEMORY_ROOT") or "memory").strip().strip("/")
+        paths = rc.load_spec_paths(root, sorted(files), memory_root, rc.extract_families(conf))[0][uid]
+    except ImportError as exc:
+        print(f"spec-tokens: REFUSING — --pass-spec cannot load its unit lookup: {exc}")
+        return None
+    except Exception as exc:  # noqa: BLE001 - the kit's Refusal, re-raised unless it is that class
+        if not isinstance(exc, load_kit_module("routed_commits").Refusal):
+            raise
+        print(f"spec-tokens: REFUSING — --pass-spec {rng}: {exc}")
+        return None
+    print(f"spec-tokens: --pass-spec · {rng} · {uid} · {paths[0]}")
+    return paths[:1]
+
+
 def main(argv):
     listing = "--list" in argv
     root = pathlib.Path(run("git", "rev-parse", "--show-toplevel").strip())
@@ -1584,6 +1626,10 @@ def main(argv):
         return 2
 
     files = read_tracked(root)
+    if "--pass-spec" in argv and ("--spec" in argv or "--legs-for" in argv):
+        print("spec-tokens: REFUSING — --pass-spec takes its one spec from the range, so it runs "
+              "beside neither --spec nor --legs-for")
+        return 2
     if "--legs-for" in argv:   # a query, branched ahead of the spec walk: it grades no spec
         return print_legs_for(root, files, argv[argv.index("--legs-for") + 1:])
     if SPEC_DATE is None:
@@ -1596,6 +1642,10 @@ def main(argv):
         named_specs = read_named_specs(root, argv[argv.index("--spec") + 1:])
         if named_specs is None:
             return 2
+    elif "--pass-spec" in argv:   # the pass's own spec, handed to the --spec path below
+        named_specs = read_pass_spec(root, files, argv[argv.index("--pass-spec") + 1:])
+        if not named_specs:
+            return 2 if named_specs is None else 0
     if named_specs is not None:   # the writer's self-check: LIVE and git ls-files are not consulted
         specs, frozen, unretired = named_specs, 0, list(named_specs)
     else:

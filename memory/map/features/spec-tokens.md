@@ -8,7 +8,7 @@ streams = ["tooling"]
 decisions = []
 
 [claims]
-gate-legs = ["spec tokens (a spec's own names resolve)", "spec-tokens self-test"]
+gate-legs = ["spec tokens (a spec's own names resolve)", "spec tokens (the pass's own spec)", "spec-tokens self-test"]
 kits = []
 git-hooks = []
 harness-hooks = []

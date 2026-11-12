@@ -265,7 +265,9 @@ fail=0
 # 401 -> 405, TOOL-dRedressedBar-24 S9: arm 9e2's four, outside the `HAVE_TIMEOUT` gate, counted off the arm.
 # 405 -> 407, PLAY-dOrderedCharter-50: arm 1a's `enforces` control and arm 1a-owed, neither gated.
 # 407 -> 410, PLAY-dOrderedCharter-70 S13: arm 13g's `filled` line and arm 13h's two, neither gated.
-FLOOR_ASSERTIONS=410
+# 410 -> 412, TOOL-aNimbleMend-4: arm 1a's `scope_of` control, and arm 1a's `pass_leg` control, which
+# TOOL-aNimbleMend-2 added and left uncounted. Neither is gated. Counted by reading; this pass runs no suite.
+FLOOR_ASSERTIONS=412
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -363,7 +365,7 @@ if bad:
 n=$((n+1))
 "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack", "enforces", "pass_leg"}
+KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack", "enforces", "pass_leg", "scope_of"}
 try:
     legs = json.load(open(sys.argv[1]))
 except Exception as e:
@@ -699,7 +701,7 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
 keyset_probe() { "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack", "enforces", "pass_leg"}
+KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack", "enforces", "pass_leg", "scope_of"}
 legs = json.load(open(sys.argv[1]))
 sys.exit(1 if any(k not in KNOWN for l in legs for k in l) else 0)
 ' "$1"; }
@@ -755,6 +757,17 @@ printf '%s' '[{"name":"a","pass_legs":true,"argv":["bash","x.sh"]}]' > "$ctl/plt
 if keyset_probe "$ctl/pl.json" && ! keyset_probe "$ctl/pltypo.json"; then :
 else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`pass_leg\` and FAIL a near-miss of it; one of the two did not hold"
+  fail=1
+fi
+# ...and `scope_of` (TOOL-aNimbleMend-4 S1), by the same two halves, in both KNOWN copies: the leg a
+# scoped row is a cheap form of, whose reds `pass_legs.py --write` credits it. The near-miss is the
+# kebab spelling.
+n=$((n+1))
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"scope_of":"b"},{"name":"b","argv":["bash","y.sh"]}]' > "$ctl/so.json"
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"scope-of":"b"},{"name":"b","argv":["bash","y.sh"]}]' > "$ctl/sotypo.json"
+if keyset_probe "$ctl/so.json" && ! keyset_probe "$ctl/sotypo.json"; then :
+else
+  echo "canary: the manifest key-set predicate must PASS a row carrying \`scope_of\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
 rm -rf "$ctl"

@@ -6,6 +6,7 @@
 #
 # window TAB bars read TAB first bar's started TAB last bar's started TAB node TAB date
 # leg TAB reds TAB last seconds, or -
+# A row carrying `scope_of` holds its own reds plus those of the leg it names.
 # window	202	2026-09-21T03:34:29Z	2026-11-12T12:09:29Z	a	2026-11-12
 agent-cap self-test	2	742.0
 brief-recorded	20	104.1
@@ -40,6 +41,7 @@ lexicon naming predicates	22	11.8
 lexicon wiring	22	15.6
 manifest-check self-test	1	2162.0
 memory hygiene	48	632.7
+memory hygiene (the pass checks)	48	-
 memory-hygiene self-test	2	905.9
 method carriers (every pointer declared)	8	12.0
 pass-order history	5	141.4
@@ -48,6 +50,7 @@ playbook parity	3	7.2
 playbook parity selftest	2	338.4
 playbook render wiring	6	2.1
 policy check	10	13.0
+positional (the citation check alone)	6	-
 pre-push run-log line	2	-
 pre-push self-test	2	585.7
 process-monitor adopter selftest	3	-
@@ -74,6 +77,7 @@ shell hygiene (a location probe asked from a moved directory)	5	2.9
 shell hygiene (a loop fed by a command substitution)	17	1.6
 spawn budget (forks per hot entrypoint)	5	171.8
 spec tokens (a spec's own names resolve)	12	57.6
+spec tokens (the pass's own spec)	12	-
 spec-tokens self-test	3	76.1
 straggler-guard arms	26	183.0
 tags (the resolver's checks)	6	-

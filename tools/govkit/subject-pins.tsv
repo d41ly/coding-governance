@@ -87,6 +87,7 @@ manifest-check self-test	kit	selftests
 marker contracts	repo	declarations
 measure-legs selftest	kit	selftests
 memory hygiene	repo	records
+memory hygiene (the pass checks)	repo	records
 memory-hygiene self-test	kit	selftests
 memory-recall kit selftest	kit	selftests
 memory-recall skill wiring	repo	wiring
@@ -105,6 +106,7 @@ playbook render wiring	repo	wiring
 playbook validity gate	repo	declarations
 policy check	repo	declarations
 policy fixtures	kit	selftests
+positional (the citation check alone)	repo	declarations
 pre-push bar self-test	kit	selftests
 pre-push run-log line	repo	selftests
 pre-push self-test	kit	selftests
@@ -155,6 +157,7 @@ shell hygiene (a loop fed by a command substitution)	repo	product
 shell-hygiene selftest	kit	selftests
 spawn budget (forks per hot entrypoint)	repo	product
 spec tokens (a spec's own names resolve)	repo	declarations
+spec tokens (the pass's own spec)	repo	declarations
 spec-audit opt-in pack self-test	kit	selftests
 spec-tokens self-test	kit	selftests
 step-gate	repo	declarations

@@ -15,6 +15,8 @@ PASS_BUDGET_SECONDS:
                cheaper leg further down still enters.
 
 Every recorded red counts, an inherited one included: the run log does not say whose a red was.
+A row carrying `scope_of` is a cheap form of the leg it names, and `--write` credits it that leg's
+reds beside its own (`read_scope_reds`, TOOL-aNimbleMend-4).
 
 THE INPUTS. Red history lives in `<git-common-dir>/runlog/gates.log`, one line per bar with its
 failing legs as `fail.<n>` fields, and the last seconds in `gate-ledger.tsv`. Both are node-local,
@@ -142,6 +144,27 @@ def read_red_counts(runlog: pathlib.Path, names) -> dict:
         return {}
     return {"bars": bars, "red_bars": red_bars, "first": started[0], "last": started[-1],
             "reds": reds, "dropped": dropped}
+
+
+def read_scope_reds(legs, reds: dict) -> dict:
+    """`reds` with each row carrying `scope_of` credited the count of the leg it names, added to its
+    own (TOOL-aNimbleMend-4). A scoped form runs because its parent redded, so the parent's count is
+    its reason to run; the credit overstates it by the parent's reds the form does not grade. Every
+    credit reads the counts as logged, so a form of a form gains one parent's and no more. A
+    `scope_of` naming no manifest row is a Refusal.
+    """
+    names = {l["name"] for l in legs}
+    out = dict(reds)
+    for leg in legs:
+        parent = leg.get("scope_of")
+        if parent is None:
+            continue
+        if parent not in names:
+            raise Refusal(f"`{leg['name']}` carries scope_of `{parent}`, a name no manifest row carries")
+        credited = reds.get(leg["name"], 0) + reds.get(parent, 0)
+        if credited:
+            out[leg["name"]] = credited
+    return out
 
 
 def read_last_seconds(git_dirs) -> dict:
@@ -326,6 +349,7 @@ def cmd_write() -> int:
         raise Refusal("--write needs GOV_NODE set to the node whose run log is read; it is unset, "
                       "and a default would attribute this window to a machine that did not run it")
     _text, legs = read_manifest()
+    read_scope_reds(legs, {})  # an unknown scope_of refuses before the log is read or a byte written
     git_dir, common = resolve_git_dirs()
     runlog = common / "runlog" / "gates.log"
     log = read_red_counts(runlog, {l["name"] for l in legs})
@@ -333,6 +357,7 @@ def cmd_write() -> int:
         print(f"pass-legs: DEAD PROBE — {runlog} is absent or holds no bar line, so there is no "
               f"red history to rank by. Nothing was written.", file=sys.stderr)
         return 1
+    log["reds"] = read_scope_reds(legs, log["reds"])
     last = read_last_seconds([git_dir, common])
     today = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
     lines = ["# pass-leg-evidence.txt — recorded reds per gate leg, TRACKED so the pass-leg rule can read it.",
@@ -343,6 +368,7 @@ def cmd_write() -> int:
              "#",
              "# window TAB bars read TAB first bar's started TAB last bar's started TAB node TAB date",
              "# leg TAB reds TAB last seconds, or -",
+             "# A row carrying `scope_of` holds its own reds plus those of the leg it names.",
              "\t".join(["# window", str(log["bars"]), log["first"], log["last"], node, today])]
     for name in sorted(log["reds"]):
         lines.append(f"{name}\t{log['reds'][name]}\t{last[name]:.1f}" if name in last
