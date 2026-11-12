@@ -1,11 +1,12 @@
 # TOOL-aLiftedCeiling-1 — the instruction-edits leg's ceiling covers its wait on the tag index
 
-**Status:** DEFERRED · rev-1 · 2026-11-12 · node a · Tier-1 · base 123123146 · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-11-12 · node a · Tier-1 · base 123123146 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-12-build-TOOL-aLiftedCeiling-1-ledger.md](../build/2026-11-12-build-TOOL-aLiftedCeiling-1-ledger.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aLiftedCeiling-1-1-spec-writer.md](../prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-1-1-spec-writer.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aLiftedCeiling-1-brief.md](../prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-1-brief.md) | research | — |
 | [2026-11-12-prompt-TOOL-aLiftedCeiling-1-build-brief.md](../prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-1-build-brief.md) | journal | — |
