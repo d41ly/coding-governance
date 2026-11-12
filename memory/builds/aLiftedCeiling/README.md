@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-12
 streams: tooling
 roster: TOOL
-ids: TOOL-aLiftedCeiling-1
+ids: TOOL-aLiftedCeiling-1 TOOL-aLiftedCeiling-2
 authorized-by: prompt
 ---
 
@@ -45,7 +45,7 @@ None.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node a · opened 2026-11-12 · streams tooling
-ids TOOL-aLiftedCeiling-1
+ids TOOL-aLiftedCeiling-1 TOOL-aLiftedCeiling-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -53,7 +53,7 @@ ids TOOL-aLiftedCeiling-1
 | [TOOL-aLiftedCeiling-1 — the instruction-edits leg's ceiling covers its wait on the tag index](spec/2026-11-12-spec-TOOL-aLiftedCeiling-1.md) | 1 | 1 | CLOSED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 3 record folder(s).
+Records: 10 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

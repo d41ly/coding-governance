@@ -33,3 +33,7 @@ base: 768014ca37d52bef329959838d97957c97f541e9
 2026-11-12T19:00:53Z brief · item TOOL-aLiftedCeiling-1 · reason 45342159f129 memory/builds/aLiftedCeiling/prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-1-build-brief.md
 
 2026-11-12T19:02:01Z dispatch · item 1eeed758 TOOL-aLiftedCeiling-1 · reason tools/gate-legs.json tools/run-gates/ceiling-evidence.txt memory/guides/SESSION-KICKOFF.md memory/builds/aLiftedCeiling/spec/2026-11-12-spec-TOOL-aLiftedCeiling-1.md memory/builds/aLiftedCeiling/build/2026-11-12-build-TOOL-aLiftedCeiling-1-ledger.md memory/builds/aLiftedCeiling/README.md memory/LIVE.md
+
+2026-11-12T19:18:32Z review · item aLiftedCeiling · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 1 · disposition promote
+
+2026-11-12T19:18:35Z rescope · item add TOOL-aLiftedCeiling-2 · reason the closing review's round-1 minor, promoted: the instruction-edits evidence row's how text names no host load and a clone sha other than the spec's

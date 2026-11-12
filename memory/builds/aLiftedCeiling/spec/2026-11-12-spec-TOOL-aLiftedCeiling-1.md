@@ -13,6 +13,7 @@
 | [2026-11-12-prompt-TOOL-aLiftedCeiling-1-brief.md](../prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-1-brief.md) | research | — |
 | [2026-11-12-prompt-TOOL-aLiftedCeiling-1-build-brief.md](../prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-1-build-brief.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aLiftedCeiling-1-spec-brief.md](../prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-1-spec-brief.md) | research | — |
+| [2026-11-12-review-TOOL-aLiftedCeiling-1-diff-review-round1.md](../reviews/2026-11-12-review-TOOL-aLiftedCeiling-1-diff-review-round1.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
 
