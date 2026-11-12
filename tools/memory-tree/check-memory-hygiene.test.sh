@@ -3173,12 +3173,18 @@ printf 'later\n' > "$RF31/later.txt"; write_rf31_commit -m 'one more commit'
 out=$(run_rf31_gate --only 31); rf31rc=$?
 n=$((n+1)); [ "$rf31rc" = 1 ] || { echo "FAIL check 31 through the engine: an unrecorded fix below HEAD exited $rf31rc, not 1"; st=1; }
 chit 31 'the fixture leg · the fix commit has no red-fix record'
+chit 31 'a Red-fix: commit and its red-fix record disagree; write the record with build_records.py new red-fix'
 "$_PY" "$HERE/build_records.py" new red-fix --root "$RF31" --build tFix --unit ARCH-tFix-1 --leg 'the fixture leg' \
   --red-line 'FAIL the fixture leg' --commit 'HEAD~1' --rerun 'the fixture leg, green' >/dev/null 2>&1
 git -C "$RF31" add -A >/dev/null 2>&1
 out=$(run_rf31_gate --only 31); rf31rc=$?
 n=$((n+1)); [ "$rf31rc" = 0 ] || { echo "FAIL check 31 through the engine: a fix with its record staged exited $rf31rc, not 0"; st=1; }
 hit 'memory-hygiene: check 31: red-fix join · 1 fix commit(s) · 1 record(s) · 0 owed'
+# --- The join's exit 2: the fix commit's loose object is removed, so the join's `git log` cannot walk
+# --- HEAD's parent and check 31 fails on a join nobody could read. Last, since it breaks the fixture.
+rf31sha=$(git -C "$RF31" rev-parse 'HEAD~1'); rm -f "$RF31/.git/objects/${rf31sha:0:2}/${rf31sha:2}"
+out=$(run_rf31_gate --only 31)
+chit 31 'the red-fix join could not be read, so no Red-fix: commit was joined to its record'
 
 # ---- the verdict, printed AFTER the last arm. Upstream printed PASS ~150 lines early and landed a
 # ---- red merge bar because the head of the output said success.
@@ -4682,7 +4688,9 @@ done
 # PLAY-dOrderedCharter-64, -42 and -55, plus TOOL-dPavedRoad-4's 15 = 690. Counted by reading; OWED: observed at the close.
 # RAISED 690 -> 699 by TOOL-aNimbleMend-9: its two red-fix-join plant assertions and its seven check-31
 # engine assertions, each top-level and never skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=699
+# RAISED 699 -> 701 by TOOL-aNimbleMend-9's second pass: check 31's two failure texts, one assertion
+# each, top-level and never skipped. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=701
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
