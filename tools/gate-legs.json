@@ -2283,7 +2283,10 @@
       "AGENTS.md",
       "memory/builds/dClosedLoop/build/",
       "help/policy.md",
-      ".governance/install.json"
+      ".governance/install.json",
+      "{prefix}/run-gates/pass-legs.sh",
+      "{prefix}/run-gates/pass_legs.py",
+      "{prefix}/memory-tree/build_records.py"
     ],
     "chunk": "selftests",
     "subject": "kit",

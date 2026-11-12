@@ -105,3 +105,9 @@ base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 2026-11-12T18:43:01Z dispatch · item cf606486 TOOL-aNimbleMend-11 · reason help/pass-legs.md help/red-fix-lane.md help/README.md help/policy.md help/charter.md help/reference/policy.md tools/govkit/usage.toml tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-11-1-acceptance-ledger.md memory/guides/SESSION-KICKOFF.md
 
 2026-11-12T18:52:15Z dispatch · item b443d708 TOOL-aNimbleMend-11 · reason tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/template-size-limits.txt memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-11-1-acceptance-ledger.md memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-11.md
+
+2026-11-12T19:04:10Z dispatch · item 883e7e25 TOOL-aNimbleMend-12 · reason tools/policy/check_policy.py tools/policy/README.md tools/gate-legs.json memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-12-1-acceptance-ledger.md memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-12.md
+
+2026-11-12T19:04:12Z brief · item TOOL-aNimbleMend-12 · reason 38fe9d723c08 memory/builds/aNimbleMend/prompts/2026-11-12-prompt-TOOL-aNimbleMend-12-build-brief.md
+
+2026-11-12T19:22:19Z dispatch · item 883e7e25 TOOL-aNimbleMend-12 · reason tools/policy/check_policy.py tools/policy/README.md tools/gate-legs.json memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-12-1-acceptance-ledger.md memory/guides/SESSION-KICKOFF.md

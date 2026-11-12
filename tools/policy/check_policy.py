@@ -192,6 +192,11 @@ and never `settings --write`, and admit under `GOV_DEFAULT_BRANCH=master`, then 
 rendered limit and under a control with none, reads each agent's start and end stamps, and prints
 each run's peak overlap. It costs real sessions, so no leg runs it.
 
+`pass-and-lane-adopter` and `pass-and-lane-gov` (TOOL-aNimbleMend-12) are outcome cases, both run by
+`run_pass_lane_case`: one pass-leg run and one inline red fix in the order a build runs them, in an
+installed scratch adopter and in a clone of the tree under test, with `bar.inline-red-fixes` and
+`pass.fast-legs` each on and off. Its docstring holds the steps and what neither case checks.
+
 Later units add arms to ARMS and cases to CASES.
 """
 import ast
@@ -4584,6 +4589,302 @@ def run_live():
     return 1 if wrong or not asserted else 0
 
 
+# ---- a pass-leg run and an inline red fix, end to end (TOOL-aNimbleMend-12) ---------------------
+
+PASS_LANE_CASES = ("pass-and-lane-adopter", "pass-and-lane-gov")
+PASS_LANE_KITS = ("policy", "run-gates", "agent-cap", "memory-tree")  # registry ids; their `requires` join them
+PASS_LANE_LEG = "planted pass leg"
+# The planted leg's program: red exactly while the product file, its one argument, holds BROKEN.
+PASS_LANE_PROGRAM = "import sys; sys.exit('BROKEN' in open(sys.argv[1], encoding='utf-8').read())"
+# The gov case's build, unit and product file under the tool root: this build's folder, which the clone holds.
+PASS_LANE_GOV = ("aNimbleMend", "TOOL-aNimbleMend-12", "planted-pass-leg.txt")
+# What the flow runs, each found by its path's ending: a receipt row in the adopter, the tool root in the clone.
+PASS_LANE_FILES = {"adapter": "/run-gates/pass-legs.sh", "hook": "/hooks/scratch-guard.js",
+                   "records": "/memory-tree/build_records.py", "grader": "/memory-tree/routed_commits.py",
+                   "policy": "/policy/policy.py"}
+LANE_KEY, LEGS_KEY = "bar.inline-red-fixes", "pass.fast-legs"
+PASS_JOIN = re.compile(r"(\d+) fix commit\(s\) · (\d+) record\(s\) · (\d+) owed")
+PASS_LEGS_CONST = re.compile(r"^const PASS_LEGS = '([^']*)'", re.M)  # the harness template's spelling of the adapter call
+
+
+def build_pass_lane_target(name, gov):
+    """The target of one `pass-and-lane-` case (TOOL-aNimbleMend-12 S2, S3), on `main` with no remote, so
+    local main is the landed revision every policy reader takes. -> {root, roots, product, manifest,
+    build, unit, memroot, mirror, and one repo-relative path per PASS_LANE_FILES key}; the caller removes
+    `roots`. RuntimeError naming what the tree lacks or which step refused, nothing left behind.
+
+    `gov`: `build_source_snapshot`'s clone of the tree under test, every remote removed and `main` set to
+    its HEAD, with gov's own conf, role index and policy file; each file is found under the tool root.
+
+    Else the adopter: `build_install_target` with PASS_LANE_KITS' closure and one `apply` through
+    `run_govkit`, each file found through its receipt row, then what an adopter writes by hand, committed:
+    `ROUTED_PATHS`, `LEG_MANIFEST` and a `ROUTED_COMMIT_CUTOFF` before every fixture commit in the conf;
+    one build folder holding one spec whose id opens with the conf's first family; a leg manifest of one
+    row carrying no pass-leg field, since `build_install_target` strips the `[gate_runner]` seed and the
+    deployer then orders the legs and emits no manifest; and `src/app.txt` holding `ok`, committed under
+    the unit's id, as the commit grader asks of a product path."""
+    top, troot, roots = derive_source_top(), budgets.derive_tool_root(), []
+    try:
+        if gov:
+            t = build_source_snapshot(top)
+            roots.append(t)
+            for remote in run_fixture_git(t, "remote").split():
+                run_fixture_git(t, "remote", "remove", remote)
+            run_fixture_git(t, "checkout", "-q", "-B", "main")
+            found = {k: troot + end if (t / (troot + end)).is_file() else None for k, end in PASS_LANE_FILES.items()}
+        else:
+            ids, missed = derive_requires_closure(list(PASS_LANE_KITS))
+            if missed:
+                raise RuntimeError("; ".join(missed))
+            t, s = build_install_target(name, ids)
+            roots += [t, s]
+            rc, out = run_govkit(s, top, "apply", "--target", t.as_posix(), "--kits", ",".join(ids))
+            if rc:
+                raise RuntimeError(f"the deployer's apply --kits {','.join(ids)} exited {rc}, so nothing was "
+                                   f"installed to grade: {out.strip()[-600:]}")
+            paths = [str(r.get("path")) for r in read_receipt_rows(t)]
+            found = {k: next((p for p in paths if p.endswith(end)), None) for k, end in PASS_LANE_FILES.items()}
+        lacks = [PASS_LANE_FILES[k] for k, p in found.items() if not p]
+        if lacks:
+            raise RuntimeError(f"the target holds no {', '.join(lacks)} " + ("under its tool root" if gov else
+                               "as a receipt row's path") + ", so the flow has no such step to run")
+        conf_path = t / ".memory-tree.conf"
+        conf = load_tree_lib().parse_conf(conf_path.read_bytes().decode("utf-8").replace("\r\n", "\n"), {})
+        memroot = (conf.get("MEMORY_ROOT") or "memory").strip().strip("/")
+        # the adapter's own rule: the manifest is its kit directory's sibling
+        manifest = posixpath.join(posixpath.dirname(posixpath.dirname(found["adapter"])), "gate-legs.json")
+        if gov:
+            build, unit, product = PASS_LANE_GOV[0], PASS_LANE_GOV[1], f"{troot}/{PASS_LANE_GOV[2]}"
+            if not (t / memroot / "builds" / build).is_dir():
+                raise RuntimeError(f"the clone holds no {memroot}/builds/{build}/, the build folder the record door writes in")
+        else:
+            family = next((p.split(":", 1)[-1] for p in (conf.get("FAMILIES") or "").split()), None)
+            if not family:
+                raise RuntimeError("the installed .memory-tree.conf declares no FAMILIES, so no unit id can be spelled")
+            build, unit, product = "tPassLane", f"{family}-tPassLane-1", "src/app.txt"
+            conf_path.write_bytes(conf_path.read_bytes() + f'\nROUTED_PATHS="src/"\nLEG_MANIFEST="{manifest}"\n'
+                                  'ROUTED_COMMIT_CUTOFF="2001-01-01"\n'.encode("utf-8"))
+            write_case_file(t, f"{memroot}/builds/{build}/spec/2026-01-01-spec-{unit}.md", f"# {unit} — a unit\n\n"
+                            "**Status:** INPROGRESS · rev-1 · 2026-01-01 · node a · Tier-2 · base 0123abcd\n")
+            write_case_file(t, manifest, json.dumps([{"name": "an adopter leg", "argv": ["python", "-c", "pass"],
+                                                      "chunk": "product", "subject": "repo", "ceiling": 60}], indent=2) + "\n")
+            run_fixture_git(t, "branch", "-M", "main")
+            for rel, text, why in ((None, None, "the install, and what its adopter writes by hand"),
+                                   (product, "ok\n", f"{unit}: the product file")):
+                if rel:
+                    write_case_file(t, rel, text)
+                run_fixture_git(t, "add", "-A")
+                run_fixture_git(t, "commit", "-q", "-m", why)
+    except BaseException:
+        for d in roots:
+            remove_repo(d)
+        raise
+    return {"root": t, "roots": roots, "product": product, "manifest": manifest, "build": build, "unit": unit,
+            "memroot": memroot, "mirror": Path(t, *MIRROR_FILE).is_file(), **found}
+
+
+def write_planted_leg(t, manifest, product):
+    """The leg manifest of target `t` with the pass-leg field dropped from every row and one row
+    appended that carries it (TOOL-aNimbleMend-12 F2): PASS_LANE_LEG, red exactly while `product`
+    holds BROKEN, with no `guard`, so it runs on every diff. Re-dumped whole: the file is a fixture's."""
+    rows = [{k: v for k, v in r.items() if k != "pass_leg"}
+            for r in json.loads(Path(t, manifest).read_text(encoding="utf-8"))]
+    rows.append({"name": PASS_LANE_LEG, "argv": ["python", "-c", PASS_LANE_PROGRAM, product], "chunk": "product",
+                 "subject": "repo", "ceiling": 60, "pass_leg": True})
+    write_case_file(t, manifest, json.dumps(rows, indent=2, ensure_ascii=False) + "\n")
+
+
+def write_lane_key(case, text, why):
+    """One key flip of a `pass-and-lane-` case: `text` as the target's policy file (None: no file),
+    committed on `main` in a commit touching it alone; then, where the target carries a policy mirror,
+    `policy.py mirror --write` and a second commit of the mirror, the two-commit order
+    TOOL-aNimbleMend-1's rollout states, so no read is refused for a stale mirror. RuntimeError where
+    the render refuses."""
+    t = case["root"]
+    if text is None:
+        Path(t, *POLICY_FILE).unlink(missing_ok=True)
+    else:
+        write_policy(t, text)
+    run_fixture_git(t, "add", "-A")
+    run_fixture_git(t, "commit", "-q", "-m", why)
+    if case["mirror"]:
+        rc, out = run_case_argv(t, [sys.executable, case["policy"], "mirror", "--write"])
+        if rc:
+            raise RuntimeError(f"policy.py mirror --write after {why} exited {rc}: {render_said(out, 'policy:')}")
+        run_fixture_git(t, "add", "-A")
+        run_fixture_git(t, "commit", "-q", "--allow-empty", "-m", f"the mirror, after {why}")
+
+
+def run_pass_lane_case(name):
+    """`pass-and-lane-adopter` and `pass-and-lane-gov` (TOOL-aNimbleMend-12): one pass-leg run and one
+    inline red fix in the order a build runs them, in `build_pass_lane_target`'s target, one check line
+    per step. A pass commit breaks the planted leg and the adapter records it red; the write gate, which
+    refused the product write while no red was open (that stderr is R0), admits it under the red-fix
+    lane; with `bar.inline-red-fixes` off the refusal is R0 again; the fix commit carries `Red-fix:`
+    beside `Pass: none` and is inside the lane's limits; the adapter reads the leg green and the gate
+    refuses with R0; the record door writes the fix's record and the join counts one fix commit and one
+    record above its first reading, none owed; and with `pass.fast-legs` off the adapter exits 0,
+    printing nothing, with the run record and the gate ledger hashing as before. The adopter adds the
+    adapter's empty-list line before any row carries the field, and the commit grader over the pushed
+    range: `1 red-fix` with the lane on, the fix commit `names no unit` with it off. The gov case adds
+    the harness template's `PASS_LEGS` naming the invocation the steps run, and the gate refusing a
+    role that declares no product write while the red is open.
+
+    Every adapter call runs with each inherited `GATE_` name dropped, a `GATE_TURNSTILE_DIR` of its own
+    and `GATE_REGEN_CHECK=0`: the runner's freshness preflight refuses a pass-leg field the derivation
+    rule did not write, and the planted row is typed. WHAT IT DOES NOT CHECK: any arm a building unit
+    owns; one of gov's real legs red; the harness, or a role agent's refusal at the hooks; the
+    derivation's own list; the runner's preflight; that the unchanged path kept the base commit's bytes,
+    since each comparison is between two outputs of the built tree; and the commit grader over gov's
+    own history. A missing deployer, a refused install, or a step whose subject the tree lacks is a
+    WRONG naming it. -> (assertions, wrong)."""
+    gov = name == PASS_LANE_CASES[1]
+    checks, kept, case, ts = [], {}, None, None
+    try:
+        case = build_pass_lane_target(name, gov)
+        ts = Path(tempfile.mkdtemp(prefix="pol-"))
+        t, leg, product, unit = case["root"], PASS_LANE_LEG, case["product"], case["unit"]
+        trailer = load_tree_lib().RED_FIX_TRAILER
+        git_dir = Path(run_fixture_git(t, "rev-parse", "--absolute-git-dir"))
+        files = (git_dir / "gate-pass-legs.txt", git_dir / "gate-ledger.tsv")  # the run record, the gate ledger
+        env = {k: v for k, v in os.environ.items() if not k.startswith("GATE_") and k not in policy.GIT_ENV_LEAKS}
+        env.update(GATE_TURNSTILE_DIR=ts.as_posix(), GATE_REGEN_CHECK="0")
+        bash = resolve_bash((t / case["adapter"]).as_posix())
+        if bash is None:
+            raise RuntimeError("no bash on PATH can see the adapter: set GOV_BASH")
+
+        def run_pass_adapter(base):
+            """`bash <adapter> --base <base>` in the target -> (exit, stdout, stderr), CR stripped."""
+            p = subprocess.run([bash, case["adapter"], "--base", base], cwd=t, env=env, capture_output=True,
+                               text=True, encoding="utf-8", errors="replace")
+            return p.returncode, p.stdout.replace("\r", ""), p.stderr.replace("\r", "")
+
+        def read_lane_status():
+            """-> (the planted leg's status in the run record, its status in the gate ledger)."""
+            rows = [[ln.split("\t") for ln in (policy.read_text_or_none(f) or "").splitlines()] for f in files]
+            return (next((f[2] for f in rows[0] if f[:2] == ["leg", leg] and len(f) > 2), "no leg line"),
+                    next((f[2] for f in rows[1] if f[0] == leg and len(f) > 2), "no row"))
+
+        def read_lane_hashes():
+            """-> the sha256 of the run record and of the gate ledger, None for a file that is absent."""
+            return [hashlib.sha256(f.read_bytes()).hexdigest() if f.is_file() else None for f in files]
+
+        def write_lane_commit(why, *more):
+            """Everything in the target committed under `why` and each further paragraph -> its sha."""
+            run_fixture_git(t, "add", "-A")
+            run_fixture_git(t, "commit", "-q", "-m", why, *(a for m in more for a in ("-m", m)))
+            return run_fixture_git(t, "rev-parse", "HEAD")
+
+        def check_product_write(scenario, what, want, agent=None):
+            """P, the product write: a `Write` of the product file from a session with no orientation
+            card, the main loop unless `agent` names a role -> the write gate's check line."""
+            payload = {"tool_name": "Write", "cwd": t.as_posix(), "session_id": "pass-lane-no-card",
+                       "tool_input": {"file_path": (t / product).as_posix(), "content": "ok\n"}}
+            return check_hook_call(scenario, what, t / case["hook"], dict(payload, agent_type=agent) if agent else payload,
+                                   want, cwd=t)
+
+        if gov:  # g1: the command a main loop is told to run is the command the steps below run
+            template = f"{budgets.derive_tool_root()}/workflows/unattended-build.template.js"
+            said = PASS_LEGS_CONST.search(policy.read_text_or_none(t / template) or "")
+            argv = said[1].replace("{{TOOL_ROOT}}", budgets.derive_tool_root() + "/").split() if said else []
+            checks.append(("setup", f"g1 · PASS_LEGS in {template} names bash, the adapter under the tool root and --base",
+                           argv[:3] == ["bash", case["adapter"], "--base"] and len(argv) == 4,
+                           said[0] if said else "no PASS_LEGS constant reads there"))
+        else:
+            rc, out, err = run_pass_adapter("HEAD")
+            checks.append(("install", "step 1 · before any row carries the field the adapter exits 0 with its empty-list line",
+                           rc == 0 and "pass-legs: 0 legs declared, nothing ran" in out.splitlines(),
+                           f"exit {rc} · {render_said(out + err, 'pass-legs:')!r}"))
+        write_planted_leg(t, case["manifest"], product)
+        write_case_file(t, product, "ok\n")
+        write_lane_commit(f"{unit}: plant the pass leg")
+        _rc, out = run_case_argv(t, [sys.executable, case["records"], "join", "red-fix"])
+        before = PASS_JOIN.search(out)
+        checks.append(check_product_write("on", "step 2 · the gate refuses the product write while no red is open",
+                                          lambda rc, err: rc == 2 and bool(kept.setdefault("R0", err))))
+        r0 = kept.get("R0", "")
+        size = len(r0.encode("utf-8"))
+        write_case_file(t, product, "BROKEN\n")
+        passed = write_lane_commit(f"{unit}: the pass, which breaks the planted leg")
+        rc, out, _err = run_pass_adapter("HEAD~1")
+        seen = read_lane_status()
+        red_line = render_said(out, "GATE FAIL").strip() or f"{leg} failed"
+        checks.append(("on", "step 3 · over the pass commit the adapter exits 1, its run record reads the planted leg "
+                       "`fail` and the gate ledger holds it red", rc == 1 and seen == ("fail", "fail"),
+                       f"exit {rc} · run record {seen[0]} · ledger {seen[1]}"))
+        checks.append(check_product_write("on", f"step 4 · the gate admits the product write with one witness line naming "
+                                          f"{leg} and {trailer}:", lambda rc, err: rc == 0 and leg in err
+                                          and f"{trailer}:" in err and len(err.strip().splitlines()) == 1))
+        if gov:  # g2: the lane admits the main loop and a product role, never a role that may not write product
+            roles = json.loads((t / ".claude" / "roles.json").read_text(encoding="utf-8")).get("roles") or {}
+            role = next((n for n, r in roles.items() if r.get("agent") is True and r.get("writes") != "product"), None)
+            checks.append(check_product_write("on", f"g2 · the gate refuses {role}, a role declaring no product write, while "
+                                              "the red is open", lambda rc, err: bool(role) and rc == 2, agent=role or "none"))
+        base = policy.read_text_or_none(Path(t, *POLICY_FILE))
+        # ponytail: the key's table is appended whole; a policy file already holding [bar] or [pass]
+        # would need the key set in place, and neither gov's nor the scaffold holds one
+        render_off = lambda key: (base or "") + '\n[{}]\n{} = "off"\n'.format(*key.split(".", 1))  # noqa: E731
+        write_lane_key(case, render_off(LANE_KEY), "the lane key off")
+        checks.append(check_product_write("lane-off", f"step 5 · with {LANE_KEY} off and the red open the gate refuses, its "
+                                          f"stderr equal to R0 over the same {size} byte(s)",
+                                          lambda rc, err: rc == 2 and bool(r0) and err == r0))
+        write_lane_key(case, base, "the lane key's removal")
+        write_case_file(t, product, "ok\n")
+        fix = write_lane_commit("fix: the product file reads ok again", f"{trailer}: {leg}\nPass: none")
+        rc, out = run_case_argv(t, [sys.executable, case["grader"], "--red-fix-limits", "HEAD"])
+        checks.append(("on", f"step 6 · the limits verb exits 0 over the fix commit, which carries `{trailer}: {leg}` "
+                       "beside `Pass: none` and no unit id", rc == 0, f"exit {rc} · {render_said(out, 'red-fix limits')}"))
+        rc, _out, _err = run_pass_adapter("HEAD~1")
+        seen = read_lane_status()
+        rerun = f"bash {case['adapter']} --base HEAD~1 exited {rc}, the leg {seen[0]}"
+        checks.append(("on", "step 7 · over the fix commit the adapter exits 0 and its run record reads the planted leg `ok`",
+                       rc == 0 and seen[0] == "ok", f"exit {rc} · run record {seen[0]} · ledger {seen[1]}"))
+        checks.append(check_product_write("on", f"step 8 · the lane closed with the red: the gate refuses, its stderr equal "
+                                          f"to R0 over the same {size} byte(s)", lambda rc, err: rc == 2 and bool(r0) and err == r0))
+        folder = t / case["memroot"] / "builds" / case["build"] / "build"
+        held = set(folder.glob("*-red-fix-*.md"))
+        rc, out = run_case_argv(t, [sys.executable, case["records"], "new", "red-fix", "--build", case["build"], "--unit", unit,
+                                    "--leg", leg, "--red-line", red_line, "--commit", fix, "--rerun", rerun])
+        new = sorted(p.name for p in set(folder.glob("*-red-fix-*.md")) - held)
+        checks.append(("on", "step 9 · the record door exits 0 for the fix commit and writes one red-fix record in the "
+                       "build folder", rc == 0 and len(new) == 1, f"exit {rc} · {', '.join(new) or render_said(out, 'refused')}"))
+        write_lane_commit("the red-fix record")
+        rc, out = run_case_argv(t, [sys.executable, case["records"], "join", "red-fix"])
+        after = PASS_JOIN.search(out)
+        checks.append(("on", "step 10 · the join exits 0 with one fix commit and one record above its step 2 reading, and 0 owed",
+                       rc == 0 and bool(before and after) and [int(n) for n in after.groups()]
+                       == [int(before[1]) + 1, int(before[2]) + 1, 0],
+                       f"exit {rc} · {render_said(out, 'fix commit(s)')} · step 2 read {before[0] if before else 'no summary'}"))
+        if not gov:  # the grader's other half grades a whole history, so gov's own is the close's bar's to grade
+            rc, out = run_case_argv(t, [sys.executable, case["grader"]], env={"GATE_PUSH_BASE": passed})
+            head = render_said(out, ": RANGE ")
+            checks.append(("on", "step 11 · over the range pushed since the pass commit the grader's summary holds `1 red-fix` "
+                           "and no violation line names the fix commit", ": RANGE " in head and " · 1 red-fix · " in head
+                           and not any(ln.startswith(f"  {fix[:8]} ") for ln in out.splitlines()), f"exit {rc} · {head}"))
+            write_lane_key(case, render_off(LANE_KEY), "the lane key off, after the fix")
+            rc, out = run_case_argv(t, [sys.executable, case["grader"]], env={"GATE_PUSH_BASE": passed})
+            listed = next((ln.strip() for ln in out.splitlines() if ln.startswith(f"  {fix[:8]} ")), "no line names the fix commit")
+            checks.append(("lane-off", f"step 12 · with {LANE_KEY} off the grader lists the fix commit as `names no unit`",
+                           listed.endswith("names no unit"), f"exit {rc} · {listed}"))
+        write_lane_key(case, render_off(LEGS_KEY), "the pass-leg key off")
+        hashes = read_lane_hashes()
+        rc, out, err = run_pass_adapter("HEAD~1")
+        checks.append(("legs-off", f"step 13 · with {LEGS_KEY} off the adapter exits 0 and prints nothing, as built, and the "
+                       "run record and the gate ledger each hash as before the call",
+                       rc == 0 and not (out + err).strip() and None not in hashes and read_lane_hashes() == hashes,
+                       f"exit {rc} · {len((out + err).strip().splitlines())} line(s) printed · run record "
+                       f"{str(hashes[0])[:12]} · ledger {str(hashes[1])[:12]}, each " +
+                       ("unchanged" if read_lane_hashes() == hashes else "CHANGED or absent")))
+    except subprocess.CalledProcessError as exc:
+        checks.append((name, "the flow's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}"))
+    except (RuntimeError, OSError, ValueError, LookupError, ImportError) as exc:
+        checks.append((name, "the flow", False, f"{type(exc).__name__}: {exc}"))
+    finally:
+        for d in [*(case["roots"] if case else ()), *([ts] if ts else ())]:
+            remove_repo(d)
+    return print_checks(name, checks)
+
+
 CASES = [
     ("shape-no-empty", ARM["arm_shape"], seed_no_empty),
     ("shape-unknown-field", ARM["arm_shape"], seed_unknown_field),
@@ -4639,6 +4940,7 @@ CASES = [
     ("census-window-edge", None, run_census_window_edge),  # the window's edges: depth 3 and a bare top-level file uncounted
     ("census-source-receipt", None, run_census_source_receipt),  # gov's source-mode receipt read as no receipt is
     *((CAP_CASE_PREFIX + n, None, run_cap_case) for n in CAP_CASES),  # one per census row
+    *((c, None, run_pass_lane_case) for c in PASS_LANE_CASES),  # a pass-leg run and an inline red fix, end to end
 ]
 
 

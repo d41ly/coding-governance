@@ -3333,6 +3333,11 @@
       "file": "tools/run-gates/held_halves.py"
     },
     {
+      "id": "build_pass_lane_target",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "build_path_probe",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -27288,6 +27293,11 @@
       "file": "tools/playbook/edge_grammar.py"
     },
     {
+      "id": "run_pass_lane_case",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "run_pathless",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
@@ -33168,6 +33178,11 @@
       "file": "tools/push-main.sh"
     },
     {
+      "id": "write_lane_key",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "write_layer_row",
       "kind": "function",
       "file": "tools/playbook/check_layers.py"
@@ -33436,6 +33451,11 @@
       "id": "write_planted",
       "kind": "function",
       "file": "tools/unattended/check-arms-groups.test.sh"
+    },
+    {
+      "id": "write_planted_leg",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "write_pm_red",

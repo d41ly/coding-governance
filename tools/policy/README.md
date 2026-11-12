@@ -669,6 +669,28 @@ nothing (S12); `arms-empty-declared` reds an `ARMS` row declaring no `empty` or 
 `arm_reader_coverage` and `arm_mirror_readers` must print `not graded`, then over its scaffold, where
 `arm_schema` must grade the scaffold's keys with no finding (S27).
 
+The two end-to-end cases of the pass legs and the red-fix lane (TOOL-aNimbleMend-12), each an outcome
+case run by `run_pass_lane_case` and each printing one line per step. `pass-and-lane-adopter` installs
+this kit, `run-gates`, `agent-cap` and `memory-tree` into a fresh target, writes what its adopter
+writes by hand (the routed path, the leg manifest and its conf key, one build folder with one spec)
+and observes, in order: the adapter's empty-list line before any row carries the pass-leg field; the
+write gate refusing a product write while no red is open; a pass commit that breaks the planted leg
+recorded `fail` in the run record and the gate ledger; the gate admitting the same write with the
+lane's one witness line; the refusal byte for byte the first one with `bar.inline-red-fixes` off; a fix
+commit carrying `Red-fix:` beside `Pass: none` inside the lane's limits; the leg `ok` and the lane
+closed again; the fix's record written by the record door and joined, none owed; the commit grader
+counting `1 red-fix` over the pushed range, and listing the fix commit as `names no unit` with the key
+off; and, with `pass.fast-legs` off, the adapter exiting 0 and printing nothing with the run record
+and the ledger hashing as before. `pass-and-lane-gov` runs the same order in a clone of the tree under
+test, under gov's own conf, role index, policy file and mirror, with one planted row as the whole
+pass-leg list; it drops the adapter's empty list and the grader's two steps, and adds the harness
+template's `PASS_LEGS` naming the invocation the steps run and the gate refusing a role that declares
+no product write while the red is open. Neither observes an arm a building unit owns, one of gov's
+real legs red, the harness or a role agent's refusal at the hooks, the derivation's own list, or that
+the unchanged path kept the base commit's bytes: each comparison is between two outputs of the built
+tree. Both run the adapter under `GATE_REGEN_CHECK=0`, since the runner's freshness preflight refuses
+a pass-leg field the derivation rule did not write, so neither observes that preflight.
+
 ## Each arm in an adopter
 
 The `policy check` leg ships, so every arm in `ARMS` runs in an adopter's tree as well as in gov's.
