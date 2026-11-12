@@ -1680,6 +1680,7 @@
   },
   {
     "name": "memory hygiene (the pass checks)",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-memory-hygiene.sh",
@@ -1865,6 +1866,7 @@
   },
   {
     "name": "spec tokens (the pass's own spec)",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/check-spec-tokens.py",
@@ -2126,6 +2128,7 @@
   },
   {
     "name": "positional (the citation check alone)",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/playbook/positional.py",
@@ -2176,6 +2179,7 @@
   },
   {
     "name": "writing practice (records and units)",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/playbook/writing_practice.py",
