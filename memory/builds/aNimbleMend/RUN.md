@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 5b7b83a1f4fd5e1a43998815a0630e4b73404775
-phase: BUILDING
+witness: 7e785ac21389cfe392533224ac7292c0f3717d6b
+phase: VERIFYING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/inline-bar-fixes-pass-legs-1a64f7
@@ -139,3 +139,5 @@ base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 2026-11-12T22:02:21Z dispatch · item f9d6d6be TOOL-aNimbleMend-15 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/hooks/README.md tools/policy/check_policy.py help/red-fix-lane.md tools/memory-tree/.memory-tree.conf.example memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-15-1-acceptance-ledger.md
 
 2026-11-12T22:19:49Z dispatch · item 685c0bf2 TOOL-aNimbleMend-15 · reason tools/hooks/scratch-guard.test.sh
+
+2026-11-12T23:12:53Z dispatch · item 7e785ac2 TOOL-aNimbleMend-15 · reason tools/workflows/unattended-unit.js tools/workflows/unattended-build.test.sh

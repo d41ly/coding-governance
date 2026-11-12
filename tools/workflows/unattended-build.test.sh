@@ -248,6 +248,10 @@ POLICY_KIT_DIR=$(resolve_kit_dir "$_rkd_py" policy policy.py "$HERE") || exit 2
 POLICY_KIT="${POLICY_KIT_DIR##*/}"
 MT_KIT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree gotchas.py "$HERE") || exit 2
 MT_KIT="${MT_KIT_DIR##*/}"
+# The run-gates kit, by the pass-leg runner the harness names in `dispatch.args.passLegs`
+# (TOOL-aNimbleMend-7): a layout below holds that file under this directory's resolved name.
+RUN_GATES_DIR=$(resolve_kit_dir "$_rkd_py" run-gates pass-legs.sh "$HERE") || exit 2
+RUN_GATES="${RUN_GATES_DIR##*/}"
 # In this suite KIT_REL names the TOOL ROOT, not the kit dir: the prefix without its slash.
 KIT_REL="${PFX%/}"; KIT_REL="${KIT_REL:-.}"
 # ROOTPFX is a ROOT install's prefix, empty by definition: a fixture that models a root install,
@@ -2250,6 +2254,11 @@ build_layout() { # dir · kit dir · unattended dir, or '-' for none · checklis
   # `-` IS A REVIEW-HARNESS-ONLY INSTALL, which `requires` permits: this kit requires agent-cap and
   # policy and nothing else, so neither the unattended kit nor the memory-tree kit has to be there.
   if [ "$ud" != - ]; then mkdir -p "$d/$ud"; printf '#!/usr/bin/env bash\n' > "$d/$ud/unattended.sh"; fi
+  # THE PASS-LEG RUNNER, a stub as the driver is (TOOL-aNimbleMend-15): the harness names it in
+  # `dispatch.args.passLegs` since TOOL-aNimbleMend-7, so arm (v) asks the layout for it. It sits a
+  # directory up from this kit, where the render's probe for the citation looks, under the name the
+  # resolver printed for the run-gates kit. No layout types that name.
+  if [ "$ud" != - ]; then mkdir -p "$d/$kd/../${RUN_GATES}"; printf '#!/usr/bin/env bash\n' > "$d/$kd/../${RUN_GATES}/pass-legs.sh"; fi
   if [ -n "$gp" ]; then mkdir -p "$(dirname "$d/$gp")"; printf '# a stub checklist\n' > "$d/$gp"; fi
   ( cd "$d" && git add -A && git commit -q --no-verify -m layout )
 }

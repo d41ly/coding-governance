@@ -288,11 +288,13 @@ const PROMPT =
       'to say. The caller has the spec revised by the spec-writer role and dispatches this unit again.\n'
     : 'The spec is the design; where you must diverge, CHANGE THE SPEC FIRST as a rev-N bump with its ' +
       'section 9 line, then write the code.\n') +
-  DRIVER_STEPS +
   // TOOL-aNimbleMend-15 - asked in BOTH modes and with or without `passLegs`, so the prompt stays the
   // same either way: a pass can make more than one commit, and only the builder saw where it started.
+  // AHEAD of the driver steps, never after them: the pre-build paragraph follows the `--brief` order
+  // and precedes the no-gate paragraph, and the suite pins both joins.
   'Before your first write, read `git rev-parse HEAD` and return what it prints as `base`: the commit ' +
   'this pass started from.\n' +
+  DRIVER_STEPS +
   // TOOL-aMendedFleet-74 — empty unless the caller passed `prebuild`, so a default prompt is unchanged.
   // FILE paths, never a directory: a directory selects the whole catalogue, not a checklist.
   (cfg.prebuild === undefined
