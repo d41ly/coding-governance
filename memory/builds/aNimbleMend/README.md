@@ -74,7 +74,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 13 unit(s) · node a · opened 2026-11-12 · streams tooling
+**Build status:** SPECCED · 15 unit(s) · node a · opened 2026-11-12 · streams tooling
 ids TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-13 TOOL-aNimbleMend-14 TOOL-aNimbleMend-15
 
 <!-- gen:build-units -->
@@ -93,15 +93,18 @@ ids TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 
 | [TOOL-aNimbleMend-10 — the inline lane's limits, graded on every `Red-fix:` commit](spec/2026-11-12-spec-TOOL-aNimbleMend-10.md) | 10 | 2 | CLOSED | rev-2 | 2026-11-12 |
 | [TOOL-aNimbleMend-11 — the documents: a help page per mechanism, and the build method and the unattended protocol saying where the pass legs run and what the lane admits](spec/2026-11-12-spec-TOOL-aNimbleMend-11.md) | 11 | 2 | CLOSED | rev-3 | 2026-11-12 |
 | [TOOL-aNimbleMend-12 — the acceptance suite: one pass-leg run and one inline fix, end to end, in a scratch adopter and in a clone of gov, with each switch on and off](spec/2026-11-12-spec-TOOL-aNimbleMend-12.md) | 12 | 2 | CLOSED | rev-2 | 2026-11-12 |
+| [TOOL-aNimbleMend-14 — the red-fix lane opens only on a red of this branch's present state: an open red is bounded by its row's own head](spec/2026-11-12-spec-TOOL-aNimbleMend-14.md) | 14 | 2 | SPECCED | rev-1 | 2026-11-12 |
+| [TOOL-aNimbleMend-15 — the closing review's thirteen mediums and four lows, batched: the pass-leg tooling, the commit grader, the hooks, three guards and two help pages say and check what they do](spec/2026-11-12-spec-TOOL-aNimbleMend-15.md) | 15 | 2 | SPECCED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
 Records: 32 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aNimbleMend-1 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-13 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9.
+Ids no `spec-audit` record has ever named: TOOL-aNimbleMend-1 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-13 TOOL-aNimbleMend-14 TOOL-aNimbleMend-15 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7
+TOOL-aNimbleMend-8 TOOL-aNimbleMend-9.
 
-Ids whose spec moved past its audited revision: none — 0 of 13 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 15 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -120,6 +123,8 @@ Ids whose spec moved past its audited revision: none — 0 of 13 unit id(s) carr
 | 10 | `TOOL-aNimbleMend-10` | no |
 | 11 | `TOOL-aNimbleMend-11` | no |
 | 12 | `TOOL-aNimbleMend-12` | no |
+| 14 | `TOOL-aNimbleMend-14` | no |
+| 15 | `TOOL-aNimbleMend-15` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
