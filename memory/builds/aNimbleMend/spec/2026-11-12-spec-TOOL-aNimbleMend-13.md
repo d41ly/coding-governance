@@ -10,6 +10,7 @@
 | [2026-11-12-prompt-TOOL-aNimbleMend-13-1-spec-writer.md](../prompts/2026-11-12-prompt-TOOL-aNimbleMend-13-1-spec-writer.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aNimbleMend-13-brief.md](../prompts/2026-11-12-prompt-TOOL-aNimbleMend-13-brief.md) | research | — |
 | [2026-11-12-prompt-TOOL-aNimbleMend-13-build-brief.md](../prompts/2026-11-12-prompt-TOOL-aNimbleMend-13-build-brief.md) | research | — |
+| [2026-11-12-review-TOOL-aNimbleMend-1-closing-diff-review-round1.md](../reviews/2026-11-12-review-TOOL-aNimbleMend-1-closing-diff-review-round1.md) | diff-review | TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 |
 
 <!-- /gen:spec-records -->
 

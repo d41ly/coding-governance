@@ -5,7 +5,7 @@ opened: 2026-11-12
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-13
+ids: TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-13 TOOL-aNimbleMend-14 TOOL-aNimbleMend-15
 ---
 
 # aNimbleMend — a red leg is fixed inline with its record written after, and every pass runs a budgeted list of fast legs
@@ -69,11 +69,13 @@ None.
 | 11 | `TOOL-aNimbleMend-11` | the documents: a help page per mechanism, and the build method and the unattended protocol changed where they are rendered from |
 | 12 | `TOOL-aNimbleMend-12` | the acceptance suite: both mechanisms in a scratch adopter and in gov, with each switch off giving today's behaviour byte for byte |
 | 13 | `TOOL-aNimbleMend-13` | added in the run: the findings of the pass legs' first run over this build, repaired, so a pass-leg run grades the whole manifest and holds no declared leg |
+| 14 | `TOOL-aNimbleMend-14` | promoted from the closing review's HIGH: the lane opens only on a red of this branch's present state, bounded by the ledger row's own head |
+| 15 | `TOOL-aNimbleMend-15` | promoted from the closing review: its thirteen mediums and four lows, batched |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 13 unit(s) · node a · opened 2026-11-12 · streams tooling
-ids TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-13
+ids TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-13 TOOL-aNimbleMend-14 TOOL-aNimbleMend-15
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -93,7 +95,7 @@ ids TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 
 | [TOOL-aNimbleMend-12 — the acceptance suite: one pass-leg run and one inline fix, end to end, in a scratch adopter and in a clone of gov, with each switch on and off](spec/2026-11-12-spec-TOOL-aNimbleMend-12.md) | 12 | 2 | CLOSED | rev-2 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 29 bound to this build, across 3 record folder(s).
+Records: 32 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

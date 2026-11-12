@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 72a9a7a8cc97f8bf46d1eabc046f84eaa5eabb7f
-phase: BUILDING
+witness: c428a23c390fbd605389e7f03f92665f0a44d5f8
+phase: REVIEWING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/inline-bar-fixes-pass-legs-1a64f7
@@ -117,3 +117,9 @@ base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 2026-11-12T19:50:29Z dispatch · item ee8a7d73 TOOL-aNimbleMend-12 · reason tools/policy/check_policy.py memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-12.md
 
 2026-11-12T19:55:24Z dispatch · item ee8a7d73 TOOL-aNimbleMend-12 · reason tools/policy/check_policy.py memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-12.md memory/LIVE.md memory/builds/aNimbleMend/README.md
+
+2026-11-12T20:20:13Z review · item aNimbleMend · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 3 · minors 20 · disposition promote
+
+2026-11-12T20:20:16Z rescope · item add TOOL-aNimbleMend-14 · reason promoted at the closing diff review's round 1 exit (0 blockers, 3 highs, 20 minors): unit 14 the one HIGH item, unit 15 the mediums and lows batched
+
+2026-11-12T20:20:18Z rescope · item add TOOL-aNimbleMend-15 · reason promoted at the closing diff review's round 1 exit (0 blockers, 3 highs, 20 minors): unit 14 the one HIGH item, unit 15 the mediums and lows batched
