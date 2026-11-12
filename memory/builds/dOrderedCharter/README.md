@@ -191,7 +191,7 @@ ids PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY
 | [PLAY-dOrderedCharter-83 — the reconcile merge with origin/main at 47ed57fab: fifty conflicted files, each resolved by its kind](spec/2026-11-11-spec-PLAY-dOrderedCharter-83.md) | 45 | 2 | CLOSED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 644 bound to this build, across 4 record folder(s).
+Records: 645 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
