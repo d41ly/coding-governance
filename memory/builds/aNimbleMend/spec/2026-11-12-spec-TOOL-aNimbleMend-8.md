@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-8 — the inline red-fix lane: an open red admits a product write, and a `Red-fix:` trailer admits its commit
 
-**Status:** SPECCED · rev-2 · 2026-11-12 · node a · Tier-2 · base 1265772c · streams tooling · order 8
+**Status:** INPROGRESS · rev-2 · 2026-11-12 · node a · Tier-2 · base 1265772c · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
