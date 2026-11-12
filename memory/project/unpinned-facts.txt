@@ -15189,3 +15189,7 @@ memory/builds/aQueuedIndex/build/2026-11-12-build-TOOL-aQueuedIndex-1-1-builder-
 memory/builds/aQueuedIndex/build/2026-11-12-build-TOOL-aQueuedIndex-1-ledger.md	105 s
 memory/builds/aQueuedIndex/build/2026-11-12-build-TOOL-aQueuedIndex-1-ledger.md	110 s
 memory/builds/aQueuedIndex/build/2026-11-12-build-TOOL-aQueuedIndex-1-ledger.md	130 s
+memory/builds/aQueuedIndex/reviews/2026-11-12-review-TOOL-aQueuedIndex-1-diff-review-round1.md	30 s
+memory/builds/aQueuedIndex/spec/2026-11-12-spec-TOOL-aQueuedIndex-2.md	10 s
+memory/builds/aQueuedIndex/spec/2026-11-12-spec-TOOL-aQueuedIndex-2.md	3 s
+memory/builds/aQueuedIndex/spec/2026-11-12-spec-TOOL-aQueuedIndex-2.md	300 s

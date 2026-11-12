@@ -45,22 +45,23 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-11-12 · streams tooling
+**Build status:** DEFERRED · 2 unit(s) · node a · opened 2026-11-12 · streams tooling
 ids TOOL-aQueuedIndex-1 TOOL-aQueuedIndex-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aQueuedIndex-1 — writers of the shared tag index queue instead of failing](spec/2026-11-12-spec-TOOL-aQueuedIndex-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-11-12 |
+| [TOOL-aQueuedIndex-2 — the queued-writers plant fails on each mechanism it claims](spec/2026-11-12-spec-TOOL-aQueuedIndex-2.md) | 2 | 1 | DEFERRED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 11 bound to this build, across 4 record folder(s).
+Records: 12 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aQueuedIndex-1.
+Ids no `spec-audit` record has ever named: TOOL-aQueuedIndex-1 TOOL-aQueuedIndex-2.
 
-Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -68,6 +69,7 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aQueuedIndex-1` | no |
+| 2 | `TOOL-aQueuedIndex-2` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
