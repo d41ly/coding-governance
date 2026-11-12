@@ -102,7 +102,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 77 unit(s) · node d · opened 2026-10-21 · streams playbook
+**Build status:** DEFERRED · 78 unit(s) · node d · opened 2026-10-21 · streams playbook
 ids PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12
 ids PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24
 ids PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36
@@ -192,15 +192,16 @@ ids PLAY-dOrderedCharter-86 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-83 — the reconcile merge with origin/main at 47ed57fab: fifty conflicted files, each resolved by its kind](spec/2026-11-11-spec-PLAY-dOrderedCharter-83.md) | 45 | 2 | CLOSED | rev-1 | 2026-11-12 |
 | [PLAY-dOrderedCharter-84 — a live unattended run's branch may commit a guarded path](spec/2026-11-12-spec-PLAY-dOrderedCharter-84.md) | 46 | 2 | CLOSED | rev-2 | 2026-11-12 |
 | [PLAY-dOrderedCharter-85 — the prepare folds gov first's walk into the merge before it regenerates](spec/2026-11-12-spec-PLAY-dOrderedCharter-85.md) | 46 | 2 | CLOSED | rev-1 | 2026-11-12 |
+| [PLAY-dOrderedCharter-86 — the run guard finds the driver by its file name, and the opt-in pack's self-test leg gets its pending row](spec/2026-11-12-spec-PLAY-dOrderedCharter-86.md) | 47 | 1 | DEFERRED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 657 bound to this build, across 4 record folder(s).
+Records: 658 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64
 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77
-PLAY-dOrderedCharter-78 PLAY-dOrderedCharter-80 PLAY-dOrderedCharter-81 PLAY-dOrderedCharter-82 PLAY-dOrderedCharter-83 PLAY-dOrderedCharter-84 PLAY-dOrderedCharter-85.
+PLAY-dOrderedCharter-78 PLAY-dOrderedCharter-80 PLAY-dOrderedCharter-81 PLAY-dOrderedCharter-82 PLAY-dOrderedCharter-83 PLAY-dOrderedCharter-84 PLAY-dOrderedCharter-85 PLAY-dOrderedCharter-86.
 
 Ids whose spec moved past its audited revision: PLAY-dOrderedCharter-1@rev-1 PLAY-dOrderedCharter-10@rev-1 PLAY-dOrderedCharter-11@rev-1 PLAY-dOrderedCharter-12@rev-1 PLAY-dOrderedCharter-13@rev-1 PLAY-dOrderedCharter-14@rev-1 PLAY-dOrderedCharter-15@rev-1 PLAY-dOrderedCharter-16@rev-1
 PLAY-dOrderedCharter-17@rev-1 PLAY-dOrderedCharter-18@rev-1 PLAY-dOrderedCharter-19@rev-1 PLAY-dOrderedCharter-2@rev-1 PLAY-dOrderedCharter-20@rev-1 PLAY-dOrderedCharter-21@rev-1 PLAY-dOrderedCharter-22@rev-1 PLAY-dOrderedCharter-23@rev-1 PLAY-dOrderedCharter-24@rev-1 PLAY-dOrderedCharter-25@rev-1
@@ -211,7 +212,7 @@ PLAY-dOrderedCharter-40@rev-1 PLAY-dOrderedCharter-41@rev-1 PLAY-dOrderedCharter
 
 <!-- gen:build-coverage -->
 
-Coverage of dOrderedCharter's 37 clause(s) and 30 owned node(s), over 77 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dOrderedCharter's 37 clause(s) and 30 owned node(s), over 78 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 37
 - carried in parts: 0 (none)
@@ -230,7 +231,7 @@ Coverage of dOrderedCharter's 37 clause(s) and 30 owned node(s), over 77 spec(s)
   `spec/2026-11-08-spec-PLAY-dOrderedCharter-72.md` (PLAY-dClosedLoop-2), `spec/2026-11-08-spec-PLAY-dOrderedCharter-73.md` (PLAY-dClosedLoop-2), `spec/2026-11-08-spec-PLAY-dOrderedCharter-74.md` (PLAY-dClosedLoop-2), `spec/2026-11-10-spec-PLAY-dOrderedCharter-75.md` (PLAY-dClosedLoop-2),
   `spec/2026-11-10-spec-PLAY-dOrderedCharter-76.md` (PLAY-dClosedLoop-2), `spec/2026-11-10-spec-PLAY-dOrderedCharter-77.md` (PLAY-dClosedLoop-2), `spec/2026-11-10-spec-PLAY-dOrderedCharter-78.md` (PLAY-dClosedLoop-2), `spec/2026-11-11-spec-PLAY-dOrderedCharter-80.md` (PLAY-dClosedLoop-2),
   `spec/2026-11-11-spec-PLAY-dOrderedCharter-81.md` (PLAY-dClosedLoop-2), `spec/2026-11-11-spec-PLAY-dOrderedCharter-82.md` (PLAY-dClosedLoop-2), `spec/2026-11-11-spec-PLAY-dOrderedCharter-83.md` (PLAY-dClosedLoop-2), `spec/2026-11-12-spec-PLAY-dOrderedCharter-84.md` (PLAY-dClosedLoop-2),
-  `spec/2026-11-12-spec-PLAY-dOrderedCharter-85.md` (PLAY-dClosedLoop-2)
+  `spec/2026-11-12-spec-PLAY-dOrderedCharter-85.md` (PLAY-dClosedLoop-2), `spec/2026-11-12-spec-PLAY-dOrderedCharter-86.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0033, cl-dClosedLoop-0034, cl-dClosedLoop-0035, cl-dClosedLoop-0038, cl-dClosedLoop-0042, cl-dClosedLoop-0043, cl-dClosedLoop-0044, cl-dClosedLoop-0050, cl-dClosedLoop-0051, cl-dClosedLoop-0067
 <!-- /gen:build-coverage -->
 
@@ -283,6 +284,7 @@ Coverage of dOrderedCharter's 37 clause(s) and 30 owned node(s), over 77 spec(s)
 | 44 | `PLAY-dOrderedCharter-82` | no |
 | 45 | `PLAY-dOrderedCharter-83` | no |
 | 46 | `PLAY-dOrderedCharter-84`, `PLAY-dOrderedCharter-85` | yes |
+| 47 | `PLAY-dOrderedCharter-86` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
