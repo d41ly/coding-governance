@@ -1107,6 +1107,8 @@ module.exports = {
   resolveModelProfile, checkEffortLevel, // rule 8's, for the roles kit's parity arm and a probe of the rule alone
   // TOOL-dPavedRoad-2 S5: format-guard.js finds the roles kit and reads the handoff marker through these.
   resolveKitDir, extractHandoffMarker,
+  // TOOL-aNimbleMend-8 S4: scratch-guard.js finds the policy kit's mirror reader for the red-fix lane's key.
+  resolvePolicyHelper,
 }
 if (require.main === module) main()
 

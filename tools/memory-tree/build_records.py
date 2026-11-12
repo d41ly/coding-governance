@@ -310,21 +310,11 @@ def read_override(path, text):
 def read_override_value(root):
     """`charter.override` at `root`'s landed revision, through the policy kit's `policy.py get`, found beside
     this kit since a kit imports no sibling. ValueError where no policy kit answers or the reader refuses."""
-    import os
-    import subprocess
-    from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
+    from tree_lib import read_policy_value   # noqa: E402  the kit's one policy read (TOOL-aNimbleMend-8 S7)
     try:
-        kit = resolve_kit_dir("policy", "policy.py", KIT)
+        return read_policy_value("charter.override", root)
     except LookupError as exc:
         raise ValueError(f"charter.override cannot be read, so no override is recorded: {exc}") from None
-    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
-    p = subprocess.run([sys.executable, str(kit / "policy.py"), "get", "charter.override"], cwd=str(root), env=env,
-                       capture_output=True, text=True, encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL)
-    said = p.stdout.split()
-    if p.returncode != 0 or len(said) != 1:
-        why = (p.stderr or p.stdout).strip().splitlines()
-        raise ValueError(f"charter.override did not read: {why[-1] if why else f'exit {p.returncode}'}")
-    return said[0]
 
 
 def read_rule_tags():

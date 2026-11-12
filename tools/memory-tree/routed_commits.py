@@ -25,6 +25,16 @@ names; `Pass: none` adds none and keeps the subject's. That deliberately differs
 decides which commit is a unit's pass, this leg only whether a commit is attributed to any unit.
 Which spec defines an id is `tree_lib.parse_spec_h1` over every spec at HEAD.
 
+THE RED-FIX LANE (TOOL-aNimbleMend-8). A graded commit that names no unit is admitted when it carries
+at least one `Red-fix: <leg name>` trailer, one leg per trailer line, and every value is a leg name
+of the `LEG_MANIFEST` file in that commit's own tree; the summary line counts them as `<n> red-fix`.
+A value that names no leg, a blank `LEG_MANIFEST` and a commit holding no manifest are violations
+that say so. A commit that names a unit is graded as ever and its trailer is not read. The policy
+key `bar.inline-red-fixes` gates the pushed RANGE and never the history: off, a `Red-fix:` commit in
+RANGE is `names no unit`, and WHOLE still admits it, so turning the key off reds nothing that
+landed. The key is read once, by `read_lane_state`, and only when a RANGE commit is a candidate; a
+history with no trailer costs no spawn it did not cost before.
+
 Exit 0 clean · 1 a violation or a stale waiver · 2 REFUSED, the leg cannot give an answer worth
 reading (an unarmed conf, a shallow clone, an empty id map, a truncated log stream).
 
@@ -35,7 +45,10 @@ is not graded, so a conflict resolution that adds product code passes; its non-m
 graded. Commits committed before `ROUTED_COMMIT_CUTOFF` are counted and not graded, and the cutoff
 is a date the committer sets. The graded run controls the conf, so it can narrow `ROUTED_PATHS`,
 move the cutoff or list a waiver: the summary prints all three as a trace, not a guard. A spec
-moved since the commit is looked for at its HEAD path and reads as absent. Pass-order history
+moved since the commit is looked for at its HEAD path and reads as absent, and so is a leg manifest
+moved since a `Red-fix:` commit: it is looked for at the path HEAD's conf names. The lane checks
+neither that the commit fixes the red nor that the named leg was ever red: the gate ledger is per
+clone and untracked, so this leg reads none, and a trailer naming a real leg passes. Pass-order history
 (the unattended kit) answers "spec at the first parent" from a header window and lets a trailer
 replace the subject; this file reads the H1 and the union, and NOTHING machine-joins the two files.
 
@@ -70,7 +83,8 @@ sys.dont_write_bytecode = True
 KIT = pathlib.Path(__file__).resolve().parent
 if str(KIT) not in sys.path:
     sys.path.append(str(KIT))
-from tree_lib import GIT_ENV_LEAKS, build_git_env, build_spec_path_re, parse_conf, parse_spec_h1  # noqa: E402
+from tree_lib import (GIT_ENV_LEAKS, RED_FIX_TRAILER, build_git_env, build_spec_path_re, parse_conf,  # noqa: E402
+                      parse_leg_names, parse_spec_h1, read_policy_value)
 
 SAY = "routed-commits"
 ZERO_SHA_RE = re.compile(r"^0+$")
@@ -227,16 +241,38 @@ def derive_commit_range(repo, env) -> tuple:
 
 def read_routed_commits(repo, rev_args: list) -> list:
     """Every commit in the range, newest first, from ONE log pass (S6): sha, parents, committer date,
-    subject, `Pass:` trailer and the paths it touches, renames read as a deletion plus an addition."""
-    fmt = "%x1e%H%x1f%P%x1f%cI%x1f%s%x1f%(trailers:key=Pass,valueonly,separator=%x20)%x1f"
+    subject, `Pass:` trailer and the paths it touches, renames read as a deletion plus an addition.
+    `red_fix` is the list of its `Red-fix:` trailer values (TOOL-aNimbleMend-8 S5), one leg name per
+    trailer line: a leg name holds spaces, commas and parentheses, so a value is its whole line."""
+    fmt = ("%x1e%H%x1f%P%x1f%cI%x1f%s%x1f%(trailers:key=Pass,valueonly,separator=%x20)%x1f"
+           "%(trailers:key=" + RED_FIX_TRAILER + ",valueonly,unfold,separator=%x1d)%x1f")
     raw = run_git(repo, "log", "-z", "--root", "--no-renames", "--name-only", "--no-color",
                   f"--format={fmt}", *rev_args, "--").decode("utf-8", "replace")
     commits = []
     for rec in raw.split("\x1e")[1:]:
-        sha, parents, date, subject, trailer, rest = rec.split("\x1f", 5)
+        sha, parents, date, subject, trailer, red_fix, rest = rec.split("\x1f", 6)
         commits.append({"sha": sha, "parents": parents.split(), "date": date, "subject": subject,
-                        "trailer": trailer.strip(), "paths": [p for p in re.split(r"[\0\n]", rest) if p]})
+                        "trailer": trailer.strip(), "red_fix": [v.strip() for v in red_fix.split("\x1d") if v.strip()],
+                        "paths": [p for p in re.split(r"[\0\n]", rest) if p]})
     return commits
+
+
+def read_lane_state(repo) -> tuple:
+    """`(on, why)`: the red-fix lane's key, `bar.inline-red-fixes`, by the ask contract's five outcomes
+    (TOOL-aNimbleMend-8 S7). On for the answer `on`, and for a repository with no policy kit, where
+    `why` is the NOTE the contract asks for; off for `off`, for a refused read, where `why` is the
+    reader's own line, and for any other value, where `why` names the key and the value."""
+    try:
+        value = read_policy_value("bar.inline-red-fixes", repo)
+    except LookupError:
+        return True, "NOTE — no policy kit resolves beside this kit, so bar.inline-red-fixes reads on"
+    except ValueError as exc:
+        return False, str(exc)
+    if value == "on":
+        return True, ""
+    if value == "off":
+        return False, ""
+    return False, f"bar.inline-red-fixes reads {value}, neither on nor off, so the red-fix lane is closed"
 
 
 def check_routed_commits(repo, env) -> tuple:
@@ -261,6 +297,10 @@ def check_routed_commits(repo, env) -> tuple:
     id_re = build_id_re(families)
     routed = " ".join(entries)
     lines, failed, range_shas, read = [], False, set(), []
+    # TOOL-aNimbleMend-8 S7: the lane key, read ONCE and only when a RANGE commit carries the trailer and
+    # names no unit. It gates the pushed range, never the history: WHOLE admits whatever the key says.
+    lane = []
+    manifest = (conf.get("LEG_MANIFEST") or "").strip()
     for mode, rev_args, label, tag in populations:
         commits = read_routed_commits(repo, rev_args)
         read.append((mode, label.split(" (")[0], commits))
@@ -269,7 +309,7 @@ def check_routed_commits(repo, env) -> tuple:
             raise Refusal(f"the log pass parsed {len(commits)} commit(s) and `git rev-list --count` reports {total} "
                           f"over the same range; a truncated stream is not a clean one")
         merges = exempt = not_routed = graded = 0
-        violations, pending = [], []
+        violations, pending, candidates, red_fix_n = [], [], [], 0
         for c in commits:
             if len(c["parents"]) >= 2:
                 merges += 1
@@ -281,7 +321,11 @@ def check_routed_commits(repo, env) -> tuple:
                 graded += 1
                 ids = extract_unit_ids(c["subject"] + " " + c["trailer"], id_re)
                 pairs = [(i, p) for i in ids for p in id_map.get(i, [])]
-                if not ids:
+                if not ids and c["red_fix"] and mode == "RANGE" and not lane:
+                    lane.append(read_lane_state(repo))
+                if not ids and c["red_fix"] and (mode == "WHOLE" or lane[0][0]):
+                    candidates.append(c)        # a lane candidate: its trailer is graded below
+                elif not ids:
                     violations.append((c, ids, "names no unit"))
                 elif not c["parents"]:
                     violations.append((c, ids, "no first parent"))
@@ -297,6 +341,35 @@ def check_routed_commits(repo, env) -> tuple:
                 if not any(present):
                     paths = ", ".join(sorted({p for _, p in pairs}))
                     violations.append((c, ids, f"no spec at its first parent {c['parents'][0][:8]}: {paths}"))
+        if candidates:
+            # TOOL-aNimbleMend-8 S6: each candidate's manifest, in ONE batched read made only when a
+            # candidate exists. Every value a leg name at its own commit admits; anything else says so.
+            legs = {}
+            if manifest:
+                raw = run_git(repo, "cat-file", "--batch",
+                              stdin="".join(f"{c['sha']}:{manifest}\n" for c in candidates).encode("utf-8"))
+                pos = 0
+                for c in candidates:
+                    end = raw.index(b"\n", pos)
+                    head = raw[pos:end].split()
+                    pos = end + 1
+                    if len(head) != 3 or not head[2].isdigit():
+                        continue                # `missing`: no manifest at that commit
+                    body, pos = raw[pos:pos + int(head[2])], pos + int(head[2]) + 1
+                    try:
+                        legs[c["sha"]] = parse_leg_names(body.decode("utf-8", "replace"))
+                    except ValueError:
+                        pass                    # not a leg manifest: read as absent
+            for c in candidates:
+                names = legs.get(c["sha"])
+                strays = [v for v in c["red_fix"] if names is not None and v not in names]
+                if names is None:
+                    violations.append((c, [], f"its `{RED_FIX_TRAILER}:` trailer cannot be checked: " + (
+                        f"no leg manifest reads at {manifest} in that commit" if manifest else "LEG_MANIFEST is blank")))
+                elif strays:
+                    violations.append((c, [], f"`{RED_FIX_TRAILER}: {strays[0]}` names no leg of {manifest} at that commit"))
+                else:
+                    red_fix_n += 1
         waived_n, stale = 0, []
         if mode == "WHOLE" and waived:
             kept = []
@@ -309,7 +382,10 @@ def check_routed_commits(repo, env) -> tuple:
             violations = kept
         failed = failed or bool(violations or stale)
         lines.append(f"{SAY}: {label} · graded {graded} · {exempt} exempt by the {cutoff} cutoff · {merges} merge(s) · "
-                     f"{not_routed} not routed · {waived_n} waived · {len(id_map)} spec id(s) at HEAD · ROUTED_PATHS {routed}")
+                     f"{not_routed} not routed · {waived_n} waived{f' · {red_fix_n} red-fix' if red_fix_n else ''} · "
+                     f"{len(id_map)} spec id(s) at HEAD · ROUTED_PATHS {routed}")
+        if mode == "RANGE" and lane and lane[0][1]:
+            lines.append(f"{SAY}: {lane[0][1]}")
         if graded == 0:
             lines.append(f"{SAY}:{tag} graded 0 — the range holds {total} commit(s) and none of its non-merge commits "
                          f"on or after the {cutoff} cutoff touches ROUTED_PATHS {routed}")
@@ -650,6 +726,89 @@ def run_selftest() -> int:
         set_fixture_conf(repo)
         newest = read_newest_unit(repo, f"{s[1]}..HEAD")
         print_arm(newest == "TOOL-tFix-1", f"AC11 --newest-unit skips a newest merge commit's id (got '{newest}')")
+
+        # ---- TOOL-aNimbleMend-8 AC4 AC5 AC6: the red-fix lane. Four commits, graded WHOLE and RANGE with
+        # the lane key stubbed on and then off, then a trailer-free twin for the spawn count. Against a
+        # grader that reads no `Red-fix:` trailer every arm but the last two reads RED.
+        lane_files = [{"README.md": "x\n", "legs.json": '[{"name": "leg one"}]\n'}, {"src/a.txt": "a\n"},
+                      {"src/b.txt": "b\n"}, {"src/c.txt": "c\n"}]
+        lane_msgs = ["init", "fix: clear leg one\n\nRed-fix: leg one\nPass: none", "fix: names no leg\n\nRed-fix: leg nine",
+                     "chore: no id"]
+        repo, s = build_fixture(root, "lane", [{"msg": m, "files": f} for m, f in zip(lane_msgs, lane_files)])
+        free, _s = build_fixture(root, "lanefree", [{"msg": m.split("\n")[0], "files": f} for m, f in zip(lane_msgs, lane_files)])
+        set_fixture_conf(repo, LEG_MANIFEST="legs.json")
+        set_fixture_conf(free, LEG_MANIFEST="legs.json")
+        c2, c3, c4 = (f"  {x[:8]} " for x in s[1:])
+        asked, spawns = [], {}
+        orig_lane = globals()["read_lane_state"]
+        try:
+            for on in (True, False):
+                globals()["read_lane_state"] = lambda _repo, on=on: (asked.append(on) or on, "")
+                before = GIT_SPAWNS[0]
+                rc_w, whole = run_check(repo)
+                spawns["lane"] = GIT_SPAWNS[0] - before
+                rc_r, both = run_check(repo, {"GATE_PUSH_BASE": s[0]})
+                rng, beside_line = both.split("\n")[0], next((ln for ln in both.split("\n") if beside in ln), "")
+                listed = both.split(f"{SAY}: {beside}")[0]
+                if on:
+                    print_arm(rc_w == 1 and c2 not in whole and "1 red-fix" in whole.split("\n")[0]
+                        and any(c3 in ln and "leg nine" in ln and "legs.json" in ln for ln in whole.split("\n"))
+                        and any(c4 in ln and ln.endswith("names no unit") for ln in whole.split("\n")),
+                        "TOOL-aNimbleMend-8 AC4 WHOLE admits a commit whose `Red-fix:` value is a leg at its own "
+                        "commit and counts it, reds a value that is no leg naming it and the manifest, and "
+                        "still reds a trailer-free commit `names no unit`", whole)
+                    print_arm(rc_r == 1 and c2 not in both and "1 red-fix" in rng and "1 red-fix" in beside_line
+                        and any(c3 in ln and "leg nine" in ln and "legs.json" in ln for ln in listed.split("\n"))
+                        and any(c4 in ln and ln.endswith("names no unit") for ln in listed.split("\n")),
+                        "TOOL-aNimbleMend-8 AC4 RANGE with the key on does the same, and both summary lines "
+                        "hold `1 red-fix`", both)
+                else:
+                    print_arm(rc_r == 1 and "red-fix" not in rng and "1 red-fix" in beside_line
+                        and all(any(c in ln and ln.endswith("no unit id — names no unit") for ln in listed.split("\n"))
+                                for c in (c2, c3, c4)),
+                        "TOOL-aNimbleMend-8 AC5 the key off, RANGE reds all three `no unit id — names no "
+                        "unit`, and the WHOLE half beside it still admits the lane commit", both)
+                    print_arm(rc_w == 1 and c2 not in whole and "1 red-fix" in whole.split("\n")[0],
+                        "TOOL-aNimbleMend-8 AC5 the key off reds no lane commit graded WHOLE", whole)
+            print_arm(asked == [True, False],
+                f"TOOL-aNimbleMend-8 S7 the lane key is read once per RANGE grading and never for WHOLE alone (asked {asked})")
+            set_fixture_conf(repo)
+            rc, out = run_check(repo)
+            print_arm(rc == 1 and any(c2 in ln and "cannot be checked" in ln and "LEG_MANIFEST is blank" in ln for ln in out.split("\n")),
+                "TOOL-aNimbleMend-8 S6 a blank LEG_MANIFEST reds a lane commit saying its trailer cannot be checked", out)
+            set_fixture_conf(repo, LEG_MANIFEST="absent.json")
+            rc, out = run_check(repo)
+            print_arm(rc == 1 and any(c2 in ln and "cannot be checked" in ln and "absent.json" in ln for ln in out.split("\n")),
+                "TOOL-aNimbleMend-8 S6 a commit holding no manifest reds saying its trailer cannot be checked", out)
+
+            def check_lane_unread(_repo):
+                raise AssertionError("the lane key was read for a trailer-free history")
+
+            globals()["read_lane_state"] = check_lane_unread
+            before = GIT_SPAWNS[0]
+            try:
+                rc, out = run_check(free)
+                rc2, out2 = run_check(free, {"GATE_PUSH_BASE": _s[0]})
+            except AssertionError as exc:
+                rc, out, rc2, out2 = -1, str(exc), -1, ""
+            spawns["free"] = GIT_SPAWNS[0] - before
+        finally:
+            globals()["read_lane_state"] = orig_lane
+        before = GIT_SPAWNS[0]
+        run_check(free)
+        spawns["free whole"] = GIT_SPAWNS[0] - before
+        print_arm(rc == 1 and rc2 == 1 and "red-fix" not in out + out2 and spawns["lane"] == spawns["free whole"] + 1,
+            "TOOL-aNimbleMend-8 AC5 a trailer-free history reads no lane key, prints no red-fix count and costs "
+            f"one git spawn fewer than its lane twin, the batched manifest read ({spawns})", out + "\n" + out2)
+        policy_get = "policy" + ".py"       # spelled apart: AC6 counts that name in this file as zero
+        import build_records  # noqa: E402  a sibling, for the one policy read's second caller
+        import inspect
+        import tree_lib  # noqa: E402
+        print_arm(callable(getattr(tree_lib, "read_policy_value", None))
+            and "read_policy_value" in inspect.getsource(build_records.read_override_value)
+            and policy_get not in pathlib.Path(__file__).read_text(encoding="utf-8"),
+            "TOOL-aNimbleMend-8 AC6 the policy read lives once, in tree_lib, the override door calls it, and "
+            "this file spells no policy reader of its own")
 
         # ---- TOOL-dTrueNorth-4 AC1-AC7 AC10 AC13: the deviation join's fixture over every plant, each
         # plant's failing case staged by the plant itself, and the record-late plant through this host.

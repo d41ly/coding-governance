@@ -124,7 +124,7 @@ def write(path, text):
 # and the python half mis-read REMOVED coverage with the gate still green. TOOL-aRepatriatedFork-9
 # moved it into `tree_lib.py`, so this engine no longer needs a sibling ENGINE to import.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from tree_lib import FM_RE, kit_rel, parse_conf  # noqa: E402  the kit's ONE conf parser
+from tree_lib import FM_RE, kit_rel, parse_conf, parse_leg_names  # noqa: E402  the kit's ONE conf parser
 
 def load_conf(root: str) -> dict:
     conf = {"MEMORY_ROOT": "memory", "UNIVERSAL_BUDGET": "", "LEG_MANIFEST": ""}
@@ -195,16 +195,11 @@ def load_leg_names(root: str, conf: dict):
     judged, and saying so beats both a false red and a silent pass. A SET key naming a file that does
     not read as a list of `{name: ...}` rows is a named failure, never a traceback.
     """
-    import json
-
     rel = conf.get("LEG_MANIFEST", "").strip()
     if not rel:
         return None
     try:
-        rows = json.loads(read(os.path.join(root, rel)))
-        if not isinstance(rows, list):
-            raise ValueError("the top level is not a list of leg rows")
-        return {r["name"] for r in rows if isinstance(r, dict) and isinstance(r.get("name"), str)}
+        return parse_leg_names(read(os.path.join(root, rel)))   # the kit's one manifest parser
     except (OSError, ValueError) as exc:
         raise Problem(f"gotchas: LEG_MANIFEST names {rel}, which cannot be read as a leg manifest "
                       f"({type(exc).__name__}: {exc}) — fix the path, or blank the key so a leg-name "

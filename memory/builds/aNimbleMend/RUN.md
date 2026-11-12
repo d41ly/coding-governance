@@ -79,3 +79,9 @@ base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 2026-11-12T17:05:34Z dispatch · item b7bfe5fa TOOL-aNimbleMend-13 · reason memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/builds/aNimbleMend/README.md
 
 2026-11-12T17:14:10Z dispatch · item cb1ee1c5 TOOL-aNimbleMend-13 · reason memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-13-1-acceptance-ledger.md memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-13.md memory/LIVE.md memory/builds/aNimbleMend/README.md
+
+2026-11-12T17:22:55Z dispatch · item 1d010f40 TOOL-aNimbleMend-8 · reason tools/hooks/scratch-guard.js tools/hooks/agent-cap.js tools/hooks/scratch-guard.test.sh tools/hooks/README.md tools/memory-tree/routed_commits.py tools/memory-tree/tree_lib.py tools/memory-tree/build_records.py tools/memory-tree/gotchas.py memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-8.md memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-8-1-acceptance-ledger.md
+
+2026-11-12T17:22:57Z brief · item TOOL-aNimbleMend-8 · reason 31459d489d13 memory/builds/aNimbleMend/prompts/2026-11-12-prompt-TOOL-aNimbleMend-8-build-brief.md
+
+2026-11-12T17:34:14Z dispatch · item 1d010f40 TOOL-aNimbleMend-8 · reason memory/LIVE.md memory/builds/aNimbleMend/README.md memory/map/generated/symbols.json

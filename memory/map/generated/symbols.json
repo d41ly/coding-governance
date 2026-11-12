@@ -4473,6 +4473,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "checkLane",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkLiteralOpen",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -4519,6 +4524,11 @@
     },
     {
       "id": "checkPosixRootLitter",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkRedLane",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
@@ -15803,6 +15813,11 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "parse_leg_names",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
       "id": "parse_legacy_rows",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -16849,6 +16864,11 @@
     },
     {
       "id": "readMode",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "readOpenReds",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
@@ -18813,6 +18833,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_lane_state",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
       "id": "read_lang_modes",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -19616,6 +19641,11 @@
       "id": "read_policy_value",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "read_policy_value",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "read_policy_value",
@@ -33121,6 +33151,11 @@
       "id": "write_lease",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_ledger",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "write_leg_capture",

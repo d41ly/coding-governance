@@ -103,6 +103,19 @@
  * that role's type. It grades two write classes; `none`, `review` and `records` are declared in the
  * index and read by nothing here.
  *
+ * THE RED-FIX LANE (TOOL-aNimbleMend-8). A product write the route arm or the role arm is about to
+ * refuse is admitted, with one witness line, while the gate ledger under the worktree's own git dir
+ * (`gate-ledger.tsv`, written by the bar runner and by a pass-leg run) records a leg `fail` or
+ * `timeout` and the policy key `bar.inline-red-fixes` reads `on`, or no policy kit resolves. The
+ * writer is the main loop or a role declaring `writes = product`; any other writer, a broken role
+ * index, the key `off`, a refused key read and any other value each leave the refusal standing.
+ * `readOpenReds` reads the ledger, `checkRedLane` is the decision, and the commit owes a
+ * `Red-fix: <leg>` trailer beside `Pass: none`, which the commit grader reads. A spec write never
+ * reaches it. WHAT THE LANE DOES NOT CHECK: whether the write fixes the red, since any product path
+ * is admitted while any leg is open; whether a red no run has re-measured is still red, since a row
+ * stands until the runner next records that leg; and a ledger edited by hand, which is read like
+ * the runner's.
+ *
  * THE FOURTH CHECK: THE ROLE-GATE ARM (TOOL-aOrientedCast-11). Gates are the main session's, at the
  * merge or push threshold. On a Bash or PowerShell payload carrying an `agent_type`, AFTER the
  * scratch verdict and the orientation check, `checkRoleGate` refuses a simple command that runs a
@@ -1146,6 +1159,51 @@ function checkRoleWrite(cls, index, w) {
   return { deny: renderRoleDeny(cls, index, writers, w) }
 }
 
+// ---- the red-fix lane (TOOL-aNimbleMend-8) ------------------------------------------------------
+
+/** The bar runner's ledger under a worktree's own git dir; the runner's `RG_GIT_DIR` holds it. */
+const GATE_LEDGER_FILE = 'gate-ledger.tsv'
+
+/**
+ * S1: the names of the legs the gate ledger under `gitDir` records red, in ledger order. A row is
+ * tab-separated, its first field the leg name and its third the status; `fail` and `timeout` are
+ * red, `ok`, `retried` and any other status are not, and a row with fewer than three fields is
+ * skipped. An absent, empty or unreadable ledger, and an empty `gitDir`, is the empty list.
+ */
+function readOpenReds(gitDir) {
+  if (!gitDir) return []
+  let text
+  try { text = require('fs').readFileSync(require('path').join(gitDir, GATE_LEDGER_FILE), 'utf8') } catch { return [] }
+  const reds = []
+  for (const l of text.split('\n')) {
+    const f = l.replace(/\r$/, '').split('\t')
+    if (f.length >= 3 && (f[2] === 'fail' || f[2] === 'timeout')) reds.push(f[0])
+  }
+  return reds
+}
+
+/**
+ * S2: the lane's one decision, first match wins. `w` carries `agentType`, `index` as loadRoleIndex
+ * returns it, `lane` as `{ on, why }` and `reds` as readOpenReds returns them. `{ witness }` admits,
+ * null leaves the refusal standing.
+ *  1. `lane.on` is not true → null
+ *  2. `reds` is empty → null
+ *  3. the index is broken → null
+ *  4. `agentType` is empty, the main loop → witness
+ *  5. the index is absent → witness
+ *  6. `agentType` names an `agent`-true role declaring `writes = product` → witness
+ *  7. anything else, the untyped harness agent included → null
+ * It does not ask whether the write fixes the red: any product path is admitted while a leg is open.
+ */
+function checkRedLane(w) {
+  if (!w.lane || w.lane.on !== true) return null
+  if (!Array.isArray(w.reds) || w.reds.length === 0) return null
+  if (!w.index || w.index.state === 'broken') return null
+  const r = w.index.state === 'ok' && w.agentType && Object.prototype.hasOwnProperty.call(w.index.roles, w.agentType) ? w.index.roles[w.agentType] : null
+  if (w.agentType && w.index.state !== 'absent' && !(r && r.agent === true && r.writes === 'product')) return null
+  return { witness: `red-fix lane admits this write — open red leg(s): ${w.reds.join(', ')}; its commit owes a \`Red-fix: <leg>\` trailer beside \`Pass: none\`${w.lane.why ? ` · ${w.lane.why}` : ''}` }
+}
+
 /**
  * THE ONE EVALUATION ORDER of the write gate. Returns null to print nothing, `{ witness }` to allow
  * with one stderr line, `{ deny }` to refuse.
@@ -1177,6 +1235,11 @@ function checkRoleWrite(cls, index, w) {
  *     `writes = product` → deny, UNARMED; the payload's `agent_type` names such a role → null; else
  *     deny. The route arm runs first and never instead: a builder with no buildable route meets
  *     step 7, 8 or 9b's refusal word for word.
+ * 10. the red-fix lane (TOOL-aNimbleMend-8), on a product-class refusal from step 7, 8, 9b or 9a
+ *     and on nothing else: read the lane key `bar.inline-red-fixes`, then the gate ledger
+ *     (readOpenReds), then return checkRedLane's witness, or the refusal as composed. A key read that
+ *     refused or answered another value appends its one line to the refusal; under `off` the refusal
+ *     is byte for byte the one composed. An admitted write and every non-product write read neither.
  * No `agent_id` exemption: a subagent's write is judged by the same order (S7).
  */
 function checkRouted(data, env) {
@@ -1246,15 +1309,43 @@ function checkRouted(data, env) {
     const routed = extractRouteUnits(cardText).units.filter((u) => u.spec).map((u) => buildComparablePath(path.join(top, buildNativePath(u.spec))))
     return checkRoleWrite('spec', loadRoleIndex(top), { tool, ti, native: target, target: targetC, agentType, slug, routed })
   }
+  // Step 10: the red-fix lane, asked with a product-class verdict already composed. An admit passes
+  // through untouched, so the key and the ledger are read on a refusal only.
+  const checkLane = (verdict) => {
+    if (!verdict || !verdict.deny) return verdict
+    let lane
+    try {
+      const helper = require('./agent-cap.js').resolvePolicyHelper()
+      if (!helper || !fs.existsSync(helper)) {
+        lane = { on: true, why: 'NOTE — no policy kit resolves beside this hook, so bar.inline-red-fixes reads on' }
+      } else {
+        const v = require(helper).readPolicy('bar.inline-red-fixes', { repo: top }).value
+        lane = v === 'on' ? { on: true, why: '' } : v === 'off' ? { on: false, why: '' }
+          : { on: false, why: `bar.inline-red-fixes reads ${JSON.stringify(v)}, neither on nor off, so the red-fix lane is closed` }
+      }
+    } catch (e) {
+      lane = { on: false, why: String((e && e.message) || e).split(/\r?\n/)[0] }
+    }
+    // The worktree's OWN git dir, where the runner wrote, never the common dir.
+    let gitDir = mine.hit.gitPath
+    if (mine.hit.isFile) {
+      let m = null
+      try { m = /gitdir:\s*(.+)/.exec(fs.readFileSync(mine.hit.gitPath, 'utf8')) } catch { m = null }
+      gitDir = m ? path.resolve(top, m[1].trim()) : ''
+    }
+    const admit = checkRedLane({ agentType, index: loadRoleIndex(top), lane, reds: readOpenReds(gitDir) })
+    if (admit) return admit
+    return !lane.on && lane.why ? { deny: `${verdict.deny}${lane.why}\n` } : verdict
+  }
   const card = sid ? readCard(mine.common, sid) : null
   if (!card || card.text === null) {
     const where = card ? `this session has no orientation card at ${card.shown} (session ${sid})` : 'the payload carries no session_id, so no orientation card can be read'
-    return { deny: renderRouteDeny(tool, targetC, entry, confShown, where, `Create the card with manifest-check.sh --card --write --session ${sid || '<session id>'} from the kickoff kit, then run /session-kickoff, which specs the unit, writes its brief and appends a ## route naming it.`) }
+    return checkLane({ deny: renderRouteDeny(tool, targetC, entry, confShown, where, `Create the card with manifest-check.sh --card --write --session ${sid || '<session id>'} from the kickoff kit, then run /session-kickoff, which specs the unit, writes its brief and appends a ## route naming it.`) })
   }
   const route = extractRouteUnits(card.text)
   if (!route.seen || route.units.length === 0) {
     const what = route.seen ? `its ## route at ${card.shown} carries no - unit: line` : `its orientation card ${card.shown} carries no ## route`
-    return { deny: renderRouteDeny(tool, targetC, entry, confShown, what, `Run /session-kickoff: give the unit its spec, then append a ## route naming it through manifest-check.sh --card --append --session ${sid}.`) }
+    return checkLane({ deny: renderRouteDeny(tool, targetC, entry, confShown, what, `Run /session-kickoff: give the unit its spec, then append a ## route naming it through manifest-check.sh --card --append --session ${sid}.`) })
   }
   // Step 9a: the route admits; the writer's role decides. The slug is the unit id's middle.
   const checkUnitWrite = (u) => {
@@ -1264,17 +1355,17 @@ function checkRouted(data, env) {
   const reasons = []
   for (const u of route.units) {
     const why = checkBuildable(u, route.build, top, memRoot.trim(), confBytes)
-    if (!why) return checkUnitWrite(u)
+    if (!why) return checkLane(checkUnitWrite(u))
     reasons.push(`  ${u.unit}: ${why}`)
   }
   // Step 9b: the units the build's run-state file records as dispatched, minus the card's own.
   const dispatched = readDispatchedUnits(top, memRoot.trim(), route.build)
   const onCard = new Set(route.units.map((u) => u.unit))
   for (const u of dispatched.units) {
-    if (!onCard.has(u.unit) && !checkBuildable(u, route.build, top, memRoot.trim(), confBytes)) return checkUnitWrite(u)
+    if (!onCard.has(u.unit) && !checkBuildable(u, route.build, top, memRoot.trim(), confBytes)) return checkLane(checkUnitWrite(u))
   }
   if (dispatched.units.length > 0) reasons.push(`  the run-state file ${dispatched.file} records a dispatch for ${dispatched.units.length} unit(s) of ${route.build}, and none is buildable`)
-  return { deny: renderRouteDeny(tool, targetC, entry, confShown, `no unit its card ${card.shown} routes is buildable:\n${reasons.join('\n')}`, 'Make one routed unit buildable — its spec at the status that admits writes — or route the unit that owns this write through /session-kickoff and manifest-check.sh --card --append.') }
+  return checkLane({ deny: renderRouteDeny(tool, targetC, entry, confShown, `no unit its card ${card.shown} routes is buildable:\n${reasons.join('\n')}`, 'Make one routed unit buildable — its spec at the status that admits writes — or route the unit that owns this write through /session-kickoff and manifest-check.sh --card --append.') })
 }
 
 // ---- the role-gate arm (TOOL-aOrientedCast-11) --------------------------------------------------
@@ -1743,4 +1834,4 @@ function main() {
 }
 
 if (require.main === module) main()
-module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits }
+module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane }

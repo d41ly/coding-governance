@@ -1,11 +1,12 @@
 # TOOL-aNimbleMend-8 — the inline red-fix lane: an open red admits a product write, and a `Red-fix:` trailer admits its commit
 
-**Status:** INPROGRESS · rev-2 · 2026-11-12 · node a · Tier-2 · base 1265772c · streams tooling · order 8
+**Status:** CLOSED · rev-2 · 2026-11-12 · node a · Tier-2 · base 1265772c · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-12-build-TOOL-aNimbleMend-8-1-acceptance-ledger.md](../build/2026-11-12-build-TOOL-aNimbleMend-8-1-acceptance-ledger.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aNimbleMend-1-brief.md](../prompts/2026-11-12-prompt-TOOL-aNimbleMend-1-brief.md) | research | TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 |
 | [2026-11-12-prompt-TOOL-aNimbleMend-8-build-brief.md](../prompts/2026-11-12-prompt-TOOL-aNimbleMend-8-build-brief.md) | research | — |
 

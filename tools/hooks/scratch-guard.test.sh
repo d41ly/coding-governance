@@ -1209,6 +1209,64 @@ else
   echo "FAIL D-AC6 the hook's RUN_STATE_FILE is '$sg_runmd_hook' and the driver's runmd_of basename is '$sg_runmd_driver'"; fail=$((fail+1))
 fi
 
+# ---- the RED-FIX LANE (TOOL-aNimbleMend-8): an open red in the gate ledger admits a product write --
+# ---- the gate was about to refuse, with the lane key on; off, the refusal is the one composed ------
+# The ledger sits under the linked worktree's OWN git dir. The lane key is read at the landed
+# revision, which in a clone with no remote is the local branch GOV_DEFAULT_BRANCH names: the primary
+# branch holds no policy file, so the key reads its default `on`; `sg-lane-off` holds one setting it
+# `off`; a branch that does not exist is a refused read. Every arm ABOVE ran with that variable as
+# the caller left it. Against the hook at 1d010f40 the L-AC1 and L-AC3 rows fail (no readOpenReds, no
+# checkRedLane) and each exit-0 row below exits 2; the exit-2 rows are their near-misses.
+SG_WT_GITDIR=$(unset GIT_DIR GIT_WORK_TREE; git -C "$SGWT" rev-parse --absolute-git-dir)
+SG_LEDGER="$SG_WT_GITDIR/gate-ledger.tsv"
+# write_ledger <leg name>=<status> ... — a gate ledger of nine-field rows, one per argument.
+write_ledger() {
+  local r
+  : > "$SG_LEDGER"
+  for r in "$@"; do printf '%s\t1\t%s\tk\tt\tr\t0\tb\th\n' "${r%%=*}" "${r#*=}" >> "$SG_LEDGER"; done
+}
+sg_blob=$(printf '[bar]\ninline-red-fixes = "off"\n' | git -C "$SGFIX" hash-object -w --stdin)
+sg_tree=$(printf '100644 blob %s\tpolicy.toml\n' "$sg_blob" | git -C "$SGFIX" mktree)
+sg_top=$(printf '040000 tree %s\t.governance\n' "$sg_tree" | git -C "$SGFIX" mktree)
+git -C "$SGFIX" update-ref refs/heads/sg-lane-off "$($SGGIT -C "$SGFIX" commit-tree "$sg_top" -m 'the lane key off')"
+SG_LANE_ON=$(git -C "$SGFIX" symbolic-ref --short HEAD)
+write_ledger "leg one=fail" "leg two=ok" "leg three=timeout" "leg four=retried"
+printf 'a name alone\n' >> "$SG_LEDGER"
+mkdir -p "$TMP/lane-empty"
+sg_reds=$(node -p "JSON.stringify(require(process.argv[1]).readOpenReds(process.argv[2]))" "$HOOK" "$SG_WT_GITDIR" 2>&1)
+if [ "$sg_reds" = '["leg one","leg three"]' ]; then echo "ok   L-AC1 readOpenReds reads fail and timeout rows in ledger order, and skips ok, retried and a short row"; pass=$((pass+1))
+else echo "FAIL L-AC1 readOpenReds over the fixture ledger printed: $sg_reds"; fail=$((fail+1)); fi
+sg_reds=$(node -p "JSON.stringify(require(process.argv[1]).readOpenReds(process.argv[2]))" "$HOOK" "$TMP/lane-empty" 2>&1)
+if [ "$sg_reds" = '[]' ]; then echo "ok   L-AC1 readOpenReds over a directory holding no ledger is the empty list"; pass=$((pass+1))
+else echo "FAIL L-AC1 readOpenReds over a directory holding no ledger printed: $sg_reds"; fail=$((fail+1)); fi
+export GOV_DEFAULT_BRANCH="$SG_LANE_ON"
+run_write "L-AC2 the key on, a red open, the main loop, an unrouted card -> allow, one witness line naming the legs and the trailer" 0 "one;;red-fix lane;;leg one, leg three;;Red-fix: <leg>" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+write_ledger "leg two=ok" "leg four=retried"
+run_write "L-AC2 the key on, no red open -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+cp "$TMP/err" "$TMP/lane-composed.err"
+write_ledger "leg one=fail"
+export GOV_DEFAULT_BRANCH=sg-lane-off
+run_write "L-AC2 the key off, a red open -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+if cmp -s "$TMP/err" "$TMP/lane-composed.err"; then echo "ok   L-AC2 under the key off the refusal is byte for byte the one composed with no red open"; pass=$((pass+1))
+else echo "FAIL L-AC2 under the key off the refusal differs from the one composed with no red open"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+export GOV_DEFAULT_BRANCH=sg-no-such-branch
+run_write "L-AC2 a refused key read, a red open -> deny, the reader's line appended to the refusal" 2 "any;;## route;;policy: refused" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+export GOV_DEFAULT_BRANCH="$SG_LANE_ON"
+write_roles ok
+run_edit "L-AC2 a role index, the main loop on a buildable route (the role arm's refusal), a red open -> allow, the witness line" 0 "one;;red-fix lane;;leg one" Write "$SG_T" - session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+run_edit "L-AC2 gov-builder, an unrouted card, a red open -> allow, the witness line" 0 "one;;red-fix lane;;leg one" Write "$SG_T" - session_id=sgtest-r6 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
+run_edit "L-AC2 gov-spec-writer on a product path, a red open -> deny with the ## route refusal" 2 "any;;## route" Write "$SG_T" - session_id=sgtest-r6 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-spec-writer
+run_edit "L-AC2 the untyped harness agent, a red open -> deny with the ## route refusal" 2 "any;;## route" Write "$SG_T" - session_id=sgtest-r6 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=workflow-subagent
+run_edit "L-AC3 gov-builder writing a spec, a red open -> deny by the role arm: a spec write never reaches the lane" 2 "any;;a spec path;;gov-spec-writer" Write "$SG_CWD_WT/$SG_SPECS/2026-10-09-spec-TOOL-x-2.md" - session_id=sgtest-r6 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
+write_roles broken
+run_edit "L-AC2 a broken role index, the main loop, a red open -> deny with the ## route refusal" 2 "any;;## route" Write "$SG_T" - session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+write_roles absent
+unset GOV_DEFAULT_BRANCH
+rm -f "$SG_LEDGER"
+sg_lane_at=$(node -p "const t = String(require(process.argv[1]).checkRouted); const s = t.indexOf(\"checkRoleWrite('spec'\"); s >= 0 && t.indexOf('checkRedLane') > s" "$HOOK" 2>&1)
+if [ "$sg_lane_at" = true ]; then echo "ok   L-AC3 checkRouted asks checkRedLane, and only after the spec class has returned"; pass=$((pass+1))
+else echo "FAIL L-AC3 checkRouted does not ask checkRedLane after the spec class returns ($sg_lane_at)"; fail=$((fail+1)); fi
+
 # ==================================================================================================
 # ---- the ROLE-GATE ARM (TOOL-aOrientedCast-11): a role agent runs no gate its allowlist does not --
 # ---- name; the main loop is never refused -------------------------------------------------------
@@ -1544,8 +1602,10 @@ n=$((pass+fail))
 # and the no-dispatch-row check), counted by hand under the same rule.
 # 333 = 328 + the 5 run_role_bash rows TOOL-aNimbleMend-6 added for the pass-leg runner (4 for AC1 and
 # 1 for AC2), counted by hand under the same rule.
+# 347 = 333 + the 14 red-fix lane rows TOOL-aNimbleMend-8 added (2 for AC1, 10 for AC2 and 2 for AC3),
+# counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=333
+FLOOR_ASSERTIONS=347
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
