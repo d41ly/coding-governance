@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-7 — the run point: each unit harness return tells the main loop to run the pass legs
 
-**Status:** SPECCED · rev-2 · 2026-11-12 · node a · Tier-2 · base 1265772c · streams tooling · order 7
+**Status:** INPROGRESS · rev-2 · 2026-11-12 · node a · Tier-2 · base 1265772c · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
