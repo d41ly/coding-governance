@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-12
 streams: tooling
 roster: TOOL
-ids: TOOL-aQueuedIndex-1 TOOL-aQueuedIndex-2
+ids: TOOL-aQueuedIndex-1 TOOL-aQueuedIndex-2 TOOL-aQueuedIndex-3
 authorized-by: prompt
 ---
 
@@ -46,7 +46,7 @@ None.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 2 unit(s) · node a · opened 2026-11-12 · streams tooling
-ids TOOL-aQueuedIndex-1 TOOL-aQueuedIndex-2
+ids TOOL-aQueuedIndex-1 TOOL-aQueuedIndex-2 TOOL-aQueuedIndex-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -55,7 +55,7 @@ ids TOOL-aQueuedIndex-1 TOOL-aQueuedIndex-2
 | [TOOL-aQueuedIndex-2 — the queued-writers plant fails on each mechanism it claims](spec/2026-11-12-spec-TOOL-aQueuedIndex-2.md) | 2 | 1 | CLOSED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 14 bound to this build, across 4 record folder(s).
+Records: 17 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -15,6 +15,7 @@
 | [2026-11-12-prompt-TOOL-aQueuedIndex-1-build-brief.md](../prompts/2026-11-12-prompt-TOOL-aQueuedIndex-1-build-brief.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aQueuedIndex-1-spec-brief.md](../prompts/2026-11-12-prompt-TOOL-aQueuedIndex-1-spec-brief.md) | research | — |
 | [2026-11-12-review-TOOL-aQueuedIndex-1-diff-review-round1.md](../reviews/2026-11-12-review-TOOL-aQueuedIndex-1-diff-review-round1.md) | diff-review | — |
+| [2026-11-12-review-TOOL-aQueuedIndex-2-diff-review-round2.md](../reviews/2026-11-12-review-TOOL-aQueuedIndex-2-diff-review-round2.md) | diff-review | TOOL-aQueuedIndex-2 |
 
 <!-- /gen:spec-records -->
 

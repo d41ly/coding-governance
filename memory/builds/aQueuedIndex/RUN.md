@@ -43,3 +43,7 @@ base: d084590b612e1dfe97fb7a55b1ff9c1cedb3482c
 2026-11-12T16:22:30Z brief · item TOOL-aQueuedIndex-2 · reason 4db42f335ccf memory/builds/aQueuedIndex/prompts/2026-11-12-prompt-TOOL-aQueuedIndex-2-build-brief.md
 
 2026-11-12T16:23:39Z dispatch · item 543acfa5 TOOL-aQueuedIndex-2 · reason tools/playbook/gov_tag.py tools/playbook/adopt-playbook.sh memory/builds/aQueuedIndex/spec/2026-11-12-spec-TOOL-aQueuedIndex-2.md memory/builds/aQueuedIndex/build/2026-11-12-build-TOOL-aQueuedIndex-2-ledger.md memory/builds/aQueuedIndex/README.md memory/LIVE.md
+
+2026-11-12T16:38:54Z review · item aQueuedIndex · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 1 · disposition promote
+
+2026-11-12T16:38:56Z rescope · item add TOOL-aQueuedIndex-3 · reason the closing review's round-2 minor, promoted: BUSY_TIMEOUT = 600 has no check that fails if it shrinks; the queued-writers plant prints the timeout and its row requires 600
