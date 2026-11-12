@@ -331,6 +331,39 @@ but exit 0 and its own exit-2 refusal, exit 1 or 127, a null status, a signal or
 `PolicyRefusal` naming the status, the signal and the shim's stderr (TOOL-dGroundRules-21 S16).
 Python and shell consumers call the reader, never the mirror.
 
+## A default-on switch
+
+The contract for a mechanism an adopter turns off with one line of the policy file
+(TOOL-aNimbleMend-1). Two rows carry it today, each `allowed = ["on", "off"]` and `default = "on"`:
+`bar.inline-red-fixes`, whose `off` means no inline red-fix lane, every product write then needing
+its specced unit, and `pass.fast-legs`, whose `off` means a unit pass runs no gate leg. A mechanism
+asks its key once, immediately before the act the key switches, and never at load.
+
+| The reader's answer | What the mechanism does |
+|---|---|
+| `on` | acts |
+| `off` | is absent: it does what the tree did before the mechanism, and prints nothing new |
+| no policy kit resolves beside the asker | acts, and prints one NOTE line on stderr naming the key and `on` |
+| the reader refuses, exit 2 or a `PolicyRefusal` | is absent, and prints the reader's own refusal line |
+| any other value | is absent, and prints one line naming the key and the value |
+
+The third row holds because the catalogue is this kit's: a repository without the kit has no switch
+and keeps the mechanism. The fourth and fifth fail to the earlier behaviour, because a switch that
+cannot be read must not loosen anything. `read_spec_audit_switch` in the unattended kit's driver is
+the precedent for all three.
+
+The call shapes, one per language, each passing the key as a literal so reader coverage,
+`scan_reader_keys` in `check_policy.py`, counts it; a key passed through a variable reads as unread:
+
+| Asker | Call | Policy kit found by |
+|---|---|---|
+| shell | `"$py" "$d/policy.py" get pass.fast-legs` | the asker kit's inline `resolve_kit_dir` |
+| Python | a call whose first argument is the key literal, running `policy.py get` as a subprocess | the asker kit's inline `resolve_kit_dir` |
+| JavaScript hook | `readPolicy('pass.fast-legs', { repo })` from `policy-mirror.js` | `resolveKitDir`, as the agent-cap hook's `resolvePolicyHelper` does |
+
+With no `--rev` both readers take the landed revision, so a run cannot flip its own switch on its
+branch, and a key set to `off` on a branch has no effect until it lands.
+
 ## The guard
 
 The stand-in, until dDeclaredLoop's guard lands, for the defaults of `policy-file.guard` and
