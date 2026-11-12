@@ -780,9 +780,17 @@ def run_plant(root, top, plant, sets) -> int:
         return 0 if done and rows and stamp == ti.INDEX_SCHEMA and named and same else 1
     # TOOL-aQueuedIndex-1 S5: two writers over one unbuilt tree, the second holding a view it served first
     if plant == "queued-writers":
+        import ast
         import concurrent.futures
         import sqlite3
         import time
+        # TOOL-aQueuedIndex-2 S2: every `with con:` block of the index module opens with the write lock
+        blocks = [node for node in ast.walk(ast.parse(pathlib.Path(ti.__file__).read_text(encoding="utf-8")))
+                  if isinstance(node, ast.With) and ast.unparse(node.items[0].context_expr) == "con"]
+        bare = [node for node in blocks if ast.unparse(node.body[0]) != "con.execute('BEGIN IMMEDIATE')"]
+        say(f"write blocks: {len(blocks) - len(bare)} of {len(blocks)} open with BEGIN IMMEDIATE")
+        for node in bare:
+            say(f"write block at line {node.lineno} does not open with BEGIN IMMEDIATE")
         run_verb(root, "rebuild", None, sets=sets)
         base = ti.read_git(root, "rev-parse", "HEAD^{tree}").strip()
         write_commit(root, {"tools/corekit/pause.tags": "pause\n"}, "a blob that parses for 3 s")
@@ -821,9 +829,16 @@ def run_plant(root, top, plant, sets) -> int:
         finally:
             con.close()
             pool.shutdown(wait=True)
+        # TOOL-aQueuedIndex-2 S1: a waiter that rebuilt under the lock counts its blobs as runs or skipped
         a, b = one.result(), state["parsed"]
-        say(f"writer one parsed {a} blob(s), writer two parsed {b}; both writers green")
-        return 0 if print_equal(read_dump(root), read_cold_dump()) and a > 0 and b == 0 else 1
+        runs, skipped = sum(state["runs"].values()), sum(state["skipped"].values())
+        say(f"writer one parsed {a} blob(s); writer two parsed {b}, ran {runs} and skipped {skipped}")
+        # S3: the green line prints last, and only once every check holds
+        green = (print_equal(read_dump(root), read_cold_dump()) and blocks and not bare
+                 and a > 0 and b == runs == skipped == 0)
+        if green:
+            say("both writers green")
+        return 0 if green else 1
     if plant == "extractor-removed":
         reg, gone = f"{FIXTURE_KIT}/namespaces.toml", "fixture_again:extract_again"
         base_reg = (root / reg).read_text(encoding="utf-8")

@@ -1,11 +1,12 @@
 # TOOL-aQueuedIndex-2 — the queued-writers plant fails on each mechanism it claims
 
-**Status:** DEFERRED · rev-1 · 2026-11-12 · node a · Tier-1 · base 27177490e · streams tooling · order 2 · ratified 2026-11-12
+**Status:** CLOSED · rev-1 · 2026-11-12 · node a · Tier-1 · base 27177490e · streams tooling · order 2 · ratified 2026-11-12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-12-build-TOOL-aQueuedIndex-2-ledger.md](../build/2026-11-12-build-TOOL-aQueuedIndex-2-ledger.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aQueuedIndex-2-1-spec-writer.md](../prompts/2026-11-12-prompt-TOOL-aQueuedIndex-2-1-spec-writer.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aQueuedIndex-2-build-brief.md](../prompts/2026-11-12-prompt-TOOL-aQueuedIndex-2-build-brief.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aQueuedIndex-2-spec-brief.md](../prompts/2026-11-12-prompt-TOOL-aQueuedIndex-2-spec-brief.md) | research | — |
