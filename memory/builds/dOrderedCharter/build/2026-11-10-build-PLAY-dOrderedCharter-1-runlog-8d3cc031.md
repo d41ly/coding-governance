@@ -1,6 +1,6 @@
 # Run record
 
-**Serves:** journal PLAY-dOrderedCharter-1..37 PLAY-dOrderedCharter-40..48 PLAY-dOrderedCharter-50..53 PLAY-dOrderedCharter-61..65 PLAY-dOrderedCharter-67..77
+**Serves:** journal PLAY-dOrderedCharter-1..37 PLAY-dOrderedCharter-39..55 PLAY-dOrderedCharter-61..65 PLAY-dOrderedCharter-67..78 PLAY-dOrderedCharter-80..83
 
 Rendered from the run model by the runlog kit's `record` command. Every value below is drawn from a closed schema, so no line carries free text. Re-render it rather than edit it.
 
@@ -9,30 +9,30 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 - run-state: memory/builds/dOrderedCharter/RUN.md
 - run: 2 of 2
 - start: 8d3cc0319906b5fe85dc11b6b4fbd51bc2939104
-- phase: VERIFYING
+- phase: HELD
 - terminal: no
-- window: 2026-11-02T15:38:47Z to 2026-11-10T11:29:24Z
+- window: 2026-11-02T15:38:47Z to 2026-11-12T00:30:03Z
 - window opened by: git
 - window closed by: last-activity
-- duration: 676237s
+- duration: 809476s · DERIVED from the window
 - own commits: 0
 - last own commit: -
 - merged: -
-- units served: 66
+- units served: 75
 - sources present: 7 of 7
-- owner turns: launch 1 · pre-run 0 · in-window 13 · post-close 0
-- usage main: requests 3239 · in 8402 · out 1941152 · cache-read 1800488770 · cache-write 5461551
-- usage agent: requests 4901 · in 9986 · out 4753622 · cache-read 809154236 · cache-write 19491353
-- usage workflow: requests 8698 · in 17572 · out 6715770 · cache-read 1448240920 · cache-write 44863432
-- attributed calls: 16516 of 18193
+- owner turns: launch 1 · pre-run 0 · in-window 26 · post-close 0
+- usage main: requests 4275 · in 11088 · out 2489770 · cache-read 2371387285 · cache-write 9338752
+- usage agent: requests 6587 · in 13424 · out 6079090 · cache-read 1102498502 · cache-write 24566057
+- usage workflow: requests 10543 · in 21288 · out 7769752 · cache-read 1827977264 · cache-write 53001558
+- attributed calls: 20742 of 22803
 - values withheld: 0
-- commitment: sha256 2e90347fcc98605ca48fcb1056edf2355e9314a2c7fde0a3d199422966f1c276 · lines 6168
+- commitment: sha256 35d1c9df46e80de454def9654965f6852c93e28e1e7dce7f881c25f6887d1e2d · lines 7418
 
 ## Timeline
 
-- events: 187 · shown 60 · elided 127
-- elided: 127 events from 2026-11-03T14:07:03Z to 2026-11-09T09:18:06Z
-- withheld rows: verb 2709 · push 377 · push-refused 0 · gate 5 · compact 4 · limit 7 · idle 1 · workflow 107
+- events: 222 · shown 60 · elided 162
+- elided: 162 events from 2026-11-03T14:07:03Z to 2026-11-10T21:57:01Z
+- withheld rows: verb 3265 · push 453 · push-refused 0 · gate 11 · compact 6 · limit 7 · idle 1 · workflow 121
 
 | UTC | source | event | value | phase | rc | more |
 |---|---|---|---|---|---|---|
@@ -69,53 +69,52 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 | UTC | source | event | value | phase | rc | more |
 |---|---|---|---|---|---|---|
-| 2026-11-09T09:18:12Z | run-state | brief | PLAY-dOrderedCharter-46 | - | - | - |
-| 2026-11-09T10:48:22Z | run-state | dispatch | PLAY-dOrderedCharter-35 | - | - | - |
-| 2026-11-09T10:50:14Z | run-state | brief | PLAY-dOrderedCharter-35 | - | - | - |
-| 2026-11-09T12:32:46Z | run-state | dispatch | PLAY-dOrderedCharter-36 | - | - | - |
-| 2026-11-09T12:33:14Z | run-state | brief | PLAY-dOrderedCharter-36 | - | - | - |
-| 2026-11-09T15:37:03Z | run-state | dispatch | PLAY-dOrderedCharter-34 | - | - | - |
-| 2026-11-09T15:37:13Z | run-state | brief | PLAY-dOrderedCharter-34 | - | - | - |
-| 2026-11-09T16:03:02Z | run-state | dispatch | PLAY-dOrderedCharter-34 | - | - | - |
-| 2026-11-09T16:15:06Z | run-state | dispatch | PLAY-dOrderedCharter-34 | - | - | - |
-| 2026-11-09T18:20:40Z | run-state | brief | PLAY-dOrderedCharter-31 | - | - | - |
-| 2026-11-09T18:31:02Z | run-state | dispatch | PLAY-dOrderedCharter-31 | - | - | - |
-| 2026-11-09T20:09:28Z | run-state | dispatch | PLAY-dOrderedCharter-37 | - | - | - |
-| 2026-11-09T20:09:47Z | run-state | brief | PLAY-dOrderedCharter-37 | - | - | - |
-| 2026-11-09T20:38:32Z | run-state | dispatch | PLAY-dOrderedCharter-37 | - | - | - |
-| 2026-11-09T21:50:44Z | run-state | brief | PLAY-dOrderedCharter-40 | - | - | - |
-| 2026-11-09T22:02:21Z | run-state | dispatch | PLAY-dOrderedCharter-40 | - | - | - |
-| 2026-11-09T22:42:19Z | run-state | brief | PLAY-dOrderedCharter-33 | - | - | - |
-| 2026-11-09T22:53:46Z | run-state | dispatch | PLAY-dOrderedCharter-33 | - | - | - |
-| 2026-11-09T23:07:52Z | run-state | dispatch | PLAY-dOrderedCharter-33 | - | - | - |
-| 2026-11-10T01:47:54Z | run-state | brief | PLAY-dOrderedCharter-75 | - | - | - |
-| 2026-11-10T02:00:20Z | run-state | dispatch | PLAY-dOrderedCharter-75 | - | - | - |
-| 2026-11-10T03:09:08Z | run-state | brief | PLAY-dOrderedCharter-76 | - | - | - |
-| 2026-11-10T03:22:08Z | run-state | dispatch | PLAY-dOrderedCharter-76 | - | - | - |
-| 2026-11-10T04:05:12Z | run-state | phase | 773ad97c6add | VERIFYING | - | - |
-| 2026-11-10T07:11:11Z | run-state | brief | PLAY-dOrderedCharter-77 | - | - | - |
-| 2026-11-10T07:40:34Z | run-state | dispatch | PLAY-dOrderedCharter-77 | - | - | - |
-| 2026-11-10T08:29:52Z | run-state | dispatch | PLAY-dOrderedCharter-77 | - | - | - |
-| 2026-11-10T08:44:47Z | run-state | dispatch | PLAY-dOrderedCharter-77 | - | - | - |
-| 2026-11-10T08:58:15Z | run-state | phase | 26eda42141ce | BUILDING | - | - |
-| 2026-11-10T11:29:24Z | run-state | phase | fd220d40bc2b | VERIFYING | - | - |
+| 2026-11-10T22:24:40Z | run-state | phase | 5e98256fe83c | BUILDING | - | - |
+| 2026-11-11T00:32:21Z | run-state | dispatch | PLAY-dOrderedCharter-39 | - | - | - |
+| 2026-11-11T00:41:04Z | run-state | brief | PLAY-dOrderedCharter-39 | - | - | - |
+| 2026-11-11T03:31:23Z | run-state | brief | PLAY-dOrderedCharter-78 | - | - | - |
+| 2026-11-11T03:41:49Z | run-state | dispatch | PLAY-dOrderedCharter-78 | - | - | - |
+| 2026-11-11T04:18:19Z | run-state | dispatch | PLAY-dOrderedCharter-49 | - | - | - |
+| 2026-11-11T04:18:24Z | run-state | brief | PLAY-dOrderedCharter-49 | - | - | - |
+| 2026-11-11T05:12:57Z | run-state | brief | PLAY-dOrderedCharter-54 | - | - | - |
+| 2026-11-11T05:24:28Z | run-state | dispatch | PLAY-dOrderedCharter-54 | - | - | - |
+| 2026-11-11T11:47:27Z | run-state | brief | PLAY-dOrderedCharter-55 | - | - | - |
+| 2026-11-11T11:58:47Z | run-state | dispatch | PLAY-dOrderedCharter-55 | - | - | - |
+| 2026-11-11T12:58:17Z | run-state | phase | d470dc379ed9 | VERIFYING | - | - |
+| 2026-11-11T14:54:32Z | run-state | brief | PLAY-dOrderedCharter-80 | - | - | - |
+| 2026-11-11T15:05:36Z | run-state | dispatch | PLAY-dOrderedCharter-80 | - | - | - |
+| 2026-11-11T15:17:49Z | run-state | phase | 827115352fd6 | BUILDING | - | - |
+| 2026-11-11T15:29:20Z | run-state | phase | 387a184f59d7 | VERIFYING | - | - |
+| 2026-11-11T17:15:57Z | run-state | brief | PLAY-dOrderedCharter-81 | - | - | - |
+| 2026-11-11T17:28:54Z | run-state | dispatch | PLAY-dOrderedCharter-81 | - | - | - |
+| 2026-11-11T17:36:29Z | run-state | phase | 84a28f634d67 | BUILDING | - | - |
+| 2026-11-11T17:49:37Z | run-state | phase | bf8d12a94c00 | VERIFYING | - | - |
+| 2026-11-11T19:02:38Z | run-state | brief | PLAY-dOrderedCharter-82 | - | - | - |
+| 2026-11-11T19:15:53Z | run-state | dispatch | PLAY-dOrderedCharter-82 | - | - | - |
+| 2026-11-11T20:41:17Z | run-state | dispatch | PLAY-dOrderedCharter-82 | - | - | - |
+| 2026-11-11T21:00:31Z | run-state | phase | a5741d9ad9f0 | BUILDING | - | - |
+| 2026-11-11T21:14:09Z | run-state | phase | 1caeadc65342 | VERIFYING | - | - |
+| 2026-11-11T22:55:25Z | run-state | brief | PLAY-dOrderedCharter-83 | - | - | - |
+| 2026-11-11T23:06:09Z | run-state | dispatch | PLAY-dOrderedCharter-83 | - | - | - |
+| 2026-11-11T23:44:14Z | run-state | phase | 67234835eda9 | BUILDING | - | - |
+| 2026-11-12T00:00:31Z | run-state | phase | b85308fbd448 | VERIFYING | - | - |
+| 2026-11-12T00:30:03Z | run-state | phase | 4a2502087275 | HELD | - | - |
 
 ## Units
 
-- units: 70 · shown 0 · aggregated yes
+- units: 75 · shown 0 · aggregated yes
 
 | # | status | units |
 |---|---|---|
-| 1 | DEFERRED | 5 |
-| 2 | CLOSED | 65 |
+| 1 | CLOSED | 75 |
 
 ## Decisions
 
-- entries: 331 · shown 0 · aggregated yes
+- entries: 353 · shown 0 · aggregated yes
 - trailer near-misses: 0
 - decision-log rows the owner's: 0
-- spec marks: owner-before 4 · owner-inside 0 · agent-before 170 · agent-inside 114
-- excluded rows: proposal 0 · rescope 16 · dispatch 106 · review 1 · brief 72 · hold 0 · resume 0
+- spec marks: owner-before 4 · owner-inside 4 · agent-before 165 · agent-inside 135
+- excluded rows: proposal 0 · rescope 21 · dispatch 119 · review 1 · brief 81 · hold 2 · resume 1
 - review rounds: 1 · shown 1 · aggregated no
 
 | # | source | entries |
@@ -124,13 +123,13 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 | 2 | abort | 0 |
 | 3 | override | 0 |
 | 4 | waiver | 0 |
-| 5 | handoff | 0 |
+| 5 | handoff | 2 |
 | 6 | rescope-retire | 0 |
 | 7 | rescope-supersede | 0 |
 | 8 | rescope-defer | 34 |
 | 9 | review | 0 |
 | 10 | trailer | 0 |
-| 11 | spec-mark | 288 |
+| 11 | spec-mark | 308 |
 | 12 | decision-log | 0 |
 | 13 | ledger | 0 |
 
@@ -145,23 +144,23 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 | # | item | unit | state |
 |---|---|---|---|
 | 1 | brief-before-build | - | UNJUDGEABLE |
-| 2 | phases-walked | - | UNJUDGEABLE |
+| 2 | phases-walked | - | MET |
 | 3 | green-at-close | - | UNJUDGEABLE |
-| 4 | keepalive-reaped | - | UNJUDGEABLE |
+| 4 | keepalive-reaped | - | MET |
 | 5 | review-exited | - | MET |
 
 ## Anomalies
 
-- anomalies: 592 · shown 0 · aggregated yes
+- anomalies: 628 · shown 0 · aggregated yes
 
 | # | kind | subclass | count |
 |---|---|---|---|
 | 1 | no-progress | - | 1 |
-| 2 | out-of-band-edit | - | 8 |
+| 2 | out-of-band-edit | - | 12 |
 | 3 | refusal-loop | - | 1 |
-| 4 | killed-verb | - | 542 |
-| 5 | red-behind-zero | - | 4 |
-| 6 | destructive-git | - | 35 |
+| 4 | killed-verb | - | 562 |
+| 5 | red-behind-zero | - | 5 |
+| 6 | destructive-git | - | 46 |
 | 7 | idle-gap | - | 1 |
 
 ## Coverage
@@ -169,15 +168,15 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 - journal starts: 0 joined of 0 record-creating
 - unjoined starts: 0
 - sessions: 1 named · 1 extracted
-- idle gaps: judged yes · near an owner turn 0
+- idle gaps: judged yes · near an owner turn 2
 - anomaly kinds: judged 12 of 12
 
 | # | source | state | lines | bad |
 |---|---|---|---|---|
 | 1 | run-state | present | - | - |
-| 2 | driver | present | 5409 | 1 |
-| 3 | gates | present | 5 | 0 |
-| 4 | pushes | present | 377 | 0 |
+| 2 | driver | present | 6501 | 1 |
+| 3 | gates | present | 11 | 0 |
+| 4 | pushes | present | 453 | 0 |
 | 5 | git | present | - | - |
 | 6 | transcripts | present | - | - |
 | 7 | build-folder | present | - | - |
@@ -186,8 +185,8 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 ```json
 {"schema":1,"sections":{
-"Summary":{"facts":{"run-state":"memory/builds/dOrderedCharter/RUN.md","run":"2 of 2","start":"8d3cc0319906b5fe85dc11b6b4fbd51bc2939104","phase":"VERIFYING","terminal":"no","window":"2026-11-02T15:38:47Z to 2026-11-10T11:29:24Z","window opened by":"git","window closed by":"last-activity","duration":"676237s","own commits":"0","last own commit":"-","merged":"-","units served":"66","sources present":"7 of 7","owner turns":"launch 1 · pre-run 0 · in-window 13 · post-close 0","usage main":"requests 3239 · in 8402 · out 1941152 · cache-read 1800488770 · cache-write 5461551","usage agent":"requests 4901 · in 9986 · out 4753622 · cache-read 809154236 · cache-write 19491353","usage workflow":"requests 8698 · in 17572 · out 6715770 · cache-read 1448240920 · cache-write 44863432","attributed calls":"16516 of 18193","values withheld":"0","commitment":"sha256 2e90347fcc98605ca48fcb1056edf2355e9314a2c7fde0a3d199422966f1c276 · lines 6168"},"tables":[]},
-"Timeline":{"facts":{"events":"187 · shown 60 · elided 127","elided":"127 events from 2026-11-03T14:07:03Z to 2026-11-09T09:18:06Z","withheld rows":"verb 2709 · push 377 · push-refused 0 · gate 5 · compact 4 · limit 7 · idle 1 · workflow 107"},"tables":[{"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
+"Summary":{"facts":{"run-state":"memory/builds/dOrderedCharter/RUN.md","run":"2 of 2","start":"8d3cc0319906b5fe85dc11b6b4fbd51bc2939104","phase":"HELD","terminal":"no","window":"2026-11-02T15:38:47Z to 2026-11-12T00:30:03Z","window opened by":"git","window closed by":"last-activity","duration":"809476s · DERIVED from the window","own commits":"0","last own commit":"-","merged":"-","units served":"75","sources present":"7 of 7","owner turns":"launch 1 · pre-run 0 · in-window 26 · post-close 0","usage main":"requests 4275 · in 11088 · out 2489770 · cache-read 2371387285 · cache-write 9338752","usage agent":"requests 6587 · in 13424 · out 6079090 · cache-read 1102498502 · cache-write 24566057","usage workflow":"requests 10543 · in 21288 · out 7769752 · cache-read 1827977264 · cache-write 53001558","attributed calls":"20742 of 22803","values withheld":"0","commitment":"sha256 35d1c9df46e80de454def9654965f6852c93e28e1e7dce7f881c25f6887d1e2d · lines 7418"},"tables":[]},
+"Timeline":{"facts":{"events":"222 · shown 60 · elided 162","elided":"162 events from 2026-11-03T14:07:03Z to 2026-11-10T21:57:01Z","withheld rows":"verb 3265 · push 453 · push-refused 0 · gate 11 · compact 6 · limit 7 · idle 1 · workflow 121"},"tables":[{"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
 ["2026-11-02T15:38:47Z","run-state","phase","8bec4cefd957","RUNNING","-","-"],
 ["2026-11-02T18:02:17Z","run-state","dispatch","PLAY-dOrderedCharter-18","-","-","-"],
 ["2026-11-02T18:02:26Z","run-state","brief","PLAY-dOrderedCharter-18","-","-","-"],
@@ -219,74 +218,73 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["2026-11-03T13:12:44Z","run-state","dispatch","PLAY-dOrderedCharter-24","-","-","-"],
 ["2026-11-03T13:13:24Z","run-state","brief","PLAY-dOrderedCharter-24","-","-","-"]]},
 {"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
-["2026-11-09T09:18:12Z","run-state","brief","PLAY-dOrderedCharter-46","-","-","-"],
-["2026-11-09T10:48:22Z","run-state","dispatch","PLAY-dOrderedCharter-35","-","-","-"],
-["2026-11-09T10:50:14Z","run-state","brief","PLAY-dOrderedCharter-35","-","-","-"],
-["2026-11-09T12:32:46Z","run-state","dispatch","PLAY-dOrderedCharter-36","-","-","-"],
-["2026-11-09T12:33:14Z","run-state","brief","PLAY-dOrderedCharter-36","-","-","-"],
-["2026-11-09T15:37:03Z","run-state","dispatch","PLAY-dOrderedCharter-34","-","-","-"],
-["2026-11-09T15:37:13Z","run-state","brief","PLAY-dOrderedCharter-34","-","-","-"],
-["2026-11-09T16:03:02Z","run-state","dispatch","PLAY-dOrderedCharter-34","-","-","-"],
-["2026-11-09T16:15:06Z","run-state","dispatch","PLAY-dOrderedCharter-34","-","-","-"],
-["2026-11-09T18:20:40Z","run-state","brief","PLAY-dOrderedCharter-31","-","-","-"],
-["2026-11-09T18:31:02Z","run-state","dispatch","PLAY-dOrderedCharter-31","-","-","-"],
-["2026-11-09T20:09:28Z","run-state","dispatch","PLAY-dOrderedCharter-37","-","-","-"],
-["2026-11-09T20:09:47Z","run-state","brief","PLAY-dOrderedCharter-37","-","-","-"],
-["2026-11-09T20:38:32Z","run-state","dispatch","PLAY-dOrderedCharter-37","-","-","-"],
-["2026-11-09T21:50:44Z","run-state","brief","PLAY-dOrderedCharter-40","-","-","-"],
-["2026-11-09T22:02:21Z","run-state","dispatch","PLAY-dOrderedCharter-40","-","-","-"],
-["2026-11-09T22:42:19Z","run-state","brief","PLAY-dOrderedCharter-33","-","-","-"],
-["2026-11-09T22:53:46Z","run-state","dispatch","PLAY-dOrderedCharter-33","-","-","-"],
-["2026-11-09T23:07:52Z","run-state","dispatch","PLAY-dOrderedCharter-33","-","-","-"],
-["2026-11-10T01:47:54Z","run-state","brief","PLAY-dOrderedCharter-75","-","-","-"],
-["2026-11-10T02:00:20Z","run-state","dispatch","PLAY-dOrderedCharter-75","-","-","-"],
-["2026-11-10T03:09:08Z","run-state","brief","PLAY-dOrderedCharter-76","-","-","-"],
-["2026-11-10T03:22:08Z","run-state","dispatch","PLAY-dOrderedCharter-76","-","-","-"],
-["2026-11-10T04:05:12Z","run-state","phase","773ad97c6add","VERIFYING","-","-"],
-["2026-11-10T07:11:11Z","run-state","brief","PLAY-dOrderedCharter-77","-","-","-"],
-["2026-11-10T07:40:34Z","run-state","dispatch","PLAY-dOrderedCharter-77","-","-","-"],
-["2026-11-10T08:29:52Z","run-state","dispatch","PLAY-dOrderedCharter-77","-","-","-"],
-["2026-11-10T08:44:47Z","run-state","dispatch","PLAY-dOrderedCharter-77","-","-","-"],
-["2026-11-10T08:58:15Z","run-state","phase","26eda42141ce","BUILDING","-","-"],
-["2026-11-10T11:29:24Z","run-state","phase","fd220d40bc2b","VERIFYING","-","-"]]}]},
-"Units":{"facts":{"units":"70 · shown 0 · aggregated yes"},"tables":[{"name":"by-status","header":["#","status","units"],"rows":[
-["1","DEFERRED","5"],
-["2","CLOSED","65"]]}]},
-"Decisions":{"facts":{"entries":"331 · shown 0 · aggregated yes","trailer near-misses":"0","decision-log rows the owner's":"0","spec marks":"owner-before 4 · owner-inside 0 · agent-before 170 · agent-inside 114","excluded rows":"proposal 0 · rescope 16 · dispatch 106 · review 1 · brief 72 · hold 0 · resume 0","review rounds":"1 · shown 1 · aggregated no"},"tables":[{"name":"by-source","header":["#","source","entries"],"rows":[
+["2026-11-10T22:24:40Z","run-state","phase","5e98256fe83c","BUILDING","-","-"],
+["2026-11-11T00:32:21Z","run-state","dispatch","PLAY-dOrderedCharter-39","-","-","-"],
+["2026-11-11T00:41:04Z","run-state","brief","PLAY-dOrderedCharter-39","-","-","-"],
+["2026-11-11T03:31:23Z","run-state","brief","PLAY-dOrderedCharter-78","-","-","-"],
+["2026-11-11T03:41:49Z","run-state","dispatch","PLAY-dOrderedCharter-78","-","-","-"],
+["2026-11-11T04:18:19Z","run-state","dispatch","PLAY-dOrderedCharter-49","-","-","-"],
+["2026-11-11T04:18:24Z","run-state","brief","PLAY-dOrderedCharter-49","-","-","-"],
+["2026-11-11T05:12:57Z","run-state","brief","PLAY-dOrderedCharter-54","-","-","-"],
+["2026-11-11T05:24:28Z","run-state","dispatch","PLAY-dOrderedCharter-54","-","-","-"],
+["2026-11-11T11:47:27Z","run-state","brief","PLAY-dOrderedCharter-55","-","-","-"],
+["2026-11-11T11:58:47Z","run-state","dispatch","PLAY-dOrderedCharter-55","-","-","-"],
+["2026-11-11T12:58:17Z","run-state","phase","d470dc379ed9","VERIFYING","-","-"],
+["2026-11-11T14:54:32Z","run-state","brief","PLAY-dOrderedCharter-80","-","-","-"],
+["2026-11-11T15:05:36Z","run-state","dispatch","PLAY-dOrderedCharter-80","-","-","-"],
+["2026-11-11T15:17:49Z","run-state","phase","827115352fd6","BUILDING","-","-"],
+["2026-11-11T15:29:20Z","run-state","phase","387a184f59d7","VERIFYING","-","-"],
+["2026-11-11T17:15:57Z","run-state","brief","PLAY-dOrderedCharter-81","-","-","-"],
+["2026-11-11T17:28:54Z","run-state","dispatch","PLAY-dOrderedCharter-81","-","-","-"],
+["2026-11-11T17:36:29Z","run-state","phase","84a28f634d67","BUILDING","-","-"],
+["2026-11-11T17:49:37Z","run-state","phase","bf8d12a94c00","VERIFYING","-","-"],
+["2026-11-11T19:02:38Z","run-state","brief","PLAY-dOrderedCharter-82","-","-","-"],
+["2026-11-11T19:15:53Z","run-state","dispatch","PLAY-dOrderedCharter-82","-","-","-"],
+["2026-11-11T20:41:17Z","run-state","dispatch","PLAY-dOrderedCharter-82","-","-","-"],
+["2026-11-11T21:00:31Z","run-state","phase","a5741d9ad9f0","BUILDING","-","-"],
+["2026-11-11T21:14:09Z","run-state","phase","1caeadc65342","VERIFYING","-","-"],
+["2026-11-11T22:55:25Z","run-state","brief","PLAY-dOrderedCharter-83","-","-","-"],
+["2026-11-11T23:06:09Z","run-state","dispatch","PLAY-dOrderedCharter-83","-","-","-"],
+["2026-11-11T23:44:14Z","run-state","phase","67234835eda9","BUILDING","-","-"],
+["2026-11-12T00:00:31Z","run-state","phase","b85308fbd448","VERIFYING","-","-"],
+["2026-11-12T00:30:03Z","run-state","phase","4a2502087275","HELD","-","-"]]}]},
+"Units":{"facts":{"units":"75 · shown 0 · aggregated yes"},"tables":[{"name":"by-status","header":["#","status","units"],"rows":[
+["1","CLOSED","75"]]}]},
+"Decisions":{"facts":{"entries":"353 · shown 0 · aggregated yes","trailer near-misses":"0","decision-log rows the owner's":"0","spec marks":"owner-before 4 · owner-inside 4 · agent-before 165 · agent-inside 135","excluded rows":"proposal 0 · rescope 21 · dispatch 119 · review 1 · brief 81 · hold 2 · resume 1","review rounds":"1 · shown 1 · aggregated no"},"tables":[{"name":"by-source","header":["#","source","entries"],"rows":[
 ["1","decision","9"],
 ["2","abort","0"],
 ["3","override","0"],
 ["4","waiver","0"],
-["5","handoff","0"],
+["5","handoff","2"],
 ["6","rescope-retire","0"],
 ["7","rescope-supersede","0"],
 ["8","rescope-defer","34"],
 ["9","review","0"],
 ["10","trailer","0"],
-["11","spec-mark","288"],
+["11","spec-mark","308"],
 ["12","decision-log","0"],
 ["13","ledger","0"]]},
 {"name":"rounds","header":["#","UTC","verdict","blockers","exit"],"rows":[
 ["1","2026-11-05T00:19:03Z","CLEAN WITH FIXES","0","CONVERGED"]]}]},
 "Conformance":{"facts":{"items":"5 · shown 5 · aggregated no"},"tables":[{"name":"items","header":["#","item","unit","state"],"rows":[
 ["1","brief-before-build","-","UNJUDGEABLE"],
-["2","phases-walked","-","UNJUDGEABLE"],
+["2","phases-walked","-","MET"],
 ["3","green-at-close","-","UNJUDGEABLE"],
-["4","keepalive-reaped","-","UNJUDGEABLE"],
+["4","keepalive-reaped","-","MET"],
 ["5","review-exited","-","MET"]]}]},
-"Anomalies":{"facts":{"anomalies":"592 · shown 0 · aggregated yes"},"tables":[{"name":"by-kind","header":["#","kind","subclass","count"],"rows":[
+"Anomalies":{"facts":{"anomalies":"628 · shown 0 · aggregated yes"},"tables":[{"name":"by-kind","header":["#","kind","subclass","count"],"rows":[
 ["1","no-progress","-","1"],
-["2","out-of-band-edit","-","8"],
+["2","out-of-band-edit","-","12"],
 ["3","refusal-loop","-","1"],
-["4","killed-verb","-","542"],
-["5","red-behind-zero","-","4"],
-["6","destructive-git","-","35"],
+["4","killed-verb","-","562"],
+["5","red-behind-zero","-","5"],
+["6","destructive-git","-","46"],
 ["7","idle-gap","-","1"]]}]},
-"Coverage":{"facts":{"journal starts":"0 joined of 0 record-creating","unjoined starts":"0","sessions":"1 named · 1 extracted","idle gaps":"judged yes · near an owner turn 0","anomaly kinds":"judged 12 of 12"},"tables":[{"name":"sources","header":["#","source","state","lines","bad"],"rows":[
+"Coverage":{"facts":{"journal starts":"0 joined of 0 record-creating","unjoined starts":"0","sessions":"1 named · 1 extracted","idle gaps":"judged yes · near an owner turn 2","anomaly kinds":"judged 12 of 12"},"tables":[{"name":"sources","header":["#","source","state","lines","bad"],"rows":[
 ["1","run-state","present","-","-"],
-["2","driver","present","5409","1"],
-["3","gates","present","5","0"],
-["4","pushes","present","377","0"],
+["2","driver","present","6501","1"],
+["3","gates","present","11","0"],
+["4","pushes","present","453","0"],
 ["5","git","present","-","-"],
 ["6","transcripts","present","-","-"],
 ["7","build-folder","present","-","-"]]}]}}}
