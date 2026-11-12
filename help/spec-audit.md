@@ -58,6 +58,7 @@ every confirmed finding promoted.
 
 `--help` prints every verb the unattended driver takes and the guide that states each verb's contract, then the driver's usage header, and exits 0. `-h` is the same. <!-- usage: verb:unattended.sh:--help 965e3eb2 -->
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```bash
 bash tools/unattended/unattended.sh --help
 ```
