@@ -15154,3 +15154,8 @@ memory/builds/dOrderedCharter/spec/2026-11-12-spec-PLAY-dOrderedCharter-87.md	18
 memory/builds/dOrderedCharter/spec/2026-11-12-spec-PLAY-dOrderedCharter-88.md	11 lines
 memory/builds/dOrderedCharter/spec/2026-11-12-spec-PLAY-dOrderedCharter-88.md	13 rows
 memory/builds/dOrderedCharter/RUN.md	2, units
+memory/builds/aQueuedIndex/prompts/2026-11-12-prompt-TOOL-aQueuedIndex-1-brief.md	100 s
+memory/builds/aQueuedIndex/prompts/2026-11-12-prompt-TOOL-aQueuedIndex-1-brief.md	100 seconds
+memory/builds/aQueuedIndex/prompts/2026-11-12-prompt-TOOL-aQueuedIndex-1-brief.md	31 s
+memory/builds/aQueuedIndex/prompts/2026-11-12-prompt-TOOL-aQueuedIndex-1-brief.md	60 s
+memory/builds/aQueuedIndex/prompts/2026-11-12-prompt-TOOL-aQueuedIndex-1-brief.md	600 s
