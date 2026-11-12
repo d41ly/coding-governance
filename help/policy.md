@@ -21,6 +21,9 @@ consumers today, each family documented on its own page:
 - `install.retired-edits`, which `update` reads
   ([what update does with your edits](update-edits.md));
 - `platforms.provision`, which the Python resolver reads ([the Python floor](python-floor.md));
+- `pass.fast-legs`, which the pass-leg runner reads ([the pass legs](pass-legs.md));
+- `bar.inline-red-fixes`, which the write gate and the commit grader read
+  ([the red-fix lane](red-fix-lane.md));
 - `policy-file.on-invalid`, which the reader itself reads ([below](#how-to-use-it)).
 
 Every other key has no consumer yet: the build its catalogue row names as `owner` adds one, so a

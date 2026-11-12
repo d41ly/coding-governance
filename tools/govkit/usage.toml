@@ -130,7 +130,20 @@ id = "script:{prefix}/memory-tree/build_records.py#new"
 shape = "verb"
 entry = "{prefix}/memory-tree/build_records.py"
 verb = "new"
-flags = ["--build=", "--unit=", "--root=", "--principle=", "--excuses=", "--reason=", "--expires=", "--tag=", "--action=", "--mark=", "--before=", "--after=", "--successor=", "--promoted-from=", "--rule=", "--words=", "--session="]
+flags = ["--build=", "--unit=", "--root=", "--principle=", "--excuses=", "--reason=", "--expires=", "--tag=", "--action=", "--mark=", "--before=", "--after=", "--successor=", "--promoted-from=", "--rule=", "--words=", "--session=", "--leg=", "--red-line=", "--commit=", "--rerun="]
+
+[[usage]]
+id = "script:{prefix}/memory-tree/build_records.py#join"
+shape = "verb"
+entry = "{prefix}/memory-tree/build_records.py"
+verb = "join"
+flags = ["--staged", "--root="]
+
+[[usage]]
+id = "script:{prefix}/memory-tree/routed_commits.py"
+shape = "verb"
+entry = "{prefix}/memory-tree/routed_commits.py"
+flags = ["--newest-unit=", "--red-fix-limits=", "--selftest"]
 
 [[usage]]
 id = "script:{prefix}/playbook/instruction_units.py#envelopes"
@@ -204,6 +217,18 @@ id = "script:{prefix}/run-gates/derive-ceilings.py"
 shape = "verb"
 entry = "{prefix}/run-gates/derive-ceilings.py"
 flags = ["--report", "--write", "--check", "--reset=", "--observed=", "--how="]
+
+[[usage]]
+id = "script:{prefix}/run-gates/pass-legs.sh"
+shape = "verb"
+entry = "{prefix}/run-gates/pass-legs.sh"
+flags = ["--base="]
+
+[[usage]]
+id = "script:{prefix}/run-gates/pass_legs.py"
+shape = "verb"
+entry = "{prefix}/run-gates/pass_legs.py"
+flags = ["--write", "--apply", "--check", "--report", "--budget", "--figures"]
 
 [[usage]]
 id = "script:{prefix}/policy/policy.py#get"

@@ -93,7 +93,7 @@ ids TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 
 | [TOOL-aNimbleMend-12 — the acceptance suite: one pass-leg run and one inline fix, end to end, in a scratch adopter and in a clone of gov, with each switch on and off](spec/2026-11-12-spec-TOOL-aNimbleMend-12.md) | 12 | 2 | SPECCED | rev-2 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 27 bound to this build, across 3 record folder(s).
+Records: 28 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
