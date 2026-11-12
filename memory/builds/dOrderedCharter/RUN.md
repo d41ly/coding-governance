@@ -23,20 +23,20 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 47ed57fab692a005daa7c9850c59e033dfbddce3 · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 4a25020872756fa8608c43dcdf3b7ce1ce19f799
-phase: HELD
+witness: deea5f18fca705ade515f3bf9996aff916e529b3
+phase: VERIFYING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dorderedcharter-725f52
 anchor-kind: default-branch
 cli-version: 2.1.309
-lease-utc: 2026-11-11T11:17:21Z
+lease-utc: 2026-11-12T00:55:36Z
 pid-image: claude.exe
 host: compeeto-agent
-pid: 8496
+pid: 5716
 session: 0394fa33-012c-408f-a840-e6e4cfaac23f
-keepalive: 65a9574c
+keepalive: 561bec20
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 8bec4cefd957d194660a8d7c2916f420b7299074
 anchor-ref: refs/heads/main
@@ -583,3 +583,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-12T00:29:19Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dOrderedCharter && bash tools/push-main.sh --land --slug dOrderedCharter && bash tools/unattended/unattended.sh --settle dOrderedCharter
 
 2026-11-12T00:29:19Z hold · item owner-decision · reason until owner · reaped 65a9574c · resume none(owner)
+
+2026-11-12T00:55:41Z resume · item dOrderedCharter · reason held · keepalive 561bec20 · manual
+
+2026-11-12T00:57:05Z rescope · item add PLAY-dOrderedCharter-84 · reason the owner's 2026-11-12 ruling that no file is owner-only to a run under its mandate: the policy guard admits a live run's guarded change, and the prepare commits its upgrade steps' output before regenerating
