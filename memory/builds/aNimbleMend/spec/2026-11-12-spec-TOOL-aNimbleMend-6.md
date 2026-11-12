@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-6 — the hooks: the pass-leg runner is refused to a role agent by the role-gate arm and stays admitted at the main loop by the gate guard, pinned on both
 
-**Status:** OPEN · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 6
+**Status:** INPROGRESS · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
