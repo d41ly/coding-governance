@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-13 — the first pass-leg run's findings repaired: a pass leg grades the whole manifest, the rule selects no leg the runner holds, and three texts say what the code does
 
-**Status:** INPROGRESS · rev-1 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 13
+**Status:** INPROGRESS · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -362,6 +362,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-12 · initial draft.
+- rev-2 · 2026-11-12 · S1 to S7 unchanged; the header moves order 13 to 8, so the unit builds before the lane units: the dispatch verb refused it behind five unbuilt units, and every pass-leg run before it repeats three false reds.
 
 ## 10. Reuse audit
 

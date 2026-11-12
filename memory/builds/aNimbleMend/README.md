@@ -85,12 +85,12 @@ ids TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 
 | [TOOL-aNimbleMend-5 — the pass-leg runner: the declared legs run over one pass's diff through the bar runner, with a run record and an overrun printed as a finding](spec/2026-11-12-spec-TOOL-aNimbleMend-5.md) | 5 | 2 | CLOSED | rev-2 | 2026-11-12 |
 | [TOOL-aNimbleMend-6 — the hooks: the pass-leg runner is refused to a role agent by the role-gate arm and stays admitted at the main loop by the gate guard, pinned on both](spec/2026-11-12-spec-TOOL-aNimbleMend-6.md) | 6 | 2 | CLOSED | rev-2 | 2026-11-12 |
 | [TOOL-aNimbleMend-7 — the run point: each unit harness return tells the main loop to run the pass legs](spec/2026-11-12-spec-TOOL-aNimbleMend-7.md) | 7 | 2 | CLOSED | rev-2 | 2026-11-12 |
+| [TOOL-aNimbleMend-13 — the first pass-leg run's findings repaired: a pass leg grades the whole manifest, the rule selects no leg the runner holds, and three texts say what the code does](spec/2026-11-12-spec-TOOL-aNimbleMend-13.md) | 8 | 2 | INPROGRESS | rev-2 | 2026-11-12 |
 | [TOOL-aNimbleMend-8 — the inline red-fix lane: an open red admits a product write, and a `Red-fix:` trailer admits its commit](spec/2026-11-12-spec-TOOL-aNimbleMend-8.md) | 8 | 2 | SPECCED | rev-2 | 2026-11-12 |
 | [TOOL-aNimbleMend-9 — the red-fix record: a typed kind written after the fix and joined to its commit](spec/2026-11-12-spec-TOOL-aNimbleMend-9.md) | 9 | 2 | SPECCED | rev-2 | 2026-11-12 |
 | [TOOL-aNimbleMend-10 — the inline lane's limits, graded on every `Red-fix:` commit](spec/2026-11-12-spec-TOOL-aNimbleMend-10.md) | 10 | 2 | SPECCED | rev-2 | 2026-11-12 |
 | [TOOL-aNimbleMend-11 — the documents: a help page per mechanism, and the build method and the unattended protocol saying where the pass legs run and what the lane admits](spec/2026-11-12-spec-TOOL-aNimbleMend-11.md) | 11 | 2 | SPECCED | rev-3 | 2026-11-12 |
 | [TOOL-aNimbleMend-12 — the acceptance suite: one pass-leg run and one inline fix, end to end, in a scratch adopter and in a clone of gov, with each switch on and off](spec/2026-11-12-spec-TOOL-aNimbleMend-12.md) | 12 | 2 | SPECCED | rev-2 | 2026-11-12 |
-| [TOOL-aNimbleMend-13 — the first pass-leg run's findings repaired: a pass leg grades the whole manifest, the rule selects no leg the runner holds, and three texts say what the code does](spec/2026-11-12-spec-TOOL-aNimbleMend-13.md) | 13 | 2 | INPROGRESS | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
 Records: 23 bound to this build, across 3 record folder(s).
@@ -113,12 +113,11 @@ Ids whose spec moved past its audited revision: none — 0 of 13 unit id(s) carr
 | 5 | `TOOL-aNimbleMend-5` | no |
 | 6 | `TOOL-aNimbleMend-6` | no |
 | 7 | `TOOL-aNimbleMend-7` | no |
-| 8 | `TOOL-aNimbleMend-8` | no |
+| 8 | `TOOL-aNimbleMend-13`, `TOOL-aNimbleMend-8` | yes |
 | 9 | `TOOL-aNimbleMend-9` | no |
 | 10 | `TOOL-aNimbleMend-10` | no |
 | 11 | `TOOL-aNimbleMend-11` | no |
 | 12 | `TOOL-aNimbleMend-12` | no |
-| 13 | `TOOL-aNimbleMend-13` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
