@@ -9,11 +9,13 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+units-at-landing: TOOL-aLiftedCeiling-1 TOOL-aLiftedCeiling-2 TOOL-aLiftedCeiling-3
+gates-run: unattended-179451901190045713753-4883 868477a3
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 74f74024d12fa13896aebc5aa476d816fac9397e
-phase: VERIFYING
+phase: LANDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/unattended-aliftedceiling
