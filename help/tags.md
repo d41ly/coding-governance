@@ -33,6 +33,9 @@ rebuilt in place, never deleted, so a session reading it keeps it, printing
 delete it. Deleting the file costs one rebuild. Two worktrees whose
 extractor code differs keep their rows side by side in the one file, and each is served only the rows
 its own extractor code wrote, so switching between them re-parses nothing.
+When two commands write the index at once, the second queues behind the first for up to 600 seconds,
+longer than a full build, and reuses a tree the first built while it waited instead of building it
+again; past that wait it exits 2 saying the index is locked.
 
 ## How to use it
 

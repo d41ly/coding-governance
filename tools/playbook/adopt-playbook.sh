@@ -341,6 +341,7 @@ served-across|0|served 0 rows of one's version, and one serves 1
 helper-edit|0|after the helper edit fixture_tags:extract_declared re-ran over 2 blobs, 0 skipped as fresh
 held-open|0|the rebuild completed under a held reader|DIFFER
 held-open|0|the file is index-s
+queued-writers|0|both writers green|DIFFER
 extractor-removed|0|the removed extractor's stored rows: 4, served: 0;|DIFFER
 worktree-spelling|0|served its own edit · 1 dirty rows kept under its key after the sweep, 0 of the pruned worktree's left
 none $_tk|0|tags: purpose · no chain to read
