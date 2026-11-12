@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-11 — the documents: a help page per mechanism, and the build method and the unattended protocol saying where the pass legs run and what the lane admits
 
-**Status:** SPECCED · rev-1 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 11
+**Status:** SPECCED · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
@@ -377,8 +377,8 @@ below because neither is tracked before this unit builds.
 - **AC6** — When `grep -A1 -F "pass.fast-legs" help/reference/policy.md` and
   `grep -A1 -F "bar.inline-red-fixes" help/reference/policy.md` run, the line under each key's
   heading reads
-  `Documented on` followed by a link whose text is `help/pass-legs.md` and whose target is that
-  page one folder up, and the same for `help/red-fix-lane.md`.
+  `Documented on` followed by a link to S1's page, its text the page's path from the repository
+  root and its target that page one folder up, and the same for S2's page.
   Red when: the reference page was not re-rendered after the anchors landed, so it still carries
   the key's own summary and anchor, which the docs leg reads as anchored twice.
 - **AC7** — When `tr -d '\r' < memory/guides/BUILD-METHOD.md | wc -c` runs it prints at most 30720,
@@ -438,6 +438,7 @@ command and an unmarked block.
 ## 9. Revision log
 
 - rev-1 · 2026-11-12 · initial draft.
+- rev-2 · 2026-11-12 · AC6 names the two help pages by their scope items, since a path the unit has not built yet is an untracked citation to the spec-token check.
 
 ## 10. Reuse audit
 

@@ -87,7 +87,7 @@ ids TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 
 | [TOOL-aNimbleMend-8 — the inline red-fix lane: an open red admits a product write, and a `Red-fix:` trailer admits its commit](spec/2026-11-12-spec-TOOL-aNimbleMend-8.md) | 8 | 2 | SPECCED | rev-1 | 2026-11-12 |
 | [TOOL-aNimbleMend-9 — the red-fix record: a typed kind written after the fix and joined to its commit](spec/2026-11-12-spec-TOOL-aNimbleMend-9.md) | 9 | 2 | SPECCED | rev-1 | 2026-11-12 |
 | [TOOL-aNimbleMend-10 — the inline lane's limits, graded on every `Red-fix:` commit](spec/2026-11-12-spec-TOOL-aNimbleMend-10.md) | 10 | 2 | SPECCED | rev-1 | 2026-11-12 |
-| [TOOL-aNimbleMend-11 — the documents: a help page per mechanism, and the build method and the unattended protocol saying where the pass legs run and what the lane admits](spec/2026-11-12-spec-TOOL-aNimbleMend-11.md) | 11 | 2 | SPECCED | rev-1 | 2026-11-12 |
+| [TOOL-aNimbleMend-11 — the documents: a help page per mechanism, and the build method and the unattended protocol saying where the pass legs run and what the lane admits](spec/2026-11-12-spec-TOOL-aNimbleMend-11.md) | 11 | 2 | SPECCED | rev-2 | 2026-11-12 |
 | [TOOL-aNimbleMend-12 — the acceptance suite: one pass-leg run and one inline fix, end to end, in a scratch adopter and in a clone of gov, with each switch on and off](spec/2026-11-12-spec-TOOL-aNimbleMend-12.md) | 12 | 2 | SPECCED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
