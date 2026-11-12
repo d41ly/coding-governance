@@ -196,7 +196,7 @@ ids PLAY-dOrderedCharter-86 PLAY-dOrderedCharter-87 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-87 — the adopter-rules step types each rule `adopter-rule`, a level-0 repository statement type the grammar admits as written](spec/2026-11-12-spec-PLAY-dOrderedCharter-87.md) | 48 | 2 | CLOSED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 664 bound to this build, across 4 record folder(s).
+Records: 665 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
