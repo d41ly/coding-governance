@@ -14,7 +14,7 @@ four limits. The same kit's `build_records.py` writes the record and joins every
 
 A red row of the gate ledger. The ledger is `gate-ledger.tsv` under the worktree's own git dir,
 and the bar runner and a [pass-leg run](pass-legs.md) both write it. The lane is open while it
-holds a row whose status is `fail` or `timeout`.
+holds an open red: a row whose status is `fail` or `timeout`, inside the bounds stated below.
 
 The write gate asks the lane only when it is about to refuse a product write, and admits it when
 all three hold:
