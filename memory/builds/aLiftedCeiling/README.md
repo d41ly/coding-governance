@@ -57,7 +57,7 @@ ids TOOL-aLiftedCeiling-1 TOOL-aLiftedCeiling-2 TOOL-aLiftedCeiling-3
 | [TOOL-aLiftedCeiling-3 — the instruction-edits evidence row's source spells no kit path](spec/2026-11-12-spec-TOOL-aLiftedCeiling-3.md) | 3 | 1 | CLOSED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 17 bound to this build, across 4 record folder(s).
+Records: 18 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

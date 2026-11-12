@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-12-build-TOOL-aLiftedCeiling-1-agent-ledger.md](../build/2026-11-12-build-TOOL-aLiftedCeiling-1-agent-ledger.md) | journal | TOOL-aLiftedCeiling-1 TOOL-aLiftedCeiling-2 |
+| [2026-11-12-build-TOOL-aLiftedCeiling-1-runlog-0a5fb16b.md](../build/2026-11-12-build-TOOL-aLiftedCeiling-1-runlog-0a5fb16b.md) | journal | TOOL-aLiftedCeiling-1 TOOL-aLiftedCeiling-2 |
 | [2026-11-12-build-TOOL-aLiftedCeiling-3-ledger.md](../build/2026-11-12-build-TOOL-aLiftedCeiling-3-ledger.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aLiftedCeiling-3-1-spec-writer.md](../prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-3-1-spec-writer.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aLiftedCeiling-3-build-brief.md](../prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-3-build-brief.md) | journal | — |
