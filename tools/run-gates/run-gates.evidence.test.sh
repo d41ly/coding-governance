@@ -284,7 +284,9 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=253
+FLOOR_ASSERTIONS=270
+# RAISED 253 -> 270 by TOOL-aNimbleMend-15: the pass-leg rule arms over fixtures F and B, S8's thirteen,
+# S2's one and S3's three. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 250 -> 253 by TOOL-aNimbleMend-13: the kit-subject arms, AC3's two and AC4's one. Counted one
 # per `ok … || nope` pair; this pass runs no suite.
 # RAISED 240 -> 250 by TOOL-aNimbleMend-3: the pass-budget arms, AC2's two, AC3's one, AC4's one, AC5's
@@ -2377,6 +2379,175 @@ run_pb over derive-ceilings.py --check
   && ok "AC8 with pass_legs.py removed the ceiling check exits 0 on a not-graded line" \
   || { nope "AC8 a missing pass_legs.py broke the ceiling check (rc=$PB_RC)"; print_pb_out; }
 rm -rf "$PB_T"
+
+# --- THE PASS-LEG RULE AND ITS VERBS (TOOL-aNimbleMend-15 S8, with S2 and S3) -----------------------
+# `--write`, `--report`, `--check` and `--apply` of `pass_legs.py` over TOOL-aNimbleMend-2's fixtures
+# F and B, as code: a scratch repository holding a copy of the module, a hand-written manifest named
+# by GATE_LEGS, a cost file beside the module, and a planted run log and gate ledger under its git
+# directory. F's legs, with the cap at 120: `a-cheap` and `b-mid` are selected; `c-stale` is over the
+# cap by its ledger seconds alone; `d-self`, `e-unatt` and `g-e2e` are of an excluded class;
+# `f-nomeas` has no cost row; `h-quiet` has no red; `i-scoped` carries `scope_of` naming `a-cheap`.
+# The run log holds nine bars, one PASS-LEG line whose fail fields name `h-quiet` and `a-cheap`, and
+# one line that is no `ev=once`: neither may move a count or the window (S2).
+# WHAT THIS DOES NOT CHECK: the ledger read from a second git directory, the later-row-wins half of
+# the last seconds, a failing name the manifest no longer carries, and the Refusal of
+# `render_pass_field` on an edit that would change more than the field.
+PW_T=$(mktemp -d); PW_K="$PW_T/${PFX}${KIT}"; PW_M="$PW_T/legs.json"; PW_GD="$PW_T/.git"
+mkdir -p "$PW_K"
+cp "$ROOT/${PFX}${KIT}/pass_legs.py" "$PW_K/" \
+  || { echo "evidence-test: cannot copy pass_legs.py for the pass-leg rule arms"; exit 2; }
+( cd "$PW_T" && git init -q --template= -b main . ) >/dev/null 2>&1
+mkdir -p "$PW_GD/runlog"
+run_pw() { # node tag, or - for GOV_NODE unset · verb -> PW_RC, and both streams in PW_OUT
+  PW_OUT=$( cd "$PW_T" && if [ "$1" = - ]; then unset GOV_NODE; else export GOV_NODE="$1"; fi
+            GATE_LEGS="$PW_M" "$DC_PY" "$PW_K/pass_legs.py" "$2" 2>&1 | tr -d '\r'; exit "${PIPESTATUS[0]}" ); PW_RC=$?
+}
+print_pw_out() { printf '%s\n' "$PW_OUT" | sed 's/^/      /'; }
+write_pw_row() { # name · chunk · argv body · extra keys, or "" · "," unless it is the last row
+  printf '  {\n    "name": "%s",\n    "argv": [%s], "chunk": "%s"%s\n  }%s\n' "$1" "$3" "$2" "$4" "$5"
+}
+write_pw_cost() { printf '%s\t%s\t1\tf\t2026-11-12\trunner\n' "$1" "$2" >> "$PW_K/ceiling-evidence.txt"; }   # leg · seconds
+write_pw_last() { printf '%s\t%s\tok\t-\t100\n' "$1" "$2" >> "$PW_GD/gate-ledger.tsv"; }                     # leg · seconds
+write_pw_log() { # "<leg>:<reds> ..." -> nine bars, bar k failing every leg whose reds are k or more
+  local k pair line f
+  : > "$PW_GD/runlog/gates.log"
+  for k in 1 2 3 4 5 6 7 8 9; do
+    line="p=gates"$'\t'"ev=once"$'\t'"run=bar$k"$'\t'"started=s$k"; f=0
+    for pair in $1; do
+      if [ "${pair#*:}" -ge "$k" ]; then f=$((f + 1)); line="$line"$'\t'"fail.$f=${pair%:*}"; fi
+    done
+    printf '%s\n' "$line" >> "$PW_GD/runlog/gates.log"
+  done
+}
+{
+  printf '[\n'
+  write_pw_row a-cheap product '"true"' '' ,
+  write_pw_row b-mid declarations '"true"' '' ,
+  write_pw_row c-stale declarations '"true"' '' ,
+  write_pw_row d-self selftests '"true"' '' ,
+  write_pw_row e-unatt declarations '"bash", "x/check-unattended.sh"' '' ,
+  write_pw_row f-nomeas product '"true"' '' ,
+  write_pw_row g-e2e e2e '"true"' '' ,
+  write_pw_row h-quiet product '"true"' '' ,
+  write_pw_row i-scoped product '"true"' ', "scope_of": "a-cheap"' ''
+  printf ']\n'
+} > "$PW_M"
+printf '# hdr\n' > "$PW_K/ceiling-evidence.txt"; : > "$PW_GD/gate-ledger.tsv"
+write_pw_cost a-cheap 2.0; write_pw_cost b-mid 100.0; write_pw_cost c-stale 90.0; write_pw_cost d-self 1.0
+write_pw_cost e-unatt 3.0; write_pw_cost g-e2e 5.0; write_pw_cost h-quiet 1.0
+write_pw_last a-cheap 2.0; write_pw_last b-mid 90.0; write_pw_last c-stale 300.0; write_pw_last d-self 1.0
+write_pw_last e-unatt 3.0; write_pw_last f-nomeas 5.0; write_pw_last g-e2e 5.0; write_pw_last h-quiet 1.0
+write_pw_log "a-cheap:4 b-mid:5 c-stale:6 d-self:9 e-unatt:9 f-nomeas:7 g-e2e:3 i-scoped:1"
+printf 'p=gates\tev=once\trun=pass-20261112T000000Z\tstarted=s10\tfail.1=h-quiet\tfail.2=a-cheap\n' >> "$PW_GD/runlog/gates.log"
+printf 'p=gates\tev=start\trun=bar9\tstarted=s11\tfail.1=h-quiet\n' >> "$PW_GD/runlog/gates.log"
+
+# GOV_NODE unset refuses before a byte is written, and names the variable.
+run_pw - --write
+[ "$PW_RC" = 2 ] && printf '%s\n' "$PW_OUT" | grep -q '^pass-legs: REFUSED — --write needs GOV_NODE set' \
+  && [ ! -e "$PW_K/pass-leg-evidence.txt" ] && ! grep -q '"pass_leg"' "$PW_M" \
+  && ok "S8 --write with GOV_NODE unset exits 2 naming GOV_NODE, and writes neither the evidence nor a field" \
+  || { nope "S8 --write with GOV_NODE unset did not refuse, or wrote something (rc=$PW_RC)"; print_pw_out; }
+# --write distils the log: reds per leg from the bars, last seconds from the ledger.
+run_pw f --write
+pw_rows=$(grep -v '^#' "$PW_K/pass-leg-evidence.txt" 2>/dev/null | tr -d '\r')
+pw_want=$(printf '%s\t%s\t%s\n' a-cheap 4 2.0 b-mid 5 90.0 c-stale 6 300.0 d-self 9 1.0 e-unatt 9 3.0 f-nomeas 7 5.0 g-e2e 3 5.0 i-scoped 5 -)
+[ "$PW_RC" = 0 ] && [ "$pw_rows" = "$pw_want" ] \
+  && ok "S8 --write under GOV_NODE=f writes one row per leg with a red: its reds and its last seconds, and none for h-quiet" \
+  || { nope "S8 --write did not write the evidence rows the run log and the ledger hold (rc=$PW_RC)"; print_pw_out; printf '%s\n' "$pw_rows" | sed 's/^/      | /'; }
+printf '%s\n' "$pw_rows" | grep -qx "i-scoped"$'\t'"5"$'\t'"-" && printf '%s\n' "$pw_rows" | grep -qx "a-cheap"$'\t'"4"$'\t'"2.0" \
+  && ok "S8 the scope_of credit: i-scoped holds its own red plus a-cheap's four, and a-cheap keeps four" \
+  || nope "S8 a row carrying scope_of was not credited its parent's reds, or the credit moved the parent's"
+# S2. The pass-leg line and the line that is no bar moved neither the bars, the reds nor the window.
+grep -q "^# window"$'\t'"9"$'\t'"s1"$'\t'"s9"$'\t'"f"$'\t' "$PW_K/pass-leg-evidence.txt" \
+  && ! printf '%s\n' "$pw_rows" | grep -q '^h-quiet' && printf '%s\n' "$PW_OUT" | grep -q 'from 9 bar(s)' \
+  && ok "S2 a run-log line whose run id opens pass- is no bar: nine bars, the window ends at s9, and its fail fields add no red" \
+  || { nope "S2 a pass-leg run was counted as a bar, or its fail fields as reds"; grep '^# window' "$PW_K/pass-leg-evidence.txt" | sed 's/^/      | /'; }
+[ "$(grep -c '"pass_leg": true' "$PW_M")" = 2 ] \
+  && [ "$(grep -A1 -E '"name": "(a-cheap|b-mid)"' "$PW_M" | grep -c '"pass_leg": true')" = 2 ] \
+  && ok "S8 --write applies the field: exactly a-cheap and b-mid carry it" \
+  || { nope "S8 --write left the field on other rows than a-cheap and b-mid"; grep -B1 '"pass_leg"' "$PW_M" | sed 's/^/      | /'; }
+# --report: one row per verdict, the ranked legs first in fill order, then the excluded in manifest order.
+run_pw f --report
+pw_got=$(printf '%s\n' "$PW_OUT" | grep -v '^#' | sed 1d | cut -f1,5)
+pw_want=$(printf '%s\t%s\n' selected a-cheap selected b-mid over-cap c-stale selftest d-self unattended-gate e-unatt \
+  unevidenced f-nomeas e2e g-e2e no-red h-quiet unevidenced i-scoped)
+[ "$PW_RC" = 0 ] && [ "$pw_got" = "$pw_want" ] \
+  && ok "S8 --report gives each leg its verdict: the selected two by score, then the excluded in manifest order" \
+  || { nope "S8 --report's verdicts or their order moved (rc=$PW_RC)"; print_pw_out; }
+# --check: green on what --apply wrote, red on a typed field, on a removed one, and on a moved line.
+run_pw f --check
+[ "$PW_RC" = 0 ] && [ "$PW_OUT" = "pass-legs: 2 declared, 102.0s of 600s" ] \
+  && ok "S8 --check over the applied manifest exits 0 on the declared count and sum" \
+  || { nope "S8 --check is not green over what --apply wrote (rc=$PW_RC)"; print_pw_out; }
+cp "$PW_M" "$PW_T/good.json"
+sed 's/^    "name": "h-quiet",$/&\n    "pass_leg": true,/' "$PW_T/good.json" > "$PW_M"
+run_pw f --check
+[ "$PW_RC" = 1 ] && printf '%s\n' "$PW_OUT" | grep -qxF 'pass-legs: `h-quiet` carries a pass_leg field the rule does not give it' \
+  && printf '%s\n' "$PW_OUT" | grep -qxF 'pass-legs: the field is derived, never typed — run `pass_legs.py --apply`' \
+  && ok "S8 --check exits 1 naming a row whose field was typed by hand, with the remedy line" \
+  || { nope "S8 a hand-typed pass_leg field did not red --check (rc=$PW_RC)"; print_pw_out; }
+sed '/^    "name": "a-cheap",$/{n;d;}' "$PW_T/good.json" > "$PW_M"
+run_pw f --check
+[ "$PW_RC" = 1 ] && printf '%s\n' "$PW_OUT" | grep -qxF 'pass-legs: `a-cheap` is selected and carries no pass_leg field' \
+  && ok "S8 --check exits 1 naming a selected row whose field was removed" \
+  || { nope "S8 a removed pass_leg field did not red --check (rc=$PW_RC)"; print_pw_out; }
+sed 's/^    "pass_leg": true,$/      "pass_leg": true,/' "$PW_T/good.json" > "$PW_M"
+run_pw f --check
+[ "$PW_RC" = 1 ] && printf '%s\n' "$PW_OUT" | grep -qxF "pass-legs: the manifest's bytes differ from what --apply writes" \
+  && ok "S8 --check exits 1 on the right rows carrying the field at another indent, which is a real difference of text" \
+  || { nope "S8 a pass_leg line --apply would not write did not red --check (rc=$PW_RC)"; print_pw_out; }
+# S3. A CRLF checkout of the same manifest is no difference, and a real one keeps the file's line ending.
+sed 's/$/\r/' "$PW_T/good.json" > "$PW_M"; pw_sum=$(cksum < "$PW_M")
+run_pw f --check
+[ "$PW_RC" = 0 ] && [ "$PW_OUT" = "pass-legs: 2 declared, 102.0s of 600s" ] \
+  && ok "S3 --check over a CRLF copy of the applied manifest exits 0" \
+  || { nope "S3 --check compared the rendered text with the raw CRLF bytes (rc=$PW_RC)"; print_pw_out; }
+run_pw f --apply
+[ "$PW_RC" = 0 ] && [ "$(cksum < "$PW_M")" = "$pw_sum" ] \
+  && ok "S3 --apply over that CRLF copy writes nothing: its bytes are unchanged" \
+  || { nope "S3 --apply rewrote a CRLF manifest that held no real difference (rc=$PW_RC)"; print_pw_out; }
+sed '/^    "name": "a-cheap",$/{n;d;}' "$PW_T/good.json" | sed 's/$/\r/' > "$PW_M"
+run_pw f --apply
+[ "$PW_RC" = 0 ] && [ "$(cksum < "$PW_M")" = "$pw_sum" ] \
+  && ok "S3 --apply over a CRLF manifest missing a field writes it back and keeps CRLF on every line" \
+  || { nope "S3 --apply did not restore the field, or changed the file's line ending (rc=$PW_RC)"; print_pw_out; }
+cp "$PW_T/good.json" "$PW_M"
+# A scope_of naming no row refuses before the log is read; a run log gone is a DEAD PROBE, nothing written.
+sed 's/"scope_of": "a-cheap"/"scope_of": "no-such-leg"/' "$PW_T/good.json" > "$PW_M"; pw_sum=$(cksum < "$PW_K/pass-leg-evidence.txt")
+run_pw f --write
+[ "$PW_RC" = 2 ] && printf '%s\n' "$PW_OUT" | grep -qF 'pass-legs: REFUSED — `i-scoped` carries scope_of `no-such-leg`, a name no manifest row carries' \
+  && [ "$(cksum < "$PW_K/pass-leg-evidence.txt")" = "$pw_sum" ] \
+  && ok "S8 --write refuses a scope_of naming no manifest row with exit 2, and leaves the evidence unmoved" \
+  || { nope "S8 an unknown scope_of parent did not refuse --write (rc=$PW_RC)"; print_pw_out; }
+cp "$PW_T/good.json" "$PW_M"; pw_m_sum=$(cksum < "$PW_M")
+mv "$PW_GD/runlog/gates.log" "$PW_T/gates.log.aside"
+run_pw f --write
+[ "$PW_RC" = 1 ] && printf '%s\n' "$PW_OUT" | grep -q '^pass-legs: DEAD PROBE — .* is absent or holds no bar line, so there is no red history to rank by. Nothing was written.$' \
+  && [ "$(cksum < "$PW_K/pass-leg-evidence.txt")" = "$pw_sum" ] && [ "$(cksum < "$PW_M")" = "$pw_m_sum" ] \
+  && ok "S8 --write with no run log exits 1 on DEAD PROBE, and the evidence and the manifest are unmoved" \
+  || { nope "S8 an absent run log was read as zero reds, or --write did not exit 1 (rc=$PW_RC)"; print_pw_out; }
+# Fixture B: seven legs of one cost. The fill takes six at exactly the budget and reads the seventh over.
+{
+  printf '[\n'
+  for pw_i in 1 2 3 4 5 6; do write_pw_row "p$pw_i" product '"true"' '' ,; done
+  write_pw_row p7 product '"true"' '' ''
+  printf ']\n'
+} > "$PW_M"
+printf '# hdr\n' > "$PW_K/ceiling-evidence.txt"; : > "$PW_GD/gate-ledger.tsv"
+for pw_i in 1 2 3 4 5 6 7; do write_pw_cost "p$pw_i" 100.0; done
+write_pw_log "p1:7 p2:6 p3:5 p4:4 p5:3 p6:2 p7:1"
+run_pw f --write
+run_pw f --report
+pw_got=$(printf '%s\n' "$PW_OUT" | grep -v '^#' | sed 1d | cut -f1,5)
+pw_want=$(printf '%s\t%s\n' selected p1 selected p2 selected p3 selected p4 selected p5 selected p6 over-budget p7)
+[ "$PW_RC" = 0 ] && [ "$pw_got" = "$pw_want" ] \
+  && ok "S8 over fixture B the fill selects p1 to p6 at exactly the budget and reads p7 over-budget" \
+  || { nope "S8 the fill walk moved: p1 to p6 are not the selected six, or p7 is not over-budget (rc=$PW_RC)"; print_pw_out; }
+run_pw f --check
+[ "$PW_RC" = 0 ] && [ "$PW_OUT" = "pass-legs: 6 declared, 600.0s of 600s" ] \
+  && ok "S8 --check over fixture B prints six declared legs at 600.0s of 600s" \
+  || { nope "S8 --check over fixture B is not green on six legs at the budget (rc=$PW_RC)"; print_pw_out; }
+rm -rf "$PW_T"
 
 # --- THE WORKER'S BUILTINS KEEP TODAY'S BYTES (TOOL-aSparedSpawn-4 AC1 to AC4, AC6, AC7) -----------
 # The worker reads its clock, its output, its log name and its key with builtins where it spawned. Each

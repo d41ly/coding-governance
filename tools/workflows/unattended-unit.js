@@ -65,7 +65,8 @@
 //
 // `passLegs` IS OPTIONAL (TOOL-aNimbleMend-7): a one-line command the parent hands out in
 // `dispatch.args`. Given, and the builder committed, the return carries a `nextAction` ordering the
-// main loop to run it over the pass commit. Absent, the return, log, prompt and options are unchanged.
+// main loop to run it over the pass's commits, from the `base` the builder returns
+// (TOOL-aNimbleMend-15). Absent, the return, log, prompt and options are unchanged.
 export const meta = {
   name: 'unattended-unit',
   version: '1.1', // gov:kit unattended-unit@1.1 — engine identity (deployed verbatim)
@@ -227,6 +228,7 @@ const UNIT_SCHEMA = {
   properties: {
     committed: { type: 'boolean' },
     sha: { type: 'string' },
+    base: { type: 'string' },
     why: { type: 'string' },
     summary: { type: 'string' },
   },
@@ -287,6 +289,10 @@ const PROMPT =
     : 'The spec is the design; where you must diverge, CHANGE THE SPEC FIRST as a rev-N bump with its ' +
       'section 9 line, then write the code.\n') +
   DRIVER_STEPS +
+  // TOOL-aNimbleMend-15 - asked in BOTH modes and with or without `passLegs`, so the prompt stays the
+  // same either way: a pass can make more than one commit, and only the builder saw where it started.
+  'Before your first write, read `git rev-parse HEAD` and return what it prints as `base`: the commit ' +
+  'this pass started from.\n' +
   // TOOL-aMendedFleet-74 — empty unless the caller passed `prebuild`, so a default prompt is unchanged.
   // FILE paths, never a directory: a directory selects the whole catalogue, not a checklist.
   (cfg.prebuild === undefined
@@ -348,6 +354,11 @@ log('unit ' + cfg.unitId + ': builder ' + (builder
 log(effort ? 'effort builder: ' + effort + ' — efforts.builder'
   : 'effort builder: the agent type\'s own, else the session\'s — no efforts.builder')
 
+// TOOL-aNimbleMend-15 - A COMMIT NAME AN AGENT RETURNED reaches `nextAction` only through this shape.
+// `nextAction` is an instruction to the main loop, which holds grants the builder lacks, and `sha` and
+// `base` are a role agent's free text. The return's own `sha` field and the log line keep the raw value.
+const COMMIT_SHAPE = /^[0-9a-f]{7,64}$/
+
 const r = await agent(
   PROMPT,
   Object.assign({ label: identity, schema: UNIT_SCHEMA },
@@ -366,11 +377,22 @@ return {
   diverged: !!(r && r.committed === false && typeof r.why === 'string' && r.why.indexOf('DIVERGENCE:') === 0),
   // TOOL-aNimbleMend-7 - THE RUN POINT. Present only when the caller handed `passLegs` AND a commit
   // exists to run it over; it orders the main loop, and says nothing about how a red is fixed.
+  // TOOL-aNimbleMend-15 - the command's base is the commit the builder STARTED from, never a relative
+  // rev: a pass can make two commits. A `base` that fails the shape, or that names the pass commit
+  // itself (one a prefix of the other), is not used, and the sentence hands the main loop the rev it
+  // read before the dispatch. A `sha` that fails the shape names no commit here.
   ...(cfg.passLegs !== undefined && r && r.committed
     ? {
         nextAction:
-          'Run `' + cfg.passLegs + '` at the main loop before the next dispatch and before any later ' +
-          'commit, where that file exists. The pass commit is ' + ((r && r.sha) || '') + ', which is HEAD ' +
+          'Run `' + cfg.passLegs + ' --base ' +
+          (typeof r.base === 'string' && COMMIT_SHAPE.test(r.base) &&
+          String(r.sha || '').indexOf(r.base) !== 0 && r.base.indexOf(String(r.sha || '')) !== 0
+            ? r.base + '`'
+            : '<rev>`, where the builder returned no usable base, so `<rev>` is the commit HEAD named ' +
+              'before the dispatch,') +
+          ' at the main loop before the next dispatch and before any later ' +
+          'commit, where that file exists. The pass commit is ' +
+          (typeof r.sha === 'string' && COMMIT_SHAPE.test(r.sha) ? r.sha + ', which is HEAD ' : 'HEAD ') +
           'when the command runs. Act on its exit status and on every finding line it prints. The ' +
           'command runs nothing where `pass.fast-legs` is `off`.',
       }

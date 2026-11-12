@@ -156,9 +156,13 @@ why_no_regenerate = "the adopter writes nothing, so `update` re-runs no adopter 
 # enrols every `[[generated]]` path as a generated index and the manifest is an authored file.
 # Stage 2: the field reads no other generated output, and the codebase map at stage 3 reads the
 # tree after it. The adopter above still writes nothing, which is what its reason states.
+# WHICH FILE THE CHECK GRADES (TOOL-aNimbleMend-15): the manifest BESIDE THIS KIT, under any runner.
+# Both halves run behind the leg shim, which unsets `GATE_LEGS` and maps the python launcher. A
+# pass-leg run starts the bar runner with `GATE_LEGS` naming its filtered list, and a bare python
+# here inherited it, so that run's preflight graded the derived list and never the declaration.
 [[regenerate]]
-argv = ["python", "{kit}/pass_legs.py", "--apply"]
-check = ["python", "{kit}/pass_legs.py", "--check"]
+argv = ["bash", "{kit}/run-held-wsl.sh", "--leg", "python", "{kit}/pass_legs.py", "--apply"]
+check = ["bash", "{kit}/run-held-wsl.sh", "--leg", "python", "{kit}/pass_legs.py", "--check"]
 stage = 2
 writes = ["the pass_leg field of the leg manifest"]
 

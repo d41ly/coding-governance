@@ -14,10 +14,10 @@ PreToolUse guards — fan-out bounded across Workflow+Agent, scratch bounded acr
 - kits 1: `hooks`
 - harness-hooks 4: `PreToolUse tools/hooks/agent-cap.js`, `PreToolUse tools/hooks/scratch-guard.js`, `SubagentStart tools/hooks/scratch-guard.js`, `Stop tools/hooks/format-guard.js`
 - workflow-scripts 1: `check-verifier-fanout.js`
-- gotcha-classes 9: `bash-c-multiline-flattens-under-msys.md`, `held-suite-guard-misses-a-sibling-kit.md`
+- gotcha-classes 10: `bash-c-multiline-flattens-under-msys.md`, `held-suite-guard-misses-a-sibling-kit.md`
 - guides 1
 - globs 12
-- cut 20 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 21 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## annotation-style
 

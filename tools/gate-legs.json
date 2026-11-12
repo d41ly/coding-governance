@@ -372,7 +372,8 @@
       "{prefix}/hooks/",
       "{prefix}/lib/",
       "{prefix}/unattended/unattended.sh",
-      "skills/session-kickoff/"
+      "skills/session-kickoff/",
+      "{prefix}/policy/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -550,7 +551,8 @@
     "guard": [
       "{prefix}/lib/",
       "{prefix}/memory-tree/",
-      "{prefix}/unattended/lib-unattended.sh"
+      "{prefix}/unattended/lib-unattended.sh",
+      "{prefix}/policy/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -2246,8 +2248,7 @@
       "{prefix}/govkit/entries/",
       "{prefix}/memory-tree/kit.toml",
       "{prefix}/memory-tree/adopt-memory-tree.sh",
-      "{prefix}/run-gates/kit.toml",
-      "{prefix}/run-gates/regen.py",
+      "{prefix}/run-gates/",
       "{prefix}/roles/kit.toml",
       "{prefix}/playbook/kit.toml",
       "{prefix}/memory-recall/kit.toml",
@@ -2284,8 +2285,6 @@
       "memory/builds/dClosedLoop/build/",
       "help/policy.md",
       ".governance/install.json",
-      "{prefix}/run-gates/pass-legs.sh",
-      "{prefix}/run-gates/pass_legs.py",
       "{prefix}/memory-tree/build_records.py"
     ],
     "chunk": "selftests",

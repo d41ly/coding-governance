@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 174 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 162 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 174 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 163 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -311,6 +311,7 @@ Inventories: gate-legs: 174 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · 
 | `borrowed-seed-inherits-its-head-state.md` | unattended |
 | `bounded-through-a-pipe-is-unbounded.md` | run-gates, unattended |
 | `canary-waits-on-a-rendezvous-not-a-clock.md` | run-gates |
+| `carried-forward-row-read-as-current.md` | agent-cap |
 | `changed-mode-selection-ignores-doc-reads.md` | run-gates |
 | `check-format-grades-two-populations.md` | build-readme-surface |
 | `check-grades-one-layer-of-a-layered-config.md` | policy |

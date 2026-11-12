@@ -283,6 +283,7 @@
       "borrowed-seed-inherits-its-head-state.md",
       "bounded-through-a-pipe-is-unbounded.md",
       "canary-waits-on-a-rendezvous-not-a-clock.md",
+      "carried-forward-row-read-as-current.md",
       "changed-mode-selection-ignores-doc-reads.md",
       "check-format-grades-two-populations.md",
       "check-grades-one-layer-of-a-layered-config.md",

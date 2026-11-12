@@ -76,8 +76,10 @@ once read, and the pre-push hook clears all three before the bar it runs.
 The records keep every attempt: the first attempt's `<i>.leg` row reads `timeout` and a
 `<i>.retry.leg` row sits beside it, with a set-aside tail attempt's `<i>.tail.leg` between them when
 there was one, the verdict file gains `retried <n>`, and the ledger row takes the
-retry's seconds with the status `retried`, which reuse never accepts. The drift report sums `retried`
-across the run records as `legs_retried_after_timeout`.
+retry's seconds. Its status is `retried` only where the retry exited 0, and otherwise the retry's
+own, `fail` or `timeout`, so the ledger holds the leg's final verdict; reuse accepts neither, and a
+red row carries no key. The drift report sums `retried` across the run records as
+`legs_retried_after_timeout`.
 
 ## The switch every adopter needs to know about
 
@@ -1007,15 +1009,22 @@ was. An `unevidenced` leg enters once a routine `derive-ceilings.py --write` giv
 `# window` line naming the bars read, the first and last bar's start, the node and the date, then
 one `<leg> TAB <reds> TAB <last seconds, or ->` row per manifest leg with at least one red. Reds are
 counted from the bar lines of `<git-common-dir>/runlog/gates.log`, whose `fail.<n>` fields name
-each bar's failing legs. The gate ledger keeps one row per leg and no history, so it gives the last
+each bar's failing legs. A line whose `run` value opens `pass-` is a pass-leg run, which is no bar,
+and it is skipped: only a declared leg can red there. The gate ledger keeps one row per leg and no history, so it gives the last
 seconds alone, read from `<git-dir>` and `<git-common-dir>` with the later row winning. The file is
 gov's own and is withheld from the payload, as the ceiling evidence is.
+
+**`scope_of` names the leg a row is a cheap form of.** A manifest row carrying `"scope_of": "<leg>"`
+grades part of what that leg grades, and `--write` credits it the named leg's reds beside its own.
+The evidence row of a scoped leg therefore holds its own reds plus its parent's, and every credit
+reads the counts as logged, so a form of a form gains one parent's and no more. A `scope_of` naming
+no manifest row is a Refusal: exit 2, before the run log is read or a byte is written.
 
 | verb | what it does |
 |---|---|
 | `GOV_NODE=<tag> python pass_legs.py --write` | distils this node's run log and ledgers into the evidence file, replacing every row, then applies. Exit 2 with `GOV_NODE` unset. A run log that is absent or holds no bar line is a `DEAD PROBE`: exit 1, nothing written |
 | `python pass_legs.py --apply` | writes the field onto each selected row and removes it from every other, from tracked files alone. It edits the manifest as text, one line after a row's `"name"` line, and refuses with exit 2 and nothing written unless the result parses to the old rows with only `pass_leg` differing |
-| `python pass_legs.py --check` | exit 0 printing `pass-legs: <n> declared, <sum>s of <budget>s` when the manifest's bytes are what `--apply` would write; exit 1 naming each leg that carries a field the rule does not give it and each selected leg that lacks one |
+| `python pass_legs.py --check` | exit 0 printing `pass-legs: <n> declared, <sum>s of <budget>s` when the manifest's text, line endings apart, is what `--apply` would write; exit 1 naming each leg that carries a field the rule does not give it and each selected leg that lacks one |
 | `python pass_legs.py --report` | one line per leg: verdict, reds, cost, score and name, under the window line |
 | `python pass_legs.py --budget` | the budget gate below: exit 0 when the declared legs are clean, a warning included; exit 1 on any finding; exit 2 when it cannot grade, on a manifest that does not parse, a limit under the budget or a cap over the budget |
 | `python pass_legs.py --figures` | prints `<budget> TAB <limit> TAB <cap>` and nothing else, three integers, so a shell reader holds no copy of them |
@@ -1030,7 +1039,10 @@ node that has run a bar.
 and every bar's preflight proves it fresh, as "Generated outputs" above states for every staged
 row. A ceiling-evidence refresh that moves the selection is cured by the landing or by one
 `--regen`, and is never a leg's red. A deployer update rebuilds the rows it owns from their
-descriptors and drops the field from them, and the same staged row puts it back.
+descriptors and drops the field from them, and the same staged row puts it back. Both halves of the
+row run behind the leg shim, `bash run-held-wsl.sh --leg python pass_legs.py …`, which unsets
+`GATE_LEGS`: the check grades the manifest beside this kit under any runner, a pass-leg run's
+included, whose runner is started with `GATE_LEGS` naming its filtered list.
 
 **The budget gate re-reads the list the rule leaves.** `--check` asks whether the field is the
 rule's own output. `--budget` asks a different question of the same tracked files: whether the

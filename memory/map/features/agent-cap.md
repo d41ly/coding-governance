@@ -33,6 +33,7 @@ gotcha-classes = ["bash-c-multiline-flattens-under-msys.md", "held-suite-guard-m
   "a-view-fix-trades-one-blindness-for-another.md",
   "settings-edit-takes-effect-mid-session.md",
   "conf-value-interpolated-into-a-regex.md",
+  "carried-forward-row-read-as-current.md",
 ]
 guides = ["REVIEW-PROTOCOL.md"]
 backlog-shards = []

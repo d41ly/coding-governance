@@ -271,7 +271,10 @@ fail=0
 # Counted off the section's own `check_pl_value` calls; this pass runs no suite.
 # 438 -> 440, TOOL-aNimbleMend-13: arm 14a2's two, a pass leg's `GATE_LEGS` unset behind the shim and
 # set once the wrap is taken out of the fixture's adapter. Neither is gated. Counted by reading.
-FLOOR_ASSERTIONS=440
+# 440 -> 450, TOOL-aNimbleMend-15: arm 9f's ledger status of a failed retry, behind the `timeout` gate
+# and counted on a host without one as well (40 -> 41); arm 14i's six through the freshness preflight;
+# and arm 14j's three on a refused key read, counted where no policy kit resolves too. Counted by reading.
+FLOOR_ASSERTIONS=450
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -3385,6 +3388,10 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   check_hv_line "AC4 its second timeout is FAIL naming the missing calibration" '^GATE FAIL  lone  \(timed out after 1s, again on its serial retry; no spawn floor is recorded for this clone, so HOST was not measured\)$'
   check_hv_value "AGH8 a retry that FAILS appends no retry-passed line" \
     "$(awk -F'\t' '$3 == "retry-passed"' "$H1/.git/health.log" 2>/dev/null | wc -l | tr -d ' ')" "$hv_rp0"
+  # TOOL-aNimbleMend-15 S4: the ledger holds the leg's FINAL verdict. A ceiling that fired and a retry
+  # that did not exit 0 is the retry's own status, never `retried`, which a reader of open reds skips.
+  check_hv_value "S4 a leg whose ceiling fired and whose retry failed reads fail or timeout in the ledger, never retried" \
+    "$(awk -F'\t' '$1 == "lone" { print ($3 == "fail" || $3 == "timeout") ? "red" : $3 }' "$H1/.git/gate-ledger.tsv" 2>/dev/null)" red
 
   # 9g. AC4 — HOST. A planted 1 ms floor and a spawn seamed to cost 50 ms: a leg that times out twice
   #     is HOST and the bar exits 4.
@@ -3521,7 +3528,7 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   check_hv_value "aSS3 AC4 the deciding attempt started after the drain ($_hvrs, $_hvse)" \
     "$(case "$_hvrs$_hvse" in ''|*[!0-9]*) echo unread ;; *) [ "$_hvrs" -ge "$_hvse" ] && echo after-drain || echo in-tail ;; esac)" after-drain
 else
-  n=$((n+40))
+  n=$((n+41))
   echo "canary: SKIP the ceiling arms of section 9 — this host has no runnable 'timeout -k', so no ceiling can fire and nothing can be deferred, retried or read HOST here"
 fi
 rm -rf "$HV" 2>/dev/null || true
@@ -4096,10 +4103,11 @@ rm -rf "$SC" 2>/dev/null || true
 #    on `watched/`, `gamma` unguarded and NOT declared. Each row's script leaves a marker named after
 #    it OUTSIDE the repository, so "ran" is read off the disk and never off the runner's output.
 #    `gamma` is the liveness half: an adapter that handed the runner the whole manifest would leave
-#    its marker. No policy kit sits in the fixture, so the switch reads on under its NOTE line; the
-#    switch's own arm needs a policy kit beside the adapter and is not this suite's.
+#    its marker. No policy kit sits in the fixture until arm 14j copies one in, so the switch reads
+#    on under its NOTE line; the switch's `off` arm needs a policy file and is not this suite's.
 #
-#    WHAT THIS DOES NOT CHECK: the switch (AC4), and the record's mode, which a Windows tree does
+#    WHAT THIS DOES NOT CHECK: the switch's two values (AC4), the adapter's unknown-value arm, which
+#    is unreachable defence as 14j states, and the record's mode, which a Windows tree does
 #    not hold. The overrun arms sleep four seconds against a fixture budget of 1 and a limit of 2,
 #    figures edited into the fixture's OWN copy of the declaration module; the adapter types none.
 PL=$(mktemp -d) || { echo "canary: cannot create a scratch dir for the pass-leg arms"; exit 2; }
@@ -4209,6 +4217,52 @@ write_pl_figures 1 600; write_pl_commit "a limit of 600"
 run_pl_legs FX_SLEEP=4 -- --base HEAD~1
 check_pl_value "AC6 inside the tolerance there is no overrun finding" "$(printf '%s\n' "$PL_OUT" | grep -c '^pass-legs: FINDING overrun')" 0
 check_pl_value "AC6 ...and one NOTE line naming the budget" "$(printf '%s\n' "$PL_OUT" | grep -c '^pass-legs: NOTE the run took [0-9]*s, inside the tolerance above the 1s budget$') $(read_pl_key over)" "1 tolerance"
+# 14i. TOOL-aNimbleMend-15 S6 S10 — the adapter THROUGH the runner's freshness preflight. Every arm
+#      above runs with no `regen.py` beside the runner, so its preflight prints `NOT checked`. Here the
+#      fixture kit gains `regen.py` and the kit's own descriptor, whose staged row runs
+#      `pass_legs.py --check` behind the leg shim, and a red row and a cost row for `alpha` and `beta`,
+#      so the RULE selects the two rows that carry the field. The runner is started with `GATE_LEGS`
+#      naming the filtered list, and the check must still grade the manifest beside the kit: a
+#      `"pass_leg": false` typed on `gamma` is a field the rule does not give it, and it is absent
+#      from the filtered list, which keeps only a row whose field is true. So the refusal is red when
+#      the shim is taken out of the fixture's descriptor: the check then reads the filtered list and
+#      finds nothing. The fixture's module is the kit's own again, with 14h's figures gone.
+cp "$KITDIR/regen.py" "$KITDIR/kit.toml" "$KITDIR/pass_legs.py" "$PLR/$KIT_REL/" 2>/dev/null
+printf '# window\t1\t-\t-\tf\t2026-11-12\nalpha\t1\t-\nbeta\t1\t-\n' > "$PLR/$KIT_REL/pass-leg-evidence.txt"
+printf 'alpha\t1.0\t1\tf\t2026-11-12\trunner\nbeta\t1.0\t1\tf\t2026-11-12\trunner\n' > "$PLR/$KIT_REL/ceiling-evidence.txt"
+write_pl_legs '"pass_leg": true, ' ''; write_pl_commit "the descriptor, the regen verb and the rule's evidence"
+run_pl_legs -- --base HEAD~1
+check_pl_value "S10 a pass-leg run whose preflight ran exits 0" "$PL_RC" 0
+check_pl_value "S10 ...with no NOT checked line" "$(printf '%s\n' "$PL_OUT" | grep -c 'generated outputs NOT checked')" 0
+check_pl_value "S10 ...and the preflight proved the staged row fresh" "$(printf '%s\n' "$PL_OUT" | grep -c '^regen: fresh · stage 2 · .* · the pass_leg field of the leg manifest')" 1
+sed 's/{"name": "gamma", /&"pass_leg": false, /' "$PLR/${PFX}gate-legs.json" > "$PL/legs.typed" && cp "$PL/legs.typed" "$PLR/${PFX}gate-legs.json"
+write_pl_commit "a pass_leg typed on gamma"
+run_pl_legs -- --base HEAD~1
+check_pl_value "S6 a pass_leg typed on a row of the manifest refuses the pass-leg run at the preflight" "$PL_RC" 2
+check_pl_value "S6 ...on the check's own line naming the row, under the runner's refusal" \
+  "$(printf '%s\n' "$PL_OUT" | grep -c 'pass-legs: `gamma` carries a pass_leg field the rule does not give it') $(printf '%s\n' "$PL_OUT" | grep -c '^run-gates: REFUSED')" "1 1"
+check_pl_value "S6 ...and no leg ran" "$(read_pl_marks)" ""
+write_pl_legs '"pass_leg": true, ' ''; write_pl_commit "the typed field gone"
+# 14j. TOOL-aNimbleMend-15 S11 — a REFUSED key read runs nothing and exits 0. The policy kit is copied
+#      beside the fixture kit, untracked, at its resolved name, and `GOV_DEFAULT_BRANCH` names no
+#      branch, so the kit's reader refuses on its own stderr line. The run record of the arm above
+#      must stand byte for byte. Without that kit the arm is an announced skip, counted the same.
+#      WHAT THIS DOES NOT CHECK: the unknown-value arm of the adapter, `pass.fast-legs answered …`,
+#      which is unreachable defence: the reader refuses a value that is neither on nor off before
+#      the adapter sees one, so no fixture reaches it through the policy file.
+if POL_DIR=$(resolve_kit_dir "$_rkd_py" policy policy.py "$HERE" 2>/dev/null); then
+  run_pl_legs -- --base HEAD~1
+  _pl_rec=$(cksum < "$PLR/.git/gate-pass-legs.txt" 2>/dev/null)
+  cp -r "$ROOT/$POL_DIR" "$PLR/${KIT_REL%/*}/${POL_DIR##*/}" 2>/dev/null
+  run_pl_legs GOV_DEFAULT_BRANCH=no-such-branch -- --base HEAD~1
+  check_pl_value "S11 a refused key read exits 0" "$PL_RC" 0
+  check_pl_value "S11 ...under the reader's own line, with no NOTE that the kit is absent" \
+    "$(printf '%s\n' "$PL_OUT" | grep -c '^policy: refused · .* names no commit in this repository') $(printf '%s\n' "$PL_OUT" | grep -c '^pass-legs: NOTE')" "1 0"
+  check_pl_value "S11 ...with no leg run and the run record unmoved" "$(read_pl_marks)$([ "$(cksum < "$PLR/.git/gate-pass-legs.txt" 2>/dev/null)" = "$_pl_rec" ] && echo same)" same
+else
+  echo "canary: 14j SKIPPED — no policy kit resolves beside this kit, so the adapter's refused key read was not run"
+  n=$((n+3))
+fi
 rm -rf "$PL" 2>/dev/null || true
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }

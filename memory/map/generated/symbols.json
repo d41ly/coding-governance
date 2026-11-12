@@ -16448,6 +16448,11 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "print_pw_out",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "print_ready",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
@@ -19286,6 +19291,11 @@
       "id": "read_newest_unit",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
+      "id": "read_next_action",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.test.sh"
     },
     {
       "id": "read_next_line",
@@ -27533,6 +27543,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "run_pw",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "run_raw",
       "kind": "function",
       "file": "tools/unattended/gate-guard.test.sh"
@@ -33551,6 +33566,26 @@
       "id": "write_published_conf",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_pw_cost",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "write_pw_last",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "write_pw_log",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "write_pw_row",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "write_python_stubs",

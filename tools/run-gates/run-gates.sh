@@ -5374,14 +5374,19 @@ if [ -n "$LEDGER" ]; then
       # absorbed `<key>TAB<foreign>`, and a TAB inside the key breaks the ledger's nine-field grammar.
       IFS=$'\t' read -r _ lst _ _ _ lend lkey _ < "$RUNDIR/$i.leg" 2>/dev/null || { lst=ok; lkey=-; }
     fi
-    # A RETRIED LEG takes its retry's seconds and the status `retried`, whatever the retry did
-    # (TOOL-dDerivedDocket-26 S2). The seconds are the leg's cost ALONE, which is the better dispatch
-    # hint; the status says a pass needed a second attempt, and the reuse cache writes no entry for
-    # one (its first attempt was no `ok`), so it is never copied forward as a proven green.
+    # A RETRIED LEG takes its retry's seconds, and the status `retried` ONLY where the retry exited 0
+    # (TOOL-dDerivedDocket-26 S2, narrowed by TOOL-aNimbleMend-15). The seconds are the leg's cost
+    # ALONE, which is the better dispatch hint; `retried` says a pass needed a second attempt, and the
+    # reuse cache writes no entry for one (its first attempt was no `ok`), so it is never copied
+    # forward as a proven green. A retry that did NOT exit 0 writes its own status, the second field
+    # of its `<i>.retry.leg` row, and `fail` where that row does not read: the ledger holds the leg's
+    # FINAL verdict, so a reader of open reds sees a leg that timed out and then failed its retry.
     if [ -f "$WORK/$i.retry.sec" ]; then
-      lsec="$WORK/$i.retry.sec"; lst=retried
+      lsec="$WORK/$i.retry.sec"; lst=retried; lrc=""; lrst=""
       [ -n "$RUNDIR" ] && [ -f "$RUNDIR/$i.retry.leg" ] \
-        && IFS=$'\t' read -r _ _ _ _ _ lend _ < "$RUNDIR/$i.retry.leg" 2>/dev/null
+        && IFS=$'\t' read -r _ lrst _ _ _ lend _ < "$RUNDIR/$i.retry.leg" 2>/dev/null
+      { IFS= read -r lrc < "$WORK/$i.retry.rc"; } 2>/dev/null
+      [ "$lrc" = 0 ] || lst=${lrst:-fail}
     fi
     # A RED leg's row carries no key: a key on a failed row would be a true statement about the
     # inputs and a dangerous one about the verdict, for any reader that took it for a reusable one.

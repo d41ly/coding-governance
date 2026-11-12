@@ -67,6 +67,10 @@ EXCLUSIONS = ("selftest", "kit-subject", "e2e", "unattended-gate", "no-red", "un
 _NAME_LINE = re.compile(r'^    "name": (".*"),\s*$')
 _FIELD_LINE = re.compile(r'^\s*"pass_leg"\s*:')
 _FAIL_KEY = re.compile(r"^fail\.\d+$")
+# What opens the run id of a pass-leg run, which is no bar. The adapter beside this file, pass-legs.sh,
+# writes it where it pins `GATE_RUN_ID` (`PL_RUN=pass-<stamp>`). Spelled there and here; nothing
+# compares the two (TOOL-aNimbleMend-15).
+PASS_RUN_PREFIX = "pass-"
 
 
 class Refusal(Exception):
@@ -129,8 +133,11 @@ def read_pass_evidence():
 def read_red_counts(runlog: pathlib.Path, names) -> dict:
     """The bar run log's red history, or {} when the log is absent or holds no bar line.
 
-    A bar is a `p=gates`, `ev=once` line. A leg named twice on one line counts once, and `fail_more`
-    names no leg and adds nothing. `dropped` holds the failing names the manifest no longer carries.
+    A bar is a `p=gates`, `ev=once` line whose `run` value does not open PASS_RUN_PREFIX: a pass-leg
+    run writes the same line over a filtered manifest, where only a declared leg can red, so it is
+    skipped and adds to neither the bars, the reds nor the window's stamps. A leg named twice on one
+    line counts once, and `fail_more` names no leg and adds nothing. `dropped` holds the failing
+    names the manifest no longer carries.
     """
     if not runlog.is_file():
         return {}
@@ -138,7 +145,7 @@ def read_red_counts(runlog: pathlib.Path, names) -> dict:
     started, reds, dropped = [], {}, set()
     for line in runlog.read_text(encoding="utf-8", errors="replace").splitlines():
         kv = dict(f.split("=", 1) for f in line.split("\t") if "=" in f)
-        if kv.get("p") != "gates" or kv.get("ev") != "once":
+        if kv.get("p") != "gates" or kv.get("ev") != "once" or kv.get("run", "").startswith(PASS_RUN_PREFIX):
             continue
         bars += 1
         started.append(kv.get("started") or "-")
@@ -370,11 +377,15 @@ def render_summary(rows) -> str:
 
 
 def cmd_apply() -> int:
+    # Like is compared with like (TOOL-aNimbleMend-15): `text` is the manifest with LF line ends, so a
+    # CRLF checkout is no difference, and a real one is written back in the file's own line ending.
     text, _legs, rows, selected, evidence = derive_state()
-    new = render_pass_field(text, selected).encode("utf-8")
-    p = resolve_manifest_path()
-    if new != p.read_bytes():
-        p.write_bytes(new)
+    new = render_pass_field(text, selected)
+    if new != text:
+        p = resolve_manifest_path()
+        if b"\r\n" in p.read_bytes():
+            new = new.replace("\n", "\r\n")
+        p.write_bytes(new.encode("utf-8"))
     print(render_summary(rows) if evidence else "pass-legs: not derived, no evidence file")
     return 0
 
@@ -385,7 +396,7 @@ def cmd_check() -> int:
     bad = [f"`{n}` carries a pass_leg field the rule does not give it"
            for n in declared if n not in selected]
     bad += [f"`{n}` is selected and carries no pass_leg field" for n in selected if n not in declared]
-    if not bad and render_pass_field(text, selected).encode("utf-8") != resolve_manifest_path().read_bytes():
+    if not bad and render_pass_field(text, selected) != text:
         bad.append("the manifest's bytes differ from what --apply writes")
     if bad:
         for b in bad:
