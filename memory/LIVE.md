@@ -4,7 +4,7 @@
 Derived, never authored: a build leaves this file when every one of its units reaches a
 terminal status. Nothing here is edited by hand.
 
-Dormant: no record dated within 21 days of 2026-11-12, the newest record date in this tree (aLiftedCeiling).
+Dormant: no record dated within 21 days of 2026-11-13, the newest record date in this tree (aWitnessedCrash).
 
 Landed-unclosed: the build's non-terminal units whose id tracked product source cites, by drift-audit's non_terminal_specs_cited_by_product_source join. A candidate to close, not a verdict.
 
@@ -12,6 +12,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 |---|---|---|---|---|---|---|---|---|
 | [aOrientedCast](builds/aOrientedCast/README.md) | OPEN | a | 2026-10-11 | tooling+kickoff+playbook | 33 | 2026-11-10 | active | 0 |
 | [aShelvedLeg](builds/aShelvedLeg/README.md) | DEFERRED | a | 2026-11-10 | tooling | 3 | 2026-11-11 | active | 0 |
+| [aWitnessedCrash](builds/aWitnessedCrash/README.md) | OPEN | a | 2026-11-13 | tooling | 1 | 2026-11-13 | active | 0 |
 | [dBoundRoles](builds/dBoundRoles/README.md) | DEFERRED | d | 2026-10-21 | tooling | 75 | 2026-11-05 | active | 0 |
 | [dCalibratedLens](builds/dCalibratedLens/README.md) | DEFERRED | d | 2026-10-21 | tooling | 56 | 2026-11-04 | active | 0 |
 | [dClosedLoop](builds/dClosedLoop/README.md) | INPROGRESS | d | 2026-10-14 | playbook+kickoff+tooling+deployer | 39 | 2026-10-26 | active | 0 |
